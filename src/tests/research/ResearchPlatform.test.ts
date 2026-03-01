@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { ResearchPlatform } from '@/lib/research/ResearchPlatform'
 import { AnonymizationService } from '@/lib/research/services/AnonymizationService'
 import { ConsentManagementService } from '@/lib/research/services/ConsentManagementService'

@@ -14,8 +14,8 @@ services:
     container_name: pixelated-caddy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     user: root
     ports:
-      - "127.0.0.1:54321:5003"
+      - '127.0.0.1:54321:5003'
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - MEM0_API_KEY=${MEM0_API_KEY}
@@ -49,7 +49,7 @@ services:
       - OLLAMA_HOST=0.0.0.0
       - OLLAMA_ORIGINS=*
     ports:
-      - "11434:11434"
+      - '11434:11434'
     volumes:
       - ollama_data:/root/.ollama
     networks:
@@ -63,13 +63,15 @@ services:
     environment:
       - PORT=8000
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ../ai/logs:/app/logs
       - ../ai/data:/app/data
     networks:
       - web
-    command: sh -c "mkdir -p /tmp/ai_pkg && ln -sf /app /tmp/ai_pkg/ai && PYTHONPATH=/tmp/ai_pkg uv run python -m ai.main"
+    command:
+      sh -c "mkdir -p /tmp/ai_pkg && ln -sf /app /tmp/ai_pkg/ai &&
+      PYTHONPATH=/tmp/ai_pkg uv run python -m ai.main"
 
 networks:
   web:

@@ -2,8 +2,8 @@ import React, { useState, forwardRef, useEffect } from 'react'
 import { usePasswordStrength } from '../../hooks/usePasswordStrength'
 import { Eye, EyeOff } from 'lucide-react'
 
-interface PasswordInputWithStrengthProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+
+interface PasswordInputWithStrengthProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
   name: string
   error?: string
@@ -122,25 +122,19 @@ export const PasswordInputWithStrength = forwardRef<
 
     return (
       <div className={`password-input-wrapper ${wrapperClassName}`}>
-        <div className="form-group">
-          <label htmlFor={name} className="block mb-2 font-medium">
+        <div className='form-group'>
+          <label htmlFor={name} className='mb-2 block font-medium'>
             {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
+            {required && <span className='text-red-500 ml-1'>*</span>}
           </label>
 
-          <div className="relative">
+          <div className='relative'>
             <input
               ref={ref}
               id={name}
               name={name}
               type={showPassword ? 'text' : 'password'}
-              className={`
-                w-full p-3 border rounded
-                ${isShowingError ? 'border-red-500 bg-red-50' : 'border-gray-300'}
-                ${isFocused ? 'ring-2 ring-blue-300 border-blue-300' : ''}
-                ${showToggleButton ? 'pr-12' : ''}
-                ${inputClassName}
-              `}
+              className={`w-full rounded border p-3 ${isShowingError ? 'border-red-500 bg-red-50' : 'border-gray-300'} ${isFocused ? 'ring-blue-300 border-blue-300 ring-2' : ''} ${showToggleButton ? 'pr-12' : ''} ${inputClassName} `}
               value={currentValue}
               onChange={handleChange}
               onFocus={handleFocus}
@@ -153,16 +147,16 @@ export const PasswordInputWithStrength = forwardRef<
 
             {showToggleButton && (
               <button
-                type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded-sm"
+                type='button'
+                className='text-gray-500 hover:text-gray-700 focus-visible:ring-blue-300 absolute right-3 top-1/2 -translate-y-1/2 transform rounded-sm focus:outline-none focus-visible:ring-2'
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 title={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                  <EyeOff className='h-4 w-4' aria-hidden='true' />
                 ) : (
-                  <Eye className="h-4 w-4" aria-hidden="true" />
+                  <Eye className='h-4 w-4' aria-hidden='true' />
                 )}
               </button>
             )}
@@ -190,8 +184,8 @@ export const PasswordInputWithStrength = forwardRef<
             <>
               <div
                 id={`${name}-strength`}
-                className="password-strength-meter mt-2"
-                role="progressbar"
+                className='password-strength-meter mt-2'
+                role='progressbar'
                 aria-valuenow={
                   strength === 'empty'
                     ? 0
@@ -228,7 +222,7 @@ export const PasswordInputWithStrength = forwardRef<
 
               {showStrengthText && (
                 <div
-                  className="password-feedback text-xs mt-1"
+                  className='password-feedback mt-1 text-xs'
                   style={{ color }}
                   aria-live="polite"
                   aria-atomic="true"

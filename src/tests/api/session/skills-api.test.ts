@@ -1,6 +1,7 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import { POST, GET } from '../skills'
 import { Pool } from 'pg'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
+import { POST, GET } from '../skills'
 
 // Mock pg.Pool
 vi.mock('pg', () => {
@@ -30,7 +31,7 @@ describe('Session Skills API', () => {
     it('should save skill scores with batched INSERT query', async () => {
       const skillScores = {
         'Active Listening': 85,
-        'Empathy': 90,
+        Empathy: 90,
         'Technical Skills': 75,
         'Interpersonal Communication': 80,
       }
@@ -235,7 +236,7 @@ describe('Session Skills API', () => {
         rowCount: 1,
         rows: [
           {
-            skill_scores: { 'Active Listening': 85, 'Empathy': 90 },
+            skill_scores: { 'Active Listening': 85, Empathy: 90 },
           },
         ],
       })
@@ -247,7 +248,7 @@ describe('Session Skills API', () => {
       expect(responseBody.sessionId).toBe('test-session-123')
       expect(responseBody.skillScores).toEqual({
         'Active Listening': 85,
-        'Empathy': 90,
+        Empathy: 90,
       })
     })
 

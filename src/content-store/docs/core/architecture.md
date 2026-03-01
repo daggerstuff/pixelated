@@ -10,7 +10,9 @@ share: true
 
 ## Overview
 
-Pixelated is built on a modern, scalable architecture that prioritizes security, real-time communication, and AI integration. The system consists of several key components working together to provide a seamless experience.
+Pixelated is built on a modern, scalable architecture that prioritizes security,
+real-time communication, and AI integration. The system consists of several key
+components working together to provide a seamless experience.
 
 ## Core Components
 

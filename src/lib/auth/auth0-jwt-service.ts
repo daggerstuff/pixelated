@@ -5,10 +5,10 @@
 
 import { AuthenticationClient } from 'auth0'
 import * as jwt from 'jsonwebtoken'
+
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-
 import { auth0Config, isAuth0Configured } from './auth0-config'
 
 // Initialize Auth0 authentication client
@@ -19,14 +19,15 @@ let auth0Authentication: AuthenticationClient | null = null
  */
 function initializeAuth0Client() {
   if (!isAuth0Configured()) {
-    console.warn('Auth0 configuration incomplete'); return
+    console.warn('Auth0 configuration incomplete')
+    return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret
+      clientSecret: auth0Config.clientSecret,
     })
   }
 }
@@ -119,7 +120,8 @@ function currentTimestamp(): number {
 function extractRoleFromPayload(payload: any): UserRole {
   // Try to get role from app_metadata first
   if (payload['https://pixelated.empathy/app_metadata']?.roles?.length > 0) {
-    return payload['https://pixelated.empathy/app_metadata'].roles[0] as UserRole
+    return payload['https://pixelated.empathy/app_metadata']
+      .roles[0] as UserRole
   }
 
   // Try user_metadata
@@ -151,11 +153,16 @@ export async function validateToken(
 ): Promise<TokenValidationResult> {
   try {
     if (!auth0Authentication) {
-      throw new AuthenticationError('Auth0 authentication client not initialized')
+      throw new AuthenticationError(
+        'Auth0 authentication client not initialized',
+      )
     }
 
     // Decode token to check standard claims (aud, iss) before expensive UserInfo call
-    const decodedToken = jwt.decode(token, { complete: true }) as { payload: jwt.JwtPayload; header: any } | null
+    const decodedToken = jwt.decode(token, { complete: true }) as {
+      payload: jwt.JwtPayload
+      header: any
+    } | null
 
     if (!decodedToken || !decodedToken.payload) {
       throw new AuthenticationError('Malformed token')
@@ -175,7 +182,9 @@ export async function validateToken(
     // Validate Audience
     const expectedAudience = auth0Config.audience
     if (!expectedAudience || expectedAudience.trim() === '') {
-      console.warn('AUTH0_AUDIENCE not configured - audience validation skipped')
+      console.warn(
+        'AUTH0_AUDIENCE not configured - audience validation skipped',
+      )
     } else {
       const { aud } = payload
       if (!aud) {
@@ -198,7 +207,9 @@ export async function validateToken(
     // Validate token type matches expected (access tokens only for now)
     // Check this before expensive UserInfo call to fail fast
     if (tokenType === 'refresh') {
-      throw new AuthenticationError('Refresh token validation not supported with this method')
+      throw new AuthenticationError(
+        'Refresh token validation not supported with this method',
+      )
     }
 
     // Now verify with UserInfo (acts as online signature/revocation check)
@@ -224,7 +235,15 @@ export async function validateToken(
 
     // Filter out PHI/PII from userInfo before returning
     // Remove email, name, picture and other identifiable information
-    const { email: _email, name: _name, picture: _picture, nickname: _nickname, given_name: _given_name, family_name: _family_name, ...filteredUserInfo } = userInfo
+    const {
+      email: _email,
+      name: _name,
+      picture: _picture,
+      nickname: _nickname,
+      given_name: _given_name,
+      family_name: _family_name,
+      ...filteredUserInfo
+    } = userInfo
     const safePayload = { ...filteredUserInfo, ...payload }
 
     return {
@@ -259,16 +278,20 @@ export async function refreshAccessToken(
 ): Promise<TokenPair> {
   try {
     if (!auth0Authentication) {
-      throw new AuthenticationError('Auth0 authentication client not initialized')
+      throw new AuthenticationError(
+        'Auth0 authentication client not initialized',
+      )
     }
 
     // Exchange refresh token for new access token
     const tokenResponse = await auth0Authentication.refreshToken({
-      refresh_token: refreshToken
+      refresh_token: refreshToken,
     })
 
     // Get user info from new access token
-    const userResponse = await auth0Authentication.getProfile(tokenResponse.access_token)
+    const userResponse = await auth0Authentication.getProfile(
+      tokenResponse.access_token,
+    )
 
     // Extract user information
     const userId = userResponse.sub || ''
@@ -279,7 +302,9 @@ export async function refreshAccessToken(
       userId: userId,
       oldTokenId: 'unknown', // We don't have the old token ID
       newAccessTokenId: userResponse.jti || '',
-      newRefreshTokenId: tokenResponse.refresh_token ? 'present' : 'not_provided',
+      newRefreshTokenId: tokenResponse.refresh_token
+        ? 'present'
+        : 'not_provided',
     })
 
     // Update Phase 6 MCP server with refresh progress
@@ -308,12 +333,14 @@ export async function refreshAccessToken(
 export async function generateTokenPair(
   _userId: string,
   _role: UserRole,
-  _clientInfo: ClientInfo
+  _clientInfo: ClientInfo,
 ): Promise<TokenPair> {
   // This is a dummy implementation as tokens should come from Auth0
-  // In a real migration, we might use the Management API to create a token or 
+  // In a real migration, we might use the Management API to create a token or
   // simply rely on the signIn/refresh flow which already returns these.
-  throw new Error('Direct token generation not supported in Auth0-native mode. Use signIn or refresh instead.')
+  throw new Error(
+    'Direct token generation not supported in Auth0-native mode. Use signIn or refresh instead.',
+  )
 }
 
 /**
@@ -322,9 +349,11 @@ export async function generateTokenPair(
 export async function generateIdToken(
   _userId: string,
   _role: UserRole,
-  _email: string
+  _email: string,
 ): Promise<string> {
-  throw new Error('Direct ID token generation not supported in Auth0-native mode.')
+  throw new Error(
+    'Direct ID token generation not supported in Auth0-native mode.',
+  )
 }
 
 /**
@@ -387,17 +416,24 @@ export function startTokenCleanupScheduler(): void {
   if (cleanupInterval) return
 
   // Run cleanup every hour
-  cleanupInterval = setInterval(async () => {
-    try {
-      const result = await cleanupExpiredTokens()
-      console.log(`[Auth0-JWT] Cleanup completed: ${result.cleanedTokens} tokens removed`)
-    } catch (error) {
-      console.error('[Auth0-JWT] Cleanup failed:', error)
-    }
-  }, 60 * 60 * 1000)
+  cleanupInterval = setInterval(
+    async () => {
+      try {
+        const result = await cleanupExpiredTokens()
+        console.log(
+          `[Auth0-JWT] Cleanup completed: ${result.cleanedTokens} tokens removed`,
+        )
+      } catch (error) {
+        console.error('[Auth0-JWT] Cleanup failed:', error)
+      }
+    },
+    60 * 60 * 1000,
+  )
 
   // Also run immediately
-  cleanupExpiredTokens().catch(err => console.error('[Auth0-JWT] Initial cleanup failed:', err))
+  cleanupExpiredTokens().catch((err) =>
+    console.error('[Auth0-JWT] Initial cleanup failed:', err),
+  )
 }
 
 /**

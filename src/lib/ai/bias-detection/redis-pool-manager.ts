@@ -107,7 +107,7 @@ export class RedisConnectionPool {
       missRate: 0,
     }
 
-    this.initialize()
+    void this.initialize()
   }
 
   private async initialize(): Promise<void> {

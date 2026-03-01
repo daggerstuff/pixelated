@@ -356,13 +356,18 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const moveUpBtn = sectionElement.querySelector('.move-up-section')
         const moveDownBtn = sectionElement.querySelector('.move-down-section')
         const removeBtn = sectionElement.querySelector('.remove-section')
-        const titleInput = sectionElement.querySelector('.section-title') as HTMLInputElement | null
+        const titleInput = sectionElement.querySelector(
+          '.section-title',
+        ) as HTMLInputElement | null
         const descriptionInput = sectionElement.querySelector(
           '.section-description',
         ) as HTMLInputElement | null
-        const contentTextarea = sectionElement.querySelector('.section-content') as HTMLTextAreaElement | null
-        const requiredCheckbox =
-          sectionElement.querySelector('.section-required') as HTMLInputElement | null
+        const contentTextarea = sectionElement.querySelector(
+          '.section-content',
+        ) as HTMLTextAreaElement | null
+        const requiredCheckbox = sectionElement.querySelector(
+          '.section-required',
+        ) as HTMLInputElement | null
 
         moveUpBtn?.addEventListener('click', () => {
           if (index > 0) {
@@ -492,9 +497,12 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const removeBtn = placeholderElement.querySelector(
           '.remove-placeholder',
         )
-        const keyInput = placeholderElement.querySelector('.placeholder-key') as HTMLInputElement | null
-        const labelInput =
-          placeholderElement.querySelector('.placeholder-label') as HTMLInputElement | null
+        const keyInput = placeholderElement.querySelector(
+          '.placeholder-key',
+        ) as HTMLInputElement | null
+        const labelInput = placeholderElement.querySelector(
+          '.placeholder-label',
+        ) as HTMLInputElement | null
         const descriptionInput = placeholderElement.querySelector(
           '.placeholder-description',
         ) as HTMLInputElement | null

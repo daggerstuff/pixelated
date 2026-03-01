@@ -4,12 +4,13 @@
  */
 
 import { vi } from 'vitest'
-import { StreamingHandler } from './streaming-handler'
+
 import type {
   IUnifiedMetaAlignerAPI,
   UnifiedProcessingRequest,
   UnifiedProcessingResponse,
 } from '../api/unified-api'
+import { StreamingHandler } from './streaming-handler'
 
 describe('StreamingHandler', () => {
   let api: IUnifiedMetaAlignerAPI

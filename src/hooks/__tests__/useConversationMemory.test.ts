@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { renderHook, act } from '@testing-library/react'
-import { useConversationMemory } from '../useConversationMemory'
 import { describe, expect, it } from 'vitest'
+
+import { useConversationMemory } from '../useConversationMemory'
 
 describe('useConversationMemory', () => {
   it('initializes with default state', () => {
@@ -55,7 +56,7 @@ describe('useConversationMemory', () => {
     })
 
     expect(result.current.memory.progressSnapshots).toHaveLength(1)
-    expect(result.current.memory.progressSnapshots[0]!.value).toBe(25)
+    expect(result.current.memory.progressSnapshots[0].value).toBe(25)
   })
 
   it('updates skill scores', () => {

@@ -3,8 +3,9 @@
  * Manages offline detection, request queuing, and synchronization
  */
 
-import requestQueue, { type QueuedRequest } from './requestQueue'
 import { type OfflineState } from '@/hooks/useOfflineDetection'
+
+import requestQueue, { type QueuedRequest } from './requestQueue'
 
 export interface OfflineManagerConfig {
   enableRequestQueue?: boolean
@@ -135,7 +136,7 @@ class OfflineManager {
           document.visibilityState === 'visible' &&
           this.networkState?.isOnline
         ) {
-          this.sync()
+          void this.sync()
         }
       })
     }
@@ -169,7 +170,7 @@ class OfflineManager {
 
     this.syncInterval = setInterval(() => {
       if (this.networkState?.isOnline) {
-        this.sync()
+        void this.sync()
       }
     }, this.config.syncInterval)
   }

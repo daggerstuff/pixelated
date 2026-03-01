@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+
 import {
   EmbeddingRequestSchema,
   BatchEmbeddingRequestSchema,
@@ -220,4 +221,3 @@ describe('EmbeddingModelSchema', () => {
     expect(result.success).toBe(false)
   })
 })
-

@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
-import { EmotionDisplay } from '../EmotionDisplay'
+
 import { SimulatorProvider } from '../../context/SimulatorContext'
 import type { EmotionState } from '../../types'
+import { EmotionDisplay } from '../EmotionDisplay'
 
 const mockEmotionState: EmotionState = {
   valence: 0.75,

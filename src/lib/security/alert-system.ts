@@ -5,9 +5,9 @@
  * This service manages notifications, escalations, and human oversight for high-risk situations.
  */
 
+import { AIRepository } from '../db/ai/repository'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { RiskLevel, RiskAssessmentResult } from './risk-level-assessment'
-import { AIRepository } from '../db/ai/repository'
 
 const logger = createBuildSafeLogger('risk-alert-system')
 

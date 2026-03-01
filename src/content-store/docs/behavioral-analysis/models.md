@@ -12,7 +12,9 @@ toc: true
 
 ## Overview
 
-This document outlines the implementation of behavioral analysis models in therapeutic settings, focusing on machine learning approaches for detecting patterns, analyzing responses, and predicting potential crisis situations.
+This document outlines the implementation of behavioral analysis models in
+therapeutic settings, focusing on machine learning approaches for detecting
+patterns, analyzing responses, and predicting potential crisis situations.
 
 ## Core Components
 

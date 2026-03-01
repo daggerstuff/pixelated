@@ -1,6 +1,6 @@
-import { performance } from 'node:perf_hooks'
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { performance } from 'node:perf_hooks'
 
 export interface UptimeRecord {
   timestamp: string
@@ -37,11 +37,11 @@ export class UptimeMonitor {
     }
 
     this.checkInterval = setInterval(() => {
-      this.performCheck()
+      void this.performCheck()
     }, intervalMs)
 
     // Perform initial check
-    this.performCheck()
+    void this.performCheck()
   }
 
   stop() {
@@ -145,7 +145,7 @@ export class UptimeMonitor {
       downChecks,
       degradedChecks,
       averageResponseTime: Math.round(averageResponseTime * 100) / 100,
-      lastCheck: relevantRecords[relevantRecords.length - 1]!,
+      lastCheck: relevantRecords[relevantRecords.length - 1],
       period: `${periodHours}h`,
     }
   }

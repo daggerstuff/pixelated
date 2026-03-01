@@ -1,9 +1,10 @@
 import type { APIRoute, APIContext } from 'astro'
+
 import { rateLimitConfig } from '@/config/rate-limit.config'
 import { fheService } from '@/lib/fhe'
+import { EncryptionMode } from '@/lib/fhe/types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { RateLimiter } from '@/lib/middleware/rate-limit'
-import { EncryptionMode } from '@/lib/fhe/types'
 
 export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
   // Create a rate limiter instance with specific config for sensitive operations
@@ -14,7 +15,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
 
   try {
     // Apply rate limiting (stricter for key rotation)
-    const rateLimitResult = await rateLimit.check(
+    const rateLimitResult =  rateLimit.check(
       request.headers.get('x-forwarded-for') || 'anonymous',
       'key-rotation',
     )
@@ -56,7 +57,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: import.meta.env.PROD !== true,
+        enableDebug: ! import.meta.env.PROD,
       })
     }
 
@@ -82,7 +83,8 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
         success: false,
         error: 'Failed to rotate encryption keys',
         message:
-          import.meta.env.PROD !== true ? (error as Error).message : undefined,
+          !
+          import.meta.env.PROD ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

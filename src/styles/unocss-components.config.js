@@ -1,4 +1,11 @@
-import { defineConfig, presetUno, presetAttributify, presetIcons, presetTypography, presetWebFonts } from 'unocss'
+import {
+  defineConfig,
+  presetUno,
+  presetAttributify,
+  presetIcons,
+  presetTypography,
+  presetWebFonts,
+} from 'unocss'
 
 export default defineConfig({
   presets: [
@@ -6,8 +13,10 @@ export default defineConfig({
     presetAttributify(),
     presetIcons({
       collections: {
-        carbon: () => import('@iconify-json/carbon/icons.json').then(i => i.default),
-        mdi: () => import('@iconify-json/mdi/icons.json').then(i => i.default),
+        carbon: () =>
+          import('@iconify-json/carbon/icons.json').then((i) => i.default),
+        mdi: () =>
+          import('@iconify-json/mdi/icons.json').then((i) => i.default),
       },
     }),
     presetTypography(),
@@ -103,26 +112,26 @@ export default defineConfig({
       'slide-in-down': 'slideInDown 0.5s ease-out',
       'scale-in': 'scaleIn 0.3s ease-out',
       'bounce-in': 'bounceIn 0.6s ease-out',
-      'float': 'float 6s ease-in-out infinite',
+      float: 'float 6s ease-in-out infinite',
       'pulse-slow': 'pulse 3s ease-in-out infinite',
       'spin-slow': 'spin 4s linear infinite',
     },
 
     // Custom spacing scale
     spacing: {
-      '4xs': '0.125rem',    // 2px
-      '3xs': '0.25rem',     // 4px
-      '2xs': '0.5rem',      // 8px
-      'xs': '0.75rem',      // 12px
-      'sm': '1rem',         // 16px
-      'md': '1.5rem',       // 24px
-      'lg': '2rem',         // 32px
-      'xl': '3rem',         // 48px
-      '2xl': '4rem',        // 64px
-      '3xl': '6rem',        // 96px
-      '4xl': '8rem',        // 128px
-      '5xl': '12rem',       // 192px
-      '6xl': '16rem',       // 256px
+      '4xs': '0.125rem', // 2px
+      '3xs': '0.25rem', // 4px
+      '2xs': '0.5rem', // 8px
+      xs: '0.75rem', // 12px
+      sm: '1rem', // 16px
+      md: '1.5rem', // 24px
+      lg: '2rem', // 32px
+      xl: '3rem', // 48px
+      '2xl': '4rem', // 64px
+      '3xl': '6rem', // 96px
+      '4xl': '8rem', // 128px
+      '5xl': '12rem', // 192px
+      '6xl': '16rem', // 256px
     },
 
     // Custom border radius
@@ -130,11 +139,11 @@ export default defineConfig({
       '4xs': '0.125rem',
       '3xs': '0.25rem',
       '2xs': '0.375rem',
-      'xs': '0.5rem',
-      'sm': '0.625rem',
-      'md': '0.75rem',
-      'lg': '1rem',
-      'xl': '1.25rem',
+      xs: '0.5rem',
+      sm: '0.625rem',
+      md: '0.75rem',
+      lg: '1rem',
+      xl: '1.25rem',
       '2xl': '1.5rem',
       '3xl': '1.75rem',
       '4xl': '2rem',
@@ -144,13 +153,13 @@ export default defineConfig({
 
     // Custom shadows
     boxShadow: {
-      'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-      'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
-      'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-      'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+      lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+      xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
       '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-      'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
-      'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
+      inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+      glow: '0 0 20px rgba(59, 130, 246, 0.3)',
       'glow-lg': '0 0 40px rgba(59, 130, 246, 0.4)',
       'glow-primary': '0 0 20px var(--color-primary-500)',
       'glow-secondary': '0 0 20px var(--color-secondary-500)',
@@ -161,89 +170,126 @@ export default defineConfig({
   // Custom rules for our components
   rules: [
     // Gradient backgrounds
-    [/^bg-gradient-(\w+)-(\w+)$/, ([, _direction, gradient]) => {
-      const gradients = {
-        primary: 'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
-        secondary: 'linear-gradient(135deg, var(--color-secondary-600), var(--color-accent-500))',
-        accent: 'linear-gradient(135deg, var(--color-accent-500), var(--color-primary-500))',
-        dark: 'linear-gradient(135deg, var(--color-neutral-950), var(--color-neutral-800))',
-        light: 'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
-      };
+    [
+      /^bg-gradient-(\w+)-(\w+)$/,
+      ([, _direction, gradient]) => {
+        const gradients = {
+          primary:
+            'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
+          secondary:
+            'linear-gradient(135deg, var(--color-secondary-600), var(--color-accent-500))',
+          accent:
+            'linear-gradient(135deg, var(--color-accent-500), var(--color-primary-500))',
+          dark: 'linear-gradient(135deg, var(--color-neutral-950), var(--color-neutral-800))',
+          light:
+            'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
+        }
 
-// directions object removed - was unused
+        // directions object removed - was unused
 
-      return {
-        background: gradients[gradient] || `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`
-      };
-    }],
+        return {
+          background:
+            gradients[gradient] ||
+            `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`,
+        }
+      },
+    ],
 
     // Dark mode utilities
-    ['dark', {
-      '@media (prefers-color-scheme: dark)': {
-        'color-scheme': 'dark'
-      }
-    }],
+    [
+      'dark',
+      {
+        '@media (prefers-color-scheme: dark)': {
+          'color-scheme': 'dark',
+        },
+      },
+    ],
 
     // Card utilities
-    ['card', {
-      'background-color': 'var(--bg-secondary)',
-      'border': '1px solid var(--border-secondary)',
-      'border-radius': 'var(--card-radius)',
-      'padding': 'var(--card-padding)',
-      'box-shadow': 'var(--card-shadow)',
-      'transition': 'all var(--duration-normal) var(--ease-in-out)',
-    }],
+    [
+      'card',
+      {
+        'background-color': 'var(--bg-secondary)',
+        border: '1px solid var(--border-secondary)',
+        'border-radius': 'var(--card-radius)',
+        padding: 'var(--card-padding)',
+        'box-shadow': 'var(--card-shadow)',
+        transition: 'all var(--duration-normal) var(--ease-in-out)',
+      },
+    ],
 
-    ['card-hover', {
-      'box-shadow': 'var(--card-shadow-hover)',
-      'transform': 'translateY(-2px)',
-    }],
+    [
+      'card-hover',
+      {
+        'box-shadow': 'var(--card-shadow-hover)',
+        transform: 'translateY(-2px)',
+      },
+    ],
 
     // Button utilities
-    ['btn', {
-      'display': 'inline-flex',
-      'align-items': 'center',
-      'justify-content': 'center',
-      'padding': 'var(--button-padding-y) var(--button-padding-x)',
-      'border-radius': 'var(--button-radius)',
-      'font-weight': 'var(--button-font-weight)',
-      'transition': 'all var(--duration-fast) var(--ease-out)',
-      'cursor': 'pointer',
-      'border': 'none',
-      'text-decoration': 'none',
-    }],
+    [
+      'btn',
+      {
+        display: 'inline-flex',
+        'align-items': 'center',
+        'justify-content': 'center',
+        padding: 'var(--button-padding-y) var(--button-padding-x)',
+        'border-radius': 'var(--button-radius)',
+        'font-weight': 'var(--button-font-weight)',
+        transition: 'all var(--duration-fast) var(--ease-out)',
+        cursor: 'pointer',
+        border: 'none',
+        'text-decoration': 'none',
+      },
+    ],
 
-    ['btn-primary', {
-      'background-color': 'var(--color-primary-600)',
-      'color': 'white',
-    }],
+    [
+      'btn-primary',
+      {
+        'background-color': 'var(--color-primary-600)',
+        color: 'white',
+      },
+    ],
 
-    ['btn-secondary', {
-      'background-color': 'var(--bg-tertiary)',
-      'color': 'var(--text-primary)',
-      'border': '1px solid var(--border-primary)',
-    }],
+    [
+      'btn-secondary',
+      {
+        'background-color': 'var(--bg-tertiary)',
+        color: 'var(--text-primary)',
+        border: '1px solid var(--border-primary)',
+      },
+    ],
 
     // Text gradient
-    ['text-gradient', {
-      'background': 'linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500))',
-      '-webkit-background-clip': 'text',
-      '-webkit-text-fill-color': 'transparent',
-      'background-clip': 'text',
-    }],
+    [
+      'text-gradient',
+      {
+        background:
+          'linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500))',
+        '-webkit-background-clip': 'text',
+        '-webkit-text-fill-color': 'transparent',
+        'background-clip': 'text',
+      },
+    ],
 
     // Glass morphism
-    ['glass', {
-      'background': 'rgba(255, 255, 255, 0.1)',
-      'backdrop-filter': 'blur(10px)',
-      'border': '1px solid rgba(255, 255, 255, 0.2)',
-    }],
+    [
+      'glass',
+      {
+        background: 'rgba(255, 255, 255, 0.1)',
+        'backdrop-filter': 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+      },
+    ],
 
-    ['glass-dark', {
-      'background': 'rgba(0, 0, 0, 0.2)',
-      'backdrop-filter': 'blur(10px)',
-      'border': '1px solid rgba(255, 255, 255, 0.1)',
-    }],
+    [
+      'glass-dark',
+      {
+        background: 'rgba(0, 0, 0, 0.2)',
+        'backdrop-filter': 'blur(10px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+    ],
   ],
 
   // Custom shortcuts
@@ -260,10 +306,14 @@ export default defineConfig({
     'text-pretty': 'text-wrap-pretty',
 
     // Component shortcuts
-    'card-base': 'bg-secondary border border-border-secondary rounded-lg p-6 shadow-md',
-    'card-hover': 'hover:shadow-xl hover:-translate-y-1 transition-all duration-300',
-    'btn-base': 'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
-    'input-base': 'w-full px-3 py-2 border border-border-primary rounded-md bg-secondary text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+    'card-base':
+      'bg-secondary border border-border-secondary rounded-lg p-6 shadow-md',
+    'card-hover':
+      'hover:shadow-xl hover:-translate-y-1 transition-all duration-300',
+    'btn-base':
+      'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
+    'input-base':
+      'w-full px-3 py-2 border border-border-primary rounded-md bg-secondary text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
 
     // Animation shortcuts
     'animate-float': 'animate-float',
@@ -362,11 +412,11 @@ export default defineConfig({
 
   // Responsive breakpoints matching design system
   breakpoints: {
-    'xs': '475px',
-    'sm': '640px',
-    'md': '768px',
-    'lg': '1024px',
-    'xl': '1280px',
+    xs: '475px',
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
     '2xl': '1536px',
     '3xl': '1920px',
   },
@@ -376,9 +426,12 @@ export default defineConfig({
     {
       extractor: (code) => {
         // Extract class names from Astro components
-        const classMatches = code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) || []
+        const classMatches =
+          code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) || []
         return classMatches.flatMap((match) => {
-          const classes = match.replace(/class(?:Name)?=["'`]/, '').replace(/["'`]$/, '')
+          const classes = match
+            .replace(/class(?:Name)?=["'`]/, '')
+            .replace(/["'`]$/, '')
           return classes.split(/\s+/).filter(Boolean)
         })
       },
@@ -387,15 +440,8 @@ export default defineConfig({
   ],
 
   // Include all utilities
-  include: [
-    /\.astro$/,
-    /\.tsx?$/,
-    /\.jsx?$/,
-  ],
+  include: [/\.astro$/, /\.tsx?$/, /\.jsx?$/],
 
   // Exclude node_modules
-  exclude: [
-    /node_modules/,
-    /\.git/,
-  ],
+  exclude: [/node_modules/, /\.git/],
 })

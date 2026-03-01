@@ -157,7 +157,7 @@ export type TherapeuticProgress = {
   trustLevel: number // Scale 0-10, patient's trust in the therapist
   rapportScore: number // Scale 0-10, overall quality of patient-therapist relationship
   therapistPerception: // Patient's current view of the therapist's stance
-  | 'supportive'
+    | 'supportive'
     | 'neutral'
     | 'understanding'
     | 'confusing'
@@ -165,7 +165,7 @@ export type TherapeuticProgress = {
     | 'dismissive'
     | 'unhelpful'
   transferenceState: // Patient's active transference pattern towards the therapist
-  | 'none'
+    | 'none'
     | 'positive-idealizing' // Sees therapist as overly positive, perfect, or saviour-like
     | 'negative-critical' // Sees therapist as judgmental, harmful, or reminiscent of a negative figure
     | 'maternal' // Experiences therapist as a mother figure

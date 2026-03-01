@@ -8,7 +8,7 @@ export { toast }
 export function ToastContainer() {
   return (
     <ToastComponent
-      position="bottom-right"
+      position='bottom-right'
       toastOptions={{
         duration: 5000,
         style: {

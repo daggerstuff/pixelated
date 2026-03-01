@@ -3,15 +3,15 @@
  * @description This module provides format conversion utilities.
  */
 
-import { validateData } from './validation'
-import {
-  UnifiedProcessingRequestSchema,
-  UnifiedProcessingResponseSchema,
-} from './schemas'
 import type {
   UnifiedProcessingRequest,
   UnifiedProcessingResponse,
 } from '../api/unified-api'
+import {
+  UnifiedProcessingRequestSchema,
+  UnifiedProcessingResponseSchema,
+} from './schemas'
+import { validateData } from './validation'
 
 /**
  * Converts data to the UnifiedProcessingRequest format.

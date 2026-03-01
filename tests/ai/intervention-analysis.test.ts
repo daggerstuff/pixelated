@@ -1,5 +1,4 @@
 import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
-
 import { InterventionAnalysisService } from '@/lib/ai/services/intervention-analysis'
 
 // Define types for mocked responses

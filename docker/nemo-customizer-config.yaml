@@ -4,7 +4,7 @@ entity_store_url: http://nemo-entity-store:8000
 nemo_data_store_url: http://nemo-datastore:3000
 
 training:
-  workspace_dir: "/mount/workspace"
+  workspace_dir: '/mount/workspace'
 
 customizationTargets:
   overrideExistingTargets: true
@@ -34,4 +34,4 @@ customizationConfigTemplates:
           tensor_parallel_size: 1
           micro_batch_size: 1
       max_seq_length: 4096
-      prompt_template: "{prompt} {completion}"
+      prompt_template: '{prompt} {completion}'

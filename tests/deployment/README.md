@@ -1,6 +1,7 @@
 # Deployment Pipeline Testing Suite
 
-This comprehensive testing suite validates the deployment pipeline improvement implementation through both unit tests and integration tests.
+This comprehensive testing suite validates the deployment pipeline improvement
+implementation through both unit tests and integration tests.
 
 ## Overview
 
@@ -8,19 +9,27 @@ The testing suite is organized into two main categories:
 
 ### Unit Tests
 
-- **Environment Manager**: Tests Node.js and pnpm installation and verification functions
-- **Backup Manager**: Tests backup preservation, archiving, and rollback command generation
-- **Container Manager**: Tests container building, health checks, and traffic switching
+- **Environment Manager**: Tests Node.js and pnpm installation and verification
+  functions
+- **Backup Manager**: Tests backup preservation, archiving, and rollback command
+  generation
+- **Container Manager**: Tests container building, health checks, and traffic
+  switching
 - **Registry Manager**: Tests GitLab registry integration and rollback support
-- **Secure Environment Manager**: Tests environment file encryption, transfer, and secure deployment
+- **Secure Environment Manager**: Tests environment file encryption, transfer,
+  and secure deployment
 
 ### Integration Tests
 
-- **End-to-End Deployment**: Tests complete deployment scenarios from start to finish
-- **Failure Scenarios**: Tests various failure conditions and recovery mechanisms
+- **End-to-End Deployment**: Tests complete deployment scenarios from start to
+  finish
+- **Failure Scenarios**: Tests various failure conditions and recovery
+  mechanisms
 - **Rollback Procedures**: Tests rollback and recovery mechanisms
-- **Performance Timing**: Tests deployment performance requirements and timing validation
-- **Secure Environment Deployment**: Tests end-to-end secure environment variable handling
+- **Performance Timing**: Tests deployment performance requirements and timing
+  validation
+- **Secure Environment Deployment**: Tests end-to-end secure environment
+  variable handling
 
 ## Quick Start
 
@@ -150,7 +159,8 @@ Test results are saved to `/tmp/deployment-*-results/` directories with:
 
 ## Requirements Validation
 
-The test suite validates all requirements from the deployment pipeline improvement specification:
+The test suite validates all requirements from the deployment pipeline
+improvement specification:
 
 ### Requirement 1: Node.js Environment Modernization
 
@@ -236,7 +246,8 @@ chmod +x tests/deployment/integration/*.sh
 
 #### Mock Command Failures
 
-Tests use mock commands that simulate real operations. If you see unexpected failures:
+Tests use mock commands that simulate real operations. If you see unexpected
+failures:
 
 1. Check that mock commands are being created properly
 
@@ -251,10 +262,12 @@ Tests use mock commands that simulate real operations. If you see unexpected fai
 
 When adding new tests:
 
-1. **Follow Naming Conventions**: Use descriptive test names with clear pass/fail criteria
+1. **Follow Naming Conventions**: Use descriptive test names with clear
+   pass/fail criteria
 2. **Include Mock Services**: Provide realistic mocks for external dependencies
 3. **Add Performance Validation**: Include timing checks where appropriate
-4. **Document Test Purpose**: Add clear comments explaining what each test validates
+4. **Document Test Purpose**: Add clear comments explaining what each test
+   validates
 5. **Update This README**: Document new test scenarios and requirements
 
 ## Continuous Integration
@@ -276,4 +289,6 @@ test_deployment_pipeline:
     - main
 ```
 
-The test suite provides comprehensive validation of the deployment pipeline improvement, ensuring reliability, security, and performance requirements are met before production deployment.
+The test suite provides comprehensive validation of the deployment pipeline
+improvement, ensuring reliability, security, and performance requirements are
+met before production deployment.

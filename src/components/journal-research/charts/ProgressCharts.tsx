@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
-import type { Progress, ProgressMetrics } from '@/lib/api/journal-research/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+
 import ChartComponent from '@/components/analytics/ChartComponent'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import type {
+  Progress,
+  ProgressMetrics,
+} from '@/lib/api/journal-research/types'
 import { cn } from '@/lib/utils'
 
 export interface ProgressChartsProps {
@@ -138,9 +147,9 @@ export function ProgressCharts({
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type="bar"
+            type='bar'
             data={overallProgressData}
-            title="Overall Progress"
+            title='Overall Progress'
             options={{
               scales: {
                 y: {
@@ -163,9 +172,9 @@ export function ProgressCharts({
           </CardHeader>
           <CardContent>
             <ChartComponent
-              type="bar"
+              type='bar'
               data={metricsData}
-              title="Metrics Overview"
+              title='Metrics Overview'
               options={{
                 scales: {
                   y: {
@@ -178,15 +187,15 @@ export function ProgressCharts({
         </Card>
       )}
 
-      <Card className="md:col-span-2">
+      <Card className='md:col-span-2'>
         <CardHeader>
           <CardTitle>Phase Progress</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type="bar"
+            type='bar'
             data={progressData}
-            title="Progress by Phase"
+            title='Progress by Phase'
             options={{
               scales: {
                 y: {
@@ -204,4 +213,3 @@ export function ProgressCharts({
     </div>
   )
 }
-

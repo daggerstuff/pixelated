@@ -4,11 +4,12 @@
  */
 
 import { EventEmitter } from 'events'
+
+import axios, { AxiosInstance } from 'axios'
 import { Redis } from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
-import axios, { AxiosInstance } from 'axios'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   FeedConfig,
   FeedItem,
@@ -91,7 +92,7 @@ export class ExternalThreatFeedIntegrationCore
       timeout: 30000,
       headers: {
         'User-Agent': 'Pixelated-Threat-Feed-Integration/1.0',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
     })
@@ -392,9 +393,9 @@ export class ExternalThreatFeedIntegrationCore
   private getFeedProcessingInterval(updateFrequency: string): number {
     const intervals: Record<string, number> = {
       'real-time': 5 * 60 * 1000, // 5 minutes
-      'hourly': 60 * 60 * 1000, // 1 hour
-      'daily': 24 * 60 * 60 * 1000, // 24 hours
-      'weekly': 7 * 24 * 60 * 60 * 1000, // 7 days
+      hourly: 60 * 60 * 1000, // 1 hour
+      daily: 24 * 60 * 60 * 1000, // 24 hours
+      weekly: 7 * 24 * 60 * 60 * 1000, // 7 days
     }
 
     return intervals[updateFrequency] || 60 * 60 * 1000 // Default to hourly
@@ -1488,13 +1489,13 @@ class MISPFeedProcessor implements FeedProcessor {
     const typeMap: Record<string, string> = {
       'ip-dst': 'ip',
       'ip-src': 'ip',
-      'domain': 'domain',
-      'url': 'url',
-      'md5': 'file_hash',
-      'sha1': 'file_hash',
-      'sha256': 'file_hash',
-      'filename': 'file_name',
-      'email': 'email',
+      domain: 'domain',
+      url: 'url',
+      md5: 'file_hash',
+      sha1: 'file_hash',
+      sha256: 'file_hash',
+      filename: 'file_name',
+      email: 'email',
     }
 
     return typeMap[mispType] || 'unknown'
@@ -1618,14 +1619,14 @@ class OTXFeedProcessor implements FeedProcessor {
 
   private mapOTXType(otxType: string): string {
     const typeMap: Record<string, string> = {
-      'IPv4': 'ip',
-      'domain': 'domain',
-      'hostname': 'domain',
-      'URL': 'url',
+      IPv4: 'ip',
+      domain: 'domain',
+      hostname: 'domain',
+      URL: 'url',
       'FileHash-MD5': 'file_hash',
       'FileHash-SHA1': 'file_hash',
       'FileHash-SHA256': 'file_hash',
-      'email': 'email',
+      email: 'email',
     }
 
     return typeMap[otxType] || 'unknown'

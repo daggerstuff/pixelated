@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { toast } from 'react-hot-toast'
+
+import { createTogetherAIService } from '../ai/AIService'
+import { AIRepository } from '../db/ai/repository'
+import { createFHIRClient } from '../ehr/services/fhir.client'
+import type { FHIRClient } from '../ehr/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { DocumentationSystem } from './DocumentationSystem'
 import { createDocumentationSystem } from './DocumentationSystem'
-import { createTogetherAIService } from '../ai/AIService'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { toast } from 'react-hot-toast'
-import { AIRepository } from '../db/ai/repository'
-import type { FHIRClient } from '../ehr/types'
-import { createFHIRClient } from '../ehr/services/fhir.client'
-
 // Import shared types to avoid circular dependencies
 import type {
   SessionDocumentation,
@@ -222,7 +222,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
           safeSetState(setDocumentation, docWithMeta)
         }
       } catch (error: unknown) {
-        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
+        if (error instanceof Error && (error)?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'loadDocumentation')
@@ -264,7 +264,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
 
         toast.success('Documentation generated successfully')
       } catch (error: unknown) {
-        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
+        if (error instanceof Error && (error)?.name === 'AbortError') {
           return
         }
         const errorObj = handleError(error, 'generateDocumentation')
@@ -486,7 +486,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
   // Auto-load documentation on mount or sessionId change
   useEffect(() => {
     if (sessionId) {
-      loadDocumentation()
+      void loadDocumentation()
     }
   }, [sessionId, loadDocumentation])
 

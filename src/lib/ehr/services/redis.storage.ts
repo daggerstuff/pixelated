@@ -1,5 +1,6 @@
-import type { StorageAPI } from '../types'
 import { createClient } from 'redis'
+
+import type { StorageAPI } from '../types'
 
 export class RedisStorageAPI implements StorageAPI {
   private client: ReturnType<typeof createClient>

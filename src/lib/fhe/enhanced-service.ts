@@ -5,6 +5,8 @@
  * capabilities like caching, logging, and error handling.
  */
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { MockFHEService } from './mock/mock-fhe-service'
 import type {
   FHEOperation,
   FHEService,
@@ -13,8 +15,6 @@ import type {
   EncryptedData,
 } from './types'
 import { EncryptionMode } from './types'
-import { MockFHEService } from './mock/mock-fhe-service'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('enhanced-fhe')
 
@@ -70,7 +70,7 @@ export function createEnhancedFHEService(
     },
 
     // Pass through with stats tracking
-    generateKeys: async (config?: FHEConfig | undefined) => {
+    generateKeys: async (config?: FHEConfig  ) => {
       try {
         return await baseService.generateKeys(config)
       } catch (error: unknown) {
@@ -88,7 +88,7 @@ export function createEnhancedFHEService(
     async encrypt<T>(
       value: T,
       options?: unknown,
-    ): Promise<EncryptedData<unknown>> {
+    ): Promise<EncryptedData> {
       try {
         stats.encryptCount++
         return await baseService.encrypt(value, options)
@@ -101,7 +101,7 @@ export function createEnhancedFHEService(
 
     // Enhanced decrypt with stats tracking
     async decrypt<T>(
-      encryptedData: EncryptedData<unknown>,
+      encryptedData: EncryptedData,
       options?: unknown,
     ): Promise<T> {
       try {
@@ -133,7 +133,7 @@ export function createEnhancedFHEService(
       try {
         stats.operationCount++
         logger.debug('Processing encrypted data', { operation })
-        return await baseService.processEncrypted!(
+        return await baseService.processEncrypted(
           encryptedData,
           operation,
           params,

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react'
+
 import { InputValidator } from '@/middleware/security'
 
 interface BiasAnalysisResult {
@@ -113,16 +114,16 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
     (score: number, label: string) => {
       const percentage = Math.min(score * 100, 100)
       return (
-        <div className="mb-3">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-sm font-medium text-gray-700">{label}</span>
+        <div className='mb-3'>
+          <div className='mb-1 flex items-center justify-between'>
+            <span className='text-gray-700 text-sm font-medium'>{label}</span>
             <span
               className={`text-sm font-semibold ${getBiasScoreColor(score)}`}
             >
               {formatBiasScore(score)}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className='bg-gray-200 h-2 w-full rounded-full'>
             <div
               className={`h-2 rounded-full transition-all duration-300 ${
                 score < 0.2
@@ -145,10 +146,10 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
   const renderRecommendations = useCallback(() => {
     if (!result.recommendations || result.recommendations.length === 0) {
       return (
-        <div className="text-center py-8 text-gray-500">
-          <div className="text-4xl mb-2">✅</div>
+        <div className='text-gray-500 py-8 text-center'>
+          <div className='mb-2 text-4xl'>✅</div>
           <p>No specific recommendations at this time.</p>
-          <p className="text-sm mt-1">
+          <p className='mt-1 text-sm'>
             The analysis indicates low bias levels.
           </p>
         </div>
@@ -156,16 +157,16 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
     }
 
     return (
-      <div className="space-y-3">
+      <div className='space-y-3'>
         {result.recommendations.map((recommendation, index) => (
           <div
             key={index}
-            className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200"
+            className='bg-blue-50 border-blue-200 flex items-start gap-3 rounded-lg border p-3'
           >
-            <div className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
+            <div className='bg-blue-500 text-white flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold'>
               {index + 1}
             </div>
-            <p className="text-blue-800 text-sm leading-relaxed">
+            <p className='text-blue-800 text-sm leading-relaxed'>
               {InputValidator.sanitizeString(recommendation)}
             </p>
           </div>
@@ -179,13 +180,13 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
       if (!selectedLayer || selectedLayer !== layer.name) return null
 
       return (
-        <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
-          <h4 className="font-semibold text-gray-800 mb-3">
+        <div className='bg-gray-50 mt-4 rounded-lg border p-4'>
+          <h4 className='text-gray-800 mb-3 font-semibold'>
             {layer.name} Analysis Details
           </h4>
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className='grid grid-cols-2 gap-4 text-sm'>
             <div>
-              <span className="font-medium text-gray-600">Bias Score:</span>
+              <span className='text-gray-600 font-medium'>Bias Score:</span>
               <span
                 className={`ml-2 font-semibold ${getBiasScoreColor(layer.bias_score)}`}
               >
@@ -194,19 +195,19 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
             </div>
             {layer.confidence && (
               <div>
-                <span className="font-medium text-gray-600">Confidence:</span>
-                <span className="ml-2 font-semibold text-gray-800">
+                <span className='text-gray-600 font-medium'>Confidence:</span>
+                <span className='text-gray-800 ml-2 font-semibold'>
                   {formatBiasScore(layer.confidence)}
                 </span>
               </div>
             )}
           </div>
           {layer.details && (
-            <div className="mt-3">
-              <span className="font-medium text-gray-600">
+            <div className='mt-3'>
+              <span className='text-gray-600 font-medium'>
                 Additional Details:
               </span>
-              <pre className="mt-1 text-xs bg-white p-2 rounded border overflow-x-auto">
+              <pre className='bg-white mt-1 overflow-x-auto rounded border p-2 text-xs'>
                 {JSON.stringify(layer.details, null, 2)}
               </pre>
             </div>
@@ -220,42 +221,42 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
   return (
     <div className={`bias-analysis-results ${className}`}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
+      <div className='bg-white border-gray-200 border-b px-6 py-4'>
+        <div className='flex items-center justify-between'>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className='text-gray-900 text-2xl font-bold'>
               Bias Analysis Results
             </h1>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className='text-gray-600 mt-1 text-sm'>
               Analysis completed on{' '}
               {new Date(result.createdAt).toLocaleString()}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className='flex items-center gap-3'>
             {onExport && (
-              <div className="flex gap-2">
+              <div className='flex gap-2'>
                 <button
                   onClick={() => handleExport('json')}
-                  className="btn-secondary text-xs"
+                  className='btn-secondary text-xs'
                 >
                   Export JSON
                 </button>
                 <button
                   onClick={() => handleExport('csv')}
-                  className="btn-secondary text-xs"
+                  className='btn-secondary text-xs'
                 >
                   Export CSV
                 </button>
                 <button
                   onClick={() => handleExport('pdf')}
-                  className="btn-secondary text-xs"
+                  className='btn-secondary text-xs'
                 >
                   Export PDF
                 </button>
               </div>
             )}
             {onNewAnalysis && (
-              <button onClick={onNewAnalysis} className="btn-primary">
+              <button onClick={onNewAnalysis} className='btn-primary'>
                 New Analysis
               </button>
             )}
@@ -263,15 +264,15 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className='space-y-6 p-6'>
         {/* Overview Section */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className='bg-white border-gray-200 overflow-hidden rounded-lg border'>
           <button
             onClick={() => toggleSection('overview')}
-            className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
+            className='bg-gray-50 border-gray-200 hover:bg-gray-100 w-full border-b px-6 py-4 text-left transition-colors'
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className='flex items-center justify-between'>
+              <h2 className='text-gray-900 text-lg font-semibold'>
                 Analysis Overview
               </h2>
               <div
@@ -283,75 +284,75 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
           </button>
 
           {expandedSections.has('overview') && (
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className='p-6'>
+              <div className='mb-6 grid grid-cols-1 gap-6 md:grid-cols-3'>
                 {/* Overall Bias Score */}
-                <div className="text-center">
+                <div className='text-center'>
                   <div
-                    className={`inline-flex items-center px-4 py-2 rounded-full border text-sm font-semibold ${getAlertLevelColor(result.alertLevel)}`}
+                    className={`inline-flex items-center rounded-full border px-4 py-2 text-sm font-semibold ${getAlertLevelColor(result.alertLevel)}`}
                   >
                     {result.alertLevel.toUpperCase()} BIAS LEVEL
                   </div>
-                  <div className="mt-3">
+                  <div className='mt-3'>
                     <div
                       className={`text-3xl font-bold ${getBiasScoreColor(result.overallBiasScore)}`}
                     >
                       {formatBiasScore(result.overallBiasScore)}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">
+                    <div className='text-gray-600 mt-1 text-sm'>
                       Overall Bias Score
                     </div>
                   </div>
                 </div>
 
                 {/* Confidence */}
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600">
+                <div className='text-center'>
+                  <div className='text-blue-600 text-3xl font-bold'>
                     {formatBiasScore(result.confidence)}
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className='text-gray-600 mt-1 text-sm'>
                     Analysis Confidence
                   </div>
                 </div>
 
                 {/* Processing Time */}
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600">
+                <div className='text-center'>
+                  <div className='text-purple-600 text-3xl font-bold'>
                     {result.processingTimeMs}ms
                   </div>
-                  <div className="text-sm text-gray-600 mt-1">
+                  <div className='text-gray-600 mt-1 text-sm'>
                     Processing Time
                   </div>
                 </div>
               </div>
 
               {/* Demographics Summary */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-800 mb-3">
+              <div className='bg-gray-50 rounded-lg p-4'>
+                <h3 className='text-gray-800 mb-3 font-semibold'>
                   Patient Demographics
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                   <div>
-                    <span className="font-medium text-gray-600">Gender:</span>
-                    <span className="ml-2 capitalize">
+                    <span className='text-gray-600 font-medium'>Gender:</span>
+                    <span className='ml-2 capitalize'>
                       {result.demographics.gender}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">
+                    <span className='text-gray-600 font-medium'>
                       Ethnicity:
                     </span>
-                    <span className="ml-2 capitalize">
+                    <span className='ml-2 capitalize'>
                       {result.demographics.ethnicity}
                     </span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">Age:</span>
-                    <span className="ml-2">{result.demographics.age}</span>
+                    <span className='text-gray-600 font-medium'>Age:</span>
+                    <span className='ml-2'>{result.demographics.age}</span>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">Language:</span>
-                    <span className="ml-2 uppercase">
+                    <span className='text-gray-600 font-medium'>Language:</span>
+                    <span className='ml-2 uppercase'>
                       {result.demographics.primaryLanguage}
                     </span>
                   </div>
@@ -362,13 +363,13 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         </div>
 
         {/* Layer Analysis Section */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className='bg-white border-gray-200 overflow-hidden rounded-lg border'>
           <button
             onClick={() => toggleSection('layers')}
-            className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
+            className='bg-gray-50 border-gray-200 hover:bg-gray-100 w-full border-b px-6 py-4 text-left transition-colors'
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className='flex items-center justify-between'>
+              <h2 className='text-gray-900 text-lg font-semibold'>
                 Layer-by-Layer Analysis
               </h2>
               <div
@@ -380,15 +381,15 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
           </button>
 
           {expandedSections.has('layers') && (
-            <div className="p-6">
-              <div className="space-y-4">
+            <div className='p-6'>
+              <div className='space-y-4'>
                 {layerResults.map((layer, _index) => (
                   <div
                     key={layer.name}
-                    className="border border-gray-200 rounded-lg p-4"
+                    className='border-gray-200 rounded-lg border p-4'
                   >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold text-gray-800 capitalize">
+                    <div className='mb-3 flex items-center justify-between'>
+                      <h3 className='text-gray-800 font-semibold capitalize'>
                         {layer.name.replace(/_/g, ' ')}
                       </h3>
                       <button
@@ -397,7 +398,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                             selectedLayer === layer.name ? null : layer.name,
                           )
                         }
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className='text-blue-600 hover:text-blue-800 text-sm font-medium'
                       >
                         {selectedLayer === layer.name
                           ? 'Hide Details'
@@ -414,13 +415,13 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         </div>
 
         {/* Recommendations Section */}
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className='bg-white border-gray-200 overflow-hidden rounded-lg border'>
           <button
             onClick={() => toggleSection('recommendations')}
-            className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
+            className='bg-gray-50 border-gray-200 hover:bg-gray-100 w-full border-b px-6 py-4 text-left transition-colors'
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className='flex items-center justify-between'>
+              <h2 className='text-gray-900 text-lg font-semibold'>
                 Recommendations & Insights
               </h2>
               <div
@@ -432,19 +433,19 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
           </button>
 
           {expandedSections.has('recommendations') && (
-            <div className="p-6">{renderRecommendations()}</div>
+            <div className='p-6'>{renderRecommendations()}</div>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 border-t border-gray-200">
+        <div className='border-gray-200 flex flex-col justify-center gap-4 border-t pt-6 sm:flex-row'>
           {onViewHistory && (
-            <button onClick={onViewHistory} className="btn-secondary">
+            <button onClick={onViewHistory} className='btn-secondary'>
               View Analysis History
             </button>
           )}
           {onNewAnalysis && (
-            <button onClick={onNewAnalysis} className="btn-primary">
+            <button onClick={onNewAnalysis} className='btn-primary'>
               Start New Analysis
             </button>
           )}

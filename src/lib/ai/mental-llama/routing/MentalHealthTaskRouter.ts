@@ -51,7 +51,7 @@ const ANXIETY_KEYWORDS = [
 ]
 
 export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
-  constructor(private llmInvoker: LLMInvoker) { }
+  constructor(private llmInvoker: LLMInvoker) {}
 
   async route(input: RoutingInput): Promise<RoutingDecision> {
     const text = input.text.toLowerCase()
@@ -190,19 +190,19 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
   private mapLlmCategoryToAnalyzer(category: string): string {
     const normalized = category.trim().toLowerCase()
     const map: Record<string, string> = {
-      'suicidal': 'crisis',
+      suicidal: 'crisis',
       'self-harm': 'crisis',
-      'suicide': 'crisis',
-      'crisis': 'crisis',
-      'depression': 'depression',
-      'depressive': 'depression',
-      'anxiety': 'anxiety',
-      'panic': 'anxiety',
-      'worry': 'anxiety',
-      'general': 'general_mental_health',
-      'general_mental_health': 'general_mental_health',
-      'unknown': 'unknown',
-      'none': 'none',
+      suicide: 'crisis',
+      crisis: 'crisis',
+      depression: 'depression',
+      depressive: 'depression',
+      anxiety: 'anxiety',
+      panic: 'anxiety',
+      worry: 'anxiety',
+      general: 'general_mental_health',
+      general_mental_health: 'general_mental_health',
+      unknown: 'unknown',
+      none: 'none',
     }
     return map[normalized] ?? 'general_mental_health'
   }

@@ -14,14 +14,14 @@
  * The optimizer includes both static presets and dynamic optimization capabilities.
  */
 
-import { FHEOperation } from './types'
-import type { FHEPerformanceMetrics, FHEOperationContext } from './types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import {
   SealSchemeType,
   type SealEncryptionParamsOptions,
   SEAL_PARAMETER_PRESETS,
 } from './seal-types'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { FHEOperation } from './types'
+import type { FHEPerformanceMetrics, FHEOperationContext } from './types'
 
 // Define specific return types for analyzePerformanceHistory
 interface OperationStat {

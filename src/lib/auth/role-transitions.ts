@@ -4,9 +4,10 @@
  */
 
 import { nanoid } from 'nanoid'
+
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { AuthenticationError } from './jwt-service'
 import {
   UserRole,
@@ -14,8 +15,8 @@ import {
   validateRoleTransition,
   canAssignRole,
 } from './roles'
-import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
 import type { SessionData } from './session-management'
+import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
 
 // Configuration
 const ROLE_TRANSITION_CONFIG = {
@@ -64,12 +65,12 @@ export interface RoleTransitionAuditLog {
   requestId: string
   userId: string
   action:
-  | 'requested'
-  | 'approved'
-  | 'rejected'
-  | 'cancelled'
-  | 'expired'
-  | 'completed'
+    | 'requested'
+    | 'approved'
+    | 'rejected'
+    | 'cancelled'
+    | 'expired'
+    | 'completed'
   roleFrom: UserRole
   roleTo: UserRole
   actorId: string
@@ -223,8 +224,7 @@ export async function requestRoleTransition(
       error: error instanceof Error ? error.message : 'Unknown error',
       requestedRole,
       requestedBy,
-    },
-    )
+    })
 
     throw error instanceof AuthenticationError
       ? error
@@ -505,11 +505,14 @@ export async function cancelRoleTransitionRequest(
       'role_transition_cancelled',
     )
   } catch (error) {
-    await logSecurityEvent(SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED, {
-      userId: userId,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requestId,
-    })
+    await logSecurityEvent(
+      SecurityEventType.ROLE_TRANSITION_CANCELLATION_FAILED,
+      {
+        userId: userId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        requestId,
+      },
+    )
 
     throw error instanceof AuthenticationError
       ? error
@@ -762,8 +765,7 @@ async function logRoleTransitionAudit(
       roleTo: auditLog.roleTo,
       actorId: auditLog.actorId,
       actorRole: auditLog.actorRole,
-    },
-    )
+    })
   } catch (error) {
     console.error('Error logging role transition audit:', error)
   }

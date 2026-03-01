@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro'
 export const prerender = false
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
-import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('analytics-charts-api')
 

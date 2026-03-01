@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { KVStore } from '@/lib/db/KVStore'
+
 import {
   PatientModelService,
   type ModelIdentifier,
@@ -8,6 +8,7 @@ import type {
   CognitiveModel,
   PatientResponseStyleConfig,
 } from '@/lib/ai/types/CognitiveModel'
+import { KVStore } from '@/lib/db/KVStore'
 
 export function usePatientModel() {
   const [isLoading, setIsLoading] = useState(true)
@@ -52,7 +53,7 @@ export function usePatientModel() {
       }
     }
 
-    loadModels()
+    void loadModels()
   }, [currentModelId])
 
   // Load the selected model when currentModelId changes
@@ -76,14 +77,14 @@ export function usePatientModel() {
       } catch (err: unknown) {
         console.error(`Failed to load patient model ${currentModelId}:`, err)
         setError(
-          `Error loading patient model: ${err instanceof Error ? (err as Error)?.message || String(err) : String(err)}`,
+          `Error loading patient model: ${err instanceof Error ? (err)?.message || String(err) : String(err)}`,
         )
       } finally {
         setIsLoading(false)
       }
     }
 
-    loadModel()
+    void loadModel()
   }, [patientService, currentModelId])
 
   // Select a different patient model

@@ -1,3 +1,5 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { generateId } from '../../utils/ids'
 import type {
   BaaTemplate,
   BaaTemplateSection,
@@ -5,8 +7,6 @@ import type {
   BusinessAssociateType,
   ServiceCategory,
 } from './types'
-import { generateId } from '../../utils/ids'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')

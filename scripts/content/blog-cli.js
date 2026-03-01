@@ -7,9 +7,9 @@
  * A lightweight command-line interface for the blog publishing system
  */
 
+import { spawnSync } from 'child_process'
 // Import dependencies
 import { createInterface } from 'readline'
-import { spawnSync } from 'child_process'
 import { fileURLToPath } from 'url'
 
 // ANSI colors for pretty output
@@ -376,7 +376,7 @@ rl.on('close', () => {
 
 // Start the CLI only when executed directly (prevents side-effects on import)
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  start()
+  void start()
 }
 
 // Export helpers for testing

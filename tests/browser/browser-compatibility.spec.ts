@@ -5,8 +5,9 @@
  * using Playwright's browser automation capabilities.
  */
 
-import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
+
+import { test, expect } from '@playwright/test'
 
 // Test URLs to check in different browsers
 const TEST_URLS = [

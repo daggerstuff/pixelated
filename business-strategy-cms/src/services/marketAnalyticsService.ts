@@ -1,8 +1,8 @@
-import { Logger } from '../utils/logger'
 import {
   MarketPenetration,
   MarketOpportunity,
 } from '../types/business-intelligence'
+import { Logger } from '../utils/logger'
 // import { DatabaseService } from './databaseService'
 
 export class MarketAnalyticsService {
@@ -97,10 +97,7 @@ export class MarketAnalyticsService {
     resourceRequirements: ResourceRequirements
     riskAssessment: RiskAssessment
   }> {
-    await this.analyzeTargetMarkets(
-      currentMarket,
-      targetMarkets,
-    )
+    await this.analyzeTargetMarkets(currentMarket, targetMarkets)
 
     const phases: ExpansionPhase[] = []
     let totalTimeline = 0
@@ -329,7 +326,7 @@ export class MarketAnalyticsService {
     // Mock implementation - replace with actual market research APIs
     const mockData: Record<string, { current: number; total: number }> = {
       'healthcare-institutions': { current: 150, total: 2000 },
-      'universities': { current: 75, total: 500 },
+      universities: { current: 75, total: 500 },
       'private-practices': { current: 300, total: 8000 },
       'corporate-wellness': { current: 50, total: 1000 },
       'government-agencies': { current: 25, total: 200 },

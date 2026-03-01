@@ -1,16 +1,16 @@
+import css from '@eslint/css'
 import js from '@eslint/js'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
-import pluginReact from 'eslint-plugin-react'
-import pluginReactHooks from 'eslint-plugin-react-hooks'
-import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import pluginNode from 'eslint-plugin-node'
-import pluginVitest from 'eslint-plugin-vitest'
-import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
 import json from '@eslint/json'
 import markdown from '@eslint/markdown'
-import css from '@eslint/css'
 import pluginAstro from 'eslint-plugin-astro'
+import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
+import pluginNode from 'eslint-plugin-node'
+import pluginReact from 'eslint-plugin-react'
+import pluginReactHooks from 'eslint-plugin-react-hooks'
+import pluginVitest from 'eslint-plugin-vitest'
+import pluginVitestGlobals from 'eslint-plugin-vitest-globals'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   // Base JavaScript recommendations
@@ -165,7 +165,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -176,7 +176,7 @@ export default tseslint.config(
   {
     files: ['**/*.{jsx,tsx}'],
     plugins: {
-      'react': pluginReact,
+      react: pluginReact,
       'react-hooks': pluginReactHooks,
     },
     settings: {
@@ -258,7 +258,7 @@ export default tseslint.config(
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      'vitest': pluginVitest,
+      vitest: pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -289,7 +289,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },

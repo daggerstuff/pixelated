@@ -1,6 +1,7 @@
+import crypto from 'crypto'
+
 import { getLogger } from '@/lib/logging'
 import { ResearchDataPoint } from '@/lib/research/types/research-types'
-import crypto from 'crypto'
 
 const logger = getLogger({ prefix: 'AnonymizationService' })
 

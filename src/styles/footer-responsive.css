@@ -342,8 +342,14 @@
 /* Portrait mobile optimizations */
 @media (max-width: 767px) and (orientation: portrait) {
   .footer-container {
-    padding-top: max(var(--space-12), env(safe-area-inset-top, var(--space-12)));
-    padding-bottom: max(var(--space-6), env(safe-area-inset-bottom, var(--space-6)));
+    padding-top: max(
+      var(--space-12),
+      env(safe-area-inset-top, var(--space-12))
+    );
+    padding-bottom: max(
+      var(--space-6),
+      env(safe-area-inset-bottom, var(--space-6))
+    );
   }
 
   .brand-header {
@@ -396,8 +402,14 @@
 /* iOS-specific fixes */
 @supports (-webkit-touch-callout: none) {
   .footer-container {
-    padding-left: max(var(--space-4), env(safe-area-inset-left, var(--space-4)));
-    padding-right: max(var(--space-4), env(safe-area-inset-right, var(--space-4)));
+    padding-left: max(
+      var(--space-4),
+      env(safe-area-inset-left, var(--space-4))
+    );
+    padding-right: max(
+      var(--space-4),
+      env(safe-area-inset-right, var(--space-4))
+    );
   }
 
   .social-link {

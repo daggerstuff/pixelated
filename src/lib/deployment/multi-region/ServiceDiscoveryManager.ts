@@ -1,12 +1,14 @@
-import { Logger } from '../../utils/logger'
-import { ConfigurationManager } from './ConfigurationManager'
-import { HealthMonitor } from './HealthMonitor'
 import { EventEmitter } from 'events'
+
 import { Consul, ConsulOptions } from 'consul'
 import { Etcd3 } from 'etcd3'
-import { ZooKeeperClient } from 'zookeeper'
-import { DNSClient } from './DNSClient'
 import { v4 as uuidv4 } from 'uuid'
+import { ZooKeeperClient } from 'zookeeper'
+
+import { Logger } from '../../utils/logger'
+import { ConfigurationManager } from './ConfigurationManager'
+import { DNSClient } from './DNSClient'
+import { HealthMonitor } from './HealthMonitor'
 
 /**
  * Service Discovery Manager
@@ -1147,7 +1149,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
       }
 
       // Start watching
-      watchLoop()
+      void watchLoop()
 
       // Return stop function
       return () => {

@@ -1,6 +1,7 @@
 // src/hooks/useSessionProgressMilestones.ts
 
 import { useState } from 'react'
+
 import type { SessionProgressMetrics } from '@/types/dashboard'
 
 export interface ProgressMilestoneState {
@@ -9,8 +10,7 @@ export interface ProgressMilestoneState {
   progressMetrics: SessionProgressMetrics
 }
 
-export interface UseSessionProgressMilestonesResult
-  extends ProgressMilestoneState {
+export interface UseSessionProgressMilestonesResult extends ProgressMilestoneState {
   setProgress: (value: number) => void
   addProgressSnapshot: (value: number) => void
   updateSkillScore: (skill: string, score: number) => void

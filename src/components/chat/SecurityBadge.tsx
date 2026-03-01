@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+
 import { IconShieldLock } from './icons'
 
 interface SecurityBadgeProps {
@@ -27,7 +28,7 @@ export function SecurityBadge({
             : 'border-purple-700 bg-purple-900/30 text-purple-400',
       )}
     >
-      <IconShieldLock className="h-3 w-3" />
+      <IconShieldLock className='h-3 w-3' />
       <span>
         {securityLevel === 'maximum'
           ? fheInitialized

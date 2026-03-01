@@ -1,7 +1,12 @@
 // import type { APIRoute } from 'astro'
 import fs from 'node:fs'
 
-import { safeJoin, ALLOWED_DIRECTORIES, validatePath, sanitizeFilename } from '../../../utils/path-security'
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  validatePath,
+  sanitizeFilename,
+} from '../../../utils/path-security'
 
 /**
  * API endpoint to fetch browser compatibility data from reports

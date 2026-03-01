@@ -1,6 +1,7 @@
 import type { APIContext } from 'astro'
-import { ContactService } from '../../lib/services/contact/ContactService'
+
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
+import { ContactService } from '../../lib/services/contact/ContactService'
 
 // Mock ContactService
 class ContactService {
@@ -83,7 +84,7 @@ export const POST = async ({ request }: APIContext) => {
       if (
         !formData[field] ||
         typeof formData[field] !== 'string' ||
-        !(formData[field] as string).trim()
+        !(formData[field]).trim()
       ) {
         return new Response(
           JSON.stringify({
@@ -139,7 +140,7 @@ export const POST = async ({ request }: APIContext) => {
 
     logger.error('Contact form submission failed with unexpected error', {
       error: error instanceof Error ? String(error) : 'Unknown error',
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
       userAgent: request.headers.get('user-agent'),
       ip: getClientIP(request),
       duration: `${duration}ms`,

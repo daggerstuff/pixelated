@@ -73,9 +73,8 @@ const serializedMessages = JSON.stringify(messages)
 
     try {
       // Dynamically import the lazy-loaded React component only when needed
-      const { default: LazyAnalyticsDashboard } = await import(
-        './LazyAnalyticsDashboard'
-      )
+      const { default: LazyAnalyticsDashboard } =
+        await import('./LazyAnalyticsDashboard')
 
       // Parse message data
       const messages = parseMessageData(messagesData)

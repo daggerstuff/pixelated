@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { WebSocketClient } from '../services/websocketClient.js'
+
 import { DocumentChangeEvent } from '../services/socketService.js'
+import { WebSocketClient } from '../services/websocketClient.js'
 
 interface UseCollaborationProps {
   token: string
@@ -99,7 +100,7 @@ export function useCollaboration({
     })
 
     socket.connect()
-    socket.joinDocument(documentId)
+    void socket.joinDocument(documentId)
 
     return () => {
       socket.disconnect()

@@ -1,10 +1,10 @@
 import type { FC } from 'react'
 import React from 'react'
-import { usePersistentState } from '@/hooks/usePersistentState'
 
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
+import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
 import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
+import { usePersistentState } from '@/hooks/usePersistentState'
 
 interface InstitutionMetrics {
   totalPatients: number
@@ -41,19 +41,19 @@ export const AdminDashboard: FC = () => {
     'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
   >({
     key: 'admin_dashboard_view',
-    defaultValue: 'overview'
+    defaultValue: 'overview',
   })
   const [timeRange, setTimeRange] = usePersistentState<
     'week' | 'month' | 'quarter' | 'year'
   >({
     key: 'admin_dashboard_timerange',
-    defaultValue: 'month'
+    defaultValue: 'month',
   })
   const [selectedTherapists, setSelectedTherapists] = usePersistentState<
     string[]
   >({
     key: 'admin_selected_therapists',
-    defaultValue: []
+    defaultValue: [],
   })
 
   // Mock data - in real app would come from API
@@ -102,41 +102,41 @@ export const AdminDashboard: FC = () => {
   }
 
   return (
-    <ResponsiveContainer size="full">
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveContainer size='full'>
+      <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
+        <header className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm'>
+          <div className='px-6 py-4'>
+            <div className='flex items-center justify-between'>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className='text-gray-900 dark:text-white text-2xl font-bold'>
                   Healthcare Administration
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className='text-gray-600 dark:text-gray-400 mt-1 text-sm'>
                   Institutional Overview • {institutionMetrics.totalTherapists}{' '}
                   therapists • {institutionMetrics.totalPatients} patients
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
-                <OfflineIndicator position="inline" />
+              <div className='flex items-center gap-4'>
+                <OfflineIndicator position='inline' />
                 <select
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+                  className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                  <option value="year">This Year</option>
+                  <option value='week'>This Week</option>
+                  <option value='month'>This Month</option>
+                  <option value='quarter'>This Quarter</option>
+                  <option value='year'>This Year</option>
                 </select>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="px-6">
-            <nav className="flex space-x-8">
+          <div className='px-6'>
+            <nav className='flex space-x-8'>
               {[
                 { id: 'overview', label: 'Overview', icon: '📊' },
                 { id: 'therapists', label: 'Therapists', icon: '👨‍⚕️' },
@@ -147,7 +147,7 @@ export const AdminDashboard: FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
-                  className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -162,7 +162,7 @@ export const AdminDashboard: FC = () => {
         </header>
 
         {/* Main Content */}
-        <main className="p-6">
+        <main className='p-6'>
           {dashboardView === 'overview' && (
             <OverviewTab
               metrics={institutionMetrics}
@@ -221,67 +221,73 @@ const OverviewTab: FC<{
   onTherapistSelect: (therapistId: string) => void
   selectedTherapists: string[]
   timeRange: 'week' | 'month' | 'quarter' | 'year'
-}> = ({ metrics, therapists, onTherapistSelect, selectedTherapists, timeRange }) => {
+}> = ({
+  metrics,
+  therapists,
+  onTherapistSelect,
+  selectedTherapists,
+  timeRange,
+}) => {
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Total Patients
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.totalPatients.toLocaleString()}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400">👥</span>
+              <div className='bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-blue-600 dark:text-blue-400'>👥</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               {metrics.activePatients} active patients
             </p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Therapists
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.totalTherapists}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 dark:text-green-400">👨‍⚕️</span>
+              <div className='bg-green-100 dark:bg-green-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-green-600 dark:text-green-400'>👨‍⚕️</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Licensed professionals</p>
+            <p className='text-gray-500 mt-2 text-sm'>Licensed professionals</p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Avg Sessions
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.avgSessionsPerPatient}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 dark:text-purple-400">📈</span>
+              <div className='bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-purple-600 dark:text-purple-400'>📈</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               Per patient this{' '}
               {timeRange === 'week'
                 ? 'week'
@@ -293,21 +299,21 @@ const OverviewTab: FC<{
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Compliance Score
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.complianceScore}%
                 </p>
               </div>
-              <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-yellow-600 dark:text-yellow-400">📋</span>
+              <div className='bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-yellow-600 dark:text-yellow-400'>📋</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               HIPAA & security compliance
             </p>
           </div>
@@ -316,33 +322,33 @@ const OverviewTab: FC<{
 
       {/* Therapist Performance Overview */}
       <SlideUp>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>
             Therapist Performance Overview
           </h3>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {therapists.map((therapist) => (
               <div
                 key={therapist.id}
-                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                className='bg-gray-50 dark:bg-gray-800/50 flex items-center gap-4 rounded-lg p-4'
               >
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={selectedTherapists.includes(therapist.id)}
                   onChange={() => onTherapistSelect(therapist.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className='text-blue-600 h-4 w-4 rounded'
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-gray-900 dark:text-white">
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <p className='text-gray-900 dark:text-white font-medium'>
                       {therapist.name}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className='flex items-center gap-2'>
+                      <span className='text-gray-600 dark:text-gray-400 text-sm'>
                         ⭐ {therapist.avgSessionRating}/5.0
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
                           therapist.completionRate >= 95
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                             : therapist.completionRate >= 90
@@ -354,37 +360,37 @@ const OverviewTab: FC<{
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Patients:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {therapist.patientsCount}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         High Risk:
                       </span>
-                      <span className="ml-2 font-medium text-red-600">
+                      <span className='text-red-600 ml-2 font-medium'>
                         {therapist.riskLevelDistribution.high +
                           therapist.riskLevelDistribution.critical}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Success Rate:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {Math.floor(Math.random() * 20) + 75}%
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Last Active:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {Math.floor(Math.random() * 3) + 1}h ago
                       </span>
                     </div>
@@ -397,35 +403,35 @@ const OverviewTab: FC<{
       </SlideUp>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>⚡</span>
               Quick Actions
             </h3>
-            <div className="space-y-3">
-              <button className="w-full text-left p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
-                <p className="font-medium text-blue-900 dark:text-blue-100">
+            <div className='space-y-3'>
+              <button className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 w-full rounded-lg border p-3 text-left transition-colors'>
+                <p className='text-blue-900 dark:text-blue-100 font-medium'>
                   Generate Reports
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
+                <p className='text-blue-700 dark:text-blue-200 text-sm'>
                   Create institutional reports
                 </p>
               </button>
-              <button className="w-full text-left p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors">
-                <p className="font-medium text-green-900 dark:text-green-100">
+              <button className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 w-full rounded-lg border p-3 text-left transition-colors'>
+                <p className='text-green-900 dark:text-green-100 font-medium'>
                   Resource Allocation
                 </p>
-                <p className="text-sm text-green-700 dark:text-green-200">
+                <p className='text-green-700 dark:text-green-200 text-sm'>
                   Manage therapist assignments
                 </p>
               </button>
-              <button className="w-full text-left p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors">
-                <p className="font-medium text-purple-900 dark:text-purple-100">
+              <button className='bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 w-full rounded-lg border p-3 text-left transition-colors'>
+                <p className='text-purple-900 dark:text-purple-100 font-medium'>
                   System Settings
                 </p>
-                <p className="text-sm text-purple-700 dark:text-purple-200">
+                <p className='text-purple-700 dark:text-purple-200 text-sm'>
                   Configure platform settings
                 </p>
               </button>
@@ -434,68 +440,68 @@ const OverviewTab: FC<{
         </SlideUp>
 
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>📊</span>
               Performance Metrics
             </h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <span className='text-gray-600 dark:text-gray-400 text-sm'>
                   Patient Satisfaction
                 </span>
-                <span className="font-medium">4.3/5.0</span>
+                <span className='font-medium'>4.3/5.0</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+              <div className='flex items-center justify-between'>
+                <span className='text-gray-600 dark:text-gray-400 text-sm'>
                   Treatment Success Rate
                 </span>
-                <span className="font-medium">78%</span>
+                <span className='font-medium'>78%</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+              <div className='flex items-center justify-between'>
+                <span className='text-gray-600 dark:text-gray-400 text-sm'>
                   Average Treatment Duration
                 </span>
-                <span className="font-medium">12 weeks</span>
+                <span className='font-medium'>12 weeks</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+              <div className='flex items-center justify-between'>
+                <span className='text-gray-600 dark:text-gray-400 text-sm'>
                   Readmission Rate
                 </span>
-                <span className="font-medium">8%</span>
+                <span className='font-medium'>8%</span>
               </div>
             </div>
           </div>
         </SlideUp>
 
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>🚨</span>
               Alerts & Notifications
             </h3>
-            <div className="space-y-3">
-              <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
-                <p className="font-medium text-red-900 dark:text-red-100">
+            <div className='space-y-3'>
+              <div className='bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 rounded-lg border p-3'>
+                <p className='text-red-900 dark:text-red-100 font-medium'>
                   High Risk Patients
                 </p>
-                <p className="text-sm text-red-700 dark:text-red-200">
+                <p className='text-red-700 dark:text-red-200 text-sm'>
                   3 patients require immediate attention
                 </p>
               </div>
-              <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                <p className="font-medium text-yellow-900 dark:text-yellow-100">
+              <div className='bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 rounded-lg border p-3'>
+                <p className='text-yellow-900 dark:text-yellow-100 font-medium'>
                   Compliance Review
                 </p>
-                <p className="text-sm text-yellow-700 dark:text-yellow-200">
+                <p className='text-yellow-700 dark:text-yellow-200 text-sm'>
                   Quarterly audit due in 2 weeks
                 </p>
               </div>
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="font-medium text-blue-900 dark:text-blue-100">
+              <div className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 rounded-lg border p-3'>
+                <p className='text-blue-900 dark:text-blue-100 font-medium'>
                   System Update
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
+                <p className='text-blue-700 dark:text-blue-200 text-sm'>
                   New features available
                 </p>
               </div>
@@ -516,28 +522,28 @@ const TherapistsTab: FC<{
   selectedTherapists: string[]
 }> = ({ therapists, onTherapistSelect, selectedTherapists }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Therapist Management</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Therapist Management</h2>
+        <div className='flex items-center gap-2'>
+          <span className='text-gray-600 dark:text-gray-400 text-sm'>
             {selectedTherapists.length} selected
           </span>
-          <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+          <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors'>
             Manage Assignments
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-4">
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
+        <div className='border-gray-200 dark:border-gray-700 border-b p-4'>
+          <div className='flex items-center gap-4'>
             <input
-              type="text"
-              placeholder="Search therapists..."
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              type='text'
+              placeholder='Search therapists...'
+              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm'
             />
-            <select className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm">
+            <select className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'>
               <option>All Performance Levels</option>
               <option>High Performers</option>
               <option>Needs Support</option>
@@ -546,30 +552,30 @@ const TherapistsTab: FC<{
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className='divide-gray-200 dark:divide-gray-700 divide-y'>
           {therapists.map((therapist) => (
             <div
               key={therapist.id}
-              className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              className='hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors'
             >
-              <div className="flex items-center gap-4">
+              <div className='flex items-center gap-4'>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={selectedTherapists.includes(therapist.id)}
                   onChange={() => onTherapistSelect(therapist.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className='text-blue-600 h-4 w-4 rounded'
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <h3 className='text-gray-900 dark:text-white font-medium'>
                       {therapist.name}
                     </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className='flex items-center gap-2'>
+                      <span className='text-gray-600 dark:text-gray-400 text-sm'>
                         ⭐ {therapist.avgSessionRating}/5.0
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
                           therapist.completionRate >= 95
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                             : therapist.completionRate >= 90
@@ -581,43 +587,43 @@ const TherapistsTab: FC<{
                       </span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Patients:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {therapist.patientsCount}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         High Risk:
                       </span>
-                      <span className="ml-2 font-medium text-red-600">
+                      <span className='text-red-600 ml-2 font-medium'>
                         {therapist.riskLevelDistribution.high +
                           therapist.riskLevelDistribution.critical}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Success Rate:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {Math.floor(Math.random() * 20) + 75}%
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Last Active:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {Math.floor(Math.random() * 3) + 1}h ago
                       </span>
                     </div>
                   </div>
                 </div>
-                <button className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+                <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                   View Details
                 </button>
               </div>
@@ -636,62 +642,62 @@ const InstitutionsTab: FC<{
   metrics: InstitutionMetrics
 }> = ({ metrics }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Institutional Management</h2>
-        <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Institutional Management</h2>
+        <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Add Institution
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Resource Allocation</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Resource Allocation</h3>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Therapist Utilization
               </span>
-              <span className="font-medium">87%</span>
+              <span className='font-medium'>87%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className='bg-gray-200 dark:bg-gray-700 h-2 w-full rounded-full'>
               <div
-                className="bg-green-500 h-2 rounded-full"
+                className='bg-green-500 h-2 rounded-full'
                 style={{ width: '87%' }}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Patient Capacity
               </span>
-              <span className="font-medium">73%</span>
+              <span className='font-medium'>73%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className='bg-gray-200 dark:bg-gray-700 h-2 w-full rounded-full'>
               <div
-                className="bg-blue-500 h-2 rounded-full"
+                className='bg-blue-500 h-2 rounded-full'
                 style={{ width: '73%' }}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 AI System Usage
               </span>
-              <span className="font-medium">92%</span>
+              <span className='font-medium'>92%</span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className='bg-gray-200 dark:bg-gray-700 h-2 w-full rounded-full'>
               <div
-                className="bg-purple-500 h-2 rounded-full"
+                className='bg-purple-500 h-2 rounded-full'
                 style={{ width: '92%' }}
               />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Department Overview</h3>
-          <div className="space-y-3">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Department Overview</h3>
+          <div className='space-y-3'>
             {[
               { name: 'Adult Therapy', patients: 456, therapists: 12 },
               { name: 'Child & Adolescent', patients: 234, therapists: 8 },
@@ -700,17 +706,17 @@ const InstitutionsTab: FC<{
             ].map((dept) => (
               <div
                 key={dept.name}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
               >
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className='text-gray-900 dark:text-white font-medium'>
                     {dept.name}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className='text-gray-600 dark:text-gray-400 text-sm'>
                     {dept.therapists} therapists • {dept.patients} patients
                   </p>
                 </div>
-                <button className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+                <button className='text-blue-600 dark:text-blue-400 text-sm hover:underline'>
                   Manage
                 </button>
               </div>
@@ -729,20 +735,20 @@ const SystemTab: FC<{
   health: SystemHealth
 }> = ({ health }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">System Health & Performance</h2>
-        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>System Health & Performance</h2>
+        <button className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Run Diagnostics
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Performance Metrics</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Performance Metrics</h3>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 API Response Time
               </span>
               <span
@@ -751,8 +757,8 @@ const SystemTab: FC<{
                 {health.apiResponseTime}ms
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Database Performance
               </span>
               <span
@@ -761,8 +767,8 @@ const SystemTab: FC<{
                 {health.databasePerformance}%
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Memory Usage
               </span>
               <span
@@ -771,8 +777,8 @@ const SystemTab: FC<{
                 {health.memoryUsage}%
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Error Rate
               </span>
               <span
@@ -784,28 +790,28 @@ const SystemTab: FC<{
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">System Status</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <span className="font-medium text-green-900 dark:text-green-100">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>System Status</h3>
+          <div className='space-y-3'>
+            <div className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 flex items-center justify-between rounded-lg border p-3'>
+              <span className='text-green-900 dark:text-green-100 font-medium'>
                 Platform Uptime
               </span>
-              <span className="font-bold text-green-600">{health.uptime}%</span>
+              <span className='text-green-600 font-bold'>{health.uptime}%</span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <span className="font-medium text-blue-900 dark:text-blue-100">
+            <div className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 flex items-center justify-between rounded-lg border p-3'>
+              <span className='text-blue-900 dark:text-blue-100 font-medium'>
                 Active Sessions
               </span>
-              <span className="font-bold text-blue-600">
+              <span className='text-blue-600 font-bold'>
                 {Math.floor(Math.random() * 50) + 20}
               </span>
             </div>
-            <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-              <span className="font-medium text-purple-900 dark:text-purple-100">
+            <div className='bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 flex items-center justify-between rounded-lg border p-3'>
+              <span className='text-purple-900 dark:text-purple-100 font-medium'>
                 Data Processing
               </span>
-              <span className="font-bold text-purple-600">Normal</span>
+              <span className='text-purple-600 font-bold'>Normal</span>
             </div>
           </div>
         </div>
@@ -821,20 +827,20 @@ const ComplianceTab: FC<{
   metrics: InstitutionMetrics
 }> = ({ metrics }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Compliance & Audit Management</h2>
-        <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Compliance & Audit Management</h2>
+        <button className='bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Generate Report
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Compliance Status</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Compliance Status</h3>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 HIPAA Compliance
               </span>
               <span
@@ -843,30 +849,30 @@ const ComplianceTab: FC<{
                 {metrics.complianceScore}%
               </span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Data Encryption
               </span>
-              <span className="font-medium text-green-600">100%</span>
+              <span className='text-green-600 font-medium'>100%</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Access Controls
               </span>
-              <span className="font-medium text-green-600">Compliant</span>
+              <span className='text-green-600 font-medium'>Compliant</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Audit Logging
               </span>
-              <span className="font-medium text-green-600">Active</span>
+              <span className='text-green-600 font-medium'>Active</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Audits</h3>
-          <div className="space-y-3">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Recent Audits</h3>
+          <div className='space-y-3'>
             {[
               {
                 type: 'Security Audit',
@@ -889,19 +895,19 @@ const ComplianceTab: FC<{
             ].map((audit, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
               >
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className='text-gray-900 dark:text-white font-medium'>
                     {audit.type}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className='text-gray-600 dark:text-gray-400 text-sm'>
                     {audit.date}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className='text-right'>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${
                       audit.status === 'passed'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                         : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
@@ -909,7 +915,7 @@ const ComplianceTab: FC<{
                   >
                     {audit.status}
                   </span>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className='text-gray-600 dark:text-gray-400 mt-1 text-sm'>
                     {audit.score}%
                   </p>
                 </div>

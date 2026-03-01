@@ -10,7 +10,8 @@ toc: true
 
 # AI Features User Guide
 
-This guide provides an overview of the AI features available in the application and how to use them effectively.
+This guide provides an overview of the AI features available in the application
+and how to use them effectively.
 
 ## Overview
 
@@ -20,7 +21,8 @@ The application includes several AI-powered features to enhance your experience:
 - **Sentiment Analysis**: Analyze the sentiment of text
 - **Crisis Detection**: Detect potential crisis situations in text
 - **Response Generation**: Generate therapeutic responses to user messages
-- **Intervention Analysis**: Analyze the effectiveness of therapeutic interventions
+- **Intervention Analysis**: Analyze the effectiveness of therapeutic
+  interventions
 
 ## Chat Interface
 
@@ -40,7 +42,8 @@ You can customize your conversation experience using the settings panel:
 1. Click the Settings icon (⚙️) in the top-right corner of the chat interface
 2. Adjust the following settings:
    - **AI Model**: Choose between different AI models (e.g., GPT-4o, Claude)
-   - **Temperature**: Adjust the creativity of responses (higher = more creative)
+   - **Temperature**: Adjust the creativity of responses (higher = more
+     creative)
    - **Response Length**: Set the maximum length of AI responses
    - **Response Speed**: Choose between standard or faster responses
 
@@ -102,7 +105,8 @@ The system can automatically detect crisis situations in user messages:
 
 ## Response Generation
 
-The response generation feature helps create therapeutic responses to user messages.
+The response generation feature helps create therapeutic responses to user
+messages.
 
 ### Generating Responses
 
@@ -126,7 +130,8 @@ You can create and use response templates for common situations:
 
 ## Intervention Analysis
 
-The intervention analysis feature evaluates the effectiveness of therapeutic interventions.
+The intervention analysis feature evaluates the effectiveness of therapeutic
+interventions.
 
 ### Analyzing Interventions
 

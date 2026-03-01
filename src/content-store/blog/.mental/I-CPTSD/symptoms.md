@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # CPTSD Symptoms and Manifestations
 
-Complex PTSD symptoms are multifaceted and can manifest in various ways. Understanding these symptoms is crucial for both diagnosis and treatment.
+Complex PTSD symptoms are multifaceted and can manifest in various ways.
+Understanding these symptoms is crucial for both diagnosis and treatment.
 
 ## Core Symptom Categories
 

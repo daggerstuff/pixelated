@@ -1,12 +1,12 @@
-import CryptoJS from 'crypto-js'
-
-import { createClient, type RedisClientType } from 'redis'
 import {
   KMSClient,
   EncryptCommand,
   DecryptCommand,
   GenerateDataKeyCommand,
 } from '@aws-sdk/client-kms'
+import CryptoJS from 'crypto-js'
+import { createClient, type RedisClientType } from 'redis'
+
 import { logger, LogLevel } from '../../utils/logger'
 
 /**
@@ -327,7 +327,10 @@ export function decrypt(data: string, key: string): string {
     logger.error('Decryption failed', {
       error: error instanceof Error ? String(error) : String(error),
     })
-    throw new Error(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+    throw new Error(
+      `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      { cause: error },
+    )
   }
 }
 

@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { PatientResponseService } from '../PatientResponseService'
-import type { PatientResponseStyleConfig } from '../PatientResponseService'
-import { PatientProfileService } from '../PatientProfileService'
-import { BeliefConsistencyService } from '../BeliefConsistencyService'
-import type { PatientProfile } from '../../models/patient'
-import type { TherapeuticProgress } from '../../types/CognitiveModel'
-// KVStore is needed for PatientProfileService
 
 import { EmotionSynthesizer } from '../../emotions/EmotionSynthesizer' // Corrected path
+import type { PatientProfile } from '../../models/patient'
+import type { TherapeuticProgress } from '../../types/CognitiveModel'
+import { BeliefConsistencyService } from '../BeliefConsistencyService'
+import { PatientProfileService } from '../PatientProfileService'
+import { PatientResponseService } from '../PatientResponseService'
+// KVStore is needed for PatientProfileService
+import type { PatientResponseStyleConfig } from '../PatientResponseService'
 
 // Mocks
 vi.mock('../PatientProfileService')

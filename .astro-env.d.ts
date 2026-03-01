@@ -34,13 +34,13 @@ declare module 'virtual:astro:assets/fonts/internal' {
 
 declare namespace astroHTML.JSX {
   interface HTMLAttributes {
-    'class'?: string | null | undefined
-    'id'?: string | null | undefined
-    'style'?: string | null | undefined
-    'slot'?: string | null | undefined
-    'title'?: string | null | undefined
-    'role'?: string | null | undefined
-    'tabindex'?: string | number | null | undefined
+    class?: string | null | undefined
+    id?: string | null | undefined
+    style?: string | null | undefined
+    slot?: string | null | undefined
+    title?: string | null | undefined
+    role?: string | null | undefined
+    tabindex?: string | number | null | undefined
     'aria-label'?: string | null | undefined
     'aria-labelledby'?: string | null | undefined
     'aria-describedby'?: string | null | undefined

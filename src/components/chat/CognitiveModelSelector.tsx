@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { KVStore } from '@/lib/db/KVStore'
+
 import type {
   PatientResponseStyleConfig,
   CognitiveModel,
 } from '@/lib/ai/types/CognitiveModel'
+import { KVStore } from '@/lib/db/KVStore'
 import { cn } from '@/lib/utils'
 
 type ModelIdentifier = {
@@ -63,7 +64,7 @@ export function CognitiveModelSelector({
 
           // Load details for the selected model
           if (selectedModelId) {
-            loadModelDetails(selectedModelId)
+            void loadModelDetails(selectedModelId)
           }
         } else {
           // If no models found, set up some example data
@@ -116,7 +117,7 @@ export function CognitiveModelSelector({
       }
     }
 
-    fetchModels()
+    void fetchModels()
   }, [selectedModelId, onSelectModel])
 
   // Load detailed information for the selected model
@@ -347,7 +348,7 @@ export function CognitiveModelSelector({
   // Handle model selection
   const handleModelSelect = (modelId: string) => {
     onSelectModel(modelId)
-    loadModelDetails(modelId)
+    void loadModelDetails(modelId)
   }
 
   // Handle style config changes
@@ -382,12 +383,12 @@ export function CognitiveModelSelector({
 
   if (loading) {
     return (
-      <div className="flex justify-center p-4">Loading patient models...</div>
+      <div className='flex justify-center p-4'>Loading patient models...</div>
     )
   }
 
   if (error) {
-    return <div className="text-red-500 p-4">{error}</div>
+    return <div className='text-red-500 p-4'>{error}</div>
   }
 
   return (
@@ -397,12 +398,12 @@ export function CognitiveModelSelector({
         className,
       )}
     >
-      <h3 className="text-lg font-medium mb-4">Select Patient Profile</h3>
+      <h3 className='mb-4 text-lg font-medium'>Select Patient Profile</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-2'>
         <div>
-          <h4 className="text-sm font-medium mb-2">Available Profiles</h4>
-          <div className="space-y-2">
+          <h4 className='mb-2 text-sm font-medium'>Available Profiles</h4>
+          <div className='space-y-2'>
             {models.map((model) => (
               <button
                 key={model.id}
@@ -414,12 +415,12 @@ export function CognitiveModelSelector({
                 )}
                 onClick={() => handleModelSelect(model.id)}
               >
-                <div className="font-medium">{model.name}</div>
-                <div className="text-sm text-gray-500">
+                <div className='font-medium'>{model.name}</div>
+                <div className='text-gray-500 text-sm'>
                   {model.presentingIssues.join(', ')}
                 </div>
                 {model.diagnosisSummary && (
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className='text-gray-500 mt-1 text-xs'>
                     {model.diagnosisSummary}
                   </div>
                 )}
@@ -431,35 +432,35 @@ export function CognitiveModelSelector({
         <div>
           {currentModelDetails && (
             <div>
-              <h4 className="text-sm font-medium mb-2">Patient Details</h4>
-              <div className="bg-white border border-gray-200 rounded-md p-3">
-                <div className="grid grid-cols-2 gap-2 mb-3">
+              <h4 className='mb-2 text-sm font-medium'>Patient Details</h4>
+              <div className='bg-white border-gray-200 rounded-md border p-3'>
+                <div className='mb-3 grid grid-cols-2 gap-2'>
                   <div>
-                    <div className="text-xs text-gray-500">Name</div>
+                    <div className='text-gray-500 text-xs'>Name</div>
                     <div>{currentModelDetails.name}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Age</div>
+                    <div className='text-gray-500 text-xs'>Age</div>
                     <div>{currentModelDetails.demographicInfo?.age}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Gender</div>
+                    <div className='text-gray-500 text-xs'>Gender</div>
                     <div>{currentModelDetails.demographicInfo?.gender}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-500">Occupation</div>
+                    <div className='text-gray-500 text-xs'>Occupation</div>
                     <div>{currentModelDetails.demographicInfo?.occupation}</div>
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <div className="text-xs text-gray-500">Presenting Issues</div>
-                  <div className="flex flex-wrap gap-1 mt-1">
+                <div className='mb-3'>
+                  <div className='text-gray-500 text-xs'>Presenting Issues</div>
+                  <div className='mt-1 flex flex-wrap gap-1'>
                     {currentModelDetails.presentingIssues?.map(
                       (issue: string, index: number) => (
                         <span
                           key={`issue-${issue}-${index}`}
-                          className="inline-block bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded"
+                          className='bg-gray-100 text-gray-800 inline-block rounded px-2 py-1 text-xs'
                         >
                           {issue}
                         </span>
@@ -470,13 +471,13 @@ export function CognitiveModelSelector({
 
                 {currentModelDetails.coreBeliefs?.length > 0 && (
                   <div>
-                    <div className="text-xs text-gray-500">Core Beliefs</div>
-                    <ul className="mt-1 text-sm">
+                    <div className='text-gray-500 text-xs'>Core Beliefs</div>
+                    <ul className='mt-1 text-sm'>
                       {currentModelDetails.coreBeliefs.map(
                         (belief, index: number) => (
                           <li
                             key={`belief-${belief.belief}-${index}`}
-                            className="mb-1"
+                            className='mb-1'
                           >
                             &ldquo;{belief.belief}&rdquo; (Strength:{' '}
                             {belief.strength}/10)
@@ -490,100 +491,100 @@ export function CognitiveModelSelector({
             </div>
           )}
 
-          <div className="mt-4">
-            <h4 className="text-sm font-medium mb-2">
+          <div className='mt-4'>
+            <h4 className='mb-2 text-sm font-medium'>
               Response Style Configuration
             </h4>
-            <div className="bg-white border border-gray-200 rounded-md p-3">
-              <div className="mb-3">
+            <div className='bg-white border-gray-200 rounded-md border p-3'>
+              <div className='mb-3'>
                 <label
-                  htmlFor="openness-slider"
-                  className="text-xs text-gray-500 block mb-1"
+                  htmlFor='openness-slider'
+                  className='text-gray-500 mb-1 block text-xs'
                 >
                   Openness (1 = Closed, 10 = Very Open)
                 </label>
                 <input
-                  id="openness-slider"
-                  type="range"
-                  min="1"
-                  max="10"
+                  id='openness-slider'
+                  type='range'
+                  min='1'
+                  max='10'
                   value={styleConfig.openness}
                   onChange={(e) =>
                     handleStyleChange('openness', parseInt(e.target.value))
                   }
-                  className="w-full"
-                  aria-label="Openness level from 1 to 10"
+                  className='w-full'
+                  aria-label='Openness level from 1 to 10'
                 />
 
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className='text-gray-500 flex justify-between text-xs'>
                   <span>Closed</span>
                   <span>Value: {styleConfig.openness}</span>
                   <span>Open</span>
                 </div>
               </div>
 
-              <div className="mb-3">
+              <div className='mb-3'>
                 <label
-                  htmlFor="coherence-slider"
-                  className="text-xs text-gray-500 block mb-1"
+                  htmlFor='coherence-slider'
+                  className='text-gray-500 mb-1 block text-xs'
                 >
                   Coherence (1 = Disorganized, 10 = Very Organized)
                 </label>
                 <input
-                  id="coherence-slider"
-                  type="range"
-                  min="1"
-                  max="10"
+                  id='coherence-slider'
+                  type='range'
+                  min='1'
+                  max='10'
                   value={styleConfig.coherence}
                   onChange={(e) =>
                     handleStyleChange('coherence', parseInt(e.target.value))
                   }
-                  className="w-full"
-                  aria-label="Coherence level from 1 to 10"
+                  className='w-full'
+                  aria-label='Coherence level from 1 to 10'
                 />
 
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className='text-gray-500 flex justify-between text-xs'>
                   <span>Disorganized</span>
                   <span>Value: {styleConfig.coherence}</span>
                   <span>Organized</span>
                 </div>
               </div>
 
-              <div className="mb-3">
+              <div className='mb-3'>
                 <label
-                  htmlFor="defense-slider"
-                  className="text-xs text-gray-500 block mb-1"
+                  htmlFor='defense-slider'
+                  className='text-gray-500 mb-1 block text-xs'
                 >
                   Defense Level (1 = Low Defenses, 10 = High Defenses)
                 </label>
                 <input
-                  id="defense-slider"
-                  type="range"
-                  min="1"
-                  max="10"
+                  id='defense-slider'
+                  type='range'
+                  min='1'
+                  max='10'
                   value={styleConfig.defenseLevel}
                   onChange={(e) =>
                     handleStyleChange('defenseLevel', parseInt(e.target.value))
                   }
-                  className="w-full"
-                  aria-label="Defense level from 1 to 10"
+                  className='w-full'
+                  aria-label='Defense level from 1 to 10'
                 />
 
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className='text-gray-500 flex justify-between text-xs'>
                   <span>Low</span>
                   <span>Value: {styleConfig.defenseLevel}</span>
                   <span>High</span>
                 </div>
               </div>
 
-              <div className="mb-3">
+              <div className='mb-3'>
                 <label
-                  htmlFor="disclosure-style"
-                  className="text-xs text-gray-500 block mb-1"
+                  htmlFor='disclosure-style'
+                  className='text-gray-500 mb-1 block text-xs'
                 >
                   Disclosure Style
                 </label>
-                <div className="grid grid-cols-4 gap-1">
+                <div className='grid grid-cols-4 gap-1'>
                   {(
                     ['guarded', 'selective', 'reflective', 'open'] as const
                   ).map((style) => (
@@ -605,12 +606,12 @@ export function CognitiveModelSelector({
 
               <div>
                 <label
-                  htmlFor="challenge-response"
-                  className="text-xs text-gray-500 block mb-1"
+                  htmlFor='challenge-response'
+                  className='text-gray-500 mb-1 block text-xs'
                 >
                   Response to Challenges
                 </label>
-                <div className="grid grid-cols-4 gap-1">
+                <div className='grid grid-cols-4 gap-1'>
                   {(
                     ['defensive', 'curious', 'dismissive', 'receptive'] as const
                   ).map((response) => (

@@ -419,13 +419,20 @@ export const prerender = false // Enable SSR for real-time data
     updateDashboard(data) {
       // Update main stats
       const totalSessionsEl = document.getElementById('total-sessions')
-      if (totalSessionsEl) totalSessionsEl.textContent = String(data.summary.unique_sessions)
+      if (totalSessionsEl)
+        totalSessionsEl.textContent = String(data.summary.unique_sessions)
       const conversionRateEl = document.getElementById('conversion-rate')
-      if (conversionRateEl) conversionRateEl.textContent = data.summary.conversion_funnel.conversion_rate.toFixed(1) + '%'
+      if (conversionRateEl)
+        conversionRateEl.textContent =
+          data.summary.conversion_funnel.conversion_rate.toFixed(1) + '%'
       const avgTimeEl = document.getElementById('avg-time-cta')
-      if (avgTimeEl) avgTimeEl.textContent = Math.round(data.summary.avg_time_to_cta / 1000) + 's'
+      if (avgTimeEl)
+        avgTimeEl.textContent =
+          Math.round(data.summary.avg_time_to_cta / 1000) + 's'
       const scrollDepthEl = document.getElementById('avg-scroll-depth')
-      if (scrollDepthEl) scrollDepthEl.textContent = Math.round(data.summary.scroll_depth_avg) + '%'
+      if (scrollDepthEl)
+        scrollDepthEl.textContent =
+          Math.round(data.summary.scroll_depth_avg) + '%'
 
       // Update A/B test results
       this.updateVariantStats(data)
@@ -486,13 +493,20 @@ export const prerender = false // Enable SSR for real-time data
         pageViews > 0 ? (demoInteractions / pageViews) * 100 : 0
       const ctaClickPct = pageViews > 0 ? (ctaClicks / pageViews) * 100 : 0
 
-      const interactionPctEl = document.getElementById('funnel-demo-interactions-pct')
-      if (interactionPctEl) interactionPctEl.textContent = demoInteractionPct.toFixed(1) + '%'
+      const interactionPctEl = document.getElementById(
+        'funnel-demo-interactions-pct',
+      )
+      if (interactionPctEl)
+        interactionPctEl.textContent = demoInteractionPct.toFixed(1) + '%'
       const ctaClickPctEl = document.getElementById('funnel-cta-clicks-pct')
-      if (ctaClickPctEl) ctaClickPctEl.textContent = ctaClickPct.toFixed(1) + '%'
+      if (ctaClickPctEl)
+        ctaClickPctEl.textContent = ctaClickPct.toFixed(1) + '%'
 
-      const interactionBarEl = document.getElementById('funnel-demo-interactions-bar')
-      if (interactionBarEl) interactionBarEl.style.width = demoInteractionPct + '%'
+      const interactionBarEl = document.getElementById(
+        'funnel-demo-interactions-bar',
+      )
+      if (interactionBarEl)
+        interactionBarEl.style.width = demoInteractionPct + '%'
       const ctaClickBarEl = document.getElementById('funnel-cta-clicks-bar')
       if (ctaClickBarEl) ctaClickBarEl.style.width = ctaClickPct + '%'
     }

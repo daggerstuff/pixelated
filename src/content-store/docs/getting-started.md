@@ -12,11 +12,13 @@ slug: 'getting-started'
 
 # Tutorial with Pixelated Empathy
 
-Welcome to Pixelated Empathy, an AI-powered platform for mental health research and innovation. This guide will help you get started quickly.
+Welcome to Pixelated Empathy, an AI-powered platform for mental health research
+and innovation. This guide will help you get started quickly.
 
 ## Overview
 
-Pixelated Empathy combines cutting-edge AI technology with evidence-based therapeutic approaches to provide:
+Pixelated Empathy combines cutting-edge AI technology with evidence-based
+therapeutic approaches to provide:
 
 - **AI-Powered Chat**: Intelligent conversations with mental health support
 - **Emotion Detection**: Real-time emotion analysis and insights
@@ -106,4 +108,4 @@ If you need help:
 
 - Check the [FAQ](/docs/faq)
 - Browse the [API documentation](/api-docs)
-- Contact support at support@pixelatedempathy.com 
+- Contact support at support@pixelatedempathy.com

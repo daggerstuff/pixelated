@@ -12,10 +12,23 @@ http:
         stsSeconds: 31536000
         stsIncludeSubdomains: true
         stsPreload: true
-        referrerPolicy: "strict-origin-when-cross-origin"
+        referrerPolicy: 'strict-origin-when-cross-origin'
         customResponseHeaders:
-          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
-        contentSecurityPolicy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.sentry.io; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: https://*.sentry.io https://cdn.pixelatedempathy.com https://pixelatedempathy.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io; upgrade-insecure-requests; block-all-mixed-content; script-src-attr 'none'; script-src-elem 'self' https://*.sentry.io; style-src-attr 'none'; worker-src 'self' blob:; manifest-src 'self'; media-src 'self';"
+          X-Robots-Tag: 'none,noarchive,nosnippet,notranslate,noimageindex'
+        contentSecurityPolicy:
+          "default-src 'self'; script-src 'self' 'unsafe-inline'
+          https://*.sentry.io; style-src 'self' 'unsafe-inline'
+          https://fonts.googleapis.com; img-src 'self' data: https:
+          https://*.sentry.io https://cdn.pixelatedempathy.com
+          https://pixelatedempathy.com; font-src 'self'
+          https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none';
+          base-uri 'self'; form-action 'self'; connect-src 'self'
+          https://*.sentry.io https://pixelatedempathy.com
+          https://cdn.pixelatedempathy.com wss://*.sentry.io;
+          upgrade-insecure-requests; block-all-mixed-content; script-src-attr
+          'none'; script-src-elem 'self' https://*.sentry.io; style-src-attr
+          'none'; worker-src 'self' blob:; manifest-src 'self'; media-src
+          'self';"
 
     # Rate Limiting
     rate-limit:
@@ -45,7 +58,9 @@ http:
     # Circuit Breaker
     circuit-breaker:
       circuitBreaker:
-        expression: "NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) > 0.3"
+        expression:
+          'NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) >
+          0.3'
 
     # Retry
     retry:
@@ -58,7 +73,7 @@ http:
     pixelated-backend:
       loadBalancer:
         servers:
-          - url: "http://pixelated-app:4321"
+          - url: 'http://pixelated-app:4321'
         healthCheck:
           path: /api/health
           interval: 30s
@@ -74,7 +89,7 @@ http:
   routers:
     # Main Application
     app:
-      rule: "Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)"
+      rule: 'Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)'
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -88,7 +103,9 @@ http:
 
     # API Routes
     api:
-      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/api/`)"
+      rule:
+        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
+        PathPrefix(`/api/`)'
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -102,7 +119,9 @@ http:
 
     # Auth Routes (stricter rate limiting)
     auth:
-      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/api/auth/`)"
+      rule:
+        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
+        PathPrefix(`/api/auth/`)'
       entryPoints:
         - websecure
       service: pixelated-backend
@@ -116,7 +135,9 @@ http:
 
     # WebSocket Routes
     websocket:
-      rule: "(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) && PathPrefix(`/ws`)"
+      rule:
+        '(Host(`pixelatedempathy.com`) || Host(`www.pixelatedempathy.com`)) &&
+        PathPrefix(`/ws`)'
       entryPoints:
         - websecure
       service: pixelated-backend

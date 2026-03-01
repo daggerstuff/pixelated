@@ -80,15 +80,16 @@ export class PerformanceLogger {
       this.metricsBuffer = []
 
       // Log summary
-      logger.info(
-        `Flushed ${flushedCount} performance metrics to ${logFile}`,
-      )
+      logger.info(`Flushed ${flushedCount} performance metrics to ${logFile}`)
     } catch (error: unknown) {
       logger.error('Failed to flush performance metrics:', error)
     }
   }
 
-  public async getMetrics(timeRange: { start: Date; end: Date }): Promise<any[]> {
+  public async getMetrics(timeRange: {
+    start: Date
+    end: Date
+  }): Promise<any[]> {
     if (!timeRange?.['start'] || !timeRange?.['end']) {
       logger.error('Invalid time range provided')
       return []

@@ -1,3 +1,6 @@
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import type { AuthRole } from '../../../../config/auth.config'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import type { AuthUser } from '../../../../lib/auth/types'
 import { BackupSecurityManager } from '../../../../lib/security/backup'
@@ -6,8 +9,6 @@ import {
   RecoveryTestStatus,
   TestEnvironmentType,
 } from '../../../../lib/security/backup/backup-types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { AuthRole } from '../../../../config/auth.config'
 
 export const prerender = false
 

@@ -5,8 +5,8 @@
  * and maintaining security across the application.
  */
 
-import type { BaseAPIContext } from '../auth/apiRouteTypes.js'
 import type { User } from '../../types/user.js'
+import type { BaseAPIContext } from '../auth/apiRouteTypes.js'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { verifyToken } from '../security/verification.js'
 

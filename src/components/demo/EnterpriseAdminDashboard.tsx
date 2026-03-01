@@ -1,9 +1,3 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Shield,
   Activity,
@@ -19,6 +13,13 @@ import {
   Clock,
   Lock,
 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 interface SystemMetrics {
   uptime: number
@@ -266,79 +267,79 @@ export default function EnterpriseAdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
+      <div className='flex min-h-[400px] items-center justify-center'>
+        <div className='text-center'>
+          <div className='border-blue-600 border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4'></div>
+          <p className='text-gray-600'>Loading admin dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
+    <div className='mx-auto w-full max-w-7xl space-y-6 p-6'>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className='text-gray-900 text-3xl font-bold'>
             Enterprise Admin Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className='text-gray-600 mt-1'>
             Comprehensive system monitoring and analytics • Last updated:{' '}
             {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <Button
-            variant="outline"
-            size="sm"
+            variant='outline'
+            size='sm'
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={autoRefresh ? 'bg-green-50 border-green-200' : ''}
           >
             <RefreshCw
-              className={`w-4 h-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`}
+              className={`mr-2 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
             />
             Auto Refresh
           </Button>
-          <Button variant="outline" size="sm" onClick={exportMetrics}>
-            <Download className="w-4 h-4 mr-2" />
+          <Button variant='outline' size='sm' onClick={exportMetrics}>
+            <Download className='mr-2 h-4 w-4' />
             Export
           </Button>
           <Badge
-            variant="outline"
-            className="bg-green-50 text-green-700 border-green-200"
+            variant='outline'
+            className='bg-green-50 text-green-700 border-green-200'
           >
-            <Shield className="w-4 h-4 mr-2" />
+            <Shield className='mr-2 h-4 w-4' />
             System Healthy
           </Badge>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Activity className="w-5 h-5 text-green-600" />
+          <CardContent className='p-6'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-green-100 rounded-lg p-2'>
+                <Activity className='text-green-600 h-5 w-5' />
               </div>
               <div>
-                <p className="text-sm text-gray-600">System Uptime</p>
-                <p className="text-2xl font-bold">{systemMetrics?.uptime}%</p>
+                <p className='text-gray-600 text-sm'>System Uptime</p>
+                <p className='text-2xl font-bold'>{systemMetrics?.uptime}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+          <CardContent className='p-6'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-blue-100 rounded-lg p-2'>
+                <Users className='text-blue-600 h-5 w-5' />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Active Users</p>
-                <p className="text-2xl font-bold">
+                <p className='text-gray-600 text-sm'>Active Users</p>
+                <p className='text-2xl font-bold'>
                   {systemMetrics?.activeUsers.toLocaleString()}
                 </p>
               </div>
@@ -347,14 +348,14 @@ export default function EnterpriseAdminDashboard() {
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <BarChart3 className="w-5 h-5 text-purple-600" />
+          <CardContent className='p-6'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-purple-100 rounded-lg p-2'>
+                <BarChart3 className='text-purple-600 h-5 w-5' />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Requests</p>
-                <p className="text-2xl font-bold">
+                <p className='text-gray-600 text-sm'>Total Requests</p>
+                <p className='text-2xl font-bold'>
                   {systemMetrics?.totalRequests.toLocaleString()}
                 </p>
               </div>
@@ -363,14 +364,14 @@ export default function EnterpriseAdminDashboard() {
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="w-5 h-5 text-yellow-600" />
+          <CardContent className='p-6'>
+            <div className='flex items-center gap-3'>
+              <div className='bg-yellow-100 rounded-lg p-2'>
+                <Clock className='text-yellow-600 h-5 w-5' />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Avg Response</p>
-                <p className="text-2xl font-bold">
+                <p className='text-gray-600 text-sm'>Avg Response</p>
+                <p className='text-2xl font-bold'>
                   {systemMetrics?.averageResponseTime}ms
                 </p>
               </div>
@@ -379,79 +380,79 @@ export default function EnterpriseAdminDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="system" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="system">
-            <Server className="w-4 h-4 mr-2" />
+      <Tabs defaultValue='system' className='w-full'>
+        <TabsList className='grid w-full grid-cols-4'>
+          <TabsTrigger value='system'>
+            <Server className='mr-2 h-4 w-4' />
             System Health
           </TabsTrigger>
-          <TabsTrigger value="security">
-            <Shield className="w-4 h-4 mr-2" />
+          <TabsTrigger value='security'>
+            <Shield className='mr-2 h-4 w-4' />
             Security
           </TabsTrigger>
-          <TabsTrigger value="users">
-            <Users className="w-4 h-4 mr-2" />
+          <TabsTrigger value='users'>
+            <Users className='mr-2 h-4 w-4' />
             User Analytics
           </TabsTrigger>
-          <TabsTrigger value="api">
-            <Zap className="w-4 h-4 mr-2" />
+          <TabsTrigger value='api'>
+            <Zap className='mr-2 h-4 w-4' />
             API Health
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="system" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value='system' className='space-y-6'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Server className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Server className='h-5 w-5' />
                   Infrastructure Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">CPU Usage</span>
-                    <span className="font-medium">
+              <CardContent className='space-y-4'>
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>CPU Usage</span>
+                    <span className='font-medium'>
                       {systemMetrics?.cpuUsage}%
                     </span>
                   </div>
-                  <Progress value={systemMetrics?.cpuUsage} className="h-2" />
+                  <Progress value={systemMetrics?.cpuUsage} className='h-2' />
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Memory Usage</span>
-                    <span className="font-medium">
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>Memory Usage</span>
+                    <span className='font-medium'>
                       {systemMetrics?.memoryUsage}%
                     </span>
                   </div>
                   <Progress
                     value={systemMetrics?.memoryUsage}
-                    className="h-2"
+                    className='h-2'
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
+                <div className='space-y-3'>
+                  <div className='flex items-center justify-between'>
+                    <span className='text-gray-600 text-sm'>
                       Cache Hit Rate
                     </span>
-                    <span className="font-medium">
+                    <span className='font-medium'>
                       {systemMetrics?.cacheHitRate}%
                     </span>
                   </div>
                   <Progress
                     value={systemMetrics?.cacheHitRate}
-                    className="h-2"
+                    className='h-2'
                   />
                 </div>
 
-                <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="text-sm text-gray-600">
+                <div className='flex items-center justify-between border-t pt-2'>
+                  <span className='text-gray-600 text-sm'>
                     Database Connections
                   </span>
-                  <span className="font-medium">
+                  <span className='font-medium'>
                     {systemMetrics?.databaseConnections}/100
                   </span>
                 </div>
@@ -460,16 +461,16 @@ export default function EnterpriseAdminDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <TrendingUp className='h-5 w-5' />
                   Performance Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Error Rate</span>
+              <CardContent className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Error Rate</span>
                   <Badge
-                    variant="outline"
+                    variant='outline'
                     className={
                       systemMetrics && systemMetrics.errorRate < 1
                         ? 'bg-green-50 text-green-700 border-green-200'
@@ -479,21 +480,21 @@ export default function EnterpriseAdminDashboard() {
                     {systemMetrics?.errorRate}%
                   </Badge>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>
                     Average Response Time
                   </span>
-                  <span className="font-medium">
+                  <span className='font-medium'>
                     {systemMetrics?.averageResponseTime}ms
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Uptime</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Uptime</span>
                   <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    variant='outline'
+                    className='bg-green-50 text-green-700 border-green-200'
                   >
-                    <CheckCircle className="w-3 h-3 mr-1" />
+                    <CheckCircle className='mr-1 h-3 w-3' />
                     {systemMetrics?.uptime}%
                   </Badge>
                 </div>
@@ -502,28 +503,28 @@ export default function EnterpriseAdminDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="security" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value='security' className='space-y-6'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Lock className='h-5 w-5' />
                   Authentication & Access
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">
+              <CardContent className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>
                     Total Auth Attempts
                   </span>
-                  <span className="font-medium">
+                  <span className='font-medium'>
                     {securityMetrics?.authenticationAttempts.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Failed Logins</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Failed Logins</span>
                   <Badge
-                    variant="outline"
+                    variant='outline'
                     className={
                       securityMetrics && securityMetrics.failedLogins < 200
                         ? 'bg-green-50 text-green-700 border-green-200'
@@ -533,17 +534,17 @@ export default function EnterpriseAdminDashboard() {
                     {securityMetrics?.failedLogins}
                   </Badge>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Blocked IPs</span>
-                  <span className="font-medium">
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Blocked IPs</span>
+                  <span className='font-medium'>
                     {securityMetrics?.blockedIPs.length}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Vulnerabilities</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Vulnerabilities</span>
                   <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    variant='outline'
+                    className='bg-green-50 text-green-700 border-green-200'
                   >
                     {securityMetrics?.vulnerabilities}
                   </Badge>
@@ -553,28 +554,28 @@ export default function EnterpriseAdminDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <AlertTriangle className='h-5 w-5' />
                   Security Alerts
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3 max-h-60 overflow-y-auto">
+                <div className='max-h-60 space-y-3 overflow-y-auto'>
                   {securityMetrics?.securityAlerts.map((alert) => (
-                    <div key={alert.id} className="p-3 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
+                    <div key={alert.id} className='rounded-lg border p-3'>
+                      <div className='mb-2 flex items-center justify-between'>
                         <Badge
-                          variant="outline"
+                          variant='outline'
                           className={getSeverityColor(alert.severity)}
                         >
                           {alert.severity.toUpperCase()}
                         </Badge>
-                        <span className="text-xs text-gray-500">
+                        <span className='text-gray-500 text-xs'>
                           {new Date(alert.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
-                      <p className="text-sm font-medium">{alert.type}</p>
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className='text-sm font-medium'>{alert.type}</p>
+                      <p className='text-gray-600 mt-1 text-xs'>
                         {alert.message}
                       </p>
                     </div>
@@ -585,49 +586,49 @@ export default function EnterpriseAdminDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="users" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value='users' className='space-y-6'>
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Users className='h-5 w-5' />
                   User Engagement
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Users</span>
-                  <span className="font-medium">
+              <CardContent className='space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Total Users</span>
+                  <span className='font-medium'>
                     {userAnalytics?.totalUsers.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Active Today</span>
-                  <span className="font-medium">
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Active Today</span>
+                  <span className='font-medium'>
                     {userAnalytics?.activeToday.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>
                     Active This Week
                   </span>
-                  <span className="font-medium">
+                  <span className='font-medium'>
                     {userAnalytics?.activeThisWeek.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>
                     New Registrations
                   </span>
-                  <span className="font-medium">
+                  <span className='font-medium'>
                     {userAnalytics?.newRegistrations}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Retention Rate</span>
+                <div className='flex items-center justify-between'>
+                  <span className='text-gray-600 text-sm'>Retention Rate</span>
                   <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    variant='outline'
+                    className='bg-green-50 text-green-700 border-green-200'
                   >
                     {userAnalytics?.userRetention}%
                   </Badge>
@@ -637,20 +638,20 @@ export default function EnterpriseAdminDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <BarChart3 className='h-5 w-5' />
                   Feature Usage
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {userAnalytics?.mostUsedFeatures.map((feature) => (
-                    <div key={feature.feature} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">{feature.feature}</span>
-                        <span className="font-medium">{feature.usage}%</span>
+                    <div key={feature.feature} className='space-y-2'>
+                      <div className='flex justify-between text-sm'>
+                        <span className='text-gray-600'>{feature.feature}</span>
+                        <span className='font-medium'>{feature.usage}%</span>
                       </div>
-                      <Progress value={feature.usage} className="h-2" />
+                      <Progress value={feature.usage} className='h-2' />
                     </div>
                   ))}
                 </div>
@@ -659,47 +660,47 @@ export default function EnterpriseAdminDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="api" className="space-y-6">
+        <TabsContent value='api' className='space-y-6'>
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5" />
+              <CardTitle className='flex items-center gap-2'>
+                <Zap className='h-5 w-5' />
                 API Endpoint Health
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className='space-y-4'>
                 {apiHealth?.endpoints.map((endpoint) => (
                   <div
                     key={endpoint.name + endpoint.url}
-                    className="flex items-center justify-between p-4 border rounded-lg"
+                    className='flex items-center justify-between rounded-lg border p-4'
                   >
-                    <div className="flex items-center gap-3">
+                    <div className='flex items-center gap-3'>
                       <Badge
-                        variant="outline"
+                        variant='outline'
                         className={getStatusColor(endpoint.status)}
                       >
                         {endpoint.status === 'healthy' && (
-                          <CheckCircle className="w-3 h-3 mr-1" />
+                          <CheckCircle className='mr-1 h-3 w-3' />
                         )}
                         {endpoint.status === 'degraded' && (
-                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          <AlertTriangle className='mr-1 h-3 w-3' />
                         )}
                         {endpoint.status === 'down' && (
-                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          <AlertTriangle className='mr-1 h-3 w-3' />
                         )}
                         {endpoint.status}
                       </Badge>
                       <div>
-                        <h4 className="font-medium">{endpoint.name}</h4>
-                        <p className="text-sm text-gray-500">{endpoint.url}</p>
+                        <h4 className='font-medium'>{endpoint.name}</h4>
+                        <p className='text-gray-500 text-sm'>{endpoint.url}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">
+                    <div className='text-right'>
+                      <div className='text-sm font-medium'>
                         {endpoint.responseTime}ms
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className='text-gray-500 text-xs'>
                         {endpoint.successRate}% success
                       </div>
                     </div>
@@ -709,16 +710,16 @@ export default function EnterpriseAdminDashboard() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <BarChart3 className="w-5 h-5 text-blue-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-blue-100 rounded-lg p-2'>
+                    <BarChart3 className='text-blue-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Requests</p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-gray-600 text-sm'>Total Requests</p>
+                    <p className='text-2xl font-bold'>
                       {apiHealth?.totalRequests.toLocaleString()}
                     </p>
                   </div>
@@ -727,14 +728,14 @@ export default function EnterpriseAdminDashboard() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-green-100 rounded-lg p-2'>
+                    <CheckCircle className='text-green-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Successful</p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-gray-600 text-sm'>Successful</p>
+                    <p className='text-2xl font-bold'>
                       {apiHealth?.successfulRequests.toLocaleString()}
                     </p>
                   </div>
@@ -743,14 +744,14 @@ export default function EnterpriseAdminDashboard() {
             </Card>
 
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
+              <CardContent className='p-6'>
+                <div className='flex items-center gap-3'>
+                  <div className='bg-red-100 rounded-lg p-2'>
+                    <AlertTriangle className='text-red-600 h-5 w-5' />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Failed</p>
-                    <p className="text-2xl font-bold">
+                    <p className='text-gray-600 text-sm'>Failed</p>
+                    <p className='text-2xl font-bold'>
                       {apiHealth?.failedRequests.toLocaleString()}
                     </p>
                   </div>

@@ -1,5 +1,6 @@
-import type { SentimentAnalysisResult } from '../../../lib/db/ai/types'
 import { useCallback, useState, useRef } from 'react'
+
+import type { SentimentAnalysisResult } from '../../../lib/db/ai/types'
 
 interface UseSentimentAnalysisOptions {
   apiEndpoint?: string
@@ -314,7 +315,7 @@ export function useSentimentAnalysis({
           if (retries === maxRetries - 1 || !isRetryableError(err)) {
             const errorMessage =
               err instanceof Error
-                ? (err as Error)?.message || String(err)
+                ? (err)?.message || String(err)
                 : 'Failed to analyze sentiment'
             setError(errorMessage)
             setFailureCount((prev) => prev + 1)
@@ -401,7 +402,7 @@ export function useSentimentAnalysis({
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Failed to analyze sentiment batch'
         setError(errorMessage)
         setFailureCount((prev) => prev + texts.length - batchResults.length)

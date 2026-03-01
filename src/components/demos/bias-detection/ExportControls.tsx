@@ -1,6 +1,7 @@
 // Export controls component for bias detection analysis data
 
 import { useState, type FC } from 'react'
+
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
@@ -210,26 +211,26 @@ export const ExportControls: FC<ExportControlsProps> = ({
   }
 
   return (
-    <div className="export-controls space-y-6">
+    <div className='export-controls space-y-6'>
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className='text-gray-900 mb-2 text-lg font-semibold'>
           Export Analysis Data
         </h3>
-        <p className="text-gray-600">
+        <p className='text-gray-600'>
           Download comprehensive bias analysis results for reporting and
           compliance
         </p>
       </div>
 
       {/* Export Format Selection */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Export Format</h4>
+      <div className='bg-white border-gray-200 rounded-lg border p-6'>
+        <h4 className='text-gray-900 mb-4 font-semibold'>Export Format</h4>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
           {/* JSON Format */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`cursor-pointer rounded-lg border p-4 transition-all ${
               exportFormat === 'json'
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
@@ -242,30 +243,30 @@ export const ExportControls: FC<ExportControlsProps> = ({
               }
             }}
             tabIndex={0}
-            role="radio"
+            role='radio'
             aria-checked={exportFormat === 'json'}
-            aria-label="JSON export format"
+            aria-label='JSON export format'
           >
-            <div className="flex items-center mb-2">
+            <div className='mb-2 flex items-center'>
               <input
-                type="radio"
+                type='radio'
                 checked={exportFormat === 'json'}
                 onChange={() => setExportFormat('json')}
-                className="mr-2"
+                className='mr-2'
               />
-              <span className="font-medium text-gray-900">JSON</span>
+              <span className='text-gray-900 font-medium'>JSON</span>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className='text-gray-600 text-sm'>
               Complete structured data with all analysis details
             </p>
-            <div className="mt-2 text-xs text-gray-500">
+            <div className='text-gray-500 mt-2 text-xs'>
               Best for: Technical analysis, data processing
             </div>
           </div>
 
           {/* CSV Format */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`cursor-pointer rounded-lg border p-4 transition-all ${
               exportFormat === 'csv'
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
@@ -278,30 +279,30 @@ export const ExportControls: FC<ExportControlsProps> = ({
               }
             }}
             tabIndex={0}
-            role="radio"
+            role='radio'
             aria-checked={exportFormat === 'csv'}
-            aria-label="CSV export format"
+            aria-label='CSV export format'
           >
-            <div className="flex items-center mb-2">
+            <div className='mb-2 flex items-center'>
               <input
-                type="radio"
+                type='radio'
                 checked={exportFormat === 'csv'}
                 onChange={() => setExportFormat('csv')}
-                className="mr-2"
+                className='mr-2'
               />
-              <span className="font-medium text-gray-900">CSV</span>
+              <span className='text-gray-900 font-medium'>CSV</span>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className='text-gray-600 text-sm'>
               Tabular data format for spreadsheet analysis
             </p>
-            <div className="mt-2 text-xs text-gray-500">
+            <div className='text-gray-500 mt-2 text-xs'>
               Best for: Excel analysis, statistical processing
             </div>
           </div>
 
           {/* PDF Format */}
           <div
-            className={`border rounded-lg p-4 cursor-pointer transition-all ${
+            className={`cursor-pointer rounded-lg border p-4 transition-all ${
               exportFormat === 'pdf'
                 ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
@@ -314,26 +315,26 @@ export const ExportControls: FC<ExportControlsProps> = ({
               }
             }}
             tabIndex={0}
-            role="radio"
+            role='radio'
             aria-checked={exportFormat === 'pdf'}
-            aria-label="PDF export format"
+            aria-label='PDF export format'
           >
-            <div className="flex items-center mb-2">
+            <div className='mb-2 flex items-center'>
               <input
-                id="pdf-format"
-                type="radio"
+                id='pdf-format'
+                type='radio'
                 checked={exportFormat === 'pdf'}
                 onChange={() => setExportFormat('pdf')}
-                className="mr-2"
+                className='mr-2'
               />
-              <label htmlFor="pdf-format" className="font-medium text-gray-900">
+              <label htmlFor='pdf-format' className='text-gray-900 font-medium'>
                 PDF Report
               </label>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className='text-gray-600 text-sm'>
               Formatted report for documentation and sharing
             </p>
-            <div className="mt-2 text-xs text-gray-500">
+            <div className='text-gray-500 mt-2 text-xs'>
               Best for: Reports, compliance documentation
             </div>
           </div>
@@ -341,15 +342,15 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Component Selection */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h4 className="font-semibold text-gray-900 mb-4">Include Components</h4>
+      <div className='bg-white border-gray-200 rounded-lg border p-6'>
+        <h4 className='text-gray-900 mb-4 font-semibold'>Include Components</h4>
 
-        <div className="space-y-3">
+        <div className='space-y-3'>
           {/* Analysis Results */}
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <input
-              id="include-analysis"
-              type="checkbox"
+              id='include-analysis'
+              type='checkbox'
               checked={includeComponents.analysis}
               onChange={(e) =>
                 setIncludeComponents((prev) => ({
@@ -357,24 +358,24 @@ export const ExportControls: FC<ExportControlsProps> = ({
                   analysis: e.target.checked,
                 }))
               }
-              className="mr-3"
-              aria-label="Include analysis results"
+              className='mr-3'
+              aria-label='Include analysis results'
             />
-            <label htmlFor="include-analysis" className="flex-1">
-              <span className="font-medium text-gray-900">
+            <label htmlFor='include-analysis' className='flex-1'>
+              <span className='text-gray-900 font-medium'>
                 Analysis Results
               </span>
-              <p className="text-sm text-gray-600">
+              <p className='text-gray-600 text-sm'>
                 Overall bias scores, layer analysis, and confidence metrics
               </p>
             </label>
           </div>
 
           {/* Counterfactual Scenarios */}
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <input
-              id="include-counterfactual"
-              type="checkbox"
+              id='include-counterfactual'
+              type='checkbox'
               checked={includeComponents.counterfactual}
               onChange={(e) =>
                 setIncludeComponents((prev) => ({
@@ -382,24 +383,24 @@ export const ExportControls: FC<ExportControlsProps> = ({
                   counterfactual: e.target.checked,
                 }))
               }
-              className="mr-3"
-              aria-label="Include counterfactual scenarios"
+              className='mr-3'
+              aria-label='Include counterfactual scenarios'
             />
-            <label htmlFor="include-counterfactual" className="flex-1">
-              <span className="font-medium text-gray-900">
+            <label htmlFor='include-counterfactual' className='flex-1'>
+              <span className='text-gray-900 font-medium'>
                 Counterfactual Scenarios
               </span>
-              <p className="text-sm text-gray-600">
+              <p className='text-gray-600 text-sm'>
                 Alternative scenarios and expected bias reduction estimates
               </p>
             </label>
           </div>
 
           {/* Historical Comparison */}
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <input
-              id="include-historical"
-              type="checkbox"
+              id='include-historical'
+              type='checkbox'
               checked={includeComponents.historical}
               onChange={(e) =>
                 setIncludeComponents((prev) => ({
@@ -408,10 +409,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
                 }))
               }
               disabled={!historicalComparison}
-              className="mr-3"
-              aria-label="Include historical comparison"
+              className='mr-3'
+              aria-label='Include historical comparison'
             />
-            <label htmlFor="include-historical" className="flex-1">
+            <label htmlFor='include-historical' className='flex-1'>
               <span
                 className={`font-medium ${historicalComparison ? 'text-gray-900' : 'text-gray-400'}`}
               >
@@ -426,10 +427,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
           </div>
 
           {/* Recommendations */}
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <input
-              id="include-recommendations"
-              type="checkbox"
+              id='include-recommendations'
+              type='checkbox'
               checked={includeComponents.recommendations}
               onChange={(e) =>
                 setIncludeComponents((prev) => ({
@@ -437,22 +438,22 @@ export const ExportControls: FC<ExportControlsProps> = ({
                   recommendations: e.target.checked,
                 }))
               }
-              className="mr-3"
-              aria-label="Include recommendations"
+              className='mr-3'
+              aria-label='Include recommendations'
             />
-            <label htmlFor="include-recommendations" className="flex-1">
-              <span className="font-medium text-gray-900">Recommendations</span>
-              <p className="text-sm text-gray-600">
+            <label htmlFor='include-recommendations' className='flex-1'>
+              <span className='text-gray-900 font-medium'>Recommendations</span>
+              <p className='text-gray-600 text-sm'>
                 AI-generated suggestions for bias reduction
               </p>
             </label>
           </div>
 
           {/* Demographics */}
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <input
-              id="include-demographics"
-              type="checkbox"
+              id='include-demographics'
+              type='checkbox'
               checked={includeComponents.demographics}
               onChange={(e) =>
                 setIncludeComponents((prev) => ({
@@ -460,14 +461,14 @@ export const ExportControls: FC<ExportControlsProps> = ({
                   demographics: e.target.checked,
                 }))
               }
-              className="mr-3"
-              aria-label="Include demographics context"
+              className='mr-3'
+              aria-label='Include demographics context'
             />
-            <label htmlFor="include-demographics" className="flex-1">
-              <span className="font-medium text-gray-900">
+            <label htmlFor='include-demographics' className='flex-1'>
+              <span className='text-gray-900 font-medium'>
                 Demographics Context
               </span>
-              <p className="text-sm text-gray-600">
+              <p className='text-gray-600 text-sm'>
                 Client demographic information for context
               </p>
             </label>
@@ -476,11 +477,11 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Export Summary */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-        <div className="flex justify-between items-center">
+      <div className='bg-gray-50 border-gray-200 rounded-lg border p-4'>
+        <div className='flex items-center justify-between'>
           <div>
-            <div className="font-medium text-gray-900">Export Summary</div>
-            <div className="text-sm text-gray-600">
+            <div className='text-gray-900 font-medium'>Export Summary</div>
+            <div className='text-gray-600 text-sm'>
               Format: {exportFormat.toUpperCase()} • Size: ~
               {getExportSizeEstimate().toFixed(1)} KB • Components:{' '}
               {Object.values(includeComponents).filter(Boolean).length}/5
@@ -492,26 +493,26 @@ export const ExportControls: FC<ExportControlsProps> = ({
             disabled={
               isExporting || Object.values(includeComponents).every((v) => !v)
             }
-            className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center"
+            className='bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-gray-400 flex items-center rounded-md px-6 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed'
           >
             {isExporting ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div className='border-white mr-2 h-4 w-4 animate-spin rounded-full border-b-2'></div>
                 Exporting...
               </>
             ) : (
               <>
                 <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  className='mr-2 h-4 w-4'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
                     strokeWidth={2}
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    d='M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
                   />
                 </svg>
                 Export Data
@@ -522,9 +523,9 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Export Guidelines */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h5 className="font-medium text-blue-900 mb-2">Export Guidelines</h5>
-        <ul className="text-sm text-blue-800 space-y-1">
+      <div className='bg-blue-50 border-blue-200 rounded-lg border p-4'>
+        <h5 className='text-blue-900 mb-2 font-medium'>Export Guidelines</h5>
+        <ul className='text-blue-800 space-y-1 text-sm'>
           <li>• Exported data contains sensitive analysis information</li>
           <li>
             • Ensure compliance with your organization&apos;s data handling

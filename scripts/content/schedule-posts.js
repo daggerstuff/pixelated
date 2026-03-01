@@ -9,10 +9,11 @@
  */
 
 import fs from 'fs/promises'
+import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
+
 import { globby } from 'globby'
-import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const matter = require('gray-matter')
 import simpleGit from 'simple-git'
@@ -119,4 +120,4 @@ async function schedulePost() {
 }
 
 // Run the scheduler
-schedulePost()
+void schedulePost()

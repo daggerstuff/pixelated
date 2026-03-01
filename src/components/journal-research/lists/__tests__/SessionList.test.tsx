@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { SessionList } from '../SessionList'
+import { describe, it, expect, vi } from 'vitest'
+
 import { mockSessionList } from '../../__tests__/test-utils'
+import { SessionList } from '../SessionList'
 
 describe('SessionList', () => {
   it('renders session list correctly', () => {
@@ -16,12 +17,16 @@ describe('SessionList', () => {
   it('displays sessions in table', () => {
     render(<SessionList sessions={mockSessionList} />)
 
-    expect(screen.getByText(mockSessionList.items[0].sessionId)).toBeInTheDocument()
+    expect(
+      screen.getByText(mockSessionList.items[0].sessionId),
+    ).toBeInTheDocument()
   })
 
   it('calls onSessionClick when session is clicked', () => {
     const handleClick = vi.fn()
-    render(<SessionList sessions={mockSessionList} onSessionClick={handleClick} />)
+    render(
+      <SessionList sessions={mockSessionList} onSessionClick={handleClick} />,
+    )
 
     const sessionLink = screen.getByText(mockSessionList.items[0].sessionId)
     fireEvent.click(sessionLink)
@@ -123,11 +128,10 @@ describe('SessionList', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <SessionList sessions={mockSessionList} className="custom-class" />,
+      <SessionList sessions={mockSessionList} className='custom-class' />,
     )
 
     const listContainer = container.querySelector('.custom-class')
     expect(listContainer).toBeInTheDocument()
   })
 })
-

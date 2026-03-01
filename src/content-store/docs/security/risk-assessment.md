@@ -1,9 +1,9 @@
 ---
-title: "Risk Level Assessment System"
-description: "Risk Level Assessment System documentation"
+title: 'Risk Level Assessment System'
+description: 'Risk Level Assessment System documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -12,30 +12,38 @@ toc: true
 
 ## Overview
 
-The Risk Level Assessment System provides a comprehensive framework for evaluating and responding to potential security and mental health risks identified within the application. It combines sophisticated risk scoring with configurable alerting capabilities to ensure appropriate responses to potential crises.
+The Risk Level Assessment System provides a comprehensive framework for
+evaluating and responding to potential security and mental health risks
+identified within the application. It combines sophisticated risk scoring with
+configurable alerting capabilities to ensure appropriate responses to potential
+crises.
 
 ## Key Components
 
 The system consists of three main components:
 
-1. **Risk Level Assessment Service**: Evaluates risk factors and determines appropriate risk levels
-2. **Risk Alert System**: Manages notifications, escalations, and human oversight for high-risk situations
-3. **Crisis Detection Integration**: Connects AI-based crisis detection with the risk assessment framework
+1. **Risk Level Assessment Service**: Evaluates risk factors and determines
+   appropriate risk levels
+2. **Risk Alert System**: Manages notifications, escalations, and human
+   oversight for high-risk situations
+3. **Crisis Detection Integration**: Connects AI-based crisis detection with the
+   risk assessment framework
 
 ## Risk Levels
 
 The system uses four risk levels:
 
-| Level | Description | Typical Response |
-|-------|-------------|------------------|
-| **Low** | Minimal concern, routine monitoring | Passive monitoring only |
-| **Medium** | Moderate concern, requires attention | Dashboard notification |
-| **High** | Significant concern, requires intervention | Dashboard notification + Human review |
-| **Critical** | Severe concern, requires immediate action | Dashboard notification + Human review + Optional escalation |
+| Level        | Description                                | Typical Response                                            |
+| ------------ | ------------------------------------------ | ----------------------------------------------------------- |
+| **Low**      | Minimal concern, routine monitoring        | Passive monitoring only                                     |
+| **Medium**   | Moderate concern, requires attention       | Dashboard notification                                      |
+| **High**     | Significant concern, requires intervention | Dashboard notification + Human review                       |
+| **Critical** | Severe concern, requires immediate action  | Dashboard notification + Human review + Optional escalation |
 
 ## Configuration Options
 
-The risk assessment system can be configured with various sensitivity levels and thresholds:
+The risk assessment system can be configured with various sensitivity levels and
+thresholds:
 
 ### Sensitivity Levels
 
@@ -54,7 +62,8 @@ The risk assessment system can be configured with various sensitivity levels and
 
 ### Risk Level Assessment Service
 
-The `RiskLevelAssessmentService` evaluates various risk factors to determine an overall risk level. It uses a weighted scoring system that considers:
+The `RiskLevelAssessmentService` evaluates various risk factors to determine an
+overall risk level. It uses a weighted scoring system that considers:
 
 - Factor severity (0-1 scale)
 - Factor confidence (0-1 scale)
@@ -62,20 +71,23 @@ The `RiskLevelAssessmentService` evaluates various risk factors to determine an 
 
 ```typescript
 // Example usage
-import { riskLevelAssessment, type RiskFactor } from '../../security/risk-level-assessment'
+import {
+  riskLevelAssessment,
+  type RiskFactor,
+} from '../../security/risk-level-assessment'
 
 // Create risk factors
 const factors: RiskFactor[] = [
   {
     type: 'suicidal_ideation',
     severity: 0.8,
-    confidence: 0.7
+    confidence: 0.7,
   },
   {
     type: 'social_isolation',
     severity: 0.6,
-    confidence: 0.8
-  }
+    confidence: 0.8,
+  },
 ]
 
 // Assess risk level
@@ -87,7 +99,9 @@ console.log(`Requires intervention: ${assessment.requiresIntervention}`)
 
 ### Risk Alert System
 
-The `RiskAlertSystem` manages notifications and human oversight for high-risk situations. It supports multiple notification channels and includes configurable cooldown periods to prevent alert fatigue.
+The `RiskAlertSystem` manages notifications and human oversight for high-risk
+situations. It supports multiple notification channels and includes configurable
+cooldown periods to prevent alert fatigue.
 
 ```typescript
 // Example usage
@@ -95,15 +109,10 @@ import { riskAlertSystem } from '../../security/alert-system'
 import { riskLevelAssessment } from '../../security/risk-level-assessment'
 
 // Process assessment through alert system
-await riskAlertSystem.processAssessment(
-  assessment,
-  userId,
-  'chat-message',
-  {
-    messageId: '123456',
-    sessionId: '789012'
-  }
-)
+await riskAlertSystem.processAssessment(assessment, userId, 'chat-message', {
+  messageId: '123456',
+  sessionId: '789012',
+})
 ```
 
 ### Human Oversight
@@ -127,13 +136,18 @@ For high and critical risk levels, the system ensures human review through:
 The system includes robust error handling and fallback mechanisms:
 
 - If risk assessment fails, it defaults to a medium risk level
-- If alert delivery fails through the primary channel, it attempts alternate channels
+- If alert delivery fails through the primary channel, it attempts alternate
+  channels
 - All errors are logged for review and system improvement
 - Periodic audits ensure system reliability and accuracy
 
 ## Best Practices for Implementation
 
-1. **Regular Calibration**: Periodically review and adjust sensitivity levels based on false positive/negative rates
-2. **Human in the Loop**: Always maintain human oversight for high and critical risk levels
-3. **Documentation**: Keep clear records of all alert responses for quality improvement
-4. **Privacy Focus**: Collect only necessary information needed for risk assessment
+1. **Regular Calibration**: Periodically review and adjust sensitivity levels
+   based on false positive/negative rates
+2. **Human in the Loop**: Always maintain human oversight for high and critical
+   risk levels
+3. **Documentation**: Keep clear records of all alert responses for quality
+   improvement
+4. **Privacy Focus**: Collect only necessary information needed for risk
+   assessment

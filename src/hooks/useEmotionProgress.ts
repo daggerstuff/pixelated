@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+
 import type { ProgressionAnalysis } from '@/lib/ai/temporal/types'
 
 export interface EmotionProgressData {
@@ -141,7 +142,7 @@ export default function useEmotionProgress({
       }
     }
 
-    fetchEmotionProgressData()
+    void fetchEmotionProgressData()
   }, [timeRange, userId])
 
   return {

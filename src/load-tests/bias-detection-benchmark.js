@@ -5,13 +5,13 @@
  * for the bias detection engine with various scenarios and user patterns.
  */
 
-import http from 'k6/http'
-import { check, sleep, group } from 'k6'
-import { Rate, Trend, Counter, Gauge } from 'k6/metrics'
 import {
   randomString,
   randomIntBetween,
 } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js'
+import { check, sleep, group } from 'k6'
+import http from 'k6/http'
+import { Rate, Trend, Counter, Gauge } from 'k6/metrics'
 
 // Custom metrics for detailed performance analysis
 export const errorRate = new Rate('bias_detection_errors')
@@ -233,11 +233,11 @@ function generateSessionData(baseSession) {
 
 function generatePatientPresentation(scenarioType) {
   const presentations = {
-    'depression':
+    depression:
       'Patient presents with persistent low mood, fatigue, and social withdrawal for the past 6 weeks.',
-    'anxiety':
+    anxiety:
       'Patient reports excessive worry, restlessness, and difficulty concentrating affecting daily activities.',
-    'trauma':
+    trauma:
       'Patient exhibits symptoms of PTSD following a recent traumatic event, including flashbacks and hypervigilance.',
     'substance-abuse':
       'Patient acknowledges problematic alcohol use impacting work and relationships.',
@@ -294,7 +294,7 @@ export default function () {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${AUTH_TOKEN}`,
+          Authorization: `Bearer ${AUTH_TOKEN}`,
         },
         tags: {
           endpoint: 'analyze',

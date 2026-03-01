@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { DashboardWidget } from './DashboardWidget'
+
 import {
   Select,
   SelectContent,
@@ -7,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
+import { DashboardWidget } from './DashboardWidget'
 
 // Optional: Import type definitions for better TypeScript support
 type ChartType = 'line' | 'bar' | 'pie' | 'doughnut'
@@ -76,7 +78,7 @@ export function ChartWidget({
   useEffect(() => {
     // Dynamically import Chart.js only in browser environment
     if (typeof window !== 'undefined' && chartRef.current) {
-      import('chart.js').then((ChartJS) => {
+      void import('chart.js').then((ChartJS) => {
         // Register required controllers and elements
         ChartJS.Chart.register(
           ChartJS.CategoryScale,
@@ -231,7 +233,7 @@ export function ChartWidget({
       }
     }
 
-    loadData()
+    void loadData()
 
     if (refreshInterval && fetchData) {
       const interval = setInterval(loadData, refreshInterval)
@@ -257,7 +259,7 @@ export function ChartWidget({
           setIsLoading(false)
         }
       }
-      refreshAsync()
+      void refreshAsync()
     }
   }
 
@@ -267,15 +269,15 @@ export function ChartWidget({
       value={range}
       onValueChange={(value: string) => setRange(value as TimeRange)}
     >
-      <SelectTrigger className="w-[100px] h-8 text-xs">
+      <SelectTrigger className='h-8 w-[100px] text-xs'>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="day">Day</SelectItem>
-        <SelectItem value="week">Week</SelectItem>
-        <SelectItem value="month">Month</SelectItem>
-        <SelectItem value="quarter">Quarter</SelectItem>
-        <SelectItem value="year">Year</SelectItem>
+        <SelectItem value='day'>Day</SelectItem>
+        <SelectItem value='week'>Week</SelectItem>
+        <SelectItem value='month'>Month</SelectItem>
+        <SelectItem value='quarter'>Quarter</SelectItem>
+        <SelectItem value='year'>Year</SelectItem>
       </SelectContent>
     </Select>
   ) : null
@@ -292,9 +294,9 @@ export function ChartWidget({
       <div
         style={{ height: `${height}px` }}
         aria-label={description ? `${title}: ${description}` : title}
-        role="img"
+        role='img'
       >
-        <div className="sr-only">
+        <div className='sr-only'>
           {description ? `${title}: ${description}` : title}
           {/* Optionally, summarize the data here for screen readers */}
         </div>

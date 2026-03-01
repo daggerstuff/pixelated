@@ -1,5 +1,6 @@
-import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
 import { existsSync } from 'node:fs'
+
+import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
 
 interface ProductionReadinessCheck {
   id: string

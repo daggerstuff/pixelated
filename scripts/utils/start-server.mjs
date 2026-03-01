@@ -1,19 +1,21 @@
 #!/usr/bin/env node
 
-import { Sentry, closeSentry } from './instrument.mjs'
-
 import { createServer } from 'node:http'
+
 import { handler as ssrHandler } from '/app/dist/server/entry.mjs'
 
-const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT;
-const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN;
-let initialPort = Number.isFinite(parsedPort) && parsedPort >= 0 && parsedPort <= 65535 ? parsedPort : 4321;
-if (
-  Number.isNaN(initialPort) ||
-  initialPort < 0 ||
-  initialPort > 65535
-) {
-  console.error(`Invalid port: ${initialPort}. Falling back to default port 4321.`)
+import { Sentry, closeSentry } from './instrument.mjs'
+
+const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT
+const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN
+let initialPort =
+  Number.isFinite(parsedPort) && parsedPort >= 0 && parsedPort <= 65535
+    ? parsedPort
+    : 4321
+if (Number.isNaN(initialPort) || initialPort < 0 || initialPort > 65535) {
+  console.error(
+    `Invalid port: ${initialPort}. Falling back to default port 4321.`,
+  )
   initialPort = 4321
 }
 const host = process.env.HOST || '0.0.0.0'
@@ -45,20 +47,31 @@ function redactValue(val, keepLast = 8) {
 
 function logSentryStartupChecks() {
   const serverDsn = process.env.SENTRY_DSN
-  const publicDsn = process.env.PUBLIC_SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
+  const publicDsn =
+    process.env.PUBLIC_SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN
   const release = process.env.SENTRY_RELEASE
   const authToken = process.env.SENTRY_AUTH_TOKEN
 
   console.log('Sentry startup check:')
   console.log('  SENTRY_DSN:', serverDsn ? redactValue(serverDsn) : '<missing>')
-  console.log('  PUBLIC_SENTRY_DSN:', publicDsn ? redactValue(publicDsn) : '<missing>')
-  console.log('  SENTRY_RELEASE:', typeof release === 'string' && release.length ? release : '<missing>')
+  console.log(
+    '  PUBLIC_SENTRY_DSN:',
+    publicDsn ? redactValue(publicDsn) : '<missing>',
+  )
+  console.log(
+    '  SENTRY_RELEASE:',
+    typeof release === 'string' && release.length ? release : '<missing>',
+  )
   console.log('  SENTRY_AUTH_TOKEN provided:', !!authToken)
   if (!serverDsn) {
-    console.warn('Warning: SENTRY_DSN is not set — server-side events will not be sent to Sentry.')
+    console.warn(
+      'Warning: SENTRY_DSN is not set — server-side events will not be sent to Sentry.',
+    )
   }
   if (!release) {
-    console.warn('Warning: SENTRY_RELEASE is not set — sessions or releases may be rejected by Sentry.')
+    console.warn(
+      'Warning: SENTRY_RELEASE is not set — sessions or releases may be rejected by Sentry.',
+    )
   }
 }
 
@@ -104,12 +117,10 @@ const maxDelay = 5000
 
 function tryListen(portToTry, retriesLeft, delay = baseDelay) {
   let port = Number(portToTry)
-  if (
-    Number.isNaN(port) ||
-    port < 0 ||
-    port > 65535
-  ) {
-    console.error(`Invalid port: ${portToTry}. Falling back to default port 4321.`)
+  if (Number.isNaN(port) || port < 0 || port > 65535) {
+    console.error(
+      `Invalid port: ${portToTry}. Falling back to default port 4321.`,
+    )
     port = 4321
   }
 
@@ -120,7 +131,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
       // Only clear 'error' listeners to avoid touching other process-wide
       // handlers that may be registered elsewhere.
       activeRetryServer.removeAllListeners('error')
-      activeRetryServer.close(() => { })
+      activeRetryServer.close(() => {})
     } catch {
       // ignore
     }
@@ -133,7 +144,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
   activeRetryServer = retryServer
 
   const onListening = () => {
-    retryServer.off('error', onError);
+    retryServer.off('error', onError)
     console.log(`Server running at http://${host}:${port}`)
     try {
       logSentryStartupChecks()
@@ -147,7 +158,9 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
       console.error(`Port ${port} is already in use.`)
 
       if (isPortFallbackDisabled) {
-        console.error('Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.')
+        console.error(
+          'Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.',
+        )
         // Only report to Sentry when port fallback is disabled (fatal error)
         try {
           if (Sentry) {
@@ -188,7 +201,9 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
       // This is expected behavior and will be handled gracefully
       const nextPort = port + 1
       const nextDelay = Math.min(delay * 2, maxDelay)
-      console.warn(`Attempting fallback to port ${nextPort} (${retriesLeft - 1} retries left, delay ${delay}ms)`)
+      console.warn(
+        `Attempting fallback to port ${nextPort} (${retriesLeft - 1} retries left, delay ${delay}ms)`,
+      )
       setTimeout(() => tryListen(nextPort, retriesLeft - 1, nextDelay), delay)
       return
     }
@@ -208,11 +223,12 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
   retryServer.listen(port, host, onListening)
 }
 
-const retriesRaw = process.env.PORT_FALLBACK_MAX_RETRIES;
-let maxRetries;
+const retriesRaw = process.env.PORT_FALLBACK_MAX_RETRIES
+let maxRetries
 {
-  const n = retriesRaw !== undefined ? Number.parseInt(String(retriesRaw), 10) : NaN;
-  maxRetries = Number.isFinite(n) && n >= 0 ? n : 10;
+  const n =
+    retriesRaw !== undefined ? Number.parseInt(String(retriesRaw), 10) : NaN
+  maxRetries = Number.isFinite(n) && n >= 0 ? n : 10
 }
 tryListen(initialPort, maxRetries)
 
@@ -220,7 +236,9 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason)
   try {
     if (Sentry) {
-      Sentry.captureException(reason instanceof Error ? reason : new Error(String(reason)))
+      Sentry.captureException(
+        reason instanceof Error ? reason : new Error(String(reason)),
+      )
     }
   } catch (e) {
     console.error('Failed to capture unhandledRejection to Sentry:', e)

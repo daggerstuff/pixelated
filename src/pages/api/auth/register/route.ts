@@ -1,6 +1,7 @@
-import { userManager, initializeDatabase } from '@/lib/db'
-import { verifyPassword } from '@/lib/auth/utils'
 import { z } from 'zod'
+
+import { verifyPassword } from '@/lib/auth/utils'
+import { userManager, initializeDatabase } from '@/lib/db'
 
 // Register schema
 const RegisterSchema = z.object({
@@ -23,7 +24,7 @@ export async function POST({ request }: { request: Request }) {
     if (!result.success) {
       return new Response(
         JSON.stringify({ error: result.error.issues[0].message }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -33,7 +34,7 @@ export async function POST({ request }: { request: Request }) {
     if (!termsAccepted) {
       return new Response(
         JSON.stringify({ error: 'You must accept the Terms of Service' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -42,7 +43,7 @@ export async function POST({ request }: { request: Request }) {
     if (existingUser) {
       return new Response(
         JSON.stringify({ error: 'Email already registered' }),
-        { status: 409, headers: { 'Content-Type': 'application/json' } }
+        { status: 409, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -66,16 +67,15 @@ export async function POST({ request }: { request: Request }) {
     return new Response(
       JSON.stringify({
         message: 'User registered successfully',
-        userId
+        userId,
       }),
-      { status: 201, headers: { 'Content-Type': 'application/json' } }
+      { status: 201, headers: { 'Content-Type': 'application/json' } },
     )
-
   } catch (error: any) {
     console.error('Registration error:', error)
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    )
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

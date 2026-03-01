@@ -4,10 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
+import * as crypto from 'node:crypto'
+
+import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
-import * as tf from '@tensorflow/tfjs'
-import * as crypto from 'node:crypto'
 
 export interface ThreatResponse {
   responseId: string
@@ -101,7 +102,8 @@ export interface ResponseOrchestrationService {
 
 export class AdvancedResponseOrchestrator
   extends EventEmitter
-  implements ResponseOrchestrationService {
+  implements ResponseOrchestrationService
+{
   private redis!: Redis
   private mongoClient!: MongoClient
   private responseExecutor!: ResponseExecutor
@@ -115,7 +117,7 @@ export class AdvancedResponseOrchestrator
     private rateLimitingService: RateLimitingService,
   ) {
     super()
-    this.initializeServices()
+    void this.initializeServices()
   }
 
   private async initializeServices(): Promise<void> {
@@ -996,9 +998,11 @@ class MLDecisionEngine extends DecisionEngine {
   private extractFeatures(threatData: unknown): number[] {
     // Extract relevant features for ML analysis
     const data = threatData as ThreatData
-    const severityScore = typeof data.severity === 'number'
-      ? data.severity
-      : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] || 0
+    const severityScore =
+      typeof data.severity === 'number'
+        ? data.severity
+        : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] ||
+          0
 
     return [
       data.anomalyScore || 0,

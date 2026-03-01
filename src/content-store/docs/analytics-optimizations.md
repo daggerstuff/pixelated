@@ -1,6 +1,8 @@
 ---
 title: 'Thread Analytics Optimizations'
-description: 'Comprehensive optimizations for the thread analytics system including materialized views, caching strategies, and performance improvements'
+description:
+  'Comprehensive optimizations for the thread analytics system including
+  materialized views, caching strategies, and performance improvements'
 pubDate: 2024-12-01
 author: 'System Documentation'
 toc: true
@@ -9,7 +11,9 @@ draft: false
 
 # Thread Analytics Optimizations
 
-This document outlines the optimizations implemented for the thread analytics system to improve performance, reduce database load, and ensure efficient data access.
+This document outlines the optimizations implemented for the thread analytics
+system to improve performance, reduce database load, and ensure efficient data
+access.
 
 ## Overview
 
@@ -25,7 +29,8 @@ The thread analytics system has been optimized using several strategies:
 
 ### Thread Activity Summary
 
-The `thread_activity_summary` materialized view combines frequently accessed metrics into a single, pre-computed view:
+The `thread_activity_summary` materialized view combines frequently accessed
+metrics into a single, pre-computed view:
 
 ```sql
 CREATE MATERIALIZED VIEW thread_activity_summary AS
@@ -109,7 +114,8 @@ The system implements a multi-level caching strategy:
    )
    ```
 
-Cache invalidation is handled automatically through TTL and triggered by data updates.
+Cache invalidation is handled automatically through TTL and triggered by data
+updates.
 
 ## Optimized Indexes
 

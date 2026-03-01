@@ -19,13 +19,14 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const appLogger = createBuildSafeLogger('app')
 import crypto from 'crypto'
+
+import type { MentalArenaPythonBridge } from './MentalArenaPythonBridge.ts'
 import {
   DisorderCategory,
   type SyntheticConversation,
   type SymptomEncodingResult,
   type TherapistDecodingResult,
 } from './types.ts'
-import type { MentalArenaPythonBridge } from './MentalArenaPythonBridge.ts'
 
 const logger = appLogger
 
@@ -51,7 +52,7 @@ export interface FHEService {
     supportsOperation(op: string): boolean
   }
   isInitialized(): boolean
-  initialize(): Promise<void>
+  initialize(config: any): Promise<void>
   generateKeys(): Promise<{ publicKey: string; privateKey: string }>
   supportsOperation(op: string): boolean
 }
@@ -241,7 +242,12 @@ export class MentalArenaAdapter {
       return result.conversations
     } catch (error: unknown) {
       logger.error('Failed to generate synthetic data', { error, options })
-      throw new Error(`Synthetic data generation failed: ${error}`, { cause: error })
+      throw new Error(
+        `Synthetic data generation failed: ${error instanceof Error ? error.message : String(error)}`,
+        {
+          cause: error,
+        },
+      )
     } finally {
       const processingTime = Date.now() - startTime
       this.performanceMetrics.recordGeneration(
@@ -274,7 +280,11 @@ export class MentalArenaAdapter {
 
     // Initialize encryption if needed
     if (this.encryptionEnabled && !this.fheService.isInitialized()) {
-      await this.fheService.initialize()
+      await this.fheService.initialize({
+        mode: 'secure',
+        keySize: 2048,
+        securityLevel: 'tc128',
+      })
     }
 
     // Generate conversations for each disorder concurrently
@@ -309,7 +319,7 @@ export class MentalArenaAdapter {
           }
 
           disorderConversations.forEach((conversation, index) => {
-            const validation = validations[index]!
+            const validation = validations[index]
             processedResults.validationResults.push(validation)
 
             if (validation.isValid) {

@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-Advanced detection systems in therapy combine multiple modalities of analysis to provide comprehensive insights into client behavior, emotional states, and potential crisis indicators. This document outlines the key components and implementation approaches for building robust detection systems.
+Advanced detection systems in therapy combine multiple modalities of analysis to
+provide comprehensive insights into client behavior, emotional states, and
+potential crisis indicators. This document outlines the key components and
+implementation approaches for building robust detection systems.
 
 ## Multimodal Analysis Components
 

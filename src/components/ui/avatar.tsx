@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { cn } from '@/lib/utils'
 
 export interface AvatarProps {
@@ -24,9 +25,9 @@ export function Avatar({
       )}
     >
       {src ? (
-        <img src={src} alt={alt} className="w-full h-full object-cover" />
+        <img src={src} alt={alt} className='h-full w-full object-cover' />
       ) : (
-        <span className="font-medium text-sm">{initials}</span>
+        <span className='text-sm font-medium'>{initials}</span>
       )}
     </div>
   )

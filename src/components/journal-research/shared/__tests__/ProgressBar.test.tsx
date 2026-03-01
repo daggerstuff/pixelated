@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+
 import { ProgressBar } from '../ProgressBar'
 
 describe('ProgressBar', () => {
@@ -41,14 +42,16 @@ describe('ProgressBar', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(<ProgressBar value={50} className="custom-class" />)
+    const { container } = render(
+      <ProgressBar value={50} className='custom-class' />,
+    )
 
     const progressBar = container.querySelector('.custom-class')
     expect(progressBar).toBeInTheDocument()
   })
 
   it('displays label when provided', () => {
-    render(<ProgressBar value={50} label="Test Progress" />)
+    render(<ProgressBar value={50} label='Test Progress' />)
 
     expect(screen.getByText('Test Progress')).toBeInTheDocument()
   })
@@ -59,4 +62,3 @@ describe('ProgressBar', () => {
     expect(screen.getByText('50%')).toBeInTheDocument()
   })
 })
-

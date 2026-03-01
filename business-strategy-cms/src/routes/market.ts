@@ -1,8 +1,9 @@
 import { Router } from 'express'
+
 import { authenticateToken } from '@/middleware/auth'
+import type { AuthenticatedRequest } from '@/middleware/auth'
 import { MarketDataService } from '@/services/marketDataService'
 import { logger } from '@/utils/logger'
-import type { AuthenticatedRequest } from '@/middleware/auth'
 
 const router = Router()
 

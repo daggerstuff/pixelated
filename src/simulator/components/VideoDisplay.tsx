@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import type { UserSession } from '../types'
 import { toast } from 'sonner'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { signalingService } from '../../lib/services/WebRTCSignalingService'
 import type { SignalingMessage } from '../../lib/services/WebRTCSignalingService'
+import type { UserSession } from '../types'
 
 const logger = createBuildSafeLogger('VideoDisplay')
 
@@ -252,7 +254,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
           await createAndSendOffer()
         }
       }
-      initialize()
+      void initialize()
 
       // Register signaling message handler
       const cleanup = signalingService.onMessage(
@@ -303,57 +305,57 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
   return (
     <div
-      className={`video-display relative rounded-lg overflow-hidden bg-gray-800 ${className}`}
+      className={`video-display bg-gray-800 relative overflow-hidden rounded-lg ${className}`}
       style={{ aspectRatio: '16/9' }}
-      role="region"
-      aria-label="Video chat interface"
+      role='region'
+      aria-label='Video chat interface'
     >
       {/* Remote video (patient/client feed) */}
       <video
         ref={remoteVideoRef}
-        className={`absolute inset-0 w-full h-full object-cover ${
+        className={`absolute inset-0 h-full w-full object-cover ${
           isConnected && !hasPermissionError ? 'opacity-100' : 'opacity-0'
         }`}
         autoPlay
         playsInline
       >
-        <track kind="captions" src="" label="English captions" />
+        <track kind='captions' src='' label='English captions' />
       </video>
 
       {/* Connection error or permission denied state */}
       {(hasPermissionError || !isConnected) && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 text-white">
+        <div className='bg-gray-800 text-white absolute inset-0 flex flex-col items-center justify-center'>
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-16 w-16 mb-3 ${
+            xmlns='http://www.w3.org/2000/svg'
+            className={`mb-3 h-16 w-16 ${
               hasPermissionError ? 'text-red-500' : 'text-gray-500'
             }`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
           >
             {hasPermissionError ? (
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={1.5}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
               />
             ) : (
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={1.5}
-                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                d='M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z'
               />
             )}
           </svg>
-          <p className="text-lg font-medium text-gray-300">
+          <p className='text-gray-300 text-lg font-medium'>
             {hasPermissionError
               ? 'Camera Access Required'
               : 'Practice Simulation'}
           </p>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className='text-gray-400 mt-1 text-sm'>
             {hasPermissionError
               ? 'Please allow access to your camera and microphone'
               : 'Click Start to begin a therapeutic interaction'}
@@ -363,17 +365,17 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
       {/* Connection status indicator */}
       <div
-        className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-xs font-medium flex items-center ${
+        className={`absolute bottom-4 left-4 flex items-center rounded-full px-3 py-1 text-xs font-medium ${
           connectionStatus === 'connected'
             ? 'bg-green-100 text-green-800'
             : connectionStatus === 'connecting' || isReconnecting
               ? 'bg-yellow-100 text-yellow-800 animate-pulse'
               : 'bg-gray-100 text-gray-800'
         }`}
-        role="status"
+        role='status'
       >
         <span
-          className={`w-2 h-2 rounded-full mr-1.5 ${
+          className={`mr-1.5 h-2 w-2 rounded-full ${
             connectionStatus === 'connected'
               ? 'bg-green-500'
               : connectionStatus === 'connecting' || isReconnecting
@@ -387,38 +389,38 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 
       {/* Local video preview */}
       <div
-        className="absolute bottom-4 right-4 w-32 h-24 md:w-40 md:h-30 bg-gray-900 rounded overflow-hidden border-2 border-gray-700"
-        role="region"
-        aria-label="Your video preview"
+        className='md:h-30 bg-gray-900 border-gray-700 absolute bottom-4 right-4 h-24 w-32 overflow-hidden rounded border-2 md:w-40'
+        role='region'
+        aria-label='Your video preview'
       >
         <video
           ref={localVideoRef}
-          className="w-full h-full object-cover"
+          className='h-full w-full object-cover'
           autoPlay
           playsInline
           muted
         >
-          <track kind="captions" src="" label="English captions" />
+          <track kind='captions' src='' label='English captions' />
         </video>
       </div>
 
       {/* Privacy indicator */}
       <div
-        className="absolute top-4 right-4 bg-green-900 bg-opacity-70 text-green-100 text-xs px-2 py-1 rounded-md flex items-center"
-        role="status"
+        className='bg-green-900 text-green-100 absolute right-4 top-4 flex items-center rounded-md bg-opacity-70 px-2 py-1 text-xs'
+        role='status'
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3.5 w-3.5 mr-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          xmlns='http://www.w3.org/2000/svg'
+          className='mr-1 h-3.5 w-3.5'
+          fill='none'
+          viewBox='0 0 24 24'
+          stroke='currentColor'
         >
           <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeLinecap='round'
+            strokeLinejoin='round'
             strokeWidth={2}
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
           />
         </svg>
         End-to-End Encrypted

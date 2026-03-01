@@ -133,37 +133,37 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+    <div className='mx-auto w-full max-w-6xl space-y-6 p-6'>
+      <div className='mb-8 text-center'>
+        <h1 className='text-gray-900 mb-2 text-3xl font-bold'>
           Clinical Formulation Demo
         </h1>
-        <p className="text-gray-600">
+        <p className='text-gray-600'>
           Generate comprehensive clinical formulations using AI-assisted
           analysis
         </p>
       </div>
 
       {/* Input Section */}
-      <div className="bg-white rounded-lg shadow-md p-6 border">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      <div className='bg-white rounded-lg border p-6 shadow-md'>
+        <h2 className='text-gray-900 mb-4 text-xl font-semibold'>
           Patient Information
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
           <div>
-            <h3 className="font-medium text-gray-700 mb-2">
+            <h3 className='text-gray-700 mb-2 font-medium'>
               Presenting Problem
             </h3>
-            <p className="text-gray-600 bg-gray-50 p-3 rounded">
+            <p className='text-gray-600 bg-gray-50 rounded p-3'>
               {patientData?.presentingProblem ||
                 'Patient reports feeling depressed for the past 3 months, with difficulty sleeping, loss of appetite, and decreased motivation following job loss.'}
             </p>
           </div>
 
           <div>
-            <h3 className="font-medium text-gray-700 mb-2">Demographics</h3>
-            <div className="text-gray-600 bg-gray-50 p-3 rounded space-y-1">
+            <h3 className='text-gray-700 mb-2 font-medium'>Demographics</h3>
+            <div className='text-gray-600 bg-gray-50 space-y-1 rounded p-3'>
               <div>Age: {patientData?.demographics?.age || 32}</div>
               <div>Gender: {patientData?.demographics?.gender || 'Female'}</div>
               <div>
@@ -175,8 +175,8 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </div>
         </div>
 
-        <div className="mt-6">
-          <h3 className="font-medium text-gray-700 mb-2">
+        <div className='mt-6'>
+          <h3 className='text-gray-700 mb-2 font-medium'>
             Therapeutic Approach
           </h3>
           <select
@@ -184,7 +184,7 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
             onChange={(e) =>
               setSelectedApproach(e.target.value as typeof selectedApproach)
             }
-            className="w-full md:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2 md:w-auto'
           >
             {Object.entries(approaches).map(([key, label]) => (
               <option key={key} value={key}>
@@ -194,11 +194,11 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </select>
         </div>
 
-        <div className="mt-6">
+        <div className='mt-6'>
           <button
             onClick={generateFormulation}
             disabled={isGenerating}
-            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            className='bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg px-6 py-3 font-semibold transition-colors'
           >
             {isGenerating
               ? 'Generating Formulation...'
@@ -209,10 +209,10 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
 
       {/* Loading State */}
       {isGenerating && (
-        <div className="bg-white rounded-lg shadow-md p-6 border">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="text-gray-600">
+        <div className='bg-white rounded-lg border p-6 shadow-md'>
+          <div className='flex items-center justify-center space-x-2'>
+            <div className='border-blue-600 h-6 w-6 animate-spin rounded-full border-b-2'></div>
+            <span className='text-gray-600'>
               Analyzing patient data and generating formulation...
             </span>
           </div>
@@ -221,64 +221,64 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
 
       {/* Results Section */}
       {formulation && !isGenerating && (
-        <div className="space-y-6">
+        <div className='space-y-6'>
           {/* Four P's Framework */}
-          <div className="bg-white rounded-lg shadow-md p-6 border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <div className='bg-white rounded-lg border p-6 shadow-md'>
+            <h2 className='text-gray-900 mb-6 text-xl font-semibold'>
               Four P&apos;s Formulation
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-                <h3 className="font-semibold text-red-800 mb-3">
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+              <div className='bg-red-50 border-red-200 rounded-lg border p-4'>
+                <h3 className='text-red-800 mb-3 font-semibold'>
                   Precipitating Factors
                 </h3>
-                <ul className="space-y-1 text-sm text-red-700">
+                <ul className='text-red-700 space-y-1 text-sm'>
                   {formulation.precipitatingFactors.map((factor, index) => (
-                    <li key={`precip-${index}`} className="flex items-start">
-                      <span className="mr-2">•</span>
+                    <li key={`precip-${index}`} className='flex items-start'>
+                      <span className='mr-2'>•</span>
                       <span>{factor}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                <h3 className="font-semibold text-orange-800 mb-3">
+              <div className='bg-orange-50 border-orange-200 rounded-lg border p-4'>
+                <h3 className='text-orange-800 mb-3 font-semibold'>
                   Predisposing Factors
                 </h3>
-                <ul className="space-y-1 text-sm text-orange-700">
+                <ul className='text-orange-700 space-y-1 text-sm'>
                   {formulation.predisposingFactors.map((factor, index) => (
-                    <li key={`predis-${index}`} className="flex items-start">
-                      <span className="mr-2">•</span>
+                    <li key={`predis-${index}`} className='flex items-start'>
+                      <span className='mr-2'>•</span>
                       <span>{factor}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <h3 className="font-semibold text-yellow-800 mb-3">
+              <div className='bg-yellow-50 border-yellow-200 rounded-lg border p-4'>
+                <h3 className='text-yellow-800 mb-3 font-semibold'>
                   Perpetuating Factors
                 </h3>
-                <ul className="space-y-1 text-sm text-yellow-700">
+                <ul className='text-yellow-700 space-y-1 text-sm'>
                   {formulation.perpetuatingFactors.map((factor, index) => (
-                    <li key={`perp-${index}`} className="flex items-start">
-                      <span className="mr-2">•</span>
+                    <li key={`perp-${index}`} className='flex items-start'>
+                      <span className='mr-2'>•</span>
                       <span>{factor}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-800 mb-3">
+              <div className='bg-green-50 border-green-200 rounded-lg border p-4'>
+                <h3 className='text-green-800 mb-3 font-semibold'>
                   Protective Factors
                 </h3>
-                <ul className="space-y-1 text-sm text-green-700">
+                <ul className='text-green-700 space-y-1 text-sm'>
                   {formulation.protectiveFactors.map((factor, index) => (
-                    <li key={`prot-${index}`} className="flex items-start">
-                      <span className="mr-2">•</span>
+                    <li key={`prot-${index}`} className='flex items-start'>
+                      <span className='mr-2'>•</span>
                       <span>{factor}</span>
                     </li>
                   ))}
@@ -288,33 +288,33 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </div>
 
           {/* Hypotheses */}
-          <div className="bg-white rounded-lg shadow-md p-6 border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className='bg-white rounded-lg border p-6 shadow-md'>
+            <h2 className='text-gray-900 mb-4 text-xl font-semibold'>
               Clinical Hypotheses
             </h2>
 
-            <div className="space-y-4">
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 className="font-semibold text-blue-800 mb-2">
+            <div className='space-y-4'>
+              <div className='bg-blue-50 border-blue-200 rounded-lg border p-4'>
+                <h3 className='text-blue-800 mb-2 font-semibold'>
                   Primary Hypothesis
                 </h3>
-                <p className="text-blue-700">
+                <p className='text-blue-700'>
                   {formulation.hypotheses.primary}
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-800 mb-2">
+                <h3 className='text-gray-800 mb-2 font-semibold'>
                   Alternative Hypotheses
                 </h3>
-                <ul className="space-y-1">
+                <ul className='space-y-1'>
                   {formulation.hypotheses.alternative.map(
                     (hypothesis, index) => (
                       <li
                         key={`alt-${index}`}
-                        className="text-gray-600 flex items-start"
+                        className='text-gray-600 flex items-start'
                       >
-                        <span className="mr-2 text-gray-400">•</span>
+                        <span className='text-gray-400 mr-2'>•</span>
                         <span>{hypothesis}</span>
                       </li>
                     ),
@@ -325,23 +325,23 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </div>
 
           {/* Treatment Plan */}
-          <div className="bg-white rounded-lg shadow-md p-6 border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          <div className='bg-white rounded-lg border p-6 shadow-md'>
+            <h2 className='text-gray-900 mb-6 text-xl font-semibold'>
               Treatment Plan
             </h2>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">
+                <h3 className='text-gray-800 mb-3 font-semibold'>
                   Treatment Goals
                 </h3>
-                <ul className="space-y-2">
+                <ul className='space-y-2'>
                   {formulation.treatmentGoals.map((goal, index) => (
                     <li
                       key={`goal-${index}`}
-                      className="flex items-start text-gray-600"
+                      className='text-gray-600 flex items-start'
                     >
-                      <span className="mr-2 text-green-500 font-bold">✓</span>
+                      <span className='text-green-500 mr-2 font-bold'>✓</span>
                       <span>{goal}</span>
                     </li>
                   ))}
@@ -349,16 +349,16 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">
+                <h3 className='text-gray-800 mb-3 font-semibold'>
                   Intervention Plan
                 </h3>
-                <ul className="space-y-2">
+                <ul className='space-y-2'>
                   {formulation.interventionPlan.map((intervention, index) => (
                     <li
                       key={`intervention-${index}`}
-                      className="flex items-start text-gray-600"
+                      className='text-gray-600 flex items-start'
                     >
-                      <span className="mr-2 text-blue-500">→</span>
+                      <span className='text-blue-500 mr-2'>→</span>
                       <span>{intervention}</span>
                     </li>
                   ))}
@@ -368,15 +368,15 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </div>
 
           {/* Risk Assessment */}
-          <div className="bg-white rounded-lg shadow-md p-6 border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className='bg-white rounded-lg border p-6 shadow-md'>
+            <h2 className='text-gray-900 mb-4 text-xl font-semibold'>
               Risk Assessment
             </h2>
 
-            <div className="flex items-center space-x-4 mb-4">
-              <span className="text-gray-700">Risk Level:</span>
+            <div className='mb-4 flex items-center space-x-4'>
+              <span className='text-gray-700'>Risk Level:</span>
               <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                className={`rounded-full px-3 py-1 text-sm font-medium ${
                   formulation.riskAssessment.level === 'high'
                     ? 'bg-red-100 text-red-800'
                     : formulation.riskAssessment.level === 'moderate'
@@ -390,14 +390,14 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
             </div>
 
             <div>
-              <h3 className="font-medium text-gray-700 mb-2">Risk Factors:</h3>
-              <ul className="space-y-1">
+              <h3 className='text-gray-700 mb-2 font-medium'>Risk Factors:</h3>
+              <ul className='space-y-1'>
                 {formulation.riskAssessment.factors.map((factor, index) => (
                   <li
                     key={`risk-${index}`}
-                    className="text-gray-600 flex items-start"
+                    className='text-gray-600 flex items-start'
                   >
-                    <span className="mr-2 text-orange-500">⚠</span>
+                    <span className='text-orange-500 mr-2'>⚠</span>
                     <span>{factor}</span>
                   </li>
                 ))}
@@ -406,24 +406,24 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
           </div>
 
           {/* Prognosis */}
-          <div className="bg-white rounded-lg shadow-md p-6 border">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className='bg-white rounded-lg border p-6 shadow-md'>
+            <h2 className='text-gray-900 mb-4 text-xl font-semibold'>
               Prognosis & Review
             </h2>
 
-            <div className="space-y-4">
+            <div className='space-y-4'>
               <div>
-                <h3 className="font-medium text-gray-700 mb-2">Prognosis:</h3>
-                <p className="text-gray-600 bg-gray-50 p-3 rounded">
+                <h3 className='text-gray-700 mb-2 font-medium'>Prognosis:</h3>
+                <p className='text-gray-600 bg-gray-50 rounded p-3'>
                   {formulation.prognosis}
                 </p>
               </div>
 
               <div>
-                <h3 className="font-medium text-gray-700 mb-2">
+                <h3 className='text-gray-700 mb-2 font-medium'>
                   Next Review Date:
                 </h3>
-                <p className="text-gray-600">
+                <p className='text-gray-600'>
                   {new Date(formulation.reviewDate).toLocaleDateString()}
                 </p>
               </div>

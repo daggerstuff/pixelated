@@ -8,16 +8,14 @@
 import type { AuthConfig, AuthRole } from './auth.config'
 // Authentication configuration
 import { authConfig, hasRolePrivilege } from './auth.config'
+// Deployment configuration
+import deploymentConfig from './deployment.config'
 import type { Env } from './env.config'
 // Environment variables configuration
 import { config as envConfig } from './env.config'
-
 import type { RateLimitOptions } from './rate-limit.config'
 // Rate limit configuration
 import rateLimitConfig from './rate-limit.config'
-
-// Deployment configuration
-import deploymentConfig from './deployment.config'
 
 // Theme configuration
 export const SITE = {

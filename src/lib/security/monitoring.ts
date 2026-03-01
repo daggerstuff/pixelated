@@ -78,7 +78,7 @@ export enum SecurityEventType {
   BULK_IMPORT_JOB_STATUS_CHECK = 'bulk_import_job_status_check',
   BULK_IMPORT_JOB_STATUS_ERROR = 'bulk_import_job_status_error',
   RECURRING_EXPORT_SCHEDULED = 'recurring_export_scheduled',
-  RECURRING_EXPORT_SCHEDULE_ERROR = 'recurring_export_schedule_error'
+  RECURRING_EXPORT_SCHEDULE_ERROR = 'recurring_export_schedule_error',
 }
 
 /**

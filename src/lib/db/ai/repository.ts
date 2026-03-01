@@ -1,3 +1,5 @@
+import type { EmotionAnalysis } from '../../ai/emotions/types'
+import type { TherapySession } from '../../ai/models/ai-types'
 import type {
   AIUsageStats,
   CrisisDetectionResult,
@@ -5,14 +7,12 @@ import type {
   ResponseGenerationResult,
   SentimentAnalysisResult,
 } from './types'
-import type { TherapySession } from '../../ai/models/ai-types'
-import type { EmotionAnalysis } from '../../ai/emotions/types'
 let mongodb: unknown
 let ObjectId: unknown
 
 if (typeof window === 'undefined') {
   // Server side - import real MongoDB dependencies
-  ;(async () => {
+  ;void (async () => {
     try {
       const configModule = await import('../../../config/mongodb.config')
       mongodb = configModule.default

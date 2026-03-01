@@ -23,7 +23,7 @@ export function compileAstroComponent(
   const MockAstroComponent: React.FC<MockAstroComponentProps> = (props) => {
     return React.createElement(
       'div',
-      { 'data-testid': 'astro-component', 'className': 'rum-dashboard' },
+      { 'data-testid': 'astro-component', className: 'rum-dashboard' },
       props.title && React.createElement('h2', {}, props.title),
       props.description && React.createElement('p', {}, props.description),
       React.createElement(

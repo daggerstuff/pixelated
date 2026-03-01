@@ -7,6 +7,7 @@ import {
   beforeEach,
   afterEach,
 } from 'vitest'
+
 import { RedisService } from '../RedisService'
 import { RedisErrorCode, RedisServiceError } from '../types'
 import { cleanupTestKeys, generateTestKey } from './test-utils'

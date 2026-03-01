@@ -96,7 +96,7 @@ export class DashboardUpdater {
       console.error('Error updating metrics:', err)
       this.showError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : String(err),
       )
     }
@@ -104,7 +104,7 @@ export class DashboardUpdater {
 
   public startUpdates() {
     // Initial update
-    this.updateMetrics()
+    void this.updateMetrics()
 
     // Set up interval for updates
     this.updateInterval = window.setInterval(

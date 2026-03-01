@@ -33,7 +33,7 @@ const loadTest = async () => {
         path: '/api/documents',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer test-token',
+          Authorization: 'Bearer test-token',
         },
         body: JSON.stringify({
           title: 'Load Test Document',

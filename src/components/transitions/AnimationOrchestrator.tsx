@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   AnimatePresence,
   motion,
   useAnimation,
   type Variants,
 } from 'framer-motion'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+
 import {
   animationPresets,
   getReducedMotionVariant,
@@ -121,7 +122,7 @@ export function AnimationOrchestrator({
   const handleViewportEnter = useCallback(() => {
     if (triggerOnViewport && !isVisible) {
       setIsVisible(true)
-      controls.start('animate')
+      void controls.start('animate')
       onAnimationStart?.()
     }
   }, [triggerOnViewport, isVisible, controls, onAnimationStart])
@@ -129,7 +130,7 @@ export function AnimationOrchestrator({
   // Handle mount trigger
   useEffect(() => {
     if (triggerOnMount && !triggerOnViewport) {
-      controls.start('animate')
+      void controls.start('animate')
       onAnimationStart?.()
     }
   }, [triggerOnMount, triggerOnViewport, controls, onAnimationStart])
@@ -148,9 +149,9 @@ export function AnimationOrchestrator({
       className={className}
       style={style}
       variants={variants}
-      initial="initial"
+      initial='initial'
       animate={controls}
-      exit="exit"
+      exit='exit'
       onAnimationComplete={handleAnimationComplete}
       onViewportEnter={triggerOnViewport ? handleViewportEnter : undefined}
       viewport={
@@ -179,7 +180,7 @@ export function PageTransition({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="page"
+      orchestrationType='page'
       className={className}
       {...props}
     >
@@ -200,7 +201,7 @@ export function ListAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="list"
+      orchestrationType='list'
       staggerChildren={staggerChildren}
       staggerDelay={staggerDelay}
       triggerOnViewport={triggerOnViewport}
@@ -222,7 +223,7 @@ export function ModalAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="modal"
+      orchestrationType='modal'
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -242,7 +243,7 @@ export function InteractiveAnimation({
   return (
     <AnimationOrchestrator
       sequence={sequence}
-      orchestrationType="interactive"
+      orchestrationType='interactive'
       triggerOnMount={triggerOnMount}
       className={className}
       {...props}
@@ -301,13 +302,13 @@ export function AdvancedSequence({
     if (loop) {
       setCurrentStep(0)
       await controls.start(steps[0].variants['initial'] || {})
-      executeSequence()
+      void executeSequence()
     }
   }, [steps, controls, loop, onSequenceComplete])
 
   useEffect(() => {
     if (autoPlay && steps.length > 0) {
-      executeSequence()
+      void executeSequence()
     }
   }, [autoPlay, executeSequence, steps.length])
 
@@ -355,7 +356,7 @@ export function Choreography({
       onChoreographyComplete?.()
     }
 
-    runChoreography()
+    void runChoreography()
   }, [masterControls, masterSequence, onChoreographyComplete])
 
   return (
@@ -369,9 +370,9 @@ export function Choreography({
           <motion.div
             key={item.id}
             variants={item.variants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            initial='initial'
+            animate='animate'
+            exit='exit'
             custom={item.delay}
           >
             {item.element}

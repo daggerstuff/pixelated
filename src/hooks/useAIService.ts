@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
-import { createTogetherAIService } from '@/lib/ai/services/together'
+
 import type { AIMessage, AIServiceOptions } from '@/lib/ai/models/ai-types'
+import { createTogetherAIService } from '@/lib/ai/services/together'
 
 export function useAIService() {
   const getAIResponse = useCallback(

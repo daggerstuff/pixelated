@@ -77,12 +77,12 @@ interface ChartLoadingProps {
 function ChartLoading({ height = 300, className = '' }: ChartLoadingProps) {
   return (
     <div
-      className={`flex items-center justify-center bg-muted/10 rounded-lg ${className}`}
+      className={`bg-muted/10 flex items-center justify-center rounded-lg ${className}`}
       style={{ height: `${height}px` }}
     >
-      <div className="flex flex-col items-center space-y-2">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-sm text-muted-foreground">Loading chart...</p>
+      <div className='flex flex-col items-center space-y-2'>
+        <div className='border-primary h-8 w-8 animate-spin rounded-full border-b-2'></div>
+        <p className='text-muted-foreground text-sm'>Loading chart...</p>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@ const { createElement } = React
 const startTransition = React.startTransition || ((cb) => cb())
 
 import { createRoot, hydrateRoot } from 'react-dom/client'
+
 import StaticHtml from './static-html.js'
 
 function isAlreadyHydrated(element) {

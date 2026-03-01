@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import type { SimulationContainerProps, TherapeuticTechnique, RealTimeFeedback, Scenario } from '../types'
+
 import { useSimulator } from '../context/SimulatorContext'
+import type {
+  SimulationContainerProps,
+  TherapeuticTechnique,
+  RealTimeFeedback,
+  Scenario,
+} from '../types'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import SimulationControls from './SimulationControls'
 
@@ -36,7 +42,7 @@ export function SimulationContainer({
     transcribedText?: string
     isConnected?: boolean
   }
-  
+
   const currentScenario = typedState?.currentScenario
   const isProcessing = typedState?.isProcessing ?? false
   const realtimeFeedback = typedState?.realtimeFeedback ?? []
@@ -216,7 +222,7 @@ export function SimulationContainer({
   return (
     <div className={`simulation-container ${className}`}>
       {!isCompatible && (
-        <div className="compatibility-warning">
+        <div className='compatibility-warning'>
           <h3>Browser Compatibility Warning</h3>
           <p>
             Your browser is missing some features required for optimal
@@ -234,47 +240,51 @@ export function SimulationContainer({
         </div>
       )}
 
-      <div className="simulation-header">
-        <h2>{(currentScenario && 'title' in currentScenario ? currentScenario.title : null) || 'Therapeutic Simulation'}</h2>
+      <div className='simulation-header'>
+        <h2>
+          {(currentScenario && 'title' in currentScenario
+            ? currentScenario.title
+            : null) || 'Therapeutic Simulation'}
+        </h2>
         {onBackToScenarios && (
-          <button onClick={onBackToScenarios} className="back-button">
+          <button onClick={onBackToScenarios} className='back-button'>
             ← Back to Scenarios
           </button>
         )}
       </div>
 
       {/* Add the simulation controls */}
-      <SimulationControls className="simulation-control-panel" />
+      <SimulationControls className='simulation-control-panel' />
 
-      <div className="conversation-container">
+      <div className='conversation-container'>
         {conversation.map((item) => (
           <div
             key={`${item.type}-${item.timestamp}`}
             className={`conversation-item ${item.type}-message`}
           >
-            <div className="message-header">
-              <span className="message-type">
+            <div className='message-header'>
+              <span className='message-type'>
                 {item.type === 'scenario'
                   ? 'Scenario'
                   : item.type === 'user'
                     ? 'Therapist'
                     : 'Client'}
               </span>
-              <span className="message-time">
+              <span className='message-time'>
                 {new Date(item.timestamp).toLocaleTimeString()}
               </span>
             </div>
-            <div className="message-content">
+            <div className='message-content'>
               {item.content}
               {item.type === 'user' &&
                 showTechniqueHighlights &&
                 item.techniques &&
                 item.techniques.length > 0 && (
-                  <div className="technique-tags">
+                  <div className='technique-tags'>
                     {item.techniques.map((technique) => (
                       <span
                         key={technique}
-                        className="technique-tag"
+                        className='technique-tag'
                         title={getTechniqueDescription(technique)}
                       >
                         {technique.replace(/_/g, ' ')}
@@ -288,33 +298,33 @@ export function SimulationContainer({
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="response-form">
-        <div className="form-controls">
-          <div className="textarea-container">
+      <form onSubmit={handleSubmit} className='response-form'>
+        <div className='form-controls'>
+          <div className='textarea-container'>
             <textarea
               ref={responseInputRef}
               value={userResponse}
               onChange={handleTextAreaChange}
-              placeholder="Type your therapeutic response here..."
+              placeholder='Type your therapeutic response here...'
               rows={3}
               disabled={isProcessing || !isConnected}
             />
           </div>
-          <div className="button-container">
+          <div className='button-container'>
             <button
-              type="submit"
+              type='submit'
               disabled={isProcessing || !userResponse.trim() || !isConnected}
-              className="send-button"
+              className='send-button'
             >
               {isProcessing ? 'Processing...' : 'Send Response'}
             </button>
           </div>
         </div>
-        <div className="response-options">
-          <label htmlFor="techniqueHighlightsCheckbox" className="option-label">
+        <div className='response-options'>
+          <label htmlFor='techniqueHighlightsCheckbox' className='option-label'>
             <input
-              id="techniqueHighlightsCheckbox"
-              type="checkbox"
+              id='techniqueHighlightsCheckbox'
+              type='checkbox'
               checked={showTechniqueHighlights}
               onChange={() =>
                 setShowTechniqueHighlights(!showTechniqueHighlights)
@@ -322,10 +332,10 @@ export function SimulationContainer({
             />
             Show technique highlights
           </label>
-          <label htmlFor="autoScrollCheckbox" className="option-label">
+          <label htmlFor='autoScrollCheckbox' className='option-label'>
             <input
-              id="autoScrollCheckbox"
-              type="checkbox"
+              id='autoScrollCheckbox'
+              type='checkbox'
               checked={autoScrollEnabled}
               onChange={() => setAutoScrollEnabled(!autoScrollEnabled)}
             />

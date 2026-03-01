@@ -10,11 +10,14 @@ toc: true
 
 ## AI Development Guide
 
-This guide provides comprehensive information for developers working with the AI components in the application.
+This guide provides comprehensive information for developers working with the AI
+components in the application.
 
 ## Overview
 
-The AI system is designed to be modular, extensible, and secure. It provides a unified interface for interacting with various AI providers and includes specialized services for common AI tasks.
+The AI system is designed to be modular, extensible, and secure. It provides a
+unified interface for interacting with various AI providers and includes
+specialized services for common AI tasks.
 
 ## Getting Started
 
@@ -65,7 +68,8 @@ The AI system follows a layered architecture:
 1. **API Layer**: RESTful endpoints for accessing AI capabilities
 2. **Services Layer**: Specialized services for common AI tasks
 3. **Provider Layer**: Unified interface for interacting with AI providers
-4. **Cross-cutting Concerns**: Error handling, performance optimization, audit logging
+4. **Cross-cutting Concerns**: Error handling, performance optimization, audit
+   logging
 
 ### Directory Structure
 
@@ -97,7 +101,8 @@ src/lib/ai/
 
 ### AI Service
 
-The `AIService` interface defines the core functionality for interacting with AI providers:
+The `AIService` interface defines the core functionality for interacting with AI
+providers:
 
 ```typescript
 interface AIService {
@@ -186,7 +191,6 @@ class AIError extends Error {
 Use the `createAIService` factory function to create an AI service:
 
 ```typescript
-
 const aiService = createAIService({
   provider: 'openai', // or 'anthropic'
   enableErrorHandling: true,
@@ -212,7 +216,8 @@ console.log(completion.content)
 
 ### Creating a Streaming Chat Completion
 
-Use the `createStreamingChatCompletion` method to generate a streaming completion:
+Use the `createStreamingChatCompletion` method to generate a streaming
+completion:
 
 ```typescript
 const { stream } = await aiService.createStreamingChatCompletion(
@@ -235,7 +240,6 @@ for await (const chunk of stream) {
 Use the `SentimentAnalysisService` to analyze the sentiment of text:
 
 ```typescript
-
 const aiService = createAIService()
 const sentimentService = new SentimentAnalysisService({ aiService })
 
@@ -250,7 +254,6 @@ const result = await sentimentService.analyzeSentiment(
 Use the `CrisisDetectionService` to detect potential crisis situations:
 
 ```typescript
-
 const aiService = createAIService()
 const crisisService = new CrisisDetectionService({ aiService })
 
@@ -265,7 +268,6 @@ const result = await crisisService.detectCrisis(
 Use the `ResponseGenerationService` to generate therapeutic responses:
 
 ```typescript
-
 const aiService = createAIService()
 const responseService = new ResponseGenerationService({ aiService })
 
@@ -277,10 +279,10 @@ const result = await responseService.generateResponse([
 
 ### Intervention Analysis
 
-Use the `InterventionAnalysisService` to analyze the effectiveness of interventions:
+Use the `InterventionAnalysisService` to analyze the effectiveness of
+interventions:
 
 ```typescript
-
 const aiService = createAIService()
 const interventionService = new InterventionAnalysisService({ aiService })
 
@@ -299,7 +301,6 @@ const result = await interventionService.analyzeIntervention(
 Use try-catch blocks to handle AI errors:
 
 ```typescript
-
 const aiService = createAIService()
 
 try {
@@ -321,7 +322,6 @@ try {
 Use the error handling utilities for more advanced error handling:
 
 ```typescript
-
 try {
   // Call AI service
 } catch (error) {
@@ -355,7 +355,6 @@ Use the API error handling utility in API routes:
 Use the optimized AI service wrapper for better performance:
 
 ```typescript
-
 const optimizedService = createOptimizedAIService(aiService, {
   logToConsole: true,
   createAuditLogs: true,
@@ -369,7 +368,6 @@ const optimizedService = createOptimizedAIService(aiService, {
 Use the token optimization utilities to manage token usage:
 
 ```typescript
-
 const tokenCount = estimateMessagesTokenCount(messages)
 console.log(`Estimated token count: ${tokenCount}`)
 
@@ -381,7 +379,6 @@ const truncatedMessages = truncateMessages(messages, 4000, 1000)
 Use the retry utility for handling transient errors:
 
 ```typescript
-
 const completion = await withRetry(
   () =>
     aiService.createChatCompletion(
@@ -738,11 +735,13 @@ To add a new specialized service:
 2. Export the new service in `src/lib/ai/services/index.ts`:
 
 ```typescript
+
 ```
 
 3. Update the main exports in `src/lib/ai/index.ts`:
 
 ```typescript
+
 ```
 
 ## Troubleshooting
@@ -805,7 +804,6 @@ const aiService = createAIService({
 Implement request tracing for complex issues:
 
 ```typescript
-
 const aiService = createAIService()
 const tracedService = withTracing(aiService, {
   logRequests: true,

@@ -1,5 +1,6 @@
-import { azureInsights } from '../lib/monitoring/azure-insights'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { azureInsights } from '../lib/monitoring/azure-insights'
 
 const logger = createBuildSafeLogger('monitoring-middleware')
 
@@ -261,7 +262,7 @@ export async function monitoringMiddleware(
       pathname: url.pathname,
       duration,
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
       userId: userId || 'anonymous',
       ip,
     })

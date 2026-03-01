@@ -1,10 +1,5 @@
 export const prerender = false
 
-// import type { APIRoute } from 'astro'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
-import { AIRepository } from '@/lib/db/ai/repository'
-import type { AuthUser } from '@/lib/auth/types'
 import {
   EmotionTemporalAnalyzer,
   type EmotionAnalysisResult,
@@ -13,6 +8,11 @@ import {
   type EmotionProgression,
   type EmotionCorrelation,
 } from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthUser } from '@/lib/auth/types'
+import { AIRepository } from '@/lib/db/ai/repository'
+// import type { APIRoute } from 'astro'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('temporal-emotions-api')
 

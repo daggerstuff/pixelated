@@ -16,9 +16,10 @@
  */
 
 import { spawn, type ChildProcess } from 'node:child_process'
+import * as crypto from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
-import * as crypto from 'node:crypto'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('MentalArenaPythonBridge')
@@ -139,7 +140,9 @@ export class MentalArenaPythonBridge {
       })
     } catch (error: unknown) {
       logger.error('Failed to initialize MentalArena Python bridge', error)
-      throw new Error(`Python bridge initialization failed: ${error}`, { cause: error })
+      throw new Error(`Python bridge initialization failed: ${error}`, {
+        cause: error,
+      })
     }
   }
 
@@ -774,7 +777,7 @@ export class MentalArenaPythonBridge {
       }
 
       // Process the queue
-      this.processExecutionQueue()
+      void this.processExecutionQueue()
     })
   }
 
@@ -973,7 +976,9 @@ export class MentalArenaPythonBridge {
         throw error
       }
       logger.error('Failed to validate requirements.txt', error)
-      throw new Error(`Requirements validation failed: ${error}`, { cause: error })
+      throw new Error(`Requirements validation failed: ${error}`, {
+        cause: error,
+      })
     }
   }
 
@@ -982,26 +987,26 @@ export class MentalArenaPythonBridge {
    */
   private getPackageWhitelist(): Record<string, string[]> {
     return {
-      'torch': ['>=1.12.0,<3.0.0'],
-      'transformers': ['>=4.20.0,<5.0.0'],
-      'datasets': ['>=2.0.0,<3.0.0'],
-      'numpy': ['>=1.21.0,<2.0.0'],
-      'pandas': ['>=1.4.0,<3.0.0'],
+      torch: ['>=1.12.0,<3.0.0'],
+      transformers: ['>=4.20.0,<5.0.0'],
+      datasets: ['>=2.0.0,<3.0.0'],
+      numpy: ['>=1.21.0,<2.0.0'],
+      pandas: ['>=1.4.0,<3.0.0'],
       'scikit-learn': ['>=1.1.0,<2.0.0'],
-      'matplotlib': ['>=3.5.0,<4.0.0'],
-      'seaborn': ['>=0.11.0,<1.0.0'],
-      'tqdm': ['>=4.64.0,<5.0.0'],
-      'requests': ['>=2.28.0,<3.0.0'],
-      'pyyaml': ['>=6.0,<7.0'],
-      'pillow': ['>=9.0.0,<11.0.0'],
-      'tokenizers': ['>=0.13.0,<1.0.0'],
-      'accelerate': ['>=0.20.0,<1.0.0'],
-      'evaluate': ['>=0.4.0,<1.0.0'],
-      'wandb': ['>=0.13.0,<1.0.0'],
-      'tensorboard': ['>=2.9.0,<3.0.0'],
-      'jupyter': ['>=1.0.0,<2.0.0'],
-      'ipython': ['>=8.0.0,<9.0.0'],
-      'scipy': ['>=1.9.0,<2.0.0'],
+      matplotlib: ['>=3.5.0,<4.0.0'],
+      seaborn: ['>=0.11.0,<1.0.0'],
+      tqdm: ['>=4.64.0,<5.0.0'],
+      requests: ['>=2.28.0,<3.0.0'],
+      pyyaml: ['>=6.0,<7.0'],
+      pillow: ['>=9.0.0,<11.0.0'],
+      tokenizers: ['>=0.13.0,<1.0.0'],
+      accelerate: ['>=0.20.0,<1.0.0'],
+      evaluate: ['>=0.4.0,<1.0.0'],
+      wandb: ['>=0.13.0,<1.0.0'],
+      tensorboard: ['>=2.9.0,<3.0.0'],
+      jupyter: ['>=1.0.0,<2.0.0'],
+      ipython: ['>=8.0.0,<9.0.0'],
+      scipy: ['>=1.9.0,<2.0.0'],
     }
   }
 

@@ -4,11 +4,10 @@
  */
 
 import { ManagementClient, AuthenticationClient } from 'auth0'
-import { logSecurityEvent, SecurityEventType } from '../security/index'
+
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
-
 
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
@@ -18,26 +17,35 @@ let auth0Management: ManagementClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!auth0Config.domain || !auth0Config.clientId || !auth0Config.clientSecret) {
-
-    console.warn('Auth0 configuration incomplete'); return
+  if (
+    !auth0Config.domain ||
+    !auth0Config.clientId ||
+    !auth0Config.clientSecret
+  ) {
+    console.warn('Auth0 configuration incomplete')
+    return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
       domain: auth0Config.domain,
       clientId: auth0Config.clientId,
-      clientSecret: auth0Config.clientSecret
+      clientSecret: auth0Config.clientSecret,
     })
   }
 
-  if (!auth0Management && auth0Config.managementClientId && auth0Config.managementClientSecret) {
+  if (
+    !auth0Management &&
+    auth0Config.managementClientId &&
+    auth0Config.managementClientSecret
+  ) {
     auth0Management = new ManagementClient({
       domain: auth0Config.domain,
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-      scope: 'read:users update:users create:users read:guardian_factors update:guardian_factors'
+      scope:
+        'read:users update:users create:users read:guardian_factors update:guardian_factors',
     })
   }
 }
@@ -96,28 +104,40 @@ export class Auth0MFAService {
 
     try {
       // Get user's enrolled factors
-      const enrolledFactors = await auth0Management.getGuardianEnrollments({ id: userId })
+      const enrolledFactors = await auth0Management.getGuardianEnrollments({
+        id: userId,
+      })
 
       // Get all available factors
       const availableFactors = await auth0Management.getGuardianFactors()
 
       // Filter out already enrolled factors
-      const enrolledFactorTypes = enrolledFactors.map((factor: any) => factor.type)
+      const enrolledFactorTypes = enrolledFactors.map(
+        (factor: any) => factor.type,
+      )
       const availableFactorTypes = availableFactors
-        .filter((factor: any) => factor.enabled && !enrolledFactorTypes.includes(factor.name))
+        .filter(
+          (factor: any) =>
+            factor.enabled && !enrolledFactorTypes.includes(factor.name),
+        )
         .map((factor: any) => factor.name)
 
       return availableFactorTypes
     } catch (error) {
       console.error('Failed to get available MFA factors:', error)
-      throw new Error(`Failed to get available MFA factors: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to get available MFA factors: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Start MFA enrollment process
    */
-  async startEnrollment(userId: string, factor: MFAEnrollment): Promise<MFAChallenge> {
+  async startEnrollment(
+    userId: string,
+    factor: MFAEnrollment,
+  ): Promise<MFAChallenge> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -128,16 +148,17 @@ export class Auth0MFAService {
       switch (factor.factorType) {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
-          const otpEnrollment = await auth0Management.createGuardianEnrollmentTicket({
-            user_id: userId,
-            send_mail: false
-          })
+          const otpEnrollment =
+            await auth0Management.createGuardianEnrollmentTicket({
+              user_id: userId,
+              send_mail: false,
+            })
 
           challenge = {
             challengeType: 'otp',
             bindingMethod: 'qr',
             qrCode: otpEnrollment.ticket_id, // This would be used to generate QR code
-            oobCode: otpEnrollment.ticket_id
+            oobCode: otpEnrollment.ticket_id,
           }
           break
 
@@ -150,7 +171,7 @@ export class Auth0MFAService {
           challenge = {
             challengeType: 'sms',
             bindingMethod: 'sms',
-            oobCode: `sms-${userId}` // Placeholder - actual implementation would get this from Auth0
+            oobCode: `sms-${userId}`, // Placeholder - actual implementation would get this from Auth0
           }
           break
 
@@ -160,35 +181,45 @@ export class Auth0MFAService {
           challenge = {
             challengeType: factor.factorType,
             bindingMethod: 'prompt',
-            oobCode: `webauthn-${userId}` // Placeholder - actual implementation would get this from Auth0
+            oobCode: `webauthn-${userId}`, // Placeholder - actual implementation would get this from Auth0
           }
           break
 
         default:
-          throw new Error(`Unsupported factor type: ${(factor as any).factorType}`)
+          throw new Error(
+            `Unsupported factor type: ${(factor as any).factorType}`,
+          )
       }
 
       // Log enrollment start event
       logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_STARTED, {
         userId: userId,
         factorType: factor.factorType,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with enrollment progress
-      await updatePhase6AuthenticationProgress(userId, `mfa_enrollment_started_${factor.factorType}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `mfa_enrollment_started_${factor.factorType}`,
+      )
 
       return challenge
     } catch (error) {
       console.error('Failed to start MFA enrollment:', error)
-      throw new Error(`Failed to start MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to start MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Complete MFA enrollment process
    */
-  async completeEnrollment(userId: string, verification: MFAVerification): Promise<MFAFactor> {
+  async completeEnrollment(
+    userId: string,
+    verification: MFAVerification,
+  ): Promise<MFAFactor> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -201,7 +232,7 @@ export class Auth0MFAService {
         id: `factor-${Date.now()}`,
         factorType: verification.challengeType as any,
         enrolledAt: new Date().toISOString(),
-        status: 'enabled'
+        status: 'enabled',
       }
 
       // Log enrollment completion event
@@ -209,16 +240,21 @@ export class Auth0MFAService {
         userId: userId,
         factorType: verification.challengeType,
         factorId: enrolledFactor.id,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with enrollment completion
-      await updatePhase6AuthenticationProgress(userId, `mfa_enrollment_completed_${verification.challengeType}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `mfa_enrollment_completed_${verification.challengeType}`,
+      )
 
       return enrolledFactor
     } catch (error) {
       console.error('Failed to complete MFA enrollment:', error)
-      throw new Error(`Failed to complete MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to complete MFA enrollment: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -231,7 +267,9 @@ export class Auth0MFAService {
     }
 
     try {
-      const enrollments = await auth0Management.getGuardianEnrollments({ id: userId })
+      const enrollments = await auth0Management.getGuardianEnrollments({
+        id: userId,
+      })
 
       const factors: MFAFactor[] = enrollments.map((enrollment: any) => ({
         id: enrollment.id,
@@ -239,7 +277,7 @@ export class Auth0MFAService {
         friendlyName: enrollment.name,
         enrolledAt: enrollment.enrolled_at,
         lastUsedAt: enrollment.last_used_at,
-        status: enrollment.status || 'enabled'
+        status: enrollment.status || 'enabled',
       }))
 
       return factors
@@ -264,21 +302,32 @@ export class Auth0MFAService {
       logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, {
         userId: userId,
         factorId: factorId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with factor deletion
-      await updatePhase6AuthenticationProgress(userId, `mfa_factor_deleted_${factorId}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `mfa_factor_deleted_${factorId}`,
+      )
     } catch (error) {
-      console.error(`Failed to delete MFA factor ${factorId} for user ${userId}:`, error)
-      throw new Error(`Failed to delete MFA factor: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        `Failed to delete MFA factor ${factorId} for user ${userId}:`,
+        error,
+      )
+      throw new Error(
+        `Failed to delete MFA factor: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Challenge user for MFA during authentication
    */
-  async challengeUser(userId: string, factorType: string): Promise<MFAChallenge> {
+  async challengeUser(
+    userId: string,
+    factorType: string,
+  ): Promise<MFAChallenge> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -290,7 +339,7 @@ export class Auth0MFAService {
       const challenge: MFAChallenge = {
         challengeType: factorType,
         bindingMethod: factorType === 'sms' ? 'sms' : 'prompt',
-        oobCode: `challenge-${userId}-${Date.now()}`
+        oobCode: `challenge-${userId}-${Date.now()}`,
       }
 
       // Log challenge event
@@ -298,23 +347,31 @@ export class Auth0MFAService {
         userId: userId,
         factorType: factorType,
         challengeId: challenge.oobCode,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with challenge sent
-      await updatePhase6AuthenticationProgress(userId, `mfa_challenge_sent_${factorType}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `mfa_challenge_sent_${factorType}`,
+      )
 
       return challenge
     } catch (error) {
       console.error('Failed to challenge user for MFA:', error)
-      throw new Error(`Failed to challenge user for MFA: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to challenge user for MFA: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
   /**
    * Verify MFA challenge response
    */
-  async verifyChallenge(userId: string, verification: MFAVerification): Promise<boolean> {
+  async verifyChallenge(
+    userId: string,
+    verification: MFAVerification,
+  ): Promise<boolean> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -328,11 +385,14 @@ export class Auth0MFAService {
         userId: userId,
         challengeType: verification.challengeType,
         success: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with verification completion
-      await updatePhase6AuthenticationProgress(userId, `mfa_verification_completed_${verification.challengeType}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `mfa_verification_completed_${verification.challengeType}`,
+      )
 
       return true
     } catch (error) {
@@ -343,7 +403,7 @@ export class Auth0MFAService {
         userId: userId,
         challengeType: verification.challengeType,
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       })
 
       return false
@@ -369,17 +429,23 @@ export class Auth0MFAService {
   /**
    * Set user's preferred MFA factor
    */
-  async setUserPreferredFactor(userId: string, factorId: string): Promise<void> {
+  async setUserPreferredFactor(
+    userId: string,
+    factorId: string,
+  ): Promise<void> {
     // In a real implementation, this would update the user's preferred factor in Auth0
     // For now, we'll just log the event
     logSecurityEvent(SecurityEventType.MFA_PREFERRED_FACTOR_SET, {
       userId: userId,
       factorId: factorId,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     })
 
     // Update Phase 6 MCP server with preferred factor set
-    await updatePhase6AuthenticationProgress(userId, `mfa_preferred_factor_set_${factorId}`)
+    await updatePhase6AuthenticationProgress(
+      userId,
+      `mfa_preferred_factor_set_${factorId}`,
+    )
   }
 }
 

@@ -12,7 +12,9 @@ toc: true
 
 ## Introduction
 
-This document outlines the security best practices to be followed when implementing and maintaining the AI features of our Astro application. These guidelines are designed to ensure HIPAA compliance and protect sensitive data.
+This document outlines the security best practices to be followed when
+implementing and maintaining the AI features of our Astro application. These
+guidelines are designed to ensure HIPAA compliance and protect sensitive data.
 
 ## API Security
 
@@ -385,4 +387,7 @@ const ratelimit = new Ratelimit({
 
 ## Conclusion
 
-Following these security best practices will help ensure that our AI system implementation meets HIPAA compliance requirements and provides strong protection for sensitive data. Regular security reviews and updates to these practices are essential to maintain a strong security posture as threats evolve.
+Following these security best practices will help ensure that our AI system
+implementation meets HIPAA compliance requirements and provides strong
+protection for sensitive data. Regular security reviews and updates to these
+practices are essential to maintain a strong security posture as threats evolve.

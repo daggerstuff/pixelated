@@ -1,7 +1,9 @@
 import type { APIRoute } from 'astro'
-import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { isAuthenticated } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
 import {
   createAuditLog,
   AuditEventType,
@@ -23,7 +25,7 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
-      });
+      })
     }
     const userKey =
       authResult['authenticated'] && authResult['user']?.['id']
@@ -113,7 +115,7 @@ export const GET: APIRoute = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, private',
-        'ETag': `"validation-${validationResults.length}-${validationStats.metrics.processed}"`,
+        ETag: `"validation-${validationResults.length}-${validationStats.metrics.processed}"`,
       },
     })
   } catch (error: unknown) {

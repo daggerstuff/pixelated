@@ -42,21 +42,17 @@ const Slider: FC<SliderProps> = ({
 
   return (
     <div
-      className={`relative ${isVertical ? 'h-32 w-6' : 'w-full h-6'} ${className}`}
+      className={`relative ${isVertical ? 'h-32 w-6' : 'h-6 w-full'} ${className}`}
     >
       <input
-        type="range"
+        type='range'
         min={min}
         max={max}
         step={step}
         value={sliderValue}
         disabled={disabled}
         onChange={handleChange}
-        className={`
-          appearance-none bg-transparent cursor-pointer slider-input
-          ${isVertical ? 'slider-vertical' : 'w-full h-2'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
-        `}
+        className={`bg-transparent slider-input cursor-pointer appearance-none ${isVertical ? 'slider-vertical' : 'h-2 w-full'} ${disabled ? 'cursor-not-allowed opacity-50' : ''} `}
         style={{
           background: `linear-gradient(to ${isVertical ? 'top' : 'right'}, 
             #3b82f6 0%, #3b82f6 ${((sliderValue - min) / (max - min)) * 100}%, 

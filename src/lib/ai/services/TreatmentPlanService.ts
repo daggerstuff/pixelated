@@ -1,6 +1,6 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { PatientProfile } from '../models/patient'
 import type { SkillAcquired } from '../types/CognitiveModel'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const appLogger = createBuildSafeLogger('app')
 

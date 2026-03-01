@@ -1,9 +1,10 @@
 import { createContext, useContext } from 'react'
+
+import { useSimulator } from '../hooks/useSimulator'
 import type {
   SimulatorContext as SimulatorContextType,
   SimulatorProviderProps,
 } from '../types'
-import { useSimulator } from '../hooks/useSimulator'
 
 // Create the simulator context
 const SimulatorContext = createContext<SimulatorContextType | undefined>(

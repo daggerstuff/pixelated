@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Support Groups
 
-This guide provides information about various support groups and peer support resources available for CPTSD and addiction recovery.
+This guide provides information about various support groups and peer support
+resources available for CPTSD and addiction recovery.
 
 ## Types of Support Groups
 

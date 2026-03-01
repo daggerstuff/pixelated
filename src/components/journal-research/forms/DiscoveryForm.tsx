@@ -1,15 +1,23 @@
 import { useState } from 'react'
+
+import {
+  ErrorMessage,
+  FieldError,
+} from '@/components/journal-research/shared/ErrorMessage'
+import { Button } from '@/components/ui/button/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
 import {
   DiscoveryInitiatePayloadSchema,
   type DiscoveryInitiatePayload,
 } from '@/lib/api/journal-research/types'
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button/button'
-import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import { cn } from '@/lib/utils'
 
 export interface DiscoveryFormProps {
   onSubmit: (data: DiscoveryInitiatePayload) => void | Promise<void>
@@ -49,9 +57,8 @@ export function DiscoveryForm({
       const validated = DiscoveryInitiatePayloadSchema.parse(payload)
       await onSubmit(validated)
     } catch (error) {
-      
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -62,7 +69,9 @@ export function DiscoveryForm({
 
   const handleSourceToggle = (source: string) => {
     setSources((prev) =>
-      prev.includes(source) ? prev.filter((s) => s !== source) : [...prev, source],
+      prev.includes(source)
+        ? prev.filter((s) => s !== source)
+        : [...prev, source],
     )
   }
 
@@ -84,39 +93,39 @@ export function DiscoveryForm({
         <CardTitle>Initiate Discovery</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className='space-y-6'>
+          <div className='space-y-2'>
             <Label>Target Sources</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className='flex flex-wrap gap-2'>
               {availableSources.map((source) => (
                 <label
                   key={source}
-                  className="flex cursor-pointer items-center gap-2 rounded-md border p-2 hover:bg-muted"
+                  className='hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2'
                 >
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={sources.includes(source)}
                     onChange={() => handleSourceToggle(source)}
-                    className="rounded"
+                    className='rounded'
                   />
-                  <span className="text-sm capitalize">{source}</span>
+                  <span className='text-sm capitalize'>{source}</span>
                 </label>
               ))}
             </div>
             <FieldError error={errors.sources} />
             {sources.length === 0 && (
-              <p className="text-sm text-yellow-500">
+              <p className='text-yellow-500 text-sm'>
                 Please select at least one source
               </p>
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="keywords">Search Keywords</Label>
-            <div className="flex gap-2">
+          <div className='space-y-2'>
+            <Label htmlFor='keywords'>Search Keywords</Label>
+            <div className='flex gap-2'>
               <input
-                id="keywords"
-                type="text"
+                id='keywords'
+                type='text'
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -125,30 +134,30 @@ export function DiscoveryForm({
                     handleAddKeyword()
                   }
                 }}
-                placeholder="Enter keyword"
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder='Enter keyword'
+                className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
               />
               <Button
-                type="button"
+                type='button'
                 onClick={handleAddKeyword}
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
               >
                 Add
               </Button>
             </div>
             {keywords.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className='mt-2 flex flex-wrap gap-2'>
                 {keywords.map((keyword) => (
                   <span
                     key={keyword}
-                    className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                    className='bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs'
                   >
                     {keyword}
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => handleRemoveKeyword(keyword)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className='text-muted-foreground hover:text-foreground'
                       aria-label={`Remove ${keyword}`}
                     >
                       ×
@@ -162,13 +171,13 @@ export function DiscoveryForm({
 
           <ErrorMessage error={submitError} fieldErrors={errors} />
 
-          <div className="flex justify-end gap-2">
+          <div className='flex justify-end gap-2'>
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button type='button' variant='outline' onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={isLoading || sources.length === 0}>
+            <Button type='submit' disabled={isLoading || sources.length === 0}>
               {isLoading ? 'Starting Discovery...' : 'Start Discovery'}
             </Button>
           </div>
@@ -177,4 +186,3 @@ export function DiscoveryForm({
     </Card>
   )
 }
-

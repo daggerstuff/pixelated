@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   getIntegrationPlan,
   initiateIntegration,
@@ -103,7 +104,7 @@ export const useIntegrationInitiateMutation = (sessionId: string | null) => {
     mutationFn: (payload: IntegrationInitiatePayload) =>
       initiateIntegration(sessionId ?? '', payload),
     onSuccess: (plan: IntegrationPlan) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.integration.list(
           sessionId ?? 'unknown',
           {},
@@ -123,5 +124,3 @@ export const useIntegrationSelection = () =>
     toggleComparePlanId: state.toggleComparePlanId,
     clearCompare: state.clearCompare,
   }))
-
-

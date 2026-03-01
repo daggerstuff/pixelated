@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { POST } from '../../pages/api/mock-client-response'
 
 describe('API /mock-client-response', () => {

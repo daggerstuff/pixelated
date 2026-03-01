@@ -10,7 +10,9 @@ share: true
 
 # API Error Handling
 
-This document describes the standardized error handling system for API endpoints. The system provides consistent error responses across all API endpoints, making it easier for clients to handle errors.
+This document describes the standardized error handling system for API
+endpoints. The system provides consistent error responses across all API
+endpoints, making it easier for clients to handle errors.
 
 ## Error Response Format
 
@@ -29,10 +31,13 @@ All API errors follow a consistent JSON format:
 }
 ```
 
-- **type**: A string identifying the general category of error (e.g., `validation_error`, `authentication_error`)
-- **code**: A more specific error code with a namespaced format (e.g., `api.invalid_input`, `api.resource_not_found`)
+- **type**: A string identifying the general category of error (e.g.,
+  `validation_error`, `authentication_error`)
+- **code**: A more specific error code with a namespaced format (e.g.,
+  `api.invalid_input`, `api.resource_not_found`)
 - **message**: A human-readable description of the error
-- **details**: An optional object containing additional information about the error
+- **details**: An optional object containing additional information about the
+  error
 
 ## HTTP Status Codes
 
@@ -187,7 +192,8 @@ The following error codes are used across the API:
 
 ### For API Route Developers
 
-Our codebase includes a utility for standardized error handling. Import and use it in your API endpoints like this:
+Our codebase includes a utility for standardized error handling. Import and use
+it in your API endpoints like this:
 
 ```typescript
   createNotFoundError,
@@ -230,7 +236,8 @@ Our codebase includes a utility for standardized error handling. Import and use 
 
 ### Helper Functions
 
-The utility includes several helper functions to create specific types of errors:
+The utility includes several helper functions to create specific types of
+errors:
 
 | Function                        | Description                                                 |
 | ------------------------------- | ----------------------------------------------------------- |
@@ -294,31 +301,43 @@ async function fetchResource(id: string) {
 
 When implementing API endpoints, follow these best practices for error handling:
 
-1. **Always use the error utility:** Use the error handling utility for all API endpoints to ensure consistent error responses.
+1. **Always use the error utility:** Use the error handling utility for all API
+   endpoints to ensure consistent error responses.
 
-2. **Be specific with error types:** Choose the most specific error type and code that applies to the situation.
+2. **Be specific with error types:** Choose the most specific error type and
+   code that applies to the situation.
 
-3. **Provide helpful messages:** Error messages should be clear, concise, and helpful. They should help the user understand what went wrong and how to fix it.
+3. **Provide helpful messages:** Error messages should be clear, concise, and
+   helpful. They should help the user understand what went wrong and how to fix
+   it.
 
-4. **Include relevant details:** Add relevant details to the error response to help clients understand and fix the issue.
+4. **Include relevant details:** Add relevant details to the error response to
+   help clients understand and fix the issue.
 
-5. **Validate input early:** Validate input as early as possible in the request handler to avoid unnecessary processing.
+5. **Validate input early:** Validate input as early as possible in the request
+   handler to avoid unnecessary processing.
 
-6. **Handle all errors:** Catch all exceptions and convert them to standardized error responses using `handleAPIError`.
+6. **Handle all errors:** Catch all exceptions and convert them to standardized
+   error responses using `handleAPIError`.
 
-7. **Don't expose sensitive information:** Be careful not to include sensitive information in error details.
+7. **Don't expose sensitive information:** Be careful not to include sensitive
+   information in error details.
 
-8. **Log errors appropriately:** Log errors for monitoring and debugging purposes, but be mindful of sensitive data.
+8. **Log errors appropriately:** Log errors for monitoring and debugging
+   purposes, but be mindful of sensitive data.
 
-9. **Return appropriate status codes:** Ensure the HTTP status code in the response matches the error type.
+9. **Return appropriate status codes:** Ensure the HTTP status code in the
+   response matches the error type.
 
-10. **Document errors:** Document all possible error responses in your API documentation.
+10. **Document errors:** Document all possible error responses in your API
+    documentation.
 
 ## Extending the Error System
 
 To add new error types or codes:
 
-1. Add the new error type to the `APIErrorType` enum in `src/lib/api/error-handling.ts`
+1. Add the new error type to the `APIErrorType` enum in
+   `src/lib/api/error-handling.ts`
 2. Add the mapping to HTTP status code in the `errorTypeToStatusCode` object
 3. Add the new error code to the `APIErrorCodes` object
 4. Create a helper function for the new error type if appropriate
@@ -326,7 +345,8 @@ To add new error types or codes:
 
 ## Handling Route Method Validation
 
-For routes that only support specific HTTP methods, use the `validateMethod` function:
+For routes that only support specific HTTP methods, use the `validateMethod`
+function:
 
 ```typescript
 
@@ -342,8 +362,11 @@ For routes that only support specific HTTP methods, use the `validateMethod` fun
 }
 ```
 
-This function automatically sets the appropriate `Allow` header on the response for 405 Method Not Allowed errors.
+This function automatically sets the appropriate `Allow` header on the response
+for 405 Method Not Allowed errors.
 
 ## Conclusion
 
-By using this standardized error handling system, we ensure that all API endpoints provide consistent and helpful error responses, making it easier for clients to handle errors and improving the overall developer experience.
+By using this standardized error handling system, we ensure that all API
+endpoints provide consistent and helpful error responses, making it easier for
+clients to handle errors and improving the overall developer experience.

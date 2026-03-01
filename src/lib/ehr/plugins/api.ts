@@ -1,6 +1,7 @@
-import type { FHIRClient, Logger, PluginAPI } from '../types'
 import { EventEmitter } from 'node:events'
+
 import { RedisStorageAPI } from '../services/redis.storage'
+import type { FHIRClient, Logger, PluginAPI } from '../types'
 
 export function createPluginAPI(
   fhirClient: FHIRClient,

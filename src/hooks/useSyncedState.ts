@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import storageManager from '@/utils/storage/storageManager'
-import tabSyncManager from '@/utils/sync/tabSyncManager'
 import type { StorageConfig } from '@/utils/storage/storageManager'
+import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 export interface UseSyncedStateOptions<T> extends Partial<StorageConfig> {
   key: string

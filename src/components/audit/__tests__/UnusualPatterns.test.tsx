@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import { UnusualPatterns } from '../UnusualPatterns'
+
 import type { UnusualPattern } from '../../../lib/audit/analysis'
+import { UnusualPatterns } from '../UnusualPatterns'
 
 describe('UnusualPatterns', () => {
   const mockPatterns: UnusualPattern[] = [

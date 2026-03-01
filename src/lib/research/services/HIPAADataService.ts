@@ -1,10 +1,11 @@
+import crypto from 'crypto'
+import { createHash } from 'crypto'
+
 import { getLogger } from '@/lib/logging/logger'
 import {
   AccessControlMatrix,
   AuditLog,
 } from '@/lib/research/types/research-types'
-import crypto from 'crypto'
-import { createHash } from 'crypto'
 
 const logger = getLogger('HIPAADataService')
 
@@ -53,7 +54,7 @@ export class HIPAADataService {
       auditRetentionDays: 2555, // 7 years for HIPAA
       accessControlMatrix: {
         roles: {
-          'researcher': {
+          researcher: {
             permissions: ['read-anonymized', 'aggregate-analysis'],
             restrictions: ['no-identifiable', 'no-raw-phi'],
           },
@@ -66,7 +67,7 @@ export class HIPAADataService {
             ],
             restrictions: ['no-identifiable', 'audit-required'],
           },
-          'therapist': {
+          therapist: {
             permissions: [
               'read-own-clients',
               'write-notes',
@@ -74,7 +75,7 @@ export class HIPAADataService {
             ],
             restrictions: ['own-clients-only', 'no-research-export'],
           },
-          'admin': {
+          admin: {
             permissions: ['full-access', 'user-management', 'audit-review'],
             restrictions: ['audit-required', 'dual-authorization'],
           },

@@ -20,53 +20,53 @@
 <script>
   // Handle visibility and accessibility logic
   const handleScroll = () => {
-    const scrollThreshold = 300;
-    const toTopButton = document.getElementById("to-top-button");
-    if (!toTopButton) return;
+    const scrollThreshold = 300
+    const toTopButton = document.getElementById('to-top-button')
+    if (!toTopButton) return
 
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+    const scrollY = window.scrollY || document.documentElement.scrollTop
 
     if (isDesktop) {
       if (scrollY <= scrollThreshold) {
-        toTopButton.style.opacity = "0";
-        toTopButton.style.pointerEvents = "none";
-        toTopButton.setAttribute("tabindex", "-1");
-        toTopButton.setAttribute("aria-hidden", "true");
-        toTopButton.setAttribute("disabled", "");
+        toTopButton.style.opacity = '0'
+        toTopButton.style.pointerEvents = 'none'
+        toTopButton.setAttribute('tabindex', '-1')
+        toTopButton.setAttribute('aria-hidden', 'true')
+        toTopButton.setAttribute('disabled', '')
       } else {
-        toTopButton.style.opacity = "0.6";
-        toTopButton.style.pointerEvents = "auto";
-        toTopButton.removeAttribute("tabindex");
-        toTopButton.removeAttribute("aria-hidden");
-        toTopButton.removeAttribute("disabled");
+        toTopButton.style.opacity = '0.6'
+        toTopButton.style.pointerEvents = 'auto'
+        toTopButton.removeAttribute('tabindex')
+        toTopButton.removeAttribute('aria-hidden')
+        toTopButton.removeAttribute('disabled')
       }
     } else {
       // Mobile logic
-      toTopButton.style.opacity = "";
-      toTopButton.style.pointerEvents = "";
-      toTopButton.setAttribute("tabindex", "0");
-      toTopButton.setAttribute("aria-hidden", "false");
+      toTopButton.style.opacity = ''
+      toTopButton.style.pointerEvents = ''
+      toTopButton.setAttribute('tabindex', '0')
+      toTopButton.setAttribute('aria-hidden', 'false')
     }
-  };
+  }
 
   // Set up event listeners
-  document.addEventListener("astro:page-load", () => {
-    const toTopButton = document.getElementById("to-top-button");
+  document.addEventListener('astro:page-load', () => {
+    const toTopButton = document.getElementById('to-top-button')
 
     // Add click handler
     if (toTopButton) {
-      toTopButton.addEventListener("click", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      });
+      toTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      })
     }
 
     // Initialize state on load
-    handleScroll();
-  });
+    handleScroll()
+  })
 
   // Listen for scroll and resize events globally
   // (These persist across View Transitions in SPA mode, which is fine)
-  window.addEventListener("scroll", handleScroll, { passive: true });
-  window.addEventListener("resize", handleScroll, { passive: true });
+  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('resize', handleScroll, { passive: true })
 </script>

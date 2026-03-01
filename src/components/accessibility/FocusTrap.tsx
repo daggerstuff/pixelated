@@ -163,8 +163,8 @@ export function FocusTrap({
       onKeyDown={handleKeyDown}
       className={className}
       // These help screen readers understand this is a modal/dialog
-      role="dialog"
-      aria-modal="true"
+      role='dialog'
+      aria-modal='true'
     >
       {children}
     </div>

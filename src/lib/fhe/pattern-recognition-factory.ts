@@ -5,9 +5,10 @@
  * pattern recognition services for secure data analysis.
  */
 
-import { mockFHEService } from './mock/mock-fhe-service'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { nanoid } from 'nanoid'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { mockFHEService } from './mock/mock-fhe-service'
 import type {
   PatternRecognitionOps,
   TrendPattern,
@@ -148,9 +149,8 @@ export async function createPatternRecognitionFHEService(
       logger.info('Using SEAL FHE service for pattern recognition')
 
       // Import dynamically to avoid circular dependencies
-      const { SealPatternRecognitionService } = await import(
-        './seal-pattern-recognition'
-      )
+      const { SealPatternRecognitionService } =
+        await import('./seal-pattern-recognition')
 
       // Create and initialize SEAL service
       const sealService = new SealPatternRecognitionService()

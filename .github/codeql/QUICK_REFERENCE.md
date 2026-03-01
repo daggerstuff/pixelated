@@ -2,7 +2,9 @@
 
 ## What is CodeQL?
 
-CodeQL is GitHub's semantic code analysis engine that treats code as data, allowing you to query it like a database to find security vulnerabilities and code quality issues.
+CodeQL is GitHub's semantic code analysis engine that treats code as data,
+allowing you to query it like a database to find security vulnerabilities and
+code quality issues.
 
 ## Quick Links
 
@@ -13,6 +15,7 @@ CodeQL is GitHub's semantic code analysis engine that treats code as data, allow
 ## When Does CodeQL Run?
 
 ✅ **Automatic Triggers:**
+
 - Push to `master` or `develop` branches
 - Pull requests targeting `master` or `develop`
 - Every Monday at 2:00 AM UTC (scheduled)
@@ -21,24 +24,26 @@ CodeQL is GitHub's semantic code analysis engine that treats code as data, allow
 
 ## Understanding Alert Severity
 
-| Severity | What It Means | Action Required |
-|----------|---------------|-----------------|
-| **Critical** (9.0+) | Active security vulnerability, immediate risk | Fix immediately before merge |
-| **High** (8.0-8.9) | Serious security issue | Fix before release |
-| **Medium** (6.0-7.9) | Potential security concern | Address in current sprint |
-| **Low** (<6.0) | Code quality or minor issue | Address when convenient |
+| Severity             | What It Means                                 | Action Required              |
+| -------------------- | --------------------------------------------- | ---------------------------- |
+| **Critical** (9.0+)  | Active security vulnerability, immediate risk | Fix immediately before merge |
+| **High** (8.0-8.9)   | Serious security issue                        | Fix before release           |
+| **Medium** (6.0-7.9) | Potential security concern                    | Address in current sprint    |
+| **Low** (<6.0)       | Code quality or minor issue                   | Address when convenient      |
 
 ## Healthcare-Specific Checks
 
 Our custom queries detect:
 
 ### FHIR Security (`fhir-security.ql`)
+
 - ❌ Unvalidated FHIR resource access
 - ❌ Missing FHIR version checks
 - ❌ Insecure FHIR search operations
 - ❌ FHIR operations without security context
 
 ### EHR Security (`ehr-security.ql`)
+
 - ❌ Unencrypted PHI/EHR data transfer
 - ❌ Weak authentication for EHR access
 - ❌ Missing audit logs (HIPAA violation)
@@ -49,66 +54,74 @@ Our custom queries detect:
 ### Issue: "Unvalidated FHIR resource access"
 
 **Bad:**
+
 ```javascript
-const patient = await getResource('Patient', patientId);
+const patient = await getResource('Patient', patientId)
 ```
 
 **Good:**
+
 ```javascript
-const patient = await getResource('Patient', patientId);
-await validateResource(patient);
+const patient = await getResource('Patient', patientId)
+await validateResource(patient)
 ```
 
 ### Issue: "Unencrypted EHR data transfer"
 
 **Bad:**
+
 ```javascript
 fetch('http://ehr-api.example.com/patient', {
-  body: JSON.stringify(patientData)
-});
+  body: JSON.stringify(patientData),
+})
 ```
 
 **Good:**
+
 ```javascript
-const encryptedData = await encrypt(patientData);
+const encryptedData = await encrypt(patientData)
 fetch('https://ehr-api.example.com/patient', {
   body: JSON.stringify(encryptedData),
-  headers: { 'Content-Type': 'application/encrypted+json' }
-});
+  headers: { 'Content-Type': 'application/encrypted+json' },
+})
 ```
 
 ### Issue: "Missing audit logging"
 
 **Bad:**
+
 ```javascript
 async function updatePatientRecord(patientId, data) {
-  return await db.patients.update(patientId, data);
+  return await db.patients.update(patientId, data)
 }
 ```
 
 **Good:**
+
 ```javascript
 async function updatePatientRecord(patientId, data) {
-  const result = await db.patients.update(patientId, data);
+  const result = await db.patients.update(patientId, data)
   await auditLog.record({
     action: 'UPDATE_PATIENT',
     patientId,
     userId: currentUser.id,
-    timestamp: new Date()
-  });
-  return result;
+    timestamp: new Date(),
+  })
+  return result
 }
 ```
 
 ## Reviewing Alerts
 
 ### In Pull Requests
+
 1. Go to "Files changed" tab
 2. Look for CodeQL annotations on specific lines
 3. Click annotation to see full details
 4. Fix the issue or dismiss with justification
 
 ### In Security Tab
+
 1. Navigate to Security → Code scanning
 2. Filter by severity, branch, or language
 3. Click alert for detailed explanation
@@ -117,11 +130,13 @@ async function updatePatientRecord(patientId, data) {
 ## Dismissing False Positives
 
 Only dismiss alerts if:
+
 - ✅ You've verified it's a false positive
 - ✅ You've documented why it's safe
 - ✅ Security team has reviewed (for high/critical)
 
 **How to dismiss:**
+
 1. Open the alert
 2. Click "Dismiss alert"
 3. Select reason (false positive, used in tests, won't fix)
@@ -130,6 +145,7 @@ Only dismiss alerts if:
 ## Performance Tips
 
 If CodeQL is slow:
+
 1. Check which files are being analyzed (config paths)
 2. Ensure test files are excluded
 3. Verify node_modules is in paths-ignore
@@ -138,16 +154,19 @@ If CodeQL is slow:
 ## Troubleshooting
 
 ### "CodeQL failed to build the project"
+
 - Check Actions logs for build errors
 - Verify dependencies are properly installed
 - Ensure build scripts work locally
 
 ### "No results found"
+
 - Verify paths in config include your code
 - Check that queries are properly enabled
 - Ensure language is correctly detected
 
 ### "Too many alerts"
+
 - Review query filters in config
 - Adjust severity thresholds
 - Focus on security-extended queries first
@@ -155,6 +174,7 @@ If CodeQL is slow:
 ## Advanced Usage
 
 ### Running CodeQL Locally
+
 ```bash
 # Install CodeQL CLI
 gh extension install github/gh-codeql
@@ -169,6 +189,7 @@ codeql database analyze ./codeql-db \
 ```
 
 ### Testing Custom Queries
+
 ```bash
 # Validate query syntax
 codeql query format .github/codeql/custom-queries/your-query.ql
@@ -180,16 +201,17 @@ codeql query run .github/codeql/custom-queries/your-query.ql \
 
 ## HIPAA Compliance Mapping
 
-| HIPAA Requirement | CodeQL Check | Query |
-|-------------------|--------------|-------|
-| §164.312(a)(1) Access Control | Authentication validation | ehr-security.ql |
-| §164.312(b) Audit Controls | Audit logging | ehr-security.ql |
-| §164.312(c)(1) Integrity | Version checks, validation | fhir-security.ql |
-| §164.312(e)(1) Transmission Security | Encryption checks | ehr-security.ql |
+| HIPAA Requirement                    | CodeQL Check               | Query            |
+| ------------------------------------ | -------------------------- | ---------------- |
+| §164.312(a)(1) Access Control        | Authentication validation  | ehr-security.ql  |
+| §164.312(b) Audit Controls           | Audit logging              | ehr-security.ql  |
+| §164.312(c)(1) Integrity             | Version checks, validation | fhir-security.ql |
+| §164.312(e)(1) Transmission Security | Encryption checks          | ehr-security.ql  |
 
 ## Best Practices
 
 ✅ **DO:**
+
 - Review all high/critical alerts before merging
 - Add security context to healthcare operations
 - Implement audit logging for PHI access
@@ -198,6 +220,7 @@ codeql query run .github/codeql/custom-queries/your-query.ql \
 - Use parameterized queries for databases
 
 ❌ **DON'T:**
+
 - Dismiss alerts without investigation
 - Hardcode credentials or API keys
 - Skip encryption for healthcare data
@@ -220,4 +243,7 @@ codeql query run .github/codeql/custom-queries/your-query.ql \
 
 ---
 
-**Remember**: CodeQL is a tool to help you write secure code. It's not a replacement for security review, but it catches many common issues automatically. Always consider the healthcare context and HIPAA requirements when addressing alerts.
+**Remember**: CodeQL is a tool to help you write secure code. It's not a
+replacement for security review, but it catches many common issues
+automatically. Always consider the healthcare context and HIPAA requirements
+when addressing alerts.

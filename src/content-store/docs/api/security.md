@@ -14,7 +14,9 @@ This document outlines the security features implemented in our API endpoints.
 
 ## Rate Limiting
 
-Our API implements rate limiting to prevent abuse and ensure fair usage of resources. The rate limits are enforced using a Redis-based implementation for distributed environments.
+Our API implements rate limiting to prevent abuse and ensure fair usage of
+resources. The rate limits are enforced using a Redis-based implementation for
+distributed environments.
 
 ### Rate Limits by Role
 
@@ -32,14 +34,18 @@ Different rate limits apply based on user roles:
 All API responses include the following rate limit headers:
 
 - `X-RateLimit-Limit`: The maximum number of requests allowed per window
-- `X-RateLimit-Remaining`: The number of requests remaining in the current window
-- `X-RateLimit-Reset`: The time when the rate limit window resets (Unix timestamp)
+- `X-RateLimit-Remaining`: The number of requests remaining in the current
+  window
+- `X-RateLimit-Reset`: The time when the rate limit window resets (Unix
+  timestamp)
 
-When rate limits are exceeded, the API returns a `429 Too Many Requests` response with a `Retry-After` header indicating when to retry.
+When rate limits are exceeded, the API returns a `429 Too Many Requests`
+response with a `Retry-After` header indicating when to retry.
 
 ## CORS (Cross-Origin Resource Sharing)
 
-Our API implements strict CORS policies to ensure secure cross-origin communication.
+Our API implements strict CORS policies to ensure secure cross-origin
+communication.
 
 ### Development Environment
 
@@ -117,10 +123,14 @@ All API responses include the following security headers:
 
 ## Best Practices
 
-1. **Authentication**: Always include a valid `Authorization` header for authenticated endpoints.
-2. **Rate Limits**: Implement proper rate limit handling in your client applications.
-3. **Error Handling**: Handle rate limit and CORS errors gracefully in your applications.
-4. **Request IDs**: Include `X-Request-ID` in requests to help with request tracing.
+1. **Authentication**: Always include a valid `Authorization` header for
+   authenticated endpoints.
+2. **Rate Limits**: Implement proper rate limit handling in your client
+   applications.
+3. **Error Handling**: Handle rate limit and CORS errors gracefully in your
+   applications.
+4. **Request IDs**: Include `X-Request-ID` in requests to help with request
+   tracing.
 
 ## Monitoring and Logging
 
@@ -171,7 +181,9 @@ This document outlines the security features implemented in our API endpoints.
 
 ## Rate Limiting
 
-Our API implements rate limiting to prevent abuse and ensure fair usage of resources. The rate limits are enforced using a Redis-based implementation for distributed environments.
+Our API implements rate limiting to prevent abuse and ensure fair usage of
+resources. The rate limits are enforced using a Redis-based implementation for
+distributed environments.
 
 ### Rate Limits by Role
 
@@ -189,14 +201,18 @@ Different rate limits apply based on user roles:
 All API responses include the following rate limit headers:
 
 - `X-RateLimit-Limit`: The maximum number of requests allowed per window
-- `X-RateLimit-Remaining`: The number of requests remaining in the current window
-- `X-RateLimit-Reset`: The time when the rate limit window resets (Unix timestamp)
+- `X-RateLimit-Remaining`: The number of requests remaining in the current
+  window
+- `X-RateLimit-Reset`: The time when the rate limit window resets (Unix
+  timestamp)
 
-When rate limits are exceeded, the API returns a `429 Too Many Requests` response with a `Retry-After` header indicating when to retry.
+When rate limits are exceeded, the API returns a `429 Too Many Requests`
+response with a `Retry-After` header indicating when to retry.
 
 ## CORS (Cross-Origin Resource Sharing)
 
-Our API implements strict CORS policies to ensure secure cross-origin communication.
+Our API implements strict CORS policies to ensure secure cross-origin
+communication.
 
 ### Development Environment
 
@@ -274,10 +290,14 @@ All API responses include the following security headers:
 
 ## Best Practices
 
-1. **Authentication**: Always include a valid `Authorization` header for authenticated endpoints.
-2. **Rate Limits**: Implement proper rate limit handling in your client applications.
-3. **Error Handling**: Handle rate limit and CORS errors gracefully in your applications.
-4. **Request IDs**: Include `X-Request-ID` in requests to help with request tracing.
+1. **Authentication**: Always include a valid `Authorization` header for
+   authenticated endpoints.
+2. **Rate Limits**: Implement proper rate limit handling in your client
+   applications.
+3. **Error Handling**: Handle rate limit and CORS errors gracefully in your
+   applications.
+4. **Request IDs**: Include `X-Request-ID` in requests to help with request
+   tracing.
 
 ## Monitoring and Logging
 

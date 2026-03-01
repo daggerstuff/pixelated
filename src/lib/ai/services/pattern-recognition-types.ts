@@ -1,6 +1,7 @@
 import { z } from 'zod'
-import type { TherapySession } from '../models/ai-types'
+
 import type { EmotionAnalysis } from '../emotions/types'
+import type { TherapySession } from '../models/ai-types'
 
 // Base schemas for statistical metrics
 export const StatisticalMetricsSchema = z.object({

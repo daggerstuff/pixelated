@@ -1,6 +1,6 @@
 /**
  * Alert Utilities Module
- * 
+ *
  * Provides utility functions for alert management, severity calculation,
  * escalation logic, and reporting.
  */
@@ -114,7 +114,8 @@ export function shouldEscalateAlert(alert: Alert): boolean {
   if (alert.escalatedAt) {
     const lastEscalated = new Date(alert.escalatedAt)
     const timeSinceEscalation = now.getTime() - lastEscalated.getTime()
-    if (timeSinceEscalation < 15 * 60 * 1000) { // 15 minutes
+    if (timeSinceEscalation < 15 * 60 * 1000) {
+      // 15 minutes
       return false
     }
   }
@@ -124,7 +125,7 @@ export function shouldEscalateAlert(alert: Alert): boolean {
     critical: { minutes: 5, maxEscalations: 3 },
     high: { minutes: 15, maxEscalations: 2 },
     medium: { minutes: 30, maxEscalations: 1 },
-    low: { minutes: 60, maxEscalations: 1 }
+    low: { minutes: 60, maxEscalations: 1 },
   }
 
   const rule = escalationRules[alert.severity]
@@ -151,11 +152,13 @@ export function shouldEscalateAlert(alert: Alert): boolean {
 /**
  * Get alert statistics from Redis
  */
-export async function getAlertStatistics(redis: RedisClientType): Promise<AlertStatistics> {
+export async function getAlertStatistics(
+  redis: RedisClientType,
+): Promise<AlertStatistics> {
   try {
     const stats = await redis.hGetAll('alert:statistics')
     if (!stats) {
-      throw new Error('No statistics found');
+      throw new Error('No statistics found')
     }
 
     return {
@@ -166,15 +169,15 @@ export async function getAlertStatistics(redis: RedisClientType): Promise<AlertS
         critical: parseInt(stats.critical || '0', 10),
         high: parseInt(stats.high || '0', 10),
         medium: parseInt(stats.medium || '0', 10),
-        low: parseInt(stats.low || '0', 10)
+        low: parseInt(stats.low || '0', 10),
       },
       bySource: {
-        'rate_limiting': parseInt(stats.rate_limiting || '0', 10),
-        'behavioral_analysis': parseInt(stats.behavioral_analysis || '0', 10),
-        'threat_intelligence': parseInt(stats.threat_intelligence || '0', 10),
-        'system_monitoring': parseInt(stats.system_monitoring || '0', 10)
+        rate_limiting: parseInt(stats.rate_limiting || '0', 10),
+        behavioral_analysis: parseInt(stats.behavioral_analysis || '0', 10),
+        threat_intelligence: parseInt(stats.threat_intelligence || '0', 10),
+        system_monitoring: parseInt(stats.system_monitoring || '0', 10),
       },
-      avgResolutionTime: parseInt(stats.avgResolutionTime || '0', 10)
+      avgResolutionTime: parseInt(stats.avgResolutionTime || '0', 10),
     }
   } catch (error) {
     console.error('Error getting alert statistics:', error)
@@ -184,7 +187,7 @@ export async function getAlertStatistics(redis: RedisClientType): Promise<AlertS
       resolved: 0,
       bySeverity: { critical: 0, high: 0, medium: 0, low: 0 },
       bySource: {},
-      avgResolutionTime: 0
+      avgResolutionTime: 0,
     }
   }
 }
@@ -198,7 +201,7 @@ export async function generateAlertReport(
     timeRange: string
     includeMetrics: boolean
     includeRecommendations: boolean
-  }
+  },
 ): Promise<AlertReport> {
   const { timeRange, includeRecommendations } = options
 
@@ -207,37 +210,41 @@ export async function generateAlertReport(
     alerts,
     metrics: {
       total: alerts.length,
-      active: alerts.filter(a => a.status === 'active').length,
-      resolved: alerts.filter(a => a.status === 'resolved').length,
+      active: alerts.filter((a) => a.status === 'active').length,
+      resolved: alerts.filter((a) => a.status === 'resolved').length,
       bySeverity: {
-        critical: alerts.filter(a => a.severity === 'critical').length,
-        high: alerts.filter(a => a.severity === 'high').length,
-        medium: alerts.filter(a => a.severity === 'medium').length,
-        low: alerts.filter(a => a.severity === 'low').length
+        critical: alerts.filter((a) => a.severity === 'critical').length,
+        high: alerts.filter((a) => a.severity === 'high').length,
+        medium: alerts.filter((a) => a.severity === 'medium').length,
+        low: alerts.filter((a) => a.severity === 'low').length,
       },
       bySource: {},
-      avgResolutionTime: 0
+      avgResolutionTime: 0,
     },
     recommendations: [],
-    generatedAt: new Date().toISOString()
+    generatedAt: new Date().toISOString(),
   }
 
   // Calculate bySource statistics
   const sourceCounts: Record<string, number> = {}
-  alerts.forEach(alert => {
+  alerts.forEach((alert) => {
     sourceCounts[alert.source] = (sourceCounts[alert.source] || 0) + 1
   })
   report.metrics.bySource = sourceCounts
 
   // Calculate average resolution time for resolved alerts
-  const resolvedAlerts = alerts.filter(a => a.status === 'resolved' && a.resolvedAt)
+  const resolvedAlerts = alerts.filter(
+    (a) => a.status === 'resolved' && a.resolvedAt,
+  )
   if (resolvedAlerts.length > 0) {
     const totalResolutionTime = resolvedAlerts.reduce((sum, alert) => {
       const created = new Date(alert.createdAt).getTime()
       const resolved = new Date(alert.resolvedAt!).getTime()
       return sum + (resolved - created)
     }, 0)
-    report.metrics.avgResolutionTime = Math.floor(totalResolutionTime / resolvedAlerts.length)
+    report.metrics.avgResolutionTime = Math.floor(
+      totalResolutionTime / resolvedAlerts.length,
+    )
   }
 
   // Generate recommendations if requested
@@ -251,36 +258,52 @@ export async function generateAlertReport(
 /**
  * Generate recommendations based on alert patterns
  */
-function generateRecommendations(alerts: Alert[], metrics: AlertStatistics): string[] {
+function generateRecommendations(
+  alerts: Alert[],
+  metrics: AlertStatistics,
+): string[] {
   const recommendations: string[] = []
 
   // High critical alert frequency
   if (metrics.bySeverity.critical > metrics.total * 0.3) {
-    recommendations.push('High frequency of critical alerts detected. Consider implementing automated response mechanisms.')
+    recommendations.push(
+      'High frequency of critical alerts detected. Consider implementing automated response mechanisms.',
+    )
   }
 
   // Long resolution times
-  if (metrics.avgResolutionTime > 3600000) { // 1 hour
-    recommendations.push('Average resolution time exceeds 1 hour. Review alert response procedures.')
+  if (metrics.avgResolutionTime > 3600000) {
+    // 1 hour
+    recommendations.push(
+      'Average resolution time exceeds 1 hour. Review alert response procedures.',
+    )
   }
 
   // High active alert count
   if (metrics.active > metrics.total * 0.6) {
-    recommendations.push('High number of active alerts. Consider increasing monitoring staff or automating responses.')
+    recommendations.push(
+      'High number of active alerts. Consider increasing monitoring staff or automating responses.',
+    )
   }
 
   // Specific source recommendations
   if (metrics.bySource.rate_limiting > 10) {
-    recommendations.push('Multiple rate limiting alerts. Review API usage patterns and consider rate limit adjustments.')
+    recommendations.push(
+      'Multiple rate limiting alerts. Review API usage patterns and consider rate limit adjustments.',
+    )
   }
 
   if (metrics.bySource.behavioral_analysis > 5) {
-    recommendations.push('Multiple behavioral analysis alerts. Consider enhancing user behavior monitoring.')
+    recommendations.push(
+      'Multiple behavioral analysis alerts. Consider enhancing user behavior monitoring.',
+    )
   }
 
   // Default recommendation if no specific patterns
   if (recommendations.length === 0) {
-    recommendations.push('Monitor alert trends and adjust thresholds as needed.')
+    recommendations.push(
+      'Monitor alert trends and adjust thresholds as needed.',
+    )
   }
 
   return recommendations
@@ -289,7 +312,11 @@ function generateRecommendations(alerts: Alert[], metrics: AlertStatistics): str
 /**
  * Update alert statistics in Redis
  */
-export async function updateAlertStatistics(redis: RedisClientType, alert: Alert, previousStatus?: string): Promise<void> {
+export async function updateAlertStatistics(
+  redis: RedisClientType,
+  alert: Alert,
+  previousStatus?: string,
+): Promise<void> {
   try {
     // Increment total if this is a new alert
     if (!previousStatus) {
@@ -309,7 +336,6 @@ export async function updateAlertStatistics(redis: RedisClientType, alert: Alert
 
     // Update source counters
     await redis.hIncrBy('alert:statistics', alert.source, 1)
-
   } catch (error) {
     console.error('Error updating alert statistics:', error)
   }

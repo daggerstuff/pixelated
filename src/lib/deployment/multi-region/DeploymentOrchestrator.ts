@@ -6,11 +6,12 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('DeploymentOrchestrator')
-import { RegionConfig } from './MultiRegionDeploymentManager'
 import { CloudProviderManager, DeploymentResult } from './CloudProviderManager'
+import { RegionConfig } from './MultiRegionDeploymentManager'
 
 export interface DeploymentOrchestratorConfig {
   maxParallelDeployments: number
@@ -58,10 +59,10 @@ export interface ValidationStep {
   id: string
   name: string
   type:
-  | 'health-check'
-  | 'performance-test'
-  | 'security-scan'
-  | 'compliance-check'
+    | 'health-check'
+    | 'performance-test'
+    | 'security-scan'
+    | 'compliance-check'
   target: string
   timeout: number
   successCriteria: Record<string, unknown>
@@ -558,12 +559,12 @@ export class DeploymentOrchestrator extends EventEmitter {
         .filter((result) => result.status === 'fulfilled')
         .map(
           (result) =>
-            (result as PromiseFulfilledResult<DeploymentResult>).value,
+            (result).value,
         )
 
       const failedResults = results
         .filter((result) => result.status === 'rejected')
-        .map((result) => (result as PromiseRejectedResult).reason)
+        .map((result) => (result).reason)
 
       if (failedResults.length > 0) {
         logger.warn(`Some infrastructure deployments failed`, {
@@ -613,7 +614,10 @@ export class DeploymentOrchestrator extends EventEmitter {
 
       return results
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<Record<string, unknown>>).value)
+        .map(
+          (result) =>
+            (result as PromiseFulfilledResult<Record<string, unknown>>).value,
+        )
     } catch (error) {
       logger.error('Service deployment failed', { error })
       throw error
@@ -656,7 +660,10 @@ export class DeploymentOrchestrator extends EventEmitter {
 
       return results
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<Record<string, unknown>>).value)
+        .map(
+          (result) =>
+            (result as PromiseFulfilledResult<Record<string, unknown>>).value,
+        )
     } catch (error) {
       logger.error('Monitoring setup failed', { error })
       throw error

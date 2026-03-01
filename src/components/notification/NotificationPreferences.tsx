@@ -36,14 +36,14 @@ export function NotificationPreferences({
 
   if (isLoading) {
     return (
-      <Card className={cn('p-6', className)} aria-busy="true">
-        <div className="space-y-6" role="status">
-          <Skeleton className="h-6 w-1/3" />
-          <div className="space-y-4">
+      <Card className={cn('p-6', className)} aria-busy='true'>
+        <div className='space-y-6' role='status'>
+          <Skeleton className='h-6 w-1/3' />
+          <div className='space-y-4'>
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center justify-between">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-6 w-10" />
+              <div key={i} className='flex items-center justify-between'>
+                <Skeleton className='h-4 w-1/4' />
+                <Skeleton className='h-6 w-10' />
               </div>
             ))}
           </div>
@@ -54,7 +54,7 @@ export function NotificationPreferences({
 
   if (error) {
     return (
-      <Alert variant="error" className={className}>
+      <Alert variant='error' className={className}>
         Failed to load notification preferences: {String(error)}
       </Alert>
     )
@@ -62,19 +62,19 @@ export function NotificationPreferences({
 
   return (
     <Card className={cn('p-6', className)}>
-      <div className="space-y-6">
+      <div className='space-y-6'>
         <div>
-          <h2 className="text-lg font-semibold">Notification Channels</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className='text-lg font-semibold'>Notification Channels</h2>
+          <p className='text-muted-foreground text-sm'>
             Choose how you want to receive notifications
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="in-app">In-app notifications</Label>
+        <div className='space-y-4'>
+          <div className='flex items-center justify-between'>
+            <Label htmlFor='in-app'>In-app notifications</Label>
             <Switch
-              id="in-app"
+              id='in-app'
               checked={preferences.channels[NotificationChannel.IN_APP]}
               onCheckedChange={(checked) =>
                 updateChannel(NotificationChannel.IN_APP, checked)
@@ -82,10 +82,10 @@ export function NotificationPreferences({
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="email">Email notifications</Label>
+          <div className='flex items-center justify-between'>
+            <Label htmlFor='email'>Email notifications</Label>
             <Switch
-              id="email"
+              id='email'
               checked={preferences.channels[NotificationChannel.EMAIL]}
               onCheckedChange={(checked) =>
                 updateChannel(NotificationChannel.EMAIL, checked)
@@ -93,10 +93,10 @@ export function NotificationPreferences({
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="push">Push notifications</Label>
+          <div className='flex items-center justify-between'>
+            <Label htmlFor='push'>Push notifications</Label>
             <Switch
-              id="push"
+              id='push'
               checked={preferences.channels[NotificationChannel.PUSH]}
               onCheckedChange={(checked) =>
                 updateChannel(NotificationChannel.PUSH, checked)
@@ -104,10 +104,10 @@ export function NotificationPreferences({
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Label htmlFor="sms">SMS notifications</Label>
+          <div className='flex items-center justify-between'>
+            <Label htmlFor='sms'>SMS notifications</Label>
             <Switch
-              id="sms"
+              id='sms'
               checked={preferences.channels[NotificationChannel.SMS]}
               onCheckedChange={(checked) =>
                 updateChannel(NotificationChannel.SMS, checked)
@@ -116,16 +116,19 @@ export function NotificationPreferences({
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <div>
-            <h2 className="text-lg font-semibold">Notification Frequency</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className='text-lg font-semibold'>Notification Frequency</h2>
+            <p className='text-muted-foreground text-sm'>
               Choose how often you want to receive notifications
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label id="notification-frequency-label" htmlFor="notification-frequency">
+          <div className='space-y-2'>
+            <Label
+              id='notification-frequency-label'
+              htmlFor='notification-frequency'
+            >
               Notification Frequency
             </Label>
             <Select
@@ -133,32 +136,35 @@ export function NotificationPreferences({
               onValueChange={(value) =>
                 updateFrequency(value as NotificationFrequency)
               }
-              placeholder="Select frequency"
+              placeholder='Select frequency'
             >
-              <SelectTrigger id="notification-frequency" aria-labelledby="notification-frequency-label">
+              <SelectTrigger
+                id='notification-frequency'
+                aria-labelledby='notification-frequency-label'
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="immediate">Immediate</SelectItem>
-                <SelectItem value="batched">Batched</SelectItem>
-                <SelectItem value="daily">Daily digest</SelectItem>
-                <SelectItem value="weekly">Weekly digest</SelectItem>
+                <SelectItem value='immediate'>Immediate</SelectItem>
+                <SelectItem value='batched'>Batched</SelectItem>
+                <SelectItem value='daily'>Daily digest</SelectItem>
+                <SelectItem value='weekly'>Weekly digest</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <div>
-            <h2 className="text-lg font-semibold">Quiet Hours</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className='text-lg font-semibold'>Quiet Hours</h2>
+            <p className='text-muted-foreground text-sm'>
               Set hours during which notifications will be muted
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className='flex items-center gap-4'>
             <Switch
-              id="quiet-hours"
+              id='quiet-hours'
               checked={preferences.quiet_hours.enabled}
               onCheckedChange={(checked) =>
                 updateQuietHours({
@@ -168,16 +174,16 @@ export function NotificationPreferences({
               }
             />
 
-            <Label htmlFor="quiet-hours">Enable quiet hours</Label>
+            <Label htmlFor='quiet-hours'>Enable quiet hours</Label>
           </div>
 
           {preferences.quiet_hours.enabled && (
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <Label htmlFor="start-time">Start time</Label>
+            <div className='flex items-center gap-4'>
+              <div className='flex-1'>
+                <Label htmlFor='start-time'>Start time</Label>
                 <Input
-                  id="start-time"
-                  type="time"
+                  id='start-time'
+                  type='time'
                   value={preferences.quiet_hours.start}
                   onChange={(e) =>
                     updateQuietHours({
@@ -187,11 +193,11 @@ export function NotificationPreferences({
                   }
                 />
               </div>
-              <div className="flex-1">
-                <Label htmlFor="end-time">End time</Label>
+              <div className='flex-1'>
+                <Label htmlFor='end-time'>End time</Label>
                 <Input
-                  id="end-time"
-                  type="time"
+                  id='end-time'
+                  type='time'
                   value={preferences.quiet_hours.end}
                   onChange={(e) =>
                     updateQuietHours({
@@ -205,22 +211,22 @@ export function NotificationPreferences({
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <div>
-            <h2 className="text-lg font-semibold">Notification Categories</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className='text-lg font-semibold'>Notification Categories</h2>
+            <p className='text-muted-foreground text-sm'>
               Choose which types of notifications you want to receive
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {Object.entries(preferences.categories).map(
               ([category, enabled]) => (
                 <div
                   key={category}
-                  className="flex items-center justify-between"
+                  className='flex items-center justify-between'
                 >
-                  <Label htmlFor={category} className="capitalize">
+                  <Label htmlFor={category} className='capitalize'>
                     {category} notifications
                   </Label>
                   <Switch

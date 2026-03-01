@@ -1,5 +1,7 @@
-import { z } from 'zod'
 import * as crypto from 'node:crypto'
+
+import { z } from 'zod'
+
 import type {
   ParticipantDemographics,
   TherapeuticSession,
@@ -112,9 +114,9 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
   const normalizeDate = (d: any) => (typeof d === 'string' ? new Date(d) : d)
   const aiResponses = Array.isArray(session.aiResponses)
     ? session.aiResponses.map((r: any) => ({
-      ...r,
-      timestamp: normalizeDate(r.timestamp),
-    }))
+        ...r,
+        timestamp: normalizeDate(r.timestamp),
+      }))
     : []
   const normalized: TherapeuticSession = {
     ...session,
@@ -225,10 +227,10 @@ export function calculateDemographicRepresentation(
       return
     }
     counts[key] ||= {}
-    counts[key]![val] = (counts[key]![val] || 0) + 1
+    counts[key][val] = (counts[key][val] || 0) + 1
   }
   for (const s of sessions) {
-    const d = s.participantDemographics as ParticipantDemographics
+    const d = s.participantDemographics
     add('age', d.age)
     add('gender', d.gender)
     add('ethnicity', d.ethnicity)
@@ -322,7 +324,7 @@ export function calculateFairnessMetrics(
   const tprs: number[] = []
   const fprs: number[] = []
   for (const g of groups) {
-    const m = groupMetrics[g]!
+    const m = groupMetrics[g]
     const { tp, fp, tn, fn } = m
     const total = tp + fp + tn + fn
     const pr = total > 0 ? (tp + fp) / total : 0

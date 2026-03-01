@@ -1,5 +1,6 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { randomBytes } from 'crypto'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 // Supabase import removed - migrated to MongoDB
 // Create our own audit logging service since the actual one has different signature
 class AuditLoggingService {
@@ -27,9 +28,10 @@ function getAuditLogger(context: string): AuditLoggingService {
 
 // Import the generateId function from ids.ts instead of idUtils
 
-import { mongoClient as db } from '../../db/mongoClient'
 import { v4 as uuidv4 } from 'uuid'
+
 import { dataExportDAO } from '../../../services/mongodb.dao'
+import { mongoClient as db } from '../../db/mongoClient'
 
 // Replace missing permissions module with a stub
 // Setup logging
@@ -147,11 +149,11 @@ export interface ExportDownloadSuccessResponse {
 export interface ExportDownloadErrorResponse {
   success: false
   error:
-  | 'not_found'
-  | 'unauthorized'
-  | 'not_ready'
-  | 'expired'
-  | 'internal_error'
+    | 'not_found'
+    | 'unauthorized'
+    | 'not_ready'
+    | 'expired'
+    | 'internal_error'
   message?: string
   status?: ExportStatus
   progress?: number
@@ -292,7 +294,7 @@ export async function createDataExportRequest(
   } catch (error: unknown) {
     logger.error('Error creating export request', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
       input,
     })
 
@@ -533,7 +535,7 @@ async function processExportRequest(exportId: string): Promise<void> {
   } catch (error: unknown) {
     logger.error('Error processing export', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
       exportId,
     })
 

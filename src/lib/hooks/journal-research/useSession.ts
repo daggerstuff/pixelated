@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   createSession,
   deleteSession,
@@ -35,14 +36,20 @@ const matchesSearchTerm = (session: Session, searchTerm: string) => {
   if (session.sessionId.toLowerCase().includes(lowerSearch)) {
     return true
   }
-  if (session.targetSources.some((source) => source.toLowerCase().includes(lowerSearch))) {
+  if (
+    session.targetSources.some((source) =>
+      source.toLowerCase().includes(lowerSearch),
+    )
+  ) {
     return true
   }
   return Object.entries(session.searchKeywords).some(([category, keywords]) => {
     if (category.toLowerCase().includes(lowerSearch)) {
       return true
     }
-    return keywords.some((keyword) => keyword.toLowerCase().includes(lowerSearch))
+    return keywords.some((keyword) =>
+      keyword.toLowerCase().includes(lowerSearch),
+    )
   })
 }
 
@@ -51,9 +58,9 @@ const matchesPhaseFilter = (session: Session, phases: SessionPhase[]) => {
     return true
   }
   const currentPhase = (session.currentPhase ?? 'unknown').toLowerCase()
-  return phases.some((phase) => phase === 'unknown'
-    ? !currentPhase
-    : currentPhase.includes(phase))
+  return phases.some((phase) =>
+    phase === 'unknown' ? !currentPhase : currentPhase.includes(phase),
+  )
 }
 
 const applySessionFilters = (
@@ -95,7 +102,8 @@ export const useSessionListQuery = ({
     }),
     queryFn: () => listSessions({ page, pageSize }),
     enabled,
-    select: (data) => applySessionFilters(data, filters.searchTerm, filters.phases),
+    select: (data) =>
+      applySessionFilters(data, filters.searchTerm, filters.phases),
   })
 }
 
@@ -118,7 +126,7 @@ export const useCreateSessionMutation = () => {
     mutationKey: journalResearchMutationKeys.sessions.create(),
     mutationFn: (payload: CreateSessionPayload) => createSession(payload),
     onSuccess: (session) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.root,
       })
       useJournalSessionStore.getState().setSelectedSessionId(session.sessionId)
@@ -140,10 +148,10 @@ export const useUpdateSessionMutation = () => {
       payload: UpdateSessionPayload
     }) => updateSession(sessionId, payload),
     onSuccess: (session) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.detail(session.sessionId),
       })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.list({}),
         exact: false,
       })
@@ -158,7 +166,7 @@ export const useDeleteSessionMutation = () => {
     mutationKey: journalResearchMutationKeys.sessions.delete(),
     mutationFn: (sessionId: string) => deleteSession(sessionId),
     onSuccess: (_, sessionId) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.root,
       })
       const { selectedSessionId, setSelectedSessionId } =
@@ -169,5 +177,3 @@ export const useDeleteSessionMutation = () => {
     },
   })
 }
-
-

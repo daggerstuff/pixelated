@@ -19,7 +19,7 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
 
   try {
     const session = await authClient.getSession()
-    
+
     if (session?.data?.session?.token) {
       return session.data.session.token
     }
@@ -32,7 +32,7 @@ export async function getJournalResearchAuthToken(): Promise<string | null> {
     )
   } catch (error) {
     logger.warn('Failed to get auth token from Better Auth', { error })
-    
+
     // Fallback to localStorage
     try {
       return (
@@ -62,9 +62,7 @@ export async function isJournalResearchAuthenticated(): Promise<boolean> {
  * Handle unauthorized access by redirecting to login
  * @param redirectPath Optional path to redirect to after login
  */
-export function handleJournalResearchUnauthorized(
-  redirectPath?: string,
-): void {
+export function handleJournalResearchUnauthorized(redirectPath?: string): void {
   if (typeof window === 'undefined') {
     return
   }
@@ -72,4 +70,3 @@ export function handleJournalResearchUnauthorized(
   const currentPath = redirectPath ?? window.location.pathname
   window.location.href = `/auth/sign-in?redirect=${encodeURIComponent(currentPath)}`
 }
-

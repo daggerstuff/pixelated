@@ -1,5 +1,6 @@
-import { KeyStorage } from './keyStorage'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
+
+import { KeyStorage } from './keyStorage'
 
 interface EncryptionOptions {
   namespace: string

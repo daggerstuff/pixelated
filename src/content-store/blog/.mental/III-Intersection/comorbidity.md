@@ -7,7 +7,9 @@ pubDate: 2024-02-28
 
 # CPTSD and Addiction Comorbidity
 
-This guide explores the comorbidity between Complex Post-Traumatic Stress Disorder (CPTSD) and addiction, including assessment, treatment considerations, and outcome monitoring.
+This guide explores the comorbidity between Complex Post-Traumatic Stress
+Disorder (CPTSD) and addiction, including assessment, treatment considerations,
+and outcome monitoring.
 
 ## Understanding Comorbidity
 

@@ -1,4 +1,3 @@
-import { getLogger } from '@/lib/utils/logger'
 import {
   ResearchPlatformConfig,
   ResearchAPIResponse,
@@ -6,12 +5,14 @@ import {
   SystemMetrics,
   Alert,
 } from '@/lib/research/types/research-types'
+import { getLogger } from '@/lib/utils/logger'
+
 import { AnonymizationService } from './services/AnonymizationService'
 import { ConsentManagementService } from './services/ConsentManagementService'
-import { HIPAADataService } from './services/HIPAADataService'
-import { ResearchQueryEngine } from './services/ResearchQueryEngine'
-import { PatternDiscoveryService } from './services/PatternDiscoveryService'
 import { EvidenceGenerationService } from './services/EvidenceGenerationService'
+import { HIPAADataService } from './services/HIPAADataService'
+import { PatternDiscoveryService } from './services/PatternDiscoveryService'
+import { ResearchQueryEngine } from './services/ResearchQueryEngine'
 
 const logger = getLogger('ResearchPlatform')
 
@@ -91,7 +92,7 @@ export class ResearchPlatform {
       auditRetentionDays: config.hipaa.auditRetentionDays,
       accessControlMatrix: {
         roles: {
-          'researcher': {
+          researcher: {
             permissions: ['read-anonymized', 'aggregate-analysis'],
             restrictions: ['no-identifiable', 'no-raw-phi'],
           },
@@ -104,7 +105,7 @@ export class ResearchPlatform {
             ],
             restrictions: ['no-identifiable', 'audit-required'],
           },
-          'therapist': {
+          therapist: {
             permissions: [
               'read-own-clients',
               'write-notes',
@@ -112,7 +113,7 @@ export class ResearchPlatform {
             ],
             restrictions: ['own-clients-only', 'no-research-export'],
           },
-          'admin': {
+          admin: {
             permissions: ['full-access', 'user-management', 'audit-review'],
             restrictions: ['audit-required', 'dual-authorization'],
           },

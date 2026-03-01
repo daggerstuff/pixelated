@@ -23,5 +23,5 @@ Or if ts-node is globally available:
 
 ## Output
 
-The script will create or overwrite `alerts.json` in the repository root,
-with the Dependabot alerts data.
+The script will create or overwrite `alerts.json` in the repository root, with
+the Dependabot alerts data.

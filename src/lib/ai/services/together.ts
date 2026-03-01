@@ -1,3 +1,6 @@
+import { SpanStatusCode } from '@opentelemetry/api'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   AIMessage,
   AIServiceOptions,
@@ -5,9 +8,10 @@ import type {
   AIUsage,
   AIStreamChunk,
 } from '../models/ai-types'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { getArizeTracer } from '../tracing/arize-setup'
 
 const appLogger = createBuildSafeLogger('app')
+const tracer = getArizeTracer()
 
 export interface TogetherAIConfig {
   togetherApiKey: string
@@ -168,7 +172,7 @@ class RateLimitManager {
 
     if (
       this.rateLimitInfo.requestTimestamps.length >=
-      this.rateLimitInfo.requestsPerMinute &&
+        this.rateLimitInfo.requestsPerMinute &&
       oldestRequestTime
     ) {
       requestWaitTime = oldestRequestTime + windowMs - now
@@ -181,7 +185,7 @@ class RateLimitManager {
 
     if (
       currentTokenCount + estimatedTokens >=
-      this.rateLimitInfo.tokensPerMinute &&
+        this.rateLimitInfo.tokensPerMinute &&
       oldestTokenTime
     ) {
       tokenWaitTime = oldestTokenTime + windowMs - now
@@ -321,7 +325,7 @@ export function createTogetherAIService(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         'User-Agent': 'Together-AI-Client/1.0',
       },
       body: JSON.stringify({ ...body, stream }),
@@ -332,7 +336,7 @@ export function createTogetherAIService(
       const response = await fetch(url, requestInit)
 
       if (!response.ok) {
-        let errorData
+        let errorData: unknown
         try {
           errorData = await response.json()
         } catch {
@@ -355,72 +359,99 @@ export function createTogetherAIService(
       messages: AIMessage[],
       options?: AIServiceOptions,
     ): Promise<AICompletion | { content: string; usage?: AIUsage }> {
-      try {
-        if (!apiKey) {
-          throw new TogetherAIError('Together AI API key is not configured')
-        }
+      return tracer.startActiveSpan(
+        'together.generateCompletion',
+        async (span) => {
+          try {
+            if (!apiKey) {
+              throw new TogetherAIError('Together AI API key is not configured')
+            }
 
-        const requestBody = {
-          model: options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-          messages,
-          temperature: options?.temperature || 0.7,
-          max_tokens: options?.maxTokens || 1024,
-          stop: options?.stop,
-        }
+            const model =
+              options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+            const requestBody = {
+              model,
+              messages,
+              temperature: options?.temperature || 0.7,
+              max_tokens: options?.maxTokens || 1024,
+              stop: options?.stop,
+            }
 
-        const data = await makeRequest<TogetherCompletionResponse>(
-          `${baseUrl}/v1/chat/completions`,
-          requestBody,
-        )
+            span.setAttributes({
+              'llm.model_name': model,
+              'llm.prompts': JSON.stringify(messages),
+              'llm.temperature': requestBody.temperature,
+            })
 
-        // Return in expected format
-        return {
-          id: data.id || `together-${Date.now()}`,
-          created: data.created || Date.now(),
-          model: data.model || requestBody.model,
-          choices: data.choices?.map((choice) => ({
-            message: {
-              role: choice.message.role as 'assistant',
-              content: choice.message.content,
-            },
-            finishReason: (choice.finish_reason === 'stop'
-              ? 'stop'
-              : choice.finish_reason === 'length'
-                ? 'length'
-                : 'stop') as 'stop' | 'length' | 'content_filter',
-          })) || [
-              {
+            const data = await makeRequest<TogetherCompletionResponse>(
+              `${baseUrl}/v1/chat/completions`,
+              requestBody,
+            )
+
+            const completion = {
+              id: data.id || `together-${Date.now()}`,
+              created: data.created || Date.now(),
+              model: data.model || requestBody.model,
+              choices: data.choices?.map((choice) => ({
                 message: {
-                  role: 'assistant',
-                  content: '',
-                  name: 'assistant',
+                  role: choice.message.role as 'assistant',
+                  content: choice.message.content,
                 },
-                finishReason: 'stop' as const,
+                finishReason: (choice.finish_reason === 'stop'
+                  ? 'stop'
+                  : choice.finish_reason === 'length'
+                    ? 'length'
+                    : 'stop') as 'stop' | 'length' | 'content_filter',
+              })) || [
+                {
+                  message: {
+                    role: 'assistant',
+                    content: '',
+                    name: 'assistant',
+                  },
+                  finishReason: 'stop' as const,
+                },
+              ],
+              usage: {
+                promptTokens: data.usage?.prompt_tokens || 0,
+                completionTokens: data.usage?.completion_tokens || 0,
+                totalTokens: data.usage?.total_tokens || 0,
               },
-            ],
-          usage: {
-            promptTokens: data.usage?.prompt_tokens || 0,
-            completionTokens: data.usage?.completion_tokens || 0,
-            totalTokens: data.usage?.total_tokens || 0,
-          },
-          provider: 'together',
-          content: data.choices?.[0]?.message?.content || '',
-        }
-      } catch (error: unknown) {
-        if (error instanceof TogetherAIError) {
-          throw error
-        }
+              provider: 'together',
+              content: data.choices?.[0]?.message?.content || '',
+            }
 
-        appLogger.error('Error in Together AI completion:', {
-          error:
-            error instanceof Error
-              ? { message: String(error), stack: (error as Error)?.stack }
-              : error,
-        })
-        throw new TogetherAIError(
-          `Together AI service error: ${error instanceof Error ? String(error) : 'Unknown error'}`,
-        )
-      }
+            span.setAttributes({
+              'llm.completions': JSON.stringify(completion.choices),
+              'llm.usage.prompt_tokens': completion.usage.promptTokens,
+              'llm.usage.completion_tokens': completion.usage.completionTokens,
+              'llm.usage.total_tokens': completion.usage.totalTokens,
+            })
+
+            return completion
+          } catch (error: unknown) {
+            span.setStatus({
+              code: SpanStatusCode.ERROR,
+              message: error instanceof Error ? error.message : String(error),
+            })
+            if (error instanceof TogetherAIError) {
+              throw error
+            }
+
+            appLogger.error('Error in Together AI completion:', {
+              error:
+                error instanceof Error
+                  ? { message: String(error), stack: (error)?.stack }
+                  : error,
+            })
+            throw new TogetherAIError(
+              `Together AI service error: ${error instanceof Error ? String(error) : 'Unknown error'}`,
+            )
+          } finally {
+            span.end()
+          }
+        },
+      )
     },
 
     async createChatCompletion(
@@ -431,7 +462,7 @@ export function createTogetherAIService(
 
       // Ensure we return an AICompletion object
       if ('id' in result) {
-        return result as AICompletion
+        return result
       }
 
       // Convert basic response to AICompletion format
@@ -462,18 +493,27 @@ export function createTogetherAIService(
       messages: AIMessage[],
       options?: AIServiceOptions,
     ): Promise<AsyncGenerator<AIStreamChunk, void, void>> {
+      const span = tracer.startSpan('together.createStreamingChatCompletion')
       try {
         if (!apiKey) {
           throw new TogetherAIError('Together AI API key is not configured')
         }
 
+        const model = options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
         const requestBody = {
-          model: options?.model || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+          model,
           messages,
           temperature: options?.temperature || 0.7,
           max_tokens: options?.maxTokens || 1024,
           stop: options?.stop,
         }
+
+        span.setAttributes({
+          'llm.model_name': model,
+          'llm.prompts': JSON.stringify(messages),
+          'llm.temperature': requestBody.temperature,
+          'llm.is_streaming': true,
+        })
 
         const response = await makeRequest<Response>(
           `${baseUrl}/v1/chat/completions`,
@@ -488,7 +528,7 @@ export function createTogetherAIService(
         const reader = response.body.getReader()
         const decoder = new TextDecoder()
 
-        const streamGenerator = async function*(): AsyncGenerator<
+        const streamGenerator = async function* (): AsyncGenerator<
           AIStreamChunk,
           void,
           void
@@ -525,9 +565,7 @@ export function createTogetherAIService(
 
                 try {
                   const jsonData = trimmedLine.slice(6) // Remove 'data: ' prefix
-                  const parsed: TogetherStreamResponse = JSON.parse(
-                    jsonData,
-                  ) as unknown
+                  const parsed = JSON.parse(jsonData) as TogetherStreamResponse
 
                   if (parsed.id) {
                     requestId = parsed.id
@@ -593,6 +631,13 @@ export function createTogetherAIService(
               }
             }
           } catch (streamError) {
+            span.setStatus({
+              code: SpanStatusCode.ERROR,
+              message:
+                streamError instanceof Error
+                  ? streamError.message
+                  : String(streamError),
+            })
             appLogger.error('Error in streaming response', {
               error:
                 streamError instanceof Error
@@ -608,11 +653,17 @@ export function createTogetherAIService(
             } catch {
               // Ignore lock release errors
             }
+            span.end()
           }
         }
 
         return streamGenerator()
       } catch (error: unknown) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: error instanceof Error ? error.message : String(error),
+        })
+        span.end()
         if (error instanceof TogetherAIError) {
           throw error
         }
@@ -620,7 +671,7 @@ export function createTogetherAIService(
         appLogger.error('Error in Together AI streaming completion:', {
           error:
             error instanceof Error
-              ? { message: String(error), stack: (error as Error)?.stack }
+              ? { message: String(error), stack: (error)?.stack }
               : error,
         })
         throw new TogetherAIError(

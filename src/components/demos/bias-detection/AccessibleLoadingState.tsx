@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion'
 // Accessible loading state component with better UX
 import React from 'react'
-import { motion } from 'framer-motion'
 
 interface AccessibleLoadingStateProps {
   message?: string
@@ -25,37 +25,37 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white rounded-lg border border-gray-200 p-6 space-y-6"
-      role="status"
-      aria-live="polite"
+      className='bg-white border-gray-200 space-y-6 rounded-lg border p-6'
+      role='status'
+      aria-live='polite'
       aria-label={message}
     >
       {/* Main loading message */}
-      <div className="text-center space-y-2">
-        <div className="flex justify-center">
+      <div className='space-y-2 text-center'>
+        <div className='flex justify-center'>
           <motion.div
-            className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full"
+            className='border-blue-200 border-t-blue-600 h-8 w-8 rounded-full border-4'
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-            aria-hidden="true"
+            aria-hidden='true'
           />
         </div>
-        <h3 className="text-lg font-medium text-gray-900">{message}</h3>
-        <p className="text-sm text-gray-600">
+        <h3 className='text-gray-900 text-lg font-medium'>{message}</h3>
+        <p className='text-gray-600 text-sm'>
           This may take a few moments for comprehensive analysis
         </p>
       </div>
 
       {/* Progress bar */}
       {progress > 0 && (
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600">
+        <div className='space-y-2'>
+          <div className='text-gray-600 flex justify-between text-sm'>
             <span>Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className='bg-gray-200 h-2 w-full rounded-full'>
             <motion.div
-              className="bg-blue-600 h-2 rounded-full"
+              className='bg-blue-600 h-2 rounded-full'
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
@@ -65,7 +65,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
       )}
 
       {/* Step indicator */}
-      <div className="space-y-3">
+      <div className='space-y-3'>
         {steps.map((step, index) => (
           <motion.div
             key={index}
@@ -75,10 +75,10 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
               x: 0,
             }}
             transition={{ delay: index * 0.1 }}
-            className="flex items-center space-x-3"
+            className='flex items-center space-x-3'
           >
             <div
-              className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium ${
                 index < currentStep
                   ? 'bg-green-100 text-green-800'
                   : index === currentStep
@@ -88,19 +88,19 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
             >
               {index < currentStep ? (
                 <svg
-                  className="w-4 h-4"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+                  className='h-4 w-4'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
                 >
                   <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
+                    fillRule='evenodd'
+                    d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                    clipRule='evenodd'
                   />
                 </svg>
               ) : index === currentStep ? (
                 <motion.div
-                  className="w-2 h-2 bg-blue-600 rounded-full"
+                  className='bg-blue-600 h-2 w-2 rounded-full'
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 />
@@ -120,7 +120,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
       </div>
 
       {/* Accessibility features */}
-      <div className="sr-only" aria-live="assertive">
+      <div className='sr-only' aria-live='assertive'>
         {currentStep < steps.length &&
           `Currently processing: ${steps[currentStep]}`}
       </div>

@@ -3,10 +3,12 @@
  * Compress and optimize static assets for better performance
  */
 
-import { readFile, mkdir } from 'fs/promises'
 import { existsSync, statSync } from 'fs'
+import { readFile, mkdir } from 'fs/promises'
 import { join } from 'path'
+
 import { getLogger } from '@/lib/logging'
+
 import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = getLogger('image-optimizer')
@@ -103,15 +105,24 @@ export class ImageOptimizer {
     try {
       validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
     } catch (error) {
-      throw new Error(`Invalid image path: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Invalid image path: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
 
     const startTime = Date.now()
 
     try {
       // Security: Validate path to prevent traversal
-      if (!validatePath(imagePath, [ALLOWED_DIRECTORIES.PUBLIC, ALLOWED_DIRECTORIES.ASSETS])) {
-        throw new Error(`Access denied: Path is outside allowed directories: ${imagePath}`)
+      if (
+        !validatePath(imagePath, [
+          ALLOWED_DIRECTORIES.PUBLIC,
+          ALLOWED_DIRECTORIES.ASSETS,
+        ])
+      ) {
+        throw new Error(
+          `Access denied: Path is outside allowed directories: ${imagePath}`,
+        )
       }
 
       // Check if file exists

@@ -4,14 +4,14 @@
  */
 
 import {
+  ObjectiveEvaluationResult,
+  AlignmentEvaluationResult,
+} from './objective-interfaces'
+import {
   ObjectiveDefinition,
   AlignmentContext,
   ObjectiveCriteria,
 } from './objectives'
-import {
-  ObjectiveEvaluationResult,
-  AlignmentEvaluationResult,
-} from './objective-interfaces'
 
 /**
  * Detailed metrics for objective evaluation

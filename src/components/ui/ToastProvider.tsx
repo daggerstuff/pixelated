@@ -14,7 +14,7 @@ export default function ToastProvider() {
 
   return (
     <Toast
-      position="bottom-right"
+      position='bottom-right'
       toastOptions={{
         // Default duration
         duration: 4000,
@@ -33,7 +33,7 @@ export default function ToastProvider() {
           className: 'border-l-4 border-blue-500',
         },
       }}
-      className="max-w-md"
+      className='max-w-md'
     />
   )
 }

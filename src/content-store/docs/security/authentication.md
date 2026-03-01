@@ -1,6 +1,7 @@
 ---
 title: 'Authentication'
-description: "Learn about Pixelated Health's authentication system and security features"
+description:
+  "Learn about Pixelated Health's authentication system and security features"
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,22 +11,23 @@ share: true
 
 ## Authentication
 
-Pixelated Healths authentication system provides robust security through multiple authentication methods,
-session management, and comprehensive security controls.
+Pixelated Healths authentication system provides robust security through
+multiple authentication methods, session management, and comprehensive security
+controls.
 
 ## Authentication Methods
 
-  <Card
-    title="Password Authentication"
-    icon="key"
-    href="#password-authentication"
-  >
+<Card title="Password Authentication" icon="key" href="#password-authentication"
+
+>
+
     Secure password-based login
-  <Card
-    title="Multi-Factor Auth"
-    icon="shield-check"
-    href="#multi-factor-authentication"
-  >
+
+<Card title="Multi-Factor Auth" icon="shield-check"
+href="#multi-factor-authentication"
+
+>
+
     Additional security layers
     Biometric and hardware authentication
     Single sign-on integration
@@ -34,7 +36,7 @@ session management, and comprehensive security controls.
 
 ### Requirements
 
-  Password requirements ensure strong security while maintaining usability
+Password requirements ensure strong security while maintaining usability
 
 - Minimum 12 characters
 - Mix of uppercase and lowercase letters
@@ -46,28 +48,25 @@ session management, and comprehensive security controls.
 ### Implementation
 
 ```typescript Authentication
-
 const auth = new GradiantAuth({
-passwordPolicy: {
-minLength: 12,
-requireUppercase: true,
-requireLowercase: true,
-requireNumbers: true,
-requireSpecial: true,
-preventCommonPasswords: true
-}
-});
-
-````
+  passwordPolicy: {
+    minLength: 12,
+    requireUppercase: true,
+    requireLowercase: true,
+    requireNumbers: true,
+    requireSpecial: true,
+    preventCommonPasswords: true,
+  },
+})
+```
 
 ```typescript Password Change
 const response = await auth.updatePassword({
   userId: 'user_123',
   currentPassword: 'current-password',
-  newPassword: 'new-secure-password'
-});
-````
-
+  newPassword: 'new-secure-password',
+})
+```
 
 ## Multi-Factor Authentication
 
@@ -82,14 +81,14 @@ const response = await auth.updatePassword({
 
 ### Setup Process
 
-  ### Enable MFA Navigate to security settings and enable MFA ### Choose Method
-  Select preferred authentication method ### Verify Setup Complete verification
-  process ### Save Backup Codes Store backup codes securely
+### Enable MFA Navigate to security settings and enable MFA ### Choose Method
+
+Select preferred authentication method ### Verify Setup Complete verification
+process ### Save Backup Codes Store backup codes securely
 
 ## WebAuthn Support
 
 ### Features
-
 
 - Biometric authentication
 - Hardware security keys
@@ -139,15 +138,15 @@ const oauthConfig = {
     google: {
       clientId: exampleId,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      scope: ['openid', 'email', 'profile']
+      scope: ['openid', 'email', 'profile'],
     },
     azure: {
       clientId: exampleId,
       clientSecret: process.env.AZURE_CLIENT_SECRET,
-      tenant: process.env.AZURE_TENANT_ID
-    }
-  }
-};
+      tenant: process.env.AZURE_TENANT_ID,
+    },
+  },
+}
 ```
 
 ```typescript SAML Setup
@@ -159,11 +158,9 @@ const samlConfig = {
 }
 ```
 
-
 ## Session Management
 
 ### Session Security
-
 
 - Secure session tokens
 - Automatic session expiration
@@ -237,10 +234,10 @@ const session = await auth.createSession({
 
 Need help with authentication? Contact our security team:
 
-  <Card
-    title="Security Support"
-    icon="headset"
-    href="mailto:security@gradiant.dev"
-  >
+<Card title="Security Support" icon="headset"
+href="mailto:security@gradiant.dev"
+
+>
+
     Contact security team
     View security guides

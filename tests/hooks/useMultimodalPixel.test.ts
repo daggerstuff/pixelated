@@ -10,26 +10,27 @@
  * - Emotion tracking and fusion results
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useMultimodalPixel } from "../../src/hooks/useMultimodalPixel";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+import { useMultimodalPixel } from '../../src/hooks/useMultimodalPixel'
 
 // Mock dependencies
 // (removed top-level global.fetch assignment)
 
 // Mock WebSocket
 class MockWebSocket {
-  readyState: number = WebSocket.CONNECTING;
-  onopen: (() => void) | null = null;
-  onmessage: ((event: MessageEvent) => void) | null = null;
-  onclose: (() => void) | null = null;
-  onerror: (() => void) | null = null;
+  readyState: number = WebSocket.CONNECTING
+  onopen: (() => void) | null = null
+  onmessage: ((event: MessageEvent) => void) | null = null
+  onclose: (() => void) | null = null
+  onerror: (() => void) | null = null
 
   constructor(public url: string) {
     setTimeout(() => {
-      this.readyState = WebSocket.OPEN;
-      this.onopen?.();
-    }, 0);
+      this.readyState = WebSocket.OPEN
+      this.onopen?.()
+    }, 0)
   }
 
   send(_data: string) {
@@ -37,546 +38,567 @@ class MockWebSocket {
   }
 
   close() {
-    this.readyState = WebSocket.CLOSED;
-    this.onclose?.();
+    this.readyState = WebSocket.CLOSED
+    this.onclose?.()
   }
 
-  static CONNECTING = 0;
-  static OPEN = 1;
-  static CLOSING = 2;
-  static CLOSED = 3;
+  static CONNECTING = 0
+  static OPEN = 1
+  static CLOSING = 2
+  static CLOSED = 3
 }
 
 describe('useMultimodalPixel', () => {
-    beforeEach(() => {
-        vi.resetAllMocks();
-        vi.stubGlobal("fetch", vi.fn());
-        vi.stubGlobal("WebSocket", MockWebSocket);
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.stubGlobal('fetch', vi.fn())
+    vi.stubGlobal('WebSocket', MockWebSocket)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  describe('REST Inference - Text Only', () => {
+    it('should perform text-only inference', async () => {
+      const mockResponse = {
+        response: 'Test response',
+        transcription: null,
+        text_emotion: {
+          eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85],
+          overall_eq: 0.77,
+        },
+        audio_emotion: null,
+        fused_emotion: {
+          eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85],
+          overall_eq: 0.77,
+        },
+        latency_ms: 125,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      let inferenceResult: any = null
+      await act(async () => {
+        inferenceResult = await result.current.infer({
+          text: 'How are you feeling?',
+          sessionId: 'session-123',
+        })
+      })
+
+      expect(inferenceResult?.response).toBe('Test response')
+      expect(inferenceResult?.text_emotion?.overall_eq).toBe(0.77)
+      expect(inferenceResult?.latency_ms).toBe(125)
     })
 
-    afterEach(() => {
-      vi.unstubAllGlobals();
-    });
+    it('should track text emotion scores', async () => {
+      const mockResponse = {
+        response: 'Response',
+        text_emotion: {
+          eq_scores: [0.9, 0.8, 0.7, 0.85, 0.88],
+          overall_eq: 0.82,
+        },
+        latency_ms: 110,
+      }
 
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
 
-    describe('REST Inference - Text Only', () => {
-        it('should perform text-only inference', async () => {
-            const mockResponse = {
-                response: 'Test response',
-                transcription: null,
-                text_emotion: { eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85], overall_eq: 0.77 },
-                audio_emotion: null,
-                fused_emotion: { eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85], overall_eq: 0.77 },
-                latency_ms: 125,
-            }
+      const { result } = renderHook(() => useMultimodalPixel())
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
-
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            let inferenceResult: any = null;
-            await act(async () => {
-                inferenceResult = await result.current.infer({
-                    text: 'How are you feeling?',
-                    sessionId: 'session-123',
-                })
-            })
-
-            expect(inferenceResult?.response).toBe('Test response')
-            expect(inferenceResult?.text_emotion?.overall_eq).toBe(0.77)
-            expect(inferenceResult?.latency_ms).toBe(125)
+      await act(async () => {
+        await result.current.infer({
+          text: 'I feel great!',
         })
+      })
 
-        it('should track text emotion scores', async () => {
-            const mockResponse = {
-                response: 'Response',
-                text_emotion: { eq_scores: [0.9, 0.8, 0.7, 0.85, 0.88], overall_eq: 0.82 },
-                latency_ms: 110,
-            }
-
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
-
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                await result.current.infer({
-                    text: 'I feel great!',
-                })
-            })
-
-            expect(result.current.textEmotion?.overall_eq).toBe(0.82)
-            expect(result.current.lastResponse?.text_emotion?.eq_scores).toHaveLength(5)
-        })
-
-        it('should handle empty input gracefully', async () => {
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                const res = await result.current.infer({
-                    text: '',
-                    audioBlob: null,
-                })
-                expect(res).toBeNull()
-            })
-
-            expect(result.current.error).toBe('Text or audio is required')
-        })
+      expect(result.current.textEmotion?.overall_eq).toBe(0.82)
+      expect(result.current.lastResponse?.text_emotion?.eq_scores).toHaveLength(
+        5,
+      )
     })
 
-    describe('REST Inference - Audio + Text', () => {
-        it('should handle audio blob and text inference', async () => {
-            const audioBlob = new Blob(['audio data'], { type: 'audio/webm' })
-            const mockResponse = {
-                response: 'I hear your anxiety',
-                transcription: 'I am very anxious',
-                audio_emotion: { valence: 0.3, arousal: 0.8, primary_emotion: 'anxiety', confidence: 0.92 },
-                text_emotion: { overall_eq: 0.75 },
-                fused_emotion: { valence: 0.32, arousal: 0.78, overall_eq: 0.76, conflict_score: 0.1 },
-                latency_ms: 165,
-            }
+    it('should handle empty input gracefully', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
-
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            let inferenceResult: any = null;
-            await act(async () => {
-                inferenceResult = await result.current.infer({
-                    text: 'I am very anxious',
-                    audioBlob,
-                    sessionId: 'session-456',
-                })
-            })
-
-            expect(inferenceResult?.transcription).toBe('I am very anxious')
-            expect(inferenceResult?.audio_emotion?.primary_emotion).toBe('anxiety')
-            expect(inferenceResult?.fused_emotion?.conflict_score).toBe(0.1)
+      await act(async () => {
+        const res = await result.current.infer({
+          text: '',
+          audioBlob: null,
         })
+        expect(res).toBeNull()
+      })
 
-        it('should track audio emotion metrics', async () => {
-            const audioBlob = new Blob(['audio'], { type: 'audio/webm' })
-            const mockResponse = {
-                response: 'Response',
-                audio_emotion: {
-                    valence: 0.5,
-                    arousal: 0.6,
-                    dominance: 0.55,
-                    primary_emotion: 'neutral',
-                    confidence: 0.88,
-                },
-                latency_ms: 150,
-            }
+      expect(result.current.error).toBe('Text or audio is required')
+    })
+  })
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
+  describe('REST Inference - Audio + Text', () => {
+    it('should handle audio blob and text inference', async () => {
+      const audioBlob = new Blob(['audio data'], { type: 'audio/webm' })
+      const mockResponse = {
+        response: 'I hear your anxiety',
+        transcription: 'I am very anxious',
+        audio_emotion: {
+          valence: 0.3,
+          arousal: 0.8,
+          primary_emotion: 'anxiety',
+          confidence: 0.92,
+        },
+        text_emotion: { overall_eq: 0.75 },
+        fused_emotion: {
+          valence: 0.32,
+          arousal: 0.78,
+          overall_eq: 0.76,
+          conflict_score: 0.1,
+        },
+        latency_ms: 165,
+      }
 
-            const { result } = renderHook(() => useMultimodalPixel())
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
 
-            await act(async () => {
-                await result.current.infer({
-                    text: 'Test',
-                    audioBlob,
-                })
-            })
+      const { result } = renderHook(() => useMultimodalPixel())
 
-            expect(result.current.audioEmotion?.valence).toBe(0.5)
-            expect(result.current.audioEmotion?.arousal).toBe(0.6)
-            expect(result.current.audioEmotion?.confidence).toBe(0.88)
+      let inferenceResult: any = null
+      await act(async () => {
+        inferenceResult = await result.current.infer({
+          text: 'I am very anxious',
+          audioBlob,
+          sessionId: 'session-456',
         })
+      })
 
-        it('should detect modality conflict', async () => {
-            const audioBlob = new Blob(['audio'], { type: 'audio/webm' })
-            const mockResponse = {
-                response: 'Response',
-                audio_emotion: { valence: 0.9, arousal: 0.2, primary_emotion: 'happy' },
-                text_emotion: { overall_eq: 0.3 },
-                fused_emotion: { conflict_score: 0.8 },
-                conflict_detected: true,
-                latency_ms: 140,
-            }
-
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
-
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                await result.current.infer({
-                    text: 'I am depressed',
-                    audioBlob,
-                })
-            })
-
-            expect(result.current.conflictDetected).toBe(true)
-            expect(result.current.fusedEmotion?.conflict_score).toBeGreaterThan(0.5)
-        })
+      expect(inferenceResult?.transcription).toBe('I am very anxious')
+      expect(inferenceResult?.audio_emotion?.primary_emotion).toBe('anxiety')
+      expect(inferenceResult?.fused_emotion?.conflict_score).toBe(0.1)
     })
 
-    describe('WebSocket Streaming', () => {
-        it('should connect to WebSocket stream', async () => {
-            const { result } = renderHook(() => useMultimodalPixel())
+    it('should track audio emotion metrics', async () => {
+      const audioBlob = new Blob(['audio'], { type: 'audio/webm' })
+      const mockResponse = {
+        response: 'Response',
+        audio_emotion: {
+          valence: 0.5,
+          arousal: 0.6,
+          dominance: 0.55,
+          primary_emotion: 'neutral',
+          confidence: 0.88,
+        },
+        latency_ms: 150,
+      }
 
-            await act(async () => {
-                result.current.connectStream({ sessionId: 'session-789', contextType: 'therapeutic' })
-            })
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
 
-            await waitFor(() => {
-                expect(result.current.streaming).toBe(true)
-                expect(result.current.streamStatus).toBe('connected')
-            })
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({
+          text: 'Test',
+          audioBlob,
         })
+      })
 
-        it('should send text chunks to stream', async () => {
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            result.current.connectStream({ sessionId: "session-789" });
-          });
-
-          await waitFor(() => {
-            expect(result.current.streaming).toBe(true);
-          });
-
-          await act(async () => {
-            result.current.sendTextToStream("Hello from stream");
-          });
-
-          // Verify intent to send (actual send would happen on open WS)
-        })
-
-        it('should buffer and send audio chunks', async () => {
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                result.current.connectStream({ sessionId: 'session-789' })
-            })
-
-            await waitFor(() => {
-                expect(result.current.streaming).toBe(true)
-            })
-
-            const audioBlob = new Blob(['chunk data'], { type: 'audio/webm' })
-
-            await act(async () => {
-                result.current.sendChunkToStream(audioBlob)
-            })
-
-            // Verify stream is still open
-            expect(result.current.streaming).toBe(true)
-        })
-
-        it('should finalize stream and trigger inference', async () => {
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            result.current.connectStream({ sessionId: "session-789" });
-          });
-
-          await waitFor(() => {
-            expect(result.current.streaming).toBe(true);
-          });
-
-          await act(async () => {
-            result.current.finalizeStream({
-              text: "Final text",
-              sessionId: "session-789",
-              contextType: "therapeutic",
-            });
-          });
-
-          // Stream should remain open until server responds
-          expect(result.current.streaming).toBe(true);
-        })
-
-        it('should handle stream status updates', async () => {
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                result.current.connectStream({ sessionId: 'session-789' })
-            })
-
-            await waitFor(() => {
-                expect(result.current.streamStatus).toBe('connected')
-            })
-        })
-
-        it('should handle stream errors gracefully', async () => {
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                result.current.connectStream({ sessionId: 'session-789' })
-            })
-
-            // Simulate error
-            await waitFor(() => {
-                expect(result.current.streaming).toBe(true)
-            })
-
-            // Close stream to trigger cleanup
-            await act(async () => {
-                result.current.disconnectStream()
-            })
-
-            expect(result.current.streaming).toBe(false)
-        })
-
-        it('should parse stream result messages', async () => {
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            result.current.connectStream({ sessionId: "session-789" });
-          });
-
-          await waitFor(() => {
-            expect(result.current.streaming).toBe(true);
-          });
-
-          // Simulate receiving result message
-          await act(async () => {
-            result.current.finalizeStream({
-              text: "Test",
-              sessionId: "session-789",
-            });
-          });
-
-          // Stream should process result
-          expect(result.current.streaming).toBe(true);
-        })
+      expect(result.current.audioEmotion?.valence).toBe(0.5)
+      expect(result.current.audioEmotion?.arousal).toBe(0.6)
+      expect(result.current.audioEmotion?.confidence).toBe(0.88)
     })
 
-    describe('State Management', () => {
-        it('should initialize with default state', () => {
-            const { result } = renderHook(() => useMultimodalPixel())
+    it('should detect modality conflict', async () => {
+      const audioBlob = new Blob(['audio'], { type: 'audio/webm' })
+      const mockResponse = {
+        response: 'Response',
+        audio_emotion: { valence: 0.9, arousal: 0.2, primary_emotion: 'happy' },
+        text_emotion: { overall_eq: 0.3 },
+        fused_emotion: { conflict_score: 0.8 },
+        conflict_detected: true,
+        latency_ms: 140,
+      }
 
-            expect(result.current.loading).toBe(false)
-            expect(result.current.error).toBeNull()
-            expect(result.current.lastResponse).toBeNull()
-            expect(result.current.streaming).toBe(false)
-            expect(result.current.transcription).toBeNull()
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({
+          text: 'I am depressed',
+          audioBlob,
         })
+      })
 
-        it('should reset state', async () => {
-            const mockResponse = {
-                response: 'Test',
-                latency_ms: 100,
-            }
+      expect(result.current.conflictDetected).toBe(true)
+      expect(result.current.fusedEmotion?.conflict_score).toBeGreaterThan(0.5)
+    })
+  })
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
+  describe('WebSocket Streaming', () => {
+    it('should connect to WebSocket stream', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-            const { result } = renderHook(() => useMultimodalPixel())
-
-            await act(async () => {
-                await result.current.infer({ text: 'Test' })
-            })
-
-            expect(result.current.lastResponse).toBeDefined()
-
-            await act(async () => {
-                result.current.reset()
-            })
-
-            expect(result.current.lastResponse).toBeNull()
-            expect(result.current.error).toBeNull()
-            expect(result.current.transcription).toBeNull()
+      await act(async () => {
+        result.current.connectStream({
+          sessionId: 'session-789',
+          contextType: 'therapeutic',
         })
+      })
 
-        it('should cancel ongoing inference', async () => {
-          const { result } = renderHook(() => useMultimodalPixel());
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+        expect(result.current.streamStatus).toBe('connected')
+      })
+    })
 
-          // Start inference
-          act(async () => {
-            result.current.infer({ text: "Test" });
-          });
+    it('should send text chunks to stream', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-          // Cancel it
-          await act(async () => {
-            result.current.cancel();
-          });
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
 
-          // Should not have completed
-          expect(result.current.loading).toBe(false);
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
+
+      await act(async () => {
+        result.current.sendTextToStream('Hello from stream')
+      })
+
+      // Verify intent to send (actual send would happen on open WS)
+    })
+
+    it('should buffer and send audio chunks', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
+
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
+
+      const audioBlob = new Blob(['chunk data'], { type: 'audio/webm' })
+
+      await act(async () => {
+        void result.current.sendChunkToStream(audioBlob)
+      })
+
+      // Verify stream is still open
+      expect(result.current.streaming).toBe(true)
+    })
+
+    it('should finalize stream and trigger inference', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
+
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
+
+      await act(async () => {
+        result.current.finalizeStream({
+          text: 'Final text',
+          sessionId: 'session-789',
+          contextType: 'therapeutic',
         })
+      })
 
-        it.skip("should disconnect streaming", async () => {
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            result.current.connectStream({ sessionId: "session-789" });
-          });
-
-          await waitFor(() => {
-            expect(result.current.streaming).toBe(true);
-          });
-
-          await act(async () => {
-            result.current.disconnectStream();
-          });
-
-          await waitFor(() => {
-            expect(result.current.streaming).toBe(false);
-          });
-          expect(result.current.streamStatus).toBe("disconnected");
-        });
+      // Stream should remain open until server responds
+      expect(result.current.streaming).toBe(true)
     })
 
-    describe('Error Handling', () => {
-        it.skip("should handle network errors", async () => {
-          vi.mocked(global.fetch).mockRejectedValueOnce(
-            new Error("Network error"),
-          );
+    it('should handle stream status updates', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-          const { result } = renderHook(() => useMultimodalPixel());
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
 
-          await act(async () => {
-            await result.current.infer({ text: "Test" });
-          });
-
-          expect(result.current.error).toBeDefined();
-          expect(result.current.loading).toBe(false);
-        });
-
-        it.skip("should handle HTTP error responses", async () => {
-          vi.mocked(global.fetch).mockResolvedValueOnce({
-            ok: false,
-            status: 500,
-            text: async () => "Internal server error",
-          } as any);
-
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            await result.current.infer({ text: "Test" });
-          });
-
-          expect(result.current.error).toBeDefined();
-        });
-
-        it.skip("should handle timeout gracefully", async () => {
-          vi.mocked(global.fetch).mockRejectedValueOnce(
-            new Error("Request timeout"),
-          );
-
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            await result.current.infer({ text: "Test" });
-          });
-
-          expect(result.current.error).toContain("timeout");
-        });
+      await waitFor(() => {
+        expect(result.current.streamStatus).toBe('connected')
+      })
     })
 
-    describe('Latency Tracking', () => {
-        it.skip("should track inference latency", async () => {
-          const mockResponse = {
-            response: "Test",
-            latency_ms: 142,
-          };
+    it('should handle stream errors gracefully', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-          vi.mocked(global.fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockResponse,
-          } as any);
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
 
-          const { result } = renderHook(() => useMultimodalPixel());
+      // Simulate error
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
 
-          await act(async () => {
-            await result.current.infer({ text: "Test" });
-          });
+      // Close stream to trigger cleanup
+      await act(async () => {
+        result.current.disconnectStream()
+      })
 
-          expect(result.current.latencyMs).toBe(142);
-        });
-
-        it.skip("should validate latency under 200ms target", async () => {
-          const mockResponse = {
-            response: "Test",
-            latency_ms: 198,
-          };
-
-          vi.mocked(global.fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockResponse,
-          } as any);
-
-          const { result } = renderHook(() => useMultimodalPixel());
-
-          await act(async () => {
-            await result.current.infer({ text: "Test" });
-          });
-
-          expect(result.current.latencyMs).toBeLessThan(200);
-        });
+      expect(result.current.streaming).toBe(false)
     })
 
-    describe('Session & Context Tracking', () => {
-        it.skip("should pass session ID through inference", async () => {
-          const mockResponse = {
-            response: "Test",
-            latency_ms: 100,
-          };
+    it('should parse stream result messages', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
 
-          vi.mocked(global.fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockResponse,
-          } as any);
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
 
-          const { result } = renderHook(() => useMultimodalPixel());
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
 
-          await act(async () => {
-            await result.current.infer({
-              text: "Test",
-              sessionId: "session-abc-123",
-            });
-          });
+      // Simulate receiving result message
+      await act(async () => {
+        result.current.finalizeStream({
+          text: 'Test',
+          sessionId: 'session-789',
+        })
+      })
 
-          // Verify fetch was called with session ID
-          expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
-            expect.any(String),
-            expect.objectContaining({
-              method: "POST",
-            }),
-          );
-        });
-
-        it.skip("should track context type (therapeutic, crisis, etc)", async () => {
-          const mockResponse = {
-            response: "Test",
-            latency_ms: 100,
-          };
-
-          vi.mocked(global.fetch).mockResolvedValueOnce({
-            ok: true,
-            json: async () => mockResponse,
-          } as any);
-
-          const { result } = renderHook(() =>
-            useMultimodalPixel({ defaultContextType: "crisis_response" }),
-          );
-
-          await act(async () => {
-            await result.current.infer({
-              text: "I want to end it",
-              contextType: "crisis_response",
-            });
-          });
-
-          expect(vi.mocked(global.fetch)).toHaveBeenCalled();
-        });
+      // Stream should process result
+      expect(result.current.streaming).toBe(true)
     })
+  })
+
+  describe('State Management', () => {
+    it('should initialize with default state', () => {
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      expect(result.current.loading).toBe(false)
+      expect(result.current.error).toBeNull()
+      expect(result.current.lastResponse).toBeNull()
+      expect(result.current.streaming).toBe(false)
+      expect(result.current.transcription).toBeNull()
+    })
+
+    it('should reset state', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 100,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.lastResponse).toBeDefined()
+
+      await act(async () => {
+        result.current.reset()
+      })
+
+      expect(result.current.lastResponse).toBeNull()
+      expect(result.current.error).toBeNull()
+      expect(result.current.transcription).toBeNull()
+    })
+
+    it('should cancel ongoing inference', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      // Start inference
+      void act(async () => {
+        void result.current.infer({ text: 'Test' })
+      })
+
+      // Cancel it
+      await act(async () => {
+        result.current.cancel()
+      })
+
+      // Should not have completed
+      expect(result.current.loading).toBe(false)
+    })
+
+    it.skip('should disconnect streaming', async () => {
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        result.current.connectStream({ sessionId: 'session-789' })
+      })
+
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(true)
+      })
+
+      await act(async () => {
+        result.current.disconnectStream()
+      })
+
+      await waitFor(() => {
+        expect(result.current.streaming).toBe(false)
+      })
+      expect(result.current.streamStatus).toBe('disconnected')
+    })
+  })
+
+  describe('Error Handling', () => {
+    it.skip('should handle network errors', async () => {
+      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'))
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.error).toBeDefined()
+      expect(result.current.loading).toBe(false)
+    })
+
+    it.skip('should handle HTTP error responses', async () => {
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        text: async () => 'Internal server error',
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.error).toBeDefined()
+    })
+
+    it.skip('should handle timeout gracefully', async () => {
+      vi.mocked(global.fetch).mockRejectedValueOnce(
+        new Error('Request timeout'),
+      )
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.error).toContain('timeout')
+    })
+  })
+
+  describe('Latency Tracking', () => {
+    it.skip('should track inference latency', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 142,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.latencyMs).toBe(142)
+    })
+
+    it.skip('should validate latency under 200ms target', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 198,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({ text: 'Test' })
+      })
+
+      expect(result.current.latencyMs).toBeLessThan(200)
+    })
+  })
+
+  describe('Session & Context Tracking', () => {
+    it.skip('should pass session ID through inference', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 100,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() => useMultimodalPixel())
+
+      await act(async () => {
+        await result.current.infer({
+          text: 'Test',
+          sessionId: 'session-abc-123',
+        })
+      })
+
+      // Verify fetch was called with session ID
+      expect(vi.mocked(global.fetch)).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          method: 'POST',
+        }),
+      )
+    })
+
+    it.skip('should track context type (therapeutic, crisis, etc)', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 100,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const { result } = renderHook(() =>
+        useMultimodalPixel({ defaultContextType: 'crisis_response' }),
+      )
+
+      await act(async () => {
+        await result.current.infer({
+          text: 'I want to end it',
+          contextType: 'crisis_response',
+        })
+      })
+
+      expect(vi.mocked(global.fetch)).toHaveBeenCalled()
+    })
+  })
 })

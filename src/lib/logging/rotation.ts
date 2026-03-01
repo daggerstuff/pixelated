@@ -2,7 +2,12 @@ import { exec } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
-import { safeJoin, ALLOWED_DIRECTORIES, validatePath } from '../../utils/path-security'
+
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  validatePath,
+} from '../../utils/path-security'
 
 const execAsync = promisify(exec)
 

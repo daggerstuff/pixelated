@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-The Real-Time Updates System enables live synchronization of behavioral analysis data, therapeutic insights, and emotional state tracking across all client interfaces. This document outlines the architecture, implementation details, and integration guidelines for the real-time updates capability.
+The Real-Time Updates System enables live synchronization of behavioral analysis
+data, therapeutic insights, and emotional state tracking across all client
+interfaces. This document outlines the architecture, implementation details, and
+integration guidelines for the real-time updates capability.
 
 ## Architecture
 

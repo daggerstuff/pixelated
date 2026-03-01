@@ -1,4 +1,13 @@
+import {
+  InfoIcon,
+  BrainIcon,
+  MessageSquareIcon,
+  RefreshCwIcon,
+  DownloadIcon,
+} from 'lucide-react'
 import { useState } from 'react'
+
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -8,7 +17,7 @@ import {
   CardContent,
   CardFooter,
 } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -18,21 +27,13 @@ import {
 } from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import {
-  InfoIcon,
-  BrainIcon,
-  MessageSquareIcon,
-  RefreshCwIcon,
-  DownloadIcon,
-} from 'lucide-react'
 import { DisorderCategory } from '@/lib/ai/mental-arena/types'
 
 /**
@@ -241,19 +242,19 @@ export default function SyntheticTherapyDemo() {
   const selectedConversation = conversations[selectedConversationIndex] || null
 
   return (
-    <div className="flex flex-col w-full max-w-6xl mx-auto gap-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">
+    <div className='mx-auto flex w-full max-w-6xl flex-col gap-6'>
+      <div className='flex items-center justify-between'>
+        <h1 className='text-2xl font-bold'>
           Synthetic Therapy Conversation Generator
         </h1>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline" size="icon">
-                <InfoIcon className="h-4 w-4" />
+              <Button variant='outline' size='icon'>
+                <InfoIcon className='h-4 w-4' />
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="max-w-sm">
+            <TooltipContent className='max-w-sm'>
               <p>
                 This demo uses the MentalArena framework to generate synthetic
                 therapy conversations between patients and therapists. The
@@ -265,17 +266,17 @@ export default function SyntheticTherapyDemo() {
         </TooltipProvider>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="md:col-span-1">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
+        <Card className='md:col-span-1'>
           <CardHeader>
             <CardTitle>Configuration</CardTitle>
             <CardDescription>
               Adjust settings for conversation generation
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="numSessions">Number of Sessions</Label>
+          <CardContent className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='numSessions'>Number of Sessions</Label>
               <Slider
                 min={1}
                 max={5}
@@ -286,13 +287,13 @@ export default function SyntheticTherapyDemo() {
                 }
               />
 
-              <div className="text-right text-sm text-muted-foreground">
+              <div className='text-muted-foreground text-right text-sm'>
                 {config.numSessions}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="maxTurns">Max Turns per Conversation</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='maxTurns'>Max Turns per Conversation</Label>
               <Slider
                 min={1}
                 max={10}
@@ -303,13 +304,13 @@ export default function SyntheticTherapyDemo() {
                 }
               />
 
-              <div className="text-right text-sm text-muted-foreground">
+              <div className='text-muted-foreground text-right text-sm'>
                 {config.maxTurns}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='model'>Model</Label>
               <Select
                 value={config.model}
                 onValueChange={(value: string) =>
@@ -320,19 +321,19 @@ export default function SyntheticTherapyDemo() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                  <SelectItem value="gpt-4">GPT-4</SelectItem>
-                  <SelectItem value="llama-3-8b">Llama 3 (8B)</SelectItem>
-                  <SelectItem value="meta-llama/Meta-Llama-3-8B">
+                  <SelectItem value='gpt-3.5-turbo'>GPT-3.5 Turbo</SelectItem>
+                  <SelectItem value='gpt-4'>GPT-4</SelectItem>
+                  <SelectItem value='llama-3-8b'>Llama 3 (8B)</SelectItem>
+                  <SelectItem value='meta-llama/Meta-Llama-3-8B'>
                     Meta-Llama-3-8B
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Label>Disorders</Label>
-              <div className="flex flex-wrap gap-2">
+              <div className='flex flex-wrap gap-2'>
                 {(Object.values(DisorderCategory) as string[])
                   .slice(0, 5)
                   .map((disorder) => (
@@ -343,7 +344,7 @@ export default function SyntheticTherapyDemo() {
                           ? 'default'
                           : 'outline'
                       }
-                      className="cursor-pointer"
+                      className='cursor-pointer'
                       onClick={() => {
                         const disorders = config.disorders.includes(
                           disorder as DisorderCategory,
@@ -359,32 +360,32 @@ export default function SyntheticTherapyDemo() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className='flex items-center space-x-2'>
               <Switch
-                id="pythonBridge"
+                id='pythonBridge'
                 checked={config.usePythonBridge}
                 onCheckedChange={(checked: boolean) =>
                   setConfig({ ...config, usePythonBridge: checked })
                 }
               />
 
-              <Label htmlFor="pythonBridge">Use Python Bridge</Label>
+              <Label htmlFor='pythonBridge'>Use Python Bridge</Label>
             </div>
           </CardContent>
           <CardFooter>
             <Button
-              className="w-full"
+              className='w-full'
               onClick={handleGenerateConversations}
               disabled={loading}
             >
               {loading ? (
                 <>
-                  <RefreshCwIcon className="mr-2 h-4 w-4 animate-spin" />
+                  <RefreshCwIcon className='mr-2 h-4 w-4 animate-spin' />
                   Generating...
                 </>
               ) : (
                 <>
-                  <BrainIcon className="mr-2 h-4 w-4" />
+                  <BrainIcon className='mr-2 h-4 w-4' />
                   Generate Conversations
                 </>
               )}
@@ -392,50 +393,50 @@ export default function SyntheticTherapyDemo() {
           </CardFooter>
         </Card>
 
-        <div className="md:col-span-3 space-y-6">
+        <div className='space-y-6 md:col-span-3'>
           {conversations.length > 0 && selectedConversation ? (
             <>
-              <Tabs defaultValue="conversation" className="w-full">
-                <TabsList className="w-full justify-start">
-                  <TabsTrigger value="conversation">Conversation</TabsTrigger>
-                  <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
-                  <TabsTrigger value="summary">Summary</TabsTrigger>
+              <Tabs defaultValue='conversation' className='w-full'>
+                <TabsList className='w-full justify-start'>
+                  <TabsTrigger value='conversation'>Conversation</TabsTrigger>
+                  <TabsTrigger value='symptoms'>Symptoms</TabsTrigger>
+                  <TabsTrigger value='summary'>Summary</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="conversation" className="space-y-4 mt-4">
+                <TabsContent value='conversation' className='mt-4 space-y-4'>
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex justify-between">
+                      <CardTitle className='flex justify-between'>
                         <span>Synthetic Therapy Conversation</span>
-                        <Badge variant="outline">
+                        <Badge variant='outline'>
                           Session {selectedConversationIndex + 1}/
                           {conversations.length}
                         </Badge>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="rounded-lg bg-secondary/50 p-4">
-                        <div className="flex items-start gap-4">
-                          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white">
+                    <CardContent className='space-y-4'>
+                      <div className='bg-secondary/50 rounded-lg p-4'>
+                        <div className='flex items-start gap-4'>
+                          <div className='bg-primary text-white flex h-8 w-8 items-center justify-center rounded-full'>
                             P
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium">Patient</div>
-                            <div className="mt-1">
+                          <div className='flex-1'>
+                            <div className='font-medium'>Patient</div>
+                            <div className='mt-1'>
                               {selectedConversation.patientText}
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="rounded-lg bg-muted p-4">
-                        <div className="flex items-start gap-4">
-                          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                      <div className='bg-muted rounded-lg p-4'>
+                        <div className='flex items-start gap-4'>
+                          <div className='bg-blue-600 text-white flex h-8 w-8 items-center justify-center rounded-full'>
                             T
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium">Therapist</div>
-                            <div className="mt-1">
+                          <div className='flex-1'>
+                            <div className='font-medium'>Therapist</div>
+                            <div className='mt-1'>
                               {selectedConversation.therapistText}
                             </div>
                           </div>
@@ -445,8 +446,8 @@ export default function SyntheticTherapyDemo() {
                   </Card>
                 </TabsContent>
 
-                <TabsContent value="symptoms" className="space-y-4 mt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <TabsContent value='symptoms' className='mt-4 space-y-4'>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <Card>
                       <CardHeader>
                         <CardTitle>Encoded Symptoms (Patient)</CardTitle>
@@ -454,55 +455,55 @@ export default function SyntheticTherapyDemo() {
                           Symptoms encoded into the patient profile
                         </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
+                      <CardContent className='space-y-4'>
                         {selectedConversation.encodedSymptoms.map((symptom) => (
                           <div
                             key={`${symptom.name}-${symptom.duration}`}
-                            className="rounded-lg border p-4 space-y-2"
+                            className='space-y-2 rounded-lg border p-4'
                           >
-                            <div className="flex justify-between items-center">
-                              <h3 className="font-medium">{symptom.name}</h3>
-                              <Badge variant="outline">
+                            <div className='flex items-center justify-between'>
+                              <h3 className='font-medium'>{symptom.name}</h3>
+                              <Badge variant='outline'>
                                 {symptom.duration}
                               </Badge>
                             </div>
-                            <div className="space-y-1">
-                              <div className="text-sm text-muted-foreground">
+                            <div className='space-y-1'>
+                              <div className='text-muted-foreground text-sm'>
                                 Severity: {(symptom.severity * 100).toFixed(0)}%
                               </div>
-                              <div className="w-full bg-secondary rounded-full h-2">
+                              <div className='bg-secondary h-2 w-full rounded-full'>
                                 <div
-                                  className="bg-primary h-2 rounded-full"
+                                  className='bg-primary h-2 rounded-full'
                                   style={{
                                     width: `${symptom.severity * 100}%`,
                                   }}
                                 />
                               </div>
                             </div>
-                            <div className="space-y-1">
-                              <div className="text-sm font-medium">
+                            <div className='space-y-1'>
+                              <div className='text-sm font-medium'>
                                 Manifestations:
                               </div>
-                              <div className="flex flex-wrap gap-2">
+                              <div className='flex flex-wrap gap-2'>
                                 {symptom.manifestations.map((manifestation) => (
                                   <Badge
                                     key={`${symptom.name}-${manifestation}`}
-                                    variant="secondary"
+                                    variant='secondary'
                                   >
                                     {manifestation}
                                   </Badge>
                                 ))}
                               </div>
                             </div>
-                            <div className="space-y-1">
-                              <div className="text-sm font-medium">
+                            <div className='space-y-1'>
+                              <div className='text-sm font-medium'>
                                 Cognitions:
                               </div>
-                              <div className="flex flex-wrap gap-2">
+                              <div className='flex flex-wrap gap-2'>
                                 {symptom.cognitions.map((cognition) => (
                                   <Badge
                                     key={`${symptom.name}-${cognition}`}
-                                    variant="outline"
+                                    variant='outline'
                                   >
                                     {cognition}
                                   </Badge>
@@ -521,10 +522,10 @@ export default function SyntheticTherapyDemo() {
                           Symptoms identified by the therapist model
                         </CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="rounded-lg border p-4 space-y-2">
-                          <div className="font-medium">Identified Symptoms</div>
-                          <div className="flex flex-wrap gap-2 mt-2">
+                      <CardContent className='space-y-4'>
+                        <div className='space-y-2 rounded-lg border p-4'>
+                          <div className='font-medium'>Identified Symptoms</div>
+                          <div className='mt-2 flex flex-wrap gap-2'>
                             {selectedConversation.decodedSymptoms.map(
                               (symptom) => {
                                 const isCorrect =
@@ -546,11 +547,11 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className="rounded-lg border p-4 space-y-2">
-                          <div className="font-medium">
+                        <div className='space-y-2 rounded-lg border p-4'>
+                          <div className='font-medium'>
                             Correctly Identified
                           </div>
-                          <div className="flex flex-wrap gap-2 mt-2">
+                          <div className='mt-2 flex flex-wrap gap-2'>
                             {selectedConversation.encodedSymptoms
                               .filter((encoded) =>
                                 selectedConversation.decodedSymptoms.some(
@@ -562,7 +563,7 @@ export default function SyntheticTherapyDemo() {
                               .map((symptom) => (
                                 <Badge
                                   key={`correctly-identified-${symptom.name}`}
-                                  variant="default"
+                                  variant='default'
                                 >
                                   {symptom.name}
                                 </Badge>
@@ -570,9 +571,9 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className="rounded-lg border p-4 space-y-2">
-                          <div className="font-medium">Missed by Therapist</div>
-                          <div className="flex flex-wrap gap-2 mt-2">
+                        <div className='space-y-2 rounded-lg border p-4'>
+                          <div className='font-medium'>Missed by Therapist</div>
+                          <div className='mt-2 flex flex-wrap gap-2'>
                             {selectedConversation.encodedSymptoms
                               .filter(
                                 (encoded) =>
@@ -585,7 +586,7 @@ export default function SyntheticTherapyDemo() {
                               .map((symptom) => (
                                 <Badge
                                   key={`missed-${symptom.name}`}
-                                  variant="outline"
+                                  variant='outline'
                                 >
                                   {symptom.name}
                                 </Badge>
@@ -593,11 +594,11 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className="rounded-lg border p-4 space-y-2">
-                          <div className="font-medium">
+                        <div className='space-y-2 rounded-lg border p-4'>
+                          <div className='font-medium'>
                             Incorrectly Identified
                           </div>
-                          <div className="flex flex-wrap gap-2 mt-2">
+                          <div className='mt-2 flex flex-wrap gap-2'>
                             {selectedConversation.decodedSymptoms
                               .filter(
                                 (decoded) =>
@@ -610,7 +611,7 @@ export default function SyntheticTherapyDemo() {
                               .map((symptom) => (
                                 <Badge
                                   key={`incorrect-${symptom}`}
-                                  variant="secondary"
+                                  variant='secondary'
                                 >
                                   {symptom}
                                 </Badge>
@@ -622,7 +623,7 @@ export default function SyntheticTherapyDemo() {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="summary" className="space-y-4 mt-4">
+                <TabsContent value='summary' className='mt-4 space-y-4'>
                   <Card>
                     <CardHeader>
                       <CardTitle>Session Summary & Analysis</CardTitle>
@@ -630,15 +631,15 @@ export default function SyntheticTherapyDemo() {
                         AI-generated summary and accuracy score
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="rounded-lg bg-muted p-4 whitespace-pre-wrap font-mono text-sm">
+                    <CardContent className='space-y-4'>
+                      <div className='bg-muted whitespace-pre-wrap rounded-lg p-4 font-mono text-sm'>
                         {selectedConversation.sessionSummary}
                       </div>
-                      <div className="flex justify-end">
+                      <div className='flex justify-end'>
                         <Badge
                           variant={
                             selectedConversation.accuracyScore &&
-                              selectedConversation.accuracyScore >= 0.7
+                            selectedConversation.accuracyScore >= 0.7
                               ? 'default'
                               : 'destructive'
                           }
@@ -650,9 +651,9 @@ export default function SyntheticTherapyDemo() {
                         </Badge>
                       </div>
                     </CardContent>
-                    <CardFooter className="flex justify-end">
-                      <Button variant="outline">
-                        <DownloadIcon className="mr-2 h-4 w-4" />
+                    <CardFooter className='flex justify-end'>
+                      <Button variant='outline'>
+                        <DownloadIcon className='mr-2 h-4 w-4' />
                         Download Report
                       </Button>
                     </CardFooter>
@@ -661,7 +662,7 @@ export default function SyntheticTherapyDemo() {
               </Tabs>
             </>
           ) : (
-            <Card className="flex flex-col items-center justify-center h-96 border-dashed">
+            <Card className='flex h-96 flex-col items-center justify-center border-dashed'>
               <CardHeader>
                 <CardTitle>No Conversations Generated</CardTitle>
                 <CardDescription>
@@ -669,7 +670,7 @@ export default function SyntheticTherapyDemo() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <MessageSquareIcon className="h-16 w-16 text-muted-foreground" />
+                <MessageSquareIcon className='text-muted-foreground h-16 w-16' />
               </CardContent>
             </Card>
           )}

@@ -3,6 +3,7 @@ import { sendEmail } from '@/lib/email'
 import { FHE } from '@/lib/fhe'
 import { logger } from '@/lib/logger'
 import { redis } from '@/lib/redis'
+
 import { BreachNotificationSystem } from '../breach-notification'
 
 // Mock dependencies

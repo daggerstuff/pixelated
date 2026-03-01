@@ -9,10 +9,10 @@ import React, { useState, useEffect, Suspense } from 'react'
 
 // Loading component for Three.js visualizations
 export const ThreeDLoading = () => (
-  <div className="flex items-center justify-center p-8 min-h-[400px] bg-slate-50 rounded-lg">
-    <div className="flex flex-col items-center gap-2">
-      <div className="h-10 w-10 border-4 border-t-indigo-500 border-r-transparent border-b-indigo-500 border-l-transparent rounded-full animate-spin"></div>
-      <div className="text-sm text-slate-500">Loading 3D visualization...</div>
+  <div className='bg-slate-50 flex min-h-[400px] items-center justify-center rounded-lg p-8'>
+    <div className='flex flex-col items-center gap-2'>
+      <div className='border-t-indigo-500 border-r-transparent border-b-indigo-500 border-l-transparent h-10 w-10 animate-spin rounded-full border-4'></div>
+      <div className='text-slate-500 text-sm'>Loading 3D visualization...</div>
     </div>
   </div>
 )
@@ -66,7 +66,7 @@ export const useThree = () => {
       }
     }
 
-    loadModules()
+    void loadModules()
 
     return () => {
       isMounted = false

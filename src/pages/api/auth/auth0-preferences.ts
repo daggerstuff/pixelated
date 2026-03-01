@@ -4,10 +4,11 @@
  */
 
 import type { APIRoute } from 'astro'
-import { getUserById, updateUser } from '@/services/auth0.service'
+
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { createAuditLog } from '@/lib/audit'
+import { getUserById, updateUser } from '@/services/auth0.service'
 
 // Replace Supabase Json type with MongoDB-compatible type
 type JsonValue = string | number | boolean | null | JsonObject | JsonValue[]
@@ -109,7 +110,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -122,7 +123,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -147,7 +148,7 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.preferences.access',
       user.id,
       'auth-preferences',
-      { action: 'get_preferences' }
+      { action: 'get_preferences' },
     )
 
     return new Response(JSON.stringify({ preferences: aiPrefs }), {
@@ -166,7 +167,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -174,7 +175,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }
@@ -193,7 +194,7 @@ export const PUT: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -206,7 +207,7 @@ export const PUT: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -247,7 +248,7 @@ export const PUT: APIRoute = async ({ request }) => {
       'auth.preferences.update',
       user.id,
       'auth-preferences',
-      { action: 'update_preferences' }
+      { action: 'update_preferences' },
     )
 
     return new Response(JSON.stringify({ success: true }), {
@@ -266,7 +267,7 @@ export const PUT: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -279,7 +280,7 @@ export const PUT: APIRoute = async ({ request }) => {
       {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }
@@ -298,7 +299,7 @@ export const DELETE: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -311,7 +312,7 @@ export const DELETE: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -342,7 +343,7 @@ export const DELETE: APIRoute = async ({ request }) => {
       'auth.preferences.reset',
       user.id,
       'auth-preferences',
-      { action: 'reset_preferences' }
+      { action: 'reset_preferences' },
     )
 
     return new Response(JSON.stringify({ success: true }), {
@@ -361,7 +362,7 @@ export const DELETE: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -369,7 +370,7 @@ export const DELETE: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

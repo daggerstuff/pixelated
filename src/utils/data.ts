@@ -1,4 +1,5 @@
 import type { CollectionEntry } from 'astro:content'
+
 import type { GitHubView } from '@/types'
 
 // Define the structure for the highlights collection entry data
@@ -25,7 +26,7 @@ export const VERSION_COLOR = {
  */
 export function matchLogo(
   input: string,
-  logos: GitHubView['mainLogoOverrides'] | GitHubView['subLogoMatches'],
+  logos: GitHubView['mainLogoOverrides']  ,
 ) {
   for (const [pattern, logo] of logos) {
     if (typeof pattern === 'string') {

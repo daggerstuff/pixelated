@@ -1,9 +1,11 @@
 import type { ErrorInfo, ReactNode } from 'react'
+import React, { Component } from 'react'
+
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { logger } from '@/lib/logger'
-import React, { Component } from 'react'
+
 import {
   normalizeError,
   logError,
@@ -11,7 +13,6 @@ import {
   createErrorContext,
   type ErrorContext,
 } from './utils'
-
 
 interface Props {
   children: ReactNode
@@ -76,7 +77,10 @@ export class ErrorBoundary extends Component<Props, State> {
     // Log to monitoring service if enabled
     if (this.props.logToMonitoring !== false) {
       // Integration point for monitoring services (Sentry, etc.)
-      if (typeof window !== 'undefined' && (window as { Sentry?: unknown }).Sentry) {
+      if (
+        typeof window !== 'undefined' &&
+        (window as { Sentry?: unknown }).Sentry
+      ) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const Sentry = (window as any).Sentry
@@ -154,17 +158,17 @@ export class ErrorBoundary extends Component<Props, State> {
         normalizedError?.recoverable
 
       return (
-        <Card className="p-6 max-w-lg mx-auto my-8">
+        <Card className='mx-auto my-8 max-w-lg p-6'>
           <Alert
-            variant="error"
-            title="Something went wrong"
+            variant='error'
+            title='Something went wrong'
             description={userMessage}
           />
 
           {this.state.error && (
-            <details className="mt-4 text-xs text-muted-foreground">
-              <summary className="cursor-pointer">Technical details</summary>
-              <pre className="mt-2 p-2 bg-muted rounded overflow-auto">
+            <details className='text-muted-foreground mt-4 text-xs'>
+              <summary className='cursor-pointer'>Technical details</summary>
+              <pre className='bg-muted mt-2 overflow-auto rounded p-2'>
                 {this.state.error.message}
                 {this.state.errorInfo?.componentStack && (
                   <>
@@ -177,9 +181,9 @@ export class ErrorBoundary extends Component<Props, State> {
             </details>
           )}
 
-          <div className="mt-4 flex justify-end gap-2">
+          <div className='mt-4 flex justify-end gap-2'>
             {canRetry && (
-              <Button onClick={this.handleReset} variant="outline">
+              <Button onClick={this.handleReset} variant='outline'>
                 Try Again ({MAX_RETRY_COUNT - this.state.retryCount} attempts
                 left)
               </Button>

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+
 import { UsabilityUtils } from '../utils/UsabilityUtils'
 
 test.describe('Mobile Usability', () => {

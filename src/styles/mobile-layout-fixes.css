@@ -201,7 +201,7 @@
   }
 
   /* Ensure emoji icons are centered */
-  [class*="text-"][class*="xl"] {
+  [class*='text-'][class*='xl'] {
     text-align: center !important;
   }
 

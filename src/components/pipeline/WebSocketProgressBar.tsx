@@ -98,9 +98,9 @@ export function WebSocketProgressBar(props: {
   return (
     <div>
       <div>WebSocket status</div>
-      <div role="status">{statusText}</div>
+      <div role='status'>{statusText}</div>
       <div
-        role="progressbar"
+        role='progressbar'
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(progress)}
@@ -109,7 +109,7 @@ export function WebSocketProgressBar(props: {
         <div
           className={`h-3 rounded-full ${progressColor}`}
           style={{ width: `${progress}%` }}
-          data-testid="progress-fill"
+          data-testid='progress-fill'
         />
       </div>
       <div>{progress.toFixed(1)}%</div>
@@ -117,7 +117,7 @@ export function WebSocketProgressBar(props: {
       {showMetrics && (
         <div>
           <div>Updates per second</div>
-          <div data-testid="trending-up-icon">^</div>
+          <div data-testid='trending-up-icon'>^</div>
         </div>
       )}
       {connectionAttempts ? (

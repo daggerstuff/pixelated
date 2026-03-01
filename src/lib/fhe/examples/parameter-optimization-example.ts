@@ -5,13 +5,13 @@
  * optimal parameters for different operations and optimization strategies.
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   fheParameterOptimizer,
   OptimizationStrategy,
 } from '../parameter-optimizer'
-import { FHEOperation } from '../types'
 import { SealSchemeType } from '../seal-types'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { FHEOperation } from '../types'
 
 const logger = createBuildSafeLogger('fhe-parameter-optimization-example')
 

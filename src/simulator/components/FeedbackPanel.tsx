@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { useSimulator } from '../context/SimulatorContext'
 import type { RealTimeFeedback } from '../types'
 import { FeedbackType } from '../types'
@@ -71,30 +72,30 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
 
   return (
     <div
-      className={`feedback-panel bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${className}`}
+      className={`feedback-panel bg-white border-gray-200 rounded-lg border p-4 shadow-sm ${className}`}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">
+      <div className='mb-4 flex items-center justify-between'>
+        <h2 className='text-gray-800 text-lg font-semibold'>
           Real-Time Feedback
         </h2>
 
         {realtimeFeedback.length > 0 && (
           <button
             onClick={handleClearFeedback}
-            className="text-xs text-gray-500 hover:text-gray-700 flex items-center"
+            className='text-gray-500 hover:text-gray-700 flex items-center text-xs'
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              xmlns='http://www.w3.org/2000/svg'
+              className='mr-1 h-4 w-4'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={2}
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
               />
             </svg>
             Clear
@@ -103,30 +104,30 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
       </div>
 
       {!isConnected && (
-        <div className="bg-gray-50 p-4 rounded text-center text-gray-500 text-sm">
+        <div className='bg-gray-50 text-gray-500 rounded p-4 text-center text-sm'>
           Start a simulation to receive feedback
         </div>
       )}
 
       {isConnected && realtimeFeedback.length === 0 && (
-        <div className="bg-gray-50 p-4 rounded text-center text-gray-500 text-sm">
+        <div className='bg-gray-50 text-gray-500 rounded p-4 text-center text-sm'>
           Waiting for feedback...
         </div>
       )}
 
-      <div className="space-y-3 mt-2 max-h-[500px] overflow-y-auto pr-1">
+      <div className='mt-2 max-h-[500px] space-y-3 overflow-y-auto pr-1'>
         {realtimeFeedback.map((feedback: RealTimeFeedback, index: number) => (
           <div
             key={`${feedback.timestamp}-${index}`}
-            className={`p-3 rounded-md border-l-4 ${priorityColors[feedback.priority]} ${getBorderColor(feedback.type as FeedbackType)}-500`}
+            className={`rounded-md border-l-4 p-3 ${priorityColors[feedback.priority]} ${getBorderColor(feedback.type)}-500`}
           >
-            <div className="flex justify-between items-start mb-1">
+            <div className='mb-1 flex items-start justify-between'>
               <span
-                className={`text-xs font-medium px-2 py-0.5 rounded ${feedbackTypeColors[feedback.type as FeedbackType]}`}
+                className={`rounded px-2 py-0.5 text-xs font-medium ${feedbackTypeColors[feedback.type]}`}
               >
-                {feedbackTypeLabels[feedback.type as FeedbackType]}
+                {feedbackTypeLabels[feedback.type]}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className='text-gray-400 text-xs'>
                 {new Date(feedback.timestamp).toLocaleTimeString([], {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -135,33 +136,33 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
             </div>
 
             {feedback.context && (
-              <div className="text-xs text-gray-500 italic mb-1">
+              <div className='text-gray-500 mb-1 text-xs italic'>
                 &quot;{feedback.context}&quot;
               </div>
             )}
 
-            <div className="text-sm font-medium text-gray-800 mb-1">
+            <div className='text-gray-800 mb-1 text-sm font-medium'>
               {feedback.suggestion}
             </div>
 
-            <div className="text-xs text-gray-600">{feedback.rationale}</div>
+            <div className='text-gray-600 text-xs'>{feedback.rationale}</div>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 text-xs text-gray-400 flex items-center">
+      <div className='text-gray-400 mt-4 flex items-center text-xs'>
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3 mr-1"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          xmlns='http://www.w3.org/2000/svg'
+          className='mr-1 h-3 w-3'
+          fill='none'
+          viewBox='0 0 24 24'
+          stroke='currentColor'
         >
           <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeLinecap='round'
+            strokeLinejoin='round'
             strokeWidth={2}
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            d='M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
           />
         </svg>
         Feedback is generated in real-time and is not recorded

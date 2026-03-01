@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
-import { Command } from 'commander'
-
 import { existsSync } from 'fs'
 
-import TaskListManager from '../lib/services/TaskListManager'
-import OllamaCheckInService from '../lib/services/OllamaCheckInService'
+import { Command } from 'commander'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
+import OllamaCheckInService from '../lib/services/OllamaCheckInService'
+import TaskListManager from '../lib/services/TaskListManager'
 
 const logger = createBuildSafeLogger('task-cli')
 

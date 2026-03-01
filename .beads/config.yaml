@@ -40,3 +40,9 @@
 # - linear.api-key
 # - github.org
 # - github.repo
+
+dolt.port: 3306
+
+dolt.host: 127.0.0.1
+
+dolt.user: 'root'

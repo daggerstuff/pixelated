@@ -3,14 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * Unit tests for Context Detection System
  */
 
+import type { AIService } from '../../ai/models/types'
+import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
+import { ContextType } from '../core/objectives'
 import {
   ContextDetector,
   type ContextDetectorConfig,
   type ContextDetectionResult,
 } from './context-detector'
-import { ContextType } from '../core/objectives'
-import type { AIService } from '../../ai/models/types'
-import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 
 // Mock dependencies
 const mockAIService: AIService = {
@@ -405,7 +405,9 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).not.toBe(ContextType.CLINICAL_ASSESSMENT)
+          expect(result.detectedContext).not.toBe(
+            ContextType.CLINICAL_ASSESSMENT,
+          )
         }
       })
 
@@ -475,7 +477,8 @@ describe('ContextDetector', () => {
       })
 
       it('should not log PII in clinical assessment detection', async () => {
-        const queryWithPII = 'Can you diagnose John Smith, SSN 123-45-6789, for depression?'
+        const queryWithPII =
+          'Can you diagnose John Smith, SSN 123-45-6789, for depression?'
         mockDetectCrisis.mockResolvedValue({
           isCrisis: false,
           confidence: 0.05,
@@ -487,13 +490,13 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: queryWithPII,
         })
-        
+
         // Spy on logger to ensure no PII is logged
         const loggerSpy = vi.spyOn(console, 'log')
         const result = await contextDetector.detectContext(queryWithPII)
-        
+
         expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-        
+
         // Check that no logged messages contain PII
         const logCalls = loggerSpy.mock.calls
         for (const call of logCalls) {
@@ -501,7 +504,7 @@ describe('ContextDetector', () => {
           expect(logMessage).not.toContain('John Smith')
           expect(logMessage).not.toContain('123-45-6789')
         }
-        
+
         loggerSpy.mockRestore()
       })
 
@@ -657,8 +660,8 @@ describe('ContextDetector', () => {
       }))
 
       vi.mocked(mockAIService.createChatCompletion)
-        .mockResolvedValueOnce(aiResponses[0]!)
-        .mockResolvedValueOnce(aiResponses[1]!)
+        .mockResolvedValueOnce(aiResponses[0])
+        .mockResolvedValueOnce(aiResponses[1])
 
       const results = await contextDetector.detectContextBatch(inputs)
 

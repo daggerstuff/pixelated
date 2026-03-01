@@ -307,7 +307,7 @@ export interface EncryptedData<T = unknown> {
 /**
  * Type guard for EncryptedData
  */
-export function isEncryptedData(obj: unknown): obj is EncryptedData<unknown> {
+export function isEncryptedData(obj: unknown): obj is EncryptedData {
   if (!obj || typeof obj !== 'object') {
     return false
   }
@@ -456,7 +456,7 @@ export interface FHEService {
    * @param value The value to encrypt
    * @returns The encrypted data
    */
-  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData<unknown>>
+  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData>
 
   /**
    * Decrypt encrypted data
@@ -464,7 +464,7 @@ export interface FHEService {
    * @returns The decrypted value
    */
   decrypt<T>(
-    encryptedData: EncryptedData<unknown>,
+    encryptedData: EncryptedData,
     options?: unknown,
   ): Promise<T>
 
@@ -475,9 +475,9 @@ export interface FHEService {
    * @returns Result of addition
    */
   add?(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData>
 
   /**
    * Subtract one encrypted value from another
@@ -486,9 +486,9 @@ export interface FHEService {
    * @returns Result of subtraction
    */
   subtract?(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData>
 
   /**
    * Multiply encrypted value
@@ -497,16 +497,16 @@ export interface FHEService {
    * @returns Result of multiplication
    */
   multiply?(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData>
 
   /**
    * Negate an encrypted value
    * @param value Encrypted value to negate
    * @returns Negated encrypted value
    */
-  negate?(value: EncryptedData<unknown>): Promise<EncryptedData<unknown>>
+  negate?(value: EncryptedData): Promise<EncryptedData>
 
   /**
    * Apply a polynomial function to encrypted data
@@ -515,9 +515,9 @@ export interface FHEService {
    * @returns Result of polynomial evaluation
    */
   applyPolynomial?(
-    value: EncryptedData<unknown>,
+    value: EncryptedData,
     coefficients: Polynomial,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData>
 
   /**
    * Rotate elements in an encrypted vector
@@ -526,9 +526,9 @@ export interface FHEService {
    * @returns Rotated encrypted vector
    */
   rotate?(
-    vector: EncryptedData<unknown>,
+    vector: EncryptedData,
     steps: number,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData>
 
   /**
    * Process encrypted data

@@ -17,7 +17,7 @@ const { mockLogger } = vi.hoisted(() => ({
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  }
+  },
 }))
 
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -25,7 +25,6 @@ vi.mock('@/lib/logging/build-safe-logger', () => ({
 }))
 
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection'
-
 import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 
 // Import the actual handler
@@ -229,7 +228,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     })
 
     const defaultHeaders: Record<string, string> = {
-      'authorization': 'Bearer valid-token',
+      authorization: 'Bearer valid-token',
       'content-type': 'application/json',
       ...headers,
     }
@@ -251,27 +250,30 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       GET = module.GET
     }
 
-    vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
-      let responseData: any
-      try {
-        responseData = JSON.parse(body)
-      } catch {
-        responseData = { error: 'Invalid JSON' }
-      }
+    vi.stubGlobal(
+      'Response',
+      vi.fn(function (body: string, init?: ResponseInit) {
+        let responseData: any
+        try {
+          responseData = JSON.parse(body)
+        } catch {
+          responseData = { error: 'Invalid JSON' }
+        }
 
-      const defaultHeaders = new Map([
-        ['Content-Type', 'application/json'],
-        ['X-Processing-Time', '150'],
-      ])
+        const defaultHeaders = new Map([
+          ['Content-Type', 'application/json'],
+          ['X-Processing-Time', '150'],
+        ])
 
-      return {
-        status: init?.status || 200,
-        json: vi.fn().mockResolvedValue(responseData),
-        headers: {
-          get: vi.fn((key: string) => defaultHeaders.get(key) || null),
-        },
-      }
-    }))
+        return {
+          status: init?.status || 200,
+          json: vi.fn().mockResolvedValue(responseData),
+          headers: {
+            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+          },
+        }
+      }),
+    )
 
     mockBiasEngine = {
       getDashboardData: vi.fn().mockResolvedValue(mockDashboardData),
@@ -366,15 +368,18 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
-        return {
-          status: init?.status || 500,
-          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-          headers: {
-            get: vi.fn((_key: string) => "application/json"),
-          },
-        }
-      }))
+      vi.stubGlobal(
+        'Response',
+        vi.fn(function (body: string, init?: ResponseInit) {
+          return {
+            status: init?.status || 500,
+            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
+            headers: {
+              get: vi.fn((_key: string) => 'application/json'),
+            },
+          }
+        }),
+      )
 
       const response = await GET({ request } as { request: Request })
 
@@ -492,15 +497,18 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
-        return {
-          status: init?.status || 500,
-          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-          headers: {
-            get: vi.fn((_key: string) => "application/json"),
-          },
-        }
-      }))
+      vi.stubGlobal(
+        'Response',
+        vi.fn(function (body: string, init?: ResponseInit) {
+          return {
+            status: init?.status || 500,
+            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
+            headers: {
+              get: vi.fn((_key: string) => 'application/json'),
+            },
+          }
+        }),
+      )
 
       const response = await GET({ request } as { request: Request })
 
@@ -538,7 +546,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         headers: {
           get: vi.fn((key: string) => {
             const headers: Record<string, string> = {
-              'authorization': 'Bearer valid-token',
+              authorization: 'Bearer valid-token',
               'content-type': 'application/json',
             }
             return headers[key.toLowerCase()] || null

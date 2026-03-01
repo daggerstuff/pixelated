@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   getAcquisition,
   initiateAcquisition,
@@ -36,10 +37,7 @@ const filterAcquisitions = (
       return false
     }
 
-    if (
-      filters.showDownloadFailuresOnly &&
-      acquisition.status !== 'failed'
-    ) {
+    if (filters.showDownloadFailuresOnly && acquisition.status !== 'failed') {
       return false
     }
 
@@ -100,16 +98,16 @@ export const useAcquisitionInitiateMutation = (sessionId: string | null) => {
     mutationFn: (payload: AcquisitionInitiatePayload) =>
       initiateAcquisition(sessionId ?? '', payload),
     onSuccess: (acquisition: Acquisition) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(
           sessionId ?? 'unknown',
           {},
         ),
         exact: false,
       })
-      useAcquisitionStore.getState().setSelectedAcquisitionId(
-        acquisition.acquisitionId,
-      )
+      useAcquisitionStore
+        .getState()
+        .setSelectedAcquisitionId(acquisition.acquisitionId)
     },
   })
 }
@@ -127,13 +125,13 @@ export const useAcquisitionUpdateMutation = (sessionId: string | null) => {
       payload: AcquisitionUpdatePayload
     }) => updateAcquisition(sessionId ?? '', acquisitionId, payload),
     onSuccess: (acquisition: Acquisition) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.detail(
           sessionId ?? 'unknown',
           acquisition.acquisitionId,
         ),
       })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(
           sessionId ?? 'unknown',
           {},
@@ -152,5 +150,3 @@ export const useAcquisitionSelection = () =>
     expandRow: state.expandRow,
     collapseRow: state.collapseRow,
   }))
-
-

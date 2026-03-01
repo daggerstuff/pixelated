@@ -246,7 +246,7 @@ export class UsabilityUtils {
       testName,
       url: page.url(),
       timestamp: new Date().toISOString(),
-      viewport: await page.viewportSize(),
+      viewport:  page.viewportSize(),
       userAgent: await page.evaluate(() => navigator.userAgent),
       results: testResults,
       summary: {

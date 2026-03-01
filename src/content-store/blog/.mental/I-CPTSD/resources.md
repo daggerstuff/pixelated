@@ -1,13 +1,15 @@
 ---
 title: 'CPTSD Resources'
-description: 'Comprehensive resource guide for Complex PTSD support and information'
+description:
+  'Comprehensive resource guide for Complex PTSD support and information'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # CPTSD Resources and Support
 
-A curated collection of resources for understanding, managing, and treating Complex PTSD.
+A curated collection of resources for understanding, managing, and treating
+Complex PTSD.
 
 ## Educational Resources
 

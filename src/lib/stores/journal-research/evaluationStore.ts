@@ -90,5 +90,3 @@ export const useEvaluationStore = create<EvaluationStoreState>((set) => ({
 
   resetFilters: () => set({ filters: defaultFilters }),
 }))
-
-

@@ -1,4 +1,5 @@
 import React from '@/lib/esm-compat/react'
+
 import { useAnonymizedMetrics } from './hooks'
 
 // Simple simulator components
@@ -15,13 +16,13 @@ export function SimulationContainer({
 }) {
   return (
     <div className={className}>
-      <div className="p-6">
-        <h3 className="text-lg font-medium mb-4">Simulation: {scenarioId}</h3>
-        <p className="text-gray-600 mb-6">
+      <div className='p-6'>
+        <h3 className='mb-4 text-lg font-medium'>Simulation: {scenarioId}</h3>
+        <p className='text-gray-600 mb-6'>
           This is a placeholder for the simulation interface.
         </p>
-        <div className="p-4 bg-gray-100 rounded-lg">
-          <p className="text-sm text-gray-700">
+        <div className='bg-gray-100 rounded-lg p-4'>
+          <p className='text-gray-700 text-sm'>
             Scenario description would appear here.
           </p>
         </div>
@@ -49,19 +50,19 @@ export function ScenarioSelector({
 
   return (
     <div className={className}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
         {scenarios.map((scenario) => (
           <button
             key={scenario.id}
-            className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer w-full text-left"
+            className='hover:bg-gray-50 w-full cursor-pointer rounded-lg border p-4 text-left'
             onClick={() => onSelect(scenario.id)}
           >
-            <h4 className="font-medium mb-1">{scenario.name}</h4>
-            <p className="text-sm text-gray-600 mb-2">
+            <h4 className='mb-1 font-medium'>{scenario.name}</h4>
+            <p className='text-gray-600 mb-2 text-sm'>
               Difficulty: {scenario.difficulty}
             </p>
             <button
-              className="text-sm text-blue-600 hover:text-blue-800"
+              className='text-blue-600 hover:text-blue-800 text-sm'
               onClick={(e: React.MouseEvent) => {
                 e.stopPropagation()
                 onSelect(scenario.id)

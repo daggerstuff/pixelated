@@ -1,7 +1,7 @@
-import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AIRepository } from '@/lib/db/ai/repository'
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
+import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 export const prerender = false
 
@@ -163,17 +163,20 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
       count: limitedSessions.length,
     })
 
-    return new Response(JSON.stringify({
-      sessions: limitedSessions,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      }
-    }), {
-      status: HTTP_STATUS.OK,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({
+        sessions: limitedSessions,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
+      }),
+      {
+        status: HTTP_STATUS.OK,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
   } catch (error: unknown) {
     logger.error('Error processing sessions request', {
       error: error instanceof Error ? String(error) : 'Unknown error',

@@ -5,11 +5,12 @@
  */
 
 import { EventEmitter } from 'events'
-import { MongoClient, Db, Collection, ObjectId } from 'mongodb'
-import { Redis } from 'ioredis'
-import { v4 as uuidv4 } from 'uuid'
-import { logger } from '../../logger'
 
+import { Redis } from 'ioredis'
+import { MongoClient, Db, Collection, ObjectId } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+
+import { logger } from '../../logger'
 import { auditLog } from '../audit-logging'
 import { encrypt, decrypt } from '../encryption'
 
@@ -944,9 +945,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           { stix_id: stixId },
           {
             $set: {
-              'encrypted_data': encryptedData,
+              encrypted_data: encryptedData,
               'metadata.processed': true,
-              'updated_at': new Date(),
+              updated_at: new Date(),
             },
           },
         )
@@ -955,9 +956,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           { stix_id: stixId },
           {
             $set: {
-              'stix_object': updatedData,
+              stix_object: updatedData,
               'metadata.processed': true,
-              'updated_at': new Date(),
+              updated_at: new Date(),
             },
           },
         )

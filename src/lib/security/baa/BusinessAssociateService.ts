@@ -1,10 +1,10 @@
+import { generateId } from '../../utils/ids'
 import type {
   BusinessAssociate,
   BusinessAssociateType,
   ServiceCategory,
 } from './types'
 import { ComplianceLevel } from './types'
-import { generateId } from '../../utils/ids'
 
 /**
  * Service for managing Business Associates (vendors, partners, etc.)

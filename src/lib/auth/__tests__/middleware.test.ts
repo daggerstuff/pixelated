@@ -5,6 +5,10 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
+import { auth0UserService } from '../../../services/auth0.service'
+import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
+import { logSecurityEvent } from '../../security'
+import { validateToken } from '../auth0-jwt-service'
 import {
   authenticateRequest,
   requireRole,
@@ -14,10 +18,6 @@ import {
   type AuthenticatedRequest,
   type UserRole,
 } from '../middleware'
-import { validateToken } from '../auth0-jwt-service'
-import { auth0UserService } from '../../../services/auth0.service'
-import { logSecurityEvent } from '../../security'
-import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 
 // Mock dependencies
 vi.mock('../auth0-jwt-service', () => ({
@@ -69,7 +69,7 @@ describe('Authentication Middleware', () => {
     mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer valid-token',
+        Authorization: 'Bearer valid-token',
         'X-CSRF-Token': 'valid-csrf-token',
         'User-Agent': 'Mozilla/5.0',
         'X-Forwarded-For': '127.0.0.1',
@@ -772,7 +772,7 @@ describe('Authentication Middleware', () => {
       const optionsRequest = new Request('https://example.com/api/test', {
         method: 'OPTIONS',
         headers: {
-          'Origin': 'https://app.example.com',
+          Origin: 'https://app.example.com',
           'Access-Control-Request-Method': 'POST',
         },
       })

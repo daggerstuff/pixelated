@@ -1,5 +1,5 @@
-import { performance } from 'node:perf_hooks'
 import os from 'node:os'
+import { performance } from 'node:perf_hooks'
 
 export interface HealthCheck {
   name: string

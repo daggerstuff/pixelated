@@ -1,18 +1,22 @@
 import type { APIRoute, APIContext } from 'astro'
-import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
+
+import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
+import type {
+  CrisisDetectionResult,
+  CrisisDetectionOptions,
+} from '@/lib/ai/crisis/types'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
 import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
   type AuditDetails,
 } from '@/lib/audit'
-import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
-import type { CrisisDetectionResult, CrisisDetectionOptions } from '@/lib/ai/crisis/types'
-import { getUserById } from '@/services/auth0.service'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 // Initialize scoped logger for this module
 const logger = createBuildSafeLogger('crisis-detection')
@@ -33,10 +37,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Validate token
@@ -172,7 +179,9 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     )
 
     return new Response(
-      JSON.stringify({ error: 'Internal server error during crisis detection' }),
+      JSON.stringify({
+        error: 'Internal server error during crisis detection',
+      }),
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },

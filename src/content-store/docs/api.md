@@ -1,16 +1,18 @@
 ---
-title: "API Documentation"
-description: "Complete API documentation for Pixelated Empathy backend endpoints"
+title: 'API Documentation'
+description:
+  'Complete API documentation for Pixelated Empathy backend endpoints'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["api", "documentation"]
+author: 'Pixelated Team'
+tags: ['api', 'documentation']
 draft: false
 toc: true
 ---
 
 # API Documentation
 
-This document provides an overview of the API endpoints available in the application.
+This document provides an overview of the API endpoints available in the
+application.
 
 ## API Structure
 
@@ -24,7 +26,8 @@ Our API is organized into several functional areas:
 
 ## Authentication
 
-Authentication is handled through JWT tokens. Most endpoints require authentication.
+Authentication is handled through JWT tokens. Most endpoints require
+authentication.
 
 ### User Authentication Flow
 
@@ -142,12 +145,12 @@ Response: { success: boolean }
 
 ```typescript
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatarUrl?: string;
-  role: 'user' | 'admin';
-  createdAt: string;
+  id: string
+  name: string
+  email: string
+  avatarUrl?: string
+  role: 'user' | 'admin'
+  createdAt: string
 }
 ```
 
@@ -155,13 +158,13 @@ interface User {
 
 ```typescript
 interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  recipientId: string;
-  conversationId: string;
-  read: boolean;
-  createdAt: string;
+  id: string
+  content: string
+  senderId: string
+  recipientId: string
+  conversationId: string
+  read: boolean
+  createdAt: string
 }
 ```
 
@@ -169,17 +172,17 @@ interface Message {
 
 ```typescript
 interface SecurityEvent {
-  id: string;
-  timestamp: number;
-  type: string;
-  severity: 'critical' | 'high' | 'medium' | 'low';
-  userId?: string;
-  ip?: string;
+  id: string
+  timestamp: number
+  type: string
+  severity: 'critical' | 'high' | 'medium' | 'low'
+  userId?: string
+  ip?: string
   metadata?: {
-    details: string;
-    source?: string;
-    context?: string;
-  };
+    details: string
+    source?: string
+    context?: string
+  }
 }
 ```
 
@@ -187,16 +190,16 @@ interface SecurityEvent {
 
 ```typescript
 interface SystemMetrics {
-  activeUsers: number;
-  activeSessions: number;
-  sessionsToday: number;
-  totalTherapists: number;
-  totalClients: number;
-  messagesSent: number;
-  avgResponseTime: number;
-  systemLoad: number;
-  storageUsed: string;
-  activeSecurityLevel: string;
+  activeUsers: number
+  activeSessions: number
+  sessionsToday: number
+  totalTherapists: number
+  totalClients: number
+  messagesSent: number
+  avgResponseTime: number
+  systemLoad: number
+  storageUsed: string
+  activeSecurityLevel: string
 }
 ```
 
@@ -206,16 +209,16 @@ Many endpoints that return lists support pagination through query parameters:
 
 ```typescript
 interface PaginationInfo {
-  page: number;  // Current page number
-  limit: number;  // Items per page
-  total: number;  // Total number of items
-  hasNext: boolean;  // Whether there are more pages
-  hasPrev: boolean;  // Whether there are previous pages
+  page: number // Current page number
+  limit: number // Items per page
+  total: number // Total number of items
+  hasNext: boolean // Whether there are more pages
+  hasPrev: boolean // Whether there are previous pages
 }
 
 interface PaginatedResponse<T> {
-  data: T[];  // Current page of results
-  pagination: PaginationInfo;  // Pagination metadata
+  data: T[] // Current page of results
+  pagination: PaginationInfo // Pagination metadata
 }
 ```
 
@@ -223,17 +226,23 @@ Example usage:
 
 ```typescript
 // First page
-const response = await fetch('/api/messages?conversationId=123&page=1&limit=20', {
-  headers: { Authorization: `Bearer ${token}` }
-});
-const firstPage = await response.json();
+const response = await fetch(
+  '/api/messages?conversationId=123&page=1&limit=20',
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  },
+)
+const firstPage = await response.json()
 
 // Next page
 if (firstPage.pagination.hasNext) {
-  const nextResponse = await fetch('/api/messages?conversationId=123&page=2&limit=20', {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  const secondPage = await nextResponse.json();
+  const nextResponse = await fetch(
+    '/api/messages?conversationId=123&page=2&limit=20',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  )
+  const secondPage = await nextResponse.json()
 }
 ```
 
@@ -243,9 +252,9 @@ API errors follow a standard format:
 
 ```typescript
 interface ApiError {
-  code: string;  // Error code (e.g., "not_found", "unauthorized")
-  message: string;  // Human-readable error message
-  details?: any;  // Additional error details
+  code: string // Error code (e.g., "not_found", "unauthorized")
+  message: string // Human-readable error message
+  details?: any // Additional error details
 }
 ```
 
@@ -264,29 +273,34 @@ Common error codes:
 React components can use fetch or custom hooks to interact with the API:
 
 ```jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 function MessagesComponent({ conversationId }) {
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(`/api/messages?conversationId=${conversationId}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        const data = await response.json();
-        setMessages(data.messages);
+        const response = await fetch(
+          `/api/messages?conversationId=${conversationId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          },
+        )
+        const data = await response.json()
+        setMessages(data.messages)
       } catch (error) {
-        console.error('Failed to fetch messages:', error);
+        console.error('Failed to fetch messages:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchMessages();
-  }, [conversationId]);
+    fetchMessages()
+  }, [conversationId])
 
   const handleSend = async (content) => {
     try {
@@ -294,26 +308,26 @@ function MessagesComponent({ conversationId }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ content, recipientId: 'user123' })
-      });
+        body: JSON.stringify({ content, recipientId: 'user123' }),
+      })
       // Refresh messages
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed to send message:', error)
     }
-  };
+  }
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>
 
   return (
     <div>
-      {messages.map(message => (
+      {messages.map((message) => (
         <div key={message.id}>{message.content}</div>
       ))}
       <button onClick={() => handleSend('Hello!')}>Send</button>
     </div>
-  );
+  )
 }
 ```
 

@@ -1,5 +1,5 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 
 const logger = createBuildSafeLogger('notifications-api')

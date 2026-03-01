@@ -1,5 +1,5 @@
-import { Pool } from 'pg'
 import dotenv from 'dotenv'
+import { Pool } from 'pg'
 
 // Load environment variables
 dotenv.config()
@@ -35,7 +35,7 @@ async function testAuthTables() {
       ORDER BY column_name
     `)
     console.log('Authentication columns in users table:')
-    userColumns.rows.forEach(row => {
+    userColumns.rows.forEach((row) => {
       console.log(`  - ${row.column_name} (${row.data_type})`)
     })
 
@@ -72,27 +72,32 @@ async function testAuthTables() {
     console.log('Created test user:', {
       id: testUser.id,
       email: testUser.email,
-      status: testUser.authentication_status
+      status: testUser.authentication_status,
     })
 
     // Insert a test session
-    const testSessionResult = await client.query(`
+    const testSessionResult = await client.query(
+      `
       INSERT INTO auth_sessions (
         id, user_id, expires_at, token
       ) VALUES (
         'test_session_123', $1, NOW() + INTERVAL '1 hour', 'test_token_456'
       ) RETURNING id, user_id, expires_at
-    `, [testUser.id])
+    `,
+      [testUser.id],
+    )
 
     const testSession = testSessionResult.rows[0]
     console.log('Created test session:', {
       id: testSession.id,
       userId: testSession.user_id,
-      expiresAt: testSession.expires_at
+      expiresAt: testSession.expires_at,
     })
 
     // Clean up test data
-    await client.query('DELETE FROM auth_sessions WHERE id = $1', [testSession.id])
+    await client.query('DELETE FROM auth_sessions WHERE id = $1', [
+      testSession.id,
+    ])
     await client.query('DELETE FROM users WHERE id = $1', [testUser.id])
     console.log('✅ Cleaned up test data')
 
@@ -105,4 +110,4 @@ async function testAuthTables() {
   }
 }
 
-testAuthTables()
+void testAuthTables()

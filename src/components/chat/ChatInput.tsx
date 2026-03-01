@@ -1,7 +1,9 @@
-import { cn } from '@/lib/utils'
 import { useEffect, useRef } from 'react'
-import { IconSend } from './icons'
+
 import { useTheme } from '@/components/theme/ThemeProvider'
+import { cn } from '@/lib/utils'
+
+import { IconSend } from './icons'
 
 export interface ChatInputProps {
   value: string
@@ -83,7 +85,7 @@ export function ChatInput({
       />
 
       <button
-        type="submit"
+        type='submit'
         disabled={isLoading || disabled || !value.trim()}
         className={buttonClasses}
       >

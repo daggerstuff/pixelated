@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import { Auth0UserService } from '../../../src/services/auth0.service'
 
 // Mock the auth0 module
@@ -10,7 +11,7 @@ vi.mock('auth0', () => {
         getUser: vi.fn(),
         getUsers: vi.fn(),
         updateUser: vi.fn(),
-        createPasswordChangeTicket: vi.fn()
+        createPasswordChangeTicket: vi.fn(),
       }
     }),
     AuthenticationClient: vi.fn().mockImplementation(() => {
@@ -18,9 +19,9 @@ vi.mock('auth0', () => {
         passwordGrant: vi.fn(),
         getProfile: vi.fn(),
         refreshToken: vi.fn(),
-        revokeRefreshToken: vi.fn()
+        revokeRefreshToken: vi.fn(),
       }
-    })
+    }),
   }
 })
 
@@ -32,10 +33,10 @@ vi.mock('../../../src/config/mongodb.config', () => {
         collection: vi.fn().mockReturnValue({
           findOne: vi.fn(),
           insertOne: vi.fn(),
-          updateOne: vi.fn()
-        })
-      })
-    }
+          updateOne: vi.fn(),
+        }),
+      }),
+    },
   }
 })
 
@@ -59,7 +60,8 @@ describe('Auth0UserService', () => {
     // Get the mock clients
     const auth0Module = require('auth0')
     mockManagementClient = auth0Module.ManagementClient.mock.results[0].value
-    mockAuthenticationClient = auth0Module.AuthenticationClient.mock.results[0].value
+    mockAuthenticationClient =
+      auth0Module.AuthenticationClient.mock.results[0].value
   })
 
   afterEach(() => {
@@ -77,7 +79,7 @@ describe('Auth0UserService', () => {
       const mockTokenResponse = {
         access_token: 'mock-access-token',
         refresh_token: 'mock-refresh-token',
-        expires_in: 3600
+        expires_in: 3600,
       }
 
       const mockUserProfile = {
@@ -89,13 +91,18 @@ describe('Auth0UserService', () => {
         created_at: '2023-01-01T00:00:00Z',
         last_login: '2023-01-02T00:00:00Z',
         app_metadata: { roles: ['User'] },
-        user_metadata: { role: 'user' }
+        user_metadata: { role: 'user' },
       }
 
-      mockAuthenticationClient.passwordGrant.mockResolvedValue(mockTokenResponse)
+      mockAuthenticationClient.passwordGrant.mockResolvedValue(
+        mockTokenResponse,
+      )
       mockAuthenticationClient.getProfile.mockResolvedValue(mockUserProfile)
 
-      const result = await auth0UserService.signIn('test@example.com', 'password123')
+      const result = await auth0UserService.signIn(
+        'test@example.com',
+        'password123',
+      )
 
       expect(result).toEqual({
         user: {
@@ -108,10 +115,10 @@ describe('Auth0UserService', () => {
           createdAt: '2023-01-01T00:00:00Z',
           lastLogin: '2023-01-02T00:00:00Z',
           appMetadata: { roles: ['User'] },
-          userMetadata: { role: 'user' }
+          userMetadata: { role: 'user' },
         },
         token: 'mock-access-token',
-        refreshToken: 'mock-refresh-token'
+        refreshToken: 'mock-refresh-token',
       })
 
       expect(mockAuthenticationClient.passwordGrant).toHaveBeenCalledWith({
@@ -119,15 +126,18 @@ describe('Auth0UserService', () => {
         password: 'password123',
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: 'test-audience'
+        audience: 'test-audience',
       })
     })
 
     it('should throw error for invalid credentials', async () => {
-      mockAuthenticationClient.passwordGrant.mockRejectedValue(new Error('Unauthorized'))
+      mockAuthenticationClient.passwordGrant.mockRejectedValue(
+        new Error('Unauthorized'),
+      )
 
-      await expect(auth0UserService.signIn('test@example.com', 'wrongpassword'))
-        .rejects.toThrow('Invalid credentials')
+      await expect(
+        auth0UserService.signIn('test@example.com', 'wrongpassword'),
+      ).rejects.toThrow('Invalid credentials')
     })
   })
 
@@ -141,12 +151,16 @@ describe('Auth0UserService', () => {
         picture: null,
         created_at: '2023-01-01T00:00:00Z',
         app_metadata: { roles: ['User'] },
-        user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' }
+        user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       }
 
       mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
 
-      const result = await auth0UserService.createUser('newuser@example.com', 'password123', 'user')
+      const result = await auth0UserService.createUser(
+        'newuser@example.com',
+        'password123',
+        'user',
+      )
 
       expect(result).toEqual({
         id: 'auth0|123456',
@@ -157,7 +171,7 @@ describe('Auth0UserService', () => {
         avatarUrl: null,
         createdAt: '2023-01-01T00:00:00Z',
         appMetadata: { roles: ['User'] },
-        userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' }
+        userMetadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       })
 
       expect(mockManagementClient.createUser).toHaveBeenCalledWith({
@@ -167,20 +181,27 @@ describe('Auth0UserService', () => {
         email_verified: false,
         app_metadata: {
           roles: ['User'],
-          imported_from: 'manual_creation'
+          imported_from: 'manual_creation',
         },
         user_metadata: {
           role: 'user',
-          created_at: expect.any(String)
-        }
+          created_at: expect.any(String),
+        },
       })
     })
 
     it('should throw error when user creation fails', async () => {
-      mockManagementClient.createUser.mockRejectedValue(new Error('User already exists'))
+      mockManagementClient.createUser.mockRejectedValue(
+        new Error('User already exists'),
+      )
 
-      await expect(auth0UserService.createUser('existing@example.com', 'password123', 'user'))
-        .rejects.toThrow('Failed to create user')
+      await expect(
+        auth0UserService.createUser(
+          'existing@example.com',
+          'password123',
+          'user',
+        ),
+      ).rejects.toThrow('Failed to create user')
     })
   })
 
@@ -195,7 +216,7 @@ describe('Auth0UserService', () => {
         created_at: '2023-01-01T00:00:00Z',
         last_login: '2023-01-02T00:00:00Z',
         app_metadata: { roles: ['Admin'] },
-        user_metadata: { role: 'admin' }
+        user_metadata: { role: 'admin' },
       }
 
       mockManagementClient.getUser.mockResolvedValue(mockAuth0User)
@@ -212,12 +233,14 @@ describe('Auth0UserService', () => {
         createdAt: '2023-01-01T00:00:00Z',
         lastLogin: '2023-01-02T00:00:00Z',
         appMetadata: { roles: ['Admin'] },
-        userMetadata: { role: 'admin' }
+        userMetadata: { role: 'admin' },
       })
     })
 
     it('should return null when user is not found', async () => {
-      mockManagementClient.getUser.mockRejectedValue(new Error('User not found'))
+      mockManagementClient.getUser.mockRejectedValue(
+        new Error('User not found'),
+      )
 
       const result = await auth0UserService.getUserById('nonexistent-user')
 
@@ -227,17 +250,19 @@ describe('Auth0UserService', () => {
 
   describe('findUserByEmail', () => {
     it('should successfully find user by email', async () => {
-      const mockAuth0Users = [{
-        user_id: 'auth0|123456',
-        email: 'test@example.com',
-        email_verified: true,
-        name: 'Test User',
-        picture: 'https://example.com/avatar.jpg',
-        created_at: '2023-01-01T00:00:00Z',
-        last_login: '2023-01-02T00:00:00Z',
-        app_metadata: { roles: ['Therapist'] },
-        user_metadata: { role: 'therapist' }
-      }]
+      const mockAuth0Users = [
+        {
+          user_id: 'auth0|123456',
+          email: 'test@example.com',
+          email_verified: true,
+          name: 'Test User',
+          picture: 'https://example.com/avatar.jpg',
+          created_at: '2023-01-01T00:00:00Z',
+          last_login: '2023-01-02T00:00:00Z',
+          app_metadata: { roles: ['Therapist'] },
+          user_metadata: { role: 'therapist' },
+        },
+      ]
 
       mockManagementClient.getUsers.mockResolvedValue(mockAuth0Users)
 
@@ -253,19 +278,21 @@ describe('Auth0UserService', () => {
         createdAt: '2023-01-01T00:00:00Z',
         lastLogin: '2023-01-02T00:00:00Z',
         appMetadata: { roles: ['Therapist'] },
-        userMetadata: { role: 'therapist' }
+        userMetadata: { role: 'therapist' },
       })
 
       expect(mockManagementClient.getUsers).toHaveBeenCalledWith({
         q: 'email:"test@example.com"',
-        search_engine: 'v3'
+        search_engine: 'v3',
       })
     })
 
     it('should return null when user is not found', async () => {
       mockManagementClient.getUsers.mockResolvedValue([])
 
-      const result = await auth0UserService.findUserByEmail('nonexistent@example.com')
+      const result = await auth0UserService.findUserByEmail(
+        'nonexistent@example.com',
+      )
 
       expect(result).toBeNull()
     })
@@ -282,7 +309,7 @@ describe('Auth0UserService', () => {
         created_at: '2023-01-01T00:00:00Z',
         last_login: '2023-01-02T00:00:00Z',
         app_metadata: { roles: ['User'] },
-        user_metadata: { role: 'user', updated_field: 'new_value' }
+        user_metadata: { role: 'user', updated_field: 'new_value' },
       }
 
       mockManagementClient.updateUser.mockResolvedValue(mockAuth0User)
@@ -291,7 +318,7 @@ describe('Auth0UserService', () => {
         email: 'updated@example.com',
         fullName: 'Updated User',
         role: 'user',
-        customField: 'new_value'
+        customField: 'new_value',
       }
 
       const result = await auth0UserService.updateUser('auth0|123456', updates)
@@ -306,7 +333,7 @@ describe('Auth0UserService', () => {
         createdAt: '2023-01-01T00:00:00Z',
         lastLogin: '2023-01-02T00:00:00Z',
         appMetadata: { roles: ['User'] },
-        userMetadata: { role: 'user', updated_field: 'new_value' }
+        userMetadata: { role: 'user', updated_field: 'new_value' },
       })
 
       expect(mockManagementClient.updateUser).toHaveBeenCalledWith(
@@ -315,19 +342,23 @@ describe('Auth0UserService', () => {
           email: 'updated@example.com',
           user_metadata: {
             fullName: 'Updated User',
-            customField: 'new_value'
+            customField: 'new_value',
           },
           app_metadata: {
-            roles: ['User']
-          }
-        }
+            roles: ['User'],
+          },
+        },
       )
     })
 
     it('should return null when update fails', async () => {
-      mockManagementClient.updateUser.mockRejectedValue(new Error('Update failed'))
+      mockManagementClient.updateUser.mockRejectedValue(
+        new Error('Update failed'),
+      )
 
-      const result = await auth0UserService.updateUser('auth0|123456', { fullName: 'Updated Name' })
+      const result = await auth0UserService.updateUser('auth0|123456', {
+        fullName: 'Updated Name',
+      })
 
       expect(result).toBeNull()
     })
@@ -337,20 +368,24 @@ describe('Auth0UserService', () => {
     it('should successfully change user password', async () => {
       mockManagementClient.updateUser.mockResolvedValue({})
 
-      await expect(auth0UserService.changePassword('auth0|123456', 'newpassword123'))
-        .resolves.not.toThrow()
+      await expect(
+        auth0UserService.changePassword('auth0|123456', 'newpassword123'),
+      ).resolves.not.toThrow()
 
       expect(mockManagementClient.updateUser).toHaveBeenCalledWith(
         { id: 'auth0|123456' },
-        { password: 'newpassword123' }
+        { password: 'newpassword123' },
       )
     })
 
     it('should throw error when password change fails', async () => {
-      mockManagementClient.updateUser.mockRejectedValue(new Error('Password policy violation'))
+      mockManagementClient.updateUser.mockRejectedValue(
+        new Error('Password policy violation'),
+      )
 
-      await expect(auth0UserService.changePassword('auth0|123456', 'weak'))
-        .rejects.toThrow('Failed to change password')
+      await expect(
+        auth0UserService.changePassword('auth0|123456', 'weak'),
+      ).rejects.toThrow('Failed to change password')
     })
   })
 
@@ -361,15 +396,18 @@ describe('Auth0UserService', () => {
       await auth0UserService.signOut('mock-refresh-token')
 
       expect(mockAuthenticationClient.revokeRefreshToken).toHaveBeenCalledWith({
-        token: 'mock-refresh-token'
+        token: 'mock-refresh-token',
       })
     })
 
     it('should not throw error when sign out fails', async () => {
-      mockAuthenticationClient.revokeRefreshToken.mockRejectedValue(new Error('Invalid token'))
+      mockAuthenticationClient.revokeRefreshToken.mockRejectedValue(
+        new Error('Invalid token'),
+      )
 
-      await expect(auth0UserService.signOut('invalid-token'))
-        .resolves.not.toThrow()
+      await expect(
+        auth0UserService.signOut('invalid-token'),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -378,7 +416,7 @@ describe('Auth0UserService', () => {
       const mockTokenResponse = {
         access_token: 'new-access-token',
         refresh_token: 'new-refresh-token',
-        expires_in: 3600
+        expires_in: 3600,
       }
 
       const mockUserProfile = {
@@ -390,7 +428,7 @@ describe('Auth0UserService', () => {
         created_at: '2023-01-01T00:00:00Z',
         last_login: '2023-01-02T00:00:00Z',
         app_metadata: { roles: ['User'] },
-        user_metadata: { role: 'user' }
+        user_metadata: { role: 'user' },
       }
 
       mockAuthenticationClient.refreshToken.mockResolvedValue(mockTokenResponse)
@@ -409,26 +447,29 @@ describe('Auth0UserService', () => {
           createdAt: '2023-01-01T00:00:00Z',
           lastLogin: '2023-01-02T00:00:00Z',
           appMetadata: { roles: ['User'] },
-          userMetadata: { role: 'user' }
+          userMetadata: { role: 'user' },
         },
         session: {
           accessToken: 'new-access-token',
           refreshToken: 'new-refresh-token',
-          expiresAt: expect.any(Date)
+          expiresAt: expect.any(Date),
         },
-        accessToken: 'new-access-token'
+        accessToken: 'new-access-token',
       })
 
       expect(mockAuthenticationClient.refreshToken).toHaveBeenCalledWith({
-        refresh_token: 'old-refresh-token'
+        refresh_token: 'old-refresh-token',
       })
     })
 
     it('should throw error when session refresh fails', async () => {
-      mockAuthenticationClient.refreshToken.mockRejectedValue(new Error('Invalid refresh token'))
+      mockAuthenticationClient.refreshToken.mockRejectedValue(
+        new Error('Invalid refresh token'),
+      )
 
-      await expect(auth0UserService.refreshSession('invalid-refresh-token'))
-        .rejects.toThrow('Failed to refresh session')
+      await expect(
+        auth0UserService.refreshSession('invalid-refresh-token'),
+      ).rejects.toThrow('Failed to refresh session')
     })
   })
 
@@ -437,7 +478,7 @@ describe('Auth0UserService', () => {
       const mockDecodedToken = {
         user_id: 'auth0|123456',
         email: 'test@example.com',
-        app_metadata: { roles: ['Admin'] }
+        app_metadata: { roles: ['Admin'] },
       }
 
       mockAuthenticationClient.getProfile.mockResolvedValue(mockDecodedToken)
@@ -447,42 +488,57 @@ describe('Auth0UserService', () => {
       expect(result).toEqual({
         userId: 'auth0|123456',
         email: 'test@example.com',
-        role: 'admin'
+        role: 'admin',
       })
     })
 
     it('should throw error for invalid token', async () => {
-      mockAuthenticationClient.getProfile.mockRejectedValue(new Error('Invalid token'))
+      mockAuthenticationClient.getProfile.mockRejectedValue(
+        new Error('Invalid token'),
+      )
 
-      await expect(auth0UserService.verifyAuthToken('invalid-jwt-token'))
-        .rejects.toThrow('Invalid token')
+      await expect(
+        auth0UserService.verifyAuthToken('invalid-jwt-token'),
+      ).rejects.toThrow('Invalid token')
     })
   })
 
   describe('createPasswordResetTicket', () => {
     it('should successfully create password reset ticket', async () => {
       const mockTicket = {
-        ticket: 'https://test-domain.auth0.com/lo/reset?ticket=abc123'
+        ticket: 'https://test-domain.auth0.com/lo/reset?ticket=abc123',
       }
 
-      mockManagementClient.createPasswordChangeTicket.mockResolvedValue(mockTicket)
+      mockManagementClient.createPasswordChangeTicket.mockResolvedValue(
+        mockTicket,
+      )
 
-      const result = await auth0UserService.createPasswordResetTicket('auth0|123456', 'https://example.com/reset-complete')
+      const result = await auth0UserService.createPasswordResetTicket(
+        'auth0|123456',
+        'https://example.com/reset-complete',
+      )
 
-      expect(result).toBe('https://test-domain.auth0.com/lo/reset?ticket=abc123')
+      expect(result).toBe(
+        'https://test-domain.auth0.com/lo/reset?ticket=abc123',
+      )
 
-      expect(mockManagementClient.createPasswordChangeTicket).toHaveBeenCalledWith({
+      expect(
+        mockManagementClient.createPasswordChangeTicket,
+      ).toHaveBeenCalledWith({
         user_id: 'auth0|123456',
         result_url: 'https://example.com/reset-complete',
-        ttl_sec: 3600
+        ttl_sec: 3600,
       })
     })
 
     it('should throw error when ticket creation fails', async () => {
-      mockManagementClient.createPasswordChangeTicket.mockRejectedValue(new Error('User not found'))
+      mockManagementClient.createPasswordChangeTicket.mockRejectedValue(
+        new Error('User not found'),
+      )
 
-      await expect(auth0UserService.createPasswordResetTicket('nonexistent-user'))
-        .rejects.toThrow('Failed to create password reset ticket')
+      await expect(
+        auth0UserService.createPasswordResetTicket('nonexistent-user'),
+      ).rejects.toThrow('Failed to create password reset ticket')
     })
   })
 
@@ -498,23 +554,23 @@ describe('Auth0UserService', () => {
         picture: null,
         created_at: '2023-01-01T00:00:00Z',
         app_metadata: { roles: ['Admin'] },
-        user_metadata: { role: 'admin', created_at: '2023-01-01T00:00:00Z' }
+        user_metadata: { role: 'admin', created_at: '2023-01-01T00:00:00Z' },
       }
 
       mockManagementClient.createUser.mockResolvedValue(mockAuth0User)
 
       // Test admin role mapping
-      auth0UserService.createUser('admin@example.com', 'password123', 'admin')
+      void auth0UserService.createUser('admin@example.com', 'password123', 'admin')
 
       expect(mockManagementClient.createUser).toHaveBeenCalledWith(
         expect.objectContaining({
           app_metadata: expect.objectContaining({
-            roles: ['Admin']
+            roles: ['Admin'],
           }),
           user_metadata: expect.objectContaining({
-            role: 'admin'
-          })
-        })
+            role: 'admin',
+          }),
+        }),
       )
     })
 
@@ -528,7 +584,7 @@ describe('Auth0UserService', () => {
         created_at: '2023-01-01T00:00:00Z',
         last_login: '2023-01-02T00:00:00Z',
         app_metadata: { roles: ['Therapist'] },
-        user_metadata: { role: 'therapist' }
+        user_metadata: { role: 'therapist' },
       }
 
       mockManagementClient.getUser.mockResolvedValue(mockAuth0User)

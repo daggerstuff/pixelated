@@ -1,7 +1,9 @@
-import { expect, test } from '@playwright/test'
+import crypto from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import crypto from 'node:crypto'
+
+import { expect, test } from '@playwright/test'
+
 import { FEATURES } from '../lib/browser/feature-detection'
 
 // Define types for compatibility results

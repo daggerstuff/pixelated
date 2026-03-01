@@ -4,13 +4,14 @@
  */
 
 import type { APIRoute } from 'astro'
-import { validateToken } from '@/lib/auth/auth0-jwt-service'
-import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AIRepository } from '@/lib/db/ai/repository'
+
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
 import { createAuditLog } from '@/lib/audit'
+import { validateToken } from '@/lib/auth/auth0-jwt-service'
+import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -66,7 +67,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -79,7 +80,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -108,7 +109,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -248,8 +249,8 @@ export const GET: APIRoute = async ({ request }) => {
         action: 'get_3d_emotion_visualization',
         pointCount: emotionPoints.length,
         sessionCount: response.metadata.sessionCount,
-        dominantEmotion: dominantEmotions[0]?.emotion || 'none'
-      }
+        dominantEmotion: dominantEmotions[0]?.emotion || 'none',
+      },
     )
 
     logger.info('Generated 3D emotion visualization data', {
@@ -278,7 +279,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -309,7 +310,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -322,7 +323,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -351,7 +352,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -382,8 +383,8 @@ export const POST: APIRoute = async ({ request }) => {
           newEmotionPoint.arousal,
           newEmotionPoint.dominance,
         ],
-        sessionId: newEmotionPoint.sessionId
-      }
+        sessionId: newEmotionPoint.sessionId,
+      },
     )
 
     // TODO: Save to database
@@ -423,7 +424,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(

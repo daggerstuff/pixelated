@@ -1,16 +1,18 @@
 ---
-title: "Code Splitting Best Practices"
-description: "Code Splitting Best Practices documentation"
+title: 'Code Splitting Best Practices'
+description: 'Code Splitting Best Practices documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Code Splitting Best Practices
 
-This guide outlines our approach to code splitting in the project, which helps reduce initial load times and improves performance by loading code only when needed.
+This guide outlines our approach to code splitting in the project, which helps
+reduce initial load times and improves performance by loading code only when
+needed.
 
 ## Table of Contents
 
@@ -26,10 +28,13 @@ This guide outlines our approach to code splitting in the project, which helps r
 
 ## Introduction
 
-Code splitting is a technique that breaks down our application code into smaller chunks that can be loaded on demand or in parallel. This improves:
+Code splitting is a technique that breaks down our application code into smaller
+chunks that can be loaded on demand or in parallel. This improves:
 
-- **Initial Load Time**: Users download only the code necessary for the current view
-- **Resource Usage**: Reduces memory usage by loading components only when needed
+- **Initial Load Time**: Users download only the code necessary for the current
+  view
+- **Resource Usage**: Reduces memory usage by loading components only when
+  needed
 - **Perceived Performance**: Main thread is less blocked during initial render
 
 ## When to Use Code Splitting
@@ -37,14 +42,16 @@ Code splitting is a technique that breaks down our application code into smaller
 Code splitting is most effective for:
 
 - **Large Components**: Components over 20KB in size
-- **Conditionally Rendered Components**: UI that isn't immediately visible (tabs, modals, etc.)
+- **Conditionally Rendered Components**: UI that isn't immediately visible
+  (tabs, modals, etc.)
 - **Route-Based Splitting**: Different pages/routes
 - **Feature-Based Splitting**: Optional features that aren't needed by all users
 
 ### Good Candidates in Our Project
 
 1. **Analytics Dashboards**: Large, data-visualization-heavy components
-2. **Media Processing Components**: Components that handle image/video processing
+2. **Media Processing Components**: Components that handle image/video
+   processing
 3. **Complex Form Systems**: Multi-step forms, specialized inputs
 4. **Rich Text Editors**: WYSIWYG editors and formatting tools
 5. **Interactive Chat Interfaces**: Real-time messaging and complex UI
@@ -72,7 +79,8 @@ function MyComponent() {
 
 ### Astro Dynamic Imports
 
-For Astro components with client interactive components, use both `client:only` and dynamic imports:
+For Astro components with client interactive components, use both `client:only`
+and dynamic imports:
 
 ```astro
 ---
@@ -107,7 +115,8 @@ For Astro components with client interactive components, use both `client:only` 
 </script>
 ```
 
-Alternatively, for simpler cases, use Astro's client directives with partial hydration:
+Alternatively, for simpler cases, use Astro's client directives with partial
+hydration:
 
 ```astro
 ---
@@ -134,14 +143,17 @@ async function handleAction() {
 
 ## Performance Considerations
 
-1. **Loading States**: Always provide meaningful loading states while chunks load
+1. **Loading States**: Always provide meaningful loading states while chunks
+   load
 2. **Prefetching**: Consider prefetching important chunks before they're needed
    ```js
    // Prefetch a component when hovering over a button that will show it
    const prefetchComponent = () => import('./LargeComponent')
    ```
-3. **Chunk Size Monitoring**: Track chunk sizes in build output to identify optimization opportunities
-4. **Bundle Analysis**: Periodically run bundle analysis tools to identify bloated dependencies
+3. **Chunk Size Monitoring**: Track chunk sizes in build output to identify
+   optimization opportunities
+4. **Bundle Analysis**: Periodically run bundle analysis tools to identify
+   bloated dependencies
 
 ## Testing Split Components
 
@@ -161,16 +173,18 @@ import { vi } from 'vitest'
 
 // Mock the lazy-loaded component
 vi.mock('./HeavyComponent', () => ({
-  default: () => <div data-testid="heavy-component">Heavy Component Content</div>
+  default: () => (
+    <div data-testid='heavy-component'>Heavy Component Content</div>
+  ),
 }))
 
 const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
 test('renders lazy component with loading state', async () => {
   render(
-    <Suspense fallback={<div data-testid="loading">Loading...</div>}>
+    <Suspense fallback={<div data-testid='loading'>Loading...</div>}>
       <HeavyComponent />
-    </Suspense>
+    </Suspense>,
   )
 
   // Should show loading state first
@@ -186,7 +200,8 @@ test('renders lazy component with loading state', async () => {
 
 ### AnalyticsDashboardReact
 
-We lazy load the analytics dashboard since it's data-visualization heavy and not needed immediately:
+We lazy load the analytics dashboard since it's data-visualization heavy and not
+needed immediately:
 
 ```tsx
 // Before:
@@ -197,21 +212,24 @@ import { lazy, Suspense } from 'react'
 const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
 
 // Usage
-{showAnalytics && (
-  <Suspense fallback={<LoadingAnalytics />}>
-    <AnalyticsDashboardReact
-      messages={messages}
-      securityLevel={securityLevel}
-      encryptionEnabled={encryptionEnabled}
-      scenario={scenarioName}
-    />
-  </Suspense>
-)}
+{
+  showAnalytics && (
+    <Suspense fallback={<LoadingAnalytics />}>
+      <AnalyticsDashboardReact
+        messages={messages}
+        securityLevel={securityLevel}
+        encryptionEnabled={encryptionEnabled}
+        scenario={scenarioName}
+      />
+    </Suspense>
+  )
+}
 ```
 
 ### MentalHealthChatDemo
 
-For the mental health chat demo, we use Astro's dynamic imports with client:only:
+For the mental health chat demo, we use Astro's dynamic imports with
+client:only:
 
 ```astro
 ---
@@ -237,11 +255,16 @@ For the mental health chat demo, we use Astro's dynamic imports with client:only
 
 ## Best Practices Summary
 
-1. **Be Selective**: Only split components that provide meaningful performance benefits
-2. **Provide Good Loading States**: Always show meaningful loading UI during fetch
+1. **Be Selective**: Only split components that provide meaningful performance
+   benefits
+2. **Provide Good Loading States**: Always show meaningful loading UI during
+   fetch
 3. **Error Handling**: Handle loading failures gracefully
-4. **Measure Impact**: Verify performance improvements with tools like Lighthouse
+4. **Measure Impact**: Verify performance improvements with tools like
+   Lighthouse
 5. **Consistent Approach**: Follow the established patterns in this guide
-6. **Document Split Points**: Add comments explaining why a component is code-split
+6. **Document Split Points**: Add comments explaining why a component is
+   code-split
 
-By following these guidelines, we can maintain a fast, efficient application while keeping our codebase maintainable.
+By following these guidelines, we can maintain a fast, efficient application
+while keeping our codebase maintainable.

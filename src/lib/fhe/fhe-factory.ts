@@ -7,6 +7,11 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { mockFHEService } from './mock/mock-fhe-service'
+import { SealOperations } from './seal-operations'
+import { SealScheme } from './seal-scheme'
+import { SealService } from './seal-service'
+import { SealSchemeType } from './seal-types'
 import type { FHEOperation } from './types'
 import type {
   FHEConfig,
@@ -16,11 +21,6 @@ import type {
   FHEKeys,
   TenantConfig,
 } from './types'
-import { mockFHEService } from './mock/mock-fhe-service'
-import { SealService } from './seal-service'
-import { SealScheme } from './seal-scheme'
-import { SealSchemeType } from './seal-types'
-import { SealOperations } from './seal-operations'
 
 // Add version to mock scheme
 if (
@@ -121,7 +121,7 @@ const sealFHEService: FHEService = {
   async encrypt<T>(
     data: T,
     _options?: unknown,
-  ): Promise<EncryptedData<unknown>> {
+  ): Promise<EncryptedData> {
     try {
       if (
         !Array.isArray(data) ||
@@ -138,7 +138,7 @@ const sealFHEService: FHEService = {
   },
 
   async decrypt<T>(
-    encryptedData: EncryptedData<unknown>,
+    encryptedData: EncryptedData,
     _options?: unknown,
   ): Promise<T> {
     try {
@@ -159,9 +159,9 @@ const sealFHEService: FHEService = {
   },
 
   async add(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>> {
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData> {
     try {
       // Handle scalar (number) addition
       if (typeof b === 'number') {
@@ -193,9 +193,9 @@ const sealFHEService: FHEService = {
   },
 
   async subtract(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>> {
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData> {
     try {
       // Handle scalar (number) subtraction
       if (typeof b === 'number') {
@@ -227,9 +227,9 @@ const sealFHEService: FHEService = {
   },
 
   async multiply(
-    a: EncryptedData<unknown>,
-    b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>> {
+    a: EncryptedData,
+    b: EncryptedData | number,
+  ): Promise<EncryptedData> {
     try {
       // Handle scalar (number) multiplication
       if (typeof b === 'number') {
@@ -260,7 +260,7 @@ const sealFHEService: FHEService = {
     }
   },
 
-  async negate(value: EncryptedData<unknown>): Promise<EncryptedData<unknown>> {
+  async negate(value: EncryptedData): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
@@ -284,9 +284,9 @@ const sealFHEService: FHEService = {
   },
 
   async applyPolynomial(
-    value: EncryptedData<unknown>,
+    value: EncryptedData,
     coefficients: Polynomial,
-  ): Promise<EncryptedData<unknown>> {
+  ): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
@@ -310,9 +310,9 @@ const sealFHEService: FHEService = {
   },
 
   async rotate(
-    vector: EncryptedData<unknown>,
+    vector: EncryptedData,
     steps: number,
-  ): Promise<EncryptedData<unknown>> {
+  ): Promise<EncryptedData> {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
@@ -342,7 +342,7 @@ const sealFHEService: FHEService = {
 function createEncryptedData(
   serializedCiphertext: string,
   originalData?: number[],
-): EncryptedData<unknown> {
+): EncryptedData {
   return {
     id: `seal-encrypted-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`,
     data: serializedCiphertext,
@@ -534,7 +534,7 @@ export async function getTenantFHEService(
     encrypt: async <T>(
       data: T,
       options?: unknown,
-    ): Promise<EncryptedData<unknown>> => {
+    ): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
         throw new Error(`Rate limit exceeded for tenant ${tenantId}`)
@@ -555,7 +555,7 @@ export async function getTenantFHEService(
 
     // Override decrypt to verify tenant ownership
     decrypt: async <T>(
-      encryptedData: EncryptedData<unknown>,
+      encryptedData: EncryptedData,
       options?: unknown,
     ): Promise<T> => {
       // Verify tenant ownership if metadata contains tenant ID

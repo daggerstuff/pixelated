@@ -6,8 +6,8 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { EmotionAnalysis } from '../emotions/types'
 import { TherapeuticTechnique } from '../../simulator/types'
+import type { EmotionAnalysis } from '../emotions/types'
 
 const logger = createBuildSafeLogger('EnhancedTechniqueClassificationService')
 
@@ -128,7 +128,7 @@ export class EnhancedTechniqueClassificationService {
   private constructor() {
     logger.info('EnhancedTechniqueClassificationService initialized')
     this.initializeEffectivenessDatabase()
-    this.trainAdvancedClassificationModel()
+    void this.trainAdvancedClassificationModel()
   }
 
   public static getInstance(): EnhancedTechniqueClassificationService {
@@ -270,7 +270,9 @@ export class EnhancedTechniqueClassificationService {
       return tracking
     } catch (error: unknown) {
       logger.error('Error tracking session progress', { error })
-      throw new Error(`Failed to track session progress: ${error}`, { cause: error })
+      throw new Error(`Failed to track session progress: ${error}`, {
+        cause: error,
+      })
     }
   }
 

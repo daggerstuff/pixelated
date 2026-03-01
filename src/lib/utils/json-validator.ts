@@ -175,7 +175,7 @@ export function validateAnalysisResults(
       return { success: false, error: `Risk factor ${i} has invalid structure` }
     }
 
-    if (!['High', 'Moderate', 'Low'].includes(r['severity'] as string)) {
+    if (!['High', 'Moderate', 'Low'].includes(r['severity'])) {
       return { success: false, error: `Risk factor ${i} has invalid severity` }
     }
   }

@@ -139,12 +139,12 @@ export class Logger {
     // Sanitize error object properties if it exists
     const processedError = errorObject
       ? {
-        name: errorObject.name, // Typically safe
-        message: this.sanitizeString(errorObject.message),
-        stack: errorObject.stack
-          ? this.sanitizeString(errorObject.stack)
-          : undefined,
-      }
+          name: errorObject.name, // Typically safe
+          message: this.sanitizeString(errorObject.message),
+          stack: errorObject.stack
+            ? this.sanitizeString(errorObject.stack)
+            : undefined,
+        }
       : undefined
 
     const errorMetadata = {
@@ -190,7 +190,7 @@ export class Logger {
             typeof data[key] === 'string'
           ) {
             sanitizedObject[key] = this.sanitizeString(
-              data[key] as string,
+              data[key],
               currentPatterns,
               `[SANITIZED_${key.toUpperCase()}]`,
             )

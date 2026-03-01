@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import type { Swiper as SwiperType } from 'swiper'
 import {
   Navigation,
   Pagination,
@@ -10,7 +10,7 @@ import {
   Mousewheel,
   A11y,
 } from 'swiper/modules'
-import type { Swiper as SwiperType } from 'swiper'
+import { Swiper, SwiperSlide } from 'swiper/react'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -82,10 +82,10 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         title: 'Therapeutic Journey',
         description: 'Explore your emotional landscape with guided sessions',
         content: (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-purple-600 text-white p-8 rounded-lg">
-            <div className="text-6xl mb-4">🧠</div>
-            <h3 className="text-2xl font-bold mb-2">Mindfulness</h3>
-            <p className="text-center opacity-90">
+          <div className='from-blue-500 to-purple-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
+            <div className='mb-4 text-6xl'>🧠</div>
+            <h3 className='mb-2 text-2xl font-bold'>Mindfulness</h3>
+            <p className='text-center opacity-90'>
               Begin your healing journey with mindful awareness
             </p>
           </div>
@@ -96,10 +96,10 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         title: 'Progress Tracking',
         description: 'Monitor your emotional growth over time',
         content: (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-teal-600 text-white p-8 rounded-lg">
-            <div className="text-6xl mb-4">📈</div>
-            <h3 className="text-2xl font-bold mb-2">Analytics</h3>
-            <p className="text-center opacity-90">
+          <div className='from-green-500 to-teal-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
+            <div className='mb-4 text-6xl'>📈</div>
+            <h3 className='mb-2 text-2xl font-bold'>Analytics</h3>
+            <p className='text-center opacity-90'>
               Track your progress with detailed insights
             </p>
           </div>
@@ -110,10 +110,10 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         title: 'Community Support',
         description: 'Connect with others on similar journeys',
         content: (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-pink-500 to-rose-600 text-white p-8 rounded-lg">
-            <div className="text-6xl mb-4">🤝</div>
-            <h3 className="text-2xl font-bold mb-2">Community</h3>
-            <p className="text-center opacity-90">
+          <div className='from-pink-500 to-rose-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
+            <div className='mb-4 text-6xl'>🤝</div>
+            <h3 className='mb-2 text-2xl font-bold'>Community</h3>
+            <p className='text-center opacity-90'>
               Find support in our caring community
             </p>
           </div>
@@ -124,10 +124,10 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         title: 'Personalized Tools',
         description: 'AI-powered tools tailored to your needs',
         content: (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-8 rounded-lg">
-            <div className="text-6xl mb-4">🎯</div>
-            <h3 className="text-2xl font-bold mb-2">AI Tools</h3>
-            <p className="text-center opacity-90">
+          <div className='from-orange-500 to-red-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
+            <div className='mb-4 text-6xl'>🎯</div>
+            <h3 className='mb-2 text-2xl font-bold'>AI Tools</h3>
+            <p className='text-center opacity-90'>
               Personalized interventions powered by AI
             </p>
           </div>
@@ -138,10 +138,10 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         title: 'Secure & Private',
         description: 'Your data is protected with enterprise-grade security',
         content: (
-          <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-8 rounded-lg">
-            <div className="text-6xl mb-4">🔒</div>
-            <h3 className="text-2xl font-bold mb-2">Security</h3>
-            <p className="text-center opacity-90">
+          <div className='from-indigo-500 to-blue-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
+            <div className='mb-4 text-6xl'>🔒</div>
+            <h3 className='mb-2 text-2xl font-bold'>Security</h3>
+            <p className='text-center opacity-90'>
               Your privacy is our top priority
             </p>
           </div>
@@ -253,44 +253,44 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
   if (!isReady) {
     return (
       <div
-        className={`flex items-center justify-center bg-gray-100 rounded-lg ${className}`}
+        className={`bg-gray-100 flex items-center justify-center rounded-lg ${className}`}
         style={{ height }}
       >
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600">Loading carousel...</span>
+        <div className='border-blue-500 h-8 w-8 animate-spin rounded-full border-b-2'></div>
+        <span className='text-gray-600 ml-2'>Loading carousel...</span>
       </div>
     )
   }
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
-      <Swiper {...swiperProps} className="w-full h-full">
+      <Swiper {...swiperProps} className='h-full w-full'>
         {carouselItems.map((item) => (
           <SwiperSlide
             key={item.id}
-            className="flex items-center justify-center"
+            className='flex items-center justify-center'
           >
             {item.content ? (
               typeof item.content === 'string' ? (
-                <div className="flex flex-col items-center justify-center h-full p-4 text-center">
+                <div className='flex h-full flex-col items-center justify-center p-4 text-center'>
                   {item.image && (
                     <img
                       src={item.image}
                       alt={item.title || 'Carousel item'}
-                      className="w-full h-48 object-cover rounded-lg mb-4"
+                      className='mb-4 h-48 w-full rounded-lg object-cover'
                     />
                   )}
                   {item.title && (
-                    <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                    <h3 className='mb-2 text-xl font-bold'>{item.title}</h3>
                   )}
                   {item.description && (
-                    <p className="text-gray-600 mb-4">{item.description}</p>
+                    <p className='text-gray-600 mb-4'>{item.description}</p>
                   )}
-                  <div className="text-lg">{item.content}</div>
+                  <div className='text-lg'>{item.content}</div>
                   {item.link && (
                     <a
                       href={item.link}
-                      className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      className='bg-blue-500 text-white hover:bg-blue-600 mt-4 rounded px-4 py-2 transition-colors'
                     >
                       Learn More
                     </a>
@@ -301,14 +301,14 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
               )
             ) : (
               <div
-                className={`flex flex-col items-center justify-center h-full bg-gradient-to-br ${item.gradient || 'from-gray-500 to-gray-600'} text-white p-6 rounded-lg`}
+                className={`flex h-full flex-col items-center justify-center bg-gradient-to-br ${item.gradient || 'from-gray-500 to-gray-600'} text-white rounded-lg p-6`}
               >
-                {item.icon && <div className="text-5xl mb-4">{item.icon}</div>}
+                {item.icon && <div className='mb-4 text-5xl'>{item.icon}</div>}
                 {item.title && (
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                  <h3 className='mb-2 text-xl font-bold'>{item.title}</h3>
                 )}
                 {item.subtitle && (
-                  <p className="text-center text-sm opacity-90">
+                  <p className='text-center text-sm opacity-90'>
                     {item.subtitle}
                   </p>
                 )}
@@ -321,13 +321,13 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
       {/* Custom Navigation Buttons */}
       {navigation && (
         <>
-          <div className="swiper-button-prev !text-white !bg-black !bg-opacity-50 !rounded-full !w-10 !h-10 !mt-0 !top-1/2 !left-4 hover:!bg-opacity-70 transition-all duration-200"></div>
-          <div className="swiper-button-next !text-white !bg-black !bg-opacity-50 !rounded-full !w-10 !h-10 !mt-0 !top-1/2 !right-4 hover:!bg-opacity-70 transition-all duration-200"></div>
+          <div className='swiper-button-prev !text-white !bg-black !left-4 !top-1/2 !mt-0 !h-10 !w-10 !rounded-full !bg-opacity-50 transition-all duration-200 hover:!bg-opacity-70'></div>
+          <div className='swiper-button-next !text-white !bg-black !right-4 !top-1/2 !mt-0 !h-10 !w-10 !rounded-full !bg-opacity-50 transition-all duration-200 hover:!bg-opacity-70'></div>
         </>
       )}
 
       {/* Accessibility announcements */}
-      <div className="sr-only" aria-live="polite" id="carousel-status">
+      <div className='sr-only' aria-live='polite' id='carousel-status'>
         Carousel with {carouselItems.length} items
       </div>
     </div>

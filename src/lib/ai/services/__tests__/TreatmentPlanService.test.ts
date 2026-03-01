@@ -1,4 +1,3 @@
-import { TreatmentPlanService } from '../TreatmentPlanService'
 import type { PatientProfile, ConversationMessage } from '../../models/patient'
 import type {
   CognitiveModel,
@@ -8,6 +7,7 @@ import type {
   DemographicInfo,
   DiagnosisInfo,
 } from '../../types/CognitiveModel'
+import { TreatmentPlanService } from '../TreatmentPlanService'
 
 describe('TreatmentPlanService', () => {
   let service: TreatmentPlanService

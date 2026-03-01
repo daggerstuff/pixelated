@@ -28,12 +28,7 @@ export interface AIServiceResponse {
 // Avoid using an empty interface extension which triggers the no-empty-object-type rule.
 // Use a type alias to explicitly represent the same shape as AIServiceOptions.
 export type AIStreamOptions = AIServiceOptions
-import {
-  ObjectiveDefinition,
-  AlignmentContext,
-  ContextType,
-  CORE_MENTAL_HEALTH_OBJECTIVES,
-} from '../core/objectives'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   ObjectiveEvaluationResult,
   AlignmentEvaluationResult,
@@ -43,7 +38,12 @@ import {
   ObjectiveMetricsEngine,
   AlignmentMetrics,
 } from '../core/objective-metrics'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import {
+  ObjectiveDefinition,
+  AlignmentContext,
+  ContextType,
+  CORE_MENTAL_HEALTH_OBJECTIVES,
+} from '../core/objectives'
 
 const logger = createBuildSafeLogger('metaaligner-api')
 

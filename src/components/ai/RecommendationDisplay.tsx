@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 
 interface RecommendationDisplayProps {
@@ -44,7 +45,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 }) => {
   if (!recommendations || recommendations.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className='text-gray-500 py-8 text-center'>
         No recommendations available
       </div>
     )
@@ -111,8 +112,8 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
+    <div className='space-y-6'>
+      <h2 className='text-gray-900 mb-4 text-2xl font-bold'>
         Treatment Recommendations ({recommendations.length})
       </h2>
 
@@ -126,21 +127,21 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
               rec.id ||
               `rec-${rec.title || 'untitled'}-${rec.metadata?.generatedAt || Date.now()}`
             }
-            className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
+            className='bg-white border-gray-200 rounded-lg border p-6 shadow-md'
           >
             {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className='mb-4 flex items-start justify-between'>
+              <div className='flex-1'>
+                <h3 className='text-gray-900 mb-2 text-xl font-semibold'>
                   {rec.title || 'Treatment Recommendation'}
                 </h3>
                 {rec.description && (
-                  <p className="text-gray-600 mb-3">{rec.description}</p>
+                  <p className='text-gray-600 mb-3'>{rec.description}</p>
                 )}
               </div>
-              <div className="flex flex-col items-end gap-2">
+              <div className='flex flex-col items-end gap-2'>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium border ${getPriorityColor(rec.priority)}`}
+                  className={`rounded-full border px-3 py-1 text-sm font-medium ${getPriorityColor(rec.priority)}`}
                 >
                   {rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}{' '}
                   Priority
@@ -157,15 +158,15 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Indications */}
             {rec.indications && rec.indications.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Target Indications:
                 </h4>
-                <div className="flex flex-wrap gap-2">
+                <div className='flex flex-wrap gap-2'>
                   {rec.indications.map((indication: string) => (
                     <span
                       key={`indication-${indication}`}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded"
+                      className='bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm'
                     >
                       {indication}
                     </span>
@@ -176,25 +177,25 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Treatment Details */}
             {rec.treatment && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Treatment Details:
                 </h4>
-                <div className="bg-gray-50 rounded p-3">
+                <div className='bg-gray-50 rounded p-3'>
                   {typeof rec.treatment === 'string' ? (
-                    <p className="text-gray-800">{rec.treatment}</p>
+                    <p className='text-gray-800'>{rec.treatment}</p>
                   ) : isTreatmentDetails(rec.treatment) ? (
-                    <div className="space-y-2">
+                    <div className='space-y-2'>
                       {rec.treatment['approach'] && (
                         <div>
-                          <span className="font-medium">Approach: </span>
+                          <span className='font-medium'>Approach: </span>
                           <span>{rec.treatment['approach']}</span>
                         </div>
                       )}
                       {rec.treatment['techniques'] &&
                         rec.treatment['techniques'].length > 0 && (
                           <div>
-                            <span className="font-medium">Techniques: </span>
+                            <span className='font-medium'>Techniques: </span>
                             <span>
                               {rec.treatment['techniques'].join(', ')}
                             </span>
@@ -202,19 +203,19 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                         )}
                       {rec.treatment['duration'] && (
                         <div>
-                          <span className="font-medium">Duration: </span>
+                          <span className='font-medium'>Duration: </span>
                           <span>{rec.treatment['duration']}</span>
                         </div>
                       )}
                       {rec.treatment['frequency'] && (
                         <div>
-                          <span className="font-medium">Frequency: </span>
+                          <span className='font-medium'>Frequency: </span>
                           <span>{rec.treatment['frequency']}</span>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-800">Treatment details available</p>
+                    <p className='text-gray-800'>Treatment details available</p>
                   )}
                 </div>
               </div>
@@ -222,21 +223,21 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Rationale */}
             {rec.rationale && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Rationale:
                 </h4>
-                <p className="text-gray-600 text-sm">{rec.rationale}</p>
+                <p className='text-gray-600 text-sm'>{rec.rationale}</p>
               </div>
             )}
 
             {/* Evidence */}
             {rec.evidence && rec.evidence.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Supporting Evidence:
                 </h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                <ul className='text-gray-600 list-inside list-disc space-y-1 text-sm'>
                   {rec.evidence.map((evidence: string) => (
                     <li key={`evidence-${evidence.slice(0, 20)}`}>
                       {evidence}
@@ -248,21 +249,21 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Personalization */}
             {rec.personalization && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Personalization Notes:
                 </h4>
-                <div className="bg-blue-50 rounded p-3">
+                <div className='bg-blue-50 rounded p-3'>
                   {typeof rec.personalization === 'string' ? (
-                    <p className="text-blue-800 text-sm">
+                    <p className='text-blue-800 text-sm'>
                       {rec.personalization}
                     </p>
                   ) : isPersonalizationDetails(rec.personalization) ? (
-                    <div className="space-y-1 text-sm text-blue-800">
+                    <div className='text-blue-800 space-y-1 text-sm'>
                       {rec.personalization['factors'] &&
                         rec.personalization['factors'].length > 0 && (
                           <div>
-                            <span className="font-medium">Factors: </span>
+                            <span className='font-medium'>Factors: </span>
                             <span>
                               {rec.personalization['factors'].join(', ')}
                             </span>
@@ -270,13 +271,13 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                         )}
                       {rec.personalization['adaptations'] && (
                         <div>
-                          <span className="font-medium">Adaptations: </span>
+                          <span className='font-medium'>Adaptations: </span>
                           <span>{rec.personalization['adaptations']}</span>
                         </div>
                       )}
                     </div>
                   ) : (
-                    <p className="text-blue-800 text-sm">
+                    <p className='text-blue-800 text-sm'>
                       Personalization details available
                     </p>
                   )}
@@ -286,21 +287,21 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Alternatives */}
             {rec.alternatives && rec.alternatives.length > 0 && (
-              <div className="mb-4">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">
+              <div className='mb-4'>
+                <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                   Alternative Approaches:
                 </h4>
-                <div className="space-y-2">
+                <div className='space-y-2'>
                   {rec.alternatives.map((alt) => (
                     <div
                       key={`alt-${alt.name}`}
-                      className="bg-gray-50 rounded p-2 text-sm"
+                      className='bg-gray-50 rounded p-2 text-sm'
                     >
-                      <div className="font-medium text-gray-800">
+                      <div className='text-gray-800 font-medium'>
                         {alt.name}
                       </div>
                       {alt.description && (
-                        <div className="text-gray-600 mt-1">
+                        <div className='text-gray-600 mt-1'>
                           {alt.description}
                         </div>
                       )}
@@ -320,33 +321,33 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
             {/* Media Recommendations */}
             {rec.mediaRecommendations &&
               rec.mediaRecommendations.length > 0 && (
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                <div className='mb-4'>
+                  <h4 className='text-gray-700 mb-2 text-sm font-medium'>
                     Recommended Resources:
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className='grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3'>
                     {rec.mediaRecommendations.map((media) => (
                       <div
                         key={`media-${media.title}-${media.type}`}
-                        className="bg-gray-50 rounded p-3 text-sm"
+                        className='bg-gray-50 rounded p-3 text-sm'
                       >
-                        <div className="font-medium text-gray-800">
+                        <div className='text-gray-800 font-medium'>
                           {media.title}
                         </div>
-                        <div className="text-gray-600 mt-1 capitalize">
+                        <div className='text-gray-600 mt-1 capitalize'>
                           {media.type}
                         </div>
                         {media.description && (
-                          <div className="text-gray-600 mt-1 text-xs">
+                          <div className='text-gray-600 mt-1 text-xs'>
                             {media.description}
                           </div>
                         )}
                         {media.url && (
                           <a
                             href={media.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 text-xs mt-1 inline-block"
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-blue-600 hover:text-blue-800 mt-1 inline-block text-xs'
                           >
                             View Resource →
                           </a>
@@ -359,7 +360,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
             {/* Timestamp */}
             {rec.timestamp && (
-              <div className="text-xs text-gray-500 border-t pt-3 mt-4">
+              <div className='text-gray-500 mt-4 border-t pt-3 text-xs'>
                 Generated: {new Date(rec.timestamp).toLocaleString()}
               </div>
             )}

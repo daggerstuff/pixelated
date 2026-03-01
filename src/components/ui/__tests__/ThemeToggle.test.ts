@@ -1,5 +1,7 @@
 import { fireEvent } from '@testing-library/dom'
+
 import { renderAstro } from '@/test/utils/astro'
+
 import ThemeToggle from '../ThemeToggle.astro'
 
 describe('ThemeToggle', () => {

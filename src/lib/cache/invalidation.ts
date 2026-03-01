@@ -1,4 +1,5 @@
 import type { Redis } from 'ioredis'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { RedisService } from '../services/redis'
 

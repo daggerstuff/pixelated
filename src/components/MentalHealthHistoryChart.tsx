@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+
 // Use lazy-loaded chart components to reduce bundle size
 import {
   LineChart,
@@ -93,27 +94,27 @@ export function MentalHealthHistoryChart({
 
   if (!hasData) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-muted/20 rounded-lg border-2 border-dashed border-muted-foreground/20">
-        <div className="text-center">
-          <div className="text-muted-foreground mb-2">
+      <div className='bg-muted/20 border-muted-foreground/20 flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed'>
+        <div className='text-center'>
+          <div className='text-muted-foreground mb-2'>
             <svg
-              className="w-8 h-8 mx-auto mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              className='mx-auto mb-2 h-8 w-8'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={1.5}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'
               />
             </svg>
           </div>
-          <p className="text-sm text-muted-foreground font-medium">
+          <p className='text-muted-foreground text-sm font-medium'>
             No Analysis Data
           </p>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className='text-muted-foreground mt-1 text-xs'>
             Charts will appear after message analysis
           </p>
         </div>
@@ -122,22 +123,22 @@ export function MentalHealthHistoryChart({
   }
 
   return (
-    <div className="w-full h-full space-y-4">
+    <div className='h-full w-full space-y-4'>
       {/* Current State Radar Chart */}
-      <div className="h-48">
-        <h4 className="text-sm font-medium mb-2 text-muted-foreground">
+      <div className='h-48'>
+        <h4 className='text-muted-foreground mb-2 text-sm font-medium'>
           Current Mental Health Profile
         </h4>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width='100%' height='100%'>
           <RadarChart data={latestScores}>
             <PolarGrid
-              gridType="polygon"
-              className="stroke-muted-foreground/20"
+              gridType='polygon'
+              className='stroke-muted-foreground/20'
             />
             <PolarAngleAxis
-              dataKey="metric"
+              dataKey='metric'
               tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              className="text-xs"
+              className='text-xs'
             />
             <PolarRadiusAxis
               angle={90}
@@ -146,10 +147,10 @@ export function MentalHealthHistoryChart({
               tickCount={4}
             />
             <Radar
-              name="Score"
-              dataKey="score"
-              stroke="hsl(var(--primary))"
-              fill="hsl(var(--primary))"
+              name='Score'
+              dataKey='score'
+              stroke='hsl(var(--primary))'
+              fill='hsl(var(--primary))'
               fillOpacity={0.1}
               strokeWidth={2}
             />
@@ -168,18 +169,18 @@ export function MentalHealthHistoryChart({
 
       {/* Trend Lines */}
       {timeSeriesData.length > 1 && (
-        <div className="h-32">
-          <h4 className="text-sm font-medium mb-2 text-muted-foreground">
+        <div className='h-32'>
+          <h4 className='text-muted-foreground mb-2 text-sm font-medium'>
             Trend Analysis
           </h4>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width='100%' height='100%'>
             <LineChart data={timeSeriesData}>
               <CartesianGrid
-                strokeDasharray="3 3"
-                className="stroke-muted-foreground/10"
+                strokeDasharray='3 3'
+                className='stroke-muted-foreground/10'
               />
               <XAxis
-                dataKey="session"
+                dataKey='session'
                 tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{
                   stroke: 'hsl(var(--muted-foreground))',
@@ -211,7 +212,7 @@ export function MentalHealthHistoryChart({
               {Object.entries(SCORE_COLORS).map(([key, color]) => (
                 <Line
                   key={key}
-                  type="monotone"
+                  type='monotone'
                   dataKey={key}
                   stroke={color}
                   strokeWidth={1.5}

@@ -9,24 +9,28 @@ share: true
 icon: 'image'
 ---
 
-
 ## Image
 
 ### Using Markdown
 
-The [markdown syntax](https://www.markdownguide.org/basic-syntax/#images) lets you add images using the following code
+The [markdown syntax](https://www.markdownguide.org/basic-syntax/#images) lets
+you add images using the following code
 
 ```md
 ![title](/path/image.jpg)
 ```
 
-Note that the image file size must be less than 5MB. Otherwise, we recommend hosting on a service like [Cloudinary](https://cloudinary.com/) or [S3](https://aws.amazon.com/s3/). You can then use that URL and embed.
+Note that the image file size must be less than 5MB. Otherwise, we recommend
+hosting on a service like [Cloudinary](https://cloudinary.com/) or
+[S3](https://aws.amazon.com/s3/). You can then use that URL and embed.
 
 ### Using Embeds
 
-To get more customizability with images, you can also use [embeds](/writing-content/embed) to add images
+To get more customizability with images, you can also use
+[embeds](/writing-content/embed) to add images
 
 ```html
+
 ```
 
 ## Embeds and HTML elements
@@ -42,14 +46,16 @@ To get more customizability with images, you can also use [embeds](/writing-cont
   style={{ width: '100%', borderRadius: '0.5rem' }}
 ></iframe>
 
-
-
-Mintlify supports [HTML tags in Markdown](https://www.markdownguide.org/basic-syntax/#html). This is helpful if you prefer HTML tags to Markdown syntax, and lets you create documentation with infinite flexibility.
-
+Mintlify supports
+[HTML tags in Markdown](https://www.markdownguide.org/basic-syntax/#html). This
+is helpful if you prefer HTML tags to Markdown syntax, and lets you create
+documentation with infinite flexibility.
 
 ### iFrames
 
-Loads another HTML page within the document. Most commonly used for embedding videos.
+Loads another HTML page within the document. Most commonly used for embedding
+videos.
 
 ```html
+
 ```

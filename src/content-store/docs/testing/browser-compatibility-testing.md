@@ -1,16 +1,17 @@
 ---
-title: "Browser Compatibility Testing Guide"
-description: "Browser Compatibility Testing Guide documentation"
+title: 'Browser Compatibility Testing Guide'
+description: 'Browser Compatibility Testing Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "testing"]
+author: 'Pixelated Team'
+tags: ['documentation', 'testing']
 draft: false
 toc: true
 ---
 
 # Browser Compatibility Testing Guide
 
-This guide outlines the process for testing our AI components across different browsers to ensure consistent functionality and accessibility.
+This guide outlines the process for testing our AI components across different
+browsers to ensure consistent functionality and accessibility.
 
 ## Testing Goals
 
@@ -38,15 +39,18 @@ We aim to support the following browsers:
 
 ### 1. Setup Testing Environment
 
-1. Access the browser compatibility testing page at `/dev/browser-compatibility-test`
+1. Access the browser compatibility testing page at
+   `/dev/browser-compatibility-test`
 2. Use real devices when possible, especially for mobile testing
 3. For desktop browsers, test with both mouse and keyboard navigation
 4. Test with screen readers enabled when testing accessibility features
-5. Test with different user preferences (dark mode, reduced motion, high contrast)
+5. Test with different user preferences (dark mode, reduced motion, high
+   contrast)
 
 ### 2. Component Testing
 
-For each component, follow the specific testing instructions on the test page. In general:
+For each component, follow the specific testing instructions on the test page.
+In general:
 
 #### AI Chat Component
 
@@ -86,7 +90,8 @@ When you encounter an issue:
 2. Provide detailed information about the browser and issue
 3. Include steps to reproduce the issue
 4. Specify the severity of the issue
-5. Take screenshots if possible and attach them to the issue in our issue tracking system
+5. Take screenshots if possible and attach them to the issue in our issue
+   tracking system
 
 ### 5. Issue Severity Levels
 
@@ -160,4 +165,5 @@ Our CI pipeline includes:
 
 ## Contact
 
-For questions about browser compatibility testing, contact the accessibility team at [accessibility@example.com](mailto:accessibility@example.com).
+For questions about browser compatibility testing, contact the accessibility
+team at [accessibility@example.com](mailto:accessibility@example.com).

@@ -1,25 +1,35 @@
 ---
-description: "Prompt for generating an AGENTS.md file for a repository"
-mode: "agent"
+description: 'Prompt for generating an AGENTS.md file for a repository'
+mode: 'agent'
 ---
 
 # Create high‑quality AGENTS.md file
 
-You are a code agent. Your task is to create a complete, accurate AGENTS.md at the root of this repository that follows the public guidance at https://agents.md/.
+You are a code agent. Your task is to create a complete, accurate AGENTS.md at
+the root of this repository that follows the public guidance at
+https://agents.md/.
 
-AGENTS.md is an open format designed to provide coding agents with the context and instructions they need to work effectively on a project.
+AGENTS.md is an open format designed to provide coding agents with the context
+and instructions they need to work effectively on a project.
 
 ## What is AGENTS.md?
 
-AGENTS.md is a Markdown file that serves as a "README for agents" - a dedicated, predictable place to provide context and instructions to help AI coding agents work on your project. It complements README.md by containing detailed technical context that coding agents need but might clutter a human-focused README.
+AGENTS.md is a Markdown file that serves as a "README for agents" - a dedicated,
+predictable place to provide context and instructions to help AI coding agents
+work on your project. It complements README.md by containing detailed technical
+context that coding agents need but might clutter a human-focused README.
 
 ## Key Principles
 
-- **Agent-focused**: Contains detailed technical instructions for automated tools
-- **Complements README.md**: Doesn't replace human documentation but adds agent-specific context
-- **Standardized location**: Placed at repository root (or subproject roots for monorepos)
+- **Agent-focused**: Contains detailed technical instructions for automated
+  tools
+- **Complements README.md**: Doesn't replace human documentation but adds
+  agent-specific context
+- **Standardized location**: Placed at repository root (or subproject roots for
+  monorepos)
 - **Open format**: Uses standard Markdown with flexible structure
-- **Ecosystem compatibility**: Works across 20+ different AI coding tools and agents
+- **Ecosystem compatibility**: Works across 20+ different AI coding tools and
+  agents
 
 ## File Structure and Content Guidelines
 
@@ -171,19 +181,28 @@ Here's a real example from the agents.md website:
 
 ## Dev environment tips
 
-- Use `pnpm dlx turbo run where <project_name>` to jump to a package instead of scanning with `ls`.
-- Run `pnpm install --filter <project_name>` to add the package to your workspace so Vite, ESLint, and TypeScript can see it.
-- Use `pnpm create vite@latest <project_name> -- --template react-ts` to spin up a new React + Vite package with TypeScript checks ready.
-- Check the name field inside each package's package.json to confirm the right name—skip the top-level one.
+- Use `pnpm dlx turbo run where <project_name>` to jump to a package instead of
+  scanning with `ls`.
+- Run `pnpm install --filter <project_name>` to add the package to your
+  workspace so Vite, ESLint, and TypeScript can see it.
+- Use `pnpm create vite@latest <project_name> -- --template react-ts` to spin up
+  a new React + Vite package with TypeScript checks ready.
+- Check the name field inside each package's package.json to confirm the right
+  name—skip the top-level one.
 
 ## Testing instructions
 
 - Find the CI plan in the .github/workflows folder.
-- Run `pnpm turbo run test --filter <project_name>` to run every check defined for that package.
-- From the package root you can just call `pnpm test`. The commit should pass all tests before you merge.
-- To focus on one step, add the Vitest pattern: `pnpm vitest run -t "<test name>"`.
+- Run `pnpm turbo run test --filter <project_name>` to run every check defined
+  for that package.
+- From the package root you can just call `pnpm test`. The commit should pass
+  all tests before you merge.
+- To focus on one step, add the Vitest pattern:
+  `pnpm vitest run -t "<test name>"`.
 - Fix any test or type errors until the whole suite is green.
-- After moving files or changing imports, run `pnpm lint --filter <project_name>` to be sure ESLint and TypeScript rules still pass.
+- After moving files or changing imports, run
+  `pnpm lint --filter <project_name>` to be sure ESLint and TypeScript rules
+  still pass.
 - Add or update tests for the code you change, even if nobody asked.
 
 ## PR instructions
@@ -195,21 +214,18 @@ Here's a real example from the agents.md website:
 ## Implementation Steps
 
 1. **Analyze the project structure** to understand:
-
    - Programming languages and frameworks used
    - Package managers and build tools
    - Testing frameworks
    - Project architecture (monorepo, single package, etc.)
 
 2. **Identify key workflows** by examining:
-
    - package.json scripts
    - Makefile or other build files
    - CI/CD configuration files
    - Documentation files
 
 3. **Create comprehensive sections** covering:
-
    - All essential setup and development commands
    - Testing strategies and commands
    - Code style and conventions
@@ -219,7 +235,8 @@ Here's a real example from the agents.md website:
 
 5. **Test the instructions** by ensuring all commands work as documented
 
-6. **Keep it focused** on what agents need to know, not general project information
+6. **Keep it focused** on what agents need to know, not general project
+   information
 
 ## Best Practices
 
@@ -228,7 +245,8 @@ Here's a real example from the agents.md website:
 - **Include context**: Explain why certain steps are needed
 - **Stay current**: Update as the project evolves
 - **Test commands**: Ensure all listed commands actually work
-- **Consider nested files**: For monorepos, create AGENTS.md files in subprojects as needed
+- **Consider nested files**: For monorepos, create AGENTS.md files in
+  subprojects as needed
 
 ## Monorepo Considerations
 
@@ -241,9 +259,14 @@ For large monorepos:
 
 ## Final Notes
 
-- AGENTS.md works with 20+ AI coding tools including Cursor, Aider, Gemini CLI, and many others
+- AGENTS.md works with 20+ AI coding tools including Cursor, Aider, Gemini CLI,
+  and many others
 - The format is intentionally flexible - adapt it to your project's needs
-- Focus on actionable instructions that help agents understand and work with your codebase
+- Focus on actionable instructions that help agents understand and work with
+  your codebase
 - This is living documentation - update it as your project evolves
 
-When creating the AGENTS.md file, prioritize clarity, completeness, and actionability. The goal is to give any coding agent enough context to effectively contribute to the project without requiring additional human guidance.
+When creating the AGENTS.md file, prioritize clarity, completeness, and
+actionability. The goal is to give any coding agent enough context to
+effectively contribute to the project without requiring additional human
+guidance.

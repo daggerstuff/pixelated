@@ -5,9 +5,9 @@
  * It handles session creation, validation, and cleanup.
  */
 
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent } from '../security'
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 
 export interface DeviceInfo {
   deviceId: string
@@ -53,7 +53,9 @@ const MAX_CONCURRENT_SESSIONS = 5
 /**
  * Create a new session for a user
  */
-export async function createSession(options: SessionCreateOptions): Promise<SessionData> {
+export async function createSession(
+  options: SessionCreateOptions,
+): Promise<SessionData> {
   const {
     userId,
     role,
@@ -62,7 +64,7 @@ export async function createSession(options: SessionCreateOptions): Promise<Sess
     userAgent,
     rememberMe = false,
     twoFactorToken,
-    permissions = []
+    permissions = [],
   } = options
 
   const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -70,10 +72,12 @@ export async function createSession(options: SessionCreateOptions): Promise<Sess
   const timeout = rememberMe ? EXTENDED_SESSION_TIMEOUT : SESSION_TIMEOUT
 
   // Check concurrent session limit
-  const existingSessions = await getFromCache(`user:sessions:${userId}`) || []
+  const existingSessions = (await getFromCache(`user:sessions:${userId}`)) || []
   if (existingSessions.length >= MAX_CONCURRENT_SESSIONS) {
     // Remove oldest session
-    const oldestSession = existingSessions.sort((a, b) => a.lastActivity - b.lastActivity)[0]
+    const oldestSession = existingSessions.sort(
+      (a, b) => a.lastActivity - b.lastActivity,
+    )[0]
     await removeFromCache(`session:${oldestSession.sessionId}`)
     await removeFromCache(`session:device:${oldestSession.sessionId}`)
   }
@@ -92,31 +96,43 @@ export async function createSession(options: SessionCreateOptions): Promise<Sess
     isExtended: rememberMe,
     securityLevel: 'standard',
     twoFactorVerified: !!twoFactorToken,
-    permissions
+    permissions,
   }
 
   // Store session data
-  await setInCache(`session:${sessionId}`, sessionData, Math.floor(timeout / 1000))
+  await setInCache(
+    `session:${sessionId}`,
+    sessionData,
+    Math.floor(timeout / 1000),
+  )
 
   // Store device binding
   const deviceFingerprint = `${deviceInfo.deviceId}:${ipAddress}:${userAgent}`
-  await setInCache(`session:device:${sessionId}`, { fingerprint: deviceFingerprint }, Math.floor(timeout / 1000))
+  await setInCache(
+    `session:device:${sessionId}`,
+    { fingerprint: deviceFingerprint },
+    Math.floor(timeout / 1000),
+  )
 
   // Update user's session list
-  const updatedSessions = existingSessions.filter(s => s.expiresAt > now)
+  const updatedSessions = existingSessions.filter((s) => s.expiresAt > now)
   updatedSessions.push({
     sessionId,
     expiresAt: sessionData.expiresAt,
-    lastActivity: sessionData.lastActivity
+    lastActivity: sessionData.lastActivity,
   })
-  await setInCache(`user:sessions:${userId}`, updatedSessions, Math.floor(timeout / 1000))
+  await setInCache(
+    `user:sessions:${userId}`,
+    updatedSessions,
+    Math.floor(timeout / 1000),
+  )
 
   // Log security event
   await logSecurityEvent('SESSION_CREATED', userId, {
     sessionId,
     deviceId: deviceInfo.deviceId,
     ipAddress,
-    securityLevel: sessionData.securityLevel
+    securityLevel: sessionData.securityLevel,
   })
 
   // Update Phase 6 MCP integration
@@ -132,8 +148,13 @@ export async function validateSession(
   sessionId: string,
   deviceInfo: DeviceInfo,
   ipAddress: string,
-  userAgent: string
-): Promise<{ valid: boolean; session?: SessionData; error?: string; securityAlert?: string }> {
+  userAgent: string,
+): Promise<{
+  valid: boolean
+  session?: SessionData
+  error?: string
+  securityAlert?: string
+}> {
   try {
     const session = await getFromCache(`session:${sessionId}`)
 
@@ -152,29 +173,43 @@ export async function validateSession(
     const deviceFingerprint = `${deviceInfo.deviceId}:${ipAddress}:${userAgent}`
     const storedFingerprint = await getFromCache(`session:device:${sessionId}`)
 
-    if (storedFingerprint && storedFingerprint.fingerprint !== deviceFingerprint) {
+    if (
+      storedFingerprint &&
+      storedFingerprint.fingerprint !== deviceFingerprint
+    ) {
       return {
         valid: false,
         error: 'Device binding mismatch',
-        securityAlert: 'Suspicious device change detected'
+        securityAlert: 'Suspicious device change detected',
       }
     }
 
     // Update last activity
     session.lastActivity = Date.now()
-    await setInCache(`session:${sessionId}`, session, Math.floor((session.expiresAt - Date.now()) / 1000))
+    await setInCache(
+      `session:${sessionId}`,
+      session,
+      Math.floor((session.expiresAt - Date.now()) / 1000),
+    )
 
     // Update user's session list
-    const userSessions = await getFromCache(`user:sessions:${session.userId}`) || []
-    const updatedSessions = userSessions.map(s =>
-      s.sessionId === sessionId ? { ...s, lastActivity: session.lastActivity } : s
+    const userSessions =
+      (await getFromCache(`user:sessions:${session.userId}`)) || []
+    const updatedSessions = userSessions.map((s) =>
+      s.sessionId === sessionId
+        ? { ...s, lastActivity: session.lastActivity }
+        : s,
     )
-    await setInCache(`user:sessions:${session.userId}`, updatedSessions, Math.floor((session.expiresAt - Date.now()) / 1000))
+    await setInCache(
+      `user:sessions:${session.userId}`,
+      updatedSessions,
+      Math.floor((session.expiresAt - Date.now()) / 1000),
+    )
 
     // Log security event
     await logSecurityEvent('SESSION_VALIDATED', session.userId, {
       sessionId,
-      deviceId: deviceInfo.deviceId
+      deviceId: deviceInfo.deviceId,
     })
 
     return { valid: true, session }
@@ -194,14 +229,17 @@ export async function invalidateSession(sessionId: string): Promise<void> {
     await removeFromCache(`session:device:${sessionId}`)
 
     // Update user's session list
-    const userSessions = await getFromCache(`user:sessions:${session.userId}`) || []
-    const updatedSessions = userSessions.filter(s => s.sessionId !== sessionId)
+    const userSessions =
+      (await getFromCache(`user:sessions:${session.userId}`)) || []
+    const updatedSessions = userSessions.filter(
+      (s) => s.sessionId !== sessionId,
+    )
     await setInCache(`user:sessions:${session.userId}`, updatedSessions)
 
     // Log security event
     await logSecurityEvent('SESSION_INVALIDATED', session.userId, {
       sessionId,
-      reason: 'manual_invalidation'
+      reason: 'manual_invalidation',
     })
   }
 }
@@ -210,7 +248,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
  * Get all active sessions for a user
  */
 export async function getUserSessions(userId: string): Promise<SessionData[]> {
-  const sessionList = await getFromCache(`user:sessions:${userId}`) || []
+  const sessionList = (await getFromCache(`user:sessions:${userId}`)) || []
   const now = Date.now()
 
   const activeSessions: SessionData[] = []

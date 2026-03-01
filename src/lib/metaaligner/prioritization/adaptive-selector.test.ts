@@ -3,16 +3,13 @@ import { describe, expect, vi, test, beforeEach } from 'vitest'
  * Unit tests for Adaptive Objective Selector
  */
 
+import type { AIService } from '../../ai/models/types'
+import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
+import { ContextType, CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
 import {
   AdaptiveSelector,
   type AdaptiveSelectorConfig,
 } from './adaptive-selector'
-import {
-  ContextType,
-  CORE_MENTAL_HEALTH_OBJECTIVES,
-} from '../core/objectives'
-import type { AIService } from '../../ai/models/types'
-import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 // Import WeightingStrategy
 
 // Mock dependencies
@@ -416,7 +413,7 @@ describe('AdaptiveSelector', () => {
     }
 
     result.selectedObjectives.forEach((so) => {
-      expect(so.weight).toBeCloseTo(defaultWeights[so.objective.id]!, 5)
+      expect(so.weight).toBeCloseTo(defaultWeights[so.objective.id], 5)
     })
   })
 

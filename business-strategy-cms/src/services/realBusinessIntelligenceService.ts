@@ -1,11 +1,11 @@
-import { Logger } from '../utils/logger'
-import { YahooFinanceService } from './yahooFinanceService'
-import { DatabaseService } from './databaseService'
 import {
   MarketData,
   CompetitorAnalysis,
   BusinessInsight,
 } from '../types/business-intelligence'
+import { Logger } from '../utils/logger'
+import { DatabaseService } from './databaseService'
+import { YahooFinanceService } from './yahooFinanceService'
 
 export class RealBusinessIntelligenceService {
   private logger: Logger

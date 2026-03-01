@@ -1,6 +1,6 @@
+import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/server'
-import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 
 const logger = createBuildSafeLogger('default')
 import { existsSync } from 'fs'
@@ -57,11 +57,11 @@ export function mergedDatasetExists(outputPath?: string): boolean {
   // Validate and resolve path to prevent path traversal
   const checkPath = outputPath
     ? securePathJoin(basePath, outputPath, {
-      allowedExtensions: ['.jsonl', '.json', '.csv'],
-    })
+        allowedExtensions: ['.jsonl', '.json', '.csv'],
+      })
     : securePathJoin(basePath, defaultFilename, {
-      allowedExtensions: ['.jsonl', '.json', '.csv'],
-    })
+        allowedExtensions: ['.jsonl', '.json', '.csv'],
+      })
 
   const exists = existsSync(checkPath)
   logger.info('Checking merged dataset existence', { path: checkPath, exists })
@@ -117,7 +117,10 @@ export async function validateMergedDataset(filePath: string): Promise<{
     validation.sampleCount = 0
   }
 
-  logger.info('Dataset validation completed', { filePath: validatedPath, validation })
+  logger.info('Dataset validation completed', {
+    filePath: validatedPath,
+    validation,
+  })
 
   return validation
 }

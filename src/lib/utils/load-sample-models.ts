@@ -2,9 +2,10 @@
  * Utility for loading sample cognitive models into the KV store
  */
 
-import { KVStore } from '../db/KVStore'
-import { PatientModelService } from '../ai/services/PatientModelService'
 import sampleCognitiveModels from '@/data/sample-cognitive-models'
+
+import { PatientModelService } from '../ai/services/PatientModelService'
+import { KVStore } from '../db/KVStore'
 
 /**
  * Load sample cognitive models into the KV store

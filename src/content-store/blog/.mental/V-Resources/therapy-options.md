@@ -1,13 +1,15 @@
 ---
 title: 'Therapy Options'
-description: 'Comprehensive guide to therapy options for CPTSD and addiction recovery'
+description:
+  'Comprehensive guide to therapy options for CPTSD and addiction recovery'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Therapy Options
 
-This guide outlines various therapy approaches and modalities available for treating CPTSD and addiction.
+This guide outlines various therapy approaches and modalities available for
+treating CPTSD and addiction.
 
 ## Evidence-Based Therapies
 

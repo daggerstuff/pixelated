@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Literature Resources
 
-This guide provides a curated collection of literature and educational resources for understanding and treating CPTSD and addiction.
+This guide provides a curated collection of literature and educational resources
+for understanding and treating CPTSD and addiction.
 
 ## Core Literature
 

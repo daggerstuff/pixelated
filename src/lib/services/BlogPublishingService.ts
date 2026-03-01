@@ -1,10 +1,12 @@
-import { z } from 'zod'
-import * as cron from 'node-cron'
 import * as fs from 'fs/promises'
 import * as path from 'path'
+
+import * as cron from 'node-cron'
+import { z } from 'zod'
+
+import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { securePathJoin } from '../utils/server'
-import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publishing')
 
@@ -170,7 +172,10 @@ export class BlogPublishingService {
       logger.info(`Publishing post: ${post.metadata.title}`)
 
       // Read the file (validate path first)
-      const validatedPath = validatePath(post.filePath, ALLOWED_DIRECTORIES.CONTENT)
+      const validatedPath = validatePath(
+        post.filePath,
+        ALLOWED_DIRECTORIES.CONTENT,
+      )
       const content = await fs.readFile(validatedPath, 'utf8')
 
       // Update the draft status in frontmatter
@@ -219,8 +224,13 @@ export class BlogPublishingService {
   private async walkDirectory(dirPath: string): Promise<void> {
     try {
       // Validate directory path to prevent path traversal
-      const validatedDirPath = validatePath(dirPath, ALLOWED_DIRECTORIES.CONTENT)
-      const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
+      const validatedDirPath = validatePath(
+        dirPath,
+        ALLOWED_DIRECTORIES.CONTENT,
+      )
+      const entries = await fs.readdir(validatedDirPath, {
+        withFileTypes: true,
+      })
 
       for (const entry of entries) {
         // Validate entry name for security - prevent path traversal

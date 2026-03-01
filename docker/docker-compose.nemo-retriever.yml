@@ -6,7 +6,7 @@ services:
     image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:latest
     container_name: nim-embedding
     ports:
-      - "8080:8000"
+      - '8080:8000'
     environment:
       - NGC_API_KEY=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
       - NIM_API_KEY=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
@@ -24,7 +24,8 @@ services:
       sh -c "
         (while true; do 
           if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
-            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
           fi
           sleep 1
         done) &
@@ -37,7 +38,7 @@ services:
     image: nvcr.io/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2:latest
     container_name: nim-reranking
     ports:
-      - "8081:8000"
+      - '8081:8000'
     environment:
       - NGC_API_KEY=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
       - NIM_API_KEY=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
@@ -55,7 +56,8 @@ services:
       sh -c "
         (while true; do 
           if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
-            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
           fi
           sleep 1
         done) &

@@ -76,43 +76,43 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
   }
 
   return (
-    <div className="todo-component">
-      <div className="todo-header">
+    <div className='todo-component'>
+      <div className='todo-header'>
         <h2>{title}</h2>
       </div>
 
-      <div className="todo-form">
+      <div className='todo-form'>
         <input
-          type="text"
-          id="todo-input"
-          placeholder="Add a new task..."
+          type='text'
+          id='todo-input'
+          placeholder='Add a new task...'
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
         />
 
-        <button id="add-todo-btn" onClick={addTodo}>
+        <button id='add-todo-btn' onClick={addTodo}>
           Add
         </button>
       </div>
 
-      <ul id="todo-list" className="todo-list">
+      <ul id='todo-list' className='todo-list'>
         {todos.map((todo) => (
           <li
             key={todo.id}
             className={`todo-item ${todo.completed ? 'completed' : ''}`}
             data-id={todo.id}
           >
-            <span className="todo-text">{todo.text}</span>
-            <div className="todo-actions">
+            <span className='todo-text'>{todo.text}</span>
+            <div className='todo-actions'>
               <button
-                className="todo-button complete-button"
+                className='todo-button complete-button'
                 onClick={() => toggleTodoComplete(todo.id)}
               >
                 {todo.completed ? '↩️' : '✓'}
               </button>
               <button
-                className="todo-button delete-button"
+                className='todo-button delete-button'
                 onClick={() => deleteTodo(todo.id)}
               >
                 ×

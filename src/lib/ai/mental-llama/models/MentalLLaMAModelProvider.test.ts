@@ -1,5 +1,5 @@
-import { MentalLLaMAModelProvider } from './MentalLLaMAModelProvider.ts'
 import { getEnv } from '../../../../config/env.config.js'
+import { MentalLLaMAModelProvider } from './MentalLLaMAModelProvider.ts'
 
 // Mock getEnv
 vi.mock('src/config/env.config.ts', () => ({
@@ -116,7 +116,7 @@ describe('MentalLLaMAModelProvider', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${mockApiKey}`,
+          Authorization: `Bearer ${mockApiKey}`,
         },
         body: JSON.stringify({
           model: 'mentalllama-chat-7B',

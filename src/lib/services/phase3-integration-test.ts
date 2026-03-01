@@ -5,17 +5,17 @@
  * performance benchmarking, and production readiness validation.
  */
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { MemoryService } from '../memory'
-import { fheService } from '../fhe'
-import { EncryptionMode } from '../fhe/types'
 import { BiasDetectionEngine } from '../ai/bias-detection/index'
 import { MultidimensionalEmotionMapper } from '../ai/emotions/MultidimensionalEmotionMapper'
+import { fheService } from '../fhe'
+import { EncryptionMode } from '../fhe/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { MemoryService } from '../memory'
 import { AnalyticsService } from './analytics/AnalyticsService'
-import { RedisService } from './redis/RedisService'
-import { NotificationService } from './notification/NotificationService'
 import { ContactService } from './contact/ContactService'
 import { EmailService } from './email/EmailService'
+import { NotificationService } from './notification/NotificationService'
+import { RedisService } from './redis/RedisService'
 
 const logger = createBuildSafeLogger('phase3-integration-test')
 
@@ -143,7 +143,7 @@ export class Phase3IntegrationTester {
 
     const totalTime = Date.now() - startTime
     const success =
-      Object.values(results).every((result) => result === true) &&
+      Object.values(results).every((result) =>  result) &&
       errors.length === 0
 
     // Generate performance recommendations

@@ -9,15 +9,14 @@ share: true
 icon: 'recycle'
 ---
 
-
 ## Creating a custom snippet
 
-**Pre-condition**: You must create your snippet file in the `snippets` directory.
+**Pre-condition**: You must create your snippet file in the `snippets`
+directory.
 
-  Any page in the `snippets` directory will be treated as a snippet and will not
-  be rendered into a standalone page. If you want to create a standalone page
-  from the snippet, import the snippet into another file and call it as a
-  component.
+Any page in the `snippets` directory will be treated as a snippet and will not
+be rendered into a standalone page. If you want to create a standalone page from
+the snippet, import the snippet into another file and call it as a component.
 
 ### Default export
 
@@ -30,8 +29,8 @@ Hello world! This is my content I want to reuse across pages. My keyword of the
 day is {word}.
 ```
 
-  The content that you want to reuse must be inside the `snippets` directory in
-  order for the import to work.
+The content that you want to reuse must be inside the `snippets` directory in
+order for the import to work.
 
 2. Import the snippet into your destination file.
 
@@ -41,11 +40,9 @@ title: My title
 description: My Description
 ---
 
-
 ## Header
 
 Lorem impsum dolor sit amet.
-
 ```
 
 ### Reusable variables
@@ -53,8 +50,6 @@ Lorem impsum dolor sit amet.
 1. Export a variable from your snippet file:
 
 ```mdx snippets/path/to/custom-variables.mdx
-
-
 ;
 ```
 
@@ -65,7 +60,6 @@ Lorem impsum dolor sit amet.
 title: My title
 description: My Description
 ---
-
 
 Hello, my name is {myName} and I like {myObject.fruit}.
 ```
@@ -81,8 +75,8 @@ Hello, my name is {myName} and I like {myObject.fruit}.
 ;
 ```
 
-  MDX does not compile inside the body of an arrow function. Stick to HTML
-  syntax when you can or use a default export if you need to use MDX.
+MDX does not compile inside the body of an arrow function. Stick to HTML syntax
+when you can or use a default export if you need to use MDX.
 
 2. Import the snippet into your destination file and pass in the props
 
@@ -92,7 +86,5 @@ title: My title
 description: My Description
 ---
 
-
 Lorem ipsum dolor sit amet.
-
 ```

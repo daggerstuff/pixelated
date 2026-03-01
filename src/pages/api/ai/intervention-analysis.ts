@@ -1,3 +1,6 @@
+import { AIService } from '@/lib/ai/models/ai-types'
+import { aiRepository } from '@/lib/db/ai'
+
 // import type { APIRoute, APIContext } from 'astro'
 import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
@@ -5,10 +8,6 @@ import { InterventionAnalysisService } from '../../../lib/ai/services/interventi
 import { createTogetherAIService } from '../../../lib/ai/services/together'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
-import { aiRepository } from '@/lib/db/ai'
-import { AIService } from '@/lib/ai/models/ai-types'
-
-
 
 /**
  * API route for intervention effectiveness analysis
@@ -196,7 +195,7 @@ export const POST = async ({ request }) => {
       'intervention-analysis',
       {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
         status: 'error',
       },
     )

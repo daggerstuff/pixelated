@@ -3,8 +3,8 @@
 import { check, sleep } from 'k6'
 import { randomString } from 'k6/data'
 import http from 'k6/http'
-import { Counter, Rate, Trend } from 'k6/metrics'
 import type { RefinedResponse } from 'k6/http'
+import { Counter, Rate, Trend } from 'k6/metrics'
 
 // Define response types for better type safety
 interface NotificationResponse {

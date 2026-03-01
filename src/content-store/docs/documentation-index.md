@@ -1,22 +1,25 @@
 ---
-title: "Pixelated Documentation Index"
-description: "Pixelated Documentation Index documentation"
+title: 'Pixelated Documentation Index'
+description: 'Pixelated Documentation Index documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Pixelated Documentation Index
 
-This index provides a comprehensive overview of all documentation resources available for the Pixelated project.
+This index provides a comprehensive overview of all documentation resources
+available for the Pixelated project.
 
 ## Core Documentation
 
 - [Introduction](./introduction.mdx) - Project overview and key features
-- [Architecture](./architecture.mdx) - System architecture and component relationships
-- [Project Status](./project-status.md) - Current progress, completed features, and future plans
+- [Architecture](./architecture.mdx) - System architecture and component
+  relationships
+- [Project Status](./project-status.md) - Current progress, completed features,
+  and future plans
 - [Component Library](./component-library.md) - UI component documentation
 - [Quickstart](./quickstart.mdx) - Getting started with the project
 
@@ -40,27 +43,33 @@ This index provides a comprehensive overview of all documentation resources avai
 
 - [Redis Service](./redis-service.mdx) - Redis service documentation
 - [Redis Configuration](./redis-configuration.mdx) - Redis configuration guide
-- [Redis Error Handling](./redis-error-handling.mdx) - Redis error handling guide
+- [Redis Error Handling](./redis-error-handling.mdx) - Redis error handling
+  guide
 - [Redis Testing](./redis-testing.mdx) - Redis testing guide
 - [Redis Migration](./redis-migration.mdx) - Redis migration guide
 - [Email Service](./email-service.mdx) - Email service documentation
-- [Notification Service](./notification-service.mdx) - Notification service documentation
+- [Notification Service](./notification-service.mdx) - Notification service
+  documentation
 - [Analytics Service](./analytics-service.mdx) - Analytics service documentation
 - [WebSockets](./websocket.mdx) - WebSocket implementation documentation
 - [Providers](./providers.mdx) - Provider implementation documentation
 
 ## Security
 
-- [Security Implementation](./security-implementation.md) - Security features and implementation
-- [Server Authentication](./server-auth.md) - Server authentication documentation
+- [Security Implementation](./security-implementation.md) - Security features
+  and implementation
+- [Server Authentication](./server-auth.md) - Server authentication
+  documentation
 - [Authentication Types](./auth-types.md) - Authentication type definitions
 - [SECURITY.md](security/security-policy.md) - Security policies and practices
 
 ## Analysis & Optimization
 
 - [Text Analysis](./text-analysis.mdx) - Text analysis implementations
-- [Analytics Optimizations](./analytics-optimizations.mdx) - Analytics optimization techniques
-- [RUM Documentation](./rum-documentation.md) - Real User Monitoring documentation
+- [Analytics Optimizations](./analytics-optimizations.mdx) - Analytics
+  optimization techniques
+- [RUM Documentation](./rum-documentation.md) - Real User Monitoring
+  documentation
 
 ## Project Management
 
@@ -70,10 +79,14 @@ This index provides a comprehensive overview of all documentation resources avai
 
 ## How to Use This Documentation
 
-1. **New Team Members**: Start with the [Introduction](./introduction.mdx), [Architecture](./architecture.mdx), and [Development Setup](./development-setup.md)
-2. **Developers**: Reference the [Component Library](./component-library.md) and [API Reference](./api.md) regularly
+1. **New Team Members**: Start with the [Introduction](./introduction.mdx),
+   [Architecture](./architecture.mdx), and
+   [Development Setup](./development-setup.md)
+2. **Developers**: Reference the [Component Library](./component-library.md) and
+   [API Reference](./api.md) regularly
 3. **DevOps**: Focus on the Infrastructure & Deployment section
-4. **Project Managers**: Monitor the [Project Status](./project-status.md) document
+4. **Project Managers**: Monitor the [Project Status](./project-status.md)
+   document
 5. **Security Team**: Review all documentation in the Security section
 
 ## Documentation Standards

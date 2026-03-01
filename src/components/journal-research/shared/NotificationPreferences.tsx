@@ -1,4 +1,10 @@
+import { CheckCircle, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -7,7 +13,6 @@ import {
   CardTitle,
 } from '@/components/ui/card/card'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -15,12 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CheckCircle, AlertCircle } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
 
 export type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'never'
 
@@ -68,7 +69,9 @@ const defaultPreferences: JournalResearchNotificationPreferences = {
 
 interface NotificationPreferencesStore {
   preferences: JournalResearchNotificationPreferences
-  setPreferences: (preferences: Partial<JournalResearchNotificationPreferences>) => void
+  setPreferences: (
+    preferences: Partial<JournalResearchNotificationPreferences>,
+  ) => void
   resetPreferences: () => void
 }
 
@@ -101,9 +104,8 @@ export function NotificationPreferences({
   const { preferences, setPreferences } = useNotificationPreferencesStore()
   const [pushPermission, setPushPermission] =
     useState<NotificationPermission>('default')
-  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(
-    null,
-  )
+  const [pushSubscription, setPushSubscription] =
+    useState<PushSubscription | null>(null)
   const [isRequestingPush, setIsRequestingPush] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -139,12 +141,12 @@ export function NotificationPreferences({
       }
 
       // Register service worker
-      const registration = await navigator.serviceWorker.register(
-        '/sw.js',
-      ).catch(() => {
-        // Fallback: try to get existing registration
-        return navigator.serviceWorker.getRegistration()
-      })
+      const registration = await navigator.serviceWorker
+        .register('/sw.js')
+        .catch(() => {
+          // Fallback: try to get existing registration
+          return navigator.serviceWorker.getRegistration()
+        })
 
       if (!registration) {
         setError('Failed to register service worker')
@@ -172,7 +174,9 @@ export function NotificationPreferences({
       setPreferences({ browserPush: true })
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to enable push notifications',
+        err instanceof Error
+          ? err.message
+          : 'Failed to enable push notifications',
       )
     } finally {
       setIsRequestingPush(false)
@@ -209,30 +213,31 @@ export function NotificationPreferences({
       <CardHeader>
         <CardTitle>Notification Preferences</CardTitle>
         <CardDescription>
-          Configure how you receive notifications for journal research activities
+          Configure how you receive notifications for journal research
+          activities
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className='space-y-6'>
         {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+          <Alert variant='destructive'>
+            <AlertCircle className='h-4 w-4' />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        <div className="space-y-4">
+        <div className='space-y-4'>
           <div>
-            <h3 className="text-sm font-medium mb-3">Notification Channels</h3>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="in-app">In-app notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+            <h3 className='mb-3 text-sm font-medium'>Notification Channels</h3>
+            <div className='space-y-3'>
+              <div className='flex items-center justify-between'>
+                <div className='space-y-0.5'>
+                  <Label htmlFor='in-app'>In-app notifications</Label>
+                  <p className='text-muted-foreground text-xs'>
                     Show notifications in the notification center
                   </p>
                 </div>
                 <Switch
-                  id="in-app"
+                  id='in-app'
                   checked={preferences.inApp}
                   onCheckedChange={(checked) =>
                     setPreferences({ inApp: checked })
@@ -240,15 +245,15 @@ export function NotificationPreferences({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="toast">Toast notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+              <div className='flex items-center justify-between'>
+                <div className='space-y-0.5'>
+                  <Label htmlFor='toast'>Toast notifications</Label>
+                  <p className='text-muted-foreground text-xs'>
                     Show temporary toast messages
                   </p>
                 </div>
                 <Switch
-                  id="toast"
+                  id='toast'
                   checked={preferences.toast}
                   onCheckedChange={(checked) =>
                     setPreferences({ toast: checked })
@@ -256,26 +261,28 @@ export function NotificationPreferences({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="browser-push">Browser push notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+              <div className='flex items-center justify-between'>
+                <div className='space-y-0.5'>
+                  <Label htmlFor='browser-push'>
+                    Browser push notifications
+                  </Label>
+                  <p className='text-muted-foreground text-xs'>
                     Receive notifications even when the app is closed
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className='flex items-center gap-2'>
                   {pushPermission === 'granted' && preferences.browserPush ? (
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant='outline'
+                      size='sm'
                       onClick={disablePushNotifications}
                     >
                       Disable
                     </Button>
                   ) : (
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant='outline'
+                      size='sm'
                       onClick={requestPushPermission}
                       disabled={isRequestingPush || pushPermission === 'denied'}
                     >
@@ -287,20 +294,20 @@ export function NotificationPreferences({
                     </Button>
                   )}
                   {pushPermission === 'granted' && (
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className='text-green-600 h-4 w-4' />
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="email">Email notifications</Label>
-                  <p className="text-xs text-muted-foreground">
+              <div className='flex items-center justify-between'>
+                <div className='space-y-0.5'>
+                  <Label htmlFor='email'>Email notifications</Label>
+                  <p className='text-muted-foreground text-xs'>
                     Receive notifications via email
                   </p>
                 </div>
                 <Switch
-                  id="email"
+                  id='email'
                   checked={preferences.email}
                   onCheckedChange={(checked) =>
                     setPreferences({ email: checked })
@@ -311,7 +318,7 @@ export function NotificationPreferences({
           </div>
 
           <div>
-            <h3 className="text-sm font-medium mb-3">Notification Frequency</h3>
+            <h3 className='mb-3 text-sm font-medium'>Notification Frequency</h3>
             <Select
               value={preferences.frequency}
               onValueChange={(value: NotificationFrequency) =>
@@ -322,42 +329,48 @@ export function NotificationPreferences({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="immediate">Immediate</SelectItem>
-                <SelectItem value="batched">Batched (every 5 minutes)</SelectItem>
-                <SelectItem value="daily">Daily digest</SelectItem>
-                <SelectItem value="never">Never</SelectItem>
+                <SelectItem value='immediate'>Immediate</SelectItem>
+                <SelectItem value='batched'>
+                  Batched (every 5 minutes)
+                </SelectItem>
+                <SelectItem value='daily'>Daily digest</SelectItem>
+                <SelectItem value='never'>Never</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium mb-3">Notification Categories</h3>
-            <div className="space-y-2">
-              {Object.entries(preferences.categories).map(([category, enabled]) => (
-                <div
-                  key={category}
-                  className="flex items-center justify-between"
-                >
-                  <Label
-                    htmlFor={`category-${category}`}
-                    className="capitalize"
+            <h3 className='mb-3 text-sm font-medium'>
+              Notification Categories
+            </h3>
+            <div className='space-y-2'>
+              {Object.entries(preferences.categories).map(
+                ([category, enabled]) => (
+                  <div
+                    key={category}
+                    className='flex items-center justify-between'
                   >
-                    {category}
-                  </Label>
-                  <Switch
-                    id={`category-${category}`}
-                    checked={enabled}
-                    onCheckedChange={(checked) =>
-                      setPreferences({
-                        categories: {
-                          ...preferences.categories,
-                          [category]: checked,
-                        },
-                      })
-                    }
-                  />
-                </div>
-              ))}
+                    <Label
+                      htmlFor={`category-${category}`}
+                      className='capitalize'
+                    >
+                      {category}
+                    </Label>
+                    <Switch
+                      id={`category-${category}`}
+                      checked={enabled}
+                      onCheckedChange={(checked) =>
+                        setPreferences({
+                          categories: {
+                            ...preferences.categories,
+                            [category]: checked,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -375,4 +388,3 @@ export const useJournalResearchNotificationPreferences = () => {
     resetPreferences: store.resetPreferences,
   }
 }
-

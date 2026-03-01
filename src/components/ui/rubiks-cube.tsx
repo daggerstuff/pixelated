@@ -1,9 +1,8 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import * as THREE from 'three'
 import { OrbitControls } from '@react-three/drei'
 import { RoundedBox } from '@react-three/drei'
 import { SpotLight } from '@react-three/drei'
 import { PerspectiveCamera } from '@react-three/drei'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import {
   Suspense,
   useRef,
@@ -12,6 +11,7 @@ import {
   forwardRef,
   useCallback,
 } from 'react'
+import * as THREE from 'three'
 import { Vector3, Matrix4, Object3D } from 'three'
 
 // Type Definitions
@@ -135,7 +135,7 @@ function SceneContent() {
   return (
     <>
       <EnhancedSpotlight
-        color="#aaaace"
+        color='#aaaace'
         position={[3, 3, 2]}
         penumbra={1}
         distance={17}
@@ -313,9 +313,9 @@ const RubiksCubeModel = forwardRef<THREE.Group, RubiksCubeModelProps>(
             >
               {/* eslint-disable-next-line react/no-unknown-property */}
               <meshStandardMaterial
-                color="#ffffff"
+                color='#ffffff'
                 // eslint-disable-next-line react/no-unknown-property
-                emissive="#111111"
+                emissive='#111111'
                 // eslint-disable-next-line react/no-unknown-property
                 roughness={0.2}
                 // eslint-disable-next-line react/no-unknown-property

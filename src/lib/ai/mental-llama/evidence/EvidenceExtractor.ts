@@ -7,6 +7,7 @@
  */
 
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+
 import type {
   IModelProvider,
   MentalHealthAnalysisResult,
@@ -687,9 +688,9 @@ export class EvidenceExtractor {
           clinicalRelevance: clinical,
           metadata: {
             semanticRationale: (item.context &&
-              (item.context as Record<string, unknown>)[
-                'semanticRationale'
-              ]) as string | undefined,
+              (item.context)['semanticRationale']) as
+              | string
+              | undefined,
           },
         }
       })
@@ -809,7 +810,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
       if (!categorized[item.category]) {
         categorized[item.category] = []
       }
-      categorized[item.category]!.push(item)
+      categorized[item.category].push(item)
     })
 
     return categorized

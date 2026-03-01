@@ -1,4 +1,5 @@
 import { renderHook } from '@testing-library/react'
+
 import { useEmotionDetection } from '../useEmotionDetection'
 
 // Mock the useAIService hook

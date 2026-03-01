@@ -4,6 +4,7 @@ import {
   StatisticalTest,
   PatternDiscoveryResult,
 } from '@/lib/research/types/research-types'
+
 import { PatternDiscoveryService } from './PatternDiscoveryService'
 import { ResearchQueryEngine } from './ResearchQueryEngine'
 

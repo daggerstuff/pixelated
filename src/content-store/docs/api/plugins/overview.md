@@ -1,23 +1,26 @@
 ---
-title: "Plugin System Overview"
-description: "Plugin System Overview documentation"
+title: 'Plugin System Overview'
+description: 'Plugin System Overview documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Plugin System Overview
 
-The Pixelated EHR Integration Platform's Plugin System provides a secure and flexible way to extend the platform's functionality. This document provides an overview of the plugin architecture, security model, and basic usage.
+The Pixelated EHR Integration Platform's Plugin System provides a secure and
+flexible way to extend the platform's functionality. This document provides an
+overview of the plugin architecture, security model, and basic usage.
 
 ## Architecture
 
 The Plugin System consists of two main components:
 
 1. **Plugin Service**: Manages plugin lifecycle, security, and resource usage
-2. **Plugin Marketplace Service**: Handles plugin distribution, discovery, and updates
+2. **Plugin Marketplace Service**: Handles plugin distribution, discovery, and
+   updates
 
 ### Plugin Service
 
@@ -74,7 +77,7 @@ The Plugin System implements a robust security model:
 const pluginService = new PluginService({
   auditService,
   securityService,
-  metricsService
+  metricsService,
 })
 
 // Install a plugin
@@ -87,8 +90,8 @@ await pluginService.installPlugin({
     description: 'Extends EHR functionality',
     permissions: ['read:patients', 'write:appointments'],
     author: 'Developer Name',
-    homepage: 'https://example.com/my-plugin'
-  }
+    homepage: 'https://example.com/my-plugin',
+  },
 })
 ```
 
@@ -106,14 +109,14 @@ const marketplaceService = new PluginMarketplaceService({
   pluginService,
   auditService,
   securityService,
-  metricsService
+  metricsService,
 })
 
 // Search for plugins
 const plugins = await marketplaceService.searchPlugins({
   query: 'appointment',
   tags: ['scheduling'],
-  sort: 'downloads'
+  sort: 'downloads',
 })
 
 // Download and install a plugin
@@ -165,7 +168,7 @@ const defaultLimits = {
   storage: '50MB',
   networkCalls: 100, // per minute
   databaseQueries: 1000, // per minute
-  executionTimeout: '5s'
+  executionTimeout: '5s',
 }
 ```
 
@@ -193,9 +196,12 @@ pluginService.on('plugin:error', ({ pluginId, error }) => {
 })
 
 // Resource usage events
-pluginService.on('plugin:resource:exceeded', ({ pluginId, resource, limit }) => {
-  console.warn(`Plugin ${pluginId} exceeded ${resource} limit of ${limit}`)
-})
+pluginService.on(
+  'plugin:resource:exceeded',
+  ({ pluginId, resource, limit }) => {
+    console.warn(`Plugin ${pluginId} exceeded ${resource} limit of ${limit}`)
+  },
+)
 ```
 
 ## Best Practices

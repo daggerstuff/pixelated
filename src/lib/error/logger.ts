@@ -2,6 +2,8 @@
  * Error logging service with monitoring integration
  */
 
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   AppError,
   ErrorSeverity,
@@ -9,7 +11,6 @@ import {
   type ErrorContext,
   type FormattedError,
 } from './types'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { formatErrorForLogging } from './utils'
 
 const logger = createBuildSafeLogger('error-logger')
@@ -117,7 +118,8 @@ class ErrorLoggingService {
     if (!this.monitoringService) return
 
     try {
-      const errorObj = error.cause instanceof Error ? error.cause : new Error(error.message)
+      const errorObj =
+        error.cause instanceof Error ? error.cause : new Error(error.message)
 
       const context: Record<string, unknown> = {
         severity: error.severity,
@@ -174,8 +176,8 @@ class ErrorLoggingService {
       // Recreate AppError from formatted error
       const error = new AppError(entry.error.message, {
         code: entry.error.code,
-        severity: entry.error.severity as ErrorSeverity,
-        category: entry.error.category as ErrorCategory,
+        severity: entry.error.severity,
+        category: entry.error.category,
         context: entry.context,
         recoverable: entry.error.recoverable,
         retryable: entry.error.retryable,
@@ -270,4 +272,3 @@ export function normalizeErrorForLogging(
     recoverable: true,
   })
 }
-

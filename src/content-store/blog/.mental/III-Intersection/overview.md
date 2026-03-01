@@ -1,13 +1,16 @@
 ---
 title: 'CPTSD and Addiction Intersection'
-description: 'Understanding the complex relationship between CPTSD and addiction'
+description:
+  'Understanding the complex relationship between CPTSD and addiction'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # CPTSD and Addiction Intersection
 
-This guide explores the complex relationship between Complex Post-Traumatic Stress Disorder (CPTSD) and addiction, including their interconnected nature, challenges, and treatment approaches.
+This guide explores the complex relationship between Complex Post-Traumatic
+Stress Disorder (CPTSD) and addiction, including their interconnected nature,
+challenges, and treatment approaches.
 
 ## Understanding the Connection
 

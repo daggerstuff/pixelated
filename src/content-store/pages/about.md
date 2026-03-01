@@ -7,18 +7,27 @@ date: '2025-01-29'
 
 ## Our Story
 
-Pixelated Empathy was founded with a vision to revolutionize mental healthcare through technology. We believe that by combining artificial intelligence, data science, and evidence-based therapeutic approaches, we can make mental health support more accessible, effective, and personalized than ever before.
+Pixelated Empathy was founded with a vision to revolutionize mental healthcare
+through technology. We believe that by combining artificial intelligence, data
+science, and evidence-based therapeutic approaches, we can make mental health
+support more accessible, effective, and personalized than ever before.
 
 ## Our Team
 
-We're a multidisciplinary team of researchers, engineers, clinicians, and advocates who are passionate about improving mental health outcomes through innovation.
+We're a multidisciplinary team of researchers, engineers, clinicians, and
+advocates who are passionate about improving mental health outcomes through
+innovation.
 
 ### Core Values
 
-- **Evidence-Based**: All our solutions are grounded in scientific research and clinical best practices
-- **Privacy-First**: We prioritize user privacy and data security in everything we build
-- **Accessibility**: Mental health support should be available to everyone, regardless of circumstance
-- **Transparency**: We believe in open science and transparent development processes
+- **Evidence-Based**: All our solutions are grounded in scientific research and
+  clinical best practices
+- **Privacy-First**: We prioritize user privacy and data security in everything
+  we build
+- **Accessibility**: Mental health support should be available to everyone,
+  regardless of circumstance
+- **Transparency**: We believe in open science and transparent development
+  processes
 
 ## What We Build
 
@@ -46,7 +55,8 @@ We actively contribute to the mental health research community through:
 
 - **Publications**: Peer-reviewed papers on AI applications in mental health
 - **Open Source**: Contributing tools and models to the community
-- **Collaborations**: Partnerships with academic institutions and healthcare organizations
+- **Collaborations**: Partnerships with academic institutions and healthcare
+  organizations
 - **Innovation**: Developing novel approaches to longstanding challenges
 
 ## Get Involved
@@ -85,4 +95,5 @@ Ready to learn more or get involved? Reach out to us:
 
 ---
 
-_Together, we're building a future where mental health support is accessible, effective, and personalized for everyone._
+_Together, we're building a future where mental health support is accessible,
+effective, and personalized for everyone._

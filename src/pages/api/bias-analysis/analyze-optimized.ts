@@ -3,12 +3,14 @@
  * High-performance API with caching, connection pooling, and response optimization
  */
 
-import type { APIRoute } from 'astro'
-import { securityMiddleware } from '@/middleware/security'
-import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
-import { getLogger } from '@/lib/logging'
 import { randomUUID } from 'crypto'
+
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
+
+import { getLogger } from '@/lib/logging'
+import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
+import { securityMiddleware } from '@/middleware/security'
 
 const logger = getLogger('bias-analysis-api')
 
@@ -34,8 +36,8 @@ const AnalyzeBiasRequestSchema = z.object({
 const CACHE_HEADERS = {
   'Content-Type': 'application/json',
   'Cache-Control': 'no-cache, no-store, must-revalidate',
-  'Pragma': 'no-cache',
-  'Expires': '0',
+  Pragma: 'no-cache',
+  Expires: '0',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',

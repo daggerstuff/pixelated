@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import type { SpeechRecognitionConfig } from '../utils/speechRecognition'
 import {
   createSpeechRecognition,

@@ -4,28 +4,28 @@ on:
   push:
     branches: [master, main]
     paths:
-      - "ai/dataset_pipeline/**"
-      - "ai/config/**"
-      - ".github/workflows/dataset-pipeline.yml"
+      - 'ai/dataset_pipeline/**'
+      - 'ai/config/**'
+      - '.github/workflows/dataset-pipeline.yml'
   pull_request:
     branches: [master, main]
     paths:
-      - "ai/dataset_pipeline/**"
-      - "ai/config/**"
+      - 'ai/dataset_pipeline/**'
+      - 'ai/config/**'
   workflow_dispatch:
     inputs:
       target_samples:
-        description: "Target number of samples for test export"
+        description: 'Target number of samples for test export'
         required: false
-        default: "50"
+        default: '50'
       run_full_export:
-        description: "Run full export (not just smoke test)"
+        description: 'Run full export (not just smoke test)'
         required: false
-        default: "false"
+        default: 'false'
 
 env:
-  PYTHON_VERSION: "3.11"
-  UV_VERSION: "0.9.6"
+  PYTHON_VERSION: '3.11'
+  UV_VERSION: '0.9.6'
 
 jobs:
   verify-pipeline:

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+
 import { MonitoringService } from './service'
 
 // Extended hook for monitoring service with RUM capabilities

@@ -1,16 +1,24 @@
 import { useState, useEffect } from 'react'
+
+import {
+  ErrorMessage,
+  FieldError,
+} from '@/components/journal-research/shared/ErrorMessage'
+import { Button } from '@/components/ui/button/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
 import {
   EvaluationUpdatePayloadSchema,
   type EvaluationUpdatePayload,
   type Evaluation,
 } from '@/lib/api/journal-research/types'
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button/button'
-import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import { cn } from '@/lib/utils'
 
 export interface EvaluationFormProps {
   evaluation?: Evaluation
@@ -62,9 +70,8 @@ export function EvaluationForm({
       const validated = EvaluationUpdatePayloadSchema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -73,7 +80,10 @@ export function EvaluationForm({
     }
   }
 
-  const handleScoreChange = (field: keyof EvaluationUpdatePayload, value: string) => {
+  const handleScoreChange = (
+    field: keyof EvaluationUpdatePayload,
+    value: string,
+  ) => {
     const numValue = parseFloat(value)
     if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
       setFormData({ ...formData, [field]: numValue })
@@ -111,23 +121,23 @@ export function EvaluationForm({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className='space-y-6'>
           {metrics.map((metric) => (
-            <div key={metric.key} className="space-y-2">
-              <div className="flex items-center justify-between">
+            <div key={metric.key} className='space-y-2'>
+              <div className='flex items-center justify-between'>
                 <div>
                   <Label htmlFor={metric.key}>{metric.label}</Label>
-                  <p className="text-xs text-muted-foreground">
+                  <p className='text-muted-foreground text-xs'>
                     {metric.description}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className='flex items-center gap-2'>
                   <input
                     id={metric.key}
-                    type="number"
-                    min="1"
-                    max="10"
-                    step="0.1"
+                    type='number'
+                    min='1'
+                    max='10'
+                    step='0.1'
                     value={formData[metric.key]?.toString() ?? ''}
                     onChange={(e) => {
                       handleScoreChange(metric.key, e.target.value)
@@ -149,16 +159,20 @@ export function EvaluationForm({
                         : 'border-input',
                     )}
                     aria-invalid={!!errors[metric.key] && touched[metric.key]}
-                    aria-describedby={errors[metric.key] && touched[metric.key] ? `${metric.key}-error` : undefined}
+                    aria-describedby={
+                      errors[metric.key] && touched[metric.key]
+                        ? `${metric.key}-error`
+                        : undefined
+                    }
                   />
-                  <span className="text-sm text-muted-foreground">/ 10</span>
+                  <span className='text-muted-foreground text-sm'>/ 10</span>
                 </div>
               </div>
               <input
-                type="range"
-                min="1"
-                max="10"
-                step="0.1"
+                type='range'
+                min='1'
+                max='10'
+                step='0.1'
                 value={formData[metric.key] ?? 5}
                 onChange={(e) => {
                   handleScoreChange(metric.key, e.target.value)
@@ -173,23 +187,29 @@ export function EvaluationForm({
                 onBlur={() => {
                   setTouched((prev) => ({ ...prev, [metric.key]: true }))
                 }}
-                className="w-full"
+                className='w-full'
               />
-              <FieldError error={errors[metric.key] && touched[metric.key] ? errors[metric.key] : undefined} />
+              <FieldError
+                error={
+                  errors[metric.key] && touched[metric.key]
+                    ? errors[metric.key]
+                    : undefined
+                }
+              />
             </div>
           ))}
 
-          <div className="space-y-2">
-            <Label htmlFor="priorityTier">Priority Tier</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='priorityTier'>Priority Tier</Label>
             <select
-              id="priorityTier"
+              id='priorityTier'
               value={formData.priorityTier ?? ''}
               onChange={(e) =>
                 setFormData({ ...formData, priorityTier: e.target.value })
               }
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              className='border-input w-full rounded-md border bg-background px-3 py-2 text-sm'
             >
-              <option value="">Select priority tier</option>
+              <option value=''>Select priority tier</option>
               {priorityTiers.map((tier) => (
                 <option key={tier} value={tier}>
                   {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -201,13 +221,13 @@ export function EvaluationForm({
 
           <ErrorMessage error={submitError} fieldErrors={errors} />
 
-          <div className="flex justify-end gap-2">
+          <div className='flex justify-end gap-2'>
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button type='button' variant='outline' onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={isLoading}>
+            <Button type='submit' disabled={isLoading}>
               {isLoading
                 ? 'Saving...'
                 : evaluation
@@ -220,4 +240,3 @@ export function EvaluationForm({
     </Card>
   )
 }
-

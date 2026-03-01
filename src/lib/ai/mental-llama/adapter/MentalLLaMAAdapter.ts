@@ -1,6 +1,17 @@
 import { getAiServiceLogger } from '@/lib/logging/standardized-logger'
+
+import { ROUTER_LOW_CONFIDENCE_THRESHOLD } from '../constants/index.ts'
 import { EvidenceService } from '../evidence/EvidenceService.ts'
 import { ExpertGuidanceOrchestrator } from '../ExpertGuidanceOrchestrator.js'
+import {
+  specializedPrompts,
+  buildGeneralAnalysisPrompt,
+} from '../prompts/prompt-templates.ts'
+import type {
+  AnalyzeMentalHealthParams,
+  Message,
+  ExplanationQualityMetrics,
+} from '../types/index.ts'
 import type {
   MentalLLaMAAdapterOptions,
   MentalHealthAnalysisResult,
@@ -14,16 +25,6 @@ import type {
   RoutingDecision, // <-- Use RoutingDecision from mentalLLaMATypes only
   RawModelOutput,
 } from '../types/mentalLLaMATypes.ts'
-import type {
-  AnalyzeMentalHealthParams,
-  Message,
-  ExplanationQualityMetrics,
-} from '../types/index.ts'
-import {
-  specializedPrompts,
-  buildGeneralAnalysisPrompt,
-} from '../prompts/prompt-templates.ts'
-import { ROUTER_LOW_CONFIDENCE_THRESHOLD } from '../constants/index.ts'
 const logger = getAiServiceLogger('mental-llama')
 
 // Option 1: Static import (uncomment if you want static import)
@@ -45,7 +46,7 @@ export class MentalLLaMAAdapter {
     this.crisisNotifier = options.crisisNotifier
     this.taskRouter = options.taskRouter
     this.evidenceService = new EvidenceService(
-      this.modelProvider as IModelProvider | undefined,
+      this.modelProvider,
       {
         enableLLMEnhancement: !!this.modelProvider,
         enableCaching: true,
@@ -60,9 +61,8 @@ export class MentalLLaMAAdapter {
     // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
     try {
       // @ts-expect-error: Module may not exist in all environments
-      this.crisisSessionFlaggingServiceImport = import(
-        '../../crisis/CrisisSessionFlaggingService.ts'
-      )
+      this.crisisSessionFlaggingServiceImport =
+        import('../../crisis/CrisisSessionFlaggingService.ts')
     } catch {
       logger.warn(
         'CrisisSessionFlaggingService module not found, continuing without it.',

@@ -3,8 +3,9 @@
  * Global content delivery optimization with edge caching and asset management
  */
 
-import { getLogger } from '@/lib/logging'
 import { createHash } from 'crypto'
+
+import { getLogger } from '@/lib/logging'
 
 const logger = getLogger('cdn-optimizer')
 

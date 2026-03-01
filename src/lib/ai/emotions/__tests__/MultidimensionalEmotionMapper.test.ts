@@ -83,7 +83,7 @@ describe('MultidimensionalEmotionMapper', () => {
       const dummyEmotions = mapper['getDummyEmotionVector']()
       const firstDummyKey = Object.keys(
         dummyEmotions,
-      )[0]! as keyof EmotionVector
+      )[0] as keyof EmotionVector
       expect(mapper['findPrimaryEmotion'](emotions)).toBe(firstDummyKey)
     })
 
@@ -342,35 +342,35 @@ describe('MultidimensionalEmotionMapper', () => {
       expect(smoothedMaps[0]).toEqual(mapsToSmooth[0])
 
       // Second map smoothed
-      expectDimensionsCloseTo(smoothedMaps[1]!.dimensions, {
+      expectDimensionsCloseTo(smoothedMaps[1].dimensions, {
         valence:
-          alpha * mapsToSmooth[0]!.dimensions.valence +
-          (1 - alpha) * mapsToSmooth[1]!.dimensions.valence,
+          alpha * mapsToSmooth[0].dimensions.valence +
+          (1 - alpha) * mapsToSmooth[1].dimensions.valence,
         arousal:
-          alpha * mapsToSmooth[0]!.dimensions.arousal +
-          (1 - alpha) * mapsToSmooth[1]!.dimensions.arousal,
+          alpha * mapsToSmooth[0].dimensions.arousal +
+          (1 - alpha) * mapsToSmooth[1].dimensions.arousal,
         dominance:
-          alpha * mapsToSmooth[0]!.dimensions.dominance +
-          (1 - alpha) * mapsToSmooth[1]!.dimensions.dominance,
+          alpha * mapsToSmooth[0].dimensions.dominance +
+          (1 - alpha) * mapsToSmooth[1].dimensions.dominance,
       })
-      expect(smoothedMaps[1]!.primaryEmotion).toBe(
-        mapsToSmooth[1]!.primaryEmotion,
+      expect(smoothedMaps[1].primaryEmotion).toBe(
+        mapsToSmooth[1].primaryEmotion,
       ) // Other fields preserved
 
       // Third map smoothed based on the previously smoothed second map's values
-      expectDimensionsCloseTo(smoothedMaps[2]!.dimensions, {
+      expectDimensionsCloseTo(smoothedMaps[2].dimensions, {
         valence:
-          alpha * smoothedMaps[1]!.dimensions.valence +
-          (1 - alpha) * mapsToSmooth[2]!.dimensions.valence,
+          alpha * smoothedMaps[1].dimensions.valence +
+          (1 - alpha) * mapsToSmooth[2].dimensions.valence,
         arousal:
-          alpha * smoothedMaps[1]!.dimensions.arousal +
-          (1 - alpha) * mapsToSmooth[2]!.dimensions.arousal,
+          alpha * smoothedMaps[1].dimensions.arousal +
+          (1 - alpha) * mapsToSmooth[2].dimensions.arousal,
         dominance:
-          alpha * smoothedMaps[1]!.dimensions.dominance +
-          (1 - alpha) * mapsToSmooth[2]!.dimensions.dominance,
+          alpha * smoothedMaps[1].dimensions.dominance +
+          (1 - alpha) * mapsToSmooth[2].dimensions.dominance,
       })
-      expect(smoothedMaps[2]!.primaryEmotion).toBe(
-        mapsToSmooth[2]!.primaryEmotion,
+      expect(smoothedMaps[2].primaryEmotion).toBe(
+        mapsToSmooth[2].primaryEmotion,
       )
     })
   })

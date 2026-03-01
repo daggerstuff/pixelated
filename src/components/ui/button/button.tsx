@@ -1,6 +1,8 @@
-import * as React from 'react'
 import { cva } from 'class-variance-authority'
+import * as React from 'react'
+
 import { cn } from '~/lib/utils'
+
 import type { ButtonProps } from './button-types'
 import { getAriaProps, getButtonClassName, isLinkButton } from './button-types'
 
@@ -80,9 +82,9 @@ const Button = React.forwardRef<
     const loadingSpinner =
       loading && showSpinner ? (
         <span
-          className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-          role="status"
-          aria-label="Loading"
+          className='border-current border-t-transparent inline-block h-4 w-4 animate-spin rounded-full border-2'
+          role='status'
+          aria-label='Loading'
         />
       ) : null
 
@@ -117,7 +119,7 @@ const Button = React.forwardRef<
     return (
       <button
         ref={ref as React.ForwardedRef<HTMLButtonElement>}
-        type="button"
+        type='button'
         {...commonProps}
       >
         {contentWrapper}

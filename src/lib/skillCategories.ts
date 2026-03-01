@@ -9,7 +9,7 @@ export type SkillCategory = (typeof SKILL_CATEGORIES)[number]
 const SKILL_NAME_MAP: Record<string, SkillCategory> = {
   'active listening': 'interpersonal',
   'rapport building': 'interpersonal',
-  'empathy': 'interpersonal',
+  empathy: 'interpersonal',
   'reflective listening': 'interpersonal',
 
   'cognitive restructuring': 'therapeutic',
@@ -19,7 +19,7 @@ const SKILL_NAME_MAP: Record<string, SkillCategory> = {
 
   'technical assessment': 'technical',
   'technical skill': 'technical',
-  'documentation': 'technical',
+  documentation: 'technical',
 }
 
 export function isValidCategory(cat?: string): cat is SkillCategory {
@@ -51,13 +51,13 @@ export function getSkillCategory(
 
   // Exact mapping
   if (SKILL_NAME_MAP[name]) {
-    return SKILL_NAME_MAP[name] as SkillCategory
+    return SKILL_NAME_MAP[name]
   }
 
   // Substring mapping
   for (const key of Object.keys(SKILL_NAME_MAP)) {
     if (name.includes(key)) {
-      return SKILL_NAME_MAP[key] as SkillCategory
+      return SKILL_NAME_MAP[key]
     }
   }
 

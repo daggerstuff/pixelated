@@ -6,9 +6,10 @@
  * or initializing resources.
  */
 
-import type { FullConfig } from '@playwright/test'
 import { execSync } from 'child_process'
 import * as http from 'http'
+
+import type { FullConfig } from '@playwright/test'
 
 /**
  * Check if the MCP server is running at the specified URL

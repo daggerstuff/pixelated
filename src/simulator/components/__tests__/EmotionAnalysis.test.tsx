@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { EmotionAnalysis } from '../EmotionAnalysis'
+
 import { SimulatorProvider } from '../../context/SimulatorContext'
+import { EmotionAnalysis } from '../EmotionAnalysis'
 
 // Mock the child components
 vi.mock('../EmotionDetector', () => ({
@@ -22,14 +23,14 @@ vi.mock('../EmotionDetector', () => ({
           dominance: 0.7,
         })
       }, 100)
-      return <div data-testid="emotion-detector">Emotion Detector</div>
+      return <div data-testid='emotion-detector'>Emotion Detector</div>
     },
   ),
 }))
 
 vi.mock('../EmotionDisplay', () => ({
   EmotionDisplay: vi.fn(() => (
-    <div data-testid="emotion-display">Emotion Display</div>
+    <div data-testid='emotion-display'>Emotion Display</div>
   )),
 }))
 

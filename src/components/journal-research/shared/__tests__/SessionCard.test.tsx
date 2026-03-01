@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { SessionCard } from '../SessionCard'
+import { describe, it, expect, vi } from 'vitest'
+
 import { mockSession } from '../../__tests__/test-utils'
+import { SessionCard } from '../SessionCard'
 
 describe('SessionCard', () => {
   it('renders session information correctly', () => {
@@ -10,7 +11,9 @@ describe('SessionCard', () => {
     expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
     expect(screen.getByText(/Started/)).toBeInTheDocument()
     expect(screen.getByText(mockSession.currentPhase)).toBeInTheDocument()
-    expect(screen.getByText(`${mockSession.targetSources.length}`)).toBeInTheDocument()
+    expect(
+      screen.getByText(`${mockSession.targetSources.length}`),
+    ).toBeInTheDocument()
   })
 
   it('displays progress percentage correctly', () => {
@@ -75,7 +78,7 @@ describe('SessionCard', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <SessionCard session={mockSession} className="custom-class" />,
+      <SessionCard session={mockSession} className='custom-class' />,
     )
 
     const card = container.querySelector('.custom-class')
@@ -96,4 +99,3 @@ describe('SessionCard', () => {
     expect(screen.getByText('PubMed, arXiv')).toBeInTheDocument()
   })
 })
-

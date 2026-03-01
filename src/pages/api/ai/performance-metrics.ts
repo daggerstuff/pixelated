@@ -1,6 +1,7 @@
-import { getSession } from '../../../lib/auth/session'
+import type { APIContext } from 'astro'
+
 import mongodb from '../../../config/mongodb.config'
-import type { APIContext } from 'astro';
+import { getSession } from '../../../lib/auth/session'
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {

@@ -1,7 +1,16 @@
-import { describe, it, expect, vi, beforeEach, afterEach, type MockedClass } from 'vitest'
-import { ContactService } from '../ContactService'
-import { EmailService } from '../../email/EmailService'
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type MockedClass,
+} from 'vitest'
+
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { EmailService } from '../../email/EmailService'
+import { ContactService } from '../ContactService'
 
 const logger = createBuildSafeLogger('contact-service')
 

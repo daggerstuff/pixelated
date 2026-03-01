@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+
 import { AccessibilityUtils } from '../utils/AccessibilityUtils'
 
 test.describe('Color Contrast Compliance', () => {

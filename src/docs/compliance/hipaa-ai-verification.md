@@ -1,13 +1,17 @@
 # HIPAA Compliance Verification Checklist for AI Components
 
-This document outlines the verification process for ensuring HIPAA compliance of our AI components. It serves as a comprehensive checklist for auditing and validating that our AI implementation meets all necessary HIPAA requirements.
+This document outlines the verification process for ensuring HIPAA compliance of
+our AI components. It serves as a comprehensive checklist for auditing and
+validating that our AI implementation meets all necessary HIPAA requirements.
 
 ## 1. Data Encryption and Security
 
 ### End-to-End Encryption
 
-- [ ] Verify that all PHI data sent to AI providers is encrypted in transit using TLS 1.3
-- [ ] Verify that all PHI data stored by AI components is encrypted at rest using FIPS 140-2 validated modules
+- [ ] Verify that all PHI data sent to AI providers is encrypted in transit
+      using TLS 1.3
+- [ ] Verify that all PHI data stored by AI components is encrypted at rest
+      using FIPS 140-2 validated modules
 - [ ] Confirm encryption uses AES-256-GCM for data at rest
 - [ ] Verify automated key rotation occurs every 90 days
 - [ ] Test key rotation process with automated failover and recovery procedures

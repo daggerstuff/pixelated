@@ -1,5 +1,6 @@
 import { cleanup } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
+
 import SearchDemo from '../SearchDemo.astro'
 
 // Mock the SearchDemoReact component
@@ -12,12 +13,12 @@ vi.mock('../SearchDemoReact', () => {
       type: 'div',
       props: {
         'data-testid': 'search-demo-react',
-        'children': [
+        children: [
           {
             type: 'input',
             props: {
-              'type': 'text',
-              'placeholder': 'Search for anything...',
+              type: 'text',
+              placeholder: 'Search for anything...',
               'data-testid': 'search-input',
             },
           },

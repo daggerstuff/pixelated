@@ -1,6 +1,7 @@
 ---
 title: 'Testing Environment Setup Guides'
-description: 'Comprehensive guides for setting up testing environments for Pixelated'
+description:
+  'Comprehensive guides for setting up testing environments for Pixelated'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,9 +11,9 @@ share: true
 
 ## Testing Environment Setup Guides
 
-This document provides detailed instructions for setting up various testing environments for the
-Pixelated platform. Following these guides will ensure consistent testing across development,
-CI/CD, and production environments.
+This document provides detailed instructions for setting up various testing
+environments for the Pixelated platform. Following these guides will ensure
+consistent testing across development, CI/CD, and production environments.
 
 ### Local Development Environment Setup
 
@@ -67,7 +68,8 @@ pnpm test
 
 ### Setting Up Vitest
 
-Pixelated uses Vitest for unit and integration testing. Here's how to configure it:
+Pixelated uses Vitest for unit and integration testing. Here's how to configure
+it:
 
 1. The Vitest configuration is in `vitest.config.ts`:
 
@@ -91,7 +93,6 @@ Pixelated uses Vitest for unit and integration testing. Here's how to configure 
 2. Create a `vitest.setup.ts` file for global test setup:
 
 ```typescript
-
 // Mock global fetch
 global.fetch = vi.fn()
 
@@ -132,19 +133,15 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
       redis:
         image: redis:7
         ports:
           - 6379:6379
         options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
+          5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v3
@@ -303,7 +300,6 @@ mkdir -p src/mocks
 
 ```typescript
 // src/services/ai.test.ts
-
 
 vi.mock('openai', () => ({
   OpenAI: vi.fn().mockImplementation(() => mockOpenAIClient),
@@ -539,9 +535,9 @@ NODE_OPTIONS=--max_old_space_size=4096 pnpm test
 
 ## Conclusion
 
-Following these setup guides will ensure a consistent testing environment across all stages of development.
-For more detailed information on specific testing patterns, refer to the
-[Test Patterns Documentation](/docs/api/test-patterns).
+Following these setup guides will ensure a consistent testing environment across
+all stages of development. For more detailed information on specific testing
+patterns, refer to the [Test Patterns Documentation](/docs/api/test-patterns).
 
 For any issues not covered in this guide, please refer to the
 [Troubleshooting Guide](/docs/testing/debugging) or open an issue on GitHub.

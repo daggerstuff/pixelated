@@ -205,7 +205,7 @@ export function useSessionEmotions(
       }
     }
 
-    loadData()
+    void loadData()
 
     return () => {
       isMounted = false

@@ -1,10 +1,11 @@
-import type { Message } from '@/types/chat'
-import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
-import { markdownToHtml } from '@/lib/markdown'
-import { formatTimestamp } from '@/lib/dates'
 import { useContext } from 'react'
+
 import { ThemeContext } from '@/components/theme/ThemeProvider'
+import { Badge } from '@/components/ui/badge'
+import { formatTimestamp } from '@/lib/dates'
+import { markdownToHtml } from '@/lib/markdown'
+import { cn } from '@/lib/utils'
+import type { Message } from '@/types/chat'
 
 // Define the MentalHealthAnalysis interface with the properties we need
 interface MentalHealthAnalysis {
@@ -91,7 +92,7 @@ export function ChatMessage({
         )}
       >
         {/* Role badge */}
-        <div className="absolute -top-3 left-3">
+        <div className='absolute -top-3 left-3'>
           <div
             className={cn(
               'rounded-full px-2 py-1 text-xs',
@@ -114,7 +115,7 @@ export function ChatMessage({
 
         {/* Mental health badge (if applicable) */}
         {hasAnalysis && (
-          <div className="absolute -top-3 right-3">
+          <div className='absolute -top-3 right-3'>
             <Badge
               className={`${getCategoryColor(message.mentalHealthAnalysis!.category)} text-white text-xs`}
             >
@@ -123,14 +124,14 @@ export function ChatMessage({
           </div>
         )}
 
-        <div className="mt-1">
+        <div className='mt-1'>
           {/* For system messages, display as-is */}
           {isSystemMessage ? (
-            <div className="text-sm">{message.content}</div>
+            <div className='text-sm'>{message.content}</div>
           ) : (
             /* For user and bot messages, convert markdown to HTML */
             <div
-              className="prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none"
+              className='prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none'
               dangerouslySetInnerHTML={{
                 __html: markdownToHtml(message.content),
               }}
@@ -139,7 +140,7 @@ export function ChatMessage({
         </div>
 
         {timestamp && (
-          <div className="mt-2 text-right text-xs opacity-60">
+          <div className='mt-2 text-right text-xs opacity-60'>
             {formatTimestamp(timestamp)}
           </div>
         )}

@@ -1,6 +1,7 @@
-import * as React from 'react'
-import { DashboardWidget } from './DashboardWidget'
 import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
+import * as React from 'react'
+
+import { DashboardWidget } from './DashboardWidget'
 
 export interface MetricWidgetProps {
   title: string
@@ -60,7 +61,7 @@ export function MetricWidget({
       }
     }
 
-    loadData()
+    void loadData()
 
     if (refreshInterval && fetchMetric) {
       const interval = setInterval(loadData, refreshInterval)
@@ -151,17 +152,17 @@ export function MetricWidget({
       className={className}
       variant={variant}
     >
-      <div className="space-y-2">
-        <div className="text-3xl font-bold" aria-live="polite">
-          <span className="sr-only">{title} value</span>
+      <div className='space-y-2'>
+        <div className='text-3xl font-bold' aria-live='polite'>
+          <span className='sr-only'>{title} value</span>
           {prefix}
           {formatValue(currentValue)}
           {suffix}
         </div>
 
         {percentChange !== null && (
-          <div className="flex items-center text-sm">
-            <span className="mr-1 text-gray-500">vs previous:</span>
+          <div className='flex items-center text-sm'>
+            <span className='text-gray-500 mr-1'>vs previous:</span>
             <span
               className={`flex items-center font-medium ${
                 percentChange > 0
@@ -172,11 +173,11 @@ export function MetricWidget({
               }`}
             >
               {percentChange > 0 ? (
-                <ArrowUpRight className="h-4 w-4 mr-1" />
+                <ArrowUpRight className='mr-1 h-4 w-4' />
               ) : percentChange < 0 ? (
-                <ArrowDownRight className="h-4 w-4 mr-1" />
+                <ArrowDownRight className='mr-1 h-4 w-4' />
               ) : (
-                <Minus className="h-4 w-4 mr-1" />
+                <Minus className='mr-1 h-4 w-4' />
               )}
               {Math.abs(percentChange || 0).toFixed(1)}%
             </span>

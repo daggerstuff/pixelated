@@ -10,13 +10,13 @@ spec:
     kind: Deployment
     name: metoro-exporter
   updatePolicy:
-    updateMode: "Off"  # Only recommendations, no auto-updates
+    updateMode: 'Off' # Only recommendations, no auto-updates
   resourcePolicy:
     containerPolicies:
-    - containerName: metoro-exporter
-      minAllowed:
-        cpu: 50m
-        memory: 128Mi
-      maxAllowed:
-        cpu: 500m
-        memory: 1Gi
+      - containerName: metoro-exporter
+        minAllowed:
+          cpu: 50m
+          memory: 128Mi
+        maxAllowed:
+          cpu: 500m
+          memory: 1Gi

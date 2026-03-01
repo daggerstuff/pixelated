@@ -1,6 +1,7 @@
+import { getCurrentUser } from '@/lib/auth'
+
 // import type { APIRoute, APIContext } from 'astro'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { getCurrentUser } from '@/lib/auth'
 import { MemoryService } from '../../../lib/memory'
 
 const logger = createBuildSafeLogger('memory-api')
@@ -21,7 +22,7 @@ export const POST = async ({ request, cookies }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
@@ -40,18 +41,15 @@ export const POST = async ({ request, cookies }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
     // Create memory
-    const result = await memoryService.createMemory(
-      content,
-      {
-        userId: user.id,
-        ...metadata,
-      }
-    )
+    const result = await memoryService.createMemory(content, {
+      userId: user.id,
+      ...metadata,
+    })
 
     return new Response(JSON.stringify(result), {
       status: 201,
@@ -72,7 +70,7 @@ export const POST = async ({ request, cookies }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   }
 }

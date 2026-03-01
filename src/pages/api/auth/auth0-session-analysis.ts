@@ -4,13 +4,14 @@
  */
 
 import type { APIRoute } from 'astro'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { validateToken } from '@/lib/auth/auth0-jwt-service'
-import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
-import { AIRepository } from '@/lib/db/ai/repository'
+
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
 import { createAuditLog } from '@/lib/audit'
+import { validateToken } from '@/lib/auth/auth0-jwt-service'
+import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -34,7 +35,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -47,7 +48,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -103,7 +104,11 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.session.analysis.forbidden',
         user.id,
         'auth-session-analysis',
-        { action: 'get_session_analysis', sessionId, reason: 'no_access_to_session' }
+        {
+          action: 'get_session_analysis',
+          sessionId,
+          reason: 'no_access_to_session',
+        },
       )
 
       return new Response(
@@ -111,7 +116,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -124,7 +129,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -151,7 +156,11 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.session.analysis.access',
       user.id,
       'auth-session-analysis',
-      { action: 'get_session_analysis', sessionId, count: emotionsWithDimensions.length }
+      {
+        action: 'get_session_analysis',
+        sessionId,
+        count: emotionsWithDimensions.length,
+      },
     )
 
     logger.info('Returning session emotion data', {
@@ -175,7 +184,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -186,7 +195,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

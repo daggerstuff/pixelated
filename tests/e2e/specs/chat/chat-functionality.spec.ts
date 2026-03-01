@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
-import { LoginPage } from '../../pages/LoginPage'
+
 import { DashboardPage } from '../../pages/DashboardPage'
+import { LoginPage } from '../../pages/LoginPage'
 
 test.describe('Chat Functionality', () => {
   test.beforeEach(async ({ page }) => {

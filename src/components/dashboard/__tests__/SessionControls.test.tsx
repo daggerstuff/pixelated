@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { SessionControls } from '../SessionControls'
-import type { TherapistSession } from '@/types/dashboard'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+
+import type { TherapistSession } from '@/types/dashboard'
+
+import { SessionControls } from '../SessionControls'
 
 describe('SessionControls', () => {
   const mockSessions: TherapistSession[] = [

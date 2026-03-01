@@ -4,7 +4,8 @@ paths:
       tags:
         - Authentication
       summary: Log in with email and password
-      description: Authenticate a user using their email and password credentials
+      description:
+        Authenticate a user using their email and password credentials
       requestBody:
         required: true
         content:
@@ -87,7 +88,8 @@ paths:
                   summary: Rate limit exceeded
                   value:
                     code: AUTH_RATE_LIMIT
-                    message: Too many login attempts. Please try again in 15 minutes.
+                    message:
+                      Too many login attempts. Please try again in 15 minutes.
                     details:
                       retryAfter: 900
                       maxAttempts: 5
@@ -314,7 +316,9 @@ paths:
                   summary: Device compatibility error
                   value:
                     code: WEBAUTHN_DEVICE_INCOMPATIBLE
-                    message: The authenticator is not compatible with this implementation
+                    message:
+                      The authenticator is not compatible with this
+                      implementation
                     details:
                       requiredFeatures: [UserVerification]
                       missingFeatures: [UserVerification]
@@ -337,7 +341,9 @@ paths:
                   summary: User verification failed
                   value:
                     code: WEBAUTHN_USER_VERIFICATION_FAILED
-                    message: User verification failed (e.g., wrong PIN, failed biometric)
+                    message:
+                      User verification failed (e.g., wrong PIN, failed
+                      biometric)
                     details:
                       remainingAttempts: 2
                       lockoutPeriod: 300
@@ -458,7 +464,9 @@ paths:
                   summary: Device temporarily locked
                   value:
                     code: WEBAUTHN_DEVICE_LOCKED
-                    message: Device is temporarily locked due to too many failed attempts
+                    message:
+                      Device is temporarily locked due to too many failed
+                      attempts
                     details:
                       remainingLockTime: 300
                       maxAttempts: 5
@@ -466,7 +474,9 @@ paths:
                   summary: Device permanently disabled
                   value:
                     code: WEBAUTHN_DEVICE_DISABLED
-                    message: Device has been permanently disabled due to security policy
+                    message:
+                      Device has been permanently disabled due to security
+                      policy
                     details:
                       reason: Too many failed attempts
                       contactSupport: true
@@ -474,7 +484,9 @@ paths:
                   summary: User verification failed
                   value:
                     code: WEBAUTHN_USER_VERIFICATION_FAILED
-                    message: User verification failed (e.g., wrong PIN, failed biometric)
+                    message:
+                      User verification failed (e.g., wrong PIN, failed
+                      biometric)
                     details:
                       remainingAttempts: 2
                       lockoutPeriod: 300

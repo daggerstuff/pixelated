@@ -7,7 +7,8 @@ pubDate: 2024-02-26
 
 # Addiction Assessment Tools and Methods
 
-Effective addiction treatment begins with thorough assessment. This guide covers various assessment tools and methods used in addiction evaluation.
+Effective addiction treatment begins with thorough assessment. This guide covers
+various assessment tools and methods used in addiction evaluation.
 
 ## Initial Screening
 

@@ -3,8 +3,8 @@
  * Provides real-time metrics, dashboards, and alerting
  */
 
-import { redis } from '../redis'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { redis } from '../redis'
 import type {
   RateLimitAnalytics,
   RateLimitAlert,

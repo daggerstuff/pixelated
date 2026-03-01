@@ -9,7 +9,8 @@ import Redis from 'ioredis'
 const getRedisConfig = () => {
   return {
     // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
-    connectionUrl: process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
+    connectionUrl:
+      process.env['REDIS_URL'] || process.env['UPSTASH_REDIS_REST_URL'],
     restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
   }
 }
@@ -106,7 +107,7 @@ function createMockRedisClient() {
     // Connection operations
     ping: async () => 'PONG',
     quit: async () => 'OK',
-    disconnect: () => { },
+    disconnect: () => {},
     status: 'ready',
 
     // List operations
@@ -179,8 +180,8 @@ function createMockRedisClient() {
     ttl: async (key: string) => (mockStore.has(key) ? -1 : -2),
 
     // Event emitter methods (for compatibility)
-    on: () => { },
-    off: () => { },
+    on: () => {},
+    off: () => {},
     emit: () => false,
   }
 }

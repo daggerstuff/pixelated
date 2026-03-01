@@ -16,13 +16,13 @@
   --bg-glass: rgba(10, 10, 10, 0.95);
   --bg-overlay: rgba(0, 0, 0, 0.96);
   --bg-surface: #0f0f0f;
-  
+
   /* Elevated Surfaces with Subtle Variations */
   --bg-level-1: #141414;
   --bg-level-2: #1a1a1a;
   --bg-level-3: #202020;
   --bg-level-4: #262626;
-  
+
   /* Text Hierarchy - High Contrast */
   --text-primary: #ffffff;
   --text-secondary: #e5e5e5;
@@ -30,34 +30,34 @@
   --text-muted: #8a8a8a;
   --text-subtle: #666666;
   --text-disabled: #444444;
-  
+
   /* Accent System - Emerald Green Primary */
   --accent-primary: #10b981;
   --accent-primary-hover: #34d399;
   --accent-primary-active: #059669;
   --accent-primary-subtle: rgba(16, 185, 129, 0.1);
   --accent-primary-muted: rgba(16, 185, 129, 0.2);
-  
+
   /* Secondary Accents */
   --accent-blue: #3b82f6;
   --accent-purple: #8b5cf6;
   --accent-orange: #f59e0b;
   --accent-red: #ef4444;
-  
+
   /* Border System */
   --border-primary: #2a2a2a;
   --border-secondary: #1f1f1f;
   --border-subtle: #161616;
   --border-accent: var(--accent-primary);
   --border-muted: #333333;
-  
+
   /* Shadows - Subtle Dark Mode Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.25);
   --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
-  
+
   /* Spacing System - Consistent Scale */
   --space-px: 1px;
   --space-0: 0;
@@ -73,7 +73,7 @@
   --space-16: 4rem;
   --space-20: 5rem;
   --space-24: 6rem;
-  
+
   /* Border Radius System */
   --radius-none: 0;
   --radius-sm: 0.125rem;
@@ -82,7 +82,7 @@
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
   --radius-full: 9999px;
-  
+
   /* Typography Scale */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -94,7 +94,7 @@
   --text-4xl: 2.25rem;
   --text-5xl: 3rem;
   --text-6xl: 3.75rem;
-  
+
   /* Font Weights */
   --weight-light: 300;
   --weight-normal: 400;
@@ -103,13 +103,13 @@
   --weight-bold: 700;
   --weight-extrabold: 800;
   --weight-black: 900;
-  
+
   /* Transitions */
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
   --transition-slow: 350ms ease;
   --transition-spring: 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  
+
   /* Z-Index Stack */
   --z-base: 1;
   --z-elevated: 10;
@@ -197,7 +197,12 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--accent-primary),
+    transparent
+  );
   opacity: 0;
   transition: opacity var(--transition-normal);
 }
@@ -287,7 +292,11 @@
 
 .heading-brutalist--hero {
   font-size: clamp(2.5rem, 5vw, 4rem);
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  background: linear-gradient(
+    135deg,
+    var(--text-primary),
+    var(--accent-primary)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -298,7 +307,11 @@
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-blue)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -340,7 +353,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
   }
   50% {
@@ -421,13 +435,13 @@
   .heading-brutalist--hero {
     font-size: 2.5rem;
   }
-  
+
   .grid-brutalist--2,
   .grid-brutalist--3,
   .grid-brutalist--4 {
     grid-template-columns: 1fr;
   }
-  
+
   .container-refined {
     padding: 0 var(--space-4);
   }
@@ -452,7 +466,13 @@
 body.enhanced-dark-theme {
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    'Geist Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

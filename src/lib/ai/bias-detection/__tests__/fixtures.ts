@@ -1,5 +1,6 @@
-import type { TherapeuticSession } from '../types'
 import { vi } from 'vitest'
+
+import type { TherapeuticSession } from '../types'
 /**
  * Test fixtures for bias detection scenarios
  */

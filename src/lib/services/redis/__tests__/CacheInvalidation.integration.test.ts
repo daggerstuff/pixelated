@@ -1,5 +1,7 @@
-import { CacheInvalidation } from '@/lib/cache/invalidation'
 import { Redis } from 'ioredis'
+
+import { CacheInvalidation } from '@/lib/cache/invalidation'
+
 import { RedisService } from '../RedisService'
 import {
   cleanupTestKeys,
@@ -33,7 +35,9 @@ describe('cacheInvalidation Integration', () => {
     })
     await redis.connect()
 
-    cacheInvalidation = new CacheInvalidation({ redis: redis.getClient() as Redis })
+    cacheInvalidation = new CacheInvalidation({
+      redis: redis.getClient() as Redis,
+    })
   })
 
   afterEach(async () => {
@@ -67,7 +71,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys are removed
       for (const key of keys) {
-        await expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
       }
     })
 
@@ -126,7 +130,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys exist
       for (const key of keys) {
-        await expect(key).toEqual(expect.objectContaining({ exists: true }))
+         expect(key).toEqual(expect.objectContaining({ exists: true }))
       }
 
       // Invalidate by tag
@@ -135,7 +139,7 @@ describe('cacheInvalidation Integration', () => {
 
       // Verify keys are removed
       for (const key of keys) {
-        await expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
       }
     })
 
@@ -149,13 +153,13 @@ describe('cacheInvalidation Integration', () => {
       await cacheInvalidation.set(key, value, { pattern: key, tags })
 
       // Verify key exists
-      await expect(key).toEqual(expect.objectContaining({ exists: true }))
+       expect(key).toEqual(expect.objectContaining({ exists: true }))
 
       // Invalidate using each tag
       for (const tag of tags) {
         await cacheInvalidation.invalidateTag(tag)
         await sleep(100) // Allow time for invalidation to propagate
-        await expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+         expect(key).not.toEqual(expect.objectContaining({ exists: true }))
 
         // Reset key for next tag test
         if (tag !== tags[tags.length - 1]) {
@@ -234,7 +238,7 @@ describe('cacheInvalidation Integration', () => {
       await cacheInvalidation.invalidatePattern(`${pattern}:*`)
       await sleep(100) // Allow time for invalidation to propagate
 
-      await expect(key).not.toEqual(expect.objectContaining({ exists: true }))
+       expect(key).not.toEqual(expect.objectContaining({ exists: true }))
     })
   })
 

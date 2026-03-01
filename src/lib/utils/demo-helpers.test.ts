@@ -1,6 +1,8 @@
 // Unit tests for demo helper functions
 
 import { describe, it, expect, beforeEach } from 'vitest'
+
+import type { SessionData, BiasAnalysisResults } from '../types/bias-detection'
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
@@ -14,7 +16,6 @@ import {
   determineAlertLevel,
   generateSessionId,
 } from './demo-helpers'
-import type { SessionData, BiasAnalysisResults } from '../types/bias-detection'
 
 describe('Demo Helpers', () => {
   let mockSessionData: SessionData
@@ -131,9 +132,7 @@ describe('Demo Helpers', () => {
         evaluation: 0.6,
       }
 
-      const scenarios = generateCounterfactualScenarios(
-        biasFactors,
-      )
+      const scenarios = generateCounterfactualScenarios(biasFactors)
       // Expect 4 scenarios: Age, Cultural, Gender, Language are high enough (0.6, 0.5, 0.5, 0.6)
       // plus therapeutic approach (always added)
       expect(scenarios.length).toBeGreaterThanOrEqual(3)
@@ -163,9 +162,7 @@ describe('Demo Helpers', () => {
         evaluation: 0.3,
       }
 
-      const scenarios = generateCounterfactualScenarios(
-        biasFactors,
-      )
+      const scenarios = generateCounterfactualScenarios(biasFactors)
       expect(
         scenarios.some((s) => s.change.includes('Therapeutic Language')),
       ).toBe(true)
@@ -346,19 +343,17 @@ describe('Demo Helpers', () => {
         demographics: mockSessionData.demographics,
       }
 
-      const counterfactualScenarios = generateCounterfactualScenarios(
-        {
-          overall: 0.5,
-          linguistic: 0.4,
-          gender: 0.3,
-          racial: 0.4,
-          age: 0.3,
-          cultural: 0.4,
-          model: 0.4,
-          interactive: 0.4,
-          evaluation: 0.4,
-        },
-      )
+      const counterfactualScenarios = generateCounterfactualScenarios({
+        overall: 0.5,
+        linguistic: 0.4,
+        gender: 0.3,
+        racial: 0.4,
+        age: 0.3,
+        cultural: 0.4,
+        model: 0.4,
+        interactive: 0.4,
+        evaluation: 0.4,
+      })
 
       const historicalComparison = generateHistoricalComparison(0.5)
 

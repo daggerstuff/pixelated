@@ -1,9 +1,9 @@
 ---
-title: "[ADR-0000] ADR Template"
-description: "[ADR-0000] ADR Template documentation"
+title: '[ADR-0000] ADR Template'
+description: '[ADR-0000] ADR Template documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -14,12 +14,13 @@ toc: true
 
 [Proposed | Accepted | Deprecated | Superseded]
 
-If superseded, include a reference to the new ADR:
-Superseded by [ADR-XXXX](XXXX-example.md)
+If superseded, include a reference to the new ADR: Superseded by
+[ADR-XXXX](XXXX-example.md)
 
 ## Context
 
-Describe the context and problem statement, e.g., in free form using two to three sentences. You may want to articulate the problem in form of a question.
+Describe the context and problem statement, e.g., in free form using two to
+three sentences. You may want to articulate the problem in form of a question.
 
 ## Decision
 

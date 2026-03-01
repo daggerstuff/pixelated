@@ -37,7 +37,7 @@ describe('SemanticEvidenceParser', () => {
       const result = parseSemanticEvidenceResponse(validResponse)
 
       expect(result).toHaveLength(2)
-      const firstItem = result[0]!
+      const firstItem = result[0]
       expect(firstItem).toMatchObject({
         content: 'I feel hopeless',
         type: 'direct_quote',
@@ -89,7 +89,7 @@ describe('SemanticEvidenceParser', () => {
 
       // Should only have the valid item
       expect(result).toHaveLength(1)
-      const validItem = result[0]!
+      const validItem = result[0]
       expect(validItem.text).toBe('Valid evidence item')
     })
 
@@ -133,8 +133,8 @@ describe('SemanticEvidenceParser', () => {
       )
 
       expect(result).toHaveLength(2)
-      const highConfidenceItem = result[0]!
-      const lowConfidenceItem = result[1]!
+      const highConfidenceItem = result[0]
+      const lowConfidenceItem = result[1]
       expect(highConfidenceItem.confidence).toBe(1) // Clamped to max
       expect(lowConfidenceItem.confidence).toBe(0) // Clamped to min
     })
@@ -154,7 +154,7 @@ describe('SemanticEvidenceParser', () => {
       )
 
       expect(result).toHaveLength(1)
-      const evidenceItem = result[0]!
+      const evidenceItem = result[0]
       expect(evidenceItem.clinicalRelevance).toBe('supportive') // Should default to 'supportive'
     })
 
@@ -171,7 +171,7 @@ describe('SemanticEvidenceParser', () => {
       const result = parseSemanticEvidenceResponse(responseWithWhitespace)
 
       expect(result).toHaveLength(1)
-      const evidenceItem = result[0]!
+      const evidenceItem = result[0]
       expect(evidenceItem.text).toBe('Evidence with whitespace')
     })
 
@@ -201,7 +201,7 @@ describe('SemanticEvidenceParser', () => {
 
       // Should only process the valid item, others should be filtered out by schema validation
       expect(result).toHaveLength(1)
-      const validItem = result[0]!
+      const validItem = result[0]
       expect(validItem.text).toBe('Valid item')
     })
   })

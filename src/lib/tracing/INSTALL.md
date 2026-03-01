@@ -17,11 +17,14 @@ pnpm add @opentelemetry/sdk-node \
 
 ## Note on Existing Dependencies
 
-Some OpenTelemetry packages may already be available as transitive dependencies from:
+Some OpenTelemetry packages may already be available as transitive dependencies
+from:
+
 - `@sentry/opentelemetry` (Sentry integration)
 - Other monitoring tools
 
-However, for full functionality, the packages listed above should be explicitly installed.
+However, for full functionality, the packages listed above should be explicitly
+installed.
 
 ## Verification
 

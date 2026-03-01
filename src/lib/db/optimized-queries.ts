@@ -4,8 +4,10 @@
  */
 
 import { PoolClient, QueryResult } from 'pg'
-import { getPool } from './index'
+
 import { getLogger } from '@/lib/logging'
+
+import { getPool } from './index'
 
 const logger = getLogger('optimized-queries')
 

@@ -89,43 +89,43 @@ export default function ScenarioGenerationDemo() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-6">
-      <div className="space-y-6">
+    <div className='mx-auto w-full max-w-5xl p-6'>
+      <div className='space-y-6'>
         {/* Scenario Type Selection */}
         <div>
           <label
-            htmlFor="scenario-type"
-            className="block text-sm font-medium text-slate-200 mb-3"
+            htmlFor='scenario-type'
+            className='text-slate-200 mb-3 block text-sm font-medium'
           >
             Select Scenario Type
           </label>
           <div
-            id="scenario-type"
-            className="grid grid-cols-2 md:grid-cols-4 gap-3"
+            id='scenario-type'
+            className='grid grid-cols-2 gap-3 md:grid-cols-4'
           >
             {scenarioTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className={`p-4 rounded-lg border transition-all ${
+                className={`rounded-lg border p-4 transition-all ${
                   selectedType === type.id
                     ? 'bg-blue-600/20 border-blue-400 text-blue-200'
                     : 'bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700/50'
                 }`}
               >
-                <div className="text-2xl mb-2">{type.icon}</div>
-                <div className="text-sm font-medium">{type.label}</div>
+                <div className='mb-2 text-2xl'>{type.icon}</div>
+                <div className='text-sm font-medium'>{type.label}</div>
               </button>
             ))}
           </div>
         </div>
 
         {/* Generate Button */}
-        <div className="text-center">
+        <div className='text-center'>
           <button
             onClick={generateScenario}
             disabled={isGenerating}
-            className="px-8 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+            className='bg-orange-600 hover:bg-orange-700 disabled:bg-slate-600 text-white rounded-lg px-8 py-3 font-medium transition-colors disabled:cursor-not-allowed'
           >
             {isGenerating
               ? 'Generating Scenario...'
@@ -135,33 +135,33 @@ export default function ScenarioGenerationDemo() {
 
         {/* Generated Scenario */}
         {scenario && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {/* Client Profile */}
-            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">
+            <div className='bg-slate-800/50 border-slate-600/50 rounded-lg border p-6'>
+              <h3 className='text-white mb-4 text-lg font-semibold'>
                 Client Profile
               </h3>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 <div>
-                  <div className="text-orange-400 font-medium">
+                  <div className='text-orange-400 font-medium'>
                     Name & Demographics
                   </div>
-                  <div className="text-white">
+                  <div className='text-white'>
                     {scenario.client.name}, {scenario.client.age}
                   </div>
-                  <div className="text-slate-300 text-sm">
+                  <div className='text-slate-300 text-sm'>
                     {scenario.client.occupation}
                   </div>
                 </div>
                 <div>
-                  <div className="text-orange-400 font-medium">
+                  <div className='text-orange-400 font-medium'>
                     Presenting Concern
                   </div>
-                  <div className="text-white">{scenario.client.presenting}</div>
+                  <div className='text-white'>{scenario.client.presenting}</div>
                 </div>
                 <div>
-                  <div className="text-orange-400 font-medium">Background</div>
-                  <div className="text-slate-300 text-sm">
+                  <div className='text-orange-400 font-medium'>Background</div>
+                  <div className='text-slate-300 text-sm'>
                     {scenario.background}
                   </div>
                 </div>
@@ -169,32 +169,32 @@ export default function ScenarioGenerationDemo() {
             </div>
 
             {/* Clinical Information */}
-            <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">
+            <div className='bg-slate-800/50 border-slate-600/50 rounded-lg border p-6'>
+              <h3 className='text-white mb-4 text-lg font-semibold'>
                 Clinical Presentation
               </h3>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 <div>
-                  <div className="text-green-400 font-medium mb-2">
+                  <div className='text-green-400 mb-2 font-medium'>
                     Key Symptoms
                   </div>
-                  <ul className="space-y-1">
+                  <ul className='space-y-1'>
                     {scenario.symptoms.map((symptom: string) => (
                       <li
                         key={symptom}
-                        className="text-slate-300 text-sm flex items-start gap-2"
+                        className='text-slate-300 flex items-start gap-2 text-sm'
                       >
-                        <span className="text-green-400 text-xs mt-1">•</span>
+                        <span className='text-green-400 mt-1 text-xs'>•</span>
                         {symptom}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <div className="text-blue-400 font-medium">
+                  <div className='text-blue-400 font-medium'>
                     Clinical Formulation
                   </div>
-                  <div className="text-slate-300 text-sm">
+                  <div className='text-slate-300 text-sm'>
                     {scenario.formulation}
                   </div>
                 </div>
@@ -202,20 +202,20 @@ export default function ScenarioGenerationDemo() {
             </div>
 
             {/* Treatment Plan */}
-            <div className="lg:col-span-2 bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-              <h3 className="text-lg font-semibold text-white mb-4">
+            <div className='bg-slate-800/50 border-slate-600/50 rounded-lg border p-6 lg:col-span-2'>
+              <h3 className='text-white mb-4 text-lg font-semibold'>
                 Suggested Treatment Approach
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 {scenario.treatment.map((treatment: string, index: number) => (
                   <div
                     key={`treatment-${index}-${treatment.slice(0, 20)}`}
-                    className="flex items-start gap-3 p-3 bg-slate-700/30 rounded-lg"
+                    className='bg-slate-700/30 flex items-start gap-3 rounded-lg p-3'
                   >
-                    <span className="text-cyan-400 font-bold text-sm">
+                    <span className='text-cyan-400 text-sm font-bold'>
                       {index + 1}
                     </span>
-                    <span className="text-slate-300 text-sm">{treatment}</span>
+                    <span className='text-slate-300 text-sm'>{treatment}</span>
                   </div>
                 ))}
               </div>
@@ -224,9 +224,9 @@ export default function ScenarioGenerationDemo() {
         )}
 
         {isGenerating && (
-          <div className="text-center py-8">
-            <div className="inline-flex items-center gap-3 text-slate-300">
-              <div className="w-6 h-6 border-2 border-orange-400 border-t-transparent rounded-full animate-spin"></div>
+          <div className='py-8 text-center'>
+            <div className='text-slate-300 inline-flex items-center gap-3'>
+              <div className='border-orange-400 border-t-transparent h-6 w-6 animate-spin rounded-full border-2'></div>
               Generating comprehensive clinical scenario...
             </div>
           </div>

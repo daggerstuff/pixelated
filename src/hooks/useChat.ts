@@ -1,6 +1,7 @@
-import type { ChatOptions } from '@/types/chat'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
+
+import type { ChatOptions } from '@/types/chat'
 
 interface LocalMessage {
   id?: string

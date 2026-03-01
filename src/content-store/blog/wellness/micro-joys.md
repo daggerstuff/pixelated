@@ -20,7 +20,11 @@ category: Research
 
 ## Introduction
 
-In our quest for happiness, we often overlook the tiny moments of joy that pepper our daily lives. These "micro-joys" – small, seemingly insignificant moments of pleasure or contentment – can be powerful tools for building lasting happiness and resilience. Let's explore how to notice, appreciate, and cultivate these precious moments.
+In our quest for happiness, we often overlook the tiny moments of joy that
+pepper our daily lives. These "micro-joys" – small, seemingly insignificant
+moments of pleasure or contentment – can be powerful tools for building lasting
+happiness and resilience. Let's explore how to notice, appreciate, and cultivate
+these precious moments.
 
 ## Understanding Micro-Joys
 
@@ -34,7 +38,8 @@ Micro-joys are the small pleasures that make us smile:
 - A favorite song playing randomly
 - The satisfaction of making your bed
 
-These moments might seem trivial, but they form the fabric of our daily happiness.
+These moments might seem trivial, but they form the fabric of our daily
+happiness.
 
 ## The Science of Small Pleasures
 
@@ -230,7 +235,12 @@ Build lasting joy habits:
 
 ## Conclusion
 
-The art of finding joy in small moments is a powerful practice for mental wellness. By cultivating awareness of micro-joys and creating intentional habits to notice and celebrate them, we can build a more resilient, happier life. Remember, it's not about seeking grand moments of happiness, but about appreciating the beautiful small moments that are already present in our daily lives.
+The art of finding joy in small moments is a powerful practice for mental
+wellness. By cultivating awareness of micro-joys and creating intentional habits
+to notice and celebrate them, we can build a more resilient, happier life.
+Remember, it's not about seeking grand moments of happiness, but about
+appreciating the beautiful small moments that are already present in our daily
+lives.
 
 ## Daily Joy Challenge
 
@@ -244,4 +254,5 @@ Start your micro-joy journey:
 
 ---
 
-_Next in our series, we'll explore how friendships can be a powerful source of daily joy and mental wellness._
+_Next in our series, we'll explore how friendships can be a powerful source of
+daily joy and mental wellness._

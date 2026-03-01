@@ -1,4 +1,6 @@
-import type { Source } from '@/lib/api/journal-research/types'
+import { format } from 'date-fns'
+import { ExternalLink } from 'lucide-react'
+
 import {
   Card,
   CardContent,
@@ -7,8 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/card'
-import { format } from 'date-fns'
-import { ExternalLink } from 'lucide-react'
+import type { Source } from '@/lib/api/journal-research/types'
 
 export interface SourceCardProps {
   source: Source
@@ -40,82 +41,81 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
       }
     >
       <CardHeader>
-        <CardTitle className="text-lg font-semibold line-clamp-2">
+        <CardTitle className='line-clamp-2 text-lg font-semibold'>
           {source.title}
         </CardTitle>
-        <CardDescription className="mt-1">
+        <CardDescription className='mt-1'>
           {source.authors.join(', ')}
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <div className="space-y-3">
-          <div className="text-sm text-muted-foreground line-clamp-3">
+        <div className='space-y-3'>
+          <div className='text-muted-foreground line-clamp-3 text-sm'>
             {source.abstract}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className='flex flex-wrap gap-2'>
             {source.keywords.slice(0, 5).map((keyword) => (
               <span
                 key={keyword}
-                className="rounded-full bg-muted px-2 py-1 text-xs"
+                className='bg-muted rounded-full px-2 py-1 text-xs'
               >
                 {keyword}
               </span>
             ))}
             {source.keywords.length > 5 && (
-              <span className="rounded-full bg-muted px-2 py-1 text-xs">
+              <span className='bg-muted rounded-full px-2 py-1 text-xs'>
                 +{source.keywords.length - 5} more
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className='grid grid-cols-2 gap-4 text-sm'>
             <div>
-              <span className="text-muted-foreground">Published:</span>
-              <span className="ml-2 font-medium">
+              <span className='text-muted-foreground'>Published:</span>
+              <span className='ml-2 font-medium'>
                 {format(source.publicationDate, 'MMM yyyy')}
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground">Type:</span>
-              <span className="ml-2 font-medium capitalize">
+              <span className='text-muted-foreground'>Type:</span>
+              <span className='ml-2 font-medium capitalize'>
                 {source.sourceType}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className='text-muted-foreground flex items-center gap-4 text-xs'>
             {source.openAccess && (
-              <span className="rounded bg-green-100 px-2 py-1 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <span className='bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1'>
                 Open Access
               </span>
             )}
-            <span className="capitalize">{source.dataAvailability}</span>
+            <span className='capitalize'>{source.dataAvailability}</span>
             {source.doi && (
-              <span className="font-mono text-xs">{source.doi}</span>
+              <span className='font-mono text-xs'>{source.doi}</span>
             )}
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
+      <CardFooter className='flex items-center justify-between'>
+        <div className='text-muted-foreground text-xs'>
           Discovered {format(source.discoveryDate, 'MMM d, yyyy')}
         </div>
         <a
           href={source.url}
-          target="_blank"
-          rel="noopener noreferrer"
+          target='_blank'
+          rel='noopener noreferrer'
           onClick={handleLinkClick}
-          className="flex items-center gap-1 text-xs text-primary hover:underline"
+          className='text-primary flex items-center gap-1 text-xs hover:underline'
           aria-label={`Open ${source.title} in new tab`}
         >
           View Source
-          <ExternalLink className="h-3 w-3" />
+          <ExternalLink className='h-3 w-3' />
         </a>
       </CardFooter>
     </Card>
   )
 }
-

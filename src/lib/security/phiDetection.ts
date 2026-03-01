@@ -239,7 +239,7 @@ export class PresidioPHIDetector {
     } catch (error: unknown) {
       logger.error('Error detecting PHI', {
         error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
       })
 
       // Use fallback detection in case of error

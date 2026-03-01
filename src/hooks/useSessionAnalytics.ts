@@ -104,7 +104,7 @@ export function useSessionAnalytics(
         if (isMounted) {
           setError(
             err instanceof Error
-              ? (err as Error)?.message || String(err)
+              ? (err)?.message || String(err)
               : 'An unknown error occurred',
           )
         }
@@ -115,7 +115,7 @@ export function useSessionAnalytics(
       }
     }
 
-    fetchAllAnalytics()
+    void fetchAllAnalytics()
     return () => {
       isMounted = false
     }

@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react'
 import * as path from 'path'
-import { compileAstroComponent } from '../../../test-utils/astro-test-utils'
+
+import { render, screen } from '@testing-library/react'
 import React from 'react'
+
+import { compileAstroComponent } from '../../../test-utils/astro-test-utils'
 
 // Mock the monitoring config
 vi.mock('../../../lib/monitoring/config', () => ({

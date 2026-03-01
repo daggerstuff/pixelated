@@ -1,22 +1,27 @@
 ---
-title: "Real User Monitoring (RUM) Documentation"
-description: "Real User Monitoring (RUM) Documentation documentation"
+title: 'Real User Monitoring (RUM) Documentation'
+description: 'Real User Monitoring (RUM) Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Real User Monitoring (RUM) Documentation
 
-This guide provides information about our Real User Monitoring (RUM) implementation, how to use it, and how to interpret the data.
+This guide provides information about our Real User Monitoring (RUM)
+implementation, how to use it, and how to interpret the data.
 
 ## Overview
 
-Real User Monitoring collects performance data from actual users of our application. Unlike synthetic testing, RUM provides insights into real-world experiences across different devices, network conditions, geographic locations, and browsers.
+Real User Monitoring collects performance data from actual users of our
+application. Unlike synthetic testing, RUM provides insights into real-world
+experiences across different devices, network conditions, geographic locations,
+and browsers.
 
-Our RUM implementation uses the Grafana Faro Web SDK to collect and visualize real user metrics.
+Our RUM implementation uses the Grafana Faro Web SDK to collect and visualize
+real user metrics.
 
 ## Key Metrics Collected
 
@@ -24,7 +29,8 @@ Our RUM implementation uses the Grafana Faro Web SDK to collect and visualize re
 
 - **Time to First Byte (TTFB)**: Time from request to first byte of response
 - **First Contentful Paint (FCP)**: Time until first content is rendered
-- **Largest Contentful Paint (LCP)**: Time until largest content element is rendered
+- **Largest Contentful Paint (LCP)**: Time until largest content element is
+  rendered
 - **Speed Index**: How quickly content is visually displayed
 
 ### Interactivity
@@ -35,7 +41,8 @@ Our RUM implementation uses the Grafana Faro Web SDK to collect and visualize re
 
 ### Visual Stability
 
-- **Cumulative Layout Shift (CLS)**: Measures visual stability and unexpected layout shifts
+- **Cumulative Layout Shift (CLS)**: Measures visual stability and unexpected
+  layout shifts
 
 ### Resource Metrics
 
@@ -59,14 +66,19 @@ Our RUM implementation uses the Grafana Faro Web SDK to collect and visualize re
 
 Our RUM implementation consists of several components:
 
-1. **Monitoring Service**: Core service that initializes monitoring (`src/lib/monitoring/service.ts`)
-2. **Monitoring Component**: Astro component that loads the monitoring service (`src/components/Monitoring.astro`)
-3. **RUM Dashboard**: Interactive dashboard for viewing metrics (`src/components/monitoring/RealUserMonitoring.astro`)
-4. **React Hooks**: Hooks for accessing RUM data in React components (`src/lib/monitoring/hooks.ts`)
+1. **Monitoring Service**: Core service that initializes monitoring
+   (`src/lib/monitoring/service.ts`)
+2. **Monitoring Component**: Astro component that loads the monitoring service
+   (`src/components/Monitoring.astro`)
+3. **RUM Dashboard**: Interactive dashboard for viewing metrics
+   (`src/components/monitoring/RealUserMonitoring.astro`)
+4. **React Hooks**: Hooks for accessing RUM data in React components
+   (`src/lib/monitoring/hooks.ts`)
 
 ## Configuration
 
-RUM configuration is defined in `src/lib/monitoring/config.ts`. The key settings are:
+RUM configuration is defined in `src/lib/monitoring/config.ts`. The key settings
+are:
 
 ```typescript
 const defaultConfig: MonitoringConfig = {
@@ -100,15 +112,18 @@ To configure RUM, set the following environment variables:
 - `GRAFANA_API_KEY`: API key for Grafana (required for RUM)
 - `GRAFANA_ORG_ID`: Organization ID in Grafana
 - `SLACK_WEBHOOK`: Webhook URL for Slack alerts
-- `MONITORING_EMAIL_RECIPIENTS`: Comma-separated list of email recipients for alerts
+- `MONITORING_EMAIL_RECIPIENTS`: Comma-separated list of email recipients for
+  alerts
 
 ## Using the Real User Monitoring Dashboard
 
-The RUM dashboard is available at `/admin/real-user-monitoring` and provides a visual representation of all collected metrics.
+The RUM dashboard is available at `/admin/real-user-monitoring` and provides a
+visual representation of all collected metrics.
 
 ### Access
 
-The dashboard is accessible to administrators and is found in the Admin Dashboard under the Monitoring section.
+The dashboard is accessible to administrators and is found in the Admin
+Dashboard under the Monitoring section.
 
 ### Reading the Dashboard
 
@@ -120,36 +135,42 @@ Metrics are color-coded based on our performance budgets:
 
 ### Refreshing Data
 
-The dashboard automatically refreshes every 30 seconds. You can manually refresh the data by clicking the "Refresh Now" button.
+The dashboard automatically refreshes every 30 seconds. You can manually refresh
+the data by clicking the "Refresh Now" button.
 
 ## Using RUM in React Components
 
 To access RUM data in React components, use the provided hooks:
 
 ```tsx
-import { useMonitoring, useRUMData } from '../lib/monitoring/hooks';
+import { useMonitoring, useRUMData } from '../lib/monitoring/hooks'
 
 function MyComponent() {
   // Get monitoring utilities
-  const { trackEvent, trackError, trackMetric, 
-          trackUserInteraction, trackPageView } = useMonitoring();
-  
+  const {
+    trackEvent,
+    trackError,
+    trackMetric,
+    trackUserInteraction,
+    trackPageView,
+  } = useMonitoring()
+
   // Access RUM data
-  const { 
-    loadingPerformance, 
-    interactivityMetrics, 
+  const {
+    loadingPerformance,
+    interactivityMetrics,
     visualStability,
-    isLoading, 
-    lastUpdated, 
-    refreshData 
-  } = useRUMData();
-  
+    isLoading,
+    lastUpdated,
+    refreshData,
+  } = useRUMData()
+
   // Track custom event
   const handleClick = () => {
-    trackUserInteraction('button', 'click', { buttonId: 'my-button' });
+    trackUserInteraction('button', 'click', { buttonId: 'my-button' })
     // Your component logic here
-  };
-  
+  }
+
   return (
     <div>
       <h2>Performance Metrics</h2>
@@ -165,7 +186,7 @@ function MyComponent() {
       )}
       <button onClick={handleClick}>Track Interaction</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -173,17 +194,17 @@ function MyComponent() {
 
 We've established the following performance budgets:
 
-| Metric | Target (Good) | Maximum (Acceptable) |
-|--------|---------------|----------------------|
-| TTFB   | < 300ms       | < 600ms              |
-| FCP    | < 1.8s        | < 3s                 |
-| LCP    | < 2.5s        | < 4s                 |
-| CLS    | < 0.1         | < 0.25               |
-| TBT    | < 200ms       | < 600ms              |
-| FID    | < 100ms       | < 300ms              |
-| JS Size| < 500KB       | < 1MB                |
-| CSS Size| < 100KB      | < 200KB              |
-| Requests| < 50         | < 80                 |
+| Metric   | Target (Good) | Maximum (Acceptable) |
+| -------- | ------------- | -------------------- |
+| TTFB     | < 300ms       | < 600ms              |
+| FCP      | < 1.8s        | < 3s                 |
+| LCP      | < 2.5s        | < 4s                 |
+| CLS      | < 0.1         | < 0.25               |
+| TBT      | < 200ms       | < 600ms              |
+| FID      | < 100ms       | < 300ms              |
+| JS Size  | < 500KB       | < 1MB                |
+| CSS Size | < 100KB       | < 200KB              |
+| Requests | < 50          | < 80                 |
 
 ## Troubleshooting
 
@@ -210,7 +231,7 @@ To enable debug mode for more detailed logging:
 
 ```typescript
 // In your development environment
-window.localStorage.setItem('rum-debug', 'true');
+window.localStorage.setItem('rum-debug', 'true')
 ```
 
 ## Future Enhancements
@@ -221,5 +242,6 @@ Planned improvements to our RUM implementation:
 2. **User journey tracking**: Map user flows and identify bottlenecks
 3. **Advanced alerting**: Set up proactive alerts based on RUM data
 4. **Integration with CI/CD**: Block deployments if performance metrics degrade
-5. **Expanded demographics**: More detailed user segmentation by device type, browser version
+5. **Expanded demographics**: More detailed user segmentation by device type,
+   browser version
 6. **Historical trends**: View performance changes over time

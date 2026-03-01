@@ -1,6 +1,7 @@
-import type { RedisService } from '@/lib/services/redis/RedisService'
 import { EventEmitter } from 'node:events'
+
 import { AnalyticsService } from '@/lib/analytics/service'
+import type { RedisService } from '@/lib/services/redis/RedisService'
 
 interface MonitoringConfig {
   enableWebVitals: boolean

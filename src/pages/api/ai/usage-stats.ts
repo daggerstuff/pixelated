@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { requirePermission } from '../../../lib/access-control'
 import { getAIUsageStats } from '../../../lib/ai/analytics'
 import { handleApiError } from '../../../lib/ai/error-handling'
@@ -36,7 +37,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
     }
 
     if (!cookies) {
@@ -45,7 +46,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
     }
     // Verify session and permissions
     session = await getSession()

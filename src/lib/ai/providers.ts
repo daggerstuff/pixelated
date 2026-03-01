@@ -1,6 +1,6 @@
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk } from './models/ai-types'
 import { createTogetherAIService } from './services/together'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
@@ -36,13 +36,13 @@ function getEnvVar(key: string): string | undefined {
 
 // Default provider configurations
 const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
-  'anthropic': {
+  anthropic: {
     name: 'Anthropic Claude',
     baseUrl: 'https://api.anthropic.com',
     defaultModel: 'claude-3-sonnet-20240229',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  'openai': {
+  openai: {
     name: 'OpenAI GPT',
     baseUrl: 'https://api.openai.com/v1',
     defaultModel: 'gpt-4',
@@ -54,13 +54,13 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  'together': {
+  together: {
     name: 'Together AI',
     baseUrl: 'https://api.together.xyz',
     defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  'huggingface': {
+  huggingface: {
     name: 'Hugging Face',
     baseUrl: 'https://api-inference.huggingface.co',
     defaultModel: 'microsoft/DialoGPT-medium',

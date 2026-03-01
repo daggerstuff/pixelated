@@ -1,35 +1,38 @@
-import type { Message } from '@/types/chat'
-import type { Scenario } from '@/types/scenarios'
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
+
 import { clientScenarios } from '@/data/scenarios'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
+import type { Message } from '@/types/chat'
+import type { Scenario } from '@/types/scenarios'
 // Import this component dynamically for code splitting
 const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
-import { ChatContainer } from './ChatContainer'
+import { BarChart as IconChart } from 'lucide-react'
+
+// Import SupervisorFeedback component
+import { SupervisorFeedback } from '@/components/feedback/SupervisorFeedback'
 import { MentalHealthInsights } from '@/components/MentalHealthInsights'
+import { Label } from '@/components/ui/label'
+// Removed unused import: SecurityBadge
+import { Switch } from '@/components/ui/switch'
+import { useAIService } from '@/hooks/useAIService'
+import {
+  useEmotionDetection,
+  type EmotionAnalysis,
+} from '@/hooks/useEmotionDetection'
+import { useMentalHealthAnalysis } from '@/hooks/useMentalHealthAnalysis'
+import { usePatientModel } from '@/hooks/usePatientModel'
+import { useRiskAssessment } from '@/hooks/useRiskAssessment'
+import { loadSampleModels } from '@/lib/utils/load-sample-models'
+
+import { ChatContainer } from './ChatContainer'
+import { CognitiveModelSelector } from './CognitiveModelSelector'
 import {
   IconChevronDown,
   IconMaximize,
   IconMinimize,
   IconMental,
 } from './icons'
-import { BarChart as IconChart } from 'lucide-react'
-// Removed unused import: SecurityBadge
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { useAIService } from '@/hooks/useAIService'
-import { useMentalHealthAnalysis } from '@/hooks/useMentalHealthAnalysis'
-import {
-  useEmotionDetection,
-  type EmotionAnalysis,
-} from '@/hooks/useEmotionDetection'
-import { useRiskAssessment } from '@/hooks/useRiskAssessment'
-import { CognitiveModelSelector } from './CognitiveModelSelector'
-import { usePatientModel } from '@/hooks/usePatientModel'
-import { loadSampleModels } from '@/lib/utils/load-sample-models'
-// Import SupervisorFeedback component
-import { SupervisorFeedback } from '@/components/feedback/SupervisorFeedback'
 
 // Extended Message type with mental health analysis
 interface ExtendedMessage extends Message {
@@ -80,11 +83,11 @@ const useTherapeuticInterventions = (): TherapeuticInterventions => {
 
 // Loading fallback component
 const LoadingAnalytics = () => (
-  <div className="rounded-xl border border-green-700/30 bg-black bg-opacity-90 p-6 animate-pulse">
-    <div className="h-6 w-1/3 bg-green-700/20 mb-4 rounded"></div>
-    <div className="grid grid-cols-2 gap-4">
-      <div className="h-40 bg-green-700/10 rounded"></div>
-      <div className="h-40 bg-green-700/10 rounded"></div>
+  <div className='border-green-700/30 bg-black animate-pulse rounded-xl border bg-opacity-90 p-6'>
+    <div className='bg-green-700/20 mb-4 h-6 w-1/3 rounded'></div>
+    <div className='grid grid-cols-2 gap-4'>
+      <div className='bg-green-700/10 h-40 rounded'></div>
+      <div className='bg-green-700/10 h-40 rounded'></div>
     </div>
   </div>
 )
@@ -313,7 +316,7 @@ function ProfessionalTherapistWorkspace() {
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An error occurred while processing your message',
       )
       console.error('Chat error:', err)
@@ -427,11 +430,11 @@ function ProfessionalTherapistWorkspace() {
       )}
     >
       {/* Header toolbar */}
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-green-300">
+      <div className='mb-4 flex items-center justify-between'>
+        <h1 className='text-green-300 text-xl font-bold'>
           Therapy Training Environment
         </h1>
-        <div className="flex items-center space-x-2">
+        <div className='flex items-center space-x-2'>
           <button
             onClick={() => setShowPatientModelSelector(true)}
             className={cn(
@@ -453,9 +456,9 @@ function ProfessionalTherapistWorkspace() {
                 ? 'bg-green-800/70 text-green-200'
                 : 'bg-green-900/30 text-green-400',
             )}
-            aria-label="Toggle analytics dashboard"
+            aria-label='Toggle analytics dashboard'
           >
-            <IconChart className="h-5 w-5" />
+            <IconChart className='h-5 w-5' />
           </button>
           <button
             onClick={() => setShowMentalHealthPanel(!showMentalHealthPanel)}
@@ -465,9 +468,9 @@ function ProfessionalTherapistWorkspace() {
                 ? 'bg-green-800/70 text-green-200'
                 : 'bg-green-900/30 text-green-400',
             )}
-            aria-label="Toggle mental health insights"
+            aria-label='Toggle mental health insights'
           >
-            <IconMental className="h-5 w-5" />
+            <IconMental className='h-5 w-5' />
           </button>
           <button
             onClick={toggleSupervisorFeedback}
@@ -482,55 +485,55 @@ function ProfessionalTherapistWorkspace() {
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="rounded-lg bg-green-900/30 p-1.5 text-green-400"
+            className='bg-green-900/30 text-green-400 rounded-lg p-1.5'
             aria-label={isExpanded ? 'Minimize' : 'Maximize'}
           >
             {isExpanded ? (
-              <IconMinimize className="h-5 w-5" />
+              <IconMinimize className='h-5 w-5' />
             ) : (
-              <IconMaximize className="h-5 w-5" />
+              <IconMaximize className='h-5 w-5' />
             )}
           </button>
         </div>
       </div>
 
       {/* Main content area */}
-      <div className="flex h-full flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
+      <div className='flex h-full flex-col space-y-4 lg:flex-row lg:space-x-4 lg:space-y-0'>
         {/* Chat container */}
-        <div className="flex-1">
+        <div className='flex-1'>
           <button
-            className="flex items-center gap-2 rounded-lg bg-green-900/30 px-3 py-2 text-green-300"
+            className='bg-green-900/30 text-green-300 flex items-center gap-2 rounded-lg px-3 py-2'
             aria-pressed={showScenarios}
             onClick={() => setShowScenarios(!showScenarios)}
           >
             {' '}
-            <div className="relative mb-4 flex items-center justify-between">
+            <div className='relative mb-4 flex items-center justify-between'>
               <span>Client Case: {selectedScenario.name}</span>
-              <IconChevronDown className="h-4 w-4" />
+              <IconChevronDown className='h-4 w-4' />
             </div>
             {/* Settings */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center space-x-2">
+            <div className='flex items-center gap-2'>
+              <div className='flex items-center space-x-2'>
                 <Switch
-                  id="mh-analysis"
+                  id='mh-analysis'
                   checked={storeState.mentalHealthAnalysisEnabled}
                   onCheckedChange={toggleMentalHealthAnalysis}
                 />
 
-                <Label htmlFor="mh-analysis" className="text-sm text-green-300">
+                <Label htmlFor='mh-analysis' className='text-green-300 text-sm'>
                   Cognitive Assessment
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className='flex items-center space-x-2'>
                 <Switch
-                  id="expert-guidance"
+                  id='expert-guidance'
                   checked={storeState.expertGuidanceEnabled}
                   onCheckedChange={toggleExpertGuidance}
                 />
 
                 <Label
-                  htmlFor="expert-guidance"
-                  className="text-sm text-green-300"
+                  htmlFor='expert-guidance'
+                  className='text-green-300 text-sm'
                 >
                   Clinical Guidance
                 </Label>
@@ -540,11 +543,11 @@ function ProfessionalTherapistWorkspace() {
 
           {/* Scenarios popup */}
           {showScenarios && (
-            <div className="absolute z-10 mt-1 w-64 rounded-lg border border-green-700/30 bg-black bg-opacity-95 p-2 shadow-lg">
-              <h3 className="mb-2 border-b border-green-700/30 pb-1 text-sm font-semibold text-green-300">
+            <div className='border-green-700/30 bg-black absolute z-10 mt-1 w-64 rounded-lg border bg-opacity-95 p-2 shadow-lg'>
+              <h3 className='border-green-700/30 text-green-300 mb-2 border-b pb-1 text-sm font-semibold'>
                 Select Client Case
               </h3>
-              <div className="flex flex-col space-y-1">
+              <div className='flex flex-col space-y-1'>
                 {clientScenarios.map((scenario) => (
                   <button
                     key={scenario.id}
@@ -556,15 +559,15 @@ function ProfessionalTherapistWorkspace() {
                     )}
                     onClick={() => changeScenario(scenario)}
                   >
-                    <div className="font-medium">{scenario.name}</div>
-                    <div className="text-xs text-gray-400">
+                    <div className='font-medium'>{scenario.name}</div>
+                    <div className='text-gray-400 text-xs'>
                       {scenario.description}
                     </div>
-                    <div className="mt-1 flex flex-wrap gap-1">
+                    <div className='mt-1 flex flex-wrap gap-1'>
                       {scenario.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full bg-green-900/30 px-2 py-0.5 text-xs text-green-300"
+                          className='bg-green-900/30 text-green-300 rounded-full px-2 py-0.5 text-xs'
                         >
                           {tag}
                         </span>
@@ -581,20 +584,20 @@ function ProfessionalTherapistWorkspace() {
             messages={messages}
             onSendMessage={(msg) => {
               setInput(msg)
-              handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+              void handleSubmit({ preventDefault: () => {} } as React.FormEvent)
             }}
             isLoading={isLoading}
             {...(error ? { error } : {})}
           />
 
-          <div className="flex items-center space-x-2 mb-2 ml-2">
+          <div className='mb-2 ml-2 flex items-center space-x-2'>
             <Switch
-              id="patient-simulation-toggle"
+              id='patient-simulation-toggle'
               checked={usePatientSimulation}
               onCheckedChange={setUsePatientSimulation}
             />
 
-            <Label htmlFor="patient-simulation-toggle">
+            <Label htmlFor='patient-simulation-toggle'>
               Use Patient Simulation
             </Label>
             {usePatientSimulation && (
@@ -602,7 +605,7 @@ function ProfessionalTherapistWorkspace() {
                 onClick={() =>
                   setShowPatientModelSelector(!showPatientModelSelector)
                 }
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 border border-gray-300 bg-white hover:bg-gray-100 h-8 py-2 px-3"
+                className='border-gray-300 bg-white hover:bg-gray-100 inline-flex h-8 items-center justify-center rounded-md border px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50'
               >
                 {showPatientModelSelector ? 'Hide' : 'Select'} Patient Model
               </button>
@@ -610,22 +613,22 @@ function ProfessionalTherapistWorkspace() {
           </div>
 
           {usePatientSimulation && showPatientModelSelector && (
-            <div className="m-2">
+            <div className='m-2'>
               <CognitiveModelSelector
                 selectedModelId={currentModelId}
                 onSelectModel={selectModel}
                 onStyleConfigChange={updateStyleConfig}
-                className="mb-4"
+                className='mb-4'
               />
 
               {isPatientModelLoading && (
-                <div className="text-blue-500">Loading patient models...</div>
+                <div className='text-blue-500'>Loading patient models...</div>
               )}
               {patientModelError && (
-                <div className="text-red-500">{patientModelError}</div>
+                <div className='text-red-500'>{patientModelError}</div>
               )}
               {currentModel && (
-                <div className="text-gray-700 text-sm mb-2">
+                <div className='text-gray-700 mb-2 text-sm'>
                   Using patient model: <strong>{currentModel.name}</strong> -{' '}
                   {currentModel.diagnosisInfo?.primaryDiagnosis}
                 </div>
@@ -636,18 +639,18 @@ function ProfessionalTherapistWorkspace() {
 
         {/* Right sidebar panels */}
         {showMentalHealthPanel && (
-          <div className="w-full lg:w-80">
-            <div className="rounded-xl border border-green-700/30 bg-black bg-opacity-90 p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium text-green-300">
+          <div className='w-full lg:w-80'>
+            <div className='border-green-700/30 bg-black rounded-xl border bg-opacity-90 p-4'>
+              <div className='mb-4 flex items-center justify-between'>
+                <h3 className='text-green-300 text-lg font-medium'>
                   Cognitive Assessment
                 </h3>
                 <button
                   onClick={() => setShowMentalHealthPanel(false)}
-                  className="rounded-lg bg-green-900/30 p-1 text-green-300 hover:bg-green-800/30"
-                  aria-label="Close cognitive assessment panel"
+                  className='bg-green-900/30 text-green-300 hover:bg-green-800/30 rounded-lg p-1'
+                  aria-label='Close cognitive assessment panel'
                 >
-                  <IconMinimize className="h-4 w-4" />
+                  <IconMinimize className='h-4 w-4' />
                 </button>
               </div>
               <MentalHealthInsights
@@ -681,7 +684,7 @@ function ProfessionalTherapistWorkspace() {
 
         {/* Supervisor Feedback Panel */}
         {showSupervisorFeedback && (
-          <div className="w-full lg:w-96">
+          <div className='w-full lg:w-96'>
             <SupervisorFeedback
               sessionTranscript={getSessionTranscript()}
               patientModel={{
@@ -704,11 +707,11 @@ function ProfessionalTherapistWorkspace() {
 
       {/* Analytics Dashboard */}
       {showAnalytics && (
-        <div className="mt-4">
+        <div className='mt-4'>
           <Suspense fallback={<LoadingAnalytics />}>
             <LazyAnalyticsDashboard
               messages={messages}
-              securityLevel="standard"
+              securityLevel='standard'
               encryptionEnabled={false}
               scenario={selectedScenario.name}
             />
@@ -718,20 +721,20 @@ function ProfessionalTherapistWorkspace() {
 
       {/* Patient model selector */}
       {showPatientModelSelector && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md rounded-lg bg-white p-6">
-            <h3 className="mb-4 text-lg font-medium">Select Patient Model</h3>
+        <div className='bg-black/50 fixed inset-0 z-50 flex items-center justify-center'>
+          <div className='bg-white w-full max-w-md rounded-lg p-6'>
+            <h3 className='mb-4 text-lg font-medium'>Select Patient Model</h3>
             <CognitiveModelSelector
               selectedModelId={currentModelId}
               onSelectModel={selectModel}
               onStyleConfigChange={updateStyleConfig}
-              className="mb-4"
+              className='mb-4'
             />
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className='mt-4 flex justify-end space-x-2'>
               <button
                 onClick={() => setShowPatientModelSelector(false)}
-                className="rounded-md bg-gray-200 px-4 py-2 text-gray-800"
+                className='bg-gray-200 text-gray-800 rounded-md px-4 py-2'
               >
                 Close
               </button>
@@ -747,12 +750,12 @@ function ProfessionalTherapistWorkspace() {
               </button>
             </div>
             {isPatientModelLoading && (
-              <div className="mt-2 text-blue-500">
+              <div className='text-blue-500 mt-2'>
                 Loading patient models...
               </div>
             )}
             {patientModelError && (
-              <div className="mt-2 text-red-500">{patientModelError}</div>
+              <div className='text-red-500 mt-2'>{patientModelError}</div>
             )}
           </div>
         </div>

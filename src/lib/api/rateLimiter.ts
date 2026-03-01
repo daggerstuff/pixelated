@@ -114,11 +114,11 @@ class RateLimiter {
           )
         }
 
-        if (burstCount > this.config.burstLimit!) {
+        if (burstCount > this.config.burstLimit) {
           const ttl = await this.config.storage.ttl(burstKey)
           return {
             success: false,
-            limit: this.config.burstLimit!,
+            limit: this.config.burstLimit,
             remaining: 0,
             resetTime: Date.now() + ttl * 1000,
             retryAfter: ttl,

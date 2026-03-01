@@ -6,8 +6,9 @@
  */
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import { EventType } from '@/lib/services/analytics/analytics-types'
+import type { Event, Metric } from '@/lib/services/analytics/analytics-types'
+import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import type {
   AnalyticsChartData,
   AnalyticsFilters,
@@ -15,7 +16,6 @@ import type {
   SkillProgressData,
   MetricSummary,
 } from '@/types/analytics'
-import type { Event, Metric } from '@/lib/services/analytics/analytics-types'
 
 const logger = createBuildSafeLogger('analytics-dashboard-api')
 

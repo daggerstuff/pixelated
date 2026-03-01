@@ -15,11 +15,14 @@
  */
 
 import fs from 'node:fs/promises'
-
 import process from 'node:process'
 
 import { createCryptoSystem } from '../lib/crypto/index'
-import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../utils/path-security'
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  sanitizeFilename,
+} from '../utils/path-security'
 
 // Parse command line arguments
 const args = process.argv.slice(2)

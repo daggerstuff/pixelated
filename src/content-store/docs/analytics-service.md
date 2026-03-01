@@ -1,6 +1,7 @@
 ---
 title: 'Analytics Service'
-description: 'Guide to Pixelated Healths analytics service for data processing and insights'
+description:
+  'Guide to Pixelated Healths analytics service for data processing and insights'
 pubDate: 2025-03-24
 share: true
 toc: true
@@ -13,10 +14,10 @@ author: 'Pixelated Team'
 
 ## Overview
 
-The Analytics Service provides a robust, real-time analytics system for tracking events
-and metrics across the application. Built with TypeScript and WebSocket technology,
-it offers a scalable solution for collecting, processing, and analyzing data while maintaining
-HIPAA compliance.
+The Analytics Service provides a robust, real-time analytics system for tracking
+events and metrics across the application. Built with TypeScript and WebSocket
+technology, it offers a scalable solution for collecting, processing, and
+analyzing data while maintaining HIPAA compliance.
 
 ## Features
 
@@ -35,7 +36,6 @@ HIPAA compliance.
 ### Initializing the Service
 
 ```typescript
-
 const analyticsService = new AnalyticsService({
   retentionDays: 90, // How long to keep data
   batchSize: 100, // Events to process per batch
@@ -152,7 +152,6 @@ const userMetrics = await analyticsService.getMetrics({
 ### WebSocket Integration
 
 ```typescript
-
 // In your client code:
 const ws = new WebSocket('ws://localhost:8083')
 

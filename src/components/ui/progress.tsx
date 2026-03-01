@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { cn } from '../../lib/utils'
 
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -72,7 +73,7 @@ export function Progress({
   return (
     <div
       className={cn('w-full', className)}
-      role="progressbar"
+      role='progressbar'
       aria-valuenow={indeterminate ? undefined : value}
       aria-valuemin={0}
       aria-valuemax={max}
@@ -80,7 +81,7 @@ export function Progress({
       {...props}
     >
       {/* Progress bar with label */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         {/* Progress bar container */}
         <div
           className={cn(
@@ -106,7 +107,7 @@ export function Progress({
 
         {/* Show value if requested */}
         {showValue && !indeterminate && (
-          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+          <span className='text-gray-500 dark:text-gray-400 ml-2 text-xs'>
             {Math.round(percentage)}%
           </span>
         )}
@@ -157,9 +158,9 @@ export function ProgressCircular({
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        role="progressbar"
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+        role='progressbar'
         aria-valuenow={indeterminate ? undefined : value}
         aria-valuemin={0}
         aria-valuemax={max}
@@ -170,9 +171,9 @@ export function ProgressCircular({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          className="stroke-gray-200 dark:stroke-gray-700"
+          className='stroke-gray-200 dark:stroke-gray-700'
           strokeWidth={strokeWidth}
-          fill="none"
+          fill='none'
         />
 
         {/* Progress circle */}
@@ -188,14 +189,14 @@ export function ProgressCircular({
           strokeDashoffset={
             indeterminate ? circumference * 0.25 : strokeDashoffset
           }
-          strokeLinecap="round"
-          fill="none"
+          strokeLinecap='round'
+          fill='none'
         />
       </svg>
 
       {/* Show value if requested */}
       {showValue && !indeterminate && (
-        <span className="absolute text-xs text-gray-800 dark:text-gray-200">
+        <span className='text-gray-800 dark:text-gray-200 absolute text-xs'>
           {Math.round(percentage)}%
         </span>
       )}

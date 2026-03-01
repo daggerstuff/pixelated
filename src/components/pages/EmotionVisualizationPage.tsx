@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
+
 import useMultidimensionalEmotions from '../../hooks/useMultidimensionalEmotions'
+import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
 
 const EmotionVisualizationPage: FC = () => {
   const { clientId } = useParams<{ clientId: string }>()
@@ -17,58 +18,58 @@ const EmotionVisualizationPage: FC = () => {
   } = useMultidimensionalEmotions(clientId || 'unknown', timeRange, dataPoints)
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">3D Emotion Visualization</h1>
+    <div className='container mx-auto px-4 py-8'>
+      <h1 className='mb-6 text-3xl font-bold'>3D Emotion Visualization</h1>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className='bg-red-100 border-red-400 text-red-700 mb-4 rounded border px-4 py-3'>
           Error: {String(error)}
         </div>
       )}
 
-      <div className="mb-6 flex flex-wrap gap-4">
+      <div className='mb-6 flex flex-wrap gap-4'>
         <div>
-          <label htmlFor="timeRange" className="block text-sm font-medium mb-1">
+          <label htmlFor='timeRange' className='mb-1 block text-sm font-medium'>
             Time Range
           </label>
           <select
-            id="timeRange"
+            id='timeRange'
             value={timeRange}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setTimeRange(e.target.value as 'day' | 'week' | 'month' | 'year')
             }
-            className="border rounded px-3 py-2"
+            className='rounded border px-3 py-2'
           >
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
+            <option value='day'>Day</option>
+            <option value='week'>Week</option>
+            <option value='month'>Month</option>
+            <option value='year'>Year</option>
           </select>
         </div>
 
         <div>
           <label
-            htmlFor="dataPoints"
-            className="block text-sm font-medium mb-1"
+            htmlFor='dataPoints'
+            className='mb-1 block text-sm font-medium'
           >
             Data Points
           </label>
           <input
-            id="dataPoints"
-            type="number"
-            min="5"
-            max="200"
+            id='dataPoints'
+            type='number'
+            min='5'
+            max='200'
             value={dataPoints}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setDataPoints(Number(e.target.value))
             }
-            className="border rounded px-3 py-2 w-24"
+            className='w-24 rounded border px-3 py-2'
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-4">
-        <div className="h-[600px]">
+      <div className='bg-white rounded-lg p-4 shadow-lg'>
+        <div className='h-[600px]'>
           <MultidimensionalEmotionChart
             emotionData={emotionData}
             isLoading={isLoading}
@@ -76,15 +77,15 @@ const EmotionVisualizationPage: FC = () => {
         </div>
       </div>
 
-      <div className="mt-8 bg-gray-100 p-4 rounded-lg">
-        <h2 className="text-xl font-semibold mb-3">
+      <div className='bg-gray-100 mt-8 rounded-lg p-4'>
+        <h2 className='mb-3 text-xl font-semibold'>
           About the 3D Emotion Visualization
         </h2>
-        <p className="mb-3">
+        <p className='mb-3'>
           This visualization uses the PAD (Pleasure-Arousal-Dominance) emotional
           state model to represent emotions in a three-dimensional space:
         </p>
-        <ul className="list-disc pl-5 mb-3">
+        <ul className='mb-3 list-disc pl-5'>
           <li>
             <strong>Valence (X-axis):</strong> Represents pleasure-displeasure,
             ranging from negative to positive feelings.

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+
 import ScenarioGenerationDemo from '../components/demo/ScenarioGenerationDemo'
 
 describe('ScenarioGenerationDemo', () => {

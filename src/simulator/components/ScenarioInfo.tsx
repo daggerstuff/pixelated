@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import type { Scenario, TherapeuticDomain } from '../types'
 
 interface ScenarioInfoProps {
@@ -44,21 +45,21 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
 
   return (
     <div
-      className={`scenario-info bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${className}`}
+      className={`scenario-info bg-white border-gray-200 rounded-lg border p-4 shadow-sm ${className}`}
     >
-      <div className="flex justify-between items-start">
+      <div className='flex items-start justify-between'>
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className='text-gray-800 text-lg font-semibold'>
             {scenario.title}
           </h2>
-          <div className="flex flex-wrap gap-2 mt-1">
+          <div className='mt-1 flex flex-wrap gap-2'>
             <span
-              className={`text-xs font-medium px-2 py-0.5 rounded ${difficultyColors[scenario.difficulty]}`}
+              className={`rounded px-2 py-0.5 text-xs font-medium ${difficultyColors[scenario.difficulty]}`}
             >
               {scenario.difficulty.charAt(0).toUpperCase() +
                 scenario.difficulty.slice(1)}
             </span>
-            <span className="text-xs font-medium px-2 py-0.5 rounded bg-blue-100 text-blue-800">
+            <span className='bg-blue-100 text-blue-800 rounded px-2 py-0.5 text-xs font-medium'>
               {domainLabels[scenario.domain]}
             </span>
           </div>
@@ -66,76 +67,80 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
 
         <button
           onClick={() => setExpanded(!expanded)}
-          className="text-gray-400 hover:text-gray-600 focus:outline-none"
+          className='text-gray-400 hover:text-gray-600 focus:outline-none'
         >
-          <span className="sr-only">{expanded ? 'Collapse' : 'Expand'}</span>
+          <span className='sr-only'>{expanded ? 'Collapse' : 'Expand'}</span>
           <svg
-            xmlns="http://www.w3.org/2000/svg"
+            xmlns='http://www.w3.org/2000/svg'
             className={`h-5 w-5 transform transition-transform ${expanded ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
           >
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinecap='round'
+              strokeLinejoin='round'
               strokeWidth={2}
-              d="M19 9l-7 7-7-7"
+              d='M19 9l-7 7-7-7'
             />
           </svg>
         </button>
       </div>
 
       <div
-        className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0 overflow-hidden'}`}
+        className={`transition-all duration-300 ease-in-out ${expanded ? 'mt-4 max-h-96 opacity-100' : 'max-h-0 overflow-hidden opacity-0'}`}
       >
-        <div className="space-y-3 text-sm text-gray-600">
+        <div className='text-gray-600 space-y-3 text-sm'>
           <p>{scenario.description}</p>
 
           <div>
-            <div className="font-medium text-gray-700 mb-1">Context</div>
+            <div className='text-gray-700 mb-1 font-medium'>Context</div>
             <p>{scenario.contextDescription}</p>
           </div>
 
           <div>
-            <div className="font-medium text-gray-700 mb-1">
+            <div className='text-gray-700 mb-1 font-medium'>
               Patient Background
             </div>
             <p>{scenario.clientBackground}</p>
           </div>
 
           <div>
-            <div className="font-medium text-gray-700 mb-1">
+            <div className='text-gray-700 mb-1 font-medium'>
               Presenting Issue
             </div>
             <p>{scenario.presentingIssue}</p>
           </div>
 
-          {scenario.suggestedApproaches && scenario.suggestedApproaches.length > 0 && (
-            <div>
-              <div className="font-medium text-gray-700 mb-1">
-                Suggested Approaches
+          {scenario.suggestedApproaches &&
+            scenario.suggestedApproaches.length > 0 && (
+              <div>
+                <div className='text-gray-700 mb-1 font-medium'>
+                  Suggested Approaches
+                </div>
+                <ul className='list-inside list-disc'>
+                  {scenario.suggestedApproaches.map((approach: string) => (
+                    <li key={approach}>{approach}</li>
+                  ))}
+                </ul>
               </div>
-              <ul className="list-disc list-inside">
-                {scenario.suggestedApproaches.map((approach: string) => (
-                  <li key={approach}>{approach}</li>
-                ))}
-              </ul>
-            </div>
-          )}
+            )}
 
           <div>
-            <div className="font-medium text-gray-700 mb-1">Target Skills</div>
-            <div className="flex flex-wrap gap-1 mt-1">
+            <div className='text-gray-700 mb-1 font-medium'>Target Skills</div>
+            <div className='mt-1 flex flex-wrap gap-1'>
               {scenario.techniques.map((skill) => (
                 <span
                   key={skill}
-                  className="text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700"
+                  className='bg-gray-100 text-gray-700 rounded px-2 py-0.5 text-xs'
                 >
                   {skill
                     .toString()
                     .split('_')
-                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .map(
+                      (word: string) =>
+                        word.charAt(0).toUpperCase() + word.slice(1),
+                    )
                     .join(' ')}
                 </span>
               ))}
@@ -147,7 +152,7 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
       {!expanded && (
         <button
           onClick={() => setExpanded(true)}
-          className="mt-2 text-xs text-blue-600 hover:text-blue-800 focus:outline-none"
+          className='text-blue-600 hover:text-blue-800 mt-2 text-xs focus:outline-none'
         >
           Show details
         </button>

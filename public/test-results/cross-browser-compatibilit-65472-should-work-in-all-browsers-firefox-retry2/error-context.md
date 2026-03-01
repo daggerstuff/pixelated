@@ -1,7 +1,8 @@
 # Test info
 
 - Name: Cross-browser compatibility >> home page should work in all browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:46:5
 
 # Error details
 
@@ -28,42 +29,45 @@ Call log:
 ```yaml
 - alert
 - link "Skip to content":
-  - /url: "#main"
+    - /url: '#main'
 - banner:
-  - link "Vivi Ornitier @ pixelatedempathy.com":
-    - /url: /
-    - img
-  - navigation:
-    - list:
-      - listitem:
-        - link "Features":
-          - /url: /features
-      - listitem:
-        - link "Blog":
-          - /url: /blog
-      - listitem:
-        - link "Dashboard":
-          - /url: /dashboard
-      - listitem:
-        - link "AntfuStyle on Github":
-          - /url: https://github.com/vivirox
-      - listitem:
-        - link "Vivi on Twitter":
-          - /url: https://x.com/pixelated
-    - button "Toggle theme":
-      - img
+    - link "Vivi Ornitier @ pixelatedempathy.com":
+        - /url: /
+        - img
+    - navigation:
+        - list:
+            - listitem:
+                - link "Features":
+                    - /url: /features
+            - listitem:
+                - link "Blog":
+                    - /url: /blog
+            - listitem:
+                - link "Dashboard":
+                    - /url: /dashboard
+            - listitem:
+                - link "AntfuStyle on Github":
+                    - /url: https://github.com/vivirox
+            - listitem:
+                - link "Vivi on Twitter":
+                    - /url: https://x.com/pixelated
+        - button "Toggle theme":
+            - img
 - main:
-  - paragraph:
-    - text: Pixelated Empathy - the premier destination for the world of AI-assisted emotional intelligence. Therapy training has never been more accessible, or more effective.
-    - strong: Ever.
+    - paragraph:
+        - text:
+            Pixelated Empathy - the premier destination for the world of
+            AI-assisted emotional intelligence. Therapy training has never been
+            more accessible, or more effective.
+        - strong: Ever.
 - contentinfo:
-  - paragraph: © 2025 Pixelated Empathy. All rights reserved.
-  - link "Privacy Policy":
-    - /url: /privacy
-  - link "Terms of Service":
-    - /url: /terms
-  - link "Contact":
-    - /url: /contact
+    - paragraph: © 2025 Pixelated Empathy. All rights reserved.
+    - link "Privacy Policy":
+        - /url: /privacy
+    - link "Terms of Service":
+        - /url: /terms
+    - link "Contact":
+        - /url: /contact
 - button "Scroll to top"
 ```
 

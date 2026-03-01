@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { FC } from 'react'
+
 import { ChartWidget } from '@/components/analytics/ChartWidget'
 
 interface ForecastForm {
@@ -92,7 +93,7 @@ const TreatmentForecastForm: FC = () => {
     } catch (err: unknown) {
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'Unknown error',
       )
     } finally {
@@ -101,152 +102,152 @@ const TreatmentForecastForm: FC = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className='space-y-4'>
+      <div className='grid grid-cols-2 gap-4'>
         <div>
-          <label htmlFor="sessionId" className="block font-medium">
+          <label htmlFor='sessionId' className='block font-medium'>
             Session ID
           </label>
           <input
-            id="sessionId"
-            name="sessionId"
+            id='sessionId'
+            name='sessionId'
             value={form.sessionId}
             onChange={handleChange}
             required
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           />
         </div>
         <div>
-          <label htmlFor="clientId" className="block font-medium">
+          <label htmlFor='clientId' className='block font-medium'>
             Client ID
           </label>
           <input
-            id="clientId"
-            name="clientId"
+            id='clientId'
+            name='clientId'
             value={form.clientId}
             onChange={handleChange}
             required
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           />
         </div>
         <div>
-          <label htmlFor="therapistId" className="block font-medium">
+          <label htmlFor='therapistId' className='block font-medium'>
             Therapist ID
           </label>
           <input
-            id="therapistId"
-            name="therapistId"
+            id='therapistId'
+            name='therapistId'
             value={form.therapistId}
             onChange={handleChange}
             required
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           />
         </div>
         <div>
-          <label htmlFor="startTime" className="block font-medium">
+          <label htmlFor='startTime' className='block font-medium'>
             Start Time
           </label>
           <input
-            id="startTime"
-            name="startTime"
-            type="datetime-local"
+            id='startTime'
+            name='startTime'
+            type='datetime-local'
             value={form.startTime}
             onChange={handleChange}
             required
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <div>
-          <label htmlFor="status" className="block font-medium">
+          <label htmlFor='status' className='block font-medium'>
             Status
           </label>
           <select
-            id="status"
-            name="status"
+            id='status'
+            name='status'
             value={form.status}
             onChange={handleChange}
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           >
-            <option value="active">Active</option>
-            <option value="paused">Paused</option>
-            <option value="completed">Completed</option>
-            <option value="emergency">Emergency</option>
+            <option value='active'>Active</option>
+            <option value='paused'>Paused</option>
+            <option value='completed'>Completed</option>
+            <option value='emergency'>Emergency</option>
           </select>
         </div>
         <div>
-          <label htmlFor="securityLevel" className="block font-medium">
+          <label htmlFor='securityLevel' className='block font-medium'>
             Security Level
           </label>
           <select
-            id="securityLevel"
-            name="securityLevel"
+            id='securityLevel'
+            name='securityLevel'
             value={form.securityLevel}
             onChange={handleChange}
-            className="input input-bordered w-full"
+            className='input input-bordered w-full'
           >
-            <option value="standard">Standard</option>
-            <option value="hipaa">HIPAA</option>
-            <option value="fhe">FHE</option>
+            <option value='standard'>Standard</option>
+            <option value='hipaa'>HIPAA</option>
+            <option value='fhe'>FHE</option>
           </select>
         </div>
       </div>
       <div>
-        <label htmlFor="emotionAnalysisEnabled" className="block font-medium">
+        <label htmlFor='emotionAnalysisEnabled' className='block font-medium'>
           Enable Emotion Analysis
         </label>
         <input
-          id="emotionAnalysisEnabled"
-          name="emotionAnalysisEnabled"
-          type="checkbox"
+          id='emotionAnalysisEnabled'
+          name='emotionAnalysisEnabled'
+          type='checkbox'
           checked={form.emotionAnalysisEnabled}
           onChange={handleChange}
-          className="checkbox"
+          className='checkbox'
         />
       </div>
       <div>
-        <label htmlFor="desiredOutcomes" className="block font-medium">
+        <label htmlFor='desiredOutcomes' className='block font-medium'>
           Desired Outcomes{' '}
-          <span className="text-xs text-gray-500">(comma-separated)</span>
+          <span className='text-gray-500 text-xs'>(comma-separated)</span>
         </label>
         <input
-          id="desiredOutcomes"
-          name="desiredOutcomes"
+          id='desiredOutcomes'
+          name='desiredOutcomes'
           value={form.desiredOutcomes}
           onChange={handleChange}
           required
-          className="input input-bordered w-full"
-          placeholder="e.g., reduce anxiety, improve sleep"
+          className='input input-bordered w-full'
+          placeholder='e.g., reduce anxiety, improve sleep'
         />
       </div>
       <button
-        type="submit"
-        className="btn btn-primary w-full"
+        type='submit'
+        className='btn btn-primary w-full'
         disabled={loading}
       >
         {loading ? 'Forecasting...' : 'Get Forecast'}
       </button>
-      {error && <div className="alert alert-error mt-4">{error}</div>}
+      {error && <div className='alert alert-error mt-4'>{error}</div>}
       {results && (
-        <section className="mt-8">
-          <h2 className="text-2xl font-semibold mb-2">Forecast Results</h2>
+        <section className='mt-8'>
+          <h2 className='mb-2 text-2xl font-semibold'>Forecast Results</h2>
           <ChartWidget
-            title="Predicted Efficacy by Technique"
-            chartType="bar"
+            title='Predicted Efficacy by Technique'
+            chartType='bar'
             labels={results.map((r) => r.technique)}
             series={[
               { name: 'Predicted Efficacy', data: results.map((r) => r.score) },
             ]}
             height={300}
           />
-          <ul className="mt-4 space-y-2">
+          <ul className='mt-4 space-y-2'>
             {results.map((r) => (
-              <li key={r.technique} className="bg-gray-50 rounded p-3 border">
+              <li key={r.technique} className='bg-gray-50 rounded border p-3'>
                 <strong>{r.technique}</strong>: {Math.round(r.score * 100)}%
                 efficacy
                 <br />
-                <span className="text-xs text-gray-600">{r.rationale}</span>
+                <span className='text-gray-600 text-xs'>{r.rationale}</span>
               </li>
             ))}
           </ul>

@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 /**
  * NOTE: If you see a TypeScript error about 'react/jsx-runtime' missing a declaration file,
  * this is a project-level configuration or dependency issue. Ensure your TypeScript version
@@ -5,11 +6,12 @@
  */
 import * as React from 'react'
 import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { IconFilter, IconX } from '@/components/ui/icons'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
 import Popover, {
   PopoverContent,
   PopoverTrigger,
@@ -21,9 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { IconFilter, IconX } from '@/components/ui/icons'
-import { format } from 'date-fns'
+import { Slider } from '@/components/ui/slider'
+import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 
 export interface AdvancedFilterOptions {
@@ -188,8 +189,8 @@ export function AdvancedFilteringComponent({
     switch (activeTab) {
       case 'time':
         return (
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className='space-y-4'>
+            <div className='space-y-2'>
               <Label>Time Range</Label>
               <Select
                 value={options.timeRange?.presetRange || 'custom'}
@@ -198,37 +199,37 @@ export function AdvancedFilteringComponent({
                     'timeRange',
                     'presetRange',
                     value as
-                    | 'day'
-                    | 'week'
-                    | 'month'
-                    | 'quarter'
-                    | 'year'
-                    | 'custom',
+                      | 'day'
+                      | 'week'
+                      | 'month'
+                      | 'quarter'
+                      | 'year'
+                      | 'custom',
                   )
                 }
-                placeholder="Select time range"
+                placeholder='Select time range'
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className='w-full'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="day">Last 24 hours</SelectItem>
-                  <SelectItem value="week">Last 7 days</SelectItem>
-                  <SelectItem value="month">Last 30 days</SelectItem>
-                  <SelectItem value="quarter">Last 90 days</SelectItem>
-                  <SelectItem value="year">Last 365 days</SelectItem>
-                  <SelectItem value="custom">Custom range</SelectItem>
+                  <SelectItem value='day'>Last 24 hours</SelectItem>
+                  <SelectItem value='week'>Last 7 days</SelectItem>
+                  <SelectItem value='month'>Last 30 days</SelectItem>
+                  <SelectItem value='quarter'>Last 90 days</SelectItem>
+                  <SelectItem value='year'>Last 365 days</SelectItem>
+                  <SelectItem value='custom'>Custom range</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {options.timeRange?.presetRange === 'custom' && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Start Date</Label>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='startDate'>Start Date</Label>
                   <Input
-                    id="startDate"
-                    type="date"
+                    id='startDate'
+                    type='date'
                     value={
                       options.timeRange?.startDate
                         ? format(options.timeRange.startDate, 'yyyy-MM-dd')
@@ -243,11 +244,11 @@ export function AdvancedFilteringComponent({
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="endDate">End Date</Label>
+                <div className='space-y-2'>
+                  <Label htmlFor='endDate'>End Date</Label>
                   <Input
-                    id="endDate"
-                    type="date"
+                    id='endDate'
+                    type='date'
                     value={
                       options.timeRange?.endDate
                         ? format(options.timeRange.endDate, 'yyyy-MM-dd')
@@ -268,12 +269,12 @@ export function AdvancedFilteringComponent({
 
       case 'emotions':
         return (
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className='space-y-4'>
+            <div className='space-y-2'>
               <Label>Emotion Types</Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
+              <div className='mt-1 grid grid-cols-2 gap-2 sm:grid-cols-3'>
                 {availableEmotionTypes.map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
+                  <div key={type} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`emotion-${type}`}
                       checked={(options.emotions?.types || []).includes(type)}
@@ -284,7 +285,7 @@ export function AdvancedFilteringComponent({
 
                     <Label
                       htmlFor={`emotion-${type}`}
-                      className="cursor-pointer"
+                      className='cursor-pointer'
                     >
                       {type}
                     </Label>
@@ -293,18 +294,18 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
+            <div className='space-y-2'>
+              <div className='flex justify-between'>
                 <Label>Intensity Range</Label>
-                <span className="text-xs text-gray-500">
+                <span className='text-gray-500 text-xs'>
                   {options.emotions?.minIntensity?.toFixed(1) || '0.0'} -{' '}
                   {options.emotions?.maxIntensity?.toFixed(1) || '1.0'}
                 </span>
               </div>
-              <div className="pt-2 px-2">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <Label className="text-xs">Min</Label>
+              <div className='px-2 pt-2'>
+                <div className='flex gap-4'>
+                  <div className='flex-1'>
+                    <Label className='text-xs'>Min</Label>
                     <Slider
                       value={[options.emotions?.minIntensity || 0]}
                       min={0}
@@ -315,8 +316,8 @@ export function AdvancedFilteringComponent({
                       }}
                     />
                   </div>
-                  <div className="flex-1">
-                    <Label className="text-xs">Max</Label>
+                  <div className='flex-1'>
+                    <Label className='text-xs'>Max</Label>
                     <Slider
                       value={[options.emotions?.maxIntensity || 1]}
                       min={0}
@@ -331,25 +332,25 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Label>Dimensional Ranges</Label>
 
-              <div className="space-y-4 mt-2">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label className="text-sm">
+              <div className='mt-2 space-y-4'>
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <Label className='text-sm'>
                       Valence (Negative to Positive)
                     </Label>
-                    <span className="text-xs text-gray-500">
+                    <span className='text-gray-500 text-xs'>
                       {formatRange(
                         options.emotions?.dimensionalRanges?.valence,
                       )}
                     </span>
                   </div>
-                  <div className="pt-2 px-2">
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <Label className="text-xs">Min</Label>
+                  <div className='px-2 pt-2'>
+                    <div className='flex gap-4'>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Min</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.valence
@@ -368,15 +369,15 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[1]
+                                      .valence[1]
                                   : 1,
                               ],
                             )
                           }
                         />
                       </div>
-                      <div className="flex-1">
-                        <Label className="text-xs">Max</Label>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Max</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.valence
@@ -394,7 +395,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[0]
+                                      .valence[0]
                                   : -1,
                                 max,
                               ],
@@ -406,19 +407,19 @@ export function AdvancedFilteringComponent({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label className="text-sm">Arousal (Calm to Excited)</Label>
-                    <span className="text-xs text-gray-500">
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <Label className='text-sm'>Arousal (Calm to Excited)</Label>
+                    <span className='text-gray-500 text-xs'>
                       {formatRange(
                         options.emotions?.dimensionalRanges?.arousal,
                       )}
                     </span>
                   </div>
-                  <div className="pt-2 px-2">
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <Label className="text-xs">Min</Label>
+                  <div className='px-2 pt-2'>
+                    <div className='flex gap-4'>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Min</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.arousal
@@ -437,15 +438,15 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[1]
+                                      .arousal[1]
                                   : 1,
                               ],
                             )
                           }
                         />
                       </div>
-                      <div className="flex-1">
-                        <Label className="text-xs">Max</Label>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Max</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.arousal
@@ -463,7 +464,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[0]
+                                      .arousal[0]
                                   : -1,
                                 max,
                               ],
@@ -475,21 +476,21 @@ export function AdvancedFilteringComponent({
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <Label className="text-sm">
+                <div className='space-y-2'>
+                  <div className='flex justify-between'>
+                    <Label className='text-sm'>
                       Dominance (Submissive to Dominant)
                     </Label>
-                    <span className="text-xs text-gray-500">
+                    <span className='text-gray-500 text-xs'>
                       {formatRange(
                         options.emotions?.dimensionalRanges?.dominance,
                       )}
                     </span>
                   </div>
-                  <div className="pt-2 px-2">
-                    <div className="flex gap-4">
-                      <div className="flex-1">
-                        <Label className="text-xs">Min</Label>
+                  <div className='px-2 pt-2'>
+                    <div className='flex gap-4'>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Min</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.dominance
@@ -508,15 +509,15 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[1]
+                                      .dominance[1]
                                   : 1,
                               ],
                             )
                           }
                         />
                       </div>
-                      <div className="flex-1">
-                        <Label className="text-xs">Max</Label>
+                      <div className='flex-1'>
+                        <Label className='text-xs'>Max</Label>
                         <Slider
                           value={[
                             options.emotions?.dimensionalRanges?.dominance
@@ -534,7 +535,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[0]
+                                      .dominance[0]
                                   : -1,
                                 max,
                               ],
@@ -552,12 +553,12 @@ export function AdvancedFilteringComponent({
 
       case 'patterns':
         return (
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className='space-y-4'>
+            <div className='space-y-2'>
               <Label>Pattern Types</Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+              <div className='mt-1 grid grid-cols-1 gap-2 sm:grid-cols-2'>
                 {availablePatternTypes.map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
+                  <div key={type} className='flex items-center space-x-2'>
                     <Checkbox
                       id={`pattern-${type}`}
                       checked={(options.patterns?.types || []).includes(type)}
@@ -568,7 +569,7 @@ export function AdvancedFilteringComponent({
 
                     <Label
                       htmlFor={`pattern-${type}`}
-                      className="cursor-pointer text-sm"
+                      className='cursor-pointer text-sm'
                     >
                       {type}
                     </Label>
@@ -577,14 +578,14 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
+            <div className='space-y-2'>
+              <div className='flex justify-between'>
                 <Label>Minimum Pattern Strength</Label>
-                <span className="text-xs text-gray-500">
+                <span className='text-gray-500 text-xs'>
                   {options.patterns?.minStrength?.toFixed(1) || '0.0'}
                 </span>
               </div>
-              <div className="pt-2 px-2">
+              <div className='px-2 pt-2'>
                 <Slider
                   value={[options.patterns?.minStrength || 0]}
                   min={0}
@@ -597,14 +598,14 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
+            <div className='space-y-2'>
+              <div className='flex justify-between'>
                 <Label>Minimum Confidence</Label>
-                <span className="text-xs text-gray-500">
+                <span className='text-gray-500 text-xs'>
                   {options.patterns?.minConfidence?.toFixed(1) || '0.0'}
                 </span>
               </div>
-              <div className="pt-2 px-2">
+              <div className='px-2 pt-2'>
                 <Slider
                   value={[options.patterns?.minConfidence || 0]}
                   min={0}
@@ -618,11 +619,11 @@ export function AdvancedFilteringComponent({
             </div>
 
             {availablePatternCategories.length > 0 && (
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 <Label>Pattern Categories</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+                <div className='mt-1 grid grid-cols-1 gap-2 sm:grid-cols-2'>
                   {availablePatternCategories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2">
+                    <div key={category} className='flex items-center space-x-2'>
                       <Checkbox
                         id={`category-${category}`}
                         checked={(options.patterns?.categories || []).includes(
@@ -635,7 +636,7 @@ export function AdvancedFilteringComponent({
 
                       <Label
                         htmlFor={`category-${category}`}
-                        className="cursor-pointer text-sm"
+                        className='cursor-pointer text-sm'
                       >
                         {category}
                       </Label>
@@ -649,8 +650,8 @@ export function AdvancedFilteringComponent({
 
       case 'visualization':
         return (
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className='space-y-4'>
+            <div className='space-y-2'>
               <Label>Group By</Label>
               <Select
                 value={options.visualization?.groupBy || 'session'}
@@ -661,28 +662,28 @@ export function AdvancedFilteringComponent({
                     value as 'day' | 'week' | 'month' | 'session',
                   )
                 }
-                placeholder="Select grouping"
+                placeholder='Select grouping'
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className='w-full'>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="session">Session</SelectItem>
-                  <SelectItem value="day">Day</SelectItem>
-                  <SelectItem value="week">Week</SelectItem>
-                  <SelectItem value="month">Month</SelectItem>
+                  <SelectItem value='session'>Session</SelectItem>
+                  <SelectItem value='day'>Day</SelectItem>
+                  <SelectItem value='week'>Week</SelectItem>
+                  <SelectItem value='month'>Month</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between">
+            <div className='space-y-2'>
+              <div className='flex justify-between'>
                 <Label>Smoothing</Label>
-                <span className="text-xs text-gray-500">
+                <span className='text-gray-500 text-xs'>
                   {options.visualization?.smoothing || 0}
                 </span>
               </div>
-              <div className="pt-2 px-2">
+              <div className='px-2 pt-2'>
                 <Slider
                   value={[options.visualization?.smoothing || 0]}
                   min={0}
@@ -695,11 +696,11 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showRawData">Show Raw Data</Label>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <Label htmlFor='showRawData'>Show Raw Data</Label>
                 <Switch
-                  id="showRawData"
+                  id='showRawData'
                   checked={options.visualization?.showRawData || false}
                   onCheckedChange={(checked: boolean) =>
                     handleChange('visualization', 'showRawData', checked)
@@ -707,10 +708,10 @@ export function AdvancedFilteringComponent({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showTrendlines">Show Trendlines</Label>
+              <div className='flex items-center justify-between'>
+                <Label htmlFor='showTrendlines'>Show Trendlines</Label>
                 <Switch
-                  id="showTrendlines"
+                  id='showTrendlines'
                   checked={options.visualization?.showTrendlines || false}
                   onCheckedChange={(checked: boolean) =>
                     handleChange('visualization', 'showTrendlines', checked)
@@ -718,12 +719,12 @@ export function AdvancedFilteringComponent({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showConfidenceIntervals">
+              <div className='flex items-center justify-between'>
+                <Label htmlFor='showConfidenceIntervals'>
                   Show Confidence Intervals
                 </Label>
                 <Switch
-                  id="showConfidenceIntervals"
+                  id='showConfidenceIntervals'
                   checked={
                     options.visualization?.showConfidenceIntervals || false
                   }
@@ -737,10 +738,10 @@ export function AdvancedFilteringComponent({
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <Label htmlFor="showAnnotations">Show Annotations</Label>
+              <div className='flex items-center justify-between'>
+                <Label htmlFor='showAnnotations'>Show Annotations</Label>
                 <Switch
-                  id="showAnnotations"
+                  id='showAnnotations'
                   checked={options.visualization?.showAnnotations || false}
                   onCheckedChange={(checked: boolean) =>
                     handleChange('visualization', 'showAnnotations', checked)
@@ -763,29 +764,29 @@ export function AdvancedFilteringComponent({
         <Popover>
           <PopoverTrigger>
             <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
+              variant='outline'
+              size='sm'
+              className='flex items-center gap-2'
             >
-              <IconFilter className="h-4 w-4" />
+              <IconFilter className='h-4 w-4' />
               Advanced Filter
             </Button>
           </PopoverTrigger>
           <PopoverContent>
-            <div className="w-80 sm:w-96 p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-sm font-medium">Advanced Filters</h4>
+            <div className='w-80 p-4 sm:w-96'>
+              <div className='mb-4 flex items-center justify-between'>
+                <h4 className='text-sm font-medium'>Advanced Filters</h4>
                 <Button
-                  size="sm"
-                  variant="ghost"
+                  size='sm'
+                  variant='ghost'
                   onClick={resetFilters}
-                  className="h-8 w-8 p-0"
+                  className='h-8 w-8 p-0'
                 >
-                  <IconX className="h-4 w-4" />
+                  <IconX className='h-4 w-4' />
                 </Button>
               </div>
 
-              <div className="flex border-b mb-4">
+              <div className='mb-4 flex border-b'>
                 {(
                   ['time', 'emotions', 'patterns', 'visualization'] as const
                 ).map((tab) => (
@@ -804,12 +805,12 @@ export function AdvancedFilteringComponent({
                 ))}
               </div>
 
-              <div className="max-h-96 overflow-y-auto">
+              <div className='max-h-96 overflow-y-auto'>
                 {renderFilterSection()}
               </div>
 
-              <div className="mt-4 flex justify-end">
-                <Button size="sm" onClick={applyFilters}>
+              <div className='mt-4 flex justify-end'>
+                <Button size='sm' onClick={applyFilters}>
                   Apply Filters
                 </Button>
               </div>
@@ -828,19 +829,19 @@ export function AdvancedFilteringComponent({
         className,
       )}
     >
-      <div className="flex justify-between items-center mb-4">
-        <h4 className="text-sm font-medium">Advanced Filtering</h4>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={resetFilters}>
+      <div className='mb-4 flex items-center justify-between'>
+        <h4 className='text-sm font-medium'>Advanced Filtering</h4>
+        <div className='space-x-2'>
+          <Button variant='outline' size='sm' onClick={resetFilters}>
             Reset
           </Button>
-          <Button size="sm" onClick={applyFilters}>
+          <Button size='sm' onClick={applyFilters}>
             Apply Filters
           </Button>
         </div>
       </div>
 
-      <div className="flex border-b mb-4">
+      <div className='mb-4 flex border-b'>
         {(['time', 'emotions', 'patterns', 'visualization'] as const).map(
           (tab) => (
             <button

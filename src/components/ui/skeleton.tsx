@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { cn } from '../../lib/utils'
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -192,7 +193,7 @@ export function SkeletonCard({
       })}
     >
       {hasCircle && (
-        <div className="flex-shrink-0">
+        <div className='flex-shrink-0'>
           <SkeletonAvatar size={circleSize} />
         </div>
       )}
@@ -224,12 +225,12 @@ export function SkeletonChartBar({ className }: SkeletonProps) {
         return (
           <div
             key={`chart-bar-${i}`}
-            className="flex w-full flex-col items-center gap-2"
+            className='flex w-full flex-col items-center gap-2'
           >
             <Skeleton
               height={randomHeight}
-              width="100%"
-              className="rounded-t-md"
+              width='100%'
+              className='rounded-t-md'
             />
 
             <Skeleton height={4} width={8} />
@@ -243,15 +244,15 @@ export function SkeletonChartBar({ className }: SkeletonProps) {
 export function SkeletonChartLine({ className }: SkeletonProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="flex justify-between">
+      <div className='flex justify-between'>
         <Skeleton height={5} width={24} />
-        <div className="flex space-x-2">
+        <div className='flex space-x-2'>
           <Skeleton height={5} width={12} />
           <Skeleton height={5} width={12} />
           <Skeleton height={5} width={12} />
         </div>
       </div>
-      <Skeleton height={40} width="100%" />
+      <Skeleton height={40} width='100%' />
     </div>
   )
 }
@@ -267,18 +268,18 @@ export function SkeletonTable({
 }) {
   return (
     <div className={cn('space-y-3', className)}>
-      <div className="flex gap-4">
+      <div className='flex gap-4'>
         {Array.from({ length: columns }).map((_, i) => (
-          <Skeleton key={`table-header-${i}`} height={6} className="flex-1" />
+          <Skeleton key={`table-header-${i}`} height={6} className='flex-1' />
         ))}
       </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={`table-row-${i}`} className="flex gap-4">
+        <div key={`table-row-${i}`} className='flex gap-4'>
           {Array.from({ length: columns }).map((_, j) => (
             <Skeleton
               key={`table-cell-${i}-${j}`}
               height={10}
-              className="flex-1"
+              className='flex-1'
             />
           ))}
         </div>
@@ -290,23 +291,23 @@ export function SkeletonTable({
 export function SkeletonProfile({ className }: SkeletonProps) {
   return (
     <div className={cn('space-y-8', className)}>
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="flex-shrink-0 flex flex-col items-center">
+      <div className='flex flex-col gap-6 md:flex-row'>
+        <div className='flex flex-shrink-0 flex-col items-center'>
           <SkeletonAvatar size={96} />
-          <Skeleton className="mt-4" height={4} width={20} />
+          <Skeleton className='mt-4' height={4} width={20} />
         </div>
 
-        <div className="flex-grow space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className='flex-grow space-y-4'>
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={`profile-field-${i}`} className="space-y-1">
+              <div key={`profile-field-${i}`} className='space-y-1'>
                 <Skeleton height={4} width={24} />
-                <Skeleton height={6} width="100%" />
+                <Skeleton height={6} width='100%' />
               </div>
             ))}
-            <div className="space-y-1 md:col-span-2">
+            <div className='space-y-1 md:col-span-2'>
               <Skeleton height={4} width={24} />
-              <Skeleton height={20} width="100%" />
+              <Skeleton height={20} width='100%' />
             </div>
           </div>
 
@@ -314,14 +315,14 @@ export function SkeletonProfile({ className }: SkeletonProps) {
         </div>
       </div>
 
-      <div className="pt-6 mt-6 space-y-4">
-        <Skeleton height={6} width={40} className="mx-auto" />
+      <div className='mt-6 space-y-4 pt-6'>
+        <Skeleton height={6} width={40} className='mx-auto' />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={`profile-detail-${i}`} className="space-y-1">
+            <div key={`profile-detail-${i}`} className='space-y-1'>
               <Skeleton height={4} width={24} />
-              <Skeleton height={6} width="100%" />
+              <Skeleton height={6} width='100%' />
             </div>
           ))}
         </div>

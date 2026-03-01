@@ -6,8 +6,9 @@
  */
 
 import type { AstroGlobal } from 'astro'
-import { dlpService, type DLPResult } from './dlp'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { dlpService, type DLPResult } from './dlp'
 
 const logger = createBuildSafeLogger('dlp-integration')
 

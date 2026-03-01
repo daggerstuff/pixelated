@@ -1,5 +1,6 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { updateDataDeletionRequest } from '../../../../lib/services/patient-rights/dataDeleteService'
 
 // Create a logger instance for this endpoint

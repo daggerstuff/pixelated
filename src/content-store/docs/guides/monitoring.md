@@ -1,9 +1,9 @@
 ---
-title: "Monitoring Guide"
-description: "Monitoring Guide documentation"
+title: 'Monitoring Guide'
+description: 'Monitoring Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -68,12 +68,14 @@ To enable production health checks, configure the `APP_URL` variable:
    - `https://yourdomain.com`
 
 **Note**: If you see HTTP 522 errors, this typically means:
+
 - The site is not actually deployed to a server
 - DNS is not correctly configured
 - Cloudflare settings don't match your hosting provider
 - The origin server is down or unreachable
 
-For detailed monitoring setup, see [monitoring/MONITORING_README.md](/monitoring/MONITORING_README.md).
+For detailed monitoring setup, see
+[monitoring/MONITORING_README.md](/monitoring/MONITORING_README.md).
 
 ## Metrics Reference
 

@@ -1,17 +1,18 @@
+// TensorFlow.js imports moved to dynamic imports to reduce bundle size
+// import * as tf from '@tensorflow/tfjs'
+// import { loadLayersModel } from '@tensorflow/tfjs-layers'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
+import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'
+import { createTogetherAIService } from '../../lib/ai/services/together'
+import type { TogetherAIService } from '../../lib/ai/services/together'
 import type {
   FeedbackServiceInterface,
   RealTimeFeedback,
   Scenario,
 } from '../types'
 import { TherapeuticTechnique, FeedbackType } from '../types'
-// TensorFlow.js imports moved to dynamic imports to reduce bundle size
-// import * as tf from '@tensorflow/tfjs'
-// import { loadLayersModel } from '@tensorflow/tfjs-layers'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'
-import { createTogetherAIService } from '../../lib/ai/services/together'
-import type { MentalLLaMAAdapter } from '../../lib/ai/mental-llama/MentalLLaMAAdapter'
-import type { TogetherAIService } from '../../lib/ai/services/together'
 
 export interface MentalHealthInsights {
   hasMentalHealthIssue: boolean
@@ -97,11 +98,11 @@ export class FeedbackService implements FeedbackServiceInterface {
   constructor() {
     // Initialize audio worklet if available
     if (typeof window !== 'undefined' && window.AudioContext) {
-      this.initializeAudioProcessor()
+      void this.initializeAudioProcessor()
     }
 
     // Load enhanced healthcare models
-    this.initEnhancedModels()
+    void this.initEnhancedModels()
   }
 
   private async initializeAudioProcessor() {
@@ -156,7 +157,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
     // Start processing if not already in progress
     if (!this.isProcessing) {
-      this.processQueuedData()
+      void this.processQueuedData()
     }
   }
 
@@ -194,7 +195,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       // Process any remaining items
       if (this.processingQueue.length > 0) {
-        this.processQueuedData()
+        void this.processQueuedData()
       }
     }
   }

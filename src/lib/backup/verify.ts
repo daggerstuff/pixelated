@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { EventEmitter } from 'node:events'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
+
 import { RedisService } from '@/lib/services/redis/RedisService'
 import { getEnv } from '@/lib/utils/env'
 
@@ -254,7 +255,7 @@ export class BackupVerificationService extends EventEmitter {
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        await this.verifyDataIntegrity(backup.data)
+         this.verifyDataIntegrity(backup.data)
       }
 
       // Verify restoration capability

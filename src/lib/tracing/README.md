@@ -1,6 +1,7 @@
 # Distributed Tracing Module
 
-This module provides OpenTelemetry-based distributed tracing for the Pixelated Empathy platform.
+This module provides OpenTelemetry-based distributed tracing for the Pixelated
+Empathy platform.
 
 ## Features
 
@@ -13,7 +14,8 @@ This module provides OpenTelemetry-based distributed tracing for the Pixelated E
 
 ## Quick Start
 
-Tracing is automatically initialized when the application starts. No additional setup required!
+Tracing is automatically initialized when the application starts. No additional
+setup required!
 
 ### Environment Variables
 
@@ -88,7 +90,8 @@ addSpanAttributes({
 
 1. **Application Startup** (`src/lib/startup.ts`): Initializes tracing
 2. **Astro Middleware** (`src/middleware.ts`): Adds tracing middleware
-3. **Monitoring Middleware** (`src/middleware/monitoring.ts`): Can use trace IDs for correlation
+3. **Monitoring Middleware** (`src/middleware/monitoring.ts`): Can use trace IDs
+   for correlation
 
 ## Performance Impact
 
@@ -100,7 +103,8 @@ addSpanAttributes({
 
 - No PHI (Protected Health Information) is included in span attributes
 - Trace IDs are safe to log (they're random identifiers)
-- All tracing respects the same privacy requirements as the rest of the application
+- All tracing respects the same privacy requirements as the rest of the
+  application
 
 ## See Also
 

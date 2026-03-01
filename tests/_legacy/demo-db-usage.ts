@@ -2,11 +2,10 @@ import {
   userManager,
   sessionManager,
   biasAnalysisManager,
-  healthCheck
+  healthCheck,
 } from './src/lib/db/index'
 
 // Initialize database connection
-
 
 async function demonstrateDatabaseUsage() {
   try {
@@ -29,7 +28,7 @@ async function demonstrateDatabaseUsage() {
       lastName: 'Therapist',
       role: 'therapist',
       institution: 'Demo Institution',
-      licenseNumber: 'DEMO123456'
+      licenseNumber: 'DEMO123456',
     })
 
     console.log('👤 Created user with ID:', userId)
@@ -40,7 +39,7 @@ async function demonstrateDatabaseUsage() {
       id: user.id,
       email: user.email,
       name: `${user.first_name} ${user.last_name}`,
-      role: user.role
+      role: user.role,
     })
 
     // Create a therapy session
@@ -50,8 +49,8 @@ async function demonstrateDatabaseUsage() {
       context: {
         topic: 'Anxiety management',
         duration: 50,
-        notes: 'Initial consultation'
-      }
+        notes: 'Initial consultation',
+      },
     })
 
     console.log('💬 Created session with ID:', sessionId)
@@ -62,7 +61,7 @@ async function demonstrateDatabaseUsage() {
       id: session.id,
       therapist: `${session.first_name} ${session.last_name}`,
       type: session.session_type,
-      startedAt: session.started_at
+      startedAt: session.started_at,
     })
 
     // Create a bias analysis (simulated)
@@ -75,20 +74,20 @@ async function demonstrateDatabaseUsage() {
       layerResults: {
         demographic: 0.05,
         linguistic: 0.12,
-        cultural: 0.08
+        cultural: 0.08,
       },
       recommendations: [
         'Consider exploring cultural background more deeply',
-        'Validate client emotions more frequently'
+        'Validate client emotions more frequently',
       ],
       demographics: {
         age: 35,
         gender: 'female',
         ethnicity: 'caucasian',
-        primaryLanguage: 'en'
+        primaryLanguage: 'en',
       },
       contentHash: 'abc123demo',
-      processingTimeMs: 450
+      processingTimeMs: 450,
     })
 
     console.log('📊 Created bias analysis with ID:', analysisId)
@@ -98,11 +97,10 @@ async function demonstrateDatabaseUsage() {
     console.log('📊 Bias analysis summary:', summary)
 
     console.log('✅ Database demo completed successfully!')
-
   } catch (error) {
     console.error('❌ Demo failed:', error)
   }
 }
 
 // Run the demo
-demonstrateDatabaseUsage()
+void demonstrateDatabaseUsage()

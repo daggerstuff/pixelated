@@ -1,10 +1,11 @@
 import { Router } from 'express'
+
 import { authRouter } from './auth'
-import { userRouter } from './users'
-import { onboardingRouter } from './onboarding'
 import { documentRouter } from './documents'
 import { marketRouter } from './market'
+import { onboardingRouter } from './onboarding'
 import { strategyRouter } from './strategy'
+import { userRouter } from './users'
 
 const router = Router()
 

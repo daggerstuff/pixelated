@@ -1,5 +1,6 @@
-import type { PluginAPI } from '../types'
 import { EventEmitter } from 'node:events'
+
+import type { PluginAPI } from '../types'
 
 export interface Plugin {
   id: string

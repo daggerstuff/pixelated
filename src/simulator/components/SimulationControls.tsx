@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { useSimulator } from '../context/SimulatorContext'
 
 interface SimulationControlsProps {
@@ -85,14 +86,14 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
   return (
     <div className={`simulation-controls ${className}`}>
-      <div className="control-panel">
+      <div className='control-panel'>
         <h3>Simulation Controls</h3>
 
-        <div className="control-group">
-          <label htmlFor="speechRecognitionCheckbox" className="control-label">
+        <div className='control-group'>
+          <label htmlFor='speechRecognitionCheckbox' className='control-label'>
             <input
-              id="speechRecognitionCheckbox"
-              type="checkbox"
+              id='speechRecognitionCheckbox'
+              type='checkbox'
               checked={isSpeechRecognitionEnabled}
               onChange={() => toggleSpeechRecognition?.()}
               disabled={!isConnected}
@@ -100,16 +101,16 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
             <span>Speech Recognition</span>
           </label>
-          <p className="control-description">
+          <p className='control-description'>
             Automatically transcribes your speech for enhanced feedback.
           </p>
         </div>
 
-        <div className="control-group">
-          <label htmlFor="enhancedModelsCheckbox" className="control-label">
+        <div className='control-group'>
+          <label htmlFor='enhancedModelsCheckbox' className='control-label'>
             <input
-              id="enhancedModelsCheckbox"
-              type="checkbox"
+              id='enhancedModelsCheckbox'
+              type='checkbox'
               checked={isUsingEnhancedModels}
               onChange={(e) =>
                 toggleEnhancedModels?.(e.target?.['checked'] || false)
@@ -119,16 +120,16 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
 
             <span>Enhanced Healthcare Models</span>
           </label>
-          <p className="control-description">
+          <p className='control-description'>
             Uses fine-tuned healthcare models for better therapeutic feedback.
           </p>
         </div>
       </div>
 
       {isSpeechRecognitionEnabled && transcribedText && (
-        <div className="transcription-panel">
+        <div className='transcription-panel'>
           <h4>Speech Transcription</h4>
-          <div className="transcription-content">{transcribedText}</div>
+          <div className='transcription-content'>{transcribedText}</div>
         </div>
       )}
 

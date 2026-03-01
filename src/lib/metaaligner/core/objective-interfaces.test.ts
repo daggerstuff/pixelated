@@ -1,4 +1,5 @@
 import { describe, test, beforeEach, expect } from 'vitest'
+
 import type {
   ObjectiveBuilder,
   ObjectiveRegistry,

@@ -5,9 +5,9 @@
  * Integrates with PHI detection to scan content before transmission.
  */
 
-import { detectAndRedactPHI } from './phiDetection'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { AuditEventType, logAuditEvent, type AuditDetails } from '../audit'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { detectAndRedactPHI } from './phiDetection'
 
 const logger = createBuildSafeLogger('dlp-service')
 

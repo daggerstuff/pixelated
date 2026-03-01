@@ -10,7 +10,9 @@ toc: true
 
 # Live Region System
 
-The Live Region System provides a standardized way to announce dynamic content changes to users of assistive technologies like screen readers. This ensures users are informed about important updates that may not be visually apparent.
+The Live Region System provides a standardized way to announce dynamic content
+changes to users of assistive technologies like screen readers. This ensures
+users are informed about important updates that may not be visually apparent.
 
 ## Overview
 
@@ -18,8 +20,10 @@ The system includes:
 
 1. **Four specialized live regions:**
    - **Status:** For general status updates (polite announcements)
-   - **Alert:** For important notifications that need immediate attention (assertive announcements)
-   - **Log:** For sequential information updates (polite announcements, not atomic)
+   - **Alert:** For important notifications that need immediate attention
+     (assertive announcements)
+   - **Log:** For sequential information updates (polite announcements, not
+     atomic)
    - **Progress:** For progress updates (polite announcements)
 
 2. **Three implementation approaches:**
@@ -29,7 +33,8 @@ The system includes:
 
 ## Implementation
 
-The Live Region System is automatically included in the BaseLayout, so it's available on all pages that use this layout.
+The Live Region System is automatically included in the BaseLayout, so it's
+available on all pages that use this layout.
 
 ### Using Live Regions in Astro Components
 
@@ -169,7 +174,8 @@ announceProgress(value, max, label)
 2. **Write clear messages:**
    - Be concise but descriptive
    - Include action context
-   - Use present tense (e.g., "Form submitted" rather than "Form has been submitted")
+   - Use present tense (e.g., "Form submitted" rather than "Form has been
+     submitted")
 
 3. **Control verbosity:**
    - Don't announce every minor change

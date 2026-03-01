@@ -1,3 +1,4 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import {
   afterAll,
   afterEach,
@@ -8,14 +9,15 @@ import {
   it,
   vi,
 } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+
 import { act } from '@/test/setup-react19'
+
 import '@testing-library/jest-dom'
 // Defer importing BiasDashboard until after globals are stubbed
 let BiasDashboard: (typeof import('./BiasDashboard'))['BiasDashboard']
 
 // Keep original fetch to restore after tests
-const __originalFetch: typeof fetch | undefined = global.fetch as typeof fetch
+const __originalFetch: typeof fetch | undefined = global.fetch
 
 // Mock the logger
 vi.mock('@/lib/logging/build-safe-logger', () => ({
@@ -109,7 +111,7 @@ const createMockWebSocket = (): MockWebSocketInstance => ({
 const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
   typeof vi.fn
 > & {
-  new(url: string | URL, protocols?: string | string[]): MockWebSocketInstance
+  new (url: string | URL, protocols?: string | string[]): MockWebSocketInstance
   prototype: WebSocket
   readonly CONNECTING: 0
   readonly OPEN: 1
@@ -120,11 +122,11 @@ const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
 // Mock WebSocket using Vitest's stubGlobal
 vi.stubGlobal('WebSocket', MockWebSocketConstructor)
 
-  // Define standard readyState constants on the mock constructor
-  ; (MockWebSocketConstructor as any).CONNECTING = 0
-  ; (MockWebSocketConstructor as any).OPEN = 1
-  ; (MockWebSocketConstructor as any).CLOSING = 2
-  ; (MockWebSocketConstructor as any).CLOSED = 3
+// Define standard readyState constants on the mock constructor
+;(MockWebSocketConstructor as any).CONNECTING = 0
+;(MockWebSocketConstructor as any).OPEN = 1
+;(MockWebSocketConstructor as any).CLOSING = 2
+;(MockWebSocketConstructor as any).CLOSED = 3
 
 // --- GLOBAL MOCKS FOR BROWSER APIS ---
 // Ensure matchMedia is always mocked for all tests
@@ -145,7 +147,7 @@ beforeAll(async () => {
     })
   }
   // Mock window.alert and window.prompt to prevent test failures
-  vi.spyOn(window, 'alert').mockImplementation(() => { })
+  vi.spyOn(window, 'alert').mockImplementation(() => {})
   vi.spyOn(window, 'prompt').mockImplementation(() => '')
   // Mock URL.createObjectURL if not present
   if (!global.URL.createObjectURL) {
@@ -169,10 +171,10 @@ describe('BiasDashboard', () => {
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
     // Ensure the constructor has a default implementation after reset
     MockWebSocketConstructor.mockImplementation(createMockWebSocket)
-      ; (MockWebSocketConstructor as any).CONNECTING = 0
-      ; (MockWebSocketConstructor as any).OPEN = 1
-      ; (MockWebSocketConstructor as any).CLOSING = 2
-      ; (MockWebSocketConstructor as any).CLOSED = 3
+    ;(MockWebSocketConstructor as any).CONNECTING = 0
+    ;(MockWebSocketConstructor as any).OPEN = 1
+    ;(MockWebSocketConstructor as any).CLOSING = 2
+    ;(MockWebSocketConstructor as any).CLOSED = 3
     // Default fetch mock for initial dashboard load unless a test overrides it
     global.fetch = vi
       .fn()
@@ -225,7 +227,7 @@ describe('BiasDashboard', () => {
     if (__originalFetch) {
       global.fetch = __originalFetch
     } else {
-      ; (global as any).fetch = undefined
+      ;(global as any).fetch = undefined
     }
     // Ensure global WebSocket remains our mock after tests that might override it
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
@@ -254,15 +256,15 @@ describe('BiasDashboard', () => {
   it.skip('handles WebSocket connection', async () => {
     // Helper to get the latest WebSocket instance from mock results
     const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>).mock
-        ?.results
+      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
+        .mock?.results
       if (!results || results.length === 0) return undefined
       return results[results.length - 1]?.value as MockWebSocketInstance
     }
 
     // Use the same robust mock setup as Enhanced WebSocket tests
     MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket();
+      return createMockWebSocket()
     })
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
@@ -281,7 +283,7 @@ describe('BiasDashboard', () => {
 
     // Simulate WebSocket 'onopen' event
     const ws = getCurrentWS()!
-    act(() => {
+    void act(() => {
       ws.onopen?.(new Event('open'))
     })
 
@@ -315,9 +317,9 @@ describe('BiasDashboard', () => {
     })
 
     // Simulate connection error
-    act(() => {
+    void act(() => {
       if (mockWebSocket.onerror) {
-        const errorEvent = new Event('error') as Event
+        const errorEvent = new Event('error')
         mockWebSocket.onerror(errorEvent)
       }
     })
@@ -332,14 +334,14 @@ describe('BiasDashboard', () => {
   it.skip('updates data when receiving WebSocket messages', async () => {
     // Helper to get the latest WebSocket instance from mock results
     const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>).mock
-        ?.results
+      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
+        .mock?.results
       if (!results || results.length === 0) return undefined
       return results[results.length - 1]?.value as MockWebSocketInstance
     }
 
     MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket();
+      return createMockWebSocket()
     })
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
@@ -357,7 +359,7 @@ describe('BiasDashboard', () => {
 
     // First simulate connection
     const ws = getCurrentWS()!
-    act(() => {
+    void act(() => {
       ws.onopen?.(new Event('open'))
     })
 
@@ -367,7 +369,7 @@ describe('BiasDashboard', () => {
     })
 
     // Simulate WebSocket message with proper alert structure
-    act(() => {
+    void act(() => {
       ws.onmessage?.(
         new MessageEvent('message', {
           data: JSON.stringify({
@@ -480,7 +482,7 @@ describe('BiasDashboard', () => {
     const _openCall = mockWs.addEventListener.mock.calls.find(
       (call: unknown[]) => call[0] === 'open',
     )
-    const intervalId = setInterval(() => { }, 30000)
+    const intervalId = setInterval(() => {}, 30000)
     mockWs.heartbeatInterval = intervalId as any
 
     unmount()
@@ -511,7 +513,7 @@ describe('BiasDashboard', () => {
 
     const timeRangeSelect = screen.getByLabelText(
       /time range/i,
-    ) as HTMLSelectElement
+    )
     fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
 
     expect(timeRangeSelect.value).toBe('7d')
@@ -540,7 +542,7 @@ describe('BiasDashboard', () => {
 
     const biasScoreSelect = screen.getByLabelText(
       /bias score level/i,
-    ) as HTMLSelectElement
+    )
     fireEvent.change(biasScoreSelect, { target: { value: 'high' } })
 
     expect(biasScoreSelect.value).toBe('high')
@@ -555,7 +557,7 @@ describe('BiasDashboard', () => {
 
     const alertLevelSelect = screen.getByLabelText(
       /alert level/i,
-    ) as HTMLSelectElement
+    )
     fireEvent.change(alertLevelSelect, { target: { value: 'critical' } })
 
     expect(alertLevelSelect.value).toBe('critical')
@@ -775,7 +777,7 @@ describe('BiasDashboard', () => {
     fireEvent.click(screen.getByTestId('notifications-button'))
 
     // Mock window.alert
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { })
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
 
     // Click send test button
     const sendTestButton = screen.getByText(/send test/i)
@@ -1062,7 +1064,7 @@ describe('BiasDashboard', () => {
       global.URL.revokeObjectURL = vi.fn()
       const clickSpy = vi
         .spyOn(HTMLAnchorElement.prototype, 'click')
-        .mockImplementation(() => { })
+        .mockImplementation(() => {})
       const originalFetch = globalThis.fetch
       globalThis.fetch = vi.fn(async (input: any, init?: any) => {
         const url = typeof input === 'string' ? input : input?.url
@@ -1097,8 +1099,8 @@ describe('BiasDashboard', () => {
       // Cleanup
       clickSpy.mockRestore()
       globalThis.fetch = originalFetch
-        ; (global.URL.createObjectURL as any) = vi.fn()
-        ; (global.URL.revokeObjectURL as any) = vi.fn()
+      ;(global.URL.createObjectURL as any) = vi.fn()
+      ;(global.URL.revokeObjectURL as any) = vi.fn()
     })
 
     it('closes export dialog when cancel is clicked', async () => {
@@ -1481,7 +1483,7 @@ describe('BiasDashboard', () => {
       if (originalFetch) {
         global.fetch = originalFetch
       } else {
-        ; (global as any).fetch = undefined
+        ;(global as any).fetch = undefined
       }
       if (container && container.parentNode) {
         container.parentNode.removeChild(container)
@@ -1512,7 +1514,7 @@ describe('BiasDashboard', () => {
       ).toBeInTheDocument()
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
@@ -1534,9 +1536,9 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate connection error
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onerror) {
-          const errorEvent = new Event('error') as Event
+          const errorEvent = new Event('error')
           mockWebSocket.onerror(errorEvent)
         }
       })
@@ -1560,7 +1562,7 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate connection close
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onclose) {
           const closeEvent = new CloseEvent('close', {
             code: 1006,
@@ -1596,7 +1598,7 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         mockWebSocket.onopen?.(new Event('open'))
       })
 
@@ -1625,7 +1627,7 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
@@ -1657,14 +1659,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         mockWebSocket.onopen!(new Event('open'))
       })
 
       mockWebSocket.send.mockClear()
 
       // Simulate heartbeat message from server
-      act(() => {
+      void act(() => {
         mockWebSocket.onmessage!(
           new MessageEvent('message', {
             data: JSON.stringify({ type: 'heartbeat' }),
@@ -1692,7 +1694,7 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
@@ -1702,7 +1704,7 @@ describe('BiasDashboard', () => {
       fireEvent.click(screen.getByRole('tab', { name: /alerts/i }))
 
       // Simulate new bias alert
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onmessage) {
           const messageEvent = new MessageEvent('message', {
             data: JSON.stringify({
@@ -1739,14 +1741,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
       })
 
       // Simulate session update
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onmessage) {
           const messageEvent = new MessageEvent('message', {
             data: JSON.stringify({
@@ -1779,14 +1781,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
       })
 
       // Simulate metrics update
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onmessage) {
           const messageEvent = new MessageEvent('message', {
             data: JSON.stringify({
@@ -1820,9 +1822,9 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate connection error
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onerror) {
-          const errorEvent = new Event('error') as Event
+          const errorEvent = new Event('error')
           mockWebSocket.onerror(errorEvent)
         }
       })
@@ -1869,14 +1871,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection with heartbeat
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
       })
 
       // Set up heartbeat interval
-      const intervalId = setInterval(() => { }, 30000)
+      const intervalId = setInterval(() => {}, 30000)
       mockWebSocket.heartbeatInterval = intervalId as any
 
       // Unmount component
@@ -1902,14 +1904,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
       })
 
       // Simulate unknown message type
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onmessage) {
           const messageEvent = new MessageEvent('message', {
             data: JSON.stringify({
@@ -1937,14 +1939,14 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate successful connection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onopen) {
           mockWebSocket.onopen(new Event('open'))
         }
       })
 
       // Simulate malformed message
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onmessage) {
           const messageEvent = new MessageEvent('message', {
             data: 'invalid json',
@@ -1969,7 +1971,7 @@ describe('BiasDashboard', () => {
       })
 
       // Simulate connection close to trigger reconnection
-      act(() => {
+      void act(() => {
         if (mockWebSocket.onclose) {
           const closeEvent = new CloseEvent('close', {
             code: 1006,

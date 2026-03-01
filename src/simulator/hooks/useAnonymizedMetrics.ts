@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import { TherapeuticTechnique } from '../types'
 
 // Local storage key for metrics

@@ -1,13 +1,14 @@
+import type { ChildProcessWithoutNullStreams } from 'child_process'
+import { spawn } from 'child_process'
+import { randomUUID } from 'crypto'
+
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   PythonBridgeRequest,
   PythonBridgeResponse,
   IMHIEvaluationParams,
   MentalLLaMAAnalysisResult,
 } from '../types/index.ts'
-import type { ChildProcessWithoutNullStreams } from 'child_process'
-import { spawn } from 'child_process'
-import { randomUUID } from 'crypto'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('MentalLLaMA')
 
@@ -90,7 +91,7 @@ export class MentalLLaMAPythonBridge {
               ) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
                 clearTimeout(timeout)
-                this.requestQueue.delete(response.id!)
+                this.requestQueue.delete(response.id)
                 if (response.success) {
                   resolve(response.data)
                 } else {

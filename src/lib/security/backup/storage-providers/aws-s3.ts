@@ -89,7 +89,7 @@ export class S3StorageProvider implements StorageProvider {
       } = await import('@aws-sdk/client-s3')
       // Create S3 instance with provided credentials
       const s3Instance = new S3({
-        credentials: this.config.credentials as unknown as S3Credentials,
+        credentials: this.config.credentials as S3Credentials,
         region: this.config.region as string,
         ...(this.config.options as Partial<S3Config>),
       })
@@ -109,13 +109,13 @@ export class S3StorageProvider implements StorageProvider {
                   !!item.ETag,
               )
               .map((item) => ({
-                Key: item.Key!,
+                Key: item.Key,
                 LastModified:
                   item.LastModified instanceof Date
                     ? item.LastModified
-                    : new Date(item.LastModified!),
+                    : new Date(item.LastModified),
                 Size: typeof item.Size === 'number' ? item.Size : 0,
-                ETag: item.ETag!,
+                ETag: item.ETag,
               })),
           }
         },

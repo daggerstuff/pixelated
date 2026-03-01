@@ -4,15 +4,16 @@
  */
 
 import { lazy, Suspense, type ComponentType, type ReactNode } from 'react'
+
 import { ErrorBoundary } from '@/lib/error'
 
 // Loading fallback component
 function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
-    <div className="flex items-center justify-center min-h-[200px] p-8">
-      <div className="flex flex-col items-center gap-2">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-        <p className="text-sm text-muted-foreground">{message}</p>
+    <div className='flex min-h-[200px] items-center justify-center p-8'>
+      <div className='flex flex-col items-center gap-2'>
+        <div className='border-primary h-8 w-8 animate-spin rounded-full border-b-2' />
+        <p className='text-muted-foreground text-sm'>{message}</p>
       </div>
     </div>
   )
@@ -21,10 +22,10 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
 // Error fallback component
 function ErrorFallback({ error }: { error: Error }) {
   return (
-    <div className="flex items-center justify-center min-h-[200px] p-8">
-      <div className="text-center">
-        <p className="text-sm text-red-500">Failed to load component</p>
-        <p className="text-xs text-muted-foreground mt-1">{error.message}</p>
+    <div className='flex min-h-[200px] items-center justify-center p-8'>
+      <div className='text-center'>
+        <p className='text-red-500 text-sm'>Failed to load component</p>
+        <p className='text-muted-foreground mt-1 text-xs'>{error.message}</p>
       </div>
     </div>
   )
@@ -58,7 +59,7 @@ export const LazyDashboardPage = withLazyLoading(
       default: module.DashboardPage,
     })),
   ),
-  <LoadingFallback message="Loading dashboard..." />,
+  <LoadingFallback message='Loading dashboard...' />,
 )
 
 export const LazySessionsListPage = withLazyLoading(
@@ -67,7 +68,7 @@ export const LazySessionsListPage = withLazyLoading(
       default: module.SessionsListPage,
     })),
   ),
-  <LoadingFallback message="Loading sessions..." />,
+  <LoadingFallback message='Loading sessions...' />,
 )
 
 export const LazySessionDetailPage = withLazyLoading(
@@ -76,7 +77,7 @@ export const LazySessionDetailPage = withLazyLoading(
       default: module.SessionDetailPage,
     })),
   ),
-  <LoadingFallback message="Loading session details..." />,
+  <LoadingFallback message='Loading session details...' />,
 )
 
 export const LazyDiscoveryPage = withLazyLoading(
@@ -85,7 +86,7 @@ export const LazyDiscoveryPage = withLazyLoading(
       default: module.DiscoveryPage,
     })),
   ),
-  <LoadingFallback message="Loading discovery..." />,
+  <LoadingFallback message='Loading discovery...' />,
 )
 
 export const LazyEvaluationPage = withLazyLoading(
@@ -94,7 +95,7 @@ export const LazyEvaluationPage = withLazyLoading(
       default: module.EvaluationPage,
     })),
   ),
-  <LoadingFallback message="Loading evaluation..." />,
+  <LoadingFallback message='Loading evaluation...' />,
 )
 
 export const LazyAcquisitionPage = withLazyLoading(
@@ -103,7 +104,7 @@ export const LazyAcquisitionPage = withLazyLoading(
       default: module.AcquisitionPage,
     })),
   ),
-  <LoadingFallback message="Loading acquisition..." />,
+  <LoadingFallback message='Loading acquisition...' />,
 )
 
 export const LazyIntegrationPage = withLazyLoading(
@@ -112,7 +113,7 @@ export const LazyIntegrationPage = withLazyLoading(
       default: module.IntegrationPage,
     })),
   ),
-  <LoadingFallback message="Loading integration..." />,
+  <LoadingFallback message='Loading integration...' />,
 )
 
 export const LazyReportsPage = withLazyLoading(
@@ -121,7 +122,7 @@ export const LazyReportsPage = withLazyLoading(
       default: module.ReportsPage,
     })),
   ),
-  <LoadingFallback message="Loading reports..." />,
+  <LoadingFallback message='Loading reports...' />,
 )
 
 // Lazy load feature components (heavy components)
@@ -131,7 +132,7 @@ export const LazyDashboard = withLazyLoading(
       default: module.Dashboard,
     })),
   ),
-  <LoadingFallback message="Loading dashboard..." />,
+  <LoadingFallback message='Loading dashboard...' />,
 )
 
 export const LazyProgressTracker = withLazyLoading(
@@ -140,7 +141,7 @@ export const LazyProgressTracker = withLazyLoading(
       default: module.ProgressTracker,
     })),
   ),
-  <LoadingFallback message="Loading progress..." />,
+  <LoadingFallback message='Loading progress...' />,
 )
 
 export const LazyProgressCharts = withLazyLoading(
@@ -149,7 +150,7 @@ export const LazyProgressCharts = withLazyLoading(
       default: module.ProgressCharts,
     })),
   ),
-  <LoadingFallback message="Loading charts..." />,
+  <LoadingFallback message='Loading charts...' />,
 )
 
 export const LazyReportGenerator = withLazyLoading(
@@ -158,7 +159,7 @@ export const LazyReportGenerator = withLazyLoading(
       default: module.ReportGenerator,
     })),
   ),
-  <LoadingFallback message="Loading report generator..." />,
+  <LoadingFallback message='Loading report generator...' />,
 )
 
 export const LazyReportViewer = withLazyLoading(
@@ -167,7 +168,7 @@ export const LazyReportViewer = withLazyLoading(
       default: module.ReportViewer,
     })),
   ),
-  <LoadingFallback message="Loading report viewer..." />,
+  <LoadingFallback message='Loading report viewer...' />,
 )
 
 // Lazy load chart components
@@ -177,7 +178,7 @@ export const LazyMetricsChart = withLazyLoading(
       default: module.MetricsChart,
     })),
   ),
-  <LoadingFallback message="Loading metrics chart..." />,
+  <LoadingFallback message='Loading metrics chart...' />,
 )
 
 export const LazyPhaseProgressChart = withLazyLoading(
@@ -186,6 +187,5 @@ export const LazyPhaseProgressChart = withLazyLoading(
       default: module.PhaseProgressChart,
     })),
   ),
-  <LoadingFallback message="Loading progress chart..." />,
+  <LoadingFallback message='Loading progress chart...' />,
 )
-

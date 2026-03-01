@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content'
+
 import { blogSearch } from '@/lib/search'
 
 let isIndexed = false

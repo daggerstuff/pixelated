@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import offlineManager from '@/utils/offline/offlineManager'
 import requestQueue from '@/utils/offline/requestQueue'
+
 import { useOfflineDetection } from './useOfflineDetection'
 
 export interface UseOfflineManagerOptions {

@@ -8,11 +8,11 @@ export function ContrastChecker() {
   return (
     <div>
       <div>
-        <label htmlFor="color1Input">
+        <label htmlFor='color1Input'>
           Color 1:
           <input
-            id="color1Input"
-            type="color"
+            id='color1Input'
+            type='color'
             value={color1}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setColor1(e.target.value)
@@ -21,11 +21,11 @@ export function ContrastChecker() {
         </label>
       </div>
       <div>
-        <label htmlFor="color2Input">
+        <label htmlFor='color2Input'>
           Color 2:
           <input
-            id="color2Input"
-            type="color"
+            id='color2Input'
+            type='color'
             value={color2}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setColor2(e.target.value)

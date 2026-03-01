@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach} from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 /**
  * Unit tests for the Session Analysis API Endpoint
  */
@@ -230,28 +230,31 @@ describe('Session Analysis API Endpoint', () => {
     vi.clearAllMocks()
 
     // Setup global Response mock with default behavior
-    vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
-      let responseData: any
-      try {
-        responseData = JSON.parse(body)
-      } catch {
-        responseData = { error: 'Invalid JSON' }
-      }
+    vi.stubGlobal(
+      'Response',
+      vi.fn(function (body: string, init?: ResponseInit) {
+        let responseData: any
+        try {
+          responseData = JSON.parse(body)
+        } catch {
+          responseData = { error: 'Invalid JSON' }
+        }
 
-      const defaultHeaders = new Map([
-        ['Content-Type', 'application/json'],
-        ['X-Cache', 'MISS'],
-        ['X-Processing-Time', '100'],
-      ])
+        const defaultHeaders = new Map([
+          ['Content-Type', 'application/json'],
+          ['X-Cache', 'MISS'],
+          ['X-Processing-Time', '100'],
+        ])
 
-      return {
-        status: init?.status || 200,
-        json: vi.fn().mockResolvedValue(responseData),
-        headers: {
-          get: vi.fn((key: string) => defaultHeaders.get(key) || null),
-        },
-      }
-    }))
+        return {
+          status: init?.status || 200,
+          json: vi.fn().mockResolvedValue(responseData),
+          headers: {
+            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+          },
+        }
+      }),
+    )
 
     // Setup mock return values
     mockCacheManager.analysisCache.getAnalysisResult.mockResolvedValue(null)
@@ -305,7 +308,7 @@ describe('Session Analysis API Endpoint', () => {
   ): MockRequest => {
     const defaultHeaders: Record<string, string> = {
       'content-type': 'application/json',
-      'authorization': 'Bearer valid-token',
+      authorization: 'Bearer valid-token',
       ...headers,
     }
 
@@ -334,15 +337,20 @@ describe('Session Analysis API Endpoint', () => {
         ['X-Processing-Time', '100'],
       ])
 
-      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
-        return {
-          status: init?.status || 200,
-          json: mockResponseJson.mockResolvedValue(JSON.parse(body) as unknown),
-          headers: {
-            get: vi.fn((key: string) => mockResponseHeaders.get(key) || null),
-          },
-        }
-      }))
+      vi.stubGlobal(
+        'Response',
+        vi.fn(function (body: string, init?: ResponseInit) {
+          return {
+            status: init?.status || 200,
+            json: mockResponseJson.mockResolvedValue(
+              JSON.parse(body) as unknown,
+            ),
+            headers: {
+              get: vi.fn((key: string) => mockResponseHeaders.get(key) || null),
+            },
+          }
+        }),
+      )
 
       const response = await POST({ request })
 
@@ -550,7 +558,7 @@ describe('Session Analysis API Endpoint', () => {
           get: vi.fn((key: string) => {
             const headers: Record<string, string> = {
               'content-type': 'application/json',
-              'authorization': 'Bearer valid-token',
+              authorization: 'Bearer valid-token',
             }
             return headers[key.toLowerCase()] || null
           }),
@@ -571,16 +579,19 @@ describe('Session Analysis API Endpoint', () => {
       const request = createMockRequest(requestBody)
 
       // Mock Response with processing time
-      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
-        const responseData = JSON.parse(body) as unknown
-        return {
-          status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(responseData),
-          headers: {
-            get: vi.fn(() => 'application/json'),
-          },
-        }
-      }))
+      vi.stubGlobal(
+        'Response',
+        vi.fn(function (body: string, init?: ResponseInit) {
+          const responseData = JSON.parse(body) as unknown
+          return {
+            status: init?.status || 200,
+            json: vi.fn().mockResolvedValue(responseData),
+            headers: {
+              get: vi.fn(() => 'application/json'),
+            },
+          }
+        }),
+      )
 
       const response = await POST({ request })
       const responseData = await response.json()
@@ -601,15 +612,18 @@ describe('Session Analysis API Endpoint', () => {
         ['X-Processing-Time', '150'],
       ])
 
-      vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
-        return {
-          status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-          headers: {
-            get: vi.fn((key: string) => mockHeaders.get(key) || null),
-          },
-        }
-      }))
+      vi.stubGlobal(
+        'Response',
+        vi.fn(function (body: string, init?: ResponseInit) {
+          return {
+            status: init?.status || 200,
+            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
+            headers: {
+              get: vi.fn((key: string) => mockHeaders.get(key) || null),
+            },
+          }
+        }),
+      )
 
       const response = await POST({ request })
 
@@ -840,7 +854,7 @@ describe('Session Analysis API Endpoint', () => {
       expect(lastResponse).toBeDefined()
       // expect(lastResponse!.status).toBe(429) // Mock API doesn't implement rate limiting
 
-      const _responseData = await lastResponse!.json()
+      const _responseData = await lastResponse.json()
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Rate Limit Exceeded')
     })

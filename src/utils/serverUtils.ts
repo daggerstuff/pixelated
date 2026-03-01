@@ -43,10 +43,17 @@ export function safelyGetHeader(
  * @returns Object with header values or empty object in prerendered context
  */
 export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
-  console.error(`[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env.COMMAND}`);
+  console.error(
+    `[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env.COMMAND}`,
+  )
   // Only try to access headers in SSR context and not during static build
   const isBuild = import.meta.env.COMMAND === 'build'
-  if (import.meta.env.SSR && astro.request && astro.request.headers && !isBuild) {
+  if (
+    import.meta.env.SSR &&
+    astro.request &&
+    astro.request.headers &&
+    !isBuild
+  ) {
     const headers: Record<string, string> = {}
 
     // Convert headers to a plain object
@@ -67,7 +74,7 @@ export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
  * @returns boolean indicating if we're in SSR mode
  */
 export function isSSR(): boolean {
-  return import.meta.env.SSR === true
+  return  import.meta.env.SSR
 }
 
 /**

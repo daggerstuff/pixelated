@@ -1,14 +1,14 @@
+import { fheService } from '../fhe'
+import { logger } from '../logger'
+import { redis } from '../redis'
+import { listRecentBreaches } from '../security/breach-notification'
+import type { BreachDetails } from '../security/breach-notification'
 import { calculateScore } from './compliance'
 import * as MachineLearning from './ml'
 import * as NotificationEffectiveness from './notifications'
 import * as RiskScoring from './risk'
 import { StatisticalAnalysis } from './statistics'
 import * as SecurityTrends from './trends'
-import { fheService } from '../fhe'
-import { logger } from '../logger'
-import { redis } from '../redis'
-import { listRecentBreaches } from '../security/breach-notification'
-import type { BreachDetails } from '../security/breach-notification'
 
 // Adapter function to convert BreachDetails to SecurityBreach
 function convertToSecurityBreach(
@@ -42,7 +42,7 @@ function convertToBreach(
     id: breach.id,
     timestamp: new Date(breach.timestamp),
     severity: {
-      level: breach.severity as 'critical' | 'high' | 'medium' | 'low',
+      level: breach.severity,
       score:
         breach.severity === 'critical'
           ? 1.0

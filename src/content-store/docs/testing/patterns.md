@@ -10,7 +10,8 @@ share: true
 
 # Test Patterns
 
-This guide outlines the common test patterns and best practices used throughout Pixelated Healths test suite.
+This guide outlines the common test patterns and best practices used throughout
+Pixelated Healths test suite.
 
 ## Test Organization
 
@@ -63,7 +64,6 @@ describe('AuthenticationService', () => {
 Use MSW for mocking HTTP requests:
 
 ```typescript
-
 const server = setupServer(
   rest.post('/api/analytics', (req, rest, ctx) => {
     return rest(ctx.json({ success: true }))
@@ -169,7 +169,6 @@ describe('Error Handling', () => {
 Use factories for test data:
 
 ```typescript
-
 describe('User Sessions', () => {
   it('should link session to user', async () => {
     const user = await createUser()

@@ -1,6 +1,4 @@
-import type { PatientProfile } from '../models/patient'
-import { PatientProfileService } from './PatientProfileService'
-import { BeliefConsistencyService } from './BeliefConsistencyService'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger' // Assuming logger is available
 // IMPORTANT: Always use public methods from EmotionSynthesizer - never access private methods directly
 import {
   EmotionSynthesizer,
@@ -8,7 +6,9 @@ import {
   type EmotionProfile,
   type EmotionTransitionContext,
 } from '../emotions/EmotionSynthesizer'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger' // Assuming logger is available
+import type { PatientProfile } from '../models/patient'
+import { BeliefConsistencyService } from './BeliefConsistencyService'
+import { PatientProfileService } from './PatientProfileService'
 
 const logger = createBuildSafeLogger('default')
 

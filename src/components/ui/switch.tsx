@@ -2,8 +2,10 @@ import * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface SwitchProps
-  extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type'> {
+interface SwitchProps extends Omit<
+  React.ComponentPropsWithoutRef<'input'>,
+  'type'
+> {
   checked?: boolean
   onCheckedChange?: (checked: boolean) => void
 }
@@ -16,11 +18,11 @@ const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     }
 
     return (
-      <label className="relative inline-flex items-center cursor-pointer">
+      <label className='relative inline-flex cursor-pointer items-center'>
         <input
-          type="checkbox"
+          type='checkbox'
           ref={ref}
-          className="sr-only peer"
+          className='peer sr-only'
           checked={checked}
           onChange={handleChange}
           {...props}

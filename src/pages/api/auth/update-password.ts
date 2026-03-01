@@ -51,7 +51,8 @@ export const POST = async ({ request, cookies }: APIContext) => {
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Password updates should be performed via Auth0 Universal Login or Management Dashboard.',
+        message:
+          'Password updates should be performed via Auth0 Universal Login or Management Dashboard.',
       }),
       {
         status: 501,
@@ -61,7 +62,7 @@ export const POST = async ({ request, cookies }: APIContext) => {
       },
     )
 
-    /* 
+    /*
     Legacy implementation removed:
     // Update the password using the AuthService with token verification
     await updatePasswordWithToken(email, token, password)

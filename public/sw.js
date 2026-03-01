@@ -66,7 +66,7 @@ self.addEventListener('fetch', (event) => {
           headers,
         })
 
-        cache.put(event.request, modifiedResponse)
+        void cache.put(event.request, modifiedResponse)
 
         return response
       } catch (error) {

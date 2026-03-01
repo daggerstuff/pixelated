@@ -1,18 +1,19 @@
 ---
-title: "Notification Service API Documentation"
-description: "Notification Service API Documentation documentation"
+title: 'Notification Service API Documentation'
+description: 'Notification Service API Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Notification Service API Documentation
 
-The Pixelated platform includes multiple notification services that handle different aspects of the system's
-notification capabilities. This document provides comprehensive documentation for these services, their
-interfaces, methods, and usage examples.
+The Pixelated platform includes multiple notification services that handle
+different aspects of the system's notification capabilities. This document
+provides comprehensive documentation for these services, their interfaces,
+methods, and usage examples.
 
 ## Table of Contents
 
@@ -28,20 +29,23 @@ interfaces, methods, and usage examples.
 
 ## Overview
 
-The notification system in Pixelated is designed to handle various types of notifications across different
-channels. The system includes three main services:
+The notification system in Pixelated is designed to handle various types of
+notifications across different channels. The system includes three main
+services:
 
 1. **NotificationService**: A basic notification service for cache alerts
-2. **AutomatedNotificationService**: An enhanced service with support for multiple channels and advanced
-   features
-3. **Security NotificationService**: A specialized service for security-related notifications with advanced error
-   handling and circuit breaking
+2. **AutomatedNotificationService**: An enhanced service with support for
+   multiple channels and advanced features
+3. **Security NotificationService**: A specialized service for security-related
+   notifications with advanced error handling and circuit breaking
 
-These services share common concepts but are tailored for specific use cases within the application.
+These services share common concepts but are tailored for specific use cases
+within the application.
 
 ## NotificationService
 
-The `NotificationService` is a singleton class that handles notifications for cache alerts.
+The `NotificationService` is a singleton class that handles notifications for
+cache alerts.
 
 ### Base Service Interfaces
 
@@ -117,15 +121,20 @@ await notificationService.clearNotificationHistory()
 
 The service also includes several private methods:
 
-- `getNotificationConfig()`: Fetches notification configuration from the database
-- `shouldThrottle(alertId: string, config: NotificationConfig)`: Determines if notifications should be throttled
-- `sendEmailNotification(alert: CacheAlert, config: NotificationConfig)`: Sends email notifications
-- `sendSlackNotification(alert: CacheAlert, config: NotificationConfig)`: Sends Slack notifications
+- `getNotificationConfig()`: Fetches notification configuration from the
+  database
+- `shouldThrottle(alertId: string, config: NotificationConfig)`: Determines if
+  notifications should be throttled
+- `sendEmailNotification(alert: CacheAlert, config: NotificationConfig)`: Sends
+  email notifications
+- `sendSlackNotification(alert: CacheAlert, config: NotificationConfig)`: Sends
+  Slack notifications
 
 ## AutomatedNotificationService
 
-The `AutomatedNotificationService` is an enhanced notification service that extends EventEmitter and supports
-multiple notification channels with advanced features.
+The `AutomatedNotificationService` is an enhanced notification service that
+extends EventEmitter and supports multiple notification channels with advanced
+features.
 
 ### Automated Service Interfaces 2
 
@@ -200,7 +209,8 @@ Sends a notification through configured channels based on severity and type.
 
 **Parameters**:
 
-- `notification`: A `Notification` object containing information about the notification
+- `notification`: A `Notification` object containing information about the
+  notification
 
 **Returns**: `Promise<void>`
 
@@ -224,7 +234,8 @@ await notificationService.notify(notification)
 The AutomatedNotificationService emits the following events:
 
 - `notification:sent`: Emitted when a notification is successfully sent
-- `notification:error`: Emitted when an error occurs while sending a notification
+- `notification:error`: Emitted when an error occurs while sending a
+  notification
 
 **Example**:
 
@@ -242,8 +253,9 @@ notificationService.on('notification:error', ({ notification, error }) => {
 
 ## Security NotificationService
 
-The `NotificationService` in the security module is a specialized service for handling security-related
-notifications with advanced error handling, circuit breaking, and performance monitoring.
+The `NotificationService` in the security module is a specialized service for
+handling security-related notifications with advanced error handling, circuit
+breaking, and performance monitoring.
 
 ### Security Service Interfaces 2
 
@@ -285,7 +297,8 @@ Sends notifications for a security incident through configured channels.
 
 **Parameters**:
 
-- `incident`: A `SecurityIncident` object containing information about the security incident
+- `incident`: A `SecurityIncident` object containing information about the
+  security incident
 
 **Returns**: `Promise<void>`
 
@@ -334,10 +347,7 @@ const channel = {
   },
 }
 
-await notificationService.addNotificationChannel(
-  IncidentSeverity.HIGH,
-  channel,
-)
+await notificationService.addNotificationChannel(IncidentSeverity.HIGH, channel)
 ```
 
 #### `removeNotificationChannel(severity: IncidentSeverity, channelType: string, target: string)`
@@ -460,8 +470,10 @@ interface ChannelMetrics {
 
 ### Configuration
 
-1. **Environment Variables**: Store sensitive information like API keys and credentials in environment variables
-2. **Database Configuration**: Store notification configuration in the database for easy updates without code changes
+1. **Environment Variables**: Store sensitive information like API keys and
+   credentials in environment variables
+2. **Database Configuration**: Store notification configuration in the database
+   for easy updates without code changes
 3. **Throttling**: Always implement throttling to prevent notification flooding
 4. **Templates**: Use templates for notification content to maintain consistency
 
@@ -470,14 +482,16 @@ interface ChannelMetrics {
 1. **Severity Levels**: Use appropriate severity levels for notifications
 2. **Metadata**: Include relevant metadata in notifications for better context
 3. **Error Handling**: Always handle errors when sending notifications
-4. **Circuit Breaking**: Implement circuit breaking to prevent cascading failures
+4. **Circuit Breaking**: Implement circuit breaking to prevent cascading
+   failures
 5. **Monitoring**: Monitor notification metrics to detect issues
 
 ## Error Handling
 
 The notification services implement various error handling strategies:
 
-1. **Retries**: Automatically retry failed notifications with exponential backoff
+1. **Retries**: Automatically retry failed notifications with exponential
+   backoff
 2. **Circuit Breaking**: Prevent sending notifications through failing channels
 3. **Fallbacks**: Use alternative channels when primary channels fail
 4. **Logging**: Log all notification errors for troubleshooting
@@ -493,9 +507,11 @@ The notification services implement various error handling strategies:
 
 ## Performance Considerations
 
-1. **Throttling**: Implement throttling to prevent overwhelming notification providers
+1. **Throttling**: Implement throttling to prevent overwhelming notification
+   providers
 2. **Batching**: Batch notifications when possible to reduce API calls
-3. **Asynchronous Processing**: Process notifications asynchronously to avoid blocking
+3. **Asynchronous Processing**: Process notifications asynchronously to avoid
+   blocking
 4. **Caching**: Cache notification templates and configuration
 5. **Monitoring**: Monitor notification performance metrics
 

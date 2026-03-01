@@ -1,6 +1,6 @@
 declare module '@react-three/fiber' {
-  import type * as THREE from 'three'
   import type * as React from 'react'
+  import type * as THREE from 'three'
 
   interface CanvasProps {
     children?: React.ReactNode

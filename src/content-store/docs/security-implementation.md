@@ -1,22 +1,25 @@
 ---
-title: "Security Implementation Guide"
-description: "Security Implementation Guide documentation"
+title: 'Security Implementation Guide'
+description: 'Security Implementation Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "security"]
+author: 'Pixelated Team'
+tags: ['documentation', 'security']
 draft: false
 toc: true
 ---
 
 # Security Implementation Guide
 
-This document outlines the security measures implemented in the application to ensure data protection, prevent common web vulnerabilities, and maintain compliance with HIPAA requirements.
+This document outlines the security measures implemented in the application to
+ensure data protection, prevent common web vulnerabilities, and maintain
+compliance with HIPAA requirements.
 
 ## Overview
 
 The application employs multiple layers of security:
 
-1. **API Security**: Input validation, authentication, and error handling for all endpoints
+1. **API Security**: Input validation, authentication, and error handling for
+   all endpoints
 2. **Response Headers**: HTTP security headers to prevent common web attacks
 3. **Request Validation**: Schema-based validation using Zod
 4. **Rate Limiting**: Protection against abuse and DDoS attempts
@@ -35,8 +38,8 @@ if (!session?.user) {
   return new Response(JSON.stringify({ error: 'Unauthorized' }), {
     status: 401,
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   })
 }
 ```
@@ -47,14 +50,17 @@ Request validation is performed using Zod schemas:
 
 ```typescript
 // Validate request body against schema
-const [data, validationError] = await validateRequestBody(request, CompletionRequestSchema)
+const [data, validationError] = await validateRequestBody(
+  request,
+  CompletionRequestSchema,
+)
 
 if (validationError) {
   return new Response(JSON.stringify(validationError), {
     status: validationError.status,
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   })
 }
 ```
@@ -69,15 +75,18 @@ const totalInputSize = JSON.stringify(data).length
 const maxAllowedSize = 1024 * 50 // 50KB limit
 
 if (totalInputSize > maxAllowedSize) {
-  return new Response(JSON.stringify({
-    error: 'Payload too large',
-    message: 'The request payload exceeds the maximum allowed size'
-  }), {
-    status: 413,
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
+  return new Response(
+    JSON.stringify({
+      error: 'Payload too large',
+      message: 'The request payload exceeds the maximum allowed size',
+    }),
+    {
+      status: 413,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  )
 }
 ```
 
@@ -88,8 +97,7 @@ A standardized error handling system is implemented:
 ```typescript
 try {
   // API logic here
-}
-catch (error) {
+} catch (error) {
   console.error('Error in AI completion API:', error)
 
   // Create audit log for the error
@@ -99,8 +107,8 @@ catch (error) {
     status: 'error',
     details: {
       error: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    }
+      stack: error instanceof Error ? error.stack : undefined,
+    },
   })
 
   // Use the standardized error handling
@@ -113,19 +121,30 @@ catch (error) {
 The application implements security headers through middleware:
 
 ```typescript
-const securityHeadersMiddleware: MiddlewareHandler = async ({ locals }, next) => {
+const securityHeadersMiddleware: MiddlewareHandler = async (
+  { locals },
+  next,
+) => {
   const response = await next()
 
   // Set security headers
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-XSS-Protection', '1; mode=block')
-  response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  response.headers.set(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains',
+  )
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=()',
+  )
 
   // Content Security Policy
-  response.headers.set('Content-Security-Policy', `
+  response.headers.set(
+    'Content-Security-Policy',
+    `
     default-src 'self';
     script-src 'self' 'unsafe-inline' https://trusted-cdn.com;
     style-src 'self' 'unsafe-inline' https://trusted-cdn.com;
@@ -136,7 +155,10 @@ const securityHeadersMiddleware: MiddlewareHandler = async ({ locals }, next) =>
     form-action 'self';
     base-uri 'self';
     object-src 'none'
-  `.replace(/\s+/g, ' ').trim())
+  `
+      .replace(/\s+/g, ' ')
+      .trim(),
+  )
 
   return response
 }
@@ -163,8 +185,14 @@ export const corsMiddleware: MiddlewareHandler = async ({ request }, next) => {
   // Set CORS headers if origin is allowed
   if (isAllowedOrigin) {
     response.headers.set('Access-Control-Allow-Origin', origin)
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.set(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE, OPTIONS',
+    )
+    response.headers.set(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization',
+    )
     response.headers.set('Access-Control-Allow-Credentials', 'true')
     response.headers.set('Access-Control-Max-Age', '86400')
   }
@@ -173,7 +201,7 @@ export const corsMiddleware: MiddlewareHandler = async ({ request }, next) => {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
-      headers: response.headers
+      headers: response.headers,
     })
   }
 
@@ -190,14 +218,18 @@ export class RateLimiter {
   private limits: Record<string, number> = {
     admin: 1000, // 1000 requests per minute for admins
     user: 100, // 100 requests per minute for regular users
-    anonymous: 20 // 20 requests per minute for anonymous users
+    anonymous: 20, // 20 requests per minute for anonymous users
   }
 
   private windowMs = 60 * 1000 // 1 minute window
-  private requestCounts: Map<string, { count: number, resetTime: number }> = new Map()
+  private requestCounts: Map<string, { count: number; resetTime: number }> =
+    new Map()
 
   // Check if a request should be rate limited
-  public checkLimit(key: string, role: string = 'anonymous'): { limited: boolean, limit: number, remaining: number, resetTime: number } {
+  public checkLimit(
+    key: string,
+    role: string = 'anonymous',
+  ): { limited: boolean; limit: number; remaining: number; resetTime: number } {
     const now = Date.now()
     const limit = this.limits[role] || this.limits.anonymous
 
@@ -238,7 +270,10 @@ export class RateLimiter {
 }
 
 // Middleware implementation
-export const rateLimitMiddleware: MiddlewareHandler = async ({ request, locals }, next) => {
+export const rateLimitMiddleware: MiddlewareHandler = async (
+  { request, locals },
+  next,
+) => {
   // Skip rate limiting for non-API routes
   if (!request.url.includes('/api/ai/')) {
     return await next()
@@ -264,20 +299,23 @@ export const rateLimitMiddleware: MiddlewareHandler = async ({ request, locals }
     // Calculate retry after in seconds
     const retryAfter = Math.ceil((resetTime - Date.now()) / 1000)
 
-    return new Response(JSON.stringify({
-      error: 'Too many requests',
-      message: 'Rate limit exceeded',
-      retryAfter
-    }), {
-      status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': retryAfter.toString(),
-        'X-RateLimit-Limit': limit.toString(),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': Math.ceil(resetTime / 1000).toString()
-      }
-    })
+    return new Response(
+      JSON.stringify({
+        error: 'Too many requests',
+        message: 'Rate limit exceeded',
+        retryAfter,
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter.toString(),
+          'X-RateLimit-Limit': limit.toString(),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': Math.ceil(resetTime / 1000).toString(),
+        },
+      },
+    )
   }
 
   // Proceed with the request
@@ -286,7 +324,10 @@ export const rateLimitMiddleware: MiddlewareHandler = async ({ request, locals }
   // Add rate limit headers to the response
   response.headers.set('X-RateLimit-Limit', limit.toString())
   response.headers.set('X-RateLimit-Remaining', remaining.toString())
-  response.headers.set('X-RateLimit-Reset', Math.ceil(resetTime / 1000).toString())
+  response.headers.set(
+    'X-RateLimit-Reset',
+    Math.ceil(resetTime / 1000).toString(),
+  )
 
   return response
 }
@@ -306,7 +347,7 @@ export const CompletionRequestSchema = z.object({
   stream: z.boolean().default(false),
   presence_penalty: z.number().min(0).max(2).optional(),
   frequency_penalty: z.number().min(0).max(2).optional(),
-  top_p: z.number().min(0).max(1).optional()
+  top_p: z.number().min(0).max(1).optional(),
 })
 ```
 
@@ -324,8 +365,8 @@ await createAuditLog({
   details: {
     model: completion.model,
     contentLength: completion.content.length,
-    tokenUsage: completion.usage
-  }
+    tokenUsage: completion.usage,
+  },
 })
 ```
 

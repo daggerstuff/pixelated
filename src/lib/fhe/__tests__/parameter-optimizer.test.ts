@@ -6,9 +6,9 @@ import {
   FHEParameterOptimizer,
   OptimizationStrategy,
 } from '../parameter-optimizer'
-import { FHEOperation } from '../types'
-import { SealSchemeType } from '../seal-types'
 import { SecurityLevel } from '../parameter-optimizer'
+import { SealSchemeType } from '../seal-types'
+import { FHEOperation } from '../types'
 
 describe('FHEParameterOptimizer', () => {
   let optimizer: FHEParameterOptimizer

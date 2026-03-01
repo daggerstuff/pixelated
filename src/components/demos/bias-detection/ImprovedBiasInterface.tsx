@@ -1,13 +1,14 @@
+import { motion, AnimatePresence } from 'framer-motion'
 // Enhanced Bias Detection Interface with improved UX
 import React, { useState, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { SessionInputForm } from './SessionInputForm'
-import { AccessibleLoadingState } from './AccessibleLoadingState'
+
 import type {
   SessionData,
   BiasAnalysisResults,
 } from '../../../lib/types/bias-detection'
+import { AccessibleLoadingState } from './AccessibleLoadingState'
+import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
+import { SessionInputForm } from './SessionInputForm'
 
 interface ImprovedBiasInterfaceProps {
   className?: string
@@ -136,15 +137,15 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
 
   return (
     <div className={`improved-bias-interface ${className}`}>
-      <div className="max-w-6xl mx-auto">
+      <div className='mx-auto max-w-6xl'>
         {/* Header with progress indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className='mb-8'>
+          <div className='mb-4 flex items-center justify-between'>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className='text-gray-900 text-2xl font-bold'>
                 Enhanced Bias Detection Analysis
               </h2>
-              <p className="text-gray-600 mt-1">
+              <p className='text-gray-600 mt-1'>
                 Real-time bias analysis with comprehensive feedback
               </p>
             </div>
@@ -152,7 +153,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
             {currentStep !== 'input' && (
               <button
                 onClick={resetAnalysis}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                className='text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-blue-500 rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
               >
                 New Analysis
               </button>
@@ -160,38 +161,41 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
           </div>
 
           {/* Step indicator */}
-          <div className="flex items-center space-x-4 mb-6">
+          <div className='mb-6 flex items-center space-x-4'>
             {['Input', 'Analysis', 'Results'].map((step, index) => (
-              <div key={step} className="flex items-center">
+              <div key={step} className='flex items-center'>
                 <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
-                    ? 'bg-blue-600 text-white'
-                    : index <
-                      ['input', 'analyzing', 'results'].indexOf(currentStep)
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-600'
-                    }`}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
+                    currentStep === ['input', 'analyzing', 'results'][index]
+                      ? 'bg-blue-600 text-white'
+                      : index <
+                          ['input', 'analyzing', 'results'].indexOf(currentStep)
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-200 text-gray-600'
+                  }`}
                 >
                   {index <
-                    ['input', 'analyzing', 'results'].indexOf(currentStep)
+                  ['input', 'analyzing', 'results'].indexOf(currentStep)
                     ? '✓'
                     : index + 1}
                 </div>
                 <span
-                  className={`ml-2 text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
-                    ? 'text-blue-600'
-                    : 'text-gray-500'
-                    }`}
+                  className={`ml-2 text-sm font-medium ${
+                    currentStep === ['input', 'analyzing', 'results'][index]
+                      ? 'text-blue-600'
+                      : 'text-gray-500'
+                  }`}
                 >
                   {step}
                 </span>
                 {index < 2 && (
                   <div
-                    className={`w-12 h-0.5 mx-4 ${index <
+                    className={`mx-4 h-0.5 w-12 ${
+                      index <
                       ['input', 'analyzing', 'results'].indexOf(currentStep)
-                      ? 'bg-green-600'
-                      : 'bg-gray-200'
-                      }`}
+                        ? 'bg-green-600'
+                        : 'bg-gray-200'
+                    }`}
                   />
                 )}
               </div>
@@ -200,14 +204,14 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
         </div>
 
         {/* Content based on current step */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode='wait'>
           {currentStep === 'input' && (
             <motion.div
-              key="input"
+              key='input'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
+              className='space-y-6'
             >
               <SessionInputForm onSubmit={runAnalysis} disabled={isAnalyzing} />
             </motion.div>
@@ -215,13 +219,13 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
 
           {currentStep === 'analyzing' && (
             <motion.div
-              key="analyzing"
+              key='analyzing'
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 1.05 }}
             >
               <AccessibleLoadingState
-                message="Analyzing content for bias patterns..."
+                message='Analyzing content for bias patterns...'
                 progress={analysisProgress}
                 steps={analysisSteps}
                 currentStep={analysisStepIndex}
@@ -231,23 +235,23 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
 
           {currentStep === 'results' && analysisResults && (
             <motion.div
-              key="results"
+              key='results'
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="space-y-6"
+              className='space-y-6'
             >
               <BiasAnalysisDisplay
                 results={analysisResults}
-                sessionData={sessionData!}
+                sessionData={sessionData}
               />
 
               {/* Additional insights section */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="text-lg font-medium text-blue-900 mb-2">
+              <div className='bg-blue-50 border-blue-200 rounded-lg border p-6'>
+                <h3 className='text-blue-900 mb-2 text-lg font-medium'>
                   🎯 Key Insights
                 </h3>
-                <div className="space-y-2 text-sm text-blue-800">
+                <div className='text-blue-800 space-y-2 text-sm'>
                   <p>
                     • Analysis completed with{' '}
                     {analysisResults.detectedPatterns.length} bias patterns
@@ -268,13 +272,13 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
         </AnimatePresence>
 
         {/* Footer with accessibility info */}
-        <div className="mt-12 pt-6 border-t border-gray-200">
-          <div className="text-center text-sm text-gray-500">
+        <div className='border-gray-200 mt-12 border-t pt-6'>
+          <div className='text-gray-500 text-center text-sm'>
             <p>
               This tool provides bias analysis to support inclusive therapeutic
               practices.
             </p>
-            <p className="mt-1">
+            <p className='mt-1'>
               Results should be reviewed by qualified professionals.
             </p>
           </div>

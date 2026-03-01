@@ -1,12 +1,13 @@
-// IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../config/instrument.mjs'
-
 import { IncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { createServer } from 'http'
 import { parse } from 'url'
-import type { TherapeuticSession } from './types'
-import { BiasDetectionEngine } from './BiasDetectionEngine'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { BiasDetectionEngine } from './BiasDetectionEngine'
+import type { TherapeuticSession } from './types'
+
+// IMPORTANT: Import Sentry instrumentation at the very top
+import '../../../../config/instrument.mjs'
 
 const appLogger = createBuildSafeLogger('bias-detection-server')
 

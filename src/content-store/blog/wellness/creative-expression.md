@@ -21,7 +21,12 @@ category: Research
 
 ## Introduction
 
-Creativity is not just for artists—it's a vital pathway to mental wellness for everyone. When we engage in creative expression, we activate healing processes in our brains and bodies that can transform our emotional state, process difficult experiences, and build resilience. This article explores accessible creative practices that anyone can incorporate into daily life for enhanced mental wellness, regardless of artistic background or skill level.
+Creativity is not just for artists—it's a vital pathway to mental wellness for
+everyone. When we engage in creative expression, we activate healing processes
+in our brains and bodies that can transform our emotional state, process
+difficult experiences, and build resilience. This article explores accessible
+creative practices that anyone can incorporate into daily life for enhanced
+mental wellness, regardless of artistic background or skill level.
 
 ## Art Therapy for Everyone
 
@@ -359,7 +364,13 @@ Starting right now:
 
 ## Conclusion
 
-Creative expression offers a powerful, accessible pathway to mental wellness that requires no special talent—only willingness to explore and play. By incorporating simple creative practices into daily life, we can process emotions, reduce stress, cultivate joy, and build resilience. Remember that the goal is not to create masterpieces but to engage in the healing process of creation itself. Your creative journey is uniquely yours, and its greatest value lies in how it helps you express, understand, and care for yourself.
+Creative expression offers a powerful, accessible pathway to mental wellness
+that requires no special talent—only willingness to explore and play. By
+incorporating simple creative practices into daily life, we can process
+emotions, reduce stress, cultivate joy, and build resilience. Remember that the
+goal is not to create masterpieces but to engage in the healing process of
+creation itself. Your creative journey is uniquely yours, and its greatest value
+lies in how it helps you express, understand, and care for yourself.
 
 ## Weekly Creativity Challenge
 
@@ -373,4 +384,5 @@ Begin your creative wellness practice:
 
 ---
 
-_Next in our series, we'll explore how connecting with nature can be a powerful source of everyday joy and mental wellness._
+_Next in our series, we'll explore how connecting with nature can be a powerful
+source of everyday joy and mental wellness._

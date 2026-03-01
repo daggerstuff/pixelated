@@ -10,7 +10,7 @@ pipeline.batch.size: 125
 pipeline.batch.delay: 50
 
 # HTTP API settings
-http.host: "0.0.0.0"
+http.host: '0.0.0.0'
 http.port: 9600
 
 # Dead letter queue settings
@@ -22,7 +22,7 @@ xpack.monitoring.enabled: false
 
 # Logging settings
 log.level: info
-log.format: "%{yyyy-MM-dd HH:mm:ss.SSS} %{level} %{module} %{message}"
+log.format: '%{yyyy-MM-dd HH:mm:ss.SSS} %{level} %{module} %{message}'
 
 # Queue settings
 queue.type: persisted

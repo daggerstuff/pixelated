@@ -1,5 +1,8 @@
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
+
+import { redisClient } from '@/config/database'
+import { UserModel } from '@/models/User'
 import {
   User,
   UserCredentials,
@@ -8,8 +11,6 @@ import {
   JwtPayload,
   UserRole,
 } from '@/types/user'
-import { UserModel } from '@/models/User'
-import { redisClient } from '@/config/database'
 
 const JWT_SECRET = process.env['JWT_SECRET'] || 'your-super-secret-jwt-key'
 const JWT_REFRESH_SECRET =

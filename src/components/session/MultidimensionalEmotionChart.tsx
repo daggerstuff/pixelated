@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState, useMemo } from 'react'
-import { cn } from '../../lib/utils.js'
 import * as THREE from 'three'
 import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
+import { cn } from '../../lib/utils.js'
 
 // Dynamic Three.js imports to reduce bundle size
 async function loadThreeWithTypes() {
@@ -10,9 +11,9 @@ async function loadThreeWithTypes() {
     import('three/examples/jsm/controls/OrbitControls.js'),
   ])
   return {
-    THREE: threeModule as typeof import('three'),
+    THREE: threeModule,
     OrbitControls: (
-      orbitModule as typeof import('three/examples/jsm/controls/OrbitControls.js')
+      orbitModule
     ).OrbitControls,
   }
 }
@@ -60,7 +61,7 @@ const quadrantColors: Record<string, string> = {
   'high-arousal negative-valence': '#f97316', // orange-500
   'low-arousal positive-valence': '#60a5fa', // blue-400
   'low-arousal negative-valence': '#6366f1', // indigo-500
-  'neutral': '#94a3b8', // slate-400
+  neutral: '#94a3b8', // slate-400
 }
 
 // Get color for a quadrant, with fallback
@@ -330,7 +331,7 @@ export default function MultidimensionalEmotionChart({
 
         labelsRef.current = [xLabel, yLabel, zLabel].filter(
           Boolean,
-        ) as THREE.Object3D[]
+        )
       }
 
       // Add grid helper - simplify for lower detail
@@ -616,10 +617,10 @@ export default function MultidimensionalEmotionChart({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg">
-        <div className="animate-pulse flex flex-col w-full">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2.5"></div>
-          <div className="h-40 bg-gray-200 rounded w-full"></div>
+      <div className='bg-gray-50 flex items-center justify-center rounded-lg p-6'>
+        <div className='flex w-full animate-pulse flex-col'>
+          <div className='bg-gray-200 mb-2.5 h-4 w-3/4 rounded'></div>
+          <div className='bg-gray-200 h-40 w-full rounded'></div>
         </div>
       </div>
     )
@@ -628,11 +629,11 @@ export default function MultidimensionalEmotionChart({
   // Empty state
   if (!dimensionalMaps.length) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
-        <p className="text-gray-500 mb-2">
+      <div className='bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6'>
+        <p className='text-gray-500 mb-2'>
           No dimensional emotion data available
         </p>
-        <p className="text-sm text-gray-400">
+        <p className='text-gray-400 text-sm'>
           More data needs to be collected for multi-dimensional analysis
         </p>
       </div>
@@ -641,25 +642,25 @@ export default function MultidimensionalEmotionChart({
 
   // Patterns display component
   const PatternsDisplay = () => (
-    <div className="p-4">
-      <h3 className="text-base font-medium mb-3">Emotion Dimension Patterns</h3>
+    <div className='p-4'>
+      <h3 className='mb-3 text-base font-medium'>Emotion Dimension Patterns</h3>
 
       {patterns.length === 0 ? (
-        <p className="text-gray-500 text-sm">
+        <p className='text-gray-500 text-sm'>
           No significant patterns detected in the dimensional data
         </p>
       ) : (
-        <div className="space-y-4">
+        <div className='space-y-4'>
           {patterns.map((pattern) => (
             <div
               key={
                 pattern.id ??
                 `${pattern.type}-${pattern.startTime}-${pattern.endTime}`
               }
-              className="p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+              className='border-gray-200 hover:border-gray-300 rounded-lg border p-3 transition-colors'
             >
-              <div className="flex justify-between items-start">
-                <div className="font-medium">
+              <div className='flex items-start justify-between'>
+                <div className='font-medium'>
                   {pattern.type === 'oscillation' && 'Oscillation Pattern'}
                   {pattern.type === 'progression' && 'Progression Pattern'}
                   {pattern.type === 'quadrant_transition' &&
@@ -667,16 +668,16 @@ export default function MultidimensionalEmotionChart({
                   {pattern.type === 'dimension_dominance' &&
                     'Dominant Dimension'}
                 </div>
-                <div className="text-xs px-2 py-1 bg-gray-100 rounded-full">
+                <div className='bg-gray-100 rounded-full px-2 py-1 text-xs'>
                   Strength: {(pattern.strength * 100).toFixed(0)}%
                 </div>
               </div>
 
-              <p className="text-gray-600 mt-1 text-sm">
+              <p className='text-gray-600 mt-1 text-sm'>
                 {pattern.description}
               </p>
 
-              <div className="mt-2 text-xs text-gray-500 flex justify-between">
+              <div className='text-gray-500 mt-2 flex justify-between text-xs'>
                 <span>
                   Start: {new Date(pattern.startTime).toLocaleString()}
                 </span>
@@ -693,13 +694,13 @@ export default function MultidimensionalEmotionChart({
     <div
       className={cn('bg-white rounded-lg shadow-sm overflow-hidden', className)}
     >
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className='border-gray-100 border-b p-4'>
+        <div className='flex items-center justify-between'>
+          <h3 className='text-gray-900 text-lg font-medium'>
             Multi-dimensional Emotion Mapping {fps > 0 && `(${fps} FPS)`}
           </h3>
 
-          <div className="flex space-x-2">
+          <div className='flex space-x-2'>
             <button
               onClick={() => setViewMode('3d')}
               className={cn(
@@ -730,23 +731,23 @@ export default function MultidimensionalEmotionChart({
         {viewMode === '3d' ? (
           <div
             ref={containerRef}
-            className="w-full h-full"
+            className='h-full w-full'
             style={{ touchAction: 'none' }}
           />
         ) : (
-          <div className="w-full h-full overflow-y-auto">
+          <div className='h-full w-full overflow-y-auto'>
             <PatternsDisplay />
           </div>
         )}
       </div>
 
-      <div className="p-3 bg-gray-50 border-t border-gray-100">
-        <div className="text-xs text-gray-500">
-          <p className="mb-1">
+      <div className='bg-gray-50 border-gray-100 border-t p-3'>
+        <div className='text-gray-500 text-xs'>
+          <p className='mb-1'>
             <strong>Valence:</strong> Horizontal axis (red) - positive to
             negative emotions
           </p>
-          <p className="mb-1">
+          <p className='mb-1'>
             <strong>Arousal:</strong> Vertical axis (green) - high to low energy
           </p>
           <p>

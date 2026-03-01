@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+
 import { useConversationMemory } from '../hooks/useConversationMemory'
-import { ProgressBar } from './dashboard/ProgressBar'
 import { tokens } from '../lib/design-tokens'
 import { cn } from '../lib/utils'
+import { ProgressBar } from './dashboard/ProgressBar'
 
 interface TrainingSessionProps {
   className?: string
@@ -15,8 +16,8 @@ function AIErrorBoundary({ children }: { children: React.ReactNode }) {
   if (hasError) {
     return (
       <div
-        role="alert"
-        className="bg-destructive text-destructive-foreground p-4 rounded-md"
+        role='alert'
+        className='bg-destructive text-destructive-foreground rounded-md p-4'
       >
         <strong>AI Service Error:</strong>{' '}
         {error?.message || 'The AI service is temporarily unavailable.'}
@@ -124,7 +125,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
   return (
     <AIErrorBoundary>
       <section
-        aria-label="Therapist Training Session"
+        aria-label='Therapist Training Session'
         className={cn(
           'max-w-xl mx-auto p-8 bg-background rounded-lg shadow',
           className,
@@ -132,24 +133,24 @@ function TrainingSession({ className }: TrainingSessionProps) {
         style={{ background: tokens.colors.background }}
       >
         <header>
-          <h2 className="text-2xl font-bold mb-6 text-primary">
+          <h2 className='text-primary mb-6 text-2xl font-bold'>
             Therapist Training Session
           </h2>
         </header>
 
         {/* Progress Bar */}
-        <div className="mb-6">
-          <ProgressBar value={memory.progress} label="Session Progress" />
+        <div className='mb-6'>
+          <ProgressBar value={memory.progress} label='Session Progress' />
         </div>
 
         <nav
-          aria-label="Session Controls"
-          className="mb-6 flex gap-2 flex-wrap"
+          aria-label='Session Controls'
+          className='mb-6 flex flex-wrap gap-2'
         >
           {SESSION_CONTROLS.map(({ key, label }) => (
             <button
               key={key}
-              type="button"
+              type='button'
               onClick={() => handleControl(key)}
               disabled={
                 (key === 'start' && memory.sessionState !== 'idle') ||
@@ -175,39 +176,39 @@ function TrainingSession({ className }: TrainingSessionProps) {
         </nav>
 
         <main>
-          <p className="mb-4">
+          <p className='mb-4'>
             Session State: <strong>{memory.sessionState}</strong>
           </p>
 
           {memory.sessionState === 'active' && (
             <section
-              aria-label="Mock Client Interaction"
-              className="mock-client-section mb-6"
+              aria-label='Mock Client Interaction'
+              className='mock-client-section mb-6'
             >
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
-                  sendToMockClient(clientInput)
+                  void sendToMockClient(clientInput)
                 }}
-                className="client-input-form flex flex-col gap-2"
+                className='client-input-form flex flex-col gap-2'
               >
                 <label
-                  htmlFor="therapist-message"
-                  className="block text-sm font-medium mb-2"
+                  htmlFor='therapist-message'
+                  className='mb-2 block text-sm font-medium'
                 >
                   Therapist Message
                 </label>
                 <input
-                  id="therapist-message"
-                  type="text"
+                  id='therapist-message'
+                  type='text'
                   value={clientInput}
                   onChange={(e) => setClientInput(e.target.value)}
                   disabled={isLoading}
-                  aria-required="true"
-                  className="w-full rounded-md border px-3 py-2 mb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  aria-required='true'
+                  className='focus-visible:ring-primary mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2'
                 />
                 <button
-                  type="submit"
+                  type='submit'
                   disabled={isLoading || !clientInput}
                   className={cn(
                     'py-2 px-4 rounded-md font-medium transition-colors',
@@ -222,9 +223,9 @@ function TrainingSession({ className }: TrainingSessionProps) {
                 </button>
               </form>
 
-              <div className="mt-4">
+              <div className='mt-4'>
                 <strong>Client Response:</strong>
-                <div className="bg-muted rounded-md p-3 mt-2 text-sm min-h-[60px]">
+                <div className='bg-muted mt-2 min-h-[60px] rounded-md p-3 text-sm'>
                   {clientResponse || 'Waiting for client response...'}
                 </div>
               </div>
@@ -232,27 +233,27 @@ function TrainingSession({ className }: TrainingSessionProps) {
           )}
 
           {/* Evaluation Feedback Section */}
-          <section aria-label="Evaluation Feedback" className="mb-6">
+          <section aria-label='Evaluation Feedback' className='mb-6'>
             <form
               onSubmit={handleFeedbackSubmit}
-              className="flex flex-col gap-2"
+              className='flex flex-col gap-2'
             >
               <label
-                htmlFor="feedback"
-                className="block text-sm font-medium mb-2"
+                htmlFor='feedback'
+                className='mb-2 block text-sm font-medium'
               >
                 Evaluation Feedback
               </label>
               <textarea
-                id="feedback"
+                id='feedback'
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Enter your feedback about the session..."
-                className="w-full rounded-md border px-3 py-2 mb-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                placeholder='Enter your feedback about the session...'
+                className='focus-visible:ring-primary mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2'
                 rows={3}
               />
               <button
-                type="submit"
+                type='submit'
                 className={cn(
                   'py-2 px-4 rounded-md font-medium transition-colors',
                   'bg-accent text-accent-foreground hover:bg-accent/90',
@@ -265,11 +266,11 @@ function TrainingSession({ className }: TrainingSessionProps) {
 
           {/* Conversation History */}
           {memory.history.length > 0 && (
-            <section aria-label="Conversation History" className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">
+            <section aria-label='Conversation History' className='mb-6'>
+              <h3 className='mb-3 text-lg font-semibold'>
                 Conversation History
               </h3>
-              <div className="bg-muted rounded-md p-3 max-h-40 overflow-y-auto">
+              <div className='bg-muted max-h-40 overflow-y-auto rounded-md p-3'>
                 {memory.history.map((entry, index) => (
                   <div
                     key={index}

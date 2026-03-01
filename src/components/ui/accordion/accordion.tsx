@@ -1,5 +1,6 @@
-import * as React from 'react'
 import { ChevronDown } from 'lucide-react'
+import * as React from 'react'
+
 import { cn } from '../../../lib/utils'
 
 interface AccordionProps {
@@ -29,7 +30,7 @@ const AccordionContext = React.createContext<{
   openItems: string[]
   toggleItem: (value: string) => void
   type: 'single' | 'multiple'
-}>({ openItems: [], toggleItem: () => { }, type: 'single' })
+}>({ openItems: [], toggleItem: () => {}, type: 'single' })
 
 const AccordionItemContext = React.createContext<{
   value: string
@@ -103,7 +104,9 @@ const AccordionTrigger = React.forwardRef<
   // Simplifying for this specific refactor to keep it contained.
 
   return (
-    <AccordionItemContext.Provider value={{ value, isOpen, contentId, triggerId } as any}>
+    <AccordionItemContext.Provider
+      value={{ value, isOpen, contentId, triggerId } as any}
+    >
       <button
         ref={ref}
         id={triggerId}
@@ -133,13 +136,15 @@ const AccordionContent = React.forwardRef<
   HTMLDivElement,
   AccordionContentProps
 >(({ className, children, ...props }, ref) => {
-  const { isOpen, contentId, triggerId } = React.useContext(AccordionItemContext) as any
+  const { isOpen, contentId, triggerId } = React.useContext(
+    AccordionItemContext,
+  ) as any
 
   return (
     <div
       ref={ref}
       id={contentId}
-      role="region"
+      role='region'
       aria-labelledby={triggerId}
       className={cn(
         'overflow-hidden text-sm transition-all duration-200',

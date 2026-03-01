@@ -1,6 +1,8 @@
 ---
 title: 'Encryption & Zero-Knowledge System'
-description: 'Learn about Pixelated Healths encryption architecture and zero-knowledge implementation'
+description:
+  'Learn about Pixelated Healths encryption architecture and zero-knowledge
+  implementation'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,15 +12,17 @@ share: true
 
 ## Encryption & Zero-Knowledge System
 
-Pixelated Healths encryption system provides end-to-end security through zero-knowledge proofs, quantum-resistant algorithms, and comprehensive key management.
+Pixelated Healths encryption system provides end-to-end security through
+zero-knowledge proofs, quantum-resistant algorithms, and comprehensive key
+management.
 
 ## Architecture Overview
 
-  <Card
-    title="Zero-Knowledge Proofs"
-    icon="lock-keyhole"
-    href="#zero-knowledge-proofs"
-  >
+<Card title="Zero-Knowledge Proofs" icon="lock-keyhole"
+href="#zero-knowledge-proofs"
+
+>
+
     Privacy-preserving verification
     Secure key lifecycle
     End-to-end encryption
@@ -28,7 +32,7 @@ Pixelated Healths encryption system provides end-to-end security through zero-kn
 
 ### Implementation
 
-  Our zero-knowledge system ensures data privacy while enabling verification
+Our zero-knowledge system ensures data privacy while enabling verification
 
 ```mermaid
 graph TD
@@ -41,32 +45,28 @@ graph TD
 ### Circuit Components
 
 ```typescript Session Circuit
-
 const circuit = new SessionDataCircuit({
-hashFunction: 'Poseidon',
-curveType: 'BN254',
-merkleTreeDepth: 20
-});
+  hashFunction: 'Poseidon',
+  curveType: 'BN254',
+  merkleTreeDepth: 20,
+})
 
 const proof = await circuit.generateProof({
-sessionData: encryptedData,
-publicInputs: publicParams
-});
-
-````
+  sessionData: encryptedData,
+  publicInputs: publicParams,
+})
+```
 
 ```typescript Verification
 const isValid = await circuit.verifyProof({
   proof: proof,
-  publicInputs: publicParams
-});
-````
-
+  publicInputs: publicParams,
+})
+```
 
 ## Key Management
 
 ### Key Hierarchy
-
 
 - Master Key (KMS)
 - Key Encryption Keys (KEKs)
@@ -113,36 +113,32 @@ await keyManager.rotateKeys({
 ### Implementation
 
 ```typescript Encryption
-
 const encryption = new DataEncryption({
-algorithm: 'AES-256-GCM',
-keyDerivation: 'HKDF',
-padding: 'PKCS7'
-});
+  algorithm: 'AES-256-GCM',
+  keyDerivation: 'HKDF',
+  padding: 'PKCS7',
+})
 
 // Encrypt data
 const encrypted = await encryption.encrypt({
-data: sensitiveData,
-key: dek,
-associated: metadata
-});
-
-````
+  data: sensitiveData,
+  key: dek,
+  associated: metadata,
+})
+```
 
 ```typescript Decryption
 // Decrypt data
 const decrypted = await encryption.decrypt({
   data: encrypted,
   key: dek,
-  associated: metadata
-});
-````
-
+  associated: metadata,
+})
+```
 
 ## Quantum Resistance
 
 ### Algorithms
-
 
 - CRYSTALS-Kyber (Key Encapsulation)
 - CRYSTALS-Dilithium (Digital Signatures)
@@ -177,7 +173,6 @@ const decapsulated = await quantumResistant.decapsulate({
 
 ### Features
 
-
 - Partial homomorphic encryption
 - Somewhat homomorphic encryption
 - Fully homomorphic encryption
@@ -206,7 +201,6 @@ const sum = await homomorphic.decrypt(encryptedSum) // 8
 ## Forward Secrecy
 
 ### Protocol
-
 
 ```mermaid
 sequenceDiagram
@@ -262,10 +256,9 @@ const decrypted = await session.decrypt(encrypted)
 
 Need help with encryption? Contact our security team:
 
-  <Card
-    title="Security Support"
-    icon="shield"
-    href="mailto:security@gradiant.dev"
-  >
+<Card title="Security Support" icon="shield" href="mailto:security@gradiant.dev"
+
+>
+
     Contact security team
     View technical guides

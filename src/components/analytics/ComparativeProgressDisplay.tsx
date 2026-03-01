@@ -1,11 +1,12 @@
 import { useState } from 'react'
+
+import { useComparativeProgress } from '../../hooks/useComparativeProgress'
 // import { LineChart } from '../ui/charts/LineChart' // This will be in ProgressChart.tsx
 import type { ComparativeProgressResult } from '../../types/analytics'
-import { useComparativeProgress } from '../../hooks/useComparativeProgress'
 import { ComparativeProgressControls } from './ComparativeProgressControls'
-import { ProgressDataDisplay } from './ProgressDataDisplay'
 import { InsightMessage } from './InsightMessage'
 import { PercentileBar } from './PercentileBar'
+import { ProgressDataDisplay } from './ProgressDataDisplay'
 
 interface ComparativeProgressDisplayProps {
   userId: string
@@ -16,8 +17,8 @@ interface ComparativeProgressDisplayProps {
 
 // Helper components for different states. These can be moved to separate files if preferred.
 const LoadingSpinner = () => (
-  <div className="flex justify-center items-center py-12">
-    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-indigo-500"></div>
+  <div className='flex items-center justify-center py-12'>
+    <div className='border-indigo-500 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2'></div>
   </div>
 )
 
@@ -28,12 +29,12 @@ const ErrorState = ({
   message: string
   retry: () => void
 }) => (
-  <div className="p-4 bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md">
-    <p className="font-medium">Error loading data</p>
-    <p className="text-sm">{message}</p>
+  <div className='bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md p-4'>
+    <p className='font-medium'>Error loading data</p>
+    <p className='text-sm'>{message}</p>
     <button
       onClick={retry}
-      className="mt-2 px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/50 rounded-md text-sm font-medium"
+      className='bg-red-100 hover:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/50 mt-2 rounded-md px-4 py-2 text-sm font-medium'
     >
       Retry
     </button>
@@ -41,11 +42,11 @@ const ErrorState = ({
 )
 
 const EmptyState = () => (
-  <div className="p-8 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-md">
-    <p className="text-gray-500 dark:text-gray-400">
+  <div className='border-gray-300 dark:border-gray-700 rounded-md border border-dashed p-8 text-center'>
+    <p className='text-gray-500 dark:text-gray-400'>
       No data available for the selected metric and time period.
     </p>
-    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">
+    <p className='text-gray-400 dark:text-gray-500 mt-2 text-sm'>
       Try selecting a different metric or expanding the date range.
     </p>
   </div>
@@ -186,7 +187,7 @@ export function ComparativeProgressDisplay({
         data &&
         data.userProgressSnapshots &&
         data.userProgressSnapshots.length > 0 && (
-          <div className="space-y-6">
+          <div className='space-y-6'>
             <ProgressDataDisplay
               labels={labels}
               userData={userData}

@@ -419,7 +419,7 @@ export class WebRTCService implements WebRTCServiceInterface {
     // Simulate receiving an answer from the peer
     // For this implementation, we'll automatically create an answer locally
     setTimeout(() => {
-      this.handleReceivedAnswer({
+      void this.handleReceivedAnswer({
         type: 'answer',
         sdp: offer.sdp,
       })

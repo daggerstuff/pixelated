@@ -1,9 +1,10 @@
+import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidance,
   IModelProvider,
 } from './types/mentalLLaMATypes'
-import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
 
 const logger = getClinicalAnalysisLogger('helpers')
 
@@ -370,7 +371,7 @@ Provide a comprehensive clinical analysis in JSON format:
         rationale: string
       }>
     > = {
-      'depression': [
+      depression: [
         {
           recommendation:
             'Professional mental health evaluation and depression screening',
@@ -388,7 +389,7 @@ Provide a comprehensive clinical analysis in JSON format:
             'Psychotherapy is first-line treatment for depression with strong evidence base',
         },
       ],
-      'anxiety': [
+      anxiety: [
         {
           recommendation: 'Anxiety disorder screening and symptom assessment',
           priority: 'medium',
@@ -405,7 +406,7 @@ Provide a comprehensive clinical analysis in JSON format:
             'Immediate coping strategies can provide symptom relief while formal treatment is arranged',
         },
       ],
-      'ptsd': [
+      ptsd: [
         {
           recommendation:
             'Trauma-focused therapy evaluation (EMDR, CPT, or PE)',

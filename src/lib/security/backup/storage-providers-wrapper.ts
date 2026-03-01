@@ -5,9 +5,9 @@
  * It ensures server-only modules are not bundled in client code by using dynamic imports.
  */
 
-import type { StorageProvider, StorageProviderConfig } from './types'
 import { isBrowser } from '../../browser/is-browser'
 import { createBuildSafeLogger as getLogger } from '../../logging/build-safe-logger'
+import type { StorageProvider, StorageProviderConfig } from './types'
 
 /**
  * Get storage provider instance based on provider name

@@ -11,7 +11,9 @@ groups:
           description: 'Error rate is {{ $value }} errors per second'
 
       - alert: HighResponseTime
-        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 0.5
+        expr:
+          histogram_quantile(0.95,
+          rate(http_request_duration_seconds_bucket[5m])) > 0.5
         for: 5m
         labels:
           severity: warning
@@ -38,7 +40,9 @@ groups:
           description: 'Disk space is {{ $value | humanizePercentage }} used'
 
       - alert: MemoryUsageHigh
-        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        expr:
+          (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+          node_memory_MemTotal_bytes > 0.9
         for: 5m
         labels:
           severity: warning
@@ -47,7 +51,9 @@ groups:
           description: 'Memory usage is {{ $value | humanizePercentage }}'
 
       - alert: CPUUsageHigh
-        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        expr:
+          100 - (avg by (instance)
+          (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
         for: 5m
         labels:
           severity: warning
@@ -56,7 +62,9 @@ groups:
           description: 'CPU usage is {{ $value }}%'
 
       - alert: BusinessIntelligenceAPIError
-        expr: rate(business_intelligence_api_requests_total{status="error"}[5m]) > 0.05
+        expr:
+          rate(business_intelligence_api_requests_total{status="error"}[5m]) >
+          0.05
         for: 5m
         labels:
           severity: warning
@@ -71,7 +79,8 @@ groups:
           severity: warning
         annotations:
           summary: 'File upload failures'
-          description: 'File upload failure rate is {{ $value }} failures per second'
+          description:
+            'File upload failure rate is {{ $value }} failures per second'
 
       - alert: CollaborationSessionErrors
         expr: rate(collaboration_session_errors_total[5m]) > 0.1
@@ -80,4 +89,5 @@ groups:
           severity: warning
         annotations:
           summary: 'Collaboration session errors'
-          description: 'Collaboration error rate is {{ $value }} errors per second'
+          description:
+            'Collaboration error rate is {{ $value }} errors per second'

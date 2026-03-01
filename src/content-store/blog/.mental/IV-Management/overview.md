@@ -1,13 +1,16 @@
 ---
 title: 'Management Strategies Overview'
-description: 'Overview of management strategies for CPTSD and addiction recovery'
+description:
+  'Overview of management strategies for CPTSD and addiction recovery'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Management Strategies Overview
 
-This guide provides a comprehensive overview of management strategies for individuals dealing with CPTSD and addiction, focusing on practical, day-to-day approaches.
+This guide provides a comprehensive overview of management strategies for
+individuals dealing with CPTSD and addiction, focusing on practical, day-to-day
+approaches.
 
 ## Core Management Principles
 

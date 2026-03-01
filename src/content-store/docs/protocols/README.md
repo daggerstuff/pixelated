@@ -1,20 +1,22 @@
 ---
-title: "MP-SPDZ Protocol Documentation"
-description: "MP-SPDZ Protocol Documentation documentation"
+title: 'MP-SPDZ Protocol Documentation'
+description: 'MP-SPDZ Protocol Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # MP-SPDZ Protocol Documentation
 
-This document provides detailed information about the secure multi-party computation (MPC) protocols available in our TypeScript bindings for MP-SPDZ.
+This document provides detailed information about the secure multi-party
+computation (MPC) protocols available in our TypeScript bindings for MP-SPDZ.
 
 ## Available Protocols
 
-We support three main protocols, each with different security guarantees and performance characteristics:
+We support three main protocols, each with different security guarantees and
+performance characteristics:
 
 1. [MASCOT](./mascot.md) - Maximum security with malicious adversaries
 2. [SPDZ2k](./spdz2k.md) - Optimized for integer arithmetic
@@ -22,7 +24,8 @@ We support three main protocols, each with different security guarantees and per
 
 ## Protocol Selection Guide
 
-Choose the appropriate protocol based on your security and performance requirements:
+Choose the appropriate protocol based on your security and performance
+requirements:
 
 ### MASCOT Protocol
 
@@ -60,10 +63,10 @@ Choose the appropriate protocol based on your security and performance requireme
 ## Performance Comparison
 
 | Protocol | Security Model | Preprocessing | Online Phase | Memory Usage |
-|----------|---------------|---------------|--------------|--------------|
-| MASCOT   | Malicious     | Slow          | Moderate     | High         |
-| SPDZ2k   | Malicious     | Moderate      | Fast         | Moderate     |
-| Semi2k   | Semi-honest   | Fast          | Very Fast    | Low          |
+| -------- | -------------- | ------------- | ------------ | ------------ |
+| MASCOT   | Malicious      | Slow          | Moderate     | High         |
+| SPDZ2k   | Malicious      | Moderate      | Fast         | Moderate     |
+| Semi2k   | Semi-honest    | Fast          | Very Fast    | Low          |
 
 ## Security Considerations
 

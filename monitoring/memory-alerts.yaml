@@ -17,13 +17,13 @@ data:
       warning: 75  # 75% memory usage
       critical: 85  # 85% memory usage
       emergency: 95  # 95% memory usage
-    
+
     # Build-specific thresholds
     build_thresholds:
       warning: 70
       critical: 80
       emergency: 90
-    
+
     # Alert configuration
     alerts:
       enabled: true
@@ -31,7 +31,7 @@ data:
         - slack
         - email
       cooldown: 300  # 5 minutes between alerts
-    
+
     # Monitoring intervals
     intervals:
       check: 30  # Check every 30 seconds
@@ -54,63 +54,73 @@ spec:
       rules:
         # High memory usage alert
         - alert: HighMemoryUsage
-          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 75
+          expr:
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+            node_memory_MemTotal_bytes * 100 > 75
           for: 2m
           labels:
             severity: warning
             component: memory
           annotations:
-            summary: "High memory usage detected"
-            description: "Memory usage is above 75% for more than 2 minutes"
-            runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+            summary: 'High memory usage detected'
+            description: 'Memory usage is above 75% for more than 2 minutes'
+            runbook_url: 'https://docs.pixelatedempathy.com/runbooks/memory-alerts'
+
         # Critical memory usage alert
         - alert: CriticalMemoryUsage
-          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+          expr:
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+            node_memory_MemTotal_bytes * 100 > 85
           for: 1m
           labels:
             severity: critical
             component: memory
           annotations:
-            summary: "Critical memory usage detected"
-            description: "Memory usage is above 85% for more than 1 minute"
-            runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+            summary: 'Critical memory usage detected'
+            description: 'Memory usage is above 85% for more than 1 minute'
+            runbook_url: 'https://docs.pixelatedempathy.com/runbooks/memory-alerts'
+
         # Emergency memory usage alert
         - alert: EmergencyMemoryUsage
-          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 95
+          expr:
+            (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) /
+            node_memory_MemTotal_bytes * 100 > 95
           for: 30s
           labels:
             severity: emergency
             component: memory
           annotations:
-            summary: "Emergency memory usage detected"
-            description: "Memory usage is above 95% for more than 30 seconds"
-            runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+            summary: 'Emergency memory usage detected'
+            description: 'Memory usage is above 95% for more than 30 seconds'
+            runbook_url: 'https://docs.pixelatedempathy.com/runbooks/memory-alerts'
+
         # GitLab runner memory alert
         - alert: GitLabRunnerHighMemory
-          expr: container_memory_usage_bytes{pod_name=~"gitlab-runner-.*"} / container_spec_memory_limit_bytes > 0.8
+          expr:
+            container_memory_usage_bytes{pod_name=~"gitlab-runner-.*"} /
+            container_spec_memory_limit_bytes > 0.8
           for: 2m
           labels:
             severity: warning
             component: gitlab-runner
           annotations:
-            summary: "GitLab Runner high memory usage"
-            description: "GitLab Runner memory usage is above 80%"
-            runbook_url: "https://docs.pixelatedempathy.com/runbooks/gitlab-runner-memory"
-        
+            summary: 'GitLab Runner high memory usage'
+            description: 'GitLab Runner memory usage is above 80%'
+            runbook_url: 'https://docs.pixelatedempathy.com/runbooks/gitlab-runner-memory'
+
         # Build process memory alert
         - alert: BuildProcessHighMemory
-          expr: container_memory_usage_bytes{container_name=~"build", pod_name=~"runner-.*"} / container_spec_memory_limit_bytes > 0.9
+          expr:
+            container_memory_usage_bytes{container_name=~"build",
+            pod_name=~"runner-.*"} / container_spec_memory_limit_bytes > 0.9
           for: 1m
           labels:
             severity: critical
             component: build
           annotations:
-            summary: "Build process high memory usage"
-            description: "Build process memory usage is above 90%"
-            runbook_url: "https://docs.pixelatedempathy.com/runbooks/build-memory-alerts"
+            summary: 'Build process high memory usage'
+            description: 'Build process memory usage is above 90%'
+            runbook_url: 'https://docs.pixelatedempathy.com/runbooks/build-memory-alerts'
 
 ---
 # ServiceMonitor for memory metrics
@@ -145,7 +155,7 @@ metadata:
   labels:
     app.kubernetes.io/name: memory-monitoring
     app.kubernetes.io/component: dashboard
-    grafana_dashboard: "1"
+    grafana_dashboard: '1'
 data:
   memory-dashboard.json: |
     {
@@ -251,14 +261,14 @@ spec:
       labels:
         app.kubernetes.io/name: memory-monitoring
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9100"
-        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9100'
+        prometheus.io/path: '/metrics'
     spec:
       # Security context at pod level
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65534  # nobody user (node-exporter default)
+        runAsUser: 65534 # nobody user (node-exporter default)
         runAsGroup: 65534
         fsGroup: 65534
         seccompProfile:
@@ -323,20 +333,20 @@ spec:
               mountPath: /tmp
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "50m"
+              memory: '64Mi'
+              cpu: '50m'
             limits:
-              memory: "128Mi"
-              cpu: "100m"
+              memory: '128Mi'
+              cpu: '100m'
       volumes:
         - name: proc
           hostPath:
             path: /proc
-            type: ""
+            type: ''
         - name: sys
           hostPath:
             path: /sys
-            type: ""
+            type: ''
         # Temporary volume for writable filesystem
         - name: tmp
           emptyDir: {}

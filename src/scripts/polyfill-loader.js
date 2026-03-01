@@ -158,7 +158,7 @@ function loadServicePolyfills() {
     const polyfillUrl = `https://polyfill.io/v3/polyfill.min.js?features=${serviceFeatures.join(',')}`
 
     // Load via service
-    loadScript(polyfillUrl)
+    void loadScript(polyfillUrl)
 
     // Track what we loaded
     loadedPolyfills.push(...serviceFeatures)
@@ -194,7 +194,7 @@ async function initPolyfills() {
   await loadCriticalPolyfills()
 
   // Load enhancement polyfills in parallel - don't wait
-  loadEnhancementPolyfills()
+  void loadEnhancementPolyfills()
 
   // Load service polyfills in parallel - don't wait
   loadServicePolyfills()
@@ -216,6 +216,6 @@ if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initPolyfills)
   } else {
-    initPolyfills()
+    void initPolyfills()
   }
 }

@@ -36,29 +36,29 @@ pr:
 
 parameters:
   - name: terraformAction
-    displayName: "Terraform Action"
+    displayName: 'Terraform Action'
     type: string
-    default: "plan"
+    default: 'plan'
     values:
       - plan
       - apply
       - destroy
       - refresh
   - name: environment
-    displayName: "Environment"
+    displayName: 'Environment'
     type: string
-    default: "staging"
+    default: 'staging'
     values:
       - staging
       - production
   - name: terraformVersion
-    displayName: "Terraform Version"
+    displayName: 'Terraform Version'
     type: string
-    default: "1.9.0"
+    default: '1.9.0'
     values:
-      - "1.9.0"
-      - "1.8.0"
-      - "1.7.0"
+      - '1.9.0'
+      - '1.8.0'
+      - '1.7.0'
 
 variables:
   # Reference variable groups from Azure DevOps Library
@@ -67,28 +67,28 @@ variables:
 
   # Terraform variables
   - name: terraformDirectory
-    value: "$(System.DefaultWorkingDirectory)/terraform"
+    value: '$(System.DefaultWorkingDirectory)/terraform'
   - name: artifactName
-    value: "terraform-plan"
+    value: 'terraform-plan'
   - name: stateFileName
-    value: "terraform.tfstate"
+    value: 'terraform.tfstate'
 
   # Environment-specific variables
   - name: environment
-    value: "${{ parameters.environment }}"
+    value: '${{ parameters.environment }}'
   - name: tfvarsFile
-    value: "environments/${{ parameters.environment }}.tfvars"
+    value: 'environments/${{ parameters.environment }}.tfvars'
 
 stages:
   # Stage 1: Validate Terraform configuration
   - stage: TerraformValidate
-    displayName: "Terraform Validate & Plan"
+    displayName: 'Terraform Validate & Plan'
     condition: succeeded()
     jobs:
       - job: ValidateAndPlan
-        displayName: "Terraform Validation & Planning"
+        displayName: 'Terraform Validation & Planning'
         pool:
-          vmImage: "ubuntu-latest"
+          vmImage: 'ubuntu-latest'
         steps:
           # Checkout code with credentials for pulling Terraform state
           - checkout: self
@@ -96,9 +96,9 @@ stages:
 
           # Configure Git for SSH authentication
           - task: Bash@3
-            displayName: "Configure Git for SSH"
+            displayName: 'Configure Git for SSH'
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 # Configure Git to use system credential helper for Azure DevOps
                 git config --global credential.helper store
@@ -110,11 +110,11 @@ stages:
 
           # Configure Azure CLI and authenticate
           - task: AzureCLI@2
-            displayName: "Login to Azure"
+            displayName: 'Login to Azure'
             inputs:
-              azureSubscription: "$(AZURE_SUBSCRIPTION)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
+              azureSubscription: '$(AZURE_SUBSCRIPTION)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
               inlineScript: |
                 echo "✅ Azure authentication successful"
                 echo "Subscription ID: $(az account show --query id -o tsv)"
@@ -125,15 +125,15 @@ stages:
 
           # Install Terraform
           - task: TerraformInstaller@0
-            displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+            displayName: 'Install Terraform ${{ parameters.terraformVersion }}'
             inputs:
-              terraformVersion: "${{ parameters.terraformVersion }}"
+              terraformVersion: '${{ parameters.terraformVersion }}'
 
           # Terraform validate and init
           - task: Bash@3
-            displayName: "Initialize Terraform Backend"
+            displayName: 'Initialize Terraform Backend'
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 cd $(terraformDirectory)
 
@@ -156,28 +156,30 @@ stages:
 
           # Run terraform fmt check
           - task: TerraformTaskV4@4
-            displayName: "Terraform Format Check"
+            displayName: 'Terraform Format Check'
             inputs:
-              provider: "azurerm"
-              command: "fmt"
-              commandOptions: "-check=true -recursive"
+              provider: 'azurerm'
+              command: 'fmt'
+              commandOptions: '-check=true -recursive'
               workingDirectory: $(terraformDirectory)
 
           # Terraform validate
           - task: TerraformTaskV4@4
-            displayName: "Terraform Validate"
+            displayName: 'Terraform Validate'
             inputs:
-              provider: "azurerm"
-              command: "validate"
-              commandOptions: "-var-file=$(tfvarsFile)"
+              provider: 'azurerm'
+              command: 'validate'
+              commandOptions: '-var-file=$(tfvarsFile)'
               workingDirectory: $(terraformDirectory)
 
           # Generate Terraform plan
           - task: Bash@3
-            displayName: "Generate Terraform Plan"
-            condition: and(succeeded(), or(eq('${{ parameters.terraformAction }}', 'plan'), eq('${{ parameters.terraformAction }}', 'apply')))
+            displayName: 'Generate Terraform Plan'
+            condition:
+              and(succeeded(), or(eq('${{ parameters.terraformAction }}',
+              'plan'), eq('${{ parameters.terraformAction }}', 'apply')))
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 echo "📋 Generating Terraform plan..."
                 cd $(terraformDirectory)
@@ -208,15 +210,16 @@ stages:
               TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
-              TF_IN_AUTOMATION: "true"
-              TF_LOG: "INFO"
+              TF_IN_AUTOMATION: 'true'
+              TF_LOG: 'INFO'
 
           # Pretty print the plan (suppress color for Azure DevOps logs)
           - task: Bash@3
-            displayName: "Display Terraform Plan Summary"
-            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            displayName: 'Display Terraform Plan Summary'
+            condition:
+              and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 cd $(terraformDirectory)
                 terraform show -no-color tfplan | head -100
@@ -226,24 +229,27 @@ stages:
 
           # Save terraform plan as artifact
           - task: PublishPipelineArtifact@1
-            displayName: "Publish Terraform Plan"
-            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            displayName: 'Publish Terraform Plan'
+            condition:
+              and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
             inputs:
-              targetPath: "$(terraformDirectory)/tfplan"
-              artifactName: "$(artifactName)-plan-${{ parameters.environment }}"
-              artifactType: "pipeline"
+              targetPath: '$(terraformDirectory)/tfplan'
+              artifactName: '$(artifactName)-plan-${{ parameters.environment }}'
+              artifactType: 'pipeline'
 
   # Stage 2: Apply Terraform changes if permitted
   - stage: TerraformApply
-    displayName: "Terraform Apply (Manual Approval)"
+    displayName: 'Terraform Apply (Manual Approval)'
     dependsOn: TerraformValidate
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{ parameters.terraformAction }}', 'apply'))
+    condition:
+      and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
+      parameters.terraformAction }}', 'apply'))
     jobs:
       - deployment: ApplyChanges
-        displayName: "Apply Infrastructure Changes"
+        displayName: 'Apply Infrastructure Changes'
         environment: ${{ parameters.environment }}
         pool:
-          vmImage: "ubuntu-latest"
+          vmImage: 'ubuntu-latest'
         strategy:
           runOnce:
             deploy:
@@ -252,24 +258,25 @@ stages:
                   persistCredentials: true
 
                 - task: AzureCLI@2
-                  displayName: "Login to Azure"
+                  displayName: 'Login to Azure'
                   inputs:
-                    azureSubscription: "$(AZURE_SUBSCRIPTION)"
-                    scriptType: "bash"
-                    scriptLocation: "inlineScript"
+                    azureSubscription: '$(AZURE_SUBSCRIPTION)'
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
                     inlineScript: |
                       echo "✅ Azure authentication successful"
                       az account set --subscription $(az account show --query id -o tsv)
 
                 - task: TerraformInstaller@0
-                  displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+                  displayName:
+                    'Install Terraform ${{ parameters.terraformVersion }}'
                   inputs:
-                    terraformVersion: "${{ parameters.terraformVersion }}"
+                    terraformVersion: '${{ parameters.terraformVersion }}'
 
                 - task: Bash@3
-                  displayName: "Initialize Terraform Backend"
+                  displayName: 'Initialize Terraform Backend'
                   inputs:
-                    targetType: "inline"
+                    targetType: 'inline'
                     script: |
                       cd $(terraformDirectory)
 
@@ -286,15 +293,16 @@ stages:
 
                 # Download the plan artifact
                 - task: DownloadPipelineArtifact@2
-                  displayName: "Download Terraform Plan"
+                  displayName: 'Download Terraform Plan'
                   inputs:
-                    artifactName: "$(artifactName)-plan-${{ parameters.environment }}"
-                    targetPath: "$(terraformDirectory)"
+                    artifactName:
+                      '$(artifactName)-plan-${{ parameters.environment }}'
+                    targetPath: '$(terraformDirectory)'
 
                 - task: Bash@3
-                  displayName: "Apply Terraform Changes"
+                  displayName: 'Apply Terraform Changes'
                   inputs:
-                    targetType: "inline"
+                    targetType: 'inline'
                     script: |
                       echo "🚀 Applying Terraform infrastructure changes to ${{ parameters.environment }}..."
                       cd $(terraformDirectory)
@@ -315,14 +323,14 @@ stages:
                       TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
                       ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
                       ARM_TENANT_ID: $(AZURE_TENANT_ID)
-                      TF_IN_AUTOMATION: "1"
-                      TF_CLI_ARGS: "-no-color"
+                      TF_IN_AUTOMATION: '1'
+                      TF_CLI_ARGS: '-no-color'
 
                 # Generate and save outputs
                 - task: Bash@3
-                  displayName: "Generate Terraform Outputs"
+                  displayName: 'Generate Terraform Outputs'
                   inputs:
-                    targetType: "inline"
+                    targetType: 'inline'
                     script: |
                       cd $(terraformDirectory)
 
@@ -345,10 +353,12 @@ stages:
 
                 # Post-deployment: Setup Kubernetes cluster with cert-manager and initial resources
                 - task: Bash@3
-                  displayName: "Setup Kubernetes Cluster (Optional)"
-                  condition: and(succeeded(), eq('${{ parameters.environment }}', 'staging'))
+                  displayName: 'Setup Kubernetes Cluster (Optional)'
+                  condition:
+                    and(succeeded(), eq('${{ parameters.environment }}',
+                    'staging'))
                   inputs:
-                    targetType: "inline"
+                    targetType: 'inline'
                     script: |
                       set -euo pipefail
 
@@ -418,35 +428,37 @@ stages:
 
   # Stage 3: Refresh state (for troubleshooting)
   - stage: TerraformRefresh
-    displayName: "Terraform State Refresh"
-    dependsOn: [ ]
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{ parameters.terraformAction }}', 'refresh'))
+    displayName: 'Terraform State Refresh'
+    dependsOn: []
+    condition:
+      and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
+      parameters.terraformAction }}', 'refresh'))
     jobs:
       - job: RefreshState
-        displayName: "Refresh Terraform State"
+        displayName: 'Refresh Terraform State'
         pool:
-          vmImage: "ubuntu-latest"
+          vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
 
           - task: AzureCLI@2
-            displayName: "Login to Azure"
+            displayName: 'Login to Azure'
             inputs:
-              azureSubscription: "$(AZURE_SUBSCRIPTION)"
-              scriptType: "bash"
-              scriptLocation: "inlineScript"
+              azureSubscription: '$(AZURE_SUBSCRIPTION)'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
               inlineScript: |
                 az account set --subscription $(az account show --query id -o tsv)
 
           - task: TerraformInstaller@0
-            displayName: "Install Terraform ${{ parameters.terraformVersion }}"
+            displayName: 'Install Terraform ${{ parameters.terraformVersion }}'
             inputs:
-              terraformVersion: "${{ parameters.terraformVersion }}"
+              terraformVersion: '${{ parameters.terraformVersion }}'
 
           - task: Bash@3
-            displayName: "Initialize Terraform Backend"
+            displayName: 'Initialize Terraform Backend'
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 cd $(terraformDirectory)
 
@@ -460,9 +472,9 @@ stages:
               TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
 
           - task: Bash@3
-            displayName: "Terraform Refresh"
+            displayName: 'Terraform Refresh'
             inputs:
-              targetType: "inline"
+              targetType: 'inline'
               script: |
                 cd $(terraformDirectory)
                 terraform refresh -var-file=$(tfvarsFile)
@@ -478,10 +490,10 @@ postDeployment:
         echo "✅ Terraform pipeline completed successfully"
         echo "Environment: ${{ parameters.environment }}"
         echo "Action: ${{ parameters.terraformAction }}"
-      displayName: "Post-deployment Success"
+      displayName: 'Post-deployment Success'
 
   onFailure:
     - script: |
         echo "❌ Terraform pipeline completed with failures"
         echo "Check the logs above for details"
-      displayName: "Post-deployment Failure"
+      displayName: 'Post-deployment Failure'

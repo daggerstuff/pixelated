@@ -1,13 +1,15 @@
 ---
 title: 'Addiction Recovery'
-description: 'Comprehensive guide to addiction recovery processes and support systems'
+description:
+  'Comprehensive guide to addiction recovery processes and support systems'
 author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 
 # Addiction Recovery
 
-This guide provides a comprehensive overview of addiction recovery, including treatment approaches, support systems, and long-term maintenance strategies.
+This guide provides a comprehensive overview of addiction recovery, including
+treatment approaches, support systems, and long-term maintenance strategies.
 
 ## Recovery Foundations
 

@@ -42,7 +42,9 @@ export const DemographicBiasBreakdownSchema = z.object({
   overallScore: z.number().min(0).max(1),
   concernLevel: z.enum(['low', 'medium', 'high', 'critical']),
 })
-export type DemographicBiasBreakdown = z.infer<typeof DemographicBiasBreakdownSchema>
+export type DemographicBiasBreakdown = z.infer<
+  typeof DemographicBiasBreakdownSchema
+>
 
 // Dataset audit result
 export const DatasetAuditResultSchema = z.object({
@@ -91,14 +93,16 @@ export const AuditConfigSchema = z.object({
     age: z.number().min(0).max(1).default(0.25),
     cultural: z.number().min(0).max(1).default(0.25),
   }),
-  enabledMetrics: z.array(z.string()).default([
-    'genderBias',
-    'racialBias',
-    'ageBias',
-    'culturalBias',
-    'sentimentBias',
-    'representationBias',
-  ]),
+  enabledMetrics: z
+    .array(z.string())
+    .default([
+      'genderBias',
+      'racialBias',
+      'ageBias',
+      'culturalBias',
+      'sentimentBias',
+      'representationBias',
+    ]),
   autoQuarantine: z.boolean().default(true),
   requireManualApproval: z.boolean().default(true),
 })
@@ -125,7 +129,9 @@ export const QuarantineActionPayloadSchema = z.object({
   reviewedBy: z.string(),
   notes: z.string().optional(),
 })
-export type QuarantineActionPayload = z.infer<typeof QuarantineActionPayloadSchema>
+export type QuarantineActionPayload = z.infer<
+  typeof QuarantineActionPayloadSchema
+>
 
 // Audit history entry
 export const AuditHistoryEntrySchema = z.object({
@@ -159,7 +165,9 @@ export const PaginatedDatasetsForAuditSchema = z.object({
   pageSize: z.number(),
   totalPages: z.number(),
 })
-export type PaginatedDatasetsForAudit = z.infer<typeof PaginatedDatasetsForAuditSchema>
+export type PaginatedDatasetsForAudit = z.infer<
+  typeof PaginatedDatasetsForAuditSchema
+>
 
 // Initiate audit payload
 export const InitiateAuditPayloadSchema = z.object({
@@ -172,7 +180,14 @@ export type InitiateAuditPayload = z.infer<typeof InitiateAuditPayloadSchema>
 export const AuditProgressUpdateSchema = z.object({
   auditId: z.string(),
   datasetId: z.string(),
-  status: z.enum(['started', 'sampling', 'analyzing', 'computing_metrics', 'completed', 'failed']),
+  status: z.enum([
+    'started',
+    'sampling',
+    'analyzing',
+    'computing_metrics',
+    'completed',
+    'failed',
+  ]),
   progress: z.number().min(0).max(100),
   currentStep: z.string(),
   estimatedTimeRemaining: z.number().optional(), // seconds
@@ -181,7 +196,9 @@ export const AuditProgressUpdateSchema = z.object({
 export type AuditProgressUpdate = z.infer<typeof AuditProgressUpdateSchema>
 
 // Serialization helpers for API requests
-export const serializeInitiateAuditPayload = (payload: InitiateAuditPayload) => {
+export const serializeInitiateAuditPayload = (
+  payload: InitiateAuditPayload,
+) => {
   const parsed = InitiateAuditPayloadSchema.parse(payload)
   return {
     dataset_ids: parsed.datasetIds,
@@ -203,7 +220,9 @@ export const serializeInitiateAuditPayload = (payload: InitiateAuditPayload) => 
   }
 }
 
-export const serializeQuarantineActionPayload = (payload: QuarantineActionPayload) => {
+export const serializeQuarantineActionPayload = (
+  payload: QuarantineActionPayload,
+) => {
   const parsed = QuarantineActionPayloadSchema.parse(payload)
   return {
     dataset_id: parsed.datasetId,
@@ -215,7 +234,9 @@ export const serializeQuarantineActionPayload = (payload: QuarantineActionPayloa
 }
 
 // Response schema transformers (for parsing API responses)
-export const parseDatasetAuditResult = (data: Record<string, unknown>): DatasetAuditResult => {
+export const parseDatasetAuditResult = (
+  data: Record<string, unknown>,
+): DatasetAuditResult => {
   return DatasetAuditResultSchema.parse({
     auditId: data.audit_id,
     datasetId: data.dataset_id,
@@ -234,13 +255,17 @@ export const parseDatasetAuditResult = (data: Record<string, unknown>): DatasetA
       passed: m.passed,
       details: m.details,
     })),
-    demographicBreakdown: (data.demographic_breakdown as Array<Record<string, unknown>>)?.map((d) => ({
+    demographicBreakdown: (
+      data.demographic_breakdown as Array<Record<string, unknown>>
+    )?.map((d) => ({
       category: d.category,
       scores: d.scores,
       overallScore: d.overall_score,
       concernLevel: d.concern_level,
     })),
-    scoreDistribution: (data.score_distribution as Array<Record<string, unknown>>)?.map((s) => ({
+    scoreDistribution: (
+      data.score_distribution as Array<Record<string, unknown>>
+    )?.map((s) => ({
       range: s.range,
       count: s.count,
       percentage: s.percentage,
@@ -250,7 +275,9 @@ export const parseDatasetAuditResult = (data: Record<string, unknown>): DatasetA
   })
 }
 
-export const parseDatasetForAudit = (data: Record<string, unknown>): DatasetForAudit => {
+export const parseDatasetForAudit = (
+  data: Record<string, unknown>,
+): DatasetForAudit => {
   return DatasetForAuditSchema.parse({
     datasetId: data.dataset_id,
     name: data.name,
@@ -267,7 +294,9 @@ export const parseDatasetForAudit = (data: Record<string, unknown>): DatasetForA
   })
 }
 
-export const parseAuditSummary = (data: Record<string, unknown>): AuditSummary => {
+export const parseAuditSummary = (
+  data: Record<string, unknown>,
+): AuditSummary => {
   return AuditSummarySchema.parse({
     totalDatasets: data.total_datasets,
     pendingReview: data.pending_review,
@@ -276,6 +305,8 @@ export const parseAuditSummary = (data: Record<string, unknown>): AuditSummary =
     quarantined: data.quarantined,
     rejected: data.rejected,
     averageBiasScore: data.average_bias_score,
-    lastAuditDate: data.last_audit_date ? new Date(data.last_audit_date as string) : undefined,
+    lastAuditDate: data.last_audit_date
+      ? new Date(data.last_audit_date as string)
+      : undefined,
   })
 }

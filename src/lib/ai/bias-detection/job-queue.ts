@@ -35,7 +35,7 @@ export class JobQueue<T = any, R = any> {
       jobId: id,
       createdAt: job.createdAt,
     })
-    this.processNext()
+    void this.processNext()
     return id
   }
 
@@ -66,9 +66,9 @@ export class JobQueue<T = any, R = any> {
     const avgDuration =
       completedJobs.length > 0
         ? completedJobs.reduce(
-          (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
-          0,
-        ) / completedJobs.length
+            (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
+            0,
+          ) / completedJobs.length
         : 0
     const errorCount = jobs.filter((j) => j.status === 'failed').length
     const total = jobs.length
@@ -102,7 +102,7 @@ export class JobQueue<T = any, R = any> {
 
     // Process next job in queue
     if (this.queue.length > 0) {
-      this.processNext()
+      void this.processNext()
     }
   }
 }

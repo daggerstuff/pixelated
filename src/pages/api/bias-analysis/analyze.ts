@@ -1,7 +1,9 @@
-import type { APIRoute } from 'astro'
-import { securityMiddleware } from '@/middleware/security'
-import { Pool } from 'pg'
 import { randomUUID } from 'crypto'
+
+import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
+
+import { securityMiddleware } from '@/middleware/security'
 
 // Database connection
 const pool = new Pool({

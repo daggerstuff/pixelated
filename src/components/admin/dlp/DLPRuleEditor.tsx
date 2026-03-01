@@ -1,5 +1,6 @@
 import React, { useState, useEffect, forwardRef } from 'react'
 import type { ReactNode } from 'react'
+
 import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
 /**
@@ -8,7 +9,7 @@ import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
  */
 const Card = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className="rounded-lg border bg-card text-card-foreground shadow-sm"
+    className='bg-card text-card-foreground rounded-lg border shadow-sm'
     {...props}
   >
     {children}
@@ -19,7 +20,7 @@ const CardHeader = ({
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="flex flex-col space-y-1.5 p-6" {...props}>
+  <div className='flex flex-col space-y-1.5 p-6' {...props}>
     {children}
   </div>
 )
@@ -28,7 +29,7 @@ const CardTitle = ({
   children,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <h3 className="text-2xl font-semibold leading-none tracking-tight" {...props}>
+  <h3 className='text-2xl font-semibold leading-none tracking-tight' {...props}>
     {children}
   </h3>
 )
@@ -37,7 +38,7 @@ const CardDescription = ({
   children,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className="text-sm text-muted-foreground" {...props}>
+  <p className='text-muted-foreground text-sm' {...props}>
     {children}
   </p>
 )
@@ -46,7 +47,7 @@ const CardContent = ({
   children,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className="p-6 pt-0" {...props}>
+  <div className='p-6 pt-0' {...props}>
     {children}
   </div>
 )
@@ -61,11 +62,11 @@ const Switch = ({
   id: string
 }) => (
   <input
-    type="checkbox"
+    type='checkbox'
     id={id}
     checked={checked}
     onChange={(e) => onCheckedChange(e.target.checked)}
-    className="peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary peer-unchecked:bg-input bg-input"
+    className='border-transparent focus-visible:ring-ring peer-checked:bg-primary peer-unchecked:bg-input bg-input peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50'
   />
 )
 
@@ -74,7 +75,7 @@ const Button = ({
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   <button
-    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+    className='focus-visible:ring-ring border-input hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center rounded-md border bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
     {...props}
   >
     {children}
@@ -95,7 +96,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     <input
       type={type}
       className={
-        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
+        'border-input file:bg-transparent placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
         (className ? ' ' + className : '')
       }
       ref={ref}
@@ -114,7 +115,7 @@ interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
 const Label = ({ htmlFor, children, ...props }: LabelProps) => (
   <label
     htmlFor={htmlFor}
-    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
     {...props}
   >
     {children}
@@ -122,8 +123,7 @@ const Label = ({ htmlFor, children, ...props }: LabelProps) => (
 )
 
 // Create an inline Textarea component
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   id?: string
   placeholder?: string
   value?: string
@@ -140,7 +140,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       onChange={onChange}
       rows={rows}
       ref={ref}
-      className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      className='border-input placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
       {...props}
     />
   ),
@@ -164,7 +164,7 @@ const Select = ({
   <select
     value={value}
     onChange={(e) => onValueChange(e.target.value)}
-    className="block w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    className='border-input focus-visible:ring-ring block w-full rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
   >
     {children}
   </select>
@@ -293,7 +293,7 @@ export default function DLPRuleEditor() {
       // Switch back to rules tab
       const rulesTab = document.querySelector(
         '[value="rules"]',
-      ) as HTMLElement as HTMLElement
+      ) as HTMLElement
       if (rulesTab) {
         setTimeout(() => {
           rulesTab.click()
@@ -328,18 +328,18 @@ export default function DLPRuleEditor() {
       </CardHeader>
       <CardContent>
         <form
-          className="space-y-4"
+          className='space-y-4'
           onSubmit={(e) => {
             e.preventDefault()
             saveRule()
           }}
         >
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="rule-id">Rule ID</Label>
+          <div className='grid grid-cols-2 gap-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='rule-id'>Rule ID</Label>
               <Input
-                id="rule-id"
-                placeholder="unique-rule-id"
+                id='rule-id'
+                placeholder='unique-rule-id'
                 value={currentRule.id}
                 onChange={(e) => handleChange('id', e.target.value)}
                 readOnly={isEditing}
@@ -347,22 +347,22 @@ export default function DLPRuleEditor() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rule-name">Rule Name</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='rule-name'>Rule Name</Label>
               <Input
-                id="rule-name"
-                placeholder="PHI Detection"
+                id='rule-name'
+                placeholder='PHI Detection'
                 value={currentRule.name}
                 onChange={(e) => handleChange('name', e.target.value)}
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="rule-description">Description</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='rule-description'>Description</Label>
             <Textarea
-              id="rule-description"
-              placeholder="Describe what this rule does and when it applies"
+              id='rule-description'
+              placeholder='Describe what this rule does and when it applies'
               value={currentRule.description}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 handleChange('description', e.target.value)
@@ -371,9 +371,9 @@ export default function DLPRuleEditor() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="rule-action">Action</Label>
+          <div className='grid grid-cols-2 gap-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='rule-action'>Action</Label>
               <Select
                 value={currentRule.action as string}
                 onValueChange={(value: string) => handleChange('action', value)}
@@ -392,41 +392,41 @@ export default function DLPRuleEditor() {
               </Select>
             </div>
 
-            <div className="flex items-center space-x-2 pt-6">
+            <div className='flex items-center space-x-2 pt-6'>
               <Switch
-                id="rule-active"
+                id='rule-active'
                 checked={!!currentRule.isActive}
                 onCheckedChange={(checked: boolean) =>
                   handleChange('isActive', checked)
                 }
               />
 
-              <Label htmlFor="rule-active">Active</Label>
+              <Label htmlFor='rule-active'>Active</Label>
             </div>
           </div>
 
           {currentRule.action === DLPAction.REDACT && (
-            <div className="p-4 bg-muted rounded-md">
-              <p className="text-sm text-muted-foreground mb-2">
+            <div className='bg-muted rounded-md p-4'>
+              <p className='text-muted-foreground mb-2 text-sm'>
                 <strong>Preview:</strong> When this rule is triggered, matching
                 content will be redacted.
               </p>
-              <div className="text-sm">
+              <div className='text-sm'>
                 <span>Original: </span>
-                <span className="font-mono">
+                <span className='font-mono'>
                   This contains {currentRule.name || '[term]'}
                 </span>
               </div>
-              <div className="text-sm">
+              <div className='text-sm'>
                 <span>Redacted: </span>
-                <span className="font-mono">This contains [REDACTED]</span>
+                <span className='font-mono'>This contains [REDACTED]</span>
               </div>
             </div>
           )}
 
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className='flex justify-end space-x-2 pt-4'>
             <Button
-              type="button"
+              type='button'
               onClick={() => {
                 setCurrentRule(defaultRule)
                 setIsEditing(false)
@@ -442,7 +442,7 @@ export default function DLPRuleEditor() {
             >
               Cancel
             </Button>
-            <Button type="submit">
+            <Button type='submit'>
               {isEditing ? 'Update Rule' : 'Create Rule'}
             </Button>
           </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/server'
+
 import StaticHtml from './static-html.js'
 
 const slotName = (str) =>

@@ -10,6 +10,7 @@
  */
 
 import { atomWithStorage } from 'jotai/utils'
+
 import { logger } from '@/lib/logger'
 
 // Helper to synchronously require Node modules in Node-only environments without
@@ -176,7 +177,7 @@ class EnhancedStatePersistence {
 
     // Initialize offline queue processing
     if (this.config.enableOfflineQueue) {
-      this.processOfflineQueue()
+      void this.processOfflineQueue()
     }
 
     // Update usage statistics
@@ -212,7 +213,7 @@ class EnhancedStatePersistence {
 
   private startPeriodicCleanup() {
     this.cleanupTimer = setInterval(() => {
-      this.performCleanup()
+      void this.performCleanup()
     }, this.config.cleanupInterval)
   }
 
@@ -288,7 +289,7 @@ class EnhancedStatePersistence {
     if (
       sessionState['lastActivity'] &&
       typeof sessionState['lastActivity'] === 'number' &&
-      now - (sessionState['lastActivity'] as number) > sessionTimeout
+      now - (sessionState['lastActivity']) > sessionTimeout
     ) {
       this.setStoredValue('session_state', {
         lastRoute: '/',
@@ -320,7 +321,7 @@ class EnhancedStatePersistence {
         const draftWithTimestamp = draft as Record<string, unknown> & {
           timestamp: number
         }
-        if (now - (draftWithTimestamp['timestamp'] as number) > draftTimeout) {
+        if (now - (draftWithTimestamp['timestamp']) > draftTimeout) {
           delete formDrafts[key]
         }
       }
@@ -632,5 +633,5 @@ export const enhancedPersistence = EnhancedStatePersistence.getInstance()
 
 // Initialize persistence when module is loaded
 if (typeof window !== 'undefined') {
-  enhancedPersistence.initialize()
+  void enhancedPersistence.initialize()
 }

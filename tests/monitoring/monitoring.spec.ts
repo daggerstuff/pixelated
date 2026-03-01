@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+
 import { getBaseUrl } from '../utils/env'
 
 // Check if server is running before running tests

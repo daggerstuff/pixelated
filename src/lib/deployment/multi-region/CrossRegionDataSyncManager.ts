@@ -1,12 +1,14 @@
+import { EventEmitter } from 'events'
+
+import { createClient } from '@clickhouse/client'
+import * as cockroach from 'cockroach'
+import { Redis } from 'ioredis'
+import { MongoClient } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
+
 import { Logger } from '../../utils/logger'
 import { ConfigurationManager } from './ConfigurationManager'
 import { HealthMonitor } from './HealthMonitor'
-import { EventEmitter } from 'events'
-import { createClient } from '@clickhouse/client'
-import { MongoClient } from 'mongodb'
-import { Redis } from 'ioredis'
-import * as cockroach from 'cockroach'
-import { v4 as uuidv4 } from 'uuid'
 
 /**
  * Cross-Region Data Synchronization Manager

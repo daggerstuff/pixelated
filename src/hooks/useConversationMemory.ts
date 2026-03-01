@@ -23,8 +23,10 @@
 // Session timing/metrics logic (active/idle/paused/ended spans, durations, etc.)
 // Progress and milestone tracking (progress %, skill scores, milestones, etc.)
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useSessionProgressMilestones } from './useSessionProgressMilestones'
+
 import type { SessionProgressMetrics } from '@/types/dashboard'
+
+import { useSessionProgressMilestones } from './useSessionProgressMilestones'
 
 /**
  * Represents the conversational memory state for a session.
@@ -133,15 +135,19 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
     }
 
     const interval = setInterval(() => {
-      const duration = Math.floor((Date.now() - sessionStartTimeRef.current) / 1000)
-      const additionalActive = Math.floor((Date.now() - lastActiveTimeRef.current) / 1000)
+      const duration = Math.floor(
+        (Date.now() - sessionStartTimeRef.current) / 1000,
+      )
+      const additionalActive = Math.floor(
+        (Date.now() - lastActiveTimeRef.current) / 1000,
+      )
 
       setProgressState((prev: any) => ({
         progressMetrics: {
           ...prev.progressMetrics,
           sessionDuration: duration,
-          activeTime: (prev.progressMetrics.activeTime ?? 0) + additionalActive
-        }
+          activeTime: (prev.progressMetrics.activeTime ?? 0) + additionalActive,
+        },
       }))
 
       lastActiveTimeRef.current = Date.now()
@@ -153,81 +159,92 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   /**
    * Adds a new message to the conversation history and updates progress metrics.
    */
-  const addMessage = useCallback((role: 'therapist' | 'client', message: string) => {
-    const currentTime = Date.now()
-    const responseTime =
-      lastMessageTimeRef.current === null
-        ? null
-        : (currentTime - lastMessageTimeRef.current) / 1000 // in seconds
+  const addMessage = useCallback(
+    (role: 'therapist' | 'client', message: string) => {
+      const currentTime = Date.now()
+      const responseTime =
+        lastMessageTimeRef.current === null
+          ? null
+          : (currentTime - lastMessageTimeRef.current) / 1000 // in seconds
 
-    setBaseMemory((prev) => ({
-      ...prev,
-      history: [...prev.history, { role, message }],
-    }))
+      setBaseMemory((prev) => ({
+        ...prev,
+        history: [...prev.history, { role, message }],
+      }))
 
-    setProgressState((prevState: any) => {
-      const prevMetrics =
-        prevState?.progressMetrics ??
-        (DEFAULT_MEMORY.progressMetrics as SessionProgressMetrics)
-      const prevResponses = (prevMetrics.responsesCount ?? 0) as number
-      const prevAvg = (prevMetrics.responseTime ?? 0) as number
+      setProgressState((prevState: any) => {
+        const prevMetrics =
+          prevState?.progressMetrics ??
+          (DEFAULT_MEMORY.progressMetrics)
+        const prevResponses = (prevMetrics.responsesCount ?? 0) as number
+        const prevAvg = (prevMetrics.responseTime ?? 0) as number
 
-      const updatedMetrics = {
-        ...prevMetrics,
-        totalMessages: (prevMetrics.totalMessages ?? 0) + 1,
-        therapistMessages:
-          role === 'therapist'
-            ? (prevMetrics.therapistMessages ?? 0) + 1
-            : (prevMetrics.therapistMessages ?? 0),
-        clientMessages:
-          role === 'client'
-            ? (prevMetrics.clientMessages ?? 0) + 1
-            : (prevMetrics.clientMessages ?? 0),
-      } as SessionProgressMetrics
+        const updatedMetrics = {
+          ...prevMetrics,
+          totalMessages: (prevMetrics.totalMessages ?? 0) + 1,
+          therapistMessages:
+            role === 'therapist'
+              ? (prevMetrics.therapistMessages ?? 0) + 1
+              : (prevMetrics.therapistMessages ?? 0),
+          clientMessages:
+            role === 'client'
+              ? (prevMetrics.clientMessages ?? 0) + 1
+              : (prevMetrics.clientMessages ?? 0),
+        } as SessionProgressMetrics
 
-      if (responseTime !== null) {
-        const newResponses = prevResponses + 1
-        const newAvg = (prevAvg * prevResponses + responseTime) / newResponses
-        updatedMetrics.responseTime = newAvg
-        updatedMetrics.responsesCount = newResponses
-      }
+        if (responseTime !== null) {
+          const newResponses = prevResponses + 1
+          const newAvg = (prevAvg * prevResponses + responseTime) / newResponses
+          updatedMetrics.responseTime = newAvg
+          updatedMetrics.responsesCount = newResponses
+        }
 
-      return { progressMetrics: updatedMetrics }
-    })
+        return { progressMetrics: updatedMetrics }
+      })
 
-    lastMessageTimeRef.current = currentTime
-  }, [setProgressState])
+      lastMessageTimeRef.current = currentTime
+    },
+    [setProgressState],
+  )
 
   /**
    * Updates the session state and synchronizes timing/metrics.
    */
-  const setSessionState = useCallback((state: ConversationMemory['sessionState']) => {
-    const prevState = baseMemory.sessionState
+  const setSessionState = useCallback(
+    (state: ConversationMemory['sessionState']) => {
+      const prevState = baseMemory.sessionState
 
-    setBaseMemory((prev) => ({ ...prev, sessionState: state }))
+      setBaseMemory((prev) => ({ ...prev, sessionState: state }))
 
-    if (state === 'active' && prevState !== 'active') {
-      lastActiveTimeRef.current = Date.now()
-    } else if (prevState === 'active' && (state === 'paused' || state === 'ended')) {
-      const now = Date.now()
-      const elapsed = Math.floor((now - lastActiveTimeRef.current) / 1000)
+      if (state === 'active' && prevState !== 'active') {
+        lastActiveTimeRef.current = Date.now()
+      } else if (
+        prevState === 'active' &&
+        (state === 'paused' || state === 'ended')
+      ) {
+        const now = Date.now()
+        const elapsed = Math.floor((now - lastActiveTimeRef.current) / 1000)
 
-      const metricsUpdate: Partial<SessionProgressMetrics> = {
-        activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
-      }
-
-      if (state === 'ended') {
-        metricsUpdate.sessionDuration = Math.floor((now - sessionStartTimeRef.current) / 1000)
-      }
-
-      setProgressState({
-        progressMetrics: {
-          ...progressMetrics,
-          ...metricsUpdate
+        const metricsUpdate: Partial<SessionProgressMetrics> = {
+          activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
         }
-      })
-    }
-  }, [baseMemory.sessionState, progressMetrics, setProgressState])
+
+        if (state === 'ended') {
+          metricsUpdate.sessionDuration = Math.floor(
+            (now - sessionStartTimeRef.current) / 1000,
+          )
+        }
+
+        setProgressState({
+          progressMetrics: {
+            ...progressMetrics,
+            ...metricsUpdate,
+          },
+        })
+      }
+    },
+    [baseMemory.sessionState, progressMetrics, setProgressState],
+  )
 
   const resetSession = useCallback(() => {
     sessionStartTimeRef.current = Date.now()

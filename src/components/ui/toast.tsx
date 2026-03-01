@@ -1,6 +1,7 @@
-import type { ToastOptions } from 'react-hot-toast'
 import type { ReactNode } from 'react'
+import type { ToastOptions } from 'react-hot-toast'
 import { toast as hotToast, Toaster } from 'react-hot-toast'
+
 import { cn } from '../../lib/utils'
 import { IconX } from './icons'
 
@@ -80,14 +81,14 @@ export const toast = {
             t.visible ? 'animate-enter' : 'animate-leave',
           )}
         >
-          {icon && <div className="flex-shrink-0 mr-3">{icon}</div>}
-          <div className="flex-1">{message}</div>
+          {icon && <div className='mr-3 flex-shrink-0'>{icon}</div>}
+          <div className='flex-1'>{message}</div>
           <button
             onClick={() => hotToast.dismiss(t.id)}
-            className="ml-4 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Dismiss"
+            className='hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:ring-ring ml-4 rounded-full p-1 focus:outline-none focus-visible:ring-2'
+            aria-label='Dismiss'
           >
-            <IconX size={16} className="text-gray-500" aria-hidden="true" />
+            <IconX size={16} className='text-gray-500' aria-hidden='true' />
           </button>
         </div>
       ),
@@ -122,15 +123,15 @@ export const toast = {
       ...options,
       icon: (
         <svg
-          className="w-5 h-5 text-blue-500"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
+          className='text-blue-500 h-5 w-5'
+          fill='currentColor'
+          viewBox='0 0 20 20'
+          xmlns='http://www.w3.org/2000/svg'
         >
           <path
-            fillRule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-            clipRule="evenodd"
+            fillRule='evenodd'
+            d='M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z'
+            clipRule='evenodd'
           />
         </svg>
       ),
@@ -144,15 +145,15 @@ export const toast = {
       ...options,
       icon: (
         <svg
-          className="w-5 h-5 text-yellow-500"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
+          className='text-yellow-500 h-5 w-5'
+          fill='currentColor'
+          viewBox='0 0 20 20'
+          xmlns='http://www.w3.org/2000/svg'
         >
           <path
-            fillRule="evenodd"
-            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-            clipRule="evenodd"
+            fillRule='evenodd'
+            d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z'
+            clipRule='evenodd'
           />
         </svg>
       ),

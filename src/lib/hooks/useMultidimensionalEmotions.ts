@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+
 import type { DimensionalMap as DimensionalEmotionMap } from '@/lib/ai/emotions/types'
 import type { MultidimensionalPattern } from '@/lib/ai/temporal/types'
 

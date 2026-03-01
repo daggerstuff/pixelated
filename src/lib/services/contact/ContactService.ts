@@ -1,9 +1,11 @@
-import { EmailService } from '../email/EmailService'
+import { readFile } from 'fs/promises'
+
+import { z } from 'zod'
+
+import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/server'
-import { ALLOWED_DIRECTORIES, safeJoin } from '../../../utils/path-security'
-import { z } from 'zod'
-import { readFile } from 'fs/promises'
+import { EmailService } from '../email/EmailService'
 
 const logger = createBuildSafeLogger('contact-service')
 
@@ -117,11 +119,9 @@ export class ContactService {
         'templates',
         'email',
       )
-      const htmlPath = securePathJoin(
-        templatesDir,
-        `${validatedName}.html`,
-        { allowedExtensions: ['.html'] },
-      )
+      const htmlPath = securePathJoin(templatesDir, `${validatedName}.html`, {
+        allowedExtensions: ['.html'],
+      })
       const html = await readFile(htmlPath, 'utf-8')
 
       // Generate text version from HTML (basic conversion)

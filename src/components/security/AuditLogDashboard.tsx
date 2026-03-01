@@ -1,4 +1,16 @@
+import { format } from 'date-fns'
 import React, { useState, useEffect } from 'react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+
+import { Button } from '../ui/button'
 import {
   Card,
   CardContent,
@@ -14,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select'
-import { Button } from '../ui/button'
 import {
   Table as UITable,
   TableBody,
@@ -23,16 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts'
-import { format } from 'date-fns'
 
 export interface AuditLogEntry {
   id: string
@@ -153,7 +154,7 @@ export function AuditLogDashboard() {
   }, [filters])
 
   useEffect(() => {
-    fetchLogs()
+    void fetchLogs()
   }, [fetchLogs])
 
   const getEventTypeStats = () => {
@@ -201,7 +202,7 @@ export function AuditLogDashboard() {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className='space-y-4'>
       {/* Filters */}
       <Card>
         <CardHeader>
@@ -211,7 +212,7 @@ export function AuditLogDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
             <Select
               value={filters.eventType}
               onValueChange={(value: string) =>
@@ -222,7 +223,7 @@ export function AuditLogDashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Events</SelectItem>
+                <SelectItem value=''>All Events</SelectItem>
                 {eventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -232,7 +233,7 @@ export function AuditLogDashboard() {
             </Select>
 
             <Input
-              placeholder="User ID"
+              placeholder='User ID'
               value={filters.userId}
               onChange={(e) =>
                 setFilters({ ...filters, userId: e.target.value })
@@ -240,7 +241,7 @@ export function AuditLogDashboard() {
             />
 
             <Input
-              type="date"
+              type='date'
               value={filters.startDate}
               onChange={(e) =>
                 setFilters({ ...filters, startDate: e.target.value })
@@ -248,7 +249,7 @@ export function AuditLogDashboard() {
             />
 
             <Input
-              type="date"
+              type='date'
               value={filters.endDate}
               onChange={(e) =>
                 setFilters({ ...filters, endDate: e.target.value })
@@ -256,7 +257,7 @@ export function AuditLogDashboard() {
             />
 
             <Input
-              placeholder="Search..."
+              placeholder='Search...'
               value={filters.searchTerm}
               onChange={(e) =>
                 setFilters({ ...filters, searchTerm: e.target.value })
@@ -277,14 +278,14 @@ export function AuditLogDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className='h-[300px]'>
+            <ResponsiveContainer width='100%' height='100%'>
               <BarChart data={getEventTypeStats()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <CartesianGrid strokeDasharray='3 3' />
+                <XAxis dataKey='name' />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#3b82f6" />
+                <Bar dataKey='value' fill='#3b82f6' />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -299,7 +300,7 @@ export function AuditLogDashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-center py-4">Loading...</div>
+            <div className='py-4 text-center'>Loading...</div>
           ) : (
             <Table>
               <TableHeader>

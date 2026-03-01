@@ -12,7 +12,11 @@ toc: true
 
 ## Overview
 
-The Session Data Caching system optimizes the delivery, storage, and retrieval of large behavioral analysis datasets while maintaining HIPAA compliance and ensuring high performance. This document details the caching architecture, implementation strategies, and security considerations for effective session data management.
+The Session Data Caching system optimizes the delivery, storage, and retrieval
+of large behavioral analysis datasets while maintaining HIPAA compliance and
+ensuring high performance. This document details the caching architecture,
+implementation strategies, and security considerations for effective session
+data management.
 
 ## Architecture
 

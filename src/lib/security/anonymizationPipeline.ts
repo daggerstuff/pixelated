@@ -7,10 +7,11 @@
  * Usage: Import and call anonymizeData(input, options) for all data flows requiring anonymization.
  */
 
-import { piiDetectionService } from './pii'
-import { phiDetector, detectAndRedactPHIAsync } from './phiDetection'
-import { createPrivacyHash } from '../../simulator/utils/privacy'
 import * as crypto from 'crypto'
+
+import { createPrivacyHash } from '../../simulator/utils/privacy'
+import { phiDetector, detectAndRedactPHIAsync } from './phiDetection'
+import { piiDetectionService } from './pii'
 
 // Types
 export interface AnonymizationResult<T = Record<string, unknown> | string> {

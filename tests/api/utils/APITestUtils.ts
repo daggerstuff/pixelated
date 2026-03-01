@@ -120,7 +120,7 @@ export class APITestUtils {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`,
+        Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         title: `Test Conversation ${Date.now()}`,
@@ -236,7 +236,10 @@ export class APITestUtils {
           },
         )
       } catch (_error: unknown) {
-        console.warn(`Failed to cleanup conversation ${conversationId}:`, _error)
+        console.warn(
+          `Failed to cleanup conversation ${conversationId}:`,
+          _error,
+        )
       }
     }
     this.testConversations = []

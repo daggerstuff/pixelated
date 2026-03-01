@@ -1,7 +1,8 @@
 // Replaced entire file with a single authoritative implementation to remove merge residues.
 import React, { useState, useEffect, useRef } from 'react'
-import type { TherapistSession } from '@/types/dashboard'
+
 import { cn } from '@/lib/utils'
+import type { TherapistSession } from '@/types/dashboard'
 
 interface SessionControlsProps {
   sessions: TherapistSession[]
@@ -64,12 +65,12 @@ export function SessionControls({
   }, [])
 
   return (
-    <section className="space-y-4" aria-label="Session Controls">
-      <h3 className="text-lg font-semibold">Session Controls</h3>
+    <section className='space-y-4' aria-label='Session Controls'>
+      <h3 className='text-lg font-semibold'>Session Controls</h3>
 
-      <div className="flex gap-2" role="group">
+      <div className='flex gap-2' role='group'>
         <button
-          type="button"
+          type='button'
           ref={(el) => {
             buttonRefs.current['pause'] = el
           }}
@@ -88,7 +89,7 @@ export function SessionControls({
         </button>
 
         <button
-          type="button"
+          type='button'
           ref={(el) => {
             buttonRefs.current['resume'] = el
           }}
@@ -107,7 +108,7 @@ export function SessionControls({
         </button>
 
         <button
-          type="button"
+          type='button'
           ref={(el) => {
             buttonRefs.current['end'] = el
           }}
@@ -127,11 +128,11 @@ export function SessionControls({
       </div>
 
       <div>
-        <h4 className="text-md font-medium">Recent Sessions</h4>
+        <h4 className='text-md font-medium'>Recent Sessions</h4>
         {sessions.length === 0 ? (
-          <div className="text-sm italic">No recent sessions available</div>
+          <div className='text-sm italic'>No recent sessions available</div>
         ) : (
-          <ul className="space-y-2" role="list">
+          <ul className='space-y-2' role='list'>
             {sessions.slice(0, 3).map((session) => (
               <li
                 key={session.id}
@@ -139,21 +140,21 @@ export function SessionControls({
                   'flex items-center justify-between p-3 bg-background rounded border transition-colors',
                   'hover:bg-muted/50',
                 )}
-                role="listitem"
+                role='listitem'
                 aria-label={`Session ${session.id}, status: ${session.status}`}
               >
                 <div>
-                  <div className="text-sm font-medium">
+                  <div className='text-sm font-medium'>
                     Session {session.id}
                   </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className='text-muted-foreground text-xs'>
                     {new Date(session.startTime).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </div>
                   {session.endTime && (
-                    <div className="text-xs text-muted-foreground">
+                    <div className='text-muted-foreground text-xs'>
                       Ended:{' '}
                       {new Date(session.endTime).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -166,11 +167,11 @@ export function SessionControls({
                   className={cn(
                     'px-2 py-1 text-xs rounded-full whitespace-nowrap',
                     session.status === 'active' &&
-                    'bg-green-100 text-green-800',
+                      'bg-green-100 text-green-800',
                     session.status === 'paused' &&
-                    'bg-yellow-100 text-yellow-800',
+                      'bg-yellow-100 text-yellow-800',
                     session.status === 'completed' &&
-                    'bg-blue-100 text-blue-800',
+                      'bg-blue-100 text-blue-800',
                     session.status === 'cancelled' && 'bg-red-100 text-red-800',
                   )}
                 >

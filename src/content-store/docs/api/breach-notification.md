@@ -13,7 +13,9 @@ author: 'Pixelated Team'
 
 ## Overview
 
-The Breach Notification API provides programmatic access to our HIPAA-compliant security breach notification system. This API allows you to report security breaches, manage notifications, and monitor breach status.
+The Breach Notification API provides programmatic access to our HIPAA-compliant
+security breach notification system. This API allows you to report security
+breaches, manage notifications, and monitor breach status.
 
 ## Authentication
 
@@ -345,7 +347,8 @@ Retrieves analytics data for breaches.
 
 ### Webhook Events
 
-Subscribe to real-time updates by configuring webhooks in the Security Dashboard.
+Subscribe to real-time updates by configuring webhooks in the Security
+Dashboard.
 
 Available events:
 
@@ -418,7 +421,6 @@ Official SDKs are available for:
 Example using TypeScript SDK:
 
 ```typescript
-
 const client = new BreachNotificationClient('your-api-key')
 
 async function reportBreach() {

@@ -1,4 +1,5 @@
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
+
 import { IntegrationPanel } from '../features/IntegrationPanel'
 
 export interface IntegrationPageProps {
@@ -12,4 +13,3 @@ export function IntegrationPage({ sessionId }: IntegrationPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

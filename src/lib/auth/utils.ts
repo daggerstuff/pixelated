@@ -3,8 +3,9 @@
  * Helper functions for authentication operations
  */
 
-import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
+import { nanoid } from 'nanoid'
+
 import { BCRYPT_CONFIG, PASSWORD_CONFIG } from './config'
 
 /**

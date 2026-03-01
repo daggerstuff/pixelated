@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   getSource,
   initiateDiscovery,
@@ -112,7 +113,7 @@ export const useDiscoveryInitiateMutation = (sessionId: string | null) => {
     mutationFn: (payload: DiscoveryInitiatePayload) =>
       initiateDiscovery(sessionId ?? '', payload),
     onSuccess: (result: DiscoveryResponse) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.discovery.list(result.sessionId, {}),
         exact: false,
       })
@@ -143,5 +144,3 @@ export const useDiscoverySelection = () =>
     highlightSourceId: state.highlightSourceId,
     setHighlightSourceId: state.setHighlightSourceId,
   }))
-
-

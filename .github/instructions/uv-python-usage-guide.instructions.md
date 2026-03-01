@@ -1,11 +1,14 @@
 ---
 applyTo: '**/*.py,pyproject.toml'
-description: 'A comprehensive guide to using UV for Python project management, covering installation, environment management, package handling, and best practices.'
+description:
+  'A comprehensive guide to using UV for Python project management, covering
+  installation, environment management, package handling, and best practices.'
 ---
 
 # UV Python Project Management Guide
 
 ## Table of Contents
+
 - Introduction
 - Installation
 - Managing Python Versions
@@ -24,11 +27,14 @@ description: 'A comprehensive guide to using UV for Python project management, c
 
 ## Introduction
 
-UV is a modern Python package manager and virtual environment tool that offers significant performance improvements over traditional tools like pip and venv. This guide covers how to effectively use UV for Python project management.
+UV is a modern Python package manager and virtual environment tool that offers
+significant performance improvements over traditional tools like pip and venv.
+This guide covers how to effectively use UV for Python project management.
 
 ## Installation
 
 ### macOS
+
 ```bash
 # Using Homebrew
 brew install uv
@@ -38,12 +44,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### Linux
+
 ```bash
 # Using the installer script
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### Windows
+
 ```powershell
 # Using winget
 winget install --id=astral-sh.uv -e
@@ -54,9 +62,11 @@ scoop install main/uv
 
 ## Managing Python Versions
 
-UV can manage Python installations for you. Here's how to work with Python versions:
+UV can manage Python installations for you. Here's how to work with Python
+versions:
 
 ### Installing Python
+
 ```bash
 # Install latest Python version
 uv python install
@@ -72,6 +82,7 @@ uv python install pypy@3.10
 ```
 
 ### Listing Python Versions
+
 ```bash
 # List available and installed versions
 uv python list
@@ -84,6 +95,7 @@ uv python list --only-installed
 ```
 
 ### Finding Python Executables
+
 ```bash
 # Find default Python
 uv python find
@@ -97,6 +109,7 @@ uv python find >=3.11
 UV provides robust project management capabilities through its project system.
 
 ### Creating a New Project
+
 ```bash
 # Create a new project
 uv init my-project
@@ -109,12 +122,14 @@ uv init
 ```
 
 This creates:
+
 - `pyproject.toml` - Project configuration and dependencies
 - `.python-version` - Python version specification
 - `README.md` - Project documentation
 - `main.py` - Initial Python file
 
 ### Project Structure
+
 ```
 my-project/
 ├── .venv/               # Virtual environment (created on first use)
@@ -145,9 +160,11 @@ uv sync
 
 ## Virtual Environment Management
 
-UV automatically manages virtual environments for projects and can work with existing environments.
+UV automatically manages virtual environments for projects and can work with
+existing environments.
 
 ### Creating Virtual Environments
+
 ```bash
 # Create venv in default location (.venv)
 uv venv
@@ -179,15 +196,18 @@ deactivate
 ### Using Existing Environments
 
 UV automatically detects and uses virtual environments in the following order:
+
 1. Active virtual environment (VIRTUAL_ENV)
 2. Active Conda environment (CONDA_PREFIX)
 3. `.venv` in current or parent directories
 
 ## Package Management
 
-UV provides both high-level project commands and pip-compatible commands for package management.
+UV provides both high-level project commands and pip-compatible commands for
+package management.
 
 ### Project-Based Package Management
+
 ```bash
 # Add package to project
 uv add package-name
@@ -203,6 +223,7 @@ uv lock
 ```
 
 ### Pip-Compatible Commands
+
 ```bash
 # Install packages
 uv pip install package-name
@@ -227,6 +248,7 @@ uv pip freeze > requirements.txt
 ## Advanced Configuration
 
 ### pyproject.toml Configuration
+
 ```toml
 [project]
 name = "my-project"
@@ -254,6 +276,7 @@ python-version = "3.12"
 ```
 
 ### UV Configuration Options
+
 ```toml
 [tool.uv]
 # Package index configuration
@@ -274,6 +297,7 @@ cache-dir = "~/.cache/uv"
 ```
 
 ### Environment-Specific Settings
+
 ```toml
 [tool.uv.env]
 development = { extras = ["dev", "test"] }
@@ -283,6 +307,7 @@ production = { extras = [] }
 ## Development Workflows
 
 ### Local Development Setup
+
 ```bash
 # Initialize new project
 uv init my-project
@@ -311,6 +336,7 @@ uv run pre-commit install
 ```
 
 ### CI/CD Integration
+
 ```yaml
 # .github/workflows/python-ci.yml
 name: Python CI
@@ -321,23 +347,24 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    
-    - name: Install UV
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      - uses: actions/checkout@v5
 
-    - name: Setup Python
-      run: uv python install 3.12
+      - name: Install UV
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-    - name: Install dependencies
-      run: |
-        uv pip install -e ".[test]"
-        
-    - name: Run tests
-      run: uv run pytest
+      - name: Setup Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: |
+          uv pip install -e ".[test]"
+
+      - name: Run tests
+        run: uv run pytest
 ```
 
 ### Working with Multiple Python Versions
+
 ```bash
 # Create test environments
 for version in 3.8 3.9 3.10 3.11 3.12; do
@@ -352,6 +379,7 @@ done
 ## Best Practices
 
 ### 1. Project Structure
+
 ```
 my-project/
 ├── .git/
@@ -374,6 +402,7 @@ my-project/
 ```
 
 ### 2. Version Control Best Practices
+
 ```gitignore
 # .gitignore
 .venv/
@@ -389,7 +418,9 @@ build/
 ```
 
 ### 3. Dependency Management
+
 - Use semantic versioning for dependencies:
+
   ```toml
   dependencies = [
       "requests~=2.28.0",     # Compatible releases (>=2.28.0, <2.29.0)
@@ -399,15 +430,17 @@ build/
   ```
 
 - Lock dependencies for reproducibility:
+
   ```bash
   # Update lockfile
   uv lock
-  
+
   # Sync environment with lockfile
   uv sync
   ```
 
 ### 4. Testing and Quality Assurance
+
 ```bash
 # Install test dependencies
 uv add --dev pytest pytest-cov black mypy ruff
@@ -423,18 +456,21 @@ uv run ruff check src/my_project
 ```
 
 ### 5. Documentation
+
 - Use docstrings for all public APIs
 - Maintain up-to-date README.md
 - Document environment setup requirements
 - Include example usage
 
 ### 6. Security Best Practices
+
 - Keep UV and Python updated
 - Use UV's hash verification
 - Audit dependencies regularly
 - Use private package indexes securely
 
 ### 7. Performance Optimization
+
 - Use UV's concurrent downloads
 - Leverage caching effectively
 - Optimize dependency resolution
@@ -443,6 +479,7 @@ uv run ruff check src/my_project
 ## Security Considerations
 
 ### Package Verification
+
 ```bash
 # Enable hash verification
 uv pip install --require-hashes -r requirements.txt
@@ -452,6 +489,7 @@ uv pip freeze --all --require-hashes > requirements.txt
 ```
 
 ### Private Package Indexes
+
 ```toml
 [tool.uv]
 [[tool.uv.index]]
@@ -461,6 +499,7 @@ password = "${PYPI_PASSWORD}"
 ```
 
 ### Dependency Auditing
+
 ```bash
 # Install safety checker
 uv tool install safety
@@ -472,6 +511,7 @@ safety check
 ## Performance Optimization
 
 ### Caching Configuration
+
 ```bash
 # Set custom cache directory
 export UV_CACHE_DIR="/path/to/cache"
@@ -484,6 +524,7 @@ uv cache prune
 ```
 
 ### Build Optimization
+
 ```bash
 # Set concurrent build limit
 export UV_CONCURRENT_BUILDS=4
@@ -497,15 +538,17 @@ uv pip install --no-build-isolation package-name
 ### Common Issues and Solutions
 
 1. **Package Installation Failures**
+
    ```bash
    # Try with --verbose for more information
    uv pip install --verbose package-name
-   
+
    # Force reinstall
    uv pip install --force-reinstall package-name
    ```
 
 2. **Virtual Environment Issues**
+
    ```bash
    # Recreate virtual environment
    rm -rf .venv
@@ -514,15 +557,17 @@ uv pip install --no-build-isolation package-name
    ```
 
 3. **Dependency Conflicts**
+
    ```bash
    # Check for conflicts
    uv pip check
-   
+
    # Show dependency tree
    uv pip tree
    ```
 
 ### Debug Mode
+
 ```bash
 # Enable debug logging
 export RUST_LOG=debug
@@ -532,6 +577,7 @@ uv pip install package-name
 ## Environment Variables
 
 ### Common Environment Variables
+
 ```bash
 # Cache configuration
 export UV_CACHE_DIR="/path/to/cache"
@@ -553,37 +599,40 @@ export UV_NO_BUILD_ISOLATION=1
 ## Tool Integration
 
 ### Editor Integration (VSCode)
+
 ```json
 {
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-    "python.analysis.typeCheckingMode": "basic",
-    "python.formatting.provider": "black",
-    "python.linting.enabled": true,
-    "python.linting.lintOnSave": true
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.formatting.provider": "black",
+  "python.linting.enabled": true,
+  "python.linting.lintOnSave": true
 }
 ```
 
 ### Pre-commit Integration
+
 ```yaml
 # .pre-commit-config.yaml
 repos:
--   repo: https://github.com/astral-sh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.3.0
     hooks:
-    -   id: ruff
+      - id: ruff
         args: [--fix]
--   repo: https://github.com/psf/black
+  - repo: https://github.com/psf/black
     rev: 24.2.0
     hooks:
-    -   id: black
--   repo: https://github.com/pre-commit/mirrors-mypy
+      - id: black
+  - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:
-    -   id: mypy
+      - id: mypy
         additional_dependencies: [types-all]
 ```
 
 ### Docker Integration
+
 ```dockerfile
 FROM python:3.12-slim
 
@@ -602,6 +651,7 @@ CMD ["uv", "run", "python", "-m", "my_project"]
 ## Advanced Package Management
 
 ### Monorepo Support
+
 ```
 monorepo/
 ├── .git/
@@ -620,6 +670,7 @@ monorepo/
 ```
 
 Root pyproject.toml for monorepo:
+
 ```toml
 [workspace]
 members = [
@@ -635,6 +686,7 @@ python-version = "3.12"
 ### Complex Dependency Scenarios
 
 1. **Git Dependencies with Specific References**
+
    ```toml
    dependencies = [
        "mypackage @ git+https://github.com/user/repo.git@main",
@@ -644,6 +696,7 @@ python-version = "3.12"
    ```
 
 2. **Local Development Dependencies**
+
    ```toml
    dependencies = [
        "mypackage @ file:///path/to/package",
@@ -664,15 +717,17 @@ python-version = "3.12"
 ### Advanced Installation Scenarios
 
 1. **Installing with Extras**
+
    ```bash
    # Install multiple extras
    uv add 'flask[async,dotenv]'
-   
+
    # Install all extras
    uv add 'flask[all]'
    ```
 
 2. **Platform-Specific Dependencies**
+
    ```toml
    [project.dependencies]
    pywin32 = { version = ">=305", markers = "sys_platform == 'win32'" }
@@ -703,6 +758,7 @@ python-version = "3.12"
    ```
 
 ### Package Publishing Workflow
+
 ```bash
 # Build distribution
 uv build
@@ -721,6 +777,7 @@ uv publish --oidc
 ```
 
 ### Advanced Cache Management
+
 ```bash
 # View cache information
 uv cache info
@@ -735,6 +792,7 @@ uv cache prune --older-than 30d
 ```
 
 ### Custom Index Configuration
+
 ```toml
 [tool.uv]
 # Configure multiple package indexes
@@ -761,6 +819,7 @@ retries = 3
 ## Common Commands Reference
 
 ### Project Commands
+
 ```bash
 uv init              # Create new project
 uv add              # Add dependency
@@ -771,6 +830,7 @@ uv run              # Run command in project environment
 ```
 
 ### Virtual Environment Commands
+
 ```bash
 uv venv             # Create virtual environment
 uv pip install      # Install packages
@@ -780,6 +840,7 @@ uv pip freeze       # Generate requirements.txt
 ```
 
 ### Python Management Commands
+
 ```bash
 uv python install   # Install Python
 uv python list      # List Python versions
@@ -788,8 +849,10 @@ uv python pin       # Pin Python version
 ```
 
 ### Tool Commands
+
 ```bash
 uvx                 # Run tool without installing
 uv tool install     # Install tool globally
 uv tool uninstall   # Remove tool
 uv tool list        # List installed tools
+```

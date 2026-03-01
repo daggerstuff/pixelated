@@ -1,8 +1,14 @@
-import type { VNode } from 'vue'
-import type { NavBarLayout } from '../types'
-import type { ProjectGroupsSchema } from '@/lib/schema'
+interface VNode {
+  type: string | object
+  props?: Record<string, any>
+  children?: string | VNode | Array<string | VNode>
+}
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
+
+import type { ProjectGroupsSchema } from '@/lib/schema'
+
+import type { NavBarLayout } from '../types'
 
 /**
  * Slugify a string
@@ -24,7 +30,7 @@ export function slug(text: string): string {
 export function extractIconsStartingWithI(data: ProjectGroupsSchema): string[] {
   const icons = new Set<string>()
 
-  for (const [_, projects] of Object.entries(data)) {
+  for (const projects of Object.values(data)) {
     for (const project of projects) {
       if (project.icon?.startsWith('i')) {
         icons.add(project.icon)
@@ -123,7 +129,7 @@ export function unescapeHTML(node: VNode): VNode {
     return {
       ...node,
       children: children.map((child) =>
-        typeof child === 'object' ? unescapeHTML(child as VNode) : child,
+        typeof child === 'object' ? unescapeHTML(child) : child,
       ),
     }
   } else if (typeof children === 'object') {

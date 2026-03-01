@@ -1,11 +1,12 @@
+import type { CollectionEntry } from 'astro:content'
 import { describe, it, expect } from 'vitest'
+
 import {
   calculateReadingTime,
   calculateWordCount,
   formatBlogDate,
   validateBlogPost,
 } from '@/utils/blog'
-import type { CollectionEntry } from 'astro:content'
 
 describe('Blog utilities', () => {
   describe('calculateReadingTime', () => {

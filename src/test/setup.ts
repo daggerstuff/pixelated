@@ -29,7 +29,6 @@ declare module 'vitest' {
   }
 }
 
-
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {
@@ -38,20 +37,20 @@ if (typeof window !== 'undefined') {
       matches: false,
       media: query,
       onchange: null,
-      addListener: () => { },
-      removeListener: () => { },
-      addEventListener: () => { },
-      removeEventListener: () => { },
-      dispatchEvent: () => { },
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => {},
     }),
   })
 }
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
 }
 
 // Mock IntersectionObserver
@@ -60,9 +59,9 @@ global.IntersectionObserver = class MockIntersectionObserver {
   rootMargin = '0px'
   thresholds: ReadonlyArray<number> = [0]
 
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
@@ -94,9 +93,9 @@ global.URL.revokeObjectURL = vi.fn()
 
 // Mock console methods to reduce noise in tests
 beforeEach(() => {
-  vi.spyOn(console, 'log').mockImplementation(() => { })
-  vi.spyOn(console, 'warn').mockImplementation(() => { })
-  vi.spyOn(console, 'error').mockImplementation(() => { })
-  vi.spyOn(console, 'info').mockImplementation(() => { })
-  vi.spyOn(console, 'debug').mockImplementation(() => { })
+  vi.spyOn(console, 'log').mockImplementation(() => {})
+  vi.spyOn(console, 'warn').mockImplementation(() => {})
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  vi.spyOn(console, 'info').mockImplementation(() => {})
+  vi.spyOn(console, 'debug').mockImplementation(() => {})
 })

@@ -2,30 +2,33 @@
 
 ## Executive Summary
 
-The CPTSD dataset has been initially generated from Tim Fletcher transcripts
-(91 examples, 2026-01-26). This plan outlines a comprehensive approach to
-improve dataset quality, expand coverage with additional sources, and ensure
-therapeutic standards compliance.
+The CPTSD dataset has been initially generated from Tim Fletcher transcripts (91
+examples, 2026-01-26). This plan outlines a comprehensive approach to improve
+dataset quality, expand coverage with additional sources, and ensure therapeutic
+standards compliance.
 
 ## Current State Analysis
 
 ### Existing Dataset
 
 - **Source**: Tim Fletcher transcripts (91 files)
-- **Output**: `ai/training/ready_packages/data/generated/cptsd_transcripts.jsonl`
-- **S3 Location**: `s3://pixel-data/datasets/gdrive/processed/edge_cases/cptsd/cptsd_transcripts.jsonl`
+- **Output**:
+  `ai/training/ready_packages/data/generated/cptsd_transcripts.jsonl`
+- **S3 Location**:
+  `s3://pixel-data/datasets/gdrive/processed/edge_cases/cptsd/cptsd_transcripts.jsonl`
 - **Format**: ChatML with CPTSD-specific metadata
 - **Voice Profile**: Tim Fletcher voice profile integrated
 - **Chunking**: 1 chunk per file (max 6 chunks configured, only 1 used)
 - **Generated**: 2026-01-26
-- **Stats**: `ai/training/ready_packages/data/generated/cptsd_transcripts_stats.json`
+- **Stats**:
+  `ai/training/ready_packages/data/generated/cptsd_transcripts_stats.json`
 
 ### Identified Issues
 
 1. **Limited Source Diversity**: Only Tim Fletcher content processed
 2. **Underutilized Chunking**: Only 1 chunk per file despite 6-chunk capacity
-3. **Missing CPTSD-Specific Features**: No topic tagging, crisis detection,
-   or emotional flashback detection
+3. **Missing CPTSD-Specific Features**: No topic tagging, crisis detection, or
+   emotional flashback detection
 4. **Incomplete Coverage**: Additional CPTSD sources available but not processed
 
 ## Workflow Diagram
@@ -91,7 +94,8 @@ graph TD
 ### 1.3 Identify Coverage Gaps
 
 - Analyze CPTSD topics covered in current 91 examples
-- Identify missing CPTSD subtopics (emotional flashbacks, triggers, recovery stages)
+- Identify missing CPTSD subtopics (emotional flashbacks, triggers, recovery
+  stages)
 - Map coverage against Pete Walker's CPTSD framework
 - Assess diversity of therapeutic approaches
 
@@ -200,8 +204,8 @@ Based on S3 manifest analysis, the following CPTSD sources are available:
 **CPTSD-Specific Crisis Indicators**:
 
 - **Self-Harm Ideation** (Severity: CRITICAL)
-  - Keywords: hurt myself, cut, burn, self-harm, self-injure, want to die,
-    end it all
+  - Keywords: hurt myself, cut, burn, self-harm, self-injure, want to die, end
+    it all
 
 - **Suicidal Thoughts** (Severity: CRITICAL)
   - Keywords: suicide, kill myself, not worth living, better off dead, ending it
@@ -326,8 +330,8 @@ CRISIS_THRESHOLD = 0.7  # Score above this triggers crisis flag
   flashbacks vs. actual flashback experiences
 - **Trauma Triggers**: Identify trigger language without flagging therapeutic
   trigger discussions
-- **Survival Responses**: Recognize fight/flight/freeze/fawn responses as
-  trauma responses, not crisis
+- **Survival Responses**: Recognize fight/flight/freeze/fawn responses as trauma
+  responses, not crisis
 - **Recovery Language**: Differentiate between crisis language and recovery
   journey language
 
@@ -361,7 +365,8 @@ CRISIS_THRESHOLD = 0.7  # Score above this triggers crisis flag
 
 **Script Enhancement**:
 
-- Modify `build_cptsd_dataset_from_transcripts.py` to support multiple source directories
+- Modify `build_cptsd_dataset_from_transcripts.py` to support multiple source
+  directories
 - Add source-specific voice profiles (Heidi Priebe, Patrick Teahan, etc.)
 - Implement source weighting for balanced representation
 - Add source diversity metrics
@@ -576,7 +581,8 @@ CRISIS_THRESHOLD = 0.7  # Score above this triggers crisis flag
 
 ### Qualitative Metrics
 
-- **Therapeutic Soundness**: All examples validated against trauma-informed standards
+- **Therapeutic Soundness**: All examples validated against trauma-informed
+  standards
 - **Crisis Handling**: Proper crisis signal detection and response
 - **Voice Diversity**: Multiple therapeutic voices represented
 - **Content Authenticity**: Genuine CPTSD experiences and guidance
@@ -610,21 +616,24 @@ CRISIS_THRESHOLD = 0.7  # Score above this triggers crisis flag
 
 ## Dependencies
 
-- **Existing Script**: `ai/training/ready_packages/scripts/build_cptsd_dataset_from_transcripts.py`
-- **Voice Profiles**: `ai/data/tim_fletcher_voice/tim_fletcher_voice_profile.json`
+- **Existing Script**:
+  `ai/training/ready_packages/scripts/build_cptsd_dataset_from_transcripts.py`
+- **Voice Profiles**:
+  `ai/data/tim_fletcher_voice/tim_fletcher_voice_profile.json`
 - **S3 Manifest**: `ai/training/ready_packages/data/s3_manifest.json`
-- **Quality Pipeline**: Existing validation scripts in `ai/training/ready_packages/scripts/`
+- **Quality Pipeline**: Existing validation scripts in
+  `ai/training/ready_packages/scripts/`
 
 ## Resources
 
 - **Pete Walker's CPTSD Framework**: Complex PTSD: From Surviving to Thriving
 - **Trauma-Informed Care Guidelines**: SAMHSA Trauma-Informed Care
   Implementation Resource Center
-- **Crisis Intervention Standards**: National Suicide Prevention Lifeline protocols
+- **Crisis Intervention Standards**: National Suicide Prevention Lifeline
+  protocols
 - **HIPAA Privacy Standards**: 45 CFR Parts 160 and 164
 
 ---
 
-**Document Version**: 1.0
-**Created**: 2026-02-10
-**Status**: Draft - Pending Review
+**Document Version**: 1.0 **Created**: 2026-02-10 **Status**: Draft - Pending
+Review

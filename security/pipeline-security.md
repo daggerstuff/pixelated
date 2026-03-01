@@ -39,6 +39,7 @@
 ## Security Best Practices Implemented
 
 ### Container Security
+
 - ✅ Non-root user (UID 1001)
 - ✅ Read-only filesystem
 - ✅ Dropped all capabilities except essential ones
@@ -48,6 +49,7 @@
 - ✅ Security options enabled
 
 ### Build Security
+
 - ✅ Multi-stage builds to minimize attack surface
 - ✅ Security updates in base images
 - ✅ Dependency vulnerability scanning
@@ -56,6 +58,7 @@
 - ✅ Secret detection
 
 ### Deployment Security
+
 - ✅ Blue-green deployment strategy
 - ✅ Health checks before marking deployment successful
 - ✅ Automatic rollback capability
@@ -64,6 +67,7 @@
 - ✅ Network security (proper port exposure)
 
 ### Pipeline Security
+
 - ✅ Secrets stored in GitLab CI/CD variables (masked & protected)
 - ✅ No hardcoded credentials in code
 - ✅ Proper error handling without exposing sensitive data
@@ -84,16 +88,19 @@
 ## SSH Key Setup
 
 1. Generate SSH key pair:
+
    ```bash
    ssh-keygen -t ed25519 -C "gitlab-ci@pixelated" -f ~/.ssh/gitlab_ci_key
    ```
 
 2. Add public key to your VPS:
+
    ```bash
    ssh-copy-id -i ~/.ssh/gitlab_ci_key.pub user@your-vps
    ```
 
 3. Convert private key to single line for GitLab:
+
    ```bash
    awk '{printf "%s\\n", $0}' ~/.ssh/gitlab_ci_key
    ```
@@ -113,16 +120,19 @@ The pipeline includes comprehensive monitoring:
 ## Troubleshooting Common Issues
 
 ### Build Failures
+
 - Check resource limits if builds fail with OOM errors
 - Verify all required secrets are configured
 - Check Docker registry connectivity
 
 ### Deployment Failures
+
 - Verify SSH connectivity to VPS
 - Check VPS Docker installation
 - Validate health check endpoints
 
 ### Security Scan Failures
+
 - Review vulnerability reports in GitLab Security Dashboard
 - Update dependencies to fix known vulnerabilities
 - Consider accepting risk for false positives
@@ -130,12 +140,14 @@ The pipeline includes comprehensive monitoring:
 ## Emergency Procedures
 
 ### Rollback Deployment
+
 1. Go to GitLab → CI/CD → Pipelines
 2. Find the last successful deployment
 3. Click "Rollback" button
 4. Monitor health checks
 
 ### Security Incident Response
+
 1. Immediately revoke compromised credentials
 2. Rotate all secrets in GitLab CI/CD variables
 3. Review security scan results
@@ -144,10 +156,12 @@ The pipeline includes comprehensive monitoring:
 ## Compliance and Auditing
 
 The pipeline generates comprehensive audit trails:
+
 - Build logs with timestamps
 - Security scan reports
 - Deployment history
 - Health check results
 - Resource usage metrics
 
-All artifacts are retained according to GitLab's retention policies and can be used for compliance reporting.
+All artifacts are retained according to GitLab's retention policies and can be
+used for compliance reporting.

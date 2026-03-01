@@ -175,18 +175,18 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
   }, [data, height])
 
   return (
-    <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-600/30">
-      <h3 className="text-lg font-semibold text-blue-200 mb-4">{title}</h3>
-      <div className="relative">
+    <div className='bg-gray-800/50 border-gray-600/30 rounded-lg border p-6'>
+      <h3 className='text-blue-200 mb-4 text-lg font-semibold'>{title}</h3>
+      <div className='relative'>
         <canvas
           ref={canvasRef}
-          className="w-full"
+          className='w-full'
           style={{ height: `${height}px` }}
         />
         {data.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">📊</div>
+          <div className='text-gray-400 absolute inset-0 flex items-center justify-center'>
+            <div className='text-center'>
+              <div className='mb-2 text-4xl'>📊</div>
               <p>No data available</p>
             </div>
           </div>
