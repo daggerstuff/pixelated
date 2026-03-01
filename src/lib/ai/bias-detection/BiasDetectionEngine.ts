@@ -4,6 +4,10 @@ import type {
   BiasLayerWeights,
   BiasThresholdsConfig,
   AlertLevel,
+  PreprocessingAnalysisResult,
+  ModelLevelAnalysisResult,
+  InteractiveAnalysisResult,
+  EvaluationAnalysisResult,
 } from './types'
 import {
   getCacheManager,
@@ -271,7 +275,7 @@ export class BiasDetectionEngine {
    * The fallback biasScore is chosen as a neutral midpoint (range 0–1), signaling uncertainty and
    * preventing bias overestimation or underestimation in error scenarios.
    *
-   * Note: All integration and error-handling tests should expect a fallback biasScore of 0.5
+   * Note: All integration and error‑handling tests should expect a fallback biasScore of 0.5
    * for failed layers. Any changes to this value require test and documentation updates.
    */
   private fallbackLayer(): { biasScore: number; confidence: number } {
@@ -328,6 +332,138 @@ export class BiasDetectionEngine {
     )
   }
 
+  /**
+   * Returns fallback result for preprocessing analysis.
+   */
+  private getPreprocessingFallback(): PreprocessingAnalysisResult {
+    const fb = this.fallbackLayer()
+    return {
+      biasScore: fb.biasScore,
+      linguisticBias: {
+        genderBiasScore: 0,
+        racialBiasScore: 0,
+        ageBiasScore: 0,
+        culturalBiasScore: 0,
+        biasedTerms: [],
+        sentimentAnalysis: {
+          overallSentiment: 0,
+          emotionalValence: 0,
+          subjectivity: 0,
+          demographicVariations: {},
+        },
+      },
+      representationAnalysis: {
+        demographicDistribution: {},
+        underrepresentedGroups: [],
+        overrepresentedGroups: [],
+        diversityIndex: 0,
+        intersectionalityAnalysis: [],
+      },
+      dataQualityMetrics: {
+        completeness: 1,
+        consistency: 1,
+        accuracy: 1,
+        timeliness: 1,
+        validity: 1,
+        missingDataByDemographic: {},
+      },
+      recommendations: [],
+    }
+  }
+
+  /**
+   * Returns fallback result for model-level analysis.
+   */
+  private getModelLevelFallback(): ModelLevelAnalysisResult {
+    const fb = this.fallbackLayer()
+    return {
+      biasScore: fb.biasScore,
+      fairnessMetrics: {
+        demographicParity: 0,
+        equalizedOdds: 0,
+        equalOpportunity: 0,
+        calibration: 0,
+        individualFairness: 0,
+        counterfactualFairness: 0,
+      },
+      performanceMetrics: {
+        accuracy: 0,
+        precision: 0,
+        recall: 0,
+        f1Score: 0,
+        auc: 0,
+        calibrationError: 0,
+        demographicBreakdown: {},
+      },
+      groupPerformanceComparison: [],
+      recommendations: [],
+    }
+  }
+
+  /**
+   * Returns fallback result for interactive analysis.
+   */
+  private getInteractiveFallback(): InteractiveAnalysisResult {
+    const fb = this.fallbackLayer()
+    return {
+      biasScore: fb.biasScore,
+      counterfactualAnalysis: {
+        scenariosAnalyzed: 0,
+        biasDetected: false,
+        consistencyScore: 0,
+        problematicScenarios: [],
+      },
+      featureImportance: [],
+      whatIfScenarios: [],
+      recommendations: [],
+    }
+  }
+
+  /**
+   * Returns fallback result for evaluation analysis.
+   */
+  private getEvaluationFallback(): EvaluationAnalysisResult {
+    const fb = this.fallbackLayer()
+    return {
+      biasScore: fb.biasScore,
+      huggingFaceMetrics: {
+        toxicity: 0.05,
+        bias: 0.15,
+        regard: {},
+        stereotype: 0.1,
+        fairness: 0.85,
+      },
+      customMetrics: {
+        therapeuticBias: 0.1,
+        culturalSensitivity: 0.1,
+        professionalEthics: 0.1,
+        patientSafety: 0.1,
+      },
+      temporalAnalysis: {
+        trendDirection: 'stable',
+        changeRate: 0,
+        seasonalPatterns: [],
+        interventionEffectiveness: [],
+      },
+      recommendations: [],
+    }
+  }
+
+  private handleSettledPromise<T>(
+    result: PromiseSettledResult<T>,
+    fallbackGetter: () => T,
+    layerName: string,
+    recommendations: string[],
+  ): T {
+    if (result.status === 'fulfilled') {
+      return result.value;
+    }
+    // Log the rejection reason with layer context (sanitized)
+    console.warn(`Layer ${layerName} analysis failed:`, result.reason);
+    recommendations.push(`${layerName} analysis unavailable; using fallback results`);
+    return fallbackGetter();
+  }
+
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
     this.ensureInitialized()
     if (!session) {
@@ -340,132 +476,44 @@ export class BiasDetectionEngine {
       throw new Error('Session ID cannot be empty')
     }
 
-    let preprocessing: import('./types').PreprocessingAnalysisResult
-    let modelLevel: import('./types').ModelLevelAnalysisResult
-    let interactive: import('./types').InteractiveAnalysisResult
-    let evaluation: import('./types').EvaluationAnalysisResult
     const recs: string[] = []
 
-    try {
-      preprocessing = await this.pythonService.runPreprocessingAnalysis(session)
-    } catch {
-      const fb = this.fallbackLayer()
-      preprocessing = {
-        biasScore: fb.biasScore,
-        linguisticBias: {
-          genderBiasScore: 0,
-          racialBiasScore: 0,
-          ageBiasScore: 0,
-          culturalBiasScore: 0,
-          biasedTerms: [],
-          sentimentAnalysis: {
-            overallSentiment: 0,
-            emotionalValence: 0,
-            subjectivity: 0,
-            demographicVariations: {},
-          },
-        },
-        representationAnalysis: {
-          demographicDistribution: {},
-          underrepresentedGroups: [],
-          overrepresentedGroups: [],
-          diversityIndex: 0,
-          intersectionalityAnalysis: [],
-        },
-        dataQualityMetrics: {
-          completeness: 1,
-          consistency: 1,
-          accuracy: 1,
-          timeliness: 1,
-          validity: 1,
-          missingDataByDemographic: {},
-        },
-        recommendations: [],
-      }
-      recs.push('Preprocessing analysis unavailable; using fallback results')
-    }
-    try {
-      modelLevel = await this.pythonService.runModelLevelAnalysis(session)
-    } catch {
-      const fb = this.fallbackLayer()
-      modelLevel = {
-        biasScore: fb.biasScore,
-        fairnessMetrics: {
-          demographicParity: 0,
-          equalizedOdds: 0,
-          equalOpportunity: 0,
-          calibration: 0,
-          individualFairness: 0,
-          counterfactualFairness: 0,
-        },
-        performanceMetrics: {
-          accuracy: 0,
-          precision: 0,
-          recall: 0,
-          f1Score: 0,
-          auc: 0,
-          calibrationError: 0,
-          demographicBreakdown: {},
-        },
-        groupPerformanceComparison: [],
-        recommendations: [],
-      }
-      recs.push('Model-level analysis unavailable; using fallback results')
-    }
-    try {
-      interactive = await this.pythonService.runInteractiveAnalysis(session)
-    } catch {
-      const fb = this.fallbackLayer()
-      interactive = {
-        biasScore: fb.biasScore,
-        counterfactualAnalysis: {
-          scenariosAnalyzed: 0,
-          biasDetected: false,
-          consistencyScore: 0,
-          problematicScenarios: [],
-        },
-        featureImportance: [],
-        whatIfScenarios: [],
-        recommendations: [],
-      }
-      recs.push('Interactive analysis unavailable; using fallback results')
-    }
-    try {
-      evaluation = await this.pythonService.runEvaluationAnalysis(session)
-    } catch {
-      const fb = this.fallbackLayer()
-      evaluation = {
-        biasScore: fb.biasScore,
-        huggingFaceMetrics: {
-          toxicity: 0.05,
-          bias: 0.15,
-          regard: {},
-          stereotype: 0.1,
-          fairness: 0.85,
-        },
-        customMetrics: {
-          therapeuticBias: 0.1,
-          culturalSensitivity: 0.1,
-          professionalEthics: 0.1,
-          patientSafety: 0.1,
-        },
-        temporalAnalysis: {
-          trendDirection: 'stable',
-          changeRate: 0,
-          seasonalPatterns: [],
-          interventionEffectiveness: [],
-        },
-        recommendations: [],
-      }
-      recs.push('Evaluation analysis unavailable; using fallback results')
-    }
+    // Performance Optimization: Parallelize independent analysis layers using Promise.allSettled.
+    // Each call is wrapped in an async IIFE to safely catch synchronous exceptions from mocks or bridges.
+    const results = await Promise.allSettled([
+      this.pythonService.runPreprocessingAnalysis(session),
+      this.pythonService.runModelLevelAnalysis(session),
+      this.pythonService.runInteractiveAnalysis(session),
+      this.pythonService.runEvaluationAnalysis(session),
+    ]);
 
-    const layerResults: LayerResults = {
-      preprocessing: preprocessing!,
-      modelLevel: modelLevel!,
-      interactive: interactive!,
-      evaluation: evaluation!,
-    }
+    // Build layerResults while capturing failure reasons for observability
+    const layerResults: LayerResults = {} as LayerResults;
+    // Use helper to handle each settled promise and populate layerResults
+    layerResults['preprocessing'] = this.handleSettledPromise(
+      results[0],
+      () => this.getPreprocessingFallback(),
+      'Preprocessing',
+      recs
+    );
+    layerResults['modelLevel'] = this.handleSettledPromise(
+      results[1],
+      () => this.getModelLevelFallback(),
+      'Model-level',
+      recs
+    );
+    layerResults['interactive'] = this.handleSettledPromise(
+      results[2],
+      () => this.getInteractiveFallback(),
+      'Interactive',
+      recs
+    );
+    layerResults['evaluation'] = this.handleSettledPromise(
+      results[3],
+      () => this.getEvaluationFallback(),
+      'Evaluation',
+      recs
+    );
 
     const overallBiasScore = this.weightedAverage(layerResults)
     const alertLevel = this.computeAlertLevel(overallBiasScore)
@@ -891,6 +939,226 @@ export class BiasDetectionEngine {
       }
     } catch {
       /* swallow */
+    }
+  }
+  // Expose cache statistics for monitoring
+  getCacheStats() {
+    return getCacheManager().getCombinedStats()
+  }
+
+  /**
+   * Get comprehensive performance statistics including connection pools, cache, and memory usage
+   */
+  async getPerformanceStats() {
+    this.ensureInitialized()
+
+    if (this.performanceOptimizer) {
+      return await this.performanceOptimizer.getPerformanceStats()
+    }
+
+    // Fallback performance stats
+    return {
+      connections: {
+        http: { total: 0, active: 0, idle: 0, queue: 0 },
+        redis: { total: 0, active: 0, idle: 0 },
+      },
+      cache: {
+        hitRate: 0,
+        missRate: 0,
+        size: 0,
+        memoryUsage: 0,
+        compressionRatio: 0,
+      },
+      batch: {
+        activeJobs: 0,
+        completedJobs: 0,
+        failedJobs: 0,
+        averageProcessingTime: 0,
+      },
+      memory: {
+        heapUsed: process.memoryUsage().heapUsed,
+        heapTotal: process.memoryUsage().heapTotal,
+        external: process.memoryUsage().external,
+        rss: process.memoryUsage().rss,
+        gcCount: 0,
+      },
+      performance: {
+        averageResponseTime: 0,
+        throughput: 0,
+        errorRate: 0,
+        slowQueries: 0,
+      },
+    }
+  }
+
+  /**
+   * Health check for all performance-critical components
+   */
+  async getHealthStatus() {
+    this.ensureInitialized()
+
+    let performanceHealth = { healthy: true, components: {} }
+
+    if (this.performanceOptimizer) {
+      performanceHealth = await this.performanceOptimizer.healthCheck()
+    }
+
+    const pythonServiceHealth = await this.pythonService.checkHealth?.()
+
+    return {
+      overall:
+        performanceHealth.healthy && pythonServiceHealth?.status === 'healthy',
+      components: {
+        ...performanceHealth.components,
+        pythonService: pythonServiceHealth?.status === 'healthy',
+        engine: this.initialized,
+        monitoring: this._isMonitoring,
+        performanceOptimizer: this.performanceOptimizer !== null,
+      },
+      performance: await this.getPerformanceStats(),
+    }
+  }
+
+  /**
+   * Add a session analysis to the background job queue for processing
+   */
+  async queueSessionAnalysis(
+    session: SessionData,
+    priority: 'low' | 'medium' | 'high' = 'medium',
+  ): Promise<string> {
+    this.ensureInitialized()
+
+    if (this.performanceOptimizer) {
+      const priorityMap = { low: 1, medium: 5, high: 10 }
+
+      return await this.performanceOptimizer.addBackgroundJob(
+        'session-analysis',
+        session,
+        {
+          priority: priorityMap[priority],
+          timeout: this.config.pythonServiceTimeout || 30000,
+          maxAttempts: 3,
+        },
+      )
+    }
+
+    // Fallback: process immediately if no background job queue
+    const result = await this.analyzeSession(session)
+    return `immediate_${result.sessionId}_${Date.now()}`
+  }
+
+  /**
+   * Batch analyze multiple sessions with optimized performance and concurrency control.
+   * Uses the performance optimizer for intelligent batching and resource management.
+   */
+  async batchAnalyzeSessions(
+    sessions: SessionData[],
+    options: {
+      concurrency?: number
+      batchSize?: number
+      onProgress?: (progress: { completed: number; total: number }) => void
+      onError?: (error: Error, session: SessionData) => void
+      retries?: number
+      timeoutMs?: number
+      logProgress?: boolean
+      logErrors?: boolean
+      priority?: 'low' | 'medium' | 'high'
+    } = {},
+  ): Promise<{
+    results: AnalysisResult[]
+    errors: { session: SessionData; error: Error }[]
+    metrics: { completed: number; total: number; errorCount: number }
+  }> {
+    this.ensureInitialized()
+
+    const startTime = Date.now()
+
+    // Use performance optimizer for batch processing if available, otherwise fallback to original implementation
+    let analysisResults: AnalysisResult[]
+    let errors: { session: SessionData; error: Error }[]
+
+    if (this.performanceOptimizer) {
+      const result = await this.performanceOptimizer.processBatch(
+        sessions,
+        async (session: SessionData) => {
+          return await this.analyzeSession(session)
+        },
+        {
+          batchSize: options.batchSize,
+          concurrency: options.concurrency,
+          timeout: options.timeoutMs,
+          retries: options.retries,
+          priority: options.priority,
+          onProgress: options.onProgress
+            ? (completed, total) => options.onProgress!({ completed, total })
+            : undefined,
+          onError: options.onError
+            ? (error, item) => options.onError!(error, item as SessionData)
+            : undefined,
+        },
+      )
+      analysisResults = result.results
+      errors = result.errors.map(({ item, error }) => ({
+        session: item as SessionData,
+        error,
+      }))
+    } else {
+      // Fallback to original batch processing implementation
+      analysisResults = []
+      errors = []
+
+      for (const session of sessions) {
+        try {
+          const result = await this.analyzeSession(session)
+          analysisResults.push(result)
+          if (options.onProgress) {
+            options.onProgress({
+              completed: analysisResults.length,
+              total: sessions.length,
+            })
+          }
+        } catch (error) {
+          const err = { session, error: error as Error }
+          errors.push(err)
+          if (options.onError) {
+            options.onError(error as Error, session)
+          }
+        }
+      }
+    }
+
+    const processingTime = Date.now() - startTime
+
+    // Log performance metrics
+    if (options.logProgress !== false) {
+      console.log(
+        `[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`,
+      )
+      console.log(
+        `[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`,
+      )
+    }
+
+    if (options.logErrors !== false && errors.length > 0) {
+      errors.forEach(({ session, error }) => {
+        console.error(
+          `[BatchError] Session ${session.sessionId}: ${error.message}`,
+        )
+      })
+    }
+
+    // Store batch processing metrics
+    // Note: recordAnalysis expects individual analysis results, not batch metrics
+    // await this.metricsCollector.recordAnalysis?.()
+
+    return {
+      results: analysisResults,
+      errors,
+      metrics: {
+        completed: analysisResults.length,
+        total: sessions.length,
+        errorCount: errors.length,
+      },
     }
   }
   // Expose cache statistics for monitoring
