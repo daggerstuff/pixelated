@@ -134,9 +134,9 @@
     border-color: #e53e3e transparent transparent transparent;
   }
 
-  input:focus[aria-invalid='true'] + .error-label,
-  textarea:focus[aria-invalid='true'] + .error-label,
-  select:focus[aria-invalid='true'] + .error-label {
+  input:focus[aria-invalid='true'] ~ .error-label,
+  textarea:focus[aria-invalid='true'] ~ .error-label,
+  select:focus[aria-invalid='true'] ~ .error-label {
     opacity: 1;
     transform: translateY(0);
   }
