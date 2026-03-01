@@ -5,9 +5,9 @@
  * Can be run with: npm run initialize-models
  */
 
-import { KVStore } from '../lib/db/KVStore'
-import { PatientModelService } from '../lib/ai/services/PatientModelService'
 import sampleCognitiveModels from '../data/sample-cognitive-models'
+import { PatientModelService } from '../lib/ai/services/PatientModelService'
+import { KVStore } from '../lib/db/KVStore'
 
 async function main() {
   console.log('===================================================')

@@ -1,4 +1,18 @@
 import { useState, useEffect } from 'react'
+import { z } from 'zod'
+
+import {
+  ErrorMessage,
+  FieldError,
+} from '@/components/journal-research/shared/ErrorMessage'
+import { Button } from '@/components/ui/button/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
 import {
   CreateSessionPayloadSchema,
   UpdateSessionPayloadSchema,
@@ -6,17 +20,14 @@ import {
   type UpdateSessionPayload,
   type Session,
 } from '@/lib/api/journal-research/types'
-import { z } from 'zod'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button/button'
-import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import { cn } from '@/lib/utils'
 
 export interface SessionFormProps {
   session?: Session
-  onSubmit: (data: CreateSessionPayload | UpdateSessionPayload) => void | Promise<void>
+  onSubmit: (
+    data: CreateSessionPayload | UpdateSessionPayload,
+  ) => void | Promise<void>
   onCancel?: () => void
   isLoading?: boolean
   className?: string
@@ -32,9 +43,13 @@ export function SessionForm({
   className,
 }: SessionFormProps) {
   const isEdit = !!session
-  const schema = isEdit ? UpdateSessionPayloadSchema : CreateSessionPayloadSchema
+  const schema = isEdit
+    ? UpdateSessionPayloadSchema
+    : CreateSessionPayloadSchema
 
-  const [formData, setFormData] = useState<CreateSessionPayload | UpdateSessionPayload>({
+  const [formData, setFormData] = useState<
+    CreateSessionPayload | UpdateSessionPayload
+  >({
     sessionId: session?.sessionId,
     targetSources: session?.targetSources ?? ['pubmed', 'doaj'],
     searchKeywords: session?.searchKeywords ?? {},
@@ -88,9 +103,8 @@ export function SessionForm({
       const validated = schema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -113,7 +127,7 @@ export function SessionForm({
     const keywords = formData.searchKeywords ?? {}
     const category = keywordCategory || 'default'
     const categoryKeywords = keywords[category] ?? []
-    
+
     if (!categoryKeywords.includes(keywordInput.trim())) {
       setFormData({
         ...formData,
@@ -157,13 +171,13 @@ export function SessionForm({
         <CardTitle>{isEdit ? 'Edit Session' : 'Create New Session'}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className='space-y-6'>
           {!isEdit && (
-            <div className="space-y-2">
-              <Label htmlFor="sessionId">Session ID (optional)</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='sessionId'>Session ID (optional)</Label>
               <input
-                id="sessionId"
-                type="text"
+                id='sessionId'
+                type='text'
                 value={(formData as CreateSessionPayload).sessionId ?? ''}
                 onChange={(e) => {
                   setFormData({ ...formData, sessionId: e.target.value })
@@ -173,7 +187,10 @@ export function SessionForm({
                 }}
                 onBlur={() => {
                   setTouched((prev) => ({ ...prev, sessionId: true }))
-                  validateField('sessionId', (formData as CreateSessionPayload).sessionId)
+                  validateField(
+                    'sessionId',
+                    (formData as CreateSessionPayload).sessionId,
+                  )
                 }}
                 className={cn(
                   'w-full rounded-md border bg-background px-3 py-2 text-sm',
@@ -181,47 +198,57 @@ export function SessionForm({
                     ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                     : 'border-input',
                 )}
-                placeholder="Leave empty for auto-generated ID"
+                placeholder='Leave empty for auto-generated ID'
                 aria-invalid={!!errors.sessionId && touched.sessionId}
-                aria-describedby={errors.sessionId && touched.sessionId ? 'sessionId-error' : undefined}
+                aria-describedby={
+                  errors.sessionId && touched.sessionId
+                    ? 'sessionId-error'
+                    : undefined
+                }
               />
-              <FieldError error={errors.sessionId && touched.sessionId ? errors.sessionId : undefined} />
+              <FieldError
+                error={
+                  errors.sessionId && touched.sessionId
+                    ? errors.sessionId
+                    : undefined
+                }
+              />
             </div>
           )}
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Target Sources</Label>
-            <div className="flex flex-wrap gap-2">
+            <div className='flex flex-wrap gap-2'>
               {availableSources.map((source) => (
                 <label
                   key={source}
-                  className="flex cursor-pointer items-center gap-2 rounded-md border p-2 hover:bg-muted"
+                  className='hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2'
                 >
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={(formData.targetSources ?? []).includes(source)}
                     onChange={() => handleSourceToggle(source)}
-                    className="rounded"
+                    className='rounded'
                   />
-                  <span className="text-sm capitalize">{source}</span>
+                  <span className='text-sm capitalize'>{source}</span>
                 </label>
               ))}
             </div>
             <FieldError error={errors.targetSources} />
           </div>
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Search Keywords</Label>
-            <div className="flex gap-2">
+            <div className='flex gap-2'>
               <input
-                type="text"
+                type='text'
                 value={keywordCategory}
                 onChange={(e) => setKeywordCategory(e.target.value)}
-                placeholder="Category"
-                className="w-32 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder='Category'
+                className='border-input w-32 rounded-md border bg-background px-3 py-2 text-sm'
               />
               <input
-                type="text"
+                type='text'
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -230,37 +257,39 @@ export function SessionForm({
                     handleAddKeyword()
                   }
                 }}
-                placeholder="Enter keyword"
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder='Enter keyword'
+                className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
               />
               <Button
-                type="button"
+                type='button'
                 onClick={handleAddKeyword}
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
               >
                 Add
               </Button>
             </div>
-            <div className="mt-2 space-y-2">
+            <div className='mt-2 space-y-2'>
               {Object.entries(formData.searchKeywords ?? {}).map(
                 ([category, keywords]) =>
                   keywords.length > 0 && (
                     <div key={category}>
-                      <p className="mb-1 text-xs font-medium text-muted-foreground">
+                      <p className='text-muted-foreground mb-1 text-xs font-medium'>
                         {category}:
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className='flex flex-wrap gap-2'>
                         {keywords.map((keyword) => (
                           <span
                             key={keyword}
-                            className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
+                            className='bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs'
                           >
                             {keyword}
                             <button
-                              type="button"
-                              onClick={() => handleRemoveKeyword(category, keyword)}
-                              className="text-muted-foreground hover:text-foreground"
+                              type='button'
+                              onClick={() =>
+                                handleRemoveKeyword(category, keyword)
+                              }
+                              className='text-muted-foreground hover:text-foreground'
                               aria-label={`Remove ${keyword}`}
                             >
                               ×
@@ -274,25 +303,25 @@ export function SessionForm({
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Weekly Targets</Label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className='grid grid-cols-4 gap-2'>
               {['week1', 'week2', 'week3', 'week4'].map((week) => (
-                <div key={week} className="space-y-1">
-                  <Label htmlFor={week} className="text-xs capitalize">
+                <div key={week} className='space-y-1'>
+                  <Label htmlFor={week} className='text-xs capitalize'>
                     {week}
                   </Label>
                   <input
                     id={week}
-                    type="number"
-                    min="0"
+                    type='number'
+                    min='0'
                     value={
                       (formData.weeklyTargets ?? {})[week]?.toString() ?? '0'
                     }
                     onChange={(e) =>
                       handleWeeklyTargetChange(week, e.target.value)
                     }
-                    className="w-full rounded-md border border-input bg-background px-2 py-1 text-sm"
+                    className='border-input w-full rounded-md border bg-background px-2 py-1 text-sm'
                   />
                 </div>
               ))}
@@ -300,35 +329,39 @@ export function SessionForm({
           </div>
 
           {isEdit && 'currentPhase' in formData && (
-            <div className="space-y-2">
-              <Label htmlFor="currentPhase">Current Phase</Label>
+            <div className='space-y-2'>
+              <Label htmlFor='currentPhase'>Current Phase</Label>
               <select
-                id="currentPhase"
+                id='currentPhase'
                 value={formData.currentPhase ?? ''}
                 onChange={(e) =>
                   setFormData({ ...formData, currentPhase: e.target.value })
                 }
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                className='border-input w-full rounded-md border bg-background px-3 py-2 text-sm'
               >
-                <option value="discovery">Discovery</option>
-                <option value="evaluation">Evaluation</option>
-                <option value="acquisition">Acquisition</option>
-                <option value="integration">Integration</option>
-                <option value="reporting">Reporting</option>
+                <option value='discovery'>Discovery</option>
+                <option value='evaluation'>Evaluation</option>
+                <option value='acquisition'>Acquisition</option>
+                <option value='integration'>Integration</option>
+                <option value='reporting'>Reporting</option>
               </select>
             </div>
           )}
 
           <ErrorMessage error={submitError} fieldErrors={errors} />
 
-          <div className="flex justify-end gap-2">
+          <div className='flex justify-end gap-2'>
             {onCancel && (
-              <Button type="button" variant="outline" onClick={onCancel}>
+              <Button type='button' variant='outline' onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : isEdit ? 'Update Session' : 'Create Session'}
+            <Button type='submit' disabled={isLoading}>
+              {isLoading
+                ? 'Saving...'
+                : isEdit
+                  ? 'Update Session'
+                  : 'Create Session'}
             </Button>
           </div>
         </form>
@@ -336,4 +369,3 @@ export function SessionForm({
     </Card>
   )
 }
-

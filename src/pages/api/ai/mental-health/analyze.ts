@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
+
 import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
 import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
+
 import type { RoutingContext } from '../../../../lib/ai/mental-llama/types/mentalLLaMATypes.js'
 
 const logger = getApiEndpointLogger('mental-health-analyze')
@@ -197,8 +199,8 @@ export const POST: APIRoute = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     })
   } catch (error: unknown) {
@@ -209,7 +211,7 @@ export const POST: APIRoute = async ({ request }) => {
       ?.routingContext?.sessionId
     logger.error('Error analyzing mental health', {
       error: error instanceof Error ? String(error) : String(error),
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
       timing,
       textLength: text.length, // text might not be initialized if parsing failed early
       userId,

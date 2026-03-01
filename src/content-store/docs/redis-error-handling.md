@@ -13,13 +13,16 @@ author: 'Pixelated Team'
 
 ## Overview
 
-This guide provides comprehensive information about handling errors in the Redis service implementation. It covers error types, handling strategies, and best practices for maintaining a robust Redis integration.
+This guide provides comprehensive information about handling errors in the Redis
+service implementation. It covers error types, handling strategies, and best
+practices for maintaining a robust Redis integration.
 
 ## Error Types
 
 ### RedisServiceError
 
-The service uses a custom `RedisServiceError` class that extends the standard `Error` class:
+The service uses a custom `RedisServiceError` class that extends the standard
+`Error` class:
 
 ```typescript
 class RedisServiceError extends Error {

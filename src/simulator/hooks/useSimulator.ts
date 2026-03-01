@@ -1,11 +1,12 @@
 import { useState, useCallback, useEffect } from 'react'
+
+import { getScenarioById } from '../data/scenarios'
 import type { SimulationFeedback, Scenario } from '../types'
 import { TherapeuticTechnique, FeedbackType } from '../types'
 import {
   getUserConsentPreference,
   setUserConsentPreference,
 } from '../utils/privacy'
-import { getScenarioById } from '../data/scenarios'
 import { useAnonymizedMetrics } from './useAnonymizedMetrics'
 
 /**
@@ -38,7 +39,7 @@ export function useSimulator() {
   const startSimulation = useCallback(
     async (scenarioId: string) => {
       try {
-        const scenario = await getScenarioById(scenarioId)
+        const scenario =  getScenarioById(scenarioId)
         if (!scenario) {
           throw new Error(`Scenario with ID ${scenarioId} not found`)
         }

@@ -1,7 +1,7 @@
 // Define a basic FlexSearch integration
 import { promises as fs } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // Default options for flexsearch integration
 const defaultOptions = {

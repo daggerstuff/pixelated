@@ -11,9 +11,10 @@ author: 'Pixelated Team'
 
 ## WebSocket System
 
-The WebSocket system provides real-time communication capabilities for the therapy chat,
-notifications, and analytics features. It supports secure message transmission with Fully
-Homomorphic Encryption (FHE) and includes robust error handling and reconnection logic.
+The WebSocket system provides real-time communication capabilities for the
+therapy chat, notifications, and analytics features. It supports secure message
+transmission with Fully Homomorphic Encryption (FHE) and includes robust error
+handling and reconnection logic.
 
 ## Architecture
 
@@ -151,7 +152,7 @@ describe('TherapyChatWebSocketServer', () => {
   // Test connection handling
   // Test message processing
   // Test error scenarios
-});
+})
 ```
 
 ```typescript
@@ -159,7 +160,7 @@ describe('useWebSocket', () => {
   // Test connection lifecycle
   // Test message handling
   // Test reconnection logic
-});
+})
 ```
 
 ## Best Practices

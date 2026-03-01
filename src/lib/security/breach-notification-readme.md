@@ -1,6 +1,7 @@
 # Security Breach Notification System
 
-This system provides real-time notification capabilities for security breaches, compliant with HIPAA requirements and security best practices.
+This system provides real-time notification capabilities for security breaches,
+compliant with HIPAA requirements and security best practices.
 
 ## Setup
 
@@ -23,20 +24,21 @@ This system provides real-time notification capabilities for security breaches, 
 2. **Slack Webhook Setup**
 
    a. Go to your Slack workspace and create a new app (or use an existing one):
-      - Visit https://api.slack.com/apps
-      - Click "Create New App" → "From scratch"
-      - Name it "Security Breach Alerts" and select your workspace
+   - Visit https://api.slack.com/apps
+   - Click "Create New App" → "From scratch"
+   - Name it "Security Breach Alerts" and select your workspace
 
    b. Enable Incoming Webhooks:
-      - In the app settings, go to "Incoming Webhooks"
-      - Turn on "Activate Incoming Webhooks"
-      - Click "Add New Webhook to Workspace"
-      - Select the channel for security alerts (create a private #security-alerts channel if needed)
-      - Copy the webhook URL and add it to your .env file as SLACK_WEBHOOK
+   - In the app settings, go to "Incoming Webhooks"
+   - Turn on "Activate Incoming Webhooks"
+   - Click "Add New Webhook to Workspace"
+   - Select the channel for security alerts (create a private #security-alerts
+     channel if needed)
+   - Copy the webhook URL and add it to your .env file as SLACK_WEBHOOK
 
    c. Customize the app (optional):
-      - Set an app icon and description
-      - Add the app to your #security-alerts channel
+   - Set an app icon and description
+   - Add the app to your #security-alerts channel
 
 ## Usage
 
@@ -109,7 +111,8 @@ const testBreachId = await BreachNotificationSystem.runTestScenario({
 
 ## Slack Notification Format
 
-The system sends rich, formatted Slack notifications with the following elements:
+The system sends rich, formatted Slack notifications with the following
+elements:
 
 1. **Header** - Shows severity level with appropriate icons:
    - Critical: 🚨 RED alert
@@ -142,7 +145,8 @@ The system sends rich, formatted Slack notifications with the following elements
    - Critical and high severity breaches trigger immediate Slack notifications
    - All affected users receive email notifications
    - Internal stakeholders (specified in SECURITY_STAKEHOLDERS) are notified
-   - For breaches affecting 500+ users or marked as critical, authorities are notified (HHS)
+   - For breaches affecting 500+ users or marked as critical, authorities are
+     notified (HHS)
 
 2. The system tracks:
    - Notification status (pending, in-progress, completed)
@@ -153,18 +157,21 @@ The system sends rich, formatted Slack notifications with the following elements
 ## Security Considerations
 
 - All breach data is stored in Redis with appropriate TTL (Time To Live)
-- Sensitive breach details are encrypted using FHE (Fully Homomorphic Encryption)
+- Sensitive breach details are encrypted using FHE (Fully Homomorphic
+  Encryption)
 - Notification logs are maintained for compliance purposes
 - The system is designed to be fault-tolerant, with appropriate error handling
-- Slack notifications include compliance notices and follow secure formatting practices
+- Slack notifications include compliance notices and follow secure formatting
+  practices
 
 ## Compliance Information
 
 This system adheres to HIPAA Breach Notification Rule requirements:
+
 - Notification within 60 days for breaches affecting 500+ individuals
 - Annual reporting of smaller breaches
 - Proper documentation of all notification efforts
-- Retention of records for at least 6 years 
+- Retention of records for at least 6 years
 
 ## Troubleshooting
 
@@ -174,4 +181,5 @@ If Slack notifications aren't working:
 2. Ensure the Slack app has proper permissions for the channel
 3. Check network connectivity to Slack's API endpoints
 4. Examine logs for specific error messages
-5. Try running a test with `pnpm security:breach-test --severity high` to test the notification pipeline 
+5. Try running a test with `pnpm security:breach-test --severity high` to test
+   the notification pipeline

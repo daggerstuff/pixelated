@@ -3,11 +3,12 @@
  * High-performance bias analysis with caching, connection pooling, and ML model optimization
  */
 
-import { getPool, createContentHash, BiasAnalysisManager } from '@/lib/db'
-import { getCache } from '@/lib/cache/redis-cache'
-import { getLogger } from '@/lib/logging'
 import { randomUUID } from 'crypto'
 import { performance } from 'perf_hooks'
+
+import { getCache } from '@/lib/cache/redis-cache'
+import { getPool, createContentHash, BiasAnalysisManager } from '@/lib/db'
+import { getLogger } from '@/lib/logging'
 
 const logger = getLogger('bias-detection')
 

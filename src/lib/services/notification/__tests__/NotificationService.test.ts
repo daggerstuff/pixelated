@@ -1,6 +1,8 @@
+import { WebSocket } from 'ws'
+
 import { config } from '@/config/env.config'
 import { redis } from '@/lib/redis'
-import { WebSocket } from 'ws'
+
 import {
   NotificationChannel,
   NotificationPriority,
@@ -26,22 +28,25 @@ vi.mock('@/lib/redis', () => ({
       }
       return Promise.resolve(0)
     }),
-    rpoplpush: vi.fn()
-      .mockResolvedValueOnce(JSON.stringify({
-        id: 'test-id',
-        userId: 'test-user',
-        templateId: 'test-template',
-        title: 'Test',
-        body: 'Test',
-        data: {},
-        channels: ['in_app', 'email'],
-        priority: 'normal',
-        status: 'pending',
-        createdAt: Date.now(),
-        deliveredAt: null,
-        readAt: null,
-        error: null,
-      }))
+    rpoplpush: vi
+      .fn()
+      .mockResolvedValueOnce(
+        JSON.stringify({
+          id: 'test-id',
+          userId: 'test-user',
+          templateId: 'test-template',
+          title: 'Test',
+          body: 'Test',
+          data: {},
+          channels: ['in_app', 'email'],
+          priority: 'normal',
+          status: 'pending',
+          createdAt: Date.now(),
+          deliveredAt: null,
+          readAt: null,
+          error: null,
+        }),
+      )
       .mockResolvedValue(null),
     lrem: vi.fn().mockResolvedValue(1),
     llen: vi.fn().mockResolvedValue(0),

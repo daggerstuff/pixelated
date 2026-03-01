@@ -4,16 +4,27 @@
  */
 
 import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
-import { logSecurityEvent, SecurityEventType } from '../security/index'
+
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
   domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
-  clientId: process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
-  clientSecret: process.env.AUTH0_CLIENT_SECRET || import.meta.env.AUTH0_CLIENT_SECRET || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  clientId:
+    process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+  clientSecret:
+    process.env.AUTH0_CLIENT_SECRET ||
+    import.meta.env.AUTH0_CLIENT_SECRET ||
+    '',
+  managementClientId:
+    process.env.AUTH0_MANAGEMENT_CLIENT_ID ||
+    import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID ||
+    '',
+  managementClientSecret:
+    process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
+    import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET ||
+    '',
 }
 
 // Initialize Auth0 clients
@@ -25,31 +36,40 @@ let auth0UserInfo: UserInfoClient | null = null
  * Initialize Auth0 clients
  */
 function initializeAuth0Clients() {
-  if (!AUTH0_CONFIG.domain || !AUTH0_CONFIG.clientId || !AUTH0_CONFIG.clientSecret) {
-    console.warn('Auth0 configuration incomplete'); return
+  if (
+    !AUTH0_CONFIG.domain ||
+    !AUTH0_CONFIG.clientId ||
+    !AUTH0_CONFIG.clientSecret
+  ) {
+    console.warn('Auth0 configuration incomplete')
+    return
   }
 
   if (!auth0Authentication) {
     auth0Authentication = new AuthenticationClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.clientId,
-      clientSecret: AUTH0_CONFIG.clientSecret
+      clientSecret: AUTH0_CONFIG.clientSecret,
     })
   }
 
   if (!auth0UserInfo) {
     auth0UserInfo = new UserInfoClient({
-      domain: AUTH0_CONFIG.domain
+      domain: AUTH0_CONFIG.domain,
     })
   }
 
-  if (!auth0Management && AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
+  if (
+    !auth0Management &&
+    AUTH0_CONFIG.managementClientId &&
+    AUTH0_CONFIG.managementClientSecret
+  ) {
     auth0Management = new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users create:users'
+      scope: 'read:users update:users create:users',
     })
   }
 }
@@ -112,7 +132,7 @@ export class Auth0SocialAuthService {
       redirectUri,
       state,
       scope = 'openid profile email',
-      audience
+      audience,
     } = params
 
     const authUrl = `https://${this.domain}/authorize`
@@ -124,7 +144,7 @@ export class Auth0SocialAuthService {
       scope,
       ...(connection && { connection }),
       ...(state && { state }),
-      ...(audience && { audience })
+      ...(audience && { audience }),
     })
 
     return `${authUrl}?${urlParams.toString()}`
@@ -138,7 +158,7 @@ export class Auth0SocialAuthService {
       connection: 'google-oauth2',
       redirectUri,
       state,
-      scope: 'openid profile email'
+      scope: 'openid profile email',
     })
   }
 
@@ -147,7 +167,7 @@ export class Auth0SocialAuthService {
    */
   async exchangeCodeForTokens(
     code: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<SocialTokens> {
     if (!auth0Authentication) {
       throw new Error('Auth0 authentication client not initialized')
@@ -157,20 +177,22 @@ export class Auth0SocialAuthService {
       // @ts-ignore - Auth0 v5 types might be slightly mismatched with return expectations or method signatures in IDE but runtime works
       const response = await auth0Authentication.oauth.authorizationCodeGrant({
         code,
-        redirect_uri: redirectUri
+        redirect_uri: redirectUri,
       })
-      const data = response.data;
+      const data = response.data
 
       return {
         accessToken: data.access_token,
         refreshToken: data.refresh_token,
         idToken: data.id_token,
         expiresIn: data.expires_in,
-        tokenType: data.token_type
+        tokenType: data.token_type,
       }
     } catch (error) {
       console.error('Token exchange failed:', error)
-      throw new Error(`Token exchange failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Token exchange failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -195,11 +217,13 @@ export class Auth0SocialAuthService {
         picture: userInfo.picture,
         provider: userInfo.sub?.split('|')[0] || 'unknown',
         emailVerified: userInfo.email_verified || false,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       }
     } catch (error) {
       console.error('Failed to get user info:', error)
-      throw new Error(`Failed to get user info: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Failed to get user info: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -214,7 +238,7 @@ export class Auth0SocialAuthService {
     try {
       // @ts-ignore
       const response = await auth0Authentication.oauth.refreshTokenGrant({
-        refresh_token: refreshToken
+        refresh_token: refreshToken,
       })
       const data = response.data
 
@@ -223,11 +247,13 @@ export class Auth0SocialAuthService {
         refreshToken: data.refresh_token,
         idToken: data.id_token,
         expiresIn: data.expires_in,
-        tokenType: data.token_type
+        tokenType: data.token_type,
       }
     } catch (error) {
       console.error('Token refresh failed:', error)
-      throw new Error(`Token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(
+        `Token refresh failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -246,10 +272,7 @@ export class Auth0SocialAuthService {
   /**
    * Get logout URL
    */
-  getLogoutUrl(params: {
-    returnTo?: string
-    clientId?: string
-  }): string {
+  getLogoutUrl(params: { returnTo?: string; clientId?: string }): string {
     const { returnTo, clientId = this.clientId } = params
 
     const logoutUrl = `https://${this.domain}/v2/logout`
@@ -273,7 +296,7 @@ export class Auth0SocialAuthService {
    */
   async authenticate(
     code: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<SocialAuthResult> {
     // Exchange code for tokens
     const tokens = await this.exchangeCodeForTokens(code, redirectUri)
@@ -286,7 +309,7 @@ export class Auth0SocialAuthService {
       userId: user.id,
       email: user.email,
       provider: user.provider,
-      method: 'oauth'
+      method: 'oauth',
     })
 
     // Update Phase 6 MCP server with authentication progress
@@ -295,12 +318,12 @@ export class Auth0SocialAuthService {
     console.log('Social authentication successful', {
       userId: user.id,
       email: user.email,
-      provider: user.provider
+      provider: user.provider,
     })
 
     return {
       user,
-      tokens
+      tokens,
     }
   }
 
@@ -310,7 +333,7 @@ export class Auth0SocialAuthService {
   async linkSocialAccount(
     userId: string,
     connection: string,
-    accessToken: string
+    accessToken: string,
   ): Promise<void> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
@@ -323,22 +346,30 @@ export class Auth0SocialAuthService {
         {
           provider: connection,
           connection_id: connection, // This would need to be the actual connection ID
-          user_id: accessToken // This is simplified - in reality, you'd need the social provider's user ID
-        }
+          user_id: accessToken, // This is simplified - in reality, you'd need the social provider's user ID
+        },
       )
 
       // Log the linking event
       logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, {
         userId: userId,
         provider: connection,
-        linkedAt: new Date().toISOString()
+        linkedAt: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with account linking progress
-      await updatePhase6AuthenticationProgress(userId, `social_account_linked_${connection}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `social_account_linked_${connection}`,
+      )
     } catch (error) {
-      console.error(`Failed to link social account ${connection} to user ${userId}:`, error)
-      throw new Error(`Failed to link social account: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        `Failed to link social account ${connection} to user ${userId}:`,
+        error,
+      )
+      throw new Error(
+        `Failed to link social account: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -348,7 +379,7 @@ export class Auth0SocialAuthService {
   async unlinkSocialAccount(
     userId: string,
     connection: string,
-    providerUserId: string
+    providerUserId: string,
   ): Promise<void> {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
@@ -360,22 +391,30 @@ export class Auth0SocialAuthService {
         { id: userId },
         {
           provider: connection,
-          user_id: providerUserId
-        }
+          user_id: providerUserId,
+        },
       )
 
       // Log the unlinking event
       logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, {
         userId: userId,
         provider: connection,
-        unlinkedAt: new Date().toISOString()
+        unlinkedAt: new Date().toISOString(),
       })
 
       // Update Phase 6 MCP server with account unlinking progress
-      await updatePhase6AuthenticationProgress(userId, `social_account_unlinked_${connection}`)
+      await updatePhase6AuthenticationProgress(
+        userId,
+        `social_account_unlinked_${connection}`,
+      )
     } catch (error) {
-      console.error(`Failed to unlink social account ${connection} from user ${userId}:`, error)
-      throw new Error(`Failed to unlink social account: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      console.error(
+        `Failed to unlink social account ${connection} from user ${userId}:`,
+        error,
+      )
+      throw new Error(
+        `Failed to unlink social account: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      )
     }
   }
 
@@ -389,10 +428,13 @@ export class Auth0SocialAuthService {
 
     try {
       const response = await auth0Management.users.get({ id: userId })
-      const user = response.data;
+      const user = response.data
       return user.identities || []
     } catch (error) {
-      console.error(`Failed to get social connections for user ${userId}:`, error)
+      console.error(
+        `Failed to get social connections for user ${userId}:`,
+        error,
+      )
       return []
     }
   }

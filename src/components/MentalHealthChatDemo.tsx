@@ -1,9 +1,3 @@
-import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
 import {
   AlertTriangle,
   Heart,
@@ -12,31 +6,36 @@ import {
   Zap,
   Sparkles,
 } from 'lucide-react'
-import MindMirrorDashboard, {
-  type MindMirrorAnalysis,
-} from '@/components/ui/MindMirrorDashboard'
-import BrainVisualization from '@/components/ui/BrainVisualization'
-// import {
-//   MentalHealthInsights,
-//   MentalHealthHistoryChart,
-//   type EnhancedMentalHealthAnalysis as ComponentEnhancedMentalHealthAnalysis,
-// } from '@/components/MentalHealthInsights'
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
 import {
   MentalHealthInsights,
   type EnhancedMentalHealthAnalysis,
 } from '@/components/MentalHealthInsights'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { Badge } from '@/components/ui/badge'
+import BrainVisualization from '@/components/ui/BrainVisualization'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import MindMirrorDashboard, {
+  type MindMirrorAnalysis,
+} from '@/components/ui/MindMirrorDashboard'
+// import {
+//   MentalHealthInsights,
+//   MentalHealthHistoryChart,
+//   type EnhancedMentalHealthAnalysis as ComponentEnhancedMentalHealthAnalysis,
+// } from '@/components/MentalHealthInsights'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
+import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
-import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Extended analysis result that might include additional fields
-interface ExtendedMentalHealthAnalysisResult
-  extends MentalHealthAnalysisResult {
+interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
   expertGuidance?: unknown
   categoryScores?: {
     depression?: number
@@ -373,7 +372,7 @@ How are you feeling today? I'm here to listen and help.`,
       }
     }
 
-    initializeService()
+    void initializeService()
   }, [])
 
   // Get analysis history for visualization
@@ -788,76 +787,76 @@ It sounds like you're dealing with some challenges. What's been the most difficu
   }
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full max-w-7xl mx-auto">
+    <div className='mx-auto flex w-full max-w-7xl flex-col gap-4 md:flex-row'>
       {/* Main Chat Interface */}
       <div
         className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
       >
-        <Card className="h-[700px] flex flex-col shadow-lg border-0 overflow-hidden">
-          <div className="p-4 border-b bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 via-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                  <Brain className="w-6 h-6 text-white" />
+        <Card className='flex h-[700px] flex-col overflow-hidden border-0 shadow-lg'>
+          <div className='from-purple-50 via-blue-50 to-indigo-50 border-b bg-gradient-to-r p-4 backdrop-blur-sm'>
+            <div className='flex items-center justify-between'>
+              <div className='flex items-center gap-3'>
+                <div className='from-purple-500 via-blue-600 to-indigo-600 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r shadow-lg'>
+                  <Brain className='text-white h-6 w-6' />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2 className='text-gray-900 text-xl font-bold'>
                     🧠 MentalLLaMA Chat
                   </h2>
-                  <p className="text-sm text-gray-600">
+                  <p className='text-gray-600 text-sm'>
                     {settings.enableMindMirrorUI
                       ? 'Enhanced Mind Mirror Analysis'
                       : 'Production-Grade Mental Health Analysis'}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className='flex items-center gap-2'>
                 {mentalHealthService?.isInitialized ? (
                   <Badge
-                    variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    variant='outline'
+                    className='bg-green-50 text-green-700 border-green-200'
                   >
-                    <Zap className="w-3 h-3 mr-1" />
+                    <Zap className='mr-1 h-3 w-3' />
                     Live Analysis
                   </Badge>
                 ) : (
                   <Badge
-                    variant="outline"
-                    className="bg-yellow-50 text-yellow-700 border-yellow-200"
+                    variant='outline'
+                    className='bg-yellow-50 text-yellow-700 border-yellow-200'
                   >
                     Demo Mode
                   </Badge>
                 )}
-                <Badge variant="outline" className="text-xs">
+                <Badge variant='outline' className='text-xs'>
                   Session: {sessionStats.totalMessages} msgs
                 </Badge>
               </div>
             </div>
           </div>
 
-          <CardContent className="flex-1 flex flex-col p-0">
+          <CardContent className='flex flex-1 flex-col p-0'>
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className='flex-1 space-y-4 overflow-y-auto p-4'>
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className="max-w-[85%] space-y-2">
+                  <div className='max-w-[85%] space-y-2'>
                     {/* Message Bubble */}
                     <div
                       className={`rounded-2xl px-4 py-3 ${
                         message.role === 'user'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                          ? 'from-blue-500 to-blue-600 text-white bg-gradient-to-r'
                           : 'bg-gray-100 text-gray-900 border'
                       }`}
                     >
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      <p className='whitespace-pre-wrap text-sm leading-relaxed'>
                         {message.content}
                       </p>
                       {message.isProcessing && (
-                        <div className="flex items-center mt-2 text-xs opacity-70">
-                          <div className="animate-spin w-3 h-3 border border-current border-t-transparent rounded-full mr-2"></div>
+                        <div className='mt-2 flex items-center text-xs opacity-70'>
+                          <div className='border-current border-t-transparent mr-2 h-3 w-3 animate-spin rounded-full border'></div>
                           Analyzing...
                         </div>
                       )}
@@ -865,15 +864,15 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
                     {/* Analysis Results */}
                     {message.mentalHealthAnalysis && !message.isProcessing && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium text-blue-900">
+                      <div className='bg-blue-50 border-blue-200 rounded-lg border p-3 text-sm'>
+                        <div className='mb-2 flex items-center justify-between'>
+                          <span className='text-blue-900 font-medium'>
                             Analysis Results
                           </span>
-                          <div className="flex items-center gap-2">
+                          <div className='flex items-center gap-2'>
                             {message.riskLevel && (
                               <Badge
-                                variant="outline"
+                                variant='outline'
                                 className={`text-xs ${
                                   message.riskLevel === 'critical'
                                     ? 'border-red-200 text-red-700 bg-red-50'
@@ -891,7 +890,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                                 {message.riskLevel.toUpperCase()}
                               </Badge>
                             )}
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant='outline' className='text-xs'>
                               {Math.round(
                                 (message.mentalHealthAnalysis.confidence || 0) *
                                   100,
@@ -900,21 +899,21 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             </Badge>
                           </div>
                         </div>
-                        <p className="text-blue-800 text-xs mb-2">
-                          <span className="font-medium">Category:</span>{' '}
+                        <p className='text-blue-800 mb-2 text-xs'>
+                          <span className='font-medium'>Category:</span>{' '}
                           {message.mentalHealthAnalysis.mentalHealthCategory}
                         </p>
-                        <p className="text-blue-700 text-xs">
+                        <p className='text-blue-700 text-xs'>
                           {message.mentalHealthAnalysis.explanation}
                         </p>
                         {message.needsIntervention && (
                           <Button
-                            size="sm"
-                            variant="outline"
-                            className="mt-2 text-xs h-7"
+                            size='sm'
+                            variant='outline'
+                            className='mt-2 h-7 text-xs'
                             onClick={() => handleRequestIntervention(message)}
                           >
-                            <Heart className="w-3 h-3 mr-1" />
+                            <Heart className='mr-1 h-3 w-3' />
                             Request Intervention
                           </Button>
                         )}
@@ -925,10 +924,10 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               ))}
 
               {processing && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-100 border rounded-2xl px-4 py-3 max-w-[85%]">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full mr-2"></div>
+                <div className='flex justify-start'>
+                  <div className='bg-gray-100 max-w-[85%] rounded-2xl border px-4 py-3'>
+                    <div className='text-gray-600 flex items-center text-sm'>
+                      <div className='border-gray-400 border-t-transparent mr-2 h-4 w-4 animate-spin rounded-full border-2'></div>
                       {mentalHealthService?.isInitialized
                         ? 'Processing with MentalLLaMA...'
                         : 'Thinking...'}
@@ -938,11 +937,11 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               )}
 
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-800">{error}</p>
+                <div className='bg-red-50 border-red-200 mb-4 rounded-lg border p-3'>
+                  <p className='text-red-800 text-sm'>{error}</p>
                   <button
                     onClick={() => setError(null)}
-                    className="text-xs text-red-600 hover:text-red-800 mt-1"
+                    className='text-red-600 hover:text-red-800 mt-1 text-xs'
                   >
                     Dismiss
                   </button>
@@ -953,8 +952,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             </div>
 
             {/* Input Area */}
-            <div className="p-4 border-t bg-gray-50">
-              <div className="flex gap-3">
+            <div className='bg-gray-50 border-t p-4'>
+              <div className='flex gap-3'>
                 <Input
                   placeholder={
                     mentalHealthService?.isInitialized
@@ -966,19 +965,19 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault()
-                      handleSendMessage()
+                      void handleSendMessage()
                     }
                   }}
                   disabled={processing}
-                  className="flex-1"
+                  className='flex-1'
                 />
                 <Button
                   onClick={handleSendMessage}
                   disabled={processing || !input.trim()}
-                  className="px-6"
+                  className='px-6'
                 >
                   {processing ? (
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    <div className='border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2'></div>
                   ) : (
                     'Send'
                   )}
@@ -986,8 +985,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               </div>
 
               {/* Privacy Notice */}
-              <div className="mt-2 text-xs text-gray-500 flex items-center gap-1">
-                <Shield className="w-3 h-3" />
+              <div className='text-gray-500 mt-2 flex items-center gap-1 text-xs'>
+                <Shield className='h-3 w-3' />
                 {mentalHealthService?.isInitialized ? (
                   <>
                     All messages are encrypted and analyzed locally. No data is
@@ -1007,7 +1006,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
       {/* Enhanced Analysis Panel */}
       {settings.showAnalysisPanel && (
-        <div className="md:w-[35%] space-y-4">
+        <div className='space-y-4 md:w-[35%]'>
           {/* Mind-Mirror Brain Visualization */}
           {settings.enableMindMirrorUI && settings.showBrainVisualization && (
             <BrainVisualization
@@ -1024,30 +1023,30 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             />
           )}
 
-          <Tabs defaultValue={initialTab} className="w-full">
+          <Tabs defaultValue={initialTab} className='w-full'>
             <TabsList
-              className={`w-full grid ${settings.enableMindMirrorUI ? 'grid-cols-5' : 'grid-cols-4'}`}
+              className={`grid w-full ${settings.enableMindMirrorUI ? 'grid-cols-5' : 'grid-cols-4'}`}
             >
               {settings.enableMindMirrorUI && (
-                <TabsTrigger value="mindmirror" className="text-xs">
-                  <Sparkles className="w-3 h-3 mr-1" />
+                <TabsTrigger value='mindmirror' className='text-xs'>
+                  <Sparkles className='mr-1 h-3 w-3' />
                   Mirror
                 </TabsTrigger>
               )}
-              <TabsTrigger value="insights" className="text-xs">
-                <Brain className="w-3 h-3 mr-1" />
+              <TabsTrigger value='insights' className='text-xs'>
+                <Brain className='mr-1 h-3 w-3' />
                 Insights
               </TabsTrigger>
-              <TabsTrigger value="history" className="text-xs">
-                <Heart className="w-3 h-3 mr-1" />
+              <TabsTrigger value='history' className='text-xs'>
+                <Heart className='mr-1 h-3 w-3' />
                 History
               </TabsTrigger>
-              <TabsTrigger value="stats" className="text-xs">
-                <Zap className="w-3 h-3 mr-1" />
+              <TabsTrigger value='stats' className='text-xs'>
+                <Zap className='mr-1 h-3 w-3' />
                 Stats
               </TabsTrigger>
               {showSettingsPanel && (
-                <TabsTrigger value="settings" className="text-xs">
+                <TabsTrigger value='settings' className='text-xs'>
                   Settings
                 </TabsTrigger>
               )}
@@ -1055,33 +1054,33 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
             {/* Mind-Mirror Tab Content */}
             {settings.enableMindMirrorUI && (
-              <TabsContent value="mindmirror" className="mt-4 space-y-4">
-                <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg border-0 shadow-md">
-                  <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
+              <TabsContent value='mindmirror' className='mt-4 space-y-4'>
+                <div className='from-purple-50 to-blue-50 rounded-lg border-0 bg-gradient-to-r p-4 shadow-md'>
+                  <h3 className='mb-2 flex items-center gap-2 text-sm font-semibold'>
+                    <Sparkles className='text-purple-600 h-4 w-4' />
                     Mind Mirror Analysis
                   </h3>
-                  <p className="text-xs text-gray-600 mb-3">
+                  <p className='text-gray-600 mb-3 text-xs'>
                     Real-time psychological archetype detection and mood
                     analysis
                   </p>
 
                   {currentMindMirrorAnalysis ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">
+                    <div className='space-y-3'>
+                      <div className='flex items-center justify-between'>
+                        <span className='text-xs font-medium'>
                           Current Archetype
                         </span>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant='outline' className='text-xs'>
                           {currentMindMirrorAnalysis.archetype.main_archetype.replace(
                             '_',
                             ' ',
                           )}
                         </Badge>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">Confidence</span>
-                        <span className="text-xs font-bold">
+                      <div className='flex items-center justify-between'>
+                        <span className='text-xs font-medium'>Confidence</span>
+                        <span className='text-xs font-bold'>
                           {Math.round(
                             currentMindMirrorAnalysis.archetype.confidence *
                               100,
@@ -1089,8 +1088,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           %
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium">
+                      <div className='flex items-center justify-between'>
+                        <span className='text-xs font-medium'>
                           Urgency Score
                         </span>
                         <Badge
@@ -1110,7 +1109,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-500 italic">
+                    <p className='text-gray-500 text-xs italic'>
                       Send a message to see Mind Mirror analysis
                     </p>
                   )}
@@ -1118,14 +1117,14 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               </TabsContent>
             )}
 
-            <TabsContent value="insights" className="mt-4 space-y-4">
+            <TabsContent value='insights' className='mt-4 space-y-4'>
               {/* Real-time Insights */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border">
-                <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                  <Brain className="w-4 h-4 text-blue-600" />
+              <div className='from-blue-50 to-purple-50 rounded-lg border bg-gradient-to-r p-4'>
+                <h3 className='mb-2 flex items-center gap-2 text-sm font-semibold'>
+                  <Brain className='text-blue-600 h-4 w-4' />
                   Live Analysis Results
                 </h3>
-                <p className="text-xs text-gray-600 mb-3">
+                <p className='text-gray-600 mb-3 text-xs'>
                   Latest analysis from your conversation using production-grade
                   MentalLLaMA
                 </p>
@@ -1141,9 +1140,9 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 .slice(-2)
                 .map((m) => (
                   <div key={`analysis_${m.id}`}>
-                    <div className="mb-2">
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    <div className='mb-2'>
+                      <p className='text-muted-foreground flex items-center gap-1 text-xs'>
+                        <span className='bg-blue-500 h-2 w-2 rounded-full'></span>
                         Analysis for: &quot;{m.content.substring(0, 40)}
                         {m.content.length > 40 ? '...' : ''}&quot;
                       </p>
@@ -1160,14 +1159,14 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   m.mentalHealthAnalysis &&
                   !m.isProcessing,
               ) && (
-                <Card className="w-full bg-slate-50 shadow-sm">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <Brain className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-sm font-medium text-gray-600 mb-1">
+                <Card className='bg-slate-50 w-full shadow-sm'>
+                  <CardContent className='p-6'>
+                    <div className='text-center'>
+                      <Brain className='text-gray-400 mx-auto mb-3 h-12 w-12' />
+                      <p className='text-gray-600 mb-1 text-sm font-medium'>
                         No Analysis Yet
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className='text-muted-foreground text-xs'>
                         Send a message to see real-time mental health insights
                         powered by MentalLLaMA
                       </p>
@@ -1177,28 +1176,28 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               )}
             </TabsContent>
 
-            <TabsContent value="history" className="mt-4">
+            <TabsContent value='history' className='mt-4'>
               {/* Analysis History */}
-              <div className="mb-4">
-                <h3 className="font-semibold text-sm mb-2">Analysis Trends</h3>
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  <div className="bg-blue-50 p-3 rounded-lg text-center">
-                    <div className="text-lg font-bold text-blue-600">
+              <div className='mb-4'>
+                <h3 className='mb-2 text-sm font-semibold'>Analysis Trends</h3>
+                <div className='mb-4 grid grid-cols-2 gap-2'>
+                  <div className='bg-blue-50 rounded-lg p-3 text-center'>
+                    <div className='text-blue-600 text-lg font-bold'>
                       {sessionStats.analysisCount}
                     </div>
-                    <div className="text-xs text-blue-600">Analyses</div>
+                    <div className='text-blue-600 text-xs'>Analyses</div>
                   </div>
-                  <div className="bg-green-50 p-3 rounded-lg text-center">
-                    <div className="text-lg font-bold text-green-600">
+                  <div className='bg-green-50 rounded-lg p-3 text-center'>
+                    <div className='text-green-600 text-lg font-bold'>
                       {Math.round(sessionStats.averageConfidence * 100)}%
                     </div>
-                    <div className="text-xs text-green-600">Avg Confidence</div>
+                    <div className='text-green-600 text-xs'>Avg Confidence</div>
                   </div>
                 </div>
               </div>
 
               {/* If available, use the imported MentalHealthInsights with array feature for history; otherwise leave as future improvement */}
-              <div className="mt-4">
+              <div className='mt-4'>
                 {enhancedAnalysisHistory.map((insight, idx) => (
                   <MentalHealthInsights
                     key={`insight-${insight.timestamp}-${idx}`}
@@ -1208,14 +1207,14 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               </div>
 
               {enhancedAnalysisHistory.length === 0 && (
-                <Card className="w-full bg-slate-50 shadow-sm">
-                  <CardContent className="p-6">
-                    <div className="text-center">
-                      <Heart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-sm font-medium text-gray-600 mb-1">
+                <Card className='bg-slate-50 w-full shadow-sm'>
+                  <CardContent className='p-6'>
+                    <div className='text-center'>
+                      <Heart className='text-gray-400 mx-auto mb-3 h-12 w-12' />
+                      <p className='text-gray-600 mb-1 text-sm font-medium'>
                         No History Available
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className='text-muted-foreground text-xs'>
                         Continue chatting to build your analysis history
                       </p>
                     </div>
@@ -1224,88 +1223,83 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               )}
             </TabsContent>
 
-            <TabsContent value="stats" className="mt-4">
+            <TabsContent value='stats' className='mt-4'>
               {/* Session Statistics */}
               <Card>
-                <CardContent className="p-4">
-                  <h3 className="font-semibold text-sm mb-4 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-yellow-600" />
+                <CardContent className='p-4'>
+                  <h3 className='mb-4 flex items-center gap-2 text-sm font-semibold'>
+                    <Zap className='text-yellow-600 h-4 w-4' />
                     Session Statistics
                   </h3>
 
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <div className="text-sm font-medium text-gray-900">
+                  <div className='space-y-4'>
+                    <div className='grid grid-cols-2 gap-3'>
+                      <div className='bg-gray-50 rounded-lg p-3'>
+                        <div className='text-gray-900 text-sm font-medium'>
                           {sessionStats.totalMessages}
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className='text-gray-600 text-xs'>
                           Total Messages
                         </div>
                       </div>
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <div className="text-sm font-medium text-blue-900">
+                      <div className='bg-blue-50 rounded-lg p-3'>
+                        <div className='text-blue-900 text-sm font-medium'>
                           {sessionStats.analysisCount}
                         </div>
-                        <div className="text-xs text-blue-600">
+                        <div className='text-blue-600 text-xs'>
                           Analyses Performed
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
-                      <div className="text-sm font-medium text-gray-900">
+                    <div className='from-green-50 to-blue-50 rounded-lg bg-gradient-to-r p-3'>
+                      <div className='text-gray-900 text-sm font-medium'>
                         Risk Trend:{' '}
                         <span
-                          className={`
-                          ${sessionStats.riskTrend === 'critical' ? 'text-red-600' : ''}
-                          ${sessionStats.riskTrend === 'declining' ? 'text-orange-600' : ''}
-                          ${sessionStats.riskTrend === 'stable' ? 'text-blue-600' : ''}
-                          ${sessionStats.riskTrend === 'improving' ? 'text-green-600' : ''}
-                        `}
+                          className={` ${sessionStats.riskTrend === 'critical' ? 'text-red-600' : ''} ${sessionStats.riskTrend === 'declining' ? 'text-orange-600' : ''} ${sessionStats.riskTrend === 'stable' ? 'text-blue-600' : ''} ${sessionStats.riskTrend === 'improving' ? 'text-green-600' : ''} `}
                         >
                           {sessionStats.riskTrend.charAt(0).toUpperCase() +
                             sessionStats.riskTrend.slice(1)}
                         </span>
                       </div>
-                      <div className="text-xs text-gray-600 mt-1">
+                      <div className='text-gray-600 mt-1 text-xs'>
                         Based on conversation patterns
                       </div>
                     </div>
 
                     {sessionStats.interventionsTriggered > 0 && (
-                      <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-                        <div className="text-sm font-medium text-yellow-900">
-                          <AlertTriangle className="w-4 h-4 inline mr-1" />
+                      <div className='bg-yellow-50 border-yellow-200 rounded-lg border p-3'>
+                        <div className='text-yellow-900 text-sm font-medium'>
+                          <AlertTriangle className='mr-1 inline h-4 w-4' />
                           {sessionStats.interventionsTriggered} Intervention
                           {sessionStats.interventionsTriggered > 1
                             ? 's'
                             : ''}{' '}
                           Triggered
                         </div>
-                        <div className="text-xs text-yellow-700 mt-1">
+                        <div className='text-yellow-700 mt-1 text-xs'>
                           Situations requiring immediate attention were
                           identified
                         </div>
                       </div>
                     )}
 
-                    <div className="pt-3 border-t">
-                      <div className="text-xs text-gray-500 mb-2">
+                    <div className='border-t pt-3'>
+                      <div className='text-gray-500 mb-2 text-xs'>
                         Service Status
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className='flex items-center gap-2'>
                         {mentalHealthService?.isInitialized ? (
                           <>
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-xs text-green-600">
+                            <div className='bg-green-500 h-2 w-2 rounded-full'></div>
+                            <span className='text-green-600 text-xs'>
                               MentalLLaMA Active
                             </span>
                           </>
                         ) : (
                           <>
-                            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                            <span className="text-xs text-yellow-600">
+                            <div className='bg-yellow-500 h-2 w-2 rounded-full'></div>
+                            <span className='text-yellow-600 text-xs'>
                               Demo Mode
                             </span>
                           </>
@@ -1318,144 +1312,144 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             </TabsContent>
 
             {showSettingsPanel && (
-              <TabsContent value="settings" className="mt-4">
+              <TabsContent value='settings' className='mt-4'>
                 {/* Production Settings */}
                 <Card>
-                  <CardContent className="p-4 space-y-4">
-                    <h3 className="font-semibold text-sm mb-4">
+                  <CardContent className='space-y-4 p-4'>
+                    <h3 className='mb-4 text-sm font-semibold'>
                       Analysis Configuration
                     </h3>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">
+                    <div className='space-y-4'>
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>
                             Mental Health Analysis
                           </span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Enable real-time MentalLLaMA analysis of messages
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.enableAnalysis}
                             onChange={() =>
                               handleToggleSetting('enableAnalysis')
                             }
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>
                             Expert Clinical Guidance
                           </span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Use clinical knowledge base for enhanced
                             explanations
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.useExpertGuidance}
                             onChange={() =>
                               handleToggleSetting('useExpertGuidance')
                             }
                             disabled={!settings.enableAnalysis}
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">Crisis Detection</span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>Crisis Detection</span>
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Automatically detect and respond to crisis
                             situations
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.enableCrisisDetection}
                             onChange={() =>
                               handleToggleSetting('enableCrisisDetection')
                             }
                             disabled={!settings.enableAnalysis}
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">Analysis Panel</span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>Analysis Panel</span>
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Show detailed analysis and insights panel
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.showAnalysisPanel}
                             onChange={() =>
                               handleToggleSetting('showAnalysisPanel')
                             }
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">🧠 Mind Mirror UI</span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>🧠 Mind Mirror UI</span>
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Enable enhanced archetype detection and brain
                             visualization
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.enableMindMirrorUI}
                             onChange={() =>
                               handleToggleSetting('enableMindMirrorUI')
                             }
                             disabled={!settings.showAnalysisPanel}
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
 
-                      <div className="flex items-center justify-between">
-                        <label className="flex flex-col gap-1">
-                          <span className="text-sm">Brain Visualization</span>
-                          <span className="font-normal text-xs text-muted-foreground">
+                      <div className='flex items-center justify-between'>
+                        <label className='flex flex-col gap-1'>
+                          <span className='text-sm'>Brain Visualization</span>
+                          <span className='text-muted-foreground text-xs font-normal'>
                             Show 3D neural activity mapping
                           </span>
                           <input
-                            type="checkbox"
+                            type='checkbox'
                             checked={settings.showBrainVisualization}
                             onChange={() =>
                               handleToggleSetting('showBrainVisualization')
                             }
                             disabled={!settings.enableMindMirrorUI}
-                            className="mt-2"
+                            className='mt-2'
                           />
                         </label>
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t space-y-3">
-                      <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                    <div className='space-y-3 border-t pt-4'>
+                      <h4 className='text-gray-600 text-xs font-medium uppercase tracking-wide'>
                         Thresholds
                       </h4>
 
-                      <div className="space-y-2">
-                        <label className="text-xs text-gray-600">
+                      <div className='space-y-2'>
+                        <label className='text-gray-600 text-xs'>
                           Confidence Threshold:{' '}
                           {Math.round(settings.confidenceThreshold * 100)}%
                         </label>
                         <input
-                          type="range"
-                          min="0.1"
-                          max="1.0"
-                          step="0.1"
+                          type='range'
+                          min='0.1'
+                          max='1.0'
+                          step='0.1'
                           value={settings.confidenceThreshold}
                           onChange={(e) =>
                             setSettings((prev) => ({
@@ -1463,20 +1457,20 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                               confidenceThreshold: parseFloat(e.target.value),
                             }))
                           }
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          className='bg-gray-200 h-2 w-full cursor-pointer appearance-none rounded-lg'
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-xs text-gray-600">
+                      <div className='space-y-2'>
+                        <label className='text-gray-600 text-xs'>
                           Intervention Threshold:{' '}
                           {Math.round(settings.interventionThreshold * 100)}%
                         </label>
                         <input
-                          type="range"
-                          min="0.1"
-                          max="1.0"
-                          step="0.1"
+                          type='range'
+                          min='0.1'
+                          max='1.0'
+                          step='0.1'
                           value={settings.interventionThreshold}
                           onChange={(e) =>
                             setSettings((prev) => ({
@@ -1484,17 +1478,17 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                               interventionThreshold: parseFloat(e.target.value),
                             }))
                           }
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                          className='bg-gray-200 h-2 w-full cursor-pointer appearance-none rounded-lg'
                         />
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t">
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <h4 className="text-xs font-medium text-blue-900 mb-1">
+                    <div className='border-t pt-4'>
+                      <div className='bg-blue-50 rounded-lg p-3'>
+                        <h4 className='text-blue-900 mb-1 text-xs font-medium'>
                           🔒 Privacy & Security
                         </h4>
-                        <p className="text-xs text-blue-700">
+                        <p className='text-blue-700 text-xs'>
                           All conversations are processed with end-to-end
                           encryption. No data is stored on external servers.
                           Analysis happens locally using production-grade

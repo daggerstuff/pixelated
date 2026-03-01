@@ -3,10 +3,10 @@
  * Provides request authentication validation with Auth0 integration
  */
 
-import { ROLE_DEFINITIONS, type UserRole } from './auth0-rbac-service'
-import { validateToken } from './auth0-jwt-service'
-import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { auth0UserService } from '../../services/auth0.service'
+import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
+import { validateToken } from './auth0-jwt-service'
+import { ROLE_DEFINITIONS, type UserRole } from './auth0-rbac-service'
 
 export interface ClientInfo {
   ip?: string
@@ -25,7 +25,11 @@ export function extractTokenFromRequest(req: Request): string | null {
     (req.headers as any).authorization ||
     (req.headers as any).Authorization
 
-  if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
+  if (
+    authHeader &&
+    typeof authHeader === 'string' &&
+    authHeader.startsWith('Bearer ')
+  ) {
     return authHeader.substring(7) // Remove 'Bearer ' prefix
   }
 
@@ -41,7 +45,8 @@ export function extractTokenFromRequest(req: Request): string | null {
   }
 
   // Check cookie for fallback
-  const cookieHeader = req.headers.get?.('cookie') || (req.headers as any).cookie
+  const cookieHeader =
+    req.headers.get?.('cookie') || (req.headers as any).cookie
   if (cookieHeader) {
     const cookies = cookieHeader.split(';').map((c: string) => c.trim())
     for (const cookie of cookies) {
@@ -74,7 +79,9 @@ export function getClientIp(req: Request): string {
 
   return (
     (req as any).ip ||
-    (typeof xForwardedFor === 'string' ? xForwardedFor.split(',')[0].trim() : null) ||
+    (typeof xForwardedFor === 'string'
+      ? xForwardedFor.split(',')[0].trim()
+      : null) ||
     (typeof xRealIp === 'string' ? xRealIp : null) ||
     'unknown'
   )
@@ -200,9 +207,8 @@ export async function rateLimitMiddleware(
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(null, 'rate_limit_exceeded')
     } catch {
       // Phase 6 integration not available in test environment
@@ -273,9 +279,8 @@ export async function csrfProtection(request: Request): Promise<{
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(null, 'csrf_violation')
     } catch {
       // Phase 6 integration not available in test environment
@@ -305,9 +310,8 @@ export async function csrfProtection(request: Request): Promise<{
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(null, 'csrf_violation')
     } catch {
       // Phase 6 integration not available in test environment
@@ -333,9 +337,8 @@ export async function csrfProtection(request: Request): Promise<{
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(null, 'csrf_violation')
     } catch {
       // Phase 6 integration not available in test environment
@@ -361,9 +364,8 @@ export async function csrfProtection(request: Request): Promise<{
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(null, 'csrf_violation')
     } catch {
       // Phase 6 integration not available in test environment
@@ -594,10 +596,13 @@ export async function authenticateRequest(request: Request): Promise<{
 
     return {
       success: false,
-      response: new Response(JSON.stringify({ error: 'User account is inactive' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+      response: new Response(
+        JSON.stringify({ error: 'User account is inactive' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
       error: 'User account is inactive',
     }
   }
@@ -606,23 +611,28 @@ export async function authenticateRequest(request: Request): Promise<{
   const hasMFA = await auth0UserService.userHasMFA(user.id)
 
   // Device/Session Binding Check
-  const sid = validation.payload?.sid;
+  const sid = validation.payload?.sid
   if (sid) {
-    const { getFromCache, setInCache } = await import('../redis');
-    const bindingKey = `session_binding:${user.id}:${sid}`;
-    const clientInfo = getClientInfo(request);
-    const storedBinding = await getFromCache(bindingKey);
+    const { getFromCache, setInCache } = await import('../redis')
+    const bindingKey = `session_binding:${user.id}:${sid}`
+    const clientInfo = getClientInfo(request)
+    const storedBinding = await getFromCache(bindingKey)
 
     if (storedBinding) {
       // Verify IP binding (allow some flexibility if needed, but strict for now)
       if (storedBinding.ip !== clientInfo.ip) {
-        const { logSecurityEvent, SecurityEventType } = await import('../security');
-        await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, user.id, {
-          reason: 'ip_mismatch',
-          storedIp: storedBinding.ip,
-          currentIp: clientInfo.ip,
-          endpoint: new URL(request.url).pathname
-        });
+        const { logSecurityEvent, SecurityEventType } =
+          await import('../security')
+        await logSecurityEvent(
+          SecurityEventType.AUTHENTICATION_FAILED,
+          user.id,
+          {
+            reason: 'ip_mismatch',
+            storedIp: storedBinding.ip,
+            currentIp: clientInfo.ip,
+            endpoint: new URL(request.url).pathname,
+          },
+        )
 
         // We could block here, but for now we'll just log and maybe require MFA
         // If we wanted to block:
@@ -630,11 +640,15 @@ export async function authenticateRequest(request: Request): Promise<{
       }
     } else {
       // Trust On First Use (TOFU) - Bind session to this IP
-      await setInCache(bindingKey, {
-        ip: clientInfo.ip,
-        userAgent: clientInfo.userAgent,
-        boundAt: Date.now()
-      }, 24 * 60 * 60); // 24 hours
+      await setInCache(
+        bindingKey,
+        {
+          ip: clientInfo.ip,
+          userAgent: clientInfo.userAgent,
+          boundAt: Date.now(),
+        },
+        24 * 60 * 60,
+      ) // 24 hours
     }
   }
 
@@ -642,7 +656,7 @@ export async function authenticateRequest(request: Request): Promise<{
   if (!hasMFA) {
     try {
       // Get client information for risk assessment (already fetched above if sid exists, but reliable here)
-      const clientInfo = getClientInfo(request);
+      const clientInfo = getClientInfo(request)
 
       // Create login context for risk assessment
       const loginContext = {
@@ -653,18 +667,23 @@ export async function authenticateRequest(request: Request): Promise<{
         location: {
           // In a real implementation, we would get geolocation from IP
           // For now, we'll simulate based on IP
-          country: clientInfo.ip.startsWith('192.168.') || clientInfo.ip.startsWith('10.') || clientInfo.ip.startsWith('172.')
-            ? 'LOCAL'
-            : 'US' // Default to US for external IPs
-        }
+          country:
+            clientInfo.ip.startsWith('192.168.') ||
+            clientInfo.ip.startsWith('10.') ||
+            clientInfo.ip.startsWith('172.')
+              ? 'LOCAL'
+              : 'US', // Default to US for external IPs
+        },
       }
 
       // Check if adaptive MFA requires MFA for this login
-      const requiresMFA = await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
+      const requiresMFA =
+        await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
 
       if (requiresMFA) {
         // Log that MFA is required
-        const { logSecurityEvent, SecurityEventType } = await import('../security')
+        const { logSecurityEvent, SecurityEventType } =
+          await import('../security')
         await logSecurityEvent(SecurityEventType.MFA_REQUIRED, user.id, {
           reason: 'adaptive_mfa_triggered',
           riskFactors: 'calculated_by_adaptive_service',
@@ -677,8 +696,9 @@ export async function authenticateRequest(request: Request): Promise<{
           response: new Response(
             JSON.stringify({
               error: 'MFA required',
-              message: 'Multi-factor authentication is required for this login attempt',
-              code: 'MFA_REQUIRED'
+              message:
+                'Multi-factor authentication is required for this login attempt',
+              code: 'MFA_REQUIRED',
             }),
             {
               status: 401,
@@ -705,9 +725,8 @@ export async function authenticateRequest(request: Request): Promise<{
 
   // Update Phase 6 MCP server
   try {
-    const { updatePhase6AuthenticationProgress } = await import(
-      '../mcp/phase6-integration'
-    )
+    const { updatePhase6AuthenticationProgress } =
+      await import('../mcp/phase6-integration')
     await updatePhase6AuthenticationProgress(user.id, 'authentication_success')
   } catch {
     // Phase 6 integration not available in test environment
@@ -782,20 +801,24 @@ export async function requireRole(
   if (!hasAccess) {
     // Log authorization failure
     try {
-      const { logSecurityEvent, SecurityEventType } = await import('../security')
-      await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, request.user.id, {
-        requiredRoles: roles,
-        userRole: request.user.role,
-      })
+      const { logSecurityEvent, SecurityEventType } =
+        await import('../security')
+      await logSecurityEvent(
+        SecurityEventType.AUTHORIZATION_FAILED,
+        request.user.id,
+        {
+          requiredRoles: roles,
+          userRole: request.user.role,
+        },
+      )
     } catch {
       // Security module not available in test environment
     }
 
     // Update Phase 6 MCP server
     try {
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../mcp/phase6-integration')
       await updatePhase6AuthenticationProgress(
         request.user.id,
         'authorization_failed',

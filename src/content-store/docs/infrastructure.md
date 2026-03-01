@@ -1,6 +1,8 @@
 ---
 title: 'Core Infrastructure'
-description: 'Documentation of Pixelated Healths core infrastructure components, security, and configuration'
+description:
+  'Documentation of Pixelated Healths core infrastructure components, security,
+  and configuration'
 pubDate: 2025-03-24
 share: true
 toc: true
@@ -13,8 +15,9 @@ author: 'Pixelated Team'
 
 ## Overview
 
-The Pixelated platform is built on a modern, secure, and scalable infrastructure using Astro as the core framework.
-This document outlines the key components, configurations, and best practices implemented in our system.
+The Pixelated platform is built on a modern, secure, and scalable infrastructure
+using Astro as the core framework. This document outlines the key components,
+configurations, and best practices implemented in our system.
 
 ## Core Components
 

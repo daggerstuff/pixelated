@@ -4,46 +4,46 @@ on:
   workflow_call:
     outputs:
       gcp_project_id:
-        description: "GCP Project ID"
+        description: 'GCP Project ID'
         value: ${{ jobs.load-env.outputs.gcp_project_id }}
       gke_cluster_name:
-        description: "GKE Cluster Name"
+        description: 'GKE Cluster Name'
         value: ${{ jobs.load-env.outputs.gke_cluster_name }}
       gke_zone:
-        description: "GKE Zone"
+        description: 'GKE Zone'
         value: ${{ jobs.load-env.outputs.gke_zone }}
       gke_namespace:
-        description: "GKE Namespace"
+        description: 'GKE Namespace'
         value: ${{ jobs.load-env.outputs.gke_namespace }}
       gke_deployment_name:
-        description: "GKE Deployment Name"
+        description: 'GKE Deployment Name'
         value: ${{ jobs.load-env.outputs.gke_deployment_name }}
       gke_service_name:
-        description: "GKE Service Name"
+        description: 'GKE Service Name'
         value: ${{ jobs.load-env.outputs.gke_service_name }}
       gke_environment_url:
-        description: "GKE Environment URL"
+        description: 'GKE Environment URL'
         value: ${{ jobs.load-env.outputs.gke_environment_url }}
       gcp_service_account_key:
-        description: "GCP Service Account Key"
+        description: 'GCP Service Account Key'
         value: ${{ jobs.load-env.outputs.gcp_service_account_key }}
       sentry_auth_token:
-        description: "Sentry Auth Token"
+        description: 'Sentry Auth Token'
         value: ${{ jobs.load-env.outputs.sentry_auth_token }}
       sentry_org:
-        description: "Sentry Organization"
+        description: 'Sentry Organization'
         value: ${{ jobs.load-env.outputs.sentry_org }}
       sentry_project:
-        description: "Sentry Project"
+        description: 'Sentry Project'
         value: ${{ jobs.load-env.outputs.sentry_project }}
       sentry_dsn:
-        description: "Sentry DSN"
+        description: 'Sentry DSN'
         value: ${{ jobs.load-env.outputs.sentry_dsn }}
       public_sentry_dsn:
-        description: "Public Sentry DSN"
+        description: 'Public Sentry DSN'
         value: ${{ jobs.load-env.outputs.public_sentry_dsn }}
       slack_webhook_url:
-        description: "Slack Webhook URL"
+        description: 'Slack Webhook URL'
         value: ${{ jobs.load-env.outputs.slack_webhook_url }}
   workflow_dispatch:
 
@@ -58,7 +58,8 @@ jobs:
       gke_deployment_name: ${{ steps.set-env.outputs.gke_deployment_name }}
       gke_service_name: ${{ steps.set-env.outputs.gke_service_name }}
       gke_environment_url: ${{ steps.set-env.outputs.gke_environment_url }}
-      gcp_service_account_key: ${{ steps.set-env.outputs.gcp_service_account_key }}
+      gcp_service_account_key:
+        ${{ steps.set-env.outputs.gcp_service_account_key }}
       sentry_auth_token: ${{ steps.set-env.outputs.sentry_auth_token }}
       sentry_org: ${{ steps.set-env.outputs.sentry_org }}
       sentry_project: ${{ steps.set-env.outputs.sentry_project }}

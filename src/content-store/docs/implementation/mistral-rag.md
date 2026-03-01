@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-This document outlines the implementation of a Retrieval Augmented Generation (RAG) system using Mistral-7B for therapy support. The system combines the power of the Mistral-7B language model with a sophisticated retrieval system to provide context-aware, accurate responses in therapeutic settings.
+This document outlines the implementation of a Retrieval Augmented Generation
+(RAG) system using Mistral-7B for therapy support. The system combines the power
+of the Mistral-7B language model with a sophisticated retrieval system to
+provide context-aware, accurate responses in therapeutic settings.
 
 ## System Architecture
 

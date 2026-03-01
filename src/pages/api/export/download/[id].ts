@@ -1,7 +1,8 @@
 export const prerender = false
 
-import { getSession } from '../../../../lib/auth/session'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { getSession } from '../../../../lib/auth/session'
 
 // Type for export results
 interface ExportResult {

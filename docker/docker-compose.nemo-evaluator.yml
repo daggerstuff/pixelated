@@ -6,7 +6,7 @@ services:
     image: nvcr.io/nvidia/nemo-microservices/evaluator:25.12
     container_name: nemo-evaluator
     ports:
-      - "7331:7331"
+      - '7331:7331'
     environment:
       MODE: standalone
       POSTGRES_URI: postgresql://nmp:nmp@nemo-postgres:5432/evaluator

@@ -1,6 +1,8 @@
 ---
 title: 'Comprehensive Security Measures'
-description: 'Detailed documentation of all security measures implemented in the application'
+description:
+  'Detailed documentation of all security measures implemented in the
+  application'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -13,7 +15,11 @@ updated: '2024-06-26'
 
 ## Overview
 
-This document provides a comprehensive overview of all security measures implemented in the application, with a focus on the Risk Level Assessment System, alerting mechanisms, and human oversight. These measures ensure the protection of sensitive data, compliance with HIPAA regulations, and appropriate handling of potential mental health crises.
+This document provides a comprehensive overview of all security measures
+implemented in the application, with a focus on the Risk Level Assessment
+System, alerting mechanisms, and human oversight. These measures ensure the
+protection of sensitive data, compliance with HIPAA regulations, and appropriate
+handling of potential mental health crises.
 
 ## Key Security Components
 
@@ -32,7 +38,9 @@ The application implements several layers of security:
 
 ## Risk Level Assessment System
 
-The Risk Level Assessment System provides a framework for evaluating and responding to potential security and mental health risks identified within the application.
+The Risk Level Assessment System provides a framework for evaluating and
+responding to potential security and mental health risks identified within the
+application.
 
 ### Risk Levels
 
@@ -88,7 +96,8 @@ Risk factors are evaluated based on:
 
 - **Severity**: How serious the factor is (0-1 scale)
 - **Confidence**: How certain we are about the factor (0-1 scale)
-- **Factor Type**: Some factors (e.g., suicidal ideation) receive higher weighting
+- **Factor Type**: Some factors (e.g., suicidal ideation) receive higher
+  weighting
 
 Example code for risk assessment:
 
@@ -149,20 +158,25 @@ private determineRiskLevel(score: number): RiskLevel {
 
 ## Alert System
 
-The Risk Alert System manages notifications and human oversight for high-risk situations.
+The Risk Alert System manages notifications and human oversight for high-risk
+situations.
 
 ### Alert Flow
 
-  ### Assessment Processing
-  When a risk assessment is processed, the system checks if alerts should be triggered based on risk level and configuration.
+### Assessment Processing
+
+When a risk assessment is processed, the system checks if alerts should be
+triggered based on risk level and configuration.
 
 ### Cooldown Check
 
-To prevent alert fatigue, the system checks if sufficient time has passed since the last alert for the same user and level.
+To prevent alert fatigue, the system checks if sufficient time has passed since
+the last alert for the same user and level.
 
 ### Alert Creation
 
-If an alert should be sent, the system creates an alert with details such as risk level, factors, and source.
+If an alert should be sent, the system creates an alert with details such as
+risk level, factors, and source.
 
 ### Notification
 
@@ -174,8 +188,8 @@ High and critical alerts are stored in the database for human review.
 
 ### Human Review
 
-For high and critical alerts, human reviewers examine the alert and determine appropriate actions.
-
+For high and critical alerts, human reviewers examine the alert and determine
+appropriate actions.
 
 ### Alert Channels
 
@@ -219,7 +233,6 @@ For high and critical alerts, human reviewers examine the alert and determine ap
     - Secure signature for verification
 
     Webhooks require proper authentication and use HTTPS.
-
 
 ### Human Oversight
 
@@ -270,20 +283,26 @@ const pendingAlerts = await riskAlertSystem.getPendingAlertsForReview()
 
 ## FHE Security Implementation
 
-The application uses Fully Homomorphic Encryption (FHE) with Microsoft SEAL to securely process sensitive data without exposing plaintext.
+The application uses Fully Homomorphic Encryption (FHE) with Microsoft SEAL to
+securely process sensitive data without exposing plaintext.
 
 ### Key Features
 
-- **BFV Schema Implementation**: Uses the BFV cryptographic scheme for integer operations
+- **BFV Schema Implementation**: Uses the BFV cryptographic scheme for integer
+  operations
 - **Secure Key Generation**: Implements cryptographically secure key generation
-- **Data Integrity Verification**: Uses authentication tags to verify data integrity
-- **Protected Operations**: Allows computation on encrypted data without decryption
-- **Error Handling**: Comprehensive error handling to prevent information leakage
+- **Data Integrity Verification**: Uses authentication tags to verify data
+  integrity
+- **Protected Operations**: Allows computation on encrypted data without
+  decryption
+- **Error Handling**: Comprehensive error handling to prevent information
+  leakage
 
 ### Implementation Use Cases
 
 - **Secure Pattern Analysis**: Performs pattern analysis on encrypted text data
-- **Privacy-Preserving Scoring**: Calculates risk scores without exposing raw data
+- **Privacy-Preserving Scoring**: Calculates risk scores without exposing raw
+  data
 - **Sensitive Information Processing**: Processes PII and PHI securely
 - **Homomorphic Operations**: Supports addition, multiplication, and comparison
 
@@ -292,7 +311,8 @@ The application uses Fully Homomorphic Encryption (FHE) with Microsoft SEAL to s
 The system includes robust error handling and fallback mechanisms:
 
 - If risk assessment fails, it defaults to a medium risk level
-- If alert delivery fails through the primary channel, it attempts alternate channels
+- If alert delivery fails through the primary channel, it attempts alternate
+  channels
 - All errors are logged for review and system improvement
 - Periodic audits ensure system reliability and accuracy
 
@@ -316,13 +336,15 @@ private createDefaultAssessment(level: RiskLevel): RiskAssessmentResult {
 
 ## Integration with Crisis Detection
 
-The Risk Assessment System integrates with the Crisis Detection system to identify potential mental health crises in user interactions.
+The Risk Assessment System integrates with the Crisis Detection system to
+identify potential mental health crises in user interactions.
 
 ### Integration Flow
 
 1. **Text Analysis**: The system analyzes user text for concerning patterns
 2. **Pattern Extraction**: Identified patterns are converted to risk factors
-3. **Risk Assessment**: Risk factors are processed by the Risk Assessment Service
+3. **Risk Assessment**: Risk factors are processed by the Risk Assessment
+   Service
 4. **Alert Triggering**: High-risk situations trigger appropriate alerts
 5. **Human Review**: Clinical staff review and respond to alerts
 
@@ -345,10 +367,14 @@ The Risk Assessment System integrates with the Crisis Detection system to identi
 
 ## Best Practices for Implementation
 
-1. **Regular Calibration**: Periodically review and adjust sensitivity levels based on false positive/negative rates
-2. **Human in the Loop**: Always maintain human oversight for high and critical risk levels
-3. **Documentation**: Keep clear records of all alert responses for quality improvement
-4. **Privacy Focus**: Collect only necessary information needed for risk assessment
+1. **Regular Calibration**: Periodically review and adjust sensitivity levels
+   based on false positive/negative rates
+2. **Human in the Loop**: Always maintain human oversight for high and critical
+   risk levels
+3. **Documentation**: Keep clear records of all alert responses for quality
+   improvement
+4. **Privacy Focus**: Collect only necessary information needed for risk
+   assessment
 5. **Regular Testing**: Conduct regular security testing and simulations
 6. **Staff Training**: Ensure all staff are trained on alert response procedures
 7. **Continuous Monitoring**: Monitor system effectiveness and adapt as needed
@@ -436,7 +462,8 @@ The application implements robust authentication and authorization mechanisms:
 - **CSRF protection** for all requests
 - **Session timeouts** for inactive users
 
-For detailed information, see [Authentication Documentation](./authentication.mdx).
+For detailed information, see
+[Authentication Documentation](./authentication.mdx).
 
 ### Encryption & Data Protection
 

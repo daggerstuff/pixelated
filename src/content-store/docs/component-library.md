@@ -1,16 +1,17 @@
 ---
-title: "Astro Component Library"
-description: "Astro Component Library documentation"
+title: 'Astro Component Library'
+description: 'Astro Component Library documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "components"]
+author: 'Pixelated Team'
+tags: ['documentation', 'components']
 draft: false
 toc: true
 ---
 
 # Astro Component Library
 
-This documentation provides an overview of our Astro component library, including usage examples, available props, and best practices.
+This documentation provides an overview of our Astro component library,
+including usage examples, available props, and best practices.
 
 ## Table of Contents
 
@@ -41,7 +42,8 @@ This documentation provides an overview of our Astro component library, includin
 
 ## Layout Components
 
-Layout components provide the structure for pages and handle common elements like headers, footers, and navigation.
+Layout components provide the structure for pages and handle common elements
+like headers, footers, and navigation.
 
 ### BaseLayout
 
@@ -53,8 +55,8 @@ The standard layout for all pages in the application.
 
 ```typescript
 interface Props {
-  title: string;
-  description?: string;
+  title: string
+  description?: string
 }
 ```
 
@@ -80,7 +82,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 - Sets up the dark theme by default.
 - Includes the site-wide `Header` component.
 - Defines global styles, including the `Geist Sans` font.
-- Handles essential meta tags for SEO (`title`, `description`, `viewport`, etc.).
+- Handles essential meta tags for SEO (`title`, `description`, `viewport`,
+  etc.).
 - Contains a `<slot />` for page-specific content.
 
 ### DashboardLayout
@@ -93,10 +96,10 @@ Layout for authenticated user dashboard pages.
 
 ```typescript
 interface Props {
-  title: string;
-  description?: string;
-  requiresAuth?: boolean;
-  showSidebar?: boolean;
+  title: string
+  description?: string
+  requiresAuth?: boolean
+  showSidebar?: boolean
 }
 ```
 
@@ -139,12 +142,12 @@ Layout for blog posts and article pages.
 
 ```typescript
 interface Props {
-  title: string;
-  description?: string;
-  publishDate?: Date;
-  author?: string;
-  heroImage?: string;
-  tags?: string[];
+  title: string
+  description?: string
+  publishDate?: Date
+  author?: string
+  heroImage?: string
+  tags?: string[]
 }
 ```
 
@@ -187,9 +190,9 @@ Layout for admin dashboard and management pages.
 
 ```typescript
 interface Props {
-  title: string;
-  description?: string;
-  requiredPermission?: string;
+  title: string
+  description?: string
+  requiredPermission?: string
 }
 ```
 
@@ -233,7 +236,7 @@ Container component with a clean, bordered appearance.
 
 ```typescript
 interface Props extends HTMLAttributes<'div'> {
-  class?: string;
+  class?: string
 }
 ```
 
@@ -282,13 +285,13 @@ Feedback component for displaying notifications.
 
 ```typescript
 interface Props {
-  variant?: 'info' | 'success' | 'warning' | 'error';
-  title?: string;
-  description?: string;
-  icon?: string;
-  actions?: string;
-  dismissible?: boolean;
-  class?: string;
+  variant?: 'info' | 'success' | 'warning' | 'error'
+  title?: string
+  description?: string
+  icon?: string
+  actions?: string
+  dismissible?: boolean
+  class?: string
 }
 ```
 
@@ -325,11 +328,17 @@ A versatile button component that supports different variants and sizes.
 
 ```typescript
 interface Props extends HTMLAttributes<'button'> {
-  href?: string;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
-  loading?: boolean;
-  loadingText?: string;
+  href?: string
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+  loading?: boolean
+  loadingText?: string
 }
 ```
 
@@ -378,7 +387,7 @@ Button for switching between light, dark, and system themes.
 
 ```typescript
 interface Props {
-  class?: string;
+  class?: string
 }
 ```
 
@@ -410,12 +419,12 @@ Enhanced anchor component with external link handling.
 
 ```typescript
 interface Props {
-  href?: string;
-  title?: string;
-  rel?: string;
-  external?: boolean;
-  enableNewTabWarning?: boolean;
-  class?: string;
+  href?: string
+  title?: string
+  rel?: string
+  external?: boolean
+  enableNewTabWarning?: boolean
+  class?: string
 }
 ```
 
@@ -520,7 +529,7 @@ Catches and displays errors in a user-friendly way.
 
 ```typescript
 interface Props {
-  fallback?: string;
+  fallback?: string
 }
 ```
 
@@ -546,7 +555,8 @@ import ErrorBoundary from '@/components/base/ErrorBoundary.astro';
 
 ## Authentication Components
 
-Authentication components handle user login, registration, and password management.
+Authentication components handle user login, registration, and password
+management.
 
 ### LoginForm
 
@@ -558,19 +568,18 @@ A React component for user authentication.
 
 ```typescript
 interface LoginFormProps {
-  redirectTo?: string;
-  showSignup?: boolean;
-  showResetPassword?: boolean;
+  redirectTo?: string
+  showSignup?: boolean
+  showResetPassword?: boolean
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { LoginForm } from '@/components/auth/LoginForm';
-
-<LoginForm
-  redirectTo="/dashboard"
+import { LoginForm } from '@/components/auth/LoginForm'
+;<LoginForm
+  redirectTo='/dashboard'
   showSignup={true}
   showResetPassword={true}
 />
@@ -598,16 +607,15 @@ A React component for changing passwords after reset.
 
 ```typescript
 interface ResetPasswordFormProps {
-  redirectTo?: string;
+  redirectTo?: string
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
-
-<ResetPasswordForm redirectTo="/login" />
+import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
+;<ResetPasswordForm redirectTo='/login' />
 ```
 
 **Features:**
@@ -629,18 +637,17 @@ A React component for requesting password reset emails.
 
 ```typescript
 interface PasswordResetRequestFormProps {
-  redirectTo?: string;
-  onSuccess?: () => void;
+  redirectTo?: string
+  onSuccess?: () => void
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { PasswordResetRequestForm } from '@/components/auth/PasswordResetRequestForm';
-
-<PasswordResetRequestForm
-  redirectTo="/login"
+import { PasswordResetRequestForm } from '@/components/auth/PasswordResetRequestForm'
+;<PasswordResetRequestForm
+  redirectTo='/login'
   onSuccess={() => console.log('Reset email sent')}
 />
 ```
@@ -663,16 +670,15 @@ A React component for new user registration.
 
 ```typescript
 interface RegisterFormProps {
-  redirectTo?: string;
+  redirectTo?: string
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { RegisterForm } from '@/components/auth/RegisterForm';
-
-<RegisterForm redirectTo="/dashboard" />
+import { RegisterForm } from '@/components/auth/RegisterForm'
+;<RegisterForm redirectTo='/dashboard' />
 ```
 
 **Features:**
@@ -687,7 +693,8 @@ import { RegisterForm } from '@/components/auth/RegisterForm';
 
 ### AuthCard
 
-An Astro component that provides a styled card container for authentication forms.
+An Astro component that provides a styled card container for authentication
+forms.
 
 **File:** `src/components/auth/AuthCard.astro`
 
@@ -695,9 +702,9 @@ An Astro component that provides a styled card container for authentication form
 
 ```typescript
 interface Props {
-  title?: string;
-  subtitle?: string;
-  class?: string;
+  title?: string
+  subtitle?: string
+  class?: string
 }
 ```
 
@@ -730,7 +737,8 @@ Components that handle page transitions and animations.
 
 ### PageTransitions
 
-An Astro component that creates smooth transitions between pages using Astro's View Transitions API.
+An Astro component that creates smooth transitions between pages using Astro's
+View Transitions API.
 
 **File:** `src/components/transitions/PageTransitions.astro`
 
@@ -738,8 +746,8 @@ An Astro component that creates smooth transitions between pages using Astro's V
 
 ```typescript
 interface Props {
-  mode?: 'default' | 'fade' | 'slide' | 'slide-up' | 'slide-down' | 'zoom';
-  duration?: number;
+  mode?: 'default' | 'fade' | 'slide' | 'slide-up' | 'slide-down' | 'zoom'
+  duration?: number
 }
 ```
 
@@ -861,7 +869,9 @@ import ReactComponent from './ReactComponent.jsx';
 
 ## Testing Components
 
-All components in the library should have corresponding tests. See the [Component Testing Guide](./component-testing.md) for details on how to test these components.
+All components in the library should have corresponding tests. See the
+[Component Testing Guide](./component-testing.md) for details on how to test
+these components.
 
 ## Contributing New Components
 
@@ -871,7 +881,8 @@ When creating new components:
 2. Include proper TypeScript types for props
 3. Document props and usage
 4. Create tests using Vitest
-5. Follow the [React to Astro Conversion Guide](./react-to-astro-conversion.md) if converting from React
+5. Follow the [React to Astro Conversion Guide](./react-to-astro-conversion.md)
+   if converting from React
 
 ## See Also
 

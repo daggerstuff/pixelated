@@ -1,10 +1,11 @@
 #!/usr/bin/env tsx
 
-import { Command } from 'commander'
-import { BreachNotificationSystem } from '../lib/security/breach-notification'
-import { logger } from '../lib/logger'
-import dotenv from 'dotenv'
 import chalk from 'chalk'
+import { Command } from 'commander'
+import dotenv from 'dotenv'
+
+import { logger } from '../lib/logger'
+import { BreachNotificationSystem } from '../lib/security/breach-notification'
 
 // Load environment variables
 dotenv.config()
@@ -119,13 +120,13 @@ program
   )
   .action(
     async (options: {
-      'type': string
-      'severity': string
-      'description': string
+      type: string
+      severity: string
+      description: string
       'affected-data': string
-      'users': string
-      'detection': string
-      'remediation': string
+      users: string
+      detection: string
+      remediation: string
     }) => {
       try {
         console.log(chalk.red('\n🚨 REPORTING A REAL BREACH NOTIFICATION 🚨\n'))

@@ -1,16 +1,17 @@
 ---
-title: "Server-Side Authentication Security"
-description: "Server-Side Authentication Security documentation"
+title: 'Server-Side Authentication Security'
+description: 'Server-Side Authentication Security documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "authentication"]
+author: 'Pixelated Team'
+tags: ['documentation', 'authentication']
 draft: false
 toc: true
 ---
 
 # Server-Side Authentication Security
 
-This document outlines the enhanced server-side authentication security features implemented in the application.
+This document outlines the enhanced server-side authentication security features
+implemented in the application.
 
 ## Overview
 
@@ -25,9 +26,11 @@ The server-side authentication system provides:
 
 ## Implementation
 
-The core implementation is in the `src/lib/auth/serverAuth.ts` file, which provides:
+The core implementation is in the `src/lib/auth/serverAuth.ts` file, which
+provides:
 
-- `verifyServerAuth()` - Core authentication function with multiple security checks
+- `verifyServerAuth()` - Core authentication function with multiple security
+  checks
 - `protectRoute()` - Higher-order function that wraps Astro API routes
 - `trackSuspiciousActivity()` - Utility for logging suspicious behaviors
 
@@ -39,37 +42,33 @@ The core implementation is in the `src/lib/auth/serverAuth.ts` file, which provi
 import { protectRoute } from '../lib/auth/serverAuth'
 
 // Basic protection - requires authentication
-export const GET: APIRoute = protectRoute({})(
-  async ({ locals }) => {
-    const user = locals.user
-    // Your route logic here
-    return new Response(JSON.stringify({ data: 'success' }))
-  }
-)
+export const GET: APIRoute = protectRoute({})(async ({ locals }) => {
+  const user = locals.user
+  // Your route logic here
+  return new Response(JSON.stringify({ data: 'success' }))
+})
 
 // Role-based protection - requires specific role
 export const POST: APIRoute = protectRoute({
   requiredRole: 'admin',
   validateIPMatch: true,
   validateUserAgent: true,
-})(
-  async ({ locals, request }) => {
-    const admin = locals.user
-    // Your admin-only logic here
-    return new Response(JSON.stringify({ data: 'success' }))
-  }
-)
+})(async ({ locals, request }) => {
+  const admin = locals.user
+  // Your admin-only logic here
+  return new Response(JSON.stringify({ data: 'success' }))
+})
 ```
 
 ### Configuration Options
 
 The `protectRoute()` function accepts the following options:
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `requiredRole` | `AuthRole` | `undefined` | Required role for accessing the route |
-| `validateIPMatch` | `boolean` | `true` | Check if IP matches previous requests |
-| `validateUserAgent` | `boolean` | `true` | Check if user agent matches previous requests |
+| Option              | Type       | Default     | Description                                   |
+| ------------------- | ---------- | ----------- | --------------------------------------------- |
+| `requiredRole`      | `AuthRole` | `undefined` | Required role for accessing the route         |
+| `validateIPMatch`   | `boolean`  | `true`      | Check if IP matches previous requests         |
+| `validateUserAgent` | `boolean`  | `true`      | Check if user agent matches previous requests |
 
 ### Manual Authentication
 
@@ -81,20 +80,20 @@ import { verifyServerAuth } from '../lib/auth/serverAuth'
 async function customAuthFlow(context: APIContext) {
   const { cookies, request } = context
   const requestIp = request.headers.get('x-forwarded-for') || 'unknown'
-  
+
   const { authenticated, user, reason } = await verifyServerAuth({
     cookies,
     request,
     requestIp,
     requiredRole: 'user',
   })
-  
+
   if (!authenticated) {
     // Handle authentication failure
     console.log(`Auth failed: ${reason}`)
     return new Response('Unauthorized', { status: 401 })
   }
-  
+
   // User is authenticated
   return user
 }
@@ -112,7 +111,8 @@ The system implements IP-based rate limiting to prevent brute force attacks:
 
 ### IP Verification
 
-The system tracks IP addresses and detects when a user logs in from a new location:
+The system tracks IP addresses and detects when a user logs in from a new
+location:
 
 - Previous IP addresses are stored in Redis
 - Changes trigger security alerts and audit logs
@@ -162,7 +162,8 @@ When implementing authentication:
 
 ## Testing
 
-Unit tests are available in the `src/lib/auth/__tests__/serverAuth.test.ts` file, which tests:
+Unit tests are available in the `src/lib/auth/__tests__/serverAuth.test.ts`
+file, which tests:
 
 - Authentication validation logic
 - Role-based access control

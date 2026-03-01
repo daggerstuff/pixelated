@@ -13,7 +13,7 @@ jobs:
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: '--max-old-space-size=4096'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -26,7 +26,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version: '24'
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -103,7 +103,9 @@ jobs:
           echo "IMAGE_TAG_LATEST=$IMAGE_TAG_LATEST" >> $GITHUB_ENV
 
       - name: Authenticate with GitHub Container Registry
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if:
+          ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'
+          }}
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -112,7 +114,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Docker images
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if:
+          ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'
+          }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -177,7 +181,9 @@ jobs:
 
       - name: Check Docker Hub credentials
         id: check_dockerhub_creds
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if:
+          ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'
+          }}
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -230,7 +236,9 @@ jobs:
           if docker push $DOCKERHUB_LATEST; then echo "✅ Pushed $DOCKERHUB_LATEST"; else echo "❌ Failed to push $DOCKERHUB_LATEST"; exit 1; fi
 
       - name: Create deployment notification
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        if:
+          ${{ github.event_name == 'push' && github.ref == 'refs/heads/master'
+          }}
         run: |
           echo "🚀 Deployment ready for production"
           echo "📦 Image: $IMAGE_TAG_SHA"

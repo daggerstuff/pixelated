@@ -5,9 +5,9 @@ metadata:
   namespace: cert-manager
 spec:
   hard:
-    requests.cpu: "1500m"
+    requests.cpu: '1500m'
     requests.memory: 1Gi
-    limits.cpu: "3"
+    limits.cpu: '3'
     limits.memory: 2Gi
 ---
 apiVersion: v1
@@ -17,8 +17,7 @@ metadata:
   namespace: metoro
 spec:
   hard:
-    requests.cpu: "1000m"
+    requests.cpu: '1000m'
     requests.memory: 1Gi
-    limits.cpu: "2"
+    limits.cpu: '2'
     limits.memory: 2Gi
-

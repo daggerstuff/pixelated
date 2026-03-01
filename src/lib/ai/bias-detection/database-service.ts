@@ -5,6 +5,9 @@
  * Handles all CRUD operations with proper error handling and HIPAA compliance.
  */
 
+import { ObjectId } from 'mongodb'
+
+import mongodb from '../../../config/mongodb.config'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   BiasAnalysisResult,
@@ -15,8 +18,6 @@ import type {
   DemographicBreakdown,
   DashboardRecommendation,
 } from './types'
-import mongodb from '../../../config/mongodb.config'
-import { ObjectId } from 'mongodb'
 
 const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
@@ -44,7 +45,9 @@ export class BiasDetectionDatabaseService {
         error: errorMessage,
         timestamp: new Date().toISOString(),
       })
-      throw new Error(`Database connection failed: ${errorMessage}`, { cause: error })
+      throw new Error(`Database connection failed: ${errorMessage}`, {
+        cause: error,
+      })
     }
   }
 
@@ -167,15 +170,9 @@ export class BiasDetectionDatabaseService {
         error: error instanceof Error ? String(error) : String(error),
         timeRange: options?.timeRange,
       })
-      throw error;
+      throw error
     }
   }
-
-
-
-
-
-
 
   /**
    * Get summary statistics
@@ -328,9 +325,9 @@ export class BiasDetectionDatabaseService {
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
-              (sum, analysis) => sum + analysis['overallBiasScore'],
-              0,
-            ) / analyses.length
+                (sum, analysis) => sum + analysis['overallBiasScore'],
+                0,
+              ) / analyses.length
             : 0
 
         // Get demographic breakdown for this period
@@ -441,13 +438,12 @@ export class BiasDetectionDatabaseService {
     }
   }
 
-
   /**
    * Get recent analyses
    */
   private async getRecentAnalyses(
     cutoffTime: Date,
-    limit: number
+    limit: number,
   ): Promise<BiasAnalysisResult[]> {
     try {
       const db = await this.getDatabase()
@@ -645,8 +641,8 @@ export class BiasDetectionDatabaseService {
         createdAt: new Date(),
         retentionExpiry: entry.retentionPeriodDays
           ? new Date(
-            Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
-          )
+              Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
+            )
           : null,
       }
 

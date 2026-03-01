@@ -1,3 +1,5 @@
+import { getEnv } from '@/lib/utils/env'
+
 import { RedisService } from './RedisService'
 import type {
   RedisServiceConfig,
@@ -5,7 +7,6 @@ import type {
   RedisErrorCode,
   RedisServiceError,
 } from './types'
-import { getEnv } from '@/lib/utils/env'
 
 // Export the main service class and types
 export { RedisService }

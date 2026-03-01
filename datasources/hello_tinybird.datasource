@@ -1,0 +1,13 @@
+DESCRIPTION >
+Welcome to Tinybird! This is your first datafile. Datafiles represent resources in your workspace.
+You can learn more about the syntax at https://www.tinybird.co/docs/forward/dev-reference/datafiles.
+To delete the datasource associated with this datafile, delete this file in your local project and run `tb --cloud deploy --allow-destructive-operations`.
+
+SCHEMA >
+`user_id` UInt32 `json:$.user_id`,
+`command` String `json:$.command`,
+`timestamp` DateTime `json:$.timestamp`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, user_id"

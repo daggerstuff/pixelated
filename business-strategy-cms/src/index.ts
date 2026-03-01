@@ -1,16 +1,17 @@
-import express from 'express'
-import helmet from 'helmet'
-import cors from 'cors'
-import rateLimit from 'express-rate-limit'
 import { createServer } from 'http'
+
+import cors from 'cors'
+import express from 'express'
+import rateLimit from 'express-rate-limit'
+import helmet from 'helmet'
 
 import { config } from '@/config/app'
 import {
   initializeDatabases,
   closeDatabaseConnections,
 } from '@/config/database'
-import { apiRouter } from '@/routes'
 import { errorHandler } from '@/middleware/errorHandler'
+import { apiRouter } from '@/routes'
 import { SocketService } from '@/services/socketService'
 import { logger } from '@/utils/logger'
 
@@ -145,7 +146,7 @@ const gracefulShutdown = async (signal: string) => {
 
       // Close Socket.IO connections
       if (socketService && config.enableRealTimeCollaboration) {
-        ; (socketService as any).io.close()
+        ;(socketService as any).io.close()
         logger.info('Socket.IO service closed')
       }
 

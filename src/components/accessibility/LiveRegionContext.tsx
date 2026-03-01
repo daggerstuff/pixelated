@@ -145,36 +145,36 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
   return (
     <LiveRegionContext.Provider value={contextValue}>
       {/* Fallback live regions in case LiveRegionSystem.astro isn't in the page */}
-      <div className="live-region-system" aria-hidden="false">
+      <div className='live-region-system' aria-hidden='false'>
         {/* Status announcements (polite) */}
         <div
-          aria-live="polite"
-          aria-atomic="true"
-          className="sr-only"
-          role="status"
+          aria-live='polite'
+          aria-atomic='true'
+          className='sr-only'
+          role='status'
         >
           {statusMessage}
         </div>
 
         {/* Alert announcements (assertive) */}
         <div
-          aria-live="assertive"
-          aria-atomic="true"
-          className="sr-only"
-          role="alert"
+          aria-live='assertive'
+          aria-atomic='true'
+          className='sr-only'
+          role='alert'
         >
           {alertMessage}
         </div>
 
         {/* Log announcements (polite, not atomic) */}
-        <div aria-live="polite" aria-atomic="false" className="sr-only">
+        <div aria-live='polite' aria-atomic='false' className='sr-only'>
           {logMessages.map((msg, index) => (
             <div key={`log-${index}-${msg.slice(0, 10)}`}>{msg}</div>
           ))}
         </div>
 
         {/* Progress announcements (polite) */}
-        <div aria-live="polite" aria-atomic="true" className="sr-only">
+        <div aria-live='polite' aria-atomic='true' className='sr-only'>
           {progressMessage}
         </div>
       </div>

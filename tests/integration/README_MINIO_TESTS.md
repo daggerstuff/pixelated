@@ -2,19 +2,23 @@
 
 ## Overview
 
-This test suite validates MinIO/S3 object storage operations to ensure that the upgrade from `minio==7.1.0` to `minio==7.2.11` doesn't introduce regressions in critical storage functionality.
+This test suite validates MinIO/S3 object storage operations to ensure that the
+upgrade from `minio==7.1.0` to `minio==7.2.11` doesn't introduce regressions in
+critical storage functionality.
 
 ## Test Coverage
 
 The test suite covers:
 
 - **Bucket Operations**: Creation, listing, existence checks
-- **Object Operations**: Upload (bytes/file), download (bytes/file), listing, metadata, deletion
+- **Object Operations**: Upload (bytes/file), download (bytes/file), listing,
+  metadata, deletion
 - **Presigned URLs**: GET and PUT URL generation with expiration
 - **Error Handling**: Non-existent objects, invalid operations
 - **Content Types**: Explicit content type handling, binary data
 - **Region Handling**: S3-compatible region configuration
-- **Signature Calculation**: Authentication signature verification (critical for security)
+- **Signature Calculation**: Authentication signature verification (critical for
+  security)
 
 ## Prerequisites
 
@@ -93,17 +97,22 @@ tests/integration/test_minio_storage.py
 
 ### Critical Behaviors (Post-Upgrade Validation)
 
-1. **Signature Calculation**: MinIO has had signature calculation changes across versions. Tests verify that:
+1. **Signature Calculation**: MinIO has had signature calculation changes across
+   versions. Tests verify that:
    - Multiple operations with the same client maintain correct signatures
    - Presigned URLs contain valid signature parameters
 
-2. **Path-Style vs Virtual-Hosted-Style**: Tests ensure addressing works correctly regardless of bucket naming
+2. **Path-Style vs Virtual-Hosted-Style**: Tests ensure addressing works
+   correctly regardless of bucket naming
 
-3. **TLS/SSL Handling**: Tests verify secure connections work (when `MINIO_SECURE=true`)
+3. **TLS/SSL Handling**: Tests verify secure connections work (when
+   `MINIO_SECURE=true`)
 
-4. **Response Parsing**: Tests verify that response objects are parsed correctly (stat, list operations)
+4. **Response Parsing**: Tests verify that response objects are parsed correctly
+   (stat, list operations)
 
-5. **Authentication**: Tests verify that access keys and secret keys work correctly
+5. **Authentication**: Tests verify that access keys and secret keys work
+   correctly
 
 ## Integration with CI/CD
 
@@ -155,7 +164,8 @@ If tests timeout:
 
 - `src/lib/ai/training/requirements.txt` - MinIO version specification
 - `docker-compose.milvus.yml` - MinIO service configuration
-- `src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml` - Alternative MinIO config
+- `src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml` -
+  Alternative MinIO config
 
 ## Notes
 

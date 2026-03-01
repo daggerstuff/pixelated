@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
+
+import { getAllScenarios } from '../data/scenarios'
 import type { Scenario, ScenarioSelectorProps } from '../types'
 import { ScenarioDifficulty } from '../types'
-import { getAllScenarios } from '../data/scenarios'
 
 /**
  * Component for selecting scenarios to practice
@@ -54,33 +55,33 @@ export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps) {
   }, [allScenarios])
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+    <div className='mx-auto w-full max-w-4xl'>
+      <div className='mb-8'>
+        <h2 className='text-gray-800 mb-2 text-2xl font-semibold'>
           Select a Practice Scenario
         </h2>
-        <p className="text-gray-600">
+        <p className='text-gray-600'>
           Choose a scenario to practice your therapeutic skills. All
           interactions are processed in real-time with zero data retention.
         </p>
       </div>
 
       {/* Filters */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-3'>
         <div>
           <label
-            htmlFor="domain-filter"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor='domain-filter'
+            className='text-gray-700 mb-1 block text-sm font-medium'
           >
             Therapeutic Domain
           </label>
           <select
-            id="domain-filter"
+            id='domain-filter'
             value={selectedDomain}
             onChange={(e) => setSelectedDomain(e.target.value)}
-            className="w-full rounded-md border border-gray-300 py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className='border-gray-300 text-gray-700 focus:ring-blue-500 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2'
           >
-            <option value="all">All Domains</option>
+            <option value='all'>All Domains</option>
             {domains.map((domain) => (
               <option key={domain} value={domain}>
                 {domain.replace(/_/g, ' ')}
@@ -91,18 +92,18 @@ export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps) {
 
         <div>
           <label
-            htmlFor="difficulty-filter"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor='difficulty-filter'
+            className='text-gray-700 mb-1 block text-sm font-medium'
           >
             Difficulty Level
           </label>
           <select
-            id="difficulty-filter"
+            id='difficulty-filter'
             value={selectedDifficulty}
             onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="w-full rounded-md border border-gray-300 py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className='border-gray-300 text-gray-700 focus:ring-blue-500 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2'
           >
-            <option value="all">All Difficulties</option>
+            <option value='all'>All Difficulties</option>
             {difficulties.map((difficulty) => (
               <option key={difficulty} value={difficulty}>
                 {difficulty}
@@ -113,24 +114,24 @@ export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps) {
 
         <div>
           <label
-            htmlFor="search-filter"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor='search-filter'
+            className='text-gray-700 mb-1 block text-sm font-medium'
           >
             Search Scenarios
           </label>
           <input
-            id="search-filter"
-            type="text"
+            id='search-filter'
+            type='text'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by keyword..."
-            className="w-full rounded-md border border-gray-300 py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder='Search by keyword...'
+            className='border-gray-300 text-gray-700 focus:ring-blue-500 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2'
           />
         </div>
       </div>
 
       {/* Scenarios grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {filteredScenarios.length > 0 ? (
           filteredScenarios.map((scenario) => (
             <ScenarioCard
@@ -140,8 +141,8 @@ export function ScenarioSelector({ onSelectScenario }: ScenarioSelectorProps) {
             />
           ))
         ) : (
-          <div className="col-span-2 p-6 text-center bg-gray-50 rounded-lg">
-            <p className="text-gray-500">
+          <div className='bg-gray-50 col-span-2 rounded-lg p-6 text-center'>
+            <p className='text-gray-500'>
               No scenarios found matching your filters.
             </p>
           </div>
@@ -176,31 +177,31 @@ function ScenarioCard({
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold text-gray-800">
+    <div className='overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md'>
+      <div className='p-4'>
+        <div className='mb-2 flex items-start justify-between'>
+          <h3 className='text-gray-800 text-lg font-semibold'>
             {scenario.title}
           </h3>
           <span
-            className={`px-2 py-1 rounded-md text-xs font-medium ${getDifficultyColor(scenario.difficulty)}`}
+            className={`rounded-md px-2 py-1 text-xs font-medium ${getDifficultyColor(scenario.difficulty)}`}
           >
             {scenario.difficulty}
           </span>
         </div>
 
-        <p className="text-gray-600 text-sm mb-3">{scenario.description}</p>
+        <p className='text-gray-600 mb-3 text-sm'>{scenario.description}</p>
 
-        <div className="mb-3">
-          <span className="inline-block bg-blue-100 text-blue-700 rounded-full px-3 py-1 text-xs font-medium">
+        <div className='mb-3'>
+          <span className='bg-blue-100 text-blue-700 inline-block rounded-full px-3 py-1 text-xs font-medium'>
             {scenario.domain.replace(/_/g, ' ')}
           </span>
         </div>
 
-        <div className="mt-4">
+        <div className='mt-4'>
           <button
             onClick={onSelect}
-            className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className='bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 w-full rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2'
           >
             Practice This Scenario
           </button>

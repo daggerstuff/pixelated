@@ -1,7 +1,8 @@
-// @vitest-environment node
-import { describe, it, expect } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+
+// @vitest-environment node
+import { describe, it, expect } from 'vitest'
 
 describe('Security Scanning Configuration', () => {
   describe('GitHub Workflow Configuration', () => {

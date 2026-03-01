@@ -5,7 +5,9 @@
  * caching, retry logic, and type safety.
  */
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import type { Event, Metric } from '@/lib/services/analytics/analytics-types'
+import { EventType } from '@/lib/services/analytics/analytics-types'
+import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
 import type {
   AnalyticsChartData,
   SessionData,
@@ -16,9 +18,8 @@ import type {
   TimeRange,
   AnalyticsFilters,
 } from '@/types/analytics'
-import type { Event, Metric } from '@/lib/services/analytics/analytics-types'
-import { EventType } from '@/lib/services/analytics/analytics-types'
-import { AnalyticsService } from '@/lib/services/analytics/AnalyticsService'
+
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('analytics-data-service')
 
@@ -174,13 +175,13 @@ export class AnalyticsDataService {
           value: this.calculateTotalSessions(sessionCount),
           label: 'Total Sessions',
           color: 'blue' as const,
-          trend: await this.calculateTrend('total_sessions', filters.timeRange),
+          trend:  this.calculateTrend('total_sessions', filters.timeRange),
         },
         {
           value: this.calculateCompletionRate(completionRate),
           label: 'Completion Rate',
           color: 'green' as const,
-          trend: await this.calculateTrend(
+          trend:  this.calculateTrend(
             'completion_rate',
             filters.timeRange,
           ),
@@ -189,7 +190,7 @@ export class AnalyticsDataService {
           value: this.calculateAverageRating(avgRating),
           label: 'Avg. Rating',
           color: 'purple' as const,
-          trend: await this.calculateTrend('average_rating', filters.timeRange),
+          trend:  this.calculateTrend('average_rating', filters.timeRange),
         },
       ]
     } catch (error: unknown) {
@@ -427,7 +428,7 @@ export class AnalyticsDataService {
       return {
         code: 'FETCH_ERROR',
         message: String(error),
-        details: (error as Error)?.stack,
+        details: (error)?.stack,
       }
     }
 

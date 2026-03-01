@@ -1,6 +1,8 @@
 ---
 title: 'Provider System'
-description: 'Comprehensive guide to Pixelated Healths provider system for managing global state and functionality'
+description:
+  'Comprehensive guide to Pixelated Healths provider system for managing global
+  state and functionality'
 pubDate: 2025-03-24
 share: true
 toc: true
@@ -11,16 +13,18 @@ author: 'Pixelated Team'
 
 # Provider System
 
-The provider system in Pixelated is designed to manage global state and functionality across the application. It includes several key providers that handle different aspects of the application's functionality.
+The provider system in Pixelated is designed to manage global state and
+functionality across the application. It includes several key providers that
+handle different aspects of the application's functionality.
 
 ## SharedProviders
 
-The `SharedProviders` component is the root provider that composes all other providers. It includes:
+The `SharedProviders` component is the root provider that composes all other
+providers. It includes:
 
 - Error handling with ErrorBoundary
 - Theme management with ThemeProvider
 - Security settings with SecurityProvider
-
 
 ### Usage
 
@@ -35,11 +39,9 @@ function App() {
 You can also use the HOC pattern:
 
 ```tsx
-
 function YourComponent() {
   return <div>Your component content</div>
 }
-
 ```
 
 ## ThemeProvider
@@ -127,7 +129,8 @@ function YourComponent() {
 ## Best Practices
 
 1. Always use the `SharedProviders` at the root of your application
-2. Use the appropriate hooks (`useTheme`, `useSecurity`) to access provider functionality
+2. Use the appropriate hooks (`useTheme`, `useSecurity`) to access provider
+   functionality
 3. Handle errors appropriately with ErrorBoundary
 4. Consider performance implications when updating provider state
 5. Use TypeScript for better type safety and developer experience

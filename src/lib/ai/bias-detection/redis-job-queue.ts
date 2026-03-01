@@ -1,5 +1,6 @@
 // Redis-backed job queue for distributed, horizontally scalable batch analysis
 import { createClient, RedisClientType } from 'redis'
+
 import { Job, JobStatus } from './job-queue'
 
 type JobHandler<T, R> = (
@@ -49,7 +50,7 @@ export class RedisJobQueue<T = any, R = any> {
       jobId: id,
       createdAt: job.createdAt,
     })
-    this.processNext()
+    void this.processNext()
     return id
   }
 
@@ -89,7 +90,7 @@ export class RedisJobQueue<T = any, R = any> {
       try {
         job.result = await this.handler(job.data, (progress) => {
           job.progress = progress
-          this.redis.hSet(this.jobsKey, id, JSON.stringify(job))
+          void this.redis.hSet(this.jobsKey, id, JSON.stringify(job))
           console.info('[RedisJobQueue] Job progress', {
             jobId: job.id,
             progress,

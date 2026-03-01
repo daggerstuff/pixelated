@@ -1,6 +1,6 @@
-import React, { useRef, useMemo, useState } from 'react'
-import { Canvas, useFrame, extend } from '@react-three/fiber'
 import { OrbitControls, Stars } from '@react-three/drei'
+import { Canvas, useFrame, extend } from '@react-three/fiber'
+import React, { useRef, useMemo, useState } from 'react'
 import * as THREE from 'three'
 
 // Extend Three.js objects for react-three-fiber
@@ -182,7 +182,7 @@ const ParticleSystem: React.FC<{
         <line>
           <bufferGeometry ref={trailGeometryRef}>
             <bufferAttribute
-              attach="attributes-position"
+              attach='attributes-position'
               count={trailPoints.length}
               array={
                 new Float32Array(trailPoints.flatMap((p) => [p.x, p.y, p.z]))
@@ -190,7 +190,7 @@ const ParticleSystem: React.FC<{
               itemSize={3}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#64748B" transparent opacity={0.4} />
+          <lineBasicMaterial color='#64748B' transparent opacity={0.4} />
         </line>
       )}
     </group>
@@ -300,9 +300,9 @@ const Particle: React.FC<ParticleSystemProps> = ({
         <pointLight
           position={[-10, -10, -10]}
           intensity={0.3}
-          color="#4444ff"
+          color='#4444ff'
         />
-        <pointLight position={[0, 0, 0]} intensity={0.4} color="#ff4444" />
+        <pointLight position={[0, 0, 0]} intensity={0.4} color='#ff4444' />
 
         {/* Background stars */}
         <Stars
@@ -337,9 +337,9 @@ const Particle: React.FC<ParticleSystemProps> = ({
       </Canvas>
 
       {/* Emotion Controls */}
-      <div className="absolute top-4 left-4 bg-black bg-opacity-60 text-white p-4 rounded-lg">
-        <h3 className="text-lg font-semibold mb-3">Emotion Controls</h3>
-        <div className="grid grid-cols-2 gap-2">
+      <div className='bg-black text-white absolute left-4 top-4 rounded-lg bg-opacity-60 p-4'>
+        <h3 className='mb-3 text-lg font-semibold'>Emotion Controls</h3>
+        <div className='grid grid-cols-2 gap-2'>
           {(
             [
               'joy',
@@ -354,7 +354,7 @@ const Particle: React.FC<ParticleSystemProps> = ({
             <button
               key={emotionType}
               onClick={() => setCurrentEmotion(emotionType)}
-              className={`px-3 py-2 rounded text-sm capitalize transition-colors ${
+              className={`rounded px-3 py-2 text-sm capitalize transition-colors ${
                 currentEmotion === emotionType
                   ? 'bg-blue-600 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -365,7 +365,7 @@ const Particle: React.FC<ParticleSystemProps> = ({
           ))}
         </div>
 
-        <div className="mt-4 text-sm text-gray-300">
+        <div className='text-gray-300 mt-4 text-sm'>
           <div>Particles: {particleCount}</div>
           <div>Interactive: {interactive ? 'On' : 'Off'}</div>
           <div>Trails: {showTrails ? 'On' : 'Off'}</div>
@@ -374,7 +374,7 @@ const Particle: React.FC<ParticleSystemProps> = ({
 
       {/* Instructions */}
       {interactive && (
-        <div className="absolute bottom-4 right-4 bg-black bg-opacity-60 text-white p-3 rounded text-sm max-w-xs">
+        <div className='bg-black text-white absolute bottom-4 right-4 max-w-xs rounded bg-opacity-60 p-3 text-sm'>
           <p>
             Move your mouse to interact with particles. Use mouse wheel to zoom
             and drag to rotate the view.

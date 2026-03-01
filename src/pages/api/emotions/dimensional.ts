@@ -1,8 +1,9 @@
 import type { APIRoute } from 'astro'
-import { getEmotionsRepository } from '../../../lib/repositories/emotionsRepository'
-import { protectApi } from '../../../lib/auth/apiAuth'
-import { getCacheService } from '../../../lib/services/cacheService'
+
 import type { DimensionalEmotionMap } from '../../../lib/ai/emotions/dimensionalTypes'
+import { protectApi } from '../../../lib/auth/apiAuth'
+import { getEmotionsRepository } from '../../../lib/repositories/emotionsRepository'
+import { getCacheService } from '../../../lib/services/cacheService'
 
 // Disable prerendering since this API route uses request.headers
 export const prerender = false
@@ -64,9 +65,9 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(null, {
         status: 304,
         headers: {
-          'ETag': etag,
+          ETag: etag,
           'Cache-Control': computeCacheControl(startDate, endDate),
-          'Vary': 'Accept-Encoding, Authorization',
+          Vary: 'Accept-Encoding, Authorization',
         },
       })
     }
@@ -80,9 +81,9 @@ export const GET: APIRoute = async ({ request }) => {
         headers: {
           'Content-Type': 'application/json',
           'Cache-Control': computeCacheControl(startDate, endDate),
-          'ETag': etag,
+          ETag: etag,
           'X-Cache': 'HIT',
-          'Vary': 'Accept-Encoding, Authorization',
+          Vary: 'Accept-Encoding, Authorization',
         },
       })
     }
@@ -135,10 +136,10 @@ export const GET: APIRoute = async ({ request }) => {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': computeCacheControl(startDate, endDate),
-        'ETag': etag,
+        ETag: etag,
         'X-Cache': 'MISS',
         'X-Response-Time': `${Math.round(queryTime)}ms`,
-        'Vary': 'Accept-Encoding, Authorization',
+        Vary: 'Accept-Encoding, Authorization',
       },
     })
   } catch (error: unknown) {

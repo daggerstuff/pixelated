@@ -30,18 +30,18 @@ export function ProgressBar({
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <div className="mb-2 flex items-center justify-between text-sm">
-          <label htmlFor={id} className="text-muted-foreground">
+        <div className='mb-2 flex items-center justify-between text-sm'>
+          <label htmlFor={id} className='text-muted-foreground'>
             {label}
           </label>
           {showValue && (
-            <span className="font-medium">{Math.round(percentage)}%</span>
+            <span className='font-medium'>{Math.round(percentage)}%</span>
           )}
         </div>
       )}
       <div
-        className="relative h-2 w-full overflow-hidden rounded-full bg-muted"
-        role="progressbar"
+        className='bg-muted relative h-2 w-full overflow-hidden rounded-full'
+        role='progressbar'
         aria-valuenow={value}
         aria-valuemin={0}
         aria-valuemax={max}
@@ -57,11 +57,10 @@ export function ProgressBar({
         />
       </div>
       {showValue && !label && (
-        <div className="mt-1 text-right text-xs text-muted-foreground">
+        <div className='text-muted-foreground mt-1 text-right text-xs'>
           {Math.round(percentage)}%
         </div>
       )}
     </div>
   )
 }
-

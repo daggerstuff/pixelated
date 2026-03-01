@@ -1,3 +1,5 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { generateId } from '../../utils/ids'
 import type {
   ComplianceDocument,
   ComplianceVerification,
@@ -9,8 +11,6 @@ import {
   BusinessAssociateType,
   ServiceCategory,
 } from './types'
-import { generateId } from '../../utils/ids'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')

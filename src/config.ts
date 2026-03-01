@@ -1,5 +1,5 @@
-import type { Features, Site, Ui } from './types'
 import { createBuildSafeLogger } from './lib/logging/build-safe-logger'
+import type { Features, Site, Ui } from './types'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')
@@ -151,8 +151,5 @@ export const FEATURES: Features = {
       maxItemsPerPage: [true, [3]],
     },
   ],
-  giscus: [
-    true,
-    [] as const,
-  ],
+  giscus: [true, [] as const],
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+
 import type { FunnelConfig } from '../../hooks/useConversionTracking'
 import useConversionTracking from '../../hooks/useConversionTracking'
 
@@ -57,8 +58,8 @@ export default function ConversionTrackingExample() {
   }
 
   return (
-    <div className="conversion-example">
-      <div className="progress-bar">
+    <div className='conversion-example'>
+      <div className='progress-bar'>
         {funnelConfig.stages.map((stage, idx) => (
           <div
             key={stage.id}
@@ -69,9 +70,9 @@ export default function ConversionTrackingExample() {
         ))}
       </div>
 
-      <div className="content">
+      <div className='content'>
         {step < funnelConfig.stages.length - 1 ? (
-          <div className="step-content">
+          <div className='step-content'>
             <h3>
               Step {step + 1}: {funnelConfig.stages[step]?.id || 'Unknown'}
             </h3>
@@ -79,7 +80,7 @@ export default function ConversionTrackingExample() {
             <button onClick={nextStep}>Next Step</button>
           </div>
         ) : (
-          <div className="completion">
+          <div className='completion'>
             <h3>Conversion Complete!</h3>
             <p>You&apos;ve completed all steps of the funnel.</p>
             <button onClick={resetDemo}>Start Over</button>
@@ -87,10 +88,10 @@ export default function ConversionTrackingExample() {
         )}
       </div>
 
-      <div className="side-actions">
+      <div className='side-actions'>
         <h4>Other Actions</h4>
         <button onClick={handleSimpleEvent}>Track Simple Event</button>
-        <div className="event-info">
+        <div className='event-info'>
           <p>
             Click the button above to track a single event without affecting the
             funnel.

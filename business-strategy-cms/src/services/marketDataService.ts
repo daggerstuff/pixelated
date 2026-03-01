@@ -1,6 +1,6 @@
-import { YahooFinanceService } from './yahooFinanceService'
-import { AlphaVantageService } from './alphaVantageService'
 import { Logger } from '../utils/logger'
+import { AlphaVantageService } from './alphaVantageService'
+import { YahooFinanceService } from './yahooFinanceService'
 
 export interface MarketData {
   symbol: string

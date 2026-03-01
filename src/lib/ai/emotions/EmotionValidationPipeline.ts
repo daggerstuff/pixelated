@@ -216,7 +216,7 @@ class EmotionValidationPipeline {
 
       // Stop bias detection monitoring
       if (this.biasDetectionEngine) {
-        this.biasDetectionEngine.stopMonitoring()
+        void this.biasDetectionEngine.stopMonitoring()
       }
 
       this.logger.info('Emotion validation pipeline stopped successfully')
@@ -279,7 +279,7 @@ class EmotionValidationPipeline {
             this.convertToTherapeuticSession(emotionData)
           biasAnalysis = (await this.biasDetectionEngine.analyzeSession(
             therapeuticSession,
-          )) as BiasAnalysisResult
+          ))
         } catch (error: unknown) {
           this.logger.warn('Bias detection failed for emotion validation', {
             sessionId: emotionData.sessionId,
@@ -549,7 +549,7 @@ class EmotionValidationPipeline {
       if (
         biasPattern.pattern.test(responseText) &&
         demographics.gender?.toLowerCase() ===
-        biasPattern.demographic.toLowerCase()
+          biasPattern.demographic.toLowerCase()
       ) {
         detectedPatterns.push(biasPattern.bias)
         severity += 0.3

@@ -1,6 +1,7 @@
 ---
 title: 'Notification Service'
-description: 'Documentation for Pixelated Healths notification system and real-time alerts'
+description:
+  'Documentation for Pixelated Healths notification system and real-time alerts'
 pubDate: 2025-03-27
 share: true
 toc: true
@@ -13,9 +14,10 @@ author: 'Pixelated Team'
 
 ### Overview
 
-The Notification Service provides a robust, real-time notification system that supports multiple
-delivery channels and ensures reliable message delivery. Built with TypeScript and WebSocket technology,
-it offers a scalable solution for handling notifications across the application.
+The Notification Service provides a robust, real-time notification system that
+supports multiple delivery channels and ensures reliable message delivery. Built
+with TypeScript and WebSocket technology, it offers a scalable solution for
+handling notifications across the application.
 
 ### Features
 
@@ -33,7 +35,6 @@ it offers a scalable solution for handling notifications across the application.
 ### Initializing the Service
 
 ```typescript
-
 const notificationService = new NotificationService()
 ```
 
@@ -66,7 +67,6 @@ const notificationId = await notificationService.queueNotification({
 ### Handling WebSocket Connections
 
 ```typescript
-
 const wss = new WebSocketServer({ port: 8082 }, notificationService)
 
 // In your client code:

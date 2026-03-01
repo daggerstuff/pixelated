@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+
 import { WebSocketMessage } from '@/types/pipeline'
 
 /**
@@ -211,7 +212,7 @@ export function usePipelineWebSocket({
         type: 'progress_request',
         executionId,
         timestamp: new Date().toISOString(),
-        data: requestData as unknown,
+        data: requestData,
       }
       sendMessage(message)
     },
@@ -224,7 +225,7 @@ export function usePipelineWebSocket({
         type: 'status_request',
         executionId,
         timestamp: new Date().toISOString(),
-        data: requestData as unknown,
+        data: requestData,
       }
       sendMessage(message)
     },

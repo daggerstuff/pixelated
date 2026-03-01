@@ -5,9 +5,10 @@
  * of long-running tasks such as batch bias analysis, report generation, etc.
  */
 
+import { v4 as uuidv4 } from 'uuid'
+
 import { redis } from '../../lib/services/redis'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { v4 as uuidv4 } from 'uuid'
 
 const logger = createBuildSafeLogger('JobQueueService')
 

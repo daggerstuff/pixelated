@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import type { AIModel } from '../lib/ai/models/types'
 
 interface Message {
@@ -8,8 +9,8 @@ interface Message {
 }
 
 export interface AIChatReactProps {
-  'availableModels': AIModel[]
-  'showModelSelector'?: boolean
+  availableModels: AIModel[]
+  showModelSelector?: boolean
   'client:load'?: boolean
   'client:visible'?: boolean
   'client:idle'?: boolean
@@ -68,23 +69,23 @@ export default function AIChatReact({
   }
 
   return (
-    <div className="max-w-2xl mx-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
+    <div className='border-gray-200 dark:border-gray-700 mx-auto max-w-2xl overflow-hidden rounded-lg border shadow-lg'>
       {showModelSelector && (
-        <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className='bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b p-4'>
           <label
-            htmlFor="model-select"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            htmlFor='model-select'
+            className='text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium'
           >
             Select AI Model
           </label>
           <select
-            id="model-select"
+            id='model-select'
             value={selectedModel}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setSelectedModel(e.target.value)
             }
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            aria-label="AI model selection"
+            className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full rounded-md border p-2'
+            aria-label='AI model selection'
           >
             {availableModels.map((model) => (
               <option key={model.id} value={model.id}>
@@ -95,15 +96,15 @@ export default function AIChatReact({
         </div>
       )}
 
-      <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+      <div className='bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b p-4'>
+        <h2 className='text-gray-900 dark:text-white text-lg font-medium'>
           AI Chat
         </h2>
       </div>
 
-      <div className="h-96 overflow-y-auto p-4 space-y-4 bg-white dark:bg-gray-900">
+      <div className='bg-white dark:bg-gray-900 h-96 space-y-4 overflow-y-auto p-4'>
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+          <div className='text-gray-500 dark:text-gray-400 py-8 text-center'>
             <p>Send a message to start chatting with the AI assistant</p>
           </div>
         ) : (
@@ -113,7 +114,7 @@ export default function AIChatReact({
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] px-4 py-2 rounded-lg ${
+                className={`max-w-[80%] rounded-lg px-4 py-2 ${
                   message.role === 'user'
                     ? 'bg-blue-500 text-white rounded-br-none'
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
@@ -126,16 +127,16 @@ export default function AIChatReact({
         )}
 
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg rounded-bl-none max-w-[80%]">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+          <div className='flex justify-start'>
+            <div className='bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 max-w-[80%] rounded-lg rounded-bl-none px-4 py-2'>
+              <div className='flex space-x-2'>
+                <div className='bg-gray-500 h-2 w-2 animate-bounce rounded-full'></div>
                 <div
-                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  className='bg-gray-500 h-2 w-2 animate-bounce rounded-full'
                   style={{ animationDelay: '0.2s' }}
                 ></div>
                 <div
-                  className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
+                  className='bg-gray-500 h-2 w-2 animate-bounce rounded-full'
                   style={{ animationDelay: '0.4s' }}
                 ></div>
               </div>
@@ -146,23 +147,23 @@ export default function AIChatReact({
 
       <form
         onSubmit={handleSubmit}
-        className="p-4 border-t border-gray-200 dark:border-gray-700 flex bg-white dark:bg-gray-900"
+        className='border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex border-t p-4'
       >
         <input
-          type="text"
+          type='text'
           value={inputValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setInputValue(e.target.value)
           }
-          className="flex-1 border border-gray-300 dark:border-gray-600 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-          placeholder="Type your message..."
+          className='border-gray-300 dark:border-gray-600 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2'
+          placeholder='Type your message...'
           disabled={isLoading}
         />
 
         <button
-          type="submit"
+          type='submit'
           disabled={isLoading || !inputValue.trim()}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300 dark:disabled:bg-blue-800"
+          className='bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 disabled:bg-blue-300 dark:disabled:bg-blue-800 rounded-r-lg px-4 py-2 focus:outline-none focus:ring-2'
         >
           Send
         </button>

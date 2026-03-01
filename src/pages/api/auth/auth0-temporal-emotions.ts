@@ -4,11 +4,7 @@
  */
 
 import type { APIRoute } from 'astro'
-import { validateToken } from '@/lib/auth/auth0-jwt-service'
-import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AIRepository } from '@/lib/db/ai/repository'
+
 import {
   EmotionTemporalAnalyzer,
   type EmotionAnalysisResult,
@@ -18,6 +14,11 @@ import {
   type EmotionCorrelation,
 } from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
 import { createAuditLog } from '@/lib/audit'
+import { validateToken } from '@/lib/auth/auth0-jwt-service'
+import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -45,7 +46,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -58,7 +59,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -220,8 +221,8 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         action: 'get_temporal_emotions',
         sessionId,
         analysisType,
-        timeWindow: validTimeWindow
-      }
+        timeWindow: validTimeWindow,
+      },
     )
 
     // Log API access
@@ -254,7 +255,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(

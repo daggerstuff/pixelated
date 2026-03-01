@@ -1,6 +1,7 @@
-import { initializeDatabase, query } from '@/lib/db'
-import { getCache } from '@/lib/cache/redis-cache'
 import type { APIRoute } from 'astro'
+
+import { getCache } from '@/lib/cache/redis-cache'
+import { initializeDatabase, query } from '@/lib/db'
 
 export const GET: APIRoute = async ({ url }) => {
   try {

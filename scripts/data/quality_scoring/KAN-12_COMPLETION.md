@@ -6,7 +6,8 @@
 
 ## Completion Summary
 
-Quality Scoring v1 has been fully implemented with production-quality signal computation for all four required signals:
+Quality Scoring v1 has been fully implemented with production-quality signal
+computation for all four required signals:
 
 ### ✅ Completed Deliverables
 

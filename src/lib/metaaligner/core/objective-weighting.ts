@@ -4,17 +4,17 @@
  */
 
 import {
-  ObjectiveDefinition,
-  AlignmentContext,
-  ContextType,
-} from './objectives'
-import {
   AggregationMethod,
   NormalizationMethod,
   ObjectiveConfiguration,
   ObjectiveEvaluationResult,
   AlignmentEvaluationResult,
 } from './objective-interfaces'
+import {
+  ObjectiveDefinition,
+  AlignmentContext,
+  ContextType,
+} from './objectives'
 
 /**
  * Context-based weight adjustment strategies
@@ -199,7 +199,7 @@ export class ObjectiveWeightingEngine {
       finalWeights[objectiveId] =
         contextualWeights[objectiveId] !== undefined
           ? contextualWeights[objectiveId]!
-          : baseWeights[objectiveId]! // Fallback to base if not in contextual
+          : baseWeights[objectiveId] // Fallback to base if not in contextual
     }
 
     return { weights: finalWeights, contextFactors }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import { fetchJSONWithRetry } from '@/lib/net/index'
 
 export interface EmotionData {
@@ -333,7 +334,7 @@ export function useMultidimensionalEmotions(
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': 'Bearer demo-token',
+              Authorization: 'Bearer demo-token',
             },
             // pass external abort controller; helper composes signals and adds per-attempt timeout
             signal: abortControllerRef.current.signal,
@@ -435,7 +436,7 @@ export function useMultidimensionalEmotions(
     }
 
     // Fetch data
-    fetchEmotionData()
+    void fetchEmotionData()
 
     // Clean up function
     return () => {
@@ -451,7 +452,7 @@ export function useMultidimensionalEmotions(
   // Create a refresh function to manually refetch data
   const refresh = useCallback(() => {
     // Force refetch bypassing cache
-    fetchEmotionData(true)
+    void fetchEmotionData(true)
   }, [fetchEmotionData])
 
   return { data, isLoading, error, refresh, isCached }

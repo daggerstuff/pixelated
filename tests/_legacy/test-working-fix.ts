@@ -51,18 +51,22 @@ async function testBetterAuth() {
         const users = await auth.api.listUsers()
         console.log(`Found ${users.length} users in the system`)
 
-        console.log('\n🎉 All tests passed! Better-Auth with PostgreSQL is working!')
+        console.log(
+          '\n🎉 All tests passed! Better-Auth with PostgreSQL is working!',
+        )
       } else {
         console.log('❌ Authentication failed')
       }
     } else {
       console.log('❌ User creation failed')
     }
-
   } catch (error) {
     console.error('❌ Error:', error)
-    console.error('Stack:', error instanceof Error ? error.stack : 'No stack available')
+    console.error(
+      'Stack:',
+      error instanceof Error ? error.stack : 'No stack available',
+    )
   }
 }
 
-testBetterAuth()
+void testBetterAuth()

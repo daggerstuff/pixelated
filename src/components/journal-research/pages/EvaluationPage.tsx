@@ -1,4 +1,5 @@
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
+
 import { EvaluationPanel } from '../features/EvaluationPanel'
 
 export interface EvaluationPageProps {
@@ -12,4 +13,3 @@ export function EvaluationPage({ sessionId }: EvaluationPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

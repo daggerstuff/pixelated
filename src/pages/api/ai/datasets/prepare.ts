@@ -1,4 +1,8 @@
 import type { APIRoute } from 'astro'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { mergedDatasetExists } from '../../../../lib/ai/datasets/merge-datasets'
 import {
   prepareAllFormats,
   prepareForOpenAI,
@@ -6,8 +10,6 @@ import {
   preparedDatasetsExist,
   type DatasetPaths,
 } from '../../../../lib/ai/datasets/prepare-fine-tuning'
-import { mergedDatasetExists } from '../../../../lib/ai/datasets/merge-datasets'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('dataset-prepare')
 
 export const POST: APIRoute = async ({ request }) => {

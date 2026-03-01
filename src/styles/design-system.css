@@ -40,21 +40,26 @@
   --border-secondary: var(--color-neutral-800);
 
   /* === TYPOGRAPHY SYSTEM (Antfu + Lexington) === */
-  --font-family-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-family-mono: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, ' Liberation Mono', Menlo, monospace;
+  --font-family-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Monaco, 'Cascadia Code',
+    'Roboto Mono', Consolas, ' Liberation Mono', Menlo, monospace;
 
   /* Font Scale - Responsive */
-  --text-xs: 0.75rem;      /* 12px */
-  --text-sm: 0.875rem;     /* 14px */
-  --text-base: 1rem;       /* 16px */
-  --text-lg: 1.125rem;     /* 18px */
-  --text-xl: 1.25rem;      /* 20px */
-  --text-2xl: 1.5rem;      /* 24px */
-  --text-3xl: 1.875rem;    /* 30px */
-  --text-4xl: 2.25rem;     /* 36px */
-  --text-5xl: 3rem;        /* 48px */
-  --text-6xl: 3.75rem;     /* 60px */
-  --text-7xl: 4.5rem;      /* 72px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+  --text-4xl: 2.25rem; /* 36px */
+  --text-5xl: 3rem; /* 48px */
+  --text-6xl: 3.75rem; /* 60px */
+  --text-7xl: 4.5rem; /* 72px */
 
   /* Line Heights */
   --leading-tight: 1.25;
@@ -68,14 +73,14 @@
   --font-weight-bold: 700;
 
   /* === SPACING SYSTEM (Mizu + Astro Max) === */
-  --spacing-unit: 0.25rem;  /* 4px base unit */
-  --spacing-1: calc(var(--spacing-unit) * 1);   /* 4px */
-  --spacing-2: calc(var(--spacing-unit) * 2);   /* 8px */
-  --spacing-3: calc(var(--spacing-unit) * 3);   /* 12px */
-  --spacing-4: calc(var(--spacing-unit) * 4);   /* 16px */
-  --spacing-5: calc(var(--spacing-unit) * 5);   /* 20px */
-  --spacing-6: calc(var(--spacing-unit) * 6);   /* 24px */
-  --spacing-8: calc(var(--spacing-unit) * 8);   /* 32px */
+  --spacing-unit: 0.25rem; /* 4px base unit */
+  --spacing-1: calc(var(--spacing-unit) * 1); /* 4px */
+  --spacing-2: calc(var(--spacing-unit) * 2); /* 8px */
+  --spacing-3: calc(var(--spacing-unit) * 3); /* 12px */
+  --spacing-4: calc(var(--spacing-unit) * 4); /* 16px */
+  --spacing-5: calc(var(--spacing-unit) * 5); /* 20px */
+  --spacing-6: calc(var(--spacing-unit) * 6); /* 24px */
+  --spacing-8: calc(var(--spacing-unit) * 8); /* 32px */
   --spacing-10: calc(var(--spacing-unit) * 10); /* 40px */
   --spacing-12: calc(var(--spacing-unit) * 12); /* 48px */
   --spacing-16: calc(var(--spacing-unit) * 16); /* 64px */
@@ -103,8 +108,10 @@
   /* Cards (Mizu + Astro Max) */
   --card-padding: var(--spacing-6);
   --card-radius: var(--spacing-3);
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --card-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 
   /* Buttons (Antfu + Mizu) */
   --button-padding-x: var(--spacing-4);
@@ -161,7 +168,11 @@
 
 /* Typography Utilities */
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-500),
+    var(--color-secondary-500)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -227,7 +238,11 @@
   align-items: center;
   text-align: center;
   padding: var(--spacing-32) var(--container-padding);
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--bg-primary) 0%,
+    var(--bg-secondary) 100%
+  );
   position: relative;
   overflow: hidden;
 }
@@ -239,7 +254,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(var(--color-primary-600), 0.1) 0%, transparent 50%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(var(--color-primary-600), 0.1) 0%,
+    transparent 50%
+  );
   pointer-events: none;
 }
 
@@ -256,15 +275,20 @@
   transform: translateX(-50%);
   width: 200px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
 }
 
 /* Responsive Typography Scale */
 @media (max-width: 768px) {
   :root {
-    --text-7xl: 3rem;      /* Reduce from 72px to 48px */
-    --text-6xl: 2.25rem;   /* Reduce from 60px to 36px */
-    --text-5xl: 1.875rem;  /* Reduce from 48px to 30px */
+    --text-7xl: 3rem; /* Reduce from 72px to 48px */
+    --text-6xl: 2.25rem; /* Reduce from 60px to 36px */
+    --text-5xl: 1.875rem; /* Reduce from 48px to 30px */
     --section-padding: var(--spacing-16);
     --container-padding: var(--spacing-4);
   }

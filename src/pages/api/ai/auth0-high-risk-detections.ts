@@ -1,12 +1,13 @@
+import { validateToken } from '@/lib/auth/auth0-jwt-service'
+import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { aiRepository } from '@/lib/db/ai'
+import { getUserById } from '@/services/auth0.service'
+
 import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
 } from '../../../lib/audit'
-import { aiRepository } from '@/lib/db/ai'
-import { getUserById } from '@/services/auth0.service'
-import { validateToken } from '@/lib/auth/auth0-jwt-service'
-import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 
 export const GET = async ({ request, url }) => {
   let userId: string | null = null
@@ -16,10 +17,13 @@ export const GET = async ({ request, url }) => {
     const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Validate token

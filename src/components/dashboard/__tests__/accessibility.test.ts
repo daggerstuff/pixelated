@@ -1,7 +1,8 @@
-import React from 'react'
 import { render, screen } from '@testing-library/react'
-import { TherapistDashboard } from '../TherapistDashboard'
+import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
+
+import { TherapistDashboard } from '../TherapistDashboard'
 
 describe('Dashboard Accessibility (non-JSX shim)', () => {
   it('renders therapist dashboard without JSX', () => {

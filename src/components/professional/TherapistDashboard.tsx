@@ -1,10 +1,11 @@
 import type { FC } from 'react'
 import React from 'react'
+
+import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
+import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
+import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { AdvancedVisualization } from '@/lib/analytics/advancedVisualization'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
 
 interface PatientSummary {
   id: string
@@ -95,41 +96,41 @@ export const TherapistDashboard: FC = () => {
   }))
 
   return (
-    <ResponsiveContainer size="full">
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveContainer size='full'>
+      <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
+        <header className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm'>
+          <div className='px-6 py-4'>
+            <div className='flex items-center justify-between'>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className='text-gray-900 dark:text-white text-2xl font-bold'>
                   Therapist Dashboard
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className='text-gray-600 dark:text-gray-400 mt-1 text-sm'>
                   Welcome back, Dr. Smith • {patients.length} active patients
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
-                <OfflineIndicator position="inline" />
+              <div className='flex items-center gap-4'>
+                <OfflineIndicator position='inline' />
                 <select
-                  aria-label="Select time range"
+                  aria-label='Select time range'
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+                  className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
-                  <option value="week">This Week</option>
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                  <option value="year">This Year</option>
+                  <option value='week'>This Week</option>
+                  <option value='month'>This Month</option>
+                  <option value='quarter'>This Quarter</option>
+                  <option value='year'>This Year</option>
                 </select>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="px-6">
-            <nav className="flex space-x-8">
+          <div className='px-6'>
+            <nav className='flex space-x-8'>
               {[
                 { id: 'overview', label: 'Overview', icon: '📊' },
                 { id: 'patients', label: 'Patients', icon: '👥' },
@@ -139,7 +140,7 @@ export const TherapistDashboard: FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
-                  className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -154,7 +155,7 @@ export const TherapistDashboard: FC = () => {
         </header>
 
         {/* Main Content */}
-        <main className="p-6">
+        <main className='p-6'>
           {dashboardView === 'overview' && (
             <OverviewTab
               patients={patients}
@@ -214,25 +215,25 @@ const OverviewTab: FC<{
   const patientsNeedingAttention = patients.filter((p) => p.alerts.length > 0)
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Total Sessions
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.totalSessions}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400">📊</span>
+              <div className='bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-blue-600 dark:text-blue-400'>📊</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               This{' '}
               {timeRange === 'week'
                 ? 'week'
@@ -244,96 +245,96 @@ const OverviewTab: FC<{
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Avg Session Length
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.avgSessionLength}m
                 </p>
               </div>
-              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 dark:text-green-400">⏱️</span>
+              <div className='bg-green-100 dark:bg-green-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-green-600 dark:text-green-400'>⏱️</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Average duration</p>
+            <p className='text-gray-500 mt-2 text-sm'>Average duration</p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Completion Rate
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.completionRate}%
                 </p>
               </div>
-              <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 dark:text-purple-400">✅</span>
+              <div className='bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-purple-600 dark:text-purple-400'>✅</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Session completion</p>
+            <p className='text-gray-500 mt-2 text-sm'>Session completion</p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Patient Satisfaction
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.patientSatisfaction}/5
                 </p>
               </div>
-              <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-yellow-600 dark:text-yellow-400">⭐</span>
+              <div className='bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-yellow-600 dark:text-yellow-400'>⭐</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Average rating</p>
+            <p className='text-gray-500 mt-2 text-sm'>Average rating</p>
           </div>
         </FadeIn>
       </div>
 
       {/* Alerts and Urgent Items */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>🚨</span>
               Urgent Patients ({urgentPatients.length})
             </h3>
-            <div className="space-y-3">
+            <div className='space-y-3'>
               {urgentPatients.map((patient) => (
                 <div
                   key={patient.id}
-                  className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
+                  className='bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 flex items-center justify-between rounded-lg border p-3'
                 >
-                  <div className="flex items-center gap-3">
+                  <div className='flex items-center gap-3'>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       aria-label={`Select ${patient.name}`}
                       checked={selectedPatients.includes(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
-                      className="w-4 h-4 text-red-600 rounded"
+                      className='text-red-600 h-4 w-4 rounded'
                     />
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className='text-gray-900 dark:text-white font-medium'>
                         {patient.name}
                       </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className='text-gray-600 dark:text-gray-400 text-sm'>
                         Last session: {patient.lastSession.toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                   >
                     {patient.riskLevel}
                   </span>
@@ -344,30 +345,30 @@ const OverviewTab: FC<{
         </SlideUp>
 
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>⚠️</span>
               Needs Attention ({patientsNeedingAttention.length})
             </h3>
-            <div className="space-y-3">
+            <div className='space-y-3'>
               {patientsNeedingAttention.map((patient) => (
                 <div
                   key={patient.id}
-                  className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800"
+                  className='bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 rounded-lg border p-3'
                 >
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className='mb-2 flex items-center gap-3'>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       aria-label={`Select ${patient.name}`}
                       checked={selectedPatients.includes(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
-                      className="w-4 h-4 text-yellow-600 rounded"
+                      className='text-yellow-600 h-4 w-4 rounded'
                     />
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className='text-gray-900 dark:text-white font-medium'>
                       {patient.name}
                     </p>
                   </div>
-                  <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                  <ul className='text-gray-600 dark:text-gray-400 space-y-1 text-sm'>
                     {patient.alerts.map((alert, index) => (
                       <li key={index}>• {alert}</li>
                     ))}
@@ -381,50 +382,50 @@ const OverviewTab: FC<{
 
       {/* Patient Progress Overview */}
       <SlideUp>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>
             Patient Progress Overview
           </h3>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {patients.map((patient) => (
               <div
                 key={patient.id}
-                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                className='bg-gray-50 dark:bg-gray-800/50 flex items-center gap-4 rounded-lg p-4'
               >
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   aria-label={`Select ${patient.name}`}
                   checked={selectedPatients.includes(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className='text-blue-600 h-4 w-4 rounded'
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="font-medium text-gray-900 dark:text-white">
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <p className='text-gray-900 dark:text-white font-medium'>
                       {patient.name}
                     </p>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                     >
                       {patient.riskLevel}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-600 dark:text-gray-400">
+                  <div className='flex items-center gap-4'>
+                    <div className='flex-1'>
+                      <div className='mb-1 flex items-center justify-between text-sm'>
+                        <span className='text-gray-600 dark:text-gray-400'>
                           Progress
                         </span>
-                        <span className="font-medium">{patient.progress}%</span>
+                        <span className='font-medium'>{patient.progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div className='bg-gray-200 dark:bg-gray-700 h-2 w-full rounded-full'>
                         <div
                           className={`h-2 rounded-full ${getProgressColor(patient.progress)}`}
                           style={{ width: `${patient.progress}%` }}
                         />
                       </div>
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className='text-gray-600 dark:text-gray-400 text-sm'>
                       Last: {patient.lastSession.toLocaleDateString()}
                     </div>
                   </div>
@@ -447,15 +448,15 @@ const PatientsTab: FC<{
   selectedPatients: string[]
 }> = ({ patients, onPatientSelect, selectedPatients }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Patient Management</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Patient Management</h2>
+        <div className='flex items-center gap-2'>
+          <span className='text-gray-600 dark:text-gray-400 text-sm'>
             {selectedPatients.length} selected
           </span>
           <button
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm transition-colors"
+            className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50'
             disabled={selectedPatients.length === 0}
             aria-disabled={selectedPatients.length === 0}
           >
@@ -464,18 +465,18 @@ const PatientsTab: FC<{
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-4">
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
+        <div className='border-gray-200 dark:border-gray-700 border-b p-4'>
+          <div className='flex items-center gap-4'>
             <input
-              type="text"
-              aria-label="Search patients"
-              placeholder="Search patients..."
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              type='text'
+              aria-label='Search patients'
+              placeholder='Search patients...'
+              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm'
             />
             <select
-              aria-label="Filter by risk level"
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              aria-label='Filter by risk level'
+              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
             >
               <option>All Risk Levels</option>
               <option>Critical</option>
@@ -486,32 +487,32 @@ const PatientsTab: FC<{
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className='divide-gray-200 dark:divide-gray-700 divide-y'>
           {patients.map((patient) => (
             <div
               key={patient.id}
-              className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              className='hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors'
             >
-              <div className="flex items-center gap-4">
+              <div className='flex items-center gap-4'>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   aria-label={`Select ${patient.name}`}
                   checked={selectedPatients.includes(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className='text-blue-600 h-4 w-4 rounded'
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <h3 className='text-gray-900 dark:text-white font-medium'>
                       {patient.name}
                     </h3>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                     >
                       {patient.riskLevel}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 dark:text-gray-400">
+                  <div className='text-gray-600 dark:text-gray-400 grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                     <div>
                       Last session: {patient.lastSession.toLocaleDateString()}
                     </div>
@@ -524,8 +525,8 @@ const PatientsTab: FC<{
                     <div>Alerts: {patient.alerts.length}</div>
                   </div>
                   {patient.alerts.length > 0 && (
-                    <div className="mt-2">
-                      <ul className="text-sm text-orange-600 dark:text-orange-400 space-y-1">
+                    <div className='mt-2'>
+                      <ul className='text-orange-600 dark:text-orange-400 space-y-1 text-sm'>
                         {patient.alerts.map((alert, index) => (
                           <li key={index}>• {alert}</li>
                         ))}
@@ -533,7 +534,7 @@ const PatientsTab: FC<{
                     </div>
                   )}
                 </div>
-                <button className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+                <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                   View Details
                 </button>
               </div>
@@ -577,14 +578,14 @@ const AnalyticsTab: FC<{
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Therapeutic Analytics</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Therapeutic Analytics</h2>
+        <div className='flex items-center gap-2'>
+          <span className='text-gray-600 dark:text-gray-400 text-sm'>
             Time Range:
           </span>
-          <span className="text-sm font-medium capitalize">{timeRange}</span>
+          <span className='text-sm font-medium capitalize'>{timeRange}</span>
         </div>
       </div>
 
@@ -616,28 +617,28 @@ const ScheduleTab: FC<{
     .slice(0, 10)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Schedule Management</h2>
-        <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Schedule Management</h2>
+        <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Schedule Appointment
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Upcoming Appointments</h3>
-          <div className="space-y-3">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Upcoming Appointments</h3>
+          <div className='space-y-3'>
             {upcomingAppointments.map((patient) => (
               <div
                 key={patient.id}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
               >
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className='text-gray-900 dark:text-white font-medium'>
                     {patient.name}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className='text-gray-600 dark:text-gray-400 text-sm'>
                     {patient.nextAppointment?.toLocaleDateString()} at{' '}
                     {patient.nextAppointment?.toLocaleTimeString([], {
                       hour: '2-digit',
@@ -646,7 +647,7 @@ const ScheduleTab: FC<{
                   </p>
                 </div>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                  className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                 >
                   {patient.riskLevel}
                 </span>
@@ -655,9 +656,9 @@ const ScheduleTab: FC<{
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">Session Templates</h3>
-          <div className="space-y-3">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>Session Templates</h3>
+          <div className='space-y-3'>
             {[
               'Initial Assessment',
               'CBT Session',
@@ -667,12 +668,12 @@ const ScheduleTab: FC<{
             ].map((template) => (
               <button
                 key={template}
-                className="w-full text-left p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 w-full rounded-lg border p-3 text-left transition-colors'
               >
-                <p className="font-medium text-blue-900 dark:text-blue-100">
+                <p className='text-blue-900 dark:text-blue-100 font-medium'>
                   {template}
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
+                <p className='text-blue-700 dark:text-blue-200 text-sm'>
                   Standard 50-minute session
                 </p>
               </button>

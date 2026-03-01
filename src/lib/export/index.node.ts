@@ -7,15 +7,17 @@
  * This is the Node.js-specific implementation with full functionality.
  */
 
+import { Buffer } from 'buffer'
+
+import archiver from 'archiver'
+import PDFDocument from 'pdfkit'
+
 import type { ChatMessage } from '../../types/chat'
 // Import only the EncryptionMode from fhe types
 import { EncryptionMode } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { createSignedVerificationToken } from '../security/verification'
 import { generateId } from '../utils/index'
-import PDFDocument from 'pdfkit'
-import archiver from 'archiver'
-import { Buffer } from 'buffer'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -356,7 +358,7 @@ export class ExportService {
       // Set up error handling for PDF generation
       doc.on('error', (err: Error) => {
         throw new Error(
-          `PDF generation error: ${(err as Error)?.message || String(err)}`,
+          `PDF generation error: ${(err)?.message || String(err)}`,
         )
       })
 

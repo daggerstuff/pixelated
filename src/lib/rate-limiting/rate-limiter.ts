@@ -3,8 +3,8 @@
  * Provides configurable rate limiting with attack pattern detection
  */
 
-import { redis } from '../redis'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { redis } from '../redis'
 import type {
   RateLimitConfig,
   RateLimitResult,
@@ -22,7 +22,7 @@ export class DistributedRateLimiter {
   private readonly attackPrefix = 'attack_pattern:'
   private readonly analyticsPrefix = 'rate_analytics:'
 
-  constructor(private config: RateLimitConfig) { }
+  constructor(private config: RateLimitConfig) {}
 
   /**
    * Check if request should be rate limited
@@ -392,10 +392,7 @@ export class DistributedRateLimiter {
   /**
    * Reset counter for identifier
    */
-  async resetCounter(
-    identifier: string,
-    rule: RateLimitRule,
-  ): Promise<void> {
+  async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
     await redis.del(windowKey)

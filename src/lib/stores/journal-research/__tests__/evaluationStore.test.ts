@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useEvaluationStore, } from '../evaluationStore'
+
+import { useEvaluationStore } from '../evaluationStore'
 
 describe('evaluationStore', () => {
   beforeEach(() => {
@@ -184,4 +185,3 @@ describe('evaluationStore', () => {
     })
   })
 })
-

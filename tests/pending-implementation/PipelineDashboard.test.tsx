@@ -1,9 +1,11 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { PipelineDashboard } from '../PipelineDashboard'
-import { WebSocketProvider } from '@/contexts/WebSocketContext'
+import React from 'react'
+
 import { PipelineAPIProvider } from '@/contexts/PipelineAPIContext'
+import { WebSocketProvider } from '@/contexts/WebSocketContext'
+
+import { PipelineDashboard } from '../PipelineDashboard'
 
 // Mock the hooks and contexts
 jest.mock('@/hooks/usePipelineWebSocket', () => ({

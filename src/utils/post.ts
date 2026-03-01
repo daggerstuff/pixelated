@@ -21,7 +21,7 @@ export type PostCollectionType = 'blog' | 'docs'
 // Helper type for our collection entries
 export type PostCollectionEntry =
   | AstroCollectionEntry<'blog'>
-  | AstroCollectionEntry<'docs'>
+   
 
 export function filterDrafts(
   entries: PostCollectionEntry[],

@@ -29,13 +29,13 @@ services:
       - ./models:/app/models
       - ./checkpoints:/app/checkpoints
       - training_cache:/app/cache
-      - /dev/shm:/dev/shm:rw  # Shared memory for faster data loading
+      - /dev/shm:/dev/shm:rw # Shared memory for faster data loading
     # Ports
     ports:
-      - "8003:8003"
+      - '8003:8003'
     # Health Check
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8003/health']
       interval: 60s
       timeout: 30s
       retries: 3
@@ -58,7 +58,7 @@ services:
     volumes:
       - redis_training_data:/data
     ports:
-      - "6379:6379"
+      - '6379:6379'
     networks:
       - training-net
 
@@ -75,7 +75,7 @@ services:
       - postgres_training_data:/var/lib/postgresql/data
       - ./db/training-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - training-net
 
@@ -95,7 +95,7 @@ services:
       - ./monitoring/prometheus/training.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_training_data:/prometheus
     ports:
-      - "9090:9090"
+      - '9090:9090'
     networks:
       - training-net
 
@@ -104,14 +104,15 @@ services:
     container_name: pixelated-grafana-training
     restart: unless-stopped
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD
+        is required}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_training_data:/var/lib/grafana
       - ./monitoring/grafana/dashboards/training:/etc/grafana/provisioning/dashboards:ro
       - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     ports:
-      - "3001:3000"
+      - '3001:3000'
     networks:
       - training-net
 
@@ -128,7 +129,8 @@ services:
               count: 1
               capabilities: [gpu]
     environment:
-      NVIDIA_API_KEY: ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
+      NVIDIA_API_KEY:
+        ${NVIDIA_API_KEY:?NVIDIA_API_KEY is required for NeMo access}
       DATA_DESIGNER_HOST: 0.0.0.0
       DATA_DESIGNER_PORT: 8000
       DATA_DESIGNER_LOG_LEVEL: INFO
@@ -142,7 +144,7 @@ services:
       - ./ai/pipelines/edge_case_pipeline_standalone/output:/workspace/edge_cases
       - ./ai/training_data_consolidated/final:/workspace/stage_exports
     ports:
-      - "8000:8000"
+      - '8000:8000'
     networks:
       - training-net
 

@@ -26,7 +26,7 @@ export const ScrollArea: FC<ScrollAreaProps> = ({
 
   return (
     <div
-      className={`overflow-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 ${className}`}
+      className={`scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 overflow-auto ${className}`}
       style={style}
     >
       {children}

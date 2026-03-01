@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react'
-import RUMWidget from '../RUMWidget'
+
 import * as hooks from '../../../lib/monitoring/hooks'
+import RUMWidget from '../RUMWidget'
 
 // Mock the hooks
 vi.mock('../../../lib/monitoring/hooks', () => ({
@@ -111,7 +112,7 @@ describe('RUMWidget', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(<RUMWidget className="test-class" />)
+    const { container } = render(<RUMWidget className='test-class' />)
 
     expect(
       container.querySelector('.rum-widget.test-class'),

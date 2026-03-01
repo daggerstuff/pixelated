@@ -1,4 +1,5 @@
 import { FC } from 'react'
+
 import MentalHealthChatDemo from './MentalHealthChatDemo'
 
 interface MindMirrorDemoProps {
@@ -11,7 +12,7 @@ export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
       <MentalHealthChatDemo
         showAnalysisPanel={true}
         showSettingsPanel={false}
-        initialTab="analysis"
+        initialTab='analysis'
       />
     </div>
   )

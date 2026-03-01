@@ -5,9 +5,8 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Root } from 'mdast'
-
-import type { VFile } from 'vfile'
 import { visit, type Visitor } from 'unist-util-visit'
+import type { VFile } from 'vfile'
 
 type BadgePreset = Record<string, { text: string; color: string }>
 interface Config {

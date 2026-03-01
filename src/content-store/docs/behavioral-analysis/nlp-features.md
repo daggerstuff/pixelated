@@ -12,7 +12,11 @@ toc: true
 
 ## Overview
 
-Natural Language Processing (NLP) features provide advanced text analysis capabilities for behavioral and therapeutic documentation systems. This document outlines the implementation details, architecture, and usage guidelines for the NLP feature set used for summarization, insight extraction, clinical note generation, and technique identification in therapeutic contexts.
+Natural Language Processing (NLP) features provide advanced text analysis
+capabilities for behavioral and therapeutic documentation systems. This document
+outlines the implementation details, architecture, and usage guidelines for the
+NLP feature set used for summarization, insight extraction, clinical note
+generation, and technique identification in therapeutic contexts.
 
 ## Core Architecture
 

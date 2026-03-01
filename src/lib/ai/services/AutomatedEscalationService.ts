@@ -1,5 +1,6 @@
-import type { CrisisPrediction } from './PredictiveCrisisModelingService'
 import type { RiskAssessment } from '@/hooks/useRiskAssessment'
+
+import type { CrisisPrediction } from './PredictiveCrisisModelingService'
 
 export interface EscalationProtocol {
   level: 'low' | 'medium' | 'high' | 'critical' | 'emergency'

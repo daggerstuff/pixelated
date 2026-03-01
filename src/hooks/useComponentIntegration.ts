@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {
-  componentIntegrationService,
-  } from '@/lib/services/ComponentIntegrationService'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { componentIntegrationService } from '@/lib/services/ComponentIntegrationService'
 
 const logger = createBuildSafeLogger('component-integration-hooks')
 
@@ -50,14 +49,14 @@ export function useChartData(params: {
   refreshInterval?: number
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadChartData = useCallback(() => {
     return execute(() => componentIntegrationService.getChartData(params))
   }, [execute, params])
 
   useEffect(() => {
-    loadChartData()
+    void loadChartData()
 
     // Set up auto-refresh if enabled
     if (params.autoRefresh && params.refreshInterval) {
@@ -123,7 +122,7 @@ export function use3DEmotionData(params: {
   )
 
   useEffect(() => {
-    load3DEmotionData()
+    void load3DEmotionData()
   }, [load3DEmotionData])
 
   // Combine static and real-time data
@@ -206,7 +205,7 @@ export function useTreatmentPlans(params: {
   }, [])
 
   useEffect(() => {
-    loadTreatmentPlans()
+    void loadTreatmentPlans()
   }, [loadTreatmentPlans])
 
   // Auto-save functionality
@@ -214,11 +213,12 @@ export function useTreatmentPlans(params: {
     if (params.autoSave && isDirty && data && data.length > 0) {
       const autoSaveTimer = setTimeout(() => {
         // Auto-save the first plan (assuming it's being edited)
-        saveTreatmentPlan(data[0])
+        void saveTreatmentPlan(data[0])
       }, 5000) // Auto-save after 5 seconds of inactivity
 
       return () => clearTimeout(autoSaveTimer)
     }
+    return undefined
   }, [params.autoSave, isDirty, data, saveTreatmentPlan])
 
   return {
@@ -295,7 +295,7 @@ export function useParticleSystem(params: {
   )
 
   useEffect(() => {
-    loadParticleSystem()
+    void loadParticleSystem()
   }, [loadParticleSystem])
 
   return {
@@ -347,7 +347,7 @@ export function useCarouselContent(params: {
   )
 
   useEffect(() => {
-    loadCarouselContent()
+    void loadCarouselContent()
   }, [loadCarouselContent])
 
   return {
@@ -369,7 +369,7 @@ export function useIntegratedDashboard(params: {
   refreshInterval?: number
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadDashboardData = useCallback(() => {
     return execute(() =>
@@ -378,7 +378,7 @@ export function useIntegratedDashboard(params: {
   }, [execute, params])
 
   useEffect(() => {
-    loadDashboardData()
+    void loadDashboardData()
 
     // Set up auto-refresh if enabled
     if (params.autoRefresh && params.refreshInterval) {
@@ -468,7 +468,7 @@ export function useRealTimeUpdates(params: {
 export function useServiceHealth(checkInterval: number = 60000) {
   const [health, setHealth] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const checkHealth = useCallback(async () => {
     setLoading(true)
@@ -489,7 +489,7 @@ export function useServiceHealth(checkInterval: number = 60000) {
   }, [])
 
   useEffect(() => {
-    checkHealth()
+    void checkHealth()
 
     if (checkInterval > 0) {
       intervalRef.current = setInterval(checkHealth, checkInterval)

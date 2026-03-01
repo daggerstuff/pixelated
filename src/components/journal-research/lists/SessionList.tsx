@@ -1,8 +1,16 @@
-import { useState, useMemo } from 'react'
-import type { Session, SessionList as SessionListType } from '@/lib/api/journal-research/types'
-import { Table } from '@/components/ui/table'
-import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
 import { format } from 'date-fns'
+import { useState, useMemo } from 'react'
+
+import { Table } from '@/components/ui/table'
+import type {
+  TableColumn,
+  TableState,
+  TableDataSource,
+} from '@/components/ui/table-types'
+import type {
+  Session,
+  SessionList as SessionListType,
+} from '@/lib/api/journal-research/types'
 import { cn } from '@/lib/utils'
 
 export interface SessionListProps {
@@ -93,7 +101,7 @@ export function SessionList({
       accessor: (row) => (
         <button
           onClick={() => onSessionClick?.(row)}
-          className="text-left font-medium text-primary hover:underline"
+          className='text-primary text-left font-medium hover:underline'
         >
           {row.sessionId}
         </button>
@@ -110,9 +118,7 @@ export function SessionList({
     {
       id: 'currentPhase',
       header: 'Phase',
-      accessor: (row) => (
-        <span className="capitalize">{row.currentPhase}</span>
-      ),
+      accessor: (row) => <span className='capitalize'>{row.currentPhase}</span>,
       sortable: true,
     },
     {
@@ -121,14 +127,14 @@ export function SessionList({
       accessor: (row) => {
         const progress = row.progressMetrics?.progress_percentage ?? 0
         return (
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
+          <div className='flex items-center gap-2'>
+            <div className='bg-muted h-2 w-24 overflow-hidden rounded-full'>
               <div
-                className="h-full bg-primary transition-all"
+                className='bg-primary h-full transition-all'
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-sm">{Math.round(progress)}%</span>
+            <span className='text-sm'>{Math.round(progress)}%</span>
           </div>
         )
       },
@@ -139,7 +145,7 @@ export function SessionList({
       id: 'sources',
       header: 'Sources',
       accessor: (row) => (
-        <span className="text-sm">{row.targetSources.length} sources</span>
+        <span className='text-sm'>{row.targetSources.length} sources</span>
       ),
       hideMobile: true,
     },
@@ -154,23 +160,30 @@ export function SessionList({
     loading: isLoading,
   }
 
-  const phases = ['all', 'discovery', 'evaluation', 'acquisition', 'integration', 'reporting']
+  const phases = [
+    'all',
+    'discovery',
+    'evaluation',
+    'acquisition',
+    'integration',
+    'reporting',
+  ]
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-2">
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-1 gap-2'>
           <input
-            type="text"
-            placeholder="Search sessions..."
+            type='text'
+            placeholder='Search sessions...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
           />
           <select
             value={phaseFilter}
             onChange={(e) => setPhaseFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+            className='border-input rounded-md border bg-background px-3 py-2 text-sm capitalize'
           >
             {phases.map((phase) => (
               <option key={phase} value={phase}>
@@ -179,8 +192,9 @@ export function SessionList({
             ))}
           </select>
         </div>
-        <div className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedSessions.length} of {sessions.total} sessions
+        <div className='text-muted-foreground text-sm'>
+          Showing {filteredAndSortedSessions.length} of {sessions.total}{' '}
+          sessions
         </div>
       </div>
 
@@ -196,4 +210,3 @@ export function SessionList({
     </div>
   )
 }
-

@@ -49,7 +49,7 @@
 
     var isArrayBufferView =
       ArrayBuffer.isView ||
-      function(obj) {
+      function(this: void, obj: unknown) {
         return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
       };
   }

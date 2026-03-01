@@ -3,15 +3,16 @@
  */
 
 import { describe, it as test, expect, beforeEach } from 'vitest'
+
+import {
+  AlignmentEvaluationResult,
+  AggregationMethod,
+} from './objective-interfaces'
 import {
   ObjectiveMetricsEngine,
   DEFAULT_METRICS_CONFIG,
   MetricsConfig,
 } from './objective-metrics'
-import {
-  AlignmentEvaluationResult,
-  AggregationMethod,
-} from './objective-interfaces'
 import {
   ObjectiveDefinition,
   AlignmentContext,

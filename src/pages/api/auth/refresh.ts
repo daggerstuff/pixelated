@@ -4,10 +4,11 @@
  */
 
 import type { APIRoute } from 'astro'
+
 import { refreshAccessToken } from '../../../lib/auth/jwt-service'
 import { rateLimitMiddleware } from '../../../lib/auth/middleware'
-import { logSecurityEvent } from '../../../lib/security'
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
+import { logSecurityEvent } from '../../../lib/security'
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
   // Extract client information early so it's available in the catch block
@@ -60,7 +61,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     })
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(tokenPair.user.id, 'token_refreshed')
+    await updatePhase6AuthenticationProgress(
+      tokenPair.user.id,
+      'token_refreshed',
+    )
 
     return new Response(JSON.stringify({ success: true, tokenPair }), {
       status: 200,

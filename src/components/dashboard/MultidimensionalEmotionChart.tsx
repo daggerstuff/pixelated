@@ -265,40 +265,40 @@ const MultidimensionalEmotionChart: FC<MultidimensionalEmotionChartProps> = ({
   }
 
   return (
-    <div className="w-full h-full relative">
+    <div className='relative h-full w-full'>
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-move"
+        className='h-full w-full cursor-move'
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       />
 
-      <div className="absolute top-4 left-4 bg-white bg-opacity-90 p-3 rounded-lg shadow-md">
-        <h3 className="text-sm font-semibold mb-2">3D Emotion Space</h3>
-        <div className="text-xs space-y-1">
+      <div className='bg-white absolute left-4 top-4 rounded-lg bg-opacity-90 p-3 shadow-md'>
+        <h3 className='mb-2 text-sm font-semibold'>3D Emotion Space</h3>
+        <div className='space-y-1 text-xs'>
           <div>
-            <span className="font-medium">Valence:</span> Pleasure/Displeasure
+            <span className='font-medium'>Valence:</span> Pleasure/Displeasure
           </div>
           <div>
-            <span className="font-medium">Arousal:</span>{' '}
+            <span className='font-medium'>Arousal:</span>{' '}
             Activation/Deactivation
           </div>
           <div>
-            <span className="font-medium">Dominance:</span> Control/Submission
+            <span className='font-medium'>Dominance:</span> Control/Submission
           </div>
         </div>
-        <div className="text-xs mt-2 text-gray-600">
+        <div className='text-gray-600 mt-2 text-xs'>
           Click and drag to rotate
         </div>
       </div>
 
       {data.length === 0 && !isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-gray-500 text-center">
-            <div className="text-lg mb-2">No emotion data available</div>
-            <div className="text-sm">
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div className='text-gray-500 text-center'>
+            <div className='mb-2 text-lg'>No emotion data available</div>
+            <div className='text-sm'>
               Start a therapy session to see emotion patterns
             </div>
           </div>

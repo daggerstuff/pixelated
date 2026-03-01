@@ -1,5 +1,6 @@
-import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
+
 import { getSkillCategory } from '../../../lib/skillCategories'
 
 // Database connection pool
@@ -66,7 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
           explicitCategory =
             typeof obj.category === 'string' ? obj.category : undefined
         } else {
-          score = Number((scoreOrObj as unknown as number) || 0)
+          score = Number((scoreOrObj as number) || 0)
         }
 
         // Determine category using helper mapping (allows expansion without changing this file)
@@ -76,7 +77,7 @@ export const POST: APIRoute = async ({ request }) => {
           therapistId,
           skillName,
           category,
-          score: score as number,
+          score: score,
         })
       }
 

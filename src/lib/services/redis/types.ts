@@ -1,4 +1,5 @@
 import type { RedisOptions } from 'ioredis'
+
 import type { RedisZSetMember } from './redis-operation-types'
 
 /**

@@ -4,11 +4,12 @@
  */
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import type { MentalLLaMAAdapter as ServerAdapter } from './index'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from './types/mentalLLaMATypes'
-import type { MentalLLaMAAdapter as ServerAdapter } from './index'
 
 const logger = createBuildSafeLogger('mental-llama-client')
 

@@ -253,7 +253,7 @@ IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
     threshold = [threshold];
   }
 
-  return threshold.sort().filter(function (t, i, a) {
+  return threshold.sort(function(a, b) { return a - b; }).filter(function (t, i, a) {
     if (typeof t != 'number' || isNaN(t) || t < 0 || t > 1) {
       throw new Error('threshold must be a number between 0 and 1 inclusively');
     }
@@ -770,7 +770,7 @@ function removeEvent(node, event, fn, opt_useCapture) {
  * Returns the intersection between two rect objects.
  * @param {Object} rect1 The first rect.
  * @param {Object} rect2 The second rect.
- * @return {?Object|?ClientRect} The intersection rect or undefined if no
+ * @return {Object} The intersection rect or undefined if no
  *     intersection is found.
  */
 function computeRectIntersection(rect1, rect2) {
@@ -844,8 +844,8 @@ function getEmptyRect() {
  * Ensure that the result has all of the necessary fields of the DOMRect.
  * Specifically this ensures that `x` and `y` fields are set.
  *
- * @param {?DOMRect|?ClientRect} rect
- * @return {?DOMRect}
+ * @param {Object} rect
+ * @return {Object}
  */
 function ensureDOMRect(rect) {
   // A `DOMRect` object has `x` and `y` fields.

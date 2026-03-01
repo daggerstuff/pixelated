@@ -26,10 +26,11 @@ function _secureId(prefix = ''): string {
  * Provides time series forecasting, emerging threat detection, and threat propagation modeling
  */
 
+import { EventEmitter } from 'events'
+
+import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
-import { EventEmitter } from 'events'
-import * as tf from '@tensorflow/tfjs'
 
 export interface ThreatData {
   threatId: string
@@ -187,7 +188,8 @@ export interface PredictiveThreatIntelligence {
 
 export class AdvancedPredictiveThreatIntelligence
   extends EventEmitter
-  implements PredictiveThreatIntelligence {
+  implements PredictiveThreatIntelligence
+{
   private redis!: Redis
   private mongoClient!: MongoClient
   private timeSeriesForecaster!: TimeSeriesForecaster
@@ -1347,7 +1349,7 @@ export class AdvancedPredictiveThreatIntelligence
   private calculateTimeHorizon(timeframe: TimeWindow): string {
     const days = Math.ceil(
       (timeframe.end.getTime() - timeframe.start.getTime()) /
-      (1000 * 60 * 60 * 24),
+        (1000 * 60 * 60 * 24),
     )
     return `${days} days`
   }
@@ -1435,7 +1437,7 @@ interface ModelRegistry {
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(private _mongoClient: MongoClient) { }
+  constructor(private _mongoClient: MongoClient) {}
 
   async registerModel(_id: string, _model: unknown): Promise<void> {
     // Implementation placeholder
@@ -1892,8 +1894,8 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
       let i = 0;
       i <=
       dataPoints.length -
-      this.config.lookbackWindow -
-      this.config.predictionHorizon;
+        this.config.lookbackWindow -
+        this.config.predictionHorizon;
       i++
     ) {
       const xWindow = dataPoints.slice(i, i + this.config.lookbackWindow)
@@ -1925,7 +1927,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
 
         const prediction = model.predict(dummyInput) as tf.Tensor
         const data = await prediction.data()
-        const value = data[0] as number
+        const value = data[0]
 
         // Clean up tensors
         dummyInput.dispose()

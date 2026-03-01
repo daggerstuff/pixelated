@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import { UserService } from '@/services/userService'
+
 import {
   authenticateToken,
   requireAdmin,
   AuthenticatedRequest,
 } from '@/middleware/auth'
+import { UserService } from '@/services/userService'
 import { UserRole } from '@/types/user'
 
 const router = Router()

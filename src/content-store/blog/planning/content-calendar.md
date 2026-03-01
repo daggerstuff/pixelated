@@ -1,6 +1,8 @@
 ---
 title: 'Editorial Roadmap 2025'
-description: 'Strategic content planning and editorial calendar for cutting-edge trauma research and clinical applications'
+description:
+  'Strategic content planning and editorial calendar for cutting-edge trauma
+  research and clinical applications'
 author: 'Research & Editorial Team'
 pubDate: 2025-04-12
 ---
@@ -214,4 +216,5 @@ tools:
 
 ---
 
-_This is a living document updated weekly with the latest research developments and clinical insights._
+_This is a living document updated weekly with the latest research developments
+and clinical insights._

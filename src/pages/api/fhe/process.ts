@@ -1,6 +1,7 @@
-import type { FHEOperation } from '../../../lib/fhe/types'
 import type { APIRoute, APIContext } from 'astro'
+
 import { fheService } from '../../../lib/fhe'
+import type { FHEOperation } from '../../../lib/fhe/types'
 import { EncryptionMode } from '../../../lib/fhe/types'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { rateLimit } from '../../../lib/middleware/rate-limit'
@@ -14,7 +15,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       'anonymous'
 
     // Check rate limit
-    const rateLimitResult = await rateLimit.check(clientIp, 'anonymous')
+    const rateLimitResult =  rateLimit.check(clientIp, 'anonymous')
 
     if (!rateLimitResult.allowed) {
       return new Response(
@@ -64,7 +65,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: import.meta.env.PROD !== true,
+        enableDebug: ! import.meta.env.PROD,
       })
     }
 
@@ -93,7 +94,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         success: false,
         error: 'Failed to process encrypted data',
         message:
-          import.meta.env.PROD !== true ? (error as Error).message : undefined,
+          !
+          import.meta.env.PROD ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

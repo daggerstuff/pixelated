@@ -3,14 +3,14 @@
  * Post-processes LLM responses to improve alignment with mental health objectives
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { MetaAlignerAPI } from '../api/alignment-api'
 import {
   AlignmentContext,
   AlignmentEvaluationResult,
   AlignmentMetrics,
   ObjectiveDefinition,
 } from '../core/objectives'
-import { MetaAlignerAPI } from '../api/alignment-api'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('enhancement-pipeline')
 

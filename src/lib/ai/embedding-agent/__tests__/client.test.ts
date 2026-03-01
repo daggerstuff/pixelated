@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import {
   EmbeddingAgentClient,
   EmbeddingAgentError,
@@ -105,10 +106,16 @@ describe('EmbeddingAgentClient', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
-        text: async () => JSON.stringify({ error: 'Invalid request', message: 'Text is required' }),
+        text: async () =>
+          JSON.stringify({
+            error: 'Invalid request',
+            message: 'Text is required',
+          }),
       })
 
-      await expect(client.embedText({ text: '' })).rejects.toThrow(EmbeddingAgentError)
+      await expect(client.embedText({ text: '' })).rejects.toThrow(
+        EmbeddingAgentError,
+      )
     })
   })
 
@@ -116,8 +123,20 @@ describe('EmbeddingAgentClient', () => {
     it('should return batch embedding response', async () => {
       const mockResponse: BatchEmbeddingResponse = {
         embeddings: [
-          { index: 0, embedding: Array(384).fill(0.1), embeddingId: 'emb_1', textHash: 'hash1', cached: false },
-          { index: 1, embedding: Array(384).fill(0.2), embeddingId: 'emb_2', textHash: 'hash2', cached: true },
+          {
+            index: 0,
+            embedding: Array(384).fill(0.1),
+            embeddingId: 'emb_1',
+            textHash: 'hash1',
+            cached: false,
+          },
+          {
+            index: 1,
+            embedding: Array(384).fill(0.2),
+            embeddingId: 'emb_2',
+            textHash: 'hash2',
+            cached: true,
+          },
         ],
         totalCount: 2,
         cachedCount: 1,
@@ -251,8 +270,7 @@ describe('EmbeddingAgentClient', () => {
       })
 
       mockFetch.mockImplementationOnce(
-        () =>
-          new Promise((resolve) => setTimeout(resolve, 1000)),
+        () => new Promise((resolve) => setTimeout(resolve, 1000)),
       )
 
       // This should timeout (AbortError converted to EmbeddingAgentError)
@@ -272,4 +290,3 @@ describe('createEmbeddingAgentClient', () => {
     expect(client).toBeInstanceOf(EmbeddingAgentClient)
   })
 })
-

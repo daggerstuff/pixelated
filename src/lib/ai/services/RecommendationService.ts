@@ -1,12 +1,13 @@
+import type { MentalHealthAnalysis } from '@/lib/chat'
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+
+import { ClinicalKnowledgeBase } from '../mental-llama/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidedAnalysisResult,
   ExpertGuidance,
 } from '../mental-llama/types/mentalLLaMATypes'
 import type { TherapySession } from '../models/ai-types'
-import type { MentalHealthAnalysis } from '@/lib/chat'
-import { ClinicalKnowledgeBase } from '../mental-llama/ClinicalKnowledgeBase'
 
 const logger = getClinicalAnalysisLogger('general')
 
@@ -209,7 +210,7 @@ export class RecommendationService {
 
       // Generate base recommendations from clinical knowledge
       const baseRecommendations =
-        await this.generateBaseRecommendations(currentState)
+         this.generateBaseRecommendations(currentState)
 
       // Personalize recommendations based on client profile and history
       const personalizedRecommendations = await this.personalizeRecommendations(

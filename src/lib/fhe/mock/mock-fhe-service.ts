@@ -6,6 +6,8 @@
  */
 
 import { nanoid } from 'nanoid'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { EncryptionMode, FHEOperation } from '../types'
 import type {
   EncryptedData,
@@ -15,7 +17,6 @@ import type {
   FHEScheme,
   FHEService,
 } from '../types'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('mock-fhe')
 
@@ -134,7 +135,7 @@ export class MockFHEService implements FHEService {
   public async encrypt<T>(
     value: T,
     _options?: unknown,
-  ): Promise<EncryptedData<unknown>> {
+  ): Promise<EncryptedData> {
     this.checkInitialized()
     logger.info('Mock encrypting data', { dataType: typeof value })
 
@@ -143,7 +144,7 @@ export class MockFHEService implements FHEService {
     let dataType: 'number' | 'string' | 'boolean' | 'array' | 'object'
 
     if (type === 'number' || type === 'string' || type === 'boolean') {
-      dataType = type as 'number' | 'string' | 'boolean'
+      dataType = type
     } else if (Array.isArray(value)) {
       dataType = 'array'
     } else {
@@ -174,7 +175,7 @@ export class MockFHEService implements FHEService {
    * Implements the decrypt method from FHEService interface
    */
   public async decrypt<T>(
-    encryptedData: EncryptedData<unknown>,
+    encryptedData: EncryptedData,
     _options?: unknown,
   ): Promise<T> {
     this.checkInitialized()

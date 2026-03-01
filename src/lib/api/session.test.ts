@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { GET, POST } from './session'
 
 describe('API /session', () => {

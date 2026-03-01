@@ -1,5 +1,6 @@
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
 import { useEffect, useState } from 'react'
+
+import { NotificationChannel } from '@/lib/services/notification/NotificationService'
 
 export interface NotificationPreferences {
   channels: {
@@ -47,7 +48,7 @@ export function useNotificationPreferences() {
   const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    loadPreferences()
+    void loadPreferences()
   }, [])
 
   const loadPreferences = async () => {

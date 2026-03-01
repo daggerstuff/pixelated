@@ -1,8 +1,9 @@
+import { WebSocketServer } from 'ws'
+
 /// <reference types="node" />
 import { env } from '../config/env.config'
 import { AnalyticsService } from '../lib/services/analytics/AnalyticsService'
 import { getLogger } from '../lib/utils/logger'
-import { WebSocketServer } from 'ws'
 
 // Create logger (uses utils logger so tests can mock it)
 const logger = getLogger('analytics-worker')
@@ -149,13 +150,13 @@ async function startWorker() {
     }
 
     // Start processing and cleanup loops
-    processEvents()
+    void processEvents()
 
     // In test environment, set up cleanup timer manually to avoid recursion issues
     if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       setTimeout(cleanup, CLEANUP_INTERVAL)
     } else {
-      cleanup()
+      void cleanup()
     }
 
     logger.info(`Analytics worker started successfully on port ${WS_PORT}`)
@@ -193,4 +194,4 @@ process.on('SIGTERM', () => shutdown('SIGTERM'))
 process.on('SIGINT', () => shutdown('SIGINT'))
 
 // Start the worker
-startWorker()
+void startWorker()

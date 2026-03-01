@@ -1,5 +1,6 @@
-import { initializeDatabase, query } from '@/lib/db'
 import type { APIRoute } from 'astro'
+
+import { initializeDatabase, query } from '@/lib/db'
 
 export const GET: APIRoute = async () => {
   try {

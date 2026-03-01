@@ -6,7 +6,7 @@ clone:
 definitions:
   services:
     docker:
-      memory: 4096  # Increase memory for SonarCloud analysis
+      memory: 4096 # Increase memory for SonarCloud analysis
   caches:
     sonar: ~/.sonar/cache
     pnpm: ~/.pnpm-store
@@ -68,7 +68,7 @@ definitions:
           - pnpm test:e2e:smoke
     - step: &build-test-sonarcloud
         name: Build, test and analyze on SonarCloud
-        size: 2x  # Use 2x build environment for more resources
+        size: 2x # Use 2x build environment for more resources
         caches:
           - pnpm
           - sonar

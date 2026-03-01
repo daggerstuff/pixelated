@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
+
 import {
   useNotificationStore,
   type Notification,
 } from '@/lib/stores/journal-research/notificationStore'
-import { useJournalResearchWebSocket } from './useWebSocket'
+
 import { useJournalResearchSSE } from './useSSE'
+import { useJournalResearchWebSocket } from './useWebSocket'
 import type { WebSocketMessage } from './useWebSocket'
 
 interface UseNotificationsOptions {
@@ -20,9 +22,7 @@ export const useNotifications = ({
   preferWebSocket = true,
   onNotification,
 }: UseNotificationsOptions) => {
-  const addNotification = useNotificationStore(
-    (state) => state.addNotification,
-  )
+  const addNotification = useNotificationStore((state) => state.addNotification)
 
   const handleMessage = (message: WebSocketMessage) => {
     if (message.type === 'notification') {
@@ -74,4 +74,3 @@ export const useNotifications = ({
     reconnect: preferWebSocket ? ws.reconnect : sse.reconnect,
   }
 }
-

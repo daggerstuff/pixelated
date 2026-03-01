@@ -1,9 +1,12 @@
-import { Server, Socket } from 'socket.io'
 import { Server as HttpServer } from 'http'
-import { AuthService } from './authService'
-import { CollaborationService } from './collaborationService'
+
+import { Server, Socket } from 'socket.io'
+
 import { redisClient } from '@/config/database'
 import { logger } from '@/utils/logger'
+
+import { AuthService } from './authService'
+import { CollaborationService } from './collaborationService'
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -123,7 +126,7 @@ export class SocketService {
 
     try {
       // Join document room
-      socket.join(`document:${documentId}`)
+      void socket.join(`document:${documentId}`)
       socket.documentId = documentId
 
       // Add user to connected users
@@ -170,7 +173,7 @@ export class SocketService {
   ): void {
     if (!socket.user) return
 
-    socket.leave(`document:${documentId}`)
+    void socket.leave(`document:${documentId}`)
 
     if (socket.documentId === documentId) {
       socket.documentId = undefined
@@ -232,7 +235,7 @@ export class SocketService {
       .emit('document-change', documentChange)
 
     // Store change in Redis for persistence
-    this.storeChange(socket.documentId, documentChange)
+    void this.storeChange(socket.documentId, documentChange)
   }
 
   private handleUserTyping(

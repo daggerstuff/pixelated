@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, FC } from 'react'
+
 import {
   createPixelatedEmpathyAgent,
   type TherapeuticScenario,
@@ -123,12 +124,18 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     response: AgentResponse,
     currentContext: AgentContext,
   ): void => {
-    if (currentContext === 'scenario_generation' && response.metadata?.['scenario']) {
+    if (
+      currentContext === 'scenario_generation' &&
+      response.metadata?.['scenario']
+    ) {
       onScenarioGenerated?.(
         response.metadata['scenario'] as TherapeuticScenario,
       )
     }
-    if (currentContext === 'bias_detection' && response.metadata?.['bias_analysis']) {
+    if (
+      currentContext === 'bias_detection' &&
+      response.metadata?.['bias_analysis']
+    ) {
       onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis)
     }
   }
@@ -208,35 +215,35 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
 
   return (
     <div
-      className={`flex flex-col h-full max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg shadow-lg ${className}`}
+      className={`bg-white border-gray-200 mx-auto flex h-full max-w-4xl flex-col rounded-lg border shadow-lg ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-blue-50">
-        <div className="flex items-center space-x-3">
+      <div className='border-gray-200 bg-blue-50 flex items-center justify-between border-b p-4'>
+        <div className='flex items-center space-x-3'>
           <div
-            className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+            className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
           />
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className='text-gray-800 text-lg font-semibold'>
             Pixelated Empathy AI Assistant
           </h3>
         </div>
         <select
           value={context}
           onChange={(e) => setContext(e.target.value as AgentContext)}
-          className="px-3 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className='border-gray-300 focus:ring-blue-500 rounded border px-3 py-1 text-sm focus:outline-none focus:ring-2'
         >
-          <option value="general">General</option>
-          <option value="scenario_generation">Scenario Generation</option>
-          <option value="bias_detection">Bias Detection</option>
-          <option value="training_recommendation">
+          <option value='general'>General</option>
+          <option value='scenario_generation'>Scenario Generation</option>
+          <option value='bias_detection'>Bias Detection</option>
+          <option value='training_recommendation'>
             Training Recommendation
           </option>
         </select>
       </div>
 
       {/* Quick Actions */}
-      <div className="p-3 border-b border-gray-100 bg-gray-50">
-        <div className="flex flex-wrap gap-2">
+      <div className='border-gray-100 bg-gray-50 border-b p-3'>
+        <div className='flex flex-wrap gap-2'>
           {quickActions.map((action) => (
             <button
               key={action.label}
@@ -244,7 +251,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
                 setContext(action.context as AgentContext)
                 action.action()
               }}
-              className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+              className='bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full px-3 py-1 text-xs transition-colors'
             >
               {action.label}
             </button>
@@ -253,24 +260,26 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className='flex-1 space-y-4 overflow-y-auto p-4'>
         {messages.map((message) => (
           <div
             key={message.id}
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-3xl p-3 rounded-lg ${message.role === 'user'
+              className={`max-w-3xl rounded-lg p-3 ${
+                message.role === 'user'
                   ? 'bg-blue-600 text-white'
                   : message.context === 'error'
-                    ? 'bg-red-100 text-red-800 border border-red-200'
+                    ? 'bg-red-100 text-red-800 border-red-200 border'
                     : 'bg-gray-100 text-gray-800'
-                }`}
+              }`}
             >
-              <div className="whitespace-pre-wrap">{message.content}</div>
+              <div className='whitespace-pre-wrap'>{message.content}</div>
               <div
-                className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                  }`}
+                className={`mt-2 text-xs ${
+                  message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                }`}
               >
                 {message.timestamp.toLocaleTimeString()}
                 {message.context && ` • ${message.context}`}
@@ -279,10 +288,10 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           </div>
         ))}
         {isLoading && (
-          <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-800 p-3 rounded-lg">
-              <div className="flex items-center space-x-2">
-                <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full" />
+          <div className='flex justify-start'>
+            <div className='bg-gray-100 text-gray-800 rounded-lg p-3'>
+              <div className='flex items-center space-x-2'>
+                <div className='border-blue-600 border-t-transparent h-4 w-4 animate-spin rounded-full border-2' />
                 <span>AI Assistant is thinking...</span>
               </div>
             </div>
@@ -292,21 +301,21 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="flex space-x-3">
+      <div className='border-gray-200 border-t p-4'>
+        <div className='flex space-x-3'>
           <input
-            type="text"
+            type='text'
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             placeholder={`Ask about ${context.replace('_', ' ')}...`}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className='border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2'
             disabled={!isConnected || isLoading}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || !isConnected || isLoading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+            className='bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 rounded-lg px-6 py-2 transition-colors disabled:cursor-not-allowed'
           >
             Send
           </button>
@@ -326,10 +335,7 @@ type ConditionType =
   | 'personality_disorder'
   | 'crisis'
 
-const CONDITION_KEYWORDS: Record<
-  ConditionType,
-  readonly string[]
-> = {
+const CONDITION_KEYWORDS: Record<ConditionType, readonly string[]> = {
   depression: ['depression', 'depressed'],
   anxiety: ['anxiety', 'anxious'],
   ptsd: ['ptsd', 'trauma'],

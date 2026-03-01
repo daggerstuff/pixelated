@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
+
 import { AuthService } from '@/services/authService'
 import { UserRole } from '@/types/user'
 

@@ -1,7 +1,16 @@
 import { useMemo } from 'react'
-import type { Progress, ProgressMetrics } from '@/lib/api/journal-research/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+
 import ChartComponent from '@/components/analytics/ChartComponent'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
+import type {
+  Progress,
+  ProgressMetrics,
+} from '@/lib/api/journal-research/types'
 import { cn } from '@/lib/utils'
 
 export interface PhaseProgressChartProps {
@@ -33,7 +42,13 @@ export function PhaseProgressChart({
         progressValue = progress.progressPercentage
       } else {
         // Completed phases show 100%, future phases show 0%
-        const phaseOrder = ['discovery', 'evaluation', 'acquisition', 'integration', 'reporting']
+        const phaseOrder = [
+          'discovery',
+          'evaluation',
+          'acquisition',
+          'integration',
+          'reporting',
+        ]
         const currentIndex = phaseOrder.indexOf(progress.currentPhase)
         const phaseIndex = phaseOrder.indexOf(phase.key)
 
@@ -117,9 +132,9 @@ export function PhaseProgressChart({
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type="bar"
+            type='bar'
             data={chartData}
-            title="Progress by Phase"
+            title='Progress by Phase'
             options={{
               indexAxis: 'y' as const,
               scales: {
@@ -142,9 +157,9 @@ export function PhaseProgressChart({
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type="pie"
+            type='pie'
             data={pieData}
-            title="Phase Status Distribution"
+            title='Phase Status Distribution'
             options={{
               responsive: true,
               maintainAspectRatio: false,
@@ -158,37 +173,38 @@ export function PhaseProgressChart({
         </CardContent>
       </Card>
 
-      <Card className="md:col-span-2">
+      <Card className='md:col-span-2'>
         <CardHeader>
           <CardTitle>Phase Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
+          <div className='space-y-2'>
             {phaseData.map((phase) => (
-              <div key={phase.phase} className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">
+              <div key={phase.phase} className='space-y-1'>
+                <div className='flex items-center justify-between text-sm'>
+                  <span className='font-medium'>
                     {phase.phase}
                     {phase.isCurrent && (
-                      <span className="ml-2 text-xs text-primary">
+                      <span className='text-primary ml-2 text-xs'>
                         (Current)
                       </span>
                     )}
                   </span>
-                  <span className="text-muted-foreground">
+                  <span className='text-muted-foreground'>
                     {Math.round(phase.progress)}%
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className='bg-muted h-2 w-full overflow-hidden rounded-full'>
                   <div
-                    className={`h-full transition-all ${phase.isCurrent
+                    className={`h-full transition-all ${
+                      phase.isCurrent
                         ? 'bg-primary'
                         : phase.progress === 100
                           ? 'bg-green-500'
                           : 'bg-gray-300'
-                      }`}
+                    }`}
                     style={{ width: `${phase.progress}%` }}
-                    role="progressbar"
+                    role='progressbar'
                     aria-valuenow={phase.progress}
                     aria-valuemin={0}
                     aria-valuemax={100}
@@ -202,4 +218,3 @@ export function PhaseProgressChart({
     </div>
   )
 }
-

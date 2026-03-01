@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { ThreatHuntingService } from '../threat-hunting-service'
+
 import {
   createInvestigation,
   updateInvestigation,
@@ -14,6 +14,7 @@ import {
   generateInvestigationReport,
   exportInvestigationData,
 } from '../investigation-utils'
+import { ThreatHuntingService } from '../threat-hunting-service'
 
 vi.mock('../../logging/build-safe-logger')
 // vi.mock('../../redis')
@@ -198,7 +199,7 @@ describe('Threat Hunting Service', () => {
 
       mockRedis.get.mockResolvedValue(JSON.stringify(existingInvestigation))
       mockRedis.set.mockResolvedValue('OK')
-      
+
       // Create updated investigation object
       const updatedInvestigationData = {
         ...existingInvestigation,
@@ -206,7 +207,9 @@ describe('Threat Hunting Service', () => {
       } as any
 
       // Mock updateInvestigation - it returns void but we can verify it was called
-      const updateSpy = vi.spyOn(service, 'updateInvestigation').mockResolvedValue(undefined)
+      const updateSpy = vi
+        .spyOn(service, 'updateInvestigation')
+        .mockResolvedValue(undefined)
 
       await service.updateInvestigation(updatedInvestigationData)
 
@@ -1354,7 +1357,9 @@ describe('Threat Hunting Service', () => {
       } as any
 
       // Mock updateInvestigation - it returns void but we can verify it was called
-      const updateSpy = vi.spyOn(service, 'updateInvestigation').mockResolvedValue(undefined)
+      const updateSpy = vi
+        .spyOn(service, 'updateInvestigation')
+        .mockResolvedValue(undefined)
 
       await service.updateInvestigation(updatedInvestigationData)
 

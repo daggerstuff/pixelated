@@ -22,7 +22,7 @@ vi.mock('../AIChatReact', () => {
       props: {
         'data-testid': 'ai-chat-react',
         'data-props': JSON.stringify(props),
-        'children': [
+        children: [
           {
             type: 'div',
             props: {
@@ -61,32 +61,32 @@ vi.mock('../AIChatReact', () => {
           },
           props.showModelSelector
             ? {
-              type: 'div',
-              props: {
-                className: 'model-selector',
-                children: [
-                  {
-                    type: 'label',
-                    props: {
-                      children: 'Select AI Model',
+                type: 'div',
+                props: {
+                  className: 'model-selector',
+                  children: [
+                    {
+                      type: 'label',
+                      props: {
+                        children: 'Select AI Model',
+                      },
                     },
-                  },
-                  {
-                    type: 'select',
-                    props: {
-                      children: props.availableModels?.map((model) => ({
-                        type: 'option',
-                        props: {
-                          key: model.id,
-                          value: model.id,
-                          children: model.name,
-                        },
-                      })),
+                    {
+                      type: 'select',
+                      props: {
+                        children: props.availableModels?.map((model) => ({
+                          type: 'option',
+                          props: {
+                            key: model.id,
+                            value: model.id,
+                            children: model.name,
+                          },
+                        })),
+                      },
                     },
-                  },
-                ],
-              },
-            }
+                  ],
+                },
+              }
             : null,
         ].filter(Boolean),
       },

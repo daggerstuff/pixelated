@@ -12,4 +12,3 @@ export { IntegrationPage } from './IntegrationPage'
 export type { IntegrationPageProps } from './IntegrationPage'
 export { ReportsPage } from './ReportsPage'
 export type { ReportsPageProps } from './ReportsPage'
-

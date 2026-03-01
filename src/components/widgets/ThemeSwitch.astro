@@ -79,7 +79,7 @@
         ) {
           iframe.contentWindow.postMessage(
             { giscus: { setConfig: { theme: newTheme } } },
-            'https://giscus.app'
+            'https://giscus.app',
           )
         }
       }
@@ -91,7 +91,7 @@
 
     const setColorTheme = () => {
       const colorThemeMetaTag = document.querySelector(
-        "meta[name='theme-color']"
+        "meta[name='theme-color']",
       )
       const bgColor = getComputedStyle(document.body).getPropertyValue('--c-bg')
       colorThemeMetaTag?.setAttribute('content', bgColor)
@@ -128,7 +128,7 @@
       const y = event.clientY
       const endRadius = Math.hypot(
         Math.max(x, innerWidth - x),
-        Math.max(y, innerHeight - y)
+        Math.max(y, innerHeight - y),
       )
 
       const transition = document.startViewTransition(() => toggle())
@@ -150,7 +150,7 @@
             pseudoElement: isDark
               ? '::view-transition-old(root)'
               : '::view-transition-new(root)',
-          }
+          },
         )
       })
     }

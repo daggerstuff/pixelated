@@ -10,11 +10,13 @@ share: true
 
 # Security Audit API
 
-The Security Audit API provides endpoints for retrieving and analyzing security-related events in the system.
+The Security Audit API provides endpoints for retrieving and analyzing
+security-related events in the system.
 
 ## Authentication
 
-All audit endpoints require authentication and the 'audit' role. Include your JWT token in the Authorization header:
+All audit endpoints require authentication and the 'audit' role. Include your
+JWT token in the Authorization header:
 
 ```bash
 Authorization: Bearer your-jwt-token

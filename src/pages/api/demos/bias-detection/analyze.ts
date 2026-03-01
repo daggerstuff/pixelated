@@ -1,5 +1,9 @@
 // API endpoint for bias detection analysis
 
+import type {
+  SessionData,
+  BiasAnalysisResults,
+} from '../../../../lib/types/bias-detection'
 import {
   calculateBiasFactors,
   generateCounterfactualScenarios,
@@ -8,10 +12,6 @@ import {
   generateSessionId,
   determineAlertLevel,
 } from '../../../../lib/utils/demo-helpers'
-import type {
-  SessionData,
-  BiasAnalysisResults,
-} from '../../../../lib/types/bias-detection'
 
 export const POST: APIRoute = async ({ request }) => {
   try {

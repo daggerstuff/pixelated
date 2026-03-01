@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # CPTSD Treatment Approaches
 
-Treatment for Complex PTSD requires a comprehensive, phase-based approach that addresses both trauma processing and skill development.
+Treatment for Complex PTSD requires a comprehensive, phase-based approach that
+addresses both trauma processing and skill development.
 
 ## Phase-Based Treatment
 

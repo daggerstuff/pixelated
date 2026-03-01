@@ -1,8 +1,10 @@
-import type { ChatMessage } from '@/types/chat'
-import { WebSocketServer, WebSocket } from 'ws'
 import type { Server } from 'node:http'
-import { fheService } from '../fhe'
 
+import { WebSocketServer, WebSocket } from 'ws'
+
+import type { ChatMessage } from '@/types/chat'
+
+import { fheService } from '../fhe'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
@@ -44,7 +46,7 @@ class TherapyChatWebSocketServer {
             await this.handleChatMessage(clientId, message)
             break
           case 'status':
-            await this.handleStatusUpdate(clientId, message)
+             this.handleStatusUpdate(clientId, message)
             break
           default:
             logger.warn(`Unknown message type: ${message.type}`)

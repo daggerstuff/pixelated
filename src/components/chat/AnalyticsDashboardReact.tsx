@@ -1,6 +1,7 @@
+import { useEffect, useMemo, useState } from 'react'
+
 import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
-import { useEffect, useMemo, useState } from 'react'
 // Dynamic imports for FHE to reduce bundle size
 // import { fheService } from '../../lib/fhe'
 // import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
@@ -25,6 +26,8 @@ enum AnalyticsType {
   INTERVENTION_EFFECTIVENESS = 'intervention_effectiveness',
   EMOTIONAL_PATTERNS = 'emotional_patterns',
 }
+import React from 'react'
+
 import {
   IconAlertTriangle,
   IconBarChart,
@@ -33,7 +36,6 @@ import {
   IconPieChart,
   IconRefresh,
 } from './icons'
-import React from 'react'
 
 enum EncryptionMode {
   NONE = 'none',
@@ -140,7 +142,7 @@ export default function AnalyticsDashboard({
       }
     }
 
-    initFHE()
+    void initFHE()
   }, [securityLevel, encryptionEnabled])
 
   const generateId = () => {
@@ -210,7 +212,7 @@ export default function AnalyticsDashboard({
   // Load analytics when messages or FHE initialization changes
   useEffect(() => {
     if (fheInitialized && messages.length > 0) {
-      loadAnalytics()
+      void loadAnalytics()
     }
   }, [messages, fheInitialized, loadAnalytics])
 
@@ -222,7 +224,7 @@ export default function AnalyticsDashboard({
 
     const intervalId = setInterval(() => {
       if (messages.length > 0 && fheInitialized) {
-        loadAnalytics()
+        void loadAnalytics()
       }
     }, refreshInterval)
 
@@ -238,23 +240,23 @@ export default function AnalyticsDashboard({
   const renderSentimentTrend = (data: AnalyticsData) => {
     if (!data || !data.sentimentData || data.sentimentData.length === 0) {
       return (
-        <div className="text-gray-400 text-center p-4">
+        <div className='text-gray-400 p-4 text-center'>
           No sentiment data available
         </div>
       )
     }
 
     return (
-      <div className="p-4">
-        <h3 className="text-lg font-medium mb-2">Sentiment Analysis</h3>
-        <div className="bg-black bg-opacity-30 p-4 rounded-lg">
-          <div className="flex justify-between mb-4">
+      <div className='p-4'>
+        <h3 className='mb-2 text-lg font-medium'>Sentiment Analysis</h3>
+        <div className='bg-black rounded-lg bg-opacity-30 p-4'>
+          <div className='mb-4 flex justify-between'>
             <div>
-              <span className="text-sm text-gray-400">Messages Analyzed:</span>
-              <span className="ml-2 font-medium">{data.userMessageCount}</span>
+              <span className='text-gray-400 text-sm'>Messages Analyzed:</span>
+              <span className='ml-2 font-medium'>{data.userMessageCount}</span>
             </div>
             <div>
-              <span className="text-sm text-gray-400">
+              <span className='text-gray-400 text-sm'>
                 Processing Success Rate:
               </span>
               <span
@@ -271,7 +273,7 @@ export default function AnalyticsDashboard({
           </div>
 
           {/* Mock sentiment visualization - would be a chart in production */}
-          <div className="h-40 bg-gray-800 rounded-lg flex items-end p-2 space-x-1">
+          <div className='bg-gray-800 flex h-40 items-end space-x-1 rounded-lg p-2'>
             {data.sentimentData.map((item: SentimentItem) => {
               // Get mock sentiment values (would be real in production)
               const sentimentValue = Math.random()
@@ -286,11 +288,11 @@ export default function AnalyticsDashboard({
               return (
                 <div
                   key={`sentiment-${item.messageIndex}`}
-                  className="flex-1"
+                  className='flex-1'
                   title={`Message ${item.messageIndex + 1}`}
                 >
                   <div
-                    className={`${color} rounded-t-sm w-full`}
+                    className={`${color} w-full rounded-t-sm`}
                     style={{ height }}
                   ></div>
                 </div>
@@ -298,14 +300,14 @@ export default function AnalyticsDashboard({
             })}
           </div>
 
-          <div className="mt-4 text-sm text-gray-300">
+          <div className='text-gray-300 mt-4 text-sm'>
             <p>
               Sentiment analysis shows emotional valence across the conversation
               timeline.
             </p>
             {securityLevel === 'maximum' && (
-              <p className="text-green-400 flex items-center mt-1">
-                <IconLock className="h-3 w-3 mr-1" />
+              <p className='text-green-400 mt-1 flex items-center'>
+                <IconLock className='mr-1 h-3 w-3' />
                 Analysis performed with FHE, maintaining complete privacy
               </p>
             )}
@@ -318,7 +320,7 @@ export default function AnalyticsDashboard({
   const renderTopicClusters = (data: AnalyticsData) => {
     if (!data || !data.topicData || data.topicData.length === 0) {
       return (
-        <div className="text-gray-400 text-center p-4">
+        <div className='text-gray-400 p-4 text-center'>
           No topic data available
         </div>
       )
@@ -336,43 +338,43 @@ export default function AnalyticsDashboard({
 
     // Sort topics for display
     const sortedTopics = Object.entries(mockTopics)
-      .sort(([, a], [, b]) => (b as number) - (a as number))
+      .sort(([, a], [, b]) => (b) - (a))
       .slice(0, 5)
 
     return (
-      <div className="p-4">
-        <h3 className="text-lg font-medium mb-2">Topic Distribution</h3>
-        <div className="bg-black bg-opacity-30 p-4 rounded-lg">
-          <div className="mb-4">
-            <span className="text-sm text-gray-400">Messages Analyzed:</span>
-            <span className="ml-2 font-medium">{data.messageCount}</span>
+      <div className='p-4'>
+        <h3 className='mb-2 text-lg font-medium'>Topic Distribution</h3>
+        <div className='bg-black rounded-lg bg-opacity-30 p-4'>
+          <div className='mb-4'>
+            <span className='text-gray-400 text-sm'>Messages Analyzed:</span>
+            <span className='ml-2 font-medium'>{data.messageCount}</span>
           </div>
 
           {/* Mock topic visualization */}
-          <div className="space-y-2">
+          <div className='space-y-2'>
             {sortedTopics.map(([topic, value]) => (
-              <div key={topic} className="w-full">
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm capitalize">{topic}</span>
-                  <span className="text-sm text-gray-400">
-                    {Math.round((value as number) * 100)}%
+              <div key={topic} className='w-full'>
+                <div className='mb-1 flex justify-between'>
+                  <span className='text-sm capitalize'>{topic}</span>
+                  <span className='text-gray-400 text-sm'>
+                    {Math.round((value) * 100)}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-2.5">
+                <div className='bg-gray-800 h-2.5 w-full rounded-full'>
                   <div
-                    className="bg-indigo-600 h-2.5 rounded-full"
-                    style={{ width: `${Math.round((value as number) * 100)}%` }}
+                    className='bg-indigo-600 h-2.5 rounded-full'
+                    style={{ width: `${Math.round((value) * 100)}%` }}
                   ></div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 text-sm text-gray-300">
+          <div className='text-gray-300 mt-4 text-sm'>
             <p>Topic analysis identifies key themes in the conversation.</p>
             {securityLevel === 'maximum' && (
-              <p className="text-green-400 flex items-center mt-1">
-                <IconLock className="h-3 w-3 mr-1" />
+              <p className='text-green-400 mt-1 flex items-center'>
+                <IconLock className='mr-1 h-3 w-3' />
                 Topic extraction performed with FHE, maintaining complete
                 privacy
               </p>
@@ -386,7 +388,7 @@ export default function AnalyticsDashboard({
   const renderRiskAssessment = (data: AnalyticsData) => {
     if (!data || !data.riskData || data.riskData.length === 0) {
       return (
-        <div className="text-gray-400 text-center p-4">
+        <div className='text-gray-400 p-4 text-center'>
           No risk data available
         </div>
       )
@@ -404,25 +406,25 @@ export default function AnalyticsDashboard({
           : 'text-green-500'
 
     return (
-      <div className="p-4">
-        <h3 className="text-lg font-medium mb-2">Risk Assessment</h3>
-        <div className="bg-black bg-opacity-30 p-4 rounded-lg">
-          <div className="mb-4">
-            <span className="text-sm text-gray-400">Messages Analyzed:</span>
-            <span className="ml-2 font-medium">{data.messageCount}</span>
+      <div className='p-4'>
+        <h3 className='mb-2 text-lg font-medium'>Risk Assessment</h3>
+        <div className='bg-black rounded-lg bg-opacity-30 p-4'>
+          <div className='mb-4'>
+            <span className='text-gray-400 text-sm'>Messages Analyzed:</span>
+            <span className='ml-2 font-medium'>{data.messageCount}</span>
           </div>
 
-          <div className="flex justify-center my-4">
-            <div className="text-center">
+          <div className='my-4 flex justify-center'>
+            <div className='text-center'>
               <div className={`text-2xl font-bold ${riskColor}`}>
                 {riskLevel}
               </div>
-              <div className="text-sm text-gray-400 mt-1">Risk Level</div>
+              <div className='text-gray-400 mt-1 text-sm'>Risk Level</div>
             </div>
           </div>
 
           {/* Mock risk visualization - gauge chart */}
-          <div className="relative h-8 bg-gray-800 rounded-full overflow-hidden mt-4">
+          <div className='bg-gray-800 relative mt-4 h-8 overflow-hidden rounded-full'>
             <div
               className={
                 riskScore > 0.7
@@ -437,29 +439,29 @@ export default function AnalyticsDashboard({
               }}
             ></div>
             <div
-              className="absolute top-0 left-1/3 w-px h-full bg-gray-600"
-              title="Low Risk Threshold"
+              className='bg-gray-600 absolute left-1/3 top-0 h-full w-px'
+              title='Low Risk Threshold'
             ></div>
             <div
-              className="absolute top-0 left-2/3 w-px h-full bg-gray-600"
-              title="Medium Risk Threshold"
+              className='bg-gray-600 absolute left-2/3 top-0 h-full w-px'
+              title='Medium Risk Threshold'
             ></div>
           </div>
 
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className='text-gray-500 mt-1 flex justify-between text-xs'>
             <span>Low</span>
             <span>Medium</span>
             <span>High</span>
           </div>
 
-          <div className="mt-4 text-sm text-gray-300">
+          <div className='text-gray-300 mt-4 text-sm'>
             <p>
               Risk assessment identifies potential safety concerns while
               maintaining privacy.
             </p>
             {securityLevel === 'maximum' && (
-              <p className="text-green-400 flex items-center mt-1">
-                <IconLock className="h-3 w-3 mr-1" />
+              <p className='text-green-400 mt-1 flex items-center'>
+                <IconLock className='mr-1 h-3 w-3' />
                 Assessment performed with FHE, maintaining complete privacy
               </p>
             )}
@@ -472,7 +474,7 @@ export default function AnalyticsDashboard({
   const renderInterventionEffectiveness = (data: AnalyticsData) => {
     if (!data || !data.interventionData || data.interventionData.length === 0) {
       return (
-        <div className="text-gray-400 text-center p-4">
+        <div className='text-gray-400 p-4 text-center'>
           No intervention data available
         </div>
       )
@@ -488,27 +490,27 @@ export default function AnalyticsDashboard({
     ]
 
     return (
-      <div className="p-4">
-        <h3 className="text-lg font-medium mb-2">Intervention Effectiveness</h3>
-        <div className="bg-black bg-opacity-30 p-4 rounded-lg">
-          <div className="mb-4">
-            <span className="text-sm text-gray-400">Exchanges Analyzed:</span>
-            <span className="ml-2 font-medium">{data.exchangeCount}</span>
+      <div className='p-4'>
+        <h3 className='mb-2 text-lg font-medium'>Intervention Effectiveness</h3>
+        <div className='bg-black rounded-lg bg-opacity-30 p-4'>
+          <div className='mb-4'>
+            <span className='text-gray-400 text-sm'>Exchanges Analyzed:</span>
+            <span className='ml-2 font-medium'>{data.exchangeCount}</span>
           </div>
 
           {/* Mock effectiveness visualization */}
-          <div className="space-y-3">
+          <div className='space-y-3'>
             {mockInterventions.map((intervention) => (
-              <div key={intervention.type} className="w-full">
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm capitalize">
+              <div key={intervention.type} className='w-full'>
+                <div className='mb-1 flex justify-between'>
+                  <span className='text-sm capitalize'>
                     {intervention.type}
                   </span>
-                  <span className="text-sm text-gray-400">
+                  <span className='text-gray-400 text-sm'>
                     {Math.round(intervention.effectiveness * 100)}% effective
                   </span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-2.5">
+                <div className='bg-gray-800 h-2.5 w-full rounded-full'>
                   <div
                     className={`h-2.5 rounded-full ${
                       intervention.effectiveness > 0.7
@@ -526,14 +528,14 @@ export default function AnalyticsDashboard({
             ))}
           </div>
 
-          <div className="mt-4 text-sm text-gray-300">
+          <div className='text-gray-300 mt-4 text-sm'>
             <p>
               Intervention analysis shows which therapeutic approaches are mos
               effective with this client.
             </p>
             {securityLevel === 'maximum' && (
-              <p className="text-green-400 flex items-center mt-1">
-                <IconLock className="h-3 w-3 mr-1" />
+              <p className='text-green-400 mt-1 flex items-center'>
+                <IconLock className='mr-1 h-3 w-3' />
                 Analysis performed with FHE, maintaining complete privacy
               </p>
             )}
@@ -546,7 +548,7 @@ export default function AnalyticsDashboard({
   const renderEmotionalPatterns = (data: AnalyticsData) => {
     if (!data || !data.windowResults || data.windowResults.length === 0) {
       return (
-        <div className="text-gray-400 text-center p-4">
+        <div className='text-gray-400 p-4 text-center'>
           No emotional pattern data available
         </div>
       )
@@ -562,18 +564,18 @@ export default function AnalyticsDashboard({
     })
 
     return (
-      <div className="p-4">
-        <h3 className="text-lg font-medium mb-2">Emotional Patterns</h3>
-        <div className="bg-black bg-opacity-30 p-4 rounded-lg">
-          <div className="mb-4">
-            <span className="text-sm text-gray-400">Messages Analyzed:</span>
-            <span className="ml-2 font-medium">{data.messageCount}</span>
+      <div className='p-4'>
+        <h3 className='mb-2 text-lg font-medium'>Emotional Patterns</h3>
+        <div className='bg-black rounded-lg bg-opacity-30 p-4'>
+          <div className='mb-4'>
+            <span className='text-gray-400 text-sm'>Messages Analyzed:</span>
+            <span className='ml-2 font-medium'>{data.messageCount}</span>
           </div>
 
           {/* Mock emotion pattern visualization */}
-          <div className="relative h-40 bg-gray-800 bg-opacity-50 rounded-lg p-2">
+          <div className='bg-gray-800 relative h-40 rounded-lg bg-opacity-50 p-2'>
             {mockEmotionData.map((item) => (
-              <div key={item.emotion} className="absolute">
+              <div key={item.emotion} className='absolute'>
                 {item.values.map((value, index) => {
                   // Position points along the x-axis
                   const x = `${(index / (item.values.length - 1)) * 100}%`
@@ -595,7 +597,7 @@ export default function AnalyticsDashboard({
                   return (
                     <div
                       key={`${item.emotion}-${index}`}
-                      className={`absolute ${color} w-2 h-2 rounded-full`}
+                      className={`absolute ${color} h-2 w-2 rounded-full`}
                       style={{ left: x, top: y }}
                       title={`${item.emotion}: ${Math.round(value * 100)}%`}
                     ></div>
@@ -606,7 +608,7 @@ export default function AnalyticsDashboard({
           </div>
 
           {/* Legend */}
-          <div className="flex flex-wrap gap-3 mt-3">
+          <div className='mt-3 flex flex-wrap gap-3'>
             {emotions.map((emotion) => {
               const colors = {
                 anger: 'bg-red-500',
@@ -620,19 +622,19 @@ export default function AnalyticsDashboard({
               const color = colors[emotion as keyof typeof colors]
 
               return (
-                <div key={emotion} className="flex items-center">
-                  <div className={`${color} w-2 h-2 rounded-full mr-1`}></div>
-                  <span className="text-xs capitalize">{emotion}</span>
+                <div key={emotion} className='flex items-center'>
+                  <div className={`${color} mr-1 h-2 w-2 rounded-full`}></div>
+                  <span className='text-xs capitalize'>{emotion}</span>
                 </div>
               )
             })}
           </div>
 
-          <div className="mt-4 text-sm text-gray-300">
+          <div className='text-gray-300 mt-4 text-sm'>
             <p>Emotional patterns show changes in client emotions over time.</p>
             {securityLevel === 'maximum' && (
-              <p className="text-green-400 flex items-center mt-1">
-                <IconLock className="h-3 w-3 mr-1" />
+              <p className='text-green-400 mt-1 flex items-center'>
+                <IconLock className='mr-1 h-3 w-3' />
                 Analysis performed with FHE, maintaining complete privacy
               </p>
             )}
@@ -646,11 +648,11 @@ export default function AnalyticsDashboard({
   const renderAnalyticsContent = () => {
     if (!fheInitialized) {
       return (
-        <div className="p-8 text-center">
-          <div className="mb-4 text-yellow-400">
+        <div className='p-8 text-center'>
+          <div className='text-yellow-400 mb-4'>
             Initializing FHE analytics...
           </div>
-          <div className="text-sm text-gray-400">
+          <div className='text-gray-400 text-sm'>
             This may take a moment as we set up secure homomorphic encryption.
           </div>
         </div>
@@ -659,11 +661,11 @@ export default function AnalyticsDashboard({
 
     if (error) {
       return (
-        <div className="p-8 text-center">
-          <div className="mb-4 text-red-500">{error}</div>
+        <div className='p-8 text-center'>
+          <div className='text-red-500 mb-4'>{error}</div>
           <button
             onClick={loadAnalytics}
-            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+            className='bg-purple-600 text-white hover:bg-purple-700 rounded-md px-4 py-2'
           >
             Try Again
           </button>
@@ -673,11 +675,11 @@ export default function AnalyticsDashboard({
 
     if (isLoading) {
       return (
-        <div className="p-8 text-center">
-          <div className="mb-4 text-purple-400">
+        <div className='p-8 text-center'>
+          <div className='text-purple-400 mb-4'>
             Generating secure analytics...
           </div>
-          <div className="text-sm text-gray-400">
+          <div className='text-gray-400 text-sm'>
             {securityLevel === 'maximum'
               ? 'Performing homomorphic operations on encrypted data'
               : 'Processing analytics data securely'}
@@ -688,7 +690,7 @@ export default function AnalyticsDashboard({
 
     if (!currentAnalytics) {
       return (
-        <div className="p-8 text-center text-gray-400">
+        <div className='text-gray-400 p-8 text-center'>
           No analytics data available
         </div>
       )
@@ -706,36 +708,36 @@ export default function AnalyticsDashboard({
       case AnalyticsType.EMOTIONAL_PATTERNS:
         return renderEmotionalPatterns(currentAnalytics.data)
       default:
-        return <div className="p-4 text-gray-400">Select an analytics view</div>
+        return <div className='text-gray-400 p-4'>Select an analytics view</div>
     }
   }
 
   return (
-    <div className="bg-gray-900 text-gray-100 rounded-lg border border-gray-800 overflow-hidden">
+    <div className='bg-gray-900 text-gray-100 border-gray-800 overflow-hidden rounded-lg border'>
       {/* Header */}
-      <div className="bg-gradient-to-r from-black via-purple-900 to-black p-3 flex items-center justify-between">
-        <h2 className="text-lg font-medium">Therapy Analytics</h2>
-        <div className="flex items-center space-x-2">
+      <div className='from-black via-purple-900 to-black flex items-center justify-between bg-gradient-to-r p-3'>
+        <h2 className='text-lg font-medium'>Therapy Analytics</h2>
+        <div className='flex items-center space-x-2'>
           {securityLevel === 'maximum' && (
-            <span className="text-xs text-green-400 bg-black bg-opacity-50 px-2 py-1 rounded flex items-center">
-              <IconLock className="h-3 w-3 mr-1" />
+            <span className='text-green-400 bg-black flex items-center rounded bg-opacity-50 px-2 py-1 text-xs'>
+              <IconLock className='mr-1 h-3 w-3' />
               FHE Secured
             </span>
           )}
           <button
             onClick={loadAnalytics}
-            className="p-1 hover:bg-black hover:bg-opacity-30 rounded"
-            title="Refresh Analytics"
+            className='hover:bg-black rounded p-1 hover:bg-opacity-30'
+            title='Refresh Analytics'
           >
-            <IconRefresh className="h-4 w-4" />
+            <IconRefresh className='h-4 w-4' />
           </button>
         </div>
       </div>
 
       {/* Privacy warning */}
       {showPrivacyWarning && (
-        <div className="bg-yellow-900 bg-opacity-30 text-yellow-300 px-3 py-2 text-sm flex items-start">
-          <IconAlertTriangle className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
+        <div className='bg-yellow-900 text-yellow-300 flex items-start bg-opacity-30 px-3 py-2 text-sm'>
+          <IconAlertTriangle className='mr-2 mt-0.5 h-4 w-4 flex-shrink-0' />
 
           <div>
             <strong>Privacy Notice:</strong> Analytics are not fully encrypted.
@@ -746,18 +748,18 @@ export default function AnalyticsDashboard({
       )}
 
       {/* Analytics tabs */}
-      <div className="bg-black bg-opacity-40 border-b border-gray-800">
-        <div className="flex overflow-x-auto">
+      <div className='bg-black border-gray-800 border-b bg-opacity-40'>
+        <div className='flex overflow-x-auto'>
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.SENTIMENT_TREND
-                ? 'text-purple-400 border-b-2 border-purple-400'
+                ? 'text-purple-400 border-purple-400 border-b-2'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab(AnalyticsType.SENTIMENT_TREND)}
           >
-            <span className="flex items-center">
-              <IconLineChart className="h-4 w-4 mr-1" />
+            <span className='flex items-center'>
+              <IconLineChart className='mr-1 h-4 w-4' />
               Sentiment Trend
             </span>
           </button>
@@ -765,13 +767,13 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.TOPIC_CLUSTERING
-                ? 'text-purple-400 border-b-2 border-purple-400'
+                ? 'text-purple-400 border-purple-400 border-b-2'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab(AnalyticsType.TOPIC_CLUSTERING)}
           >
-            <span className="flex items-center">
-              <IconPieChart className="h-4 w-4 mr-1" />
+            <span className='flex items-center'>
+              <IconPieChart className='mr-1 h-4 w-4' />
               Topic Clustering
             </span>
           </button>
@@ -779,13 +781,13 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.EMOTIONAL_PATTERNS
-                ? 'text-purple-400 border-b-2 border-purple-400'
+                ? 'text-purple-400 border-purple-400 border-b-2'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab(AnalyticsType.EMOTIONAL_PATTERNS)}
           >
-            <span className="flex items-center">
-              <IconLineChart className="h-4 w-4 mr-1" />
+            <span className='flex items-center'>
+              <IconLineChart className='mr-1 h-4 w-4' />
               Emotional Patterns
             </span>
           </button>
@@ -793,15 +795,15 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.INTERVENTION_EFFECTIVENESS
-                ? 'text-purple-400 border-b-2 border-purple-400'
+                ? 'text-purple-400 border-purple-400 border-b-2'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() =>
               setActiveTab(AnalyticsType.INTERVENTION_EFFECTIVENESS)
             }
           >
-            <span className="flex items-center">
-              <IconBarChart className="h-4 w-4 mr-1" />
+            <span className='flex items-center'>
+              <IconBarChart className='mr-1 h-4 w-4' />
               Intervention Effectiveness
             </span>
           </button>
@@ -809,13 +811,13 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.RISK_ASSESSMENT
-                ? 'text-purple-400 border-b-2 border-purple-400'
+                ? 'text-purple-400 border-purple-400 border-b-2'
                 : 'text-gray-400 hover:text-gray-300'
             }`}
             onClick={() => setActiveTab(AnalyticsType.RISK_ASSESSMENT)}
           >
-            <span className="flex items-center">
-              <IconAlertTriangle className="h-4 w-4 mr-1" />
+            <span className='flex items-center'>
+              <IconAlertTriangle className='mr-1 h-4 w-4' />
               Risk Assessmen
             </span>
           </button>
@@ -823,10 +825,10 @@ export default function AnalyticsDashboard({
       </div>
 
       {/* Analytics content */}
-      <div className="min-h-[300px]">{renderAnalyticsContent()}</div>
+      <div className='min-h-[300px]'>{renderAnalyticsContent()}</div>
 
       {/* Footer */}
-      <div className="bg-black bg-opacity-40 p-2 text-xs text-gray-500 flex justify-between">
+      <div className='bg-black text-gray-500 flex justify-between bg-opacity-40 p-2 text-xs'>
         <div>
           {scenario ? `Analysis for ${scenario} scenario` : 'All client data'}
         </div>

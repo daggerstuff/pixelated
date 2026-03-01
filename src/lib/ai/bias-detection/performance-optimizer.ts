@@ -10,8 +10,8 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { ConnectionPool, type ConnectionPoolConfig } from './connection-pool'
 import { getCacheService } from '../../services/cacheService'
+import { ConnectionPool, type ConnectionPoolConfig } from './connection-pool'
 
 const logger = createBuildSafeLogger('PerformanceOptimizer')
 

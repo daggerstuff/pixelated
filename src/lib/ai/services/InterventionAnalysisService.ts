@@ -168,7 +168,10 @@ export class InterventionAnalysisService {
       return result
     } catch (error: unknown) {
       logger.error('Error analyzing intervention effectiveness', { error })
-      throw new Error(`Failed to analyze intervention effectiveness: ${error}`, { cause: error })
+      throw new Error(
+        `Failed to analyze intervention effectiveness: ${error}`,
+        { cause: error },
+      )
     }
   }
 

@@ -5,12 +5,12 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { SealResourceScope } from './seal-memory'
 import { SealService } from './seal-service'
 import type { SealCipherText, SealPlainText } from './seal-service'
-import { SealResourceScope } from './seal-memory'
-import { FHEOperation, OperationError } from './types'
 import { SealSchemeType, SEAL_SUPPORTED_OPERATIONS } from './seal-types'
 import type { SealOperationResult } from './seal-types'
+import { FHEOperation, OperationError } from './types'
 
 const logger = createBuildSafeLogger('seal-operations')
 
@@ -233,7 +233,7 @@ export class SealOperations {
 
       // If b is a number array, we can use plain multiplication which is more efficient
       if (Array.isArray(b)) {
-        const bAsNumberArray = b as number[] // Explicit cast
+        const bAsNumberArray = b // Explicit cast
         // Create a plaintext
         const plaintext = scope.track(seal.PlainText(), 'plaintext')
 
@@ -253,9 +253,9 @@ export class SealOperations {
             if (typeof bAsNumberArray[i] !== 'number') {
               throw new TypeError(
                 'Plaintext array for BFV/BGV multiplication must contain numbers. Received: ' +
-                String(bAsNumberArray[i]) +
-                ' of type ' +
-                typeof bAsNumberArray[i],
+                  String(bAsNumberArray[i]) +
+                  ' of type ' +
+                  typeof bAsNumberArray[i],
               )
             }
             coefArray[i] = bAsNumberArray[i]
@@ -535,9 +535,7 @@ export class SealOperations {
           // For BFV/BGV, we need to create an array of the same size as the batch
           const batchEncoder = getBatchEncoder()
           const { slotCount } = batchEncoder
-          const constArray: number[] = Array(slotCount).fill(
-            coefficients[0],
-          )
+          const constArray: number[] = Array(slotCount).fill(coefficients[0])
           batchEncoder.encode(constArray, plaintext as unknown as SealPlainText)
         }
         const result = seal.CipherText()

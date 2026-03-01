@@ -1,7 +1,6 @@
 /// <reference types="astro/client" />
 import * as LaunchDarkly from 'launchdarkly-js-client-sdk'
 
-
 let ldClient: LaunchDarkly.LDClient | null = null
 
 if (typeof window !== 'undefined' && !ldClient) {

@@ -10,8 +10,9 @@ This directory contains tests for the FHE module.
 
 ## Mock Implementation
 
-The FHE module uses a simplified mock implementation for testing purposes.
-In a production environment, this would be replaced with a real FHE library implementation.
+The FHE module uses a simplified mock implementation for testing purposes. In a
+production environment, this would be replaced with a real FHE library
+implementation.
 
 ## Test structure
 

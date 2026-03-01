@@ -1,9 +1,9 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   CrisisProtocolConfig,
   AlertConfiguration,
   CrisisEvent,
 } from './types'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const appLogger = createBuildSafeLogger('app')
 

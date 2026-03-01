@@ -14,8 +14,10 @@ import {
   AreaChart,
   Area,
 } from 'recharts'
-import type { TemporalEmotionAnalysis } from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
+
 import { cn } from '@/lib/utils'
+
+import type { TemporalEmotionAnalysis } from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
 
 type EmotionTemporalAnalysisChartProps = {
   data: TemporalEmotionAnalysis
@@ -214,10 +216,10 @@ export default function EmotionTemporalAnalysisChart({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg">
-        <div className="animate-pulse flex flex-col w-full">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2.5"></div>
-          <div className="h-40 bg-gray-200 rounded w-full"></div>
+      <div className='bg-gray-50 flex items-center justify-center rounded-lg p-6'>
+        <div className='flex w-full animate-pulse flex-col'>
+          <div className='bg-gray-200 mb-2.5 h-4 w-3/4 rounded'></div>
+          <div className='bg-gray-200 h-40 w-full rounded'></div>
         </div>
       </div>
     )
@@ -235,11 +237,11 @@ export default function EmotionTemporalAnalysisChart({
         : 0) === 0)
   ) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
-        <p className="text-gray-500 mb-2">
+      <div className='bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6'>
+        <p className='text-gray-500 mb-2'>
           No temporal analysis data available
         </p>
-        <p className="text-sm text-gray-400">
+        <p className='text-gray-400 text-sm'>
           More data needs to be collected across sessions
         </p>
       </div>
@@ -254,8 +256,8 @@ export default function EmotionTemporalAnalysisChart({
           data={prepareTrendData()}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis dataKey='name' />
           <YAxis domain={[-1, 1]} />
           <Tooltip
             formatter={(value, name) => {
@@ -276,41 +278,41 @@ export default function EmotionTemporalAnalysisChart({
           />
 
           <Legend />
-          <ReferenceLine y={0} stroke="#666" />
+          <ReferenceLine y={0} stroke='#666' />
           <defs>
             {prepareTrendData().map((item) => (
               <linearGradient
                 key={item.name}
                 id={`gradient-${item.name}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1"
+                x1='0'
+                y1='0'
+                x2='0'
+                y2='1'
               >
-                <stop offset="5%" stopColor={item.color} stopOpacity={0.8} />
+                <stop offset='5%' stopColor={item.color} stopOpacity={0.8} />
 
-                <stop offset="95%" stopColor={item.color} stopOpacity={0.2} />
+                <stop offset='95%' stopColor={item.color} stopOpacity={0.2} />
               </linearGradient>
             ))}
           </defs>
           <Area
-            type="monotone"
-            dataKey="slope"
-            stroke="#8884d8"
-            fill="#8884d8"
+            type='monotone'
+            dataKey='slope'
+            stroke='#8884d8'
+            fill='#8884d8'
             strokeWidth={2}
             fillOpacity={0.6}
-            name="Trend"
+            name='Trend'
           />
 
           <Area
-            type="monotone"
-            dataKey="correlation"
-            stroke="#82ca9d"
-            fill="#82ca9d"
+            type='monotone'
+            dataKey='correlation'
+            stroke='#82ca9d'
+            fill='#82ca9d'
             strokeWidth={2}
             fillOpacity={0.6}
-            name="Correlation"
+            name='Correlation'
           />
         </AreaChart>
       )
@@ -319,12 +321,12 @@ export default function EmotionTemporalAnalysisChart({
     if (viewMode === 'critical') {
       return (
         <ScatterChart margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="category" dataKey="name" name="Emotion" />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis type='category' dataKey='name' name='Emotion' />
 
-          <YAxis type="number" dataKey="intensity" name="Intensity" />
+          <YAxis type='number' dataKey='intensity' name='Intensity' />
 
-          <ZAxis type="category" dataKey="sessionId" name="Session" />
+          <ZAxis type='category' dataKey='sessionId' name='Session' />
 
           <Tooltip
             cursor={{ strokeDasharray: '3 3' }}
@@ -361,17 +363,17 @@ export default function EmotionTemporalAnalysisChart({
           data={prepareProgressionData()}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis dataKey='name' />
           <YAxis />
           <Tooltip />
           <Legend />
-          <ReferenceLine y={0} stroke="#666" />
+          <ReferenceLine y={0} stroke='#666' />
           {prepareProgressionData().map((item) => (
             <Area
               key={item.name}
-              type="monotone"
-              dataKey="value"
+              type='monotone'
+              dataKey='value'
               name={item.name}
               stroke={item.fill}
               fill={item.fill}
@@ -389,20 +391,20 @@ export default function EmotionTemporalAnalysisChart({
           data={prepareTransitionsData()}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis dataKey='name' />
           <YAxis
-            yAxisId="left"
-            orientation="left"
-            dataKey="frequency"
-            name="Frequency"
+            yAxisId='left'
+            orientation='left'
+            dataKey='frequency'
+            name='Frequency'
           />
 
           <YAxis
-            yAxisId="right"
-            orientation="right"
-            dataKey="duration"
-            name="Avg. Duration (min)"
+            yAxisId='right'
+            orientation='right'
+            dataKey='duration'
+            name='Avg. Duration (min)'
           />
 
           <Tooltip
@@ -419,23 +421,23 @@ export default function EmotionTemporalAnalysisChart({
 
           <Legend />
           <Area
-            yAxisId="left"
-            type="monotone"
-            dataKey="frequency"
-            stroke="#8884d8"
-            fill="#8884d8"
+            yAxisId='left'
+            type='monotone'
+            dataKey='frequency'
+            stroke='#8884d8'
+            fill='#8884d8'
             fillOpacity={0.6}
             strokeWidth={2}
-            name="Frequency"
+            name='Frequency'
           />
 
           <Line
-            yAxisId="right"
-            type="monotone"
-            dataKey="duration"
-            stroke="#82ca9d"
+            yAxisId='right'
+            type='monotone'
+            dataKey='duration'
+            stroke='#82ca9d'
             strokeWidth={2}
-            name="Avg Duration (min)"
+            name='Avg Duration (min)'
           />
         </AreaChart>
       )
@@ -447,8 +449,8 @@ export default function EmotionTemporalAnalysisChart({
           data={prepareRelationshipsData()}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <CartesianGrid strokeDasharray='3 3' />
+          <XAxis dataKey='name' />
           <YAxis domain={[-1, 1]} />
           <Tooltip
             formatter={(value, name) => {
@@ -460,15 +462,15 @@ export default function EmotionTemporalAnalysisChart({
           />
 
           <Legend />
-          <ReferenceLine y={0} stroke="#666" />
+          <ReferenceLine y={0} stroke='#666' />
           <Area
-            type="monotone"
-            dataKey="correlation"
-            stroke="#8884d8"
-            fill="#8884d8"
+            type='monotone'
+            dataKey='correlation'
+            stroke='#8884d8'
+            fill='#8884d8'
             fillOpacity={0.6}
             strokeWidth={2}
-            name="Correlation"
+            name='Correlation'
           />
         </AreaChart>
       )
@@ -477,7 +479,7 @@ export default function EmotionTemporalAnalysisChart({
     // Default fallback - return an empty chart if no condition matches
     return (
       <AreaChart data={[]} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
-        <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid strokeDasharray='3 3' />
         <XAxis />
         <YAxis />
         <Tooltip />
@@ -487,12 +489,12 @@ export default function EmotionTemporalAnalysisChart({
 
   return (
     <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
-      <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-        <h3 className="text-lg font-medium text-gray-900">
+      <div className='mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center'>
+        <h3 className='text-gray-900 text-lg font-medium'>
           Temporal Emotion Analysis
         </h3>
 
-        <div className="flex flex-wrap gap-2">
+        <div className='flex flex-wrap gap-2'>
           <button
             onClick={() => setViewMode('trends')}
             className={cn(
@@ -553,7 +555,7 @@ export default function EmotionTemporalAnalysisChart({
 
       {/* Emotion filters (only show for trend view) */}
       {viewMode === 'trends' && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className='mb-4 flex flex-wrap gap-2'>
           {Object.entries(emotionFilters).map(([emotion, isSelected]) => (
             <button
               key={emotion}
@@ -576,13 +578,13 @@ export default function EmotionTemporalAnalysisChart({
 
       {/* Chart based on selected view */}
       <div style={{ width: '100%', height: `${height}px` }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width='100%' height='100%'>
           {renderChart()}
         </ResponsiveContainer>
       </div>
 
       {/* Summary text based on view */}
-      <div className="mt-4 text-sm text-gray-600">
+      <div className='text-gray-600 mt-4 text-sm'>
         {viewMode === 'trends' && (
           <p>
             This chart shows emotional trend patterns over time, helping to

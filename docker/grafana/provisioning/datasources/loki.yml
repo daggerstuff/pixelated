@@ -10,6 +10,6 @@ datasources:
     jsonData:
       maxLines: 1000
       timeout: 60
-      httpHeaderName1: "X-Scope-OrgID"
+      httpHeaderName1: 'X-Scope-OrgID'
     secureJsonData:
-      httpHeaderValue1: "tenant1"
+      httpHeaderValue1: 'tenant1'

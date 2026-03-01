@@ -1,7 +1,6 @@
-import type { AIRepository } from '../db/ai/repository'
-import type { TherapySession } from '../ai/models/ai-types'
 import type { EmotionAnalysis } from '../ai/emotions/types'
-
+import type { TherapySession } from '../ai/models/ai-types'
+import type { AIRepository } from '../db/ai/repository'
 // Import shared types to avoid circular dependencies
 import type { SessionDocumentation } from './types'
 
@@ -20,16 +19,17 @@ interface TherapyAIOptions {
   includeEmotions?: boolean
   includeInterventions?: boolean
 }
-import type { AIService } from '../ai/AIService'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { EventEmitter } from 'node:events'
+
+import type { AIService } from '../ai/AIService'
+import type { FHIRClient } from '../ehr/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { RedisService } from '../services/redis'
 import {
   EHRIntegration,
   type EHRExportOptions,
   type EHRExportResult,
 } from './ehrIntegration'
-import type { FHIRClient } from '../ehr/types'
 
 const logger = createBuildSafeLogger('documentation-system')
 
@@ -58,7 +58,7 @@ export class DocumentationSystem extends EventEmitter {
   constructor(repository: AIRepository, _aiService: AIService) {
     super()
     this.repository = repository
-    this.initializeRealTimeUpdates()
+    void this.initializeRealTimeUpdates()
   }
 
   /**
@@ -71,7 +71,7 @@ export class DocumentationSystem extends EventEmitter {
         try {
           const sessionData = JSON.parse(message) as unknown
           if (sessionData && sessionData.sessionId) {
-            this.handleSessionUpdate(sessionData.sessionId)
+            void this.handleSessionUpdate(sessionData.sessionId)
           }
         } catch (error: unknown) {
           logger.error('Error processing session update', { error })
@@ -83,7 +83,7 @@ export class DocumentationSystem extends EventEmitter {
         try {
           const sessionData = JSON.parse(message) as unknown
           if (sessionData && sessionData.sessionId) {
-            this.trackActiveSession(sessionData.sessionId)
+            void this.trackActiveSession(sessionData.sessionId)
           }
         } catch (error: unknown) {
           logger.error('Error processing session creation', { error })
@@ -97,7 +97,7 @@ export class DocumentationSystem extends EventEmitter {
           try {
             const sessionData = JSON.parse(message) as unknown
             if (sessionData && sessionData.sessionId) {
-              this.handleSessionCompletion(sessionData.sessionId)
+              void this.handleSessionCompletion(sessionData.sessionId)
             }
           } catch (error: unknown) {
             logger.error('Error processing session completion', { error })

@@ -1,6 +1,7 @@
+import { getCurrentUser } from '@/lib/auth'
 // import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getCurrentUser } from '@/lib/auth'
+
 import { createDataDeletionRequest } from '../../../../lib/services/patient-rights/dataDeleteService'
 
 // Create a logger instance for this endpoint

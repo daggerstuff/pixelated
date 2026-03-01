@@ -29,7 +29,7 @@ export const PercentileBar: FC<PercentileBarProps> = ({ rank, label }) => {
     >
       <div
         style={{ width: '100%', backgroundColor: '#ddd' }}
-        role="progressbar"
+        role='progressbar'
         aria-valuenow={validRank}
         aria-valuemin={0}
         aria-valuemax={100}

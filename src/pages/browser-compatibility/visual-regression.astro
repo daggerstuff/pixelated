@@ -533,11 +533,9 @@ const placeholderThumbnail =
 
 <script define:vars={{ visualData, placeholderThumbnail }}>
   // Refresh button
-  document
-    .getElementById('refresh-data')
-    ?.addEventListener('click', () => {
-      window.location.reload()
-    })
+  document.getElementById('refresh-data')?.addEventListener('click', () => {
+    window.location.reload()
+  })
 
   // Image comparison modal
   const modal = document.getElementById('imageModal')

@@ -1,4 +1,4 @@
-name: "Copilot Setup Steps"
+name: 'Copilot Setup Steps'
 
 # Automatically run the setup steps when they are changed to allow for easy validation,
 # and allow manual testing through the repository's "Actions" tab
@@ -23,8 +23,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
-          cache: "pnpm"
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4

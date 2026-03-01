@@ -1,9 +1,9 @@
 ---
-title: "Crisis Protocol Documentation"
-description: "Crisis Protocol Documentation documentation"
+title: 'Crisis Protocol Documentation'
+description: 'Crisis Protocol Documentation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -12,14 +12,18 @@ toc: true
 
 ## Overview
 
-The Crisis Protocol is a comprehensive system designed to detect potential mental health crises in user communications and automatically alert appropriate personnel for immediate intervention. The protocol integrates with the MentalLLaMA analysis system to provide real-time crisis detection and response.
+The Crisis Protocol is a comprehensive system designed to detect potential
+mental health crises in user communications and automatically alert appropriate
+personnel for immediate intervention. The protocol integrates with the
+MentalLLaMA analysis system to provide real-time crisis detection and response.
 
 ## Architecture
 
 ### Components
 
 1. **MentalLLaMAAdapter**: Core component that performs mental health analysis
-2. **MentalHealthTaskRouter**: Intelligent routing system for determining analysis type
+2. **MentalHealthTaskRouter**: Intelligent routing system for determining
+   analysis type
 3. **ICrisisNotificationHandler**: Interface for crisis notification services
 4. **SlackNotificationService**: Slack-based crisis alert implementation
 5. **NotificationService**: Fallback notification service with email support
@@ -126,8 +130,8 @@ const result = await adapter.analyzeMentalHealth(
   {
     userId: 'user123',
     sessionId: 'session456',
-    sessionType: 'therapy_session'
-  }
+    sessionType: 'therapy_session',
+  },
 )
 
 // Check for crisis detection
@@ -144,7 +148,9 @@ import { SlackNotificationService } from '@/lib/services/notification/SlackNotif
 import { MentalLLaMAAdapter } from '@/lib/ai/mental-llama/MentalLLaMAAdapter'
 
 // Create custom crisis notifier
-const crisisNotifier = new SlackNotificationService('https://hooks.slack.com/services/...')
+const crisisNotifier = new SlackNotificationService(
+  'https://hooks.slack.com/services/...',
+)
 
 // Create adapter with custom notifier
 const adapter = new MentalLLaMAAdapter(
@@ -154,7 +160,7 @@ const adapter = new MentalLLaMAAdapter(
   apiKey,
   modelProvider,
   pythonBridge,
-  crisisNotifier
+  crisisNotifier,
 )
 ```
 
@@ -178,7 +184,8 @@ The Slack notification includes:
 
 ### Email Fallback
 
-If Slack notifications fail, the system falls back to email notifications sent to configured admin addresses.
+If Slack notifications fail, the system falls back to email notifications sent
+to configured admin addresses.
 
 ## Security Considerations
 
@@ -204,7 +211,7 @@ If Slack notifications fail, the system falls back to email notifications sent t
 const testText = "I don't want to live anymore"
 const result = await adapter.analyzeMentalHealth(testText, ['auto_route'], {
   userId: 'test-user',
-  sessionId: 'test-session'
+  sessionId: 'test-session',
 })
 
 console.log('Crisis detected:', result.mentalHealthCategory === 'crisis')
@@ -229,6 +236,7 @@ console.log('Crisis detected:', result.mentalHealthCategory === 'crisis')
 ### Logging
 
 Crisis events are logged with:
+
 - Timestamp
 - User/Session identifiers
 - Text sample
@@ -240,14 +248,16 @@ Crisis events are logged with:
 ### Planned Features
 
 1. **Multi-Channel Alerting**: Support for SMS, email, and webhook notifications
-2. **Escalation Protocols**: Automatic escalation if initial alerts are not acknowledged
+2. **Escalation Protocols**: Automatic escalation if initial alerts are not
+   acknowledged
 3. **Integration with EHR Systems**: Automatic crisis flags in patient records
 4. **Machine Learning Improvements**: Continuous learning from crisis outcomes
 5. **Dashboard Integration**: Real-time crisis monitoring dashboard
 
 ### Compliance Considerations
 
-1. **HIPAA Compliance**: Ensure all crisis handling meets healthcare privacy requirements
+1. **HIPAA Compliance**: Ensure all crisis handling meets healthcare privacy
+   requirements
 2. **Audit Trails**: Comprehensive logging for regulatory compliance
 3. **Data Retention**: Proper retention policies for crisis-related data
 4. **International Regulations**: Support for GDPR and other privacy regulations
@@ -300,5 +310,4 @@ node -e "console.log(require('./src/config/env.config.ts').config.notifications.
 
 ---
 
-*Last Updated: 2025-01-17*
-*Version: 1.0.0*
+_Last Updated: 2025-01-17_ _Version: 1.0.0_

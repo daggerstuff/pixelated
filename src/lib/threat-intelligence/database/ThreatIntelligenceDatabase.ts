@@ -4,10 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
-import { MongoClient, Db } from 'mongodb'
-import { Redis } from 'ioredis'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import { Redis } from 'ioredis'
+import { MongoClient, Db } from 'mongodb'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   DatabaseConfig,
   GlobalThreatIntelligence,

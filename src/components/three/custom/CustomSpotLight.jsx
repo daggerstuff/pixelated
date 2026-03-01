@@ -1,6 +1,6 @@
+import { useThree, useFrame } from '@react-three/fiber'
 /* eslint-disable */
 import PropTypes from 'prop-types'
-
 import * as React from 'react'
 import {
   Vector3,
@@ -11,7 +11,6 @@ import {
   SpotLight as SpotLightImpl,
   MathUtils,
 } from 'three'
-import { useThree, useFrame } from '@react-three/fiber'
 import { FullScreenQuad } from 'three-stdlib'
 
 // Create compatibility shim for removed encoding constants

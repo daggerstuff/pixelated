@@ -3,8 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntelligenceNetwork'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntelligenceNetwork'
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({

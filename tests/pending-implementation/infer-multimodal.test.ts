@@ -12,8 +12,8 @@
  * For unit testing, mock @/lib/services/pixel and @/lib/api/rate-limit.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { APIContext } from 'astro'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Create mocks in hoisted scope
 const mockGetSessionFromRequest = vi.fn()
@@ -21,515 +21,531 @@ const mockVerifyAuthToken = vi.fn()
 const mockApplyRateLimit = vi.fn()
 const mockCreateAuditLog = vi.fn()
 const mockLogger = {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  info: vi.fn(),
 }
 
 // Mock dependencies
 vi.mock('@/utils/auth', () => ({
-    getSessionFromRequest: mockGetSessionFromRequest,
-    verifyAuthToken: mockVerifyAuthToken,
+  getSessionFromRequest: mockGetSessionFromRequest,
+  verifyAuthToken: mockVerifyAuthToken,
 }))
 
 vi.mock('@/lib/api/rate-limit', () => ({
-    applyRateLimit: mockApplyRateLimit,
+  applyRateLimit: mockApplyRateLimit,
 }))
 
 vi.mock('@/lib/audit', () => ({
-    createAuditLog: mockCreateAuditLog,
-    AuditEventType: { AI_GENERATION: 'AI_GENERATION', AI_MODEL_ACCESS: 'AI_MODEL_ACCESS' },
-    AuditEventStatus: { SUCCESS: 'SUCCESS', WARNING: 'WARNING', ERROR: 'ERROR' },
+  createAuditLog: mockCreateAuditLog,
+  AuditEventType: {
+    AI_GENERATION: 'AI_GENERATION',
+    AI_MODEL_ACCESS: 'AI_MODEL_ACCESS',
+  },
+  AuditEventStatus: { SUCCESS: 'SUCCESS', WARNING: 'WARNING', ERROR: 'ERROR' },
 }))
 
 vi.mock('@/lib/logging/build-safe-logger', () => ({
-    createBuildSafeLogger: () => mockLogger,
+  createBuildSafeLogger: () => mockLogger,
 }))
 
 // Import POST handler after mocks are set up
-const { POST } = await import('../../../src/pages/api/ai/pixel/infer-multimodal')
+const { POST } =
+  await import('../../../src/pages/api/ai/pixel/infer-multimodal')
 
 describe('POST /api/ai/pixel/infer-multimodal', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    global.fetch = vi.fn()
+  })
+
+  describe('Authentication & Authorization', () => {
+    it('should reject requests without session', async () => {
+      mockGetSessionFromRequest.mockResolvedValueOnce(null)
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+
+      expect(response.status).toBe(401)
+      expect(await response.json()).toHaveProperty('error', 'Unauthorized')
+    })
+
+    it('should accept authenticated requests', async () => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'therapist' },
+      } as any)
+
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
+
+      const mockResponse = {
+        ok: true,
+        json: async () => ({
+          response: 'Test response',
+          latency_ms: 150,
+        }),
+      }
+      vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any)
+
+      const formData = new FormData()
+      formData.append('text', 'How are you feeling today?')
+      formData.append('context_type', 'therapeutic')
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+
+      expect(response.status).toBe(200)
+    })
+  })
+
+  describe('Rate Limiting', () => {
+    it('should enforce rate limits based on user role', async () => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: false },
+      } as any)
+
+      const formData = new FormData()
+      formData.append('text', 'Test')
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+
+      expect(response.status).toBe(429)
+      expect(await response.json()).toHaveProperty(
+        'error',
+        'Rate limit exceeded',
+      )
+    })
+
+    it('should allow higher limits for therapists', async () => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'therapist-123', role: 'therapist' },
+      })
+
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
+
+      expect(mockApplyRateLimit).toHaveBeenCalled()
+    })
+  })
+
+  describe('Text-Only Inference', () => {
     beforeEach(() => {
-        vi.clearAllMocks()
-        global.fetch = vi.fn()
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
     })
 
-    describe('Authentication & Authorization', () => {
-        it('should reject requests without session', async () => {
-            mockGetSessionFromRequest.mockResolvedValueOnce(null)
+    it('should infer from text alone', async () => {
+      const mockPixelResponse = {
+        response: 'I understand you are feeling anxious.',
+        transcription: null,
+        text_emotion: {
+          eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85],
+          overall_eq: 0.77,
+        },
+        audio_emotion: null,
+        fused_emotion: {
+          eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85],
+          overall_eq: 0.77,
+        },
+        latency_ms: 125,
+        confidence: 0.95,
+      }
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                }),
-            } as APIContext
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
+      const formData = new FormData()
+      formData.append(
+        'text',
+        'I am feeling very anxious about the exam tomorrow.',
+      )
+      formData.append('context_type', 'therapeutic')
+      formData.append('session_id', 'session-123')
 
-            const response = await POST(context)
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
+      const response = await POST(context)
 
-            expect(response.status).toBe(401)
-            expect(await response.json()).toHaveProperty('error', 'Unauthorized')
-        })
-
-        it('should accept authenticated requests', async () => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'therapist' },
-            } as any)
-
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-
-            const mockResponse = {
-                ok: true,
-                json: async () => ({
-                    response: 'Test response',
-                    latency_ms: 150,
-                }),
-            }
-            vi.mocked(global.fetch).mockResolvedValueOnce(mockResponse as any)
-
-            const formData = new FormData()
-            formData.append('text', 'How are you feeling today?')
-            formData.append('context_type', 'therapeutic')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(200)
-        })
+      expect(response.status).toBe(200)
+      const data = await response.json()
+      expect(data.response).toBeDefined()
+      expect(data.latency_ms).toBeLessThan(200)
+      expect(data.text_emotion?.overall_eq).toBeGreaterThan(0)
     })
 
-    describe('Rate Limiting', () => {
-        it('should enforce rate limits based on user role', async () => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
+    it('should extract and return EQ scores', async () => {
+      const mockPixelResponse = {
+        response: 'Response text',
+        eq_scores: {
+          emotional_awareness: 0.8,
+          empathy_recognition: 0.7,
+          emotional_regulation: 0.6,
+          social_cognition: 0.75,
+          interpersonal_skills: 0.85,
+          overall_eq: 0.77,
+        },
+        latency_ms: 140,
+      }
 
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: false } } as any)
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
-            const formData = new FormData()
-            formData.append('text', 'Test')
+      const formData = new FormData()
+      formData.append('text', 'Test text')
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
+      const response = await POST(context)
+      const data = await response.json()
 
+      expect(data.eq_scores).toBeDefined()
+      expect(data.eq_scores.overall_eq).toBe(0.77)
+    })
+  })
 
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(429)
-            expect(await response.json()).toHaveProperty('error', 'Rate limit exceeded')
-        })
-
-        it('should allow higher limits for therapists', async () => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'therapist-123', role: 'therapist' },
-            })
-
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-
-            expect(mockApplyRateLimit).toHaveBeenCalled()
-        })
+  describe('Audio + Text Multimodal Inference', () => {
+    beforeEach(() => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
     })
 
-    describe('Text-Only Inference', () => {
-        beforeEach(() => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-        })
+    it('should handle audio blob upload', async () => {
+      const audioBuffer = Buffer.from('RIFF...', 'utf8')
+      const audioBlob = new Blob([audioBuffer], { type: 'audio/webm' })
 
-        it('should infer from text alone', async () => {
-            const mockPixelResponse = {
-                response: 'I understand you are feeling anxious.',
-                transcription: null,
-                text_emotion: { eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85], overall_eq: 0.77 },
-                audio_emotion: null,
-                fused_emotion: { eq_scores: [0.8, 0.7, 0.6, 0.75, 0.85], overall_eq: 0.77 },
-                latency_ms: 125,
-                confidence: 0.95,
-            }
+      const mockPixelResponse = {
+        response: 'I hear the anxiety in your voice.',
+        transcription: 'I am very anxious',
+        audio_emotion: {
+          valence: 0.3,
+          arousal: 0.8,
+          primary_emotion: 'anxiety',
+        },
+        text_emotion: { overall_eq: 0.75 },
+        fused_emotion: {
+          valence: 0.35,
+          arousal: 0.78,
+          overall_eq: 0.76,
+          conflict_score: 0.1,
+        },
+        latency_ms: 180,
+      }
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
-            const formData = new FormData()
-            formData.append('text', 'I am feeling very anxious about the exam tomorrow.')
-            formData.append('context_type', 'therapeutic')
-            formData.append('session_id', 'session-123')
+      const formData = new FormData()
+      formData.append('text', 'I am very anxious')
+      formData.append('audio', audioBlob, 'recording.webm')
+      formData.append('context_type', 'therapeutic')
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
+      const response = await POST(context)
 
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(200)
-            const data = await response.json()
-            expect(data.response).toBeDefined()
-            expect(data.latency_ms).toBeLessThan(200)
-            expect(data.text_emotion?.overall_eq).toBeGreaterThan(0)
-        })
-
-        it('should extract and return EQ scores', async () => {
-            const mockPixelResponse = {
-                response: 'Response text',
-                eq_scores: { emotional_awareness: 0.8, empathy_recognition: 0.7, emotional_regulation: 0.6, social_cognition: 0.75, interpersonal_skills: 0.85, overall_eq: 0.77 },
-                latency_ms: 140,
-            }
-
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
-
-            const formData = new FormData()
-            formData.append('text', 'Test text')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-            const data = await response.json()
-
-            expect(data.eq_scores).toBeDefined()
-            expect(data.eq_scores.overall_eq).toBe(0.77)
-        })
+      expect(response.status).toBe(200)
+      const data = await response.json()
+      expect(data.audio_emotion).toBeDefined()
+      expect(data.fused_emotion).toBeDefined()
+      expect(data.transcription).toBeDefined()
     })
 
-    describe('Audio + Text Multimodal Inference', () => {
-        beforeEach(() => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-        })
+    it('should detect modality conflict', async () => {
+      const mockPixelResponse = {
+        response: 'Response',
+        audio_emotion: { valence: 0.9, arousal: 0.2, primary_emotion: 'happy' },
+        text_emotion: { overall_eq: 0.3 },
+        fused_emotion: { conflict_score: 0.7 },
+        latency_ms: 165,
+      }
 
-        it('should handle audio blob upload', async () => {
-            const audioBuffer = Buffer.from('RIFF...', 'utf8')
-            const audioBlob = new Blob([audioBuffer], { type: 'audio/webm' })
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
-            const mockPixelResponse = {
-                response: 'I hear the anxiety in your voice.',
-                transcription: 'I am very anxious',
-                audio_emotion: { valence: 0.3, arousal: 0.8, primary_emotion: 'anxiety' },
-                text_emotion: { overall_eq: 0.75 },
-                fused_emotion: { valence: 0.35, arousal: 0.78, overall_eq: 0.76, conflict_score: 0.1 },
-                latency_ms: 180,
-            }
+      const formData = new FormData()
+      formData.append('text', 'I am depressed')
+      formData.append(
+        'audio',
+        new Blob(['audio'], { type: 'audio/webm' }),
+        'rec.webm',
+      )
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
-            const formData = new FormData()
-            formData.append('text', 'I am very anxious')
-            formData.append('audio', audioBlob, 'recording.webm')
-            formData.append('context_type', 'therapeutic')
+      const response = await POST(context)
+      const data = await response.json()
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(200)
-            const data = await response.json()
-            expect(data.audio_emotion).toBeDefined()
-            expect(data.fused_emotion).toBeDefined()
-            expect(data.transcription).toBeDefined()
-        })
-
-        it('should detect modality conflict', async () => {
-            const mockPixelResponse = {
-                response: 'Response',
-                audio_emotion: { valence: 0.9, arousal: 0.2, primary_emotion: 'happy' },
-                text_emotion: { overall_eq: 0.3 },
-                fused_emotion: { conflict_score: 0.7 },
-                latency_ms: 165,
-            }
-
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
-
-            const formData = new FormData()
-            formData.append('text', 'I am depressed')
-            formData.append('audio', new Blob(['audio'], { type: 'audio/webm' }), 'rec.webm')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-            const data = await response.json()
-
-            expect(data.fused_emotion?.conflict_score).toBeGreaterThan(0.5)
-        })
-
-        it('should enforce 25MB audio size limit', async () => {
-            const largeBuffer = Buffer.alloc(26 * 1024 * 1024) // 26MB
-            const largeBlob = new Blob([largeBuffer], { type: 'audio/webm' })
-
-            const formData = new FormData()
-            formData.append('audio', largeBlob, 'huge.webm')
-            formData.append('text', 'Test')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(413)
-        })
+      expect(data.fused_emotion?.conflict_score).toBeGreaterThan(0.5)
     })
 
-    describe('Crisis Detection', () => {
-        beforeEach(() => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-        })
+    it('should enforce 25MB audio size limit', async () => {
+      const largeBuffer = Buffer.alloc(26 * 1024 * 1024) // 26MB
+      const largeBlob = new Blob([largeBuffer], { type: 'audio/webm' })
 
-        it('should detect crisis signals and log warning', async () => {
-            const mockPixelResponse = {
-                response: 'Please reach out to a crisis hotline immediately.',
-                conversation_metadata: {
-                    crisis_signals: ['suicidal_ideation'],
-                    safety_score: 0.1,
-                },
-                latency_ms: 150,
-            }
+      const formData = new FormData()
+      formData.append('audio', largeBlob, 'huge.webm')
+      formData.append('text', 'Test')
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
-            const formData = new FormData()
-            formData.append('text', 'I want to end it all')
-            formData.append('context_type', 'therapeutic')
+      const response = await POST(context)
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
+      expect(response.status).toBe(413)
+    })
+  })
 
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(200)
-            expect(mockCreateAuditLog).toHaveBeenCalledWith(
-                expect.any(String), // eventType
-                expect.any(String), // action
-                expect.any(String), // userId
-                expect.any(String), // resource
-                expect.objectContaining({
-                    model: 'Pixel Multimodal',
-                }),
-                expect.any(String), // status
-            )
-        })
-
-        it('should log non-crisis interactions as success', async () => {
-            const mockPixelResponse = {
-                response: 'That sounds challenging.',
-                conversation_metadata: { crisis_signals: [] },
-                latency_ms: 140,
-            }
-
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockPixelResponse,
-            } as any)
-
-            const formData = new FormData()
-            formData.append('text', 'I had a tough day')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(200)
-            expect(mockCreateAuditLog).toHaveBeenCalledWith(
-                expect.any(String), // eventType
-                expect.any(String), // action
-                expect.any(String), // userId
-                expect.any(String), // resource
-                expect.any(Object), // details
-                expect.any(String), // status
-            )
-        })
+  describe('Crisis Detection', () => {
+    beforeEach(() => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
     })
 
-    describe('Error Handling', () => {
-        beforeEach(() => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-        })
+    it('should detect crisis signals and log warning', async () => {
+      const mockPixelResponse = {
+        response: 'Please reach out to a crisis hotline immediately.',
+        conversation_metadata: {
+          crisis_signals: ['suicidal_ideation'],
+          safety_score: 0.1,
+        },
+        latency_ms: 150,
+      }
 
-        it('should handle Pixel API timeout gracefully', async () => {
-            vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Request timeout'))
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
-            const formData = new FormData()
-            formData.append('text', 'Test')
+      const formData = new FormData()
+      formData.append('text', 'I want to end it all')
+      formData.append('context_type', 'therapeutic')
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
+      const response = await POST(context)
 
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBe(500)
-            expect(await response.json()).toHaveProperty('error')
-        })
-
-        it('should handle malformed FormData', async () => {
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: 'invalid-form-data',
-                }),
-            } as APIContext
-
-
-
-
-            const response = await POST(context)
-
-            expect(response.status).toBeGreaterThanOrEqual(400)
-        })
-
-        it('should log errors for debugging', async () => {
-            vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Pixel service error'))
-
-            const formData = new FormData()
-            formData.append('text', 'Test')
-
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
-
-
-
-
-            await POST(context)
-
-            // Logger error should have been called
-        })
+      expect(response.status).toBe(200)
+      expect(mockCreateAuditLog).toHaveBeenCalledWith(
+        expect.any(String), // eventType
+        expect.any(String), // action
+        expect.any(String), // userId
+        expect.any(String), // resource
+        expect.objectContaining({
+          model: 'Pixel Multimodal',
+        }),
+        expect.any(String), // status
+      )
     })
 
-    describe('Latency Validation', () => {
-        beforeEach(() => {
-            mockGetSessionFromRequest.mockResolvedValueOnce({
-                user: { id: 'user-123', role: 'student' },
-            })
-            mockApplyRateLimit.mockResolvedValueOnce({ result: { allowed: true } } as any)
-        })
+    it('should log non-crisis interactions as success', async () => {
+      const mockPixelResponse = {
+        response: 'That sounds challenging.',
+        conversation_metadata: { crisis_signals: [] },
+        latency_ms: 140,
+      }
 
-        it('should return latency under 200ms target for text inference', async () => {
-            const mockResponse = {
-                response: 'Test',
-                latency_ms: 145,
-            }
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPixelResponse,
+      } as any)
 
-            vi.mocked(global.fetch).mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockResponse,
-            } as any)
+      const formData = new FormData()
+      formData.append('text', 'I had a tough day')
 
-            const formData = new FormData()
-            formData.append('text', 'Test')
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
 
-            const context = {
-                request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
-                    method: 'POST',
-                    body: formData,
-                }),
-            } as APIContext
+      const response = await POST(context)
 
-
-
-            const response = await POST(context)
-            const data = await response.json()
-
-            expect(data.latency_ms).toBeLessThan(200)
-        })
+      expect(response.status).toBe(200)
+      expect(mockCreateAuditLog).toHaveBeenCalledWith(
+        expect.any(String), // eventType
+        expect.any(String), // action
+        expect.any(String), // userId
+        expect.any(String), // resource
+        expect.any(Object), // details
+        expect.any(String), // status
+      )
     })
+  })
+
+  describe('Error Handling', () => {
+    beforeEach(() => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
+    })
+
+    it('should handle Pixel API timeout gracefully', async () => {
+      vi.mocked(global.fetch).mockRejectedValueOnce(
+        new Error('Request timeout'),
+      )
+
+      const formData = new FormData()
+      formData.append('text', 'Test')
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+
+      expect(response.status).toBe(500)
+      expect(await response.json()).toHaveProperty('error')
+    })
+
+    it('should handle malformed FormData', async () => {
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: 'invalid-form-data',
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+
+      expect(response.status).toBeGreaterThanOrEqual(400)
+    })
+
+    it('should log errors for debugging', async () => {
+      vi.mocked(global.fetch).mockRejectedValueOnce(
+        new Error('Pixel service error'),
+      )
+
+      const formData = new FormData()
+      formData.append('text', 'Test')
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
+
+      await POST(context)
+
+      // Logger error should have been called
+    })
+  })
+
+  describe('Latency Validation', () => {
+    beforeEach(() => {
+      mockGetSessionFromRequest.mockResolvedValueOnce({
+        user: { id: 'user-123', role: 'student' },
+      })
+      mockApplyRateLimit.mockResolvedValueOnce({
+        result: { allowed: true },
+      } as any)
+    })
+
+    it('should return latency under 200ms target for text inference', async () => {
+      const mockResponse = {
+        response: 'Test',
+        latency_ms: 145,
+      }
+
+      vi.mocked(global.fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any)
+
+      const formData = new FormData()
+      formData.append('text', 'Test')
+
+      const context = {
+        request: new Request('http://localhost/api/ai/pixel/infer-multimodal', {
+          method: 'POST',
+          body: formData,
+        }),
+      } as APIContext
+
+      const response = await POST(context)
+      const data = await response.json()
+
+      expect(data.latency_ms).toBeLessThan(200)
+    })
+  })
 })

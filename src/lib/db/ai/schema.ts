@@ -1,7 +1,8 @@
 // MongoDB Atlas–backed AI schema definitions
 
-import { mongodb } from '@/config/mongodb.config'
 import type { Db } from 'mongodb'
+
+import { mongodb } from '@/config/mongodb.config'
 
 /** AI collection names in MongoDB Atlas */
 export const AI_COLLECTIONS = {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
+
 import MultidimensionalEmotionChart from '../../components/dashboard/MultidimensionalEmotionChart'
+import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
 
 type TimeRange = 'day' | 'week' | 'month' | 'year'
 
@@ -44,67 +45,67 @@ const EmotionVisualizationDemo: FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm py-4">
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+    <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
+      <header className='bg-white dark:bg-gray-800 py-4 shadow-sm'>
+        <div className='container mx-auto px-4'>
+          <h1 className='text-gray-900 dark:text-white text-2xl font-bold'>
             3D Emotion Visualization
           </h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <p className="mb-6 text-gray-700 dark:text-gray-300">
+      <main className='container mx-auto px-4 py-8'>
+        <p className='text-gray-700 dark:text-gray-300 mb-6'>
           This demo visualizes emotions in a 3D space using the PAD
           (Pleasure-Arousal-Dominance) model. The visualization shows how
           emotions change over time, with each point representing an emotional
           state.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
           {/* Controls */}
-          <div className="col-span-1 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Controls</h2>
+          <div className='bg-white dark:bg-gray-800 col-span-1 rounded-lg p-4 shadow'>
+            <h2 className='mb-4 text-xl font-semibold'>Controls</h2>
 
-            <div className="mb-4">
+            <div className='mb-4'>
               <label
-                htmlFor="timeRangeSelect"
-                className="block text-sm font-medium mb-1"
+                htmlFor='timeRangeSelect'
+                className='mb-1 block text-sm font-medium'
               >
                 Time Range
               </label>
               <select
-                id="timeRangeSelect"
+                id='timeRangeSelect'
                 value={timeRange}
                 onChange={handleTimeRangeChange}
-                className="w-full p-2 border rounded bg-white dark:bg-gray-700 dark:text-white"
+                className='bg-white dark:bg-gray-700 dark:text-white w-full rounded border p-2'
               >
-                <option value="day">Last 24 Hours</option>
-                <option value="week">Last Week</option>
-                <option value="month">Last Month</option>
-                <option value="year">Last Year</option>
+                <option value='day'>Last 24 Hours</option>
+                <option value='week'>Last Week</option>
+                <option value='month'>Last Month</option>
+                <option value='year'>Last Year</option>
               </select>
             </div>
 
-            <div className="mb-4">
+            <div className='mb-4'>
               <label
-                htmlFor="dataPointsInput"
-                className="block text-sm font-medium mb-1"
+                htmlFor='dataPointsInput'
+                className='mb-1 block text-sm font-medium'
               >
                 Data Points: {dataPoints}
               </label>
               <input
-                id="dataPointsInput"
-                type="range"
-                min="10"
-                max="500"
-                step="10"
+                id='dataPointsInput'
+                type='range'
+                min='10'
+                max='500'
+                step='10'
                 value={dataPoints}
                 onChange={handleDataPointsChange}
-                className="w-full"
+                className='w-full'
               />
 
-              <div className="flex justify-between text-xs mt-1">
+              <div className='mt-1 flex justify-between text-xs'>
                 <span>10</span>
                 <span>250</span>
                 <span>500</span>
@@ -112,30 +113,30 @@ const EmotionVisualizationDemo: FC = () => {
             </div>
 
             {selectedEmotion && (
-              <div className="mb-4 p-3 border rounded-lg bg-gray-50 dark:bg-gray-700">
-                <h3 className="text-lg font-medium mb-2">Selected Emotion</h3>
-                <p className="text-sm mb-1">
+              <div className='bg-gray-50 dark:bg-gray-700 mb-4 rounded-lg border p-3'>
+                <h3 className='mb-2 text-lg font-medium'>Selected Emotion</h3>
+                <p className='mb-1 text-sm'>
                   <strong>Time:</strong> {formatDate(selectedEmotion.timestamp)}
                 </p>
-                <p className="text-sm mb-1">
+                <p className='mb-1 text-sm'>
                   <strong>Valence:</strong> {selectedEmotion.valence.toFixed(2)}
                 </p>
-                <p className="text-sm mb-1">
+                <p className='mb-1 text-sm'>
                   <strong>Arousal:</strong> {selectedEmotion.arousal.toFixed(2)}
                 </p>
-                <p className="text-sm mb-1">
+                <p className='mb-1 text-sm'>
                   <strong>Dominance:</strong>{' '}
                   {selectedEmotion.dominance.toFixed(2)}
                 </p>
-                <p className="text-sm">
+                <p className='text-sm'>
                   <strong>Emotion:</strong>{' '}
                   {selectedEmotion.emotion || 'Unknown'}
                 </p>
               </div>
             )}
 
-            <h3 className="text-lg font-medium mb-2">Legend</h3>
-            <div className="space-y-2 text-sm">
+            <h3 className='mb-2 text-lg font-medium'>Legend</h3>
+            <div className='space-y-2 text-sm'>
               <p>
                 <strong>Valence (X-axis):</strong> Pleasure to displeasure
               </p>
@@ -149,11 +150,11 @@ const EmotionVisualizationDemo: FC = () => {
           </div>
 
           {/* 3D Visualization */}
-          <div className="col-span-1 md:col-span-3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+          <div className='bg-white dark:bg-gray-800 col-span-1 rounded-lg p-4 shadow md:col-span-3'>
             <div
               style={{ height: '600px' }}
               aria-busy={isLoading}
-              aria-live="polite"
+              aria-live='polite'
               aria-describedby={error ? 'emotion-error' : undefined}
             >
               <MultidimensionalEmotionChart
@@ -162,7 +163,7 @@ const EmotionVisualizationDemo: FC = () => {
               />
 
               {error && (
-                <p id="emotion-error" className="text-red-500 mt-2">
+                <p id='emotion-error' className='text-red-500 mt-2'>
                   Error loading emotion data: {String(error)}
                 </p>
               )}
@@ -170,18 +171,18 @@ const EmotionVisualizationDemo: FC = () => {
           </div>
 
           {/* Data Table */}
-          <div className="col-span-1 md:col-span-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Emotion Data Points</h2>
+          <div className='bg-white dark:bg-gray-800 col-span-1 rounded-lg p-4 shadow md:col-span-4'>
+            <h2 className='mb-4 text-xl font-semibold'>Emotion Data Points</h2>
 
-            <div className="overflow-auto max-h-[300px]">
-              <table className="w-full">
+            <div className='max-h-[300px] overflow-auto'>
+              <table className='w-full'>
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-700">
-                    <th className="text-left p-2 border-b">Time</th>
-                    <th className="text-left p-2 border-b">Valence</th>
-                    <th className="text-left p-2 border-b">Arousal</th>
-                    <th className="text-left p-2 border-b">Dominance</th>
-                    <th className="text-left p-2 border-b">Emotion</th>
+                  <tr className='bg-gray-50 dark:bg-gray-700'>
+                    <th className='border-b p-2 text-left'>Time</th>
+                    <th className='border-b p-2 text-left'>Valence</th>
+                    <th className='border-b p-2 text-left'>Arousal</th>
+                    <th className='border-b p-2 text-left'>Dominance</th>
+                    <th className='border-b p-2 text-left'>Emotion</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,22 +197,21 @@ const EmotionVisualizationDemo: FC = () => {
                         }
                       }}
                       tabIndex={0}
-                      className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700
-                        ${selectedEmotionIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer ${selectedEmotionIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
                     >
-                      <td className="p-2 border-b">
+                      <td className='border-b p-2'>
                         {formatDate(point.timestamp)}
                       </td>
-                      <td className="p-2 border-b">
+                      <td className='border-b p-2'>
                         {point.valence.toFixed(2)}
                       </td>
-                      <td className="p-2 border-b">
+                      <td className='border-b p-2'>
                         {point.arousal.toFixed(2)}
                       </td>
-                      <td className="p-2 border-b">
+                      <td className='border-b p-2'>
                         {point.dominance.toFixed(2)}
                       </td>
-                      <td className="p-2 border-b">
+                      <td className='border-b p-2'>
                         {point.emotion || 'Unknown'}
                       </td>
                     </tr>

@@ -52,8 +52,8 @@ export function secureUUID(): string {
 
   // Fallback to secure random bytes
   const bytes = getRandomBytes(16)
-  bytes[6] = (bytes[6]! & 0x0f) | 0x40 // Version 4
-  bytes[8] = (bytes[8]! & 0x3f) | 0x80 // Variant 10
+  bytes[6] = (bytes[6] & 0x0f) | 0x40 // Version 4
+  bytes[8] = (bytes[8] & 0x3f) | 0x80 // Variant 10
 
   const hex = Array.from(bytes, (byte: number) =>
     byte.toString(16).padStart(2, '0'),
@@ -100,7 +100,7 @@ export function secureShuffle<T>(array: readonly T[]): T[] {
   const shuffled = [...array]
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = secureRandomInt(i + 1)
-    ;[shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!]
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
   }
   return shuffled
 }

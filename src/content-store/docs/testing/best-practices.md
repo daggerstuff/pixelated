@@ -1,6 +1,7 @@
 ---
 title: 'Testing Best Practices'
-description: 'Comprehensive best practices for testing in the Pixelated platform'
+description:
+  'Comprehensive best practices for testing in the Pixelated platform'
 pubDate: '2025-01-01'
 author: 'Pixelated Empathy Team'
 draft: false
@@ -10,7 +11,9 @@ share: true
 
 # Testing Best Practices
 
-This document outlines the best practices for testing in the Pixelated platform. Following these guidelines will ensure high-quality, maintainable, and effective tests across the codebase.
+This document outlines the best practices for testing in the Pixelated platform.
+Following these guidelines will ensure high-quality, maintainable, and effective
+tests across the codebase.
 
 ## General Testing Principles
 
@@ -18,7 +21,8 @@ This document outlines the best practices for testing in the Pixelated platform.
 
 Follow the test pyramid approach:
 
-- **Unit Tests**: The foundation - fast, isolated tests for individual functions and components
+- **Unit Tests**: The foundation - fast, isolated tests for individual functions
+  and components
 - **Integration Tests**: Middle layer - testing interactions between components
 - **End-to-End Tests**: Top layer - testing complete user flows
 
@@ -56,7 +60,6 @@ Aim for a ratio of approximately:
 Follow this structure for unit tests:
 
 ```typescript
-
 describe('functionToTest', () => {
   it('should do something specific', () => {
     // Arrange
@@ -91,7 +94,6 @@ describe('functionToTest', () => {
 Example:
 
 ```typescript
-
 // Mock the database module
 vi.mock('./database', () => ({
   Database: {
@@ -175,7 +177,6 @@ describe('Button', () => {
 Example:
 
 ```typescript
-
 describe('useCounter', () => {
   it('should initialize with the default value', () => {
     // Arrange & Act
@@ -226,7 +227,6 @@ describe('useCounter', () => {
 Example:
 
 ```typescript
-
 describe('User API', () => {
   let server
   let baseUrl
@@ -284,7 +284,6 @@ describe('User API', () => {
 Example:
 
 ```typescript
-
 describe('UserRepository', () => {
   let prisma
   let userRepository
@@ -356,7 +355,6 @@ describe('UserRepository', () => {
 Example:
 
 ```typescript
-
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -408,7 +406,6 @@ test.describe('Authentication', () => {
 Example:
 
 ```typescript
-
 describe('Report Generator Performance', () => {
   bench(
     'should generate a small report quickly',
@@ -573,7 +570,10 @@ describe('Button Accessibility', () => {
 
 ## Conclusion
 
-Following these best practices will help ensure that the Pixelated platform has a robust, maintainable, and effective test suite. Remember that testing is an ongoing process, and continuous improvement is key to maintaining high-quality software.
+Following these best practices will help ensure that the Pixelated platform has
+a robust, maintainable, and effective test suite. Remember that testing is an
+ongoing process, and continuous improvement is key to maintaining high-quality
+software.
 
 For more detailed information on specific testing patterns and setup, refer to:
 
@@ -581,4 +581,5 @@ For more detailed information on specific testing patterns and setup, refer to:
 - [Testing Setup Guides](/docs/testing/setup-guides)
 - [Debugging Guide](/docs/testing/debugging)
 
-If you have questions or need assistance with testing, please reach out to the development team or open an issue on GitHub.
+If you have questions or need assistance with testing, please reach out to the
+development team or open an issue on GitHub.

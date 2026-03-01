@@ -1,7 +1,11 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { EvaluationList } from '../lists/EvaluationList'
-import { EvaluationForm } from '../forms/EvaluationForm'
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import {
   useEvaluationListQuery,
   useEvaluationInitiateMutation,
@@ -10,12 +14,18 @@ import {
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 
+import { EvaluationForm } from '../forms/EvaluationForm'
+import { EvaluationList } from '../lists/EvaluationList'
+
 export interface EvaluationPanelProps {
   sessionId: string | null
   className?: string
 }
 
-export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) {
+export function EvaluationPanel({
+  sessionId,
+  className,
+}: EvaluationPanelProps) {
   const [isInitiating, setIsInitiating] = useState(false)
   const [editingEvaluationId, setEditingEvaluationId] = useState<string | null>(
     null,
@@ -34,7 +44,7 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
   if (!sessionId) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">
+        <p className='text-muted-foreground'>
           Please select a session to view evaluations
         </p>
       </div>
@@ -44,17 +54,17 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className="text-3xl font-bold">Evaluation</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className='text-3xl font-bold'>Evaluation</h1>
+          <p className='text-muted-foreground mt-1'>
             Evaluate discovered sources for relevance and quality
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className='flex gap-2'>
           <button
             onClick={() => setIsInitiating(true)}
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
             disabled={initiateMutation.isPending}
           >
             {initiateMutation.isPending ? 'Evaluating...' : 'Start Evaluation'}
@@ -120,12 +130,20 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <div className='text-muted-foreground py-8 text-center'>
               Loading evaluations...
             </div>
           ) : (
             <EvaluationList
-              evaluations={evaluations ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
+              evaluations={
+                evaluations ?? {
+                  items: [],
+                  total: 0,
+                  page: 1,
+                  pageSize: 25,
+                  totalPages: 0,
+                }
+              }
               isLoading={isLoading}
               onEvaluationClick={(evaluation) => {
                 setEditingEvaluationId(evaluation.evaluationId)
@@ -137,4 +155,3 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
     </div>
   )
 }
-

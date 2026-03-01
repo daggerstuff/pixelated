@@ -2,35 +2,45 @@
 // CRUD operations and document management
 
 import express, { Router, Request, Response } from 'express'
-import { asyncHandler, NotFoundError, ValidationError } from '../middleware/error-handler'
+
+import { getPostgresPool } from '../../lib/database/connection'
 // COMMENTED OUT: Legacy auth middleware - using Astro Auth0 instead
 // import { requirePermission, requireRole } from '../middleware/auth'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
-import { getPostgresPool } from '../../lib/database/connection'
+import {
+  asyncHandler,
+  NotFoundError,
+  ValidationError,
+} from '../middleware/error-handler'
 import * as documentService from '../services/document-service'
 
 // Temporary placeholder middleware - auth handled at Astro layer
-const requirePermission = (_permission: string) => (_req: Request, _res: Response, next: () => void) => next()
-const requireRole = (_roles: string[]) => (_req: Request, _res: Response, next: () => void) => next()
-
+const requirePermission =
+  (_permission: string) => (_req: Request, _res: Response, next: () => void) =>
+    next()
+const requireRole =
+  (_roles: string[]) => (_req: Request, _res: Response, next: () => void) =>
+    next()
 
 // Helper to ensure param is a string (Express types params as string | string[])
 const ensureString = (param: unknown): string => {
-    if (Array.isArray(param)) {
-        return ensureString(param[0])
+  if (Array.isArray(param)) {
+    return ensureString(param[0])
+  }
+  if (typeof param === 'string') {
+    return param
+  }
+  if (param && typeof param === 'object') {
+    // Handle ParsedQs or other objects
+    const values = Object.values(param)
+    if (values.length > 0) {
+      const firstValue = values[0]
+      return typeof firstValue === 'string'
+        ? firstValue
+        : String(firstValue ?? '')
     }
-    if (typeof param === 'string') {
-        return param
-    }
-    if (param && typeof param === 'object') {
-        // Handle ParsedQs or other objects
-        const values = Object.values(param)
-        if (values.length > 0) {
-            const firstValue = values[0]
-            return typeof firstValue === 'string' ? firstValue : String(firstValue ?? '')
-        }
-    }
-    return param !== undefined && param !== null ? String(param) : ''
+  }
+  return param !== undefined && param !== null ? String(param) : ''
 }
 const router: Router = express.Router()
 
@@ -39,34 +49,36 @@ const router: Router = express.Router()
 // ============================================================================
 
 router.post(
-    '/',
-    requirePermission('edit'),
-    asyncHandler(async (req: Request, res: Response) => {
-        const { title, type, category, content, description } = req.body
+  '/',
+  requirePermission('edit'),
+  asyncHandler(async (req: Request, res: Response) => {
+    const { title, type, category, content, description } = req.body
 
-        // Validation
-        if (!title || !type || !category) {
-            throw new ValidationError('Missing required fields: title, type, category')
-        }
+    // Validation
+    if (!title || !type || !category) {
+      throw new ValidationError(
+        'Missing required fields: title, type, category',
+      )
+    }
 
-        // Create document
-        const document = await documentService.createDocument(
-            {
-                title,
-                type,
-                category,
-                content,
-                description,
-                owner: req.user!.id
-            },
-            req.user!.id
-        )
+    // Create document
+    const document = await documentService.createDocument(
+      {
+        title,
+        type,
+        category,
+        content,
+        description,
+        owner: req.user!.id,
+      },
+      req.user!.id,
+    )
 
-        res.status(201).json({
-            success: true,
-            data: document
-        })
+    res.status(201).json({
+      success: true,
+      data: document,
     })
+  }),
 )
 
 // ============================================================================
@@ -74,55 +86,62 @@ router.post(
 // ============================================================================
 
 router.get(
-    '/',
-    asyncHandler(async (req: Request, res: Response) => {
-        const { page: pageQuery, limit: limitQuery, status, type, category, search: searchQuery } = req.query
+  '/',
+  asyncHandler(async (req: Request, res: Response) => {
+    const {
+      page: pageQuery,
+      limit: limitQuery,
+      status,
+      type,
+      category,
+      search: searchQuery,
+    } = req.query
 
-        const page = ensureString(pageQuery)
-        const limit = ensureString(limitQuery)
-        const search = ensureString(searchQuery)
+    const page = ensureString(pageQuery)
+    const limit = ensureString(limitQuery)
+    const search = ensureString(searchQuery)
 
-        const pageNum = Math.max(1, parseInt(page) || 1)
-        const pageLimit = Math.min(100, parseInt(limit) || 20)
-        const skip = (pageNum - 1) * pageLimit
+    const pageNum = Math.max(1, parseInt(page) || 1)
+    const pageLimit = Math.min(100, parseInt(limit) || 20)
+    const skip = (pageNum - 1) * pageLimit
 
-        // Build query filter
-        const filter: any = {
-            $or: [
-                { owner: req.user!.id },
-                { 'permissions.view': req.user!.id },
-                { 'permissions.edit': req.user!.id }
-            ]
-        }
+    // Build query filter
+    const filter: any = {
+      $or: [
+        { owner: req.user!.id },
+        { 'permissions.view': req.user!.id },
+        { 'permissions.edit': req.user!.id },
+      ],
+    }
 
-        if (status) filter.status = status
-        if (type) filter.type = type
-        if (category) filter.category = category
+    if (status) filter.status = status
+    if (type) filter.type = type
+    if (category) filter.category = category
 
-        if (search) {
-            filter.$text = { $search: search }
-        }
+    if (search) {
+      filter.$text = { $search: search }
+    }
 
-        // Query
-        const documents = await BusinessDocument.find(filter)
-            .skip(skip)
-            .limit(pageLimit)
-            .sort({ updatedAt: -1 })
-            .lean()
+    // Query
+    const documents = await BusinessDocument.find(filter)
+      .skip(skip)
+      .limit(pageLimit)
+      .sort({ updatedAt: -1 })
+      .lean()
 
-        const total = await BusinessDocument.countDocuments(filter)
+    const total = await BusinessDocument.countDocuments(filter)
 
-        res.json({
-            success: true,
-            data: documents,
-            pagination: {
-                page: pageNum,
-                limit: pageLimit,
-                total,
-                pages: Math.ceil(total / pageLimit)
-            }
-        })
+    res.json({
+      success: true,
+      data: documents,
+      pagination: {
+        page: pageNum,
+        limit: pageLimit,
+        total,
+        pages: Math.ceil(total / pageLimit),
+      },
     })
+  }),
 )
 
 // ============================================================================
@@ -130,21 +149,21 @@ router.get(
 // ============================================================================
 
 router.get(
-    '/:documentId',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
+  '/:documentId',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
 
-        const document = await documentService.getDocument(documentId, req.user!.id)
+    const document = await documentService.getDocument(documentId, req.user!.id)
 
-        if (!document) {
-            throw new NotFoundError('Document', documentId)
-        }
+    if (!document) {
+      throw new NotFoundError('Document', documentId)
+    }
 
-        res.json({
-            success: true,
-            data: document
-        })
+    res.json({
+      success: true,
+      data: document,
     })
+  }),
 )
 
 // ============================================================================
@@ -152,32 +171,32 @@ router.get(
 // ============================================================================
 
 router.put(
-    '/:documentId',
-    requirePermission('edit'),
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
-        const { title, content, status, description } = req.body
+  '/:documentId',
+  requirePermission('edit'),
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
+    const { title, content, status, description } = req.body
 
-        const document = await documentService.updateDocument(
-            documentId,
-            {
-                title,
-                content,
-                status,
-                description
-            },
-            req.user!.id
-        )
+    const document = await documentService.updateDocument(
+      documentId,
+      {
+        title,
+        content,
+        status,
+        description,
+      },
+      req.user!.id,
+    )
 
-        if (!document) {
-            throw new NotFoundError('Document', documentId)
-        }
+    if (!document) {
+      throw new NotFoundError('Document', documentId)
+    }
 
-        res.json({
-            success: true,
-            data: document
-        })
+    res.json({
+      success: true,
+      data: document,
     })
+  }),
 )
 
 // ============================================================================
@@ -185,25 +204,25 @@ router.put(
 // ============================================================================
 
 router.delete(
-    '/:documentId',
-    requireRole(['admin', 'manager']),
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
+  '/:documentId',
+  requireRole(['admin', 'manager']),
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
 
-        const deleted = await documentService.deleteDocument(
-            documentId,
-            req.user!.id
-        )
+    const deleted = await documentService.deleteDocument(
+      documentId,
+      req.user!.id,
+    )
 
-        if (!deleted) {
-            throw new NotFoundError('Document', documentId)
-        }
+    if (!deleted) {
+      throw new NotFoundError('Document', documentId)
+    }
 
-        res.json({
-            success: true,
-            message: 'Document deleted successfully'
-        })
+    res.json({
+      success: true,
+      message: 'Document deleted successfully',
     })
+  }),
 )
 
 // ============================================================================
@@ -211,27 +230,29 @@ router.delete(
 // ============================================================================
 
 router.post(
-    '/:documentId/share',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
-        const { sharedWith, permissionLevel } = req.body
+  '/:documentId/share',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
+    const { sharedWith, permissionLevel } = req.body
 
-        if (!sharedWith || !permissionLevel) {
-            throw new ValidationError('Missing required fields: sharedWith, permissionLevel')
-        }
+    if (!sharedWith || !permissionLevel) {
+      throw new ValidationError(
+        'Missing required fields: sharedWith, permissionLevel',
+      )
+    }
 
-        const document = await documentService.shareDocument(
-            documentId,
-            sharedWith,
-            permissionLevel,
-            req.user!.id
-        )
+    const document = await documentService.shareDocument(
+      documentId,
+      sharedWith,
+      permissionLevel,
+      req.user!.id,
+    )
 
-        res.json({
-            success: true,
-            data: document
-        })
+    res.json({
+      success: true,
+      data: document,
     })
+  }),
 )
 
 // ============================================================================
@@ -239,28 +260,28 @@ router.post(
 // ============================================================================
 
 router.post(
-    '/:documentId/comments',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
-        const { content, parentCommentId } = req.body
+  '/:documentId/comments',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
+    const { content, parentCommentId } = req.body
 
-        if (!content) {
-            throw new ValidationError('Comment content is required')
-        }
+    if (!content) {
+      throw new ValidationError('Comment content is required')
+    }
 
-        const pool = getPostgresPool()
-        const result = await pool.query(
-            `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, content, author_id, created_at`,
-            [documentId, req.user!.id, content, parentCommentId || null]
-        )
+      [documentId, req.user!.id, content, parentCommentId || null],
+    )
 
-        res.status(201).json({
-            success: true,
-            data: result.rows[0]
-        })
+    res.status(201).json({
+      success: true,
+      data: result.rows[0],
     })
+  }),
 )
 
 // ============================================================================
@@ -268,25 +289,25 @@ router.post(
 // ============================================================================
 
 router.get(
-    '/:documentId/comments',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
+  '/:documentId/comments',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
 
-        const pool = getPostgresPool()
-        const result = await pool.query(
-            `SELECT c.id, c.content, c.author_id, u.name as author_name, c.created_at, c.resolved
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      `SELECT c.id, c.content, c.author_id, u.name as author_name, c.created_at, c.resolved
        FROM comments c
        JOIN users u ON c.author_id = u.id
        WHERE c.document_id = $1
        ORDER BY c.created_at DESC`,
-            [documentId]
-        )
+      [documentId],
+    )
 
-        res.json({
-            success: true,
-            data: result.rows
-        })
+    res.json({
+      success: true,
+      data: result.rows,
     })
+  }),
 )
 
 // ============================================================================
@@ -294,24 +315,24 @@ router.get(
 // ============================================================================
 
 router.get(
-    '/:documentId/versions',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
+  '/:documentId/versions',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
 
-        const pool = getPostgresPool()
-        const result = await pool.query(
-            `SELECT id, version_number, title, created_by, created_at, change_summary
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      `SELECT id, version_number, title, created_by, created_at, change_summary
        FROM document_versions
        WHERE document_id = $1
        ORDER BY version_number DESC`,
-            [documentId]
-        )
+      [documentId],
+    )
 
-        res.json({
-            success: true,
-            data: result.rows
-        })
+    res.json({
+      success: true,
+      data: result.rows,
     })
+  }),
 )
 
 // ============================================================================
@@ -319,34 +340,34 @@ router.get(
 // ============================================================================
 
 router.get(
-    '/:documentId/export',
-    asyncHandler(async (req: Request, res: Response) => {
-        const documentId = ensureString(req.params.documentId)
-        const { format: formatQuery = 'json' } = req.query
-        const format = ensureString(formatQuery)
+  '/:documentId/export',
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = ensureString(req.params.documentId)
+    const { format: formatQuery = 'json' } = req.query
+    const format = ensureString(formatQuery)
 
-        const document = await documentService.getDocument(documentId, req.user!.id)
+    const document = await documentService.getDocument(documentId, req.user!.id)
 
-        if (!document) {
-            throw new NotFoundError('Document', documentId)
-        }
+    if (!document) {
+      throw new NotFoundError('Document', documentId)
+    }
 
-        if (format === 'md') {
-            res.setHeader('Content-Type', 'text/markdown')
-            res.setHeader(
-                'Content-Disposition',
-                `attachment; filename="${document.slug}.md"`
-            )
-            res.send(document.content.markdown)
-        } else {
-            res.setHeader('Content-Type', 'application/json')
-            res.setHeader(
-                'Content-Disposition',
-                `attachment; filename="${document.slug}.json"`
-            )
-            res.json(document)
-        }
-    })
+    if (format === 'md') {
+      res.setHeader('Content-Type', 'text/markdown')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.md"`,
+      )
+      res.send(document.content.markdown)
+    } else {
+      res.setHeader('Content-Type', 'application/json')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.json"`,
+      )
+      res.json(document)
+    }
+  }),
 )
 
 export default router

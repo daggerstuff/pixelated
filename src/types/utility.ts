@@ -165,11 +165,13 @@ export type Failure<E> = {
 
 /** Type guard for checking if result is successful */
 export const isSuccess = <T, E>(result: Result<T, E>): result is Success<T> =>
-  result.success === true
+  
+  result.success
 
 /** Type guard for checking if result is a failure */
 export const isFailure = <T, E>(result: Result<T, E>): result is Failure<E> =>
-  result.success === false
+  !
+  result.success
 
 // ============================================================================
 // VALIDATION TYPES
@@ -190,8 +192,8 @@ export type Opaque<T, K> = T & { readonly __opaque: K }
 
 /** Enhanced component props with strict children typing */
 export type StrictComponentProps<T = Record<string, unknown>> = T & {
-  'children'?: React.ReactNode
-  'className'?: string
+  children?: React.ReactNode
+  className?: string
   'data-testid'?: string
 }
 

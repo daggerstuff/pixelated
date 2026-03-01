@@ -10,7 +10,8 @@ share: true
 
 ## Getting Started with Pixelated
 
-This guide will help you set up and start using Pixelated. Follow these steps to get your environment ready and begin development.
+This guide will help you set up and start using Pixelated. Follow these steps to
+get your environment ready and begin development.
 
 ## Prerequisites
 

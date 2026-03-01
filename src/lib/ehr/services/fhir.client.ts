@@ -5,7 +5,7 @@ import { OAuth2Service } from './oauth2.service'
 export function createFHIRClient(provider: EHRProvider): FHIRClient {
   const headers = new Headers({
     'Content-Type': 'application/fhir+json',
-    'Accept': 'application/fhir+json',
+    Accept: 'application/fhir+json',
   })
 
   const oauth2Service = new OAuth2Service()

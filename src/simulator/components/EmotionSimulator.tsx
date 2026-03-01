@@ -1,13 +1,15 @@
+import { Loader2 } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
+
+import { Alert } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
 import { EmotionDisplay } from './EmotionDisplay'
 import { SpeechPatternDisplay } from './SpeechPatternDisplay'
 import { TechniqueDisplay } from './TechniqueDisplay'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Alert } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('EmotionSimulator')
 
@@ -22,13 +24,13 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
 }) => (
   <div className={`flex items-center gap-2 ${className}`}>
     <div
-      className={`w-2 h-2 rounded-full ${
+      className={`h-2 w-2 rounded-full ${
         isConnected ? 'bg-green-500' : 'bg-red-500'
       }`}
-      aria-hidden="true"
+      aria-hidden='true'
     />
 
-    <span className="text-sm text-muted-foreground">
+    <span className='text-muted-foreground text-sm'>
       {isConnected ? 'Connected' : 'Disconnected'}
     </span>
   </div>
@@ -72,7 +74,7 @@ export const EmotionSimulator: React.FC = () => {
     }
 
     try {
-      startAnalysis()
+      void startAnalysis()
     } catch (error: unknown) {
       logger.error('Error starting analysis:', error)
     }
@@ -96,33 +98,33 @@ export const EmotionSimulator: React.FC = () => {
 
   return (
     <div
-      className="p-4 space-y-6"
-      role="region"
-      aria-label="Emotion Analysis Simulator"
+      className='space-y-6 p-4'
+      role='region'
+      aria-label='Emotion Analysis Simulator'
     >
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center space-x-2">
+      <div className='flex flex-wrap items-center justify-between gap-4'>
+        <div className='flex items-center space-x-2'>
           <Switch
-            id="consent-switch"
+            id='consent-switch'
             checked={hasConsent}
             onCheckedChange={handleConsentChange}
-            aria-label="Audio analysis consent"
+            aria-label='Audio analysis consent'
           />
 
-          <label htmlFor="consent-switch" className="text-sm">
+          <label htmlFor='consent-switch' className='text-sm'>
             Allow audio analysis
           </label>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className='flex items-center space-x-2'>
           <Button
             onClick={handleStart}
             disabled={!hasConsent || isProcessing || !isConnected}
-            variant="default"
-            aria-label="Start emotion analysis"
+            variant='default'
+            aria-label='Start emotion analysis'
           >
             {isProcessing ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                 Analyzing...
               </>
             ) : (
@@ -132,16 +134,16 @@ export const EmotionSimulator: React.FC = () => {
           <Button
             onClick={handleStop}
             disabled={!isProcessing}
-            variant="secondary"
-            aria-label="Stop emotion analysis"
+            variant='secondary'
+            aria-label='Stop emotion analysis'
           >
             Stop Analysis
           </Button>
           <Button
             onClick={handleReset}
             disabled={isProcessing}
-            variant="outline"
-            aria-label="Reset analysis data"
+            variant='outline'
+            aria-label='Reset analysis data'
           >
             Reset
           </Button>
@@ -149,24 +151,24 @@ export const EmotionSimulator: React.FC = () => {
       </div>
 
       {lastError && (
-        <Alert variant="error" title="Error" description={lastError} />
+        <Alert variant='error' title='Error' description={lastError} />
       )}
 
       {!isConnected && (
         <Alert
-          variant="warning"
-          title="Connection Lost"
-          description="Unable to connect to the analysis service. Please check your connection and try again."
+          variant='warning'
+          title='Connection Lost'
+          description='Unable to connect to the analysis service. Please check your connection and try again.'
         />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
         <EmotionDisplay />
         <SpeechPatternDisplay />
         <TechniqueDisplay />
       </div>
 
-      <ConnectionStatus isConnected={isConnected} className="mt-4" />
+      <ConnectionStatus isConnected={isConnected} className='mt-4' />
     </div>
   )
 }

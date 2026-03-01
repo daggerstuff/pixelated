@@ -5,17 +5,17 @@
 
 import type { AIMessage, AIService, AICompletion } from '../../ai/models/types'
 import { MetaAlignerAPI, IntegratedAIService } from '../api/alignment-api'
-import { ContextType, CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
-import type { AlignmentContext, UserProfile } from '../core/objectives'
 import {
   DEFAULT_WEIGHT_ADJUSTMENT_PARAMS,
   WeightingStrategy,
 } from '../core/objective-weighting'
-import { getContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
+import { ContextType, CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
+import type { AlignmentContext, UserProfile } from '../core/objectives'
 // @ts-expect-error: Type declarations may be missing for test context
 import type { AdaptiveSelectorConfig } from '../prioritization/adaptive-selector'
 // @ts-expect-error: Type declarations may be missing for test context
 import { AdaptiveSelector as ActualAdaptiveSelector } from '../prioritization/adaptive-selector'
+import { getContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
 
 // Mock logger
 vi.mock('../../logging', () => ({

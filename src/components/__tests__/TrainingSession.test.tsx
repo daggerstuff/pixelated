@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { render, screen } from '@testing-library/react'
-import TrainingSession from '../TrainingSession'
 import { describe, expect, it } from 'vitest'
+
+import TrainingSession from '../TrainingSession'
 
 describe('TrainingSession', () => {
   it('renders training session component', () => {

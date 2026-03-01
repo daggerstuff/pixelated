@@ -1,10 +1,3 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import Alert from '@/components/ui/alert'
 import {
   AlertTriangle,
   Shield,
@@ -19,6 +12,14 @@ import {
   TrendingUp,
   AlertCircle,
 } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+
+import Alert from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
 import { apiClient, APIError } from '@/lib/api-client'
 import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
@@ -307,7 +308,7 @@ export default function CrisisDetectionDemo() {
 
       // Set new timeout for real-time analysis
       const timeout = setTimeout(() => {
-        performCrisisAssessment(true) // Silent assessment
+        void performCrisisAssessment(true) // Silent assessment
       }, 2000) // Wait 2 seconds after user stops typing
 
       setTypingTimeout(timeout)
@@ -340,43 +341,43 @@ export default function CrisisDetectionDemo() {
   const getRiskIcon = (level: string) => {
     switch (level) {
       case 'none':
-        return <CheckCircle className="w-5 h-5 text-green-600" />
+        return <CheckCircle className='text-green-600 h-5 w-5' />
       case 'low':
-        return <Shield className="w-5 h-5 text-blue-600" />
+        return <Shield className='text-blue-600 h-5 w-5' />
       case 'moderate':
-        return <AlertTriangle className="w-5 h-5 text-yellow-600" />
+        return <AlertTriangle className='text-yellow-600 h-5 w-5' />
       case 'high':
-        return <AlertTriangle className="w-5 h-5 text-orange-600" />
+        return <AlertTriangle className='text-orange-600 h-5 w-5' />
       case 'imminent':
-        return <AlertTriangle className="w-5 h-5 text-red-600" />
+        return <AlertTriangle className='text-red-600 h-5 w-5' />
       default:
-        return <Shield className="w-5 h-5 text-gray-600" />
+        return <Shield className='text-gray-600 h-5 w-5' />
     }
   }
 
   const getIndicatorIcon = (present: boolean, confidence: number) => {
     if (present && confidence > 0.7)
-      return <AlertTriangle className="w-4 h-4 text-red-500" />
+      return <AlertTriangle className='text-red-500 h-4 w-4' />
     if (present && confidence > 0.5)
-      return <AlertTriangle className="w-4 h-4 text-orange-500" />
-    if (present) return <AlertTriangle className="w-4 h-4 text-yellow-500" />
-    return <CheckCircle className="w-4 h-4 text-green-500" />
+      return <AlertTriangle className='text-orange-500 h-4 w-4' />
+    if (present) return <AlertTriangle className='text-yellow-500 h-4 w-4' />
+    return <CheckCircle className='text-green-500 h-4 w-4' />
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
+    <div className='mx-auto w-full max-w-6xl space-y-6 p-6'>
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center gap-3">
-          <Shield className="w-8 h-8 text-red-600" />
+      <div className='space-y-4 text-center'>
+        <h1 className='text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold'>
+          <Shield className='text-red-600 h-8 w-8' />
           Crisis Detection & Assessment
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
+        <p className='text-gray-600 mx-auto max-w-2xl'>
           Advanced AI-powered crisis detection system for real-time assessment
           of suicide risk, self-harm indicators, and mental health emergencies
           with immediate resource recommendations.
         </p>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
+        <div className='bg-red-50 border-red-200 text-red-700 rounded-lg border p-4 text-sm'>
           <strong>Important:</strong> This is a demonstration tool. For actual
           crises, immediately contact emergency services (911) or the National
           Suicide Prevention Lifeline (988).
@@ -386,57 +387,57 @@ export default function CrisisDetectionDemo() {
       {/* Input Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
+          <CardTitle className='flex items-center gap-2'>
+            <FileText className='h-5 w-5' />
             Crisis Assessment Input
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className='space-y-4'>
           <Textarea
-            placeholder="Enter text to assess for crisis indicators (e.g., chat messages, clinical notes, session transcripts)..."
+            placeholder='Enter text to assess for crisis indicators (e.g., chat messages, clinical notes, session transcripts)...'
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            className="min-h-32 resize-y"
+            className='min-h-32 resize-y'
           />
 
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-500">
+          <div className='flex items-center justify-between'>
+            <div className='text-gray-500 text-sm'>
               {inputText.length} characters • Real-time crisis detection
               {realTimeMonitoring && (
                 <Badge
-                  variant="outline"
-                  className="ml-2 bg-green-50 text-green-700"
+                  variant='outline'
+                  className='bg-green-50 text-green-700 ml-2'
                 >
-                  <Activity className="w-3 h-3 mr-1" />
+                  <Activity className='mr-1 h-3 w-3' />
                   Live Monitoring
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className='flex items-center gap-3'>
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => setRealTimeMonitoring(!realTimeMonitoring)}
                 className={
                   realTimeMonitoring ? 'bg-green-50 border-green-200' : ''
                 }
               >
-                <Activity className="w-4 h-4 mr-2" />
+                <Activity className='mr-2 h-4 w-4' />
                 {realTimeMonitoring ? 'Disable' : 'Enable'} Real-time
               </Button>
               <Button
                 onClick={() => performCrisisAssessment(false)}
                 disabled={assessing || inputText.trim().length < 5}
-                className="flex items-center gap-2 bg-red-600 hover:bg-red-700"
+                className='bg-red-600 hover:bg-red-700 flex items-center gap-2'
               >
                 {assessing ? (
                   <>
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    <div className='border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2' />
                     Assessing...
                   </>
                 ) : (
                   <>
-                    <Shield className="w-4 h-4" />
+                    <Shield className='h-4 w-4' />
                     Assess Crisis Risk
                   </>
                 )}
@@ -446,8 +447,8 @@ export default function CrisisDetectionDemo() {
 
           {/* Assessment History Indicator */}
           {assessmentHistory.length > 0 && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <TrendingUp className="w-3 h-3" />
+            <div className='text-gray-500 flex items-center gap-2 text-xs'>
+              <TrendingUp className='h-3 w-3' />
               <span>
                 {assessmentHistory.length} previous assessment
                 {assessmentHistory.length !== 1 ? 's' : ''}
@@ -458,10 +459,10 @@ export default function CrisisDetectionDemo() {
                   (a) => a.riskLevel === 'high' || a.riskLevel === 'imminent',
                 ) && (
                 <Badge
-                  variant="outline"
-                  className="text-red-600 border-red-200"
+                  variant='outline'
+                  className='text-red-600 border-red-200'
                 >
-                  <AlertCircle className="w-3 h-3 mr-1" />
+                  <AlertCircle className='mr-1 h-3 w-3' />
                   High-risk history
                 </Badge>
               )}
@@ -469,7 +470,7 @@ export default function CrisisDetectionDemo() {
           )}
 
           {error && (
-            <Alert variant="error" icon={<AlertTriangle className="w-4 h-4" />}>
+            <Alert variant='error' icon={<AlertTriangle className='h-4 w-4' />}>
               {error}
             </Alert>
           )}
@@ -478,7 +479,7 @@ export default function CrisisDetectionDemo() {
 
       {/* Assessment Results */}
       {assessment && (
-        <div className="space-y-6">
+        <div className='space-y-6'>
           {/* Risk Level Overview */}
           <Card
             className={`border-l-4 ${
@@ -494,52 +495,52 @@ export default function CrisisDetectionDemo() {
             }`}
           >
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <CardTitle className='flex items-center justify-between'>
+                <div className='flex items-center gap-3'>
                   {getRiskIcon(assessment.riskLevel)}
                   <span>Crisis Risk Assessment</span>
                 </div>
                 <Badge
-                  variant="outline"
-                  className={`text-lg px-4 py-2 ${getRiskLevelColor(assessment.riskLevel)}`}
+                  variant='outline'
+                  className={`px-4 py-2 text-lg ${getRiskLevelColor(assessment.riskLevel)}`}
                 >
                   {assessment.riskLevel.toUpperCase()} RISK
                 </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Risk Score</h4>
+                  <h4 className='text-gray-900 mb-2 font-medium'>Risk Score</h4>
                   <Progress
                     value={assessment.riskScore * 100}
-                    className="w-full mb-2"
+                    className='mb-2 w-full'
                   />
-                  <div className="text-sm text-gray-600">
+                  <div className='text-gray-600 text-sm'>
                     {(assessment.riskScore * 100).toFixed(1)}% risk probability
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">
+                  <h4 className='text-gray-900 mb-2 font-medium'>
                     Confidence Level
                   </h4>
                   <Progress
                     value={assessment.confidenceLevel * 100}
-                    className="w-full mb-2"
+                    className='mb-2 w-full'
                   />
-                  <div className="text-sm text-gray-600">
+                  <div className='text-gray-600 text-sm'>
                     {(assessment.confidenceLevel * 100).toFixed(1)}% confidence
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">
+                  <h4 className='text-gray-900 mb-2 font-medium'>
                     Assessment Time
                   </h4>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">
+                  <div className='text-gray-600 flex items-center gap-2'>
+                    <Clock className='h-4 w-4' />
+                    <span className='text-sm'>
                       {new Date(assessment.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
@@ -551,37 +552,37 @@ export default function CrisisDetectionDemo() {
           {/* Crisis Indicators */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="w-5 h-5" />
+              <CardTitle className='flex items-center gap-2'>
+                <Brain className='h-5 w-5' />
                 Crisis Indicators Analysis
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 {Object.entries(assessment.crisisIndicators).map(
                   ([key, indicator]) => (
-                    <div key={key} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
+                    <div key={key} className='rounded-lg border p-4'>
+                      <div className='mb-2 flex items-center justify-between'>
+                        <div className='flex items-center gap-2'>
                           {getIndicatorIcon(
                             indicator.present,
                             indicator.confidence,
                           )}
-                          <span className="font-medium capitalize">
+                          <span className='font-medium capitalize'>
                             {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className='text-gray-600 text-sm'>
                           {Math.round(indicator.confidence * 100)}%
                         </div>
                       </div>
 
                       <Progress
                         value={indicator.confidence * 100}
-                        className="w-full mb-2"
+                        className='mb-2 w-full'
                       />
 
-                      <div className="flex justify-between text-xs text-gray-500">
+                      <div className='text-gray-500 flex justify-between text-xs'>
                         <span>
                           {indicator.present ? 'Present' : 'Not detected'}
                         </span>
@@ -597,23 +598,23 @@ export default function CrisisDetectionDemo() {
           </Card>
 
           {/* Immediate Actions & Resources */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             {/* Immediate Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-orange-700">
-                  <Zap className="w-5 h-5" />
+                <CardTitle className='text-orange-700 flex items-center gap-2'>
+                  <Zap className='h-5 w-5' />
                   Immediate Actions Required
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3">
+                <ul className='space-y-3'>
                   {assessment.immediateActions.map((action, index) => (
-                    <li key={action} className="flex items-start gap-2">
-                      <div className="w-6 h-6 bg-orange-100 text-orange-700 rounded-full flex items-center justify-center text-xs font-bold mt-0.5">
+                    <li key={action} className='flex items-start gap-2'>
+                      <div className='bg-orange-100 text-orange-700 mt-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold'>
                         {index + 1}
                       </div>
-                      <span className="text-gray-700">{action}</span>
+                      <span className='text-gray-700'>{action}</span>
                     </li>
                   ))}
                 </ul>
@@ -623,33 +624,33 @@ export default function CrisisDetectionDemo() {
             {/* Emergency Resources */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-red-700">
-                  <Phone className="w-5 h-5" />
+                <CardTitle className='text-red-700 flex items-center gap-2'>
+                  <Phone className='h-5 w-5' />
                   Emergency Resources
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className='space-y-4'>
                   {assessment.emergencyResources.map((resource) => (
                     <div
                       key={resource.type + resource.contact}
-                      className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                      className='bg-red-50 border-red-200 rounded-lg border p-3'
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-medium text-red-900">
+                      <div className='mb-1 flex items-center justify-between'>
+                        <h4 className='text-red-900 font-medium'>
                           {resource.type}
                         </h4>
                         <Badge
-                          variant="outline"
-                          className="text-xs bg-red-100 text-red-700"
+                          variant='outline'
+                          className='bg-red-100 text-red-700 text-xs'
                         >
                           {resource.available}
                         </Badge>
                       </div>
-                      <div className="text-lg font-mono text-red-800 mb-1">
+                      <div className='text-red-800 mb-1 font-mono text-lg'>
                         {resource.contact}
                       </div>
-                      <p className="text-sm text-red-700">
+                      <p className='text-red-700 text-sm'>
                         {resource.description}
                       </p>
                     </div>
@@ -662,20 +663,20 @@ export default function CrisisDetectionDemo() {
           {/* Protective Factors */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-700">
-                <Heart className="w-5 h-5" />
+              <CardTitle className='text-green-700 flex items-center gap-2'>
+                <Heart className='h-5 w-5' />
                 Protective Factors Identified
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
                 {assessment.protectiveFactors.map((factor) => (
                   <div
                     key={factor}
-                    className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg"
+                    className='bg-green-50 border-green-200 flex items-start gap-2 rounded-lg border p-3'
                   >
-                    <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-green-800">{factor}</span>
+                    <CheckCircle className='text-green-600 mt-0.5 h-5 w-5 flex-shrink-0' />
+                    <span className='text-green-800'>{factor}</span>
                   </div>
                 ))}
               </div>
@@ -684,27 +685,27 @@ export default function CrisisDetectionDemo() {
 
           {/* Action Buttons */}
           <Card>
-            <CardContent className="p-6">
-              <div className="flex flex-wrap gap-4 justify-center">
+            <CardContent className='p-6'>
+              <div className='flex flex-wrap justify-center gap-4'>
                 <Button
-                  variant="outline"
-                  className="bg-red-50 border-red-200 text-red-700 hover:bg-red-100"
+                  variant='outline'
+                  className='bg-red-50 border-red-200 text-red-700 hover:bg-red-100'
                   onClick={() => window.open('tel:988')}
                 >
-                  <Phone className="w-4 h-4 mr-2" />
+                  <Phone className='mr-2 h-4 w-4' />
                   Call 988 (Crisis Lifeline)
                 </Button>
 
                 <Button
-                  variant="outline"
-                  className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                  variant='outline'
+                  className='bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
                   onClick={() => window.open('sms:741741?body=HOME')}
                 >
                   Crisis Text Line
                 </Button>
 
                 <Button
-                  variant="outline"
+                  variant='outline'
                   onClick={() => performCrisisAssessment(false)}
                   disabled={assessing}
                 >

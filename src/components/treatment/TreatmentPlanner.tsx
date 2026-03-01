@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import RecommendationDisplay from '../ai/RecommendationDisplay'
+
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
+import RecommendationDisplay from '../ai/RecommendationDisplay'
 
 interface TreatmentPlannerProps {
   pageTitle: string
@@ -57,7 +58,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'Unknown error'
       setError(errorMessage)
     } finally {
@@ -72,85 +73,85 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
 
   return (
     <>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{pageTitle}</h1>
-        <p className="text-gray-600">{pageDescription}</p>
+      <div className='mb-8'>
+        <h1 className='text-gray-900 mb-2 text-3xl font-bold'>{pageTitle}</h1>
+        <p className='text-gray-600'>{pageDescription}</p>
       </div>
       <form
-        className="bg-white rounded-lg shadow p-6 mb-8"
+        className='bg-white mb-8 rounded-lg p-6 shadow'
         onSubmit={fetchRecommendations}
-        autoComplete="off"
+        autoComplete='off'
       >
-        <div className="mb-4">
+        <div className='mb-4'>
           <label
-            htmlFor="clientId"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor='clientId'
+            className='text-gray-700 mb-1 block text-sm font-medium'
           >
             Client ID (UUID)
           </label>
           <input
-            id="clientId"
-            name="clientId"
-            type="text"
+            id='clientId'
+            name='clientId'
+            type='text'
             required
-            pattern="[0-9a-fA-F-]{36}"
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            pattern='[0-9a-fA-F-]{36}'
+            className='border-gray-300 w-full rounded border px-3 py-2'
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
-            placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
+            placeholder='e.g. 123e4567-e89b-12d3-a456-426614174000'
           />
         </div>
-        <div className="mb-4">
+        <div className='mb-4'>
           <label
-            htmlFor="indications"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            htmlFor='indications'
+            className='text-gray-700 mb-1 block text-sm font-medium'
           >
             Indications (comma-separated)
           </label>
           <input
-            id="indications"
-            name="indications"
-            type="text"
+            id='indications'
+            name='indications'
+            type='text'
             required
-            className="w-full border border-gray-300 rounded px-3 py-2"
+            className='border-gray-300 w-full rounded border px-3 py-2'
             value={indications}
             onChange={(e) => setIndications(e.target.value)}
-            placeholder="e.g. depression, anxiety"
+            placeholder='e.g. depression, anxiety'
           />
         </div>
         <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition disabled:opacity-50"
+          type='submit'
+          className='bg-blue-600 hover:bg-blue-700 text-white rounded px-6 py-2 font-semibold transition disabled:opacity-50'
           disabled={loading}
         >
           Fetch Recommendations
         </button>
       </form>
 
-      <div className="flex gap-2 mb-6">
+      <div className='mb-6 flex gap-2'>
         <button
-          type="button"
+          type='button'
           className={`filter-btn${filter === 'all' ? ' active' : ''}`}
           onClick={() => setFilter('all')}
         >
           All
         </button>
         <button
-          type="button"
+          type='button'
           className={`filter-btn${filter === 'high' ? ' active' : ''}`}
           onClick={() => setFilter('high')}
         >
           High Priority
         </button>
         <button
-          type="button"
+          type='button'
           className={`filter-btn${filter === 'medium' ? ' active' : ''}`}
           onClick={() => setFilter('medium')}
         >
           Medium
         </button>
         <button
-          type="button"
+          type='button'
           className={`filter-btn${filter === 'low' ? ' active' : ''}`}
           onClick={() => setFilter('low')}
         >
@@ -159,9 +160,9 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       </div>
 
       {loading && (
-        <div className="text-blue-600">Loading recommendations...</div>
+        <div className='text-blue-600'>Loading recommendations...</div>
       )}
-      {error && <div className="text-red-600">{error}</div>}
+      {error && <div className='text-red-600'>{error}</div>}
 
       {!loading && !error && filteredRecommendations.length > 0 && (
         <RecommendationDisplay recommendations={filteredRecommendations} />

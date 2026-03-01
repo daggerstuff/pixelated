@@ -7,11 +7,14 @@ description: 'Python AI/ML development guidelines for Linux with CUDA/ROCm'
 
 ## Project Context
 
-- **Platform**: Pixelated Empathy - AI-powered mental health training simulation platform
-- **AI Directory**: `ai/` contains ML models, training pipelines, bias detection, and inference services
+- **Platform**: Pixelated Empathy - AI-powered mental health training simulation
+  platform
+- **AI Directory**: `ai/` contains ML models, training pipelines, bias
+  detection, and inference services
 - **Python Version**: 3.11+ with uv package manager (required)
 - **GPU Support**: NVIDIA CUDA and AMD ROCm for Linux servers
-- **Performance Target**: Sub-50ms response times for real-time therapeutic interactions
+- **Performance Target**: Sub-50ms response times for real-time therapeutic
+  interactions
 
 ## Core AI/ML Stack
 
@@ -45,15 +48,15 @@ class TherapeuticResponseModel(nn.Module):
     def __init__(self, config):
         super().__init__()
         # Model architecture with memory optimization
-        
+
 # ai/inference/ - Production inference services
 class BiasDetectionEngine:
     def __init__(self):
         self.model = self._load_optimized_model()
-    
+
     async def detect_bias(self, text: str) -> BiasMetrics:
         # Real-time bias detection with <50ms latency
-        
+
 # ai/training/ - Training pipelines and scripts
 def train_with_fhe_privacy(model, dataloader):
     # Privacy-preserving training with FHE
@@ -62,7 +65,8 @@ def train_with_fhe_privacy(model, dataloader):
 ## Performance Optimization
 
 - **Memory Management**: Use gradient checkpointing, mixed precision training
-- **Model Optimization**: Apply quantization (8-bit/4-bit), ONNX conversion for inference
+- **Model Optimization**: Apply quantization (8-bit/4-bit), ONNX conversion for
+  inference
 - **GPU Utilization**: Implement proper batch sizing, async processing
 - **Caching**: Cache model outputs, use Redis for session state
 
@@ -77,7 +81,8 @@ scaler.scale(loss).backward()
 
 ## Security & Privacy Requirements
 
-- **HIPAA++ Compliance**: All therapeutic data must be encrypted at rest and in transit
+- **HIPAA++ Compliance**: All therapeutic data must be encrypted at rest and in
+  transit
 - **Zero-Knowledge Architecture**: Implement FHE for sensitive computations
 - **Bias Monitoring**: Real-time bias detection in all AI outputs
 - **Audit Trails**: Log all model predictions and bias metrics
@@ -107,7 +112,8 @@ mypy ai/
 
 ## Error Handling & Debugging
 
-- **Graceful Degradation**: Handle model failures without breaking user experience
+- **Graceful Degradation**: Handle model failures without breaking user
+  experience
 - **Comprehensive Logging**: Use structured logging for debugging
 - **GPU Memory**: Monitor CUDA memory usage, implement proper cleanup
 - **Model Fallbacks**: Provide backup models for critical services

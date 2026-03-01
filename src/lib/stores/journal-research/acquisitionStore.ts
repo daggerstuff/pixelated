@@ -79,5 +79,3 @@ export const useAcquisitionStore = create<AcquisitionStoreState>((set) => ({
 
   resetFilters: () => set({ filters: defaultFilters }),
 }))
-
-

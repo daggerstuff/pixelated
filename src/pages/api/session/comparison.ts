@@ -1,5 +1,5 @@
-import { Pool } from 'pg'
 import type { APIRoute } from 'astro'
+import { Pool } from 'pg'
 
 // Database connection pool
 const { DATABASE_URL } = process.env

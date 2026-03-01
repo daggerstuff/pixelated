@@ -41,21 +41,21 @@ export function ProgressBar({
       className={['w-full', className].filter(Boolean).join(' ')}
       aria-label={accessibleName}
       aria-labelledby={ariaLabelledBy}
-      role="progressbar"
+      role='progressbar'
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={percent}
       aria-valuetext={ariaValueText}
       {...rest}
     >
-      {label && <span className="block text-sm mb-1">{label}</span>}
-      <div className="relative h-4 bg-muted rounded-full">
+      {label && <span className='mb-1 block text-sm'>{label}</span>}
+      <div className='bg-muted relative h-4 rounded-full'>
         <div
-          className="absolute left-0 top-0 h-4 rounded-full bg-primary"
+          className='bg-primary absolute left-0 top-0 h-4 rounded-full'
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-xs text-muted-foreground ml-2">
+      <span className='text-muted-foreground ml-2 text-xs'>
         {ariaValueText}
       </span>
     </div>

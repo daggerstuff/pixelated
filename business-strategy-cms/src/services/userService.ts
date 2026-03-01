@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs'
-import { User, UserRole } from '@/types/user'
+
 import { UserModel } from '@/models/User'
+import { User, UserRole } from '@/types/user'
+
 import { EmailService } from './emailService'
 
 export class UserService {
@@ -75,4 +77,3 @@ export class UserService {
     return user
   }
 }
-

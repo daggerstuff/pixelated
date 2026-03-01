@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Patient Resources
 
-This guide provides a collection of resources designed to support individuals in their recovery journey from CPTSD and addiction.
+This guide provides a collection of resources designed to support individuals in
+their recovery journey from CPTSD and addiction.
 
 ## Recovery Tools
 

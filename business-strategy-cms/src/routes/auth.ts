@@ -1,4 +1,5 @@
 import { Router } from 'express'
+
 import { AuthService } from '@/services/authService'
 import { UserRegistration, UserCredentials } from '@/types/user'
 

@@ -3,12 +3,12 @@
  * Comprehensive patient data management with privacy and security
  */
 
+import encryptionManager from '@/lib/security/encryptionManager'
 import type {
   PatientProfile,
   TreatmentPlan,
   ProgressMetrics,
 } from '@/types/patient'
-import encryptionManager from '@/lib/security/encryptionManager'
 
 export interface PatientSearchCriteria {
   name?: string

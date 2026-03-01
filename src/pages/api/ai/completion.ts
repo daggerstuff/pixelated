@@ -1,13 +1,14 @@
-// import type { AIMessage } from '@/lib/ai/models/types'
-import { getSession } from '@/lib/auth/session'
 import type { APIRoute, APIContext } from 'astro'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+
 import { handleApiError } from '@/lib/ai/error-handling'
 import { createTogetherAIService } from '@/lib/ai/services/together'
+import { applyRateLimit } from '@/lib/api/rate-limit'
+import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+// import type { AIMessage } from '@/lib/ai/models/types'
+import { getSession } from '@/lib/auth/session'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { validateRequestBody } from '@/lib/validation/index'
 import { CompletionRequestSchema } from '@/lib/validation/schemas'
-import { applyRateLimit } from '@/lib/api/rate-limit'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Define AIMessage interface locally
 interface AIMessage {
@@ -149,12 +150,18 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         AuditEventStatus.FAILURE, // status
       )
 
-      return new Response(JSON.stringify({ error: 'Validation failed', details: validationError.details }), {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({
+          error: 'Validation failed',
+          details: validationError.details,
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
     }
 
     // Check input size to prevent abuse
@@ -287,7 +294,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         headers: {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache, no-transform',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           ...Object.fromEntries(rateLimit.headers.entries()),
         },
       })
@@ -326,7 +333,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     logger.error(
       'Error in AI completion API:',
       error instanceof Error
-        ? { message: String(error), stack: (error as Error)?.stack }
+        ? { message: String(error), stack: (error)?.stack }
         : { message: String(error) },
     )
     console.error('Error in AI completion API:', error)

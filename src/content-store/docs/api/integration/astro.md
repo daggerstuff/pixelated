@@ -1,20 +1,22 @@
 ---
-title: "Astro API Integration"
-description: "Astro API Integration documentation"
+title: 'Astro API Integration'
+description: 'Astro API Integration documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Astro API Integration
 
-This guide explains how to integrate our APIs within Astro components, providing server-side data fetching and client-side interactivity.
+This guide explains how to integrate our APIs within Astro components, providing
+server-side data fetching and client-side interactivity.
 
 ## Server-Side API Access
 
-In Astro components, you can fetch data during server-side rendering using the frontmatter section:
+In Astro components, you can fetch data during server-side rendering using the
+frontmatter section:
 
 ```astro
 ---
@@ -49,33 +51,34 @@ const userData = {
 
 ## Client-Side API Access
 
-For client-side API access in framework components (React, Vue, etc.), use the API client libraries:
+For client-side API access in framework components (React, Vue, etc.), use the
+API client libraries:
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { api } from '../../lib/api/client';
+import { useState, useEffect } from 'react'
+import { api } from '../../lib/api/client'
 
 export default function UserProfileClient({ userData }) {
-  const [loading, setLoading] = useState(false);
-  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(false)
+  const [metrics, setMetrics] = useState(null)
 
   useEffect(() => {
     async function fetchMetrics() {
-      setLoading(true);
+      setLoading(true)
       try {
-        const data = await api.getUserMetrics(userData.id);
-        setMetrics(data);
+        const data = await api.getUserMetrics(userData.id)
+        setMetrics(data)
       } catch (error) {
-        console.error('Error fetching metrics:', error);
+        console.error('Error fetching metrics:', error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
     }
 
     if (userData.id) {
-      fetchMetrics();
+      fetchMetrics()
     }
-  }, [userData.id]);
+  }, [userData.id])
 
   return (
     <div>
@@ -91,7 +94,7 @@ export default function UserProfileClient({ userData }) {
         <p>No metrics available</p>
       )}
     </div>
-  );
+  )
 }
 ```
 
@@ -99,7 +102,8 @@ export default function UserProfileClient({ userData }) {
 
 ### Progressive Enhancement
 
-Use progressive enhancement by providing server-rendered content with enhanced client-side functionality:
+Use progressive enhancement by providing server-rendered content with enhanced
+client-side functionality:
 
 ```astro
 ---
@@ -118,7 +122,8 @@ const initialContent = await getPopularContent({ limit: 5 });
 
 ### Partial Hydration
 
-Leverage Astro's partial hydration directives to only send JavaScript for interactive components:
+Leverage Astro's partial hydration directives to only send JavaScript for
+interactive components:
 
 ```astro
 ---
@@ -175,6 +180,7 @@ try {
 ### Performance Optimization
 
 1. **Cache frequently accessed data with `fetch()` caching**
+
    ```astro
    ---
    // Uses built-in caching
@@ -192,6 +198,7 @@ try {
 ## Advanced Integration
 
 For more advanced integration patterns, refer to:
+
 - [API Client Library Documentation](../clients/javascript.md)
 - [Authentication Integration](../auth/integration.md)
 - [Real-time Data Updates](../streaming/websockets.md)

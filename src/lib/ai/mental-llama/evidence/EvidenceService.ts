@@ -6,16 +6,17 @@
  */
 
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
-import {
-  EvidenceExtractor,
-  type EvidenceItem,
-  type EvidenceExtractionResult,
-} from './EvidenceExtractor'
+
 import type {
   IModelProvider,
   MentalHealthAnalysisResult,
   RoutingContext,
 } from '../types/mentalLLaMATypes'
+import {
+  EvidenceExtractor,
+  type EvidenceItem,
+  type EvidenceExtractionResult,
+} from './EvidenceExtractor'
 
 const logger = getClinicalAnalysisLogger('general')
 

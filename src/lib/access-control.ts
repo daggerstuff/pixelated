@@ -1,4 +1,5 @@
 import type { AstroCookies } from 'astro'
+
 import { createAuditLog, AuditEventType } from '../lib/audit'
 import { getCurrentUser, hasRole } from './auth'
 

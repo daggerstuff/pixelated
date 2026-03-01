@@ -2,27 +2,37 @@
 
 ## Summary
 
-This document summarizes the reorganization of the bias-detection folder structure.
+This document summarizes the reorganization of the bias-detection folder
+structure.
 
 ## Changes Made
 
 ### 1. Removed Unused `python/` Folder
+
 - **Removed**: `/src/lib/ai/bias-detection/python/bias_detection_service.py`
-- **Reason**: This was a leftover/duplicate that wasn't being used. The actual service is in `python-service/`.
+- **Reason**: This was a leftover/duplicate that wasn't being used. The actual
+  service is in `python-service/`.
 
 ### 2. Updated `start-python-service.py`
-- **Changed**: Now imports the Flask app from `python-service/bias_detection_service.py`
-- **Before**: Tried to import from deleted `python/` folder and created duplicate Flask app
-- **After**: Simple wrapper that imports and re-exports the Flask app from the correct location
+
+- **Changed**: Now imports the Flask app from
+  `python-service/bias_detection_service.py`
+- **Before**: Tried to import from deleted `python/` folder and created
+  duplicate Flask app
+- **After**: Simple wrapper that imports and re-exports the Flask app from the
+  correct location
 
 ### 3. Organized Test Files
+
 - **Moved**: Test files from `python-service/` root to `python-service/tests/`
 - **Files moved**:
   - `test_bias_detection_service.py`
   - `test_bias_detection_improvements.py`
 
 ### 4. Created Documentation
-- **Added**: `python-service/README.md` - Documents the structure and usage of both Flask and FastAPI services
+
+- **Added**: `python-service/README.md` - Documents the structure and usage of
+  both Flask and FastAPI services
 - **Updated**: Root `README.md` - Fixed import path reference
 
 ## Current Structure
@@ -54,12 +64,14 @@ src/lib/ai/bias-detection/
 ## Service Implementations
 
 ### Flask Service (Production)
+
 - **Location**: `python-service/bias_detection_service.py`
 - **Status**: ✅ Production (currently in use)
 - **Entry Point**: `start-python-service.py` → `bias_detection_service.app`
 - **Used by**: Gunicorn, production deployments
 
 ### FastAPI Service (Experimental)
+
 - **Location**: `python-service/bias_detection/`
 - **Status**: 🧪 Experimental (not in production)
 - **Entry Point**: `bias_detection.app:app`
@@ -104,4 +116,3 @@ python -m bias_detection.app
 4. ✅ Create documentation - **DONE**
 5. ⏳ Consider migrating to FastAPI service in future
 6. ⏳ Consolidate duplicate functionality if needed
-

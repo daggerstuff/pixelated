@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+
 import { useErrorBoundary } from '../ErrorBoundary'
 import { useSecurity } from '../SecurityProvider'
 import { SharedProviders } from '../SharedProviders'
@@ -9,7 +10,7 @@ function ThemeConsumer() {
   const { colorScheme, setColorScheme } = useTheme()
   return (
     <div>
-      <div data-testid="color-scheme">{colorScheme}</div>
+      <div data-testid='color-scheme'>{colorScheme}</div>
       <button onClick={() => setColorScheme('dark')}>Set Dark</button>
     </div>
   )
@@ -19,7 +20,7 @@ function SecurityConsumer() {
   const { securityLevel, setSecurityLevel } = useSecurity()
   return (
     <div>
-      <div data-testid="security-level">{securityLevel}</div>
+      <div data-testid='security-level'>{securityLevel}</div>
       <button onClick={() => setSecurityLevel('hipaa')}>Set HIPAA</button>
     </div>
   )

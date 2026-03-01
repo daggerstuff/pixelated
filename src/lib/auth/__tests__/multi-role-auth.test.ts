@@ -4,6 +4,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
+import { generateTokenPair, validateToken } from '../jwt-service'
+import {
+  requestRoleTransition,
+  processRoleTransitionApproval,
+  getRoleTransitionAuditTrail,
+} from '../role-transitions'
 import {
   UserRole,
   ROLE_DEFINITIONS,
@@ -12,20 +19,14 @@ import {
   canAssignRole,
   validateRoleTransition,
 } from '../roles'
+import { createSession, validateSession } from '../session-management'
+import type { SessionData, DeviceInfo } from '../session-management'
 import {
   setupTwoFactorAuth,
   completeTwoFactorSetup,
   verifyTwoFactorToken,
   isTwoFactorRequired,
 } from '../two-factor-auth'
-import { createSession, validateSession } from '../session-management'
-import {
-  requestRoleTransition,
-  processRoleTransitionApproval,
-  getRoleTransitionAuditTrail,
-} from '../role-transitions'
-import { generateTokenPair, validateToken } from '../jwt-service'
-import type { SessionData, DeviceInfo } from '../session-management'
 import type { TwoFactorVerification } from '../two-factor-auth'
 
 // Mock dependencies
@@ -64,7 +65,7 @@ vi.mock('../jwt-service', () => ({
     refreshToken: `refresh-token-${userId}`,
     tokenType: 'Bearer',
     expiresIn: 3600,
-    user: { id: userId, role }
+    user: { id: userId, role },
   })),
   validateToken: vi.fn(async () => ({ valid: true })),
   AuthenticationError: class AuthenticationError extends Error {
@@ -72,7 +73,7 @@ vi.mock('../jwt-service', () => ({
       super(message)
       this.name = 'AuthenticationError'
     }
-  }
+  },
 }))
 
 vi.mock('otplib', () => ({
@@ -901,9 +902,8 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   describe('Integration with Phase 6 MCP Server', () => {
     it('should track authentication progress through all phases', async () => {
       const { setInCache } = await import('../../redis')
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../../mcp/phase6-integration')
 
       vi.mocked(setInCache).mockResolvedValue(true)
 
@@ -939,9 +939,8 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
 
     it('should track role transition progress', async () => {
       const { getFromCache, setInCache } = await import('../../redis')
-      const { updatePhase6AuthenticationProgress } = await import(
-        '../../mcp/phase6-integration'
-      )
+      const { updatePhase6AuthenticationProgress } =
+        await import('../../mcp/phase6-integration')
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {

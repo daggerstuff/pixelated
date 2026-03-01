@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Support Systems
 
-This guide outlines the development and maintenance of comprehensive support systems for individuals managing CPTSD and addiction recovery.
+This guide outlines the development and maintenance of comprehensive support
+systems for individuals managing CPTSD and addiction recovery.
 
 ## Types of Support
 

@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react'
-import { PatternVisualization } from '../PatternVisualizationReact'
+
 import type {
   TrendPattern,
   CrossSessionPattern,
   RiskCorrelation,
 } from '@/lib/fhe/pattern-recognition'
+
+import { PatternVisualization } from '../PatternVisualizationReact'
 
 const mockTrends: TrendPattern[] = [
   {

@@ -95,9 +95,7 @@ User response:
         (this.aiService.createChatCompletion?.bind(this.aiService) as
           | typeof this.aiService.createChatCompletion
           | undefined) ||
-        (this.aiService.generateCompletion?.bind(this.aiService) as
-          | typeof this.aiService.generateCompletion
-          | undefined)
+        (this.aiService.generateCompletion?.bind(this.aiService))
 
       if (!completionProvider) {
         throw new Error(
@@ -115,7 +113,7 @@ User response:
       const rawContent =
         (completionRecord['content'] as string | undefined) ||
         (
-          completionRecord['choices'] as unknown as
+          completionRecord['choices'] as
             | Array<{ message?: { content?: string } }>
             | undefined
         )?.[0]?.message?.content ||

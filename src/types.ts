@@ -1,9 +1,11 @@
 /* SITE */
 import type { IncomingMessage } from 'node:http'
 import type { Socket } from 'node:net'
-import type { AuthUser } from './lib/auth/types'
-import type { AuthRole } from './config/auth.config'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import type { AuthRole } from './config/auth.config'
+import type { AuthUser } from './lib/auth/types'
 
 // Initialize logger for PHI audit logging
 const logger = createBuildSafeLogger('phi-audit')
@@ -563,7 +565,18 @@ export interface Ui {
 }
 
 /* FEATURES */
-export type BgType = 'plum' | 'dot' | 'rose' | 'particle' | 'default' | 'gradient' | 'pulse' | 'light' | 'dark' | 'stars' | 'animated'
+export type BgType =
+  | 'plum'
+  | 'dot'
+  | 'rose'
+  | 'particle'
+  | 'default'
+  | 'gradient'
+  | 'pulse'
+  | 'light'
+  | 'dark'
+  | 'stars'
+  | 'animated'
 type Mentioned = `@${string}` | `@${string}@${string}` | ''
 type FeatureConfig<T> = false | [boolean, T]
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6

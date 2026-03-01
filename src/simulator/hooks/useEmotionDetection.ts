@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { EmotionLlamaProvider } from '../../lib/ai/providers/EmotionLlamaProvider'
 import { fheService } from '../../lib/fhe'
-import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { useSimulatorContext } from '../context/SimulatorContext'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 
@@ -35,7 +37,7 @@ export const useEmotionDetection = () => {
       }
     }
 
-    initProvider()
+    void initProvider()
   }, [])
 
   const detectEmotions = useCallback(

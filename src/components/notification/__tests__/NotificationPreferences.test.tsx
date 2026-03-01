@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { NotificationChannel } from '@/lib/services/notification/NotificationService'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { NotificationPreferences } from '../NotificationPreferences'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
+import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+
+import { NotificationPreferences } from '../NotificationPreferences'
 
 // Mock useNotificationPreferences hook
 const mockUpdateChannel = vi.fn()

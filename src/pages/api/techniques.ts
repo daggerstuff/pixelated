@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content'
+
 import { recommend } from '../../lib/ai/services/OutcomeRecommendationEngine'
 
 const ALLOWED_CATEGORIES = ['CBT', 'Mindfulness', 'DBT', 'ACT', 'EMDR', 'Other']
@@ -122,7 +123,7 @@ export const POST = async ({ request, cookies }) => {
 
     // Get AI recommendations
     const recommendationRequest = { ...patientData, ...preferences }
-    const recommendations = await recommend(recommendationRequest)
+    const recommendations =  recommend(recommendationRequest)
 
     return new Response(
       JSON.stringify({

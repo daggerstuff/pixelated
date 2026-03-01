@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
 import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
+import React, { useState, useMemo } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 // Archetype definitions inspired by Mind-Mirror
 export interface ArchetypeResult {
@@ -148,11 +149,11 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
   if (isAnalyzing) {
     return (
       <div className={`space-y-6 ${className}`}>
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-50 to-blue-50">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-center space-x-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-              <span className="text-lg font-medium text-gray-700">
+        <Card className='from-purple-50 to-blue-50 border-0 bg-gradient-to-br shadow-lg'>
+          <CardContent className='p-6'>
+            <div className='flex items-center justify-center space-x-3'>
+              <div className='border-purple-600 h-8 w-8 animate-spin rounded-full border-b-2'></div>
+              <span className='text-gray-700 text-lg font-medium'>
                 🧠 Processing through AI...
               </span>
             </div>
@@ -165,13 +166,13 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
   if (!analysis) {
     return (
       <div className={`space-y-6 ${className}`}>
-        <Card className="border-0 shadow-lg bg-gradient-to-br from-gray-50 to-slate-50">
-          <CardContent className="p-8 text-center">
-            <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">
+        <Card className='from-gray-50 to-slate-50 border-0 bg-gradient-to-br shadow-lg'>
+          <CardContent className='p-8 text-center'>
+            <Brain className='text-gray-400 mx-auto mb-4 h-12 w-12' />
+            <h3 className='text-gray-600 mb-2 text-lg font-medium'>
               Ready for Analysis
             </h3>
-            <p className="text-gray-500">
+            <p className='text-gray-500'>
               Share your thoughts to see real-time psychological insights
             </p>
           </CardContent>
@@ -184,21 +185,21 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
     <div className={`space-y-6 ${className}`}>
       {/* Archetype Card */}
       {archetypeInfo && (
-        <Card className="border-0 shadow-lg overflow-hidden">
+        <Card className='overflow-hidden border-0 shadow-lg'>
           <div
-            className={`bg-gradient-to-r ${archetypeInfo.gradient} p-6 text-white`}
+            className={`bg-gradient-to-r ${archetypeInfo.gradient} text-white p-6`}
           >
-            <div className="flex items-center space-x-4">
-              <div className="text-4xl">{archetypeInfo.icon}</div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold">{archetypeInfo.name}</h3>
-                <p className="text-white/90 text-sm">
+            <div className='flex items-center space-x-4'>
+              <div className='text-4xl'>{archetypeInfo.icon}</div>
+              <div className='flex-1'>
+                <h3 className='text-xl font-bold'>{archetypeInfo.name}</h3>
+                <p className='text-white/90 text-sm'>
                   {archetypeInfo.description}
                 </p>
               </div>
               <Badge
-                variant="secondary"
-                className="bg-white/20 text-white border-white/30"
+                variant='secondary'
+                className='bg-white/20 text-white border-white/30'
               >
                 {Math.round(analysis.archetype.confidence * 100)}% confidence
               </Badge>
@@ -208,29 +209,29 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
       )}
 
       {/* Mood Metrics Grid */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         {moodMetrics.map((metric) => (
           <Card
             key={metric.label}
-            className="border-0 shadow-md hover:shadow-lg transition-shadow"
+            className='border-0 shadow-md transition-shadow hover:shadow-lg'
           >
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg ${metric.bgColor}`}>
+            <CardContent className='p-4'>
+              <div className='flex items-center space-x-3'>
+                <div className={`rounded-lg p-2 ${metric.bgColor}`}>
                   <metric.icon className={`h-5 w-5 ${metric.color}`} />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">
+                <div className='flex-1'>
+                  <p className='text-gray-600 text-sm font-medium'>
                     {metric.label}
                   </p>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div className='flex items-center space-x-2'>
+                    <div className='bg-gray-200 h-2 flex-1 rounded-full'>
                       <div
                         className={`h-2 rounded-full bg-gradient-to-r ${metric.color.replace('text-', 'from-')} to-opacity-60`}
                         style={{ width: `${metric.value * 100}%` }}
                       />
                     </div>
-                    <span className="text-sm font-bold text-gray-700">
+                    <span className='text-gray-700 text-sm font-bold'>
                       {Math.round(metric.value * 100)}
                     </span>
                   </div>
@@ -242,24 +243,24 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
       </div>
 
       {/* Detailed Analysis Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-          <TabsTrigger value="recommendations">Guidance</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
+        <TabsList className='grid w-full grid-cols-3'>
+          <TabsTrigger value='overview'>Overview</TabsTrigger>
+          <TabsTrigger value='insights'>Insights</TabsTrigger>
+          <TabsTrigger value='recommendations'>Guidance</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          <Card className="border-0 shadow-md">
+        <TabsContent value='overview' className='space-y-4'>
+          <Card className='border-0 shadow-md'>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Activity className="h-5 w-5" />
+              <CardTitle className='flex items-center space-x-2'>
+                <Activity className='h-5 w-5' />
                 <span>Mental State Overview</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Coherence Index</span>
+            <CardContent className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <span className='text-sm font-medium'>Coherence Index</span>
                 <Badge
                   variant={
                     analysis.mood_vector.coherence_index > 0.7
@@ -270,8 +271,8 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
                   {Math.round(analysis.mood_vector.coherence_index * 100)}%
                 </Badge>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Urgency Score</span>
+              <div className='flex items-center justify-between'>
+                <span className='text-sm font-medium'>Urgency Score</span>
                 <Badge
                   variant={
                     analysis.mood_vector.urgency_score > 0.7
@@ -286,26 +287,26 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
           </Card>
         </TabsContent>
 
-        <TabsContent value="insights" className="space-y-4">
-          <Card className="border-0 shadow-md">
+        <TabsContent value='insights' className='space-y-4'>
+          <Card className='border-0 shadow-md'>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Eye className="h-5 w-5" />
+              <CardTitle className='flex items-center space-x-2'>
+                <Eye className='h-5 w-5' />
                 <span>AI Insights</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {analysis.insights?.map((insight) => (
                   <div
                     key={insight}
-                    className="flex items-start space-x-3 p-3 bg-blue-50 rounded-lg"
+                    className='bg-blue-50 flex items-start space-x-3 rounded-lg p-3'
                   >
-                    <Sparkles className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">{insight}</p>
+                    <Sparkles className='text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                    <p className='text-gray-700 text-sm'>{insight}</p>
                   </div>
                 )) || (
-                  <p className="text-sm text-gray-500 italic">
+                  <p className='text-gray-500 text-sm italic'>
                     No specific insights available
                   </p>
                 )}
@@ -314,26 +315,26 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
           </Card>
         </TabsContent>
 
-        <TabsContent value="recommendations" className="space-y-4">
-          <Card className="border-0 shadow-md">
+        <TabsContent value='recommendations' className='space-y-4'>
+          <Card className='border-0 shadow-md'>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5" />
+              <CardTitle className='flex items-center space-x-2'>
+                <TrendingUp className='h-5 w-5' />
                 <span>Personalized Guidance</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {analysis.recommendations?.map((rec) => (
                   <div
                     key={rec}
-                    className="flex items-start space-x-3 p-3 bg-green-50 rounded-lg"
+                    className='bg-green-50 flex items-start space-x-3 rounded-lg p-3'
                   >
-                    <Shield className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm text-gray-700">{rec}</p>
+                    <Shield className='text-green-500 mt-0.5 h-4 w-4 flex-shrink-0' />
+                    <p className='text-gray-700 text-sm'>{rec}</p>
                   </div>
                 )) || (
-                  <p className="text-sm text-gray-500 italic">
+                  <p className='text-gray-500 text-sm italic'>
                     No specific recommendations available
                   </p>
                 )}

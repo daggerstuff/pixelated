@@ -1,8 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { vi } from 'vitest'
-import { RegisterForm } from '../RegisterForm'
-import { authClient } from '@/lib/auth-client'
 import userEvent from '@testing-library/user-event'
+import { vi } from 'vitest'
+
+import { authClient } from '@/lib/auth-client'
+
+import { RegisterForm } from '../RegisterForm'
 
 // Mock the authClient
 vi.mock('@/lib/auth-client', () => ({
@@ -24,7 +26,9 @@ describe('RegisterForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     ;(authClient.signUp.email as vi.Mock).mockImplementation(mockSignUp)
-    ;(authClient.signIn.social as vi.Mock).mockImplementation(mockSignInWithOAuth)
+    ;(authClient.signIn.social as vi.Mock).mockImplementation(
+      mockSignInWithOAuth,
+    )
     ;(authClient.useSession as vi.Mock).mockImplementation(() => ({
       data: null,
     }))

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   getEvaluation,
   initiateEvaluation,
@@ -64,7 +65,8 @@ const filterEvaluations = (
       case 'evaluation_date':
         return (
           (new Date(a.evaluationDate).getTime() -
-            new Date(b.evaluationDate).getTime()) * direction
+            new Date(b.evaluationDate).getTime()) *
+          direction
         )
       case 'overall_score':
       default:
@@ -127,16 +129,16 @@ export const useEvaluationInitiateMutation = (sessionId: string | null) => {
     mutationFn: (payload: EvaluationInitiatePayload) =>
       initiateEvaluation(sessionId ?? '', payload),
     onSuccess: (evaluation: Evaluation) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.evaluation.list(
           sessionId ?? 'unknown',
           {},
         ),
         exact: false,
       })
-      useEvaluationStore.getState().setSelectedEvaluationId(
-        evaluation.evaluationId,
-      )
+      useEvaluationStore
+        .getState()
+        .setSelectedEvaluationId(evaluation.evaluationId)
     },
   })
 }
@@ -154,13 +156,13 @@ export const useEvaluationUpdateMutation = (sessionId: string | null) => {
       payload: EvaluationUpdatePayload
     }) => updateEvaluation(sessionId ?? '', evaluationId, payload),
     onSuccess: (evaluation: Evaluation) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.evaluation.detail(
           sessionId ?? 'unknown',
           evaluation.evaluationId,
         ),
       })
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.evaluation.list(
           sessionId ?? 'unknown',
           {},
@@ -180,5 +182,3 @@ export const useEvaluationSelection = () =>
     isBulkEditMode: state.isBulkEditMode,
     toggleBulkEditMode: state.toggleBulkEditMode,
   }))
-
-

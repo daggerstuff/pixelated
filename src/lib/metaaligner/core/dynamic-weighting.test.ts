@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
+import { ObjectiveId } from '../config/mapping-config'
 import {
   DynamicWeightingEngine,
-
   getDynamicWeightingEngine,
   resetDynamicWeightingEngine,
   type DynamicWeightingConfig,
 } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
-import { ObjectiveId } from '../config/mapping-config'
 
 describe('DynamicWeightingEngine', () => {
   let engine: DynamicWeightingEngine
@@ -51,7 +51,7 @@ describe('DynamicWeightingEngine', () => {
       // Ensure config is correct
       engine.updateConfiguration({
         crisisOverrideEnabled: true,
-        crisisOverrideThreshold: 0.8
+        crisisOverrideThreshold: 0.8,
       })
 
       const result = engine.calculateDynamicWeights(crisisContext)
@@ -94,7 +94,9 @@ describe('DynamicWeightingEngine', () => {
 
       expect(result.crisisOverrideApplied).toBe(true)
       expect(result.blendingApplied).toBe(false)
-      expect(result.reasoning.some(r => r.includes('Crisis override'))).toBe(true)
+      expect(result.reasoning.some((r) => r.includes('Crisis override'))).toBe(
+        true,
+      )
     })
   })
 
@@ -120,7 +122,9 @@ describe('DynamicWeightingEngine', () => {
 
       // Second call should blend
       expect(result2.blendingApplied).toBe(true)
-      expect(result2.reasoning.some(r => r.includes('Blending applied'))).toBe(true)
+      expect(
+        result2.reasoning.some((r) => r.includes('Blending applied')),
+      ).toBe(true)
     })
 
     it('should smooth transitions between contexts', () => {
@@ -141,7 +145,8 @@ describe('DynamicWeightingEngine', () => {
 
       // Weights should transition smoothly, not jump
       const empathyChange = Math.abs(
-        result2.weights[ObjectiveId.EMPATHY] - result1.weights[ObjectiveId.EMPATHY]
+        result2.weights[ObjectiveId.EMPATHY] -
+          result1.weights[ObjectiveId.EMPATHY],
       )
 
       // With blending, change should be less than the full difference
@@ -321,7 +326,9 @@ describe('DynamicWeightingEngine', () => {
         const result = engine.calculateDynamicWeights(context)
 
         if (result.oscillationDetected) {
-          expect(result.reasoning.some(r => r.includes('increased smoothing'))).toBe(true)
+          expect(
+            result.reasoning.some((r) => r.includes('increased smoothing')),
+          ).toBe(true)
         }
       }
     })
@@ -376,7 +383,7 @@ describe('DynamicWeightingEngine', () => {
 
       // Second call should be faster (cached)
       expect(result2.updateTimeMs).toBeLessThanOrEqual(result1.updateTimeMs)
-      expect(result2.reasoning.some(r => r.includes('Cached'))).toBe(true)
+      expect(result2.reasoning.some((r) => r.includes('Cached'))).toBe(true)
     })
 
     it('should invalidate cache when context changes', () => {
@@ -396,7 +403,7 @@ describe('DynamicWeightingEngine', () => {
       engine.calculateDynamicWeights(context1)
       const result = engine.calculateDynamicWeights(context2)
 
-      expect(result.reasoning.some(r => r.includes('Cached'))).toBe(false)
+      expect(result.reasoning.some((r) => r.includes('Cached'))).toBe(false)
     })
   })
 

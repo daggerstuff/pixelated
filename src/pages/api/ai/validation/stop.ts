@@ -1,6 +1,7 @@
-import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { emotionValidationPipeline } from '../../../../lib/ai/emotions/EmotionValidationPipeline'
 import {
   createAuditLog,
   AuditEventType,
@@ -28,7 +29,7 @@ export const POST = async ({
             'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
     const user = await getCurrentUser(cookies)
     if (!user) {

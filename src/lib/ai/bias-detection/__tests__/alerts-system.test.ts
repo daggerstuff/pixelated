@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 /// <reference types="vitest/globals" />
 import { BiasAlertSystem } from '../alerts-system'
 import { PythonBiasDetectionBridge } from '../python-bridge'
@@ -206,8 +207,8 @@ describe('BiasAlertSystem', () => {
 
     // Create mock Python bridge
     mockPythonBridge = new PythonBiasDetectionBridge(
-      mockConfig.pythonServiceUrl!,
-      mockConfig.timeout!,
+      mockConfig.pythonServiceUrl,
+      mockConfig.timeout,
     )
 
     // Mock the acknowledgeAlert method
@@ -483,7 +484,8 @@ describe('BiasAlertSystem', () => {
       }
 
       // Mock a notification failure
-      const processSpy = vi.spyOn(alertSystem, 'processAlert')
+      const processSpy = vi
+        .spyOn(alertSystem, 'processAlert')
         .mockRejectedValue(new Error('Notification failed'))
 
       await expect(

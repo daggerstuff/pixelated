@@ -5,13 +5,13 @@
  * security features required for HIPAA compliance and beyond.
  */
 
-import type { FHEOperation, HomomorphicOperationResult } from './fhe/types'
 // Use isomorphic approach for process
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
-import { fheService } from './fhe'
-import { EncryptionMode } from './fhe/types'
 
+import { fheService } from './fhe'
+import type { FHEOperation, HomomorphicOperationResult } from './fhe/types'
+import { EncryptionMode } from './fhe/types'
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 
 // Initialize logger

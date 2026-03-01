@@ -10,14 +10,20 @@ toc: true
 
 # Responsive Image Pipeline
 
-This guide covers the responsive image optimization pipeline implemented in our Astro application. The system is designed to deliver optimal image assets for different devices, screen sizes, and network conditions while maintaining visual quality and accessibility.
+This guide covers the responsive image optimization pipeline implemented in our
+Astro application. The system is designed to deliver optimal image assets for
+different devices, screen sizes, and network conditions while maintaining visual
+quality and accessibility.
 
 ## Key Features
 
-- **Format Optimization**: Automatic conversion to modern formats (WebP, AVIF) with fallbacks
-- **Responsive Sizing**: Appropriate image dimensions for different viewport sizes
+- **Format Optimization**: Automatic conversion to modern formats (WebP, AVIF)
+  with fallbacks
+- **Responsive Sizing**: Appropriate image dimensions for different viewport
+  sizes
 - **Art Direction**: Different image crops for different devices
-- **Performance Optimizations**: Lazy loading, blur-up effects, and LQIP (Low Quality Image Placeholders)
+- **Performance Optimizations**: Lazy loading, blur-up effects, and LQIP (Low
+  Quality Image Placeholders)
 - **Accessibility**: Proper alt text and semantic markup
 - **Domain Security**: Allowlisting for external image domains
 - **Aspect Ratio Preservation**: Prevent layout shifts during image loading
@@ -28,7 +34,8 @@ Our responsive image pipeline includes three main components:
 
 ### 1. ResponsiveImage
 
-A versatile component for displaying responsive, optimized images with multiple format support and performance optimizations.
+A versatile component for displaying responsive, optimized images with multiple
+format support and performance optimizations.
 
 ```astro
 <ResponsiveImage
@@ -63,7 +70,8 @@ A versatile component for displaying responsive, optimized images with multiple 
 
 ### 2. CMSImage
 
-Specialized for CMS and external image sources with aspect ratio control and focal point support.
+Specialized for CMS and external image sources with aspect ratio control and
+focal point support.
 
 ```astro
 <CMSImage
@@ -97,7 +105,8 @@ Specialized for CMS and external image sources with aspect ratio control and foc
 
 ### 3. BackgroundImage
 
-Creates responsive background images with art direction, overlays, and content slots.
+Creates responsive background images with art direction, overlays, and content
+slots.
 
 ```astro
 <BackgroundImage
@@ -182,7 +191,6 @@ const quality = calculateImageQuality('webp', 'fast')
 For programmatic image optimization, you can use the `ImageService`:
 
 ```typescript
-
 // Optimize a single image
 const optimizedImage = await imageService.optimizeImage({
   src: imagePath,
@@ -212,7 +220,8 @@ const pictureConfig = await imageService.generatePictureConfig({
 
 ## Configuration
 
-The image pipeline is configured through the `imageConfig` object in `src/config/images.ts`:
+The image pipeline is configured through the `imageConfig` object in
+`src/config/images.ts`:
 
 ```typescript
 // Default settings
@@ -247,11 +256,14 @@ You can override these settings using environment variables:
 
 ## Best Practices
 
-1. **Above-the-fold Images**: Use `loading="eager"` for images visible in the initial viewport to optimize LCP (Largest Contentful Paint).
+1. **Above-the-fold Images**: Use `loading="eager"` for images visible in the
+   initial viewport to optimize LCP (Largest Contentful Paint).
 
-2. **Aspect Ratio**: Always specify `width` and `height` or use the `aspectRatio` prop to prevent layout shifts.
+2. **Aspect Ratio**: Always specify `width` and `height` or use the
+   `aspectRatio` prop to prevent layout shifts.
 
-3. **Alt Text**: Provide meaningful alt text for all images, including decorative ones (use empty alt for purely decorative images).
+3. **Alt Text**: Provide meaningful alt text for all images, including
+   decorative ones (use empty alt for purely decorative images).
 
 4. **Format Selection**:
    - Use `webp` for most images (good balance of quality and compression)
@@ -281,16 +293,20 @@ View interactive examples of all responsive image components:
 
 ## Performance Impact
 
-Implementing this responsive image pipeline has significantly improved our application's performance metrics:
+Implementing this responsive image pipeline has significantly improved our
+application's performance metrics:
 
 - **Largest Contentful Paint (LCP)**: Improved by 38% on average
-- **Cumulative Layout Shift (CLS)**: Reduced to near zero by maintaining aspect ratios
-- **Total Page Weight**: Reduced by up to 70% through format and dimension optimization
+- **Cumulative Layout Shift (CLS)**: Reduced to near zero by maintaining aspect
+  ratios
+- **Total Page Weight**: Reduced by up to 70% through format and dimension
+  optimization
 - **Time to Interactive**: Improved by 12% through efficient loading strategies
 
 ## Browser Support
 
-Our responsive image pipeline works across all modern browsers with appropriate fallbacks:
+Our responsive image pipeline works across all modern browsers with appropriate
+fallbacks:
 
 | Feature            | Chrome   | Firefox  | Safari     | Edge     | IE11                            |
 | ------------------ | -------- | -------- | ---------- | -------- | ------------------------------- |
@@ -306,5 +322,6 @@ This responsive image pipeline will continue to evolve with future updates:
 
 - Support for additional formats like JPEG XL as browser support improves
 - Implementation of automatic image content analysis for smart cropping
-- Integration with serverless image optimization APIs for dynamic transformations
+- Integration with serverless image optimization APIs for dynamic
+  transformations
 - Client-side detection of network quality for adaptive image delivery

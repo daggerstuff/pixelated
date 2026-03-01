@@ -1,5 +1,5 @@
-import { User, UserRole } from '@/types/user'
 import { postgresPool } from '@/config/database'
+import { User, UserRole } from '@/types/user'
 
 export class UserModel {
   private static mapRowToUser(row: any): User {

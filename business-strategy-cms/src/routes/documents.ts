@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import { DocumentService } from '@/services/documentService'
+
 import {
   authenticateToken,
   AuthenticatedRequest,
   requireCreator,
 } from '@/middleware/auth'
+import { DocumentService } from '@/services/documentService'
 import {
   DocumentCreate,
   DocumentUpdate,

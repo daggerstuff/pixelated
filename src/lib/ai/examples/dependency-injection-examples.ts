@@ -3,15 +3,15 @@
  * This file shows best practices for service instantiation and testing
  */
 
+import { KVStore } from '../../db/KVStore'
+import { EmotionSynthesizer } from '../emotions/EmotionSynthesizer'
+import type { BeliefConsistencyService } from '../services/BeliefConsistencyService'
+import { PatientProfileService } from '../services/PatientProfileService'
 import type { PatientResponseService } from '../services/PatientResponseService'
 import {
   createPatientResponseService,
   createTestPatientResponseService,
 } from '../services/PatientResponseService'
-import { EmotionSynthesizer } from '../emotions/EmotionSynthesizer'
-import { PatientProfileService } from '../services/PatientProfileService'
-import type { BeliefConsistencyService } from '../services/BeliefConsistencyService'
-import { KVStore } from '../../db/KVStore'
 
 // Example 1: Using the factory function for production code
 export function createProductionService(): PatientResponseService {

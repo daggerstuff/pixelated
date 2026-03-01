@@ -5,9 +5,10 @@
  * and system monitoring for the Pixelated Empathy platform.
  */
 
-import { WebSocketServer, WebSocket } from 'ws'
 import type { IncomingMessage } from 'http'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
+import { WebSocketServer, WebSocket } from 'ws'
+
 import type {
   BiasAlert,
   BiasAnalysisResult,
@@ -18,6 +19,7 @@ import type {
   SystemStatusWebSocketEvent,
   AnalysisCompleteWebSocketEvent,
 } from '../../ai/bias-detection/types'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('BiasWebSocketServer')
 
@@ -283,7 +285,7 @@ export class BiasWebSocketServer {
           this.handleAuthentication(clientId, message)
           break
         case 'get_dashboard_data':
-          this.handleDashboardDataRequest(clientId, message)
+          void this.handleDashboardDataRequest(clientId, message)
           break
         default:
           logger.warn('Unknown message type', { clientId, type: message.type })

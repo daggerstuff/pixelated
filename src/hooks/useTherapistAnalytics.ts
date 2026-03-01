@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
 // design tokens mapping is handled externally for chart color literals
 // Runtime import (class/value) for AnalyticsError - used for instantiation and instanceof checks
 import { AnalyticsError as AnalyticsErrorClass } from '@/types/analytics'
@@ -14,10 +14,14 @@ import type {
 } from '@/types/analytics'
 import type { TherapistSession } from '@/types/dashboard'
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
 const _rawLogger = createBuildSafeLogger('use-therapist-analytics')
 const normalizeLogger = (raw: unknown) => {
   const safeFn = (fn: unknown, fallback: (...args: unknown[]) => void) =>
-    typeof fn === 'function' ? (fn as (...args: unknown[]) => unknown) : fallback
+    typeof fn === 'function'
+      ? (fn as (...args: unknown[]) => unknown)
+      : fallback
 
   // If the module mock returned a bare function (e.g. vi.fn()), call it for all
   // log levels but still provide the standard method names.
@@ -256,20 +260,20 @@ export function useTherapistAnalytics(
       const avgProgress =
         sessions.length > 0
           ? Math.round(
-            sessions.reduce((sum, s) => sum + s.progress, 0) /
-            sessions.length,
-          )
+              sessions.reduce((sum, s) => sum + s.progress, 0) /
+                sessions.length,
+            )
           : 0
 
       const avgDuration =
         sessions.length > 0
           ? Math.round(
-            sessions.reduce((sum, s) => {
-              const start = new Date(s.startTime)
-              const end = s.endTime ? new Date(s.endTime) : new Date()
-              return sum + (end.getTime() - start.getTime()) / 1000
-            }, 0) / sessions.length,
-          )
+              sessions.reduce((sum, s) => {
+                const start = new Date(s.startTime)
+                const end = s.endTime ? new Date(s.endTime) : new Date()
+                return sum + (end.getTime() - start.getTime()) / 1000
+              }, 0) / sessions.length,
+            )
           : 0
 
       return [

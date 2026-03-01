@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -8,6 +9,7 @@ import {
   CardDescription,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -15,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import type { BackupType } from '../../../lib/security/backup/types'
-import { StorageLocation } from '../../../lib/security/backup/backup-types'
 import { Switch } from '@/components/ui/switch'
+
+import { StorageLocation } from '../../../lib/security/backup/backup-types'
+import type { BackupType } from '../../../lib/security/backup/types'
 
 interface BackupTypeConfig {
   schedule: string
@@ -176,14 +178,14 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Backup Configuration</h2>
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Backup Configuration</h2>
         {!isEditing ? (
           <Button onClick={() => setIsEditing(true)}>Edit Configuration</Button>
         ) : (
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel}>
+          <div className='flex gap-2'>
+            <Button variant='outline' onClick={handleCancel}>
               Cancel
             </Button>
             <Button onClick={handleSave}>Save Configuration</Button>
@@ -199,40 +201,40 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
               <div>
-                <h3 className="font-medium">Enable Automated Backups</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className='font-medium'>Enable Automated Backups</h3>
+                <p className='text-gray-500 dark:text-gray-400 text-sm'>
                   Automatically backup your data according to the schedule
                 </p>
               </div>
               <Switch
                 checked={backupEnabled}
                 onCheckedChange={setBackupEnabled}
-                aria-label="Enable automated backups"
+                aria-label='Enable automated backups'
               />
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className='flex items-center justify-between'>
               <div>
-                <h3 className="font-medium">Encrypt Backups</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className='font-medium'>Encrypt Backups</h3>
+                <p className='text-gray-500 dark:text-gray-400 text-sm'>
                   Enable end-to-end encryption for all backup data
                 </p>
               </div>
               <Switch
                 checked={encryptBackups}
                 onCheckedChange={setEncryptBackups}
-                aria-label="Encrypt backups"
+                aria-label='Encrypt backups'
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <div>
                 <label
-                  htmlFor="backup-frequency"
-                  className="block text-sm font-medium mb-2"
+                  htmlFor='backup-frequency'
+                  className='mb-2 block text-sm font-medium'
                 >
                   Backup Frequency
                 </label>
@@ -241,18 +243,18 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="hourly">Hourly</SelectItem>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
+                    <SelectItem value='hourly'>Hourly</SelectItem>
+                    <SelectItem value='daily'>Daily</SelectItem>
+                    <SelectItem value='weekly'>Weekly</SelectItem>
+                    <SelectItem value='monthly'>Monthly</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
                 <label
-                  htmlFor="retention-period"
-                  className="block text-sm font-medium mb-2"
+                  htmlFor='retention-period'
+                  className='mb-2 block text-sm font-medium'
                 >
                   Retention Period (Days)
                 </label>
@@ -261,11 +263,11 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="7">7 days</SelectItem>
-                    <SelectItem value="14">14 days</SelectItem>
-                    <SelectItem value="30">30 days</SelectItem>
-                    <SelectItem value="90">90 days</SelectItem>
-                    <SelectItem value="365">365 days</SelectItem>
+                    <SelectItem value='7'>7 days</SelectItem>
+                    <SelectItem value='14'>14 days</SelectItem>
+                    <SelectItem value='30'>30 days</SelectItem>
+                    <SelectItem value='90'>90 days</SelectItem>
+                    <SelectItem value='365'>365 days</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -280,13 +282,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
           <CardDescription>Configure where backups are stored</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {/* Primary Storage Location */}
             <div>
-              <h4 className="font-medium mb-2">Primary Storage</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h4 className='mb-2 font-medium'>Primary Storage</h4>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 <div>
-                  <Label htmlFor="primary-provider">Storage Provider</Label>
+                  <Label htmlFor='primary-provider'>Storage Provider</Label>
                   <Select
                     disabled={!isEditing}
                     value={
@@ -306,20 +308,20 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="aws-s3">AWS S3</SelectItem>
-                      <SelectItem value="google-cloud-storage">
+                      <SelectItem value='aws-s3'>AWS S3</SelectItem>
+                      <SelectItem value='google-cloud-storage'>
                         Google Cloud Storage
                       </SelectItem>
-                      <SelectItem value="local-filesystem">
+                      <SelectItem value='local-filesystem'>
                         Local Filesystem
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="primary-bucket">Bucket/Container Name</Label>
+                  <Label htmlFor='primary-bucket'>Bucket/Container Name</Label>
                   <Input
-                    id="primary-bucket"
+                    id='primary-bucket'
                     value={
                       formState.storageLocations[StorageLocation.PRIMARY]
                         ?.bucket || ''
@@ -336,9 +338,9 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="primary-region">Region</Label>
+                  <Label htmlFor='primary-region'>Region</Label>
                   <Input
-                    id="primary-region"
+                    id='primary-region'
                     value={
                       formState.storageLocations[StorageLocation.PRIMARY]
                         ?.region || ''
@@ -359,10 +361,10 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
 
             {/* Secondary Storage Location */}
             <div>
-              <h4 className="font-medium mb-2">Secondary Storage (Optional)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h4 className='mb-2 font-medium'>Secondary Storage (Optional)</h4>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                 <div>
-                  <Label htmlFor="secondary-provider">Storage Provider</Label>
+                  <Label htmlFor='secondary-provider'>Storage Provider</Label>
                   <Select
                     disabled={!isEditing}
                     value={
@@ -382,22 +384,22 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="aws-s3">AWS S3</SelectItem>
-                      <SelectItem value="google-cloud-storage">
+                      <SelectItem value='aws-s3'>AWS S3</SelectItem>
+                      <SelectItem value='google-cloud-storage'>
                         Google Cloud Storage
                       </SelectItem>
-                      <SelectItem value="local-filesystem">
+                      <SelectItem value='local-filesystem'>
                         Local Filesystem
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="secondary-bucket">
+                  <Label htmlFor='secondary-bucket'>
                     Bucket/Container Name
                   </Label>
                   <Input
-                    id="secondary-bucket"
+                    id='secondary-bucket'
                     value={
                       formState.storageLocations[StorageLocation.SECONDARY]
                         ?.bucket || ''
@@ -414,9 +416,9 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="secondary-region">Region</Label>
+                  <Label htmlFor='secondary-region'>Region</Label>
                   <Input
-                    id="secondary-region"
+                    id='secondary-region'
                     value={
                       formState.storageLocations[StorageLocation.SECONDARY]
                         ?.region || ''
@@ -446,9 +448,9 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <div>
-              <Label htmlFor="encryption-algorithm">Encryption Algorithm</Label>
+              <Label htmlFor='encryption-algorithm'>Encryption Algorithm</Label>
               <Select
                 disabled={!isEditing}
                 value={formState.encryption.algorithm}
@@ -460,21 +462,21 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="AES-256-GCM">
+                  <SelectItem value='AES-256-GCM'>
                     AES-256-GCM (Recommended)
                   </SelectItem>
-                  <SelectItem value="AES-256-CBC">AES-256-CBC</SelectItem>
-                  <SelectItem value="ChaCha20-Poly1305">
+                  <SelectItem value='AES-256-CBC'>AES-256-CBC</SelectItem>
+                  <SelectItem value='ChaCha20-Poly1305'>
                     ChaCha20-Poly1305
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="key-rotation">Key Rotation Period (days)</Label>
+              <Label htmlFor='key-rotation'>Key Rotation Period (days)</Label>
               <Input
-                id="key-rotation"
-                type="number"
+                id='key-rotation'
+                type='number'
                 value={formState.encryption.keyRotationDays}
                 onChange={(e) =>
                   handleChange(
@@ -485,16 +487,16 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                   )
                 }
                 disabled={!isEditing}
-                min="1"
+                min='1'
               />
 
-              <p className="text-xs text-gray-500 mt-1">Recommended: 90 days</p>
+              <p className='text-gray-500 mt-1 text-xs'>Recommended: 90 days</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <div className="flex justify-end">
+      <div className='flex justify-end'>
         <Button onClick={handleSaveConfig} disabled={saving}>
           {saving ? 'Saving...' : 'Save Configuration'}
         </Button>

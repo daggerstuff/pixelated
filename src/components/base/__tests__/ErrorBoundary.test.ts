@@ -1,5 +1,6 @@
-import ErrorBoundary from '../ErrorBoundary.astro'
 import { renderAstro } from '@/test/utils/astro'
+
+import ErrorBoundary from '../ErrorBoundary.astro'
 
 describe('ErrorBoundary', () => {
   beforeEach(() => {

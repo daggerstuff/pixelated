@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+
 import { cn } from '../../lib/utils'
-import { checkBrowserCompatibility } from '../utils/privacy'
+import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import type {
   Scenario,
   ScenarioDifficulty,
@@ -10,16 +12,14 @@ import type {
   TherapeuticTechnique,
   DetectedTechnique,
 } from '../types'
-import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
-import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { FeedbackType } from '../types'
-
-// Components
-import ScenarioInfo from './ScenarioInfo'
-import RealTimeFeedbackPanel from './RealTimeFeedbackPanel'
+import { checkBrowserCompatibility } from '../utils/privacy'
 import EmpathyMeter from './EmpathyMeter'
+import RealTimeFeedbackPanel from './RealTimeFeedbackPanel'
 import RealTimePrompts from './RealTimePrompts'
 import ResistanceMonitor from './ResistanceMonitor'
+// Components
+import ScenarioInfo from './ScenarioInfo'
 
 interface EnhancedSimulationContainerProps {
   scenarioId: string
@@ -59,24 +59,27 @@ export function EnhancedSimulationContainer({
   const conversationKey = currentPrompt.length > 0 ? 'prompted' : 'unprompted'
 
   // Unique session ID for the Gestalt WebSocket connection
-  const sessionId = useMemo(() => `session-${scenarioId}-${uuidv4().slice(0, 8)}`, [scenarioId])
+  const sessionId = useMemo(
+    () => `session-${scenarioId}-${uuidv4().slice(0, 8)}`,
+    [scenarioId],
+  )
 
   // Get scenario details and simulator functions
   // Use getScenarioById from imported function instead of from hook
   const scenario = scenarioId
     ? ({
-      id: scenarioId,
-      title: `Scenario ${scenarioId}`,
-      domain: 'DEPRESSION' as TherapeuticDomain,
-      difficulty: 'BEGINNER' as ScenarioDifficulty,
-      initialPrompt: 'Welcome to the simulation. How are you feeling today?',
-      description: 'Practice scenario for depression treatment',
-      techniques: [],
-      contextDescription: 'Initial therapy session',
-      clientBackground: 'Client presenting with depressive symptoms',
-      presentingIssue: 'Persistent low mood and difficulty concentrating',
-      objectives: ['Build rapport', 'Identify symptoms'],
-    } as Scenario)
+        id: scenarioId,
+        title: `Scenario ${scenarioId}`,
+        domain: 'DEPRESSION' as TherapeuticDomain,
+        difficulty: 'BEGINNER' as ScenarioDifficulty,
+        initialPrompt: 'Welcome to the simulation. How are you feeling today?',
+        description: 'Practice scenario for depression treatment',
+        techniques: [],
+        contextDescription: 'Initial therapy session',
+        clientBackground: 'Client presenting with depressive symptoms',
+        presentingIssue: 'Persistent low mood and difficulty concentrating',
+        objectives: ['Build rapport', 'Identify symptoms'],
+      } as Scenario)
     : null
 
   // Real-time analysis
@@ -272,16 +275,16 @@ export function EnhancedSimulationContainer({
   // If scenario not found, show error
   if (!scenario) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+      <div className='flex h-full flex-col items-center justify-center p-6'>
+        <h2 className='text-gray-800 mb-2 text-xl font-semibold'>
           Scenario Not Found
         </h2>
-        <p className="text-gray-600 mb-4">
+        <p className='text-gray-600 mb-4'>
           The requested simulation scenario could not be found.
         </p>
         <button
           onClick={onBackToScenarios}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          className='bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 transition-colors'
         >
           Return to Scenario Selection
         </button>
@@ -292,27 +295,27 @@ export function EnhancedSimulationContainer({
   // If browser not compatible, show warning
   if (!isCompatible) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-6">
-        <h2 className="text-xl font-semibold text-red-600 mb-2">
+      <div className='flex h-full flex-col items-center justify-center p-6'>
+        <h2 className='text-red-600 mb-2 text-xl font-semibold'>
           Browser Compatibility Issue
         </h2>
-        <p className="text-gray-700 mb-2">
+        <p className='text-gray-700 mb-2'>
           Your browser doesn&apos;t support some features needed for this
           simulation:
         </p>
-        <ul className="list-disc pl-5 mb-4">
+        <ul className='mb-4 list-disc pl-5'>
           {compatibilityError.map((error) => (
-            <li key={error} className="text-gray-600">
+            <li key={error} className='text-gray-600'>
               {error}
             </li>
           ))}
         </ul>
-        <p className="text-gray-700 mb-4">
+        <p className='text-gray-700 mb-4'>
           Please try using a modern browser like Chrome, Edge, or Firefox.
         </p>
         <button
           onClick={onBackToScenarios}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+          className='bg-blue-500 text-white hover:bg-blue-600 rounded-md px-4 py-2 transition-colors'
         >
           Return to Scenario Selection
         </button>
@@ -323,60 +326,58 @@ export function EnhancedSimulationContainer({
   return (
     <div className={cn('flex flex-col h-full overflow-hidden', className)}>
       {/* Header with scenario information */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <ScenarioInfo
-          scenario={scenario}
-        />
+      <div className='bg-white border-gray-200 flex items-center justify-between border-b px-4 py-3'>
+        <ScenarioInfo scenario={scenario} />
 
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center">
-            <label htmlFor="autoScroll" className="text-sm text-gray-600 mr-2">
+        <div className='flex items-center space-x-3'>
+          <div className='flex items-center'>
+            <label htmlFor='autoScroll' className='text-gray-600 mr-2 text-sm'>
               Auto-scroll
             </label>
             <input
-              type="checkbox"
-              id="autoScroll"
+              type='checkbox'
+              id='autoScroll'
               checked={autoScroll}
               onChange={() => setAutoScroll(!autoScroll)}
-              className="h-4 w-4 text-blue-600 rounded border-gray-300"
+              className='text-blue-600 border-gray-300 h-4 w-4 rounded'
             />
           </div>
 
-          <div className="flex items-center">
+          <div className='flex items-center'>
             <label
-              htmlFor="showTechniques"
-              className="text-sm text-gray-600 mr-2"
+              htmlFor='showTechniques'
+              className='text-gray-600 mr-2 text-sm'
             >
               Show Techniques
             </label>
             <input
-              type="checkbox"
-              id="showTechniques"
+              type='checkbox'
+              id='showTechniques'
               checked={showTechniqueHighlights}
               onChange={() =>
                 setShowTechniqueHighlights(!showTechniqueHighlights)
               }
-              className="h-4 w-4 text-blue-600 rounded border-gray-300"
+              className='text-blue-600 border-gray-300 h-4 w-4 rounded'
             />
           </div>
 
           <button
             onClick={onBackToScenarios}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Back to scenarios"
+            className='text-gray-500 hover:text-gray-700'
+            aria-label='Back to scenarios'
           >
             <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+              xmlns='http://www.w3.org/2000/svg'
+              className='h-5 w-5'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap='round'
+                strokeLinejoin='round'
                 strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+                d='M6 18L18 6M6 6l12 12'
               />
             </svg>
           </button>
@@ -384,12 +385,12 @@ export function EnhancedSimulationContainer({
       </div>
 
       {/* Main content area */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className='flex flex-1 overflow-hidden'>
         {/* Left panel - Conversation */}
-        <div className="w-3/5 h-full flex flex-col overflow-hidden border-r border-gray-200">
+        <div className='border-gray-200 flex h-full w-3/5 flex-col overflow-hidden border-r'>
           {/* Conversation history */}
           <div
-            className="flex-1 overflow-y-auto p-4 space-y-4"
+            className='flex-1 space-y-4 overflow-y-auto p-4'
             key={conversationKey}
           >
             {conversationHistory.map((message, index: number) => (
@@ -400,14 +401,14 @@ export function EnhancedSimulationContainer({
                   message.role === 'user' ? 'bg-blue-50 ml-auto' : 'bg-gray-50',
                 )}
               >
-                <div className="text-sm">{message.text}</div>
+                <div className='text-sm'>{message.text}</div>
               </div>
             ))}
 
             {/* Display interim transcript if speech recognition is active */}
             {isListening && interimTranscript && (
-              <div className="flex p-3 rounded-lg bg-blue-50 opacity-70 ml-auto max-w-3/4">
-                <div className="text-sm italic text-gray-700">
+              <div className='bg-blue-50 max-w-3/4 ml-auto flex rounded-lg p-3 opacity-70'>
+                <div className='text-gray-700 text-sm italic'>
                   {interimTranscript}...
                 </div>
               </div>
@@ -421,21 +422,21 @@ export function EnhancedSimulationContainer({
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="border-t border-gray-200 p-3"
+            className='border-gray-200 border-t p-3'
           >
-            <div className="relative">
+            <div className='relative'>
               <textarea
                 value={userResponse}
                 onChange={(e) => setUserResponse(e.target.value)}
-                placeholder="Type your response here..."
-                className="w-full p-3 pr-12 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none h-24"
+                placeholder='Type your response here...'
+                className='border-gray-300 focus:ring-blue-500 focus:border-transparent h-24 w-full resize-none rounded-md border p-3 pr-12 focus:ring-2'
                 disabled={isSubmitting}
               />
 
               {/* Speech recognition toggle button */}
               {isSupported && (
                 <button
-                  type="button"
+                  type='button'
                   onClick={toggleListening}
                   className={cn(
                     'absolute right-3 bottom-3 p-2 rounded-full',
@@ -450,32 +451,32 @@ export function EnhancedSimulationContainer({
                 >
                   {isListening ? (
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='h-5 w-5'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
                         strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
+                        d='M6 18L18 6M6 6l12 12'
                       />
                     </svg>
                   ) : (
                     <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='h-5 w-5'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
                         strokeWidth={2}
-                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                        d='M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z'
                       />
                     </svg>
                   )}
@@ -490,17 +491,17 @@ export function EnhancedSimulationContainer({
               onPromptClick={handlePromptSelect}
             />
 
-            <div className="flex justify-between mt-3">
-              <div className="text-xs text-gray-500">
+            <div className='mt-3 flex justify-between'>
+              <div className='text-gray-500 text-xs'>
                 {speechError ? (
-                  <span className="text-red-500">{speechError}</span>
+                  <span className='text-red-500'>{speechError}</span>
                 ) : isListening ? (
-                  <span className="text-green-500">Listening...</span>
+                  <span className='text-green-500'>Listening...</span>
                 ) : null}
               </div>
 
               <button
-                type="submit"
+                type='submit'
                 disabled={!userResponse.trim() || isSubmitting}
                 className={cn(
                   'px-4 py-2 rounded-md text-white',
@@ -516,21 +517,21 @@ export function EnhancedSimulationContainer({
         </div>
 
         {/* Right panel - Feedback and metrics */}
-        <div className="w-2/5 h-full flex flex-col overflow-hidden bg-gray-50">
+        <div className='bg-gray-50 flex h-full w-2/5 flex-col overflow-hidden'>
           {/* Live Resistance Monitor (Gestalt Engine) */}
-          <div className="p-4">
+          <div className='p-4'>
             <ResistanceMonitor sessionId={sessionId} />
           </div>
 
           {/* Real-time metrics */}
-          <div className="p-4 border-b border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
+          <div className='border-gray-200 border-b p-4'>
+            <h3 className='text-gray-700 mb-3 text-sm font-medium'>
               Real-time Performance Metrics
             </h3>
 
             {/* Empathy meter */}
-            <div className="mb-4">
-              <div className="flex justify-between text-xs text-gray-600 mb-1">
+            <div className='mb-4'>
+              <div className='text-gray-600 mb-1 flex justify-between text-xs'>
                 <span>Empathy Level</span>
                 <span>{Math.round(empathyScore * 100)}%</span>
               </div>
@@ -539,29 +540,29 @@ export function EnhancedSimulationContainer({
 
             {/* Technique detection */}
             <div>
-              <h4 className="text-xs font-medium text-gray-600 mb-1">
+              <h4 className='text-gray-600 mb-1 text-xs font-medium'>
                 Detected Therapeutic Techniques
               </h4>
-              <div className="space-y-2">
+              <div className='space-y-2'>
                 {Object.entries(techniqueScores).length > 0 ? (
                   Object.entries(techniqueScores).map(([technique, score]) => (
                     <div
                       key={technique}
-                      className="flex justify-between items-center"
+                      className='flex items-center justify-between'
                     >
-                      <span className="text-xs capitalize">
+                      <span className='text-xs capitalize'>
                         {technique.replace('_', ' ')}
                       </span>
-                      <div className="h-2 w-24 bg-gray-200 rounded overflow-hidden">
+                      <div className='bg-gray-200 h-2 w-24 overflow-hidden rounded'>
                         <div
-                          className="h-full bg-blue-500"
+                          className='bg-blue-500 h-full'
                           style={{ width: `${score * 100}%` }}
                         />
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-xs text-gray-500 italic">
+                  <div className='text-gray-500 text-xs italic'>
                     No techniques detected yet. Try using reflection,
                     validation, or open questions.
                   </div>
@@ -571,8 +572,8 @@ export function EnhancedSimulationContainer({
           </div>
 
           {/* Real-time feedback */}
-          <div className="flex-1 overflow-y-auto p-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">
+          <div className='flex-1 overflow-y-auto p-4'>
+            <h3 className='text-gray-700 mb-3 text-sm font-medium'>
               Real-time Feedback
             </h3>
 
@@ -586,8 +587,8 @@ export function EnhancedSimulationContainer({
           </div>
 
           {/* Controls */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex justify-between">
+          <div className='border-gray-200 border-t p-4'>
+            <div className='flex justify-between'>
               <button
                 onClick={() => {
                   // Reset conversation
@@ -603,7 +604,7 @@ export function EnhancedSimulationContainer({
                   setTechniqueScores({})
                   resetTranscript()
                 }}
-                className="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
+                className='bg-gray-200 text-gray-700 hover:bg-gray-300 rounded px-3 py-1.5 text-sm transition-colors'
               >
                 Reset Simulation
               </button>
@@ -614,7 +615,7 @@ export function EnhancedSimulationContainer({
                   stopListening()
                   onBackToScenarios?.()
                 }}
-                className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                className='bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1.5 text-sm transition-colors'
               >
                 End Simulation
               </button>

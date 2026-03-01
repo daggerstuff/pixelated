@@ -77,4 +77,3 @@ export {
   type EmbeddingRequestOutput,
   type SimilaritySearchRequestInput,
 } from './schemas'
-

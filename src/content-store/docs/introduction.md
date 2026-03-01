@@ -1,6 +1,8 @@
 ---
 title: 'Introduction to Pixelated Empathy'
-description: 'Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental health research and innovation'
+description:
+  'Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental
+  health research and innovation'
 pubDate: 2025-01-01
 tags: ['introduction', 'overview', 'platform']
 author: 'Pixelated Team'
@@ -13,18 +15,24 @@ share: true
 
 # Welcome to Pixelated Empathy
 
-Pixelated Empathy is a comprehensive healthcare platform that combines advanced AI capabilities with secure, HIPAA-compliant infrastructure to deliver innovative therapy solutions. Our platform empowers healthcare providers with cutting-edge tools while ensuring the highest standards of security and privacy.
+Pixelated Empathy is a comprehensive healthcare platform that combines advanced
+AI capabilities with secure, HIPAA-compliant infrastructure to deliver
+innovative therapy solutions. Our platform empowers healthcare providers with
+cutting-edge tools while ensuring the highest standards of security and privacy.
 
 ## Quick Navigation
 
-- **[Quick Start](/docs/getting-started)** - Get up and running with Pixelated in minutes
-- **[API Reference](/docs/api-reference)** - Explore our comprehensive API documentation
+- **[Quick Start](/docs/getting-started)** - Get up and running with Pixelated
+  in minutes
+- **[API Reference](/docs/api-reference)** - Explore our comprehensive API
+  documentation
 
 ## Key Features
 
 ### Zero-Knowledge Security
 
-> **Security First**: All data is protected with state-of-the-art encryption and security measures
+> **Security First**: All data is protected with state-of-the-art encryption and
+> security measures
 
 - End-to-end encryption for all sensitive data
 - Zero-knowledge proof system for session data
@@ -34,7 +42,8 @@ Pixelated Empathy is a comprehensive healthcare platform that combines advanced 
 
 ### Advanced AI Capabilities
 
-> **AI-Powered**: Powered by cutting-edge machine learning models and real-time analysis
+> **AI-Powered**: Powered by cutting-edge machine learning models and real-time
+> analysis
 
 - Multi-modal analysis (text, audio, video)
 - Real-time emotional state tracking
@@ -89,7 +98,8 @@ Start the [development server](/docs/getting-started#running-the-application)
 ## Documentation Structure
 
 - **[API Reference](/docs/api-reference)** - Comprehensive API documentation
-- **[Architecture](/docs/architecture)** - System architecture and design decisions
+- **[Architecture](/docs/architecture)** - System architecture and design
+  decisions
 - **[Security](/docs/security)** - Security features and best practices
 - **[Integration](/docs/integrations)** - Third-party integration guides
 - **[Testing](/docs/testing)** - Testing strategies and tools
@@ -99,15 +109,20 @@ Start the [development server](/docs/getting-started#running-the-application)
 
 ### Community & Support
 
-- **Discord Community** - Join our active developer community at [discord.gg/pixelated](https://discord.gg/pixelated)
-- **GitHub** - Access our open source repositories at [github.com/pixelated](https://github.com/pixelated)
+- **Discord Community** - Join our active developer community at
+  [discord.gg/pixelated](https://discord.gg/pixelated)
+- **GitHub** - Access our open source repositories at
+  [github.com/pixelated](https://github.com/pixelated)
 - **Documentation** - Browse our comprehensive guides in this documentation
-- **Support** - Get help from our support team at [support@pixelatedempathy.com](mailto:support@pixelatedempathy.com)
+- **Support** - Get help from our support team at
+  [support@pixelatedempathy.com](mailto:support@pixelatedempathy.com)
 
 ## Stay Updated
 
-Subscribe to our [newsletter](https://pixelatedempathy.com/newsletter) for the latest updates and features.
+Subscribe to our [newsletter](https://pixelatedempathy.com/newsletter) for the
+latest updates and features.
 
 ## What's Next?
 
-Ready to get started? Check out our [Tutorial Guide](/docs/getting-started) or dive into the [API Documentation](/docs/api-reference).
+Ready to get started? Check out our [Tutorial Guide](/docs/getting-started) or
+dive into the [API Documentation](/docs/api-reference).

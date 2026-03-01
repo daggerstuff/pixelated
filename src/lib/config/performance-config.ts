@@ -775,12 +775,12 @@ export class PerformanceMonitoringService {
   private setupMonitoringIntervals(): void {
     // Monitor every 30 seconds
     setInterval(() => {
-      this.collectMetrics()
+      void this.collectMetrics()
     }, 30000)
 
     // Report every 5 minutes
     setInterval(() => {
-      this.reportMetrics()
+      void this.reportMetrics()
     }, 300000)
   }
 

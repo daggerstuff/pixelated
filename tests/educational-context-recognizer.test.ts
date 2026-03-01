@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+import type { AIService } from '@/lib/ai/models/types'
 import {
   EducationalContextRecognizer,
   EducationalType,
@@ -6,7 +8,6 @@ import {
   ResourceType,
   UserProfile,
 } from '@/lib/metaaligner/prioritization/educational-context-recognizer'
-import type { AIService } from '@/lib/ai/models/types'
 
 const mockAIService: AIService = {
   createChatCompletion: vi

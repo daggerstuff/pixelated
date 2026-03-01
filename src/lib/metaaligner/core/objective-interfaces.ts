@@ -244,10 +244,30 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
 
   private validateRequiredFields(errors: ValidationError[]): void {
     const requiredFields = [
-      { field: 'id', value: this.objective.id, code: 'MISSING_ID', message: 'Objective ID is required' },
-      { field: 'name', value: this.objective.name, code: 'MISSING_NAME', message: 'Objective name is required' },
-      { field: 'description', value: this.objective.description, code: 'MISSING_DESCRIPTION', message: 'Objective description is required' },
-      { field: 'evaluationFunction', value: this.objective.evaluationFunction, code: 'MISSING_EVALUATION_FUNCTION', message: 'Evaluation function is required' },
+      {
+        field: 'id',
+        value: this.objective.id,
+        code: 'MISSING_ID',
+        message: 'Objective ID is required',
+      },
+      {
+        field: 'name',
+        value: this.objective.name,
+        code: 'MISSING_NAME',
+        message: 'Objective name is required',
+      },
+      {
+        field: 'description',
+        value: this.objective.description,
+        code: 'MISSING_DESCRIPTION',
+        message: 'Objective description is required',
+      },
+      {
+        field: 'evaluationFunction',
+        value: this.objective.evaluationFunction,
+        code: 'MISSING_EVALUATION_FUNCTION',
+        message: 'Evaluation function is required',
+      },
     ]
 
     for (const { field, value, code, message } of requiredFields) {
@@ -278,7 +298,10 @@ export class StandardObjectiveBuilder implements ObjectiveBuilder {
     }
   }
 
-  private validateCriteria(errors: ValidationError[], warnings: ValidationWarning[]): void {
+  private validateCriteria(
+    errors: ValidationError[],
+    warnings: ValidationWarning[],
+  ): void {
     if (this.criteria.length === 0) {
       warnings.push({
         field: 'criteria',

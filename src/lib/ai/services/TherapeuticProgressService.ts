@@ -1,10 +1,10 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger' // Assuming a logger setup
 import type { PatientProfile } from '../models/patient'
 import type {
   CoreBelief,
   TherapeuticInsight,
   SkillAcquired,
 } from '../types/CognitiveModel'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger' // Assuming a logger setup
 
 const appLogger = createBuildSafeLogger('app')
 
@@ -200,7 +200,7 @@ export class TherapeuticProgressService {
 
     if (existingSkillIndex !== -1) {
       // Skill already exists, update proficiency and context if provided
-      const existingSkill = skills[existingSkillIndex]!
+      const existingSkill = skills[existingSkillIndex]
       skills[existingSkillIndex] = {
         ...existingSkill,
         // We take the higher of existing or new initial proficiency if skill exists

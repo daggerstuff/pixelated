@@ -130,11 +130,11 @@ export function BrowserCompatibilityTester() {
   // Helper functions for feature detection
 
   return (
-    <div className="browser-compatibility-tester">
+    <div className='browser-compatibility-tester'>
       <h2>Browser Compatibility Test</h2>
 
-      <section aria-labelledby="browser-info-heading">
-        <h3 id="browser-info-heading">Browser Information</h3>
+      <section aria-labelledby='browser-info-heading'>
+        <h3 id='browser-info-heading'>Browser Information</h3>
         <ul>
           <li>
             <strong>User Agent:</strong> {browserInfo.userAgent}
@@ -168,8 +168,8 @@ export function BrowserCompatibilityTester() {
         </ul>
       </section>
 
-      <section aria-labelledby="feature-support-heading">
-        <h3 id="feature-support-heading">Feature Support</h3>
+      <section aria-labelledby='feature-support-heading'>
+        <h3 id='feature-support-heading'>Feature Support</h3>
         <table>
           <thead>
             <tr>

@@ -1,13 +1,14 @@
 export const prerender = false
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 // import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 
-import type { APIContext } from "astro";
+import type { APIContext } from 'astro'
 
 /**
  * API endpoint for fetching users (admin only)
@@ -15,10 +16,13 @@ import type { APIContext } from "astro";
  */
 export const GET = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
+  const next = () =>
+    new Promise<Response>((resolve) =>
+      resolve(new Response(null, { status: 200 })),
+    )
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
     context,
-    next
+    next,
   )
   if (middlewareResponse.status !== 200) {
     return middlewareResponse
@@ -82,10 +86,13 @@ export const GET = async (context: APIContext) => {
  */
 export const PATCH = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
+  const next = () =>
+    new Promise<Response>((resolve) =>
+      resolve(new Response(null, { status: 200 })),
+    )
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
     context,
-    next
+    next,
   )
   if (middlewareResponse.status !== 200) {
     return middlewareResponse

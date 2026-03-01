@@ -1,8 +1,9 @@
 import { Router } from 'express'
-import { uploadConfig } from '../middleware/upload.js'
-import { FileStorageService } from '../services/FileStorageService.js'
-import { DocumentVersioningService } from '../services/DocumentVersioningService.js'
 import { Pool } from 'pg'
+
+import { uploadConfig } from '../middleware/upload.js'
+import { DocumentVersioningService } from '../services/DocumentVersioningService.js'
+import { FileStorageService } from '../services/FileStorageService.js'
 
 const router = Router()
 
@@ -83,7 +84,7 @@ export function createFileRoutes(db: Pool) {
   router.get('/:fileId/versions/:version', async (req, res) => {
     try {
       const { fileId, version } = req.params
-      
+
       const versionNumber = parseInt(version)
 
       const versionRecord = await versioningService.getFileVersion(
@@ -104,7 +105,7 @@ export function createFileRoutes(db: Pool) {
   router.get('/:fileId/versions/:version/download', async (req, res) => {
     try {
       const { fileId, version } = req.params
-      
+
       const versionNumber = parseInt(version)
 
       const versionRecord = await versioningService.getFileVersion(

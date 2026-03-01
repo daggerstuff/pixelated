@@ -69,7 +69,11 @@ function runBlogCommand(command) {
     }
 
     const args = ['run', 'blog-publisher', '--', ...tokens]
-    const proc = spawnSync('pnpm', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], shell: false })
+    const proc = spawnSync('pnpm', args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      shell: false,
+    })
     if (proc.error) {
       return { success: false, error: proc.error.message }
     }
@@ -78,7 +82,11 @@ function runBlogCommand(command) {
       return { success: true, output: proc.stdout }
     }
 
-    return { success: false, error: proc.stderr || 'Unknown error', output: proc.stdout || '' }
+    return {
+      success: false,
+      error: proc.stderr || 'Unknown error',
+      output: proc.stdout || '',
+    }
   } catch (err) {
     return { success: false, error: err.message }
   }

@@ -1,9 +1,10 @@
-import type { EHRProvider, EHRService, FHIRClient } from '../types'
 import { z } from 'zod'
+
 import { AllscriptsProvider } from '../providers/allscripts.provider'
 import { AthenahealthProvider } from '../providers/athenahealth.provider'
 import { CernerProvider } from '../providers/cerner.provider'
 import { EpicProvider } from '../providers/epic.provider'
+import type { EHRProvider, EHRService, FHIRClient } from '../types'
 import { EHRError, ehrProviderSchema } from '../types'
 import { createFHIRClient } from './fhir.client'
 

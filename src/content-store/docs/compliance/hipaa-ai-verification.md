@@ -1,16 +1,19 @@
 ---
-title: "HIPAA Compliance Verification Checklist for AI Components"
-description: "HIPAA Compliance Verification Checklist for AI Components documentation"
+title: 'HIPAA Compliance Verification Checklist for AI Components'
+description:
+  'HIPAA Compliance Verification Checklist for AI Components documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # HIPAA Compliance Verification Checklist for AI Components
 
-This document outlines the verification process for ensuring HIPAA compliance of our AI components. It serves as a comprehensive checklist for auditing and validating that our AI implementation meets all necessary HIPAA requirements.
+This document outlines the verification process for ensuring HIPAA compliance of
+our AI components. It serves as a comprehensive checklist for auditing and
+validating that our AI implementation meets all necessary HIPAA requirements.
 
 ## 1. Data Encryption and Security
 

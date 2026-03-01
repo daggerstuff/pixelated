@@ -4,11 +4,11 @@
  * to enable dynamic objective prioritization
  */
 
-import { ContextType, type AlignmentContext } from '../core/objectives'
-import { CrisisDetectionService } from '../../ai/services/crisis-detection'
-import { EducationalContextRecognizer } from './educational-context-recognizer'
 import type { AIService } from '../../ai/models/types'
+import { CrisisDetectionService } from '../../ai/services/crisis-detection'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { ContextType, type AlignmentContext } from '../core/objectives'
+import { EducationalContextRecognizer } from './educational-context-recognizer'
 
 const logger = createBuildSafeLogger('context-detector')
 
@@ -215,10 +215,10 @@ export class ContextDetector {
         if ('content' in response && typeof response.content === 'string') {
           content = response.content
         } else if (
-          Array.isArray((response as any).choices) &&
-          (response as any).choices[0]?.message?.content
+          Array.isArray((response).choices) &&
+          (response).choices[0]?.message?.content
         ) {
-          content = String((response as any).choices[0].message.content)
+          content = String((response).choices[0].message.content)
         }
       }
 
@@ -256,13 +256,13 @@ export class ContextDetector {
           contextualIndicators: result.contextualIndicators?.length
             ? result.contextualIndicators
             : [
-              {
-                type: 'educational_pattern',
-                description:
-                  'Detected educational query (learning about mental health concept/condition/treatment)',
-                confidence: result.confidence ?? 0.8,
-              },
-            ],
+                {
+                  type: 'educational_pattern',
+                  description:
+                    'Detected educational query (learning about mental health concept/condition/treatment)',
+                  confidence: result.confidence ?? 0.8,
+                },
+              ],
           needsSpecialHandling: false,
           urgency: 'low',
           metadata: {
@@ -459,13 +459,13 @@ export class ContextDetector {
         .map((it) =>
           it && typeof it === 'object'
             ? {
-              type: String((it as any)['type'] ?? 'indicator'),
-              description: String((it as any)['description'] ?? ''),
-              confidence: clamp01((it as any)['confidence'] ?? 0.5, 0.5),
-              ...(typeof (it as any)['severity'] === 'number'
-                ? { severity: (it as any)['severity'] }
-                : {}),
-            }
+                type: String((it)['type'] ?? 'indicator'),
+                description: String((it)['description'] ?? ''),
+                confidence: clamp01((it)['confidence'] ?? 0.5, 0.5),
+                ...(typeof (it)['severity'] === 'number'
+                  ? { severity: (it)['severity'] }
+                  : {}),
+              }
             : null,
         )
         .filter(Boolean) as ContextualIndicator[]
@@ -529,19 +529,19 @@ export class ContextDetector {
       /\b(symptom checker|self-assess|official diagnosis)\b/i,
       /\b(?:do I (have|need|require) (an? )?(assessment|diagnos(e|is)?|screening|evaluation)|am I (depressed|anxious|bipolar|autistic|ptsd|adhd|psychotic|suicidal))\b/i,
       /\bwhat (is|are) my (diagnosis|symptoms|condition)\b/i,
-      
+
       // PHQ-9 and clinical assessment tools
       /\b(phq-?9|phq-?2|gad-?7|pcl-?5|bdi|beck depression inventory|hamilton rating scale|madrs)\b/i,
       /\b(score|scoring|calculate|interpret) (my|the|these)? ?(assessment|questionnaire|scale|inventory|test)\b/i,
-      
+
       // DSM-5 and clinical criteria references
       /\b(dsm-?5|dsm-?iv|icd-?10|icd-?11|diagnostic criteria|clinical criteria)\b/i,
       /\bmeet(ing)? (the )?(criteria|requirements) (for|of)\b/i,
-      
+
       // Risk assessment language
       /\b(risk assessment|suicide risk|self-harm risk|safety assessment|danger to (self|others))\b/i,
       /\b(severity|level|degree) (of|score|rating)\b.*\b(depression|anxiety|ptsd|trauma|stress|symptoms)\b/i,
-      
+
       // Professional evaluation requests
       /\b(professional (evaluation|assessment|opinion)|need to see (a|my) (doctor|psychiatrist|psychologist|therapist))\b/i,
       /\b(medical (diagnosis|evaluation)|psychiatric (evaluation|assessment))\b/i,

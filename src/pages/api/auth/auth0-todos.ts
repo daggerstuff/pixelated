@@ -5,10 +5,11 @@
 
 import type { APIRoute } from 'astro'
 import { ObjectId } from 'mongodb'
-import { todoDAO } from '@/services/mongodb.dao'
+
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { createAuditLog } from '@/lib/audit'
+import { todoDAO } from '@/services/mongodb.dao'
 
 export const prerender = false
 
@@ -26,7 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -39,11 +40,11 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
-    const todos = await todoDAO.findAll(validation.userId!)
+    const todos = await todoDAO.findAll(validation.userId)
 
     // Create audit log
     await createAuditLog(
@@ -51,7 +52,7 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.todos.access',
       validation.userId!,
       'auth-todos',
-      { action: 'get_todos', count: todos.length }
+      { action: 'get_todos', count: todos.length },
     )
 
     return new Response(
@@ -62,7 +63,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   } catch (error: unknown) {
     logError('GET /api/auth/auth0-todos', error)
@@ -76,7 +77,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -88,7 +89,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }
@@ -107,7 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -120,7 +121,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -147,7 +148,7 @@ export const POST: APIRoute = async ({ request }) => {
       'auth.todos.create',
       validation.userId!,
       'auth-todos',
-      { action: 'create_todo', todoId: todo._id.toString() }
+      { action: 'create_todo', todoId: todo._id.toString() },
     )
 
     return new Response(
@@ -158,7 +159,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         status: 201,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   } catch (error: unknown) {
     logError('POST /api/auth/auth0-todos', error)
@@ -172,7 +173,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -184,7 +185,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

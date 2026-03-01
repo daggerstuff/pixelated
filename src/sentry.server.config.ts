@@ -1,6 +1,7 @@
-import { init as initServer } from '@sentry/astro';
-import { initSentry } from '@/lib/sentry/config';
+import { init as initServer } from '@sentry/astro'
 
-const serverConfig = initSentry();
+import { initSentry } from '@/lib/sentry/config'
 
-initServer(serverConfig);
+const serverConfig = initSentry()
+
+initServer(serverConfig)

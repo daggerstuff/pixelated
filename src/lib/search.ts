@@ -225,7 +225,7 @@ if (typeof window !== 'undefined') {
 
   // Dynamically load the browser implementation
   // Using top-level await in an IIFE to avoid blocking
-  ;(async () => {
+  ;void (async () => {
     try {
       // Dynamic import with explicit .ts extension to help bundlers
       const { initBrowserSearch } = await import('./search-browser.js')

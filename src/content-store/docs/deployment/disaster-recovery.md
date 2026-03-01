@@ -1,9 +1,9 @@
 ---
-title: "Disaster Recovery Plan"
-description: "Disaster Recovery Plan documentation"
+title: 'Disaster Recovery Plan'
+description: 'Disaster Recovery Plan documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -12,19 +12,19 @@ toc: true
 
 ## Overview
 
-This document outlines the disaster recovery procedures for the Pixelated Astro application. It provides step-by-step instructions for recovering from various types of failures and outages.
+This document outlines the disaster recovery procedures for the Pixelated Astro
+application. It provides step-by-step instructions for recovering from various
+types of failures and outages.
 
 ## Quick Response Guide
 
 ### Site Down / Inaccessible
 
 1. **Check Monitoring Alerts**
-
    - Review Slack alerts for specific error details
    - Check GitHub Actions monitoring workflow results
 
 2. **Verify Deployment Status**
-
    - Check AWS CloudFormation stack status
    - Verify DNS resolution is working properly
 
@@ -39,15 +39,14 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
 ### Database Issues
 
 1. **Check Database Connection**
-
-   - Verify MongoDB Atlas status at [MongoDB Status](https://status.cloud.mongodb.com/)
+   - Verify MongoDB Atlas status at
+     [MongoDB Status](https://status.cloud.mongodb.com/)
    - Run health check against the API endpoint manually:
      ```bash
      curl -v https://app.gradiantastro.com/api/health
      ```
 
 2. **Database Recovery Steps**
-
    - If database corruption is suspected, restore from the latest backup:
 
      ```bash
@@ -77,7 +76,8 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
 
 ### Database Backups
 
-Backups are automatically created every 6 hours and stored in AWS S3. The backup workflow:
+Backups are automatically created every 6 hours and stored in AWS S3. The backup
+workflow:
 
 1. Creates a full PostgreSQL dump of the Supabase database
 2. Compresses the backup file with gzip
@@ -190,25 +190,21 @@ If GitHub Actions is unavailable:
 ### Response Procedures
 
 1. **Identification**
-
    - Determine severity level
    - Document initial findings
    - Notify appropriate team members
 
 2. **Containment**
-
    - Implement immediate mitigation (e.g., rollback)
    - Isolate affected components
    - Prevent further damage
 
 3. **Eradication**
-
    - Identify and fix the root cause
    - Deploy and test fixes
    - Verify security of all components
 
 4. **Recovery**
-
    - Restore service to normal operation
    - Verify data integrity
    - Monitor for any recurring issues
@@ -248,7 +244,8 @@ In case primary access methods are unavailable:
 
 1. Contact the DevOps and Security leads
 2. Use emergency credentials stored in the company password manager
-3. All "break glass" access is logged, audited, and requires post-incident review
+3. All "break glass" access is logged, audited, and requires post-incident
+   review
 
 ## Recovery Testing
 

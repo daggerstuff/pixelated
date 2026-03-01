@@ -1,18 +1,21 @@
+import crypto from 'crypto'
+
+import { render, screen, fireEvent } from '@testing-library/react'
 /* eslint-disable @gitlab/security-scan/gitlab_security_scan */
 /* eslint-disable security/detect-unsafe-random */
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
-import { TherapistDashboard } from '../TherapistDashboard'
-import SessionControls from '../SessionControls'
-import { TherapistProgressTracker } from '../TherapistProgressTracker'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+
+import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
+import type { TherapistAnalyticsChartData } from '@/types/analytics'
+import type { TherapistSession } from '@/types/dashboard'
+
 import { AnalyticsCharts } from '../AnalyticsCharts'
 import { ProgressBar } from '../ProgressBar'
+import SessionControls from '../SessionControls'
 import { SessionMetrics } from '../SessionMetrics'
-import type { TherapistSession } from '@/types/dashboard'
-import type { TherapistAnalyticsChartData } from '@/types/analytics'
-import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
-import crypto from 'crypto'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistProgressTracker } from '../TherapistProgressTracker'
 
 /**
  * Generates a cryptographically secure random integer between min (inclusive) and max (exclusive).
@@ -91,9 +94,9 @@ describe('Dashboard Performance Tests', () => {
         activeTime: secureRandomInt(0, 3600),
         skillScores: {
           'Active Listening': secureRandomInt(0, 100),
-          'Empathy': secureRandomInt(0, 100),
-          'Questioning': secureRandomInt(0, 100),
-          'Reflection': secureRandomInt(0, 100),
+          Empathy: secureRandomInt(0, 100),
+          Questioning: secureRandomInt(0, 100),
+          Reflection: secureRandomInt(0, 100),
         },
         responseTime: secureRandomFloat() * 10,
         conversationFlow: secureRandomInt(0, 100),
@@ -273,9 +276,7 @@ describe('Dashboard Performance Tests', () => {
   it('renders therapy charts with large dataset efficiently', () => {
     const startTime = performance.now()
 
-    render(
-      React.createElement(AnalyticsCharts),
-    )
+    render(React.createElement(AnalyticsCharts))
 
     const endTime = performance.now()
     const renderTime = endTime - startTime
@@ -414,9 +415,7 @@ describe('Dashboard Performance Tests', () => {
 
     const startTime = performance.now()
 
-    render(
-      React.createElement(AnalyticsCharts),
-    )
+    render(React.createElement(AnalyticsCharts))
 
     const endTime = performance.now()
     const renderTime = endTime - startTime
@@ -491,9 +490,7 @@ describe('Dashboard Performance Tests', () => {
 
     promises.push(
       new Promise<void>((resolve) => {
-        render(
-          React.createElement(AnalyticsCharts),
-        )
+        render(React.createElement(AnalyticsCharts))
         resolve()
       }),
     )

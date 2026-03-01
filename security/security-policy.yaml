@@ -14,40 +14,40 @@ spec:
       policyTypes:
         - Ingress
         - Egress
-    
+
     - name: allow-app-traffic
       podSelector:
         matchLabels:
           app: pixelated-empathy
       ingress:
         - from:
-          - podSelector:
-              matchLabels:
-                app: nginx-ingress
+            - podSelector:
+                matchLabels:
+                  app: nginx-ingress
           ports:
-          - protocol: TCP
-            port: 3000
+            - protocol: TCP
+              port: 3000
       egress:
         - to:
-          - podSelector:
-              matchLabels:
-                app: postgresql
+            - podSelector:
+                matchLabels:
+                  app: postgresql
           ports:
-          - protocol: TCP
-            port: 5432
+            - protocol: TCP
+              port: 5432
         - to:
-          - podSelector:
-              matchLabels:
-                app: redis
+            - podSelector:
+                matchLabels:
+                  app: redis
           ports:
-          - protocol: TCP
-            port: 6379
+            - protocol: TCP
+              port: 6379
 
   # Pod Security Standards
   podSecurityStandards:
-    enforce: "restricted"
-    audit: "restricted"
-    warn: "restricted"
+    enforce: 'restricted'
+    audit: 'restricted'
+    warn: 'restricted'
 
   # Security Context
   securityContext:
@@ -65,15 +65,15 @@ spec:
 
   # Resource Limits
   resourceLimits:
-    memory: "512Mi"
-    cpu: "500m"
-    ephemeral-storage: "1Gi"
+    memory: '512Mi'
+    cpu: '500m'
+    ephemeral-storage: '1Gi'
 
   # Image Security
   imageSecurity:
     allowedRegistries:
-      - "ghcr.io/pixelated-empathy"
-      - "docker.io/library"
+      - 'ghcr.io/pixelated-empathy'
+      - 'docker.io/library'
     requireSignedImages: true
     scanForVulnerabilities: true
     maxCriticalVulnerabilities: 0
@@ -82,20 +82,20 @@ spec:
   # Secrets Management
   secretsManagement:
     encryptionAtRest: true
-    rotationPolicy: "90d"
+    rotationPolicy: '90d'
     accessLogging: true
     allowedSecretTypes:
-      - "Opaque"
-      - "kubernetes.io/tls"
+      - 'Opaque'
+      - 'kubernetes.io/tls'
 
   # Compliance Requirements
   compliance:
     standards:
-      - "SOC2"
-      - "GDPR"
-      - "HIPAA"
+      - 'SOC2'
+      - 'GDPR'
+      - 'HIPAA'
     auditLogging: true
-    dataRetention: "7y"
+    dataRetention: '7y'
     encryptionInTransit: true
     encryptionAtRest: true
 
@@ -108,9 +108,9 @@ spec:
       automountServiceAccountToken: false
     admission:
       controllers:
-        - "PodSecurityPolicy"
-        - "NetworkPolicy"
-        - "ResourceQuota"
+        - 'PodSecurityPolicy'
+        - 'NetworkPolicy'
+        - 'ResourceQuota'
 
   # Monitoring & Alerting
   monitoring:
@@ -119,11 +119,11 @@ spec:
     threatDetection: true
     alerting:
       channels:
-        - "slack"
-        - "email"
-        - "pagerduty"
+        - 'slack'
+        - 'email'
+        - 'pagerduty'
     metrics:
-      - "failed_authentications"
-      - "privilege_escalations"
-      - "network_policy_violations"
-      - "suspicious_activities"
+      - 'failed_authentications'
+      - 'privilege_escalations'
+      - 'network_policy_violations'
+      - 'suspicious_activities'

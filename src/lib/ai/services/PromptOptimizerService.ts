@@ -157,7 +157,9 @@ export class PromptOptimizerService {
       return conversationSummary
     } catch (error: unknown) {
       logger.error('Error creating conversation summary', { error })
-      throw new Error(`Failed to create conversation summary: ${error}`, { cause: error })
+      throw new Error(`Failed to create conversation summary: ${error}`, {
+        cause: error,
+      })
     }
   }
 
@@ -229,16 +231,16 @@ export class PromptOptimizerService {
 
     // Common therapeutic topics
     const topicPatterns = {
-      'anxiety': ['anxious', 'worried', 'nervous', 'panic', 'stress'],
-      'depression': ['sad', 'depressed', 'down', 'hopeless', 'empty'],
-      'relationships': [
+      anxiety: ['anxious', 'worried', 'nervous', 'panic', 'stress'],
+      depression: ['sad', 'depressed', 'down', 'hopeless', 'empty'],
+      relationships: [
         'relationship',
         'partner',
         'family',
         'friend',
         'conflict',
       ],
-      'work': ['job', 'work', 'career', 'boss', 'colleague', 'workplace'],
+      work: ['job', 'work', 'career', 'boss', 'colleague', 'workplace'],
       'self-esteem': [
         'confidence',
         'self-worth',
@@ -246,11 +248,11 @@ export class PromptOptimizerService {
         'insecure',
         'worthless',
       ],
-      'trauma': ['trauma', 'abuse', 'ptsd', 'flashback', 'trigger'],
-      'coping': ['coping', 'manage', 'handle', 'deal with', 'strategy'],
-      'goals': ['goal', 'want', 'hope', 'plan', 'future', 'change'],
-      'medication': ['medication', 'pills', 'therapy', 'treatment', 'doctor'],
-      'sleep': ['sleep', 'insomnia', 'tired', 'exhausted', 'rest'],
+      trauma: ['trauma', 'abuse', 'ptsd', 'flashback', 'trigger'],
+      coping: ['coping', 'manage', 'handle', 'deal with', 'strategy'],
+      goals: ['goal', 'want', 'hope', 'plan', 'future', 'change'],
+      medication: ['medication', 'pills', 'therapy', 'treatment', 'doctor'],
+      sleep: ['sleep', 'insomnia', 'tired', 'exhausted', 'rest'],
     }
 
     messages.forEach((message) => {

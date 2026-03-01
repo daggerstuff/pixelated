@@ -1,9 +1,10 @@
-// Enhanced API Client with retry logic and type-safe error handling
-import { parseApiResponse, ValidationResult } from './utils/json-validator'
 import type {
   CrisisDetectionRequest,
   CrisisDetectionResponse,
 } from '@/types/crisis-detection'
+
+// Enhanced API Client with retry logic and type-safe error handling
+import { parseApiResponse, ValidationResult } from './utils/json-validator'
 
 export class EnterpriseAPIClient {
   private baseURL: string
@@ -108,7 +109,7 @@ export class EnterpriseAPIClient {
       } catch (error: unknown) {
         clearTimeout(timeoutId)
 
-        if (error instanceof Error && (error as Error)?.name === 'AbortError') {
+        if (error instanceof Error && (error)?.name === 'AbortError') {
           throw new APITimeoutError(`Request timeout after ${timeout}ms`)
         }
 
@@ -168,7 +169,7 @@ export class EnterpriseAPIClient {
 }
 
 export class APIError extends Error {
-  errorMessage: string;
+  errorMessage: string
   constructor(
     message: string,
     public status: number,
@@ -277,11 +278,11 @@ interface FrameworksResponse {
 interface AnalyzeRequest {
   content: string
   analysisType:
-  | 'session'
-  | 'progress'
-  | 'intervention'
-  | 'risk'
-  | 'comprehensive'
+    | 'session'
+    | 'progress'
+    | 'intervention'
+    | 'risk'
+    | 'comprehensive'
   clientContext?: unknown
   analysisOptions?: unknown
 }
@@ -310,5 +311,3 @@ interface ChatResponse {
   followUp: unknown
   metadata: unknown
 }
-
-

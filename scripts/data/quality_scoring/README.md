@@ -1,14 +1,18 @@
 Quality Scoring v1 – Production Implementation
 
 Purpose
-- Production-quality quality scoring system for dataset expansion project (KAN-12)
+
+- Production-quality quality scoring system for dataset expansion project
+  (KAN-12)
 - Computes four key signals: empathy, fidelity, harm, domain relevance
 - Provides accept/curate/reject decisions based on configurable thresholds
 
 Files
+
 - config.example.json – example weights and thresholds
 - scoring_interface.py – main interface with production/fallback logic
-- production_scoring.py – production-quality signal computation using quality frameworks
+- production_scoring.py – production-quality signal computation using quality
+  frameworks
 - run_stub.py – CLI tool for scoring JSONL files
 - example_output.jsonl – sample line-delimited scoring output format
 
@@ -35,7 +39,9 @@ Signals
    - Uses SafetyEthicsValidator when available
 
 Production Features
-- Uses existing quality assessment frameworks (EmpathyMentalHealthValidator, SafetyEthicsValidator)
+
+- Uses existing quality assessment frameworks (EmpathyMentalHealthValidator,
+  SafetyEthicsValidator)
 - Fallback heuristics when production components unavailable
 - Configurable weights and thresholds via config.json
 - Three-tier decision system: accept, curate, reject
@@ -51,11 +57,13 @@ python scripts/quality_scoring/run_stub.py \
 ```
 
 Integration
+
 - Integrates with dataset pipeline quality assessment frameworks
 - Can be called programmatically via `compute_signals()` and `compose_score()`
 - Ready for integration into orchestrators and quality gates
 
 Related
+
 - KAN-12: https://ratchetaf.atlassian.net/browse/KAN-12
 - Confluence Spec: Ingestion & Quality Scoring child page
 - Production validators: `ai/dataset_pipeline/quality/`

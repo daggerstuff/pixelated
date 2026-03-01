@@ -3,11 +3,13 @@
  * Multi-layer caching with intelligent invalidation, compression, and performance optimization
  */
 
-import { getCache } from './redis-cache'
-import { createCacheInvalidation } from './invalidation'
-import { getLogger } from '@/lib/logging'
-import { gzip, ungzip } from 'zlib'
 import { promisify } from 'util'
+import { gzip, ungzip } from 'zlib'
+
+import { getLogger } from '@/lib/logging'
+
+import { createCacheInvalidation } from './invalidation'
+import { getCache } from './redis-cache'
 
 const logger = getLogger('advanced-cache')
 const gzipAsync = promisify(gzip)

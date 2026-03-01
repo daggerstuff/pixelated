@@ -1,5 +1,6 @@
 import type { APIContext } from 'astro'
 import { v4 as uuidv4 } from 'uuid'
+
 // Import the FHE chat library
 import { fheChat } from '../../../lib/chat/fheChat'
 

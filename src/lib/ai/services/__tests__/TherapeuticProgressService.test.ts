@@ -1,4 +1,5 @@
-import { TherapeuticProgressService } from '../TherapeuticProgressService'
+import { vi } from 'vitest'
+
 import type { PatientProfile, ConversationMessage } from '../../models/patient'
 import type {
   CognitiveModel,
@@ -7,8 +8,7 @@ import type {
   SkillAcquired,
   TherapeuticInsight,
 } from '../../types/CognitiveModel'
-
-import { vi } from 'vitest'
+import { TherapeuticProgressService } from '../TherapeuticProgressService'
 
 // Mock logger to prevent console noise during tests and allow assertions if needed
 vi.mock('../../../logging', () => ({
@@ -127,7 +127,7 @@ describe('TherapeuticProgressService', () => {
       expect(addedInsight?.insight).toBe(insightText)
       expect(addedInsight?.belief).toBe(relatedBelief)
       expect(addedInsight?.dateAchieved).toBeDefined()
-      expect(Date.parse(addedInsight!.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
+      expect(Date.parse(addedInsight.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
       expect(updatedProfile.lastUpdatedAt).not.toBe(
         mockPatientProfile.lastUpdatedAt,
       )

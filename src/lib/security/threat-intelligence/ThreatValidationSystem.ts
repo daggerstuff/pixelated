@@ -5,9 +5,11 @@
  */
 
 import { EventEmitter } from 'events'
-import { MongoClient, Db, Collection } from 'mongodb'
+
 import { Redis } from 'ioredis'
+import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
+
 import { logger } from '../../logger'
 
 // Types
@@ -625,7 +627,9 @@ export class ThreatValidationSystem extends EventEmitter {
   /**
    * Get validation criteria for validation types
    */
-  private getValidationCriteria(_validationTypes: string[]): ValidationCriteria {
+  private getValidationCriteria(
+    _validationTypes: string[],
+  ): ValidationCriteria {
     return {
       accuracy_threshold: 0.8,
       completeness_requirements: ['value', 'type', 'source', 'timestamp'],
@@ -1333,7 +1337,9 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async crossReferenceExternalSources(_threatData: ThreatData): Promise<{
+  private async crossReferenceExternalSources(
+    _threatData: ThreatData,
+  ): Promise<{
     is_verified: boolean
     evidence: ValidationEvidence[]
   }> {

@@ -103,88 +103,86 @@ export default function ExportButton({
   const renderFormatIcon = (format: string) => {
     switch (format) {
       case 'pdf':
-        return <IconFilePdf className="w-4 h-4 mr-2" />
+        return <IconFilePdf className='mr-2 h-4 w-4' />
       case 'encrypted_archive':
-        return <IconArchive className="w-4 h-4 mr-2" />
+        return <IconArchive className='mr-2 h-4 w-4' />
       case 'json':
       default:
-        return <IconFile className="w-4 h-4 mr-2" />
+        return <IconFile className='mr-2 h-4 w-4' />
     }
   }
 
   return (
-    <div className="relative">
-      <div className="flex">
+    <div className='relative'>
+      <div className='flex'>
         <button
           onClick={() => handleExport(exportFormat)}
           disabled={disabled || isExporting}
-          className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-l-md
-            ${
-              disabled || isExporting
-                ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            }`}
-          aria-label="Export conversation"
+          className={`inline-flex items-center rounded-l-md px-3 py-2 text-sm font-medium ${
+            disabled || isExporting
+              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+              : 'bg-purple-600 hover:bg-purple-700 text-white'
+          }`}
+          aria-label='Export conversation'
         >
-          <IconDownload className="w-4 h-4 mr-2" />
+          <IconDownload className='mr-2 h-4 w-4' />
           <span>Export</span>
-          {isExporting && <span className="ml-2">...</span>}
+          {isExporting && <span className='ml-2'>...</span>}
         </button>
         <button
-          type="button"
-          className={`inline-flex items-center px-2 py-2 rounded-r-md border-l border-purple-700
-            ${
-              disabled || isExporting
-                ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            }`}
+          type='button'
+          className={`border-purple-700 inline-flex items-center rounded-r-md border-l px-2 py-2 ${
+            disabled || isExporting
+              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+              : 'bg-purple-600 hover:bg-purple-700 text-white'
+          }`}
           onClick={() => setShowOptions(!showOptions)}
           disabled={disabled || isExporting}
-          aria-label="Show export options"
+          aria-label='Show export options'
         >
-          <IconChevronDown className="w-4 h-4" />
+          <IconChevronDown className='h-4 w-4' />
         </button>
       </div>
 
       {showOptions && (
-        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-10">
-          <div className="py-1" role="menu" aria-orientation="vertical">
+        <div className='bg-gray-800 ring-black absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg ring-1 ring-opacity-5'>
+          <div className='py-1' role='menu' aria-orientation='vertical'>
             <button
-              className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
+              className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
               onClick={() => handleExport('json')}
-              role="menuitem"
+              role='menuitem'
             >
               {renderFormatIcon('json')}
               <span>JSON (.json)</span>
               <IconLock
-                className="w-3 h-3 ml-auto text-green-400"
-                aria-label="Encrypted"
+                className='text-green-400 ml-auto h-3 w-3'
+                aria-label='Encrypted'
               />
             </button>
 
             <button
-              className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
+              className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
               onClick={() => handleExport('pdf')}
-              role="menuitem"
+              role='menuitem'
             >
               {renderFormatIcon('pdf')}
               <span>PDF Document (.pdf)</span>
               <IconLock
-                className="w-3 h-3 ml-auto text-green-400"
-                aria-label="Encrypted"
+                className='text-green-400 ml-auto h-3 w-3'
+                aria-label='Encrypted'
               />
             </button>
 
             <button
-              className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
+              className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
               onClick={() => handleExport('encrypted_archive')}
-              role="menuitem"
+              role='menuitem'
             >
               {renderFormatIcon('encrypted_archive')}
               <span>Secure Archive (.secz)</span>
               <IconLock
-                className="w-3 h-3 ml-auto text-green-400"
-                aria-label="Maximum Encryption"
+                className='text-green-400 ml-auto h-3 w-3'
+                aria-label='Maximum Encryption'
               />
             </button>
           </div>
@@ -192,7 +190,7 @@ export default function ExportButton({
       )}
 
       {exportError && (
-        <div className="mt-2 text-sm text-red-500">{exportError}</div>
+        <div className='text-red-500 mt-2 text-sm'>{exportError}</div>
       )}
     </div>
   )

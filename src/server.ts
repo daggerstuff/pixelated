@@ -1,12 +1,14 @@
-import "dotenv/config";
-import express from 'express'
+import { EventEmitter } from 'events'
 import { createServer } from 'http'
-import Redis from 'ioredis'
-import { EventEmitter } from "events";
-import { Pool } from 'pg'
-import cors from 'cors'
-import { SocketService } from "./services/socketService";
 
+import cors from 'cors'
+import express from 'express'
+import Redis from 'ioredis'
+import { Pool } from 'pg'
+
+import { SocketService } from './services/socketService'
+
+import 'dotenv/config'
 
 const app = express()
 const server = createServer(app)
@@ -28,49 +30,49 @@ const db = new Pool({
 })
 
 // Redis connection
-const redisOptions = REDIS_URL.startsWith("rediss://")
+const redisOptions = REDIS_URL.startsWith('rediss://')
   ? {
       tls: {
         rejectUnauthorized: false,
       },
       lazyConnect: true,
     }
-  : { lazyConnect: true };
+  : { lazyConnect: true }
 
-let redis = new Redis(REDIS_URL, redisOptions);
+let redis = new Redis(REDIS_URL, redisOptions)
 
 // Prevent unhandled error events during connection attempts
-redis.on("error", (err) => {
+redis.on('error', (err) => {
   // We handle connection errors in the connect().catch() block below
   // This listener prevents the "Unhandled error event" warning
-  console.debug("Redis connection error (handled):", err.message);
-});
+  console.debug('Redis connection error (handled):', err.message)
+})
 
 // Attempt connection with fallback for development
 redis.connect().catch((err) => {
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     console.warn(
-      "Failed to connect to Redis in development, using mock:",
+      'Failed to connect to Redis in development, using mock:',
       err.message,
-    );
+    )
     // Create a simple mock compatible with ioredis interface
-    redis = new EventEmitter() as any;
+    redis = new EventEmitter() as any
     Object.assign(redis, {
-      status: "ready",
-      quit: async () => "OK",
+      status: 'ready',
+      quit: async () => 'OK',
       get: async () => null,
-      set: async () => "OK",
+      set: async () => 'OK',
       del: async () => 1,
       on: (event: string, cb: any) => {
-        if (event === "connect" || event === "ready") cb();
-        return redis;
+        if (event === 'connect' || event === 'ready') cb()
+        return redis
       },
       // Add other necessary methods as no-ops
-    });
+    })
   } else {
-    console.error("Failed to connect to Redis:", err);
+    console.error('Failed to connect to Redis:', err)
   }
-});
+})
 
 // Middleware
 app.use(

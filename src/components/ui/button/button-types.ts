@@ -1,5 +1,6 @@
-import type { ComponentProps } from 'react'
 import type { VariantProps } from 'class-variance-authority'
+import type { ComponentProps } from 'react'
+
 import { buttonVariants } from './button'
 
 export type ButtonVariant =
@@ -13,19 +14,19 @@ export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon'
 
 export interface ButtonBaseProps {
   /** Additional class names to apply to the button */
-  'className'?: string
+  className?: string
   /** Whether the button is in a loading state */
-  'loading'?: boolean
+  loading?: boolean
   /** Loading text to display when in loading state */
-  'loadingText'?: string
+  loadingText?: string
   /** Whether to show the loading spinner */
-  'showSpinner'?: boolean
+  showSpinner?: boolean
   /** Whether the button is disabled */
-  'disabled'?: boolean
+  disabled?: boolean
   /** Whether the button should take up the full width of its container */
-  'fullWidth'?: boolean
+  fullWidth?: boolean
   /** Whether the button should be rendered as a different element */
-  'asChild'?: boolean
+  asChild?: boolean
   /** ARIA label for accessibility */
   'aria-label'?: string
   /** ARIA description for accessibility */
@@ -33,9 +34,10 @@ export interface ButtonBaseProps {
 }
 
 export interface ButtonProps
-  extends ButtonBaseProps,
-  Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
-  VariantProps<typeof buttonVariants> {
+  extends
+    ButtonBaseProps,
+    Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
+    VariantProps<typeof buttonVariants> {
   /** The variant style to use */
   variant?: ButtonVariant
   /** The size of the button */

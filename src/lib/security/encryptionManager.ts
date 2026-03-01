@@ -116,7 +116,7 @@ class EncryptionManager {
         },
         true, // extractable
         ['encrypt', 'decrypt'],
-      )) as CryptoKey
+      ))
 
       return { id: keyId, key }
     } else {

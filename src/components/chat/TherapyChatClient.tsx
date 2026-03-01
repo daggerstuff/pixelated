@@ -1,17 +1,19 @@
 import React from 'react'
-import type { ChatMessage as ChatMessageType } from '@/types/chat'
 import type { ChangeEvent } from 'react'
-import type { Scenario } from '@/types/scenarios'
+import { useState } from 'react'
+
 import { clientScenarios } from '@/data/scenarios'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { useChat } from '@/hooks/useChat'
 import { useSecurity } from '@/hooks/useSecurity'
 import { useWebSocket } from '@/hooks/useWebSocket'
-import { useState } from 'react'
+import type { ChatMessage as ChatMessageType } from '@/types/chat'
+import type { Scenario } from '@/types/scenarios'
+
 import AnalyticsDashboardReact from './AnalyticsDashboardReact'
-import { ChatShell } from './ChatShell'
 import { ChatInput } from './ChatInput'
 import { ChatMessage } from './ChatMessage'
+import { ChatShell } from './ChatShell'
 import { ScenarioSelector } from './ScenarioSelector'
 import { SecurityBadge } from './SecurityBadge'
 
@@ -66,7 +68,7 @@ export function TherapyChatClient() {
     },
     onError: (error: Error) => {
       console.error('WebSocket error:', error)
-      analytics.trackEvent({
+      void analytics.trackEvent({
         type: 'websocket_error',
         properties: {
           error: String(error),
@@ -173,7 +175,7 @@ export function TherapyChatClient() {
     }
 
     // Track analytics
-    analytics.trackEvent({
+    void analytics.trackEvent({
       type: 'therapy_session',
       properties: {
         scenario: selectedScenario.name,
@@ -203,11 +205,11 @@ export function TherapyChatClient() {
       {({ containerRef, messagesEndRef, showScrollButton, scrollToBottom }) => (
         <div className={`${isExpanded ? 'fixed inset-0 z-50' : ''}`}>
           {/* Header */}
-          <div className="flex justify-between items-center mb-4 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 rounded-t-lg p-3">
-            <h1 className="text-xl font-bold">
+          <div className='from-purple-900 via-purple-800 to-purple-900 mb-4 flex items-center justify-between rounded-t-lg bg-gradient-to-r p-3'>
+            <h1 className='text-xl font-bold'>
               Pixelated Empathy Therapy Chat
             </h1>
-            <div className="flex items-center space-x-2">
+            <div className='flex items-center space-x-2'>
               <SecurityBadge
                 securityLevel={securityLevel}
                 encryptionEnabled={encryptionEnabled}
@@ -215,19 +217,19 @@ export function TherapyChatClient() {
               />
 
               {isConnected && (
-                <span className="px-2 py-1 text-xs bg-green-800 text-green-200 rounded">
+                <span className='bg-green-800 text-green-200 rounded px-2 py-1 text-xs'>
                   Live
                 </span>
               )}
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
-                className="px-2 py-1 text-sm bg-purple-700 rounded hover:bg-purple-600"
+                className='bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm'
               >
                 {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
               </button>
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="px-2 py-1 text-sm bg-purple-700 rounded hover:bg-purple-600"
+                className='bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm'
               >
                 {isExpanded ? 'Minimize' : 'Expand'}
               </button>
@@ -245,14 +247,14 @@ export function TherapyChatClient() {
 
           {/* FHE initialization warning */}
           {encryptionEnabled && !fheInitialized && (
-            <div className="mb-4 p-2 bg-yellow-800 bg-opacity-30 border border-yellow-700 rounded text-yellow-400 text-sm">
+            <div className='bg-yellow-800 border-yellow-700 text-yellow-400 mb-4 rounded border bg-opacity-30 p-2 text-sm'>
               Initializing FHE encryption system... This might take a moment.
             </div>
           )}
 
           {/* Analytics dashboard */}
           {showAnalytics && (
-            <div className="mb-4">
+            <div className='mb-4'>
               <AnalyticsDashboardReact
                 messages={messages}
                 securityLevel={securityLevel}
@@ -265,13 +267,14 @@ export function TherapyChatClient() {
           {/* Chat container */}
           <div
             ref={containerRef}
-            className={`overflow-y-auto ${isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
-              } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
+            className={`overflow-y-auto ${
+              isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
+            } border-purple-900 bg-black mb-2 rounded-md border bg-opacity-50 p-2 shadow-sm transition-all duration-200`}
           >
             {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                <p className="text-xl font-medium mb-2">Begin Your Session</p>
-                <p className="text-center max-w-md">
+              <div className='text-gray-400 flex h-full flex-col items-center justify-center'>
+                <p className='mb-2 text-xl font-medium'>Begin Your Session</p>
+                <p className='max-w-md text-center'>
                   Start therapy training with our AI client simulation.
                   {encryptionEnabled &&
                     (securityLevel === 'maximum'
@@ -306,8 +309,8 @@ export function TherapyChatClient() {
           {showScrollButton && (
             <button
               onClick={scrollToBottom}
-              className="fixed bottom-20 right-4 p-2 bg-purple-700 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors"
-              aria-label="Scroll to bottom"
+              className='bg-purple-700 text-white hover:bg-purple-600 fixed bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors'
+              aria-label='Scroll to bottom'
             >
               ↓
             </button>

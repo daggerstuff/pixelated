@@ -1,10 +1,5 @@
-import {
-  PatientResponseService,
-  type ResponseContext,
-  type PatientResponseStyleConfig,
-} from './PatientResponseService'
-import { PatientProfileService } from './PatientProfileService'
-import { BeliefConsistencyService } from './BeliefConsistencyService'
+import { vi } from 'vitest'
+
 import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
   CognitiveModel,
@@ -14,7 +9,13 @@ import type {
   TherapeuticProgress,
   ConversationalStyle,
 } from '../types/CognitiveModel'
-import { vi } from 'vitest'
+import { BeliefConsistencyService } from './BeliefConsistencyService'
+import { PatientProfileService } from './PatientProfileService'
+import {
+  PatientResponseService,
+  type ResponseContext,
+  type PatientResponseStyleConfig,
+} from './PatientResponseService'
 
 // Mock dependencies
 vi.mock('./PatientProfileService')

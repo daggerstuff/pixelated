@@ -6,6 +6,7 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('HealthMonitor')
@@ -156,7 +157,7 @@ export class HealthMonitor extends EventEmitter {
     }
 
     this.healthCheckInterval = setInterval(() => {
-      this.performHealthChecks()
+      void this.performHealthChecks()
     }, this.config.interval)
 
     logger.info('Health monitoring started', { interval: this.config.interval })
@@ -358,9 +359,9 @@ export class HealthMonitor extends EventEmitter {
     // Calculate overall score (weighted average)
     const overallScore = Math.round(
       performanceScore * 0.4 +
-      availabilityScore * 0.3 +
-      capacityScore * 0.2 +
-      securityScore * 0.1,
+        availabilityScore * 0.3 +
+        capacityScore * 0.2 +
+        securityScore * 0.1,
     )
 
     // Determine status
@@ -488,7 +489,7 @@ export class HealthMonitor extends EventEmitter {
     const avgConnections =
       history.length > 0
         ? history.slice(-10).reduce((sum, m) => sum + m.activeConnections, 0) /
-        10
+          10
         : current.activeConnections
 
     if (current.activeConnections > avgConnections * 1.5) {
@@ -521,7 +522,7 @@ export class HealthMonitor extends EventEmitter {
     const avgConnections =
       history.length > 0
         ? history.slice(-10).reduce((sum, m) => sum + m.activeConnections, 0) /
-        10
+          10
         : current.activeConnections
 
     if (current.activeConnections > avgConnections * 3) {
@@ -855,7 +856,7 @@ export class HealthMonitor extends EventEmitter {
     if (healthScores.length > 0) {
       summary.averageHealthScore = Math.round(
         healthScores.reduce((sum, h) => sum + h.overallScore, 0) /
-        healthScores.length,
+          healthScores.length,
       )
     }
 

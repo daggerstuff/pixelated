@@ -12,7 +12,10 @@ toc: true
 
 ## Overview
 
-The Text Analysis System is a core component of Pixelated that provides advanced natural language processing capabilities for therapy sessions. It combines multiple ML models and rule-based systems to analyze text content while maintaining HIPAA compliance.
+The Text Analysis System is a core component of Pixelated that provides advanced
+natural language processing capabilities for therapy sessions. It combines
+multiple ML models and rule-based systems to analyze text content while
+maintaining HIPAA compliance.
 
 ## Components
 
@@ -52,7 +55,8 @@ The Text Analysis System is a core component of Pixelated that provides advanced
 
 #### Emotion Model
 
-- **New Emotion Categories:** Added `shame`, `guilt`, `envy`, `pride`, and `relief` to the emotion detection capabilities.
+- **New Emotion Categories:** Added `shame`, `guilt`, `envy`, `pride`, and
+  `relief` to the emotion detection capabilities.
 
 #### Therapy Technique Model
 
@@ -73,7 +77,6 @@ The Text Analysis System is a core component of Pixelated that provides advanced
 ## Usage
 
 ```typescript
-
 // Initialize services
 const securityAudit = new SecurityAuditService()
 const textAnalysis = new TextAnalysisService(securityAudit)
@@ -110,8 +113,10 @@ Comprehensive test suite includes:
 - Integration tests for the TextAnalysisService
 - HIPAA compliance validation tests
 - Crisis detection accuracy tests
-- EmotionModel tests now cover unknown labels, empty inputs, and multiple emotions.
-- TextAnalysisService tests include scenarios for handling no emotions, multiple techniques, and crisis detection.
+- EmotionModel tests now cover unknown labels, empty inputs, and multiple
+  emotions.
+- TextAnalysisService tests include scenarios for handling no emotions, multiple
+  techniques, and crisis detection.
 
 Run tests using:
 

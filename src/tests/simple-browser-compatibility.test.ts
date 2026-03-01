@@ -1,5 +1,6 @@
-import { test, expect } from '@playwright/test'
 import * as fs from 'fs'
+
+import { test, expect } from '@playwright/test'
 
 // Ensure screenshots directory exists
 function ensureDirectoryExists(directory): void {

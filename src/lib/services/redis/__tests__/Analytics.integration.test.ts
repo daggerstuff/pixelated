@@ -1,10 +1,12 @@
+import { Redis } from 'ioredis'
+
 import {
   AnalyticsService,
   EventType,
   EventPriority,
   type EventData,
 } from '@/lib/services/analytics/AnalyticsService'
-import { Redis } from 'ioredis'
+
 import { RedisService } from '../RedisService'
 import {
   cleanupTestKeys,

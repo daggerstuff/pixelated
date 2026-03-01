@@ -1,12 +1,14 @@
 // Main bias detection demo component with comprehensive analysis interface
 
 import { useState, useCallback, type FC } from 'react'
-import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { PresetScenarioSelector } from './PresetScenarioSelector'
-import { CounterfactualAnalysis } from './CounterfactualAnalysis'
-import { HistoricalProgressTracker } from './HistoricalProgressTracker'
-import { SessionInputForm } from './SessionInputForm'
-import { ExportControls } from './ExportControls'
+
+import type {
+  SessionData,
+  BiasAnalysisResults,
+  PresetScenario,
+  CounterfactualScenario,
+  HistoricalComparison,
+} from '../../../lib/types/bias-detection'
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
@@ -16,13 +18,12 @@ import {
   createExportData,
   generateSessionId,
 } from '../../../lib/utils/demo-helpers'
-import type {
-  SessionData,
-  BiasAnalysisResults,
-  PresetScenario,
-  CounterfactualScenario,
-  HistoricalComparison,
-} from '../../../lib/types/bias-detection'
+import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
+import { CounterfactualAnalysis } from './CounterfactualAnalysis'
+import { ExportControls } from './ExportControls'
+import { HistoricalProgressTracker } from './HistoricalProgressTracker'
+import { PresetScenarioSelector } from './PresetScenarioSelector'
+import { SessionInputForm } from './SessionInputForm'
 
 interface BiasDetectionDemoProps {
   className?: string
@@ -150,7 +151,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       } catch (err: unknown) {
         setError(
           err instanceof Error
-            ? (err as Error)?.message || String(err)
+            ? (err)?.message || String(err)
             : 'Analysis failed',
         )
       } finally {
@@ -170,7 +171,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       }
 
       setSessionData(sessionData)
-      performBiasAnalysis(sessionData)
+      void performBiasAnalysis(sessionData)
     },
     [performBiasAnalysis],
   )
@@ -189,7 +190,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       }
 
       setSessionData(sessionData)
-      performBiasAnalysis(sessionData)
+      void performBiasAnalysis(sessionData)
     },
     [performBiasAnalysis],
   )
@@ -249,11 +250,11 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
   return (
     <div className={`bias-detection-demo ${className}`}>
       {/* Header */}
-      <div className="demo-header mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <div className='demo-header mb-6'>
+        <h2 className='text-gray-900 mb-2 text-2xl font-bold'>
           Advanced Bias Detection Demo
         </h2>
-        <p className="text-gray-600">
+        <p className='text-gray-600'>
           Analyze therapeutic conversations for bias patterns across multiple
           dimensions
         </p>
@@ -261,36 +262,36 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div className="flex">
-            <div className="flex-shrink-0">
+        <div className='bg-red-50 border-red-200 mb-6 rounded-lg border p-4'>
+          <div className='flex'>
+            <div className='flex-shrink-0'>
               <svg
-                className="h-5 w-5 text-red-400"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+                className='text-red-400 h-5 w-5'
+                viewBox='0 0 20 20'
+                fill='currentColor'
               >
                 <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
+                  fillRule='evenodd'
+                  d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                  clipRule='evenodd'
                 />
               </svg>
             </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
+            <div className='ml-3'>
+              <h3 className='text-red-800 text-sm font-medium'>
                 Analysis Error
               </h3>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <p className='text-red-700 mt-1 text-sm'>{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Input Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className='mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2'>
         {/* Preset Scenarios */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className='bg-white border-gray-200 rounded-lg border p-6 shadow-sm'>
+          <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
             Preset Scenarios
           </h3>
           <PresetScenarioSelector
@@ -302,8 +303,8 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         </div>
 
         {/* Custom Input */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className='bg-white border-gray-200 rounded-lg border p-6 shadow-sm'>
+          <h3 className='text-gray-900 mb-4 text-lg font-semibold'>
             Custom Analysis
           </h3>
           <SessionInputForm
@@ -324,10 +325,10 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
 
       {/* Loading State */}
       {isAnalyzing && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-3"></div>
-            <span className="text-blue-800 font-medium">
+        <div className='bg-blue-50 border-blue-200 mb-6 rounded-lg border p-6'>
+          <div className='flex items-center'>
+            <div className='border-blue-600 mr-3 h-5 w-5 animate-spin rounded-full border-b-2'></div>
+            <span className='text-blue-800 font-medium'>
               Analyzing bias patterns...
             </span>
           </div>
@@ -336,16 +337,16 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
 
       {/* Results Section */}
       {analysisResults && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className='bg-white border-gray-200 rounded-lg border shadow-sm'>
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6" aria-label="Tabs">
+          <div className='border-gray-200 border-b'>
+            <nav className='flex space-x-8 px-6' aria-label='Tabs'>
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => !tab.disabled && setActiveTab(tab.id)}
                   disabled={tab.disabled}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`border-b-2 px-1 py-4 text-sm font-medium transition-colors ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
                       : tab.disabled
@@ -360,7 +361,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className='p-6'>
             {activeTab === 'analysis' && (
               <BiasAnalysisDisplay
                 results={analysisResults}

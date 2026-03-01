@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach} from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 /**
  * Unit tests for HIPAA-compliant audit logging functionality
  */
@@ -147,13 +148,13 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.userId).toBe('user-123')
-      expect(entry!.userEmail).toBe('test@example.com')
-      expect(entry!.action.type).toBe('read')
-      expect(entry!.resource).toBe('bias-analysis-results')
-      expect(entry!.sessionId).toBe('session-789')
-      expect(entry!.success).toBe(true)
-      expect(entry!.ipAddress).toBe('192.168.1.1')
+      expect(entry.userId).toBe('user-123')
+      expect(entry.userEmail).toBe('test@example.com')
+      expect(entry.action.type).toBe('read')
+      expect(entry.resource).toBe('bias-analysis-results')
+      expect(entry.sessionId).toBe('session-789')
+      expect(entry.success).toBe(true)
+      expect(entry.ipAddress).toBe('192.168.1.1')
     })
 
     it('should log failed actions with error messages', async () => {
@@ -180,8 +181,8 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.success).toBe(false)
-      expect(entry!.errorMessage).toBe('Analysis service unavailable')
+      expect(entry.success).toBe(false)
+      expect(entry.errorMessage).toBe('Analysis service unavailable')
     })
 
     it('should generate unique audit IDs', async () => {
@@ -199,8 +200,8 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entries).toHaveLength(2)
       expect(entries[0]).toBeDefined()
       expect(entries[1]).toBeDefined()
-      expect(entries[0]!.id).not.toBe(entries[1]!.id)
-      expect(entries[0]!.id).toMatch(/^audit_\d+_[a-z0-9]+$/)
+      expect(entries[0].id).not.toBe(entries[1].id)
+      expect(entries[0].id).toMatch(/^audit_\d+_[a-z0-9]+$/)
     })
   })
 
@@ -222,11 +223,11 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.action.type).toBe('read')
-      expect(entry!.action.category).toBe('user-data')
-      expect(entry!.action.sensitivityLevel).toBe('medium') // 2 records = medium
-      expect(entry!.details['dataAccessLog']).toBeDefined()
-      const dataAccessLog = entry!.details['dataAccessLog'] as unknown
+      expect(entry.action.type).toBe('read')
+      expect(entry.action.category).toBe('user-data')
+      expect(entry.action.sensitivityLevel).toBe('medium') // 2 records = medium
+      expect(entry.details['dataAccessLog']).toBeDefined()
+      const dataAccessLog = entry.details['dataAccessLog']
       expect(dataAccessLog.dataType).toBe('demographics')
       expect(dataAccessLog.dataIds).toEqual(['demo-1', 'demo-2'])
       expect(dataAccessLog.approvedBy).toBe('supervisor-456')
@@ -245,7 +246,7 @@ describe('BiasDetectionAuditLogger', () => {
       const entries = mockStorage.getEntries()
       expect(entries).toHaveLength(1)
       expect(entries[0]).toBeDefined()
-      expect(entries[0]!.action.sensitivityLevel).toBe('critical') // >100 session records
+      expect(entries[0].action.sensitivityLevel).toBe('critical') // >100 session records
 
       mockStorage.clear()
 
@@ -261,7 +262,7 @@ describe('BiasDetectionAuditLogger', () => {
       const newEntries = mockStorage.getEntries()
       expect(newEntries).toHaveLength(1)
       expect(newEntries[0]).toBeDefined()
-      expect(newEntries[0]!.action.sensitivityLevel).toBe('medium') // 50 analysis records
+      expect(newEntries[0].action.sensitivityLevel).toBe('medium') // 50 analysis records
     })
   })
 
@@ -291,14 +292,14 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.action.type).toBe('create')
-      expect(entry!.action.sensitivityLevel).toBe('high') // high alert level
-      expect(entry!.details['sessionId']).toBe('session-123')
-      expect(entry!.details['biasScore']).toBe(0.75)
-      expect(entry!.details['alertLevel']).toBe('high')
+      expect(entry.action.type).toBe('create')
+      expect(entry.action.sensitivityLevel).toBe('high') // high alert level
+      expect(entry.details['sessionId']).toBe('session-123')
+      expect(entry.details['biasScore']).toBe(0.75)
+      expect(entry.details['alertLevel']).toBe('high')
 
       // Check demographics anonymization
-      const loggedDemographics = entry!.details['demographics'] as unknown
+      const loggedDemographics = entry.details['demographics']
       expect(loggedDemographics).toBeDefined()
       expect(loggedDemographics.age).toBe('25-35')
       expect(loggedDemographics.gender).toBe('female')
@@ -388,12 +389,12 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.action.type).toBe('update')
-      expect(entry!.action.category).toBe('configuration')
-      expect(entry!.action.sensitivityLevel).toBe('high') // Has critical impact change
-      expect(entry!.details['configUpdate']).toEqual(configUpdate)
-      expect(entry!.details['changesCount']).toBe(2)
-      expect(entry!.details['requiresRestart']).toBe(true)
+      expect(entry.action.type).toBe('update')
+      expect(entry.action.category).toBe('configuration')
+      expect(entry.action.sensitivityLevel).toBe('high') // Has critical impact change
+      expect(entry.details['configUpdate']).toEqual(configUpdate)
+      expect(entry.details['changesCount']).toBe(2)
+      expect(entry.details['requiresRestart']).toBe(true)
     })
   })
 
@@ -412,11 +413,11 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.userId).toBe('user-456')
-      expect(entry!.userEmail).toBe('user456@example.com')
-      expect(entry!.action.type).toBe('login')
-      expect(entry!.action.category).toBe('authentication')
-      expect(entry!.success).toBe(true)
+      expect(entry.userId).toBe('user-456')
+      expect(entry.userEmail).toBe('user456@example.com')
+      expect(entry.action.type).toBe('login')
+      expect(entry.action.category).toBe('authentication')
+      expect(entry.success).toBe(true)
     })
 
     it('should log failed login with error message', async () => {
@@ -434,8 +435,8 @@ describe('BiasDetectionAuditLogger', () => {
 
       const entry = entries[0]
       expect(entry).toBeDefined()
-      expect(entry!.success).toBe(false)
-      expect(entry!.errorMessage).toBe('Invalid credentials')
+      expect(entry.success).toBe(false)
+      expect(entry.errorMessage).toBe('Invalid credentials')
     })
   })
 
@@ -474,7 +475,7 @@ describe('BiasDetectionAuditLogger', () => {
     it('should filter logs by action type', async () => {
       const logs = await auditLogger.getAuditLogs({ actionType: 'create' })
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.type).toBe('create')
+      expect(logs[0].action.type).toBe('create')
     })
 
     it('should apply pagination', async () => {
@@ -522,7 +523,7 @@ describe('BiasDetectionAuditLogger', () => {
       expect(report.period).toEqual(period)
       expect(report.complianceScore).toBeLessThan(100) // Should be reduced due to violations
       expect(report.violations).toHaveLength(1) // Should detect failed login violation
-      expect(report.violations[0]!.type).toBe('unauthorized-access')
+      expect(report.violations[0].type).toBe('unauthorized-access')
       expect(report.recommendations).toHaveLength(1) // Should have recommendations
       expect(report.auditTrail).toHaveLength(16) // 15 failed logins + 1 successful action
     })
@@ -584,11 +585,11 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entry).toBeDefined()
 
       // Should anonymize demographics
-      const demographics = entry!.details['demographics'] as unknown
+      const demographics = entry.details['demographics']
       expect(demographics.region).toBe('REDACTED')
 
       // Should redact session content
-      expect(entry!.details['sessionContent']).toBe('[REDACTED]')
+      expect(entry.details['sessionContent']).toBe('[REDACTED]')
     })
 
     it('should not sanitize low-sensitivity data', async () => {
@@ -617,7 +618,7 @@ describe('BiasDetectionAuditLogger', () => {
       expect(entry).toBeDefined()
 
       // Should preserve all details for low sensitivity
-      expect(entry!.details).toEqual(details)
+      expect(entry.details).toEqual(details)
     })
   })
 
@@ -658,7 +659,7 @@ describe('BiasDetectionAuditLogger', () => {
 
       // Manually set timestamp to old date
       const entries = mockStorage.getEntries()
-      entries[0]!.timestamp = oldDate
+      entries[0].timestamp = oldDate
 
       const result = await auditLoggerWithRetention.cleanupOldLogs()
       expect(result.archived).toBe(1)
@@ -707,9 +708,9 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: 'session-123' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.type).toBe('create')
-      expect(logs[0]!.action.category).toBe('bias-analysis')
-      expect(logs[0]!.sessionId).toBe('session-123')
+      expect(logs[0].action.type).toBe('create')
+      expect(logs[0].action.category).toBe('bias-analysis')
+      expect(logs[0].sessionId).toBe('session-123')
     })
 
     it('should log export action with critical sensitivity', async () => {
@@ -725,8 +726,8 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: 'session-456' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.type).toBe('export')
-      expect(logs[0]!.action.sensitivityLevel).toBe('critical')
+      expect(logs[0].action.type).toBe('export')
+      expect(logs[0].action.sensitivityLevel).toBe('critical')
     })
 
     it('should log view action with medium sensitivity', async () => {
@@ -742,8 +743,8 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: 'session-789' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.type).toBe('read')
-      expect(logs[0]!.action.sensitivityLevel).toBe('medium')
+      expect(logs[0].action.type).toBe('read')
+      expect(logs[0].action.sensitivityLevel).toBe('medium')
     })
   })
 
@@ -755,9 +756,9 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ actionType: 'export' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.sensitivityLevel).toBe('low') // <100 records
-      expect(logs[0]!.details['exportType']).toBe('json')
-      expect(logs[0]!.details['recordCount']).toBe(50)
+      expect(logs[0].action.sensitivityLevel).toBe('low') // <100 records
+      expect(logs[0].details['exportType']).toBe('json')
+      expect(logs[0].details['recordCount']).toBe(50)
     })
 
     it('should log medium data export with medium sensitivity', async () => {
@@ -767,7 +768,7 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ actionType: 'export' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.sensitivityLevel).toBe('medium') // 100-1000 records
+      expect(logs[0].action.sensitivityLevel).toBe('medium') // 100-1000 records
     })
 
     it('should log large data export with high sensitivity', async () => {
@@ -777,7 +778,7 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ actionType: 'export' })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.action.sensitivityLevel).toBe('high') // >1000 records
+      expect(logs[0].action.sensitivityLevel).toBe('high') // >1000 records
     })
 
     it('should log failed export with error message', async () => {
@@ -794,8 +795,8 @@ describe('Convenience Functions', () => {
       const logs = await auditLogger.getAuditLogs({ success: false })
 
       expect(logs).toHaveLength(1)
-      expect(logs[0]!.success).toBe(false)
-      expect(logs[0]!.errorMessage).toBe('Export service unavailable')
+      expect(logs[0].success).toBe(false)
+      expect(logs[0].errorMessage).toBe('Export service unavailable')
     })
   })
 

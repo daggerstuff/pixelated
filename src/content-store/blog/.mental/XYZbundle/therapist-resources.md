@@ -7,7 +7,8 @@ pubDate: 2024-02-28
 
 # Therapist Resources
 
-This guide provides a curated collection of resources specifically designed for mental health professionals working with CPTSD and addiction.
+This guide provides a curated collection of resources specifically designed for
+mental health professionals working with CPTSD and addiction.
 
 ## Clinical Resources
 

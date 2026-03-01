@@ -1,10 +1,16 @@
 import type { APIRoute } from 'astro'
-import { getAIUsageStats } from '../../../lib/ai/analytics'
-import { handleApiError } from '../../../lib/ai/error-handling'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '../../../lib/audit'
-import { getUserById } from '@/services/auth0.service'
+
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { getUserById } from '@/services/auth0.service'
+
+import { getAIUsageStats } from '../../../lib/ai/analytics'
+import { handleApiError } from '../../../lib/ai/error-handling'
+import {
+  createAuditLog,
+  AuditEventType,
+  AuditEventStatus,
+} from '../../../lib/audit'
 
 /**
  * API route for AI usage statistics
@@ -19,17 +25,20 @@ export const GET: APIRoute = async ({ request, url }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
     }
 
     // Extract token from request
     const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Validate token
@@ -62,7 +71,10 @@ export const GET: APIRoute = async ({ request, url }) => {
     const model = url.searchParams.get('model') || 'all'
 
     // Get usage stats
-    const stats = await getAIUsageStats({ period: timeframe, userId: userId || undefined })
+    const stats = await getAIUsageStats({
+      period: timeframe,
+      userId: userId || undefined,
+    })
 
     // Create audit log
     await createAuditLog(
@@ -81,7 +93,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       },
     })
   } catch (error: unknown) {
-    await handleApiError(error)
+     handleApiError(error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: {

@@ -1,4 +1,3 @@
-
 services:
   # PostgreSQL Database for Business Strategy CMS
   postgres:
@@ -30,7 +29,9 @@ services:
   # Redis Cache & Session Store
   redis:
     image: redis:7-alpine
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-secure_password}
+    command:
+      redis-server --appendonly yes --requirepass
+      ${REDIS_PASSWORD:-secure_password}
     volumes:
       - redis_data:/data
     ports:

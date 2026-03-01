@@ -5,13 +5,13 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 
 import { logger } from '../../logger'
-
-import { encrypt, decrypt } from '../encryption'
 import { auditLog } from '../audit-logging'
+import { encrypt, decrypt } from '../encryption'
 
 // Types
 export interface ThreatIntelligence {
@@ -216,7 +216,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
 
       // Subscribe to global threat intelligence channel
       await subscriber.subscribe('threat-intelligence-global', (message) => {
-        this.handleIncomingThreat(message)
+        void this.handleIncomingThreat(message)
       })
 
       // Subscribe to regional channels
@@ -225,7 +225,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
           `threat-intelligence-${region}`,
           (message) => {
             if (region !== this.region) {
-              this.handleIncomingThreat(message)
+              void this.handleIncomingThreat(message)
             }
           },
         )

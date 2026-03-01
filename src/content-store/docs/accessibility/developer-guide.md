@@ -1,6 +1,7 @@
 ---
 title: 'Accessibility Developer Guide'
-description: 'Best practices and standards for implementing accessible components'
+description:
+  'Best practices and standards for implementing accessible components'
 pubDate: '2025-01-01'
 author: 'Accessibility Team'
 draft: false
@@ -11,13 +12,17 @@ date: '2025-04-12'
 
 # Accessibility Developer Guide
 
-This guide provides practical instructions for implementing accessible components in our Astro application. Following these guidelines will help ensure that our application is usable by people with disabilities and meets WCAG 2.1 AA standards.
+This guide provides practical instructions for implementing accessible
+components in our Astro application. Following these guidelines will help ensure
+that our application is usable by people with disabilities and meets WCAG 2.1 AA
+standards.
 
 ## Core Principles
 
 ### 1. Perceivable
 
-Information and user interface components must be presentable to users in ways they can perceive.
+Information and user interface components must be presentable to users in ways
+they can perceive.
 
 ### 2. Operable
 
@@ -29,7 +34,8 @@ Information and the operation of the user interface must be understandable.
 
 ### 4. Robust
 
-Content must be robust enough to be interpreted by a wide variety of user agents, including assistive technologies.
+Content must be robust enough to be interpreted by a wide variety of user
+agents, including assistive technologies.
 
 ## Testing Your Components
 
@@ -104,6 +110,7 @@ describe('YourComponent accessibility', () => {
    - Use `<fieldset>` and `<legend>` for related form fields
 
    ```astro
+
    ```
 
 ### Navigation
@@ -112,12 +119,14 @@ describe('YourComponent accessibility', () => {
    - Provide a skip link at the top of each page
 
    ```astro
+
    ```
 
 2. **ARIA Landmarks**
    - Use proper landmarks to structure your page
 
    ```astro
+
    ```
 
 3. **Navigation State**
@@ -295,7 +304,8 @@ Astro's `client:load` directive can impact accessibility. Consider these tips:
    ```
 
 3. **React Islands in Astro**
-   - When using React components with `client:load`, ensure they handle accessibility correctly
+   - When using React components with `client:load`, ensure they handle
+     accessibility correctly
 
    ```astro
    ---
@@ -314,6 +324,7 @@ Astro's `client:load` directive can impact accessibility. Consider these tips:
    - Always include a secondary indicator (icon, text, pattern)
 
    ```astro
+
    ```
 
 3. **Focus Indicators**

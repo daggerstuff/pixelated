@@ -4,12 +4,13 @@
  */
 
 import type { APIRoute } from 'astro'
+
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { AIRepository } from '@/lib/db/ai/repository'
-import { createAuditLog } from '@/lib/audit'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -61,7 +62,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -74,7 +75,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -174,8 +175,8 @@ export const GET: APIRoute = async ({ request }) => {
         action: 'get_analytics_charts',
         type,
         category,
-        dataPoints: chartData.data.datasets[0]?.data.length || 0
-      }
+        dataPoints: chartData.data.datasets[0]?.data.length || 0,
+      },
     )
 
     logger.info('Generated chart data', {
@@ -204,7 +205,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(

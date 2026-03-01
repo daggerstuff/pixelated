@@ -1,16 +1,17 @@
-// IMPORTANT: Import Sentry instrumentation at the very top
-import "../../../../config/instrument.mjs";
-
 import { createServer } from 'http'
 import { parse } from 'url'
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { apiMetrics, emotionMetrics } from '../../sentry/utils'
 import type { AIMessage, AIServiceOptions } from '../models/ai-types'
 import {
   getAIServiceByProvider,
   getAvailableProviders,
   initializeProviders,
 } from '../providers'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { apiMetrics, emotionMetrics } from '../../sentry/utils'
+
+// IMPORTANT: Import Sentry instrumentation at the very top
+import '../../../../config/instrument.mjs'
 
 const appLogger = createBuildSafeLogger('ai-server')
 
@@ -99,7 +100,7 @@ class AIServer {
 
       // If specific provider requested, try it first
       if (provider) {
-        service = getAIServiceByProvider(provider as any)
+        service = getAIServiceByProvider(provider)
         if (!service) {
           this.sendJsonResponse(res, 400, {
             success: false,
@@ -176,7 +177,7 @@ class AIServer {
 
       // If specific provider requested, try it first
       if (provider) {
-        service = getAIServiceByProvider(provider as any)
+        service = getAIServiceByProvider(provider)
         if (!service) {
           this.sendJsonResponse(res, 400, {
             success: false,
@@ -282,7 +283,7 @@ Respond in JSON format with the following structure:
 
       // If specific provider requested, try it first
       if (provider) {
-        service = getAIServiceByProvider(provider as any)
+        service = getAIServiceByProvider(provider)
         if (!service) {
           this.sendJsonResponse(res, 400, {
             success: false,
@@ -314,7 +315,7 @@ Respond in JSON format with the following structure:
       res.writeHead(200, {
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Cache-Control',
       })
@@ -411,8 +412,16 @@ Respond in JSON format with the following structure:
           await this.handleEmotionAnalysis(req, res, emotionBody)
           const durationMs = Date.now() - startTime
           const analysisDurationMs = Date.now() - analysisStartTime
-          apiMetrics.request('/ai-service/analyze-emotion', 'POST', res.statusCode || 200)
-          apiMetrics.responseTime('/ai-service/analyze-emotion', durationMs, 'POST')
+          apiMetrics.request(
+            '/ai-service/analyze-emotion',
+            'POST',
+            res.statusCode || 200,
+          )
+          apiMetrics.responseTime(
+            '/ai-service/analyze-emotion',
+            durationMs,
+            'POST',
+          )
           emotionMetrics.analysisLatency(analysisDurationMs, 'ai-service')
           break
         }
@@ -421,7 +430,11 @@ Respond in JSON format with the following structure:
           const streamBody = await this.parseRequestBody(req)
           await this.handleStreamingChat(req, res, streamBody)
           const durationMs = Date.now() - startTime
-          apiMetrics.request('/ai-service/chat/stream', 'POST', res.statusCode || 200)
+          apiMetrics.request(
+            '/ai-service/chat/stream',
+            'POST',
+            res.statusCode || 200,
+          )
           apiMetrics.responseTime('/ai-service/chat/stream', durationMs, 'POST')
           break
         }
@@ -435,7 +448,8 @@ Respond in JSON format with the following structure:
       }
     } catch (error) {
       const durationMs = Date.now() - startTime
-      const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'UnknownError'
       apiMetrics.error('/ai-service', errorType)
       apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)

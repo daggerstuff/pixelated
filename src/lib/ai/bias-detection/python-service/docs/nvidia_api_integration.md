@@ -1,11 +1,12 @@
 # Kimi-k2.5 NVIDIA API Integration
 
-This document explains how to properly use the Kimi-k2.5 model from Moonshot AI via NVIDIA's API integration.
+This document explains how to properly use the Kimi-k2.5 model from Moonshot AI
+via NVIDIA's API integration.
 
 ## Overview
 
-The Kimi-k2.5 model is accessible through NVIDIA's API platform and has been integrated into our bias detection service.
-This implementation provides:
+The Kimi-k2.5 model is accessible through NVIDIA's API platform and has been
+integrated into our bias detection service. This implementation provides:
 
 1. Proper authentication using the configured API key
 2. Support for both regular and streaming responses
@@ -15,8 +16,8 @@ This implementation provides:
 
 ## Configuration
 
-The service automatically loads configuration from `/home/vivi/.claude-code-router/config.json`. The relevant section
-looks like:
+The service automatically loads configuration from
+`/home/vivi/.claude-code-router/config.json`. The relevant section looks like:
 
 ```json
 {
@@ -25,15 +26,14 @@ looks like:
       "name": "nvidia",
       "api_base_url": "https://integrate.api.nvidia.com/v1/chat/completions",
       "api_key": "nvapi-...",
-      "models": [
-        "moonshotai/kimi-k2.5"
-      ]
+      "models": ["moonshotai/kimi-k2.5"]
     }
   ]
 }
 ```
 
-If the configuration file is not found, the service will fall back to using the `NVIDIA_API_KEY` environment variable.
+If the configuration file is not found, the service will fall back to using the
+`NVIDIA_API_KEY` environment variable.
 
 ## Usage Examples
 
@@ -135,5 +135,6 @@ pip install -r requirements-nvidia.txt
 
 ## Integration with Bias Detection
 
-The NVIDIA API service can be integrated with the existing model ensemble service to provide additional bias detection
-capabilities using the advanced Kimi-k2.5 model.
+The NVIDIA API service can be integrated with the existing model ensemble
+service to provide additional bias detection capabilities using the advanced
+Kimi-k2.5 model.

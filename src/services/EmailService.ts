@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+
 import { productionConfig } from '../config/production.js'
 
 export interface EmailTemplate {

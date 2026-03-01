@@ -1,16 +1,17 @@
 ---
-title: "Secure Analytics Example"
-description: "Secure Analytics Example documentation"
+title: 'Secure Analytics Example'
+description: 'Secure Analytics Example documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Secure Analytics Example
 
-This example demonstrates how to use MP-SPDZ TypeScript bindings to perform secure analytics on private data from multiple parties.
+This example demonstrates how to use MP-SPDZ TypeScript bindings to perform
+secure analytics on private data from multiple parties.
 
 ## Overview
 
@@ -38,13 +39,17 @@ sudo apt-get install automake build-essential clang cmake git \
 ### 1. Initialize the Environment
 
 ```typescript
-import { JIFFAdapter, JIFFAdapterConfig, MPCProtocol } from '@gradiant/mp-spdz-bindings'
+import {
+  JIFFAdapter,
+  JIFFAdapterConfig,
+  MPCProtocol,
+} from '@gradiant/mp-spdz-bindings'
 
 const config: JIFFAdapterConfig = {
   partyId: 0, // Change for each party
   numParties: 3,
   threshold: 1,
-  protocol: MPCProtocol.SEMI2K // Use SEMI2K for better performance
+  protocol: MPCProtocol.SEMI2K, // Use SEMI2K for better performance
 }
 
 const adapter = new JIFFAdapter(config)
@@ -55,9 +60,7 @@ const adapter = new JIFFAdapter(config)
 ```typescript
 async function calculateSecureMean(values: number[]): Promise<number> {
   // Share all values
-  const shares = await Promise.all(
-    values.map(value => adapter.share(value))
-  )
+  const shares = await Promise.all(values.map((value) => adapter.share(value)))
 
   // Sum the shares
   let sum = shares[0]
@@ -90,16 +93,14 @@ async function calculateSecureStdDev(values: number[]): Promise<number> {
   const meanShare = await adapter.share(mean)
 
   // Share all values
-  const shares = await Promise.all(
-    values.map(value => adapter.share(value))
-  )
+  const shares = await Promise.all(values.map((value) => adapter.share(value)))
 
   // Calculate squared differences
   const squaredDiffs = await Promise.all(
     shares.map(async (share) => {
       const diff = await adapter.subtract(share, meanShare)
       return adapter.multiply(diff, diff)
-    })
+    }),
   )
 
   // Sum squared differences
@@ -127,15 +128,15 @@ console.log('Secure standard deviation:', stdDev)
 ```typescript
 async function calculateSecureCorrelation(
   x: number[],
-  y: number[]
+  y: number[],
 ): Promise<number> {
   if (x.length !== y.length) {
     throw new Error('Arrays must have same length')
   }
 
   // Share all values
-  const xShares = await Promise.all(x.map(value => adapter.share(value)))
-  const yShares = await Promise.all(y.map(value => adapter.share(value)))
+  const xShares = await Promise.all(x.map((value) => adapter.share(value)))
+  const yShares = await Promise.all(y.map((value) => adapter.share(value)))
 
   // Calculate means
   const xMean = await calculateSecureMean(x)
@@ -149,7 +150,7 @@ async function calculateSecureCorrelation(
       const xDiff = await adapter.subtract(xShare, xMeanShare)
       const yDiff = await adapter.subtract(yShares[i], yMeanShare)
       return adapter.multiply(xDiff, yDiff)
-    })
+    }),
   )
 
   // Sum products
@@ -182,15 +183,15 @@ console.log('Secure correlation:', correlation)
 ```typescript
 async function calculateSecureLinearRegression(
   x: number[],
-  y: number[]
-): Promise<{ slope: number, intercept: number }> {
+  y: number[],
+): Promise<{ slope: number; intercept: number }> {
   if (x.length !== y.length) {
     throw new Error('Arrays must have same length')
   }
 
   // Share all values
-  const xShares = await Promise.all(x.map(value => adapter.share(value)))
-  const yShares = await Promise.all(y.map(value => adapter.share(value)))
+  const xShares = await Promise.all(x.map((value) => adapter.share(value)))
+  const yShares = await Promise.all(y.map((value) => adapter.share(value)))
 
   // Calculate means
   const xMean = await calculateSecureMean(x)
@@ -204,14 +205,14 @@ async function calculateSecureLinearRegression(
       const xDiff = await adapter.subtract(xShare, xMeanShare)
       const yDiff = await adapter.subtract(yShares[i], yMeanShare)
       return adapter.multiply(xDiff, yDiff)
-    })
+    }),
   )
 
   const denominatorProducts = await Promise.all(
     xShares.map(async (xShare) => {
       const xDiff = await adapter.subtract(xShare, xMeanShare)
       return adapter.multiply(xDiff, xDiff)
-    })
+    }),
   )
 
   // Sum products
@@ -229,7 +230,7 @@ async function calculateSecureLinearRegression(
   // Calculate intercept
   const interceptShare = await adapter.subtract(
     yMeanShare,
-    await adapter.multiply(xMeanShare, await adapter.share(slopeValue))
+    await adapter.multiply(xMeanShare, await adapter.share(slopeValue)),
   )
   const interceptValue = Number(await adapter.open(interceptShare))
 
@@ -283,7 +284,7 @@ describe('Secure Analytics', () => {
     adapter = new JIFFAdapter({
       partyId: 0,
       numParties: 3,
-      protocol: MPCProtocol.SEMI2K
+      protocol: MPCProtocol.SEMI2K,
     })
   })
 

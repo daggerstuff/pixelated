@@ -1,4 +1,5 @@
 import type { WebSocket } from 'ws'
+
 import { fheService } from '../../fhe'
 import TherapyChatWebSocketServer from '../server'
 
@@ -146,7 +147,7 @@ describe('therapyChatWebSocketServer', () => {
         sessionId: '123',
       }
 
-      await messageHandler(JSON.stringify(chatMessage))
+       messageHandler(JSON.stringify(chatMessage))
       expect(mockWebSocket.send).toHaveBeenCalled()
     })
 
@@ -176,7 +177,7 @@ describe('therapyChatWebSocketServer', () => {
         mockProcessedData,
       )
 
-      await messageHandler(JSON.stringify(encryptedMessage))
+       messageHandler(JSON.stringify(encryptedMessage))
 
       expect(mockedFHEService.initialize).toHaveBeenCalled()
       expect(mockedFHEService.processEncrypted).toHaveBeenCalledWith(
@@ -205,7 +206,7 @@ describe('therapyChatWebSocketServer', () => {
         sessionId: '123',
       }
 
-      await messageHandler(JSON.stringify(statusMessage))
+       messageHandler(JSON.stringify(statusMessage))
       expect(mockWebSocket.send).toHaveBeenCalled()
     })
 
@@ -240,7 +241,7 @@ describe('therapyChatWebSocketServer', () => {
         throw new Error('Message handler not found')
       }
 
-      await messageHandler('invalid json')
+       messageHandler('invalid json')
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Failed to process message'),
       )
@@ -306,7 +307,7 @@ describe('therapyChatWebSocketServer', () => {
         encrypted: true,
       }
 
-      await messageHandler(JSON.stringify(encryptedMessage))
+       messageHandler(JSON.stringify(encryptedMessage))
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Encryption error'),
       )
@@ -330,7 +331,7 @@ describe('therapyChatWebSocketServer', () => {
         data: { content: 'test' },
       }
 
-      await messageHandler(JSON.stringify(message))
+       messageHandler(JSON.stringify(message))
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Session ID required'),
       )

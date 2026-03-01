@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import type { ComparativeProgressResult } from '../types/analytics.js'
 
 interface DateRange {
@@ -175,7 +176,7 @@ export function useComparativeProgress(
       }
       setError(
         err instanceof Error
-          ? (err as Error)?.message || String(err)
+          ? (err)?.message || String(err)
           : 'An unknown error occurred',
       )
     } finally {
@@ -184,7 +185,7 @@ export function useComparativeProgress(
   }, [userId, metric, cohort, dateRange, validateInputs])
 
   useEffect(() => {
-    fetchData()
+    void fetchData()
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()

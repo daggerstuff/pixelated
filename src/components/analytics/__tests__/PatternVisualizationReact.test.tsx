@@ -1,15 +1,17 @@
+import { render, screen, fireEvent, cleanup } from '@testing-library/react'
 /**
  * @vitest-environment jsdom
  */
 import React from 'react'
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent, cleanup } from '@testing-library/react'
-import { PatternVisualization } from '../PatternVisualizationReact'
+
 import type {
   TrendPattern,
   CrossSessionPattern,
   RiskCorrelation,
 } from '@/lib/fhe/pattern-recognition'
+
+import { PatternVisualization } from '../PatternVisualizationReact'
 
 // Mock data
 const mockTrends: TrendPattern[] = [
@@ -81,27 +83,27 @@ vi.mock('recharts', async () => {
   return {
     ...OriginalModule,
     ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="responsive-container">{children}</div>
+      <div data-testid='responsive-container'>{children}</div>
     ),
 
     LineChart: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="line-chart">{children}</div>
+      <div data-testid='line-chart'>{children}</div>
     ),
 
     AreaChart: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="area-chart">{children}</div>
+      <div data-testid='area-chart'>{children}</div>
     ),
 
-    Line: () => <div data-testid="line" />,
-    Area: () => <div data-testid="area" />,
-    CartesianGrid: () => <div data-testid="cartesian-grid" />,
+    Line: () => <div data-testid='line' />,
+    Area: () => <div data-testid='area' />,
+    CartesianGrid: () => <div data-testid='cartesian-grid' />,
 
-    XAxis: () => <div data-testid="x-axis" />,
-    YAxis: () => <div data-testid="y-axis" />,
-    Tooltip: () => <div data-testid="tooltip" />,
-    ReferenceLine: () => <div data-testid="reference-line" />,
+    XAxis: () => <div data-testid='x-axis' />,
+    YAxis: () => <div data-testid='y-axis' />,
+    Tooltip: () => <div data-testid='tooltip' />,
+    ReferenceLine: () => <div data-testid='reference-line' />,
 
-    ReferenceArea: () => <div data-testid="reference-area" />,
+    ReferenceArea: () => <div data-testid='reference-area' />,
   }
 })
 

@@ -44,7 +44,9 @@ export async function withSpan<T>(
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
     })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    )
     throw error
   } finally {
     span.end()
@@ -72,7 +74,9 @@ export function withSpanSync<T>(
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
     })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    )
     throw error
   } finally {
     span.end()
@@ -238,6 +242,6 @@ export function getTraceContext(): Record<string, string> {
 
   const spanContext = activeSpan.spanContext()
   return {
-    'traceparent': `00-${spanContext.traceId}-${spanContext.spanId}-${spanContext.traceFlags.toString(16).padStart(2, '0')}`,
+    traceparent: `00-${spanContext.traceId}-${spanContext.spanId}-${spanContext.traceFlags.toString(16).padStart(2, '0')}`,
   }
 }

@@ -1,4 +1,6 @@
+import { format } from 'date-fns'
 import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { format } from 'date-fns'
 
 export interface FilterOptions {
   // Trend filters
@@ -69,26 +70,26 @@ export function FilterControls({
   }
 
   return (
-    <div className="filter-controls space-y-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-900 mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <h4 className="text-sm font-medium">Filter Options</h4>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={onReset}>
+    <div className='filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4'>
+      <div className='mb-2 flex items-center justify-between'>
+        <h4 className='text-sm font-medium'>Filter Options</h4>
+        <div className='space-x-2'>
+          <Button variant='outline' size='sm' onClick={onReset}>
             Reset
           </Button>
-          <Button size="sm" onClick={onApply}>
+          <Button size='sm' onClick={onApply}>
             Apply Filters
           </Button>
         </div>
       </div>
 
       {activeTab === 'trends' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="startDate">Start Date</Label>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <Label htmlFor='startDate'>Start Date</Label>
             <Input
-              id="startDate"
-              type="date"
+              id='startDate'
+              type='date'
               value={
                 options.startDate ? format(options.startDate, 'yyyy-MM-dd') : ''
               }
@@ -99,11 +100,11 @@ export function FilterControls({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="endDate">End Date</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='endDate'>End Date</Label>
             <Input
-              id="endDate"
-              type="date"
+              id='endDate'
+              type='date'
               value={
                 options.endDate ? format(options.endDate, 'yyyy-MM-dd') : ''
               }
@@ -117,13 +118,13 @@ export function FilterControls({
       )}
 
       {dateError && (
-        <div className="text-red-500 text-xs mb-2">{dateError}</div>
+        <div className='text-red-500 mb-2 text-xs'>{dateError}</div>
       )}
 
       {activeTab === 'patterns' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="patternType">Pattern Type</Label>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <Label htmlFor='patternType'>Pattern Type</Label>
             <Select
               value={options.patternType || ''}
               onValueChange={(value) => handleChange('patternType', value)}
@@ -132,7 +133,7 @@ export function FilterControls({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value=''>All Types</SelectItem>
                 {patternTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -142,11 +143,11 @@ export function FilterControls({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="minFrequency">Min Frequency</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='minFrequency'>Min Frequency</Label>
             <Input
-              id="minFrequency"
-              type="number"
+              id='minFrequency'
+              type='number'
               min={0}
               value={options.minFrequency || ''}
               onChange={(e) =>
@@ -155,19 +156,19 @@ export function FilterControls({
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
-              placeholder="Minimum frequency"
+              placeholder='Minimum frequency'
             />
           </div>
         </div>
       )}
 
       {activeTab === 'risks' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="minConfidence">Min Confidence</Label>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <Label htmlFor='minConfidence'>Min Confidence</Label>
             <Input
-              id="minConfidence"
-              type="number"
+              id='minConfidence'
+              type='number'
               min={0}
               max={1}
               step={0.1}
@@ -178,12 +179,12 @@ export function FilterControls({
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
-              placeholder="0.0 - 1.0"
+              placeholder='0.0 - 1.0'
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="riskFactor">Risk Factor</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='riskFactor'>Risk Factor</Label>
             <Select
               value={options.riskFactor || ''}
               onValueChange={(value) => handleChange('riskFactor', value)}
@@ -192,7 +193,7 @@ export function FilterControls({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Factors</SelectItem>
+                <SelectItem value=''>All Factors</SelectItem>
                 {riskFactors.map((factor) => (
                   <SelectItem key={factor} value={factor}>
                     {factor}

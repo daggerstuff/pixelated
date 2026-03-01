@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro'
 export const prerender = false
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
-import { AIRepository } from '@/lib/db/ai/repository'
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('3d-emotion-visualization-api')
 

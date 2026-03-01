@@ -1,10 +1,10 @@
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type {
   SessionDocumentation,
   EHRExportOptions,
   EHRExportResult,
   FHIRDocumentReference,
 } from './types'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('ehr-integration')
 

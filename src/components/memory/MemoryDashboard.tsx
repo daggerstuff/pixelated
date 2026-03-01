@@ -1,47 +1,3 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useMemory, useUserPreferences } from '@/hooks/useMemory'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  useDialog,
-} from '@/components/ui/dialog'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { toast } from 'sonner'
 import {
   Search,
   Plus,
@@ -57,6 +13,56 @@ import {
   Globe,
   Info,
 } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
+import { toast } from 'sonner'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  useDialog,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { useMemory, useUserPreferences } from '@/hooks/useMemory'
 import type { MemoryEntry } from '@/lib/memory/memory-client'
 
 interface MemoryDashboardProps {
@@ -93,7 +99,9 @@ export function MemoryDashboard({
   const [editContent, setEditContent] = useState('')
 
   // Therapeutic & Scope fields for new memory
-  const [newMemoryScope, setNewMemoryScope] = useState<'shared' | 'private' | 'user' | 'global'>('shared')
+  const [newMemoryScope, setNewMemoryScope] = useState<
+    'shared' | 'private' | 'user' | 'global'
+  >('shared')
   const [newMemoryAgentRole, setNewMemoryAgentRole] = useState('')
 
   const memory = useMemory({
@@ -200,77 +208,78 @@ export function MemoryDashboard({
   }, [searchQuery, handleSearchDebounced])
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className='space-y-6 p-6'>
+      <div className='flex items-center justify-between'>
         <div>
-          <h1 className="text-3xl font-bold">Memory Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className='text-3xl font-bold'>Memory Dashboard</h1>
+          <p className='text-muted-foreground'>
             Manage and explore your AI memory system
           </p>
         </div>
-
-
       </div>
 
       {/* Crisis Alert Banner */}
-      {filteredMemories.some(m => m.metadata?.crisisSeverity && m.metadata.crisisSeverity !== 'none') && (
-        <Card className="border-destructive bg-destructive/5">
-          <CardHeader className="py-3">
-            <CardTitle className="text-destructive text-sm font-medium flex items-center gap-2">
-              <AlertCircle className="h-4 w-4" />
+      {filteredMemories.some(
+        (m) =>
+          m.metadata?.crisisSeverity && m.metadata.crisisSeverity !== 'none',
+      ) && (
+        <Card className='border-destructive bg-destructive/5'>
+          <CardHeader className='py-3'>
+            <CardTitle className='text-destructive flex items-center gap-2 text-sm font-medium'>
+              <AlertCircle className='h-4 w-4' />
               Active Crisis Signals Detected
             </CardTitle>
-            <CardDescription className="text-xs text-destructive/80">
-              The AI has flagged potential crisis signals in recent user interactions.
-              Please review entries marked with crisis badges.
+            <CardDescription className='text-destructive/80 text-xs'>
+              The AI has flagged potential crisis signals in recent user
+              interactions. Please review entries marked with crisis badges.
             </CardDescription>
           </CardHeader>
         </Card>
       )}
 
       {memory.error && (
-        <Card className="border-destructive">
-          <CardContent className="pt-6">
-            <p className="text-destructive">Error: {memory.error}</p>
+        <Card className='border-destructive'>
+          <CardContent className='pt-6'>
+            <p className='text-destructive'>Error: {memory.error}</p>
           </CardContent>
         </Card>
       )}
 
-      <Tabs defaultValue="memories" className="space-y-4">
+      <Tabs defaultValue='memories' className='space-y-4'>
         <TabsList>
-          <TabsTrigger value="memories">Memories</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="preferences">Preferences</TabsTrigger>
+          <TabsTrigger value='memories'>Memories</TabsTrigger>
+          <TabsTrigger value='analytics'>Analytics</TabsTrigger>
+          <TabsTrigger value='preferences'>Preferences</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="memories" className="space-y-4">
+        <TabsContent value='memories' className='space-y-4'>
           {/* Search and Filter Controls */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5" />
+              <CardTitle className='flex items-center gap-2'>
+                <Search className='h-5 w-5' />
                 Search & Filter
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-4">
-                <div className="flex-1">
+            <CardContent className='space-y-4'>
+              <div className='flex gap-4'>
+                <div className='flex-1'>
                   <Input
-                    placeholder="Search memories..."
+                    placeholder='Search memories...'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full"
+                    className='w-full'
                   />
                 </div>
                 <Select
                   value={selectedCategory}
                   onValueChange={setSelectedCategory}
                 >
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className='w-40'>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value='all'>All Categories</SelectItem>
                     {MEMORY_CATEGORIES.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -279,10 +288,15 @@ export function MemoryDashboard({
                   </SelectContent>
                 </Select>
                 <Button onClick={addDialog.open}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className='mr-2 h-4 w-4' />
                   Add Memory
                 </Button>
-                <Dialog open={addDialog.isOpen} onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}>
+                <Dialog
+                  open={addDialog.isOpen}
+                  onOpenChange={(open) =>
+                    open ? addDialog.open() : addDialog.close()
+                  }
+                >
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Add New Memory</DialogTitle>
@@ -290,51 +304,71 @@ export function MemoryDashboard({
                         Create a new memory entry with content and metadata.
                       </DialogDescription>
                     </DialogHeader>
-                    <div className="space-y-4 py-4">
+                    <div className='space-y-4 py-4'>
                       <Textarea
-                        placeholder="Memory content..."
+                        placeholder='Memory content...'
                         value={newMemoryContent}
                         onChange={(e) => setNewMemoryContent(e.target.value)}
                         rows={4}
                       />
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className='grid grid-cols-2 gap-4'>
                         <div>
-                          <label htmlFor="memory-scope" className="text-sm font-medium">Scope</label>
+                          <label
+                            htmlFor='memory-scope'
+                            className='text-sm font-medium'
+                          >
+                            Scope
+                          </label>
                           <Select
                             value={newMemoryScope}
-                            onValueChange={(val) => setNewMemoryScope(val as typeof newMemoryScope)}
+                            onValueChange={(val) =>
+                              setNewMemoryScope(val as typeof newMemoryScope)
+                            }
                           >
-                            <SelectTrigger id="memory-scope">
+                            <SelectTrigger id='memory-scope'>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="shared">Shared (Team)</SelectItem>
-                              <SelectItem value="private">Private (Agent Only)</SelectItem>
-                              <SelectItem value="user">Personal</SelectItem>
-                              <SelectItem value="global">Global Context</SelectItem>
+                              <SelectItem value='shared'>
+                                Shared (Team)
+                              </SelectItem>
+                              <SelectItem value='private'>
+                                Private (Agent Only)
+                              </SelectItem>
+                              <SelectItem value='user'>Personal</SelectItem>
+                              <SelectItem value='global'>
+                                Global Context
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label htmlFor="agent-role" className="text-sm font-medium">Agent Role</label>
+                          <label
+                            htmlFor='agent-role'
+                            className='text-sm font-medium'
+                          >
+                            Agent Role
+                          </label>
                           <Input
-                            id="agent-role"
-                            placeholder="e.g. Trainer, Practice"
+                            id='agent-role'
+                            placeholder='e.g. Trainer, Practice'
                             value={newMemoryAgentRole}
-                            onChange={(e) => setNewMemoryAgentRole(e.target.value)}
+                            onChange={(e) =>
+                              setNewMemoryAgentRole(e.target.value)
+                            }
                           />
                         </div>
                       </div>
                       <div>
                         <label
-                          htmlFor="tags-input"
-                          className="text-sm font-medium"
+                          htmlFor='tags-input'
+                          className='text-sm font-medium'
                         >
                           Tags (comma-separated)
                         </label>
                         <Input
-                          id="tags-input"
-                          placeholder="tag1, tag2, tag3"
+                          id='tags-input'
+                          placeholder='tag1, tag2, tag3'
                           value={newMemoryTags}
                           onChange={(e) => setNewMemoryTags(e.target.value)}
                         />
@@ -342,7 +376,7 @@ export function MemoryDashboard({
                     </div>
                     <DialogFooter>
                       <Button
-                        variant="outline"
+                        variant='outline'
                         onClick={() => {
                           setNewMemoryContent('')
                           setNewMemoryCategory('general')
@@ -363,29 +397,29 @@ export function MemoryDashboard({
           {/* Memory List */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <Brain className="h-5 w-5" />
+              <CardTitle className='flex items-center justify-between'>
+                <span className='flex items-center gap-2'>
+                  <Brain className='h-5 w-5' />
                   Memories ({filteredMemories.length})
                 </span>
                 {memory.isLoading && (
-                  <Badge variant="secondary">Loading...</Badge>
+                  <Badge variant='secondary'>Loading...</Badge>
                 )}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {filteredMemories.length === 0 ? (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
+                <div className='py-8 text-center'>
+                  <Brain className='text-muted-foreground mx-auto mb-4 h-12 w-12' />
+                  <p className='text-muted-foreground'>
                     {searchQuery
                       ? 'No memories found matching your search.'
                       : 'No memories found. Add your first memory!'}
                   </p>
                 </div>
               ) : (
-                <div className="relative w-full overflow-auto">
-                  <table className="w-full text-sm">
+                <div className='relative w-full overflow-auto'>
+                  <table className='w-full text-sm'>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Content</TableHead>
@@ -398,74 +432,95 @@ export function MemoryDashboard({
                     <TableBody>
                       {filteredMemories.map((mem) => (
                         <TableRow key={mem.id}>
-                          <TableCell className="max-w-md">
-                            <p className="truncate" title={mem.content}>
+                          <TableCell className='max-w-md'>
+                            <p className='truncate' title={mem.content}>
                               {mem.content}
                             </p>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary">
+                            <Badge variant='secondary'>
                               {mem.metadata?.category || 'general'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                          <TableCell className='text-muted-foreground whitespace-nowrap text-xs'>
                             {formatTimestamp(mem.metadata?.timestamp)}
                           </TableCell>
                           <TableCell>
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className='flex flex-wrap gap-1.5'>
                               {/* Scope Badge */}
                               {mem.metadata?.scope === 'private' ? (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-amber-200 bg-amber-50 text-amber-700 text-[10px]">
-                                  <Lock className="h-2.5 w-2.5" /> Private
+                                <Badge
+                                  variant='outline'
+                                  className='border-amber-200 bg-amber-50 text-amber-700 gap-1 px-1.5 py-0 text-[10px]'
+                                >
+                                  <Lock className='h-2.5 w-2.5' /> Private
                                 </Badge>
                               ) : mem.metadata?.scope === 'global' ? (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-blue-200 bg-blue-50 text-blue-700 text-[10px]">
-                                  <Globe className="h-2.5 w-2.5" /> Global
+                                <Badge
+                                  variant='outline'
+                                  className='border-blue-200 bg-blue-50 text-blue-700 gap-1 px-1.5 py-0 text-[10px]'
+                                >
+                                  <Globe className='h-2.5 w-2.5' /> Global
                                 </Badge>
                               ) : (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-emerald-200 bg-emerald-50 text-emerald-700 text-[10px]">
-                                  <ShieldCheck className="h-2.5 w-2.5" /> Shared
+                                <Badge
+                                  variant='outline'
+                                  className='border-emerald-200 bg-emerald-50 text-emerald-700 gap-1 px-1.5 py-0 text-[10px]'
+                                >
+                                  <ShieldCheck className='h-2.5 w-2.5' /> Shared
                                 </Badge>
                               )}
 
                               {/* Crisis Severity Badge */}
-                              {mem.metadata?.crisisSeverity && mem.metadata.crisisSeverity !== 'none' && (
-                                <Badge variant="destructive" className="gap-1 px-1.5 py-0 animate-pulse text-[10px]">
-                                  <AlertCircle className="h-2.5 w-2.5" /> {mem.metadata.crisisSeverity.toUpperCase()}
-                                </Badge>
-                              )}
+                              {mem.metadata?.crisisSeverity &&
+                                mem.metadata.crisisSeverity !== 'none' && (
+                                  <Badge
+                                    variant='destructive'
+                                    className='animate-pulse gap-1 px-1.5 py-0 text-[10px]'
+                                  >
+                                    <AlertCircle className='h-2.5 w-2.5' />{' '}
+                                    {mem.metadata.crisisSeverity.toUpperCase()}
+                                  </Badge>
+                                )}
 
                               {/* Speculation Badge */}
                               {mem.metadata?.isSpeculative && (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-purple-200 bg-purple-50 text-purple-700 text-[10px]">
-                                  <Info className="h-2.5 w-2.5" /> Speculative
+                                <Badge
+                                  variant='outline'
+                                  className='border-purple-200 bg-purple-50 text-purple-700 gap-1 px-1.5 py-0 text-[10px]'
+                                >
+                                  <Info className='h-2.5 w-2.5' /> Speculative
                                 </Badge>
                               )}
 
                               {/* PII Safe Badge */}
                               {mem.metadata?.piiRemoved && (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-green-200 bg-green-50 text-green-700 text-[10px]">
-                                  <ShieldCheck className="h-2.5 w-2.5" /> PII Safe
+                                <Badge
+                                  variant='outline'
+                                  className='border-green-200 bg-green-50 text-green-700 gap-1 px-1.5 py-0 text-[10px]'
+                                >
+                                  <ShieldCheck className='h-2.5 w-2.5' /> PII
+                                  Safe
                                 </Badge>
                               )}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex gap-2">
+                            <div className='flex gap-2'>
                               <Button
-                                variant="ghost"
-                                size="icon"
+                                variant='ghost'
+                                size='icon'
                                 onClick={() => {
                                   setEditingMemory(mem)
                                   setEditContent(mem.content)
                                 }}
-                                aria-label="Edit"
+                                aria-label='Edit'
                               >
-                                <Edit className="h-4 w-4" />
+                                <Edit className='h-4 w-4' />
                               </Button>
                               <AlertDialog>
-                                <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive hover:bg-accent">
-                                  <Trash2 className="h-4 w-4" />
+                                <AlertDialogTrigger className='text-destructive hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md'>
+                                  <Trash2 className='h-4 w-4' />
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
@@ -473,17 +528,19 @@ export function MemoryDashboard({
                                       Delete Memory
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to delete this memory?
-                                      This action cannot be undone.
+                                      Are you sure you want to delete this
+                                      memory? This action cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() =>
                                         mem.id && handleDeleteMemory(mem.id)
                                       }
-                                      className="bg-destructive hover:bg-destructive/90"
+                                      className='bg-destructive hover:bg-destructive/90'
                                     >
                                       Delete
                                     </AlertDialogAction>
@@ -501,7 +558,10 @@ export function MemoryDashboard({
             </CardContent>
           </Card>
           {/* Centralized Edit Dialog */}
-          <Dialog open={!!editingMemory} onOpenChange={(open) => !open && setEditingMemory(null)}>
+          <Dialog
+            open={!!editingMemory}
+            onOpenChange={(open) => !open && setEditingMemory(null)}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Edit Memory</DialogTitle>
@@ -513,11 +573,11 @@ export function MemoryDashboard({
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={4}
-                placeholder="Memory content..."
+                placeholder='Memory content...'
               />
               <DialogFooter>
                 <Button
-                  variant="outline"
+                  variant='outline'
                   onClick={() => {
                     setEditingMemory(null)
                     setEditContent('')
@@ -531,46 +591,46 @@ export function MemoryDashboard({
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-4">
+        <TabsContent value='analytics' className='space-y-4'>
           {memory.stats && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                  <CardTitle className='text-sm font-medium'>
                     Total Memories
                   </CardTitle>
-                  <Brain className="h-4 w-4 text-muted-foreground" />
+                  <Brain className='text-muted-foreground h-4 w-4' />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className='text-2xl font-bold'>
                     {memory.stats.totalMemories}
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                  <CardTitle className='text-sm font-medium'>
                     Categories
                   </CardTitle>
-                  <Tag className="h-4 w-4 text-muted-foreground" />
+                  <Tag className='text-muted-foreground h-4 w-4' />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className='text-2xl font-bold'>
                     {Object.keys(memory.stats.categoryCounts).length}
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
+                <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                  <CardTitle className='text-sm font-medium'>
                     Recent Activity
                   </CardTitle>
-                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Clock className='text-muted-foreground h-4 w-4' />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">
+                  <div className='text-2xl font-bold'>
                     {memory.stats.recentActivity.length}
                   </div>
                 </CardContent>
@@ -581,43 +641,43 @@ export function MemoryDashboard({
           {memory.stats && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
+                <CardTitle className='flex items-center gap-2'>
+                  <BarChart3 className='h-5 w-5' />
                   Memory Distribution by Category
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {(Object.entries(memory.stats.categoryCounts) as Array<[string, number]>).map(
-                    ([category, count]) => (
-                      <div
-                        key={category}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{category}</Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-secondary rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{
-                                width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">{count}</span>
-                        </div>
+                <div className='space-y-3'>
+                  {(
+                    Object.entries(memory.stats.categoryCounts)
+                  ).map(([category, count]) => (
+                    <div
+                      key={category}
+                      className='flex items-center justify-between'
+                    >
+                      <div className='flex items-center gap-2'>
+                        <Badge variant='outline'>{category}</Badge>
                       </div>
-                    ),
-                  )}
+                      <div className='flex items-center gap-2'>
+                        <div className='bg-secondary h-2 w-24 rounded-full'>
+                          <div
+                            className='bg-primary h-2 rounded-full'
+                            style={{
+                              width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                        <span className='text-sm font-medium'>{count}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           )}
         </TabsContent>
 
-        <TabsContent value="preferences" className="space-y-4">
+        <TabsContent value='preferences' className='space-y-4'>
           <Card>
             <CardHeader>
               <CardTitle>User Preferences</CardTitle>
@@ -627,23 +687,23 @@ export function MemoryDashboard({
             </CardHeader>
             <CardContent>
               {userPrefs.memories.length === 0 ? (
-                <p className="text-muted-foreground">No preferences found.</p>
+                <p className='text-muted-foreground'>No preferences found.</p>
               ) : (
-                <div className="space-y-2">
+                <div className='space-y-2'>
                   {userPrefs.memories.map((pref) => (
                     <div
                       key={pref.id || pref.content}
-                      className="flex items-center justify-between p-2 border rounded"
+                      className='flex items-center justify-between rounded border p-2'
                     >
-                      <span className="font-mono text-sm">{pref.content}</span>
+                      <span className='font-mono text-sm'>{pref.content}</span>
                       <Button
-                        variant="ghost"
-                        size="sm"
+                        variant='ghost'
+                        size='sm'
                         onClick={() =>
                           pref.id && userPrefs.deleteMemory(pref.id)
                         }
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className='h-4 w-4' />
                       </Button>
                     </div>
                   ))}

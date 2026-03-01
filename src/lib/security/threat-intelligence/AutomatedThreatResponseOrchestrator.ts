@@ -5,11 +5,12 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
-import { logger } from '../../logger'
 
+import { logger } from '../../logger'
 import { auditLog } from '../audit-logging'
 
 // Types
@@ -1076,7 +1077,9 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateRemediateAction(_action: ResponseAction): Promise<void> {
+  private async simulateRemediateAction(
+    _action: ResponseAction,
+  ): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
     if (Math.random() < 0.08) {
@@ -1369,7 +1372,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
             .toArray(),
           this.responsesCollection
             .find({
-              'status': 'completed',
+              status: 'completed',
               'result.success': true,
             })
             .toArray(),

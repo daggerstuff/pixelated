@@ -1,3 +1,7 @@
+import { SpanStatusCode } from '@opentelemetry/api'
+
+import { getArizeTracer } from './tracing/arize-setup'
+
 /**
  * Azure AI Agent Service for Pixelated Empathy
  * Connects to our specialized clinical AI agent for therapeutic scenario generation
@@ -106,44 +110,66 @@ export class PixelatedEmpathyAgent {
    * Send message to the Azure AI Agent
    */
   async sendMessage(message: string, context: string): Promise<AgentResponse> {
-    try {
-      const response = await fetch(`${this.agentEndpoint}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-          'X-Agent-Context': context,
-        },
-        body: JSON.stringify({
-          message,
-          agent_id: this.agentId,
-          conversation_id: `${context}_${Date.now()}`,
-          temperature: 0.3,
-          max_tokens: 2000,
-        }),
-      })
+    const tracer = getArizeTracer()
+    return tracer.startActiveSpan('agent.sendMessage', async (span) => {
+      try {
+        span.setAttributes({
+          'agent.id': this.agentId,
+          'agent.context': context,
+          'llm.prompts': message,
+        })
 
-      if (!response.ok) {
-        throw new Error(
-          `Agent API error: ${response.status} ${response.statusText}`,
-        )
-      }
+        const response = await fetch(`${this.agentEndpoint}/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.apiKey}`,
+            'X-Agent-Context': context,
+          },
+          body: JSON.stringify({
+            message,
+            agent_id: this.agentId,
+            conversation_id: `${context}_${Date.now()}`,
+            temperature: 0.3,
+            max_tokens: 2000,
+          }),
+        })
 
-      const data = await response.json()
-      return {
-        success: true,
-        response: data.response || data.message,
-        metadata: data.metadata || {},
-        conversation_id: data.conversation_id,
+        if (!response.ok) {
+          throw new Error(
+            `Agent API error: ${response.status} ${response.statusText}`,
+          )
+        }
+
+        const data = await response.json()
+        const result = {
+          success: true,
+          response: data.response || data.message,
+          metadata: data.metadata || {},
+          conversation_id: data.conversation_id,
+        }
+
+        span.setAttributes({
+          'agent.response': result.response || '',
+          'agent.conversation_id': result.conversation_id || '',
+        })
+
+        return result
+      } catch (error: unknown) {
+        span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: error instanceof Error ? error.message : String(error),
+        })
+        console.error('Azure AI Agent error:', error)
+        return {
+          success: false,
+          error: error instanceof Error ? String(error) : 'Unknown error',
+          response: null,
+        }
+      } finally {
+        span.end()
       }
-    } catch (error: unknown) {
-      console.error('Azure AI Agent error:', error)
-      return {
-        success: false,
-        error: error instanceof Error ? String(error) : 'Unknown error',
-        response: null,
-      }
-    }
+    })
   }
 
   /**
@@ -153,13 +179,21 @@ export class PixelatedEmpathyAgent {
     message: string,
     context: string = 'general',
   ): AsyncGenerator<unknown, void, unknown> {
+    const tracer = getArizeTracer()
+    const span = tracer.startSpan('agent.streamConversation')
     try {
+      span.setAttributes({
+        'agent.id': this.agentId,
+        'agent.context': context,
+        'llm.is_streaming': true,
+      })
+
       const response = await fetch(`${this.agentEndpoint}/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept': 'text/event-stream',
+          Authorization: `Bearer ${this.apiKey}`,
+          Accept: 'text/event-stream',
         },
         body: JSON.stringify({
           message,
@@ -189,7 +223,7 @@ export class PixelatedEmpathyAgent {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               try {
-                const data = JSON.parse(line.slice(6) as unknown)
+                const data = JSON.parse(line.slice(6))
                 yield data
               } catch {
                 // Skip invalid JSON
@@ -201,8 +235,14 @@ export class PixelatedEmpathyAgent {
         reader.releaseLock()
       }
     } catch (error: unknown) {
+      span.setStatus({
+        code: SpanStatusCode.ERROR,
+        message: error instanceof Error ? error.message : String(error),
+      })
       console.error('Stream error:', error)
       yield { error: error instanceof Error ? String(error) : 'Stream error' }
+    } finally {
+      span.end()
     }
   }
 }

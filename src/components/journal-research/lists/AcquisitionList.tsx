@@ -1,15 +1,23 @@
+import { format } from 'date-fns'
+import { CheckCircle2, Loader2, Play } from 'lucide-react'
 import { useState, useMemo } from 'react'
+
+import { Button } from '@/components/ui/button/button'
+import { Table } from '@/components/ui/table'
+import type {
+  TableColumn,
+  TableState,
+  TableDataSource,
+} from '@/components/ui/table-types'
 import type {
   Acquisition,
   AcquisitionList as AcquisitionListType,
 } from '@/lib/api/journal-research/types'
-import { Table } from '@/components/ui/table'
-import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
-import { format } from 'date-fns'
+import {
+  useIntegrateDataset,
+  useTrainingStatus,
+} from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
-import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
-import { Button } from '@/components/ui/button/button'
-import { CheckCircle2, Loader2, Play } from 'lucide-react'
 
 export interface AcquisitionListProps {
   acquisitions: AcquisitionListType
@@ -27,8 +35,11 @@ export function AcquisitionList({
   sessionId,
 }: AcquisitionListProps) {
   const integrateMutation = useIntegrateDataset(sessionId ?? '')
-  const { data: trainingStatus } = useTrainingStatus(sessionId ?? '', !!sessionId)
-  
+  const { data: trainingStatus } = useTrainingStatus(
+    sessionId ?? '',
+    !!sessionId,
+  )
+
   // Create a map of integration statuses
   const integrationStatusMap = useMemo(() => {
     const map = new Map<string, boolean>()
@@ -107,10 +118,14 @@ export function AcquisitionList({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      approved: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      completed:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'in-progress':
+        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      pending:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      approved:
+        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
       failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     }
     return (
@@ -126,7 +141,7 @@ export function AcquisitionList({
       accessor: (row) => (
         <button
           onClick={() => onAcquisitionClick?.(row)}
-          className="text-left font-medium text-primary hover:underline font-mono text-sm"
+          className='text-primary text-left font-mono text-sm font-medium hover:underline'
         >
           {row.acquisitionId.slice(0, 8)}...
         </button>
@@ -137,7 +152,7 @@ export function AcquisitionList({
       id: 'sourceId',
       header: 'Source ID',
       accessor: (row) => (
-        <span className="font-mono text-sm">{row.sourceId.slice(0, 8)}...</span>
+        <span className='font-mono text-sm'>{row.sourceId.slice(0, 8)}...</span>
       ),
       hideMobile: true,
     },
@@ -158,16 +173,17 @@ export function AcquisitionList({
       header: 'Progress',
       accessor: (row) => {
         const progress = row.downloadProgress ?? 0
-        if (progress === 0 && row.status !== 'in-progress') return <span>-</span>
+        if (progress === 0 && row.status !== 'in-progress')
+          return <span>-</span>
         return (
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
+          <div className='flex items-center gap-2'>
+            <div className='bg-muted h-2 w-24 overflow-hidden rounded-full'>
               <div
-                className="h-full bg-primary transition-all"
+                className='bg-primary h-full transition-all'
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <span className="text-sm">{Math.round(progress)}%</span>
+            <span className='text-sm'>{Math.round(progress)}%</span>
           </div>
         )
       },
@@ -179,13 +195,13 @@ export function AcquisitionList({
       header: 'Size',
       accessor: (row) =>
         row.fileSizeMb ? (
-          <span className="text-sm">
+          <span className='text-sm'>
             {row.fileSizeMb < 1024
               ? `${row.fileSizeMb.toFixed(1)} MB`
               : `${(row.fileSizeMb / 1024).toFixed(1)} GB`}
           </span>
         ) : (
-          <span className="text-muted-foreground">-</span>
+          <span className='text-muted-foreground'>-</span>
         ),
       sortable: true,
       align: 'right',
@@ -198,7 +214,7 @@ export function AcquisitionList({
         row.acquiredDate ? (
           format(row.acquiredDate, 'MMM d, yyyy')
         ) : (
-          <span className="text-muted-foreground">-</span>
+          <span className='text-muted-foreground'>-</span>
         ),
       sortable: true,
       hideMobile: true,
@@ -209,43 +225,43 @@ export function AcquisitionList({
       accessor: (row) => {
         const isIntegrated = integrationStatusMap.get(row.sourceId) ?? false
         const isIntegrating = integrateMutation.isPending
-        
+
         if (isIntegrated) {
           return (
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <span className="text-xs text-green-600">Integrated</span>
+            <div className='flex items-center gap-2'>
+              <CheckCircle2 className='text-green-600 h-4 w-4' />
+              <span className='text-green-600 text-xs'>Integrated</span>
             </div>
           )
         }
-        
+
         if (isIntegrating) {
           return (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-              <span className="text-xs text-blue-600">Integrating...</span>
+            <div className='flex items-center gap-2'>
+              <Loader2 className='text-blue-600 h-4 w-4 animate-spin' />
+              <span className='text-blue-600 text-xs'>Integrating...</span>
             </div>
           )
         }
-        
+
         if (row.status === 'completed' && sessionId) {
           return (
             <Button
-              size="sm"
-              variant="outline"
+              size='sm'
+              variant='outline'
               onClick={(e) => {
                 e.stopPropagation()
                 integrateMutation.mutate({ sourceId: row.sourceId })
               }}
-              className="h-7 text-xs"
+              className='h-7 text-xs'
             >
-              <Play className="h-3 w-3 mr-1" />
+              <Play className='mr-1 h-3 w-3' />
               Integrate
             </Button>
           )
         }
-        
-        return <span className="text-xs text-muted-foreground">-</span>
+
+        return <span className='text-muted-foreground text-xs'>-</span>
       },
       sortable: false,
       align: 'center',
@@ -261,27 +277,25 @@ export function AcquisitionList({
     loading: isLoading,
   }
 
-  const statuses = Array.from(
-    new Set(acquisitions.items.map((a) => a.status)),
-  )
+  const statuses = Array.from(new Set(acquisitions.items.map((a) => a.status)))
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-1 gap-2">
+      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-1 gap-2'>
           <input
-            type="text"
-            placeholder="Search acquisitions..."
+            type='text'
+            placeholder='Search acquisitions...'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+            className='border-input rounded-md border bg-background px-3 py-2 text-sm capitalize'
           >
-            <option value="all">All Statuses</option>
+            <option value='all'>All Statuses</option>
             {statuses.map((status) => (
               <option key={status} value={status}>
                 {status.replace('-', ' ')}
@@ -289,7 +303,7 @@ export function AcquisitionList({
             ))}
           </select>
         </div>
-        <div className="text-sm text-muted-foreground">
+        <div className='text-muted-foreground text-sm'>
           Showing {filteredAndSortedAcquisitions.length} of {acquisitions.total}{' '}
           acquisitions
         </div>
@@ -307,4 +321,3 @@ export function AcquisitionList({
     </div>
   )
 }
-

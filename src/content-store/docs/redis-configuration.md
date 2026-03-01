@@ -1,6 +1,8 @@
 ---
 title: 'Redis Configuration'
-description: 'Detailed guide to configuring Redis for Pixelated Healths caching and queue system'
+description:
+  'Detailed guide to configuring Redis for Pixelated Healths caching and queue
+  system'
 pubDate: 2025-03-25
 share: true
 toc: true
@@ -13,12 +15,13 @@ author: 'Pixelated Team'
 
 ### Overview
 
-This guide provides detailed information about configuring the Redis service for optimal
-performance and reliability in the Pixelated application.
+This guide provides detailed information about configuring the Redis service for
+optimal performance and reliability in the Pixelated application.
 
 ### Basic Configuration
 
 1. Set up environment variables in your `.env` file:
+
    ```bash
    REDIS_URL=redis://localhost:6379
    REDIS_KEY_PREFIX=pixelated
@@ -27,7 +30,6 @@ performance and reliability in the Pixelated application.
 2. Create a configuration object:
 
    ```typescript
-
    const config: RedisServiceConfig = {
      url: process.env.REDIS_URL,
      keyPrefix: process.env.REDIS_KEY_PREFIX,
@@ -37,11 +39,9 @@ performance and reliability in the Pixelated application.
 3. Initialize the service:
 
    ```typescript
-
    const redis = new RedisService(config)
    await redis.connect()
    ```
-
 
 ## Configuration Options
 

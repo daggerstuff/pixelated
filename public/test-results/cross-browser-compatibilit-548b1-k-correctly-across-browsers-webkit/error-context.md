@@ -1,7 +1,8 @@
 # Test info
 
 - Name: Cross-browser compatibility >> forms work correctly across browsers
-- Location: /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:134:3
+- Location:
+  /home/runner/work/pixelated/pixelated/src/tests/cross-browser-compatibility.test.ts:134:3
 
 # Error details
 
@@ -25,68 +26,72 @@ Call log:
 ```yaml
 - alert
 - link "Skip to content":
-  - /url: "#main"
+    - /url: '#main'
 - banner:
-  - link "Vivi Ornitier @ pixelatedempathy.com":
-    - /url: /
-    - img
-  - navigation:
-    - list:
-      - listitem:
-        - link "Features":
-          - /url: /features
-      - listitem:
-        - link "Blog":
-          - /url: /blog
-      - listitem:
-        - link "Dashboard":
-          - /url: /dashboard
-      - listitem:
-        - link "AntfuStyle on Github":
-          - /url: https://github.com/vivirox
-      - listitem:
-        - link "Vivi on Twitter":
-          - /url: https://x.com/pixelated
-    - button "Toggle theme"
+    - link "Vivi Ornitier @ pixelatedempathy.com":
+        - /url: /
+        - img
+    - navigation:
+        - list:
+            - listitem:
+                - link "Features":
+                    - /url: /features
+            - listitem:
+                - link "Blog":
+                    - /url: /blog
+            - listitem:
+                - link "Dashboard":
+                    - /url: /dashboard
+            - listitem:
+                - link "AntfuStyle on Github":
+                    - /url: https://github.com/vivirox
+            - listitem:
+                - link "Vivi on Twitter":
+                    - /url: https://x.com/pixelated
+        - button "Toggle theme"
 - main:
-  - heading "Contact Us" [level=1]
-  - paragraph: We'd love to hear from you
-  - article:
-    - heading "Get in Touch" [level=2]
-    - paragraph: Have questions about our technology, interested in partnerships, or just want to say hello? We'd love to hear from you.
-    - paragraph:
-      - strong: "Email:"
-      - link "info@pixelatedempathy.com":
-        - /url: mailto:info@pixelatedempathy.com
-    - paragraph:
-      - strong: "Location:"
-      - text: San Francisco, CA
-    - heading "Connect With Us" [level=2]
-    - paragraph: Follow us on social media to stay updated with our latest developments, research insights, and community events.
-    - link "Twitter":
-      - /url: https://twitter.com/pixelated
-    - link "LinkedIn":
-      - /url: https://www.linkedin.com/company/pixelated-ascent
-    - link "GitHub":
-      - /url: https://github.com/pixelated
-    - heading "Send Us a Message" [level=2]
-    - text: Name
-    - textbox "Name": Test User
-    - text: Email
-    - textbox "Email": test@example.com
-    - text: Subject
-    - textbox "Subject"
-    - text: Message
-    - textbox "Message": This is a test message
-    - button "Send Message"
+    - heading "Contact Us" [level=1]
+    - paragraph: We'd love to hear from you
+    - article:
+        - heading "Get in Touch" [level=2]
+        - paragraph:
+            Have questions about our technology, interested in partnerships, or
+            just want to say hello? We'd love to hear from you.
+        - paragraph:
+            - strong: 'Email:'
+            - link "info@pixelatedempathy.com":
+                - /url: mailto:info@pixelatedempathy.com
+        - paragraph:
+            - strong: 'Location:'
+            - text: San Francisco, CA
+        - heading "Connect With Us" [level=2]
+        - paragraph:
+            Follow us on social media to stay updated with our latest
+            developments, research insights, and community events.
+        - link "Twitter":
+            - /url: https://twitter.com/pixelated
+        - link "LinkedIn":
+            - /url: https://www.linkedin.com/company/pixelated-ascent
+        - link "GitHub":
+            - /url: https://github.com/pixelated
+        - heading "Send Us a Message" [level=2]
+        - text: Name
+        - textbox "Name": Test User
+        - text: Email
+        - textbox "Email": test@example.com
+        - text: Subject
+        - textbox "Subject"
+        - text: Message
+        - textbox "Message": This is a test message
+        - button "Send Message"
 - contentinfo:
-  - paragraph: © 2025 Pixelated Empathy. All rights reserved.
-  - link "Privacy Policy":
-    - /url: /privacy
-  - link "Terms of Service":
-    - /url: /terms
-  - link "Contact":
-    - /url: /contact
+    - paragraph: © 2025 Pixelated Empathy. All rights reserved.
+    - link "Privacy Policy":
+        - /url: /privacy
+    - link "Terms of Service":
+        - /url: /terms
+    - link "Contact":
+        - /url: /contact
 - button "Scroll to top"
 ```
 

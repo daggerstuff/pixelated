@@ -4,11 +4,12 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+import { redis } from '../../redis'
+import { defaultRateLimitConfig } from '../config'
 import { DistributedRateLimiter } from '../rate-limiter'
 import { createRateLimiter } from '../rate-limiter'
-import { defaultRateLimitConfig } from '../config'
 import type { RateLimitRule } from '../types'
-import { redis } from '../../redis'
 
 // Mock Redis with stateful implementation
 vi.mock('../../redis', () => {
@@ -22,13 +23,20 @@ vi.mock('../../redis', () => {
     expire: vi.fn().mockImplementation(() => pipeline),
     hincrby: vi.fn().mockImplementation(() => pipeline),
     hset: vi.fn().mockImplementation(() => pipeline),
-    exec: vi.fn().mockImplementation(() => Promise.resolve([[null, 1], [null, 1]])),
+    exec: vi.fn().mockImplementation(() =>
+      Promise.resolve([
+        [null, 1],
+        [null, 1],
+      ]),
+    ),
   }
 
   return {
     redis: {
       _store: store,
-      get: vi.fn().mockImplementation((key) => Promise.resolve(store.get(key) || null)),
+      get: vi
+        .fn()
+        .mockImplementation((key) => Promise.resolve(store.get(key) || null)),
       set: vi.fn().mockImplementation((key, val) => {
         store.set(key, typeof val === 'string' ? val : JSON.stringify(val))
         return Promise.resolve('OK')
@@ -41,7 +49,9 @@ vi.mock('../../redis', () => {
         store.delete(key)
         return Promise.resolve(1)
       }),
-      exists: vi.fn().mockImplementation((key) => Promise.resolve(store.has(key) ? 1 : 0)),
+      exists: vi
+        .fn()
+        .mockImplementation((key) => Promise.resolve(store.has(key) ? 1 : 0)),
       expire: vi.fn().mockResolvedValue(1),
       ping: vi.fn().mockResolvedValue('PONG'),
       pipeline: vi.fn().mockReturnValue(pipeline),
@@ -62,7 +72,7 @@ describe('DistributedRateLimiter', () => {
 
   beforeEach(() => {
     // Clear redis store for each test
-    ; (redis as any)._store?.clear()
+    ;(redis as any)._store?.clear()
     rateLimiter = createRateLimiter(defaultRateLimitConfig)
   })
 
@@ -115,7 +125,9 @@ describe('DistributedRateLimiter', () => {
 
       // Setup mock responding to attack pattern checks
       vi.mocked(redis.zrangebyscore).mockResolvedValueOnce(
-        Array(15).fill(0).map((_, i) => `${Date.now() + i * 10}:${Math.random()}`)
+        Array(15)
+          .fill(0)
+          .map((_, i) => `${Date.now() + i * 10}:${Math.random()}`),
       )
 
       await rateLimiter.checkLimit('attacker', rule)
@@ -125,13 +137,15 @@ describe('DistributedRateLimiter', () => {
     it('should fail open on Redis errors', async () => {
       // Mock pipeline to throw error ONCE
       const pipeline = redis.pipeline()
-      vi.mocked(pipeline.exec).mockRejectedValueOnce(new Error('Redis connection failed'))
+      vi.mocked(pipeline.exec).mockRejectedValueOnce(
+        new Error('Redis connection failed'),
+      )
       // We need to re-mock pipeline for this test to return the failing one
-      // But our stateful mock returns a persistent object. 
+      // But our stateful mock returns a persistent object.
       // Let's override the mock implementation of pipeline temporarily
       const failingPipeline = {
         ...pipeline,
-        exec: vi.fn().mockRejectedValue(new Error('Redis connection failed'))
+        exec: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
       }
       vi.mocked(redis.pipeline).mockReturnValueOnce(failingPipeline as any)
 

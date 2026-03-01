@@ -88,15 +88,16 @@ export class ScheduledKeyRotation {
     const now = Date.now()
     const isExpired = keyData.expiresAt <= now
     const expiresWithin24Hours =
-      keyData.expiresAt > now &&
-      keyData.expiresAt <= now + 24 * 60 * 60 * 1000
+      keyData.expiresAt > now && keyData.expiresAt <= now + 24 * 60 * 60 * 1000
     return isExpired || expiresWithin24Hours
   }
 
   /**
    * Rotate a single key and handle notifications
    */
-  private async rotateKeyWithNotification(keyId: string): Promise<string | null> {
+  private async rotateKeyWithNotification(
+    keyId: string,
+  ): Promise<string | null> {
     try {
       const rotatedKey = await this.keyStorage.rotateKey(keyId)
       if (!rotatedKey) {

@@ -5,13 +5,14 @@
  */
 
 import { EventEmitter } from 'events'
+
 import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { v4 as uuidv4 } from 'uuid'
-import { logger } from '../../logger'
 
-import { auditLog } from '../audit-logging'
 import { BiasDetectionEngine } from '../../ai/bias-detection/BiasDetectionEngine'
+import { logger } from '../../logger'
+import { auditLog } from '../audit-logging'
 
 // Types
 export interface EdgeDetectionConfig {
@@ -564,7 +565,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         const inputTensor = tf.tensor2d([features])
 
         // Run model prediction
-        const prediction = (await model.predict(inputTensor)) as tf.Tensor
+        const prediction = ( model.predict(inputTensor)) as tf.Tensor
         const predictions = await prediction.data()
 
         // Clean up tensors

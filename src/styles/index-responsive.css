@@ -47,7 +47,11 @@
   font-weight: var(--weight-black);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  background: linear-gradient(
+    135deg,
+    var(--text-primary),
+    var(--accent-primary)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -123,7 +127,11 @@
   font-size: 2rem;
   padding: var(--space-3);
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-primary-hover)
+  );
   color: var(--bg-void);
   display: flex;
   align-items: center;
@@ -139,7 +147,11 @@
   font-weight: var(--weight-black);
   line-height: 1;
   margin-bottom: var(--space-3);
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  background: linear-gradient(
+    135deg,
+    var(--text-primary),
+    var(--accent-primary)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -214,7 +226,11 @@
 .author-avatar {
   width: 4rem;
   height: 4rem;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-hover));
+  background: linear-gradient(
+    135deg,
+    var(--accent-primary),
+    var(--accent-primary-hover)
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -282,7 +298,11 @@
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
   margin-bottom: var(--space-2);
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-primary));
+  background: linear-gradient(
+    135deg,
+    var(--text-primary),
+    var(--accent-primary)
+  );
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -854,13 +874,25 @@
   }
 
   .stats-section {
-    padding-left: max(var(--space-6), env(safe-area-inset-left, var(--space-6)));
-    padding-right: max(var(--space-6), env(safe-area-inset-right, var(--space-6)));
+    padding-left: max(
+      var(--space-6),
+      env(safe-area-inset-left, var(--space-6))
+    );
+    padding-right: max(
+      var(--space-6),
+      env(safe-area-inset-right, var(--space-6))
+    );
   }
 
   .testimonial-section {
-    padding-left: max(var(--space-6), env(safe-area-inset-left, var(--space-6)));
-    padding-right: max(var(--space-6), env(safe-area-inset-right, var(--space-6)));
+    padding-left: max(
+      var(--space-6),
+      env(safe-area-inset-left, var(--space-6))
+    );
+    padding-right: max(
+      var(--space-6),
+      env(safe-area-inset-right, var(--space-6))
+    );
   }
 }
 

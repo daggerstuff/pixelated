@@ -1,6 +1,7 @@
-import { QueryClient, } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { render, type RenderOptions } from '@testing-library/react'
 import { ReactElement } from 'react'
+
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
 
 /**
@@ -29,7 +30,8 @@ export function renderWithProviders(
     queryClient?: QueryClient
   },
 ) {
-  const { queryClient = createTestQueryClient(), ...renderOptions } = options ?? {}
+  const { queryClient = createTestQueryClient(), ...renderOptions } =
+    options ?? {}
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -127,4 +129,3 @@ export const mockProgressMetrics = {
   integrationPlansCreated: 1,
   lastUpdated: new Date('2024-01-15'),
 }
-

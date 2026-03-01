@@ -4,15 +4,16 @@
  */
 
 import type { APIRoute } from 'astro'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
+import type { EmotionAnalysis as TypesEmotionAnalysis } from '@/lib/ai/emotions/types'
+import { analyzeMultidimensionalPatterns } from '@/lib/ai/temporal/TemporalAnalysisAlgorithm'
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById } from '@/services/auth0.service'
 import { AIRepository } from '@/lib/db/ai/repository'
-import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
-import { analyzeMultidimensionalPatterns } from '@/lib/ai/temporal/TemporalAnalysisAlgorithm'
-import type { EmotionAnalysis as TypesEmotionAnalysis } from '@/lib/ai/emotions/types'
-import { createAuditLog } from '@/lib/audit'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -40,7 +41,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -53,7 +54,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -82,7 +83,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -122,7 +123,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 404,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -163,7 +164,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (type === 'map') {
       // Map emotions to dimensions
       const dimensionalMaps = limitedEmotionData.map((emotion) =>
-        emotionMapper.mapEmotionsToDimensions(emotion as TypesEmotionAnalysis),
+        emotionMapper.mapEmotionsToDimensions(emotion),
       )
 
       // Create audit log
@@ -172,7 +173,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.emotions.map.access',
         user.id,
         'auth-emotions',
-        { action: 'get_emotion_map', count: dimensionalMaps.length }
+        { action: 'get_emotion_map', count: dimensionalMaps.length },
       )
 
       logger.info('Returning dimensional maps', {
@@ -186,12 +187,12 @@ export const GET: APIRoute = async ({ request }) => {
       // Get multidimensional patterns
       // First create dimensional maps
       const dimensionalMaps = limitedEmotionData.map((emotion) =>
-        emotionMapper.mapEmotionsToDimensions(emotion as TypesEmotionAnalysis),
+        emotionMapper.mapEmotionsToDimensions(emotion),
       )
 
       // Analyze multidimensional patterns
       const patterns = analyzeMultidimensionalPatterns(
-        limitedEmotionData as TypesEmotionAnalysis[],
+        limitedEmotionData,
         dimensionalMaps,
       )
 
@@ -201,7 +202,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.emotions.patterns.access',
         user.id,
         'auth-emotions',
-        { action: 'get_emotion_patterns', count: patterns.length }
+        { action: 'get_emotion_patterns', count: patterns.length },
       )
 
       logger.info('Returning multidimensional patterns', {
@@ -219,7 +220,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
   } catch (error: unknown) {
@@ -234,7 +235,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -245,7 +246,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

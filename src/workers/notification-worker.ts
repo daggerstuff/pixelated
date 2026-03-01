@@ -1,6 +1,6 @@
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { NotificationService } from '@/lib/services/notification/NotificationService'
 import { WebSocketServer } from '@/lib/services/notification/WebSocketServer'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Create logger
 const logger = createBuildSafeLogger('notification-worker')
@@ -19,7 +19,6 @@ async function startWorker() {
 
   // Create WebSocket server
   wsServer = new WebSocketServer()
-
 
   // Handle WebSocket errors
   wsServer.on('error', (error: Error) => {

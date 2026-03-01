@@ -1,7 +1,8 @@
-// @vitest-environment node
-import type { Browser, Page } from '@playwright/test'
 import fs from 'node:fs/promises'
 import { join } from 'node:path'
+
+// @vitest-environment node
+import type { Browser, Page } from '@playwright/test'
 import { chromium } from '@playwright/test'
 
 // Browser performance types
@@ -285,29 +286,34 @@ describe('performance Tests', () => {
           // Use Promise.all to avoid deadlock and ensure listeners are ready
           try {
             const [inputDelay] = await Promise.all([
-              page.evaluate(() => {
-                return new Promise<number>((resolve) => {
-                  let startTime: number
+              page
+                .evaluate(() => {
+                  return new Promise<number>((resolve) => {
+                    let startTime: number
 
-                  const handlePointerDown = () => {
-                    startTime = performance.now()
-                    document.removeEventListener('pointerdown', handlePointerDown)
-                  }
+                    const handlePointerDown = () => {
+                      startTime = performance.now()
+                      document.removeEventListener(
+                        'pointerdown',
+                        handlePointerDown,
+                      )
+                    }
 
-                  const handlePointerUp = () => {
-                    const endTime = performance.now()
-                    document.removeEventListener('pointerup', handlePointerUp)
-                    resolve(endTime - startTime)
-                  }
+                    const handlePointerUp = () => {
+                      const endTime = performance.now()
+                      document.removeEventListener('pointerup', handlePointerUp)
+                      resolve(endTime - startTime)
+                    }
 
-                  document.addEventListener('pointerdown', handlePointerDown)
-                  document.addEventListener('pointerup', handlePointerUp)
+                    document.addEventListener('pointerdown', handlePointerDown)
+                    document.addEventListener('pointerup', handlePointerUp)
 
-                  // Safety timeout to avoid hanging indefinitely
-                  setTimeout(() => resolve(0), 5000)
+                    // Safety timeout to avoid hanging indefinitely
+                    setTimeout(() => resolve(0), 5000)
+                  })
                 })
-              }).catch(() => 0),
-              button.click().catch(() => { }),
+                .catch(() => 0),
+              button.click().catch(() => {}),
             ])
 
             // Store result
@@ -316,7 +322,9 @@ describe('performance Tests', () => {
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)
           } catch (error) {
-            console.warn(`Failed to measure FID on ${name}: ${error instanceof Error ? error.message : String(error)}`)
+            console.warn(
+              `Failed to measure FID on ${name}: ${error instanceof Error ? error.message : String(error)}`,
+            )
           }
         } else {
           // Skip if no clickable element found
@@ -334,7 +342,9 @@ describe('performance Tests', () => {
       page = await browser.newPage()
 
       // Navigate to the host first to avoid origin issues in fetch
-      await page.goto('http://localhost:3000/app/dashboard', { waitUntil: 'networkidle' })
+      await page.goto('http://localhost:3000/app/dashboard', {
+        waitUntil: 'networkidle',
+      })
 
       // Set up request interception for timing
       let apiResponseTime = 0

@@ -1,4 +1,5 @@
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
+
 import { SourceDiscovery } from '../features/SourceDiscovery'
 
 export interface DiscoveryPageProps {
@@ -12,4 +13,3 @@ export function DiscoveryPage({ sessionId }: DiscoveryPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

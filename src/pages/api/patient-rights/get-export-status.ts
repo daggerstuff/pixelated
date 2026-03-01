@@ -1,8 +1,10 @@
+import { z } from 'zod'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { protectApi } from '../../../lib/auth/apiAuth'
 // import type { APIRoute } from 'astro'
 import { getDataExportDetails } from '../../../lib/services/patient-rights/dataPortabilityService'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectApi } from '../../../lib/auth/apiAuth'
-import { z } from 'zod'
 
 const logger = createBuildSafeLogger('api-export-status')
 

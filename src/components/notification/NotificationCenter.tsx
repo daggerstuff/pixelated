@@ -1,12 +1,13 @@
+import { Bell, Check, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import type { NotificationItem } from '@/lib/services/notification/NotificationService'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { useWebSocket } from '@/hooks/useWebSocket'
+import type { NotificationItem } from '@/lib/services/notification/NotificationService'
 import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { cn } from '@/lib/utils'
-import { Bell, Check, X } from 'lucide-react'
 
 interface NotificationCenterProps {
   className?: string
@@ -88,16 +89,16 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   return (
     <div className={cn('relative', className)}>
       <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
+        variant='ghost'
+        size='icon'
+        className='relative'
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Bell className="h-5 w-5" />
+        <Bell className='h-5 w-5' />
         {unreadCount > 0 && (
           <Badge
-            variant="destructive"
-            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+            variant='destructive'
+            className='absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs'
           >
             {unreadCount}
           </Badge>
@@ -105,25 +106,25 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
       </Button>
 
       {isOpen && (
-        <Card className="absolute right-0 top-12 z-50 w-96 shadow-lg">
-          <div className="flex items-center justify-between border-b p-4">
-            <h2 className="text-lg font-semibold">Notifications</h2>
+        <Card className='absolute right-0 top-12 z-50 w-96 shadow-lg'>
+          <div className='flex items-center justify-between border-b p-4'>
+            <h2 className='text-lg font-semibold'>Notifications</h2>
             <Button
-              variant="ghost"
-              size="icon"
+              variant='ghost'
+              size='icon'
               onClick={() => setIsOpen(false)}
             >
-              <X className="h-4 w-4" />
+              <X className='h-4 w-4' />
             </Button>
           </div>
 
-          <div className="h-96 overflow-y-auto">
+          <div className='h-96 overflow-y-auto'>
             {notifications.length === 0 ? (
-              <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
+              <div className='text-muted-foreground flex h-full items-center justify-center p-4'>
                 No notifications
               </div>
             ) : (
-              <div className="divide-y">
+              <div className='divide-y'>
                 {notifications.map((notification: NotificationItem) => (
                   <div
                     key={notification.id}
@@ -133,32 +134,32 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         'bg-muted/50',
                     )}
                   >
-                    <div className="flex-1">
-                      <h3 className="font-medium">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">
+                    <div className='flex-1'>
+                      <h3 className='font-medium'>{notification.title}</h3>
+                      <p className='text-muted-foreground text-sm'>
                         {notification.body}
                       </p>
-                      <div className="mt-1 text-xs text-muted-foreground">
+                      <div className='text-muted-foreground mt-1 text-xs'>
                         {new Date(notification.createdAt).toLocaleString()}
                       </div>
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className='flex gap-1'>
                       {notification.status === NotificationStatus.PENDING && (
                         <Button
-                          variant="ghost"
-                          size="icon"
+                          variant='ghost'
+                          size='icon'
                           onClick={() => handleMarkAsRead(notification.id)}
                         >
-                          <Check className="h-4 w-4" />
+                          <Check className='h-4 w-4' />
                         </Button>
                       )}
                       <Button
-                        variant="ghost"
-                        size="icon"
+                        variant='ghost'
+                        size='icon'
                         onClick={() => handleDismiss(notification.id)}
                       >
-                        <X className="h-4 w-4" />
+                        <X className='h-4 w-4' />
                       </Button>
                     </div>
                   </div>

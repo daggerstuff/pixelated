@@ -1,8 +1,9 @@
-import type { UserRole } from '../../types/auth'
 import React from 'react'
 
 import { authClient } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
+
+import type { UserRole } from '../../types/auth'
 
 export interface NavigationItem {
   label: string
@@ -91,7 +92,7 @@ export function Navigation({
             isMobile ? 'block py-2' : '',
           )}
         >
-          {item.icon && <span className="mr-2">{item.icon}</span>}
+          {item.icon && <span className='mr-2'>{item.icon}</span>}
           {item.label}
         </a>
       ))}

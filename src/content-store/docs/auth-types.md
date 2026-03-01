@@ -1,8 +1,8 @@
 ---
-title: "Authentication Types and Protected Routes"
-description: "Authentication Types and Protected Routes documentation"
+title: 'Authentication Types and Protected Routes'
+description: 'Authentication Types and Protected Routes documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
+author: 'Pixelated Team'
 tags:
   - documentation
   - authentication
@@ -14,7 +14,9 @@ toc: true
 
 ## Overview
 
-This document explains the type system for protected API routes in our Astro application. We've created a type-safe approach for protecting routes with authentication and authorization checks.
+This document explains the type system for protected API routes in our Astro
+application. We've created a type-safe approach for protecting routes with
+authentication and authorization checks.
 
 ## Key Components
 
@@ -30,7 +32,10 @@ import type { AuthUser } from './types'
 // Extended APIContext with auth user information
 export interface AuthAPIContext<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+  Params extends Record<string, string | undefined> = Record<
+    string,
+    string | undefined
+  >,
 > extends APIContext<Props, Params> {
   locals: {
     user: AuthUser
@@ -41,7 +46,10 @@ export interface AuthAPIContext<
 // Protected API route handler function type
 export type ProtectedAPIRoute<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+  Params extends Record<string, string | undefined> = Record<
+    string,
+    string | undefined
+  >,
 > = (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
 
 // Options for protecting an API route
@@ -54,39 +62,50 @@ export interface ProtectRouteOptions {
 // Higher-order function to apply protection to an API route
 export type ProtectRouteFunction = <
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+  Params extends Record<string, string | undefined> = Record<
+    string,
+    string | undefined
+  >,
 >(
-  options: ProtectRouteOptions
+  options: ProtectRouteOptions,
 ) => (
-  handler: (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
+  handler: (
+    context: AuthAPIContext<Props, Params>,
+  ) => Response | Promise<Response>,
 ) => APIRoute
 ```
 
 ### 2. The `protectRoute` Function
 
-The `protectRoute` function in `src/lib/auth/serverAuth.ts` is a higher-order function that adds authentication and authorization checks to API routes:
+The `protectRoute` function in `src/lib/auth/serverAuth.ts` is a higher-order
+function that adds authentication and authorization checks to API routes:
 
 ```typescript
 export function protectRoute<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+  Params extends Record<string, string | undefined> = Record<
+    string,
+    string | undefined
+  >,
 >(
-  options: ProtectRouteOptions
+  options: ProtectRouteOptions,
 ): (
-  handler: (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
+  handler: (
+    context: AuthAPIContext<Props, Params>,
+  ) => Response | Promise<Response>,
 ) => APIRoute {
   return (handler) => {
     const apiRouteHandler: APIRoute = async (context) => {
       // Authentication and authorization checks...
-      
+
       // If authenticated, create auth context with user
       context.locals.user = user
       const authContext = context as unknown as AuthAPIContext<Props, Params>
-      
+
       // Call the handler with the auth context
       return handler(authContext)
     }
-    
+
     return apiRouteHandler
   }
 }
@@ -108,9 +127,9 @@ export const GET = protectRoute({
 })(async ({ locals, request }) => {
   // Access the authenticated user from locals
   const user = locals.user
-  
+
   // Your protected route logic here...
-  
+
   return new Response(
     JSON.stringify({ success: true, data: /* your data */ }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -122,7 +141,8 @@ export const GET = protectRoute({
 
 1. The TypeScript type system now handles the context conversion automatically
 2. The user object is available in `locals.user` and is properly typed
-3. You can specify role requirements and additional security checks in the options
+3. You can specify role requirements and additional security checks in the
+   options
 
 ## Security Features
 
@@ -152,21 +172,21 @@ export const GET = protectRoute({
   try {
     const user = locals.user
     logger.info(`User ${user.id} accessed protected resource`)
-    
+
     // Your API logic here
-    
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
-        message: 'Protected resource accessed successfully'
+        message: 'Protected resource accessed successfully',
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
   } catch (error) {
     logger.error('Error in protected route:', error)
     return new Response(
       JSON.stringify({ error: 'An unexpected error occurred' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }
 })

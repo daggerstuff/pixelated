@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import {
   generateReport,
   getReport,
@@ -55,12 +56,10 @@ export const useGenerateReportMutation = (sessionId: string | null) => {
     mutationFn: (payload: ReportGeneratePayload) =>
       generateReport(sessionId ?? '', payload),
     onSuccess: (result: Report) => {
-      queryClient.invalidateQueries({
+      void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.reports.list(result.sessionId, {}),
         exact: false,
       })
     },
   })
 }
-
-

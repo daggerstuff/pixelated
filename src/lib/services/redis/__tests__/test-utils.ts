@@ -1,6 +1,6 @@
-import type { RedisErrorCode } from '../types'
-
 import { Redis } from 'ioredis'
+
+import type { RedisErrorCode } from '../types'
 import { RedisServiceError } from '../types'
 
 /**
@@ -158,7 +158,7 @@ export async function simulateNetworkIssues(
     description: string
   },
 ): Promise<void> {
-  await redis.disconnect()
+   redis.disconnect()
   await sleep(options.duration)
   await redis.connect()
 }

@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react'
 import { X } from 'lucide-react'
+import React, { useCallback, useEffect, useState } from 'react'
+
 import { cn } from '../../lib/utils'
-import { Button } from './button'
 import FocusTrap from '../accessibility/FocusTrap'
+import { Button } from './button'
 import type {
   DialogContextType,
   DialogRootProps,
@@ -45,8 +46,7 @@ const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
   )
 }
 
-interface DialogTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
@@ -70,11 +70,10 @@ const DialogPortal = ({ children }: { children: React.ReactNode }) => {
     return null
   }
 
-  return <div className="fixed inset-0 z-50">{children}</div>
+  return <div className='fixed inset-0 z-50'>{children}</div>
 }
 
-interface DialogOverlayProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogOverlayProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 
@@ -98,7 +97,7 @@ const DialogOverlay = React.forwardRef<HTMLButtonElement, DialogOverlayProps>(
         )}
         onClick={() => onOpenChange(false)}
         onKeyDown={handleKeyDown}
-        aria-label="Close dialog"
+        aria-label='Close dialog'
         {...props}
       />
     )
@@ -135,19 +134,19 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
               e.stopPropagation()
             }
           }}
-          role="dialog"
-          aria-modal="true"
+          role='dialog'
+          aria-modal='true'
           tabIndex={-1}
           {...props}
         >
           {children}
           <button
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+            className='focus:ring-ring absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none'
             onClick={() => onOpenChange(false)}
-            aria-label="Close dialog"
+            aria-label='Close dialog'
           >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
+            <X className='h-4 w-4' />
+            <span className='sr-only'>Close</span>
           </button>
         </div>
       </DialogPortal>
@@ -218,8 +217,7 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
 )
 DialogTitle.displayName = 'DialogTitle'
 
-interface DialogDescriptionProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {
+interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
   className?: string
 }
 
@@ -306,8 +304,8 @@ function DialogModal<TData>({
         }
       }}
       tabIndex={-1}
-      aria-modal="true"
-      role="dialog"
+      aria-modal='true'
+      role='dialog'
     >
       <FocusTrap active={isOpen}>
         <div
@@ -327,29 +325,29 @@ function DialogModal<TData>({
         >
           {/* Header */}
           {title && (
-            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <div className='border-gray-200 dark:border-gray-700 flex items-center justify-between border-b px-6 py-4'>
+              <h3 className='text-gray-900 dark:text-white text-lg font-medium'>
                 {title}
               </h3>
               {showCloseButton && (
                 <button
-                  type="button"
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
+                  type='button'
+                  className='text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none'
                   onClick={onClose}
-                  aria-label="Close dialog"
+                  aria-label='Close dialog'
                 >
                   <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                    className='h-6 w-6'
+                    fill='none'
+                    stroke='currentColor'
+                    viewBox='0 0 24 24'
+                    xmlns='http://www.w3.org/2000/svg'
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
                       strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
+                      d='M6 18L18 6M6 6l12 12'
                     />
                   </svg>
                 </button>
@@ -358,11 +356,11 @@ function DialogModal<TData>({
           )}
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto p-6">{children}</div>
+          <div className='flex-1 overflow-y-auto p-6'>{children}</div>
 
           {/* Footer */}
           {footer && (
-            <div className="border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+            <div className='border-gray-200 dark:border-gray-700 border-t px-6 py-4'>
               {footer}
             </div>
           )}
@@ -428,8 +426,8 @@ function ConfirmDialog<TData>({
         }
       }}
       tabIndex={-1}
-      aria-modal="true"
-      role="alertdialog"
+      aria-modal='true'
+      role='alertdialog'
     >
       <FocusTrap active={isOpen}>
         <div
@@ -449,20 +447,20 @@ function ConfirmDialog<TData>({
         >
           {/* Header */}
           {title && (
-            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            <div className='border-gray-200 dark:border-gray-700 border-b px-6 py-4'>
+              <h3 className='text-gray-900 dark:text-white text-lg font-medium'>
                 {title}
               </h3>
             </div>
           )}
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto p-6">{children}</div>
+          <div className='flex-1 overflow-y-auto p-6'>{children}</div>
 
           {/* Footer */}
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+          <div className='border-gray-200 dark:border-gray-700 flex justify-end gap-3 border-t px-6 py-4'>
             <Button
-              variant="outline"
+              variant='outline'
               onClick={onClose}
               disabled={isLoading}
               {...cancelButtonProps}
@@ -476,7 +474,7 @@ function ConfirmDialog<TData>({
               {...confirmButtonProps}
             >
               {isLoading && (
-                <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <span className='border-current border-t-transparent mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2' />
               )}
               {confirmText}
             </Button>

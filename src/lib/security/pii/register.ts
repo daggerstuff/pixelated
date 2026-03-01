@@ -5,11 +5,12 @@
  * and middleware for use in the application.
  */
 
-import type { PIIDetectionConfig } from './'
-import type { PIIMiddlewareConfig } from './middleware'
 import process from 'node:process'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { PIIDetectionConfig } from './'
 import { piiDetectionService } from './'
+import type { PIIMiddlewareConfig } from './middleware'
 import { createPIIMiddleware } from './middleware'
 
 // Initialize logger

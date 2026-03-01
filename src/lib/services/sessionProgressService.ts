@@ -1,13 +1,13 @@
 import type {
-  SessionProgressMetrics,
-  TherapistSession,
-} from '@/types/dashboard'
-import type {
   SessionData,
   SkillProgressData,
   TherapistSessionData,
   TherapistSkillProgressData,
 } from '@/types/analytics'
+import type {
+  SessionProgressMetrics,
+  TherapistSession,
+} from '@/types/dashboard'
 
 /**
  * Database service for session progress tracking

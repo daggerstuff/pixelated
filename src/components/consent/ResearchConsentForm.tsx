@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+
 import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
@@ -46,7 +47,7 @@ export function ResearchConsentForm({
         setLoading(true)
         setError(null)
         const statuses = await consentService.getUserConsentStatus({
-          userId: user.id as string,
+          userId: user.id,
           consentTypeName: 'Research Participation',
         })
 
@@ -77,7 +78,7 @@ export function ResearchConsentForm({
       }
     }
 
-    fetchConsentStatus()
+    void fetchConsentStatus()
   }, [user])
 
   // Handle granting consent
@@ -94,7 +95,7 @@ export function ResearchConsentForm({
       const { userAgent } = window.navigator
 
       await consentService.grantConsent({
-        userId: user.id as string,
+        userId: user.id,
         consentVersionId: consentStatus.currentVersion.id,
         userAgent,
         granularOptions: selectedOptions,
@@ -102,7 +103,7 @@ export function ResearchConsentForm({
 
       // Refresh consent status
       const statuses = await consentService.getUserConsentStatus({
-        userId: user.id as string,
+        userId: user.id,
         consentTypeName: 'Research Participation',
       })
 
@@ -136,7 +137,7 @@ export function ResearchConsentForm({
       const { userAgent } = window.navigator
 
       await consentService.withdrawConsent({
-        userId: user.id as string,
+        userId: user.id,
         consentId: consentStatus.userConsent.id,
         reason: withdrawReason,
         userAgent,
@@ -144,7 +145,7 @@ export function ResearchConsentForm({
 
       // Refresh consent status
       const statuses = await consentService.getUserConsentStatus({
-        userId: user.id as string,
+        userId: user.id,
         consentTypeName: 'Research Participation',
       })
 
@@ -190,9 +191,9 @@ export function ResearchConsentForm({
   // Render loading state
   if (loading) {
     return (
-      <div className={`p-6 bg-white rounded-lg shadow ${className}`}>
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-700"></div>
+      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
+        <div className='flex h-40 items-center justify-center'>
+          <div className='border-green-700 h-10 w-10 animate-spin rounded-full border-b-2'></div>
         </div>
       </div>
     )
@@ -201,13 +202,13 @@ export function ResearchConsentForm({
   // Render error state
   if (error) {
     return (
-      <div className={`p-6 bg-white rounded-lg shadow ${className}`}>
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 mb-4">
+      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
+        <div className='bg-red-50 border-red-200 text-red-800 mb-4 rounded-lg border p-4'>
           <p>{error}</p>
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg"
+          className='bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 font-medium'
         >
           Retry
         </button>
@@ -218,8 +219,8 @@ export function ResearchConsentForm({
   // Render when no consent status is found
   if (!consentStatus) {
     return (
-      <div className={`p-6 bg-white rounded-lg shadow ${className}`}>
-        <p className="text-gray-500">
+      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
+        <p className='text-gray-500'>
           No research consent information available.
         </p>
       </div>
@@ -230,11 +231,11 @@ export function ResearchConsentForm({
   return (
     <div className={`bg-white rounded-lg shadow ${className}`}>
       {/* Header */}
-      <div className="border-b border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-800">
+      <div className='border-gray-200 border-b p-6'>
+        <h2 className='text-gray-800 text-xl font-semibold'>
           Research Participation Consent
         </h2>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className='text-gray-500 mt-1 text-sm'>
           {consentStatus.hasActiveConsent
             ? `Consent granted on ${new Date(consentStatus.userConsent?.grantedAt || '').toLocaleDateString()}`
             : 'Your consent is requested for research participation'}
@@ -242,40 +243,40 @@ export function ResearchConsentForm({
       </div>
 
       {/* Consent summary */}
-      <div className="p-6">
-        <div className="mb-6">
-          <h3 className="font-medium text-gray-800 mb-2">Summary</h3>
-          <p className="text-gray-600">
+      <div className='p-6'>
+        <div className='mb-6'>
+          <h3 className='text-gray-800 mb-2 font-medium'>Summary</h3>
+          <p className='text-gray-600'>
             {consentStatus.currentVersion.summary}
           </p>
         </div>
 
         {/* Full consent text (expandable) */}
         {!showSummaryOnly && (
-          <div className="mb-6">
+          <div className='mb-6'>
             <button
               onClick={() => setExpandedView(!expandedView)}
-              className="text-green-700 hover:text-green-800 font-medium text-sm flex items-center"
+              className='text-green-700 hover:text-green-800 flex items-center text-sm font-medium'
             >
               {expandedView
                 ? 'Hide full details'
                 : 'View full consent document'}
               <svg
                 className={`ml-1 h-4 w-4 transform ${expandedView ? 'rotate-180' : ''}`}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
+                xmlns='http://www.w3.org/2000/svg'
+                viewBox='0 0 20 20'
+                fill='currentColor'
               >
                 <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
+                  fillRule='evenodd'
+                  d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
+                  clipRule='evenodd'
                 />
               </svg>
             </button>
 
             {expandedView && (
-              <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200 text-sm text-gray-700 overflow-auto max-h-96">
+              <div className='bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm'>
                 <div
                   dangerouslySetInnerHTML={{
                     __html: consentStatus.currentVersion.documentText,
@@ -291,49 +292,49 @@ export function ResearchConsentForm({
           consentStatus.consentOptions.length > 0 &&
           !showSummaryOnly &&
           !consentStatus.hasActiveConsent && (
-            <div className="mb-6">
-              <h3 className="font-medium text-gray-800 mb-2">
+            <div className='mb-6'>
+              <h3 className='text-gray-800 mb-2 font-medium'>
                 Consent Options
               </h3>
-              <div className="space-y-3">
+              <div className='space-y-3'>
                 {consentStatus.consentOptions.map((option) => (
-                  <div key={option.id} className="flex items-start">
+                  <div key={option.id} className='flex items-start'>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       id={option.id}
                       checked={selectedOptions[option.optionName] || false}
                       onChange={(e) =>
                         handleOptionChange(option.optionName, e.target.checked)
                       }
-                      className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                      className='text-green-600 focus:ring-green-500 border-gray-300 mt-1 h-4 w-4 rounded'
                     />
 
                     <label
                       htmlFor={option.id}
-                      className="ml-2 block text-sm text-gray-700"
+                      className='text-gray-700 ml-2 block text-sm'
                     >
                       {option.description}
                       {option.isRequired && (
-                        <span className="text-red-500 ml-1">*</span>
+                        <span className='text-red-500 ml-1'>*</span>
                       )}
                     </label>
                   </div>
                 ))}
               </div>
-              <p className="mt-2 text-xs text-gray-500">
-                <span className="text-red-500">*</span> Required options
+              <p className='text-gray-500 mt-2 text-xs'>
+                <span className='text-red-500'>*</span> Required options
               </p>
             </div>
           )}
 
         {/* Action buttons */}
         {!showSummaryOnly && (
-          <div className="mt-6 flex flex-wrap gap-4">
+          <div className='mt-6 flex flex-wrap gap-4'>
             {!consentStatus.hasActiveConsent ? (
               <button
                 onClick={handleGrantConsent}
                 disabled={loading || !allRequiredOptionsSelected()}
-                className={`px-4 py-2 rounded-lg font-medium ${
+                className={`rounded-lg px-4 py-2 font-medium ${
                   allRequiredOptionsSelected()
                     ? 'bg-green-600 hover:bg-green-700 text-white'
                     : 'bg-gray-200 text-gray-500 cursor-not-allowed'
@@ -345,7 +346,7 @@ export function ResearchConsentForm({
               <button
                 onClick={() => setWithdrawDialogOpen(true)}
                 disabled={loading}
-                className="px-4 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg font-medium"
+                className='bg-red-50 text-red-700 hover:bg-red-100 rounded-lg px-4 py-2 font-medium'
               >
                 Withdraw Consent
               </button>
@@ -356,47 +357,47 @@ export function ResearchConsentForm({
 
       {/* Withdrawal dialog */}
       {withdrawDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div className="p-4 border-b">
-              <h3 className="text-lg font-semibold text-gray-800">
+        <div className='bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 p-4'>
+          <div className='bg-white w-full max-w-md rounded-lg shadow-xl'>
+            <div className='border-b p-4'>
+              <h3 className='text-gray-800 text-lg font-semibold'>
                 Withdraw Research Consent
               </h3>
             </div>
 
-            <div className="p-4">
-              <p className="text-gray-600 mb-4">
+            <div className='p-4'>
+              <p className='text-gray-600 mb-4'>
                 Youre about to withdraw your consent for research participation.
                 This means your data will no longer be used for research
                 purposes.
               </p>
 
               <label
-                htmlFor="withdraw-reason"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                htmlFor='withdraw-reason'
+                className='text-gray-700 mb-1 block text-sm font-medium'
               >
                 Reason for withdrawal (optional)
               </label>
               <textarea
-                id="withdraw-reason"
+                id='withdraw-reason'
                 value={withdrawReason}
                 onChange={(e) => setWithdrawReason(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-2 text-sm h-24 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className='border-gray-300 focus:ring-green-500 focus:border-transparent h-24 w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2'
                 placeholder="Please let us know why you're withdrawing consent (optional)"
               ></textarea>
             </div>
 
-            <div className="p-4 border-t bg-gray-50 flex justify-end space-x-3">
+            <div className='bg-gray-50 flex justify-end space-x-3 border-t p-4'>
               <button
                 onClick={() => setWithdrawDialogOpen(false)}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50"
+                className='bg-white border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg border px-4 py-2 font-medium'
               >
                 Cancel
               </button>
               <button
                 onClick={handleWithdrawConsent}
                 disabled={loading}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
+                className='bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 font-medium'
               >
                 Withdraw Consent
               </button>

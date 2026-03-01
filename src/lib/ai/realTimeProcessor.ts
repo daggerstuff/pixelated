@@ -176,7 +176,7 @@ class RealTimeProcessor {
 
     session.dataStream.onclose = () => {
       console.log(`Session ${session.sessionId} WebSocket closed`)
-      this.endSession(session.sessionId)
+      void this.endSession(session.sessionId)
     }
   }
 
@@ -490,7 +490,7 @@ class RealTimeProcessor {
               stageSum + stage.processor.getMetrics().averageProcessingTime,
             0,
           ) /
-          session.processingPipeline.length
+            session.processingPipeline.length
         )
       }, 0) / activeSessions
 
@@ -505,7 +505,6 @@ class RealTimeProcessor {
   /**
    * Adaptive processing controller
    */
-
 }
 
 /**

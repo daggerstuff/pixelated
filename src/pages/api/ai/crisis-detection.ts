@@ -1,8 +1,9 @@
 import type { APIRoute, APIContext } from 'astro'
-import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
+
+import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
+import type { CrisisDetectionResult } from '@/lib/ai/crisis/types'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
-import { getSession } from '@/lib/auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
 import {
   createAuditLog,
   AuditEventType,
@@ -10,9 +11,8 @@ import {
   type AuditDetails,
 } from '@/lib/audit'
 import type { AuditResource } from '@/lib/audit/types'
-import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
-
-import type { CrisisDetectionResult } from '@/lib/ai/crisis/types'
+import { getSession } from '@/lib/auth/session'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Define Session interface locally (not exported from session module)
 interface Session {
@@ -144,7 +144,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
             logger.error('Error handling crisis event in batch:', {
               error: error instanceof Error ? String(error) : String(error),
               stack:
-                error instanceof Error ? (error as Error)?.stack : undefined,
+                error instanceof Error ? (error)?.stack : undefined,
               detection,
             })
           }
@@ -175,7 +175,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         } catch (error: unknown) {
           logger.error('Error handling single crisis event:', {
             error: error instanceof Error ? String(error) : String(error),
-            stack: error instanceof Error ? (error as Error)?.stack : undefined,
+            stack: error instanceof Error ? (error)?.stack : undefined,
             result,
           })
         }
@@ -246,7 +246,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     const errorMessage = error instanceof Error ? String(error) : String(error)
     logger.error('Error processing crisis detection request:', {
       error: errorMessage,
-      stack: error instanceof Error ? (error as Error)?.stack : undefined,
+      stack: error instanceof Error ? (error)?.stack : undefined,
     })
 
     // Define audit resource for error
@@ -264,7 +264,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       {
         // details instead of metadata
         error: errorMessage,
-        stack: error instanceof Error ? (error as Error)?.stack : undefined,
+        stack: error instanceof Error ? (error)?.stack : undefined,
         status: 'error', // This can go into details
         resourceType: aiResource.type,
       } as AuditDetails,

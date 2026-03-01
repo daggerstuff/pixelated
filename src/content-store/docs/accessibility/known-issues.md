@@ -1,6 +1,7 @@
 ---
 title: 'Known Accessibility Issues'
-description: 'Documentation of known accessibility issues and their resolution status'
+description:
+  'Documentation of known accessibility issues and their resolution status'
 pubDate: '2025-01-01'
 author: 'Accessibility Team'
 draft: false
@@ -11,11 +12,13 @@ date: '2025-04-12'
 
 # Known Accessibility Issues
 
-This document tracks known accessibility issues in the Pixelated platform identified through automated testing, manual testing, and user feedback.
+This document tracks known accessibility issues in the Pixelated platform
+identified through automated testing, manual testing, and user feedback.
 
 ## WCAG 2.1 AA Compliance Status
 
-The Pixelated platform is partially conformant with WCAG 2.1 level AA. We are actively working to resolve known issues and achieve full compliance.
+The Pixelated platform is partially conformant with WCAG 2.1 level AA. We are
+actively working to resolve known issues and achieve full compliance.
 
 ## Current Critical Issues
 
@@ -108,7 +111,8 @@ All accessibility fixes undergo the following testing process:
 
 ## Reporting New Issues
 
-If you encounter an accessibility issue that is not listed in this document, please report it by:
+If you encounter an accessibility issue that is not listed in this document,
+please report it by:
 
 1. Opening an issue on GitHub with the "accessibility" label
 2. Emailing [accessibility@gradiant.com](mailto:accessibility@gradiant.com)

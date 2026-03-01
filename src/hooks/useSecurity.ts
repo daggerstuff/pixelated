@@ -1,5 +1,6 @@
-import { fheService } from '@/lib/fhe'
 import { useEffect, useState } from 'react'
+
+import { fheService } from '@/lib/fhe'
 
 export type SecurityLevel = 'standard' | 'hipaa' | 'maximum'
 
@@ -20,7 +21,11 @@ export function useSecurity() {
     const initializeSecurity = async () => {
       if (state.encryptionEnabled && !state.fheInitialized) {
         try {
-          await fheService.initialize()
+          await fheService.initialize({
+            mode: 'secure',
+            keySize: 2048,
+            securityLevel: 'tc128',
+          })
           setState((prev) => ({ ...prev, fheInitialized: true }))
         } catch (error: unknown) {
           console.error('Failed to initialize FHE:', error)
@@ -36,7 +41,7 @@ export function useSecurity() {
       }
     }
 
-    initializeSecurity()
+    void initializeSecurity()
   }, [state.encryptionEnabled, state.securityLevel, state.fheInitialized])
 
   const setSecurityLevel = (level: SecurityLevel) => {

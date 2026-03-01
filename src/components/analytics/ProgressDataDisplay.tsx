@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+
 import styles from './ProgressDataDisplay.module.css'
 
 interface ProgressDataDisplayProps {
@@ -37,15 +38,15 @@ export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
   return (
     <div
       className={styles['chartContainer']}
-      role="region"
-      aria-labelledby="data-title data-description"
+      role='region'
+      aria-labelledby='data-title data-description'
     >
-      <h4 id="data-title" className={styles['chartTitle']}>
+      <h4 id='data-title' className={styles['chartTitle']}>
         {title}
       </h4>
       {hasValidData ? (
         <>
-          <p id="data-description" className={styles['chartDescription']}>
+          <p id='data-description' className={styles['chartDescription']}>
             Data for: {formattedLabels}
           </p>
 
@@ -54,7 +55,7 @@ export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
             <span
               className={styles['colorIndicator']}
               style={{ '--indicator-color': color } as React.CSSProperties}
-              aria-hidden="true"
+              aria-hidden='true'
             ></span>
             <p className={styles['dataText']}>
               <span className={styles['dataLabel']}>User Data:</span>{' '}
@@ -64,7 +65,7 @@ export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
               >
                 {formattedUserData}
               </span>
-              <span className="sr-only"> (represented in {color})</span>
+              <span className='sr-only'> (represented in {color})</span>
             </p>
           </div>
 
@@ -72,7 +73,7 @@ export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
           <div className={styles['dataRow']}>
             <span
               className={`${styles['colorIndicator']} ${styles['benchmarkIndicator']}`}
-              aria-hidden="true"
+              aria-hidden='true'
             ></span>
             <p className={styles['dataText']}>
               <span className={styles['dataLabel']}>
@@ -83,7 +84,7 @@ export const ProgressDataDisplay: FC<ProgressDataDisplayProps> = ({
           </div>
 
           {/* Additional screen reader context that explains the data comparison */}
-          <div className="sr-only" aria-live="polite">
+          <div className='sr-only' aria-live='polite'>
             This data display compares user data {formattedUserData} with
             benchmark data for {benchmarkLabel} {formattedBenchmarkData} across
             the following categories: {formattedLabels}.

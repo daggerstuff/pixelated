@@ -1,6 +1,6 @@
 /**
  * Authentication and Authorization Components
- * 
+ *
  * Provides components for protecting routes and implementing role-based access control
  */
 
@@ -10,4 +10,3 @@ export { RequireRole } from './RequireRole'
 
 export type { ProtectedRouteProps } from './ProtectedRoute'
 export type { RoleGuardProps } from './RoleGuard'
-

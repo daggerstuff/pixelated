@@ -1,7 +1,7 @@
 import { CrisisSessionFlaggingService } from '@/lib/ai/crisis/CrisisSessionFlaggingService'
+import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 import { getSession } from '@/lib/auth/session'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 
 const logger = createBuildSafeLogger('crisis-session-flags-api')
 

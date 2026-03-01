@@ -4,12 +4,12 @@
  * and initializes browser-specific functionality
  */
 
+import { setupCSSPolyfills } from './css-polyfills'
 import {
   initializeFeatureDetection,
   loadPolyfills,
   getAllFeatures,
 } from './feature-detection'
-import { setupCSSPolyfills } from './css-polyfills'
 
 /**
  * Setup browser environment
@@ -226,9 +226,9 @@ function setupDeviceSpecificFixes() {
 if (typeof window !== 'undefined') {
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      setupBrowserEnvironment()
+      void setupBrowserEnvironment()
     })
   } else {
-    setupBrowserEnvironment()
+    void setupBrowserEnvironment()
   }
 }

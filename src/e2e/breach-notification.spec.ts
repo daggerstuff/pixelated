@@ -1,8 +1,9 @@
-import AuthService from '../services/AuthService'
-import { RedisService } from '../lib/services/redis/RedisService'
-import { BreachNotificationSystem } from '../lib/security/breach-notification'
 import { test, expect } from '@playwright/test'
+
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { BreachNotificationSystem } from '../lib/security/breach-notification'
+import { RedisService } from '../lib/services/redis/RedisService'
+import AuthService from '../services/AuthService'
 
 // Define fixture types
 type BreachTestFixtures = {
@@ -197,7 +198,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
           emailRequests.push({
             url: request.url(),
             postData: JSON.parse(
-              ((await request.postData()) as unknown) || '{}',
+              (( request.postData()) as unknown) || '{}',
             ),
           })
           await route.fulfill({ status: 200 })
@@ -307,7 +308,7 @@ const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
           emailRequests.push({
             url: request.url(),
             postData: JSON.parse(
-              ((await request.postData()) as unknown) || '{}',
+              (( request.postData()) as unknown) || '{}',
             ),
           })
           await route.fulfill({ status: 200 })

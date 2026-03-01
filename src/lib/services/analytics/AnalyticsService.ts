@@ -1,5 +1,7 @@
 import type { WebSocket } from 'ws'
+
 import { redis } from '@/lib/redis'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   type Event,

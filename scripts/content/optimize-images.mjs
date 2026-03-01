@@ -8,7 +8,11 @@
 import { readdir, stat } from 'fs/promises'
 import { join, extname, resolve, sep } from 'path'
 import { fileURLToPath } from 'url'
-import { imageOptimizer, generateOptimizationReport } from '../src/lib/utils/image-optimizer.ts'
+
+import {
+  imageOptimizer,
+  generateOptimizationReport,
+} from '../src/lib/utils/image-optimizer.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = join(__filename, '..')
@@ -35,7 +39,10 @@ async function findImageFiles(dir, files = []) {
 
       // Security check: ensure path stays within public directory
       const resolvedPath = resolve(fullPath)
-      if (!resolvedPath.startsWith(CONFIG.ABS_PUBLIC_DIR + sep) && resolvedPath !== CONFIG.ABS_PUBLIC_DIR) {
+      if (
+        !resolvedPath.startsWith(CONFIG.ABS_PUBLIC_DIR + sep) &&
+        resolvedPath !== CONFIG.ABS_PUBLIC_DIR
+      ) {
         console.warn(`Warning: Skipping unsafe path ${fullPath}`)
         continue
       }
@@ -92,13 +99,18 @@ async function main() {
 
     // Summary
     const stats = imageOptimizer.getOptimizationStats(results)
-    const savingsPercent = Math.round((stats.totalSavings / stats.totalOriginalSize) * 100)
+    const savingsPercent = Math.round(
+      (stats.totalSavings / stats.totalOriginalSize) * 100,
+    )
 
     console.log(`\n✨ Optimization complete!`)
     console.log(`   • Processed: ${stats.totalFiles} images`)
-    console.log(`   • Space saved: ${Math.round(stats.totalSavings / 1024)}KB (${savingsPercent}%)`)
-    console.log(`   • Avg compression: ${Math.round(stats.avgCompressionRatio * 100) / 100}x`)
-
+    console.log(
+      `   • Space saved: ${Math.round(stats.totalSavings / 1024)}KB (${savingsPercent}%)`,
+    )
+    console.log(
+      `   • Avg compression: ${Math.round(stats.avgCompressionRatio * 100) / 100}x`,
+    )
   } catch (error) {
     console.error('❌ Image optimization failed:', error.message)
     process.exit(1)
@@ -107,7 +119,7 @@ async function main() {
 
 // Run optimization if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  main().catch(error => {
+  main().catch((error) => {
     console.error('Fatal error:', error)
     process.exit(1)
   })

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useDocumentation } from '@/lib/documentation/useDocumentation'
+
 import type { EHRExportOptions } from '@/lib/documentation/ehrIntegration'
+import { useDocumentation } from '@/lib/documentation/useDocumentation'
 
 interface ExportToEHRProps {
   sessionId: string
@@ -50,37 +51,37 @@ export function ExportToEHR({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+    <div className='bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md'>
+      <h3 className='text-gray-900 dark:text-white mb-4 text-lg font-semibold'>
         Export to EHR System
       </h3>
 
-      <div className="space-y-4 mb-6">
+      <div className='mb-6 space-y-4'>
         <div>
           <label
-            htmlFor="export-format"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            htmlFor='export-format'
+            className='text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium'
           >
             Export Format
           </label>
           <select
-            id="export-format"
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            id='export-format'
+            className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full rounded-md border px-3 py-2'
             value={exportFormat}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setExportFormat(e.target.value as 'fhir' | 'ccda' | 'pdf')
             }
             disabled={isExporting}
           >
-            <option value="fhir">
+            <option value='fhir'>
               FHIR (Fast Healthcare Interoperability Resources)
             </option>
-            <option value="ccda">
+            <option value='ccda'>
               C-CDA (Consolidated Clinical Document Architecture)
             </option>
-            <option value="pdf">PDF Document</option>
+            <option value='pdf'>PDF Document</option>
           </select>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className='text-gray-500 dark:text-gray-400 mt-1 text-sm'>
             {exportFormat === 'fhir'
               ? 'Standard format for exchanging healthcare information electronically.'
               : exportFormat === 'ccda'
@@ -89,11 +90,11 @@ export function ExportToEHR({
           </p>
         </div>
 
-        <div className="flex items-center">
+        <div className='flex items-center'>
           <input
-            id="include-emotion-data"
-            type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            id='include-emotion-data'
+            type='checkbox'
+            className='border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 rounded'
             checked={includeEmotionData}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setIncludeEmotionData(e.target.checked)
@@ -102,21 +103,21 @@ export function ExportToEHR({
           />
 
           <label
-            htmlFor="include-emotion-data"
-            className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+            htmlFor='include-emotion-data'
+            className='text-gray-700 dark:text-gray-300 ml-2 block text-sm'
           >
             Include emotion analysis data
           </label>
         </div>
       </div>
 
-      <div className="flex flex-col space-y-4">
+      <div className='flex flex-col space-y-4'>
         <button
-          type="button"
-          className={`py-2 px-4 rounded-md text-white font-medium ${
+          type='button'
+          className={`text-white rounded-md px-4 py-2 font-medium ${
             isExporting
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
+              : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2'
           }`}
           onClick={handleExport}
           disabled={isExporting}
@@ -132,35 +133,35 @@ export function ExportToEHR({
                 : 'bg-red-50 dark:bg-red-900/30'
             }`}
           >
-            <div className="flex">
-              <div className="flex-shrink-0">
+            <div className='flex'>
+              <div className='flex-shrink-0'>
                 {exportResult.success ? (
                   <svg
-                    className="h-5 w-5 text-green-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    className='text-green-400 h-5 w-5'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 ) : (
                   <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                    className='text-red-400 h-5 w-5'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
                   >
                     <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
+                      fillRule='evenodd'
+                      d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                      clipRule='evenodd'
                     />
                   </svg>
                 )}
               </div>
-              <div className="ml-3">
+              <div className='ml-3'>
                 <h3
                   className={`text-sm font-medium ${
                     exportResult.success
@@ -173,32 +174,32 @@ export function ExportToEHR({
                     : 'Failed to export documentation'}
                 </h3>
                 {exportResult.error && (
-                  <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                  <div className='text-red-700 dark:text-red-300 mt-2 text-sm'>
                     {exportResult.error}
                   </div>
                 )}
 
                 {exportResult.success && showSuccessDetails && (
-                  <div className="mt-2">
-                    <p className="text-sm text-green-700 dark:text-green-300">
+                  <div className='mt-2'>
+                    <p className='text-green-700 dark:text-green-300 text-sm'>
                       Format: {exportFormat.toUpperCase()}
                     </p>
                     {typeof exportResult === 'object' &&
                       'documentId' in exportResult &&
                       exportResult.documentId && (
-                        <p className="text-sm text-green-700 dark:text-green-300">
+                        <p className='text-green-700 dark:text-green-300 text-sm'>
                           Document ID: {exportResult.documentId as string}
                         </p>
                       )}
                     {typeof exportResult === 'object' &&
                       'documentUrl' in exportResult &&
                       exportResult.documentUrl && (
-                        <div className="mt-1">
+                        <div className='mt-1'>
                           <a
                             href={exportResult.documentUrl as string}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm font-medium text-green-600 dark:text-green-400 hover:underline"
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-green-600 dark:text-green-400 text-sm font-medium hover:underline'
                           >
                             View Document in EHR System
                           </a>

@@ -4,10 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { Redis } from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   ValidationConfig,
   ValidationRule,
@@ -1069,8 +1070,8 @@ export class ThreatValidationSystemCore
       // Find threats with similar indicators
       const similarThreats = await threatsCollection
         .find({
-          'threatId': { $ne: threat.threatId },
-          'threatType': threat.threatType,
+          threatId: { $ne: threat.threatId },
+          threatType: threat.threatType,
           'indicators.value': { $in: threat.indicators.map((i) => i.value) },
         })
         .limit(10)
@@ -1367,9 +1368,9 @@ export class ThreatValidationSystemCore
 
       // Count validations that marked threats as invalid but were later confirmed as valid
       const falsePositives = await validationsCollection.countDocuments({
-        'isValid': false,
+        isValid: false,
         'metadata.confirmedValid': true,
-        'createdAt': {
+        createdAt: {
           $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
         },
       })
@@ -1387,9 +1388,9 @@ export class ThreatValidationSystemCore
 
       // Count validations that marked threats as valid but were later confirmed as invalid
       const falseNegatives = await validationsCollection.countDocuments({
-        'isValid': true,
+        isValid: true,
         'metadata.confirmedInvalid': true,
-        'createdAt': {
+        createdAt: {
           $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
         },
       })

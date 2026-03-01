@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
+import { KVStore } from '../../../db/KVStore'
+import type { PatientProfile } from '../../models/patient'
+import type { TherapeuticProgress } from '../../types/CognitiveModel'
 import {
   PatientProfileService,
   type ProfileIdentifier,
 } from '../PatientProfileService'
-import type { PatientProfile } from '../../models/patient'
-import type { TherapeuticProgress } from '../../types/CognitiveModel'
-import { KVStore } from '../../../db/KVStore'
 
 // Mock KVStore
 vi.mock('../../../db/KVStore')

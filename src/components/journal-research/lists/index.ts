@@ -6,4 +6,3 @@ export { EvaluationList } from './EvaluationList'
 export type { EvaluationListProps } from './EvaluationList'
 export { AcquisitionList } from './AcquisitionList'
 export type { AcquisitionListProps } from './AcquisitionList'
-

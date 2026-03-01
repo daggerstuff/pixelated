@@ -398,7 +398,7 @@ export class PlatformStatusMonitor {
       setTimeout(monitor, this.checkInterval)
     }
 
-    monitor()
+    void monitor()
   }
 
   stopMonitoring(): void {

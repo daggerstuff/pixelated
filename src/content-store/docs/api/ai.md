@@ -10,7 +10,8 @@ toc: true
 
 # AI API Reference
 
-This document provides a comprehensive reference for the AI API endpoints and services available in the application.
+This document provides a comprehensive reference for the AI API endpoints and
+services available in the application.
 
 ## Overview
 
@@ -22,7 +23,8 @@ The AI API provides access to various AI capabilities, including:
 - Response generation
 - Intervention effectiveness analysis
 
-All API endpoints require authentication and include comprehensive error handling and performance optimization.
+All API endpoints require authentication and include comprehensive error
+handling and performance optimization.
 
 ## Endpoints
 
@@ -395,8 +397,11 @@ X-RateLimit-Reset: 1625097600
 
 ## Authentication
 
-All API endpoints require authentication. See the [Authentication API](/api/auth) for details on how to authenticate requests.
+All API endpoints require authentication. See the
+[Authentication API](/api/auth) for details on how to authenticate requests.
 
 ## HIPAA Compliance
 
-All API endpoints are HIPAA compliant and include comprehensive audit logging. See the [Security](/security/hipaa) documentation for details on HIPAA compliance measures.
+All API endpoints are HIPAA compliant and include comprehensive audit logging.
+See the [Security](/security/hipaa) documentation for details on HIPAA
+compliance measures.

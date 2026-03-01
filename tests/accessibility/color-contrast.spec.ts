@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+import { test, expect } from '@playwright/test'
 
 // Important pages to test for color contrast issues
 const PAGES_TO_TEST = [

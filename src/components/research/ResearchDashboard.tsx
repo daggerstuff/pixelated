@@ -1,10 +1,11 @@
 import type { FC } from 'react'
 import React from 'react'
+
+import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
+import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
+import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
 import { usePersistentState } from '@/hooks/usePersistentState'
 import { AdvancedVisualization } from '@/lib/analytics/advancedVisualization'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
 
 interface ResearchStudy {
   id: string
@@ -141,17 +142,17 @@ export const ResearchDashboard: FC = () => {
   }))
 
   return (
-    <ResponsiveContainer size="full">
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <ResponsiveContainer size='full'>
+      <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
+        <header className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm'>
+          <div className='px-6 py-4'>
+            <div className='flex items-center justify-between'>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className='text-gray-900 dark:text-white text-2xl font-bold'>
                   Research Portal
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <p className='text-gray-600 dark:text-gray-400 mt-1 text-sm'>
                   Evidence-Based Mental Health Research •{' '}
                   {researchMetrics.totalStudies} studies •{' '}
                   {researchMetrics.totalParticipants.toLocaleString()}{' '}
@@ -159,25 +160,25 @@ export const ResearchDashboard: FC = () => {
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
-                <OfflineIndicator position="inline" />
+              <div className='flex items-center gap-4'>
+                <OfflineIndicator position='inline' />
                 <select
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value as any)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+                  className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
-                  <option value="month">This Month</option>
-                  <option value="quarter">This Quarter</option>
-                  <option value="year">This Year</option>
-                  <option value="all">All Time</option>
+                  <option value='month'>This Month</option>
+                  <option value='quarter'>This Quarter</option>
+                  <option value='year'>This Year</option>
+                  <option value='all'>All Time</option>
                 </select>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="px-6">
-            <nav className="flex space-x-8">
+          <div className='px-6'>
+            <nav className='flex space-x-8'>
               {[
                 { id: 'overview', label: 'Overview', icon: '📊' },
                 { id: 'studies', label: 'Studies', icon: '🔬' },
@@ -188,7 +189,7 @@ export const ResearchDashboard: FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
-                  className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -203,7 +204,7 @@ export const ResearchDashboard: FC = () => {
         </header>
 
         {/* Main Content */}
-        <main className="p-6">
+        <main className='p-6'>
           {dashboardView === 'overview' && (
             <OverviewTab
               metrics={researchMetrics}
@@ -260,84 +261,84 @@ const OverviewTab: FC<{
   selectedStudies: string[]
 }> = ({ metrics, studies, onStudySelect, selectedStudies }) => {
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Total Studies
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.totalStudies}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-blue-600 dark:text-blue-400">🔬</span>
+              <div className='bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-blue-600 dark:text-blue-400'>🔬</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               {metrics.activeStudies} currently active
             </p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Participants
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.totalParticipants.toLocaleString()}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-green-600 dark:text-green-400">👥</span>
+              <div className='bg-green-100 dark:bg-green-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-green-600 dark:text-green-400'>👥</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Across all studies</p>
+            <p className='text-gray-500 mt-2 text-sm'>Across all studies</p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Publications
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.publications}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 dark:text-purple-400">📚</span>
+              <div className='bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-purple-600 dark:text-purple-400'>📚</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Peer-reviewed articles</p>
+            <p className='text-gray-500 mt-2 text-sm'>Peer-reviewed articles</p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <div className="flex items-center justify-between">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <div className='flex items-center justify-between'>
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className='text-gray-600 dark:text-gray-400 text-sm font-medium'>
                   Avg Effect Size
                 </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className='text-gray-900 dark:text-white text-3xl font-bold'>
                   {metrics.avgEffectSize}
                 </p>
               </div>
-              <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                <span className="text-yellow-600 dark:text-yellow-400">📈</span>
+              <div className='bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
+                <span className='text-yellow-600 dark:text-yellow-400'>📈</span>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className='text-gray-500 mt-2 text-sm'>
               Treatment effectiveness
             </p>
           </div>
@@ -346,37 +347,37 @@ const OverviewTab: FC<{
 
       {/* Active Studies Overview */}
       <SlideUp>
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+          <h3 className='mb-4 text-lg font-semibold'>
             Active Research Studies
           </h3>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             {studies
               .filter((study) => study.status === 'active')
               .map((study) => (
                 <div
                   key={study.id}
-                  className="flex items-center gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800"
+                  className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 flex items-center gap-4 rounded-lg border p-4'
                 >
                   <input
-                    type="checkbox"
+                    type='checkbox'
                     checked={selectedStudies.includes(study.id)}
                     onChange={() => onStudySelect(study.id)}
-                    className="w-4 h-4 text-blue-600 rounded"
+                    className='text-blue-600 h-4 w-4 rounded'
                   />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="font-medium text-gray-900 dark:text-white">
+                  <div className='flex-1'>
+                    <div className='mb-2 flex items-center justify-between'>
+                      <p className='text-gray-900 dark:text-white font-medium'>
                         {study.title}
                       </p>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 rounded-full text-xs font-medium">
+                      <span className='bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 rounded-full px-2 py-1 text-xs font-medium'>
                         {study.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    <p className='text-gray-600 dark:text-gray-400 mb-2 text-sm'>
                       {study.description}
                     </p>
-                    <div className="flex items-center gap-4 text-sm">
+                    <div className='flex items-center gap-4 text-sm'>
                       <span>Participants: {study.participants}</span>
                       <span>Methodology: {study.methodology}</span>
                       <span>
@@ -391,35 +392,35 @@ const OverviewTab: FC<{
       </SlideUp>
 
       {/* Research Insights */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>💡</span>
               Research Insights
             </h3>
-            <div className="space-y-3">
-              <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                <p className="font-medium text-purple-900 dark:text-purple-100">
+            <div className='space-y-3'>
+              <div className='bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 rounded-lg border p-3'>
+                <p className='text-purple-900 dark:text-purple-100 font-medium'>
                   AI Intervention Effectiveness
                 </p>
-                <p className="text-sm text-purple-700 dark:text-purple-200">
+                <p className='text-purple-700 dark:text-purple-200 text-sm'>
                   +23% improvement in patient outcomes with AI assistance
                 </p>
               </div>
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <p className="font-medium text-green-900 dark:text-green-100">
+              <div className='bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 rounded-lg border p-3'>
+                <p className='text-green-900 dark:text-green-100 font-medium'>
                   Privacy Preservation Impact
                 </p>
-                <p className="text-sm text-green-700 dark:text-green-200">
+                <p className='text-green-700 dark:text-green-200 text-sm'>
                   Federated learning maintains 94% data utility
                 </p>
               </div>
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="font-medium text-blue-900 dark:text-blue-100">
+              <div className='bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 rounded-lg border p-3'>
+                <p className='text-blue-900 dark:text-blue-100 font-medium'>
                   Real-Time Processing
                 </p>
-                <p className="text-sm text-blue-700 dark:text-blue-200">
+                <p className='text-blue-700 dark:text-blue-200 text-sm'>
                   Live interventions improve session effectiveness by 18%
                 </p>
               </div>
@@ -428,12 +429,12 @@ const OverviewTab: FC<{
         </SlideUp>
 
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
+            <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
               <span>📋</span>
               Upcoming Milestones
             </h3>
-            <div className="space-y-3">
+            <div className='space-y-3'>
               {[
                 {
                   title: 'AI Ethics Review',
@@ -458,18 +459,18 @@ const OverviewTab: FC<{
               ].map((milestone, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg"
+                  className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
                 >
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
+                    <p className='text-gray-900 dark:text-white font-medium'>
                       {milestone.title}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className='text-gray-600 dark:text-gray-400 text-sm'>
                       {milestone.date}
                     </p>
                   </div>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${
                       milestone.priority === 'high'
                         ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
                         : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
@@ -496,28 +497,28 @@ const StudiesTab: FC<{
   selectedStudies: string[]
 }> = ({ studies, onStudySelect, selectedStudies }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Research Studies Management</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Research Studies Management</h2>
+        <div className='flex items-center gap-2'>
+          <span className='text-gray-600 dark:text-gray-400 text-sm'>
             {selectedStudies.length} selected
           </span>
-          <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+          <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors'>
             New Study
           </button>
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-4">
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
+        <div className='border-gray-200 dark:border-gray-700 border-b p-4'>
+          <div className='flex items-center gap-4'>
             <input
-              type="text"
-              placeholder="Search studies..."
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              type='text'
+              placeholder='Search studies...'
+              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm'
             />
-            <select className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm">
+            <select className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'>
               <option>All Statuses</option>
               <option>Planning</option>
               <option>Active</option>
@@ -527,26 +528,26 @@ const StudiesTab: FC<{
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className='divide-gray-200 dark:divide-gray-700 divide-y'>
           {studies.map((study) => (
             <div
               key={study.id}
-              className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              className='hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors'
             >
-              <div className="flex items-center gap-4">
+              <div className='flex items-center gap-4'>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   checked={selectedStudies.includes(study.id)}
                   onChange={() => onStudySelect(study.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className='text-blue-600 h-4 w-4 rounded'
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <h3 className='text-gray-900 dark:text-white font-medium'>
                       {study.title}
                     </h3>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
                         study.status === 'active'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                           : study.status === 'completed'
@@ -559,45 +560,45 @@ const StudiesTab: FC<{
                       {study.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className='text-gray-600 dark:text-gray-400 mb-2 text-sm'>
                     {study.description}
                   </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Participants:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {study.participants}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Methodology:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {study.methodology}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Start Date:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {study.startDate.toLocaleDateString()}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-600 dark:text-gray-400">
+                      <span className='text-gray-600 dark:text-gray-400'>
                         Outcomes:
                       </span>
-                      <span className="ml-2 font-medium">
+                      <span className='ml-2 font-medium'>
                         {study.outcomes.length}
                       </span>
                     </div>
                   </div>
                 </div>
-                <button className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+                <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                   View Details
                 </button>
               </div>
@@ -616,37 +617,37 @@ const DatasetsTab: FC<{
   datasets: DatasetInfo[]
 }> = ({ datasets }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Research Datasets</h2>
-        <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Research Datasets</h2>
+        <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Upload Dataset
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
         {datasets.map((dataset) => (
           <div
             key={dataset.id}
-            className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+            className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'
           >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+            <div className='mb-4 flex items-start justify-between'>
+              <div className='flex-1'>
+                <h3 className='text-gray-900 dark:text-white mb-2 font-semibold'>
                   {dataset.name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                <p className='text-gray-600 dark:text-gray-400 mb-3 text-sm'>
                   {dataset.description}
                 </p>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">
+                <div className='flex items-center gap-4 text-sm'>
+                  <span className='text-gray-600 dark:text-gray-400'>
                     Size: {(dataset.size / 1000000).toFixed(1)}MB
                   </span>
-                  <span className="text-gray-600 dark:text-gray-400">
+                  <span className='text-gray-600 dark:text-gray-400'>
                     Format: {dataset.format}
                   </span>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${
                       dataset.accessLevel === 'public'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                         : dataset.accessLevel === 'restricted'
@@ -660,15 +661,15 @@ const DatasetsTab: FC<{
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+            <div className='flex items-center justify-between'>
+              <span className='text-gray-600 dark:text-gray-400 text-sm'>
                 Updated: {dataset.lastUpdated.toLocaleDateString()}
               </span>
-              <div className="flex gap-2">
-                <button className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+              <div className='flex gap-2'>
+                <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                   Access Data
                 </button>
-                <button className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                <button className='bg-gray-500 hover:bg-gray-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                   View Metadata
                 </button>
               </div>
@@ -707,14 +708,14 @@ const AnalyticsTab: FC<{
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Research Analytics</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>Research Analytics</h2>
+        <div className='flex items-center gap-2'>
+          <span className='text-gray-600 dark:text-gray-400 text-sm'>
             Data Points:
           </span>
-          <span className="text-sm font-medium">{data.length}</span>
+          <span className='text-sm font-medium'>{data.length}</span>
         </div>
       </div>
 
@@ -767,25 +768,25 @@ const PublicationsTab: FC = () => {
   ]
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
+    <div className='space-y-6'>
+      <div className='flex items-center justify-between'>
+        <h2 className='text-xl font-semibold'>
           Publications & Research Output
         </h2>
-        <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
+        <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors'>
           Submit Publication
         </button>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-4">
+      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
+        <div className='border-gray-200 dark:border-gray-700 border-b p-4'>
+          <div className='flex items-center gap-4'>
             <input
-              type="text"
-              placeholder="Search publications..."
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm"
+              type='text'
+              placeholder='Search publications...'
+              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm'
             />
-            <select className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm">
+            <select className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'>
               <option>All Statuses</option>
               <option>Published</option>
               <option>Under Review</option>
@@ -794,20 +795,20 @@ const PublicationsTab: FC = () => {
           </div>
         </div>
 
-        <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        <div className='divide-gray-200 dark:divide-gray-700 divide-y'>
           {publications.map((publication) => (
             <div
               key={publication.id}
-              className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+              className='hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors'
             >
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-900 dark:text-white">
+              <div className='flex items-start gap-4'>
+                <div className='flex-1'>
+                  <div className='mb-2 flex items-center justify-between'>
+                    <h3 className='text-gray-900 dark:text-white font-medium'>
                       {publication.title}
                     </h3>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      className={`rounded-full px-2 py-1 text-xs font-medium ${
                         publication.status === 'published'
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
@@ -816,26 +817,26 @@ const PublicationsTab: FC = () => {
                       {publication.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <p className='text-gray-600 dark:text-gray-400 mb-2 text-sm'>
                     {publication.journal}
                   </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">
+                  <div className='flex items-center gap-4 text-sm'>
+                    <span className='text-gray-600 dark:text-gray-400'>
                       Authors: {publication.authors.join(', ')}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className='text-gray-600 dark:text-gray-400'>
                       Citations: {publication.citations}
                     </span>
-                    <span className="text-gray-600 dark:text-gray-400">
+                    <span className='text-gray-600 dark:text-gray-400'>
                       DOI: {publication.doi}
                     </span>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors">
+                <div className='flex gap-2'>
+                  <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                     View
                   </button>
-                  <button className="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">
+                  <button className='bg-gray-500 hover:bg-gray-600 text-white rounded-lg px-3 py-2 text-sm transition-colors'>
                     Download
                   </button>
                 </div>

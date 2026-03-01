@@ -1,16 +1,17 @@
 ---
-title: "Development Environment Setup"
-description: "Development Environment Setup documentation"
+title: 'Development Environment Setup'
+description: 'Development Environment Setup documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # Development Environment Setup
 
-This document provides detailed instructions for setting up your development environment for the Pixelated Empathy project.
+This document provides detailed instructions for setting up your development
+environment for the Pixelated Empathy project.
 
 ## Prerequisites
 
@@ -65,7 +66,8 @@ pnpm build
 
 ## Error Tracking with Sentry
 
-The project uses Sentry for error tracking and monitoring. To fully set up Sentry for your development environment:
+The project uses Sentry for error tracking and monitoring. To fully set up
+Sentry for your development environment:
 
 1. Create an account on [Sentry](https://sentry.io) if you don't have one.
 
@@ -81,7 +83,8 @@ SENTRY_AUTH_TOKEN=your_auth_token
 ```
 
 1. To generate a `SENTRY_AUTH_TOKEN`:
-   - Go to [Sentry Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/)
+   - Go to
+     [Sentry Auth Tokens](https://sentry.io/settings/account/api/auth-tokens/)
    - Create a new token with `project:releases` and `project:read` scopes
    - Copy the token to your `.env.local` file
 
@@ -96,7 +99,8 @@ SENTRY_AUTH_TOKEN=your_auth_token
 If you don't need Sentry integration during development, you can:
 
 1. Leave the `SENTRY_AUTH_TOKEN` empty in your `.env.local` file
-2. The build process will automatically disable source map uploads when no token is present
+2. The build process will automatically disable source map uploads when no token
+   is present
 
 ## Troubleshooting
 
@@ -114,7 +118,8 @@ pnpm run diagnostics
 
 3. For Sentry-specific issues, verify your DSN and auth token are correct.
 
-4. Consult the [Troubleshooting Guide](./TROUBLESHOOTING.md) for more detailed issue resolution.
+4. Consult the [Troubleshooting Guide](./TROUBLESHOOTING.md) for more detailed
+   issue resolution.
 
 ## Additional Development Tools
 

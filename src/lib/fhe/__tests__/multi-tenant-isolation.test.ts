@@ -123,7 +123,7 @@ describe('FHE Multi-tenant Isolation', () => {
     }
 
     // Register the tenant
-    tenantManager.registerTenant(tenantWithLimits)
+    void tenantManager.registerTenant(tenantWithLimits)
 
     // Track operations up to the limit
     for (let i = 0; i < 5; i++) {
@@ -134,7 +134,7 @@ describe('FHE Multi-tenant Isolation', () => {
     expect(tenantManager.trackOperation(tenantWithLimits.tenantId)).toBe(false)
 
     // Clean up
-    tenantManager.removeTenant(tenantWithLimits.tenantId)
+    void tenantManager.removeTenant(tenantWithLimits.tenantId)
   })
 
   it('should apply tenant-specific configuration', () => {
@@ -152,7 +152,7 @@ describe('FHE Multi-tenant Isolation', () => {
     }
 
     // Register the tenant
-    tenantManager.registerTenant(tenantWithCustomConfig)
+    void tenantManager.registerTenant(tenantWithCustomConfig)
 
     // Create a base config
     const baseConfig = {
@@ -181,7 +181,7 @@ describe('FHE Multi-tenant Isolation', () => {
     expect(configWithTenant.customParam2).toBe('value2')
 
     // Clean up
-    tenantManager.removeTenant(tenantWithCustomConfig.tenantId)
+    void tenantManager.removeTenant(tenantWithCustomConfig.tenantId)
   })
 
   it('should generate tenant-specific key prefixes', () => {

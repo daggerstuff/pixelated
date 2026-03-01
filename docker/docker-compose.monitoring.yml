@@ -5,7 +5,7 @@ services:
     image: prom/prometheus:latest
     container_name: pixelated-prometheus
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./docker/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
@@ -26,7 +26,7 @@ services:
     image: prom/alertmanager:latest
     container_name: pixelated-alertmanager
     ports:
-      - "9093:9093"
+      - '9093:9093'
     volumes:
       - ./docker/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
@@ -48,7 +48,7 @@ services:
       dockerfile: Dockerfile
     container_name: pixelated-alert-receiver
     ports:
-      - "5001:5001"  # Changed from 9093 to avoid conflict with AlertManager
+      - '5001:5001' # Changed from 9093 to avoid conflict with AlertManager
     environment:
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     restart: unless-stopped
@@ -59,12 +59,13 @@ services:
     image: grafana/grafana:latest
     container_name: pixelated-grafana
     ports:
-      - "3001:3000"
+      - '3001:3000'
     volumes:
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD must be set}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD
+        must be set}
       - GF_USERS_ALLOW_SIGN_UP=false
     restart: unless-stopped
     networks:
@@ -75,7 +76,7 @@ services:
     image: louislam/uptime-kuma:1
     container_name: pixelated-uptime-kuma
     ports:
-      - "3002:3001"
+      - '3002:3001'
     volumes:
       - uptime_data:/app/data
     restart: unless-stopped
@@ -83,10 +84,10 @@ services:
       - pixelated-network
 
 volumes:
-   prometheus_data:
-   grafana_data:
-   alertmanager_data:
-   uptime_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
+  uptime_data:
 
 networks:
   pixelated-network:

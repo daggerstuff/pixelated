@@ -253,7 +253,8 @@ await updatePatientRecord(id, data)
 
 **Validation Status**: [ ] - Complete | [ ] - In Progress | [ ] - Not Started
 
-**Validated By**: ********\_******** **Date**: ********\_********
+**Validated By**: **\*\*\*\***\_**\*\*\*\*** **Date**:
+**\*\*\*\***\_**\*\*\*\***
 
 **Notes**:
 

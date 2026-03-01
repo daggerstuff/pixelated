@@ -1,6 +1,6 @@
+import type { Page } from '@playwright/test'
 import axe from 'axe-core'
 import type { AxeResults, RunOptions, Result } from 'axe-core'
-import type { Page } from '@playwright/test'
 
 // Impact levels from most severe to least severe
 const IMPACT_LEVELS = ['critical', 'serious', 'moderate', 'minor'] as const
@@ -71,7 +71,7 @@ const WCAG_MAP: Record<string, string[]> = {
   'image-alt': ['1.1.1'],
   'input-button-name': ['4.1.2'],
   'input-image-alt': ['1.1.1'],
-  'label': ['3.3.2'],
+  label: ['3.3.2'],
   'link-name': ['4.1.2'],
   // Add more mappings as needed
 }

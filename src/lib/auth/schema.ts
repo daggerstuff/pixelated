@@ -1,4 +1,11 @@
-import { pgTable, uuid, varchar, boolean, timestamp, integer } from 'drizzle-orm/pg-core'
+import {
+  pgTable,
+  uuid,
+  varchar,
+  boolean,
+  timestamp,
+  integer,
+} from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -17,7 +24,9 @@ export const users = pgTable('users', {
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
   loginAttempts: integer('login_attempts').default(0),
   accountLockedUntil: timestamp('account_locked_until', { withTimezone: true }),
-  authenticationStatus: varchar('authentication_status', { length: 50 }).default('unauthenticated'),
+  authenticationStatus: varchar('authentication_status', {
+    length: 50,
+  }).default('unauthenticated'),
 })
 
 export const authSessions = pgTable('auth_sessions', {

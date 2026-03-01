@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react'
-import { Card } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Card } from '@/components/ui/card'
 import { Dialog, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
+import type { TherapySession } from '@/lib/ai/interfaces/therapy'
+import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'
 import type { TherapeuticGoal } from '@/lib/ai/types/TherapeuticGoals'
-import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
-import type { TherapySession } from '@/lib/ai/interfaces/therapy'
-import { Textarea } from '@/components/ui/textarea'
 interface TherapeuticGoalsTrackerProps {
   patientModel: CognitiveModel
   currentSession: TherapySession
@@ -124,7 +125,7 @@ export function TherapeuticGoalsTracker({
       setActiveGoalId(newGoal.id)
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err as Error)?.message || String(err))
+        setActionError((err)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -152,7 +153,7 @@ export function TherapeuticGoalsTracker({
       )
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err as Error)?.message || String(err))
+        setActionError((err)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -176,7 +177,7 @@ export function TherapeuticGoalsTracker({
       }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setActionError((err as Error)?.message || String(err))
+        setActionError((err)?.message || String(err))
       } else {
         setActionError('An unknown error occurred')
       }
@@ -235,20 +236,20 @@ export function TherapeuticGoalsTracker({
   }
 
   return (
-    <div className="therapeutic-goals-tracker bg-white rounded-lg shadow p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Therapeutic Goals</h3>
-        <div className="text-sm text-gray-600">
+    <div className='therapeutic-goals-tracker bg-white rounded-lg p-4 shadow'>
+      <div className='mb-4 flex items-center justify-between'>
+        <h3 className='text-lg font-semibold'>Therapeutic Goals</h3>
+        <div className='text-gray-600 text-sm'>
           Session #
           {patientModel.therapeuticProgress.sessionProgressLog.length + 1}
         </div>
       </div>
 
       {/* Overall progress */}
-      <Card className="p-4 mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <h4 className="font-medium">Overall Treatment Progress</h4>
-          <span className="text-sm font-medium">
+      <Card className='mb-4 p-4'>
+        <div className='mb-2 flex items-center justify-between'>
+          <h4 className='font-medium'>Overall Treatment Progress</h4>
+          <span className='text-sm font-medium'>
             {Math.round(overallProgress)}%
           </span>
         </div>
@@ -262,10 +263,10 @@ export function TherapeuticGoalsTracker({
                 ? 'primary'
                 : 'warning'
           }
-          size="md"
+          size='md'
         />
 
-        <div className="mt-2 text-xs text-gray-500">
+        <div className='text-gray-500 mt-2 text-xs'>
           <span
             className={`font-medium ${overallProgress >= 50 ? 'text-green-600' : 'text-amber-600'}`}
           >
@@ -281,22 +282,22 @@ export function TherapeuticGoalsTracker({
       </Card>
 
       {/* Category filter */}
-      <div className="flex gap-1 mb-4 overflow-x-auto pb-2">
+      <div className='mb-4 flex gap-1 overflow-x-auto pb-2'>
         <Button
-          size="sm"
+          size='sm'
           variant={activeTab === 'all' ? 'default' : 'outline'}
           onClick={() => handleCategoryClick('all')}
-          className="text-xs whitespace-nowrap"
+          className='whitespace-nowrap text-xs'
         >
           All
         </Button>
         {Object.values(GoalCategory).map((category) => (
           <Button
             key={category}
-            size="sm"
+            size='sm'
             variant={activeTab === category ? 'default' : 'outline'}
             onClick={() => handleCategoryClick(category)}
-            className="text-xs whitespace-nowrap"
+            className='whitespace-nowrap text-xs'
           >
             {(() => {
               switch (category) {
@@ -325,7 +326,7 @@ export function TherapeuticGoalsTracker({
       </div>
 
       {/* Action bar */}
-      <div className="flex justify-end mb-4">
+      <div className='mb-4 flex justify-end'>
         <Button onClick={() => openModal()} disabled={actionLoading}>
           + Add Goal
         </Button>
@@ -333,10 +334,10 @@ export function TherapeuticGoalsTracker({
 
       {/* Error and loading states */}
       {(error || actionError) && (
-        <div className="text-red-600 mb-2">{error || actionError}</div>
+        <div className='text-red-600 mb-2'>{error || actionError}</div>
       )}
       {(loading || actionLoading) && (
-        <div className="text-gray-500 mb-2">Loading...</div>
+        <div className='text-gray-500 mb-2'>Loading...</div>
       )}
 
       {/* Modal for add/edit goal */}
@@ -347,30 +348,30 @@ export function TherapeuticGoalsTracker({
             if (!open) closeModal()
           }}
         >
-          <form onSubmit={handleFormSubmit} className="space-y-4">
+          <form onSubmit={handleFormSubmit} className='space-y-4'>
             <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
             <Input
-              name="title"
+              name='title'
               value={form.title || ''}
               onChange={handleFormChange}
-              placeholder="Goal Title"
+              placeholder='Goal Title'
               required
               maxLength={128}
             />
 
             <Textarea
-              name="description"
+              name='description'
               value={form.description || ''}
               onChange={handleFormChange}
-              placeholder="Description"
+              placeholder='Description'
               maxLength={1024}
             />
 
             <select
-              name="category"
+              name='category'
               value={form.category || GoalCategory.EMOTIONAL_REGULATION}
               onChange={handleFormChange}
-              className="w-full border rounded p-2"
+              className='w-full rounded border p-2'
             >
               {Object.values(GoalCategory).map((cat) => (
                 <option key={cat} value={cat}>
@@ -400,10 +401,10 @@ export function TherapeuticGoalsTracker({
               ))}
             </select>
             <select
-              name="status"
+              name='status'
               value={form.status || GoalStatus.NOT_STARTED}
               onChange={handleFormChange}
-              className="w-full border rounded p-2"
+              className='w-full rounded border p-2'
             >
               {Object.values(GoalStatus).map((stat) => (
                 <option key={stat} value={stat}>
@@ -411,7 +412,7 @@ export function TherapeuticGoalsTracker({
                 </option>
               ))}
             </select>
-            <Button type="submit" disabled={actionLoading} className="w-full">
+            <Button type='submit' disabled={actionLoading} className='w-full'>
               {editGoal ? 'Update Goal' : 'Create Goal'}
             </Button>
           </form>
@@ -420,23 +421,23 @@ export function TherapeuticGoalsTracker({
 
       {/* Goals list */}
       {filteredGoals.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className='text-gray-500 py-8 text-center'>
           No goals found for this category
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-4 mb-4">
+        <div className='mb-4 grid gap-4 md:grid-cols-2'>
           {filteredGoals.map((goal) => (
             <Card
               key={goal.id}
-              className={`p-4 cursor-pointer transition-all duration-200 hover:shadow-md ${
-                activeGoalId === goal.id ? 'ring-2 ring-primary' : ''
+              className={`cursor-pointer p-4 transition-all duration-200 hover:shadow-md ${
+                activeGoalId === goal.id ? 'ring-primary ring-2' : ''
               }`}
               onClick={() => setActiveGoalId(goal.id)}
             >
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-medium">{goal.title}</h4>
+              <div className='mb-2 flex items-start justify-between'>
+                <h4 className='font-medium'>{goal.title}</h4>
                 <span
-                  className={`text-xs px-2 py-1 rounded-full ${
+                  className={`rounded-full px-2 py-1 text-xs ${
                     goal.status === GoalStatus.COMPLETED
                       ? 'bg-green-100 text-green-800'
                       : goal.status === GoalStatus.IN_PROGRESS
@@ -451,10 +452,10 @@ export function TherapeuticGoalsTracker({
                   {goal.status.replace('_', ' ')}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+              <p className='text-gray-600 mb-2 line-clamp-2 text-sm'>
                 {goal.description}
               </p>
-              <div className="flex items-center mb-1">
+              <div className='mb-1 flex items-center'>
                 <Progress
                   value={goal.progress}
                   max={100}
@@ -465,35 +466,35 @@ export function TherapeuticGoalsTracker({
                         ? 'primary'
                         : 'default'
                   }
-                  size="sm"
-                  className="flex-1 mr-2"
+                  size='sm'
+                  className='mr-2 flex-1'
                 />
 
-                <span className="text-xs font-medium">{goal.progress}%</span>
+                <span className='text-xs font-medium'>{goal.progress}%</span>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className='text-gray-500 mt-1 text-xs'>
                 {goal.checkpoints.filter((cp) => cp.isCompleted).length} /{' '}
                 {goal.checkpoints.length} checkpoints completed
               </div>
-              <div className="mt-2">
+              <div className='mt-2'>
                 <Button
-                  size="sm"
-                  variant="outline"
+                  size='sm'
+                  variant='outline'
                   onClick={(e) => {
                     e.stopPropagation()
                     openModal(goal)
                   }}
                   disabled={actionLoading}
-                  className="mr-2"
+                  className='mr-2'
                 >
                   Edit
                 </Button>
                 <Button
-                  size="sm"
-                  variant="destructive"
+                  size='sm'
+                  variant='destructive'
                   onClick={(e) => {
                     e.stopPropagation()
-                    if (window.confirm('Delete this goal?')) deleteGoal(goal.id)
+                    if (window.confirm('Delete this goal?')) void deleteGoal(goal.id)
                   }}
                   disabled={actionLoading}
                 >
@@ -507,51 +508,51 @@ export function TherapeuticGoalsTracker({
 
       {/* Goal details */}
       {activeGoal && (
-        <Card className="p-4">
-          <h4 className="font-semibold mb-2">{activeGoal.title}</h4>
-          <p className="text-sm text-gray-700 mb-4">{activeGoal.description}</p>
+        <Card className='p-4'>
+          <h4 className='mb-2 font-semibold'>{activeGoal.title}</h4>
+          <p className='text-gray-700 mb-4 text-sm'>{activeGoal.description}</p>
 
-          <h5 className="font-medium mb-2 text-sm">Progress Checkpoints</h5>
-          <div className="space-y-3 mb-4">
+          <h5 className='mb-2 text-sm font-medium'>Progress Checkpoints</h5>
+          <div className='mb-4 space-y-3'>
             {activeGoal.checkpoints.map((checkpoint) => (
               <div
                 key={`checkpoint-${checkpoint.id}`}
-                className="flex items-start"
+                className='flex items-start'
               >
                 <div
-                  className={`h-5 w-5 mt-0.5 rounded-full mr-3 flex items-center justify-center ${
+                  className={`mr-3 mt-0.5 flex h-5 w-5 items-center justify-center rounded-full ${
                     checkpoint.isCompleted ? 'bg-green-500' : 'bg-gray-200'
                   }`}
                 >
                   {checkpoint.isCompleted && (
                     <svg
-                      className="h-3 w-3 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
+                      className='text-white h-3 w-3'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
                     >
                       <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
+                        fillRule='evenodd'
+                        d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+                        clipRule='evenodd'
                       />
                     </svg>
                   )}
                 </div>
-                <div className="flex-1">
+                <div className='flex-1'>
                   <p
                     className={`text-sm ${checkpoint.isCompleted ? 'text-gray-800' : 'text-gray-600'}`}
                   >
                     {checkpoint.description}
                   </p>
                   {checkpoint.isCompleted && checkpoint.completedAt && (
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className='text-gray-500 mt-0.5 text-xs'>
                       Completed on{' '}
                       {new Date(checkpoint.completedAt).toLocaleDateString()}
                     </p>
                   )}
                   {checkpoint.notes && (
-                    <p className="text-xs text-gray-500 mt-0.5 italic">
+                    <p className='text-gray-500 mt-0.5 text-xs italic'>
                       {checkpoint.notes}
                     </p>
                   )}
@@ -563,24 +564,24 @@ export function TherapeuticGoalsTracker({
           {/* Progress history */}
           {activeGoal.progressHistory.length > 0 && (
             <>
-              <h5 className="font-medium mb-2 text-sm">Progress History</h5>
-              <div className="space-y-2 mb-4">
+              <h5 className='mb-2 text-sm font-medium'>Progress History</h5>
+              <div className='mb-4 space-y-2'>
                 {activeGoal.progressHistory.slice(-3).map((snapshot) => (
                   <div
                     key={`progress-${snapshot.timestamp}-${snapshot.progressPercent}`}
-                    className="flex items-center justify-between text-sm"
+                    className='flex items-center justify-between text-sm'
                   >
-                    <span className="text-gray-600">
+                    <span className='text-gray-600'>
                       {new Date(snapshot.timestamp).toLocaleDateString()}
                     </span>
-                    <div className="flex items-center">
-                      <div className="w-16 h-1.5 bg-gray-200 rounded-full mr-2">
+                    <div className='flex items-center'>
+                      <div className='bg-gray-200 mr-2 h-1.5 w-16 rounded-full'>
                         <div
-                          className="h-full bg-blue-500 rounded-full"
+                          className='bg-blue-500 h-full rounded-full'
                           style={{ width: `${snapshot.progressPercent}%` }}
                         />
                       </div>
-                      <span className="text-xs">
+                      <span className='text-xs'>
                         {snapshot.progressPercent}%
                       </span>
                     </div>
@@ -593,27 +594,27 @@ export function TherapeuticGoalsTracker({
           {/* Related interventions */}
           {activeGoal && (
             <>
-              <h5 className="font-medium mb-2 text-sm">Recent Interventions</h5>
-              <div className="space-y-2">
+              <h5 className='mb-2 text-sm font-medium'>Recent Interventions</h5>
+              <div className='space-y-2'>
                 {getRelatedInterventions(activeGoal.id).length > 0 ? (
                   getRelatedInterventions(activeGoal.id).map((intervention) => (
                     <div
                       key={`intervention-${intervention.type}-${intervention.timestamp.toISOString()}`}
-                      className="text-sm"
+                      className='text-sm'
                     >
-                      <div className="flex justify-between">
-                        <span className="font-medium">{intervention.type}</span>
-                        <span className="text-xs text-gray-500">
+                      <div className='flex justify-between'>
+                        <span className='font-medium'>{intervention.type}</span>
+                        <span className='text-gray-500 text-xs'>
                           {intervention.timestamp.toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600">
+                      <p className='text-gray-600 text-xs'>
                         {intervention.outcome}
                       </p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-500 italic">
+                  <p className='text-gray-500 text-sm italic'>
                     No recent interventions for this goal
                   </p>
                 )}
@@ -624,8 +625,8 @@ export function TherapeuticGoalsTracker({
           {/* Notes */}
           {activeGoal.notes && (
             <>
-              <h5 className="font-medium mt-4 mb-2 text-sm">Notes</h5>
-              <p className="text-sm text-gray-700">{activeGoal.notes}</p>
+              <h5 className='mb-2 mt-4 text-sm font-medium'>Notes</h5>
+              <p className='text-gray-700 text-sm'>{activeGoal.notes}</p>
             </>
           )}
         </Card>

@@ -88,7 +88,7 @@ export const useFHE = () => {
       }
     }
 
-    loadFHE()
+    void loadFHE()
 
     return () => {
       isMounted = false

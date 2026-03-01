@@ -1,25 +1,31 @@
 ---
-title: "HIPAA Security Compliance Guide"
-description: "HIPAA Security Compliance Guide documentation"
+title: 'HIPAA Security Compliance Guide'
+description: 'HIPAA Security Compliance Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
 
 # HIPAA Security Compliance Guide
 
-This document outlines the HIPAA security compliance standards and automated checks for the Pixelated Empathy codebase.
+This document outlines the HIPAA security compliance standards and automated
+checks for the Pixelated Empathy codebase.
 
 ## Overview
 
-As a healthcare application handling Protected Health Information (PHI), Pixelated Empathy must adhere to HIPAA security standards, particularly those related to:
+As a healthcare application handling Protected Health Information (PHI),
+Pixelated Empathy must adhere to HIPAA security standards, particularly those
+related to:
 
-1. **Technical Safeguards**: Implementation of security measures to protect electronic PHI
+1. **Technical Safeguards**: Implementation of security measures to protect
+   electronic PHI
 2. **Access Controls**: Mechanisms to ensure appropriate access to PHI
-3. **Audit Controls**: Systems to record and examine activity where PHI is accessed
-4. **Integrity Controls**: Measures to prevent unauthorized alteration or destruction of PHI
+3. **Audit Controls**: Systems to record and examine activity where PHI is
+   accessed
+4. **Integrity Controls**: Measures to prevent unauthorized alteration or
+   destruction of PHI
 5. **Transmission Security**: Protection of PHI when transmitted over a network
 
 ## Automated Security Checks
@@ -28,7 +34,8 @@ We provide automated tools to verify compliance with HIPAA security standards:
 
 ### 1. HIPAA Security Check Script
 
-The `scripts/hipaa-security-check.js` script performs a comprehensive scan of the codebase for HIPAA security compliance issues:
+The `scripts/hipaa-security-check.js` script performs a comprehensive scan of
+the codebase for HIPAA security compliance issues:
 
 ```bash
 # Run the script locally
@@ -45,7 +52,8 @@ This script checks for:
 
 ### 2. CI/CD Pipeline Integration
 
-The security checks are integrated into our GitHub Actions workflow (`.github/workflows/security-scanning.yml`) to ensure ongoing compliance:
+The security checks are integrated into our GitHub Actions workflow
+(`.github/workflows/security-scanning.yml`) to ensure ongoing compliance:
 
 - Runs on every pull request and scheduled basis
 - Generates a detailed HIPAA compliance report
@@ -64,50 +72,54 @@ All PHI data must be encrypted using:
 Example of compliant encryption implementation:
 
 ```typescript
-import crypto from 'crypto';
+import crypto from 'crypto'
 
 // Generate a secure key using proper key derivation
-const key = crypto.scryptSync(password, salt, 32); // 256 bits
+const key = crypto.scryptSync(password, salt, 32) // 256 bits
 
 // Use AES-256-GCM with proper IV
-const iv = crypto.randomBytes(16);
-const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+const iv = crypto.randomBytes(16)
+const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
 
 // Encrypt the data
-let encryptedData = cipher.update(data, 'utf8', 'hex');
-encryptedData += cipher.final('hex');
+let encryptedData = cipher.update(data, 'utf8', 'hex')
+encryptedData += cipher.final('hex')
 
 // Get the authentication tag
-const authTag = cipher.getAuthTag();
+const authTag = cipher.getAuthTag()
 ```
 
 ### Fully Homomorphic Encryption (FHE)
 
-Our platform uses Fully Homomorphic Encryption (FHE) to provide advanced protection for PHI:
+Our platform uses Fully Homomorphic Encryption (FHE) to provide advanced
+protection for PHI:
 
-1. **Data Processing on Encrypted Data**: FHE allows computation on encrypted data without requiring decryption
-2. **Microsoft SEAL Integration**: We use production-ready Microsoft SEAL for FHE implementation
+1. **Data Processing on Encrypted Data**: FHE allows computation on encrypted
+   data without requiring decryption
+2. **Microsoft SEAL Integration**: We use production-ready Microsoft SEAL for
+   FHE implementation
 3. **BFV Scheme**: Implemented for efficient homomorphic operations
 
 Example of FHE implementation:
 
 ```typescript
-import { FHEService } from '../lib/fhe/FHEService';
+import { FHEService } from '../lib/fhe/FHEService'
 
 // Initialize FHE service with secure parameters
-const fheService = new FHEService();
+const fheService = new FHEService()
 
 // Encrypt sensitive data
-const encryptedData = await fheService.encrypt(patientData);
+const encryptedData = await fheService.encrypt(patientData)
 
 // Process data while it remains encrypted
-const encryptedResult = await fheService.processEncrypted(encryptedData);
+const encryptedResult = await fheService.processEncrypted(encryptedData)
 
 // Decrypt only when necessary with proper authorization
-const result = await fheService.decrypt(encryptedResult);
+const result = await fheService.decrypt(encryptedResult)
 ```
 
-For more details on our FHE implementation, see the [FHE documentation](./encryption.mdx).
+For more details on our FHE implementation, see the
+[FHE documentation](./encryption.mdx).
 
 ### Authentication and Authorization
 
@@ -117,12 +129,12 @@ All API routes must implement proper authentication and authorization:
 // ❌ Bad - No authentication
 router.get('/patient-data', (req, res) => {
   // Direct access to patient data
-});
+})
 
 // ✅ Good - With authentication
 router.get('/patient-data', authenticate, authorize('doctor'), (req, res) => {
   // Access to patient data after authentication and authorization
-});
+})
 ```
 
 ### Audit Logging
@@ -132,20 +144,20 @@ All operations involving PHI must be logged for audit purposes:
 ```typescript
 // ❌ Bad - No audit logging
 function updatePatientRecord(patientId, data) {
-  database.update('patients', patientId, data);
+  database.update('patients', patientId, data)
 }
 
 // ✅ Good - With audit logging
 function updatePatientRecord(patientId, data, userId) {
-  database.update('patients', patientId, data);
+  database.update('patients', patientId, data)
   auditLogger.log({
     action: 'UPDATE',
     resource: 'patient',
     resourceId: patientId,
     userId,
     timestamp: new Date(),
-    changes: data
-  });
+    changes: data,
+  })
 }
 ```
 
@@ -153,51 +165,56 @@ function updatePatientRecord(patientId, data, userId) {
 
 When using AI with PHI, the following security measures are required:
 
-1. **Prompt Sanitization**: All inputs to AI models must be sanitized to prevent injection attacks
+1. **Prompt Sanitization**: All inputs to AI models must be sanitized to prevent
+   injection attacks
 2. **Response Filtering**: AI outputs must be scanned for potential PHI leakage
 3. **Secure Processing**: Use FHE when processing PHI with AI models
-4. **Comprehensive Logging**: All AI operations on PHI must be logged for audit purposes
+4. **Comprehensive Logging**: All AI operations on PHI must be logged for audit
+   purposes
 5. **Access Controls**: Strict access controls on AI features that process PHI
 
 Example of secure AI implementation with PHI:
 
 ```typescript
-import { sanitizePrompt } from '../lib/security/promptSanitizer';
-import { filterResponse } from '../lib/security/responseFilter';
-import { auditLogger } from '../lib/audit/logger';
+import { sanitizePrompt } from '../lib/security/promptSanitizer'
+import { filterResponse } from '../lib/security/responseFilter'
+import { auditLogger } from '../lib/audit/logger'
 
 async function processPatientDataWithAI(patientData, userId) {
   // Sanitize inputs
-  const sanitizedPrompt = sanitizePrompt(patientData.prompt);
-  
+  const sanitizedPrompt = sanitizePrompt(patientData.prompt)
+
   // Log the operation
   auditLogger.log({
     action: 'AI_PROCESS',
     userId,
     timestamp: new Date(),
     resource: 'patient',
-    resourceId: patientData.id
-  });
-  
+    resourceId: patientData.id,
+  })
+
   // Process with AI
-  const aiResponse = await aiService.process(sanitizedPrompt);
-  
+  const aiResponse = await aiService.process(sanitizedPrompt)
+
   // Filter response for potential PHI or sensitive data
-  const safeResponse = filterResponse(aiResponse);
-  
-  return safeResponse;
+  const safeResponse = filterResponse(aiResponse)
+
+  return safeResponse
 }
 ```
 
-For more detailed information, see our [AI Security Best Practices](../security-analysis/security-best-practices.mdx).
+For more detailed information, see our
+[AI Security Best Practices](../security-analysis/security-best-practices.mdx).
 
 ### Business Associate Agreements (BAAs)
 
 All third-party services handling PHI must have a BAA in place:
 
-1. **BAA Template System**: Use our BAA template system for creating compliant agreements
+1. **BAA Template System**: Use our BAA template system for creating compliant
+   agreements
 2. **Vendor Assessment**: Verify vendor compliance before engaging services
-3. **BAA Management**: Track and manage all BAAs through the BAA Management Workflow
+3. **BAA Management**: Track and manage all BAAs through the BAA Management
+   Workflow
 4. **Regular Review**: Review all BAAs periodically to ensure compliance
 
 To create and manage BAAs, use the admin interface at `/admin/security/baa`.
@@ -207,7 +224,8 @@ To create and manage BAAs, use the admin interface at `/admin/security/baa`.
 Our DLP system helps prevent unauthorized disclosure of PHI:
 
 1. **PHI Detection**: Automated detection of PHI in all outgoing communications
-2. **Policy Enforcement**: Configurable policies to block, redact, or alert on PHI
+2. **Policy Enforcement**: Configurable policies to block, redact, or alert on
+   PHI
 3. **Admin Interface**: Comprehensive admin interface for managing DLP rules
 4. **Audit Trail**: Complete audit trail of all DLP events
 
@@ -248,11 +266,13 @@ In addition to automated checks, perform regular manual reviews:
 3. **Authentication Mechanisms**: Evaluate strength of authentication methods
 4. **Authorization Logic**: Review business logic for authorization decisions
 5. **Audit Log Review**: Examine audit logs for suspicious activity
-6. **FHE Implementation**: Verify proper implementation of Fully Homomorphic Encryption
+6. **FHE Implementation**: Verify proper implementation of Fully Homomorphic
+   Encryption
 7. **AI Security**: Review AI implementations for security vulnerabilities
 8. **BAA Compliance**: Ensure all vendor relationships have proper BAAs in place
 9. **DLP Configuration**: Review DLP rules for effectiveness and coverage
-10. **Training Verification**: Ensure all staff have completed required HIPAA training
+10. **Training Verification**: Ensure all staff have completed required HIPAA
+    training
 
 ## Risk Assessment and Remediation
 
@@ -271,12 +291,15 @@ Regular compliance verification is required:
 1. **Automated Scanning**: Run automated compliance checks weekly
 2. **Manual Audits**: Conduct quarterly manual security audits
 3. **Penetration Testing**: Perform annual penetration testing
-4. **Documentation Review**: Review and update all compliance documentation quarterly
-5. **Staff Training**: Ensure all staff complete annual HIPAA compliance training
+4. **Documentation Review**: Review and update all compliance documentation
+   quarterly
+5. **Staff Training**: Ensure all staff complete annual HIPAA compliance
+   training
 
 ## Questions and Support
 
-If you have questions about HIPAA security compliance or encounter issues with the scanning tools, please contact the security team at [SECURITY_TEAM_EMAIL].
+If you have questions about HIPAA security compliance or encounter issues with
+the scanning tools, please contact the security team at [SECURITY_TEAM_EMAIL].
 
 ## Related Resources
 

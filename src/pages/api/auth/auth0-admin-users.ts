@@ -4,11 +4,12 @@
  */
 
 import type { APIRoute } from 'astro'
+
+import { createAuditLog } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById, getAllUsers, updateUser } from '@/services/auth0.service'
-import { createAuditLog } from '@/lib/audit'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getUserById, getAllUsers, updateUser } from '@/services/auth0.service'
 
 export const prerender = false
 
@@ -28,7 +29,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -41,7 +42,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -63,7 +64,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.admin.users.forbidden',
         user.id,
         'auth-admin-users',
-        { action: 'get_users', reason: 'insufficient_permissions' }
+        { action: 'get_users', reason: 'insufficient_permissions' },
       )
 
       return new Response(
@@ -71,7 +72,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -101,14 +102,15 @@ export const GET: APIRoute = async ({ request }) => {
     let filteredUsers = allUsers
 
     if (role) {
-      filteredUsers = filteredUsers.filter(u => u.role === role)
+      filteredUsers = filteredUsers.filter((u) => u.role === role)
     }
 
     if (search) {
       const searchTerm = search.toLowerCase()
-      filteredUsers = filteredUsers.filter(u =>
-        u.email.toLowerCase().includes(searchTerm) ||
-        (u.fullName && u.fullName.toLowerCase().includes(searchTerm))
+      filteredUsers = filteredUsers.filter(
+        (u) =>
+          u.email.toLowerCase().includes(searchTerm) ||
+          (u.fullName && u.fullName.toLowerCase().includes(searchTerm)),
       )
     }
 
@@ -122,12 +124,12 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.admin.users.list',
       user.id,
       'auth-admin-users',
-      { action: 'list_users', page, limit, role, search, count, offset }
+      { action: 'list_users', page, limit, role, search, count, offset },
     )
 
     return new Response(
       JSON.stringify({
-        data: paginatedUsers.map(u => ({
+        data: paginatedUsers.map((u) => ({
           id: u.id,
           email: u.email,
           role: u.role,
@@ -161,7 +163,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -193,7 +195,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -206,7 +208,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -228,7 +230,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         'auth.admin.users.forbidden',
         admin.id,
         'auth-admin-users',
-        { action: 'update_user', reason: 'insufficient_permissions' }
+        { action: 'update_user', reason: 'insufficient_permissions' },
       )
 
       return new Response(
@@ -236,7 +238,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -269,7 +271,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       'auth.admin.users.update',
       admin.id,
       'auth-admin-users',
-      { action: 'update_user', userId, updates, updatedBy: admin.id }
+      { action: 'update_user', userId, updates, updatedBy: admin.id },
     )
 
     return new Response(
@@ -302,7 +304,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(

@@ -32,46 +32,46 @@ export default function PipelineOverview() {
   ]
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="flex flex-col md:flex-row gap-6">
+    <div className='mx-auto w-full max-w-4xl p-6'>
+      <div className='flex flex-col gap-6 md:flex-row'>
         {/* Pipeline Steps */}
-        <div className="flex-1">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className='flex-1'>
+          <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
             {steps.map((step, index) => (
               <button
                 key={step.title}
-                type="button"
-                className={`text-left p-4 rounded-lg cursor-pointer transition-all ${
+                type='button'
+                className={`cursor-pointer rounded-lg p-4 text-left transition-all ${
                   activeStep === index
-                    ? 'bg-blue-600/20 border-2 border-blue-400'
-                    : 'bg-slate-700/50 border border-slate-600/50 hover:bg-slate-600/50'
+                    ? 'bg-blue-600/20 border-blue-400 border-2'
+                    : 'bg-slate-700/50 border-slate-600/50 hover:bg-slate-600/50 border'
                 }`}
                 onClick={() => setActiveStep(index)}
                 aria-pressed={activeStep === index}
               >
-                <div className="text-2xl mb-2">{step.icon}</div>
-                <h3 className="font-semibold text-white text-sm mb-1">
+                <div className='mb-2 text-2xl'>{step.icon}</div>
+                <h3 className='text-white mb-1 text-sm font-semibold'>
                   {step.title}
                 </h3>
-                <p className="text-xs text-slate-300">{step.description}</p>
+                <p className='text-slate-300 text-xs'>{step.description}</p>
               </button>
             ))}
           </div>
 
           {/* Active Step Details */}
-          <div className="bg-slate-800/50 rounded-lg p-6 border border-slate-600/50">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl">{steps[activeStep]?.icon}</span>
+          <div className='bg-slate-800/50 border-slate-600/50 rounded-lg border p-6'>
+            <div className='mb-4 flex items-center gap-3'>
+              <span className='text-3xl'>{steps[activeStep]?.icon}</span>
               <div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className='text-white text-xl font-semibold'>
                   {steps[activeStep]?.title}
                 </h3>
-                <p className="text-slate-300">
+                <p className='text-slate-300'>
                   {steps[activeStep]?.description}
                 </p>
               </div>
             </div>
-            <p className="text-slate-400">{steps[activeStep]?.details}</p>
+            <p className='text-slate-400'>{steps[activeStep]?.details}</p>
           </div>
         </div>
       </div>

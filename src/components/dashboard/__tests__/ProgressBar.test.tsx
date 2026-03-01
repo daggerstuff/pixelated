@@ -1,10 +1,11 @@
 import { render, screen } from '@testing-library/react'
-import { ProgressBar } from '../ProgressBar'
 import { describe, expect, it } from 'vitest'
+
+import { ProgressBar } from '../ProgressBar'
 
 describe('ProgressBar', () => {
   it('renders progress bar with correct value and label', () => {
-    render(<ProgressBar value={75} label="Test Progress" />)
+    render(<ProgressBar value={75} label='Test Progress' />)
 
     expect(screen.getByLabelText('Test Progress')).toBeInTheDocument()
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
@@ -21,7 +22,7 @@ describe('ProgressBar', () => {
   })
 
   it('clamps progress value to 100 maximum', () => {
-    render(<ProgressBar value={150} label="Over 100%" />)
+    render(<ProgressBar value={150} label='Over 100%' />)
 
     const progressBar = screen.getByRole('progressbar')
     expect(progressBar).toHaveAttribute('aria-valuenow', '100')
@@ -30,7 +31,7 @@ describe('ProgressBar', () => {
   })
 
   it('clamps progress value to 0 minimum', () => {
-    render(<ProgressBar value={-50} label="Negative Value" />)
+    render(<ProgressBar value={-50} label='Negative Value' />)
 
     const progressBar = screen.getByRole('progressbar')
     // The component clamps negative values to the minimum (0).
@@ -41,14 +42,14 @@ describe('ProgressBar', () => {
   })
 
   it('uses default max value of 100', () => {
-    render(<ProgressBar value={75} label="Default Max" />)
+    render(<ProgressBar value={75} label='Default Max' />)
 
     const progressBar = screen.getByRole('progressbar')
     expect(progressBar).toHaveAttribute('aria-valuemax', '100')
   })
 
   it('applies correct width style based on percentage', () => {
-    render(<ProgressBar value={25} label="25 Percent" />)
+    render(<ProgressBar value={25} label='25 Percent' />)
 
     const progressBar = screen.getByRole('progressbar')
     const fillElement = progressBar.querySelector('.bg-primary')
@@ -56,7 +57,7 @@ describe('ProgressBar', () => {
   })
 
   it('renders with zero value', () => {
-    render(<ProgressBar value={0} label="Zero Progress" />)
+    render(<ProgressBar value={0} label='Zero Progress' />)
 
     expect(screen.getByText('0%')).toBeInTheDocument()
     const progressBar = screen.getByRole('progressbar')
@@ -65,7 +66,7 @@ describe('ProgressBar', () => {
   })
 
   it('renders with maximum value', () => {
-    render(<ProgressBar value={100} label="Complete" />)
+    render(<ProgressBar value={100} label='Complete' />)
 
     expect(screen.getByText('100%')).toBeInTheDocument()
     const progressBar = screen.getByRole('progressbar')
@@ -74,7 +75,7 @@ describe('ProgressBar', () => {
   })
 
   it('has proper accessibility attributes', () => {
-    render(<ProgressBar value={60} label="Accessible Progress" />)
+    render(<ProgressBar value={60} label='Accessible Progress' />)
 
     const progressBar = screen.getByRole('progressbar')
     expect(progressBar).toHaveAttribute('aria-valuenow', '60')
@@ -84,7 +85,7 @@ describe('ProgressBar', () => {
   })
 
   it('forwards aria-label prop correctly', () => {
-    render(<ProgressBar value={75} aria-label="Custom Progress Label" />)
+    render(<ProgressBar value={75} aria-label='Custom Progress Label' />)
 
     expect(
       screen.getByRole('progressbar', { name: 'Custom Progress Label' }),
@@ -94,8 +95,8 @@ describe('ProgressBar', () => {
   it('forwards aria-labelledby prop correctly', () => {
     render(
       <>
-        <span id="progress-label">External Label</span>
-        <ProgressBar value={75} aria-labelledby="progress-label" />
+        <span id='progress-label'>External Label</span>
+        <ProgressBar value={75} aria-labelledby='progress-label' />
       </>,
     )
 
@@ -110,12 +111,12 @@ describe('ProgressBar', () => {
   it('prioritizes aria-labelledby over aria-label and label props', () => {
     render(
       <>
-        <span id="priority-label">Priority Label</span>
+        <span id='priority-label'>Priority Label</span>
         <ProgressBar
           value={75}
-          label="Regular Label"
-          aria-label="Aria Label"
-          aria-labelledby="priority-label"
+          label='Regular Label'
+          aria-label='Aria Label'
+          aria-labelledby='priority-label'
         />
       </>,
     )
@@ -130,7 +131,7 @@ describe('ProgressBar', () => {
 
   it('prioritizes aria-label over label prop', () => {
     render(
-      <ProgressBar value={75} label="Regular Label" aria-label="Aria Label" />,
+      <ProgressBar value={75} label='Regular Label' aria-label='Aria Label' />,
     )
 
     expect(

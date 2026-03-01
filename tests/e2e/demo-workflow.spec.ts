@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test'
-
 import path from 'path'
+
+import { test, expect } from '@playwright/test'
 
 test.describe('Psychology Pipeline Demo - Complete Workflow', () => {
   test.beforeEach(async ({ page }) => {
@@ -206,7 +206,7 @@ test.describe('Psychology Pipeline Demo - Complete Workflow', () => {
 
       // Mock API failure by intercepting network requests
       await page.route('**/api/knowledge-balancer/**', (route) => {
-        route.fulfill({
+        void route.fulfill({
           status: 500,
           contentType: 'application/json',
           body: JSON.stringify({ error: 'Service unavailable' }),

@@ -390,10 +390,12 @@ test.describe('Theme Performance Tests', () => {
         elements.forEach((el) => {
           const style = window.getComputedStyle(el)
           if (style.contain && style.contain !== 'none') {
-            containmentUsage.push({
-              tagName: el.tagName,
-              contain: style.contain,
-            }).slice(________)
+            containmentUsage
+              .push({
+                tagName: el.tagName,
+                contain: style.contain,
+              })
+              .slice(________)
           }
         })
 

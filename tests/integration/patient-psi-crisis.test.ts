@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { ContextualEnhancer } from '../../src/lib/ai/services/contextual-enhancer'
 import { RealTimeAnalyzer } from '../../src/lib/ai/services/real-time-analyzer'
 import { EmotionState } from '../../src/lib/ai/types/emotional'
@@ -110,7 +111,6 @@ describe('Patient-Psi Crisis Integration Tests', () => {
       }
 
       // Simulate historical sessions showing improvement
-
 
       const currentEmotion: EmotionState = {
         primary: 'frustrated',

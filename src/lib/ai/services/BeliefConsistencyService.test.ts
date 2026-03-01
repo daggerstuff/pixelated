@@ -1,4 +1,3 @@
-import { BeliefConsistencyService } from './BeliefConsistencyService'
 import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
   CognitiveModel,
@@ -8,6 +7,7 @@ import type {
   TherapeuticProgress,
   ConversationalStyle,
 } from '../types/CognitiveModel'
+import { BeliefConsistencyService } from './BeliefConsistencyService'
 
 // Helper to create a basic CognitiveModel for testing
 const createTestCognitiveModel = (

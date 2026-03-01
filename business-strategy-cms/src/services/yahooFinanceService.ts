@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
+
 import { Logger } from '../utils/logger'
 
 export interface YahooFinanceQuote {

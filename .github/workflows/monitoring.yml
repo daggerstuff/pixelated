@@ -2,7 +2,7 @@ name: Monitoring
 
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: '0 12 * * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +12,7 @@ env:
   NODE_VERSION: 24.13.0
   PNPM_VERSION: 10.29.2
   NODE_ENV: production
-  DEFAULT_BASE_URL: "https://pixelatedempathy.com"
+  DEFAULT_BASE_URL: 'https://pixelatedempathy.com'
   HEALTH_CHECK_TIMEOUT_PROD: 30
   HEALTH_CHECK_TIMEOUT_STAGING: 20
   HEALTH_CHECK_TIMEOUT_PREVIEW: 15
@@ -312,7 +312,9 @@ jobs:
           fi
 
       - name: Notify failure
-        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
+        if:
+          failure() && steps.set-slack-enabled-prod.outputs.slack_enabled ==
+          'true'
         uses: slackapi/slack-github-action@v2
         with:
           webhook-type: incoming-webhook
@@ -333,7 +335,9 @@ jobs:
         continue-on-error: true
 
       - name: Log notification skip
-        if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'false'
+        if:
+          failure() && steps.set-slack-enabled-prod.outputs.slack_enabled ==
+          'false'
         run: |
           echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
           echo "::warning::Production monitoring failed but no notification was sent"
@@ -546,7 +550,9 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload test results
-        if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
+        if:
+          always() && (steps.health-check.outputs.status == 'passing' ||
+          steps.health-check.outputs.status == 'warning')
         uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-staging
@@ -761,7 +767,9 @@ jobs:
           exit 0
 
       - name: Upload test results
-        if: always() && (steps.health-check.outputs.status == 'passing' || steps.health-check.outputs.status == 'warning')
+        if:
+          always() && (steps.health-check.outputs.status == 'passing' ||
+          steps.health-check.outputs.status == 'warning')
         uses: actions/upload-artifact@v5
         with:
           name: playwright-test-results-preview
@@ -872,7 +880,9 @@ jobs:
 
       - name: Add protected URLs (optional)
         id: add-protected
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.prep-lh-headers.outputs.has_auth == 'true'
+        if:
+          steps.resolve-perf.outputs.skip_lhci == 'false' &&
+          steps.prep-lh-headers.outputs.has_auth == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -885,7 +895,9 @@ jobs:
       - name: Run Lighthouse CI
         id: lhci
         uses: treosh/lighthouse-ci-action@v12
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
+        if:
+          steps.resolve-perf.outputs.skip_lhci == 'false' &&
+          steps.probe-urls.outputs.skip_lhci_urls == 'false'
         with:
           urls: |
             ${{ steps.probe-urls.outputs.urls }}
@@ -896,7 +908,9 @@ jobs:
           temporaryPublicStorage: true
 
       - name: Check for critical performance issues
-        if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.probe-urls.outputs.skip_lhci_urls == 'false'
+        if:
+          steps.resolve-perf.outputs.skip_lhci == 'false' &&
+          steps.probe-urls.outputs.skip_lhci_urls == 'false'
         run: echo "Analyzing performance metrics for PRODUCTION..."
 
       - name: Set Slack enabled output (performance)
@@ -909,11 +923,18 @@ jobs:
           fi
 
       - name: Skip notice
-        if: steps.resolve-perf.outputs.skip_lhci == 'true' || steps.probe-urls.outputs.skip_lhci_urls == 'true'
-        run: echo "Skipping Lighthouse run due to missing APP_URL or no healthy URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to enable."
+        if:
+          steps.resolve-perf.outputs.skip_lhci == 'true' ||
+          steps.probe-urls.outputs.skip_lhci_urls == 'true'
+        run:
+          echo "Skipping Lighthouse run due to missing APP_URL or no healthy
+          URLs. Configure 'APP_URL' and ensure endpoints return HTTP 200 to
+          enable."
 
       - name: Notify performance issues
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
+        if:
+          failure() && steps.set-slack-enabled-perf.outputs.slack_enabled ==
+          'true'
         uses: slackapi/slack-github-action@v2
         with:
           webhook-type: incoming-webhook
@@ -934,7 +955,9 @@ jobs:
         continue-on-error: true
 
       - name: Log performance notification skip
-        if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'false'
+        if:
+          failure() && steps.set-slack-enabled-perf.outputs.slack_enabled ==
+          'false'
         run: |
           echo "::notice::Slack notifications are disabled - SLACK_WEBHOOK secret not configured"
           echo "::warning::Performance issues detected but no notification was sent"

@@ -7,10 +7,11 @@
  */
 
 import { Request, Response, NextFunction } from 'express'
-import { RateLimitingBridge } from './rate-limiting-bridge'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { RateLimitResult } from '../../rate-limiting/types'
 import type { ThreatResponse } from '../response-orchestration'
+import { RateLimitingBridge } from './rate-limiting-bridge'
 
 const logger = createBuildSafeLogger('api-middleware')
 
@@ -112,10 +113,11 @@ export class ThreatDetectionMiddleware {
         const context = this.getContext(req)
 
         // Check rate limit with threat detection
-        const result = (await this.config.bridge.checkRateLimitWithThreatDetection(
-          identifier,
-          context,
-        )) as unknown as RateLimitCheckResult
+        const result =
+          (await this.config.bridge.checkRateLimitWithThreatDetection(
+            identifier,
+            context,
+          )) as unknown as RateLimitCheckResult
 
         // Log the check if enabled
         if (this.config.enableLogging) {
@@ -225,7 +227,7 @@ export class ThreatDetectionMiddleware {
         .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(',') : (value || ''),
+          Array.isArray(value) ? value.join(',') : value || '',
         ]),
     )
 

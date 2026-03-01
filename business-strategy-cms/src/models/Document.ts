@@ -1,4 +1,5 @@
 import { Document } from '@/types/document'
+
 import { DocumentModelMongoose, DocumentVersionModel } from './DocumentMongoose'
 
 export class DocumentModel {
@@ -122,8 +123,7 @@ export class DocumentModel {
   }
 
   static async getVersions(documentId: string): Promise<any[]> {
-    return await DocumentVersionModel.find({ documentId })
-      .sort({ version: -1 })
+    return await DocumentVersionModel.find({ documentId }).sort({ version: -1 })
   }
 
   static async getVersion(

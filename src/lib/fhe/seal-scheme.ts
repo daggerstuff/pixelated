@@ -4,9 +4,9 @@
  * Provides a concrete implementation of the FHEScheme interface for Microsoft SEAL
  */
 
+import { SEAL_SUPPORTED_OPERATIONS, SealSchemeType } from './seal-types'
 import { FHEOperation } from './types'
 import type { FHEScheme } from './types'
-import { SEAL_SUPPORTED_OPERATIONS, SealSchemeType } from './seal-types'
 
 /**
  * Implementation of the SEAL FHE scheme

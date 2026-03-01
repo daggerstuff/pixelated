@@ -11,8 +11,9 @@
 
 import type { APIContext, MiddlewareNext } from 'astro'
 import { defineMiddleware } from 'astro/middleware'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+
 import type { PIIType } from '.'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('PIIMiddleware')
 

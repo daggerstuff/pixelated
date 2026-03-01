@@ -5,26 +5,27 @@
  * Shows EQ metrics tracking, bias detection, and crisis intervention in action.
  */
 
-import React, { useState, useCallback, useEffect } from "react";
-import { usePixelConversationIntegration } from "@/hooks/usePixelConversationIntegration";
-import type { PixelInferenceResponse } from "@/types/pixel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Zap, AlertTriangle } from "lucide-react";
+import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
+import React, { useState, useCallback, useEffect } from 'react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { usePixelConversationIntegration } from '@/hooks/usePixelConversationIntegration'
+import type { PixelInferenceResponse } from '@/types/pixel'
 
 interface ConversationMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  pixelMetrics?: PixelInferenceResponse;
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: number
+  pixelMetrics?: PixelInferenceResponse
 }
 
 interface PixelEnhancedChatProps {
-  sessionId: string;
-  userId: string;
-  onMessage?: (message: string) => void;
-  onCrisisDetected?: () => void;
+  sessionId: string
+  userId: string
+  onMessage?: (message: string) => void
+  onCrisisDetected?: () => void
 }
 
 /**
@@ -49,93 +50,93 @@ export function PixelEnhancedChat({
   } = usePixelConversationIntegration({
     sessionId,
     userId,
-    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || "http://localhost:8001",
-  });
+    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || 'http://localhost:8001',
+  })
 
   // Local state
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [showMetrics, setShowMetrics] = useState(true);
+  const [messages, setMessages] = useState<ConversationMessage[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const [showMetrics, setShowMetrics] = useState(true)
 
   // Crisis detection handler
   useEffect(() => {
     if (crisisStatus?.isCrisis && onCrisisDetected) {
-      onCrisisDetected();
+      onCrisisDetected()
     }
-  }, [crisisStatus?.isCrisis, onCrisisDetected]);
+  }, [crisisStatus?.isCrisis, onCrisisDetected])
 
   /**
    * Handle sending message with Pixel analysis
    */
   const handleSendMessage = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!inputValue.trim()) return;
+      e.preventDefault()
+      if (!inputValue.trim()) return
 
       // Add user message to chat
       const userMessage: ConversationMessage = {
         id: `msg-${Date.now()}`,
-        role: "user",
+        role: 'user',
         content: inputValue,
         timestamp: Date.now(),
-      };
+      }
 
-      setMessages((prev) => [...prev, userMessage]);
-      setInputValue("");
+      setMessages((prev) => [...prev, userMessage])
+      setInputValue('')
 
       // Analyze with Pixel
-      const pixelResponse = await analyzeMessage(inputValue, "support");
+      const pixelResponse = await analyzeMessage(inputValue, 'support')
 
       if (pixelResponse) {
         // Add assistant response with metrics
         const assistantMessage: ConversationMessage = {
           id: `msg-${Date.now() + 1}`,
-          role: "assistant",
+          role: 'assistant',
           content: pixelResponse.response,
           timestamp: Date.now(),
           pixelMetrics: pixelResponse,
-        };
+        }
 
-        setMessages((prev) => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage])
 
-        onMessage?.(inputValue);
+        onMessage?.(inputValue)
       } else if (error) {
         // Show error message
         const errorMessage: ConversationMessage = {
           id: `msg-${Date.now() + 1}`,
-          role: "assistant",
+          role: 'assistant',
           content: `Error: ${error}`,
           timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        }
+        setMessages((prev) => [...prev, errorMessage])
       }
     },
     [inputValue, analyzeMessage, onMessage, error],
-  );
+  )
 
   return (
-    <div className="flex gap-4 h-full">
+    <div className='flex h-full gap-4'>
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col bg-white rounded-lg border border-gray-200">
+      <div className='bg-white border-gray-200 flex flex-1 flex-col rounded-lg border'>
         {/* Header */}
-        <div className="border-b border-gray-200 p-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <div className='border-gray-200 border-b p-4'>
+          <div className='flex items-center justify-between'>
+            <h2 className='text-gray-900 text-lg font-semibold'>
               Therapeutic Conversation
             </h2>
             <button
               onClick={() => setShowMetrics(!showMetrics)}
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className='text-blue-600 hover:text-blue-700 text-sm'
             >
-              {showMetrics ? "Hide" : "Show"} Metrics
+              {showMetrics ? 'Hide' : 'Show'} Metrics
             </button>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className='flex-1 space-y-4 overflow-y-auto p-4'>
           {messages.length === 0 ? (
-            <div className="text-center text-gray-400 mt-8">
+            <div className='text-gray-400 mt-8 text-center'>
               <p>Start a conversation to see Pixel analysis</p>
             </div>
           ) : (
@@ -149,8 +150,8 @@ export function PixelEnhancedChat({
             ))
           )}
           {isAnalyzing && (
-            <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <div className='flex justify-center py-4'>
+              <div className='border-blue-600 h-6 w-6 animate-spin rounded-full border-b-2'></div>
             </div>
           )}
         </div>
@@ -158,21 +159,21 @@ export function PixelEnhancedChat({
         {/* Input */}
         <form
           onSubmit={handleSendMessage}
-          className="border-t border-gray-200 p-4"
+          className='border-gray-200 border-t p-4'
         >
-          <div className="flex gap-2">
+          <div className='flex gap-2'>
             <input
-              type="text"
+              type='text'
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your message..."
+              placeholder='Type your message...'
               disabled={isAnalyzing}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className='border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2'
             />
             <button
-              type="submit"
+              type='submit'
               disabled={isAnalyzing || !inputValue.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              className='bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 rounded-lg px-4 py-2'
             >
               Send
             </button>
@@ -182,54 +183,54 @@ export function PixelEnhancedChat({
 
       {/* Metrics Sidebar */}
       {showMetrics && (
-        <div className="w-80 space-y-4 overflow-y-auto">
+        <div className='w-80 space-y-4 overflow-y-auto'>
           {/* EQ Metrics */}
           {eqMetrics && eqMetrics.turnsAnalyzed > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-yellow-600" />
+                <CardTitle className='flex items-center gap-2'>
+                  <Zap className='text-yellow-600 h-4 w-4' />
                   EQ Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className='space-y-2'>
                 <MetricBar
-                  label="Emotional Awareness"
+                  label='Emotional Awareness'
                   value={
                     eqMetrics.emotionalAwareness[
-                    eqMetrics.emotionalAwareness.length - 1
+                      eqMetrics.emotionalAwareness.length - 1
                     ] || 0
                   }
                 />
                 <MetricBar
-                  label="Empathy"
+                  label='Empathy'
                   value={
                     eqMetrics.empathyRecognition[
-                    eqMetrics.empathyRecognition.length - 1
+                      eqMetrics.empathyRecognition.length - 1
                     ] || 0
                   }
                 />
                 <MetricBar
-                  label="Regulation"
+                  label='Regulation'
                   value={
                     eqMetrics.emotionalRegulation[
-                    eqMetrics.emotionalRegulation.length - 1
+                      eqMetrics.emotionalRegulation.length - 1
                     ] || 0
                   }
                 />
                 <MetricBar
-                  label="Social Cognition"
+                  label='Social Cognition'
                   value={
                     eqMetrics.socialCognition[
-                    eqMetrics.socialCognition.length - 1
+                      eqMetrics.socialCognition.length - 1
                     ] || 0
                   }
                 />
                 <MetricBar
-                  label="Interpersonal Skills"
+                  label='Interpersonal Skills'
                   value={
                     eqMetrics.interpersonalSkills[
-                    eqMetrics.interpersonalSkills.length - 1
+                      eqMetrics.interpersonalSkills.length - 1
                     ] || 0
                   }
                 />
@@ -242,35 +243,35 @@ export function PixelEnhancedChat({
             <Card
               className={
                 crisisStatus.isCrisis
-                  ? "border-red-300 bg-red-50"
-                  : "border-green-300 bg-green-50"
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-green-300 bg-green-50'
               }
             >
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className='flex items-center gap-2'>
                   {crisisStatus.isCrisis ? (
                     <>
-                      <AlertCircle className="h-4 w-4 text-red-600" />
-                      <span className="text-red-900">Crisis Alert</span>
+                      <AlertCircle className='text-red-600 h-4 w-4' />
+                      <span className='text-red-900'>Crisis Alert</span>
                     </>
                   ) : (
                     <>
-                      <Zap className="h-4 w-4 text-green-600" />
-                      <span className="text-green-900">No Crisis Detected</span>
+                      <Zap className='text-green-600 h-4 w-4' />
+                      <span className='text-green-900'>No Crisis Detected</span>
                     </>
                   )}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Risk Level:</span>
+              <CardContent className='space-y-2'>
+                <div className='flex items-center justify-between'>
+                  <span className='text-sm font-medium'>Risk Level:</span>
                   <Badge
                     variant={
-                      crisisStatus.riskLevel === "critical"
-                        ? "destructive"
-                        : crisisStatus.riskLevel === "high"
-                          ? "secondary"
-                          : "default"
+                      crisisStatus.riskLevel === 'critical'
+                        ? 'destructive'
+                        : crisisStatus.riskLevel === 'high'
+                          ? 'secondary'
+                          : 'default'
                     }
                   >
                     {crisisStatus.riskLevel.toUpperCase()}
@@ -278,12 +279,12 @@ export function PixelEnhancedChat({
                 </div>
                 {crisisStatus.signals.length > 0 && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Signals:</p>
-                    <div className="space-y-1">
+                    <p className='mb-1 text-sm font-medium'>Signals:</p>
+                    <div className='space-y-1'>
                       {crisisStatus.signals.map((signal) => (
                         <div
                           key={`${signal.type}:${signal.severity}`}
-                          className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded"
+                          className='bg-red-100 text-red-800 rounded px-2 py-1 text-xs'
                         >
                           {signal.type} (severity: {signal.severity.toFixed(2)})
                         </div>
@@ -292,8 +293,8 @@ export function PixelEnhancedChat({
                   </div>
                 )}
                 {crisisStatus.interventionTriggered && (
-                  <div className="mt-2 p-2 bg-red-200 rounded">
-                    <p className="text-xs font-semibold text-red-900">
+                  <div className='bg-red-200 mt-2 rounded p-2'>
+                    <p className='text-red-900 text-xs font-semibold'>
                       Intervention: {crisisStatus.interventionType}
                     </p>
                   </div>
@@ -304,41 +305,41 @@ export function PixelEnhancedChat({
 
           {/* Bias Detection */}
           {biasFlags.length > 0 && (
-            <Card className="border-orange-300 bg-orange-50">
+            <Card className='border-orange-300 bg-orange-50'>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 justify-between">
-                  <span className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-orange-600" />
+                <CardTitle className='flex items-center justify-between gap-2'>
+                  <span className='flex items-center gap-2'>
+                    <AlertTriangle className='text-orange-600 h-4 w-4' />
                     Bias Detected
                   </span>
                   <button
                     onClick={clearBiasFlags}
-                    className="text-xs text-orange-600 hover:text-orange-700"
+                    className='text-orange-600 hover:text-orange-700 text-xs'
                   >
                     Clear
                   </button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className='space-y-2'>
                 {biasFlags.map((flag) => (
                   <div
-                    key={`${flag.detected}:${flag.severity}:${flag.suggestedCorrection ?? ""}`}
-                    className="text-sm"
+                    key={`${flag.detected}:${flag.severity}:${flag.suggestedCorrection ?? ''}`}
+                    className='text-sm'
                   >
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-orange-900">
+                    <div className='flex items-center justify-between'>
+                      <p className='text-orange-900 font-medium'>
                         {flag.detected}
                       </p>
                       <Badge
                         variant={
-                          flag.severity === "high" ? "destructive" : "secondary"
+                          flag.severity === 'high' ? 'destructive' : 'secondary'
                         }
                       >
                         {flag.severity.toUpperCase()}
                       </Badge>
                     </div>
                     {flag.suggestedCorrection && (
-                      <p className="text-xs text-orange-800 mt-1">
+                      <p className='text-orange-800 mt-1 text-xs'>
                         Suggestion: {flag.suggestedCorrection}
                       </p>
                     )}
@@ -350,7 +351,7 @@ export function PixelEnhancedChat({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 /**
@@ -361,60 +362,63 @@ function MessageBubble({
   pixelMetrics,
   showMetrics,
 }: {
-  message: ConversationMessage;
-  pixelMetrics?: PixelInferenceResponse;
-  showMetrics: boolean;
+  message: ConversationMessage
+  pixelMetrics?: PixelInferenceResponse
+  showMetrics: boolean
 }) {
   return (
     <div
-      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-sm px-4 py-2 rounded-lg ${message.role === "user"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 text-gray-900"
-          }`}
+        className={`max-w-sm rounded-lg px-4 py-2 ${
+          message.role === 'user'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 text-gray-900'
+        }`}
       >
-        <p className="text-sm">{message.content}</p>
+        <p className='text-sm'>{message.content}</p>
         {showMetrics && pixelMetrics && (
-          <div className="mt-2 text-xs space-y-1">
+          <div className='mt-2 space-y-1 text-xs'>
             {pixelMetrics.eq_scores && (
               <div>
-                <p className="font-semibold opacity-75">
+                <p className='font-semibold opacity-75'>
                   Overall EQ: {pixelMetrics.eq_scores.overall_eq.toFixed(2)}
                 </p>
               </div>
             )}
             {pixelMetrics.conversation_metadata && (
               <div>
-                <p className="opacity-75">
-                  Safety:{" "}
+                <p className='opacity-75'>
+                  Safety:{' '}
                   {pixelMetrics.conversation_metadata.safety_score.toFixed(2)},
-                  Bias:{" "}
+                  Bias:{' '}
                   {pixelMetrics.conversation_metadata.bias_score.toFixed(2)}
                 </p>
               </div>
             )}
             {pixelMetrics.memories && pixelMetrics.memories.length > 0 && (
-              <details className="mt-1">
-                <summary className="cursor-pointer opacity-75 hover:opacity-100 font-semibold">
+              <details className='mt-1'>
+                <summary className='cursor-pointer font-semibold opacity-75 hover:opacity-100'>
                   📚 Context Used ({pixelMetrics.memories.length})
                 </summary>
-                <ul className="pl-3 mt-1 list-disc space-y-1 opacity-90 max-h-32 overflow-y-auto bg-black/5 rounded p-2">
+                <ul className='bg-black/5 mt-1 max-h-32 list-disc space-y-1 overflow-y-auto rounded p-2 pl-3 opacity-90'>
                   {pixelMetrics.memories.map((mem, i) => (
-                    <li key={i} className="text-[10px] leading-3">{mem}</li>
+                    <li key={i} className='text-[10px] leading-3'>
+                      {mem}
+                    </li>
                   ))}
                 </ul>
               </details>
             )}
-            <p className="opacity-50 pt-1">
+            <p className='pt-1 opacity-50'>
               Latency: {pixelMetrics.inference_time_ms.toFixed(0)}ms
             </p>
           </div>
         )}
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -423,20 +427,20 @@ function MessageBubble({
 function MetricBar({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-xs font-semibold text-gray-600">
+      <div className='mb-1 flex items-center justify-between'>
+        <span className='text-gray-700 text-sm font-medium'>{label}</span>
+        <span className='text-gray-600 text-xs font-semibold'>
           {(value * 100).toFixed(0)}%
         </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className='bg-gray-200 h-2 w-full rounded-full'>
         <div
-          className="bg-blue-600 h-2 rounded-full transition-all"
+          className='bg-blue-600 h-2 rounded-full transition-all'
           style={{ width: `${value * 100}%` }}
         ></div>
       </div>
     </div>
-  );
+  )
 }
 
-export default PixelEnhancedChat;
+export default PixelEnhancedChat

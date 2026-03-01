@@ -4,6 +4,7 @@
  */
 
 import * as fs from 'fs'
+
 import { getLogger } from '@/lib/logging'
 
 const logger = getLogger('secrets-manager')

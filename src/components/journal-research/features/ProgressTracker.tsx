@@ -1,22 +1,31 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { ProgressCharts } from '../charts/ProgressCharts'
-import { ProgressBar } from '../shared/ProgressBar'
+import { useMemo } from 'react'
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import {
   useProgressQuery,
   useProgressMetricsQuery,
 } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
-import { useMemo } from 'react'
+
+import { ProgressCharts } from '../charts/ProgressCharts'
+import { ProgressBar } from '../shared/ProgressBar'
 
 export interface ProgressTrackerProps {
   sessionId: string | null
   className?: string
 }
 
-export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) {
-  const { data: progress, isLoading: progressLoading } = useProgressQuery(
-    sessionId,
-  )
+export function ProgressTracker({
+  sessionId,
+  className,
+}: ProgressTrackerProps) {
+  const { data: progress, isLoading: progressLoading } =
+    useProgressQuery(sessionId)
   const { data: metrics, isLoading: metricsLoading } = useProgressMetricsQuery(
     sessionId,
     {
@@ -45,7 +54,8 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
           targets.sources_identified > 0
             ? Math.min(
                 100,
-                (currentMetrics.sourcesIdentified / targets.sources_identified) *
+                (currentMetrics.sourcesIdentified /
+                  targets.sources_identified) *
                   100,
               )
             : 0,
@@ -57,7 +67,8 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
           targets.datasets_evaluated > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsEvaluated / targets.datasets_evaluated) *
+                (currentMetrics.datasetsEvaluated /
+                  targets.datasets_evaluated) *
                   100,
               )
             : 0,
@@ -93,7 +104,7 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
   if (!sessionId) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">
+        <p className='text-muted-foreground'>
           Please select a session to track progress
         </p>
       </div>
@@ -103,7 +114,7 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
   if (isLoading) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">Loading progress...</p>
+        <p className='text-muted-foreground'>Loading progress...</p>
       </div>
     )
   }
@@ -111,7 +122,7 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
   if (!progress) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className="text-muted-foreground">No progress data available</p>
+        <p className='text-muted-foreground'>No progress data available</p>
       </div>
     )
   }
@@ -120,8 +131,8 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
     <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Progress Tracker</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className='text-3xl font-bold'>Progress Tracker</h1>
+        <p className='text-muted-foreground mt-1'>
           Monitor progress against targets in real-time
         </p>
       </div>
@@ -132,21 +143,21 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
           <CardTitle>Overall Progress</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className='space-y-4'>
             <div>
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Session Progress</span>
-                <span className="font-medium">
+              <div className='mb-2 flex items-center justify-between text-sm'>
+                <span className='text-muted-foreground'>Session Progress</span>
+                <span className='font-medium'>
                   {progress.progressPercentage.toFixed(1)}%
                 </span>
               </div>
               <ProgressBar value={progress.progressPercentage} />
             </div>
             <div>
-              <p className="mb-2 text-sm font-medium text-muted-foreground">
+              <p className='text-muted-foreground mb-2 text-sm font-medium'>
                 Current Phase
               </p>
-              <p className="capitalize text-lg font-semibold">
+              <p className='text-lg font-semibold capitalize'>
                 {progress.currentPhase}
               </p>
             </div>
@@ -173,11 +184,11 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
             <CardTitle>Progress Against Targets</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className='space-y-6'>
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium">Sources Identified</span>
-                  <span className="text-muted-foreground">
+                <div className='mb-2 flex items-center justify-between text-sm'>
+                  <span className='font-medium'>Sources Identified</span>
+                  <span className='text-muted-foreground'>
                     {progressAgainstTargets.sourcesIdentified.current} /{' '}
                     {progressAgainstTargets.sourcesIdentified.target}
                   </span>
@@ -187,9 +198,9 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
                 />
               </div>
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium">Datasets Evaluated</span>
-                  <span className="text-muted-foreground">
+                <div className='mb-2 flex items-center justify-between text-sm'>
+                  <span className='font-medium'>Datasets Evaluated</span>
+                  <span className='text-muted-foreground'>
                     {progressAgainstTargets.datasetsEvaluated.current} /{' '}
                     {progressAgainstTargets.datasetsEvaluated.target}
                   </span>
@@ -199,9 +210,9 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
                 />
               </div>
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium">Datasets Acquired</span>
-                  <span className="text-muted-foreground">
+                <div className='mb-2 flex items-center justify-between text-sm'>
+                  <span className='font-medium'>Datasets Acquired</span>
+                  <span className='text-muted-foreground'>
                     {progressAgainstTargets.datasetsAcquired.current} /{' '}
                     {progressAgainstTargets.datasetsAcquired.target}
                   </span>
@@ -211,9 +222,9 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
                 />
               </div>
               <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium">Integration Plans Created</span>
-                  <span className="text-muted-foreground">
+                <div className='mb-2 flex items-center justify-between text-sm'>
+                  <span className='font-medium'>Integration Plans Created</span>
+                  <span className='text-muted-foreground'>
                     {progressAgainstTargets.integrationPlansCreated.current} /{' '}
                     {progressAgainstTargets.integrationPlansCreated.target}
                   </span>
@@ -236,41 +247,41 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
             <CardTitle>Current Metrics</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className='text-muted-foreground text-sm font-medium'>
                   Sources Identified
                 </p>
-                <p className="mt-1 text-2xl font-bold">
+                <p className='mt-1 text-2xl font-bold'>
                   {metrics.sourcesIdentified}
                 </p>
                 {metrics.lastUpdated && (
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  <p className='text-muted-foreground mt-1 text-xs'>
                     Updated {metrics.lastUpdated.toLocaleString()}
                   </p>
                 )}
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className='text-muted-foreground text-sm font-medium'>
                   Datasets Evaluated
                 </p>
-                <p className="mt-1 text-2xl font-bold">
+                <p className='mt-1 text-2xl font-bold'>
                   {metrics.datasetsEvaluated}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className='text-muted-foreground text-sm font-medium'>
                   Datasets Acquired
                 </p>
-                <p className="mt-1 text-2xl font-bold">
+                <p className='mt-1 text-2xl font-bold'>
                   {metrics.datasetsAcquired}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className='text-muted-foreground text-sm font-medium'>
                   Integration Plans
                 </p>
-                <p className="mt-1 text-2xl font-bold">
+                <p className='mt-1 text-2xl font-bold'>
                   {metrics.integrationPlansCreated}
                 </p>
               </div>
@@ -281,4 +292,3 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
     </div>
   )
 }
-

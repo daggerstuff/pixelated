@@ -21,7 +21,12 @@ category: Technical
 
 ## Introduction
 
-The integration of artificial intelligence into mental health care is creating a paradigm shift in how we approach psychological wellness. Digital therapeutics—evidence-based interventions delivered through software platforms—are revolutionizing accessibility, personalization, and effectiveness of mental health support. This article explores the rapidly evolving landscape of AI-enhanced mental health tools and their potential to transform care.
+The integration of artificial intelligence into mental health care is creating a
+paradigm shift in how we approach psychological wellness. Digital
+therapeutics—evidence-based interventions delivered through software
+platforms—are revolutionizing accessibility, personalization, and effectiveness
+of mental health support. This article explores the rapidly evolving landscape
+of AI-enhanced mental health tools and their potential to transform care.
 
 ## The Rise of Mental Health Apps
 
@@ -367,18 +372,28 @@ Beginning effectively:
 
 ## Conclusion
 
-Digital therapeutics powered by AI represent one of the most promising frontiers in mental health care. By combining clinical expertise with advanced technology, these tools offer unprecedented opportunities for accessible, personalized, and effective mental health support. While challenges remain in ensuring ethical development, proper validation, and equitable access, the potential benefits for individuals and healthcare systems are substantial. As research continues and technology evolves, AI-enhanced digital therapeutics will likely become an increasingly integral part of comprehensive mental health care.
+Digital therapeutics powered by AI represent one of the most promising frontiers
+in mental health care. By combining clinical expertise with advanced technology,
+these tools offer unprecedented opportunities for accessible, personalized, and
+effective mental health support. While challenges remain in ensuring ethical
+development, proper validation, and equitable access, the potential benefits for
+individuals and healthcare systems are substantial. As research continues and
+technology evolves, AI-enhanced digital therapeutics will likely become an
+increasingly integral part of comprehensive mental health care.
 
 ## Resources
 
 For those interested in exploring digital therapeutics:
 
-1. Evaluate options through digital health libraries and certification organizations
+1. Evaluate options through digital health libraries and certification
+   organizations
 2. Consult mental health professionals for guidance on appropriate tools
 3. Start with evidence-based applications with strong privacy protections
-4. Consider how digital tools can complement rather than replace human connection
+4. Consider how digital tools can complement rather than replace human
+   connection
 5. Monitor your experience and adjust your approach based on personal results
 
 ---
 
-_Next in our series, we'll explore Emotional AI and how technology is learning to understand human feelings._
+_Next in our series, we'll explore Emotional AI and how technology is learning
+to understand human feelings._

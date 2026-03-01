@@ -1,5 +1,9 @@
 import React, { useState, type FC } from 'react'
-import type { TherapyStyleId, TherapyStyle } from '../../lib/ai/types/TherapyStyles'
+
+import type {
+  TherapyStyleId,
+  TherapyStyle,
+} from '../../lib/ai/types/TherapyStyles'
 import {
   therapyStyleConfigs,
   getRecommendedStyles,
@@ -49,10 +53,10 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
   const currentStyle: TherapyStyle = therapyStyleConfigs[detailStyle]
 
   return (
-    <div className="therapy-style-selector">
-      <div className="style-options">
+    <div className='therapy-style-selector'>
+      <div className='style-options'>
         <h3>Select Therapy Approach</h3>
-        <div className="style-buttons">
+        <div className='style-buttons'>
           {Object.entries(therapyStyleConfigs).map(([id, style]) => {
             const isActive = id === selectedStyle
             const isRecommended = recommendedStyleIds.has(id as TherapyStyleId)
@@ -67,7 +71,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
               >
                 {style.name}
                 {isRecommended && (
-                  <span className="recommendation-badge">✓ Recommended</span>
+                  <span className='recommendation-badge'>✓ Recommended</span>
                 )}
               </button>
             )
@@ -75,11 +79,11 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         </div>
       </div>
 
-      <div className="style-details">
+      <div className='style-details'>
         <h3>{currentStyle.name}</h3>
-        <p className="style-description">{currentStyle.description}</p>
+        <p className='style-description'>{currentStyle.description}</p>
 
-        <div className="style-techniques">
+        <div className='style-techniques'>
           <h4>Techniques Used:</h4>
           <ul>
             {currentStyle.techniques.map((technique) => (
@@ -88,7 +92,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
           </ul>
         </div>
 
-        <div className="style-issues">
+        <div className='style-issues'>
           <h4>Recommended For:</h4>
           <ul>
             {currentStyle.suitableFor.map((issue) => (

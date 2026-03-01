@@ -1,13 +1,14 @@
+// Import getEnv with a specifier that matches tests' vi.mock
+import { getEnv } from '@/config/env.config.ts'
 // Config imported lazily to avoid initialization order issues
 import { getHipaaCompliantLogger } from '@/lib/logging/standardized-logger'
+
+import type { MentalLLaMAModelConfig } from '../types/index.js'
 import type {
   IModelProvider,
   LLMInvocationOptions,
   LLMResponse,
 } from '../types/mentalLLaMATypes.ts'
-import type { MentalLLaMAModelConfig } from '../types/index.js'
-// Import getEnv with a specifier that matches tests' vi.mock
-import { getEnv } from '@/config/env.config.ts'
 
 const logger = getHipaaCompliantLogger('general')
 
@@ -45,7 +46,9 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         )
       ) {
         // Normalize error message to what tests expect
-        throw new Error('Invalid response structure from MentalLLaMA API.', { cause: error })
+        throw new Error('Invalid response structure from MentalLLaMA API.', {
+          cause: error,
+        })
       }
       throw error
     }
@@ -163,7 +166,7 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.modelConfig.apiKey}`,
+          Authorization: `Bearer ${this.modelConfig.apiKey}`,
         },
         body: JSON.stringify({
           model: this.modelConfig.modelId,
@@ -230,12 +233,12 @@ export class MentalLLaMAModelProvider implements IModelProvider {
           ...(tokenUsage !== undefined ? { tokenUsage } : {}),
           ...(finishReason !== undefined
             ? {
-              finishReason: finishReason as
-                | 'stop'
-                | 'length'
-                | 'content_filter'
-                | 'function_call',
-            }
+                finishReason: finishReason as
+                  | 'stop'
+                  | 'length'
+                  | 'content_filter'
+                  | 'function_call',
+              }
             : {}),
         }
         return response
@@ -254,7 +257,7 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         {
           modelId: this.modelConfig.modelId,
           errorMessage: error instanceof Error ? String(error) : String(error),
-          stack: error instanceof Error ? (error as Error)?.stack : undefined,
+          stack: error instanceof Error ? (error)?.stack : undefined,
         },
       )
       throw error

@@ -224,7 +224,9 @@ const allTemplates = templateService.getAllTemplates()
     const deleteButtons = document.querySelectorAll('.delete-template')
     deleteButtons.forEach((button) => {
       button.addEventListener('click', (e) => {
-        const templateId = (e.currentTarget as HTMLElement)?.getAttribute('data-template-id')
+        const templateId = (e.currentTarget as HTMLElement)?.getAttribute(
+          'data-template-id',
+        )
         if (
           confirm(
             'Are you sure you want to delete this template? This action cannot be undone.',

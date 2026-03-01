@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import {
   BiasDetectionCache,
   BiasAnalysisCache,
@@ -47,7 +48,7 @@ describe('BiasDetectionCache', () => {
   })
 
   afterEach(() => {
-    cache.destroy()
+    void cache.destroy()
   })
 
   describe('Basic Cache Operations', () => {
@@ -252,7 +253,7 @@ describe('BiasDetectionCache', () => {
       expect(remainingKeys).toHaveLength(3)
       expect(remainingKeys).toContain('key4')
 
-      smallCache.destroy()
+      void smallCache.destroy()
     })
   })
 
@@ -269,7 +270,7 @@ describe('BiasDetectionCache', () => {
       // Wait for expiration
       await new Promise((resolve) => setTimeout(resolve, 100))
 
-      const cleaned = await cache.cleanup()
+      const cleaned =  cache.cleanup()
       expect(cleaned).toBe(2)
 
       expect(await cache.has('expire1')).toBe(false)
@@ -433,7 +434,7 @@ describe('BiasAnalysisCache', () => {
   })
 
   afterEach(() => {
-    analysisCache.destroy()
+    void analysisCache.destroy()
   })
 
   describe('Analysis Result Caching', () => {
@@ -552,7 +553,7 @@ describe('DashboardCache', () => {
   })
 
   afterEach(() => {
-    dashboardCache.destroy()
+    void dashboardCache.destroy()
   })
 
   describe('Dashboard Data Caching', () => {
@@ -697,7 +698,7 @@ describe('ReportCache', () => {
   })
 
   afterEach(() => {
-    reportCache.destroy()
+    void reportCache.destroy()
   })
 
   describe('Report Caching', () => {

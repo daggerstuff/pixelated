@@ -1,11 +1,13 @@
-import type { Message } from '@/types/chat'
 import type { ChangeEvent, FormEvent } from 'react'
-import { cn } from '@/lib/utils'
 import { useEffect, useRef, useState } from 'react'
+
+import { useTheme } from '@/components/theme/ThemeProvider'
+import { cn } from '@/lib/utils'
+import type { Message } from '@/types/chat'
+
 import { ChatInput } from './ChatInput'
 import { ChatMessage } from './ChatMessage'
 import { IconBrain, IconChevronDown } from './icons'
-import { useTheme } from '@/components/theme/ThemeProvider'
 // If error persists, verify ThemeProvider file actually exports ThemeContext as a named export: "export const ThemeContext = ..."
 
 export interface ChatContainerProps {
@@ -91,28 +93,28 @@ export function ChatContainer({
         )}
       >
         {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
+          <div className='flex h-full flex-col items-center justify-center space-y-4 text-center'>
             <div
               className={
                 resolvedTheme === 'dark'
-                  ? 'rounded-full bg-blue-900 p-4'
-                  : 'rounded-full bg-blue-50 p-4'
+                  ? 'bg-blue-900 rounded-full p-4'
+                  : 'bg-blue-50 rounded-full p-4'
               }
             >
               <IconBrain
                 className={
                   resolvedTheme === 'dark'
-                    ? 'h-8 w-8 text-blue-400'
-                    : 'h-8 w-8 text-blue-600'
+                    ? 'text-blue-400 h-8 w-8'
+                    : 'text-blue-600 h-8 w-8'
                 }
               />
             </div>
-            <div className="max-w-sm space-y-2">
+            <div className='max-w-sm space-y-2'>
               <h3
                 className={
                   resolvedTheme === 'dark'
-                    ? 'text-lg font-semibold text-gray-200'
-                    : 'text-lg font-semibold text-gray-900'
+                    ? 'text-gray-200 text-lg font-semibold'
+                    : 'text-gray-900 text-lg font-semibold'
                 }
               >
                 Start a Conversation
@@ -120,8 +122,8 @@ export function ChatContainer({
               <p
                 className={
                   resolvedTheme === 'dark'
-                    ? 'text-sm text-gray-400'
-                    : 'text-sm text-gray-600'
+                    ? 'text-gray-400 text-sm'
+                    : 'text-gray-600 text-sm'
                 }
               >
                 Begin your therapy session by sending a message. The AI will
@@ -183,9 +185,9 @@ export function ChatContainer({
               ? 'bg-blue-800 text-white hover:bg-blue-900'
               : 'bg-blue-600 text-white hover:bg-blue-700',
           )}
-          aria-label="Scroll to bottom"
+          aria-label='Scroll to bottom'
         >
-          <IconChevronDown className="h-5 w-5" />
+          <IconChevronDown className='h-5 w-5' />
         </button>
       )}
 

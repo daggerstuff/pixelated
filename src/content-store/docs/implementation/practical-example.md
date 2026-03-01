@@ -12,7 +12,8 @@ toc: true
 
 ## Overview
 
-This document provides a concrete example of implementing the therapy analysis system with real code samples and step-by-step instructions.
+This document provides a concrete example of implementing the therapy analysis
+system with real code samples and step-by-step instructions.
 
 ## Prerequisites
 

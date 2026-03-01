@@ -1,6 +1,7 @@
-import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isAuthenticated } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import { validationRunner } from '../../../../lib/ai/validation/ContinuousValidationRunner'
 import {
   createAuditLog,
   AuditEventType,

@@ -3,8 +3,9 @@
  */
 
 import { useQueryClient } from '@tanstack/react-query'
-import { journalResearchQueryKeys } from '@/lib/api/journal-research/react-query'
 import { useCallback } from 'react'
+
+import { journalResearchQueryKeys } from '@/lib/api/journal-research/react-query'
 
 /**
  * Hook for prefetching journal research data
@@ -65,7 +66,7 @@ export function usePrefetchOnHover() {
     (sessionId: string) => {
       // Prefetch on hover with a small delay to avoid unnecessary requests
       const timeoutId = setTimeout(() => {
-        prefetchSession(sessionId)
+        void prefetchSession(sessionId)
       }, 200)
 
       return () => clearTimeout(timeoutId)
@@ -75,4 +76,3 @@ export function usePrefetchOnHover() {
 
   return { handleMouseEnter }
 }
-

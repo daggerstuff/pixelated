@@ -1,7 +1,10 @@
 # OVHCloud Object Storage Setup Guide
 
 ## Overview
-This guide explains how to configure the Business Strategy CMS to use OVHCloud Object Storage instead of AWS S3. OVHCloud provides S3-compatible object storage with the same API endpoints and SDK compatibility.
+
+This guide explains how to configure the Business Strategy CMS to use OVHCloud
+Object Storage instead of AWS S3. OVHCloud provides S3-compatible object storage
+with the same API endpoints and SDK compatibility.
 
 ## Configuration
 
@@ -79,6 +82,7 @@ await MediaService.deleteFile('documents/file.pdf')
 ## Features
 
 ### ✅ **Supported Operations**
+
 - File upload with automatic folder organization
 - Secure file access via signed URLs
 - File metadata retrieval
@@ -87,6 +91,7 @@ await MediaService.deleteFile('documents/file.pdf')
 - Bucket creation and management
 
 ### ✅ **File Types**
+
 - Images (JPEG, PNG, GIF, WebP)
 - PDFs
 - Office documents (Word, Excel, PowerPoint)
@@ -94,6 +99,7 @@ await MediaService.deleteFile('documents/file.pdf')
 - Custom file types
 
 ### ✅ **Security**
+
 - Private ACL by default
 - Signed URLs for temporary access
 - Metadata tracking (uploaded-by, original-name)
@@ -101,24 +107,25 @@ await MediaService.deleteFile('documents/file.pdf')
 
 ## Regional Endpoints
 
-| Region | Endpoint |
-|--------|----------|
-| Gravelines (France) | `https://s3.gra.io.cloud.ovh.net` |
-| Strasbourg (France) | `https://s3.sbg.io.cloud.ovh.net` |
-| Frankfurt (Germany) | `https://s3.de.io.cloud.ovh.net` |
-| London (UK) | `https://s3.uk.io.cloud.ovh.net` |
+| Region               | Endpoint                                |
+| -------------------- | --------------------------------------- |
+| Gravelines (France)  | `https://s3.gra.io.cloud.ovh.net`       |
+| Strasbourg (France)  | `https://s3.sbg.io.cloud.ovh.net`       |
+| Frankfurt (Germany)  | `https://s3.de.io.cloud.ovh.net`        |
+| London (UK)          | `https://s3.uk.io.cloud.ovh.net`        |
 | Beauharnois (Canada) | `https://s3.ca-east-1.io.cloud.ovh.net` |
-| US East | `https://s3.us-east-1.io.cloud.ovh.net` |
+| US East              | `https://s3.us-east-1.io.cloud.ovh.net` |
 
 ## Migration from AWS S3
 
 The migration is seamless since both use the same AWS SDK. Simply update:
 
-1. **Environment variables** from AWS_* to OVH_*
+1. **Environment variables** from AWS*\* to OVH*\*
 2. **Endpoint URL** to OVHCloud regional endpoint
 3. **Region** to your OVHCloud region
 
 ### Before (AWS S3)
+
 ```bash
 AWS_ACCESS_KEY_ID=xxx
 AWS_SECRET_ACCESS_KEY=xxx
@@ -127,6 +134,7 @@ AWS_S3_BUCKET=my-bucket
 ```
 
 ### After (OVHCloud)
+
 ```bash
 OVH_ACCESS_KEY_ID=xxx
 OVH_SECRET_ACCESS_KEY=xxx
@@ -195,6 +203,7 @@ s3.listBuckets().promise().then(console.log).catch(console.error)
 ## Cost
 
 OVHCloud Object Storage pricing:
+
 - Storage: €0.01/GB/month
 - Outbound traffic: €0.01/GB
 - API requests: €0.01 per 1,000 requests

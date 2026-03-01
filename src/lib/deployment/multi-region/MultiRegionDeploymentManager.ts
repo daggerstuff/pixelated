@@ -6,16 +6,17 @@
  */
 
 import { EventEmitter } from 'events'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('MultiRegionDeploymentManager')
-import { ConfigurationManager } from './ConfigurationManager'
 import {
   CloudProviderManager,
   type DeploymentResult,
 } from './CloudProviderManager'
-import { HealthMonitor } from './HealthMonitor'
+import { ConfigurationManager } from './ConfigurationManager'
 import { DeploymentOrchestrator } from './DeploymentOrchestrator'
+import { HealthMonitor } from './HealthMonitor'
 
 export interface RegionConfig {
   id: string
@@ -384,12 +385,12 @@ export class MultiRegionDeploymentManager extends EventEmitter {
   private setupEventListeners(): void {
     this.healthMonitor.on('health-check-failed', (data) => {
       logger.warn('Health check failed', data)
-      this.handleHealthCheckFailure(data)
+      void this.handleHealthCheckFailure(data)
     })
 
     this.healthMonitor.on('health-check-recovered', (data) => {
       logger.info('Health check recovered', data)
-      this.handleHealthCheckRecovery(data)
+      void this.handleHealthCheckRecovery(data)
     })
   }
 

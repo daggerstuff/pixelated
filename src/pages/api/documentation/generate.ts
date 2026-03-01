@@ -1,12 +1,13 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getCurrentUser } from '@/lib/auth'
-import { DocumentationService } from '../../../lib/documentation'
-import { AIRepository } from '../../../lib/db/ai/repository'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   AIMessage,
   AIServiceOptions,
   createTogetherAIService,
 } from '../../../lib/ai/AIService'
+import { AIRepository } from '../../../lib/db/ai/repository'
+import { DocumentationService } from '../../../lib/documentation'
 
 const logger = createBuildSafeLogger('documentation-api')
 

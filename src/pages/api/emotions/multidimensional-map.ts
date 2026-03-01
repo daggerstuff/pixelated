@@ -1,13 +1,13 @@
 import type { APIRoute } from 'astro'
 export const prerender = false
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
+import type { EmotionAnalysis as TypesEmotionAnalysis } from '@/lib/ai/emotions/types'
+import { analyzeMultidimensionalPatterns } from '@/lib/ai/temporal/TemporalAnalysisAlgorithm'
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import { AIRepository } from '@/lib/db/ai/repository'
-import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
-import { analyzeMultidimensionalPatterns } from '@/lib/ai/temporal/TemporalAnalysisAlgorithm'
-import type { EmotionAnalysis as TypesEmotionAnalysis } from '@/lib/ai/emotions/types'
-import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('multidimensional-emotions-api')
 
@@ -133,7 +133,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     if (type === 'map') {
       // Map emotions to dimensions
       const dimensionalMaps = limitedEmotionData.map((emotion) =>
-        emotionMapper.mapEmotionsToDimensions(emotion as TypesEmotionAnalysis),
+        emotionMapper.mapEmotionsToDimensions(emotion),
       )
 
       logger.info('Returning dimensional maps', {
@@ -147,12 +147,12 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       // Get multidimensional patterns
       // First create dimensional maps
       const dimensionalMaps = limitedEmotionData.map((emotion) =>
-        emotionMapper.mapEmotionsToDimensions(emotion as TypesEmotionAnalysis),
+        emotionMapper.mapEmotionsToDimensions(emotion),
       )
 
       // Analyze multidimensional patterns
       const patterns = analyzeMultidimensionalPatterns(
-        limitedEmotionData as TypesEmotionAnalysis[],
+        limitedEmotionData,
         dimensionalMaps,
       )
       logger.info('Returning multidimensional patterns', {

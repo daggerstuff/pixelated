@@ -5,14 +5,14 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { EncryptionMode } from './types'
-import { FHEOperation } from './types'
+import { fheParameterOptimizer } from './parameter-optimizer'
+import { SealContext } from './seal-context'
+import { SealMemoryManager } from './seal-memory'
 import { getSchemeForMode, SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import type { SealSerializationOptions, SerializedSealKeys } from './seal-types'
-import { SealContext } from './seal-context'
-import { SealMemoryManager } from './seal-memory'
-import { fheParameterOptimizer } from './parameter-optimizer'
+import { EncryptionMode } from './types'
+import { FHEOperation } from './types'
 
 // Initialize logger
 const logger = createBuildSafeLogger('seal-service')
@@ -231,7 +231,7 @@ export class SealService {
 
       // Determine if we're using a mode or options
       if (typeof modeOrOptions === 'string') {
-        const mode = modeOrOptions as EncryptionMode
+        const mode = modeOrOptions
         const schemeType = getSchemeForMode(mode)
 
         if (!schemeType) {
@@ -266,7 +266,7 @@ export class SealService {
           params: optimizationResult.params,
         }
       } else {
-        options = modeOrOptions as SealContextOptions
+        options = modeOrOptions
         this.schemeType = options.scheme
       }
 
@@ -336,12 +336,12 @@ export class SealService {
       )
 
       this.encryptor = this.memoryManager.track(
-        seal.Encryptor(context, this.publicKey!), // Not null due to checkKeysGenerated logic path
+        seal.Encryptor(context, this.publicKey), // Not null due to checkKeysGenerated logic path
         'encryptor',
       )
 
       this.decryptor = this.memoryManager.track(
-        seal.Decryptor(context, this.secretKey!), // Not null due to checkKeysGenerated logic path
+        seal.Decryptor(context, this.secretKey), // Not null due to checkKeysGenerated logic path
         'decryptor',
       )
 

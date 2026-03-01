@@ -7,12 +7,12 @@
  * It uses interfaces defined in ./types.ts and implementations from ./seal-types.ts.
  */
 
-import { EncryptionMode, FHEOperation } from './types'
-import type { HomomorphicOperationResult } from './types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { SealOperations } from './seal-operations'
 import { SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
+import { EncryptionMode, FHEOperation } from './types'
+import type { HomomorphicOperationResult } from './types'
 
 // Get logger
 const logger = createBuildSafeLogger('homomorphic-ops')

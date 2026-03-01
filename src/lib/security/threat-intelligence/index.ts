@@ -4,36 +4,35 @@
  */
 
 import { EventEmitter } from 'events'
-import { logger } from '../../logger'
 
+import { logger } from '../../logger'
+import AutomatedThreatResponseOrchestrator, {
+  AutomatedThreatResponseOrchestratorConfig,
+} from './AutomatedThreatResponseOrchestrator'
+// Import configuration
+import { getCurrentConfig } from './config'
+import EdgeThreatDetectionSystem, {
+  EdgeThreatDetectionSystemConfig,
+} from './EdgeThreatDetectionSystem'
+import ExternalThreatFeedIntegration, {
+  ExternalThreatFeedIntegrationConfig,
+} from './ExternalThreatFeedIntegration'
 // Import all threat intelligence components
 import GlobalThreatIntelligenceNetwork, {
   GlobalThreatIntelligenceNetworkConfig,
 } from './GlobalThreatIntelligenceNetwork'
-import EdgeThreatDetectionSystem, {
-  EdgeThreatDetectionSystemConfig,
-} from './EdgeThreatDetectionSystem'
 import ThreatCorrelationEngine, {
   ThreatCorrelationEngineConfig,
 } from './ThreatCorrelationEngine'
-import ThreatIntelligenceDatabase, {
-  ThreatIntelligenceDatabaseConfig,
-} from './ThreatIntelligenceDatabase'
-import AutomatedThreatResponseOrchestrator, {
-  AutomatedThreatResponseOrchestratorConfig,
-} from './AutomatedThreatResponseOrchestrator'
 import ThreatHuntingSystem, {
   ThreatHuntingSystemConfig,
 } from './ThreatHuntingSystem'
-import ExternalThreatFeedIntegration, {
-  ExternalThreatFeedIntegrationConfig,
-} from './ExternalThreatFeedIntegration'
+import ThreatIntelligenceDatabase, {
+  ThreatIntelligenceDatabaseConfig,
+} from './ThreatIntelligenceDatabase'
 import ThreatValidationSystem, {
   ThreatValidationSystemConfig,
 } from './ThreatValidationSystem'
-
-// Import configuration
-import { getCurrentConfig } from './config'
 
 // Types
 export interface ThreatIntelligenceNetworkConfig {

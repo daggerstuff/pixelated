@@ -4,9 +4,11 @@
  */
 
 import { EventEmitter } from 'events'
+
+import * as tf from '@tensorflow/tfjs'
 import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
-import * as tf from '@tensorflow/tfjs'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('threat-hunting-service')
@@ -682,13 +684,13 @@ export class ThreatHuntingService extends EventEmitter {
     }
 
     try {
-      const result = await tf.tidy(async () => {
+      const result =  tf.tidy(async () => {
         const inputTensor = tf.tensor2d([features])
-        const prediction = (await this.huntingModel!.predict(
+        const prediction = ( this.huntingModel!.predict(
           inputTensor,
         )) as tf.Tensor
         const data = await prediction.data()
-        return Array.from(data) as number[]
+        return Array.from(data)
       })
 
       const maxIndex = result.indexOf(Math.max(...result))
@@ -822,7 +824,7 @@ export class ThreatHuntingService extends EventEmitter {
       this.activeInvestigations.set(investigationId, investigation)
 
       // Start investigation execution
-      this.executeInvestigation(investigationId)
+      void this.executeInvestigation(investigationId)
 
       this.emit('investigation_started', { investigationId })
       return investigationId

@@ -187,7 +187,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'POST',
             headers: {
-              'Authorization': 'Bearer hf_token',
+              Authorization: 'Bearer hf_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(datasetData),
@@ -216,7 +216,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'POST',
             headers: {
-              'Authorization': 'Bearer invalid_token',
+              Authorization: 'Bearer invalid_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({}),
@@ -317,7 +317,7 @@ describe('APIService Integration Tests', () => {
         const response = await safeFetch('https://api.wandb.ai/graphql', {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer wandb_token',
+            Authorization: 'Bearer wandb_token',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -359,7 +359,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'PUT',
             headers: {
-              'Authorization': 'Bearer azure_token',
+              Authorization: 'Bearer azure_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(datasetData),
@@ -446,7 +446,9 @@ describe('APIService Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(function() { return mockWebSocket }) as any
+      global.WebSocket = vi.fn(function () {
+        return mockWebSocket
+      }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -465,7 +467,9 @@ describe('APIService Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(function() { return mockWebSocket }) as any
+      global.WebSocket = vi.fn(function () {
+        return mockWebSocket
+      }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 

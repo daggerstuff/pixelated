@@ -10,9 +10,9 @@
  */
 
 import { fheService } from '../../fhe'
+import type { RealFHEService } from '../../fhe/fhe-service'
 import { FHEOperation } from '../../fhe/types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { RealFHEService } from '../../fhe/fhe-service'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -210,13 +210,14 @@ class PIIDetectionService {
 
       // Simulate model loading with validation
       const loadStartTime = Date.now()
-      
+
       // Simulate loading delay for realistic behavior
       await new Promise((resolve) => setTimeout(resolve, 500))
 
       // Validate simulated loading time (prevent infinite hangs)
       const loadDuration = Date.now() - loadStartTime
-      if (loadDuration > 10000) { // 10 second timeout
+      if (loadDuration > 10000) {
+        // 10 second timeout
         throw new Error('ML model loading timeout - exceeded 10 seconds')
       }
 
@@ -225,9 +226,9 @@ class PIIDetectionService {
         loadDuration,
         modelType: 'simulated-nlp-pii-detector',
       })
-
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
       logger.error('Failed to load ML model', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -238,11 +239,13 @@ class PIIDetectionService {
       })
 
       this.mlModelLoaded = false
-      
+
       // Graceful fallback to pattern matching
-      logger.info('Falling back to pattern matching due to ML model loading failure')
+      logger.info(
+        'Falling back to pattern matching due to ML model loading failure',
+      )
       this.config.patternMatchingOnly = true
-      
+
       // Log the fallback for audit purposes
       if (this.config.auditDetections) {
         logger.info('ML model fallback activated', {
@@ -345,7 +348,10 @@ class PIIDetectionService {
             logger.error('Pattern matching error', {
               pattern: pattern.source,
               type,
-              error: patternError instanceof Error ? patternError.message : String(patternError),
+              error:
+                patternError instanceof Error
+                  ? patternError.message
+                  : String(patternError),
             })
             // Continue with next pattern instead of failing completely
             continue
@@ -361,7 +367,7 @@ class PIIDetectionService {
         !this.config.patternMatchingOnly
       ) {
         logger.debug('Using ML-based detection')
-        
+
         // Enhanced ML detection with better heuristics
         mlConfidence = this.calculateMLConfidence(textLower, detectedPII)
 
@@ -371,10 +377,13 @@ class PIIDetectionService {
           detectedPII.length === 0
         ) {
           detectedPII.push(PIIType.OTHER)
-          logger.debug('ML detection identified additional PII not caught by patterns', {
-            mlConfidence,
-            minConfidence: this.config.minConfidence,
-          })
+          logger.debug(
+            'ML detection identified additional PII not caught by patterns',
+            {
+              mlConfidence,
+              minConfidence: this.config.minConfidence,
+            },
+          )
         }
       }
 
@@ -388,7 +397,8 @@ class PIIDetectionService {
       // Create result with validation
       const result: PIIDetectionResult = {
         detected:
-          detectedPII.length > 0 || validatedConfidence >= this.config.minConfidence,
+          detectedPII.length > 0 ||
+          validatedConfidence >= this.config.minConfidence,
         types: detectedPII,
         confidence: validatedConfidence,
         isEncrypted: false,
@@ -400,7 +410,10 @@ class PIIDetectionService {
           result.redacted = this.redactText(text, detectedPII)
         } catch (redactionError) {
           logger.error('Redaction failed', {
-            error: redactionError instanceof Error ? redactionError.message : String(redactionError),
+            error:
+              redactionError instanceof Error
+                ? redactionError.message
+                : String(redactionError),
             textLength: text.length,
             typesToRedact: detectedPII,
           })
@@ -422,7 +435,8 @@ class PIIDetectionService {
 
       return result
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
       logger.error('Error detecting PII', {
         error: errorMessage,
         textLength: text.length,
@@ -707,12 +721,14 @@ class PIIDetectionService {
   private isEncryptedText(text: string): boolean {
     // Check for common encryption prefixes used in the system
     const encryptionPrefixes = ['ENC:', 'FHE:', 'AES:', 'RSA:']
-    
+
     // Also check for base64-like patterns that might indicate encryption
     const base64Pattern = /^[A-Za-z0-9+/]{20,}={0,2}$/
-    
-    return encryptionPrefixes.some(prefix => text.startsWith(prefix)) ||
-           (text.length > 20 && base64Pattern.test(text))
+
+    return (
+      encryptionPrefixes.some((prefix) => text.startsWith(prefix)) ||
+      (text.length > 20 && base64Pattern.test(text))
+    )
   }
 
   /**
@@ -721,40 +737,70 @@ class PIIDetectionService {
    * @param detectedPatterns - Already detected PII patterns
    * @returns Confidence score between 0 and 1
    */
-  private calculateMLConfidence(text: string, detectedPatterns: PIIType[]): number {
+  private calculateMLConfidence(
+    text: string,
+    detectedPatterns: PIIType[],
+  ): number {
     let mlConfidence = 0
-    
+
     // Enhanced keyword categories for better detection
     const sensitiveKeywords = {
-      high: ['ssn', 'social security', 'password', 'credit card', 'bank account'],
-      medium: ['confidential', 'private', 'secret', 'medical', 'patient', 'diagnosis'],
-      low: ['health', 'insurance', 'record', 'birth', 'address', 'phone', 'email'],
+      high: [
+        'ssn',
+        'social security',
+        'password',
+        'credit card',
+        'bank account',
+      ],
+      medium: [
+        'confidential',
+        'private',
+        'secret',
+        'medical',
+        'patient',
+        'diagnosis',
+      ],
+      low: [
+        'health',
+        'insurance',
+        'record',
+        'birth',
+        'address',
+        'phone',
+        'email',
+      ],
     }
-    
+
     // Score based on keyword categories
     for (const [category, keywords] of Object.entries(sensitiveKeywords)) {
-      const categoryScore = category === 'high' ? 0.15 : category === 'medium' ? 0.1 : 0.05
-      
+      const categoryScore =
+        category === 'high' ? 0.15 : category === 'medium' ? 0.1 : 0.05
+
       for (const keyword of keywords) {
         if (text.includes(keyword)) {
           mlConfidence += categoryScore
         }
       }
     }
-    
+
     // Bonus for context indicators
-    const contextIndicators = ['personal', 'identification', 'identity', 'biometric']
+    const contextIndicators = [
+      'personal',
+      'identification',
+      'identity',
+      'biometric',
+    ]
     for (const indicator of contextIndicators) {
       if (text.includes(indicator)) {
         mlConfidence += 0.05
       }
     }
-    
+
     // Penalize if no patterns were detected but text is very short
     if (detectedPatterns.length === 0 && text.length < 10) {
       mlConfidence *= 0.5
     }
-    
+
     // Cap confidence at 1.0
     return Math.min(mlConfidence, 1.0)
   }

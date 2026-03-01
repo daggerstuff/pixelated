@@ -7,11 +7,14 @@ pubDate: 2024-02-25
 
 # Complex Post-Traumatic Stress Disorder (CPTSD)
 
-Complex Post-Traumatic Stress Disorder (CPTSD) is a psychological disorder that can develop in response to prolonged, repeated experience of interpersonal trauma in a context where escape is difficult or impossible.
+Complex Post-Traumatic Stress Disorder (CPTSD) is a psychological disorder that
+can develop in response to prolonged, repeated experience of interpersonal
+trauma in a context where escape is difficult or impossible.
 
 ## Key Differences from PTSD
 
-CPTSD includes the core symptoms of PTSD (re-experiencing, avoidance, and hyperarousal) but also features:
+CPTSD includes the core symptoms of PTSD (re-experiencing, avoidance, and
+hyperarousal) but also features:
 
 - Emotional regulation difficulties
 - Negative self-concept

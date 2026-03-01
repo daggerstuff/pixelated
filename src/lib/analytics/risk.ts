@@ -4,9 +4,9 @@
  * Production-grade risk assessment system for security breaches.
  */
 
+import { Cache } from '../cache'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { SecurityError } from '../security/errors'
-import { Cache } from '../cache'
 // Import shared types to avoid circular dependencies
 import type { BreachSeverity } from './types'
 

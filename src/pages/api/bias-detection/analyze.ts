@@ -86,7 +86,8 @@ const createResponse = (
   init?: ResponseInit,
 ): Response => {
   if (typeof Response === 'function') {
-    const responsePrototype = (Response as unknown as { prototype?: unknown }).prototype
+    const responsePrototype = (Response as unknown as { prototype?: unknown })
+      .prototype
     const canConstructResponse = Boolean(
       responsePrototype && responsePrototype.constructor === Response,
     )
@@ -100,10 +101,12 @@ const createResponse = (
     }
 
     try {
-      return (Response as unknown as (body: BodyInit | null, init?: ResponseInit) => Response)(
-        body,
-        init,
-      )
+      return (
+        Response as unknown as (
+          body: BodyInit | null,
+          init?: ResponseInit,
+        ) => Response
+      )(body, init)
     } catch {
       return createMockCompatibleResponse(body, init)
     }

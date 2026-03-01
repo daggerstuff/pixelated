@@ -57,7 +57,7 @@ export function getCurrentFormattedTime() {
  */
 export function isDiffMonth(currentTime: string, preTime?: string): boolean {
   return preTime
-    ? new Date(currentTime).getMonth() !== new Date(preTime!).getMonth()
+    ? new Date(currentTime).getMonth() !== new Date(preTime).getMonth()
     : false
 }
 
