@@ -540,6 +540,22 @@ export function omit<T extends Record<string, unknown>, K extends keyof T>(
 // ============================================================================
 
 /**
+ * Escapes HTML special characters in a string
+ * @param str - String to escape
+ * @returns Escaped string
+ */
+export function escapeHtml(str: string): string {
+  const entityMap: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s);
+}
+
+/**
  * Capitalizes the first letter of a string
  * @param str - String to capitalize
  * @returns Capitalized string
