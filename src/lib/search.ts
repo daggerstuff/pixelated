@@ -99,8 +99,17 @@ export const blogSearch: BlogSearchInterface = {
   _posts: [] as SearchDocument[],
 
   addPost(post: PostInput, content: string): void {
+    // ⚡ Bolt: Strip Markdown and HTML tags for a cleaner search summary
+    const cleanContent = content
+      .replace(/<[^>]*>?/gm, '') // Strip HTML
+      .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // Strip images
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // Strip links
+      .replace(/[#*`~_]/g, '') // Strip basic markdown markers
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim()
+
     // Extract a summary for search results (first 200 chars)
-    const summary = content.slice(0, 200).replace(/<[^>]*>?/gm, '')
+    const summary = cleanContent.slice(0, 200)
 
     // Create a search document
     const doc: SearchDocument = {

@@ -8,12 +8,15 @@ async function indexPosts() {
     return
   }
 
+  console.time('⚡ Bolt: search indexing')
   const posts = await getCollection('blog')
   for (const post of posts) {
-    const { Content } = await post.render()
-    const content = Content.toString()
+    // ⚡ Bolt: Use direct body access instead of expensive .render()
+    // This avoids compiling Markdown to components during search indexing.
+    const content = (post as any).body || post.data.description || ''
     blogSearch.addPost(post, content)
   }
+  console.timeEnd('⚡ Bolt: search indexing')
   isIndexed = true
 }
 
