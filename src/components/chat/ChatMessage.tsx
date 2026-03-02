@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { markdownToHtml } from '@/lib/markdown'
 import { formatTimestamp } from '@/lib/dates'
-import { useContext } from 'react'
+import { useContext, memo, useMemo } from 'react'
 import { ThemeContext } from '@/components/theme/ThemeProvider'
 
 // Define the MentalHealthAnalysis interface with the properties we need
@@ -24,7 +24,7 @@ export interface ChatMessageProps {
   isTyping?: boolean
 }
 
-export function ChatMessage({
+export const ChatMessage = memo(function ChatMessage({
   message,
   timestamp,
   className,
@@ -64,6 +64,13 @@ export function ChatMessage({
   const hasAnalysis =
     message.mentalHealthAnalysis &&
     message.mentalHealthAnalysis.hasMentalHealthIssue
+
+  // Optimization: Memoize markdown conversion to prevent expensive re-parsing on every re-render
+  // This is especially important during rapid keystrokes in the chat input
+  const htmlContent = useMemo(() => {
+    if (isSystemMessage) return ''
+    return markdownToHtml(message.content)
+  }, [message.content, isSystemMessage])
 
   return (
     <div
@@ -132,7 +139,7 @@ export function ChatMessage({
             <div
               className="prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none"
               dangerouslySetInnerHTML={{
-                __html: markdownToHtml(message.content),
+                __html: htmlContent,
               }}
             />
           )}
@@ -146,4 +153,4 @@ export function ChatMessage({
       </div>
     </div>
   )
-}
+})
