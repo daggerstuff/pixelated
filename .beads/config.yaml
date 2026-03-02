@@ -41,7 +41,7 @@
 # - github.org
 # - github.repo
 
-dolt.port: 3306
+dolt.port: 3307
 
 dolt.host: 127.0.0.1
 
