@@ -10,6 +10,44 @@ const LINK_REGEX = /\[([^\]]+)\]\(([^)]+)\)/g
 const HEADING_REGEX = /^(#{1,6})\s+(.+)$/gm
 
 /**
+ * Escape HTML special characters to prevent XSS
+ * @param unsafe Unsafe string
+ * @returns Escaped string
+ */
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+/**
+ * Check if a URL is safe to use in a link
+ * @param url URL to check
+ * @returns True if safe
+ */
+function isSafeUrl(url: string): boolean {
+  const normalizedUrl = url.trim().toLowerCase()
+  // Block javascript: URLs
+  if (normalizedUrl.startsWith('javascript:')) {
+    return false
+  }
+  // Allow common safe protocols and relative paths
+  return (
+    normalizedUrl.startsWith('http://') ||
+    normalizedUrl.startsWith('https://') ||
+    normalizedUrl.startsWith('mailto:') ||
+    normalizedUrl.startsWith('tel:') ||
+    normalizedUrl.startsWith('/') ||
+    normalizedUrl.startsWith('./') ||
+    normalizedUrl.startsWith('../') ||
+    !normalizedUrl.includes(':')
+  )
+}
+
+/**
  * Simple Markdown to HTML conversion for basic formatting
  * @param text Markdown text
  * @returns HTML with basic formatting
@@ -19,15 +57,22 @@ export function simpleMarkdownToHtml(text: string): string {
     return ''
   }
 
+  // First, escape HTML to prevent raw HTML injection
+  const escapedText = escapeHtml(text)
+
   // Replace Markdown formatting with HTML
-  return text
+  return escapedText
     .replace(BOLD_REGEX, '<strong>$1</strong>')
     .replace(ITALIC_REGEX, '<em>$1</em>')
     .replace(CODE_REGEX, '<code>$1</code>')
-    .replace(
-      LINK_REGEX,
-      '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>',
-    )
+    .replace(LINK_REGEX, (match, text, url) => {
+      // Validate URL to prevent javascript: injection
+      if (isSafeUrl(url)) {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`
+      }
+      // If unsafe, just return the text as a span or plain text
+      return `<span>${text}</span>`
+    })
     .replace(HEADING_REGEX, (_, level, content) => {
       const headingLevel = Math.min(level.length, 6)
       return `<h${headingLevel}>${content}</h${headingLevel}>`
