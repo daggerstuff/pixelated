@@ -15,21 +15,26 @@ const links = [
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-20">
-      <div class="flex-shrink-0 flex items-center gap-2">
+      <a
+        href="/"
+        class="flex-shrink-0 flex items-center gap-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg p-1"
+        aria-label="Pixelated Empathy Home"
+      >
         <!-- Logo Icon -->
         <div
           class="w-8 h-8 rounded-lg overflow-hidden shadow-lg shadow-primary-500/20"
         >
           <img
             src="/android-chrome-192x192.png"
-            alt="Pixelated Empathy"
+            alt=""
             class="w-full h-full object-cover"
+            aria-hidden="true"
           />
         </div>
         <span class="font-bold text-base tracking-tight text-white"
           >Pixelated Empathy</span
         >
-      </div>
+      </a>
 
       <nav class="hidden md:flex space-x-8" aria-label="Main navigation">
         {
@@ -51,12 +56,13 @@ const links = [
       <!-- Mobile menu button -->
       <button
         id="mobile-menu-button"
-        class="md:hidden text-slate-300 hover:text-white transition-colors"
-        aria-label="Toggle mobile menu"
+        class="md:hidden text-slate-300 hover:text-white transition-colors p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg"
+        aria-label="Open main menu"
         aria-expanded="false"
+        aria-controls="mobile-menu"
       >
         <svg
-          class="w-6 h-6"
+          class="w-6 h-6 block menu-icon-open"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -67,6 +73,18 @@ const links = [
             stroke-width="2"
             d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
+        <svg
+          class="w-6 h-6 hidden menu-icon-close"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
       </button>
     </div>
 
@@ -74,6 +92,9 @@ const links = [
     <div
       id="mobile-menu"
       class="md:hidden hidden border-t border-white/10 bg-slate-950/95 backdrop-blur-md"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile navigation menu"
     >
       <nav class="px-4 py-6 space-y-4" aria-label="Mobile navigation">
         {
@@ -106,15 +127,85 @@ const links = [
 </header>
 
 <script>
-  const mobileMenuButton = document.getElementById("mobile-menu-button");
-  const mobileMenu = document.getElementById("mobile-menu");
+  function initMobileMenu() {
+    const mobileMenuButton = document.getElementById("mobile-menu-button");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const menuOpenIcon = mobileMenuButton?.querySelector(".menu-icon-open");
+    const menuCloseIcon = mobileMenuButton?.querySelector(".menu-icon-close");
 
-  if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener("click", () => {
+    if (!mobileMenuButton || !mobileMenu) return;
+
+    const toggleMenu = () => {
       const isExpanded =
         mobileMenuButton.getAttribute("aria-expanded") === "true";
-      mobileMenuButton.setAttribute("aria-expanded", String(!isExpanded));
+      const newExpanded = !isExpanded;
+
+      mobileMenuButton.setAttribute("aria-expanded", String(newExpanded));
+      mobileMenuButton.setAttribute(
+        "aria-label",
+        newExpanded ? "Close main menu" : "Open main menu",
+      );
+
       mobileMenu.classList.toggle("hidden");
-    });
+      menuOpenIcon?.classList.toggle("hidden");
+      menuCloseIcon?.classList.toggle("hidden");
+
+      if (newExpanded) {
+        // Focus first link in menu when opened
+        const firstLink = mobileMenu.querySelector("a");
+        (firstLink as HTMLElement)?.focus();
+        document.body.style.overflow = "hidden"; // Prevent scrolling
+      } else {
+        document.body.style.overflow = "";
+      }
+    };
+
+    // Use a named function for the click listener so it's easier to manage if needed
+    // However, since it's on a specific element that's replaced by Astro on page load,
+    // we don't need to worry about accumulation on the button itself.
+    mobileMenuButton.addEventListener("click", toggleMenu);
+
+    // Global listeners for Escape and Click-outside need to be carefully handled.
+    // In Astro, these should be added once or cleaned up.
+    // A simple way is to use a cleanup function or check state.
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (
+        e.key === "Escape" &&
+        mobileMenuButton.getAttribute("aria-expanded") === "true"
+      ) {
+        toggleMenu();
+        mobileMenuButton.focus();
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const isExpanded =
+        mobileMenuButton.getAttribute("aria-expanded") === "true";
+      if (
+        isExpanded &&
+        !mobileMenu.contains(e.target as Node) &&
+        !mobileMenuButton.contains(e.target as Node)
+      ) {
+        toggleMenu();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeydown);
+    document.addEventListener("click", handleClickOutside);
+
+    // Astro cleanup
+    document.addEventListener(
+      "astro:before-preparation",
+      () => {
+        document.removeEventListener("keydown", handleKeydown);
+        document.removeEventListener("click", handleClickOutside);
+        document.body.style.overflow = "";
+      },
+      { once: true },
+    );
   }
+
+  // Initialize on initial load and after each view transition navigation
+  document.addEventListener("astro:page-load", initMobileMenu);
 </script>
