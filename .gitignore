@@ -267,3 +267,7 @@ prpm.lock
 nohup.out
 node_modules
 .venv
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
