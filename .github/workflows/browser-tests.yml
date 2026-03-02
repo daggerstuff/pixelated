@@ -34,7 +34,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.29.2
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup pnpm cache
         uses: actions/cache@v4
