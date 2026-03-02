@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "unicorn",
+    "typescript",
+    "oxc",
+    "react",
+    "vitest",
+    "jsx-a11y",
+    "promise",
+    "node"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "pedantic": "off",
+    "perf": "warn",
+    "style": "off",
+    "restriction": "off",
+    "nursery": "off"
+  },
+  "rules": {
+    "no-debugger": "error",
+    "no-console": "warn",
+    "no-unused-vars": "warn",
+    "typescript/no-explicit-any": "warn"
+  },
+  "settings": {
+    "jsx-a11y": {
+      "polymorphicPropName": null,
+      "components": {},
+      "attributes": {}
+    },
+    "react": {
+      "version": "19.0"
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {},
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "coverage",
+    ".astro"
+  ]
+}
