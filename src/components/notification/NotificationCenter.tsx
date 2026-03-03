@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card'
 import { useWebSocket } from '@/hooks/useWebSocket'
 import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { cn } from '@/lib/utils'
-import { Bell, Check, X } from 'lucide-react'
+import { Bell, BellOff, Check, X } from 'lucide-react'
 
 interface NotificationCenterProps {
   className?: string
@@ -92,6 +92,12 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         size="icon"
         className="relative"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={
+          unreadCount > 0
+            ? `Notifications (${unreadCount} unread)`
+            : 'Notifications'
+        }
+        title="Notifications"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
@@ -112,6 +118,8 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
+              aria-label="Close notifications"
+              title="Close"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -119,8 +127,9 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
 
           <div className="h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
-                No notifications
+              <div className="flex flex-col h-full items-center justify-center p-4 text-muted-foreground gap-2">
+                <BellOff className="h-8 w-8 opacity-20" />
+                <p>No notifications</p>
               </div>
             ) : (
               <div className="divide-y">
@@ -149,6 +158,8 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleMarkAsRead(notification.id)}
+                          aria-label="Mark as read"
+                          title="Mark as read"
                         >
                           <Check className="h-4 w-4" />
                         </Button>
@@ -157,6 +168,8 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => handleDismiss(notification.id)}
+                        aria-label="Dismiss notification"
+                        title="Dismiss"
                       >
                         <X className="h-4 w-4" />
                       </Button>
