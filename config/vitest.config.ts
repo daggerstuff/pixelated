@@ -18,28 +18,34 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
       'react-dom/test-utils': path.resolve(
         __dirname,
-        '__mocks__/react-dom/test-utils.js',
+        '../__mocks__/react-dom/test-utils.js',
       ),
       'react/jsx-dev-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-dev-runtime.js',
+        '../node_modules/react/jsx-dev-runtime.js',
       ),
       'react/jsx-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-runtime.js',
+        '../node_modules/react/jsx-runtime.js',
       ),
-      'react': path.resolve(__dirname, './node_modules/react/index.js'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom/index.js'),
+      'react': path.resolve(__dirname, '../node_modules/react/index.js'),
+      'react-dom': path.resolve(
+        __dirname,
+        '../node_modules/react-dom/index.js',
+      ),
     },
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    setupFiles: [
+      path.resolve(__dirname, '../src/test/setup.ts'),
+      path.resolve(__dirname, '../vitest.setup.ts'),
+    ],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -75,11 +81,9 @@ export default defineConfig({
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     ...(process.env['CI']
       ? {
-          poolOptions: {
-            threads: {
-              minThreads: 1,
-              maxThreads: 2,
-            },
+          threads: {
+            minThreads: 1,
+            maxThreads: 2,
           },
         }
       : {}),
