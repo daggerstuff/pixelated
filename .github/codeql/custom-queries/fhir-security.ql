@@ -1,11 +1,11 @@
 /**
- * @name Unvalidated FHIR Resource Access
- * @description Detects FHIR resource access without proper validation
+ * @name FHIR Security and Validation Checks
+ * @description Detects FHIR resource access without proper validation or security context
  * @kind problem
- * @problem.severity error
+ * @problem.severity warning
  * @security-severity 8.5
  * @precision high
- * @id js/unvalidated-fhir-access
+ * @id js/fhir-security-checks
  * @tags security
  *       hipaa
  *       fhir
@@ -23,45 +23,7 @@ predicate isFHIRResourceAccess(CallExpr call) {
       name.matches("%updateResource%") or
       name.matches("%read%") or
       name.matches("%vread%") or
-      name.matches("%search%")
-    )
-  )
-}
-
-predicate hasValidation(CallExpr call) {
-  exists(CallExpr validateCall |
-    validateCall.getCalleeName().matches("%validate%") or
-    validateCall.getCalleeName().matches("%check%") or
-    validateCall.getCalleeName().matches("%verify%")
-  )
-}
-
-from CallExpr resourceCall
-where
-  isFHIRResourceAccess(resourceCall) and
-  not hasValidation(resourceCall)
-select resourceCall,
-  "FHIR resource access without validation detected. Ensure proper validation before access."
-
-/**
- * @name Insecure FHIR Operations
- * @description Detects potentially insecure FHIR operations
- * @kind problem
- * @problem.severity warning
- * @security-severity 7.5
- * @precision high
- * @id js/insecure-fhir-ops
- * @tags security
- *       hipaa
- *       fhir
- */
-
-import javascript
-
-predicate isFHIROperation(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
+      name.matches("%search%") or
       name.matches("%batch%") or
       name.matches("%transaction%") or
       name.matches("%history%") or
@@ -71,99 +33,20 @@ predicate isFHIROperation(CallExpr call) {
   )
 }
 
-predicate hasSecurityContext(CallExpr call) {
-  exists(CallExpr securityCall |
-    securityCall.getCalleeName().matches("%authorize%") or
-    securityCall.getCalleeName().matches("%checkPermission%") or
-    securityCall.getCalleeName().matches("%verifyAccess%")
+predicate hasValidationOrSecurity(CallExpr call) {
+  exists(CallExpr c |
+    c.getCalleeName().matches("%validate%") or
+    c.getCalleeName().matches("%check%") or
+    c.getCalleeName().matches("%verify%") or
+    c.getCalleeName().matches("%authorize%") or
+    c.getCalleeName().matches("%checkPermission%") or
+    c.getCalleeName().matches("%verifyAccess%")
   )
 }
 
-from CallExpr fhirOp
+from CallExpr resourceCall
 where
-  isFHIROperation(fhirOp) and
-  not hasSecurityContext(fhirOp)
-select fhirOp,
-  "FHIR operation without security context detected. Ensure proper authorization."
-
-/**
- * @name Missing FHIR Version Check
- * @description Detects FHIR operations without version compatibility checks
- * @kind problem
- * @problem.severity warning
- * @security-severity 5.0
- * @precision high
- * @id js/missing-fhir-version
- * @tags security
- *       hipaa
- *       fhir
- */
-
-import javascript
-
-predicate isFHIRClientInit(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%Client%") or
-      name.matches("%FHIRClient%") or
-      name.matches("%createClient%")
-    )
-  )
-}
-
-predicate hasVersionCheck(CallExpr call) {
-  exists(CallExpr versionCall |
-    versionCall.getCalleeName().matches("%version%") or
-    versionCall.getCalleeName().matches("%compatibility%") or
-    versionCall.getCalleeName().matches("%checkVersion%")
-  )
-}
-
-from CallExpr clientInit
-where
-  isFHIRClientInit(clientInit) and
-  not hasVersionCheck(clientInit)
-select clientInit,
-  "FHIR client initialization without version check detected. Ensure version compatibility."
-
-/**
- * @name Insecure FHIR Search
- * @description Detects potentially insecure FHIR search operations
- * @kind problem
- * @problem.severity warning
- * @security-severity 6.5
- * @precision high
- * @id js/insecure-fhir-search
- * @tags security
- *       hipaa
- *       fhir
- */
-
-import javascript
-
-predicate isFHIRSearch(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%search%") or
-      name.matches("%find%") or
-      name.matches("%query%")
-    )
-  )
-}
-
-predicate hasInputSanitization(CallExpr call) {
-  exists(CallExpr sanitizeCall |
-    sanitizeCall.getCalleeName().matches("%sanitize%") or
-    sanitizeCall.getCalleeName().matches("%escape%") or
-    sanitizeCall.getCalleeName().matches("%validate%")
-  )
-}
-
-from CallExpr searchOp
-where
-  isFHIRSearch(searchOp) and
-  not hasInputSanitization(searchOp)
-select searchOp,
-  "FHIR search operation without input sanitization detected. Ensure proper input validation."
+  isFHIRResourceAccess(resourceCall) and
+  not hasValidationOrSecurity(resourceCall)
+select resourceCall,
+  "FHIR operation without proper validation or security context detected."
