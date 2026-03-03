@@ -142,7 +142,7 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
           # Only upload to Security tab if scanning is enabled
-          upload: false
+          upload: true
 
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v4

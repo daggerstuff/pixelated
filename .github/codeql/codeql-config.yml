@@ -46,8 +46,20 @@ paths-ignore:
 queries:
   - name: FHIR Security Checks
     uses: ./.github/codeql/custom-queries/fhir-security.ql
+  - name: FHIR Insecure Operations
+    uses: ./.github/codeql/custom-queries/fhir-insecure-ops.ql
+  - name: FHIR Version Checks
+    uses: ./.github/codeql/custom-queries/fhir-version-check.ql
+  - name: FHIR Insecure Search
+    uses: ./.github/codeql/custom-queries/fhir-insecure-search.ql
   - name: EHR Security Checks
     uses: ./.github/codeql/custom-queries/ehr-security.ql
+  - name: EHR Insecure Authentication
+    uses: ./.github/codeql/custom-queries/ehr-insecure-auth.ql
+  - name: EHR Missing Audit Log
+    uses: ./.github/codeql/custom-queries/ehr-missing-audit-log.ql
+  - name: EHR Security Patterns
+    uses: ./.github/codeql/custom-queries/ehr-security-patterns.ql
   # Use additional query packs for comprehensive security analysis
   - uses: security-extended
   - uses: security-and-quality
