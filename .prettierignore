@@ -21,3 +21,9 @@ prs.mdx
 
 # avoid whitespace affecting style
 Link.astro
+
+# Helm templates
+ai/infra/cloud/helm/
+docker/
+ai/infra/monitoring/
+ai/infra/config/
