@@ -1,2 +1,3 @@
+- description: HIPAA compliance security checks
 - query: fhir-security.ql
 - query: ehr-security.ql

@@ -90,7 +90,7 @@ case "$*" in
         ;;
     *"pnpm --version"*)
         sleep 0.2  # Environment check time
-        echo "10.29.2"
+        echo "10.30.1"
         exit 0
         ;;
     *"docker build"*)
