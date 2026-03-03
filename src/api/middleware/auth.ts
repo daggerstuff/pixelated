@@ -70,7 +70,7 @@ export function requireRoles(allowedRoles: string[]) {
             return
         }
 
-        const userRoles = user.roles || []
+        const userRoles = Array.isArray(user.roles) ? user.roles : (typeof user.role === 'string' ? [user.role] : [])
         const hasRequiredRole = allowedRoles.some((role) =>
             userRoles.includes(role)
         )
@@ -104,7 +104,7 @@ export function requirePermissions(requiredPermissions: string[]) {
             return
         }
 
-        const userPermissions = user.permissions || []
+        const userPermissions = Array.isArray(user.permissions) ? user.permissions : (typeof user.permission === 'string' ? [user.permission] : [])
         const hasAllPermissions = requiredPermissions.every((permission) =>
             userPermissions.includes(permission)
         )

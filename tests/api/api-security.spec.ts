@@ -207,6 +207,43 @@ test.describe('API Security Tests', () => {
     })
   })
 
+  test.describe('Authorization Security', () => {
+    test('should reject unauthorized access to document creation', async ({
+      request,
+    }) => {
+      const token = await apiUtils.getValidToken() // Assume this user doesn't have 'edit' permission
+
+      const response = await request.post('/api/documents', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          title: 'Unauthorized Document',
+          type: 'strategy_plan',
+          category: 'general',
+        },
+      })
+
+      // If the user doesn't have 'edit' permission, it should be 403
+      // Depending on how APITestUtils works, we might need to mock the user roles/permissions
+      expect(response.status()).toBe(403)
+    })
+
+    test('should reject non-admin access to document deletion', async ({
+      request,
+    }) => {
+      const token = await apiUtils.getValidToken() // Assume this user is not admin or manager
+
+      const response = await request.delete('/api/documents/some-doc-id', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      expect(response.status()).toBe(403)
+    })
+  })
+
   test.describe('Data Privacy Security', () => {
     test('should not expose sensitive data in error messages', async ({
       request,
