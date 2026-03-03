@@ -24,7 +24,7 @@ predicate isFHIRSearch(CallExpr call) {
   )
 }
 
-predicate hasInputSanitization(CallExpr call) {
+predicate hasInputSanitization() {
   exists(CallExpr sanitizeCall |
     sanitizeCall.getCalleeName().matches("%sanitize%") or
     sanitizeCall.getCalleeName().matches("%escape%") or
@@ -35,6 +35,6 @@ predicate hasInputSanitization(CallExpr call) {
 from CallExpr searchOp
 where
   isFHIRSearch(searchOp) and
-  not hasInputSanitization(searchOp)
+  not hasInputSanitization()
 select searchOp,
   "FHIR search operation without input sanitization detected. Ensure proper input validation."
