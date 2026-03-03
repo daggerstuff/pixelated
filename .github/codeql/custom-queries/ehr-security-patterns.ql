@@ -12,10 +12,9 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import TaintTracking::Global<EHRSecurityConfig>
-import MyPathGraph
+import EHRSecurityFlow::PathGraph
 
-private module EHRSecurityConfig implements ConfigSig {
+private module EHRSecurityConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source instanceof EHRCredentialSource or
     source instanceof RemoteFlowSource
@@ -39,10 +38,12 @@ private module EHRSecurityConfig implements ConfigSig {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
+      any(EHREndpoint endpoint).getALocalSource().flowsTo(call.getAnArgument())
     )
   }
 }
+
+module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
@@ -74,11 +75,7 @@ class EHREndpoint extends DataFlow::Node {
   }
 }
 
-private module MyPathGraph {
-  import PathGraph
-}
-
-from PathNode source, PathNode sink
-where hasFlowPath(source, sink)
+from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
+where EHRSecurityFlow::hasFlowPath(source, sink)
 select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"

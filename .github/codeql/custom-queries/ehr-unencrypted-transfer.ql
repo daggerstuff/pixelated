@@ -13,7 +13,7 @@
 
 import javascript
 
-predicate isDataTransmissionCall(CallExpr call) {
+predicate isDataTransmissionCall(DataFlow::CallNode call) {
   exists(string name |
     name = call.getCalleeName() and
     (
@@ -39,13 +39,14 @@ predicate isEHRData(DataFlow::Node node) {
   )
 }
 
-from CallExpr call, DataFlow::Node data
+from DataFlow::CallNode call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
   isEHRData(data) and
-  not exists(CallExpr encryptCall |
+  data = call.getAnArgument() and
+  not exists(DataFlow::CallNode encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    data.flowsTo(DataFlow::exprNode(encryptCall.getAnArgument()))
+    data.getALocalSource().flowsTo(encryptCall.getAnArgument())
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
