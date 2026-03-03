@@ -358,7 +358,7 @@
     "oxc-parser": "^0.107.0",
     "oxc-resolver": "^11.18.0",
     "oxfmt": "^0.26.0",
-    "oxlint": "^1.53.0",
+    "oxlint": "^1.51.0",
     "oxlint-tsgolint": "^0.14.2",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "8.3.0",
