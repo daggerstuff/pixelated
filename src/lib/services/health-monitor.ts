@@ -74,7 +74,7 @@ export class HealthMonitor {
           return {
             name,
             status: 'unhealthy' as const,
-            message: _error instanceof Error ? _String(error) : 'Unknown error',
+            message: error instanceof Error ? String(error) : 'Unknown error',
             responseTime: performance.now() - startTime,
           }
         }
@@ -146,7 +146,7 @@ export class HealthMonitor {
         name: 'system',
         status: 'unhealthy',
         message:
-          _error instanceof Error ? _String(error) : 'System check failed',
+          error instanceof Error ? String(error) : 'System check failed',
       }
     }
   }
@@ -186,7 +186,7 @@ export class HealthMonitor {
         name: 'memory',
         status: 'unhealthy',
         message:
-          _error instanceof Error ? _String(error) : 'Memory check failed',
+          error instanceof Error ? String(error) : 'Memory check failed',
       }
     }
   }
@@ -221,7 +221,7 @@ export class HealthMonitor {
       return {
         name: 'disk',
         status: 'unhealthy',
-        message: _error instanceof Error ? _String(error) : 'Disk check failed',
+        message: error instanceof Error ? String(error) : 'Disk check failed',
       }
     }
   }
