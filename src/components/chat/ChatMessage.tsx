@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { markdownToHtml } from '@/lib/markdown'
 import { formatTimestamp } from '@/lib/dates'
-import { useContext } from 'react'
+import { useContext, useMemo, memo } from 'react'
 import { ThemeContext } from '@/components/theme/ThemeProvider'
 
 // Define the MentalHealthAnalysis interface with the properties we need
@@ -24,7 +24,32 @@ export interface ChatMessageProps {
   isTyping?: boolean
 }
 
-export function ChatMessage({
+// Format category name helper - defined outside component to avoid re-allocation
+const formatCategoryName = (category: string): string => {
+  return category
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+// Get color for category badge helper - defined outside component to avoid re-allocation
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    depression: 'bg-blue-500',
+    anxiety: 'bg-yellow-500',
+    ptsd: 'bg-red-500',
+    bipolar_disorder: 'bg-purple-500',
+    ocd: 'bg-green-500',
+    eating_disorder: 'bg-pink-500',
+    social_anxiety: 'bg-indigo-500',
+    panic_disorder: 'bg-orange-500',
+    suicidality: 'bg-red-700',
+    none: 'bg-gray-500',
+  }
+  return colors[category] || 'bg-gray-500'
+}
+
+export const ChatMessage = memo(function ChatMessage({
   message,
   timestamp,
   className,
@@ -36,30 +61,13 @@ export function ChatMessage({
   const isBotMessage = message.role === 'assistant'
   const isSystemMessage = message.role === 'system'
 
-  // Format category name
-  const formatCategoryName = (category: string): string => {
-    return category
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  }
-
-  // Get color for category badge
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      depression: 'bg-blue-500',
-      anxiety: 'bg-yellow-500',
-      ptsd: 'bg-red-500',
-      bipolar_disorder: 'bg-purple-500',
-      ocd: 'bg-green-500',
-      eating_disorder: 'bg-pink-500',
-      social_anxiety: 'bg-indigo-500',
-      panic_disorder: 'bg-orange-500',
-      suicidality: 'bg-red-700',
-      none: 'bg-gray-500',
+  // Memoize markdown to HTML conversion to prevent O(n) re-renders during rapid user input
+  const contentHtml = useMemo(() => {
+    if (isSystemMessage) {
+      return ''
     }
-    return colors[category] || 'bg-gray-500'
-  }
+    return markdownToHtml(message.content)
+  }, [message.content, isSystemMessage])
 
   const hasAnalysis =
     message.mentalHealthAnalysis &&
@@ -132,7 +140,7 @@ export function ChatMessage({
             <div
               className="prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none"
               dangerouslySetInnerHTML={{
-                __html: markdownToHtml(message.content),
+                __html: contentHtml,
               }}
             />
           )}
@@ -146,4 +154,4 @@ export function ChatMessage({
       </div>
     </div>
   )
-}
+})
