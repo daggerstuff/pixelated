@@ -24,13 +24,17 @@ predicate isAuthenticationMethod(CallExpr call) {
   )
 }
 
-from CallExpr authCall
-where
-  isAuthenticationMethod(authCall) and
-  not exists(CallExpr mfaCall |
+predicate hasMFA() {
+  exists(CallExpr mfaCall |
     mfaCall.getCalleeName().matches("%mfa%") or
     mfaCall.getCalleeName().matches("%2fa%") or
     mfaCall.getCalleeName().matches("%verify%")
   )
+}
+
+from CallExpr authCall
+where
+  isAuthenticationMethod(authCall) and
+  not hasMFA()
 select authCall,
   "Potential insecure EHR authentication detected. HIPAA compliance requires strong authentication."

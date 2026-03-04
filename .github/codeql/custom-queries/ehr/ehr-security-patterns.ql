@@ -13,7 +13,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import Flow::PathGraph
 
 private module Config implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
@@ -49,8 +48,9 @@ private module Config implements DataFlow::ConfigSig {
 }
 
 module Flow = TaintTracking::Global<Config>;
+import Flow::PathGraph
 
 from Flow::PathNode source, Flow::PathNode sink
 where Flow::hasFlowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue:  flows to .",
+select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
