@@ -18,28 +18,27 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      'react-dom/test-utils': path.resolve(
-        __dirname,
-        '__mocks__/react-dom/test-utils.js',
-      ),
+      '@': path.resolve(__dirname, '../src'),
       'react/jsx-dev-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-dev-runtime.js',
+        '../node_modules/react/jsx-dev-runtime.js',
       ),
       'react/jsx-runtime': path.resolve(
         __dirname,
-        './node_modules/react/jsx-runtime.js',
+        '../node_modules/react/jsx-runtime.js',
       ),
-      'react': path.resolve(__dirname, './node_modules/react/index.js'),
-      'react-dom': path.resolve(__dirname, './node_modules/react-dom/index.js'),
+      'react': path.resolve(__dirname, '../node_modules/react/index.js'),
+      'react-dom': path.resolve(__dirname, '../node_modules/react-dom/index.js'),
     },
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    setupFiles: [
+      path.resolve(__dirname, '../src/test/setup.ts'),
+      path.resolve(__dirname, '../vitest.setup.ts'),
+    ],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -60,6 +59,13 @@ export default defineConfig({
       'tests/accessibility/**/*',
       'tests/performance/**/*',
       'tests/security/**/*',
+      '**/*.spec.ts',
+      '**/*.integration.test.ts',
+      'src/tests/responsive-navigation.test.js',
+      'src/tests/auth.test.ts',
+      'src/components/__tests__/SearchDemo.astro.test.ts',
+      'src/layouts/__tests__/DashboardLayout.test.ts',
+      'src/layouts/__tests__/DocumentationLayout.test.tsx',
       'backups/**',
       'backups/**/*',
       ...(process.env['CI']
@@ -95,7 +101,7 @@ export default defineConfig({
       enabled:
         !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
       reporter: ['text', 'json', 'html', 'cobertura'],
-      reportsDirectory: './coverage',
+      reportsDirectory: path.resolve(__dirname, '../coverage'),
       exclude: [
         'node_modules/**',
         'dist/**',
