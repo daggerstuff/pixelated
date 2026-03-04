@@ -15,9 +15,10 @@ dependencies:
 extractor: javascript
 
 # Define the query suites available in this pack
-suites:
-  - name: hipaa-compliance
-    description: HIPAA compliance security checks
-    queries:
-      - fhir-security.ql
-      - ehr-security.ql
+# DEPRECATED: Standard is to use separate .qls files
+# suites:
+#   - name: hipaa-compliance
+#     description: HIPAA compliance security checks
+#     queries:
+#       - fhir-security.ql
+#       - ehr-security.ql

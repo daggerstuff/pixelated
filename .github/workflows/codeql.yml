@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+  PNPM_VERSION: 10.30.1
 
 jobs:
   analyze:
@@ -40,9 +40,13 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality,security-extended
-          # Enable ML-powered alerts for JavaScript/TypeScript
-          setup-python-dependencies: ${{ matrix.language == 'python' }}
+          # Load default queries and custom queries conditionally based on language
+          queries: >-
+            +security-and-quality,security-extended${{
+              matrix.language == 'javascript'
+                && ',./.github/codeql/custom-queries/fhir,./.github/codeql/custom-queries/ehr'
+                || ''
+            }}
           # Increase RAM allocation for analysis
           ram: 16384
 
