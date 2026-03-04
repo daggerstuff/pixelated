@@ -13,32 +13,16 @@
 
 import javascript
 
-predicate isFHIRResourceAccess(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%getResource%") or
-      name.matches("%searchResource%") or
-      name.matches("%createResource%") or
-      name.matches("%updateResource%") or
-      name.matches("%read%") or
-      name.matches("%vread%") or
-      name.matches("%search%")
-    )
-  )
-}
-
-predicate hasValidation() {
-  exists(CallExpr validateCall |
-    validateCall.getCalleeName().matches("%validate%") or
-    validateCall.getCalleeName().matches("%check%") or
-    validateCall.getCalleeName().matches("%verify%")
-  )
-}
-
-from CallExpr resourceCall
+from CallExpr call
 where
-  isFHIRResourceAccess(resourceCall) and
-  not hasValidation()
-select resourceCall,
-  "FHIR resource access without validation detected. Ensure proper validation before access."
+  (
+    call.getCalleeName().matches("%getResource%") or
+    call.getCalleeName().matches("%searchResource%") or
+    call.getCalleeName().matches("%createResource%") or
+    call.getCalleeName().matches("%updateResource%")
+  ) and
+  not exists(CallExpr check |
+    check.getCalleeName().matches("%validate%") or
+    check.getCalleeName().matches("%verify%")
+  )
+select call, "FHIR resource access without validation detected."

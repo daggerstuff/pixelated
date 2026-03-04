@@ -16,40 +16,13 @@ import semmle.javascript.security.dataflow.RemoteFlowSources
 import semmle.javascript.security.dataflow.TaintTracking
 import DataFlow::PathGraph
 
-class EHRCredentialSource extends DataFlow::Node {
-  EHRCredentialSource() {
-    exists(DataFlow::PropRead read |
-      read = this and
-      (
-        read.getPropertyName().matches("%token%") or
-        read.getPropertyName().matches("%apiKey%") or
-        read.getPropertyName().matches("%secret%") or
-        read.getPropertyName().matches("%password%")
-      )
-    )
-  }
-}
-
-class EHREndpoint extends DataFlow::Node {
-  EHREndpoint() {
-    exists(string url |
-      url = this.getStringValue() and
-      (
-        url.matches("%/fhir/%") or
-        url.matches("%/ehr/%") or
-        url.matches("%/api/v%") or
-        url.matches("%/epic/%") or
-        url.matches("%/cerner/%") or
-        url.matches("%/allscripts/%")
-      )
-    )
-  }
-}
-
 module EHRSecurityConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource or
-    source instanceof RemoteFlowSource
+    source instanceof RemoteFlowSource or
+    exists(string name |
+      name = source.asExpr().toString().toLowerCase() and
+      (name.matches("%patient%") or name.matches("%record%") or name.matches("%ehr%"))
+    )
   }
 
   predicate isSink(DataFlow::Node sink) {
@@ -62,11 +35,6 @@ module EHRSecurityConfig implements DataFlow::ConfigSig {
       ) and
       sink = call.getAnArgument()
     )
-    or
-    exists(DataFlow::PropWrite write |
-      write.getPropertyName().matches("%url%") and
-      sink = write.getRhs()
-    )
   }
 }
 
@@ -74,5 +42,5 @@ module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
 
 from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
 where EHRSecurityFlow::hasFlowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue:  flows to .",
+select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
