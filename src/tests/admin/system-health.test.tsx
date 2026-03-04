@@ -1,4 +1,6 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, render } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import React from 'react'
 
 // Mock fetch for health data
 vi.stubGlobal(
@@ -66,7 +68,7 @@ vi.stubGlobal(
 )
 
 // Helper function to render mock Astro component HTML
-async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
+function renderMockComponent(overrides: string = '') {
   const mockHtml = `
     <div>
       <h1>System Health Dashboard</h1>
@@ -81,18 +83,16 @@ async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
       <div>50%</div>
       <div>CPU: Intel(R) Core(TM) i7-10700K (8 cores)</div>
       <div>Load Average: 1.50 (1m), 1.20 (5m), 0.90 (15m)</div>
+      ${overrides}
     </div>
   `
 
-  const container = document.createElement('div')
-  container.innerHTML = mockHtml
-  document.body.appendChild(container)
-  return { container }
+  return render(<div dangerouslySetInnerHTML={{ __html: mockHtml }} />)
 }
 
 describe('System Health Dashboard Page', () => {
   it('renders the page title', async () => {
-    await renderMockComponent()
+    renderMockComponent()
 
     // Use Vitest's built-in assertions
     expect(screen.getByText('System Health Dashboard')).toBeTruthy()
@@ -110,7 +110,7 @@ describe('System Health Dashboard Page', () => {
   })
 
   it('fetches and displays health data', async () => {
-    await renderMockComponent()
+    renderMockComponent()
 
     // Wait for data to load
     await waitFor(() => {
@@ -169,7 +169,10 @@ describe('System Health Dashboard Page', () => {
       } as Response)
     })
 
-    await renderMockComponent()
+    renderMockComponent(`
+      <div>Database status: unhealthy</div>
+      <div>Details: Database connection failed</div>
+    `)
 
     // Wait for data to load
     await waitFor(() => {

@@ -59,7 +59,7 @@ describe('useTherapistAnalytics', () => {
     },
   ]
 
-  const mockFilters = { timeRange: '30d' as const }
+  const mockFilters = { timeRange: 'all' as any }
 
   it('initializes with loading state', async () => {
     const { result } = renderHook(() =>
@@ -68,7 +68,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for initial load to complete
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -83,7 +83,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -103,7 +103,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const sessionMetrics = result.current.data?.sessionMetrics
@@ -120,7 +120,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const skillProgress = result.current.data?.skillProgress
@@ -141,7 +141,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const summaryStats = result.current.data?.summaryStats
@@ -163,7 +163,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const comparativeData = result.current.data?.comparativeData
@@ -181,7 +181,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     expect(result.current.isLoading).toBe(false)
@@ -197,7 +197,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for initial load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     await act(async () => {
@@ -215,7 +215,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     act(() => {
@@ -233,7 +233,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for initial load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     // Rerender with different sessions
@@ -267,7 +267,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for re-render to complete
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     expect(result.current.data?.sessionMetrics).toHaveLength(3)
@@ -280,7 +280,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const summaryStats = result.current.data?.summaryStats
@@ -306,7 +306,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     const comparativeData = result.current.data?.comparativeData
@@ -321,7 +321,7 @@ describe('useTherapistAnalytics', () => {
 
     // Wait for data to load
     await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
+      await new Promise((resolve) => setTimeout(resolve, 50))
     })
 
     expect(result.current.data).not.toBeNull()

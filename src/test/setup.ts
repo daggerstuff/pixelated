@@ -1,34 +1,5 @@
-/**
- * Test setup for React Testing Library
- * This file is automatically loaded by Vitest before tests are run
- */
-
 import '@testing-library/jest-dom'
-
-// Add type declarations for DOM testing matchers
-declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  interface Assertion<T = any> {
-    toBeInTheDocument(): T
-    toHaveAttribute(attr: string, value?: string): T
-    toHaveClass(...classNames: string[]): T
-    toHaveValue(value?: string | number): T
-    toBeVisible(): T
-    toBeDisabled(): T
-    toBeEnabled(): T
-    toHaveTextContent(text: string | RegExp): T
-    toHaveDisplayValue(value: string | RegExp | Array<string | RegExp>): T
-    toBeChecked(): T
-    toHaveFocus(): T
-    toBeRequired(): T
-    toBeInvalid(): T
-    toBeValid(): T
-    toHaveStyle(css: string | Record<string, unknown>): T
-    toHaveAccessibleName(name?: string | RegExp): T
-    toHaveAccessibleDescription(description?: string | RegExp): T
-  }
-}
-
+import { vi, beforeEach } from 'vitest'
 
 // Mock window.matchMedia
 if (typeof window !== 'undefined') {
@@ -66,7 +37,7 @@ global.IntersectionObserver = class MockIntersectionObserver {
   takeRecords(): IntersectionObserverEntry[] {
     return []
   }
-} as unknown as typeof IntersectionObserver
+} as unknown as typeof MockIntersectionObserver
 
 // Mock localStorage
 const localStorageMock = {

@@ -2,15 +2,21 @@ import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
-} from '../../../lib/audit'
+} from '@/lib/audit'
 import type { APIRoute } from 'astro'
-import { getSession } from '../../../lib/auth/session'
+import { getSession } from '@/lib/auth/session'
 import { aiRepository } from '@/lib/db/ai'
 import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
 import { apiMetrics, countMetric } from '@/lib/sentry/utils'
-import { createTogetherAIService } from '@/lib/ai/together-ai/service'
-import type { AIService, AIServiceOptions, AIMessage, AIStreamChunk, TherapeuticResponse } from '@/lib/ai/types'
-import { ResponseGenerationService } from '@/lib/ai/response-generation/service'
+import { createTogetherAIService } from '@/lib/ai/services/together'
+import type {
+  AIService,
+  AIServiceOptions,
+  AIMessage,
+  AIStreamChunk,
+  TherapeuticResponse,
+} from '@/lib/ai/models/ai-types'
+import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
