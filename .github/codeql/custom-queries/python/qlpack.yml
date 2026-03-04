@@ -1,0 +1,12 @@
+name: pixelated-empathy/custom-python-security-queries
+version: 1.0.0
+description: Custom CodeQL queries for Python HIPAA and EHR security compliance
+groups:
+  - hipaa
+  - ehr
+  - python
+
+dependencies:
+  codeql/python-all: "*"
+
+extractor: python

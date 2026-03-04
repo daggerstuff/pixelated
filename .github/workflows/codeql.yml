@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+  PNPM_VERSION: 10.30.1
 
 jobs:
   analyze:
@@ -40,7 +40,10 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality,security-extended
+          queries: >-
+            +security-and-quality,security-extended,
+            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/js' || '' }},
+            ${{ matrix.language == 'python' && './.github/codeql/custom-queries/python' || '' }}
           # Increase RAM allocation for analysis
           ram: 16384
 
