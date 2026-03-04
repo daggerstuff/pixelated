@@ -441,7 +441,7 @@
       "hono": "^4.12.2",
       "minimatch": "^10.2.3",
       "fast-xml-parser": "^5.3.8",
-      "rollup": "^4.32.1",
+      "rollup": "^4.59.0",
       "diff": "^5.2.2",
       "lodash": "^4.17.23",
       "wrangler": "^4.59.1",

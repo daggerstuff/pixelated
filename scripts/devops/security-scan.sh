@@ -29,7 +29,6 @@ GREP_RESULTS=$(grep -rE "API_KEY|SECRET|TOKEN|PASSWORD" . \
     --exclude={pnpm-lock.yaml,package-lock.json,yarn.lock,*.env,*.env.*} \
     --include="*.ts" --include="*.tsx" --include="*.js" --include="*.py" --include="*.yml" --include="*.yaml" \
     | grep -v "process.env" | grep -v "os.environ" | grep -v "config" \
-    | grep -v "NVIDIA_API_KEY" \
     | grep -vE '\$\([A-Z0-9_]+\)|\$[A-Z0-9_]+|\$\{[A-Z0-9_]+\}' | head -n 10)
 
 if [ -n "$GREP_RESULTS" ]; then
