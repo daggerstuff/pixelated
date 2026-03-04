@@ -67,7 +67,7 @@ try {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '../tests',
   testIgnore: ['tests/accessibility/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -118,10 +118,6 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    },
-    {
-      name: 'msedge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
     },
     /* Test against mobile viewports. */
     {

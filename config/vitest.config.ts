@@ -39,7 +39,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    setupFiles: [path.resolve(__dirname, '../src/test/setup.ts')],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
