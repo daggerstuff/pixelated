@@ -3,8 +3,33 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { markdownToHtml } from '@/lib/markdown'
 import { formatTimestamp } from '@/lib/dates'
-import { useContext } from 'react'
+import { useContext, memo } from 'react'
 import { ThemeContext } from '@/components/theme/ThemeProvider'
+
+// Format category name
+const formatCategoryName = (category: string): string => {
+  return category
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
+
+// Get color for category badge
+const getCategoryColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    depression: 'bg-blue-500',
+    anxiety: 'bg-yellow-500',
+    ptsd: 'bg-red-500',
+    bipolar_disorder: 'bg-purple-500',
+    ocd: 'bg-green-500',
+    eating_disorder: 'bg-pink-500',
+    social_anxiety: 'bg-indigo-500',
+    panic_disorder: 'bg-orange-500',
+    suicidality: 'bg-red-700',
+    none: 'bg-gray-500',
+  }
+  return colors[category] || 'bg-gray-500'
+}
 
 // Define the MentalHealthAnalysis interface with the properties we need
 interface MentalHealthAnalysis {
@@ -24,7 +49,7 @@ export interface ChatMessageProps {
   isTyping?: boolean
 }
 
-export function ChatMessage({
+export const ChatMessage = memo(function ChatMessage({
   message,
   timestamp,
   className,
@@ -35,31 +60,6 @@ export function ChatMessage({
   const isUser = message.role === 'user'
   const isBotMessage = message.role === 'assistant'
   const isSystemMessage = message.role === 'system'
-
-  // Format category name
-  const formatCategoryName = (category: string): string => {
-    return category
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ')
-  }
-
-  // Get color for category badge
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      depression: 'bg-blue-500',
-      anxiety: 'bg-yellow-500',
-      ptsd: 'bg-red-500',
-      bipolar_disorder: 'bg-purple-500',
-      ocd: 'bg-green-500',
-      eating_disorder: 'bg-pink-500',
-      social_anxiety: 'bg-indigo-500',
-      panic_disorder: 'bg-orange-500',
-      suicidality: 'bg-red-700',
-      none: 'bg-gray-500',
-    }
-    return colors[category] || 'bg-gray-500'
-  }
 
   const hasAnalysis =
     message.mentalHealthAnalysis &&
@@ -146,4 +146,4 @@ export function ChatMessage({
       </div>
     </div>
   )
-}
+})
