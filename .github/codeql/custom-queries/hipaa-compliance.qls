@@ -9,4 +9,4 @@
       - js/unencrypted-ehr-data
       - js/insecure-ehr-auth
       - js/missing-audit-log
-      - js/ehr-security
+      - js/ehr-security-patterns
