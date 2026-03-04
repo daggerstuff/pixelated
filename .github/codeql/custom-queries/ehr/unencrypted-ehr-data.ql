@@ -13,43 +13,43 @@
 
 import javascript
 
-predicate isDataTransmissionCall(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%http%") or
-      name.matches("%fetch%") or
-      name.matches("%axios%") or
-      name.matches("%request%")
+private module UnencryptedEHRConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    exists(string name |
+      name = source.asExpr().toString().toLowerCase() and
+      (
+        name.matches("%patient%") or
+        name.matches("%health%") or
+        name.matches("%record%") or
+        name.matches("%ehr%") or
+        name.matches("%fhir%") or
+        name.matches("%clinical%")
+      )
     )
-  )
-}
+  }
 
-predicate isEHRData(DataFlow::Node node) {
-  exists(string name |
-    name = node.asExpr().toString().toLowerCase() and
-    (
-      name.matches("%patient%") or
-      name.matches("%health%") or
-      name.matches("%record%") or
-      name.matches("%ehr%") or
-      name.matches("%fhir%") or
-      name.matches("%clinical%")
+  predicate isSink(DataFlow::Node sink) {
+    exists(CallExpr call |
+      (
+        call.getCalleeName().matches("%http%") or
+        call.getCalleeName().matches("%fetch%") or
+        call.getCalleeName().matches("%axios%") or
+        call.getCalleeName().matches("%request%")
+      ) and
+      sink = DataFlow::exprNode(call.getAnArgument())
     )
-  )
-}
+  }
 
-from CallExpr call, DataFlow::Node data
-where
-  isDataTransmissionCall(call) and
-  data = DataFlow::exprNode(call.getAnArgument()) and
-  isEHRData(data) and
-  not exists(DataFlow::Node encrypted |
+  predicate isBarrier(DataFlow::Node node) {
     exists(CallExpr encryptCall |
       encryptCall.getCalleeName().matches("%encrypt%") and
-      encrypted = DataFlow::exprNode(encryptCall)
-    ) and
-    encrypted.flowsTo(data)
-  )
-select call,
-  "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
+      node = DataFlow::exprNode(encryptCall)
+    )
+  }
+}
+
+module Flow = TaintTracking::Global<UnencryptedEHRConfig>;
+
+from DataFlow::Node source, DataFlow::Node sink
+where Flow::hasFlow(source, sink)
+select sink, "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."

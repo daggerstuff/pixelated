@@ -14,7 +14,7 @@
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
 
-private module Config implements DataFlow::ConfigSig {
+private module EHRPatternsConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source instanceof RemoteFlowSource
     or
@@ -47,7 +47,7 @@ private module Config implements DataFlow::ConfigSig {
   }
 }
 
-module Flow = TaintTracking::Global<Config>;
+module Flow = TaintTracking::Global<EHRPatternsConfig>;
 import Flow::PathGraph
 
 from Flow::PathNode source, Flow::PathNode sink

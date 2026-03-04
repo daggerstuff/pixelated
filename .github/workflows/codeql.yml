@@ -23,7 +23,6 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
-    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
@@ -40,14 +39,12 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          # Load default queries and custom queries conditionally based on language
           queries: >-
             +security-and-quality,security-extended${{
               matrix.language == 'javascript'
                 && ',./.github/codeql/custom-queries/fhir,./.github/codeql/custom-queries/ehr'
                 || ''
             }}
-          # Increase RAM allocation for analysis
           ram: 16384
 
       - name: Setup Node.js
@@ -97,47 +94,20 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Ensure `uv` shim is available
+      - name: Ensure uv is available
         if: matrix.language == 'python'
         run: |
           if ! command -v uv >/dev/null 2>&1; then
-            echo "uv not found - installing via pip"
-            python -m pip install --upgrade 'pip>=25.3'
-            python -m pip install 'uv>=0.9.6'
-          else
-            echo "uv already installed - verifying version"
-            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
+            python -m pip install --upgrade pip
+            python -m pip install uv
           fi
-
-      - name: Prepare uv venv
-        if: matrix.language == 'python'
-        id: prepare-uv
-        uses: ./.github/actions/prepare-uv-venv
-        with:
-          service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Install Python dependencies
         if: matrix.language == 'python'
         run: |
-          # Install Python dependencies for CodeQL analysis
-          # Check if bias-detection service exists
-          if [ -d "src/lib/ai/bias-detection/python-service" ]; then
-            cd src/lib/ai/bias-detection/python-service
-            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
-            uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
-            uv pip install ${USE_SYSTEM} -r requirements.txt || true
-            cd - > /dev/null
-          fi
-
-          # Install other Python dependencies if they exist
-          find . -name "requirements.txt" -not -path "*/node_modules/*" -not -path "*/.venv/*" -not -path "*/site-packages/*" | head -5 | while read req; do
-            dir=$(dirname "$req")
-            echo "Installing dependencies from $dir"
-            cd "$dir"
-            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
-            uv pip install ${USE_SYSTEM} -r requirements.txt || true
-            cd - > /dev/null
-          done || true
+          find . -name "requirements.txt" -not -path "*/node_modules/*" | head -5 | while read req; do
+            uv pip install -r "$req" --system || true
+          done
 
       - name: Autobuild Python
         if: matrix.language == 'python'
@@ -147,9 +117,7 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
-          # Upload SARIF file to GitHub Security tab
-          upload: true
-          # Configure output format
+          upload: false
           output: sarif-latest
 
       - name: Upload SARIF results as artifact
@@ -159,11 +127,3 @@ jobs:
           name: codeql-sarif-${{ matrix.language }}
           path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
           retention-days: 30
-
-      - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: codeql-database-${{ matrix.language }}
-          path: /home/runner/work/_temp/codeql_databases
-          retention-days: 7
