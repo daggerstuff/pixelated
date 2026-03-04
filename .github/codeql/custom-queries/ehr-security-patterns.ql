@@ -13,7 +13,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
 module EHRConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
@@ -52,6 +51,7 @@ module EHRConfig implements DataFlow::ConfigSig {
 }
 
 module EHRFlow = TaintTracking::Global<EHRConfig>;
+import EHRFlow::PathGraph
 
 from EHRFlow::PathNode source, EHRFlow::PathNode sink
 where EHRFlow::hasFlowPath(source, sink)
