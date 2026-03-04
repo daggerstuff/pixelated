@@ -1,138 +1,9 @@
 /**
- * @name Unencrypted EHR Data Transfer
- * @description Detects potential unencrypted EHR data transfers
- * @kind problem
- * @problem.severity error
- * @security-severity 9.0
- * @precision high
- * @id js/unencrypted-ehr-data
- * @tags security
- *       hipaa
- *       ehr
- */
-
-import javascript
-
-predicate isDataTransmissionCall(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%http%") or
-      name.matches("%fetch%") or
-      name.matches("%axios%") or
-      name.matches("%request%")
-    )
-  )
-}
-
-predicate isEHRData(DataFlow::Node node) {
-  exists(string name |
-    name = node.asExpr().toString().toLowerCase() and
-    (
-      name.matches("%patient%") or
-      name.matches("%health%") or
-      name.matches("%record%") or
-      name.matches("%ehr%") or
-      name.matches("%fhir%") or
-      name.matches("%clinical%")
-    )
-  )
-}
-
-from CallExpr call, DataFlow::Node data
-where
-  isDataTransmissionCall(call) and
-  isEHRData(data) and
-  not exists(CallExpr encryptCall |
-    encryptCall.getCalleeName().matches("%encrypt%") and
-    DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument()))
-  )
-select call,
-  "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
-
-/**
- * @name Insecure EHR Authentication
- * @description Detects weak authentication methods for EHR access
- * @kind problem
- * @problem.severity error
- * @security-severity 8.0
- * @precision high
- * @id js/insecure-ehr-auth
- * @tags security
- *       hipaa
- *       authentication
- */
-
-import javascript
-
-predicate isAuthenticationMethod(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%login%") or
-      name.matches("%authenticate%") or
-      name.matches("%auth%")
-    )
-  )
-}
-
-from CallExpr authCall
-where
-  isAuthenticationMethod(authCall) and
-  not exists(CallExpr mfaCall |
-    mfaCall.getCalleeName().matches("%mfa%") or
-    mfaCall.getCalleeName().matches("%2fa%") or
-    mfaCall.getCalleeName().matches("%verify%")
-  )
-select authCall,
-  "Potential insecure EHR authentication detected. HIPAA compliance requires strong authentication."
-
-/**
- * @name Missing Audit Logging
- * @description Detects EHR operations without audit logging
- * @kind problem
- * @problem.severity warning
- * @security-severity 6.0
- * @precision high
- * @id js/missing-audit-log
- * @tags security
- *       hipaa
- *       audit
- */
-
-import javascript
-
-predicate isEHROperation(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%patient%") or
-      name.matches("%record%") or
-      name.matches("%ehr%") or
-      name.matches("%fhir%")
-    )
-  )
-}
-
-predicate hasLogging(CallExpr call) {
-  exists(CallExpr logCall |
-    logCall.getCalleeName().matches("%log%") or
-    logCall.getCalleeName().matches("%audit%")
-  )
-}
-
-from CallExpr ehrOp
-where
-  isEHROperation(ehrOp) and
-  not hasLogging(ehrOp)
-select ehrOp,
-  "EHR operation detected without audit logging. HIPAA compliance requires comprehensive audit trails."
-
-/**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
+ * @security-severity 8.5
  * @precision high
  * @id js/ehr-security
  * @tags security
@@ -175,16 +46,20 @@ class EHREndpoint extends DataFlow::Node {
   }
 }
 
-class InsecureEHRConfig extends TaintTracking::Configuration {
-  InsecureEHRConfig() { this = "InsecureEHRConfig" }
-
-  override predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource
+module EHRSecurityConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    source instanceof EHRCredentialSource or
+    source instanceof RemoteFlowSource
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(DataFlow::CallNode call |
-      call.getCalleeName().matches("%log%") and
+      (
+        call.getCalleeName().matches("%log%") or
+        call.getCalleeName().matches("%request%") or
+        call.getCalleeName().matches("%fetch%") or
+        call.getCalleeName().matches("%axios%")
+      ) and
       sink = call.getAnArgument()
     )
     or
@@ -195,32 +70,9 @@ class InsecureEHRConfig extends TaintTracking::Configuration {
   }
 }
 
-class UnsafeEHRAccess extends TaintTracking::Configuration {
-  UnsafeEHRAccess() { this = "UnsafeEHRAccess" }
+module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
 
-  override predicate isSource(DataFlow::Node source) {
-    source instanceof RemoteFlowSource
-  }
-
-  override predicate isSink(DataFlow::Node sink) {
-    exists(DataFlow::CallNode call |
-      (
-        call.getCalleeName().matches("%request%") or
-        call.getCalleeName().matches("%fetch%") or
-        call.getCalleeName().matches("%axios%")
-      ) and
-      sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
-    )
-  }
-}
-
-from DataFlow::PathNode source, DataFlow::PathNode sink, TaintTracking::Configuration config
-where
-  (
-    config instanceof InsecureEHRConfig or
-    config instanceof UnsafeEHRAccess
-  ) and
-  config.hasFlowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
+from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
+where EHRSecurityFlow::hasFlowPath(source, sink)
+select sink.getNode(), source, sink, "Potential EHR security issue:  flows to .",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
