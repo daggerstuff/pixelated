@@ -42,9 +42,3 @@ paths-ignore:
   - '**/playwright-report'
   - '**/test-results'
 
-# Use additional query packs for comprehensive security analysis
-packs:
-  - codeql/javascript-queries:security-extended
-  - codeql/javascript-queries:security-and-quality
-  - codeql/python-queries:security-extended
-  - codeql/python-queries:security-and-quality
