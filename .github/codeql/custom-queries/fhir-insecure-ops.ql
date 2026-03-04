@@ -26,7 +26,7 @@ predicate isFHIROperation(CallExpr call) {
   )
 }
 
-predicate hasSecurityContext(CallExpr call) {
+predicate hasSecurityContext() {
   exists(CallExpr securityCall |
     securityCall.getCalleeName().matches("%authorize%") or
     securityCall.getCalleeName().matches("%checkPermission%") or
@@ -37,6 +37,6 @@ predicate hasSecurityContext(CallExpr call) {
 from CallExpr fhirOp
 where
   isFHIROperation(fhirOp) and
-  not hasSecurityContext(fhirOp)
+  not hasSecurityContext()
 select fhirOp,
   "FHIR operation without security context detected. Ensure proper authorization."

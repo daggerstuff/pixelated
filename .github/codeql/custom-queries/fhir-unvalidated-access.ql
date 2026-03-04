@@ -28,7 +28,7 @@ predicate isFHIRResourceAccess(CallExpr call) {
   )
 }
 
-predicate hasValidation(CallExpr call) {
+predicate hasValidation() {
   exists(CallExpr validateCall |
     validateCall.getCalleeName().matches("%validate%") or
     validateCall.getCalleeName().matches("%check%") or
@@ -39,6 +39,6 @@ predicate hasValidation(CallExpr call) {
 from CallExpr resourceCall
 where
   isFHIRResourceAccess(resourceCall) and
-  not hasValidation(resourceCall)
+  not hasValidation()
 select resourceCall,
   "FHIR resource access without validation detected. Ensure proper validation before access."

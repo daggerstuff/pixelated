@@ -1,7 +1,7 @@
 /**
  * @name Unencrypted EHR Data Transfer
  * @description Detects potential unencrypted EHR data transfers
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
  * @security-severity 9.0
  * @precision high
@@ -12,6 +12,8 @@
  */
 
 import javascript
+import semmle.javascript.security.dataflow.TaintTracking
+import DataFlow::PathGraph
 
 predicate isDataTransmissionCall(CallExpr call) {
   exists(string name |
@@ -39,14 +41,31 @@ predicate isEHRData(DataFlow::Node node) {
   )
 }
 
-from CallExpr call, DataFlow::Node data
-where
-  isDataTransmissionCall(call) and
-  isEHRData(data) and
-  not exists(CallExpr encryptCall |
-    encryptCall.getCalleeName().matches("%encrypt%") and
-    (data.flowsTo(DataFlow::exprNode(encryptCall.getAnArgument())) or
-     DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument())))
-  )
-select call,
-  "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
+/**
+ * Taint tracking configuration for unencrypted EHR data transfer.
+ */
+module UnencryptedEHRDataConfigSig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    isEHRData(source)
+  }
+
+  predicate isSink(DataFlow::Node sink) {
+    exists(DataFlow::CallNode call |
+      isDataTransmissionCall(call.asExpr()) and
+      sink = call.getAnArgument()
+    )
+  }
+
+  predicate isBarrier(DataFlow::Node node) {
+    exists(DataFlow::CallNode call |
+      call.getCalleeName().matches("%encrypt%") and
+      node = DataFlow::exprNode(call.getAnArgument())
+    )
+  }
+}
+
+module UnencryptedEHRDataFlow = TaintTracking::Global<UnencryptedEHRDataConfigSig>;
+
+from DataFlow::PathNode source, DataFlow::PathNode sink
+where UnencryptedEHRDataFlow::hasFlowPath(source, sink)
+select sink.getNode(), source, sink, "Potential unencrypted EHR data transmission detected."
