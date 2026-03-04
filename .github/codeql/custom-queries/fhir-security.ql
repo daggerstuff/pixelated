@@ -28,7 +28,7 @@ predicate isFHIRResourceAccess(CallExpr call) {
   )
 }
 
-predicate hasValidation(CallExpr call) {
+predicate hasValidation() {
   exists(CallExpr validateCall |
     validateCall.getCalleeName().matches("%validate%") or
     validateCall.getCalleeName().matches("%check%") or
@@ -39,7 +39,7 @@ predicate hasValidation(CallExpr call) {
 from CallExpr resourceCall
 where
   isFHIRResourceAccess(resourceCall) and
-  not hasValidation(resourceCall)
+  not hasValidation()
 select resourceCall,
   "FHIR resource access without validation detected. Ensure proper validation before access."
 
@@ -71,7 +71,7 @@ predicate isFHIROperation(CallExpr call) {
   )
 }
 
-predicate hasSecurityContext(CallExpr call) {
+predicate hasSecurityContext() {
   exists(CallExpr securityCall |
     securityCall.getCalleeName().matches("%authorize%") or
     securityCall.getCalleeName().matches("%checkPermission%") or
@@ -82,7 +82,7 @@ predicate hasSecurityContext(CallExpr call) {
 from CallExpr fhirOp
 where
   isFHIROperation(fhirOp) and
-  not hasSecurityContext(fhirOp)
+  not hasSecurityContext()
 select fhirOp,
   "FHIR operation without security context detected. Ensure proper authorization."
 
@@ -112,7 +112,7 @@ predicate isFHIRClientInit(CallExpr call) {
   )
 }
 
-predicate hasVersionCheck(CallExpr call) {
+predicate hasVersionCheck() {
   exists(CallExpr versionCall |
     versionCall.getCalleeName().matches("%version%") or
     versionCall.getCalleeName().matches("%compatibility%") or
@@ -123,7 +123,7 @@ predicate hasVersionCheck(CallExpr call) {
 from CallExpr clientInit
 where
   isFHIRClientInit(clientInit) and
-  not hasVersionCheck(clientInit)
+  not hasVersionCheck()
 select clientInit,
   "FHIR client initialization without version check detected. Ensure version compatibility."
 
@@ -153,7 +153,7 @@ predicate isFHIRSearch(CallExpr call) {
   )
 }
 
-predicate hasInputSanitization(CallExpr call) {
+predicate hasInputSanitization() {
   exists(CallExpr sanitizeCall |
     sanitizeCall.getCalleeName().matches("%sanitize%") or
     sanitizeCall.getCalleeName().matches("%escape%") or
@@ -164,6 +164,6 @@ predicate hasInputSanitization(CallExpr call) {
 from CallExpr searchOp
 where
   isFHIRSearch(searchOp) and
-  not hasInputSanitization(searchOp)
+  not hasInputSanitization()
 select searchOp,
   "FHIR search operation without input sanitization detected. Ensure proper input validation."
