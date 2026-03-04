@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+  PNPM_VERSION: 10.30.1
 
 jobs:
   analyze:
@@ -27,7 +27,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "python"]
+        include:
+          - language: javascript
+            queries: security-and-quality,security-extended,./.github/codeql/custom-queries/fhir-security.ql,./.github/codeql/custom-queries/fhir-insecure-ops.ql,./.github/codeql/custom-queries/fhir-version-check.ql,./.github/codeql/custom-queries/fhir-insecure-search.ql,./.github/codeql/custom-queries/ehr-unencrypted-data.ql,./.github/codeql/custom-queries/ehr-insecure-auth.ql,./.github/codeql/custom-queries/ehr-missing-audit.ql,./.github/codeql/custom-queries/ehr-security.ql
+          - language: python
+            queries: security-and-quality,security-extended
 
     steps:
       - name: Checkout repository
@@ -40,17 +44,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: >-
-            security-and-quality,
-            security-extended,
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/fhir-security.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/fhir-insecure-ops.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/fhir-version-check.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/fhir-insecure-search.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/ehr-unencrypted-data.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/ehr-insecure-auth.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/ehr-missing-audit.ql' || '' }},
-            ${{ matrix.language == 'javascript' && './.github/codeql/custom-queries/ehr-security.ql' || '' }}
+          queries: ${{ matrix.queries }}
           # Increase RAM allocation for analysis
           ram: 16384
 
