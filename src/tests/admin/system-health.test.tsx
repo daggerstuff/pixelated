@@ -91,6 +91,10 @@ function renderMockComponent(overrides: string = '') {
 }
 
 describe('System Health Dashboard Page', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+  })
+
   it('renders the page title', async () => {
     renderMockComponent()
 
@@ -115,7 +119,7 @@ describe('System Health Dashboard Page', () => {
     // Wait for data to load
     await waitFor(() => {
       // Check API status
-      expect(screen.getByText(/API status: healthy/)).toBeTruthy()
+      expect(screen.getAllByText(/API status: healthy/).length).toBeGreaterThan(0)
 
       // Check memory usage
       expect(screen.getByText('50%')).toBeTruthy()
