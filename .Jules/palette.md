@@ -1,0 +1,3 @@
+## 2025-05-14 - Accessibility Gaps in Icon-only Buttons
+**Learning:** Found a pattern where interactive components using icon-only buttons (often with `size="icon"`) lack `aria-label` attributes, making them inaccessible to screen reader users. Additionally, dynamic status indicators like unread count badges were not leveraging `aria-live` for real-time announcements.
+**Action:** When working with `Button` components in this repo, especially those with `size="icon"`, always verify that an `aria-label` is provided. For dynamic UI elements that update state (like notification counts), ensure `aria-live="polite"` is used.
