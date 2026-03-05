@@ -2243,9 +2243,7 @@ export class EdgeComputingManager extends EventEmitter {
       return statuses
     } catch (error) {
       logger.error('Edge node deployment failed', { error })
-      throw new Error(`Deployment failed: ${(error as Error).message}`, {
-        cause: error,
-      })
+      throw new Error(`Deployment failed: ${(error as Error).message}`, { cause: error })
     }
   }
 
@@ -2280,9 +2278,7 @@ export class EdgeComputingManager extends EventEmitter {
           deploymentResult = await this.deployGCPEdge(location)
           break
         default:
-          throw new Error(
-            `Unsupported edge provider: ${location.provider as string}`,
-          )
+          throw new Error(`Unsupported edge provider: ${location.provider as string}`)
       }
 
       // Create successful status
@@ -2375,12 +2371,9 @@ export class EdgeComputingManager extends EventEmitter {
       logger.error(`Cloudflare Worker deployment failed: ${location.name}`, {
         error,
       })
-      throw new Error(
-        `Cloudflare deployment failed: ${(error as Error).message}`,
-        {
-          cause: error,
-        },
-      )
+      throw new Error(`Cloudflare deployment failed: ${(error as Error).message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -2408,12 +2401,9 @@ export class EdgeComputingManager extends EventEmitter {
       logger.error(`AWS Lambda@Edge deployment failed: ${location.name}`, {
         error,
       })
-      throw new Error(
-        `AWS Lambda deployment failed: ${(error as Error).message}`,
-        {
-          cause: error,
-        },
-      )
+      throw new Error(`AWS Lambda deployment failed: ${(error as Error).message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -2436,12 +2426,9 @@ export class EdgeComputingManager extends EventEmitter {
       return { functionId: `function-${location.id}`, region: location.region }
     } catch (error) {
       logger.error(`Azure Edge deployment failed: ${location.name}`, { error })
-      throw new Error(
-        `Azure Edge deployment failed: ${(error as Error).message}`,
-        {
-          cause: error,
-        },
-      )
+      throw new Error(`Azure Edge deployment failed: ${(error as Error).message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -2464,12 +2451,9 @@ export class EdgeComputingManager extends EventEmitter {
       return { functionName: `edge-${location.id}`, region: location.region }
     } catch (error) {
       logger.error(`GCP Edge deployment failed: ${location.name}`, { error })
-      throw new Error(
-        `GCP Edge deployment failed: ${(error as Error).message}`,
-        {
-          cause: error,
-        },
-      )
+      throw new Error(`GCP Edge deployment failed: ${(error as Error).message}`, {
+        cause: error,
+      })
     }
   }
 
@@ -3119,10 +3103,7 @@ async function processRequest(req, threatCheck, biasCheck) {
         lastHealthCheck: new Date(),
 
         errorRate: 1,
-        metadata: {
-          ...currentStatus.metadata,
-          error: (error as Error).message,
-        },
+        metadata: { ...currentStatus.metadata, error: (error as Error).message },
       }
 
       this.edgeNodes.set(locationId, failedStatus)
@@ -3179,9 +3160,9 @@ async function processRequest(req, threatCheck, biasCheck) {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(lat1)) *
-        Math.cos(this.toRadians(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
+      Math.cos(this.toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c

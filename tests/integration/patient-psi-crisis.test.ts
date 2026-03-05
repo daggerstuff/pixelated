@@ -111,6 +111,7 @@ describe('Patient-Psi Crisis Integration Tests', () => {
 
       // Simulate historical sessions showing improvement
 
+
       const currentEmotion: EmotionState = {
         primary: 'frustrated',
         intensity: 0.5,

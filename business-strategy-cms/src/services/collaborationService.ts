@@ -27,12 +27,8 @@ export interface DocumentChange {
 export class CollaborationService {
   private static sessions: Map<string, CollaborationSession[]> = new Map()
   private static changes: Map<string, DocumentChange[]> = new Map()
-  private static cursorListeners: Map<string, ((update: any) => void)[]> =
-    new Map()
-  private static contentListeners: Map<
-    string,
-    ((change: DocumentChange) => void)[]
-  > = new Map()
+  private static cursorListeners: Map<string, ((update: any) => void)[]> = new Map()
+  private static contentListeners: Map<string, ((change: DocumentChange) => void)[]> = new Map()
 
   static clearAllSessions(): void {
     this.sessions.clear()
@@ -42,20 +38,14 @@ export class CollaborationService {
     this.changes.delete(documentId)
   }
 
-  static onCursorUpdate(
-    documentId: string,
-    callback: (update: any) => void,
-  ): void {
+  static onCursorUpdate(documentId: string, callback: (update: any) => void): void {
     if (!this.cursorListeners.has(documentId)) {
       this.cursorListeners.set(documentId, [])
     }
     this.cursorListeners.get(documentId)?.push(callback)
   }
 
-  static onContentChange(
-    documentId: string,
-    callback: (change: DocumentChange) => void,
-  ): void {
+  static onContentChange(documentId: string, callback: (change: DocumentChange) => void): void {
     if (!this.contentListeners.has(documentId)) {
       this.contentListeners.set(documentId, [])
     }

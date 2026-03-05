@@ -258,10 +258,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label
-              htmlFor="operation-type"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="operation-type" className="block text-sm font-medium text-gray-700 mb-1">
               Operation Type
             </label>
             <select
@@ -283,10 +280,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
           </div>
 
           <div>
-            <label
-              htmlFor="input-1"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
+            <label htmlFor="input-1" className="block text-sm font-medium text-gray-700 mb-1">
               Input 1 (Patient Score)
             </label>
             <input
@@ -307,10 +301,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
           {currentOperation.operation !== 'aggregate' && (
             <div>
-              <label
-                htmlFor="input-2"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label htmlFor="input-2" className="block text-sm font-medium text-gray-700 mb-1">
                 Input 2 (Baseline)
               </label>
               <input

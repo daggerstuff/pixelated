@@ -1,14 +1,6 @@
 import { useMemo } from 'react'
-import type {
-  Progress,
-  ProgressMetrics,
-} from '@/lib/api/journal-research/types'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import type { Progress, ProgressMetrics } from '@/lib/api/journal-research/types'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import ChartComponent from '@/components/analytics/ChartComponent'
 import { cn } from '@/lib/utils'
 

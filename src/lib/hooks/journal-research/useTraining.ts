@@ -8,11 +8,8 @@ import {
   integrateAllDatasets,
   getTrainingStatus,
   getPipelineStatus,
-} from '@/lib/api/journal-research/training'
-import {
-  journalResearchQueryKeys,
-  journalResearchMutationKeys,
-} from '@/lib/api/journal-research/react-query'
+  } from '@/lib/api/journal-research/training'
+import { journalResearchQueryKeys, journalResearchMutationKeys } from '@/lib/api/journal-research/react-query'
 
 /**
  * Hook for integrating a single dataset into the training pipeline

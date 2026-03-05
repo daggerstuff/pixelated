@@ -6,6 +6,7 @@
 
 import { journalResearchApiClient } from './client'
 
+
 export interface TrainingIntegrationResult {
   success: boolean
   source_id: string
@@ -66,17 +67,16 @@ export async function integrateDataset(
   sourceId: string,
   autoIntegrate: boolean = true,
 ): Promise<TrainingIntegrationResult> {
-  const response =
-    await journalResearchApiClient.request<TrainingIntegrationResult>(
-      `sessions/${sessionId}/training/integrate/${sourceId}`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ auto_integrate: autoIntegrate }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+  const response = await journalResearchApiClient.request<TrainingIntegrationResult>(
+    `sessions/${sessionId}/training/integrate/${sourceId}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ auto_integrate: autoIntegrate }),
+      headers: {
+        'Content-Type': 'application/json',
       },
-    )
+    },
+  )
   return response
 }
 
@@ -86,13 +86,12 @@ export async function integrateDataset(
 export async function getTrainingStatus(
   sessionId: string,
 ): Promise<TrainingSessionStatus> {
-  const response =
-    await journalResearchApiClient.request<TrainingSessionStatus>(
-      `sessions/${sessionId}/training/status`,
-      {
-        method: 'GET',
-      },
-    )
+  const response = await journalResearchApiClient.request<TrainingSessionStatus>(
+    `sessions/${sessionId}/training/status`,
+    {
+      method: 'GET',
+    },
+  )
   return response
 }
 
@@ -117,12 +116,11 @@ export async function integrateAllDatasets(
  * Get overall training pipeline status
  */
 export async function getPipelineStatus(): Promise<TrainingPipelineStatus> {
-  const response =
-    await journalResearchApiClient.request<TrainingPipelineStatus>(
-      'training/pipeline-status',
-      {
-        method: 'GET',
-      },
-    )
+  const response = await journalResearchApiClient.request<TrainingPipelineStatus>(
+    'training/pipeline-status',
+    {
+      method: 'GET',
+    },
+  )
   return response
 }

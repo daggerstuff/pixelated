@@ -206,9 +206,7 @@ describe('Threat Hunting Service', () => {
       } as any
 
       // Mock updateInvestigation - it returns void but we can verify it was called
-      const updateSpy = vi
-        .spyOn(service, 'updateInvestigation')
-        .mockResolvedValue(undefined)
+      const updateSpy = vi.spyOn(service, 'updateInvestigation').mockResolvedValue(undefined)
 
       await service.updateInvestigation(updatedInvestigationData)
 
@@ -1356,9 +1354,7 @@ describe('Threat Hunting Service', () => {
       } as any
 
       // Mock updateInvestigation - it returns void but we can verify it was called
-      const updateSpy = vi
-        .spyOn(service, 'updateInvestigation')
-        .mockResolvedValue(undefined)
+      const updateSpy = vi.spyOn(service, 'updateInvestigation').mockResolvedValue(undefined)
 
       await service.updateInvestigation(updatedInvestigationData)
 

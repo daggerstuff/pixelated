@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { useIntegrationPlanQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
@@ -193,9 +188,7 @@ ${plan.requiredTransformations.map((t) => `    # - ${t}`).join('\n')}
     return transformed_data
 
 # Schema mapping:
-${Object.entries(plan.schemaMapping)
-  .map(([k, v]) => `# ${k} -> ${v}`)
-  .join('\n')}
+${Object.entries(plan.schemaMapping).map(([k, v]) => `# ${k} -> ${v}`).join('\n')}
 `}
             </pre>
           </div>

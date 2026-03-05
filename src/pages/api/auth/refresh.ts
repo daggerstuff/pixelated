@@ -60,10 +60,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     })
 
     // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(
-      tokenPair.user.id,
-      'token_refreshed',
-    )
+    await updatePhase6AuthenticationProgress(tokenPair.user.id, 'token_refreshed')
 
     return new Response(JSON.stringify({ success: true, tokenPair }), {
       status: 200,

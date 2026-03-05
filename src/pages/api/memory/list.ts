@@ -12,12 +12,12 @@ export const GET = async ({ request, cookies }) => {
     if (!sessionCookie) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }
       })
     }
 
     const session = JSON.parse(sessionCookie.value) as unknown
-    const { userId } = session
+    const {userId} = session
 
     // Parse query parameters
     const url = new URL(request.url)
@@ -31,45 +31,40 @@ export const GET = async ({ request, cookies }) => {
       limit,
       offset,
       sortBy: sortBy as string,
-      sortOrder: sortOrder as 'asc' | 'desc',
+      sortOrder: sortOrder as 'asc' | 'desc'
     })
 
     logger.info('Memories retrieved successfully', {
       userId,
       count: memories.length,
       limit,
-      offset,
+      offset
     })
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        memories,
-        pagination: {
-          limit,
-          offset,
-          total: memories.length,
-        },
-      }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
+    return new Response(JSON.stringify({
+      success: true,
+      memories,
+      pagination: {
+        limit,
+        offset,
+        total: memories.length
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    })
+
   } catch (error: unknown) {
     logger.error('Memory list error:', {
-      message: error instanceof Error ? String(error) : String(error),
+      message: error instanceof Error ? String(error) : String(error)
     })
 
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: 'Failed to retrieve memories',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'Failed to retrieve memories'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
   }
 }

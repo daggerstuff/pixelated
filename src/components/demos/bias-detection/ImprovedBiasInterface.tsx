@@ -164,37 +164,34 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
             {['Input', 'Analysis', 'Results'].map((step, index) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'bg-blue-600 text-white'
-                      : index <
-                          ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
-                  }`}
+                  className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
+                    ? 'bg-blue-600 text-white'
+                    : index <
+                      ['input', 'analyzing', 'results'].indexOf(currentStep)
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-200 text-gray-600'
+                    }`}
                 >
                   {index <
-                  ['input', 'analyzing', 'results'].indexOf(currentStep)
+                    ['input', 'analyzing', 'results'].indexOf(currentStep)
                     ? '✓'
                     : index + 1}
                 </div>
                 <span
-                  className={`ml-2 text-sm font-medium ${
-                    currentStep === ['input', 'analyzing', 'results'][index]
-                      ? 'text-blue-600'
-                      : 'text-gray-500'
-                  }`}
+                  className={`ml-2 text-sm font-medium ${currentStep === ['input', 'analyzing', 'results'][index]
+                    ? 'text-blue-600'
+                    : 'text-gray-500'
+                    }`}
                 >
                   {step}
                 </span>
                 {index < 2 && (
                   <div
-                    className={`w-12 h-0.5 mx-4 ${
-                      index <
+                    className={`w-12 h-0.5 mx-4 ${index <
                       ['input', 'analyzing', 'results'].indexOf(currentStep)
-                        ? 'bg-green-600'
-                        : 'bg-gray-200'
-                    }`}
+                      ? 'bg-green-600'
+                      : 'bg-gray-200'
+                      }`}
                   />
                 )}
               </div>

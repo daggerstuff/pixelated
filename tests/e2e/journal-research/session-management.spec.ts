@@ -28,9 +28,7 @@ test.describe('Journal Research Session Management', () => {
 
   test('displays dashboard with session list', async ({ page }) => {
     // Check that dashboard is displayed
-    await expect(
-      page.locator('h1:has-text("Journal Research Dashboard")'),
-    ).toBeVisible()
+    await expect(page.locator('h1:has-text("Journal Research Dashboard")')).toBeVisible()
 
     // Check that session list is displayed
     await expect(page.locator('text=Recent Sessions')).toBeVisible()
@@ -54,9 +52,7 @@ test.describe('Journal Research Session Management', () => {
     await page.click('button[type="submit"]')
 
     // Wait for session to be created and redirect
-    await page.waitForURL(/\/journal-research\/sessions\/.*/, {
-      timeout: 10000,
-    })
+    await page.waitForURL(/\/journal-research\/sessions\/.*/, { timeout: 10000 })
 
     // Verify session detail page is displayed
     await expect(page.locator('h1')).toContainText('Session')
@@ -72,7 +68,7 @@ test.describe('Journal Research Session Management', () => {
     // Click on first session (if available)
     const firstSessionLink = page.locator('table a').first()
 
-    if ((await firstSessionLink.count()) > 0) {
+    if (await firstSessionLink.count() > 0) {
       await firstSessionLink.click()
 
       // Verify session detail page
@@ -111,9 +107,7 @@ test.describe('Journal Research Session Management', () => {
     await page.goto('/journal-research/sessions')
 
     // Wait for search input
-    await page.waitForSelector('input[placeholder*="Search"]', {
-      timeout: 5000,
-    })
+    await page.waitForSelector('input[placeholder*="Search"]', { timeout: 5000 })
 
     // Enter search term
     await page.fill('input[placeholder*="Search"]', 'test')
@@ -143,7 +137,7 @@ test.describe('Journal Research Session Management', () => {
     // Click on first session
     const firstSessionLink = page.locator('table a').first()
 
-    if ((await firstSessionLink.count()) > 0) {
+    if (await firstSessionLink.count() > 0) {
       await firstSessionLink.click()
 
       // Wait for session detail page
@@ -151,7 +145,7 @@ test.describe('Journal Research Session Management', () => {
 
       // Click edit button (if available)
       const editButton = page.locator('button:has-text("Edit")')
-      if ((await editButton.count()) > 0) {
+      if (await editButton.count() > 0) {
         await editButton.click()
 
         // Update session
@@ -176,7 +170,7 @@ test.describe('Journal Research Session Management', () => {
     // Click on first session
     const firstSessionLink = page.locator('table a').first()
 
-    if ((await firstSessionLink.count()) > 0) {
+    if (await firstSessionLink.count() > 0) {
       await firstSessionLink.click()
 
       // Wait for session detail page
@@ -184,7 +178,7 @@ test.describe('Journal Research Session Management', () => {
 
       // Click delete button (if available)
       const deleteButton = page.locator('button:has-text("Delete")')
-      if ((await deleteButton.count()) > 0) {
+      if (await deleteButton.count() > 0) {
         // Confirm deletion
         page.on('dialog', (dialog) => dialog.accept())
         await deleteButton.click()

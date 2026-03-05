@@ -1,11 +1,6 @@
 import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
 import { ReportGenerator, ReportViewer } from '../features'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 
 export interface ReportsPageProps {
   sessionId?: string | null

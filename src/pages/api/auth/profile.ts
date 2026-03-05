@@ -3,10 +3,7 @@ import { auth0UserService } from '../../../services/auth0.service'
 import { verifyAuthToken, getSessionFromRequest } from '../../../utils/auth'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { detectAndRedactPHI } from '../../../lib/security/phiDetection'
-import {
-  csrfProtection,
-  rateLimitMiddleware,
-} from '../../../lib/auth/middleware'
+import { csrfProtection, rateLimitMiddleware } from '../../../lib/auth/middleware'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
 
 /**
@@ -14,13 +11,7 @@ import { AuditEventType, createAuditLog } from '../../../lib/audit'
  * GET /api/auth/profile - Get current user profile
  * PUT /api/auth/profile - Update user profile
  */
-export const GET = async ({
-  request,
-  clientAddress,
-}: {
-  request: Request
-  clientAddress: string
-}) => {
+export const GET = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
   try {
     // Extract client info for logging
     const clientInfo = {
@@ -30,12 +21,7 @@ export const GET = async ({
     }
 
     // Rate limit profile reads (e.g. 60 per minute)
-    const rateLimitResult = await rateLimitMiddleware(
-      request,
-      'profile_read',
-      60,
-      60,
-    )
+    const rateLimitResult = await rateLimitMiddleware(request, 'profile_read', 60, 60)
     if (!rateLimitResult.success) return rateLimitResult.response!
 
     // Try to get session first (cookie or header)
@@ -48,10 +34,9 @@ export const GET = async ({
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
         // Fallback to cookie
-        const cookieToken = request.headers
-          .get('cookie')
+        const cookieToken = request.headers.get('cookie')
           ?.split(';')
-          .find((c) => c.trim().startsWith('auth-token='))
+          .find(c => c.trim().startsWith('auth-token='))
           ?.split('=')[1]
 
         if (cookieToken) {
@@ -71,10 +56,13 @@ export const GET = async ({
         clientInfo,
       })
 
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     const user = await auth0UserService.getUserById(userId)
@@ -121,7 +109,7 @@ export const GET = async ({
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
       error: detectAndRedactPHI(error.message),
-      clientInfo,
+      clientInfo
     })
 
     return new Response(
@@ -136,14 +124,8 @@ export const GET = async ({
   }
 }
 
-export const PUT = async ({
-  request,
-  clientAddress,
-}: {
-  request: Request
-  clientAddress: string
-}) => {
-  let clientInfo
+export const PUT = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
+  let clientInfo;
   try {
     clientInfo = {
       ip: clientAddress || 'unknown',
@@ -158,12 +140,7 @@ export const PUT = async ({
     }
 
     // Rate limit profile updates (strict: 5 per minute)
-    const rateLimitResult = await rateLimitMiddleware(
-      request,
-      'profile_update',
-      5,
-      60,
-    )
+    const rateLimitResult = await rateLimitMiddleware(request, 'profile_update', 5, 60)
     if (!rateLimitResult.success) return rateLimitResult.response!
 
     const session = await getSessionFromRequest(request)
@@ -224,7 +201,7 @@ export const PUT = async ({
     // Log security event for profile update
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, userId, {
       updates: Object.keys(auth0Updates),
-      clientInfo,
+      clientInfo
     })
 
     // Create Audit Log
@@ -233,7 +210,7 @@ export const PUT = async ({
       'profile.update',
       userId,
       'user',
-      { updates: Object.keys(auth0Updates) },
+      { updates: Object.keys(auth0Updates) }
     )
 
     return new Response(
@@ -257,16 +234,13 @@ export const PUT = async ({
 
     await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
       action: 'update_profile',
-      error: detectAndRedactPHI(
-        error instanceof Error ? error.message : String(error),
-      ),
-      clientInfo,
+      error: detectAndRedactPHI(error instanceof Error ? error.message : String(error)),
+      clientInfo
     })
 
     return new Response(
       JSON.stringify({
-        error:
-          error instanceof Error ? error.message : 'Failed to update profile',
+        error: error instanceof Error ? error.message : 'Failed to update profile',
       }),
       {
         status: 500,

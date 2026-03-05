@@ -12,6 +12,7 @@ import {
   type ErrorContext,
 } from './utils'
 
+
 interface Props {
   children: ReactNode
   fallback?: ReactNode
@@ -75,10 +76,7 @@ export class ErrorBoundary extends Component<Props, State> {
     // Log to monitoring service if enabled
     if (this.props.logToMonitoring !== false) {
       // Integration point for monitoring services (Sentry, etc.)
-      if (
-        typeof window !== 'undefined' &&
-        (window as { Sentry?: unknown }).Sentry
-      ) {
+      if (typeof window !== 'undefined' && (window as { Sentry?: unknown }).Sentry) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const Sentry = (window as any).Sentry

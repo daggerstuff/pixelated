@@ -519,9 +519,7 @@ describe('ContextTransitionDetector', () => {
         if (transition && transition.detected) {
           transitionDetected = true
           expect(transition.from.contextType).toBe(ContextType.EDUCATIONAL)
-          expect(transition.to.contextType).toBe(
-            ContextType.CLINICAL_ASSESSMENT,
-          )
+          expect(transition.to.contextType).toBe(ContextType.CLINICAL_ASSESSMENT)
         }
       })
 
@@ -530,21 +528,9 @@ describe('ContextTransitionDetector', () => {
 
     it('should handle support to crisis dialogue', () => {
       const dialogue = [
-        {
-          context: ContextType.SUPPORT,
-          confidence: 0.85,
-          urgency: 'medium' as const,
-        },
-        {
-          context: ContextType.SUPPORT,
-          confidence: 0.8,
-          urgency: 'medium' as const,
-        },
-        {
-          context: ContextType.CRISIS,
-          confidence: 0.95,
-          urgency: 'critical' as const,
-        },
+        { context: ContextType.SUPPORT, confidence: 0.85, urgency: 'medium' as const },
+        { context: ContextType.SUPPORT, confidence: 0.8, urgency: 'medium' as const },
+        { context: ContextType.CRISIS, confidence: 0.95, urgency: 'critical' as const },
       ]
 
       let crisisElevated = false
@@ -570,36 +556,12 @@ describe('ContextTransitionDetector', () => {
 
     it('should handle complex multi-context dialogue', () => {
       const dialogue = [
-        {
-          context: ContextType.GENERAL,
-          confidence: 0.6,
-          urgency: 'low' as const,
-        },
-        {
-          context: ContextType.EDUCATIONAL,
-          confidence: 0.9,
-          urgency: 'low' as const,
-        },
-        {
-          context: ContextType.EDUCATIONAL,
-          confidence: 0.88,
-          urgency: 'low' as const,
-        },
-        {
-          context: ContextType.SUPPORT,
-          confidence: 0.82,
-          urgency: 'medium' as const,
-        },
-        {
-          context: ContextType.SUPPORT,
-          confidence: 0.85,
-          urgency: 'medium' as const,
-        },
-        {
-          context: ContextType.INFORMATIONAL,
-          confidence: 0.9,
-          urgency: 'low' as const,
-        },
+        { context: ContextType.GENERAL, confidence: 0.6, urgency: 'low' as const },
+        { context: ContextType.EDUCATIONAL, confidence: 0.9, urgency: 'low' as const },
+        { context: ContextType.EDUCATIONAL, confidence: 0.88, urgency: 'low' as const },
+        { context: ContextType.SUPPORT, confidence: 0.82, urgency: 'medium' as const },
+        { context: ContextType.SUPPORT, confidence: 0.85, urgency: 'medium' as const },
+        { context: ContextType.INFORMATIONAL, confidence: 0.9, urgency: 'low' as const },
       ]
 
       const transitions: ContextTransition[] = []

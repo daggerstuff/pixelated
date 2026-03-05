@@ -39,7 +39,7 @@ export async function getCurrentUser(
       return null
     }
 
-    const { userId } = decoded
+    const {userId} = decoded
 
     // Fetch user from Auth0
     const user = await auth0UserService.getUserById(userId)

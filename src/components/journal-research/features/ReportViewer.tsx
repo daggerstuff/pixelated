@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { useReportQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'

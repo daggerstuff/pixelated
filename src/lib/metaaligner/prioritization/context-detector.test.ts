@@ -405,9 +405,7 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).not.toBe(
-            ContextType.CLINICAL_ASSESSMENT,
-          )
+          expect(result.detectedContext).not.toBe(ContextType.CLINICAL_ASSESSMENT)
         }
       })
 
@@ -477,8 +475,7 @@ describe('ContextDetector', () => {
       })
 
       it('should not log PII in clinical assessment detection', async () => {
-        const queryWithPII =
-          'Can you diagnose John Smith, SSN 123-45-6789, for depression?'
+        const queryWithPII = 'Can you diagnose John Smith, SSN 123-45-6789, for depression?'
         mockDetectCrisis.mockResolvedValue({
           isCrisis: false,
           confidence: 0.05,

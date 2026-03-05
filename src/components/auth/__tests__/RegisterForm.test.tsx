@@ -24,9 +24,7 @@ describe('RegisterForm', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     ;(authClient.signUp.email as vi.Mock).mockImplementation(mockSignUp)
-    ;(authClient.signIn.social as vi.Mock).mockImplementation(
-      mockSignInWithOAuth,
-    )
+    ;(authClient.signIn.social as vi.Mock).mockImplementation(mockSignInWithOAuth)
     ;(authClient.useSession as vi.Mock).mockImplementation(() => ({
       data: null,
     }))

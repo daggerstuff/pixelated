@@ -22,7 +22,7 @@ export class DistributedRateLimiter {
   private readonly attackPrefix = 'attack_pattern:'
   private readonly analyticsPrefix = 'rate_analytics:'
 
-  constructor(private config: RateLimitConfig) {}
+  constructor(private config: RateLimitConfig) { }
 
   /**
    * Check if request should be rate limited
@@ -392,7 +392,10 @@ export class DistributedRateLimiter {
   /**
    * Reset counter for identifier
    */
-  async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
+  async resetCounter(
+    identifier: string,
+    rule: RateLimitRule,
+  ): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
     await redis.del(windowKey)

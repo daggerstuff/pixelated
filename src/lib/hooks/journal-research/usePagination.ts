@@ -38,7 +38,11 @@ export interface UsePaginationReturn {
 export function usePagination(
   options: UsePaginationOptions = {},
 ): UsePaginationReturn {
-  const { initialPage = 1, initialPageSize = 10, total = 0 } = options
+  const {
+    initialPage = 1,
+    initialPageSize = 10,
+    total = 0,
+  } = options
 
   const [page, setPage] = useState(initialPage)
   const [pageSize, setPageSize] = useState(initialPageSize)
@@ -52,7 +56,10 @@ export function usePagination(
   const hasNextPage = useMemo(() => page < totalPages, [page, totalPages])
   const hasPreviousPage = useMemo(() => page > 1, [page])
 
-  const startIndex = useMemo(() => (page - 1) * pageSize, [page, pageSize])
+  const startIndex = useMemo(
+    () => (page - 1) * pageSize,
+    [page, pageSize],
+  )
 
   const endIndex = useMemo(
     () => Math.min(startIndex + pageSize, totalItems),
@@ -79,14 +86,11 @@ export function usePagination(
     setPage(totalPages)
   }, [totalPages])
 
-  const handleSetPage = useCallback(
-    (newPage: number) => {
-      if (newPage >= 1 && newPage <= totalPages) {
-        setPage(newPage)
-      }
-    },
-    [totalPages],
-  )
+  const handleSetPage = useCallback((newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage)
+    }
+  }, [totalPages])
 
   const handleSetPageSize = useCallback((newPageSize: number) => {
     setPageSize(newPageSize)

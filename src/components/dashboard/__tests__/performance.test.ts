@@ -273,7 +273,9 @@ describe('Dashboard Performance Tests', () => {
   it('renders therapy charts with large dataset efficiently', () => {
     const startTime = performance.now()
 
-    render(React.createElement(AnalyticsCharts))
+    render(
+      React.createElement(AnalyticsCharts),
+    )
 
     const endTime = performance.now()
     const renderTime = endTime - startTime
@@ -412,7 +414,9 @@ describe('Dashboard Performance Tests', () => {
 
     const startTime = performance.now()
 
-    render(React.createElement(AnalyticsCharts))
+    render(
+      React.createElement(AnalyticsCharts),
+    )
 
     const endTime = performance.now()
     const renderTime = endTime - startTime
@@ -487,7 +491,9 @@ describe('Dashboard Performance Tests', () => {
 
     promises.push(
       new Promise<void>((resolve) => {
-        render(React.createElement(AnalyticsCharts))
+        render(
+          React.createElement(AnalyticsCharts),
+        )
         resolve()
       }),
     )

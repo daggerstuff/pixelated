@@ -10,9 +10,7 @@ describe('SessionCard', () => {
     expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
     expect(screen.getByText(/Started/)).toBeInTheDocument()
     expect(screen.getByText(mockSession.currentPhase)).toBeInTheDocument()
-    expect(
-      screen.getByText(`${mockSession.targetSources.length}`),
-    ).toBeInTheDocument()
+    expect(screen.getByText(`${mockSession.targetSources.length}`)).toBeInTheDocument()
   })
 
   it('displays progress percentage correctly', () => {

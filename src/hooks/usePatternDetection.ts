@@ -95,13 +95,13 @@ export const usePatternDetection = () => {
 
         return Array.isArray(patterns)
           ? patterns.map((pattern) => ({
-              patternType: pattern.patternType || 'unknown',
-              description: pattern.description || '',
-              frequency: pattern.frequency || 0.5,
-              significance: pattern.significance || 0.5,
-              suggestedResponse: pattern.suggestedResponse,
-              confidence: pattern.confidence || 0.5,
-            }))
+            patternType: pattern.patternType || 'unknown',
+            description: pattern.description || '',
+            frequency: pattern.frequency || 0.5,
+            significance: pattern.significance || 0.5,
+            suggestedResponse: pattern.suggestedResponse,
+            confidence: pattern.confidence || 0.5,
+          }))
           : []
       } catch (error: unknown) {
         console.error('Error detecting patterns:', error)

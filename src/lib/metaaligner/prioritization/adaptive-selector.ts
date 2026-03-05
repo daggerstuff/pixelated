@@ -87,11 +87,7 @@ export class AdaptiveSelector {
         detectedContext: ContextType.GENERAL,
         confidence: 0.1,
         contextualIndicators: [
-          {
-            type: 'error_fallback',
-            description: 'Context detection failed, flagged for review',
-            confidence: 0.1,
-          },
+          { type: 'error_fallback', description: 'Context detection failed, flagged for review', confidence: 0.1 },
         ],
         needsSpecialHandling: true, // Flag for human review - could be a crisis
         urgency: 'high', // Default to high urgency to force human review when detection fails
@@ -106,10 +102,7 @@ export class AdaptiveSelector {
     }
 
     // Track transitions (used in tests)
-    if (
-      this.lastDetectedContext &&
-      this.lastDetectedContext !== detection.detectedContext
-    ) {
+    if (this.lastDetectedContext && this.lastDetectedContext !== detection.detectedContext) {
       detection.metadata = detection.metadata || {}
       ;(detection.metadata as Record<string, unknown>)['transition'] = {
         from: this.lastDetectedContext,
@@ -132,8 +125,7 @@ export class AdaptiveSelector {
     let weightCalculationResult: WeightCalculationResult
 
     // If detection failed (marked with metadata.error), use exact default weights without recalculation
-    const hasDetectionError =
-      'error' in detection.metadata && detection.metadata.error !== undefined
+    const hasDetectionError = 'error' in detection.metadata && detection.metadata.error !== undefined
     if (hasDetectionError) {
       selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,
@@ -143,8 +135,7 @@ export class AdaptiveSelector {
         weights: { ...defaults },
         details: {
           strategy: 'default-fallback',
-          reason:
-            'Context detection failed - using default weights with human review flag',
+          reason: 'Context detection failed - using default weights with human review flag',
         },
       } as WeightCalculationResult
     } else {

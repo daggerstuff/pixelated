@@ -52,7 +52,9 @@ export function SharedProviders({
           {enableNotifications && (
             <NotificationProvider>{children}</NotificationProvider>
           )}
-          {enableAnalytics && <AnalyticsProvider>{children}</AnalyticsProvider>}
+          {enableAnalytics && (
+            <AnalyticsProvider>{children}</AnalyticsProvider>
+          )}
           {!enableAnalytics && !enableNotifications && children}
         </SecurityProvider>
       </ThemeProvider>

@@ -144,9 +144,7 @@ export class AnonymizationPipelineService {
       }
     } catch (error) {
       console.error('Anonymization pipeline error:', error)
-      throw new Error(`Anonymization failed: ${error.message}`, {
-        cause: error,
-      })
+      throw new Error(`Anonymization failed: ${error.message}`, { cause: error })
     }
   }
 

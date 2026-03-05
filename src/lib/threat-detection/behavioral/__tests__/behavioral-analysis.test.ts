@@ -50,17 +50,13 @@ const mockMongoClientInstance = {
 // Mock external modules
 vi.mock('ioredis', () => {
   return {
-    Redis: vi.fn(function () {
-      return mockRedisInstance
-    }),
+    Redis: vi.fn(function() { return mockRedisInstance })
   }
 })
 
 vi.mock('mongodb', () => {
   return {
-    MongoClient: vi.fn(function () {
-      return mockMongoClientInstance
-    }),
+    MongoClient: vi.fn(function() { return mockMongoClientInstance })
   }
 })
 
@@ -70,7 +66,7 @@ vi.mock('@tensorflow/tfjs', () => {
     compile: vi.fn(),
     predict: vi.fn(() => ({
       dataSync: () => [0.1],
-      dispose: vi.fn(),
+      dispose: vi.fn()
     })),
   }
 
@@ -106,14 +102,14 @@ describe('Behavioral Analysis Service', () => {
       epsilon: 1,
       delta: 1e-5,
       sensitivity: 1,
-      mechanism: 'laplace' as const,
+      mechanism: 'laplace' as const
     },
     anomalyThresholds: {
       temporal: 0.8,
       spatial: 0.8,
       sequential: 0.8,
-      frequency: 0.8,
-    },
+      frequency: 0.8
+    }
   }
 
   beforeEach(() => {
@@ -134,22 +130,20 @@ describe('Behavioral Analysis Service', () => {
   describe('User Profile Management', () => {
     it('should create behavioral profile for new user', async () => {
       const userId = 'user_123'
-      const events: any[] = [
-        {
-          eventId: 'evt_1',
-          userId,
-          timestamp: new Date(),
-          eventType: 'login',
-          sourceIp: '127.0.0.1',
-          userAgent: 'test-agent',
-          requestMethod: 'POST',
-          endpoint: '/login',
-          responseCode: 200,
-          responseTime: 100,
-          payloadSize: 100,
-          sessionId: 'sess_1',
-        },
-      ]
+      const events: any[] = [{
+        eventId: 'evt_1',
+        userId,
+        timestamp: new Date(),
+        eventType: 'login',
+        sourceIp: '127.0.0.1',
+        userAgent: 'test-agent',
+        requestMethod: 'POST',
+        endpoint: '/login',
+        responseCode: 200,
+        responseTime: 100,
+        payloadSize: 100,
+        sessionId: 'sess_1'
+      }]
 
       mockRedisInstance.setex.mockResolvedValue('OK')
 
@@ -162,28 +156,26 @@ describe('Behavioral Analysis Service', () => {
 
     it('should detect anomalies', async () => {
       const userId = 'user_123'
-      const events: any[] = [
-        {
-          eventId: 'evt_1',
-          userId,
-          timestamp: new Date(),
-          eventType: 'login',
-          sourceIp: '127.0.0.1',
-          userAgent: 'test-agent',
-          requestMethod: 'POST',
-          endpoint: '/login',
-          responseCode: 200,
-          responseTime: 100,
-          payloadSize: 100,
-          sessionId: 'sess_1',
-        },
-      ]
+      const events: any[] = [{
+        eventId: 'evt_1',
+        userId,
+        timestamp: new Date(),
+        eventType: 'login',
+        sourceIp: '127.0.0.1',
+        userAgent: 'test-agent',
+        requestMethod: 'POST',
+        endpoint: '/login',
+        responseCode: 200,
+        responseTime: 100,
+        payloadSize: 100,
+        sessionId: 'sess_1'
+      }]
 
       const profile: any = {
         userId,
         profileId: 'pid_1',
         baselineMetrics: { timeOfDayThreshold: 0.5, geographicThreshold: 0.5 },
-        anomalyThresholds: defaultConfig.anomalyThresholds,
+        anomalyThresholds: defaultConfig.anomalyThresholds
       }
 
       // Mock internal methods to avoid complex logic if needed, but integration test implies testing logic

@@ -1,6 +1,6 @@
-import {} from '@playwright/test'
+import { } from '@playwright/test'
 
-import { writeFileSync, mkdirSync } from 'fs'
+import { writeFileSync, mkdirSync, } from 'fs'
 import { join } from 'path'
 
 // Test configuration
@@ -40,7 +40,7 @@ class TestResultsCollector {
       summary: this.generateSummary(),
       details: this.results,
       recommendations: this.generateRecommendations(),
-    }
+    };
   }
 
   private generateSummary() {
@@ -343,7 +343,7 @@ class PerformanceAnalyzer {
             ? 'B'
             : 'C',
       themeSwitch: metrics.themeSwitching?.fast ? 'A' : 'B',
-    }
+    };
   }
 }
 
@@ -465,7 +465,7 @@ export class ThemeTestRunner {
       `theme-${theme}`,
       theme,
       browser,
-    )
+    );
   }
 
   generateFinalReport() {

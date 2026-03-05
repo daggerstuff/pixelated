@@ -33,9 +33,7 @@ test.describe('Journal Research Acquisition Workflow', () => {
     })
 
     // Verify acquisitions are displayed
-    const acquisitionList = page.locator(
-      'table tbody tr, [data-testid="acquisition-item"]',
-    )
+    const acquisitionList = page.locator('table tbody tr, [data-testid="acquisition-item"]')
     const acquisitionCount = await acquisitionList.count()
 
     // May be 0 if no acquisitions exist yet
@@ -44,20 +42,16 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
   test('initiates acquisition process', async ({ page }) => {
     // Look for initiate acquisition button
-    const initiateButton = page.locator(
-      'button:has-text("Acquire"), button:has-text("Start Acquisition")',
-    )
+    const initiateButton = page.locator('button:has-text("Acquire"), button:has-text("Start Acquisition")')
 
-    if ((await initiateButton.count()) > 0) {
+    if (await initiateButton.count() > 0) {
       await initiateButton.click()
 
       // Wait for acquisition form or process to start
       await page.waitForSelector('form, text=Acquiring', { timeout: 5000 })
 
       // Verify acquisition process started
-      await expect(
-        page.locator('text=Acquiring, text=Progress, text=Downloading'),
-      ).toBeVisible({ timeout: 5000 })
+      await expect(page.locator('text=Acquiring, text=Progress, text=Downloading')).toBeVisible({ timeout: 5000 })
     }
   })
 
@@ -68,10 +62,8 @@ test.describe('Journal Research Acquisition Workflow', () => {
     })
 
     // Select status filter
-    const filterSelect = page
-      .locator('select, [data-testid="status-filter"]')
-      .first()
-    if ((await filterSelect.count()) > 0) {
+    const filterSelect = page.locator('select, [data-testid="status-filter"]').first()
+    if (await filterSelect.count() > 0) {
       await filterSelect.selectOption('completed')
 
       // Wait for filter to apply
@@ -94,18 +86,13 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
   test('filters acquisitions by download failures only', async ({ page }) => {
     // Wait for filter checkbox
-    await page.waitForSelector(
-      'input[type="checkbox"][name*="failure"], [data-testid="failure-filter"]',
-      {
-        timeout: 5000,
-      },
-    )
+    await page.waitForSelector('input[type="checkbox"][name*="failure"], [data-testid="failure-filter"]', {
+      timeout: 5000,
+    })
 
     // Toggle failure filter
-    const failureCheckbox = page.locator(
-      'input[type="checkbox"][name*="failure"], [data-testid="failure-filter"]',
-    )
-    if ((await failureCheckbox.count()) > 0) {
+    const failureCheckbox = page.locator('input[type="checkbox"][name*="failure"], [data-testid="failure-filter"]')
+    if (await failureCheckbox.count() > 0) {
       await failureCheckbox.check()
 
       // Wait for filter to apply
@@ -133,11 +120,9 @@ test.describe('Journal Research Acquisition Workflow', () => {
     })
 
     // Click on first acquisition
-    const firstAcquisitionLink = page
-      .locator('table a, [data-testid="acquisition-link"]')
-      .first()
+    const firstAcquisitionLink = page.locator('table a, [data-testid="acquisition-link"]').first()
 
-    if ((await firstAcquisitionLink.count()) > 0) {
+    if (await firstAcquisitionLink.count() > 0) {
       await firstAcquisitionLink.click()
 
       // Verify acquisition detail page
@@ -152,7 +137,7 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
     const firstAcquisitionLink = page.locator('table a').first()
 
-    if ((await firstAcquisitionLink.count()) > 0) {
+    if (await firstAcquisitionLink.count() > 0) {
       await firstAcquisitionLink.click()
 
       // Wait for acquisition detail page
@@ -160,13 +145,11 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
       // Click approve button (if available and status is pending)
       const approveButton = page.locator('button:has-text("Approve")')
-      if ((await approveButton.count()) > 0) {
+      if (await approveButton.count() > 0) {
         await approveButton.click()
 
         // Verify status changed to approved
-        await expect(page.locator('text=approved')).toBeVisible({
-          timeout: 5000,
-        })
+        await expect(page.locator('text=approved')).toBeVisible({ timeout: 5000 })
       }
     }
   })
@@ -177,7 +160,7 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
     const firstAcquisitionLink = page.locator('table a').first()
 
-    if ((await firstAcquisitionLink.count()) > 0) {
+    if (await firstAcquisitionLink.count() > 0) {
       await firstAcquisitionLink.click()
 
       // Wait for acquisition detail page
@@ -185,13 +168,11 @@ test.describe('Journal Research Acquisition Workflow', () => {
 
       // Click reject button (if available and status is pending)
       const rejectButton = page.locator('button:has-text("Reject")')
-      if ((await rejectButton.count()) > 0) {
+      if (await rejectButton.count() > 0) {
         await rejectButton.click()
 
         // Verify status changed or rejection message shown
-        await expect(page.locator('text=rejected, text=Rejected')).toBeVisible({
-          timeout: 5000,
-        })
+        await expect(page.locator('text=rejected, text=Rejected')).toBeVisible({ timeout: 5000 })
       }
     }
   })
@@ -201,17 +182,11 @@ test.describe('Journal Research Acquisition Workflow', () => {
     await page.waitForSelector('table', { timeout: 5000 })
 
     // Look for in-progress acquisitions
-    const inProgressRows = page.locator(
-      'table tbody tr:has-text("in-progress"), table tbody tr:has-text("downloading")',
-    )
+    const inProgressRows = page.locator('table tbody tr:has-text("in-progress"), table tbody tr:has-text("downloading")')
 
-    if ((await inProgressRows.count()) > 0) {
+    if (await inProgressRows.count() > 0) {
       // Verify progress indicator is shown
-      await expect(
-        inProgressRows
-          .first()
-          .locator('text=Progress, text=%, [data-testid="progress"]'),
-      ).toBeVisible()
+      await expect(inProgressRows.first().locator('text=Progress, text=%, [data-testid="progress"]')).toBeVisible()
     }
   })
 })
