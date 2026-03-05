@@ -2,7 +2,15 @@ import { env } from '../../config/env.config'
 import { AnalyticsService } from '../../lib/services/analytics/AnalyticsService'
 
 // @vitest-environment node
-import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest'
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from 'vitest'
 
 import { WebSocketServer, WebSocket } from 'ws'
 
@@ -21,7 +29,7 @@ vi.mock('../../lib/services/analytics/AnalyticsService', async () => {
   const cleanup = vi.fn()
 
   return {
-    AnalyticsService: vi.fn().mockImplementation(function() {
+    AnalyticsService: vi.fn().mockImplementation(function () {
       return {
         processEvents,
         registerClient,
@@ -64,8 +72,12 @@ const mockWsClientInstance = {
   readyState: 1, // WebSocket.OPEN
 }
 vi.mock('ws', () => ({
-  WebSocketServer: vi.fn(function() { return mockWssInstance }),
-  WebSocket: vi.fn(function() { return mockWsClientInstance }),
+  WebSocketServer: vi.fn(function () {
+    return mockWssInstance
+  }),
+  WebSocket: vi.fn(function () {
+    return mockWsClientInstance
+  }),
 }))
 // --- End Mock ---
 
@@ -92,12 +104,11 @@ describe('analytics-worker', () => {
     vi.clearAllMocks()
     vi.resetModules()
 
-      // Reset environment variables
-      ; (env as any).ANALYTICS_WS_PORT = '8083'
+    // Reset environment variables
+    ;(env as any).ANALYTICS_WS_PORT = '8083'
 
     // Initialize mocks for services used BY the worker
     mockAnalyticsService = new AnalyticsService() as any
-
 
     // Clear the WebSocketServer mock instance's calls
     vi.mocked(mockWssInstance.on).mockClear()
@@ -227,7 +238,7 @@ describe('analytics-worker', () => {
   describe('environment configuration', () => {
     it('should use default WebSocket port if not configured', async () => {
       // Remove port from environment
-      ; (env as any).ANALYTICS_WS_PORT = undefined
+      ;(env as any).ANALYTICS_WS_PORT = undefined
 
       // Import worker module
       await import('../analytics-worker')
@@ -239,7 +250,7 @@ describe('analytics-worker', () => {
 
     it('should use configured WebSocket port', async () => {
       // Set custom port in environment
-      ; (env as any).ANALYTICS_WS_PORT = '8090'
+      ;(env as any).ANALYTICS_WS_PORT = '8090'
 
       // Import worker module
       await import('../analytics-worker')
@@ -288,7 +299,9 @@ describe('analytics-worker', () => {
       )
 
       // Assert
-      expect(vi.mocked(mockAnalyticsService.registerClient)).toHaveBeenCalledWith(
+      expect(
+        vi.mocked(mockAnalyticsService.registerClient),
+      ).toHaveBeenCalledWith(
         'test-user',
         mockWsClient, // Check it was called with the specific client instance
       )
@@ -319,7 +332,9 @@ describe('analytics-worker', () => {
 
       messageHandler.call(mockWsClient, JSON.stringify({ type: 'invalid' }))
 
-      expect(vi.mocked(mockAnalyticsService.registerClient)).not.toHaveBeenCalled()
+      expect(
+        vi.mocked(mockAnalyticsService.registerClient),
+      ).not.toHaveBeenCalled()
       expect(vi.mocked(mockWsClient.close)).toHaveBeenCalled()
     })
 

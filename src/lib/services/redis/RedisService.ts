@@ -10,7 +10,6 @@ import { Redis } from 'ioredis'
 import { RedisErrorCode, RedisServiceError } from './types.js'
 import * as fs from 'fs'
 
-
 const logger = getHipaaCompliantLogger('general')
 
 /**
@@ -44,7 +43,9 @@ export class RedisService extends EventEmitter implements IRedisService {
     const hasUpstashUrl = Boolean(process.env['UPSTASH_REDIS_REST_URL'])
     const hasRedisUrl = Boolean(process.env['REDIS_URL'])
 
-    logger.debug(`[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`)
+    logger.debug(
+      `[RedisService] Config check: hasUpstashUrl=${hasUpstashUrl}, hasRedisUrl=${hasRedisUrl}`,
+    )
 
     // If environment variables exist, use them regardless of what was in config
     if (hasUpstashUrl) {
@@ -58,13 +59,17 @@ export class RedisService extends EventEmitter implements IRedisService {
         try {
           const password = fs.readFileSync(redisPasswordFile, 'utf8').trim()
           if (password) {
-            logger.info(`[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`)
+            logger.info(
+              `[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`,
+            )
             // Reconstruct URL with password if it doesn't already have one
             const urlObj = new URL(this.config.url)
 
             // ALWAYS use the file password if available, as it's the source of truth
             this.config.password = password
-            console.log(`[RedisService] Password loaded from ${redisPasswordFile}`)
+            console.log(
+              `[RedisService] Password loaded from ${redisPasswordFile}`,
+            )
 
             if (!urlObj.password) {
               urlObj.password = password
@@ -79,7 +84,6 @@ export class RedisService extends EventEmitter implements IRedisService {
         }
       }
     }
-
 
     // After all resolution, if we still don't have a URL and we're not in development
     if (!this.config.url && !hasUpstashUrl && !hasRedisUrl) {
@@ -402,7 +406,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       info: async () => 'connected_clients:1\nblocked_clients:0',
       publish: async () => 0,
       quit: async () => 'OK',
-      connect: async () => { },
+      connect: async () => {},
       on: (event: string, callback: (...args: unknown[]) => void) => {
         // Emit the event immediately to simulate connection events
         if (['connect', 'ready'].includes(event)) {

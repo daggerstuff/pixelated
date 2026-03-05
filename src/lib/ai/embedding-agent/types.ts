@@ -289,4 +289,3 @@ export interface CacheClearResult {
   /** Status message */
   message: string
 }
-

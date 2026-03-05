@@ -11,4 +11,3 @@ export function logAudit(action: string, details: Record<string, any>) {
   }
   fs.appendFileSync(AUDIT_LOG_PATH, JSON.stringify(entry) + '\n')
 }
-

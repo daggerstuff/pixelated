@@ -5,7 +5,12 @@
  * This middleware should be used with Astro's middleware system.
  */
 
-import { trace, context as otelContext, SpanStatusCode, SpanKind } from '@opentelemetry/api'
+import {
+  trace,
+  context as otelContext,
+  SpanStatusCode,
+  SpanKind,
+} from '@opentelemetry/api'
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { MiddlewareHandler } from 'astro'
@@ -27,7 +32,9 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
 
   // Handle static prerendering scenarios where request or headers might not be available
   if (!context?.request) {
-    logger.debug('Skipping tracing for static prerendering - no request object available')
+    logger.debug(
+      'Skipping tracing for static prerendering - no request object available',
+    )
     return next()
   }
 
@@ -51,7 +58,11 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   // Determine if it's safe to access request headers
   // In Astro, accessing headers on a prerendered page during build triggers a warning
   const isBuild = import.meta.env.COMMAND === 'build'
-  const canAccessHeaders = !isBuild && !!req && 'headers' in req && typeof req.headers?.get === 'function'
+  const canAccessHeaders =
+    !isBuild &&
+    !!req &&
+    'headers' in req &&
+    typeof req.headers?.get === 'function'
 
   // Extract trace context from headers only if safe
   const traceParent = canAccessHeaders ? req.headers.get('traceparent') : null
@@ -66,8 +77,12 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [SemanticAttributes.HTTP_SCHEME]: url.protocol.replace(':', ''),
       [SemanticAttributes.HTTP_TARGET]: url.pathname + url.search,
       [SemanticAttributes.HTTP_ROUTE]: url.pathname,
-      'http.user_agent': canAccessHeaders ? (req.headers.get('user-agent') || '') : '',
-      'http.request_id': canAccessHeaders ? (req.headers.get('x-request-id') || '') : '',
+      'http.user_agent': canAccessHeaders
+        ? req.headers.get('user-agent') || ''
+        : '',
+      'http.request_id': canAccessHeaders
+        ? req.headers.get('x-request-id') || ''
+        : '',
     },
   })
 
@@ -137,7 +152,9 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
     })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    )
     span.setAttribute('http.response.duration_ms', duration)
 
     logger.error('Request failed in tracing middleware', {

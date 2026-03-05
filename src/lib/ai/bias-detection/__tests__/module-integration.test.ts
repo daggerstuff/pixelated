@@ -7,7 +7,7 @@ import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
 // Mock the entire Python bridge to avoid network calls
 vi.mock('../python-bridge', () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function() {
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
     return {
       initialize: vi.fn().mockResolvedValue(undefined),
       analyzeSession: vi.fn().mockResolvedValue({
@@ -49,7 +49,7 @@ vi.mock('../python-bridge', () => ({
       }),
       storeMetrics: vi.fn().mockResolvedValue(undefined),
       getAlertStatistics: vi.fn().mockResolvedValue({ total: 10, resolved: 8 }),
-    };
+    }
   }),
 }))
 

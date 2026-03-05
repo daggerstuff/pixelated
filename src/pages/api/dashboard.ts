@@ -44,7 +44,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
         id: user.id,
         email: user.email,
         role: user.role,
-      }
+      },
     }
 
     return new Response(JSON.stringify(mockData), {

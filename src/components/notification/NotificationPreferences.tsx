@@ -125,7 +125,10 @@ export function NotificationPreferences({
           </div>
 
           <div className="space-y-2">
-            <Label id="notification-frequency-label" htmlFor="notification-frequency">
+            <Label
+              id="notification-frequency-label"
+              htmlFor="notification-frequency"
+            >
               Notification Frequency
             </Label>
             <Select
@@ -135,7 +138,10 @@ export function NotificationPreferences({
               }
               placeholder="Select frequency"
             >
-              <SelectTrigger id="notification-frequency" aria-labelledby="notification-frequency-label">
+              <SelectTrigger
+                id="notification-frequency"
+                aria-labelledby="notification-frequency-label"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

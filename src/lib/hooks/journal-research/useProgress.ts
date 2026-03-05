@@ -1,11 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  getProgress,
-  getProgressMetrics,
-} from '@/lib/api/journal-research'
-import {
-  journalResearchQueryKeys,
-} from '@/lib/api/journal-research/react-query'
+import { getProgress, getProgressMetrics } from '@/lib/api/journal-research'
+import { journalResearchQueryKeys } from '@/lib/api/journal-research/react-query'
 
 export const useProgressQuery = (
   sessionId: string | null,
@@ -25,9 +20,7 @@ export const useProgressMetricsQuery = (
 ) => {
   const { enabled = true, refetchInterval } = options
   return useQuery({
-    queryKey: journalResearchQueryKeys.progress.metrics(
-      sessionId ?? 'unknown',
-    ),
+    queryKey: journalResearchQueryKeys.progress.metrics(sessionId ?? 'unknown'),
     queryFn: () => getProgressMetrics(sessionId ?? ''),
     enabled: Boolean(sessionId) && enabled,
     refetchInterval,

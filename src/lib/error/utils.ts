@@ -35,11 +35,7 @@ export function normalizeError(
       const path = err.path.join('.')
       fieldErrors[path] = err.message
     })
-    return new ValidationError(
-      'Validation failed',
-      fieldErrors,
-      context,
-    )
+    return new ValidationError('Validation failed', fieldErrors, context)
   }
 
   if (error instanceof TypeError || error instanceof ReferenceError) {
@@ -215,4 +211,3 @@ export function logError(error: AppError, additionalContext?: ErrorContext) {
       break
   }
 }
-

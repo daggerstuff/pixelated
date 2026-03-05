@@ -39,9 +39,22 @@ export function useOfflineDetection({
     if (typeof navigator === 'undefined') return
 
     const isOnline = navigator.onLine
-    type NetworkInformationLike = { type?: string; effectiveType?: string; downlink?: number; rtt?: number; saveData?: boolean; addEventListener?: (type: string, listener: () => void) => void; removeEventListener?: (type: string, listener: () => void) => void }
-    const nav = navigator as unknown as { connection?: NetworkInformationLike; mozConnection?: NetworkInformationLike; webkitConnection?: NetworkInformationLike }
-    const connection = nav.connection || nav.mozConnection || nav.webkitConnection
+    type NetworkInformationLike = {
+      type?: string
+      effectiveType?: string
+      downlink?: number
+      rtt?: number
+      saveData?: boolean
+      addEventListener?: (type: string, listener: () => void) => void
+      removeEventListener?: (type: string, listener: () => void) => void
+    }
+    const nav = navigator as unknown as {
+      connection?: NetworkInformationLike
+      mozConnection?: NetworkInformationLike
+      webkitConnection?: NetworkInformationLike
+    }
+    const connection =
+      nav.connection || nav.mozConnection || nav.webkitConnection
 
     setNetworkState({
       isOnline,
@@ -70,7 +83,9 @@ export function useOfflineDetection({
 
     // Listen for connection changes if available
     if (enableNetworkInfo) {
-      const nav2 = navigator as unknown as { connection?: NetworkInformationLike }
+      const nav2 = navigator as unknown as {
+        connection?: NetworkInformationLike
+      }
       const connection = nav2.connection
       if (connection) {
         connection.addEventListener('change', updateNetworkState)
@@ -82,8 +97,10 @@ export function useOfflineDetection({
       window.removeEventListener('offline', updateNetworkState)
 
       if (enableNetworkInfo) {
-        const nav2 = navigator as unknown as { connection?: NetworkInformationLike }
-      const connection = nav2.connection
+        const nav2 = navigator as unknown as {
+          connection?: NetworkInformationLike
+        }
+        const connection = nav2.connection
         if (connection) {
           connection.removeEventListener('change', updateNetworkState)
         }

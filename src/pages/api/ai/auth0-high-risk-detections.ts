@@ -16,10 +16,13 @@ export const GET = async ({ request, url }) => {
     const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
-      return new Response(JSON.stringify({ error: 'Authentication required' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Validate token

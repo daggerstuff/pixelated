@@ -1,8 +1,5 @@
 import { PatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import type {
-  EmotionAnalysis,
-  TherapySession,
-} from '@/lib/ai/emotions/types'
+import type { EmotionAnalysis, TherapySession } from '@/lib/ai/emotions/types'
 import type { IRedisService } from '../types'
 
 // Mock FHE service for testing
@@ -93,7 +90,11 @@ const mockRedisService: IRedisService = {
   deletePattern: function (_pattern: string): Promise<void> {
     throw new Error('Function not implemented.')
   },
-  hset: function (_key: string, _field: string, _value: string): Promise<number> {
+  hset: function (
+    _key: string,
+    _field: string,
+    _value: string,
+  ): Promise<number> {
     throw new Error('Function not implemented.')
   },
   hget: function (_key: string, _field: string): Promise<string | null> {
@@ -108,7 +109,11 @@ const mockRedisService: IRedisService = {
   hlen: function (_key: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  zadd: function (_key: string, _score: number, _member: string): Promise<number> {
+  zadd: function (
+    _key: string,
+    _score: number,
+    _member: string,
+  ): Promise<number> {
     throw new Error('Function not implemented.')
   },
   zrem: function (_key: string, _member: string): Promise<number> {

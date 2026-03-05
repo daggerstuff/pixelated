@@ -123,5 +123,3 @@ export const useIntegrationSelection = () =>
     toggleComparePlanId: state.toggleComparePlanId,
     clearCompare: state.clearCompare,
   }))
-
-

@@ -6,9 +6,8 @@ import {
   TherapySessionSchema,
   ChatSessionSchema,
   EmotionStateSchema,
-  MentalHealthAnalysisSchema
-} from '@/lib/ai/services/outcome-recommendation-types';
-
+  MentalHealthAnalysisSchema,
+} from '@/lib/ai/services/outcome-recommendation-types'
 
 // Input schema for validation
 const ForecastRequestSchema = z.object({

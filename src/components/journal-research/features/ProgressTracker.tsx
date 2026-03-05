@@ -1,4 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { ProgressCharts } from '../charts/ProgressCharts'
 import { ProgressBar } from '../shared/ProgressBar'
 import {
@@ -13,10 +18,12 @@ export interface ProgressTrackerProps {
   className?: string
 }
 
-export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) {
-  const { data: progress, isLoading: progressLoading } = useProgressQuery(
-    sessionId,
-  )
+export function ProgressTracker({
+  sessionId,
+  className,
+}: ProgressTrackerProps) {
+  const { data: progress, isLoading: progressLoading } =
+    useProgressQuery(sessionId)
   const { data: metrics, isLoading: metricsLoading } = useProgressMetricsQuery(
     sessionId,
     {
@@ -45,7 +52,8 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
           targets.sources_identified > 0
             ? Math.min(
                 100,
-                (currentMetrics.sourcesIdentified / targets.sources_identified) *
+                (currentMetrics.sourcesIdentified /
+                  targets.sources_identified) *
                   100,
               )
             : 0,
@@ -57,7 +65,8 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
           targets.datasets_evaluated > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsEvaluated / targets.datasets_evaluated) *
+                (currentMetrics.datasetsEvaluated /
+                  targets.datasets_evaluated) *
                   100,
               )
             : 0,
@@ -281,4 +290,3 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
     </div>
   )
 }
-

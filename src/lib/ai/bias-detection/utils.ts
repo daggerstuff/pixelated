@@ -112,9 +112,9 @@ export function validateTherapeuticSession(session: any): TherapeuticSession {
   const normalizeDate = (d: any) => (typeof d === 'string' ? new Date(d) : d)
   const aiResponses = Array.isArray(session.aiResponses)
     ? session.aiResponses.map((r: any) => ({
-      ...r,
-      timestamp: normalizeDate(r.timestamp),
-    }))
+        ...r,
+        timestamp: normalizeDate(r.timestamp),
+      }))
     : []
   const normalized: TherapeuticSession = {
     ...session,

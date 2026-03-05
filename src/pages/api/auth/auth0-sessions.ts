@@ -58,7 +58,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: HTTP_STATUS.UNAUTHORIZED,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -71,7 +71,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: HTTP_STATUS.UNAUTHORIZED,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -79,10 +79,13 @@ export const GET: APIRoute = async ({ request }) => {
     const user = await getUserById(validation.userId!)
 
     if (!user) {
-      return new Response(JSON.stringify({ error: ERROR_MESSAGES.USER_NOT_FOUND }), {
-        status: HTTP_STATUS.UNAUTHORIZED,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: ERROR_MESSAGES.USER_NOT_FOUND }),
+        {
+          status: HTTP_STATUS.UNAUTHORIZED,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Parse query parameters
@@ -105,7 +108,7 @@ export const GET: APIRoute = async ({ request }) => {
           {
             status: HTTP_STATUS.BAD_REQUEST,
             headers: { 'Content-Type': 'application/json' },
-          }
+          },
         )
       }
     }
@@ -118,7 +121,7 @@ export const GET: APIRoute = async ({ request }) => {
           {
             status: HTTP_STATUS.BAD_REQUEST,
             headers: { 'Content-Type': 'application/json' },
-          }
+          },
         )
       }
     }
@@ -131,7 +134,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: HTTP_STATUS.BAD_REQUEST,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -164,7 +167,7 @@ export const GET: APIRoute = async ({ request }) => {
             'auth.sessions.forbidden',
             user.id,
             'auth-sessions',
-            { action: 'get_sessions', clientId, reason: 'no_access_to_client' }
+            { action: 'get_sessions', clientId, reason: 'no_access_to_client' },
           )
 
           return new Response(
@@ -172,7 +175,7 @@ export const GET: APIRoute = async ({ request }) => {
             {
               status: HTTP_STATUS.FORBIDDEN,
               headers: { 'Content-Type': 'application/json' },
-            }
+            },
           )
         }
       }
@@ -204,7 +207,7 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.sessions.access',
       user.id,
       'auth-sessions',
-      { action: 'get_sessions', count: limitedSessions.length, filter }
+      { action: 'get_sessions', count: limitedSessions.length, filter },
     )
 
     logger.info('Returning sessions', {
@@ -231,7 +234,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -242,7 +245,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

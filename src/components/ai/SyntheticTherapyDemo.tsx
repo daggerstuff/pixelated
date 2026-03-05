@@ -638,7 +638,7 @@ export default function SyntheticTherapyDemo() {
                         <Badge
                           variant={
                             selectedConversation.accuracyScore &&
-                              selectedConversation.accuracyScore >= 0.7
+                            selectedConversation.accuracyScore >= 0.7
                               ? 'default'
                               : 'destructive'
                           }

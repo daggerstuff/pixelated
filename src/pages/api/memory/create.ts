@@ -21,7 +21,7 @@ export const POST = async ({ request, cookies }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
@@ -40,18 +40,15 @@ export const POST = async ({ request, cookies }) => {
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 
     // Create memory
-    const result = await memoryService.createMemory(
-      content,
-      {
-        userId: user.id,
-        ...metadata,
-      }
-    )
+    const result = await memoryService.createMemory(content, {
+      userId: user.id,
+      ...metadata,
+    })
 
     return new Response(JSON.stringify(result), {
       status: 201,
@@ -72,7 +69,7 @@ export const POST = async ({ request, cookies }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
     )
   }
 }

@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Setup
- * 
+ *
  * Initializes distributed tracing for the application.
  * This should be called early in the application startup process.
  */
@@ -23,7 +23,7 @@ let isInitialized = false
 
 /**
  * Initialize OpenTelemetry tracing
- * 
+ *
  * This should be called once during application startup, before any other
  * modules that need tracing are loaded.
  */
@@ -56,11 +56,11 @@ export function initializeTracing(): void {
       config.exporter.type === 'console'
         ? new ConsoleSpanExporter()
         : new OTLPTraceExporter({
-          url: config.exporter.endpoint
-            ? `${config.exporter.endpoint}/v1/traces`
-            : undefined,
-          headers: config.exporter.headers,
-        })
+            url: config.exporter.endpoint
+              ? `${config.exporter.endpoint}/v1/traces`
+              : undefined,
+            headers: config.exporter.headers,
+          })
 
     // Create metric exporter
     const metricExporter = new OTLPMetricExporter({
@@ -71,9 +71,7 @@ export function initializeTracing(): void {
     })
 
     // Create sampler based on configuration
-    const sampler = new TraceIdRatioBasedSampler(
-      getSamplerConfig(config).ratio,
-    )
+    const sampler = new TraceIdRatioBasedSampler(getSamplerConfig(config).ratio)
 
     // Create span processor
     const spanProcessor = new BatchSpanProcessor(traceExporter, {
@@ -133,7 +131,7 @@ export function initializeTracing(): void {
 
 /**
  * Shutdown tracing gracefully
- * 
+ *
  * This should be called during application shutdown to ensure all
  * spans are exported before the process exits.
  */

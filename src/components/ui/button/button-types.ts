@@ -33,9 +33,10 @@ export interface ButtonBaseProps {
 }
 
 export interface ButtonProps
-  extends ButtonBaseProps,
-  Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
-  VariantProps<typeof buttonVariants> {
+  extends
+    ButtonBaseProps,
+    Omit<ComponentProps<'button'>, keyof ButtonBaseProps>,
+    VariantProps<typeof buttonVariants> {
   /** The variant style to use */
   variant?: ButtonVariant
   /** The size of the button */

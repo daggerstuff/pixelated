@@ -117,11 +117,9 @@ export class ContactService {
         'templates',
         'email',
       )
-      const htmlPath = securePathJoin(
-        templatesDir,
-        `${validatedName}.html`,
-        { allowedExtensions: ['.html'] },
-      )
+      const htmlPath = securePathJoin(templatesDir, `${validatedName}.html`, {
+        allowedExtensions: ['.html'],
+      })
       const html = await readFile(htmlPath, 'utf-8')
 
       // Generate text version from HTML (basic conversion)

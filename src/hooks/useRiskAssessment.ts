@@ -43,7 +43,12 @@ export const useRiskAssessment = () => {
         } else {
           analysisText = response
         }
-        const parsed = JSON.parse(analysisText) as { category?: string; factors?: string[]; requiresExpert?: boolean; confidence?: number }
+        const parsed = JSON.parse(analysisText) as {
+          category?: string
+          factors?: string[]
+          requiresExpert?: boolean
+          confidence?: number
+        }
 
         return {
           category: parsed.category || 'low',

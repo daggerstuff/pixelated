@@ -8,8 +8,9 @@ import type {
   SortDirection,
 } from './table-types'
 
-export interface TableProps<T extends TableRowData>
-  extends React.HTMLAttributes<HTMLTableElement> {
+export interface TableProps<
+  T extends TableRowData,
+> extends React.HTMLAttributes<HTMLTableElement> {
   /** Column definitions */
   columns: TableColumn<T>[]
   /** Data source */
@@ -186,8 +187,7 @@ function Table<T extends TableRowData>({
   )
 }
 
-export interface TableHeaderProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
+export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
   className?: string
 }
 
@@ -200,8 +200,7 @@ function TableHeader({ className, ...props }: TableHeaderProps) {
   )
 }
 
-export interface TableBodyProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
+export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
   className?: string
 }
 
@@ -214,8 +213,7 @@ function TableBody({ className, ...props }: TableBodyProps) {
   )
 }
 
-export interface TableFooterProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
+export interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
   className?: string
 }
 
@@ -229,7 +227,8 @@ function TableFooter({ className, ...props }: TableFooterProps) {
 }
 
 export interface TableRowProps
-  extends React.HTMLAttributes<HTMLTableRowElement>,
+  extends
+    React.HTMLAttributes<HTMLTableRowElement>,
     Pick<TableRowData, 'selected' | 'disabled'> {
   className?: string
 }
@@ -258,8 +257,7 @@ function TableRow({
   )
 }
 
-export interface TableHeadProps
-  extends React.ThHTMLAttributes<HTMLTableCellElement> {
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   /** Whether the column is sortable */
   sortable?: boolean
   /** Whether the column is currently sorted ascending */
@@ -377,8 +375,7 @@ function TableHead({
   )
 }
 
-export interface TableCellProps
-  extends React.TdHTMLAttributes<HTMLTableCellElement> {
+export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
   /** Cell alignment */
   align?: 'left' | 'center' | 'right'
   /** Whether to hide on mobile */
@@ -408,8 +405,7 @@ function TableCell({
   )
 }
 
-export interface TablePaginationProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface TablePaginationProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Current page (1-based) */
   currentPage: number
   /** Total number of pages */

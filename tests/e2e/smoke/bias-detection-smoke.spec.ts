@@ -45,7 +45,10 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
 
     // Helper function to detect Cloudflare challenge pages
     const isCloudflareChallenge = async (): Promise<boolean> => {
-      const bodyText = await page.locator('body').textContent().catch(() => '')
+      const bodyText = await page
+        .locator('body')
+        .textContent()
+        .catch(() => '')
       const title = await page.title().catch(() => '')
       const url = page.url()
 
@@ -89,9 +92,12 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
     // Wait for the dashboard heading to ensure page is interactive
     // Use a more flexible check that allows for Cloudflare interference
     try {
-      await expect(page.locator('body')).toContainText(/bias detection dashboard/i, {
-        timeout: 15000,
-      })
+      await expect(page.locator('body')).toContainText(
+        /bias detection dashboard/i,
+        {
+          timeout: 15000,
+        },
+      )
     } catch (error) {
       // If Cloudflare challenge appears after initial load, skip the test
       if (await isCloudflareChallenge()) {
@@ -120,9 +126,12 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
 
     // Wait for content to be visible after reload
     try {
-      await expect(page.locator('body')).toContainText(/bias detection dashboard/i, {
-        timeout: 15000,
-      })
+      await expect(page.locator('body')).toContainText(
+        /bias detection dashboard/i,
+        {
+          timeout: 15000,
+        },
+      )
     } catch (error) {
       // Final check for Cloudflare challenge
       if (await isCloudflareChallenge()) {
@@ -148,7 +157,7 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
         !error.includes('Content-Security-Policy') && // Firefox formatting
         !error.includes('violates the following') &&
         !error.includes('MIME type') && // Ignore MIME type mismatches (often analytics)
-        !error.includes('speed-insights') // Ignore Speed Insights script errors
+        !error.includes('speed-insights'), // Ignore Speed Insights script errors
     )
 
     expect(criticalErrors).toHaveLength(0)

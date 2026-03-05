@@ -16,12 +16,16 @@ describe('SessionList', () => {
   it('displays sessions in table', () => {
     render(<SessionList sessions={mockSessionList} />)
 
-    expect(screen.getByText(mockSessionList.items[0].sessionId)).toBeInTheDocument()
+    expect(
+      screen.getByText(mockSessionList.items[0].sessionId),
+    ).toBeInTheDocument()
   })
 
   it('calls onSessionClick when session is clicked', () => {
     const handleClick = vi.fn()
-    render(<SessionList sessions={mockSessionList} onSessionClick={handleClick} />)
+    render(
+      <SessionList sessions={mockSessionList} onSessionClick={handleClick} />,
+    )
 
     const sessionLink = screen.getByText(mockSessionList.items[0].sessionId)
     fireEvent.click(sessionLink)
@@ -130,4 +134,3 @@ describe('SessionList', () => {
     expect(listContainer).toBeInTheDocument()
   })
 })
-

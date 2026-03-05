@@ -6,7 +6,10 @@ import {
   type ObjectiveSwitcherConfig,
 } from './objective-switcher'
 import { ContextType } from '../core/objectives'
-import type { ContextEvent, ContextTransition } from './context-transition-detector'
+import type {
+  ContextEvent,
+  ContextTransition,
+} from './context-transition-detector'
 import type { ObjectivePriority } from './context-objective-mapping'
 
 describe('ObjectiveSwitcher', () => {
@@ -85,7 +88,9 @@ describe('ObjectiveSwitcher', () => {
 
       const objectives = switcher.getObjectives()
       expect(objectives.length).toBeGreaterThan(0)
-      expect(switcher.getCurrentContext()?.contextType).toBe(ContextType.EDUCATIONAL)
+      expect(switcher.getCurrentContext()?.contextType).toBe(
+        ContextType.EDUCATIONAL,
+      )
     })
 
     it('should not switch when transition not detected', async () => {
@@ -140,9 +145,9 @@ describe('ObjectiveSwitcher', () => {
 
       const objectives = switcher.getObjectives()
       expect(objectives.length).toBeGreaterThan(0)
-      
+
       // Crisis should prioritize safety
-      const safetyObj = objectives.find(obj => obj.key === 'safety')
+      const safetyObj = objectives.find((obj) => obj.key === 'safety')
       expect(safetyObj).toBeDefined()
     })
 
@@ -205,7 +210,7 @@ describe('ObjectiveSwitcher', () => {
       await switcher.onContextTransition(transition)
 
       // Allow async notifications to complete
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
       expect(observerMock).toHaveBeenCalled()
       const callArgs = observerMock.mock.calls[0]
@@ -244,7 +249,7 @@ describe('ObjectiveSwitcher', () => {
       }
 
       await switcher.onContextTransition(transition)
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
       expect(observer1).toHaveBeenCalled()
       expect(observer2).toHaveBeenCalled()
@@ -278,7 +283,7 @@ describe('ObjectiveSwitcher', () => {
       }
 
       await switcher.onContextTransition(transition)
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
       expect(observer).not.toHaveBeenCalled()
     })
@@ -311,7 +316,9 @@ describe('ObjectiveSwitcher', () => {
       }
 
       // Should not throw
-      await expect(switcher.onContextTransition(transition)).resolves.not.toThrow()
+      await expect(
+        switcher.onContextTransition(transition),
+      ).resolves.not.toThrow()
     })
   })
 
@@ -361,7 +368,7 @@ describe('ObjectiveSwitcher', () => {
       ]
 
       // Fire both transitions simultaneously
-      await Promise.all(transitions.map(t => switcher.onContextTransition(t)))
+      await Promise.all(transitions.map((t) => switcher.onContextTransition(t)))
 
       // Should have valid state (last transition should win)
       const currentContext = switcher.getCurrentContext()
@@ -379,14 +386,16 @@ describe('ObjectiveSwitcher', () => {
         transitions.push({
           from: {
             turnId: i,
-            contextType: i % 2 === 0 ? ContextType.GENERAL : ContextType.EDUCATIONAL,
+            contextType:
+              i % 2 === 0 ? ContextType.GENERAL : ContextType.EDUCATIONAL,
             confidence: 0.8,
             urgency: 'low',
             timestamp: Date.now() + i * 100,
           },
           to: {
             turnId: i + 1,
-            contextType: i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT,
+            contextType:
+              i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT,
             confidence: 0.85,
             urgency: 'medium',
             timestamp: Date.now() + (i + 1) * 100,
@@ -399,7 +408,7 @@ describe('ObjectiveSwitcher', () => {
       }
 
       // Fire all transitions rapidly
-      await Promise.all(transitions.map(t => switcher.onContextTransition(t)))
+      await Promise.all(transitions.map((t) => switcher.onContextTransition(t)))
 
       // All should be processed (check telemetry)
       const telemetry = switcher.getTelemetry()
@@ -421,8 +430,12 @@ describe('ObjectiveSwitcher', () => {
           },
           to: {
             turnId: i + 1,
-            contextType: i % 3 === 0 ? ContextType.EDUCATIONAL : 
-                        i % 3 === 1 ? ContextType.SUPPORT : ContextType.INFORMATIONAL,
+            contextType:
+              i % 3 === 0
+                ? ContextType.EDUCATIONAL
+                : i % 3 === 1
+                  ? ContextType.SUPPORT
+                  : ContextType.INFORMATIONAL,
             confidence: 0.85,
             urgency: 'medium',
             timestamp: Date.now() + (i + 1) * 50,
@@ -484,14 +497,16 @@ describe('ObjectiveSwitcher', () => {
         const transition: ContextTransition = {
           from: {
             turnId: i,
-            contextType: i % 2 === 0 ? ContextType.GENERAL : ContextType.EDUCATIONAL,
+            contextType:
+              i % 2 === 0 ? ContextType.GENERAL : ContextType.EDUCATIONAL,
             confidence: 0.7,
             urgency: 'low',
             timestamp: Date.now() + i * 1000,
           },
           to: {
             turnId: i + 1,
-            contextType: i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT,
+            contextType:
+              i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT,
             confidence: 0.9,
             urgency: 'low',
             timestamp: Date.now() + (i + 1) * 1000,
@@ -566,7 +581,7 @@ describe('ObjectiveSwitcher', () => {
       }
 
       await switcher.onContextTransition(transition)
-      await new Promise(resolve => setTimeout(resolve, 10))
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
       const telemetry = switcher.getTelemetry()
       expect(telemetry.observer_notifications).toBe(1)
@@ -729,7 +744,7 @@ describe('ObjectiveSwitcher', () => {
   describe('getObjectives', () => {
     it('should return read-only objectives', () => {
       const objectives = switcher.getObjectives()
-      
+
       // Should be frozen
       expect(Object.isFrozen(objectives)).toBe(true)
     })
@@ -760,9 +775,9 @@ describe('ObjectiveSwitcher', () => {
 
       const objectives = switcher.getObjectives()
       expect(objectives.length).toBeGreaterThan(0)
-      
+
       // Should have informativeness high for educational context
-      const infoObj = objectives.find(obj => obj.key === 'informativeness')
+      const infoObj = objectives.find((obj) => obj.key === 'informativeness')
       expect(infoObj).toBeDefined()
     })
   })

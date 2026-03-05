@@ -19,7 +19,6 @@ import {
 } from 'lucide-react'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 
-
 export interface PatientRiskData {
   id: string
   name: string

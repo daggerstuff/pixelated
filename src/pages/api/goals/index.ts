@@ -57,7 +57,7 @@ export const POST = async ({ request }: { request: any }) => {
         JSON.stringify({
           details: parsed.error.issues,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     const now = Date.now()

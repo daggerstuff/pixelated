@@ -64,5 +64,3 @@ export const useJournalSessionStore = create<SessionStoreState>((set) => ({
   openCreateDrawer: () => set({ isCreateDrawerOpen: true }),
   closeCreateDrawer: () => set({ isCreateDrawerOpen: false }),
 }))
-
-
