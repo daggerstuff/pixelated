@@ -359,7 +359,7 @@
     "oxc-resolver": "^11.18.0",
     "oxfmt": "^0.26.0",
     "oxlint": "^1.51.0",
-    "oxlint-tsgolint": "^0.14.2",
+    "oxlint-tsgolint": "^0.15.0",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "8.3.0",
     "postcss": "^8.5.6",
