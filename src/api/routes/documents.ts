@@ -3,15 +3,10 @@
 
 import express, { Router, Request, Response } from 'express'
 import { asyncHandler, NotFoundError, ValidationError } from '../middleware/error-handler'
-// COMMENTED OUT: Legacy auth middleware - using Astro Auth0 instead
-// import { requirePermission, requireRole } from '../middleware/auth'
+import { requirePermissions, requireRoles } from '../middleware/auth'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import { getPostgresPool } from '../../lib/database/connection'
 import * as documentService from '../services/document-service'
-
-// Temporary placeholder middleware - auth handled at Astro layer
-const requirePermission = (_permission: string) => (_req: Request, _res: Response, next: () => void) => next()
-const requireRole = (_roles: string[]) => (_req: Request, _res: Response, next: () => void) => next()
 
 
 // Helper to ensure param is a string (Express types params as string | string[])
@@ -40,7 +35,7 @@ const router: Router = express.Router()
 
 router.post(
     '/',
-    requirePermission('edit'),
+    requireRoles(['admin', 'manager', 'therapist']),
     asyncHandler(async (req: Request, res: Response) => {
         const { title, type, category, content, description } = req.body
 
@@ -153,7 +148,6 @@ router.get(
 
 router.put(
     '/:documentId',
-    requirePermission('edit'),
     asyncHandler(async (req: Request, res: Response) => {
         const documentId = ensureString(req.params.documentId)
         const { title, content, status, description } = req.body
@@ -166,7 +160,8 @@ router.put(
                 status,
                 description
             },
-            req.user!.id
+            req.user!.id,
+            (req.user as any).role
         )
 
         if (!document) {
@@ -186,13 +181,13 @@ router.put(
 
 router.delete(
     '/:documentId',
-    requireRole(['admin', 'manager']),
     asyncHandler(async (req: Request, res: Response) => {
         const documentId = ensureString(req.params.documentId)
 
         const deleted = await documentService.deleteDocument(
             documentId,
-            req.user!.id
+            req.user!.id,
+            (req.user as any).role
         )
 
         if (!deleted) {

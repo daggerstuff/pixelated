@@ -93,7 +93,8 @@ export async function updateDocument(
         status?: string
         description?: string
     },
-    userId: string
+    userId: string,
+    userRole?: string
 ) {
     const document = await BusinessDocument.findOne({ documentId })
 
@@ -104,6 +105,8 @@ export async function updateDocument(
     // Check edit permission
     const canEdit =
         document.owner.toString() === userId ||
+        userRole === 'admin' ||
+        userRole === 'manager' ||
         document.permissions.edit?.some((id: any) => id.toString() === userId)
 
     if (!canEdit) {
@@ -157,18 +160,21 @@ export async function updateDocument(
 // DELETE DOCUMENT
 // ============================================================================
 
-export async function deleteDocument(documentId: string, userId: string) {
+export async function deleteDocument(documentId: string, userId: string, userRole?: string) {
     const document = await BusinessDocument.findOne({ documentId })
 
     if (!document) {
         return false
     }
 
-    // Only owner or admin can delete
-    const canDelete = document.owner.toString() === userId
+    // Only owner or admin/manager can delete
+    const canDelete =
+        document.owner.toString() === userId ||
+        userRole === 'admin' ||
+        userRole === 'manager'
 
     if (!canDelete) {
-        throw new ForbiddenError('Only the document owner can delete this document')
+        throw new ForbiddenError('Only the document owner or an administrator can delete this document')
     }
 
     // Soft delete - archive instead
