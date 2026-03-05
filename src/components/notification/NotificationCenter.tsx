@@ -92,14 +92,18 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         size="icon"
         className="relative"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle notifications"
+        aria-label={
+          unreadCount > 0
+            ? `Notifications, ${unreadCount} unread`
+            : 'Notifications'
+        }
       >
-        <Bell className="h-5 w-5" />
+        <Bell className="h-5 w-5" aria-hidden="true" />
         {unreadCount > 0 && (
           <Badge
             variant="destructive"
             className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-            aria-live="polite"
+            aria-hidden="true"
           >
             {unreadCount}
           </Badge>
@@ -116,7 +120,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
               onClick={() => setIsOpen(false)}
               aria-label="Close notifications panel"
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
 
@@ -154,7 +158,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                           onClick={() => handleMarkAsRead(notification.id)}
                           aria-label="Mark as read"
                         >
-                          <Check className="h-4 w-4" />
+                          <Check className="h-4 w-4" aria-hidden="true" />
                         </Button>
                       )}
                       <Button
@@ -163,7 +167,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         onClick={() => handleDismiss(notification.id)}
                         aria-label="Dismiss notification"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </div>
