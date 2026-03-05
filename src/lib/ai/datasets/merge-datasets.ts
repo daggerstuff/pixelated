@@ -57,11 +57,11 @@ export function mergedDatasetExists(outputPath?: string): boolean {
   // Validate and resolve path to prevent path traversal
   const checkPath = outputPath
     ? securePathJoin(basePath, outputPath, {
-        allowedExtensions: ['.jsonl', '.json', '.csv'],
-      })
+      allowedExtensions: ['.jsonl', '.json', '.csv'],
+    })
     : securePathJoin(basePath, defaultFilename, {
-        allowedExtensions: ['.jsonl', '.json', '.csv'],
-      })
+      allowedExtensions: ['.jsonl', '.json', '.csv'],
+    })
 
   const exists = existsSync(checkPath)
   logger.info('Checking merged dataset existence', { path: checkPath, exists })
@@ -117,10 +117,7 @@ export async function validateMergedDataset(filePath: string): Promise<{
     validation.sampleCount = 0
   }
 
-  logger.info('Dataset validation completed', {
-    filePath: validatedPath,
-    validation,
-  })
+  logger.info('Dataset validation completed', { filePath: validatedPath, validation })
 
   return validation
 }

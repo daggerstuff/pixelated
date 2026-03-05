@@ -31,10 +31,8 @@ interface ChatMessage {
 }
 
 // Enhanced mental health analysis for UI display
-interface EnhancedMentalHealthAnalysis extends Omit<
-  MentalHealthAnalysis,
-  'scores' | 'summary' | 'riskLevel'
-> {
+interface EnhancedMentalHealthAnalysis
+  extends Omit<MentalHealthAnalysis, 'scores' | 'summary' | 'riskLevel'> {
   riskLevel?: 'low' | 'medium' | 'high'
   summary?: string
   scores?: {

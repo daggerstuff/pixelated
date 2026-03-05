@@ -6,4 +6,4 @@
 
 import { BaseService } from './base-service'
 
-export class NotificationService extends BaseService {}
+export class NotificationService extends BaseService { }

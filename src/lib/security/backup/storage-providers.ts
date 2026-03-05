@@ -7,11 +7,7 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { securePathJoin } from '../../utils/server'
-import {
-  ALLOWED_DIRECTORIES,
-  safeJoin,
-  validatePath,
-} from '../../../utils/path-security'
+import { ALLOWED_DIRECTORIES, safeJoin, validatePath } from '../../../utils/path-security'
 import * as path from 'path'
 import * as fs from 'fs/promises'
 import * as crypto from 'crypto'
@@ -126,18 +122,11 @@ export class FileSystemStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const defaultPath = safeJoin(
-      ALLOWED_DIRECTORIES.PROJECT_ROOT,
-      'data',
-      'backups',
-    )
+    const defaultPath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'backups')
     const userBasePath = (config['basePath'] as string) || defaultPath
 
     // Validate basePath is within the project root (prevents traversal)
-    const resolvedBasePath = validatePath(
-      userBasePath,
-      ALLOWED_DIRECTORIES.PROJECT_ROOT,
-    )
+    const resolvedBasePath = validatePath(userBasePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
 
     this.config = {
       basePath: resolvedBasePath,
@@ -180,9 +169,7 @@ export class FileSystemStorageProvider implements StorageProvider {
         // Validate dirPath is within basePath to prevent path traversal
         const validatedDirPath = validatePath(dirPath, resolvedBasePath)
 
-        const entries = await fs.readdir(validatedDirPath, {
-          withFileTypes: true,
-        })
+        const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
         for (const entry of entries) {
           // Validate entry name for security
@@ -295,18 +282,11 @@ export class MockCloudStorageProvider implements StorageProvider {
   }
 
   constructor(config: Record<string, unknown>) {
-    const defaultPath = safeJoin(
-      ALLOWED_DIRECTORIES.PROJECT_ROOT,
-      'data',
-      'mock-cloud',
-    )
+    const defaultPath = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'data', 'mock-cloud')
     const userBasePath = (config['basePath'] as string) || defaultPath
 
     // Validate basePath is within the project root (prevents traversal)
-    const resolvedBasePath = validatePath(
-      userBasePath,
-      ALLOWED_DIRECTORIES.PROJECT_ROOT,
-    )
+    const resolvedBasePath = validatePath(userBasePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
 
     this.config = {
       provider: (config['provider'] as string) || 'mock-cloud',
@@ -325,16 +305,11 @@ export class MockCloudStorageProvider implements StorageProvider {
       this.config.bucket.includes('/') ||
       this.config.bucket.includes('\\')
     ) {
-      throw new Error(
-        'Invalid provider or bucket name: contains path traversal sequences',
-      )
+      throw new Error('Invalid provider or bucket name: contains path traversal sequences')
     }
 
     // Create the base directory for the mock cloud storage using securePathJoin
-    const providerPath = securePathJoin(
-      this.config.basePath,
-      this.config.provider,
-    )
+    const providerPath = securePathJoin(this.config.basePath, this.config.provider)
     const bucketPath = securePathJoin(providerPath, this.config.bucket)
     await fs.mkdir(bucketPath, { recursive: true })
 
@@ -364,13 +339,9 @@ export class MockCloudStorageProvider implements StorageProvider {
 
     await fs.writeFile(filePath, data)
     // Validate meta file path to prevent path traversal
-    const metaFilePath = securePathJoin(
-      path.dirname(filePath),
-      path.basename(filePath) + '.meta',
-      {
-        allowedExtensions: ['.meta'],
-      },
-    )
+    const metaFilePath = securePathJoin(path.dirname(filePath), path.basename(filePath) + '.meta', {
+      allowedExtensions: ['.meta'],
+    })
     await fs.writeFile(metaFilePath, JSON.stringify(metadata, null, 2))
 
     logger.debug(`Stored file at ${key} in mock cloud storage`)
@@ -405,16 +376,11 @@ export class MockCloudStorageProvider implements StorageProvider {
       this.config.bucket.includes('/') ||
       this.config.bucket.includes('\\')
     ) {
-      throw new Error(
-        'Invalid provider or bucket name: contains path traversal sequences',
-      )
+      throw new Error('Invalid provider or bucket name: contains path traversal sequences')
     }
 
     // Build bucket path using securePathJoin to prevent path traversal
-    const providerPath = securePathJoin(
-      this.config.basePath,
-      this.config.provider,
-    )
+    const providerPath = securePathJoin(this.config.basePath, this.config.provider)
     const bucketPath = securePathJoin(providerPath, this.config.bucket)
     const resolvedBasePath = this.config.basePath
 
@@ -430,9 +396,7 @@ export class MockCloudStorageProvider implements StorageProvider {
         // Validate dirPath is within basePath to prevent path traversal
         const validatedDirPath = validatePath(dirPath, resolvedBasePath)
 
-        const entries = await fs.readdir(validatedDirPath, {
-          withFileTypes: true,
-        })
+        const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
         for (const entry of entries) {
           if (entry.name.endsWith('.meta')) {
@@ -540,9 +504,9 @@ export class AWSS3StorageProvider implements StorageProvider {
     const endpoint = config['endpoint'] as string | undefined
     const credentials = config['credentials'] as
       | {
-          accessKeyId: string
-          secretAccessKey: string
-        }
+        accessKeyId: string
+        secretAccessKey: string
+      }
       | undefined
 
     this.config = {

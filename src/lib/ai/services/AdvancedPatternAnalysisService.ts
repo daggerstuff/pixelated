@@ -466,9 +466,7 @@ export class AdvancedPatternAnalysisService {
       return model
     } catch (error: unknown) {
       logger.error('Error creating pattern evolution model', { error })
-      throw new Error(`Failed to create pattern evolution model: ${error}`, {
-        cause: error,
-      })
+      throw new Error(`Failed to create pattern evolution model: ${error}`, { cause: error })
     }
   }
 

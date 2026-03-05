@@ -153,7 +153,8 @@ export const useJournalResearchWebSocket = ({
     }
 
     const baseUrl = journalResearchApiClient.getBaseUrl()
-    const path = endpoint ?? `/sessions/${sessionId}/progress/stream`
+    const path =
+      endpoint ?? `/sessions/${sessionId}/progress/stream`
     const authToken = getAuthToken()
     const wsUrl = buildWebSocketUrl(baseUrl, path, authToken)
 

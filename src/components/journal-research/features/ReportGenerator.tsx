@@ -1,11 +1,6 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import {
   useGenerateReportMutation,
   useReportListQuery,
@@ -19,16 +14,9 @@ export interface ReportGeneratorProps {
   className?: string
 }
 
-export function ReportGenerator({
-  sessionId,
-  className,
-}: ReportGeneratorProps) {
-  const [reportType, setReportType] = useState<
-    'session_report' | 'weekly_report' | 'summary_report'
-  >('session_report')
-  const [outputFormat, setOutputFormat] = useState<'json' | 'markdown' | 'pdf'>(
-    'json',
-  )
+export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) {
+  const [reportType, setReportType] = useState<'session_report' | 'weekly_report' | 'summary_report'>('session_report')
+  const [outputFormat, setOutputFormat] = useState<'json' | 'markdown' | 'pdf'>('json')
   const [dateRange, setDateRange] = useState<{
     startDate?: string
     endDate?: string
@@ -75,9 +63,9 @@ export function ReportGenerator({
                 onChange={(e) =>
                   setReportType(
                     e.target.value as
-                      | 'session_report'
-                      | 'weekly_report'
-                      | 'summary_report',
+                    | 'session_report'
+                    | 'weekly_report'
+                    | 'summary_report',
                   )
                 }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -105,41 +93,41 @@ export function ReportGenerator({
 
             {(reportType === 'weekly_report' ||
               reportType === 'summary_report') && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.startDate ?? ''}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        startDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.startDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          startDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.endDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          endDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.endDate ?? ''}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        endDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
             <button
               onClick={() => {
@@ -149,13 +137,13 @@ export function ReportGenerator({
                   dateRange:
                     dateRange.startDate || dateRange.endDate
                       ? {
-                          startDate: dateRange.startDate
-                            ? new Date(dateRange.startDate)
-                            : undefined,
-                          endDate: dateRange.endDate
-                            ? new Date(dateRange.endDate)
-                            : undefined,
-                        }
+                        startDate: dateRange.startDate
+                          ? new Date(dateRange.startDate)
+                          : undefined,
+                        endDate: dateRange.endDate
+                          ? new Date(dateRange.endDate)
+                          : undefined,
+                      }
                       : undefined,
                 })
               }}
@@ -194,8 +182,7 @@ export function ReportGenerator({
                     <div>
                       <p className="font-medium">{report.reportId}</p>
                       <p className="text-sm text-muted-foreground">
-                        {report.reportType.replace('_', ' ')} •{' '}
-                        {report.format.toUpperCase()} •{' '}
+                        {report.reportType.replace('_', ' ')} • {report.format.toUpperCase()} •{' '}
                         {format(new Date(report.generatedDate), 'PPpp')}
                       </p>
                     </div>

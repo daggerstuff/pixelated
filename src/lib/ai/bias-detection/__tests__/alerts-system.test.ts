@@ -483,8 +483,7 @@ describe('BiasAlertSystem', () => {
       }
 
       // Mock a notification failure
-      const processSpy = vi
-        .spyOn(alertSystem, 'processAlert')
+      const processSpy = vi.spyOn(alertSystem, 'processAlert')
         .mockRejectedValue(new Error('Notification failed'))
 
       await expect(

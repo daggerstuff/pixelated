@@ -90,16 +90,16 @@ export class ExpertGuidanceOrchestrator {
       // Step 6: Update routing decision insights
       const updatedRoutingDecision = baseAnalysis._routingDecision
         ? {
-            ...baseAnalysis._routingDecision,
-            insights: {
-              ...baseAnalysis._routingDecision.insights,
-              expertGuidanceApplied: true,
-              expertGuidanceSource: fetchExpertGuidance
-                ? 'clinical_knowledge_base'
-                : 'llm_only',
-              clinicalEnhancement: true,
-            },
-          }
+          ...baseAnalysis._routingDecision,
+          insights: {
+            ...baseAnalysis._routingDecision.insights,
+            expertGuidanceApplied: true,
+            expertGuidanceSource: fetchExpertGuidance
+              ? 'clinical_knowledge_base'
+              : 'llm_only',
+            clinicalEnhancement: true,
+          },
+        }
         : undefined
 
       // Step 7: Extract comprehensive evidence for expert-guided analysis

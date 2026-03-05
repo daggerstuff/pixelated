@@ -33,10 +33,7 @@ export const GET = async ({
   // Handle OAuth errors
   if (error) {
     console.error('Auth0 OAuth error:', error, errorDescription)
-    return new Response(
-      `Authentication failed: ${error} - ${errorDescription}`,
-      { status: 400 },
-    )
+    return new Response(`Authentication failed: ${error} - ${errorDescription}`, { status: 400 })
   }
 
   if (!authCode) {
@@ -50,28 +47,22 @@ export const GET = async ({
       : `${import.meta.env.SITE}/api/auth/auth0-callback`
 
     // Complete authentication flow with Auth0
-    const { user: socialUser, tokens } = await auth0SocialAuth.authenticate(
-      authCode,
-      redirectUri,
-    )
+    const { user: socialUser, tokens } = await auth0SocialAuth.authenticate(authCode, redirectUri)
 
     // Check if we can/should sync with Auth0 Management API (optional)
-    let existingUser = null
+    let existingUser = null;
     try {
       existingUser = await auth0UserService.findUserByEmail(socialUser.email)
     } catch (e) {
       // Ignore management API errors (e.g. not initialized), proceed with social identity
-      console.log(
-        'Skipping Auth0 Management API lookup (likely not configured or error)',
-        e instanceof Error ? e.message : e,
-      )
+      console.log('Skipping Auth0 Management API lookup (likely not configured or error)', e instanceof Error ? e.message : e);
     }
 
     // In a social login flow, Auth0 has already created/linked the user.
     // We just need a reference to the user ID and role.
     // If we couldn't fetch from Management API, we use the identity from the token.
-    const userId = existingUser?.id || socialUser.id
-    const userRole = existingUser?.role || 'user' // Default role if we can't fetch real role
+    const userId = existingUser?.id || socialUser.id;
+    const userRole = existingUser?.role || 'user'; // Default role if we can't fetch real role
 
     // Set cookies for session management
     cookies.set('auth-token', tokens.accessToken, {
@@ -105,9 +96,7 @@ export const GET = async ({
       // Create a profile for the user
       await profilesCollection.insertOne({
         userId: userId,
-        fullName:
-          socialUser.name ||
-          `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
+        fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
         avatarUrl: socialUser.picture || null,
         role: userRole,
         provider: socialUser.provider,
@@ -120,14 +109,12 @@ export const GET = async ({
         { userId: userId },
         {
           $set: {
-            fullName:
-              socialUser.name ||
-              `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
+            fullName: socialUser.name || `${socialUser.givenName || ''} ${socialUser.familyName || ''}`.trim(),
             avatarUrl: socialUser.picture || existingProfile.avatarUrl,
             provider: socialUser.provider,
             updatedAt: new Date(),
-          },
-        },
+          }
+        }
       )
     }
 
@@ -151,7 +138,7 @@ export const GET = async ({
     console.error('Auth0 callback error:', error)
     return new Response(
       `Authentication failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      { status: 500 },
+      { status: 500 }
     )
   }
 }

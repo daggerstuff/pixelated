@@ -70,37 +70,15 @@ describe('Enhanced Monitoring Service', () => {
       enabled: true,
       aiInsightsEnabled: true,
       alertThresholds: { critical: 90, high: 70, medium: 50, low: 30 },
-      monitoringIntervals: {
-        realTime: 1000,
-        batch: 5000,
-        anomalyDetection: 10000,
-      },
+      monitoringIntervals: { realTime: 1000, batch: 5000, anomalyDetection: 10000 },
       notificationChannels: [],
-      aiModelConfig: {
-        modelPath: '',
-        confidenceThreshold: 0.8,
-        predictionWindow: 10,
-      },
-    }
+      aiModelConfig: { modelPath: '', confidenceThreshold: 0.8, predictionWindow: 10 }
+    };
 
     service = new EnhancedMonitoringService(
       config,
       mockRedis,
-      {
-        db: () => ({
-          collection: () => ({
-            countDocuments: vi.fn(),
-            find: () => ({
-              sort: () => ({ limit: () => ({ toArray: () => [] }) }),
-              toArray: () => [],
-            }),
-            findOne: vi.fn(),
-            insertOne: vi.fn(),
-            insertMany: vi.fn(),
-            updateOne: vi.fn(),
-          }),
-        }),
-      } as any, // mockMongo
+      { db: () => ({ collection: () => ({ countDocuments: vi.fn(), find: () => ({ sort: () => ({ limit: () => ({ toArray: () => [] }) }), toArray: () => [] }), findOne: vi.fn(), insertOne: vi.fn(), insertMany: vi.fn(), updateOne: vi.fn() }) }) } as any, // mockMongo
       mockOrchestrator,
       mockAIService,
     )
@@ -125,20 +103,7 @@ describe('Enhanced Monitoring Service', () => {
       const defaultService = new EnhancedMonitoringService(
         {},
         mockRedis,
-        {
-          db: () => ({
-            collection: () => ({
-              countDocuments: vi.fn(),
-              find: () => ({
-                sort: () => ({ limit: () => ({ toArray: () => [] }) }),
-                toArray: () => [],
-              }),
-              findOne: vi.fn(),
-              insertOne: vi.fn(),
-              insertMany: vi.fn(),
-            }),
-          }),
-        } as any, // mockMongo
+        { db: () => ({ collection: () => ({ countDocuments: vi.fn(), find: () => ({ sort: () => ({ limit: () => ({ toArray: () => [] }) }), toArray: () => [] }), findOne: vi.fn(), insertOne: vi.fn(), insertMany: vi.fn() }) }) } as any, // mockMongo
         mockOrchestrator,
         mockAIService,
       )
@@ -147,27 +112,25 @@ describe('Enhanced Monitoring Service', () => {
       // Implementation doesn't handle undefined config gracefully in constructor currently?
       // "this.config = config".
       // I need to update implementation to default config.
-      expect(defaultService.config).toEqual(
-        expect.objectContaining({
-          enabled: true,
-          alertThresholds: {
-            critical: 0.9,
-            high: 0.7,
-            medium: 0.5,
-            low: 0.3,
-          },
-          escalationRules: {
-            critical: { minutes: 5, levels: ['admin', 'security'] },
-            high: { minutes: 15, levels: ['security'] },
-            medium: { minutes: 30, levels: ['operations'] },
-            low: { minutes: 60, levels: ['monitoring'] },
-          },
-          enableAIInsights: true,
-          maxAlertHistory: 1000,
-          metricsRetention: 86400000, // 24 hours
-          enableRealTimeAlerting: true,
-        }),
-      )
+      expect(defaultService.config).toEqual(expect.objectContaining({
+        enabled: true,
+        alertThresholds: {
+          critical: 0.9,
+          high: 0.7,
+          medium: 0.5,
+          low: 0.3,
+        },
+        escalationRules: {
+          critical: { minutes: 5, levels: ['admin', 'security'] },
+          high: { minutes: 15, levels: ['security'] },
+          medium: { minutes: 30, levels: ['operations'] },
+          low: { minutes: 60, levels: ['monitoring'] },
+        },
+        enableAIInsights: true,
+        maxAlertHistory: 1000,
+        metricsRetention: 86400000, // 24 hours
+        enableRealTimeAlerting: true,
+      }))
     })
 
     it('should use custom configuration when provided', () => {
@@ -196,9 +159,7 @@ describe('Enhanced Monitoring Service', () => {
         mockOrchestrator,
         mockAIService,
       )
-      expect(customService.config).toEqual(
-        expect.objectContaining(customConfig),
-      )
+      expect(customService.config).toEqual(expect.objectContaining(customConfig))
     })
   })
 
@@ -232,7 +193,7 @@ describe('Enhanced Monitoring Service', () => {
         expect.stringMatching(/^alert:/),
         expect.any(String),
         'EX',
-        86400,
+        86400
       )
     })
 
@@ -518,7 +479,7 @@ describe('Enhanced Monitoring Service', () => {
         `metric:response_time:${Date.now()}`,
         expect.any(String),
         'EX',
-        86400,
+        86400
       )
     })
 
@@ -594,7 +555,7 @@ describe('Enhanced Monitoring Service', () => {
       mockAIService.predictAnomaly.mockResolvedValue([
         { isAnomaly: false, confidence: 0.1, severity: 'low' },
         { isAnomaly: false, confidence: 0.1, severity: 'low' },
-        { isAnomaly: true, confidence: 0.9, severity: 'high' },
+        { isAnomaly: true, confidence: 0.9, severity: 'high' }
       ])
 
       const anomalies = await detectMetricAnomalies(metrics, mockAIService)
@@ -626,26 +587,24 @@ describe('Enhanced Monitoring Service', () => {
       mockRedis.hGetAll = vi.fn().mockResolvedValue({
         ...performanceMetrics.system,
         ...performanceMetrics.application,
-        ...performanceMetrics.database,
+        ...performanceMetrics.database
       })
       // The utils parsing code expects string values for numeric properties (from redis),
       // we need to make sure the mock returns strings if the implementation parses them.
       // metrics-utils.ts: parseFloat(metricsData.cpu || '0')
       // If we pass numbers, parseFloat might work or return NaN if it expects string.
       // But Redis actually returns string values. Let's stringify.
-      mockRedis.hGetAll.mockReturnValue(
-        Promise.resolve({
-          cpu: '45',
-          memory: '60',
-          disk: '30',
-          responseTime: '150',
-          throughput: '1000',
-          errorRate: '0.02',
-          connections: '25',
-          queryTime: '50',
-          cacheHitRate: '0.85',
-        }),
-      )
+      mockRedis.hGetAll.mockReturnValue(Promise.resolve({
+        cpu: '45',
+        memory: '60',
+        disk: '30',
+        responseTime: '150',
+        throughput: '1000',
+        errorRate: '0.02',
+        connections: '25',
+        queryTime: '50',
+        cacheHitRate: '0.85'
+      }))
 
       const result = await getPerformanceMetrics(mockRedis)
 
@@ -831,7 +790,7 @@ describe('Enhanced Monitoring Service', () => {
       }
 
       // Simulate timeout by not resolving AI service promise
-      mockAIService.generateInsights.mockReturnValue(new Promise(() => {}))
+      mockAIService.generateInsights.mockReturnValue(new Promise(() => { }))
 
       const result = await service.performRealTimeMonitoring(monitoringData)
 

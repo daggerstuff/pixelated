@@ -11,6 +11,8 @@ vi.mock('../useAIService', () => ({
   default: vi.fn(),
 }))
 
+
+
 describe('usePatternDetection', () => {
   const mockMessages: Message[] = [
     {
@@ -51,7 +53,7 @@ describe('usePatternDetection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(useAIService).mockReturnValue({
-      getAIResponse: vi.fn(),
+      getAIResponse: vi.fn()
     })
   })
 
@@ -101,9 +103,7 @@ describe('usePatternDetection', () => {
   })
 
   it('should handle malformed JSON responses', async () => {
-    const mockGetAIResponse = vi
-      .fn()
-      .mockResolvedValue({ content: 'invalid json' })
+    const mockGetAIResponse = vi.fn().mockResolvedValue({ content: 'invalid json' })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })
@@ -134,9 +134,7 @@ describe('usePatternDetection', () => {
   })
 
   it('should handle non-array responses', async () => {
-    const mockGetAIResponse = vi
-      .fn()
-      .mockResolvedValue({ content: JSON.stringify({}) })
+    const mockGetAIResponse = vi.fn().mockResolvedValue({ content: JSON.stringify({}) })
     vi.mocked(useAIService).mockReturnValue({
       getAIResponse: mockGetAIResponse,
     })

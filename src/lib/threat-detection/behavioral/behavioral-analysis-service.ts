@@ -92,8 +92,7 @@ export interface BehavioralAnalysisService {
 
 export class AdvancedBehavioralAnalysisService
   extends EventEmitter
-  implements BehavioralAnalysisService
-{
+  implements BehavioralAnalysisService {
   private redis: Redis
   private mongoClient: MongoClient
   private anomalyDetector: AnomalyDetector
@@ -466,14 +465,14 @@ export class AdvancedBehavioralAnalysisService
   private calculateAverageSessionDuration(events: SecurityEvent[]): number {
     if (events.length === 0) return 0
     // Simplified: max time - min time
-    const timestamps = events.map((e) => e.timestamp.getTime())
+    const timestamps = events.map(e => e.timestamp.getTime())
     return Math.max(...timestamps) - Math.min(...timestamps)
   }
 
   private calculateTimeOfDayPreference(events: SecurityEvent[]): number {
     if (events.length === 0) return 0
     // Return avg hour (0-24) / 24
-    const hours = events.map((e) => e.timestamp.getHours())
+    const hours = events.map(e => e.timestamp.getHours())
     const avg = hours.reduce((a, b) => a + b, 0) / hours.length
     return avg / 24
   }
@@ -497,7 +496,7 @@ export class AdvancedBehavioralAnalysisService
   }
 
   private async geolocateIPs(ips: string[]): Promise<unknown[]> {
-    return ips.map((_ip) => ({ lat: 0, lon: 0 }))
+    return ips.map(_ip => ({ lat: 0, lon: 0 }))
   }
 
   private calculateIPDiversity(ips: string[]): number {
@@ -512,9 +511,7 @@ export class AdvancedBehavioralAnalysisService
     return 0.1
   }
 
-  private analyzeNetworkCharacteristics(
-    _events: SecurityEvent[],
-  ): NetworkCharacteristics {
+  private analyzeNetworkCharacteristics(_events: SecurityEvent[]): NetworkCharacteristics {
     return {
       connectionType: 'unknown',
       bandwidthEstimate: 0,
@@ -522,9 +519,7 @@ export class AdvancedBehavioralAnalysisService
     }
   }
 
-  private async extractSequentialFeatures(
-    _events: SecurityEvent[],
-  ): Promise<SequentialFeatures> {
+  private async extractSequentialFeatures(_events: SecurityEvent[]): Promise<SequentialFeatures> {
     return {
       actionSequences: [],
       transitionProbabilities: {},
@@ -533,9 +528,7 @@ export class AdvancedBehavioralAnalysisService
     }
   }
 
-  private async extractFrequencyFeatures(
-    events: SecurityEvent[],
-  ): Promise<FrequencyFeatures> {
+  private async extractFrequencyFeatures(events: SecurityEvent[]): Promise<FrequencyFeatures> {
     return {
       eventFrequency: events.length,
       endpointFrequency: {},
@@ -544,9 +537,7 @@ export class AdvancedBehavioralAnalysisService
     }
   }
 
-  private async extractContextualFeatures(
-    _events: SecurityEvent[],
-  ): Promise<ContextualFeatures> {
+  private async extractContextualFeatures(_events: SecurityEvent[]): Promise<ContextualFeatures> {
     return {
       deviceCharacteristics: {
         deviceType: 'unknown',
@@ -569,9 +560,11 @@ export class AdvancedBehavioralAnalysisService
     }
   }
 
+
+
   private removeDuplicateAnomalies(anomalies: Anomaly[]): Anomaly[] {
     const seen = new Set()
-    return anomalies.filter((a) => {
+    return anomalies.filter(a => {
       const key = `${a.patternId}-${a.anomalyType}`
       if (seen.has(key)) return false
       seen.add(key)
@@ -614,42 +607,29 @@ export class AdvancedBehavioralAnalysisService
   ): Promise<BehavioralPattern[]> {
     return patterns.map((p) => ({ ...p }))
   }
-  private async calculatePatternStability(
-    patterns: BehavioralPattern[],
-  ): Promise<BehavioralPattern[]> {
-    return patterns.map((p) => ({ ...p, stability: 0.9 }))
+  private async calculatePatternStability(patterns: BehavioralPattern[]): Promise<BehavioralPattern[]> {
+    return patterns.map(p => ({ ...p, stability: 0.9 }))
   }
 
-  private async detectSequentialAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
+  private async detectSequentialAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
     return []
   }
 
-  private async calculateBaselineMetrics(
-    _features: BehavioralFeatures,
-  ): Promise<BaselineMetrics> {
+  private async calculateBaselineMetrics(_features: BehavioralFeatures): Promise<BaselineMetrics> {
     return {
       timeOfDayThreshold: 0.5,
       geographicThreshold: 0.5,
       frequencyThreshold: 0.5,
       sequentialThreshold: 0.5,
-      deviceDiversityThreshold: 0.5,
+      deviceDiversityThreshold: 0.5
     }
   }
 
-  private async detectFrequencyAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
+  private async detectFrequencyAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
     return []
   }
 
-  private calculateProfileConfidence(
-    _features: BehavioralFeatures,
-    _patterns: BehavioralPattern[],
-  ): number {
+  private calculateProfileConfidence(_features: BehavioralFeatures, _patterns: BehavioralPattern[]): number {
     return 0.8
   }
 
@@ -661,43 +641,27 @@ export class AdvancedBehavioralAnalysisService
     return []
   }
 
-  private async detectContextualAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
+  private async detectContextualAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
     return []
   }
 
-  private async extractRiskFactors(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<RiskFactor[]> {
+  private async extractRiskFactors(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<RiskFactor[]> {
     return []
   }
 
-  private async calculateBehavioralRiskComponent(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<number> {
+  private async calculateBehavioralRiskComponent(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<number> {
     return 0.5
   }
 
-  private async calculateAnomalyRiskComponent(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<number> {
+  private async calculateAnomalyRiskComponent(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<number> {
     return 0.5
   }
 
-  private async calculateContextualRiskComponent(
-    _events: SecurityEvent[],
-  ): Promise<number> {
+  private async calculateContextualRiskComponent(_events: SecurityEvent[]): Promise<number> {
     return 0.5
   }
 
-  private async calculateHistoricalRiskComponent(
-    _userId: string,
-  ): Promise<number> {
+  private async calculateHistoricalRiskComponent(_userId: string): Promise<number> {
     return 0.5
   }
 
@@ -705,10 +669,7 @@ export class AdvancedBehavioralAnalysisService
     return 0.8
   }
 
-  private async calculateRiskTrend(
-    _userId: string,
-    _currentRisk: number,
-  ): Promise<'increasing' | 'decreasing' | 'stable'> {
+  private async calculateRiskTrend(_userId: string, _currentRisk: number): Promise<'increasing' | 'decreasing' | 'stable'> {
     return 'stable'
   }
 
@@ -860,7 +821,7 @@ export class AdvancedBehavioralAnalysisService
       std ||
       Math.sqrt(
         data.reduce((sum, val) => sum + Math.pow(val - dataMean, 2), 0) /
-          data.length,
+        data.length,
       )
 
     if (dataStd === 0) {
@@ -1091,7 +1052,10 @@ abstract class GraphAnalyzer {
 
 // Placeholder class for IsolationForest to resolve type errors
 class IsolationForest {
-  constructor(_nTrees: number, _sampleSize: number) {}
+  constructor(
+    _nTrees: number,
+    _sampleSize: number,
+  ) { }
 
   predict(data: number[][]): number[] {
     return data.map(() => 0.0)

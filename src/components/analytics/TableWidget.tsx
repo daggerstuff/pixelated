@@ -27,10 +27,11 @@ export interface Column {
   filterable?: boolean
 }
 
-export interface TableWidgetProps extends Omit<
-  WidgetProps,
-  'children' | 'title' | 'description' | 'isLoading'
-> {
+export interface TableWidgetProps
+  extends Omit<
+    WidgetProps,
+    'children' | 'title' | 'description' | 'isLoading'
+  > {
   /** The title of the table widget */
   title: string
 

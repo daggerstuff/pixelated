@@ -94,7 +94,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -107,7 +107,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -205,8 +205,8 @@ export const GET: APIRoute = async ({ request }) => {
         particleCount: particles.length,
         dominantEmotion: emotionProfile.dominantEmotion,
         intensity: emotionProfile.averageIntensity,
-        sessionId,
-      },
+        sessionId
+      }
     )
 
     logger.info('Generated particle emotion system', {
@@ -236,7 +236,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(
@@ -266,7 +266,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -279,7 +279,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -331,8 +331,8 @@ export const POST: APIRoute = async ({ request }) => {
         emotion,
         intensity: Math.max(0, Math.min(1, intensity)),
         sessionId,
-        particleCount: particleUpdates?.length || 0,
-      },
+        particleCount: particleUpdates?.length || 0
+      }
     )
 
     // TODO: Save particle interaction data for analytics
@@ -362,7 +362,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(

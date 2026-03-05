@@ -5,6 +5,7 @@ import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
 import { authenticateRequest } from './lib/auth/auth0-middleware'
 
+
 // Simple route matcher for protected API routes and journal-research pages
 const protectedRoutePatterns: RegExp[] = [
   /\/api\/protected(.*)/,
@@ -60,13 +61,11 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
 
       // Fallback to 401 if no response provided
       return new Response(
-        JSON.stringify({
-          error: authResult.error || 'Authentication required',
-        }),
+        JSON.stringify({ error: authResult.error || 'Authentication required' }),
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -83,7 +82,7 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
       // Create the user object first, then assign with proper typing
       const userData = {
         ...authResult.request.user,
-        emailVerified: authResult.request.user.emailVerified ?? false,
+        emailVerified: authResult.request.user.emailVerified ?? false
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ;(context.locals as any).user = userData
@@ -91,10 +90,13 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
   } catch (err) {
     // If authentication check fails, treat as unauthenticated
     markSpanError(err instanceof Error ? err : new Error(String(err)))
-    return new Response(JSON.stringify({ error: 'Authentication failed' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ error: 'Authentication failed' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 
   return next()

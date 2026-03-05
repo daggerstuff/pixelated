@@ -1,10 +1,5 @@
 import { useMemo } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { SessionList } from '../lists/SessionList'
 import { ProgressCharts } from '../charts/ProgressCharts'
 import { SessionCard } from '../shared/SessionCard'
@@ -13,10 +8,7 @@ import {
   useSessionQuery,
 } from '@/lib/hooks/journal-research'
 import { useJournalSessionStore } from '@/lib/stores/journal-research'
-import {
-  useProgressQuery,
-  useProgressMetricsQuery,
-} from '@/lib/hooks/journal-research'
+import { useProgressQuery, useProgressMetricsQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 
@@ -144,15 +136,7 @@ export function Dashboard({ className }: DashboardProps) {
         </CardHeader>
         <CardContent>
           <SessionList
-            sessions={
-              sessions ?? {
-                items: [],
-                total: 0,
-                page: 1,
-                pageSize: 10,
-                totalPages: 0,
-              }
-            }
+            sessions={sessions ?? { items: [], total: 0, page: 1, pageSize: 10, totalPages: 0 }}
             isLoading={sessionsLoading}
             onSessionClick={(session) => {
               useJournalSessionStore

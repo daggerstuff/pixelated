@@ -36,7 +36,10 @@ const filterAcquisitions = (
       return false
     }
 
-    if (filters.showDownloadFailuresOnly && acquisition.status !== 'failed') {
+    if (
+      filters.showDownloadFailuresOnly &&
+      acquisition.status !== 'failed'
+    ) {
       return false
     }
 
@@ -104,9 +107,9 @@ export const useAcquisitionInitiateMutation = (sessionId: string | null) => {
         ),
         exact: false,
       })
-      useAcquisitionStore
-        .getState()
-        .setSelectedAcquisitionId(acquisition.acquisitionId)
+      useAcquisitionStore.getState().setSelectedAcquisitionId(
+        acquisition.acquisitionId,
+      )
     },
   })
 }

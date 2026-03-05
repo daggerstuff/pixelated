@@ -106,7 +106,9 @@ export function Tabs({
         tabValues,
       }}
     >
-      <div className={`tabs ${className}`}>{children}</div>
+      <div className={`tabs ${className}`}>
+        {children}
+      </div>
     </TabsContext.Provider>
   )
 }

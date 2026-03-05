@@ -35,20 +35,14 @@ const matchesSearchTerm = (session: Session, searchTerm: string) => {
   if (session.sessionId.toLowerCase().includes(lowerSearch)) {
     return true
   }
-  if (
-    session.targetSources.some((source) =>
-      source.toLowerCase().includes(lowerSearch),
-    )
-  ) {
+  if (session.targetSources.some((source) => source.toLowerCase().includes(lowerSearch))) {
     return true
   }
   return Object.entries(session.searchKeywords).some(([category, keywords]) => {
     if (category.toLowerCase().includes(lowerSearch)) {
       return true
     }
-    return keywords.some((keyword) =>
-      keyword.toLowerCase().includes(lowerSearch),
-    )
+    return keywords.some((keyword) => keyword.toLowerCase().includes(lowerSearch))
   })
 }
 
@@ -57,9 +51,9 @@ const matchesPhaseFilter = (session: Session, phases: SessionPhase[]) => {
     return true
   }
   const currentPhase = (session.currentPhase ?? 'unknown').toLowerCase()
-  return phases.some((phase) =>
-    phase === 'unknown' ? !currentPhase : currentPhase.includes(phase),
-  )
+  return phases.some((phase) => phase === 'unknown'
+    ? !currentPhase
+    : currentPhase.includes(phase))
 }
 
 const applySessionFilters = (
@@ -101,8 +95,7 @@ export const useSessionListQuery = ({
     }),
     queryFn: () => listSessions({ page, pageSize }),
     enabled,
-    select: (data) =>
-      applySessionFilters(data, filters.searchTerm, filters.phases),
+    select: (data) => applySessionFilters(data, filters.searchTerm, filters.phases),
   })
 }
 

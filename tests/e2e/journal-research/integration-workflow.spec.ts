@@ -33,9 +33,7 @@ test.describe('Journal Research Integration Workflow', () => {
     })
 
     // Verify integration plans are displayed
-    const planList = page.locator(
-      'table tbody tr, [data-testid="integration-plan-item"]',
-    )
+    const planList = page.locator('table tbody tr, [data-testid="integration-plan-item"]')
     const planCount = await planList.count()
 
     // May be 0 if no plans exist yet
@@ -44,21 +42,17 @@ test.describe('Journal Research Integration Workflow', () => {
 
   test('initiates integration planning', async ({ page }) => {
     // Look for initiate integration button
-    const initiateButton = page.locator(
-      'button:has-text("Plan Integration"), button:has-text("Create Plan")',
-    )
+    const initiateButton = page.locator('button:has-text("Plan Integration"), button:has-text("Create Plan")')
 
-    if ((await initiateButton.count()) > 0) {
+    if (await initiateButton.count() > 0) {
       await initiateButton.click()
 
       // Wait for integration form to appear
-      await page.waitForSelector('form, select[name="targetFormat"]', {
-        timeout: 5000,
-      })
+      await page.waitForSelector('form, select[name="targetFormat"]', { timeout: 5000 })
 
       // Fill in integration form
       const formatSelect = page.locator('select[name="targetFormat"]')
-      if ((await formatSelect.count()) > 0) {
+      if (await formatSelect.count() > 0) {
         await formatSelect.selectOption('jsonl')
       }
 
@@ -66,9 +60,7 @@ test.describe('Journal Research Integration Workflow', () => {
       await page.click('button[type="submit"], button:has-text("Create Plan")')
 
       // Verify plan creation
-      await expect(
-        page.locator('text=Plan created, text=Integration Plan'),
-      ).toBeVisible({ timeout: 5000 })
+      await expect(page.locator('text=Plan created, text=Integration Plan')).toBeVisible({ timeout: 5000 })
     }
   })
 
@@ -79,10 +71,8 @@ test.describe('Journal Research Integration Workflow', () => {
     })
 
     // Select target format filter
-    const filterSelect = page
-      .locator('select, [data-testid="format-filter"]')
-      .first()
-    if ((await filterSelect.count()) > 0) {
+    const filterSelect = page.locator('select, [data-testid="format-filter"]').first()
+    if (await filterSelect.count() > 0) {
       await filterSelect.selectOption('jsonl')
 
       // Wait for filter to apply
@@ -110,10 +100,8 @@ test.describe('Journal Research Integration Workflow', () => {
     })
 
     // Select complexity filter
-    const filterSelect = page.locator(
-      'select, [data-testid="complexity-filter"]',
-    )
-    if ((await filterSelect.count()) > 0) {
+    const filterSelect = page.locator('select, [data-testid="complexity-filter"]')
+    if (await filterSelect.count() > 0) {
       await filterSelect.selectOption('medium')
 
       // Wait for filter to apply
@@ -141,18 +129,14 @@ test.describe('Journal Research Integration Workflow', () => {
     })
 
     // Click on first plan
-    const firstPlanLink = page
-      .locator('table a, [data-testid="plan-link"]')
-      .first()
+    const firstPlanLink = page.locator('table a, [data-testid="plan-link"]').first()
 
-    if ((await firstPlanLink.count()) > 0) {
+    if (await firstPlanLink.count() > 0) {
       await firstPlanLink.click()
 
       // Verify plan detail page
       await expect(page.locator('h1')).toBeVisible()
-      await expect(
-        page.locator('text=Target Format, text=Complexity, text=Preprocessing'),
-      ).toBeVisible()
+      await expect(page.locator('text=Target Format, text=Complexity, text=Preprocessing')).toBeVisible()
     }
   })
 
@@ -161,24 +145,20 @@ test.describe('Journal Research Integration Workflow', () => {
     await page.waitForSelector('table', { timeout: 5000 })
 
     // Look for compare checkboxes or buttons
-    const compareCheckboxes = page.locator(
-      'input[type="checkbox"][name*="compare"], [data-testid="compare-checkbox"]',
-    )
+    const compareCheckboxes = page.locator('input[type="checkbox"][name*="compare"], [data-testid="compare-checkbox"]')
 
-    if ((await compareCheckboxes.count()) >= 2) {
+    if (await compareCheckboxes.count() >= 2) {
       // Select two plans for comparison
       await compareCheckboxes.nth(0).check()
       await compareCheckboxes.nth(1).check()
 
       // Look for compare button or view comparison
       const compareButton = page.locator('button:has-text("Compare")')
-      if ((await compareButton.count()) > 0) {
+      if (await compareButton.count() > 0) {
         await compareButton.click()
 
         // Verify comparison view
-        await expect(
-          page.locator('text=Comparison, text=Plan 1, text=Plan 2'),
-        ).toBeVisible({ timeout: 5000 })
+        await expect(page.locator('text=Comparison, text=Plan 1, text=Plan 2')).toBeVisible({ timeout: 5000 })
       }
     }
   })
@@ -189,23 +169,19 @@ test.describe('Journal Research Integration Workflow', () => {
 
     const firstPlanLink = page.locator('table a').first()
 
-    if ((await firstPlanLink.count()) > 0) {
+    if (await firstPlanLink.count() > 0) {
       await firstPlanLink.click()
 
       // Wait for plan detail page
       await page.waitForSelector('h1', { timeout: 5000 })
 
       // Click generate script button (if available)
-      const generateButton = page.locator(
-        'button:has-text("Generate Script"), button:has-text("Download Script")',
-      )
-      if ((await generateButton.count()) > 0) {
+      const generateButton = page.locator('button:has-text("Generate Script"), button:has-text("Download Script")')
+      if (await generateButton.count() > 0) {
         await generateButton.click()
 
         // Verify script generation or download
-        await expect(
-          page.locator('text=Script generated, text=Download'),
-        ).toBeVisible({ timeout: 5000 })
+        await expect(page.locator('text=Script generated, text=Download')).toBeVisible({ timeout: 5000 })
       }
     }
   })
@@ -216,16 +192,14 @@ test.describe('Journal Research Integration Workflow', () => {
 
     const firstPlanLink = page.locator('table a').first()
 
-    if ((await firstPlanLink.count()) > 0) {
+    if (await firstPlanLink.count() > 0) {
       await firstPlanLink.click()
 
       // Wait for plan detail page
       await page.waitForSelector('h1', { timeout: 5000 })
 
       // Verify visualization is displayed
-      await expect(
-        page.locator('canvas, svg, [data-testid="plan-visualization"]'),
-      ).toBeVisible({ timeout: 5000 })
+      await expect(page.locator('canvas, svg, [data-testid="plan-visualization"]')).toBeVisible({ timeout: 5000 })
     }
   })
 })

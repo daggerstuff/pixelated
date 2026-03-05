@@ -35,14 +35,10 @@ export function EvaluationCard({
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
       high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     }
-    return (
-      colors[tier.toLowerCase()] ??
-      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-    )
+    return colors[tier.toLowerCase()] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
   }
 
   const metrics = [
@@ -73,11 +69,11 @@ export function EvaluationCard({
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onClick()
-              }
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onClick()
             }
+          }
           : undefined
       }
     >
@@ -115,9 +111,7 @@ export function EvaluationCard({
               <div key={metric.label} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">{metric.label}</span>
-                  <span
-                    className={`font-medium ${getScoreColor(metric.value)}`}
-                  >
+                  <span className={`font-medium ${getScoreColor(metric.value)}`}>
                     {metric.value.toFixed(1)}
                   </span>
                 </div>
@@ -138,9 +132,7 @@ export function EvaluationCard({
       </CardContent>
 
       <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>
-          Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')}
-        </span>
+        <span>Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')}</span>
         <span>By {evaluation.evaluator}</span>
       </CardFooter>
     </Card>

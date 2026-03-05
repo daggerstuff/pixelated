@@ -111,19 +111,18 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
             <p>{scenario.presentingIssue}</p>
           </div>
 
-          {scenario.suggestedApproaches &&
-            scenario.suggestedApproaches.length > 0 && (
-              <div>
-                <div className="font-medium text-gray-700 mb-1">
-                  Suggested Approaches
-                </div>
-                <ul className="list-disc list-inside">
-                  {scenario.suggestedApproaches.map((approach: string) => (
-                    <li key={approach}>{approach}</li>
-                  ))}
-                </ul>
+          {scenario.suggestedApproaches && scenario.suggestedApproaches.length > 0 && (
+            <div>
+              <div className="font-medium text-gray-700 mb-1">
+                Suggested Approaches
               </div>
-            )}
+              <ul className="list-disc list-inside">
+                {scenario.suggestedApproaches.map((approach: string) => (
+                  <li key={approach}>{approach}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div>
             <div className="font-medium text-gray-700 mb-1">Target Skills</div>
@@ -136,10 +135,7 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
                   {skill
                     .toString()
                     .split('_')
-                    .map(
-                      (word: string) =>
-                        word.charAt(0).toUpperCase() + word.slice(1),
-                    )
+                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                     .join(' ')}
                 </span>
               ))}

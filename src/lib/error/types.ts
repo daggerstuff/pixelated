@@ -109,10 +109,7 @@ export class NetworkError extends AppError {
   ) {
     super(message, {
       code: 'network.error',
-      severity:
-        statusCode && statusCode >= 500
-          ? ErrorSeverity.HIGH
-          : ErrorSeverity.MEDIUM,
+      severity: statusCode && statusCode >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM,
       category: ErrorCategory.NETWORK,
       context,
       recoverable: true,

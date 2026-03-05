@@ -30,8 +30,9 @@ vi.mock('astro:transitions', () => ({
 // Test the DocumentationLayout component
 test('DocumentationLayout renders with correct title and content', async () => {
   // Import the component
-  const { default: DocumentationLayout } =
-    await import('../DocumentationLayout.astro')
+  const { default: DocumentationLayout } = await import(
+    '../DocumentationLayout.astro'
+  )
 
   // Prepare test props
   const props = {
@@ -67,8 +68,9 @@ test('DocumentationLayout renders with correct title and content', async () => {
 // Test that the layout handles frontmatter props correctly
 test('DocumentationLayout uses frontmatter props when available', async () => {
   // Import the component
-  const { default: DocumentationLayout } =
-    await import('../DocumentationLayout.astro')
+  const { default: DocumentationLayout } = await import(
+    '../DocumentationLayout.astro'
+  )
 
   // Prepare test props with frontmatter
   const props = {

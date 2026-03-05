@@ -19,10 +19,10 @@ export { WorkflowEngineService } from './services/workflow-engine'
 
 // Types
 export type {
-  NicheMarket,
-  CompetitorProfile,
-  MarketingTactic,
-  Document,
-  User,
-  WorkflowExecution,
+    NicheMarket,
+    CompetitorProfile,
+    MarketingTactic,
+    Document,
+    User,
+    WorkflowExecution
 } from './types'

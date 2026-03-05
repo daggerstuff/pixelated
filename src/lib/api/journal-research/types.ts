@@ -11,7 +11,7 @@ const optionalIsoDateSchema = z
   .transform((value) => new Date(value))
   .optional()
   .nullable()
-  .transform((value) => value || null)
+  .transform((value) => (value || null))
 
 export const SearchKeywordMapSchema = z.record(z.string(), z.array(z.string()))
 export type SearchKeywordMap = z.infer<typeof SearchKeywordMapSchema>
@@ -265,9 +265,8 @@ export type EvaluationList = z.infer<typeof EvaluationListSchema>
 export const AcquisitionListSchema = createPaginatedSchema(AcquisitionSchema)
 export type AcquisitionList = z.infer<typeof AcquisitionListSchema>
 
-export const IntegrationPlanListSchema = createPaginatedSchema(
-  IntegrationPlanSchema,
-)
+export const IntegrationPlanListSchema =
+  createPaginatedSchema(IntegrationPlanSchema)
 export type IntegrationPlanList = z.infer<typeof IntegrationPlanListSchema>
 
 export const ReportListSchema = createPaginatedSchema(ReportSchema)
@@ -359,7 +358,9 @@ export const ReportGeneratePayloadSchema = z.object({
     .optional(),
 })
 
-export type ReportGeneratePayload = z.input<typeof ReportGeneratePayloadSchema>
+export type ReportGeneratePayload = z.input<
+  typeof ReportGeneratePayloadSchema
+>
 
 // Serialization helpers
 export const serializeCreateSessionPayload = (
@@ -455,15 +456,15 @@ export const serializeReportGeneratePayload = (
     format: parsed.format,
     date_range: parsed.dateRange
       ? {
-          start_date:
-            parsed.dateRange.startDate instanceof Date
-              ? parsed.dateRange.startDate.toISOString()
-              : parsed.dateRange.startDate,
-          end_date:
-            parsed.dateRange.endDate instanceof Date
-              ? parsed.dateRange.endDate.toISOString()
-              : parsed.dateRange.endDate,
-        }
+        start_date:
+          parsed.dateRange.startDate instanceof Date
+            ? parsed.dateRange.startDate.toISOString()
+            : parsed.dateRange.startDate,
+        end_date:
+          parsed.dateRange.endDate instanceof Date
+            ? parsed.dateRange.endDate.toISOString()
+            : parsed.dateRange.endDate,
+      }
       : undefined,
   }
 }

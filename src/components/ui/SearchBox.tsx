@@ -219,9 +219,7 @@ export default function SearchBox({
           aria-autocomplete="list"
           aria-controls="search-results"
           aria-activedescendant={
-            showResults && activeIndex >= 0
-              ? `result-${activeIndex}`
-              : undefined
+            showResults && activeIndex >= 0 ? `result-${activeIndex}` : undefined
           }
           autoComplete="off"
         />
@@ -281,11 +279,10 @@ export default function SearchBox({
                     type="button"
                     role="option"
                     aria-selected={index === activeIndex}
-                    className={`w-full text-left px-4 py-3 focus:outline-none ${
-                      index === activeIndex
+                    className={`w-full text-left px-4 py-3 focus:outline-none ${index === activeIndex
                         ? 'bg-gray-100 dark:bg-gray-700'
                         : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
+                      }`}
                     onClick={() => handleResultClick(result)}
                     tabIndex={-1}
                   >

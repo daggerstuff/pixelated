@@ -22,9 +22,7 @@ export function RoleGuard({
   const { data: session, isPending: loading } = authClient.useSession()
 
   // Simple role check function
-  const hasRole = (
-    role: AuthRole | AuthRole[] | UserRole | UserRole[],
-  ): boolean => {
+  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
     if (!session?.user) {
       return false
     }

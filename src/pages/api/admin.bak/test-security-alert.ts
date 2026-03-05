@@ -29,7 +29,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         },
-      )
+      );
     }
     const user = await getCurrentUser(cookies)
     if (!user) {

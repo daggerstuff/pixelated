@@ -33,9 +33,7 @@ test.describe('Journal Research Evaluation Workflow', () => {
     })
 
     // Verify evaluations are displayed
-    const evaluationList = page.locator(
-      'table tbody tr, [data-testid="evaluation-item"]',
-    )
+    const evaluationList = page.locator('table tbody tr, [data-testid="evaluation-item"]')
     const evaluationCount = await evaluationList.count()
 
     // May be 0 if no evaluations exist yet
@@ -44,20 +42,16 @@ test.describe('Journal Research Evaluation Workflow', () => {
 
   test('initiates evaluation process', async ({ page }) => {
     // Look for initiate evaluation button or form
-    const initiateButton = page.locator(
-      'button:has-text("Evaluate"), button:has-text("Start Evaluation")',
-    )
+    const initiateButton = page.locator('button:has-text("Evaluate"), button:has-text("Start Evaluation")')
 
-    if ((await initiateButton.count()) > 0) {
+    if (await initiateButton.count() > 0) {
       await initiateButton.click()
 
       // Wait for evaluation form or process to start
       await page.waitForSelector('form, text=Evaluating', { timeout: 5000 })
 
       // Verify evaluation process started
-      await expect(page.locator('text=Evaluating, text=Progress')).toBeVisible({
-        timeout: 5000,
-      })
+      await expect(page.locator('text=Evaluating, text=Progress')).toBeVisible({ timeout: 5000 })
     }
   })
 
@@ -68,10 +62,8 @@ test.describe('Journal Research Evaluation Workflow', () => {
     })
 
     // Select priority tier filter
-    const filterSelect = page
-      .locator('select, [data-testid="priority-filter"]')
-      .first()
-    if ((await filterSelect.count()) > 0) {
+    const filterSelect = page.locator('select, [data-testid="priority-filter"]').first()
+    if (await filterSelect.count() > 0) {
       await filterSelect.selectOption('high')
 
       // Wait for filter to apply
@@ -94,16 +86,13 @@ test.describe('Journal Research Evaluation Workflow', () => {
 
   test('sorts evaluations by score', async ({ page }) => {
     // Wait for sort controls
-    await page.waitForSelector(
-      'button:has-text("Sort"), select[name="sortBy"]',
-      {
-        timeout: 5000,
-      },
-    )
+    await page.waitForSelector('button:has-text("Sort"), select[name="sortBy"]', {
+      timeout: 5000,
+    })
 
     // Select sort option
     const sortSelect = page.locator('select[name="sortBy"]')
-    if ((await sortSelect.count()) > 0) {
+    if (await sortSelect.count() > 0) {
       await sortSelect.selectOption('overall_score')
 
       // Wait for sort to apply
@@ -138,18 +127,14 @@ test.describe('Journal Research Evaluation Workflow', () => {
     })
 
     // Click on first evaluation
-    const firstEvaluationLink = page
-      .locator('table a, [data-testid="evaluation-link"]')
-      .first()
+    const firstEvaluationLink = page.locator('table a, [data-testid="evaluation-link"]').first()
 
-    if ((await firstEvaluationLink.count()) > 0) {
+    if (await firstEvaluationLink.count() > 0) {
       await firstEvaluationLink.click()
 
       // Verify evaluation detail page
       await expect(page.locator('h1')).toBeVisible()
-      await expect(
-        page.locator('text=Score, text=Therapeutic Relevance'),
-      ).toBeVisible()
+      await expect(page.locator('text=Score, text=Therapeutic Relevance')).toBeVisible()
     }
   })
 
@@ -159,7 +144,7 @@ test.describe('Journal Research Evaluation Workflow', () => {
 
     const firstEvaluationLink = page.locator('table a').first()
 
-    if ((await firstEvaluationLink.count()) > 0) {
+    if (await firstEvaluationLink.count() > 0) {
       await firstEvaluationLink.click()
 
       // Wait for evaluation detail page
@@ -167,14 +152,12 @@ test.describe('Journal Research Evaluation Workflow', () => {
 
       // Click edit button (if available)
       const editButton = page.locator('button:has-text("Edit")')
-      if ((await editButton.count()) > 0) {
+      if (await editButton.count() > 0) {
         await editButton.click()
 
         // Update evaluation score or notes
-        const notesInput = page.locator(
-          'textarea[name="notes"], textarea[placeholder*="notes"]',
-        )
-        if ((await notesInput.count()) > 0) {
+        const notesInput = page.locator('textarea[name="notes"], textarea[placeholder*="notes"]')
+        if (await notesInput.count() > 0) {
           await notesInput.fill('Updated evaluation notes')
         }
 
@@ -182,9 +165,7 @@ test.describe('Journal Research Evaluation Workflow', () => {
         await page.click('button[type="submit"], button:has-text("Save")')
 
         // Verify update
-        await expect(page.locator('text=Updated evaluation notes')).toBeVisible(
-          { timeout: 5000 },
-        )
+        await expect(page.locator('text=Updated evaluation notes')).toBeVisible({ timeout: 5000 })
       }
     }
   })
