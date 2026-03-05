@@ -1,4 +1,5 @@
 - description: HIPAA compliance security checks
 - queries: javascript/fhir
 - queries: javascript/ehr
-- pack: codeql/javascript-queries
+- import: codeql-suites/javascript-security-and-quality.qls
+  from: codeql/javascript-queries
