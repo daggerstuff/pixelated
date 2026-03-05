@@ -1,7 +1,14 @@
 import { useState, useMemo } from 'react'
-import type { Source, SourceList as SourceListType } from '@/lib/api/journal-research/types'
+import type {
+  Source,
+  SourceList as SourceListType,
+} from '@/lib/api/journal-research/types'
 import { Table } from '@/components/ui/table'
-import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
+import type {
+  TableColumn,
+  TableState,
+  TableDataSource,
+} from '@/components/ui/table-types'
 import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -232,4 +239,3 @@ export function SourceList({
     </div>
   )
 }
-

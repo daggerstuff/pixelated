@@ -115,9 +115,9 @@ export const rehypePlugins: RehypePlugins = [
           ) {
             props['className'] = Array.isArray(el.properties?.['className'])
               ? [
-                ...(el.properties!['className'] as string[]),
-                'external-link-cursor',
-              ]
+                  ...(el.properties!['className'] as string[]),
+                  'external-link-cursor',
+                ]
               : ['external-link-cursor']
           }
         }

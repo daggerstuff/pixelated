@@ -385,7 +385,7 @@ export class MultiModalRiskAssessmentService {
       (Math.max(0, 1 - behavioralData.communicationChanges.sentimentScore) *
         0.4 +
         Math.max(0, 1 - behavioralData.communicationChanges.topicCoherence) *
-        0.3 +
+          0.3 +
         (behavioralData.communicationChanges.wordCount < 50 ? 0.3 : 0)) *
       0.25
 
@@ -396,9 +396,9 @@ export class MultiModalRiskAssessmentService {
           0,
           1 - behavioralData.socialIndicators.supportSystemEngagement,
         ) *
-        0.3 +
+          0.3 +
         Math.min(behavioralData.digitalFootprint.missedAppointments / 5, 1.0) *
-        0.2) *
+          0.2) *
       0.25
 
     // App usage pattern disruption
@@ -484,13 +484,13 @@ export class MultiModalRiskAssessmentService {
     const lifeEventsRisk =
       (Math.min(contextualData.life_events.recentLosses.length / 3, 1.0) * 0.4 +
         Math.min(contextualData.life_events.traumaticEvents.length / 2, 1.0) *
-        0.6) *
+          0.6) *
       0.2
 
     // Temporal factors (higher risk during vulnerable times)
     const temporalRisk =
       ((contextualData.temporal.timeOfDay >= 22 ||
-        contextualData.temporal.timeOfDay <= 6
+      contextualData.temporal.timeOfDay <= 6
         ? 0.3
         : 0) +
         contextualData.temporal.circadianPattern * 0.2) *
@@ -560,7 +560,12 @@ export class MultiModalRiskAssessmentService {
       .sort(([_, a], [__, b]) => b - a)
       .slice(0, 3)
       .map(([source, weight]) => ({
-        source: source as 'emotional' | 'biometric' | 'behavioral' | 'clinical' | 'contextual',
+        source: source as
+          | 'emotional'
+          | 'biometric'
+          | 'behavioral'
+          | 'clinical'
+          | 'contextual',
         factor: this.getTopFactorForSource(source, data),
         weight,
         trend: this.calculateTrendForSource(source, data),

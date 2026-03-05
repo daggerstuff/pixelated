@@ -42,22 +42,27 @@ class TenantManager {
     return true
   }
 
-  applyTenantConfig<T extends object>(baseConfig: T, tenantId: string): T & { tenantConfig?: TenantConfig } {
+  applyTenantConfig<T extends object>(
+    baseConfig: T,
+    tenantId: string,
+  ): T & { tenantConfig?: TenantConfig } {
     const tenant = this.getTenant(tenantId)
     if (!tenant) {
       return baseConfig
     }
 
     const { customConfig, resourceLimits } = tenant
-    
+
     // Create a new config merging base, custom, and resource limits
     // We prioritize tenant specific overrides
     const newConfig = {
       ...baseConfig,
       ...customConfig,
       // Apply resource limits if they map to config properties
-      ...(resourceLimits?.maxKeySize ? { keySize: resourceLimits.maxKeySize } : {}),
-      tenantConfig: tenant
+      ...(resourceLimits?.maxKeySize
+        ? { keySize: resourceLimits.maxKeySize }
+        : {}),
+      tenantConfig: tenant,
     }
 
     return newConfig
@@ -67,10 +72,13 @@ class TenantManager {
     return `${basePrefix}_tenant_${tenantId}_`
   }
 
-  enhanceOperationParams<T extends object>(params: T, tenantId: string): T & { tenantId: string } {
+  enhanceOperationParams<T extends object>(
+    params: T,
+    tenantId: string,
+  ): T & { tenantId: string } {
     return {
       ...params,
-      tenantId
+      tenantId,
     }
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Business Strategy Expansion & CMS System
- * 
+ *
  * Core module for business intelligence and content management
  * Integrates with existing Pixelated Empathy infrastructure
  */
@@ -19,10 +19,10 @@ export { WorkflowEngineService } from './services/workflow-engine'
 
 // Types
 export type {
-    NicheMarket,
-    CompetitorProfile,
-    MarketingTactic,
-    Document,
-    User,
-    WorkflowExecution
+  NicheMarket,
+  CompetitorProfile,
+  MarketingTactic,
+  Document,
+  User,
+  WorkflowExecution,
 } from './types'

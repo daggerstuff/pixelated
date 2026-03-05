@@ -123,12 +123,18 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     response: AgentResponse,
     currentContext: AgentContext,
   ): void => {
-    if (currentContext === 'scenario_generation' && response.metadata?.['scenario']) {
+    if (
+      currentContext === 'scenario_generation' &&
+      response.metadata?.['scenario']
+    ) {
       onScenarioGenerated?.(
         response.metadata['scenario'] as TherapeuticScenario,
       )
     }
-    if (currentContext === 'bias_detection' && response.metadata?.['bias_analysis']) {
+    if (
+      currentContext === 'bias_detection' &&
+      response.metadata?.['bias_analysis']
+    ) {
       onBiasAnalysis?.(response.metadata['bias_analysis'] as BiasAnalysis)
     }
   }
@@ -260,17 +266,19 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-3xl p-3 rounded-lg ${message.role === 'user'
+              className={`max-w-3xl p-3 rounded-lg ${
+                message.role === 'user'
                   ? 'bg-blue-600 text-white'
                   : message.context === 'error'
                     ? 'bg-red-100 text-red-800 border border-red-200'
                     : 'bg-gray-100 text-gray-800'
-                }`}
+              }`}
             >
               <div className="whitespace-pre-wrap">{message.content}</div>
               <div
-                className={`text-xs mt-2 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                  }`}
+                className={`text-xs mt-2 ${
+                  message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                }`}
               >
                 {message.timestamp.toLocaleTimeString()}
                 {message.context && ` • ${message.context}`}
@@ -326,10 +334,7 @@ type ConditionType =
   | 'personality_disorder'
   | 'crisis'
 
-const CONDITION_KEYWORDS: Record<
-  ConditionType,
-  readonly string[]
-> = {
+const CONDITION_KEYWORDS: Record<ConditionType, readonly string[]> = {
   depression: ['depression', 'depressed'],
   anxiety: ['anxiety', 'anxious'],
   ptsd: ['ptsd', 'trauma'],

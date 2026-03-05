@@ -2,7 +2,11 @@ import { type AstroIntegration } from 'astro'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createSearchIndexFile } from '../utils/search-indexer'
-import { validatePath, sanitizeFilename, ALLOWED_DIRECTORIES } from '../utils/path-security'
+import {
+  validatePath,
+  sanitizeFilename,
+  ALLOWED_DIRECTORIES,
+} from '../utils/path-security'
 
 interface SearchIntegrationOptions {
   // Collections to index
@@ -85,7 +89,9 @@ export default function flexsearchIntegration(
 
           // Write the file to the output directory
           const outDir = path.resolve(dir.pathname)
-          const indexFilename = sanitizeFilename(resolvedOptions.indexPath || 'search-index.js')
+          const indexFilename = sanitizeFilename(
+            resolvedOptions.indexPath || 'search-index.js',
+          )
           const indexPath = validatePath(indexFilename, outDir)
 
           await fs.writeFile(indexPath, searchIndexJs, 'utf-8')

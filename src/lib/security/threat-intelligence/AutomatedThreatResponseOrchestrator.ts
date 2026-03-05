@@ -1076,7 +1076,9 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     }
   }
 
-  private async simulateRemediateAction(_action: ResponseAction): Promise<void> {
+  private async simulateRemediateAction(
+    _action: ResponseAction,
+  ): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 300))
 
     if (Math.random() < 0.08) {

@@ -9,8 +9,7 @@ export interface ProgressMilestoneState {
   progressMetrics: SessionProgressMetrics
 }
 
-export interface UseSessionProgressMilestonesResult
-  extends ProgressMilestoneState {
+export interface UseSessionProgressMilestonesResult extends ProgressMilestoneState {
   setProgress: (value: number) => void
   addProgressSnapshot: (value: number) => void
   updateSkillScore: (skill: string, score: number) => void

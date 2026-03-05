@@ -141,7 +141,8 @@ export function NotificationCenter({
               </div>
               {unreadCount > 0 && (
                 <CardDescription>
-                  {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+                  {unreadCount} unread notification
+                  {unreadCount !== 1 ? 's' : ''}
                 </CardDescription>
               )}
               {visibleNotifications.length > 0 && (
@@ -220,7 +221,9 @@ export function NotificationCenter({
                               </div>
                               <button
                                 type="button"
-                                onClick={(e) => handleDismiss(notification.id, e)}
+                                onClick={(e) =>
+                                  handleDismiss(notification.id, e)
+                                }
                                 className="mt-0.5 rounded p-1 text-muted-foreground hover:bg-muted"
                                 aria-label="Dismiss notification"
                               >
@@ -250,4 +253,3 @@ export function NotificationCenter({
     </div>
   )
 }
-

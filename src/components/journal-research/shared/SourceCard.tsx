@@ -118,4 +118,3 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
     </Card>
   )
 }
-

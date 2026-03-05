@@ -78,7 +78,7 @@ export const POST = async ({ request }) => {
     const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN)
     const hasCustom = Boolean(
       import.meta.env.CUSTOM_ANALYTICS_ENDPOINT &&
-        import.meta.env.CUSTOM_ANALYTICS_TOKEN,
+      import.meta.env.CUSTOM_ANALYTICS_TOKEN,
     )
     console.log('Attempting analytics integrations:', {
       hasGA,

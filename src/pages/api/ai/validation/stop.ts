@@ -28,7 +28,7 @@ export const POST = async ({
             'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
     const user = await getCurrentUser(cookies)
     if (!user) {

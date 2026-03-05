@@ -2,9 +2,9 @@ import { Download, Filter, RefreshCw, X } from 'lucide-react'
 
 // Icon props interface
 interface IconProps {
-  className?: string
-  size?: number
-  strokeWidth?: number
+  'className'?: string
+  'size'?: number
+  'strokeWidth'?: number
   'aria-hidden'?: boolean | 'true' | 'false'
 }
 

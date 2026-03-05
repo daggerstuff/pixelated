@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach} from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 /// <reference types="vitest/globals" />
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import { BiasMetricsCollector } from '../metrics-collector'
@@ -667,7 +667,8 @@ describe('Refactored Modules Performance Tests', () => {
           type: 'anxiety' as const,
         },
         content: {
-          transcript: 'End-to-end performance test session for the complete bias detection workflow.',
+          transcript:
+            'End-to-end performance test session for the complete bias detection workflow.',
           aiResponses: [],
           userInputs: [],
         },
@@ -744,33 +745,36 @@ describe('Refactored Modules Performance Tests', () => {
       await alertSystem.initialize?.()
 
       const numberOfSessions = 25
-      const sessions: TherapeuticSession[] = Array.from({ length: numberOfSessions }, (_, i) => ({
-        sessionId: `sustained-load-${i}`,
-        sessionDate: new Date().toISOString(),
-        participantDemographics: {
-          age: String(20 + (i % 50)),
-          gender: i % 2 === 0 ? 'female' : 'male',
-          ethnicity: 'other',
-          primaryLanguage: 'english',
-        },
-        scenario: {
-          scenarioId: `load-scenario-${i}`,
-          type: 'anxiety' as const,
-        },
-        content: {
-          transcript: `Sustained load test session ${i} for performance validation.`,
+      const sessions: TherapeuticSession[] = Array.from(
+        { length: numberOfSessions },
+        (_, i) => ({
+          sessionId: `sustained-load-${i}`,
+          sessionDate: new Date().toISOString(),
+          participantDemographics: {
+            age: String(20 + (i % 50)),
+            gender: i % 2 === 0 ? 'female' : 'male',
+            ethnicity: 'other',
+            primaryLanguage: 'english',
+          },
+          scenario: {
+            scenarioId: `load-scenario-${i}`,
+            type: 'anxiety' as const,
+          },
+          content: {
+            transcript: `Sustained load test session ${i} for performance validation.`,
+            aiResponses: [],
+            userInputs: [],
+          },
           aiResponses: [],
+          expectedOutcomes: [],
+          transcripts: [],
           userInputs: [],
-        },
-        aiResponses: [],
-        expectedOutcomes: [],
-        transcripts: [],
-        userInputs: [],
-        metadata: {
-          sessionStartTime: new Date(),
-          sessionEndTime: new Date(),
-        },
-      }))
+          metadata: {
+            sessionStartTime: new Date(),
+            sessionEndTime: new Date(),
+          },
+        }),
+      )
 
       const startTime = performance.now()
 

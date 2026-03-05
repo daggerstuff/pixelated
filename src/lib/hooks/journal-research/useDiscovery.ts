@@ -143,5 +143,3 @@ export const useDiscoverySelection = () =>
     highlightSourceId: state.highlightSourceId,
     setHighlightSourceId: state.setHighlightSourceId,
   }))
-
-

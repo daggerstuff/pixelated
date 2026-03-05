@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useJournalSessionStore, } from '../sessionStore'
+import { useJournalSessionStore } from '../sessionStore'
 
 describe('sessionStore', () => {
   beforeEach(() => {
@@ -149,4 +149,3 @@ describe('sessionStore', () => {
     })
   })
 })
-

@@ -356,9 +356,21 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       therapistPerception: 'neutral',
       transferenceState: 'none',
       skillsAcquired: [
-        { skillName: 'Basic thought challenging', dateAchieved: '2024-08-15', proficiency: 0.6 },
-        { skillName: 'Activity scheduling', dateAchieved: '2024-08-20', proficiency: 0.5 },
-        { skillName: 'Mindfulness techniques', dateAchieved: '2024-08-25', proficiency: 0.4 },
+        {
+          skillName: 'Basic thought challenging',
+          dateAchieved: '2024-08-15',
+          proficiency: 0.6,
+        },
+        {
+          skillName: 'Activity scheduling',
+          dateAchieved: '2024-08-20',
+          proficiency: 0.5,
+        },
+        {
+          skillName: 'Mindfulness techniques',
+          dateAchieved: '2024-08-25',
+          proficiency: 0.4,
+        },
       ],
     },
   },
@@ -744,9 +756,21 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       therapistPerception: 'neutral',
       transferenceState: 'none',
       skillsAcquired: [
-        { skillName: 'Deep breathing', dateAchieved: '2024-09-05', proficiency: 0.5 },
-        { skillName: 'Progressive muscle relaxation', dateAchieved: '2024-09-10', proficiency: 0.4 },
-        { skillName: 'Basic cognitive restructuring', dateAchieved: '2024-09-15', proficiency: 0.3 },
+        {
+          skillName: 'Deep breathing',
+          dateAchieved: '2024-09-05',
+          proficiency: 0.5,
+        },
+        {
+          skillName: 'Progressive muscle relaxation',
+          dateAchieved: '2024-09-10',
+          proficiency: 0.4,
+        },
+        {
+          skillName: 'Basic cognitive restructuring',
+          dateAchieved: '2024-09-15',
+          proficiency: 0.3,
+        },
       ],
     },
   },
@@ -1131,9 +1155,21 @@ export const sampleCognitiveModels: CognitiveModel[] = [
       therapistPerception: 'neutral',
       transferenceState: 'none',
       skillsAcquired: [
-        { skillName: 'Grounding techniques', dateAchieved: '2024-07-28', proficiency: 0.5 },
-        { skillName: 'Safety planning', dateAchieved: '2024-08-05', proficiency: 0.4 },
-        { skillName: 'Basic emotional regulation', dateAchieved: '2024-08-15', proficiency: 0.3 },
+        {
+          skillName: 'Grounding techniques',
+          dateAchieved: '2024-07-28',
+          proficiency: 0.5,
+        },
+        {
+          skillName: 'Safety planning',
+          dateAchieved: '2024-08-05',
+          proficiency: 0.4,
+        },
+        {
+          skillName: 'Basic emotional regulation',
+          dateAchieved: '2024-08-15',
+          proficiency: 0.3,
+        },
       ],
     },
   },

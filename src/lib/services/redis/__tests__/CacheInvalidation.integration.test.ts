@@ -33,7 +33,9 @@ describe('cacheInvalidation Integration', () => {
     })
     await redis.connect()
 
-    cacheInvalidation = new CacheInvalidation({ redis: redis.getClient() as Redis })
+    cacheInvalidation = new CacheInvalidation({
+      redis: redis.getClient() as Redis,
+    })
   })
 
   afterEach(async () => {

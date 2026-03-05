@@ -41,7 +41,9 @@ describe('ProgressBar', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(<ProgressBar value={50} className="custom-class" />)
+    const { container } = render(
+      <ProgressBar value={50} className="custom-class" />,
+    )
 
     const progressBar = container.querySelector('.custom-class')
     expect(progressBar).toBeInTheDocument()
@@ -59,4 +61,3 @@ describe('ProgressBar', () => {
     expect(screen.getByText('50%')).toBeInTheDocument()
   })
 })
-

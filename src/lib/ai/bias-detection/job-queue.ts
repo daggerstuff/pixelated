@@ -66,9 +66,9 @@ export class JobQueue<T = any, R = any> {
     const avgDuration =
       completedJobs.length > 0
         ? completedJobs.reduce(
-          (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
-          0,
-        ) / completedJobs.length
+            (sum, j) => sum + (j.finishedAt! - j.startedAt! || 0),
+            0,
+          ) / completedJobs.length
         : 0
     const errorCount = jobs.filter((j) => j.status === 'failed').length
     const total = jobs.length

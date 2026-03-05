@@ -109,7 +109,11 @@ export class EmotionLlamaProvider {
       const decryptedResult = await this.processEncryptedResponse(result)
 
       // Convert to standardized format
-      const analysis = this.convertToEmotionAnalysis(decryptedResult, text, startTime)
+      const analysis = this.convertToEmotionAnalysis(
+        decryptedResult,
+        text,
+        startTime,
+      )
       const totalDurationMs = Date.now() - startTime
 
       // Track successful analysis metrics
@@ -159,7 +163,9 @@ export class EmotionLlamaProvider {
       }
     } catch (error: unknown) {
       logger.error('Error processing encrypted response', { error })
-      throw new Error('Failed to decrypt emotion analysis response', { cause: error })
+      throw new Error('Failed to decrypt emotion analysis response', {
+        cause: error,
+      })
     }
   }
 

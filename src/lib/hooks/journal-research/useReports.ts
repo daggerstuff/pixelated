@@ -62,5 +62,3 @@ export const useGenerateReportMutation = (sessionId: string | null) => {
     },
   })
 }
-
-

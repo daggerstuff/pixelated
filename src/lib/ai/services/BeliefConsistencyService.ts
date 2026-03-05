@@ -121,9 +121,7 @@ export class BeliefConsistencyService {
 
     const checkDirectNegation = (s1L: string, s2L: string): boolean => {
       // Case: "i do not <something>" vs "i <something>"
-      if (
-        checkNegationPattern(s1L, s2L, 'i do not ', 'i ', 'i do not ')
-      ) {
+      if (checkNegationPattern(s1L, s2L, 'i do not ', 'i ', 'i do not ')) {
         return true
       }
 

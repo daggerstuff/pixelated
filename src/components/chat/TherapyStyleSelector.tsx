@@ -1,5 +1,8 @@
 import React, { useState, type FC } from 'react'
-import type { TherapyStyleId, TherapyStyle } from '../../lib/ai/types/TherapyStyles'
+import type {
+  TherapyStyleId,
+  TherapyStyle,
+} from '../../lib/ai/types/TherapyStyles'
 import {
   therapyStyleConfigs,
   getRecommendedStyles,

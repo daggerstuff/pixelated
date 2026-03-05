@@ -12,4 +12,3 @@ export function SessionDetailPage({ sessionId }: SessionDetailPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-
