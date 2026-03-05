@@ -1,10 +1,6 @@
 import fs from 'node:fs/promises'
 
-import {
-  safeJoin,
-  ALLOWED_DIRECTORIES,
-  sanitizeFilename,
-} from './path-security'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from './path-security'
 
 interface CollectionEntry {
   id: string
@@ -22,7 +18,10 @@ async function getCollection(
   collectionName: string,
 ): Promise<CollectionEntry[]> {
   try {
-    const contentDir = safeJoin(ALLOWED_DIRECTORIES.CONTENT, collectionName)
+    const contentDir = safeJoin(
+      ALLOWED_DIRECTORIES.CONTENT,
+      collectionName,
+    )
 
     // Check if directory exists
     try {

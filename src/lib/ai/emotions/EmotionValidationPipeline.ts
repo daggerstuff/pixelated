@@ -549,7 +549,7 @@ class EmotionValidationPipeline {
       if (
         biasPattern.pattern.test(responseText) &&
         demographics.gender?.toLowerCase() ===
-          biasPattern.demographic.toLowerCase()
+        biasPattern.demographic.toLowerCase()
       ) {
         detectedPatterns.push(biasPattern.bias)
         severity += 0.3

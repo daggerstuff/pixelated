@@ -56,11 +56,11 @@ export function initializeTracing(): void {
       config.exporter.type === 'console'
         ? new ConsoleSpanExporter()
         : new OTLPTraceExporter({
-            url: config.exporter.endpoint
-              ? `${config.exporter.endpoint}/v1/traces`
-              : undefined,
-            headers: config.exporter.headers,
-          })
+          url: config.exporter.endpoint
+            ? `${config.exporter.endpoint}/v1/traces`
+            : undefined,
+          headers: config.exporter.headers,
+        })
 
     // Create metric exporter
     const metricExporter = new OTLPMetricExporter({
@@ -71,7 +71,9 @@ export function initializeTracing(): void {
     })
 
     // Create sampler based on configuration
-    const sampler = new TraceIdRatioBasedSampler(getSamplerConfig(config).ratio)
+    const sampler = new TraceIdRatioBasedSampler(
+      getSamplerConfig(config).ratio,
+    )
 
     // Create span processor
     const spanProcessor = new BatchSpanProcessor(traceExporter, {

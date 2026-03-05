@@ -12,7 +12,10 @@
  * - No lost updates guarantee
  */
 
-import { ContextEvent, ContextTransition } from './context-transition-detector'
+import {
+  ContextEvent,
+  ContextTransition,
+} from './context-transition-detector'
 import {
   getPrioritizedObjectivesForContext,
   ObjectivePriority,

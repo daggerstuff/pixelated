@@ -52,9 +52,7 @@ describe('acquisitionStore', () => {
       useAcquisitionStore.getState().toggleStatusFilter(status)
       useAcquisitionStore.getState().toggleStatusFilter(status)
 
-      expect(useAcquisitionStore.getState().filters.statuses).not.toContain(
-        status,
-      )
+      expect(useAcquisitionStore.getState().filters.statuses).not.toContain(status)
     })
 
     it('should toggle multiple status filters', () => {
@@ -68,9 +66,7 @@ describe('acquisitionStore', () => {
 
     it('should toggle showDownloadFailuresOnly', () => {
       useAcquisitionStore.getState().toggleShowDownloadFailuresOnly()
-      expect(
-        useAcquisitionStore.getState().filters.showDownloadFailuresOnly,
-      ).toBe(true)
+      expect(useAcquisitionStore.getState().filters.showDownloadFailuresOnly).toBe(true)
     })
 
     it('should reset filters to default', () => {
@@ -117,9 +113,7 @@ describe('acquisitionStore', () => {
       useAcquisitionStore.getState().expandRow('acq-1')
       useAcquisitionStore.getState().collapseRow('acq-1')
 
-      expect(useAcquisitionStore.getState().expandedRowIds).not.toContain(
-        'acq-1',
-      )
+      expect(useAcquisitionStore.getState().expandedRowIds).not.toContain('acq-1')
     })
 
     it('should collapse only specified row', () => {

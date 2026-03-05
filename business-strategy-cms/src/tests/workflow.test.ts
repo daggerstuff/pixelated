@@ -37,18 +37,15 @@ describe('WorkflowService Property Tests', () => {
     })
 
     // Create test document
-    document = await DocumentService.createDocument(
-      {
-        title: 'Test Strategy Document',
-        content: 'This is a test strategy document for workflow testing',
-        category: DocumentCategory.BUSINESS_PLAN,
-        status: DocumentStatus.DRAFT,
-        collaborators: [],
-        metadata: {},
-        tags: [],
-      },
-      user1.id,
-    )
+    document = await DocumentService.createDocument({
+      title: 'Test Strategy Document',
+      content: 'This is a test strategy document for workflow testing',
+      category: DocumentCategory.BUSINESS_PLAN,
+      status: DocumentStatus.DRAFT,
+      collaborators: [],
+      metadata: {},
+      tags: [],
+    }, user1.id)
   })
 
   afterEach(() => {
@@ -117,18 +114,15 @@ describe('WorkflowService Property Tests', () => {
     })
 
     it('should throw error for mismatched document category', async () => {
-      const marketingDoc = await DocumentService.createDocument(
-        {
-          title: 'Marketing Document',
-          content: 'Marketing content',
-          category: DocumentCategory.MARKETING_STRATEGY,
-          status: DocumentStatus.DRAFT,
-          collaborators: [],
-          metadata: {},
-          tags: [],
-        },
-        user1.id,
-      )
+      const marketingDoc = await DocumentService.createDocument({
+        title: 'Marketing Document',
+        content: 'Marketing content',
+        category: DocumentCategory.MARKETING_STRATEGY,
+        status: DocumentStatus.DRAFT,
+        collaborators: [],
+        metadata: {},
+        tags: [],
+      }, user1.id)
 
       await expect(
         WorkflowService.createWorkflowInstance(

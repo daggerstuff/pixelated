@@ -348,16 +348,12 @@ export class NotificationService {
    * Start processing notifications at a specific interval
    */
   async startProcessing(interval: number): Promise<void> {
-    logger.info(
-      `Starting notification processing loop (interval: ${interval}ms)`,
-    )
+    logger.info(`Starting notification processing loop (interval: ${interval}ms)`)
     while (true) {
       try {
         await this.processQueue()
       } catch (error) {
-        logger.error('Error in notification processing loop', {
-          error: error instanceof Error ? String(error) : String(error),
-        })
+        logger.error('Error in notification processing loop', { error: error instanceof Error ? String(error) : String(error) })
       }
       await new Promise((resolve) => setTimeout(resolve, interval))
     }

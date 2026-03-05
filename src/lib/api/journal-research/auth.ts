@@ -62,7 +62,9 @@ export async function isJournalResearchAuthenticated(): Promise<boolean> {
  * Handle unauthorized access by redirecting to login
  * @param redirectPath Optional path to redirect to after login
  */
-export function handleJournalResearchUnauthorized(redirectPath?: string): void {
+export function handleJournalResearchUnauthorized(
+  redirectPath?: string,
+): void {
   if (typeof window === 'undefined') {
     return
   }

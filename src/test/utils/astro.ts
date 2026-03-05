@@ -5,13 +5,8 @@
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-export async function renderAstro<
-  Props extends Record<string, unknown> = Record<string, unknown>,
->(
-  Component:
-    | { render(props: Record<string, unknown>): Promise<string> }
-    | { (props: Record<string, unknown>): unknown }
-    | ((props: Record<string, unknown>) => unknown),
+export async function renderAstro<Props extends Record<string, unknown> = Record<string, unknown>>(
+  Component: { render(props: Record<string, unknown>): Promise<string> } | { (props: Record<string, unknown>): unknown } | ((props: Record<string, unknown>) => unknown),
   props: Props = {} as Props,
   slotContent?: string,
 ): Promise<{
@@ -23,9 +18,7 @@ export async function renderAstro<
 }> {
   const renderProps = slotContent ? { ...props, slot: slotContent } : props
   // Type assertion needed because Astro component types vary at runtime
-  const html = await (
-    Component as { render(props: Record<string, unknown>): Promise<string> }
-  ).render(renderProps)
+  const html = await (Component as { render(props: Record<string, unknown>): Promise<string> }).render(renderProps)
   const container = document.createElement('div')
   container.innerHTML = html
 

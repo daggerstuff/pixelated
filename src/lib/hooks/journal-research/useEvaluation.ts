@@ -64,8 +64,7 @@ const filterEvaluations = (
       case 'evaluation_date':
         return (
           (new Date(a.evaluationDate).getTime() -
-            new Date(b.evaluationDate).getTime()) *
-          direction
+            new Date(b.evaluationDate).getTime()) * direction
         )
       case 'overall_score':
       default:
@@ -135,9 +134,9 @@ export const useEvaluationInitiateMutation = (sessionId: string | null) => {
         ),
         exact: false,
       })
-      useEvaluationStore
-        .getState()
-        .setSelectedEvaluationId(evaluation.evaluationId)
+      useEvaluationStore.getState().setSelectedEvaluationId(
+        evaluation.evaluationId,
+      )
     },
   })
 }

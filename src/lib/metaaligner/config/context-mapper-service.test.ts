@@ -64,18 +64,12 @@ describe('ContextMapperService', () => {
     })
 
     it('should return weights for CLINICAL_ASSESSMENT context', () => {
-      const result = service.getWeightsForContext(
-        ContextType.CLINICAL_ASSESSMENT,
-      )
+      const result = service.getWeightsForContext(ContextType.CLINICAL_ASSESSMENT)
 
       expect(result.context).toBe(ContextType.CLINICAL_ASSESSMENT)
-      expect(result.weights[ObjectiveId.CORRECTNESS]).toBeGreaterThanOrEqual(
-        0.3,
-      )
+      expect(result.weights[ObjectiveId.CORRECTNESS]).toBeGreaterThanOrEqual(0.3)
       expect(result.weights[ObjectiveId.SAFETY]).toBeGreaterThanOrEqual(0.25)
-      expect(
-        result.weights[ObjectiveId.PROFESSIONALISM],
-      ).toBeGreaterThanOrEqual(0.2)
+      expect(result.weights[ObjectiveId.PROFESSIONALISM]).toBeGreaterThanOrEqual(0.2)
     })
 
     it('should return weights for all context types', () => {
@@ -128,9 +122,7 @@ describe('ContextMapperService', () => {
 
       expect(result.weights[ObjectiveId.SAFETY]).toBeGreaterThanOrEqual(0.15)
       expect(result.safetyFloorApplied).toBe(true)
-      expect(result.reasoning.some((r) => r.includes('Safety floor'))).toBe(
-        true,
-      )
+      expect(result.reasoning.some((r) => r.includes('Safety floor'))).toBe(true)
     })
 
     it('should not apply safety floor when disabled', () => {
@@ -250,10 +242,7 @@ describe('ContextMapperService', () => {
 
       expect(result.normalized).toBe(true)
 
-      const sum = Object.values(result.weights).reduce(
-        (acc, w) => acc + (w || 0),
-        0,
-      )
+      const sum = Object.values(result.weights).reduce((acc, w) => acc + (w || 0), 0)
       expect(Math.abs(sum - 1.0)).toBeLessThan(0.001)
     })
 
@@ -336,13 +325,9 @@ describe('ContextMapperService', () => {
       }
 
       const customService = new ContextMapperService(config)
-      const result = customService.getMappingWithExplainability(
-        ContextType.EDUCATIONAL,
-      )
+      const result = customService.getMappingWithExplainability(ContextType.EDUCATIONAL)
 
-      expect(result.reasoning.some((r) => r.includes('Safety floor'))).toBe(
-        true,
-      )
+      expect(result.reasoning.some((r) => r.includes('Safety floor'))).toBe(true)
     })
 
     it('should log normalization when applied', () => {

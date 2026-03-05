@@ -97,7 +97,10 @@ export class MarketAnalyticsService {
     resourceRequirements: ResourceRequirements
     riskAssessment: RiskAssessment
   }> {
-    await this.analyzeTargetMarkets(currentMarket, targetMarkets)
+    await this.analyzeTargetMarkets(
+      currentMarket,
+      targetMarkets,
+    )
 
     const phases: ExpansionPhase[] = []
     let totalTimeline = 0

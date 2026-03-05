@@ -352,7 +352,7 @@ export class ContextualEnhancer {
   private assessTherapeuticAlliance(history: SessionContext[]): number {
     return history.length > 0
       ? history.reduce((sum, h) => sum + (h.therapeuticAlliance || 0.5), 0) /
-          history.length
+      history.length
       : 0.5
   }
 

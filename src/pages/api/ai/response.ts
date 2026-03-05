@@ -9,13 +9,7 @@ import { aiRepository } from '@/lib/db/ai'
 import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
 import { apiMetrics, countMetric } from '@/lib/sentry/utils'
 import { createTogetherAIService } from '@/lib/ai/together-ai/service'
-import type {
-  AIService,
-  AIServiceOptions,
-  AIMessage,
-  AIStreamChunk,
-  TherapeuticResponse,
-} from '@/lib/ai/types'
+import type { AIService, AIServiceOptions, AIMessage, AIStreamChunk, TherapeuticResponse } from '@/lib/ai/types'
 import { ResponseGenerationService } from '@/lib/ai/response-generation/service'
 
 // Local Session interface - getSession returns null in this codebase
@@ -100,7 +94,9 @@ export const GET: APIRoute = async ({ request }) => {
 /**
  * API route for therapeutic response generation
  */
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({
+  request,
+}) => {
   const startTime = Date.now()
   const endpoint = '/api/ai/response'
   let session: Session | null = null
@@ -170,8 +166,8 @@ export const POST: APIRoute = async ({ request }) => {
                 role: 'assistant',
                 content:
                   typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                    response !== null &&
+                    'content' in response
                     ? (response as { content: string }).content
                     : '',
                 name: 'assistant',
@@ -181,32 +177,32 @@ export const POST: APIRoute = async ({ request }) => {
           ],
           usage:
             typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+              response !== null &&
+              'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
-                }
+                promptTokens: Number(
+                  (response.usage as { promptTokens: number })
+                    ?.promptTokens || 0,
+                ),
+                completionTokens: Number(
+                  (response.usage as { completionTokens: number })
+                    ?.completionTokens || 0,
+                ),
+                totalTokens: Number(
+                  (response.usage as { totalTokens: number })?.totalTokens ||
+                  0,
+                ),
+              }
               : {
-                  promptTokens: 0,
-                  completionTokens: 0,
-                  totalTokens: 0,
-                },
+                promptTokens: 0,
+                completionTokens: 0,
+                totalTokens: 0,
+              },
           provider: 'together',
           content:
             typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+              response !== null &&
+              'content' in response
               ? (response as { content: string }).content
               : '',
         }
@@ -215,7 +211,7 @@ export const POST: APIRoute = async ({ request }) => {
         _messages: AIMessage[],
         options?: AIServiceOptions,
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
-        const generator = async function* () {
+        const generator = async function*() {
           // Minimal implementation - streaming not fully supported
           yield {
             id: `together_${Date.now()}`,
@@ -254,8 +250,8 @@ export const POST: APIRoute = async ({ request }) => {
                 role: 'assistant',
                 content:
                   typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                    response !== null &&
+                    'content' in response
                     ? (response as { content: string }).content
                     : '',
                 name: 'assistant',
@@ -265,32 +261,32 @@ export const POST: APIRoute = async ({ request }) => {
           ],
           usage:
             typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+              response !== null &&
+              'usage' in response
               ? {
-                  promptTokens: Number(
-                    (response.usage as { promptTokens: number })
-                      ?.promptTokens || 0,
-                  ),
-                  completionTokens: Number(
-                    (response.usage as { completionTokens: number })
-                      ?.completionTokens || 0,
-                  ),
-                  totalTokens: Number(
-                    (response.usage as { totalTokens: number })?.totalTokens ||
-                      0,
-                  ),
-                }
+                promptTokens: Number(
+                  (response.usage as { promptTokens: number })
+                    ?.promptTokens || 0,
+                ),
+                completionTokens: Number(
+                  (response.usage as { completionTokens: number })
+                    ?.completionTokens || 0,
+                ),
+                totalTokens: Number(
+                  (response.usage as { totalTokens: number })?.totalTokens ||
+                  0,
+                ),
+              }
               : {
-                  promptTokens: 0,
-                  completionTokens: 0,
-                  totalTokens: 0,
-                },
+                promptTokens: 0,
+                completionTokens: 0,
+                totalTokens: 0,
+              },
           provider: 'together',
           content:
             typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+              response !== null &&
+              'content' in response
               ? (response as { content: string }).content
               : '',
         }
@@ -391,8 +387,7 @@ export const POST: APIRoute = async ({ request }) => {
     })
   } catch (error: unknown) {
     const durationMs = Date.now() - startTime
-    const errorType =
-      error instanceof Error ? error.constructor.name : 'UnknownError'
+    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
 
     console.error('Error in response generation API:', error)
 

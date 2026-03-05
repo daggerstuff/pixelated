@@ -265,9 +265,8 @@ export function TherapyChatClient() {
           {/* Chat container */}
           <div
             ref={containerRef}
-            className={`overflow-y-auto ${
-              isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
-            } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
+            className={`overflow-y-auto ${isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
+              } border border-purple-900 rounded-md bg-black bg-opacity-50 p-2 mb-2 shadow-sm transition-all duration-200`}
           >
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-400">

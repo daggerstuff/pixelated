@@ -71,7 +71,11 @@ export const AlertDescription = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <div ref={ref} className={cn('text-sm opacity-90', className)} {...props} />
+    <div
+      ref={ref}
+      className={cn('text-sm opacity-90', className)}
+      {...props}
+    />
   )
 })
 

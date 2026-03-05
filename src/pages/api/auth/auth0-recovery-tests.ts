@@ -42,7 +42,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -77,7 +77,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.forbidden',
         user.id,
         'auth-security-backup',
-        { action: 'get_recovery_tests', reason: 'insufficient_permissions' },
+        { action: 'get_recovery_tests', reason: 'insufficient_permissions' }
       )
 
       return new Response(
@@ -85,7 +85,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -105,7 +105,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.list',
         user.id,
         'auth-security-backup',
-        { action: 'list_recovery_tests' },
+        { action: 'list_recovery_tests' }
       )
 
       return new Response(JSON.stringify({ tests }), {
@@ -128,7 +128,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.get',
         user.id,
         'auth-security-backup',
-        { action: 'get_recovery_test', testId },
+        { action: 'get_recovery_test', testId }
       )
 
       return new Response(JSON.stringify({ test }), {
@@ -145,7 +145,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.config.get',
         user.id,
         'auth-security-backup',
-        { action: 'get_recovery_test_config' },
+        { action: 'get_recovery_test_config' }
       )
 
       return new Response(JSON.stringify({ config }), {
@@ -172,7 +172,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
@@ -194,7 +194,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -207,7 +207,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -229,7 +229,7 @@ export const POST: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.forbidden',
         user.id,
         'auth-security-backup',
-        { action: 'post_recovery_tests', reason: 'insufficient_permissions' },
+        { action: 'post_recovery_tests', reason: 'insufficient_permissions' }
       )
 
       return new Response(
@@ -237,7 +237,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -260,7 +260,7 @@ export const POST: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.run',
         user.id,
         'auth-security-backup',
-        { action: 'run_recovery_test', backupId, environment },
+        { action: 'run_recovery_test', backupId, environment }
       )
 
       return new Response(JSON.stringify({ success: true, test: testResult }), {
@@ -279,7 +279,7 @@ export const POST: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.config.update',
         user.id,
         'auth-security-backup',
-        { action: 'update_recovery_test_config', config },
+        { action: 'update_recovery_test_config', config }
       )
 
       return new Response(JSON.stringify({ success: true }), {
@@ -298,7 +298,7 @@ export const POST: APIRoute = async ({ request }) => {
         'auth.security.backup.recovery.tests.schedule',
         user.id,
         'auth-security-backup',
-        { action: 'schedule_recovery_tests' },
+        { action: 'schedule_recovery_tests' }
       )
 
       return new Response(JSON.stringify({ success: true }), {
@@ -325,7 +325,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(JSON.stringify({ error: 'Internal server error' }), {

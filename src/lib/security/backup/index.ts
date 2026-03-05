@@ -1045,8 +1045,9 @@ async function getStorageProvider(
 ): Promise<StorageProvider> {
   try {
     // Import the storage provider dynamically
-    const { getStorageProvider: importedGetStorageProvider } =
-      await import('./storage-providers-wrapper.ts')
+    const { getStorageProvider: importedGetStorageProvider } = await import(
+      './storage-providers-wrapper.ts'
+    )
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
       type: provider,

@@ -7,10 +7,9 @@ import {
 } from '../lib/memory/memory-client'
 import { mcpMemoryManager } from '../lib/memory/mcp-memory-client'
 
-const memoryManager =
-  process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'true'
-    ? mcpMemoryManager
-    : localMemoryManager
+const memoryManager = process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'true'
+  ? mcpMemoryManager
+  : localMemoryManager
 
 interface UseMemoryOptions {
   userId?: string
@@ -374,11 +373,11 @@ export function useUserPreferences(userId: string): UseUserPreferencesReturn {
           const match = prefMemory.content.match(/= (.+)$/)
           return match && match[1]
             ? (JSON.parse(match[1]) as
-                | string
-                | number
-                | boolean
-                | object
-                | null)
+              | string
+              | number
+              | boolean
+              | object
+              | null)
             : null
         } catch {
           return null

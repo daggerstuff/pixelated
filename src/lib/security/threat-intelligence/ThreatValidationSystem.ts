@@ -625,9 +625,7 @@ export class ThreatValidationSystem extends EventEmitter {
   /**
    * Get validation criteria for validation types
    */
-  private getValidationCriteria(
-    _validationTypes: string[],
-  ): ValidationCriteria {
+  private getValidationCriteria(_validationTypes: string[]): ValidationCriteria {
     return {
       accuracy_threshold: 0.8,
       completeness_requirements: ['value', 'type', 'source', 'timestamp'],
@@ -1335,9 +1333,7 @@ export class ThreatValidationSystem extends EventEmitter {
     }
   }
 
-  private async crossReferenceExternalSources(
-    _threatData: ThreatData,
-  ): Promise<{
+  private async crossReferenceExternalSources(_threatData: ThreatData): Promise<{
     is_verified: boolean
     evidence: ValidationEvidence[]
   }> {

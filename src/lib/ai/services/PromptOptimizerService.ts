@@ -157,9 +157,7 @@ export class PromptOptimizerService {
       return conversationSummary
     } catch (error: unknown) {
       logger.error('Error creating conversation summary', { error })
-      throw new Error(`Failed to create conversation summary: ${error}`, {
-        cause: error,
-      })
+      throw new Error(`Failed to create conversation summary: ${error}`, { cause: error })
     }
   }
 

@@ -45,12 +45,7 @@ export const useEmotionDetection = () => {
 
   const parseEmotionAnalysis = (analysisText: string): EmotionAnalysis => {
     try {
-      const parsed = JSON.parse(analysisText) as {
-        primaryEmotion?: string
-        secondaryEmotions?: string[]
-        intensity?: number
-        confidence?: number
-      }
+      const parsed = JSON.parse(analysisText) as { primaryEmotion?: string; secondaryEmotions?: string[]; intensity?: number; confidence?: number }
       return {
         primaryEmotion: parsed.primaryEmotion || 'neutral',
         secondaryEmotions: parsed.secondaryEmotions || [],

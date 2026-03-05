@@ -26,9 +26,7 @@ async function runMigration() {
     const client = await pool.connect()
 
     // Read the migration file
-    const migrationPath = resolve(
-      './db/migrations/001_create_initial_tables.sql',
-    )
+    const migrationPath = resolve('./db/migrations/001_create_initial_tables.sql')
     const migrationSQL = await readFile(migrationPath, 'utf8')
 
     console.log('Executing migration...')
@@ -43,10 +41,7 @@ async function runMigration() {
       WHERE table_schema = 'public'
       ORDER BY table_name
     `)
-    console.log(
-      'Created tables:',
-      tables.rows.map((row) => row.table_name),
-    )
+    console.log('Created tables:', tables.rows.map(row => row.table_name))
 
     client.release()
     await pool.end()

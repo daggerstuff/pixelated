@@ -43,9 +43,7 @@ test.describe('Journal Research Discovery Workflow', () => {
     })
 
     // Verify sources are displayed
-    const sourceList = page.locator(
-      'table tbody tr, [data-testid="source-item"]',
-    )
+    const sourceList = page.locator('table tbody tr, [data-testid="source-item"]')
     const sourceCount = await sourceList.count()
 
     expect(sourceCount).toBeGreaterThan(0)
@@ -80,11 +78,9 @@ test.describe('Journal Research Discovery Workflow', () => {
     })
 
     // Click on first source
-    const firstSourceLink = page
-      .locator('table a, [data-testid="source-link"]')
-      .first()
+    const firstSourceLink = page.locator('table a, [data-testid="source-link"]').first()
 
-    if ((await firstSourceLink.count()) > 0) {
+    if (await firstSourceLink.count() > 0) {
       await firstSourceLink.click()
 
       // Verify source detail page
@@ -96,9 +92,7 @@ test.describe('Journal Research Discovery Workflow', () => {
 
   test('searches sources', async ({ page }) => {
     // Wait for search input
-    await page.waitForSelector('input[placeholder*="Search"]', {
-      timeout: 5000,
-    })
+    await page.waitForSelector('input[placeholder*="Search"]', { timeout: 5000 })
 
     // Enter search term
     await page.fill('input[placeholder*="Search"]', 'depression')

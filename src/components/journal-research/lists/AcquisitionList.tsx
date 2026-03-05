@@ -4,17 +4,10 @@ import type {
   AcquisitionList as AcquisitionListType,
 } from '@/lib/api/journal-research/types'
 import { Table } from '@/components/ui/table'
-import type {
-  TableColumn,
-  TableState,
-  TableDataSource,
-} from '@/components/ui/table-types'
+import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
-import {
-  useIntegrateDataset,
-  useTrainingStatus,
-} from '@/lib/hooks/journal-research/useTraining'
+import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
 import { Button } from '@/components/ui/button/button'
 import { CheckCircle2, Loader2, Play } from 'lucide-react'
 
@@ -34,10 +27,7 @@ export function AcquisitionList({
   sessionId,
 }: AcquisitionListProps) {
   const integrateMutation = useIntegrateDataset(sessionId ?? '')
-  const { data: trainingStatus } = useTrainingStatus(
-    sessionId ?? '',
-    !!sessionId,
-  )
+  const { data: trainingStatus } = useTrainingStatus(sessionId ?? '', !!sessionId)
 
   // Create a map of integration statuses
   const integrationStatusMap = useMemo(() => {
@@ -117,15 +107,11 @@ export function AcquisitionList({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      'completed':
-        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'in-progress':
-        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'pending':
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      'approved':
-        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      'failed': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      approved: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     }
     return (
       colors[status.toLowerCase()] ??
@@ -172,8 +158,7 @@ export function AcquisitionList({
       header: 'Progress',
       accessor: (row) => {
         const progress = row.downloadProgress ?? 0
-        if (progress === 0 && row.status !== 'in-progress')
-          return <span>-</span>
+        if (progress === 0 && row.status !== 'in-progress') return <span>-</span>
         return (
           <div className="flex items-center gap-2">
             <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
@@ -276,7 +261,9 @@ export function AcquisitionList({
     loading: isLoading,
   }
 
-  const statuses = Array.from(new Set(acquisitions.items.map((a) => a.status)))
+  const statuses = Array.from(
+    new Set(acquisitions.items.map((a) => a.status)),
+  )
 
   return (
     <div className={cn('space-y-4', className)}>

@@ -1,10 +1,4 @@
-import {
-  defineConfig,
-  presetUno,
-  presetAttributify,
-  presetIcons,
-  presetWebFonts,
-} from 'unocss'
+import { defineConfig, presetUno, presetAttributify, presetIcons, presetWebFonts } from 'unocss'
 
 export default defineConfig({
   theme: {
@@ -50,18 +44,17 @@ export default defineConfig({
     ...(process.env.CI === 'true' || process.env.NODE_ENV === 'test'
       ? []
       : [
-          presetWebFonts({
-            fonts: {
-              sans: 'Inter:400,600,800',
-              mono: 'DM Mono:400,600',
-              condensed: 'Roboto Condensed',
-            },
-          }),
-        ]),
+        presetWebFonts({
+          fonts: {
+            sans: 'Inter:400,600,800',
+            mono: 'DM Mono:400,600',
+            condensed: 'Roboto Condensed',
+          },
+        }),
+      ]),
   ],
   shortcuts: {
-    'btn':
-      'px-4 py-2 rounded inline-block bg-primary-600 text-white cursor-pointer hover:bg-primary-700',
+    'btn': 'px-4 py-2 rounded inline-block bg-primary-600 text-white cursor-pointer hover:bg-primary-700',
     'btn-primary': 'btn bg-primary-600 hover:bg-primary-700',
     'btn-secondary': 'btn bg-secondary-600 hover:bg-secondary-700',
   },

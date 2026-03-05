@@ -20,7 +20,9 @@ export const useNotifications = ({
   preferWebSocket = true,
   onNotification,
 }: UseNotificationsOptions) => {
-  const addNotification = useNotificationStore((state) => state.addNotification)
+  const addNotification = useNotificationStore(
+    (state) => state.addNotification,
+  )
 
   const handleMessage = (message: WebSocketMessage) => {
     if (message.type === 'notification') {

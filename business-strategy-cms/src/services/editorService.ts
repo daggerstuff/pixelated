@@ -71,6 +71,7 @@ export class EditorService {
   static sanitizeContent(html: string): string {
     // Basic HTML sanitization
 
+
     // Remove script tags and other potentially dangerous content
     let sanitized = html.replace(/<script[^>]*>.*?<\/script>/gi, '')
     sanitized = sanitized.replace(/<style[^>]*>.*?<\/style>/gi, '')

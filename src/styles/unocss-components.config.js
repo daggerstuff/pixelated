@@ -1,11 +1,4 @@
-import {
-  defineConfig,
-  presetUno,
-  presetAttributify,
-  presetIcons,
-  presetTypography,
-  presetWebFonts,
-} from 'unocss'
+import { defineConfig, presetUno, presetAttributify, presetIcons, presetTypography, presetWebFonts } from 'unocss'
 
 export default defineConfig({
   presets: [
@@ -13,10 +6,8 @@ export default defineConfig({
     presetAttributify(),
     presetIcons({
       collections: {
-        carbon: () =>
-          import('@iconify-json/carbon/icons.json').then((i) => i.default),
-        mdi: () =>
-          import('@iconify-json/mdi/icons.json').then((i) => i.default),
+        carbon: () => import('@iconify-json/carbon/icons.json').then(i => i.default),
+        mdi: () => import('@iconify-json/mdi/icons.json').then(i => i.default),
       },
     }),
     presetTypography(),
@@ -32,7 +23,7 @@ export default defineConfig({
   theme: {
     colors: {
       // Primary color scale (OKLCH-based)
-      'primary': {
+      primary: {
         50: 'oklch(96.5% 0.02 41.116)',
         100: 'oklch(92.1% 0.04 41.116)',
         200: 'oklch(87.6% 0.08 41.116)',
@@ -46,7 +37,7 @@ export default defineConfig({
         950: 'oklch(39.1% 0.30 41.116)',
       },
       // Secondary color scale
-      'secondary': {
+      secondary: {
         50: 'oklch(96.8% 0.02 276.42)',
         100: 'oklch(92.4% 0.04 276.42)',
         200: 'oklch(87.9% 0.08 276.42)',
@@ -60,7 +51,7 @@ export default defineConfig({
         950: 'oklch(32.8% 0.194 276.42)',
       },
       // Accent colors
-      'accent': {
+      accent: {
         50: 'oklch(96.2% 0.03 101.93)',
         100: 'oklch(91.8% 0.06 101.93)',
         200: 'oklch(87.3% 0.09 101.93)',
@@ -74,7 +65,7 @@ export default defineConfig({
         950: 'oklch(38.1% 0.23 101.93)',
       },
       // Neutral colors (dark theme optimized)
-      'neutral': {
+      neutral: {
         50: 'oklch(95.1% 0.004 94.33)',
         100: 'oklch(90.5% 0.007 91.03)',
         200: 'oklch(82.1% 0.01 87.72)',
@@ -88,17 +79,17 @@ export default defineConfig({
         950: 'oklch(10.2% 0.003 42.15)',
       },
       // Semantic colors
-      'background': 'var(--color-neutral-950)',
-      'foreground': 'var(--color-neutral-100)',
-      'card': 'var(--color-neutral-900)',
+      background: 'var(--color-neutral-950)',
+      foreground: 'var(--color-neutral-100)',
+      card: 'var(--color-neutral-900)',
       'card-foreground': 'var(--color-neutral-100)',
-      'popover': 'var(--color-neutral-900)',
+      popover: 'var(--color-neutral-900)',
       'popover-foreground': 'var(--color-neutral-100)',
-      'muted': 'var(--color-neutral-700)',
+      muted: 'var(--color-neutral-700)',
       'muted-foreground': 'var(--color-neutral-500)',
-      'border': 'var(--color-neutral-800)',
-      'input': 'var(--color-neutral-800)',
-      'ring': 'var(--color-primary-500)',
+      border: 'var(--color-neutral-800)',
+      input: 'var(--color-neutral-800)',
+      ring: 'var(--color-primary-500)',
     },
 
     // Animation durations matching design system
@@ -119,19 +110,19 @@ export default defineConfig({
 
     // Custom spacing scale
     spacing: {
-      '4xs': '0.125rem', // 2px
-      '3xs': '0.25rem', // 4px
-      '2xs': '0.5rem', // 8px
-      'xs': '0.75rem', // 12px
-      'sm': '1rem', // 16px
-      'md': '1.5rem', // 24px
-      'lg': '2rem', // 32px
-      'xl': '3rem', // 48px
-      '2xl': '4rem', // 64px
-      '3xl': '6rem', // 96px
-      '4xl': '8rem', // 128px
-      '5xl': '12rem', // 192px
-      '6xl': '16rem', // 256px
+      '4xs': '0.125rem',    // 2px
+      '3xs': '0.25rem',     // 4px
+      '2xs': '0.5rem',      // 8px
+      'xs': '0.75rem',      // 12px
+      'sm': '1rem',         // 16px
+      'md': '1.5rem',       // 24px
+      'lg': '2rem',         // 32px
+      'xl': '3rem',         // 48px
+      '2xl': '4rem',        // 64px
+      '3xl': '6rem',        // 96px
+      '4xl': '8rem',        // 128px
+      '5xl': '12rem',       // 192px
+      '6xl': '16rem',       // 256px
     },
 
     // Custom border radius
@@ -170,126 +161,89 @@ export default defineConfig({
   // Custom rules for our components
   rules: [
     // Gradient backgrounds
-    [
-      /^bg-gradient-(\w+)-(\w+)$/,
-      ([, _direction, gradient]) => {
-        const gradients = {
-          primary:
-            'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
-          secondary:
-            'linear-gradient(135deg, var(--color-secondary-600), var(--color-accent-500))',
-          accent:
-            'linear-gradient(135deg, var(--color-accent-500), var(--color-primary-500))',
-          dark: 'linear-gradient(135deg, var(--color-neutral-950), var(--color-neutral-800))',
-          light:
-            'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
-        }
+    [/^bg-gradient-(\w+)-(\w+)$/, ([, _direction, gradient]) => {
+      const gradients = {
+        primary: 'linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600))',
+        secondary: 'linear-gradient(135deg, var(--color-secondary-600), var(--color-accent-500))',
+        accent: 'linear-gradient(135deg, var(--color-accent-500), var(--color-primary-500))',
+        dark: 'linear-gradient(135deg, var(--color-neutral-950), var(--color-neutral-800))',
+        light: 'linear-gradient(135deg, var(--color-neutral-100), var(--color-neutral-300))',
+      };
 
-        // directions object removed - was unused
+// directions object removed - was unused
 
-        return {
-          background:
-            gradients[gradient] ||
-            `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`,
-        }
-      },
-    ],
+      return {
+        background: gradients[gradient] || `linear-gradient(135deg, var(--color-${gradient}-600), var(--color-${gradient}-500))`
+      };
+    }],
 
     // Dark mode utilities
-    [
-      'dark',
-      {
-        '@media (prefers-color-scheme: dark)': {
-          'color-scheme': 'dark',
-        },
-      },
-    ],
+    ['dark', {
+      '@media (prefers-color-scheme: dark)': {
+        'color-scheme': 'dark'
+      }
+    }],
 
     // Card utilities
-    [
-      'card',
-      {
-        'background-color': 'var(--bg-secondary)',
-        'border': '1px solid var(--border-secondary)',
-        'border-radius': 'var(--card-radius)',
-        'padding': 'var(--card-padding)',
-        'box-shadow': 'var(--card-shadow)',
-        'transition': 'all var(--duration-normal) var(--ease-in-out)',
-      },
-    ],
+    ['card', {
+      'background-color': 'var(--bg-secondary)',
+      'border': '1px solid var(--border-secondary)',
+      'border-radius': 'var(--card-radius)',
+      'padding': 'var(--card-padding)',
+      'box-shadow': 'var(--card-shadow)',
+      'transition': 'all var(--duration-normal) var(--ease-in-out)',
+    }],
 
-    [
-      'card-hover',
-      {
-        'box-shadow': 'var(--card-shadow-hover)',
-        'transform': 'translateY(-2px)',
-      },
-    ],
+    ['card-hover', {
+      'box-shadow': 'var(--card-shadow-hover)',
+      'transform': 'translateY(-2px)',
+    }],
 
     // Button utilities
-    [
-      'btn',
-      {
-        'display': 'inline-flex',
-        'align-items': 'center',
-        'justify-content': 'center',
-        'padding': 'var(--button-padding-y) var(--button-padding-x)',
-        'border-radius': 'var(--button-radius)',
-        'font-weight': 'var(--button-font-weight)',
-        'transition': 'all var(--duration-fast) var(--ease-out)',
-        'cursor': 'pointer',
-        'border': 'none',
-        'text-decoration': 'none',
-      },
-    ],
+    ['btn', {
+      'display': 'inline-flex',
+      'align-items': 'center',
+      'justify-content': 'center',
+      'padding': 'var(--button-padding-y) var(--button-padding-x)',
+      'border-radius': 'var(--button-radius)',
+      'font-weight': 'var(--button-font-weight)',
+      'transition': 'all var(--duration-fast) var(--ease-out)',
+      'cursor': 'pointer',
+      'border': 'none',
+      'text-decoration': 'none',
+    }],
 
-    [
-      'btn-primary',
-      {
-        'background-color': 'var(--color-primary-600)',
-        'color': 'white',
-      },
-    ],
+    ['btn-primary', {
+      'background-color': 'var(--color-primary-600)',
+      'color': 'white',
+    }],
 
-    [
-      'btn-secondary',
-      {
-        'background-color': 'var(--bg-tertiary)',
-        'color': 'var(--text-primary)',
-        'border': '1px solid var(--border-primary)',
-      },
-    ],
+    ['btn-secondary', {
+      'background-color': 'var(--bg-tertiary)',
+      'color': 'var(--text-primary)',
+      'border': '1px solid var(--border-primary)',
+    }],
 
     // Text gradient
-    [
-      'text-gradient',
-      {
-        'background':
-          'linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500))',
-        '-webkit-background-clip': 'text',
-        '-webkit-text-fill-color': 'transparent',
-        'background-clip': 'text',
-      },
-    ],
+    ['text-gradient', {
+      'background': 'linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500))',
+      '-webkit-background-clip': 'text',
+      '-webkit-text-fill-color': 'transparent',
+      'background-clip': 'text',
+    }],
 
     // Glass morphism
-    [
-      'glass',
-      {
-        'background': 'rgba(255, 255, 255, 0.1)',
-        'backdrop-filter': 'blur(10px)',
-        'border': '1px solid rgba(255, 255, 255, 0.2)',
-      },
-    ],
+    ['glass', {
+      'background': 'rgba(255, 255, 255, 0.1)',
+      'backdrop-filter': 'blur(10px)',
+      'border': '1px solid rgba(255, 255, 255, 0.2)',
+    }],
 
-    [
-      'glass-dark',
-      {
-        'background': 'rgba(0, 0, 0, 0.2)',
-        'backdrop-filter': 'blur(10px)',
-        'border': '1px solid rgba(255, 255, 255, 0.1)',
-      },
-    ],
+    ['glass-dark', {
+      'background': 'rgba(0, 0, 0, 0.2)',
+      'backdrop-filter': 'blur(10px)',
+      'border': '1px solid rgba(255, 255, 255, 0.1)',
+    }],
   ],
 
   // Custom shortcuts
@@ -306,14 +260,10 @@ export default defineConfig({
     'text-pretty': 'text-wrap-pretty',
 
     // Component shortcuts
-    'card-base':
-      'bg-secondary border border-border-secondary rounded-lg p-6 shadow-md',
-    'card-hover':
-      'hover:shadow-xl hover:-translate-y-1 transition-all duration-300',
-    'btn-base':
-      'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
-    'input-base':
-      'w-full px-3 py-2 border border-border-primary rounded-md bg-secondary text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
+    'card-base': 'bg-secondary border border-border-secondary rounded-lg p-6 shadow-md',
+    'card-hover': 'hover:shadow-xl hover:-translate-y-1 transition-all duration-300',
+    'btn-base': 'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
+    'input-base': 'w-full px-3 py-2 border border-border-primary rounded-md bg-secondary text-primary placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent',
 
     // Animation shortcuts
     'animate-float': 'animate-float',
@@ -426,12 +376,9 @@ export default defineConfig({
     {
       extractor: (code) => {
         // Extract class names from Astro components
-        const classMatches =
-          code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) || []
+        const classMatches = code.match(/class(?:Name)?=["'`]([^"'`]*?)["'`]/g) || []
         return classMatches.flatMap((match) => {
-          const classes = match
-            .replace(/class(?:Name)?=["'`]/, '')
-            .replace(/["'`]$/, '')
+          const classes = match.replace(/class(?:Name)?=["'`]/, '').replace(/["'`]$/, '')
           return classes.split(/\s+/).filter(Boolean)
         })
       },
@@ -440,8 +387,15 @@ export default defineConfig({
   ],
 
   // Include all utilities
-  include: [/\.astro$/, /\.tsx?$/, /\.jsx?$/],
+  include: [
+    /\.astro$/,
+    /\.tsx?$/,
+    /\.jsx?$/,
+  ],
 
   // Exclude node_modules
-  exclude: [/node_modules/, /\.git/],
+  exclude: [
+    /node_modules/,
+    /\.git/,
+  ],
 })

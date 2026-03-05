@@ -4,11 +4,7 @@ import React from 'react'
 /**
  * Flexible type for Astro component render results
  */
-type AstroRenderResult =
-  | string
-  | { html: string }
-  | Promise<string>
-  | Promise<{ html: string }>
+type AstroRenderResult = string | { html: string } | Promise<string> | Promise<{ html: string }>
 
 /**
  * Base interface for Astro components with a render method
@@ -35,17 +31,17 @@ export type AstroComponent =
   | AstroComponentWithRender
   | AstroFunctionComponent
   | {
-      default: AstroComponentWithRender | AstroFunctionComponent
-    }
+    default: AstroComponentWithRender | AstroFunctionComponent
+  }
   | {
-      render: (
-        props?: Record<string, unknown>,
-        slots?: Record<string, { render: () => string; name: string }>,
-      ) => Promise<AstroRenderResult>
-    }
+    render: (
+      props?: Record<string, unknown>,
+      slots?: Record<string, { render: () => string; name: string }>,
+    ) => Promise<AstroRenderResult>
+  }
   | ((
-      props: Record<string, unknown>,
-    ) => Promise<AstroRenderResult> | AstroRenderResult)
+    props: Record<string, unknown>,
+  ) => Promise<AstroRenderResult> | AstroRenderResult)
 
 /**
  * Extract HTML string from render result
@@ -67,7 +63,9 @@ async function extractHtml(result: AstroRenderResult): Promise<string> {
 /**
  * Normalize component to have a render method
  */
-function normalizeComponent(component: unknown): AstroComponentWithRender {
+function normalizeComponent(
+  component: unknown,
+): AstroComponentWithRender {
   // Handle default export
   if (
     typeof component === 'object' &&
@@ -81,7 +79,7 @@ function normalizeComponent(component: unknown): AstroComponentWithRender {
   if (typeof component === 'function' && !('render' in component)) {
     return {
       render: async (props = {}) => {
-        return await (component as AstroFunctionComponent)(props)
+        return await (component as AstroFunctionComponent)(props);
       },
     }
   }
@@ -133,15 +131,12 @@ export async function renderAstro<Props extends Record<string, unknown>>(
   // Prepare render options with slot content if provided
   const renderOptions = slotContent
     ? {
-        default: { render: () => slotContent, name: 'default' },
-      }
+      default: { render: () => slotContent, name: 'default' },
+    }
     : undefined
 
   // Render the component
-  const astroRenderResult = await normalizedComponent.render(
-    props,
-    renderOptions,
-  )
+  const astroRenderResult = await normalizedComponent.render(props, renderOptions)
   const html = await extractHtml(astroRenderResult)
 
   const container = document.createElement('div')

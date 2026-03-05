@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { SessionCard } from '../shared/SessionCard'
 import { SessionForm } from '../forms/SessionForm'
 import { ProgressCharts } from '../charts/ProgressCharts'
@@ -12,10 +7,7 @@ import {
   useUpdateSessionMutation,
   useDeleteSessionMutation,
 } from '@/lib/hooks/journal-research'
-import {
-  useProgressQuery,
-  useProgressMetricsQuery,
-} from '@/lib/hooks/journal-research'
+import { useProgressQuery, useProgressMetricsQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { useState } from 'react'
@@ -120,10 +112,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
             <CardTitle>Progress Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts
-              progress={progress}
-              metrics={metrics ?? undefined}
-            />
+            <ProgressCharts progress={progress} metrics={metrics ?? undefined} />
           </CardContent>
         </Card>
       )}
@@ -164,14 +153,12 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                 Search Keywords
               </p>
               <div className="mt-1 space-y-1">
-                {Object.entries(session.searchKeywords).map(
-                  ([category, keywords]) => (
-                    <div key={category}>
-                      <span className="font-medium">{category}:</span>{' '}
-                      {keywords.join(', ')}
-                    </div>
-                  ),
-                )}
+                {Object.entries(session.searchKeywords).map(([category, keywords]) => (
+                  <div key={category}>
+                    <span className="font-medium">{category}:</span>{' '}
+                    {keywords.join(', ')}
+                  </div>
+                ))}
               </div>
             </div>
             {session.progressMetrics && (

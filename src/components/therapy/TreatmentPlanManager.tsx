@@ -58,24 +58,20 @@ const formatDate = (dateString?: string | Date) => {
 }
 
 interface ClientSideNewObjective
-  extends
-    Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
+  extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
     Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
   tempId: string
 }
 
 interface ClientSideNewGoal
-  extends
-    Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
+  extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
     Omit<NewTreatmentGoalData, 'description' | 'status'> {
   tempId: string
   objectives: ClientSideNewObjective[]
 }
 
-interface FormNewPlanData extends Omit<
-  NewTreatmentPlanData,
-  'goals' | 'startDate'
-> {
+interface FormNewPlanData
+  extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
   userId: string
   startDate?: string
   goals: ClientSideNewGoal[]
@@ -93,10 +89,8 @@ type EditableGoal =
     })
   | ClientSideNewGoal
 
-interface FormUpdatePlanData extends Omit<
-  UpdateTreatmentPlanData,
-  'goals' | 'startDate'
-> {
+interface FormUpdatePlanData
+  extends Omit<UpdateTreatmentPlanData, 'goals' | 'startDate'> {
   id: string
   startDate?: string
   goals?: EditableGoal[]

@@ -11,11 +11,7 @@ import fs from 'fs'
 
 import axios from 'axios'
 import { performance } from 'perf_hooks'
-import {
-  safeJoin,
-  ALLOWED_DIRECTORIES,
-  sanitizeFilename,
-} from '../../src/utils/path-security'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from '../../src/utils/path-security'
 
 // Configuration
 interface Config {

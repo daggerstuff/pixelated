@@ -46,17 +46,10 @@ export function getTracingConfig(): TracingConfig {
     enabled,
     serviceName: import.meta.env.TRACING_SERVICE_NAME || 'pixelated-empathy',
     serviceVersion: import.meta.env.TRACING_SERVICE_VERSION || '1.0.0',
-    environment:
-      import.meta.env.MODE || (isProduction ? 'production' : 'development'),
+    environment: import.meta.env.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
-      type:
-        (import.meta.env.TRACING_EXPORTER_TYPE as
-          | 'otlp'
-          | 'console'
-          | 'jaeger'
-          | 'zipkin') || 'otlp',
-      endpoint:
-        import.meta.env.TRACING_EXPORTER_ENDPOINT || 'http://localhost:4318',
+      type: (import.meta.env.TRACING_EXPORTER_TYPE as 'otlp' | 'console' | 'jaeger' | 'zipkin') || 'otlp',
+      endpoint: import.meta.env.TRACING_EXPORTER_ENDPOINT || 'http://localhost:4318',
       headers: import.meta.env.TRACING_EXPORTER_HEADERS
         ? JSON.parse(import.meta.env.TRACING_EXPORTER_HEADERS)
         : undefined,

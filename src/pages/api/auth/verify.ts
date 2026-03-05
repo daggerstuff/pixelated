@@ -1,3 +1,4 @@
+
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
@@ -5,13 +6,7 @@ import { rateLimitMiddleware } from '../../../lib/auth/middleware'
 
 const logger = createBuildSafeLogger('auth-verify')
 
-export const GET = async ({
-  request,
-  clientAddress,
-}: {
-  request: Request
-  clientAddress: string
-}) => {
+export const GET = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
   let clientInfo = {
     ip: clientAddress || 'unknown',
     userAgent: request.headers.get('user-agent') || 'unknown',
@@ -36,6 +31,7 @@ export const GET = async ({
         },
       )
     }
+
 
     // Apply rate limiting for verification to prevent enumeration/attacks
     const rateLimitResult = await rateLimitMiddleware(
@@ -68,7 +64,7 @@ export const GET = async ({
         action: 'verify_token',
         type,
         error: result.error,
-        clientInfo,
+        clientInfo
       })
 
       return new Response(
@@ -89,15 +85,11 @@ export const GET = async ({
     if (result.data.user) {
       const user = result.data.user as any
 
-      await logSecurityEvent(
-        SecurityEventType.AUTHENTICATION_SUCCESS,
-        user.id,
-        {
-          action: 'user_verified',
-          type,
-          clientInfo,
-        },
-      )
+      await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
+        action: 'user_verified',
+        type,
+        clientInfo
+      })
 
       await createAuditLog(
         AuditEventType.SECURITY,
@@ -126,7 +118,7 @@ export const GET = async ({
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'verify_token_error',
       error: error.message,
-      clientInfo,
+      clientInfo
     })
     return new Response(
       JSON.stringify({
