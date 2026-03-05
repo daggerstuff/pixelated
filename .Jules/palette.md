@@ -1,3 +1,3 @@
-## 2025-05-14 - Accessibility Gaps in Icon-only Buttons
-**Learning:** Found a pattern where interactive components using icon-only buttons (often with `size="icon"`) lack `aria-label` attributes, making them inaccessible to screen reader users. Additionally, dynamic status indicators like unread count badges were not leveraging `aria-live` for real-time announcements.
-**Action:** When working with `Button` components in this repo, especially those with `size="icon"`, always verify that an `aria-label` is provided. For dynamic UI elements that update state (like notification counts), ensure `aria-live="polite"` is used.
+## 2025-05-14 - Accessible Notification Indicators
+**Learning:** Icon-only buttons with dynamic badges (like a notification bell with an unread count) are best made accessible by providing a dynamic \`aria-label\` on the button itself (e.g., "Notifications, 3 unread") while marking the visual badge and icons as \`aria-hidden="true"\`. This prevents redundant or confusing announcements where a screen reader might say "Button, Notifications, 3" without context.
+**Action:** Use dynamic \`aria-label\` for buttons with state-dependent badges and hide decorative/redundant child elements.
