@@ -3,7 +3,7 @@
 
 import express, { Router, Request, Response } from 'express'
 import { asyncHandler, NotFoundError, ValidationError } from '../middleware/error-handler'
-import { requirePermissions, requireRoles } from '../middleware/auth'
+import { requireRoles } from '../middleware/auth'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import { getPostgresPool } from '../../lib/database/connection'
 import * as documentService from '../services/document-service'
