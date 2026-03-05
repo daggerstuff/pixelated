@@ -40,9 +40,8 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality,security-extended
-          # Enable ML-powered alerts for JavaScript/TypeScript
-          setup-python-dependencies: ${{ matrix.language == 'python' }}
+          queries: >-
+            +security-and-quality,security-extended${{ matrix.language == 'javascript' && ',./.github/codeql/custom-queries/fhir-security.ql,./.github/codeql/custom-queries/ehr-security.ql' || '' }}
           # Increase RAM allocation for analysis
           ram: 16384
 
