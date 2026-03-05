@@ -14,11 +14,7 @@ import {
   EmbeddingAgentError,
   BatchEmbeddingRequestSchema,
 } from '@/lib/ai/embedding-agent'
-import type {
-  BatchEmbeddingRequest,
-  BatchEmbeddingResponse,
-  BatchEmbeddingItem,
-} from '@/lib/ai/embedding-agent'
+import type { BatchEmbeddingRequest, BatchEmbeddingResponse, BatchEmbeddingItem } from '@/lib/ai/embedding-agent'
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
@@ -139,8 +135,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     const batchRequest: BatchEmbeddingRequest = validation.data
 
-    const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+    const agentUrl = import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {

@@ -446,9 +446,7 @@ describe('APIService Integration Tests', () => {
       }
 
       // Mock WebSocket constructor
-      global.WebSocket = vi.fn(function () {
-        return mockWebSocket
-      }) as any
+      global.WebSocket = vi.fn(function() { return mockWebSocket }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 
@@ -467,9 +465,7 @@ describe('APIService Integration Tests', () => {
         readyState: 1,
       }
 
-      global.WebSocket = vi.fn(function () {
-        return mockWebSocket
-      }) as any
+      global.WebSocket = vi.fn(function() { return mockWebSocket }) as any
 
       const ws = new WebSocket('ws://localhost:3000/pipeline-updates')
 

@@ -149,18 +149,12 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         AuditEventStatus.FAILURE, // status
       )
 
-      return new Response(
-        JSON.stringify({
-          error: 'Validation failed',
-          details: validationError.details,
-        }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      return new Response(JSON.stringify({ error: 'Validation failed', details: validationError.details }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+      })
     }
 
     // Check input size to prevent abuse

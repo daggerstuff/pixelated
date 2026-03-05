@@ -40,7 +40,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -83,7 +83,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           error: 'Failed to parse request body',
           details: error instanceof Error ? error.message : String(error),
-        },
+        }
       )
 
       return new Response(
@@ -165,8 +165,8 @@ export const POST: APIRoute = async ({ request }) => {
         {
           action: 'analyze_risk_correlations',
           clientId,
-          reason: 'no_access_to_client',
-        },
+          reason: 'no_access_to_client'
+        }
       )
 
       return new Response(
@@ -187,8 +187,8 @@ export const POST: APIRoute = async ({ request }) => {
       {
         action: 'analyze_risk_correlations',
         clientId,
-        analysesCount: validAnalyses.length,
-      },
+        analysesCount: validAnalyses.length
+      }
     )
 
     logger.info('Processing risk correlation request', {
@@ -234,7 +234,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     // Return an error response

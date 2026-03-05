@@ -141,9 +141,7 @@ describe('UserPreferenceManager', () => {
       }
 
       manager.setPreferences('user1', prefs)
-      expect(manager.getPreferences('user1').preferredSupportStyle).toBe(
-        'direct',
-      )
+      expect(manager.getPreferences('user1').preferredSupportStyle).toBe('direct')
 
       manager.clearPreferences('user1')
       expect(manager.getPreferences('user1')).toEqual(DEFAULT_PREFERENCES)
@@ -297,8 +295,8 @@ describe('applyUserPreferences', () => {
 
       const result = applyUserPreferences(objectives, prefs)
       expect(result).toHaveLength(5) // 7 - 2 = 5
-      expect(result.find((obj) => obj.key === 'empathy')).toBeUndefined()
-      expect(result.find((obj) => obj.key === 'warmth')).toBeUndefined()
+      expect(result.find(obj => obj.key === 'empathy')).toBeUndefined()
+      expect(result.find(obj => obj.key === 'warmth')).toBeUndefined()
     })
   })
 
@@ -315,8 +313,8 @@ describe('applyUserPreferences', () => {
       const result = applyUserPreferences(objectives, prefs)
 
       // After normalization, empathy should have higher weight than safety
-      const empathy = result.find((obj) => obj.key === 'empathy')
-      const safety = result.find((obj) => obj.key === 'safety')
+      const empathy = result.find(obj => obj.key === 'empathy')
+      const safety = result.find(obj => obj.key === 'safety')
 
       expect(empathy).toBeDefined()
       expect(safety).toBeDefined()
@@ -335,10 +333,8 @@ describe('applyUserPreferences', () => {
       const resultEmpathic = applyUserPreferences(objectives, prefsEmpathic)
       const resultNone = applyUserPreferences(objectives, prefsNone)
 
-      const empathyWithStyle = resultEmpathic.find(
-        (obj) => obj.key === 'empathy',
-      )!
-      const empathyWithout = resultNone.find((obj) => obj.key === 'empathy')!
+      const empathyWithStyle = resultEmpathic.find(obj => obj.key === 'empathy')!
+      const empathyWithout = resultNone.find(obj => obj.key === 'empathy')!
 
       expect(empathyWithStyle.weight).toBeGreaterThan(empathyWithout.weight)
     })
@@ -350,7 +346,8 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find((obj) => obj.key === 'conciseness')!
+      const conciseness = result.find(obj => obj.key === 'conciseness')!
+
 
       // After boosting and normalization, should still be relatively higher
       expect(conciseness).toBeDefined()
@@ -363,7 +360,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const correctness = result.find((obj) => obj.key === 'correctness')!
+      const correctness = result.find(obj => obj.key === 'correctness')!
 
       expect(correctness).toBeDefined()
       expect(correctness.weight).toBeGreaterThan(0)
@@ -396,8 +393,8 @@ describe('applyUserPreferences', () => {
       const resultHigh = applyUserPreferences(objectives, prefsHigh)
       const resultLow = applyUserPreferences(objectives, prefsLow)
 
-      const safetyHigh = resultHigh.find((obj) => obj.key === 'safety')!
-      const safetyLow = resultLow.find((obj) => obj.key === 'safety')!
+      const safetyHigh = resultHigh.find(obj => obj.key === 'safety')!
+      const safetyLow = resultLow.find(obj => obj.key === 'safety')!
 
       expect(safetyHigh.weight).toBeGreaterThan(safetyLow.weight)
     })
@@ -409,7 +406,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const safety = result.find((obj) => obj.key === 'safety')!
+      const safety = result.find(obj => obj.key === 'safety')!
 
       expect(safety).toBeDefined()
     })
@@ -423,7 +420,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find((obj) => obj.key === 'conciseness')!
+      const conciseness = result.find(obj => obj.key === 'conciseness')!
 
       expect(conciseness).toBeDefined()
       expect(conciseness.weight).toBeGreaterThan(0)
@@ -436,9 +433,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const informativeness = result.find(
-        (obj) => obj.key === 'informativeness',
-      )!
+      const informativeness = result.find(obj => obj.key === 'informativeness')!
 
       expect(informativeness).toBeDefined()
       expect(informativeness.weight).toBeGreaterThan(0)
@@ -467,8 +462,8 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const safety = result.find((obj) => obj.key === 'safety')!
-      const clarity = result.find((obj) => obj.key === 'clarity')!
+      const safety = result.find(obj => obj.key === 'safety')!
+      const clarity = result.find(obj => obj.key === 'clarity')!
 
       expect(safety).toBeDefined()
       expect(clarity).toBeDefined()
@@ -485,7 +480,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const clarity = result.find((obj) => obj.key === 'clarity')!
+      const clarity = result.find(obj => obj.key === 'clarity')!
 
       expect(clarity).toBeDefined()
       expect(clarity.weight).toBeGreaterThan(0)
@@ -500,9 +495,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const informativeness = result.find(
-        (obj) => obj.key === 'informativeness',
-      )!
+      const informativeness = result.find(obj => obj.key === 'informativeness')!
 
       expect(informativeness).toBeDefined()
       expect(informativeness.weight).toBeGreaterThan(0)
@@ -517,7 +510,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find((obj) => obj.key === 'conciseness')!
+      const conciseness = result.find(obj => obj.key === 'conciseness')!
 
       expect(conciseness).toBeDefined()
       expect(conciseness.weight).toBeGreaterThan(0)
@@ -547,7 +540,7 @@ describe('applyUserPreferences', () => {
       expect(sum).toBeCloseTo(1.0, 4)
 
       // Safety should be boosted (high risk + prioritized)
-      const safety = result.find((obj) => obj.key === 'safety')!
+      const safety = result.find(obj => obj.key === 'safety')!
       expect(safety).toBeDefined()
       expect(safety.weight).toBeGreaterThan(0.1)
     })
@@ -578,7 +571,7 @@ describe('applyUserPreferences', () => {
     it('should handle all objectives disabled', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        disableObjectives: objectives.map((obj) => obj.key),
+        disableObjectives: objectives.map(obj => obj.key),
       }
 
       const result = applyUserPreferences(objectives, prefs)

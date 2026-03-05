@@ -3,28 +3,15 @@ import { auth0UserService } from '../../../services/auth0.service'
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
-import {
-  rateLimitMiddleware,
-  csrfProtection,
-} from '../../../lib/auth/middleware'
-import {
-  sanitizeInput,
-  isValidEmail,
-  isValidPassword,
-} from '../../../lib/auth/utils'
+import { rateLimitMiddleware, csrfProtection } from '../../../lib/auth/middleware'
+import { sanitizeInput, isValidEmail, isValidPassword } from '../../../lib/auth/utils'
 
 /**
  * Unified Sign up endpoint using Auth0
  * POST /api/auth/signup
  */
-export const POST = async ({
-  request,
-  clientAddress,
-}: {
-  request: Request
-  clientAddress: string
-}) => {
-  let clientInfo
+export const POST = async ({ request, clientAddress }: { request: Request; clientAddress: string }) => {
+  let clientInfo;
   try {
     // Extract client information
     const userAgent = request.headers.get('user-agent') || 'unknown'
@@ -71,10 +58,13 @@ export const POST = async ({
 
     // Validate email
     if (!isValidEmail(email)) {
-      return new Response(JSON.stringify({ error: 'Invalid email format' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      return new Response(
+        JSON.stringify({ error: 'Invalid email format' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Validate password
@@ -83,7 +73,7 @@ export const POST = async ({
       return new Response(
         JSON.stringify({
           error: 'Password does not meet requirements',
-          details: passwordValidity.errors,
+          details: passwordValidity.errors
         }),
         {
           status: 400,
@@ -161,8 +151,7 @@ export const OPTIONS = async ({ request }: { request: Request }) => {
     headers: {
       'Access-Control-Allow-Origin': request.headers.get('origin') || '*',
       'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers':
-        'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-CSRF-Token, X-Device-ID',
       'Access-Control-Max-Age': '86400',
     },
   })

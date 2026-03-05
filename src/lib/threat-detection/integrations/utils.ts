@@ -136,9 +136,7 @@ export function sanitizeThreatContext(
 /**
  * Calculate threat score based on various factors
  */
-export async function calculateThreatScore(
-  threatData: ThreatData,
-): Promise<number> {
+export async function calculateThreatScore(threatData: ThreatData): Promise<number> {
   let score = 0
 
   // Base score from severity
@@ -483,7 +481,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
     timeout = setTimeout(() => {
       // We intentionally ignore the return value of func for debounce
       // and cast args to unknown[] to call safely.
-      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       timeout = null
     }, wait)
   }
@@ -500,7 +498,7 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
 
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
-      ;(func as (...a: unknown[]) => unknown)(...(args as unknown[]))
+      ; (func as (...a: unknown[]) => unknown)(...(args as unknown[]))
       inThrottle = true
       setTimeout(() => {
         inThrottle = false

@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -43,7 +43,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -65,10 +65,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.analytics.engagement.forbidden',
         user.id,
         'auth-analytics',
-        {
-          action: 'get_engagement_analytics',
-          reason: 'insufficient_permissions',
-        },
+        { action: 'get_engagement_analytics', reason: 'insufficient_permissions' }
       )
 
       return new Response(
@@ -76,7 +73,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -184,7 +181,7 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.analytics.engagement.access',
       user.id,
       'auth-analytics',
-      { action: 'get_engagement_analytics' },
+      { action: 'get_engagement_analytics' }
     )
 
     return new Response(JSON.stringify(metrics), {
@@ -207,7 +204,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     const apiError: AnalyticsError = {

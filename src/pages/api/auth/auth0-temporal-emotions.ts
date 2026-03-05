@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -58,7 +58,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -220,8 +220,8 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
         action: 'get_temporal_emotions',
         sessionId,
         analysisType,
-        timeWindow: validTimeWindow,
-      },
+        timeWindow: validTimeWindow
+      }
     )
 
     // Log API access
@@ -254,7 +254,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(

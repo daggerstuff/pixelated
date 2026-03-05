@@ -108,13 +108,13 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
   }
 
   const OCCUPATION_CATEGORIES: Record<string, readonly string[]> = {
-    'Healthcare': ['doctor', 'nurse', 'therapist', 'medical'],
-    'Education': ['teacher', 'professor', 'education'],
-    'Technology': ['engineer', 'developer', 'tech', 'software'],
+    Healthcare: ['doctor', 'nurse', 'therapist', 'medical'],
+    Education: ['teacher', 'professor', 'education'],
+    Technology: ['engineer', 'developer', 'tech', 'software'],
     'Business/Finance': ['manager', 'analyst', 'finance', 'business'],
     'Service Industry': ['service', 'retail', 'restaurant'],
-    'Student': ['student'],
-    'Retired': ['retired'],
+    Student: ['student'],
+    Retired: ['retired'],
   } as const
 
   const getOccupationCategory = (occupation: string): string => {
@@ -175,7 +175,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           subcategory: category,
           current:
             currentStats.occupation[
-              category as keyof typeof currentStats.occupation
+            category as keyof typeof currentStats.occupation
             ],
           target,
           percentage:
@@ -193,7 +193,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           subcategory: category,
           current:
             currentStats.background[
-              category as keyof typeof currentStats.background
+            category as keyof typeof currentStats.background
             ],
           target,
           percentage:
@@ -259,7 +259,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       if (!acc[category]) {
         acc[category] = []
       }
-      ;(acc[category] as DemographicData[]).push(stat)
+      ; (acc[category] as DemographicData[]).push(stat)
       return acc
     },
     {} as Record<string, DemographicData[]>,
@@ -276,13 +276,12 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             Overall Balance:
           </span>
           <span
-            className={`text-lg font-bold px-3 py-1 rounded-full ${
-              overallBalance > 85
+            className={`text-lg font-bold px-3 py-1 rounded-full ${overallBalance > 85
                 ? 'bg-green-100 text-green-800'
                 : overallBalance > 70
                   ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
-            }`}
+              }`}
           >
             {overallBalance.toFixed(1)}%
           </span>
@@ -400,10 +399,10 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           {demographicStats.filter(
             (stat) => stat.percentage < 75 || stat.percentage > 125,
           ).length === 0 && (
-            <p className="text-indigo-600">
-              ✓ All demographic categories are well-balanced
-            </p>
-          )}
+              <p className="text-indigo-600">
+                ✓ All demographic categories are well-balanced
+              </p>
+            )}
         </div>
       </div>
 

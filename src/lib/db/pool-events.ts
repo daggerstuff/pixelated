@@ -22,15 +22,15 @@ import type { PoolMetrics } from './connection-pool-optimizer'
  * - Metrics updates
  */
 export interface PoolEvents {
-  'connection-acquired': [client: PoolClient]
-  'connection-released': [client: PoolClient]
-  'connection-error': [error: Error, client?: PoolClient]
-  'pool-exhausted': []
-  'slow-query': [query: string, duration: number]
-  'health-changed': [
-    score: number,
-    status: 'healthy' | 'degraded' | 'unhealthy',
-  ]
-  'failover-activated': [host: string]
-  'metrics-updated': [metrics: PoolMetrics]
+    'connection-acquired': [client: PoolClient]
+    'connection-released': [client: PoolClient]
+    'connection-error': [error: Error, client?: PoolClient]
+    'pool-exhausted': []
+    'slow-query': [query: string, duration: number]
+    'health-changed': [
+        score: number,
+        status: 'healthy' | 'degraded' | 'unhealthy',
+    ]
+    'failover-activated': [host: string]
+    'metrics-updated': [metrics: PoolMetrics]
 }

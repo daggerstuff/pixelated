@@ -61,7 +61,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -174,8 +174,8 @@ export const GET: APIRoute = async ({ request }) => {
         action: 'get_analytics_charts',
         type,
         category,
-        dataPoints: chartData.data.datasets[0]?.data.length || 0,
-      },
+        dataPoints: chartData.data.datasets[0]?.data.length || 0
+      }
     )
 
     logger.info('Generated chart data', {
@@ -204,7 +204,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(

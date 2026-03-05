@@ -61,29 +61,26 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
       offset,
     })
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        memories: result,
-        query,
-        pagination: {
-          limit,
-          offset,
-          total: result.length,
-        },
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    return new Response(JSON.stringify({
+      success: true,
+      memories: result,
+      query,
+      pagination: {
+        limit,
+        offset,
+        total: result.length
       },
-    )
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      }
+    }), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
   } catch (error: unknown) {
     logger.error('Error searching memories:', error)
 

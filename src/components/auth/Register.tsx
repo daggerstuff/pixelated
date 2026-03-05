@@ -1,76 +1,76 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
 export default function RegisterForm() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState({
-    email: '',
-    password: '',
-    fullName: '',
+    email: "",
+    password: "",
+    fullName: "",
     termsAccepted: false,
-  })
+  });
 
   // Simple validation without external schema
   const validateForm = () => {
-    if (!user.email || !user.email.includes('@')) {
-      return 'Please enter a valid email address'
+    if (!user.email || !user.email.includes("@")) {
+      return "Please enter a valid email address";
     }
     if (!user.password || user.password.length < 6) {
-      return 'Password must be at least 6 characters'
+      return "Password must be at least 6 characters";
     }
     if (!user.fullName || user.fullName.trim().length === 0) {
-      return 'Please enter your full name'
+      return "Please enter your full name";
     }
     if (!user.termsAccepted) {
-      return 'You must accept the Terms of Service'
+      return "You must accept the Terms of Service";
     }
-    return null
-  }
+    return null;
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setUser((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }))
-  }
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-    const validationError = validateForm()
+    const validationError = validateForm();
     if (validationError) {
-      setError(validationError)
-      setIsLoading(false)
-      return
+      setError(validationError);
+      setIsLoading(false);
+      return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(user),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Registration failed')
-        setIsLoading(false)
-        return
+        setError(data.error || "Registration failed");
+        setIsLoading(false);
+        return;
       }
 
       // On success, redirect to login or dashboard
-      window.location.assign('/login')
+      window.location.assign("/login");
     } catch {
-      setError('Network error. Please try again.')
-      setIsLoading(false)
+      setError("Network error. Please try again.");
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="auth-container max-w-md w-full p-6 bg-white rounded-lg shadow-md">
@@ -86,11 +86,11 @@ export default function RegisterForm() {
       )}
 
       <form className="space-y-4" onSubmit={handleSubmit}>
-        {['fullName', 'email', 'password', 'termsAccepted'].map((field) => (
+        {["fullName", "email", "password", "termsAccepted"].map((field) => (
           <div key={field} className="mb-4">
             {(() => {
               switch (field) {
-                case 'fullName':
+                case "fullName":
                   return (
                     <>
                       <label
@@ -109,8 +109,8 @@ export default function RegisterForm() {
                         required
                       />
                     </>
-                  )
-                case 'email':
+                  );
+                case "email":
                   return (
                     <>
                       <label
@@ -133,8 +133,8 @@ export default function RegisterForm() {
                         Must be a valid email address
                       </p>
                     </>
-                  )
-                case 'password':
+                  );
+                case "password":
                   return (
                     <>
                       <label
@@ -156,8 +156,8 @@ export default function RegisterForm() {
                         Must be at least 6 characters
                       </p>
                     </>
-                  )
-                case 'termsAccepted':
+                  );
+                case "termsAccepted":
                   return (
                     <>
                       <div className="flex items-center space-x-2">
@@ -189,9 +189,9 @@ export default function RegisterForm() {
                         You must accept the Terms of Service
                       </p>
                     </>
-                  )
+                  );
                 default:
-                  return null
+                  return null;
               }
             })()}
           </div>
@@ -211,7 +211,7 @@ export default function RegisterForm() {
           disabled={isLoading}
           className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-75 transition-colors"
         >
-          {isLoading ? 'Creating Account...' : 'Register'}
+          {isLoading ? "Creating Account..." : "Register"}
         </button>
       </form>
 
@@ -225,5 +225,5 @@ export default function RegisterForm() {
         </a>
       </div>
     </div>
-  )
+  );
 }

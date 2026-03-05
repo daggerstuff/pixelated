@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, } from 'vitest'
 import { QueryClient } from '@tanstack/react-query'
 import {
   listSessions,
@@ -9,6 +9,7 @@ import {
   type CreateSessionPayload,
   type UpdateSessionPayload,
 } from '../../../src/lib/api/journal-research'
+
 
 /**
  * Integration tests for Journal Research API
@@ -23,6 +24,7 @@ import {
  */
 
 describe('Journal Research API Integration', () => {
+
   let createdSessionId: string | null = null
 
   beforeAll(() => {
@@ -34,13 +36,12 @@ describe('Journal Research API Integration', () => {
       const method = init?.method || 'GET'
 
       // Mock response helper
-      const jsonResponse = (data: any, status = 200) =>
-        ({
-          ok: status >= 200 && status < 300,
-          status,
-          statusText: status === 200 ? 'OK' : 'Error',
-          json: async () => data,
-        }) as Response
+      const jsonResponse = (data: any, status = 200) => ({
+        ok: status >= 200 && status < 300,
+        status,
+        statusText: status === 200 ? 'OK' : 'Error',
+        json: async () => data,
+      } as Response)
 
       // Mock /sessions endpoints
       if (urlStr.includes('/sessions') && !urlStr.includes('/sessions/')) {
@@ -51,7 +52,7 @@ describe('Journal Research API Integration', () => {
             total: sessionStore.size,
             page: 1,
             page_size: 10,
-            total_pages: 1,
+            total_pages: 1
           })
         }
         if (method === 'POST') {
@@ -59,18 +60,8 @@ describe('Journal Research API Integration', () => {
           const body = JSON.parse(init.body as string)
 
           // Validation simulation
-          if (
-            body.target_sources &&
-            Array.isArray(body.target_sources) &&
-            body.target_sources.length === 0
-          ) {
-            return jsonResponse(
-              {
-                error: 'Validation Error',
-                message: 'target_sources cannot be empty',
-              },
-              400,
-            )
+          if (body.target_sources && Array.isArray(body.target_sources) && body.target_sources.length === 0) {
+            return jsonResponse({ error: 'Validation Error', message: 'target_sources cannot be empty' }, 400)
           }
 
           const newSessionId = 'mock-' + Math.random().toString(36).substring(7)
@@ -205,10 +196,7 @@ describe('Journal Research API Integration', () => {
         currentPhase: 'evaluation',
       }
 
-      const updatedSession = await updateSession(
-        createdSessionId,
-        updatePayload,
-      )
+      const updatedSession = await updateSession(createdSessionId, updatePayload)
 
       expect(updatedSession).toBeDefined()
       expect(updatedSession.currentPhase).toBe('evaluation')
@@ -255,12 +243,7 @@ describe('Journal Research API Integration', () => {
       })
 
       const sessions = await queryClient.fetchQuery({
-        queryKey: [
-          'journal-research',
-          'sessions',
-          'list',
-          { page: 1, pageSize: 10 },
-        ],
+        queryKey: ['journal-research', 'sessions', 'list', { page: 1, pageSize: 10 }],
         queryFn: () => listSessions({ page: 1, pageSize: 10 }),
       })
 

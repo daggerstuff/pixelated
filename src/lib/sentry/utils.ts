@@ -22,24 +22,14 @@ type SentryShim = {
     timestamp?: number
     level?: 'info' | 'error' | 'warning' | 'debug'
   }) => void
-  withScope: (
-    cb: (scope: {
-      setContext: (key: string, value: Record<string, unknown>) => void
-      setTag: (key: string, value: string) => void
-      setLevel: (level: 'debug' | 'info' | 'warning' | 'error') => void
-    }) => void,
-  ) => void
+  withScope: (cb: (scope: {
+    setContext: (key: string, value: Record<string, unknown>) => void
+    setTag: (key: string, value: string) => void
+    setLevel: (level: 'debug' | 'info' | 'warning' | 'error') => void
+  }) => void) => void
   metrics: {
-    count: (
-      name: string,
-      value: number,
-      options?: { attributes?: Record<string, unknown> },
-    ) => void
-    gauge: (
-      name: string,
-      value: number,
-      options?: { attributes?: Record<string, unknown>; unit?: string },
-    ) => void
+    count: (name: string, value: number, options?: { attributes?: Record<string, unknown> }) => void
+    gauge: (name: string, value: number, options?: { attributes?: Record<string, unknown>; unit?: string }) => void
     distribution: (
       name: string,
       value: number,
@@ -155,8 +145,8 @@ export function startTransaction(
     )
   }
   return {
-    setData: () => {},
-    finish: () => {},
+    setData: () => { },
+    finish: () => { },
   }
 }
 
@@ -204,8 +194,8 @@ export const performance = {
       )
     }
     return {
-      setData: () => {},
-      finish: () => {},
+      setData: () => { },
+      finish: () => { },
     }
   },
 
@@ -222,8 +212,8 @@ export const performance = {
       )
     }
     return {
-      setData: () => {},
-      finish: () => {},
+      setData: () => { },
+      finish: () => { },
     }
   },
 }
@@ -349,10 +339,7 @@ export function distributionMetric(
     })
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn(
-        '[Sentry Metrics] Failed to emit distribution metric:',
-        error,
-      )
+      console.warn('[Sentry Metrics] Failed to emit distribution metric:', error)
     }
   }
 }
@@ -393,7 +380,11 @@ export const emotionMetrics = {
   /**
    * Track emotion score distribution
    */
-  scoreDistribution(emotionType: string, score: number, model: string): void {
+  scoreDistribution(
+    emotionType: string,
+    score: number,
+    model: string,
+  ): void {
     distributionMetric('emotion.score', score, {
       attributes: { emotion_type: emotionType, model },
     })
@@ -463,11 +454,7 @@ export const apiMetrics = {
   /**
    * Track API response time
    */
-  responseTime(
-    endpoint: string,
-    durationMs: number,
-    method: string = 'GET',
-  ): void {
+  responseTime(endpoint: string, durationMs: number, method: string = 'GET'): void {
     distributionMetric('api.response_time', durationMs, {
       attributes: { endpoint, method },
       unit: 'millisecond',

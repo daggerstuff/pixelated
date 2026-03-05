@@ -470,7 +470,7 @@ export class PatternDiscoveryService {
       timeRange: {
         start: new Date(
           typeof firstTimestamp === 'string' ||
-            typeof firstTimestamp === 'number'
+          typeof firstTimestamp === 'number'
             ? firstTimestamp
             : Date.now(),
         ),

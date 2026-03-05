@@ -112,11 +112,10 @@ export class ThreatDetectionMiddleware {
         const context = this.getContext(req)
 
         // Check rate limit with threat detection
-        const result =
-          (await this.config.bridge.checkRateLimitWithThreatDetection(
-            identifier,
-            context,
-          )) as unknown as RateLimitCheckResult
+        const result = (await this.config.bridge.checkRateLimitWithThreatDetection(
+          identifier,
+          context,
+        )) as unknown as RateLimitCheckResult
 
         // Log the check if enabled
         if (this.config.enableLogging) {
@@ -226,7 +225,7 @@ export class ThreatDetectionMiddleware {
         .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(',') : value || '',
+          Array.isArray(value) ? value.join(',') : (value || ''),
         ]),
     )
 

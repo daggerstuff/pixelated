@@ -256,13 +256,13 @@ export class ContextDetector {
           contextualIndicators: result.contextualIndicators?.length
             ? result.contextualIndicators
             : [
-                {
-                  type: 'educational_pattern',
-                  description:
-                    'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: result.confidence ?? 0.8,
-                },
-              ],
+              {
+                type: 'educational_pattern',
+                description:
+                  'Detected educational query (learning about mental health concept/condition/treatment)',
+                confidence: result.confidence ?? 0.8,
+              },
+            ],
           needsSpecialHandling: false,
           urgency: 'low',
           metadata: {
@@ -459,13 +459,13 @@ export class ContextDetector {
         .map((it) =>
           it && typeof it === 'object'
             ? {
-                type: String((it as any)['type'] ?? 'indicator'),
-                description: String((it as any)['description'] ?? ''),
-                confidence: clamp01((it as any)['confidence'] ?? 0.5, 0.5),
-                ...(typeof (it as any)['severity'] === 'number'
-                  ? { severity: (it as any)['severity'] }
-                  : {}),
-              }
+              type: String((it as any)['type'] ?? 'indicator'),
+              description: String((it as any)['description'] ?? ''),
+              confidence: clamp01((it as any)['confidence'] ?? 0.5, 0.5),
+              ...(typeof (it as any)['severity'] === 'number'
+                ? { severity: (it as any)['severity'] }
+                : {}),
+            }
             : null,
         )
         .filter(Boolean) as ContextualIndicator[]

@@ -21,7 +21,7 @@ export async function GET(context: APIContext): Promise<Response> {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -31,22 +31,22 @@ export async function GET(context: APIContext): Promise<Response> {
     // Check if user has admin role
     if (authInfo.role !== 'admin') {
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Forbidden - Admin access required',
-        }),
+        JSON.stringify({ success: false, error: 'Forbidden - Admin access required' }),
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
     // Auth passed, return success response
-    return new Response(JSON.stringify({ success: true, authorized: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ success: true, authorized: true }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   } catch (error) {
     console.error('Authentication error in audit-logs.api.ts:', error)
     return new Response(
@@ -54,7 +54,7 @@ export async function GET(context: APIContext): Promise<Response> {
       {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
-      },
+      }
     )
   }
 }

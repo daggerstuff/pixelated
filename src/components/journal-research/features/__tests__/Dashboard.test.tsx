@@ -1,12 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, } from '@testing-library/react'
 import { Dashboard } from '../Dashboard'
-import {
-  renderWithProviders,
-  mockSession,
-  mockProgress,
-  mockProgressMetrics,
-} from '../../__tests__/test-utils'
+import { renderWithProviders, mockSession, mockProgress, mockProgressMetrics } from '../../__tests__/test-utils'
 import * as hooks from '@/lib/hooks/journal-research'
 import * as store from '@/lib/stores/journal-research'
 
@@ -24,18 +19,11 @@ vi.mock('@/lib/stores/journal-research', () => ({
 }))
 
 describe('Dashboard', () => {
-  const mockUseSessionListQuery = hooks.useSessionListQuery as ReturnType<
-    typeof vi.fn
-  >
+  const mockUseSessionListQuery = hooks.useSessionListQuery as ReturnType<typeof vi.fn>
   const mockUseSessionQuery = hooks.useSessionQuery as ReturnType<typeof vi.fn>
-  const mockUseProgressQuery = hooks.useProgressQuery as ReturnType<
-    typeof vi.fn
-  >
-  const mockUseProgressMetricsQuery =
-    hooks.useProgressMetricsQuery as ReturnType<typeof vi.fn>
-  const mockUseJournalSessionStore = store.useJournalSessionStore as ReturnType<
-    typeof vi.fn
-  >
+  const mockUseProgressQuery = hooks.useProgressQuery as ReturnType<typeof vi.fn>
+  const mockUseProgressMetricsQuery = hooks.useProgressMetricsQuery as ReturnType<typeof vi.fn>
+  const mockUseJournalSessionStore = store.useJournalSessionStore as ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -43,13 +31,7 @@ describe('Dashboard', () => {
     // Default mock implementations
     mockUseJournalSessionStore.mockReturnValue(null)
     mockUseSessionListQuery.mockReturnValue({
-      data: {
-        items: [mockSession],
-        total: 1,
-        page: 1,
-        pageSize: 10,
-        totalPages: 1,
-      },
+      data: { items: [mockSession], total: 1, page: 1, pageSize: 10, totalPages: 1 },
       isLoading: false,
     })
     mockUseSessionQuery.mockReturnValue({
@@ -70,9 +52,7 @@ describe('Dashboard', () => {
     renderWithProviders(<Dashboard />)
 
     expect(screen.getByText('Journal Research Dashboard')).toBeInTheDocument()
-    expect(
-      screen.getByText(/Monitor and manage your research sessions/),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Monitor and manage your research sessions/)).toBeInTheDocument()
   })
 
   it('renders quick action buttons', () => {
@@ -164,9 +144,7 @@ describe('Dashboard', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = renderWithProviders(
-      <Dashboard className="custom-class" />,
-    )
+    const { container } = renderWithProviders(<Dashboard className="custom-class" />)
 
     const dashboard = container.querySelector('.custom-class')
     expect(dashboard).toBeInTheDocument()

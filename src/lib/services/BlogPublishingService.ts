@@ -170,10 +170,7 @@ export class BlogPublishingService {
       logger.info(`Publishing post: ${post.metadata.title}`)
 
       // Read the file (validate path first)
-      const validatedPath = validatePath(
-        post.filePath,
-        ALLOWED_DIRECTORIES.CONTENT,
-      )
+      const validatedPath = validatePath(post.filePath, ALLOWED_DIRECTORIES.CONTENT)
       const content = await fs.readFile(validatedPath, 'utf8')
 
       // Update the draft status in frontmatter
@@ -222,13 +219,8 @@ export class BlogPublishingService {
   private async walkDirectory(dirPath: string): Promise<void> {
     try {
       // Validate directory path to prevent path traversal
-      const validatedDirPath = validatePath(
-        dirPath,
-        ALLOWED_DIRECTORIES.CONTENT,
-      )
-      const entries = await fs.readdir(validatedDirPath, {
-        withFileTypes: true,
-      })
+      const validatedDirPath = validatePath(dirPath, ALLOWED_DIRECTORIES.CONTENT)
+      const entries = await fs.readdir(validatedDirPath, { withFileTypes: true })
 
       for (const entry of entries) {
         // Validate entry name for security - prevent path traversal

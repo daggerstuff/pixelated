@@ -9,6 +9,8 @@ import {
 } from '@/components/layout/ResponsiveUtils'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
+
+
 interface SyncedPreferences {
   theme: 'light' | 'dark'
   fontSize: 'small' | 'medium' | 'large'
@@ -186,15 +188,14 @@ export const TabSyncDemo: FC = () => {
                     <div className="text-sm text-gray-500 mb-4">
                       Sync Status:{' '}
                       <span
-                        className={`font-medium ${
-                          counterSyncStatus === 'synced'
-                            ? 'text-green-600'
-                            : counterSyncStatus === 'syncing'
-                              ? 'text-yellow-600'
-                              : counterSyncStatus === 'conflict'
-                                ? 'text-red-600'
-                                : 'text-gray-600'
-                        }`}
+                        className={`font-medium ${counterSyncStatus === 'synced'
+                          ? 'text-green-600'
+                          : counterSyncStatus === 'syncing'
+                            ? 'text-yellow-600'
+                            : counterSyncStatus === 'conflict'
+                              ? 'text-red-600'
+                              : 'text-gray-600'
+                          }`}
                       >
                         {counterSyncStatus}
                       </span>
@@ -327,16 +328,14 @@ export const TabSyncDemo: FC = () => {
                               )
                             }
                             aria-label="Toggle notifications"
-                            className={`relative w-12 h-6 rounded-full transition-colors ${
-                              preferences.notifications
-                                ? 'bg-green-500'
-                                : 'bg-gray-300 dark:bg-gray-600'
-                            }`}
+                            className={`relative w-12 h-6 rounded-full transition-colors ${preferences.notifications
+                              ? 'bg-green-500'
+                              : 'bg-gray-300 dark:bg-gray-600'
+                              }`}
                           >
                             <div
-                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                                preferences.notifications ? 'left-7' : 'left-1'
-                              }`}
+                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${preferences.notifications ? 'left-7' : 'left-1'
+                                }`}
                             />
                           </button>
                         </div>
@@ -370,15 +369,14 @@ export const TabSyncDemo: FC = () => {
                           Sync Status:
                         </div>
                         <div
-                          className={`text-sm font-medium ${
-                            prefsSyncStatus === 'synced'
-                              ? 'text-green-600'
-                              : prefsSyncStatus === 'syncing'
-                                ? 'text-yellow-600'
-                                : prefsSyncStatus === 'conflict'
-                                  ? 'text-red-600'
-                                  : 'text-gray-600'
-                          }`}
+                          className={`text-sm font-medium ${prefsSyncStatus === 'synced'
+                            ? 'text-green-600'
+                            : prefsSyncStatus === 'syncing'
+                              ? 'text-yellow-600'
+                              : prefsSyncStatus === 'conflict'
+                                ? 'text-red-600'
+                                : 'text-gray-600'
+                            }`}
                         >
                           {prefsSyncStatus}
                         </div>

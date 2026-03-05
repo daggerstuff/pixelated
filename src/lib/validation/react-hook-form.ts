@@ -6,11 +6,7 @@ import { useForm, type UseFormReturn, type FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useState, useCallback } from 'react'
-import {
-  normalizeError,
-  getFieldErrors,
-  type ValidationError,
-} from '@/lib/error'
+import { normalizeError, getFieldErrors, type ValidationError } from '@/lib/error'
 
 export interface UseValidatedFormOptions<T extends FieldValues> {
   schema: z.ZodType<T>

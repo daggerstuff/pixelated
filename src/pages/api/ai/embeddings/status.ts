@@ -13,10 +13,7 @@ import {
   createEmbeddingAgentClient,
   EmbeddingAgentError,
 } from '@/lib/ai/embedding-agent'
-import type {
-  EmbeddingAgentStatus,
-  HealthCheckResponse,
-} from '@/lib/ai/embedding-agent'
+import type { EmbeddingAgentStatus, HealthCheckResponse } from '@/lib/ai/embedding-agent'
 
 const logger = createBuildSafeLogger('embeddings-status')
 
@@ -39,8 +36,7 @@ export const GET: APIRoute = async ({ request, url }: APIContext) => {
       }
     }
 
-    const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+    const agentUrl = import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     try {
@@ -149,8 +145,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       )
     }
 
-    const agentUrl =
-      import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
+    const agentUrl = import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
     const client = createEmbeddingAgentClient(agentUrl)
 
     switch (body.action) {

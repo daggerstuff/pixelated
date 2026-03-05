@@ -172,12 +172,8 @@ export class MonitoringService {
     const metrics = {
       timestamp: Date.now(),
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
-      navigation: performance.getEntriesByType(
-        'navigation',
-      )[0] as PerformanceNavigationTiming,
-      resources: performance.getEntriesByType(
-        'resource',
-      ) as PerformanceResourceTiming[],
+      navigation: performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming,
+      resources: performance.getEntriesByType('resource') as PerformanceResourceTiming[],
     }
 
     if (window.faro) {

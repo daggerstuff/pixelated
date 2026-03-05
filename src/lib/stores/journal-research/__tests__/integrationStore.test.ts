@@ -44,18 +44,14 @@ describe('integrationStore', () => {
     it('should toggle target format filter', () => {
       useIntegrationStore.getState().toggleTargetFormat('jsonl')
 
-      expect(useIntegrationStore.getState().filters.targetFormats).toContain(
-        'jsonl',
-      )
+      expect(useIntegrationStore.getState().filters.targetFormats).toContain('jsonl')
     })
 
     it('should remove target format filter when toggled again', () => {
       useIntegrationStore.getState().toggleTargetFormat('jsonl')
       useIntegrationStore.getState().toggleTargetFormat('jsonl')
 
-      expect(
-        useIntegrationStore.getState().filters.targetFormats,
-      ).not.toContain('jsonl')
+      expect(useIntegrationStore.getState().filters.targetFormats).not.toContain('jsonl')
     })
 
     it('should toggle multiple target format filters', () => {
@@ -70,18 +66,14 @@ describe('integrationStore', () => {
     it('should toggle complexity level filter', () => {
       useIntegrationStore.getState().toggleComplexityLevel('low')
 
-      expect(useIntegrationStore.getState().filters.complexityLevels).toContain(
-        'low',
-      )
+      expect(useIntegrationStore.getState().filters.complexityLevels).toContain('low')
     })
 
     it('should remove complexity level filter when toggled again', () => {
       useIntegrationStore.getState().toggleComplexityLevel('low')
       useIntegrationStore.getState().toggleComplexityLevel('low')
 
-      expect(
-        useIntegrationStore.getState().filters.complexityLevels,
-      ).not.toContain('low')
+      expect(useIntegrationStore.getState().filters.complexityLevels).not.toContain('low')
     })
 
     it('should toggle multiple complexity level filters', () => {
@@ -133,9 +125,7 @@ describe('integrationStore', () => {
       useIntegrationStore.getState().toggleComparePlanId('plan-1')
       useIntegrationStore.getState().toggleComparePlanId('plan-1')
 
-      expect(useIntegrationStore.getState().comparePlanIds).not.toContain(
-        'plan-1',
-      )
+      expect(useIntegrationStore.getState().comparePlanIds).not.toContain('plan-1')
     })
 
     it('should toggle multiple compare plan IDs', () => {

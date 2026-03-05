@@ -55,7 +55,7 @@ export class DatabaseService {
       .sort({ timestamp: -1 })
       .limit(100)
 
-    return docs.map((doc) => doc.toObject() as unknown as MarketData)
+    return docs.map(doc => doc.toObject() as unknown as MarketData)
   }
 
   /**
@@ -69,7 +69,8 @@ export class DatabaseService {
    * Get latest business metrics from MongoDB
    */
   async getLatestBusinessMetrics(): Promise<BusinessMetrics> {
-    const doc = await BusinessMetricsModel.findOne().sort({ createdAt: -1 })
+    const doc = await BusinessMetricsModel.findOne()
+      .sort({ createdAt: -1 })
 
     if (!doc) {
       return {

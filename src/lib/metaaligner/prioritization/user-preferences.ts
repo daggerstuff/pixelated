@@ -75,15 +75,8 @@ export interface UserPreferences {
 /**
  * Default user preferences
  */
-export const DEFAULT_PREFERENCES: Required<
-  Pick<
-    UserPreferences,
-    | 'preferredSupportStyle'
-    | 'responseFormality'
-    | 'riskSensitivity'
-    | 'verbosityLevel'
-  >
-> = {
+export const DEFAULT_PREFERENCES: Required<Pick<UserPreferences,
+  'preferredSupportStyle' | 'responseFormality' | 'riskSensitivity' | 'verbosityLevel'>> = {
   preferredSupportStyle: 'empathic',
   responseFormality: 'adaptive',
   riskSensitivity: 'high',
@@ -115,17 +108,11 @@ export class UserPreferenceManager {
   /**
    * Set preferences for a user
    */
-  setPreferences(
-    userId: string,
-    preferences: UserPreferences,
-  ): PreferenceValidationResult {
+  setPreferences(userId: string, preferences: UserPreferences): PreferenceValidationResult {
     const validation = this.validatePreferences(preferences)
 
     if (!validation.valid) {
-      logger.warn('Invalid preferences provided', {
-        userId,
-        errors: validation.errors,
-      })
+      logger.warn('Invalid preferences provided', { userId, errors: validation.errors })
       return validation
     }
 
@@ -167,38 +154,23 @@ export class UserPreferenceManager {
   /**
    * Validate user preferences
    */
-  validatePreferences(
-    preferences: UserPreferences,
-  ): PreferenceValidationResult {
+  validatePreferences(preferences: UserPreferences): PreferenceValidationResult {
     const errors: string[] = []
     const warnings: string[] = []
 
     // Validate support style
     if (preferences.preferredSupportStyle) {
-      const validStyles: SupportStyle[] = [
-        'pragmatic',
-        'empathic',
-        'direct',
-        'reflective',
-      ]
+      const validStyles: SupportStyle[] = ['pragmatic', 'empathic', 'direct', 'reflective']
       if (!validStyles.includes(preferences.preferredSupportStyle)) {
-        errors.push(
-          `Invalid support style: ${preferences.preferredSupportStyle}`,
-        )
+        errors.push(`Invalid support style: ${preferences.preferredSupportStyle}`)
       }
     }
 
     // Validate formality
     if (preferences.responseFormality) {
-      const validFormality: ResponseFormality[] = [
-        'formal',
-        'informal',
-        'adaptive',
-      ]
+      const validFormality: ResponseFormality[] = ['formal', 'informal', 'adaptive']
       if (!validFormality.includes(preferences.responseFormality)) {
-        errors.push(
-          `Invalid response formality: ${preferences.responseFormality}`,
-        )
+        errors.push(`Invalid response formality: ${preferences.responseFormality}`)
       }
     }
 
@@ -212,24 +184,20 @@ export class UserPreferenceManager {
 
     // Validate custom weights
     if (preferences.customObjectiveWeights) {
-      Object.entries(preferences.customObjectiveWeights).forEach(
-        ([key, weight]) => {
-          if (typeof weight !== 'number' || weight < 0 || weight > 1) {
-            errors.push(`Invalid weight for ${key}: ${weight} (must be 0-1)`)
-          }
-        },
-      )
+      Object.entries(preferences.customObjectiveWeights).forEach(([key, weight]) => {
+        if (typeof weight !== 'number' || weight < 0 || weight > 1) {
+          errors.push(`Invalid weight for ${key}: ${weight} (must be 0-1)`)
+        }
+      })
     }
 
     // Validate disable/prioritize objectives
     if (preferences.disableObjectives && preferences.prioritizeObjectives) {
-      const overlap = preferences.disableObjectives.filter((obj) =>
-        preferences.prioritizeObjectives?.includes(obj),
+      const overlap = preferences.disableObjectives.filter(obj =>
+        preferences.prioritizeObjectives?.includes(obj)
       )
       if (overlap.length > 0) {
-        warnings.push(
-          `Objectives in both disable and prioritize lists: ${overlap.join(', ')}`,
-        )
+        warnings.push(`Objectives in both disable and prioritize lists: ${overlap.join(', ')}`)
       }
     }
 
@@ -347,10 +315,7 @@ export function applyUserPreferences(
 
   // Step 7: Apply interaction preference adjustments
   if (prefs.interactionPreferences) {
-    result = applyInteractionPreferenceAdjustments(
-      result,
-      prefs.interactionPreferences,
-    )
+    result = applyInteractionPreferenceAdjustments(result, prefs.interactionPreferences)
   }
 
   // Step 8: Normalize weights to ensure they sum to 1
@@ -496,9 +461,7 @@ function applyInteractionPreferenceAdjustments(
 /**
  * Normalize objective weights to sum to 1
  */
-function normalizeWeights(
-  objectives: ObjectivePriority[],
-): ObjectivePriority[] {
+function normalizeWeights(objectives: ObjectivePriority[]): ObjectivePriority[] {
   const sum = objectives.reduce((acc, obj) => acc + obj.weight, 0)
 
   if (sum === 0) {

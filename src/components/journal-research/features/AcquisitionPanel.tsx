@@ -1,19 +1,11 @@
 import { useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { AcquisitionList } from '../lists/AcquisitionList'
 import {
   useAcquisitionListQuery,
   useAcquisitionInitiateMutation,
-} from '@/lib/hooks/journal-research'
-import {
-  useIntegrateAllDatasets,
-  usePipelineStatus,
-} from '@/lib/hooks/journal-research/useTraining'
+  } from '@/lib/hooks/journal-research'
+import { useIntegrateAllDatasets, usePipelineStatus } from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button/button'
 import { Play, Loader2 } from 'lucide-react'
@@ -23,10 +15,7 @@ export interface AcquisitionPanelProps {
   className?: string
 }
 
-export function AcquisitionPanel({
-  sessionId,
-  className,
-}: AcquisitionPanelProps) {
+export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps) {
   const [isInitiating, setIsInitiating] = useState(false)
   const { data: acquisitions, isLoading } = useAcquisitionListQuery(sessionId, {
     page: 1,
@@ -64,27 +53,25 @@ export function AcquisitionPanel({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {acquisitions &&
-            acquisitions.items.length > 0 &&
-            acquisitions.items.some((a) => a.status === 'completed') && (
-              <Button
-                onClick={() => integrateAllMutation.mutate(true)}
-                disabled={integrateAllMutation.isPending}
-                variant="outline"
-              >
-                {integrateAllMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Integrating All...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Integrate All to Pipeline
-                  </>
-                )}
-              </Button>
-            )}
+          {acquisitions && acquisitions.items.length > 0 && acquisitions.items.some(a => a.status === 'completed') && (
+            <Button
+              onClick={() => integrateAllMutation.mutate(true)}
+              disabled={integrateAllMutation.isPending}
+              variant="outline"
+            >
+              {integrateAllMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Integrating All...
+                </>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Integrate All to Pipeline
+                </>
+              )}
+            </Button>
+          )}
           <button
             onClick={() => setIsInitiating(true)}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
@@ -110,14 +97,11 @@ export function AcquisitionPanel({
               <div className="flex gap-2">
                 <button
                   onClick={() => {
-                    initiateMutation.mutate(
-                      { sourceIds: [] },
-                      {
-                        onSuccess: () => {
-                          setIsInitiating(false)
-                        },
+                    initiateMutation.mutate({ sourceIds: [] }, {
+                      onSuccess: () => {
+                        setIsInitiating(false)
                       },
-                    )
+                    })
                   }}
                   className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
@@ -147,15 +131,7 @@ export function AcquisitionPanel({
             </div>
           ) : (
             <AcquisitionList
-              acquisitions={
-                acquisitions ?? {
-                  items: [],
-                  total: 0,
-                  page: 1,
-                  pageSize: 25,
-                  totalPages: 0,
-                }
-              }
+              acquisitions={acquisitions ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
               isLoading={isLoading}
               sessionId={sessionId}
               onAcquisitionClick={(_acquisition) => {

@@ -43,9 +43,7 @@ describe('MappingConfiguration', () => {
       }
 
       const errors = validateContextCoverage(duplicateConfig)
-      expect(
-        errors.some((e) => e.type === ValidationErrorType.DUPLICATE_CONTEXT),
-      ).toBe(true)
+      expect(errors.some((e) => e.type === ValidationErrorType.DUPLICATE_CONTEXT)).toBe(true)
     })
 
     it('should validate all ContextType enum values are mapped', () => {
@@ -112,9 +110,7 @@ describe('MappingConfiguration', () => {
 
       const errors = validateWeights(incompleteWeights, ContextType.GENERAL)
       expect(errors.length).toBeGreaterThanOrEqual(3)
-      expect(
-        errors.every((e) => e.type === ValidationErrorType.MISSING_OBJECTIVE),
-      ).toBe(true)
+      expect(errors.every((e) => e.type === ValidationErrorType.MISSING_OBJECTIVE)).toBe(true)
     })
   })
 
@@ -253,9 +249,7 @@ describe('MappingConfiguration', () => {
       const errorTypes = new Set(result.errors.map((e) => e.type))
       expect(errorTypes.has(ValidationErrorType.MISSING_CONTEXT)).toBe(true)
       expect(errorTypes.has(ValidationErrorType.INVALID_WEIGHT)).toBe(true)
-      expect(errorTypes.has(ValidationErrorType.SAFETY_FLOOR_VIOLATION)).toBe(
-        true,
-      )
+      expect(errorTypes.has(ValidationErrorType.SAFETY_FLOOR_VIOLATION)).toBe(true)
     })
 
     it('should validate normalization when enabled', () => {
@@ -281,11 +275,9 @@ describe('MappingConfiguration', () => {
 
       const result = validateMappingConfiguration(unnormalizedConfig)
       expect(result.valid).toBe(false)
-      expect(
-        result.errors.some(
-          (e) => e.type === ValidationErrorType.NORMALIZATION_ERROR,
-        ),
-      ).toBe(true)
+      expect(result.errors.some((e) => e.type === ValidationErrorType.NORMALIZATION_ERROR)).toBe(
+        true,
+      )
     })
 
     it('should allow unnormalized weights when normalization disabled', () => {
@@ -312,9 +304,7 @@ describe('MappingConfiguration', () => {
       const result = validateMappingConfiguration(config)
       // Should only fail on missing contexts, not normalization
       expect(
-        result.errors.every(
-          (e) => e.type !== ValidationErrorType.NORMALIZATION_ERROR,
-        ),
+        result.errors.every((e) => e.type !== ValidationErrorType.NORMALIZATION_ERROR),
       ).toBe(true)
     })
   })
@@ -330,9 +320,7 @@ describe('MappingConfiguration', () => {
     })
 
     it('should have valid precedence ordering', () => {
-      const precedences = DEFAULT_MAPPING_CONFIG.mappings.map(
-        (m) => m.precedence,
-      )
+      const precedences = DEFAULT_MAPPING_CONFIG.mappings.map((m) => m.precedence)
 
       // Precedences should be unique and ordered
       const uniquePrecedences = new Set(precedences)
@@ -359,10 +347,7 @@ describe('MappingConfiguration', () => {
 
     it('should have all weights sum to 1.0 when normalization enabled', () => {
       for (const mapping of DEFAULT_MAPPING_CONFIG.mappings) {
-        const sum = Object.values(mapping.weights).reduce(
-          (acc, w) => acc + (w || 0),
-          0,
-        )
+        const sum = Object.values(mapping.weights).reduce((acc, w) => acc + (w || 0), 0)
         expect(Math.abs(sum - 1.0)).toBeLessThan(0.001) // Allow floating point errors
       }
     })
