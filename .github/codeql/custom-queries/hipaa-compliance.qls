@@ -1,0 +1,4 @@
+- description: HIPAA compliance security checks
+- queries: javascript/fhir
+- queries: javascript/ehr
+- pack: codeql/javascript-queries
