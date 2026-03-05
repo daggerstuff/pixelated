@@ -148,6 +148,7 @@ router.get(
 
 router.put(
     '/:documentId',
+    requireRoles(['admin', 'manager', 'therapist']),
     asyncHandler(async (req: Request, res: Response) => {
         const documentId = ensureString(req.params.documentId)
         const { title, content, status, description } = req.body
@@ -181,6 +182,7 @@ router.put(
 
 router.delete(
     '/:documentId',
+    requireRoles(['admin', 'manager', 'therapist']),
     asyncHandler(async (req: Request, res: Response) => {
         const documentId = ensureString(req.params.documentId)
 
