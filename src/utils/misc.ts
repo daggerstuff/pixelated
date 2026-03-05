@@ -28,7 +28,7 @@ export function unlockScroll() {
 export function toggleFadeEffect(
   elementId: string,
   visible: boolean,
-  hiddenClass: string
+  hiddenClass: string,
 ) {
   const element = document.getElementById(elementId)
   if (!element) return
@@ -58,7 +58,7 @@ export function toggleFadeEffect(
         // if (elementId === 'backdrop') document.body.style.overflow = ''
         // if (elementId === 'backdrop') document.documentElement.style.overflow = ''
       },
-      { once: true }
+      { once: true },
     )
   }
 }

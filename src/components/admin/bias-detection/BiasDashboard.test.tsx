@@ -109,7 +109,7 @@ const createMockWebSocket = (): MockWebSocketInstance => ({
 const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
   typeof vi.fn
 > & {
-  new(url: string | URL, protocols?: string | string[]): MockWebSocketInstance
+  new (url: string | URL, protocols?: string | string[]): MockWebSocketInstance
   prototype: WebSocket
   readonly CONNECTING: 0
   readonly OPEN: 1
@@ -120,11 +120,11 @@ const MockWebSocketConstructor = vi.fn(createMockWebSocket) as ReturnType<
 // Mock WebSocket using Vitest's stubGlobal
 vi.stubGlobal('WebSocket', MockWebSocketConstructor)
 
-  // Define standard readyState constants on the mock constructor
-  ; (MockWebSocketConstructor as any).CONNECTING = 0
-  ; (MockWebSocketConstructor as any).OPEN = 1
-  ; (MockWebSocketConstructor as any).CLOSING = 2
-  ; (MockWebSocketConstructor as any).CLOSED = 3
+// Define standard readyState constants on the mock constructor
+;(MockWebSocketConstructor as any).CONNECTING = 0
+;(MockWebSocketConstructor as any).OPEN = 1
+;(MockWebSocketConstructor as any).CLOSING = 2
+;(MockWebSocketConstructor as any).CLOSED = 3
 
 // --- GLOBAL MOCKS FOR BROWSER APIS ---
 // Ensure matchMedia is always mocked for all tests
@@ -145,7 +145,7 @@ beforeAll(async () => {
     })
   }
   // Mock window.alert and window.prompt to prevent test failures
-  vi.spyOn(window, 'alert').mockImplementation(() => { })
+  vi.spyOn(window, 'alert').mockImplementation(() => {})
   vi.spyOn(window, 'prompt').mockImplementation(() => '')
   // Mock URL.createObjectURL if not present
   if (!global.URL.createObjectURL) {
@@ -169,10 +169,10 @@ describe('BiasDashboard', () => {
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
     // Ensure the constructor has a default implementation after reset
     MockWebSocketConstructor.mockImplementation(createMockWebSocket)
-      ; (MockWebSocketConstructor as any).CONNECTING = 0
-      ; (MockWebSocketConstructor as any).OPEN = 1
-      ; (MockWebSocketConstructor as any).CLOSING = 2
-      ; (MockWebSocketConstructor as any).CLOSED = 3
+    ;(MockWebSocketConstructor as any).CONNECTING = 0
+    ;(MockWebSocketConstructor as any).OPEN = 1
+    ;(MockWebSocketConstructor as any).CLOSING = 2
+    ;(MockWebSocketConstructor as any).CLOSED = 3
     // Default fetch mock for initial dashboard load unless a test overrides it
     global.fetch = vi
       .fn()
@@ -225,7 +225,7 @@ describe('BiasDashboard', () => {
     if (__originalFetch) {
       global.fetch = __originalFetch
     } else {
-      ; (global as any).fetch = undefined
+      ;(global as any).fetch = undefined
     }
     // Ensure global WebSocket remains our mock after tests that might override it
     vi.stubGlobal('WebSocket', MockWebSocketConstructor)
@@ -254,15 +254,15 @@ describe('BiasDashboard', () => {
   it.skip('handles WebSocket connection', async () => {
     // Helper to get the latest WebSocket instance from mock results
     const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>).mock
-        ?.results
+      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
+        .mock?.results
       if (!results || results.length === 0) return undefined
       return results[results.length - 1]?.value as MockWebSocketInstance
     }
 
     // Use the same robust mock setup as Enhanced WebSocket tests
     MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket();
+      return createMockWebSocket()
     })
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
@@ -332,14 +332,14 @@ describe('BiasDashboard', () => {
   it.skip('updates data when receiving WebSocket messages', async () => {
     // Helper to get the latest WebSocket instance from mock results
     const getCurrentWS = (): MockWebSocketInstance | undefined => {
-      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>).mock
-        ?.results
+      const results = (MockWebSocketConstructor as ReturnType<typeof vi.fn>)
+        .mock?.results
       if (!results || results.length === 0) return undefined
       return results[results.length - 1]?.value as MockWebSocketInstance
     }
 
     MockWebSocketConstructor.mockImplementation(() => {
-      return createMockWebSocket();
+      return createMockWebSocket()
     })
 
     render(<BiasDashboard enableRealTimeUpdates={true} />)
@@ -480,7 +480,7 @@ describe('BiasDashboard', () => {
     const _openCall = mockWs.addEventListener.mock.calls.find(
       (call: unknown[]) => call[0] === 'open',
     )
-    const intervalId = setInterval(() => { }, 30000)
+    const intervalId = setInterval(() => {}, 30000)
     mockWs.heartbeatInterval = intervalId as any
 
     unmount()
@@ -775,7 +775,7 @@ describe('BiasDashboard', () => {
     fireEvent.click(screen.getByTestId('notifications-button'))
 
     // Mock window.alert
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { })
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
 
     // Click send test button
     const sendTestButton = screen.getByText(/send test/i)
@@ -1062,7 +1062,7 @@ describe('BiasDashboard', () => {
       global.URL.revokeObjectURL = vi.fn()
       const clickSpy = vi
         .spyOn(HTMLAnchorElement.prototype, 'click')
-        .mockImplementation(() => { })
+        .mockImplementation(() => {})
       const originalFetch = globalThis.fetch
       globalThis.fetch = vi.fn(async (input: any, init?: any) => {
         const url = typeof input === 'string' ? input : input?.url
@@ -1097,8 +1097,8 @@ describe('BiasDashboard', () => {
       // Cleanup
       clickSpy.mockRestore()
       globalThis.fetch = originalFetch
-        ; (global.URL.createObjectURL as any) = vi.fn()
-        ; (global.URL.revokeObjectURL as any) = vi.fn()
+      ;(global.URL.createObjectURL as any) = vi.fn()
+      ;(global.URL.revokeObjectURL as any) = vi.fn()
     })
 
     it('closes export dialog when cancel is clicked', async () => {
@@ -1481,7 +1481,7 @@ describe('BiasDashboard', () => {
       if (originalFetch) {
         global.fetch = originalFetch
       } else {
-        ; (global as any).fetch = undefined
+        ;(global as any).fetch = undefined
       }
       if (container && container.parentNode) {
         container.parentNode.removeChild(container)
@@ -1876,7 +1876,7 @@ describe('BiasDashboard', () => {
       })
 
       // Set up heartbeat interval
-      const intervalId = setInterval(() => { }, 30000)
+      const intervalId = setInterval(() => {}, 30000)
       mockWebSocket.heartbeatInterval = intervalId as any
 
       // Unmount component

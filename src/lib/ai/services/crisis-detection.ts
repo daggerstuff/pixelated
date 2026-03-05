@@ -234,9 +234,10 @@ export class CrisisDetectionService {
 
         if (matches) {
           // Apply idiom/cultural exclusions to prevent false positives
-          const excluded = CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some(
-            (re) => re.test(text),
-          )
+          const excluded =
+            CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some((re) =>
+              re.test(text),
+            )
 
           if (!excluded) {
             indicators.push(keyword)

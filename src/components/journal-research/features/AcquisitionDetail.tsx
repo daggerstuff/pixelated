@@ -1,12 +1,28 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import {
   useAcquisitionQuery,
   useAcquisitionUpdateMutation,
 } from '@/lib/hooks/journal-research'
-import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
+import {
+  useIntegrateDataset,
+  useTrainingStatus,
+} from '@/lib/hooks/journal-research/useTraining'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
-import { Download, CheckCircle, XCircle, Clock, Play, CheckCircle2, Loader2 } from 'lucide-react'
+import {
+  Download,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Play,
+  CheckCircle2,
+  Loader2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button/button'
 
 export interface AcquisitionDetailProps {
@@ -27,11 +43,12 @@ export function AcquisitionDetail({
   const updateMutation = useAcquisitionUpdateMutation(sessionId)
   const integrateMutation = useIntegrateDataset(sessionId)
   const { data: trainingStatus } = useTrainingStatus(sessionId, true)
-  
+
   // Check if this acquisition is integrated
-  const isIntegrated = trainingStatus?.datasets?.find(
-    (ds) => ds.source_id === acquisition?.sourceId
-  )?.integrated ?? false
+  const isIntegrated =
+    trainingStatus?.datasets?.find(
+      (ds) => ds.source_id === acquisition?.sourceId,
+    )?.integrated ?? false
 
   if (isLoading) {
     return (
@@ -50,24 +67,27 @@ export function AcquisitionDetail({
   }
 
   const statusIcons = {
-    pending: Clock,
-    approved: CheckCircle,
+    'pending': Clock,
+    'approved': CheckCircle,
     'in-progress': Download,
-    completed: CheckCircle,
-    failed: XCircle,
+    'completed': CheckCircle,
+    'failed': XCircle,
   }
 
-  const StatusIcon = statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock
+  const StatusIcon =
+    statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock
 
   const statusColors = {
-    pending: 'text-yellow-600',
-    approved: 'text-blue-600',
+    'pending': 'text-yellow-600',
+    'approved': 'text-blue-600',
     'in-progress': 'text-blue-600',
-    completed: 'text-green-600',
-    failed: 'text-red-600',
+    'completed': 'text-green-600',
+    'failed': 'text-red-600',
   }
 
-  const statusColor = statusColors[acquisition.status as keyof typeof statusColors] ?? 'text-gray-600'
+  const statusColor =
+    statusColors[acquisition.status as keyof typeof statusColors] ??
+    'text-gray-600'
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -86,7 +106,7 @@ export function AcquisitionDetail({
             <StatusIcon className={cn('h-5 w-5', statusColor)} />
             <span className="capitalize font-medium">{acquisition.status}</span>
           </div>
-          
+
           {/* Training Pipeline Integration */}
           {acquisition.status === 'completed' && (
             <div className="flex items-center gap-2">
@@ -102,7 +122,9 @@ export function AcquisitionDetail({
                   size="sm"
                   onClick={() => {
                     if (acquisition.sourceId) {
-                      integrateMutation.mutate({ sourceId: acquisition.sourceId })
+                      integrateMutation.mutate({
+                        sourceId: acquisition.sourceId,
+                      })
                     }
                   }}
                   disabled={integrateMutation.isPending}
@@ -263,4 +285,3 @@ export function AcquisitionDetail({
     </div>
   )
 }
-

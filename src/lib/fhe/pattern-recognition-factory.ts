@@ -148,9 +148,8 @@ export async function createPatternRecognitionFHEService(
       logger.info('Using SEAL FHE service for pattern recognition')
 
       // Import dynamically to avoid circular dependencies
-      const { SealPatternRecognitionService } = await import(
-        './seal-pattern-recognition'
-      )
+      const { SealPatternRecognitionService } =
+        await import('./seal-pattern-recognition')
 
       // Create and initialize SEAL service
       const sealService = new SealPatternRecognitionService()

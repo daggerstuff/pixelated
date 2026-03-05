@@ -1,6 +1,14 @@
 import { useMemo } from 'react'
-import type { Progress, ProgressMetrics } from '@/lib/api/journal-research/types'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import type {
+  Progress,
+  ProgressMetrics,
+} from '@/lib/api/journal-research/types'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import ChartComponent from '@/components/analytics/ChartComponent'
 import { cn } from '@/lib/utils'
 
@@ -33,7 +41,13 @@ export function PhaseProgressChart({
         progressValue = progress.progressPercentage
       } else {
         // Completed phases show 100%, future phases show 0%
-        const phaseOrder = ['discovery', 'evaluation', 'acquisition', 'integration', 'reporting']
+        const phaseOrder = [
+          'discovery',
+          'evaluation',
+          'acquisition',
+          'integration',
+          'reporting',
+        ]
         const currentIndex = phaseOrder.indexOf(progress.currentPhase)
         const phaseIndex = phaseOrder.indexOf(phase.key)
 
@@ -181,12 +195,13 @@ export function PhaseProgressChart({
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
-                    className={`h-full transition-all ${phase.isCurrent
+                    className={`h-full transition-all ${
+                      phase.isCurrent
                         ? 'bg-primary'
                         : phase.progress === 100
                           ? 'bg-green-500'
                           : 'bg-gray-300'
-                      }`}
+                    }`}
                     style={{ width: `${phase.progress}%` }}
                     role="progressbar"
                     aria-valuenow={phase.progress}
@@ -202,4 +217,3 @@ export function PhaseProgressChart({
     </div>
   )
 }
-

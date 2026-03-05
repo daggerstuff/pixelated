@@ -1,7 +1,6 @@
 import { Buffer } from 'node:buffer'
 import { webcrypto } from 'node:crypto'
 
-
 interface EncryptedData {
   iv: string
   data: string
@@ -109,7 +108,10 @@ export async function encrypt(data: unknown): Promise<string> {
 
     // Split the encrypted data and auth tag
     const encryptedBytes = new Uint8Array(encrypted)
-    const encryptedData = encryptedBytes.slice(0, encrypted.byteLength - TAG_LENGTH)
+    const encryptedData = encryptedBytes.slice(
+      0,
+      encrypted.byteLength - TAG_LENGTH,
+    )
     const tag = encryptedBytes.slice(encrypted.byteLength - TAG_LENGTH)
 
     // Convert to base64 for storage/transmission
@@ -123,7 +125,7 @@ export async function encrypt(data: unknown): Promise<string> {
     return JSON.stringify(result)
   } catch (error: unknown) {
     throw new (Error as {
-      new(message: string, options?: ErrorOptions): Error
+      new (message: string, options?: ErrorOptions): Error
     })(`Encryption failed: ${(error as Error).message}`, {
       cause: error,
     })
@@ -177,7 +179,7 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     return JSON.parse(decoder.decode(decrypted))
   } catch (error: unknown) {
     throw new (Error as {
-      new(message: string, options?: ErrorOptions): Error
+      new (message: string, options?: ErrorOptions): Error
     })(`Decryption failed: ${(error as Error).message}`, {
       cause: error,
     })

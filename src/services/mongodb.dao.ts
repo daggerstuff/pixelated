@@ -74,9 +74,7 @@ export class DataExportDAO {
     return db.collection<DataExport>('data_exports')
   }
 
-  async create(
-    exportRequest: Omit<DataExport, '_id'>,
-  ): Promise<DataExport> {
+  async create(exportRequest: Omit<DataExport, '_id'>): Promise<DataExport> {
     const collection = await this.getCollection()
     // Ensure files is initialized
     const data = { ...exportRequest, files: exportRequest.files || [] }

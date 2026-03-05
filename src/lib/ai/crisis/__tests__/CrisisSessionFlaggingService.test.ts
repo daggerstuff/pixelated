@@ -47,13 +47,13 @@ vi.mock('@lib/db/mongoClient', () => ({
         find: (query: any) => ({
           sort: () => ({
             toArray: async () => {
-              return Array.from(collectionState.values()).filter(doc => {
-                              if (query.user_id && doc.user_id !== query.user_id) return false
-                              if (query.status && query.status.$nin) {
-                                return !query.status.$nin.includes(doc.status)
-                              }
-                              return true
-                            });
+              return Array.from(collectionState.values()).filter((doc) => {
+                if (query.user_id && doc.user_id !== query.user_id) return false
+                if (query.status && query.status.$nin) {
+                  return !query.status.$nin.includes(doc.status)
+                }
+                return true
+              })
             },
           }),
         }),
@@ -115,9 +115,9 @@ describe('CrisisSessionFlaggingService (Mongo implementation)', () => {
   it('rejects invalid identifiers during flagging', async () => {
     const invalidRequest = { ...validRequest, userId: 'bad id' }
 
-    await expect(
-      service.flagSessionForReview(invalidRequest),
-    ).rejects.toThrow('Invalid userId')
+    await expect(service.flagSessionForReview(invalidRequest)).rejects.toThrow(
+      'Invalid userId',
+    )
   })
 
   it('updates an existing flag status', async () => {
@@ -138,7 +138,10 @@ describe('CrisisSessionFlaggingService (Mongo implementation)', () => {
 
   it('rejects invalid flag identifiers on update', async () => {
     await expect(
-      service.updateFlagStatus({ flagId: 'not-a-valid-object-id', status: 'reviewed' }),
+      service.updateFlagStatus({
+        flagId: 'not-a-valid-object-id',
+        status: 'reviewed',
+      }),
     ).rejects.toThrow('Invalid flagId provided.')
   })
 
@@ -168,6 +171,6 @@ describe('CrisisSessionFlaggingService (Mongo implementation)', () => {
       true,
     )
 
-    expect(withResolved.some(flag => flag.status === 'resolved')).toBe(true)
+    expect(withResolved.some((flag) => flag.status === 'resolved')).toBe(true)
   })
 })

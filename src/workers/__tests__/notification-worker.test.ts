@@ -10,13 +10,19 @@ declare module '@/lib/services/notification/WebSocketServer' {
 }
 
 // Provide a factory for the logger and service mocks
-const { mockLoggerInstance, startProcessingMock, onMock, closeMock, mockWsServerInstance } = vi.hoisted(() => {
+const {
+  mockLoggerInstance,
+  startProcessingMock,
+  onMock,
+  closeMock,
+  mockWsServerInstance,
+} = vi.hoisted(() => {
   const onMock = vi.fn()
   const closeMock = vi.fn()
   const mockWsServerInstance = {
     on: onMock,
     close: closeMock,
-    emit: vi.fn()
+    emit: vi.fn(),
   }
   return {
     mockLoggerInstance: {
@@ -28,21 +34,25 @@ const { mockLoggerInstance, startProcessingMock, onMock, closeMock, mockWsServer
     startProcessingMock: vi.fn().mockResolvedValue(undefined),
     onMock,
     closeMock,
-    mockWsServerInstance
+    mockWsServerInstance,
   }
 })
 
 // Mock dependencies
 vi.mock('@/lib/services/notification/NotificationService', () => {
   return {
-    NotificationService: vi.fn(class {
-      startProcessing = startProcessingMock
-    })
+    NotificationService: vi.fn(
+      class {
+        startProcessing = startProcessingMock
+      },
+    ),
   }
 })
 vi.mock('@/lib/services/notification/WebSocketServer', () => {
   return {
-    WebSocketServer: vi.fn().mockImplementation(function() { return mockWsServerInstance })
+    WebSocketServer: vi.fn().mockImplementation(function () {
+      return mockWsServerInstance
+    }),
   }
 })
 vi.mock('@/config/env.config')
@@ -74,8 +84,8 @@ describe('notification-worker', () => {
     vi.clearAllMocks()
     vi.resetModules()
 
-      // Reset environment variables
-      ; (vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8082'
+    // Reset environment variables
+    ;(vi.mocked(env) as any).NOTIFICATION_WS_PORT = '8082'
 
     // Reset default mock implementations
     startProcessingMock.mockResolvedValue(undefined)
@@ -87,8 +97,8 @@ describe('notification-worker', () => {
     // Restore original listeners (removes our worker listeners)
     process.removeAllListeners('SIGTERM')
     process.removeAllListeners('SIGINT')
-    sigtermListeners.forEach(l => process.on('SIGTERM', l))
-    sigintListeners.forEach(l => process.on('SIGINT', l))
+    sigtermListeners.forEach((l) => process.on('SIGTERM', l))
+    sigintListeners.forEach((l) => process.on('SIGINT', l))
   })
 
   describe('startWorker', () => {
@@ -99,9 +109,7 @@ describe('notification-worker', () => {
       // Wait for async execution
       await vi.runAllTimersAsync()
 
-      expect(
-        mockLoggerInstance.info,
-      ).toHaveBeenCalledWith(
+      expect(mockLoggerInstance.info).toHaveBeenCalledWith(
         expect.stringContaining('Starting notification worker'),
         expect.objectContaining({ workerId: expect.any(String) }),
       )
@@ -119,9 +127,7 @@ describe('notification-worker', () => {
       // Import worker module
       await import('../notification-worker.js')
 
-      expect(
-        mockLoggerInstance.error,
-      ).toHaveBeenCalledWith(
+      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
         expect.stringContaining('Failed to start notification worker'),
         expect.objectContaining({
           workerId: expect.any(String),
@@ -133,9 +139,7 @@ describe('notification-worker', () => {
 
     it('should handle processing errors gracefully', async () => {
       // Mock startProcessing to throw error
-      startProcessingMock.mockRejectedValueOnce(
-        new Error('Processing error'),
-      )
+      startProcessingMock.mockRejectedValueOnce(new Error('Processing error'))
 
       // Import worker module
       await import('../notification-worker.js')
@@ -143,9 +147,7 @@ describe('notification-worker', () => {
       // Wait for error to be logged
       await vi.runAllTimersAsync()
 
-      expect(
-        mockLoggerInstance.error,
-      ).toHaveBeenCalledWith(
+      expect(mockLoggerInstance.error).toHaveBeenCalledWith(
         expect.stringContaining('Notification worker failed'),
         expect.objectContaining({
           workerId: expect.any(String),
@@ -162,7 +164,9 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       // Find the new SIGTERM listener
-      const newListeners = process.listeners('SIGTERM').filter(l => !sigtermListeners.includes(l))
+      const newListeners = process
+        .listeners('SIGTERM')
+        .filter((l) => !sigtermListeners.includes(l))
       const handler = newListeners[newListeners.length - 1]
 
       expect(handler).toBeDefined()
@@ -179,7 +183,9 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       // Find the new SIGINT listener
-      const newListeners = process.listeners('SIGINT').filter(l => !sigintListeners.includes(l))
+      const newListeners = process
+        .listeners('SIGINT')
+        .filter((l) => !sigintListeners.includes(l))
       const handler = newListeners[newListeners.length - 1]
 
       expect(handler).toBeDefined()
@@ -194,7 +200,9 @@ describe('notification-worker', () => {
       await vi.runAllTimersAsync()
 
       // Find the new SIGTERM listener
-      const newListeners = process.listeners('SIGTERM').filter(l => !sigtermListeners.includes(l))
+      const newListeners = process
+        .listeners('SIGTERM')
+        .filter((l) => !sigtermListeners.includes(l))
       const handler = newListeners[newListeners.length - 1]
 
       expect(handler).toBeDefined()
@@ -235,17 +243,15 @@ describe('notification-worker', () => {
       const mockError = new Error('WebSocket error')
       // Force call the handler if we can capture it, otherwise skip
       if (onMock.mock.calls.length > 0) {
-        const handler = onMock.mock.calls.find(c => c[0] === 'error')?.[1]
+        const handler = onMock.mock.calls.find((c) => c[0] === 'error')?.[1]
         if (handler) {
           handler(mockError)
-          expect(
-            mockLoggerInstance.error,
-          ).toHaveBeenCalledWith(
+          expect(mockLoggerInstance.error).toHaveBeenCalledWith(
             expect.stringContaining('WebSocket server error'),
             expect.objectContaining({
               workerId: expect.any(String),
               error: 'WebSocket error',
-            })
+            }),
           )
         }
       }

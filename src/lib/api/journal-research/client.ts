@@ -363,5 +363,3 @@ export const journalResearchApiClient = new JournalResearchApiClient({
   getAuthToken: getAuthTokenFromBetterAuth,
   onUnauthorized: handleUnauthorized,
 })
-
-

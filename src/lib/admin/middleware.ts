@@ -8,7 +8,6 @@ import type { BaseAPIContext } from '../auth/apiRouteTypes'
 import type { AdminPermission } from './index'
 import { AdminService } from './index'
 
-
 /**
  * Verify that the request is from an authenticated admin user
  */

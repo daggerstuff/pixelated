@@ -5,13 +5,11 @@
 
 export { useAnonymizedMetrics } from './useAnonymizedMetrics'
 export { useSimulator } from '../context/SimulatorContext'
-export {
-    useGestaltWebSocket,
-} from './useGestaltWebSocket'
+export { useGestaltWebSocket } from './useGestaltWebSocket'
 export type {
-    CrisisLevel,
-    GestaltUpdatePayload,
-    GestaltConnectionStatus,
-    UseGestaltWebSocketOptions,
-    UseGestaltWebSocketResult,
+  CrisisLevel,
+  GestaltUpdatePayload,
+  GestaltConnectionStatus,
+  UseGestaltWebSocketOptions,
+  UseGestaltWebSocketResult,
 } from './useGestaltWebSocket'

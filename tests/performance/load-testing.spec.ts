@@ -50,8 +50,12 @@ test.describe('Pipeline Load Testing', () => {
           })
         } catch (error) {
           // Log page content for debugging if selector not found
-          const bodyText = await page.textContent('body').catch(() => 'Unable to get body text')
-          console.error(`Failed to find data-ingestion-tab for user ${i}. Page body preview: ${bodyText?.substring(0, 200)}`)
+          const bodyText = await page
+            .textContent('body')
+            .catch(() => 'Unable to get body text')
+          console.error(
+            `Failed to find data-ingestion-tab for user ${i}. Page body preview: ${bodyText?.substring(0, 200)}`,
+          )
           throw error
         }
       }
@@ -534,7 +538,7 @@ test.describe('Pipeline Load Testing', () => {
       // Force garbage collection
       await page.evaluate(() => {
         if ((window as any).gc) {
-          ; (window as any).gc()
+          ;(window as any).gc()
         }
       })
 

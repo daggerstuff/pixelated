@@ -122,8 +122,7 @@ const Label = ({ htmlFor, children, ...props }: LabelProps) => (
 )
 
 // Create an inline Textarea component
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   id?: string
   placeholder?: string
   value?: string

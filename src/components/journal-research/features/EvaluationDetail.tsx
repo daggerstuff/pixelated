@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { EvaluationCard } from '../shared/EvaluationCard'
 import { EvaluationForm } from '../forms/EvaluationForm'
 import {
@@ -154,7 +159,9 @@ export function EvaluationDetail({
               <p className="text-sm font-medium text-muted-foreground">
                 Evaluation Date
               </p>
-              <p className="mt-1">{format(evaluation.evaluationDate, 'PPpp')}</p>
+              <p className="mt-1">
+                {format(evaluation.evaluationDate, 'PPpp')}
+              </p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
@@ -168,4 +175,3 @@ export function EvaluationDetail({
     </div>
   )
 }
-

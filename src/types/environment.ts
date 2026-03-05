@@ -86,7 +86,8 @@ export interface BuildEnvironmentVariables {
 
 /** Combined environment variables interface */
 export interface EnvironmentVariables
-  extends CoreEnvironmentVariables,
+  extends
+    CoreEnvironmentVariables,
     DatabaseEnvironmentVariables,
     AuthEnvironmentVariables,
     AIEnvironmentVariables,

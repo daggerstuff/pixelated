@@ -19,7 +19,13 @@ import {
 } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import {
   Dialog,
@@ -93,7 +99,9 @@ export function MemoryDashboard({
   const [editContent, setEditContent] = useState('')
 
   // Therapeutic & Scope fields for new memory
-  const [newMemoryScope, setNewMemoryScope] = useState<'shared' | 'private' | 'user' | 'global'>('shared')
+  const [newMemoryScope, setNewMemoryScope] = useState<
+    'shared' | 'private' | 'user' | 'global'
+  >('shared')
   const [newMemoryAgentRole, setNewMemoryAgentRole] = useState('')
 
   const memory = useMemory({
@@ -208,12 +216,13 @@ export function MemoryDashboard({
             Manage and explore your AI memory system
           </p>
         </div>
-
-
       </div>
 
       {/* Crisis Alert Banner */}
-      {filteredMemories.some(m => m.metadata?.crisisSeverity && m.metadata.crisisSeverity !== 'none') && (
+      {filteredMemories.some(
+        (m) =>
+          m.metadata?.crisisSeverity && m.metadata.crisisSeverity !== 'none',
+      ) && (
         <Card className="border-destructive bg-destructive/5">
           <CardHeader className="py-3">
             <CardTitle className="text-destructive text-sm font-medium flex items-center gap-2">
@@ -221,8 +230,8 @@ export function MemoryDashboard({
               Active Crisis Signals Detected
             </CardTitle>
             <CardDescription className="text-xs text-destructive/80">
-              The AI has flagged potential crisis signals in recent user interactions.
-              Please review entries marked with crisis badges.
+              The AI has flagged potential crisis signals in recent user
+              interactions. Please review entries marked with crisis badges.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -282,7 +291,12 @@ export function MemoryDashboard({
                   <Plus className="h-4 w-4 mr-2" />
                   Add Memory
                 </Button>
-                <Dialog open={addDialog.isOpen} onOpenChange={(open) => (open ? addDialog.open() : addDialog.close())}>
+                <Dialog
+                  open={addDialog.isOpen}
+                  onOpenChange={(open) =>
+                    open ? addDialog.open() : addDialog.close()
+                  }
+                >
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Add New Memory</DialogTitle>
@@ -299,29 +313,49 @@ export function MemoryDashboard({
                       />
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label htmlFor="memory-scope" className="text-sm font-medium">Scope</label>
+                          <label
+                            htmlFor="memory-scope"
+                            className="text-sm font-medium"
+                          >
+                            Scope
+                          </label>
                           <Select
                             value={newMemoryScope}
-                            onValueChange={(val) => setNewMemoryScope(val as typeof newMemoryScope)}
+                            onValueChange={(val) =>
+                              setNewMemoryScope(val as typeof newMemoryScope)
+                            }
                           >
                             <SelectTrigger id="memory-scope">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="shared">Shared (Team)</SelectItem>
-                              <SelectItem value="private">Private (Agent Only)</SelectItem>
+                              <SelectItem value="shared">
+                                Shared (Team)
+                              </SelectItem>
+                              <SelectItem value="private">
+                                Private (Agent Only)
+                              </SelectItem>
                               <SelectItem value="user">Personal</SelectItem>
-                              <SelectItem value="global">Global Context</SelectItem>
+                              <SelectItem value="global">
+                                Global Context
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label htmlFor="agent-role" className="text-sm font-medium">Agent Role</label>
+                          <label
+                            htmlFor="agent-role"
+                            className="text-sm font-medium"
+                          >
+                            Agent Role
+                          </label>
                           <Input
                             id="agent-role"
                             placeholder="e.g. Trainer, Practice"
                             value={newMemoryAgentRole}
-                            onChange={(e) => setNewMemoryAgentRole(e.target.value)}
+                            onChange={(e) =>
+                              setNewMemoryAgentRole(e.target.value)
+                            }
                           />
                         </div>
                       </div>
@@ -415,37 +449,58 @@ export function MemoryDashboard({
                             <div className="flex flex-wrap gap-1.5">
                               {/* Scope Badge */}
                               {mem.metadata?.scope === 'private' ? (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-amber-200 bg-amber-50 text-amber-700 text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 px-1.5 py-0 border-amber-200 bg-amber-50 text-amber-700 text-[10px]"
+                                >
                                   <Lock className="h-2.5 w-2.5" /> Private
                                 </Badge>
                               ) : mem.metadata?.scope === 'global' ? (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-blue-200 bg-blue-50 text-blue-700 text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 px-1.5 py-0 border-blue-200 bg-blue-50 text-blue-700 text-[10px]"
+                                >
                                   <Globe className="h-2.5 w-2.5" /> Global
                                 </Badge>
                               ) : (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-emerald-200 bg-emerald-50 text-emerald-700 text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 px-1.5 py-0 border-emerald-200 bg-emerald-50 text-emerald-700 text-[10px]"
+                                >
                                   <ShieldCheck className="h-2.5 w-2.5" /> Shared
                                 </Badge>
                               )}
 
                               {/* Crisis Severity Badge */}
-                              {mem.metadata?.crisisSeverity && mem.metadata.crisisSeverity !== 'none' && (
-                                <Badge variant="destructive" className="gap-1 px-1.5 py-0 animate-pulse text-[10px]">
-                                  <AlertCircle className="h-2.5 w-2.5" /> {mem.metadata.crisisSeverity.toUpperCase()}
-                                </Badge>
-                              )}
+                              {mem.metadata?.crisisSeverity &&
+                                mem.metadata.crisisSeverity !== 'none' && (
+                                  <Badge
+                                    variant="destructive"
+                                    className="gap-1 px-1.5 py-0 animate-pulse text-[10px]"
+                                  >
+                                    <AlertCircle className="h-2.5 w-2.5" />{' '}
+                                    {mem.metadata.crisisSeverity.toUpperCase()}
+                                  </Badge>
+                                )}
 
                               {/* Speculation Badge */}
                               {mem.metadata?.isSpeculative && (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-purple-200 bg-purple-50 text-purple-700 text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 px-1.5 py-0 border-purple-200 bg-purple-50 text-purple-700 text-[10px]"
+                                >
                                   <Info className="h-2.5 w-2.5" /> Speculative
                                 </Badge>
                               )}
 
                               {/* PII Safe Badge */}
                               {mem.metadata?.piiRemoved && (
-                                <Badge variant="outline" className="gap-1 px-1.5 py-0 border-green-200 bg-green-50 text-green-700 text-[10px]">
-                                  <ShieldCheck className="h-2.5 w-2.5" /> PII Safe
+                                <Badge
+                                  variant="outline"
+                                  className="gap-1 px-1.5 py-0 border-green-200 bg-green-50 text-green-700 text-[10px]"
+                                >
+                                  <ShieldCheck className="h-2.5 w-2.5" /> PII
+                                  Safe
                                 </Badge>
                               )}
                             </div>
@@ -473,12 +528,14 @@ export function MemoryDashboard({
                                       Delete Memory
                                     </AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      Are you sure you want to delete this memory?
-                                      This action cannot be undone.
+                                      Are you sure you want to delete this
+                                      memory? This action cannot be undone.
                                     </AlertDialogDescription>
                                   </AlertDialogHeader>
                                   <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogCancel>
+                                      Cancel
+                                    </AlertDialogCancel>
                                     <AlertDialogAction
                                       onClick={() =>
                                         mem.id && handleDeleteMemory(mem.id)
@@ -501,7 +558,10 @@ export function MemoryDashboard({
             </CardContent>
           </Card>
           {/* Centralized Edit Dialog */}
-          <Dialog open={!!editingMemory} onOpenChange={(open) => !open && setEditingMemory(null)}>
+          <Dialog
+            open={!!editingMemory}
+            onOpenChange={(open) => !open && setEditingMemory(null)}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Edit Memory</DialogTitle>
@@ -588,29 +648,31 @@ export function MemoryDashboard({
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(Object.entries(memory.stats.categoryCounts) as Array<[string, number]>).map(
-                    ([category, count]) => (
-                      <div
-                        key={category}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{category}</Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 bg-secondary rounded-full h-2">
-                            <div
-                              className="bg-primary h-2 rounded-full"
-                              style={{
-                                width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">{count}</span>
-                        </div>
+                  {(
+                    Object.entries(memory.stats.categoryCounts) as Array<
+                      [string, number]
+                    >
+                  ).map(([category, count]) => (
+                    <div
+                      key={category}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{category}</Badge>
                       </div>
-                    ),
-                  )}
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 bg-secondary rounded-full h-2">
+                          <div
+                            className="bg-primary h-2 rounded-full"
+                            style={{
+                              width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium">{count}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>

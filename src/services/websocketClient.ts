@@ -1,7 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 import { DocumentChangeEvent } from './socketService.js'
 
-
 interface DocumentJoinedEvent {
   document: {
     id: string

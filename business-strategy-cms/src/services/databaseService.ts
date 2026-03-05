@@ -28,7 +28,7 @@ export class DatabaseService {
    * Store competitor analysis in MongoDB
    */
   async storeCompetitorAnalysis(analysis: CompetitorAnalysis): Promise<void> {
-    // Assuming one analysis per industry per day? Or just strictly structured. 
+    // Assuming one analysis per industry per day? Or just strictly structured.
     // The previous code used ID, but the interface doesn't always have ID for analysis.
     // The schema I created for CompetitorAnalysis uses default ID.
     // Let's assume we create a new record or update based on a key if provided.
@@ -55,7 +55,7 @@ export class DatabaseService {
       .sort({ timestamp: -1 })
       .limit(100)
 
-    return docs.map(doc => doc.toObject() as unknown as MarketData)
+    return docs.map((doc) => doc.toObject() as unknown as MarketData)
   }
 
   /**
@@ -69,8 +69,7 @@ export class DatabaseService {
    * Get latest business metrics from MongoDB
    */
   async getLatestBusinessMetrics(): Promise<BusinessMetrics> {
-    const doc = await BusinessMetricsModel.findOne()
-      .sort({ createdAt: -1 })
+    const doc = await BusinessMetricsModel.findOne().sort({ createdAt: -1 })
 
     if (!doc) {
       return {

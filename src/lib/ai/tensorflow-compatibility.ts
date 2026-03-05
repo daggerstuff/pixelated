@@ -99,7 +99,9 @@ class TensorFlowCompatibilityImpl implements TensorFlowCompatibility {
       logger.error('Failed to load TensorFlow.js browser version', {
         error: browserError,
       })
-      throw new Error('TensorFlow.js browser version failed to load', { cause: browserError })
+      throw new Error('TensorFlow.js browser version failed to load', {
+        cause: browserError,
+      })
     }
   }
 

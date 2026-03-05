@@ -75,7 +75,7 @@
     "pnpm-lock.yaml",
     "prpm.lock",
     "uv.lock",
-    "pixelated.egg-info",
+    "pixelated.egg-info"
   ],
   "extraPaths": ["stubs"],
   "typeCheckingMode": "basic",
@@ -83,5 +83,5 @@
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "reportPrivateUsage": false,
-  "pythonVersion": "3.11",
+  "pythonVersion": "3.11"
 }

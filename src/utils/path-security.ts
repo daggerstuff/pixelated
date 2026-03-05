@@ -5,19 +5,19 @@
  * All file operations should use these utilities to ensure paths are safe.
  */
 
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Get the project root directory safely
  */
 export function getProjectRoot(): string {
-  if (typeof process !== "undefined" && process.cwd) {
-    return process.cwd();
+  if (typeof process !== 'undefined' && process.cwd) {
+    return process.cwd()
   }
   // Fallback for edge cases
-  const __filename = fileURLToPath(import.meta.url);
-  return path.dirname(path.dirname(path.dirname(__filename)));
+  const __filename = fileURLToPath(import.meta.url)
+  return path.dirname(path.dirname(path.dirname(__filename)))
 }
 
 /**
@@ -28,13 +28,13 @@ export function getProjectRoot(): string {
  */
 export function validatePath(filePath: string, allowedDir: string): string {
   // Normalize the allowed directory to absolute path
-  const normalizedAllowedDir = path.resolve(allowedDir);
+  const normalizedAllowedDir = path.resolve(allowedDir)
 
   // Resolve the file path to absolute
-  const resolvedPath = path.resolve(normalizedAllowedDir, filePath);
+  const resolvedPath = path.resolve(normalizedAllowedDir, filePath)
 
   // Normalize to handle any remaining .. or . segments
-  const normalizedPath = path.normalize(resolvedPath);
+  const normalizedPath = path.normalize(resolvedPath)
 
   // Check if the resolved path is within the allowed directory
   if (
@@ -43,10 +43,10 @@ export function validatePath(filePath: string, allowedDir: string): string {
   ) {
     throw new Error(
       `Path traversal detected: ${filePath} resolves outside allowed directory ${allowedDir}`,
-    );
+    )
   }
 
-  return normalizedPath;
+  return normalizedPath
 }
 
 /**
@@ -59,8 +59,8 @@ export function safeJoin(
   allowedDir: string,
   ...pathSegments: string[]
 ): string {
-  const joinedPath = path.join(...pathSegments);
-  return validatePath(joinedPath, allowedDir);
+  const joinedPath = path.join(...pathSegments)
+  return validatePath(joinedPath, allowedDir)
 }
 
 /**
@@ -75,16 +75,16 @@ export function validatePathAgainstMultiple(
 ): string {
   for (const allowedDir of allowedDirs) {
     try {
-      return validatePath(filePath, allowedDir);
+      return validatePath(filePath, allowedDir)
     } catch {
       // Try next directory
-      continue;
+      continue
     }
   }
 
   throw new Error(
-    `Path ${filePath} is not within any allowed directories: ${allowedDirs.join(", ")}`,
-  );
+    `Path ${filePath} is not within any allowed directories: ${allowedDirs.join(', ')}`,
+  )
 }
 
 /**
@@ -95,19 +95,19 @@ export function validatePathAgainstMultiple(
 export function sanitizeFilename(filename: string): string {
   // Remove path separators and dangerous characters
   const withoutSeparators = filename
-    .replace(/[/\\]/g, "") // Remove path separators
-    .replace(/\.\./g, ""); // Remove parent directory references
+    .replace(/[/\\]/g, '') // Remove path separators
+    .replace(/\.\./g, '') // Remove parent directory references
 
   const filtered = Array.from(withoutSeparators)
     .filter((ch) => {
-      const code = ch.codePointAt(0);
-      if (code === undefined) return false;
-      if (code >= 0x00 && code <= 0x1f) return false;
-      return !["<", ">", ":", '"', "|", "?", "*"].includes(ch);
+      const code = ch.codePointAt(0)
+      if (code === undefined) return false
+      if (code >= 0x00 && code <= 0x1f) return false
+      return !['<', '>', ':', '"', '|', '?', '*'].includes(ch)
     })
-    .join("");
+    .join('')
 
-  return filtered.trim();
+  return filtered.trim()
 }
 
 /**
@@ -117,8 +117,8 @@ export function sanitizeFilename(filename: string): string {
  * @returns The validated absolute path
  */
 export function createSafeFilePath(baseDir: string, filename: string): string {
-  const sanitized = sanitizeFilename(filename);
-  return safeJoin(baseDir, sanitized);
+  const sanitized = sanitizeFilename(filename)
+  return safeJoin(baseDir, sanitized)
 }
 
 /**
@@ -131,45 +131,45 @@ export function validateAndCreateDir(
   dirPath: string,
   allowedDir: string,
 ): string {
-  return validatePath(dirPath, allowedDir);
+  return validatePath(dirPath, allowedDir)
 }
 
 /**
  * Common allowed directories for the application
  */
 // Lazy initialization to avoid issues with import.meta.url in some contexts
-let _projectRoot: string | null = null;
+let _projectRoot: string | null = null
 
 function getCachedProjectRoot(): string {
   if (!_projectRoot) {
-    _projectRoot = getProjectRoot();
+    _projectRoot = getProjectRoot()
   }
-  return _projectRoot;
+  return _projectRoot
 }
 
 export const ALLOWED_DIRECTORIES = {
   get PROJECT_ROOT() {
-    return getCachedProjectRoot();
+    return getCachedProjectRoot()
   },
   get CONTENT() {
-    return path.join(getCachedProjectRoot(), "content");
+    return path.join(getCachedProjectRoot(), 'content')
   },
   get PUBLIC() {
-    return path.join(getCachedProjectRoot(), "public");
+    return path.join(getCachedProjectRoot(), 'public')
   },
   get OUTPUT() {
-    return path.join(getCachedProjectRoot(), "output");
+    return path.join(getCachedProjectRoot(), 'output')
   },
   get LOGS() {
-    return path.join(getCachedProjectRoot(), "logs");
+    return path.join(getCachedProjectRoot(), 'logs')
   },
   get TEMP() {
-    return path.join(getCachedProjectRoot(), ".temp");
+    return path.join(getCachedProjectRoot(), '.temp')
   },
   get TESTS() {
-    return path.join(getCachedProjectRoot(), "tests");
+    return path.join(getCachedProjectRoot(), 'tests')
   },
   get SCRIPTS() {
-    return path.join(getCachedProjectRoot(), "scripts");
+    return path.join(getCachedProjectRoot(), 'scripts')
   },
-} as const;
+} as const

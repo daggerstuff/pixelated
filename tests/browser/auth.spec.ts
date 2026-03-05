@@ -25,11 +25,17 @@ test('login form shows validation errors', async ({ page }) => {
   // Wait for React component to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('button[type="submit"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('button[type="submit"]')).toBeVisible({
+    timeout: 10000,
+  })
 
   // Wait for form inputs to be ready
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
+  await expect(page.locator('input[type="password"]')).toBeVisible({
+    timeout: 10000,
+  })
 
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
@@ -77,7 +83,9 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Now verify the errors are visible and contain the expected text
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
-  await expect(passwordError).toContainText(/required|password/i, { timeout: 5000 })
+  await expect(passwordError).toContainText(/required|password/i, {
+    timeout: 5000,
+  })
 
   // Now check visibility - errors should be visible when they have content
   await expect(emailError).toBeVisible({ timeout: 10000 })
@@ -126,7 +134,9 @@ test('login page has proper transitions', async ({ page }) => {
   // Wait for React components to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
 
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
@@ -152,7 +162,9 @@ test('login page has proper transitions', async ({ page }) => {
   // Use waitForFunction to explicitly wait for the heading element to appear in the DOM
   await page.waitForFunction(
     () => {
-      const heading = document.querySelector('[data-testid="reset-password-heading"]')
+      const heading = document.querySelector(
+        '[data-testid="reset-password-heading"]',
+      )
       return heading !== null && heading.textContent?.includes('Reset Password')
     },
     { timeout: 15000 },
@@ -190,7 +202,9 @@ test('login page visual comparison', async ({ page }) => {
 
   // Wait for React component to hydrate
   await expect(page.locator('form')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
 
   // Additional wait to ensure React hydration is complete and any animations settle
   await page.waitForTimeout(2000)

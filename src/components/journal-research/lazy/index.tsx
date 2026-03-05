@@ -188,4 +188,3 @@ export const LazyPhaseProgressChart = withLazyLoading(
   ),
   <LoadingFallback message="Loading progress chart..." />,
 )
-

@@ -45,8 +45,7 @@ const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
   )
 }
 
-interface DialogTriggerProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
 }
 
@@ -73,8 +72,7 @@ const DialogPortal = ({ children }: { children: React.ReactNode }) => {
   return <div className="fixed inset-0 z-50">{children}</div>
 }
 
-interface DialogOverlayProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface DialogOverlayProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
 }
 
@@ -218,8 +216,7 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
 )
 DialogTitle.displayName = 'DialogTitle'
 
-interface DialogDescriptionProps
-  extends React.HTMLAttributes<HTMLParagraphElement> {
+interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
   className?: string
 }
 

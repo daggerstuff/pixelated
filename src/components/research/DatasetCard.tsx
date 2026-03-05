@@ -1,14 +1,14 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { type DatasetMetadata } from '@/lib/api/research';
+import React from 'react'
+import { motion } from 'framer-motion'
+import { type DatasetMetadata } from '@/lib/api/research'
 
 interface DatasetCardProps {
-    dataset: DatasetMetadata;
-    index?: number;
+  dataset: DatasetMetadata
+  index?: number
 }
 
 const DatasetHeader = ({ dataset }: { dataset: DatasetMetadata }) => {
-  const { name, source, quality_score, downloads } = dataset;
+  const { name, source, quality_score, downloads } = dataset
   return (
     <div className="flex justify-between items-start mb-3 relative z-10">
       <div className="flex flex-col">
@@ -38,15 +38,15 @@ const DatasetHeader = ({ dataset }: { dataset: DatasetMetadata }) => {
         <span className="text-xs font-mono">{downloads.toLocaleString()}</span>
       </div>
     </div>
-  );
-};
+  )
+}
 
 const DatasetStats = ({
   avg_turns,
   therapeutic_relevance,
 }: {
-  avg_turns?: number;
-  therapeutic_relevance?: number;
+  avg_turns?: number
+  therapeutic_relevance?: number
 }) => (
   <div className="grid grid-cols-2 gap-2 text-xs text-slate-300 mb-4 bg-slate-800/50 p-3 rounded-lg">
     <div className="flex flex-col">
@@ -54,7 +54,7 @@ const DatasetStats = ({
         Avg Turns
       </span>
       <span>
-        {typeof avg_turns === "number" ? avg_turns.toFixed(1) : "N/A"}
+        {typeof avg_turns === 'number' ? avg_turns.toFixed(1) : 'N/A'}
       </span>
     </div>
     <div className="flex flex-col">
@@ -69,7 +69,7 @@ const DatasetStats = ({
       </div>
     </div>
   </div>
-);
+)
 
 const DatasetTags = ({ tags }: { tags?: string[] }) => (
   <div className="flex flex-wrap gap-2 mt-auto">
@@ -87,13 +87,13 @@ const DatasetTags = ({ tags }: { tags?: string[] }) => (
       </span>
     )}
   </div>
-);
+)
 
 export default React.memo(function DatasetCard({
   dataset,
   index = 0,
 }: DatasetCardProps) {
-  const { url, description, avg_turns, therapeutic_relevance, tags } = dataset;
+  const { url, description, avg_turns, therapeutic_relevance, tags } = dataset
 
   return (
     <motion.a
@@ -104,7 +104,7 @@ export default React.memo(function DatasetCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.3 }}
       whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.2 } }}
-      whileFocus={{ scale: 1.02, boxShadow: "0 0 0 2px #ec4899" }}
+      whileFocus={{ scale: 1.02, boxShadow: '0 0 0 2px #ec4899' }}
       className="block h-full bg-[#1e293b] border border-slate-700 rounded-xl p-5 hover:border-pink-500/50 hover:shadow-2xl hover:shadow-pink-900/10 transition-all cursor-pointer group relative outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
@@ -112,7 +112,7 @@ export default React.memo(function DatasetCard({
       <DatasetHeader dataset={dataset} />
 
       <p className="text-sm text-slate-400 mb-4 line-clamp-3 flex-grow">
-        {description || "No description provided."}
+        {description || 'No description provided.'}
       </p>
 
       <DatasetStats
@@ -122,5 +122,5 @@ export default React.memo(function DatasetCard({
 
       <DatasetTags tags={tags} />
     </motion.a>
-  );
-});
+  )
+})

@@ -9,7 +9,7 @@ async function testSimpleAuth() {
     const registerResult = await simpleAuth.register(
       'simplerawtest@example.com',
       'SecurePassword123!',
-      'Simple Raw Test User'
+      'Simple Raw Test User',
     )
 
     if (registerResult.success && registerResult.user) {
@@ -24,7 +24,7 @@ async function testSimpleAuth() {
     console.log('\n🔐 Logging in test user...')
     const loginResult = await simpleAuth.login(
       'simplerawtest@example.com',
-      'SecurePassword123!'
+      'SecurePassword123!',
     )
 
     if (loginResult.success && loginResult.user) {
@@ -44,7 +44,6 @@ async function testSimpleAuth() {
     } else {
       console.log('❌ Login failed:', loginResult.error)
     }
-
   } catch (error) {
     console.error('❌ Test failed:', error)
     if (error instanceof Error) {

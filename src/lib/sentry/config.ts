@@ -54,11 +54,11 @@ export const SENTRY_CONFIG = {
 
   tracesSampleRate: Number(
     import.meta.env['PUBLIC_SENTRY_TRACES_SAMPLE_RATE'] ??
-    (import.meta.env.DEV ? 1.0 : 0.1),
+      (import.meta.env.DEV ? 1.0 : 0.1),
   ),
   profilesSampleRate: Number(
     import.meta.env['PUBLIC_SENTRY_PROFILES_SAMPLE_RATE'] ??
-    (import.meta.env.DEV ? 0.2 : 0.05),
+      (import.meta.env.DEV ? 0.2 : 0.05),
   ),
 
   replaysSessionSampleRate: 0,

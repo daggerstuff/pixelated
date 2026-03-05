@@ -1,7 +1,11 @@
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-async function safeClick(page: Page, selector: string, description: string): Promise<boolean> {
+async function safeClick(
+  page: Page,
+  selector: string,
+  description: string,
+): Promise<boolean> {
   try {
     await page.waitForSelector(selector, { timeout: 5000 })
   } catch {
@@ -42,7 +46,9 @@ test.describe('Pipeline Performance Tests', () => {
       // Log page state for debugging
       const url = page.url()
       const title = await page.title().catch(() => 'Unable to get title')
-      const bodyText = await page.textContent('body').catch(() => 'Unable to get body text')
+      const bodyText = await page
+        .textContent('body')
+        .catch(() => 'Unable to get body text')
       console.error(`Failed to initialize page in beforeAll hook:`)
       console.error(`  URL: ${url}`)
       console.error(`  Title: ${title}`)
@@ -66,7 +72,13 @@ test.describe('Pipeline Performance Tests', () => {
     }
 
     await test.step('Large File Processing Performance', async () => {
-      if (!(await safeClick(page, '[data-testid="data-ingestion-tab"]', 'Data ingestion tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="data-ingestion-tab"]',
+          'Data ingestion tab not available',
+        ))
+      )
         return
 
       // Create a large test dataset
@@ -164,7 +176,13 @@ test.describe('Pipeline Performance Tests', () => {
 
   test('Real-time validation performance', async () => {
     await test.step('Validation Response Time', async () => {
-      if (!(await safeClick(page, '[data-testid="validation-tab"]', 'Validation tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="validation-tab"]',
+          'Validation tab not available',
+        ))
+      )
         return
 
       const textArea = page.locator('[placeholder*="Enter psychology content"]')
@@ -198,7 +216,13 @@ test.describe('Pipeline Performance Tests', () => {
     })
 
     await test.step('Concurrent Validation Performance', async () => {
-      if (!(await safeClick(page, '[data-testid="validation-tab"]', 'Validation tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="validation-tab"]',
+          'Validation tab not available',
+        ))
+      )
         return
 
       // Test multiple rapid validations
@@ -230,7 +254,13 @@ test.describe('Pipeline Performance Tests', () => {
 
   test('Category balancing real-time performance', async () => {
     await test.step('Real-time Balancing Performance', async () => {
-      if (!(await safeClick(page, '[data-testid="category-balancing-tab"]', 'Category balancing tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="category-balancing-tab"]',
+          'Category balancing tab not available',
+        ))
+      )
         return
 
       // Enable real-time mode
@@ -292,7 +322,13 @@ test.describe('Pipeline Performance Tests', () => {
 
   test('Export processing performance', async () => {
     await test.step('Single Format Export Performance', async () => {
-      if (!(await safeClick(page, '[data-testid="export-tab"]', 'Export tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="export-tab"]',
+          'Export tab not available',
+        ))
+      )
         return
 
       // Test each format individually
@@ -378,7 +414,7 @@ test.describe('Pipeline Performance Tests', () => {
               progressUpdates++
             }
           })
-          .catch(() => { })
+          .catch(() => {})
       }, 100)
 
       await page.click('button:has-text("Export Selected")')
@@ -442,7 +478,13 @@ test.describe('Pipeline Performance Tests', () => {
     })
 
     await test.step('Data Sync Performance', async () => {
-      if (!(await safeClick(page, '[data-testid="category-balancing-tab"]', 'Category balancing tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="category-balancing-tab"]',
+          'Category balancing tab not available',
+        ))
+      )
         return
 
       // Test sync performance with live integration
@@ -477,7 +519,13 @@ test.describe('Pipeline Performance Tests', () => {
       // Perform intensive operations
       for (let i = 0; i < 5; i++) {
         // Data ingestion
-        if (!(await safeClick(page, '[data-testid="data-ingestion-tab"]', 'Data ingestion tab not available during memory test')))
+        if (
+          !(await safeClick(
+            page,
+            '[data-testid="data-ingestion-tab"]',
+            'Data ingestion tab not available during memory test',
+          ))
+        )
           return
         const fileInput = page.locator('[data-testid="file-input"]')
         await fileInput.setInputFiles([
@@ -491,7 +539,13 @@ test.describe('Pipeline Performance Tests', () => {
         ])
 
         // Validation
-        if (!(await safeClick(page, '[data-testid="validation-tab"]', 'Validation tab not available during memory test')))
+        if (
+          !(await safeClick(
+            page,
+            '[data-testid="validation-tab"]',
+            'Validation tab not available during memory test',
+          ))
+        )
           return
         const textArea = page.locator(
           '[placeholder*="Enter psychology content"]',
@@ -499,7 +553,13 @@ test.describe('Pipeline Performance Tests', () => {
         await textArea.fill(`Memory test iteration ${i} with content`)
 
         // Category balancing
-        if (!(await safeClick(page, '[data-testid="category-balancing-tab"]', 'Category balancing tab not available during memory test')))
+        if (
+          !(await safeClick(
+            page,
+            '[data-testid="category-balancing-tab"]',
+            'Category balancing tab not available during memory test',
+          ))
+        )
           return
         await page.click('button:has-text("Simulate Influx")')
 
@@ -509,7 +569,7 @@ test.describe('Pipeline Performance Tests', () => {
       // Force garbage collection if available
       await page.evaluate(() => {
         if ((window as any).gc) {
-          ; (window as any).gc()
+          ;(window as any).gc()
         }
       })
 
@@ -535,7 +595,13 @@ test.describe('Pipeline Performance Tests', () => {
       const startTime = performance.now()
 
       // Perform CPU-intensive operations
-      if (!(await safeClick(page, '[data-testid="category-balancing-tab"]', 'Category balancing tab not available')))
+      if (
+        !(await safeClick(
+          page,
+          '[data-testid="category-balancing-tab"]',
+          'Category balancing tab not available',
+        ))
+      )
         return
       await page.click('button:has-text("Inactive")') // Enable real-time mode
 
