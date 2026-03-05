@@ -1,0 +1,3 @@
+- name: HIPAA Compliance Security Checks
+  description: HIPAA compliance security checks for FHIR and EHR systems.
+  queries: .
