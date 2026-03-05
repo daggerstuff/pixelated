@@ -1,0 +1,6 @@
+- description: HIPAA compliance security checks
+- queries: .
+- include:
+    id:
+      - js/unvalidated-fhir-access
+      - js/unencrypted-ehr-data
