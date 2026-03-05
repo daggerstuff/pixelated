@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
-import type {
-  SimulationContainerProps,
-  TherapeuticTechnique,
-  RealTimeFeedback,
-  Scenario,
-} from '../types'
+import type { SimulationContainerProps, TherapeuticTechnique, RealTimeFeedback, Scenario } from '../types'
 import { useSimulator } from '../context/SimulatorContext'
 import { checkBrowserCompatibility } from '../utils/privacy'
 import SimulationControls from './SimulationControls'
@@ -240,11 +235,7 @@ export function SimulationContainer({
       )}
 
       <div className="simulation-header">
-        <h2>
-          {(currentScenario && 'title' in currentScenario
-            ? currentScenario.title
-            : null) || 'Therapeutic Simulation'}
-        </h2>
+        <h2>{(currentScenario && 'title' in currentScenario ? currentScenario.title : null) || 'Therapeutic Simulation'}</h2>
         {onBackToScenarios && (
           <button onClick={onBackToScenarios} className="back-button">
             ← Back to Scenarios

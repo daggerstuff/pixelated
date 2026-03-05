@@ -27,18 +27,14 @@ export const biasAuditKeys = {
   all: ['bias-audit'] as const,
   summary: () => [...biasAuditKeys.all, 'summary'] as const,
   datasets: () => [...biasAuditKeys.all, 'datasets'] as const,
-  datasetsList: (filters: {
-    status?: QuarantineStatus
-    page?: number
-    pageSize?: number
-  }) => [...biasAuditKeys.datasets(), filters] as const,
+  datasetsList: (filters: { status?: QuarantineStatus; page?: number; pageSize?: number }) =>
+    [...biasAuditKeys.datasets(), filters] as const,
   dataset: (id: string) => [...biasAuditKeys.datasets(), id] as const,
   auditResults: () => [...biasAuditKeys.all, 'audit-results'] as const,
   auditResult: (id: string) => [...biasAuditKeys.auditResults(), id] as const,
   auditResultsForDataset: (datasetId: string) =>
     [...biasAuditKeys.auditResults(), 'dataset', datasetId] as const,
-  history: (datasetId: string) =>
-    [...biasAuditKeys.all, 'history', datasetId] as const,
+  history: (datasetId: string) => [...biasAuditKeys.all, 'history', datasetId] as const,
 }
 
 /**
@@ -58,13 +54,11 @@ export function useAuditSummary() {
 /**
  * Hook for fetching datasets pending audit
  */
-export function useDatasetsForAudit(
-  options: {
-    status?: QuarantineStatus
-    page?: number
-    pageSize?: number
-  } = {},
-) {
+export function useDatasetsForAudit(options: {
+  status?: QuarantineStatus
+  page?: number
+  pageSize?: number
+} = {}) {
   const service = getBiasAuditService()
   const { status, page = 1, pageSize = 20 } = options
 
@@ -111,8 +105,7 @@ export function useAuditResultsForDataset(datasetId: string | null) {
 
   return useQuery<DatasetAuditResult[], Error>({
     queryKey: biasAuditKeys.auditResultsForDataset(datasetId ?? ''),
-    queryFn: () =>
-      datasetId ? service.getAuditResultsForDataset(datasetId) : [],
+    queryFn: () => (datasetId ? service.getAuditResultsForDataset(datasetId) : []),
     enabled: Boolean(datasetId),
     staleTime: 30000,
   })
@@ -154,9 +147,9 @@ export function useRegisterDataset() {
  */
 export function useInitiateAudit() {
   const queryClient = useQueryClient()
-  const [progressUpdates, setProgressUpdates] = useState<
-    Map<string, AuditProgressUpdate>
-  >(new Map())
+  const [progressUpdates, setProgressUpdates] = useState<Map<string, AuditProgressUpdate>>(
+    new Map()
+  )
 
   const handleProgressUpdate = useCallback((update: AuditProgressUpdate) => {
     setProgressUpdates((prev) => {
@@ -197,22 +190,16 @@ export function useInitiateAudit() {
 
       // Set individual results in cache
       for (const result of results) {
-        queryClient.setQueryData(
-          biasAuditKeys.auditResult(result.auditId),
-          result,
-        )
-        queryClient.setQueryData(
-          biasAuditKeys.dataset(result.datasetId),
-          (old: DatasetForAudit | undefined) => {
-            if (!old) return old
-            return {
-              ...old,
-              lastAuditId: result.auditId,
-              lastAuditScore: result.overallBiasScore,
-              quarantineStatus: result.quarantineStatus,
-            }
-          },
-        )
+        queryClient.setQueryData(biasAuditKeys.auditResult(result.auditId), result)
+        queryClient.setQueryData(biasAuditKeys.dataset(result.datasetId), (old: DatasetForAudit | undefined) => {
+          if (!old) return old
+          return {
+            ...old,
+            lastAuditId: result.auditId,
+            lastAuditScore: result.overallBiasScore,
+            quarantineStatus: result.quarantineStatus,
+          }
+        })
       }
     },
     onError: () => {
@@ -241,13 +228,12 @@ export function useQuarantineAction() {
   const service = getBiasAuditService()
 
   return useMutation({
-    mutationFn: (payload: QuarantineActionPayload) =>
-      service.processQuarantineAction(payload),
+    mutationFn: (payload: QuarantineActionPayload) => service.processQuarantineAction(payload),
     onSuccess: (updatedDataset) => {
       // Update the dataset in cache
       queryClient.setQueryData(
         biasAuditKeys.dataset(updatedDataset.datasetId),
-        updatedDataset,
+        updatedDataset
       )
 
       // Invalidate lists and summary
@@ -264,22 +250,14 @@ export function useQuarantineAction() {
  * Combined hook for bias audit dashboard state
  */
 export function useBiasAuditDashboard() {
-  const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(
-    null,
-  )
+  const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(null)
   const [selectedAuditId, setSelectedAuditId] = useState<string | null>(null)
-  const [statusFilter, setStatusFilter] = useState<
-    QuarantineStatus | undefined
-  >(undefined)
+  const [statusFilter, setStatusFilter] = useState<QuarantineStatus | undefined>(undefined)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
 
   const summaryQuery = useAuditSummary()
-  const datasetsQuery = useDatasetsForAudit({
-    status: statusFilter,
-    page,
-    pageSize,
-  })
+  const datasetsQuery = useDatasetsForAudit({ status: statusFilter, page, pageSize })
   const selectedDatasetQuery = useDataset(selectedDatasetId)
   const selectedAuditQuery = useAuditResult(selectedAuditId)
   const historyQuery = useAuditHistory(selectedDatasetId)
@@ -305,17 +283,14 @@ export function useBiasAuditDashboard() {
 
   const initiateAudit = useCallback(
     async (datasetIds: string[], config?: Partial<AuditConfig>) => {
-      const results = await initiateAuditMutation.mutateAsync({
-        datasetIds,
-        config,
-      })
+      const results = await initiateAuditMutation.mutateAsync({ datasetIds, config })
       if (results.length > 0) {
         setSelectedDatasetId(results[0].datasetId)
         setSelectedAuditId(results[0].auditId)
       }
       return results
     },
-    [initiateAuditMutation],
+    [initiateAuditMutation]
   )
 
   const processQuarantineAction = useCallback(
@@ -330,7 +305,7 @@ export function useBiasAuditDashboard() {
         reviewedBy: 'current_user', // Would come from auth context in production
       })
     },
-    [selectedDatasetId, quarantineActionMutation],
+    [selectedDatasetId, quarantineActionMutation]
   )
 
   return {

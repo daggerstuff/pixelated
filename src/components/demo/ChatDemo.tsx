@@ -371,15 +371,14 @@ export function ChatDemo({
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Risk Level:</span>
                       <span
-                        className={`text-sm font-medium ${
-                          crisisResult.riskLevel === 'critical'
+                        className={`text-sm font-medium ${crisisResult.riskLevel === 'critical'
                             ? 'text-red-600'
                             : crisisResult.riskLevel === 'high'
                               ? 'text-orange-600'
                               : crisisResult.riskLevel === 'medium'
                                 ? 'text-yellow-600'
                                 : 'text-green-600'
-                        }`}
+                          }`}
                       >
                         {crisisResult.riskLevel}
                       </span>

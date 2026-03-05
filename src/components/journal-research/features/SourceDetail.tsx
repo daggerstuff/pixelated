@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { SourceCard } from '../shared/SourceCard'
 import { useSourceQuery } from '@/lib/hooks/journal-research'
 import { cn } from '@/lib/utils'
@@ -139,7 +134,9 @@ export function SourceDetail({
               <p className="text-sm font-medium text-muted-foreground">
                 Discovery Date
               </p>
-              <p className="mt-1">{format(source.discoveryDate, 'PPpp')}</p>
+              <p className="mt-1">
+                {format(source.discoveryDate, 'PPpp')}
+              </p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">

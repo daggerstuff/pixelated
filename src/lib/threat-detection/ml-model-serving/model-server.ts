@@ -435,7 +435,7 @@ export class ModelServingServer extends EventEmitter {
         const { length } = first as number[]
         const sumVec = Array.from({ length }, () => 0)
         outputs.forEach((out) => {
-          ;(out as number[]).forEach((v, i) => {
+          ; (out as number[]).forEach((v, i) => {
             sumVec[i] += v
           })
         })
@@ -450,16 +450,13 @@ export class ModelServingServer extends EventEmitter {
     if (Array.isArray(firstOutput)) {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]
-      const weightedSum = predictions.reduce(
-        (sum, pred, index) => {
-          const w = weights[index]
-          ;(pred.output as number[]).forEach((val, i) => {
+      const weightedSum = predictions.reduce((sum, pred, index) => {
+        const w = weights[index]
+          ; (pred.output as number[]).forEach((val, i) => {
             sum[i] = (sum[i] || 0) + val * w
           })
-          return sum
-        },
-        Array.from({ length }, () => 0),
-      )
+        return sum
+      }, Array.from({ length }, () => 0))
 
       return weightedSum.map((v) => v / totalWeight)
     } else {
@@ -474,9 +471,7 @@ export class ModelServingServer extends EventEmitter {
 
   private calculateUncertainty(predictions: ModelPrediction[]): number {
     const outputs = predictions.map((p) => p.output)
-    const mean =
-      outputs.reduce((sum, val) => sum + val, 0).slice(________) /
-      outputs.length
+    const mean = outputs.reduce((sum, val) => sum + val, 0).slice(________) / outputs.length
     const variance =
       outputs.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
       outputs.length
@@ -577,7 +572,7 @@ export class ModelServingServer extends EventEmitter {
 
 // Helper classes for dependencies
 class RedisFeatureStore implements FeatureStore {
-  constructor(private redis: Redis) {}
+  constructor(private redis: Redis) { }
 
   async getFeatures(featureSetId: string): Promise<FeatureSet> {
     const data = await this.redis.get(`features:${featureSetId}`)
@@ -611,7 +606,7 @@ class RedisFeatureStore implements FeatureStore {
 }
 
 class MongoModelRegistry implements ModelRegistry {
-  constructor(private mongoClient: MongoClient) {}
+  constructor(private mongoClient: MongoClient) { }
 
   async registerModel(config: ModelConfig): Promise<void> {
     const db = this.mongoClient.db('threat_detection')
@@ -668,7 +663,7 @@ class ComprehensiveModelMonitoring implements ModelMonitoring {
   constructor(
     private redis: Redis,
     private mongoClient: MongoClient,
-  ) {}
+  ) { }
 
   async trackPrediction(prediction: ModelPrediction): Promise<void> {
     const db = this.mongoClient.db('threat_detection')

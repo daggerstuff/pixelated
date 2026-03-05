@@ -101,8 +101,7 @@ export interface ResponseOrchestrationService {
 
 export class AdvancedResponseOrchestrator
   extends EventEmitter
-  implements ResponseOrchestrationService
-{
+  implements ResponseOrchestrationService {
   private redis!: Redis
   private mongoClient!: MongoClient
   private responseExecutor!: ResponseExecutor
@@ -997,11 +996,9 @@ class MLDecisionEngine extends DecisionEngine {
   private extractFeatures(threatData: unknown): number[] {
     // Extract relevant features for ML analysis
     const data = threatData as ThreatData
-    const severityScore =
-      typeof data.severity === 'number'
-        ? data.severity
-        : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] ||
-          0
+    const severityScore = typeof data.severity === 'number'
+      ? data.severity
+      : { low: 1, medium: 2, high: 3, critical: 4 }[data.severity || 'low'] || 0
 
     return [
       data.anomalyScore || 0,

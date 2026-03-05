@@ -4,20 +4,12 @@ import {
   type DiscoveryInitiatePayload,
 } from '@/lib/api/journal-research/types'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import {
-  ErrorMessage,
-  FieldError,
-} from '@/components/journal-research/shared/ErrorMessage'
+import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface DiscoveryFormProps {
   onSubmit: (data: DiscoveryInitiatePayload) => void | Promise<void>
@@ -57,6 +49,7 @@ export function DiscoveryForm({
       const validated = DiscoveryInitiatePayloadSchema.parse(payload)
       await onSubmit(validated)
     } catch (error) {
+
       const fieldErrs = getFieldErrors(error) ?? {}
 
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
@@ -69,9 +62,7 @@ export function DiscoveryForm({
 
   const handleSourceToggle = (source: string) => {
     setSources((prev) =>
-      prev.includes(source)
-        ? prev.filter((s) => s !== source)
-        : [...prev, source],
+      prev.includes(source) ? prev.filter((s) => s !== source) : [...prev, source],
     )
   }
 

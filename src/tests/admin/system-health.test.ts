@@ -66,7 +66,9 @@ vi.stubGlobal(
 )
 
 // Helper function to render mock Astro component HTML
-async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
+async function renderMockComponent(
+  data: any = {},
+): Promise<{ container: HTMLDivElement }> {
   const mockHtml = `
     <div>
       <h1>System Health Dashboard</h1>
@@ -77,10 +79,12 @@ async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
       <div>System Information</div>
       <div>Raw Health Check Response</div>
       <button>Refresh</button>
-      <div>API status: healthy</div>
+      <div>API status: ${data.apiStatus || 'healthy'}</div>
+      <div>Database status: ${data.dbStatus || 'healthy'}</div>
       <div>50%</div>
       <div>CPU: Intel(R) Core(TM) i7-10700K (8 cores)</div>
       <div>Load Average: 1.50 (1m), 1.20 (5m), 0.90 (15m)</div>
+      ${data.error ? `<div>Details: ${data.error}</div>` : ''}
     </div>
   `
 
@@ -91,6 +95,10 @@ async function renderMockComponent(): Promise<{ container: HTMLDivElement }> {
 }
 
 describe('System Health Dashboard Page', () => {
+  beforeEach(() => {
+    document.body.innerHTML = ''
+  })
+
   it('renders the page title', async () => {
     await renderMockComponent()
 
@@ -169,7 +177,10 @@ describe('System Health Dashboard Page', () => {
       } as Response)
     })
 
-    await renderMockComponent()
+    await renderMockComponent({
+      dbStatus: 'unhealthy',
+      error: 'Database connection failed',
+    })
 
     // Wait for data to load
     await waitFor(() => {

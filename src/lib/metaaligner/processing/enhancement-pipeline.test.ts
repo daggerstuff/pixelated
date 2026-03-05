@@ -27,46 +27,33 @@ vi.mock('../../logging/build-safe-logger', async () => {
 vi.mock('../api/alignment-api', async () => {
   const { vi } = await import('vitest')
   return {
-    MetaAlignerAPI: vi.fn().mockImplementation(function () {
+    MetaAlignerAPI: vi.fn().mockImplementation(function() {
       return {
         evaluateResponse: vi.fn().mockImplementation(async ({ response }) => {
           // Return low score for bad responses used in tests
-          if (
-            response === 'Just deal with it.' ||
-            response === 'Very poor response' ||
-            response === 'Poor quality response' ||
-            response === 'Bad response'
-          ) {
+          if (response === 'Just deal with it.' || response === 'Very poor response' || response === 'Poor quality response' || response === 'Bad response') {
             return {
               overallScore: 0.4,
               metrics: {},
-              evaluation: {
-                overallScore: 0.4,
-                objectiveResults: { empathy: { score: 0.2 } },
-              },
+              evaluation: { overallScore: 0.4, objectiveResults: { 'empathy': { score: 0.2 } } }
             }
           }
           return {
             overallScore: 0.9,
             metrics: {},
-            evaluation: {
-              overallScore: 0.9,
-              objectiveResults: { empathy: { score: 0.9 } },
-            },
+            evaluation: { overallScore: 0.9, objectiveResults: { 'empathy': { score: 0.9 } } }
           }
         }),
-        enhanceResponse: vi
-          .fn()
-          .mockImplementation(async ({ originalResponse: _ }) => {
-            const enhanced = 'I understand this is difficult for you.'
-            return {
-              enhancementApplied: true,
-              enhancedResponse: enhanced,
-              improvements: [],
-            }
-          }),
+        enhanceResponse: vi.fn().mockImplementation(async ({ originalResponse: _ }) => {
+          const enhanced = "I understand this is difficult for you."
+          return {
+            enhancementApplied: true,
+            enhancedResponse: enhanced,
+            improvements: []
+          }
+        })
       }
-    }),
+    })
   }
 })
 
@@ -173,9 +160,7 @@ describe('EnhancementPipeline', () => {
       // Mock internal failure using "any" to access private property
       // We need to ensure metaAligner exists and spy on it
       const metaAligner = (failingPipeline as any).metaAligner
-      vi.spyOn(metaAligner, 'evaluateResponse').mockRejectedValue(
-        new Error('Simulated API failure'),
-      )
+      vi.spyOn(metaAligner, 'evaluateResponse').mockRejectedValue(new Error('Simulated API failure'))
 
       const input: PipelineInput = {
         response: 'Test response',
@@ -186,9 +171,7 @@ describe('EnhancementPipeline', () => {
         },
       }
 
-      await expect(failingPipeline.process(input)).rejects.toThrow(
-        'Simulated API failure',
-      )
+      await expect(failingPipeline.process(input)).rejects.toThrow('Simulated API failure')
     })
   })
 

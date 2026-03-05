@@ -127,11 +127,7 @@ export class MediaService {
             url,
           }
         } catch (error) {
-          console.warn(
-            'Failed to generate signed URL for file:',
-            file.Key,
-            error,
-          )
+          console.warn('Failed to generate signed URL for file:', file.Key, error)
           return {
             key: file.Key || '',
             lastModified: file.LastModified || new Date(),

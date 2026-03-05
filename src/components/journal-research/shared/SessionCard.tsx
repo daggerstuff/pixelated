@@ -17,7 +17,8 @@ export interface SessionCardProps {
 }
 
 export function SessionCard({ session, onClick, className }: SessionCardProps) {
-  const progressPercentage = session.progressMetrics?.progress_percentage ?? 0
+  const progressPercentage =
+    session.progressMetrics?.progress_percentage ?? 0
 
   const phaseColors: Record<string, string> = {
     discovery: 'bg-blue-500',

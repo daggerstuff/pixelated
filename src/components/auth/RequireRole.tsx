@@ -1,3 +1,4 @@
+
 import { useSession } from '@/lib/auth-client'
 import type { AuthRole } from '@/config/auth.config'
 import type { UserRole } from '@/types/auth'
@@ -38,7 +39,7 @@ export function RequireRole({
   const hasRequiredRole = requiredRoles.some(
     (requiredRole) =>
       userRole === requiredRole ||
-      userRole?.toLowerCase() === requiredRole.toLowerCase(),
+      userRole?.toLowerCase() === requiredRole.toLowerCase()
   )
 
   if (!hasRequiredRole) {

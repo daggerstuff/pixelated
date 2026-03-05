@@ -322,87 +322,87 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                           )}
                         </div>
 
-                        <div className="col-span-3">
-                          {formatDate(test.testDate)}
-                        </div>
-
-                        <div className="col-span-2">
-                          {renderStatusBadge(test.status)}
-                        </div>
-
-                        <div className="col-span-2">
-                          {formatDuration(test.timeTaken)}
-                        </div>
-
-                        <div className="col-span-1 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSelectTest(test.id)}
-                          >
-                            {selectedTest === test.id ? 'Hide' : 'View'}
-                          </Button>
-                        </div>
+                      <div className="col-span-3">
+                        {formatDate(test.testDate)}
                       </div>
 
-                      {selectedTest === test.id && (
-                        <div className="col-span-12 p-3 bg-slate-50 dark:bg-slate-800 mt-1 rounded-md">
-                          <h4 className="font-medium mb-2">Test Results</h4>
+                      <div className="col-span-2">
+                        {renderStatusBadge(test.status)}
+                      </div>
 
-                          <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                  Environment
-                                </h5>
-                                <p className="text-sm">{test.environment}</p>
-                              </div>
-                              <div>
-                                <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                  Test ID
-                                </h5>
-                                <p className="text-sm font-mono text-xs">
-                                  {test.id}
-                                </p>
-                              </div>
+                      <div className="col-span-2">
+                        {formatDuration(test.timeTaken)}
+                      </div>
+
+                      <div className="col-span-1 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSelectTest(test.id)}
+                        >
+                          {selectedTest === test.id ? 'Hide' : 'View'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {selectedTest === test.id && (
+                      <div className="col-span-12 p-3 bg-slate-50 dark:bg-slate-800 mt-1 rounded-md">
+                        <h4 className="font-medium mb-2">Test Results</h4>
+
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
+                                Environment
+                              </h5>
+                              <p className="text-sm">{test.environment}</p>
                             </div>
+                            <div>
+                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
+                                Test ID
+                              </h5>
+                              <p className="text-sm font-mono text-xs">
+                                {test.id}
+                              </p>
+                            </div>
+                          </div>
 
-                            {test.verificationResults &&
-                              test.verificationResults.length > 0 && (
-                                <div className="mt-3">
-                                  <h5 className="text-sm font-medium mb-2">
-                                    Verification Results
-                                  </h5>
-                                  <div className="rounded-md border divide-y">
-                                    {test.verificationResults.map((vr, idx) => (
-                                      <div
-                                        key={`vr-${vr.testCase}-${vr.id || idx}`}
-                                        className="p-2 flex justify-between items-center"
-                                      >
-                                        <div>
-                                          <span className="font-medium">
-                                            {vr.testCase}
-                                          </span>
-                                          <Badge
-                                            variant="outline"
-                                            className={`
+                          {test.verificationResults &&
+                            test.verificationResults.length > 0 && (
+                              <div className="mt-3">
+                                <h5 className="text-sm font-medium mb-2">
+                                  Verification Results
+                                </h5>
+                                <div className="rounded-md border divide-y">
+                                  {test.verificationResults.map((vr, idx) => (
+                                    <div
+                                      key={`vr-${vr.testCase}-${vr.id || idx}`}
+                                      className="p-2 flex justify-between items-center"
+                                    >
+                                      <div>
+                                        <span className="font-medium">
+                                          {vr.testCase}
+                                        </span>
+                                        <Badge
+                                          variant="outline"
+                                          className={`
                                             ${vr.status === 'critical' ? 'bg-red-100 text-red-800' : ''}
                                             ${vr.status === 'high' ? 'bg-orange-100 text-orange-800' : ''}
                                             ${vr.status === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''}
                                             ${vr.status === 'low' ? 'bg-blue-100 text-blue-800' : ''}
                                           `}
-                                          >
-                                            {vr.status}
-                                          </Badge>
-                                        </div>
-                                        <p className="text-sm mt-1">
-                                          {vr.description}
-                                        </p>
+                                        >
+                                          {vr.status}
+                                        </Badge>
                                       </div>
-                                    ))}
-                                  </div>
+                                      <p className="text-sm mt-1">
+                                        {vr.description}
+                                      </p>
+                                    </div>
+                                  ))}
                                 </div>
-                              )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}

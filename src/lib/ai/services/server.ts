@@ -1,5 +1,5 @@
 // IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../config/instrument.mjs'
+import "../../../../config/instrument.mjs";
 
 import { createServer } from 'http'
 import { parse } from 'url'
@@ -411,16 +411,8 @@ Respond in JSON format with the following structure:
           await this.handleEmotionAnalysis(req, res, emotionBody)
           const durationMs = Date.now() - startTime
           const analysisDurationMs = Date.now() - analysisStartTime
-          apiMetrics.request(
-            '/ai-service/analyze-emotion',
-            'POST',
-            res.statusCode || 200,
-          )
-          apiMetrics.responseTime(
-            '/ai-service/analyze-emotion',
-            durationMs,
-            'POST',
-          )
+          apiMetrics.request('/ai-service/analyze-emotion', 'POST', res.statusCode || 200)
+          apiMetrics.responseTime('/ai-service/analyze-emotion', durationMs, 'POST')
           emotionMetrics.analysisLatency(analysisDurationMs, 'ai-service')
           break
         }
@@ -429,11 +421,7 @@ Respond in JSON format with the following structure:
           const streamBody = await this.parseRequestBody(req)
           await this.handleStreamingChat(req, res, streamBody)
           const durationMs = Date.now() - startTime
-          apiMetrics.request(
-            '/ai-service/chat/stream',
-            'POST',
-            res.statusCode || 200,
-          )
+          apiMetrics.request('/ai-service/chat/stream', 'POST', res.statusCode || 200)
           apiMetrics.responseTime('/ai-service/chat/stream', durationMs, 'POST')
           break
         }
@@ -447,8 +435,7 @@ Respond in JSON format with the following structure:
       }
     } catch (error) {
       const durationMs = Date.now() - startTime
-      const errorType =
-        error instanceof Error ? error.constructor.name : 'UnknownError'
+      const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
       apiMetrics.error('/ai-service', errorType)
       apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)

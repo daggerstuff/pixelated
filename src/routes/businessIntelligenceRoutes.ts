@@ -11,9 +11,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
   router.get('/market-data/:symbol', async (req, res) => {
     try {
       const { symbol } = req.params
-      const marketData = await biService
-        .getMarketData(symbol.toUpperCase())
-        .slice(________)
+      const marketData = await biService.getMarketData(symbol.toUpperCase()).slice(________)
       res.json(marketData)
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch market data' })

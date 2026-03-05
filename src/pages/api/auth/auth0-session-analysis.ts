@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -103,11 +103,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.session.analysis.forbidden',
         user.id,
         'auth-session-analysis',
-        {
-          action: 'get_session_analysis',
-          sessionId,
-          reason: 'no_access_to_session',
-        },
+        { action: 'get_session_analysis', sessionId, reason: 'no_access_to_session' }
       )
 
       return new Response(
@@ -115,7 +111,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 403,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -128,7 +124,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
-        },
+        }
       )
     }
 
@@ -155,11 +151,7 @@ export const GET: APIRoute = async ({ request }) => {
       'auth.session.analysis.access',
       user.id,
       'auth-session-analysis',
-      {
-        action: 'get_session_analysis',
-        sessionId,
-        count: emotionsWithDimensions.length,
-      },
+      { action: 'get_session_analysis', sessionId, count: emotionsWithDimensions.length }
     )
 
     logger.info('Returning session emotion data', {
@@ -183,7 +175,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
+      }
     )
 
     return new Response(
@@ -194,7 +186,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      },
+      }
     )
   }
 }

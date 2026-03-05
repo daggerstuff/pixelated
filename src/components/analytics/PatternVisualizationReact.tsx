@@ -84,8 +84,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                   <div className="font-medium">{pattern.description}</div>
                   <div className="text-xs text-gray-500">
                     Sessions: {pattern.sessions.length}
-                    {pattern.timeSpanDays &&
-                      `, Span: ${pattern.timeSpanDays} days`}
+                    {pattern.timeSpanDays && `, Span: ${pattern.timeSpanDays} days`}
                   </div>
                 </button>
               ))}

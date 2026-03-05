@@ -8,10 +8,7 @@
 
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
-import {
-  RateLimitingBridge,
-  createRateLimitingBridge,
-} from './rate-limiting-bridge'
+import { RateLimitingBridge, createRateLimitingBridge } from './rate-limiting-bridge'
 import {
   ThreatDetectionMiddleware,
   createThreatDetectionMiddleware,

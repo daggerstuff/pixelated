@@ -168,7 +168,7 @@ export class EnterpriseAPIClient {
 }
 
 export class APIError extends Error {
-  errorMessage: string
+  errorMessage: string;
   constructor(
     message: string,
     public status: number,
@@ -277,11 +277,11 @@ interface FrameworksResponse {
 interface AnalyzeRequest {
   content: string
   analysisType:
-    | 'session'
-    | 'progress'
-    | 'intervention'
-    | 'risk'
-    | 'comprehensive'
+  | 'session'
+  | 'progress'
+  | 'intervention'
+  | 'risk'
+  | 'comprehensive'
   clientContext?: unknown
   analysisOptions?: unknown
 }

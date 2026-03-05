@@ -82,9 +82,7 @@ describe('Threat Detection Integration', () => {
     it('should initialize with correct configuration', () => {
       expect(threatDetectionService).toBeDefined()
       expect((threatDetectionService as any).config).toBeDefined()
-      expect((threatDetectionService as any).orchestrator).toBe(
-        mockOrchestrator,
-      )
+      expect((threatDetectionService as any).orchestrator).toBe(mockOrchestrator)
       expect((threatDetectionService as any).rateLimiter).toBe(mockRateLimiter)
     })
 
@@ -236,21 +234,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
       const result = await bridge.checkRateLimitWithThreatDetection(
         identifier,
@@ -280,21 +266,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
       await bridge.incrementCounter(identifier, context)
 
@@ -317,21 +291,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
       const result = await bridge.getRemainingRequests(identifier, context)
 
@@ -354,21 +316,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
       await bridge.resetCounter(identifier, context)
 
@@ -390,21 +340,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
 
       const middleware = new ThreatDetectionMiddleware({
@@ -430,25 +368,11 @@ describe('Threat Detection Integration', () => {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
         threatLevelRules: {
-          low: {
-            name: 'low',
-            maxRequests: 100,
-            windowMs: 60000,
-            enableAttackDetection: false,
-          },
-          medium: {},
-          high: {},
-          critical: {},
+          low: { name: 'low', maxRequests: 100, windowMs: 60000, enableAttackDetection: false },
+          medium: {}, high: {}, critical: {}
         } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
 
       const middleware = new ThreatDetectionMiddleware({
@@ -496,21 +420,9 @@ describe('Threat Detection Integration', () => {
       const bridge = new RateLimitingBridge(mockRateLimiter, mockOrchestrator, {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
-        threatLevelRules: {
-          low: {},
-          medium: {},
-          high: {},
-          critical: {},
-        } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        threatLevelRules: { low: {}, medium: {}, high: {}, critical: {} } as any,
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
 
       const middleware = new ThreatDetectionMiddleware({
@@ -552,25 +464,11 @@ describe('Threat Detection Integration', () => {
         enableAutoRateLimiting: true,
         enableThreatDetection: true,
         threatLevelRules: {
-          low: {
-            name: 'low',
-            maxRequests: 100,
-            windowMs: 60000,
-            enableAttackDetection: false,
-          },
-          medium: {},
-          high: {},
-          critical: {},
+          low: { name: 'low', maxRequests: 100, windowMs: 60000, enableAttackDetection: false },
+          medium: {}, high: {}, critical: {}
         } as any,
-        bypassRules: {
-          allowedRoles: [],
-          allowedIPRanges: [],
-          allowedEndpoints: [],
-        },
-        escalationConfig: {
-          autoEscalateThreshold: 5,
-          escalationWindowMs: 3600000,
-        },
+        bypassRules: { allowedRoles: [], allowedIPRanges: [], allowedEndpoints: [] },
+        escalationConfig: { autoEscalateThreshold: 5, escalationWindowMs: 3600000 },
       })
 
       const middleware = new ThreatDetectionMiddleware({
@@ -781,9 +679,7 @@ describe('Threat Detection Integration', () => {
       }
 
       expect(shouldRateLimitRequest(responseWithRateLimit as any)).toBe(true)
-      expect(shouldRateLimitRequest(responseWithoutRateLimit as any)).toBe(
-        false,
-      )
+      expect(shouldRateLimitRequest(responseWithoutRateLimit as any)).toBe(false)
     })
 
     it('should extract rate limit parameters correctly', () => {
@@ -901,9 +797,7 @@ describe('Threat Detection Integration', () => {
         timestamp: new Date().toISOString(),
       }
 
-      mockOrchestrator.orchestrateResponse.mockRejectedValue(
-        new Error('Orchestrator error'),
-      )
+      mockOrchestrator.orchestrateResponse.mockRejectedValue(new Error('Orchestrator error'))
       const result = await threatDetectionService.analyzeThreat(threatData)
       expect(result.metadata!.reason).toBe('service_disabled_or_error')
       expect(result.metadata!.source).toBe('threat_detection_service')
@@ -917,10 +811,7 @@ describe('Threat Detection Integration', () => {
       const identifier = 'user:123'
       const context = { userId: '123', ip: '192.168.1.1' }
 
-      const result = await threatDetectionService.checkRequest(
-        identifier,
-        context,
-      )
+      const result = await threatDetectionService.checkRequest(identifier, context)
       expect(result.allowed).toBe(true)
       expect(result.shouldBlock).toBe(false)
     })

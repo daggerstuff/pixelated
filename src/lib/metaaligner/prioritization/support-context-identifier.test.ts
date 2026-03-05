@@ -304,9 +304,7 @@ describe('SupportContextIdentifier', () => {
         identifier.generateSupportRecommendations(mockResult)
 
       expect(recommendations.resources).toEqual(
-        expect.arrayContaining([
-          expect.stringMatching(/crisis|hotline|emergency/i),
-        ]),
+        expect.arrayContaining([expect.stringMatching(/crisis|hotline|emergency/i)]),
       )
     })
 

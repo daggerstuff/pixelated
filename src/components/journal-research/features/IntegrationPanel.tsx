@@ -1,10 +1,5 @@
 import { useState } from 'react'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import {
   useIntegrationPlanListQuery,
   useIntegrationInitiateMutation,
@@ -17,10 +12,7 @@ export interface IntegrationPanelProps {
   className?: string
 }
 
-export function IntegrationPanel({
-  sessionId,
-  className,
-}: IntegrationPanelProps) {
+export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps) {
   const [isInitiating, setIsInitiating] = useState(false)
   const { data: plans, isLoading } = useIntegrationPlanListQuery(sessionId, {
     page: 1,
@@ -53,9 +45,7 @@ export function IntegrationPanel({
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           disabled={initiateMutation.isPending}
         >
-          {initiateMutation.isPending
-            ? 'Planning...'
-            : 'Start Integration Planning'}
+          {initiateMutation.isPending ? 'Planning...' : 'Start Integration Planning'}
         </button>
       </div>
 
@@ -72,7 +62,9 @@ export function IntegrationPanel({
                 plan for all acquired sources.
               </p>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Target Format</label>
+                <label className="text-sm font-medium">
+                  Target Format
+                </label>
                 <select
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   defaultValue="chatml"
@@ -155,9 +147,7 @@ export function IntegrationPanel({
                         <p className="text-sm font-medium text-muted-foreground">
                           Estimated Effort
                         </p>
-                        <p className="mt-1">
-                          {plan.estimatedEffortHours} hours
-                        </p>
+                        <p className="mt-1">{plan.estimatedEffortHours} hours</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">
@@ -173,13 +163,11 @@ export function IntegrationPanel({
                             Required Transformations
                           </p>
                           <ul className="mt-1 list-inside list-disc space-y-1">
-                            {plan.requiredTransformations.map(
-                              (transformation) => (
-                                <li key={transformation} className="text-sm">
-                                  {transformation}
-                                </li>
-                              ),
-                            )}
+                            {plan.requiredTransformations.map((transformation) => (
+                              <li key={transformation} className="text-sm">
+                                {transformation}
+                              </li>
+                            ))}
                           </ul>
                         </div>
                       )}

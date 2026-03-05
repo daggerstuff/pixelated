@@ -41,19 +41,19 @@ export const AdminDashboard: FC = () => {
     'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
   >({
     key: 'admin_dashboard_view',
-    defaultValue: 'overview',
+    defaultValue: 'overview'
   })
   const [timeRange, setTimeRange] = usePersistentState<
     'week' | 'month' | 'quarter' | 'year'
   >({
     key: 'admin_dashboard_timerange',
-    defaultValue: 'month',
+    defaultValue: 'month'
   })
   const [selectedTherapists, setSelectedTherapists] = usePersistentState<
     string[]
   >({
     key: 'admin_selected_therapists',
-    defaultValue: [],
+    defaultValue: []
   })
 
   // Mock data - in real app would come from API
@@ -221,13 +221,7 @@ const OverviewTab: FC<{
   onTherapistSelect: (therapistId: string) => void
   selectedTherapists: string[]
   timeRange: 'week' | 'month' | 'quarter' | 'year'
-}> = ({
-  metrics,
-  therapists,
-  onTherapistSelect,
-  selectedTherapists,
-  timeRange,
-}) => {
+}> = ({ metrics, therapists, onTherapistSelect, selectedTherapists, timeRange }) => {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}

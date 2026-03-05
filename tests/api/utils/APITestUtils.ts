@@ -236,10 +236,7 @@ export class APITestUtils {
           },
         )
       } catch (_error: unknown) {
-        console.warn(
-          `Failed to cleanup conversation ${conversationId}:`,
-          _error,
-        )
+        console.warn(`Failed to cleanup conversation ${conversationId}:`, _error)
       }
     }
     this.testConversations = []

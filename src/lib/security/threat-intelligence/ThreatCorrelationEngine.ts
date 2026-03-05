@@ -538,10 +538,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by time windows
    */
-  private groupThreatsByTimeWindow(
-    threats: ThreatData[],
-    windowSize: number,
-  ): TimeGroup[] {
+  private groupThreatsByTimeWindow(threats: ThreatData[], windowSize: number): TimeGroup[] {
     const groups: TimeGroup[] = []
     const sortedThreats = [...threats].sort(
       (a, b) =>
@@ -556,7 +553,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       if (
         !currentGroup ||
         threatTime - new Date(currentGroup.end_time).getTime() >
-          windowSize * 1000
+        windowSize * 1000
       ) {
         // Start new group
         if (currentGroup) {
@@ -584,9 +581,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate temporal correlation
    */
-  private calculateTemporalCorrelation(
-    threats: ThreatData[],
-  ): TemporalCorrelationResult {
+  private calculateTemporalCorrelation(threats: ThreatData[]): TemporalCorrelationResult {
     try {
       // Calculate time span
       const timestamps = threats.map((t) => new Date(t.timestamp).getTime())
@@ -764,10 +759,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate distance between two coordinates
    */
-  private calculateDistance(
-    coord1: DistanceCoordinates,
-    coord2: DistanceCoordinates,
-  ): number {
+  private calculateDistance(coord1: DistanceCoordinates, coord2: DistanceCoordinates): number {
     if (!coord1 || !coord2) return Infinity
 
     const R = 6371 // Earth's radius in kilometers
@@ -777,9 +769,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(coord1.latitude)) *
-        Math.cos(this.toRadians(coord2.latitude)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2)
+      Math.cos(this.toRadians(coord2.latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
@@ -1033,10 +1025,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Group threats by specific pattern
    */
-  private groupThreatsByPattern(
-    threats: ThreatData[],
-    pattern: string,
-  ): BehavioralGroup[] {
+  private groupThreatsByPattern(threats: ThreatData[], pattern: string): BehavioralGroup[] {
     const groups: BehavioralGroup[] = []
 
     switch (pattern) {
@@ -1096,13 +1085,13 @@ export class ThreatCorrelationEngine extends EventEmitter {
       const sequence = [sortedThreats[i]]
       let currentSeverity =
         severityOrder[
-          sortedThreats[i].severity as keyof typeof severityOrder
+        sortedThreats[i].severity as keyof typeof severityOrder
         ] || 0
 
       for (let j = i + 1; j < sortedThreats.length; j++) {
         const nextSeverity =
           severityOrder[
-            sortedThreats[j].severity as keyof typeof severityOrder
+          sortedThreats[j].severity as keyof typeof severityOrder
           ] || 0
 
         if (nextSeverity > currentSeverity) {
@@ -1127,10 +1116,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   /**
    * Calculate behavioral correlation
    */
-  private calculateBehavioralCorrelation(
-    threats: ThreatData[],
-    pattern: string,
-  ): BehavioralCorrelationResult {
+  private calculateBehavioralCorrelation(threats: ThreatData[], pattern: string): BehavioralCorrelationResult {
     try {
       let similarityScore = 0
       let patterns: ThreatPattern[] = []

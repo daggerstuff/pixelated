@@ -7,12 +7,7 @@ import {
 import fs from 'fs/promises'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import {
-  safeJoin,
-  ALLOWED_DIRECTORIES,
-  sanitizeFilename,
-  validatePath,
-} from '../../utils/path-security'
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename, validatePath } from '../../utils/path-security'
 
 const logger = createBuildSafeLogger('blog-publisher')
 
@@ -140,9 +135,7 @@ async function generateReport(): Promise<void> {
 
   // Save to file
   const reportDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'reports')
-  const filename = sanitizeFilename(
-    `blog-pipeline-${new Date().toISOString().split('T')[0]}.md`,
-  )
+  const filename = sanitizeFilename(`blog-pipeline-${new Date().toISOString().split('T')[0]}.md`)
   const reportPath = safeJoin(reportDir, filename)
 
   try {
@@ -295,9 +288,7 @@ async function generatePost(
 
   if (seriesName) {
     // Convert series name to kebab-case directory name
-    const seriesDirName = sanitizeFilename(
-      seriesName.toLowerCase().replace(/\s+/g, '-'),
-    )
+    const seriesDirName = sanitizeFilename(seriesName.toLowerCase().replace(/\s+/g, '-'))
     targetDir = safeJoin(targetDir, seriesDirName)
 
     // Ensure series directory exists
@@ -305,12 +296,10 @@ async function generatePost(
   }
 
   // Create a slug from the title
-  const slug = sanitizeFilename(
-    postTitle
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-'),
-  )
+  const slug = sanitizeFilename(postTitle
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-'))
 
   const filePath = safeJoin(targetDir, `${slug}.mdx`)
 
@@ -406,10 +395,7 @@ async function publishPost(postPath?: string): Promise<void> {
 
   try {
     // Validate file path to prevent path traversal
-    const validatedFilePath = validatePath(
-      targetPost.filePath,
-      ALLOWED_DIRECTORIES.CONTENT,
-    )
+    const validatedFilePath = validatePath(targetPost.filePath, ALLOWED_DIRECTORIES.CONTENT)
     const content = await fs.readFile(validatedFilePath, 'utf8')
 
     // Update the draft status in frontmatter

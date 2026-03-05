@@ -6,4 +6,4 @@
 
 import { BaseService } from './base-service'
 
-export class AnalyticsService extends BaseService {}
+export class AnalyticsService extends BaseService { }

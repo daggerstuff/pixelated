@@ -141,7 +141,7 @@ export function LoginForm({
         const errorMessage =
           typeof result.error === 'object' && result.error !== null
             ? (result.error as { message?: string }).message ||
-              'Login failed. Please check your credentials.'
+            'Login failed. Please check your credentials.'
             : 'Login failed. Please check your credentials.'
 
         toast.error(errorMessage)
@@ -274,6 +274,7 @@ export function LoginForm({
     const error = validatePassword(password)
     setErrors((prev) => ({ ...prev, password: error }))
   }
+
 
   // Render reset success message
   const renderResetSuccess = () => (

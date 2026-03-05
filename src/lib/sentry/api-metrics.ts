@@ -37,8 +37,7 @@ export function withMetrics<T extends (...args: any[]) => Promise<Response>>(
 
       return response
     } catch (error) {
-      errorType =
-        error instanceof Error ? error.constructor.name : 'UnknownError'
+      errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
       statusCode = 500
 
       // Record error metrics
