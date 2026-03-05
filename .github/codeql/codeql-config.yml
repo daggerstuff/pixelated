@@ -42,8 +42,3 @@ paths-ignore:
   - '**/playwright-report'
   - '**/test-results'
 
-# Use additional query packs for comprehensive security analysis
-packs:
-  javascript:
-    - security-extended
-    - security-and-quality

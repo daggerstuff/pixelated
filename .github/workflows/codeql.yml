@@ -40,7 +40,9 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality,security-extended,${{ matrix.language == 'javascript' && './.github/codeql/custom-queries' || '' }}
+          # Load custom queries only for JavaScript to avoid errors in Python job
+          queries: >-
+            security-and-quality,security-extended${{ matrix.language == 'javascript' && ',./.github/codeql/custom-queries' || '' }}
           # Increase RAM allocation for analysis
           ram: 16384
 
