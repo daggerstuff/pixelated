@@ -72,5 +72,3 @@ export async function updateEvaluation(
     },
   )
 }
-
-

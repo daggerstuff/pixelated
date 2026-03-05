@@ -59,24 +59,27 @@ export function EnhancedSimulationContainer({
   const conversationKey = currentPrompt.length > 0 ? 'prompted' : 'unprompted'
 
   // Unique session ID for the Gestalt WebSocket connection
-  const sessionId = useMemo(() => `session-${scenarioId}-${uuidv4().slice(0, 8)}`, [scenarioId])
+  const sessionId = useMemo(
+    () => `session-${scenarioId}-${uuidv4().slice(0, 8)}`,
+    [scenarioId],
+  )
 
   // Get scenario details and simulator functions
   // Use getScenarioById from imported function instead of from hook
   const scenario = scenarioId
     ? ({
-      id: scenarioId,
-      title: `Scenario ${scenarioId}`,
-      domain: 'DEPRESSION' as TherapeuticDomain,
-      difficulty: 'BEGINNER' as ScenarioDifficulty,
-      initialPrompt: 'Welcome to the simulation. How are you feeling today?',
-      description: 'Practice scenario for depression treatment',
-      techniques: [],
-      contextDescription: 'Initial therapy session',
-      clientBackground: 'Client presenting with depressive symptoms',
-      presentingIssue: 'Persistent low mood and difficulty concentrating',
-      objectives: ['Build rapport', 'Identify symptoms'],
-    } as Scenario)
+        id: scenarioId,
+        title: `Scenario ${scenarioId}`,
+        domain: 'DEPRESSION' as TherapeuticDomain,
+        difficulty: 'BEGINNER' as ScenarioDifficulty,
+        initialPrompt: 'Welcome to the simulation. How are you feeling today?',
+        description: 'Practice scenario for depression treatment',
+        techniques: [],
+        contextDescription: 'Initial therapy session',
+        clientBackground: 'Client presenting with depressive symptoms',
+        presentingIssue: 'Persistent low mood and difficulty concentrating',
+        objectives: ['Build rapport', 'Identify symptoms'],
+      } as Scenario)
     : null
 
   // Real-time analysis
@@ -324,9 +327,7 @@ export function EnhancedSimulationContainer({
     <div className={cn('flex flex-col h-full overflow-hidden', className)}>
       {/* Header with scenario information */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <ScenarioInfo
-          scenario={scenario}
-        />
+        <ScenarioInfo scenario={scenario} />
 
         <div className="flex items-center space-x-3">
           <div className="flex items-center">

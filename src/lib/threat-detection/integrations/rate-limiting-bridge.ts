@@ -13,10 +13,7 @@ import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { ThreatResponse } from '../response-orchestration'
-import type {
-  RateLimitRule,
-  RateLimitResult,
-} from '../../rate-limiting/types'
+import type { RateLimitRule, RateLimitResult } from '../../rate-limiting/types'
 
 const logger = createBuildSafeLogger('threat-rate-limit-bridge')
 
@@ -99,7 +96,6 @@ export class RateLimitingBridge {
       // console.log('TRACE: Bridge start', identifier)
       // console.log('TRACE: rateLimiter keys', Object.keys(this.rateLimiter))
 
-
       const rule = this.selectRateLimitRule(context)
 
       // Check rate limit
@@ -108,7 +104,6 @@ export class RateLimitingBridge {
         rule,
         context as unknown as Record<string, unknown>,
       )
-
 
       // If rate limited, trigger threat detection
       if (!rateLimitResult.allowed) {
@@ -328,9 +323,7 @@ export class RateLimitingBridge {
     // Check role-based bypass
     if (
       context.userId &&
-      this.config.bypassRules.allowedRoles
-        .includes(context.userId)
-
+      this.config.bypassRules.allowedRoles.includes(context.userId)
     ) {
       return true
     }
@@ -594,4 +587,3 @@ export function createRateLimitingBridge(
   const config = { ...defaultConfig, ...customConfig }
   return new RateLimitingBridge(rateLimiter, orchestrator, config)
 }
-

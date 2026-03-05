@@ -1,15 +1,15 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { type BookMetadata } from "../../lib/api/research";
+import React from 'react'
+import { motion } from 'framer-motion'
+import { type BookMetadata } from '../../lib/api/research'
 
 interface ResultCardProps {
-    result: BookMetadata;
+  result: BookMetadata
 }
 
 const ResultCardHeader = ({
   therapeutic_relevance_score,
 }: {
-  therapeutic_relevance_score?: number;
+  therapeutic_relevance_score?: number
 }) => (
   <div className="h-32 bg-gradient-to-br from-slate-700 to-slate-800 relative flex items-center justify-center overflow-hidden">
     <div className="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent opacity-60"></div>
@@ -24,18 +24,18 @@ const ResultCardHeader = ({
         </div>
       )}
   </div>
-);
+)
 
 const ResultCardMetadata = ({
   source,
   publication_year,
 }: {
-  source?: string;
-  publication_year?: number;
+  source?: string
+  publication_year?: number
 }) => (
   <div className="flex gap-2 mb-3 text-xs">
     <span className="px-2 py-1 rounded bg-slate-700 text-slate-300 capitalize border border-slate-600">
-      {(source || "unknown").replace("_", " ")}
+      {(source || 'unknown').replace('_', ' ')}
     </span>
     {(publication_year || 0) > 0 && (
       <span className="px-2 py-1 rounded bg-slate-700 text-slate-300 border border-slate-600">
@@ -43,7 +43,7 @@ const ResultCardMetadata = ({
       </span>
     )}
   </div>
-);
+)
 
 const ResultCardActions = ({ url }: { url?: string }) => (
   <div className="mt-auto flex gap-2 pt-4 border-t border-slate-700/50">
@@ -99,7 +99,7 @@ const ResultCardActions = ({ url }: { url?: string }) => (
       </svg>
     </button>
   </div>
-);
+)
 
 export default React.memo(function ResultCard({ result }: ResultCardProps) {
   const {
@@ -109,7 +109,7 @@ export default React.memo(function ResultCard({ result }: ResultCardProps) {
     source,
     therapeutic_relevance_score,
     url,
-  } = result;
+  } = result
 
   return (
     <motion.div
@@ -133,12 +133,11 @@ export default React.memo(function ResultCard({ result }: ResultCardProps) {
         </h3>
 
         <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-          {authors.join(", ")}
+          {authors.join(', ')}
         </p>
 
         <ResultCardActions url={url} />
       </div>
     </motion.div>
-  );
-});
-
+  )
+})

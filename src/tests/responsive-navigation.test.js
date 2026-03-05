@@ -214,7 +214,9 @@ test.describe('Responsive Design and Navigation Tests', () => {
 
   test('should have proper button and link interactions', async ({ page }) => {
     // Test CTA buttons in hero section
-    const ctaButtons = page.locator('a[href="/demo-hub"], a[href="/auth/signup"]')
+    const ctaButtons = page.locator(
+      'a[href="/demo-hub"], a[href="/auth/signup"]',
+    )
     const buttonCount = await ctaButtons.count()
 
     if (buttonCount > 0) {

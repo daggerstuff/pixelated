@@ -5,12 +5,20 @@ import {
   type Evaluation,
 } from '@/lib/api/journal-research/types'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import {
+  ErrorMessage,
+  FieldError,
+} from '@/components/journal-research/shared/ErrorMessage'
 
 export interface EvaluationFormProps {
   evaluation?: Evaluation
@@ -62,9 +70,8 @@ export function EvaluationForm({
       const validated = EvaluationUpdatePayloadSchema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -73,7 +80,10 @@ export function EvaluationForm({
     }
   }
 
-  const handleScoreChange = (field: keyof EvaluationUpdatePayload, value: string) => {
+  const handleScoreChange = (
+    field: keyof EvaluationUpdatePayload,
+    value: string,
+  ) => {
     const numValue = parseFloat(value)
     if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
       setFormData({ ...formData, [field]: numValue })
@@ -149,7 +159,11 @@ export function EvaluationForm({
                         : 'border-input',
                     )}
                     aria-invalid={!!errors[metric.key] && touched[metric.key]}
-                    aria-describedby={errors[metric.key] && touched[metric.key] ? `${metric.key}-error` : undefined}
+                    aria-describedby={
+                      errors[metric.key] && touched[metric.key]
+                        ? `${metric.key}-error`
+                        : undefined
+                    }
                   />
                   <span className="text-sm text-muted-foreground">/ 10</span>
                 </div>
@@ -175,7 +189,13 @@ export function EvaluationForm({
                 }}
                 className="w-full"
               />
-              <FieldError error={errors[metric.key] && touched[metric.key] ? errors[metric.key] : undefined} />
+              <FieldError
+                error={
+                  errors[metric.key] && touched[metric.key]
+                    ? errors[metric.key]
+                    : undefined
+                }
+              />
             </div>
           ))}
 
@@ -220,4 +240,3 @@ export function EvaluationForm({
     </Card>
   )
 }
-

@@ -90,10 +90,7 @@ const envSchema = z.object({
     .transform((val: string) => val === 'true')
     .default(true),
   SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default(5),
-  SECURITY_ACCOUNT_LOCKOUT_DURATION: z
-    .string()
-    .transform(Number)
-    .default(1800),
+  SECURITY_ACCOUNT_LOCKOUT_DURATION: z.string().transform(Number).default(1800),
   SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default(100),
   SECURITY_ENABLE_ALERTS: z
     .string()
@@ -140,8 +137,9 @@ const envSchema = z.object({
         }
       },
       {
-        message: 'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
-      }
+        message:
+          'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
+      },
     )
     .optional(),
 

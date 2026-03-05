@@ -45,7 +45,9 @@ export class MentalLLaMAModelProvider implements IModelProvider {
         )
       ) {
         // Normalize error message to what tests expect
-        throw new Error('Invalid response structure from MentalLLaMA API.', { cause: error })
+        throw new Error('Invalid response structure from MentalLLaMA API.', {
+          cause: error,
+        })
       }
       throw error
     }
@@ -230,12 +232,12 @@ export class MentalLLaMAModelProvider implements IModelProvider {
           ...(tokenUsage !== undefined ? { tokenUsage } : {}),
           ...(finishReason !== undefined
             ? {
-              finishReason: finishReason as
-                | 'stop'
-                | 'length'
-                | 'content_filter'
-                | 'function_call',
-            }
+                finishReason: finishReason as
+                  | 'stop'
+                  | 'length'
+                  | 'content_filter'
+                  | 'function_call',
+              }
             : {}),
         }
         return response

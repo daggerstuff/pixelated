@@ -153,7 +153,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -166,7 +166,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -409,9 +409,9 @@ export const GET: APIRoute = async ({ request }) => {
         }),
         metadata: plan.metadata
           ? {
-            ...plan.metadata,
-            interventionHistory: [],
-          }
+              ...plan.metadata,
+              interventionHistory: [],
+            }
           : undefined,
       }))
     }
@@ -427,8 +427,8 @@ export const GET: APIRoute = async ({ request }) => {
         planCount: filteredPlans.length,
         clientId,
         planId,
-        includeMetrics
-      }
+        includeMetrics,
+      },
     )
 
     logger.info('Retrieved enhanced treatment plans', {
@@ -458,7 +458,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -488,7 +488,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -501,7 +501,7 @@ export const POST: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -580,8 +580,8 @@ export const POST: APIRoute = async ({ request }) => {
         planId: newPlan.id,
         clientId: newPlan.clientId,
         goalCount: newPlan.goals.length,
-        overallProgress
-      }
+        overallProgress,
+      },
     )
 
     // TODO: Save to database
@@ -612,7 +612,7 @@ export const POST: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -642,7 +642,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -655,7 +655,7 @@ export const PATCH: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -693,8 +693,8 @@ export const PATCH: APIRoute = async ({ request }) => {
         planId,
         goalId,
         milestoneId,
-        updateKeys: Object.keys(updates)
-      }
+        updateKeys: Object.keys(updates),
+      },
     )
 
     // TODO: Implement actual database update
@@ -735,7 +735,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(

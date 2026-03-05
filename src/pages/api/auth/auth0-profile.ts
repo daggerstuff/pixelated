@@ -40,13 +40,10 @@ export const GET = async ({ request }) => {
     const user = await getUserById(validation.userId!)
 
     if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'User not found' }),
-        {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      return new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     return new Response(
@@ -131,7 +128,8 @@ export const PATCH = async ({ request }) => {
     console.error('Auth0 Profile PATCH error:', error)
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Failed to update profile',
+        error:
+          error instanceof Error ? error.message : 'Failed to update profile',
       }),
       {
         status: 500,

@@ -5,26 +5,26 @@
  * Shows EQ metrics tracking, bias detection, and crisis intervention in action.
  */
 
-import React, { useState, useCallback, useEffect } from "react";
-import { usePixelConversationIntegration } from "@/hooks/usePixelConversationIntegration";
-import type { PixelInferenceResponse } from "@/types/pixel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { AlertCircle, Zap, AlertTriangle } from "lucide-react";
+import React, { useState, useCallback, useEffect } from 'react'
+import { usePixelConversationIntegration } from '@/hooks/usePixelConversationIntegration'
+import type { PixelInferenceResponse } from '@/types/pixel'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
 
 interface ConversationMessage {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  timestamp: number;
-  pixelMetrics?: PixelInferenceResponse;
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: number
+  pixelMetrics?: PixelInferenceResponse
 }
 
 interface PixelEnhancedChatProps {
-  sessionId: string;
-  userId: string;
-  onMessage?: (message: string) => void;
-  onCrisisDetected?: () => void;
+  sessionId: string
+  userId: string
+  onMessage?: (message: string) => void
+  onCrisisDetected?: () => void
 }
 
 /**
@@ -49,69 +49,69 @@ export function PixelEnhancedChat({
   } = usePixelConversationIntegration({
     sessionId,
     userId,
-    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || "http://localhost:8001",
-  });
+    pixelApiUrl: process.env.REACT_APP_PIXEL_API_URL || 'http://localhost:8001',
+  })
 
   // Local state
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [showMetrics, setShowMetrics] = useState(true);
+  const [messages, setMessages] = useState<ConversationMessage[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const [showMetrics, setShowMetrics] = useState(true)
 
   // Crisis detection handler
   useEffect(() => {
     if (crisisStatus?.isCrisis && onCrisisDetected) {
-      onCrisisDetected();
+      onCrisisDetected()
     }
-  }, [crisisStatus?.isCrisis, onCrisisDetected]);
+  }, [crisisStatus?.isCrisis, onCrisisDetected])
 
   /**
    * Handle sending message with Pixel analysis
    */
   const handleSendMessage = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!inputValue.trim()) return;
+      e.preventDefault()
+      if (!inputValue.trim()) return
 
       // Add user message to chat
       const userMessage: ConversationMessage = {
         id: `msg-${Date.now()}`,
-        role: "user",
+        role: 'user',
         content: inputValue,
         timestamp: Date.now(),
-      };
+      }
 
-      setMessages((prev) => [...prev, userMessage]);
-      setInputValue("");
+      setMessages((prev) => [...prev, userMessage])
+      setInputValue('')
 
       // Analyze with Pixel
-      const pixelResponse = await analyzeMessage(inputValue, "support");
+      const pixelResponse = await analyzeMessage(inputValue, 'support')
 
       if (pixelResponse) {
         // Add assistant response with metrics
         const assistantMessage: ConversationMessage = {
           id: `msg-${Date.now() + 1}`,
-          role: "assistant",
+          role: 'assistant',
           content: pixelResponse.response,
           timestamp: Date.now(),
           pixelMetrics: pixelResponse,
-        };
+        }
 
-        setMessages((prev) => [...prev, assistantMessage]);
+        setMessages((prev) => [...prev, assistantMessage])
 
-        onMessage?.(inputValue);
+        onMessage?.(inputValue)
       } else if (error) {
         // Show error message
         const errorMessage: ConversationMessage = {
           id: `msg-${Date.now() + 1}`,
-          role: "assistant",
+          role: 'assistant',
           content: `Error: ${error}`,
           timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, errorMessage]);
+        }
+        setMessages((prev) => [...prev, errorMessage])
       }
     },
     [inputValue, analyzeMessage, onMessage, error],
-  );
+  )
 
   return (
     <div className="flex gap-4 h-full">
@@ -127,7 +127,7 @@ export function PixelEnhancedChat({
               onClick={() => setShowMetrics(!showMetrics)}
               className="text-sm text-blue-600 hover:text-blue-700"
             >
-              {showMetrics ? "Hide" : "Show"} Metrics
+              {showMetrics ? 'Hide' : 'Show'} Metrics
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@ export function PixelEnhancedChat({
                   label="Emotional Awareness"
                   value={
                     eqMetrics.emotionalAwareness[
-                    eqMetrics.emotionalAwareness.length - 1
+                      eqMetrics.emotionalAwareness.length - 1
                     ] || 0
                   }
                 />
@@ -205,7 +205,7 @@ export function PixelEnhancedChat({
                   label="Empathy"
                   value={
                     eqMetrics.empathyRecognition[
-                    eqMetrics.empathyRecognition.length - 1
+                      eqMetrics.empathyRecognition.length - 1
                     ] || 0
                   }
                 />
@@ -213,7 +213,7 @@ export function PixelEnhancedChat({
                   label="Regulation"
                   value={
                     eqMetrics.emotionalRegulation[
-                    eqMetrics.emotionalRegulation.length - 1
+                      eqMetrics.emotionalRegulation.length - 1
                     ] || 0
                   }
                 />
@@ -221,7 +221,7 @@ export function PixelEnhancedChat({
                   label="Social Cognition"
                   value={
                     eqMetrics.socialCognition[
-                    eqMetrics.socialCognition.length - 1
+                      eqMetrics.socialCognition.length - 1
                     ] || 0
                   }
                 />
@@ -229,7 +229,7 @@ export function PixelEnhancedChat({
                   label="Interpersonal Skills"
                   value={
                     eqMetrics.interpersonalSkills[
-                    eqMetrics.interpersonalSkills.length - 1
+                      eqMetrics.interpersonalSkills.length - 1
                     ] || 0
                   }
                 />
@@ -242,8 +242,8 @@ export function PixelEnhancedChat({
             <Card
               className={
                 crisisStatus.isCrisis
-                  ? "border-red-300 bg-red-50"
-                  : "border-green-300 bg-green-50"
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-green-300 bg-green-50'
               }
             >
               <CardHeader>
@@ -266,11 +266,11 @@ export function PixelEnhancedChat({
                   <span className="text-sm font-medium">Risk Level:</span>
                   <Badge
                     variant={
-                      crisisStatus.riskLevel === "critical"
-                        ? "destructive"
-                        : crisisStatus.riskLevel === "high"
-                          ? "secondary"
-                          : "default"
+                      crisisStatus.riskLevel === 'critical'
+                        ? 'destructive'
+                        : crisisStatus.riskLevel === 'high'
+                          ? 'secondary'
+                          : 'default'
                     }
                   >
                     {crisisStatus.riskLevel.toUpperCase()}
@@ -322,7 +322,7 @@ export function PixelEnhancedChat({
               <CardContent className="space-y-2">
                 {biasFlags.map((flag) => (
                   <div
-                    key={`${flag.detected}:${flag.severity}:${flag.suggestedCorrection ?? ""}`}
+                    key={`${flag.detected}:${flag.severity}:${flag.suggestedCorrection ?? ''}`}
                     className="text-sm"
                   >
                     <div className="flex items-center justify-between">
@@ -331,7 +331,7 @@ export function PixelEnhancedChat({
                       </p>
                       <Badge
                         variant={
-                          flag.severity === "high" ? "destructive" : "secondary"
+                          flag.severity === 'high' ? 'destructive' : 'secondary'
                         }
                       >
                         {flag.severity.toUpperCase()}
@@ -350,7 +350,7 @@ export function PixelEnhancedChat({
         </div>
       )}
     </div>
-  );
+  )
 }
 
 /**
@@ -361,19 +361,20 @@ function MessageBubble({
   pixelMetrics,
   showMetrics,
 }: {
-  message: ConversationMessage;
-  pixelMetrics?: PixelInferenceResponse;
-  showMetrics: boolean;
+  message: ConversationMessage
+  pixelMetrics?: PixelInferenceResponse
+  showMetrics: boolean
 }) {
   return (
     <div
-      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-sm px-4 py-2 rounded-lg ${message.role === "user"
-            ? "bg-blue-600 text-white"
-            : "bg-gray-100 text-gray-900"
-          }`}
+        className={`max-w-sm px-4 py-2 rounded-lg ${
+          message.role === 'user'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-100 text-gray-900'
+        }`}
       >
         <p className="text-sm">{message.content}</p>
         {showMetrics && pixelMetrics && (
@@ -388,9 +389,9 @@ function MessageBubble({
             {pixelMetrics.conversation_metadata && (
               <div>
                 <p className="opacity-75">
-                  Safety:{" "}
+                  Safety:{' '}
                   {pixelMetrics.conversation_metadata.safety_score.toFixed(2)},
-                  Bias:{" "}
+                  Bias:{' '}
                   {pixelMetrics.conversation_metadata.bias_score.toFixed(2)}
                 </p>
               </div>
@@ -402,7 +403,9 @@ function MessageBubble({
                 </summary>
                 <ul className="pl-3 mt-1 list-disc space-y-1 opacity-90 max-h-32 overflow-y-auto bg-black/5 rounded p-2">
                   {pixelMetrics.memories.map((mem, i) => (
-                    <li key={i} className="text-[10px] leading-3">{mem}</li>
+                    <li key={i} className="text-[10px] leading-3">
+                      {mem}
+                    </li>
                   ))}
                 </ul>
               </details>
@@ -414,7 +417,7 @@ function MessageBubble({
         )}
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -436,7 +439,7 @@ function MetricBar({ label, value }: { label: string; value: number }) {
         ></div>
       </div>
     </div>
-  );
+  )
 }
 
-export default PixelEnhancedChat;
+export default PixelEnhancedChat

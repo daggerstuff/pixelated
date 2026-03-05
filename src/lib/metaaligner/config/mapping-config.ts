@@ -228,9 +228,7 @@ export function validateContextCoverage(
   config: MappingConfiguration,
 ): ValidationError[] {
   const errors: ValidationError[] = []
-  const configuredContexts = new Set(
-    config.mappings.map((m) => m.context),
-  )
+  const configuredContexts = new Set(config.mappings.map((m) => m.context))
 
   // Check that all ContextType enum values are covered
   const allContexts = Object.values(ContextType)
@@ -344,9 +342,10 @@ export function validateSafetyFloor(
 /**
  * Validate complete configuration
  */
-export function validateMappingConfiguration(
-  config: MappingConfiguration,
-): { valid: boolean; errors: ValidationError[] } {
+export function validateMappingConfiguration(config: MappingConfiguration): {
+  valid: boolean
+  errors: ValidationError[]
+} {
   const errors: ValidationError[] = []
 
   // Validate context coverage

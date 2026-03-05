@@ -1,7 +1,14 @@
 import { useState, useMemo } from 'react'
-import type { Session, SessionList as SessionListType } from '@/lib/api/journal-research/types'
+import type {
+  Session,
+  SessionList as SessionListType,
+} from '@/lib/api/journal-research/types'
 import { Table } from '@/components/ui/table'
-import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
+import type {
+  TableColumn,
+  TableState,
+  TableDataSource,
+} from '@/components/ui/table-types'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 
@@ -110,9 +117,7 @@ export function SessionList({
     {
       id: 'currentPhase',
       header: 'Phase',
-      accessor: (row) => (
-        <span className="capitalize">{row.currentPhase}</span>
-      ),
+      accessor: (row) => <span className="capitalize">{row.currentPhase}</span>,
       sortable: true,
     },
     {
@@ -154,7 +159,14 @@ export function SessionList({
     loading: isLoading,
   }
 
-  const phases = ['all', 'discovery', 'evaluation', 'acquisition', 'integration', 'reporting']
+  const phases = [
+    'all',
+    'discovery',
+    'evaluation',
+    'acquisition',
+    'integration',
+    'reporting',
+  ]
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -180,7 +192,8 @@ export function SessionList({
           </select>
         </div>
         <div className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedSessions.length} of {sessions.total} sessions
+          Showing {filteredAndSortedSessions.length} of {sessions.total}{' '}
+          sessions
         </div>
       </div>
 
@@ -196,4 +209,3 @@ export function SessionList({
     </div>
   )
 }
-

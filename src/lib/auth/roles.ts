@@ -461,7 +461,7 @@ export function validateRoleTransition(
   const requiresApproval =
     toDef.requiresApproval ||
     toDef.hierarchyLevel >= 80 || // Therapist and Admin
-    toDef.permissions.includes('manage:roles');
+    toDef.permissions.includes('manage:roles')
 
   // MFA required for sensitive role transitions
   const requiresMFA =

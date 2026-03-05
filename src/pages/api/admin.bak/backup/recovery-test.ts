@@ -161,15 +161,18 @@ async function runRecoveryTest(config: unknown): Promise<RecoveryTestResult> {
   }
 }
 
-import type { APIContext } from "astro";
+import type { APIContext } from 'astro'
 
 export const POST = async (context: APIContext) => {
-  const { request, locals } = context;
+  const { request, locals } = context
   // Apply admin middleware to check for admin status and required permission
-  const next = () => new Promise<Response>((resolve) => resolve(new Response(null, { status: 200 })));
+  const next = () =>
+    new Promise<Response>((resolve) =>
+      resolve(new Response(null, { status: 200 })),
+    )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)(
     context,
-    next
+    next,
   )
   if (middlewareResponse.status !== 200) {
     return middlewareResponse
@@ -224,7 +227,7 @@ export const POST = async (context: APIContext) => {
       errors: result.details?.errors?.join(', ') || 'None',
       durationMs: result.details?.durationMs,
       note: 'Recovery test initiated.',
-    };
+    }
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_initiated',
@@ -250,7 +253,7 @@ export const POST = async (context: APIContext) => {
     const auditDetails = {
       error: errorMessage,
       // Do not include stack trace in audit logs for security
-    };
+    }
     logAuditEvent(
       AuditEventType.SECURITY,
       'recovery_test_failed',

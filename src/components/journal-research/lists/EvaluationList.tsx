@@ -1,7 +1,11 @@
 import { format } from 'date-fns'
 import { useMemo, useState } from 'react'
 import { Table } from '@/components/ui/table'
-import type { TableColumn, TableDataSource, TableState } from '@/components/ui/table-types'
+import type {
+  TableColumn,
+  TableDataSource,
+  TableState,
+} from '@/components/ui/table-types'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,
@@ -47,7 +51,9 @@ export function EvaluationList({
 
     // Apply tier filter
     if (tierFilter !== 'all') {
-      filtered = filtered.filter((evaluation) => evaluation.priorityTier === tierFilter)
+      filtered = filtered.filter(
+        (evaluation) => evaluation.priorityTier === tierFilter,
+      )
     }
 
     // Apply score filter
@@ -55,7 +61,8 @@ export function EvaluationList({
       filtered = filtered.filter((evaluation) => evaluation.overallScore >= 8)
     } else if (scoreFilter === 'medium') {
       filtered = filtered.filter(
-        (evaluation) => evaluation.overallScore >= 6 && evaluation.overallScore < 8,
+        (evaluation) =>
+          evaluation.overallScore >= 6 && evaluation.overallScore < 8,
       )
     } else if (scoreFilter === 'low') {
       filtered = filtered.filter((evaluation) => evaluation.overallScore < 6)
@@ -107,7 +114,8 @@ export function EvaluationList({
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
       high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      medium:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
       low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
     }
     return (
@@ -249,4 +257,3 @@ export function EvaluationList({
     </div>
   )
 }
-

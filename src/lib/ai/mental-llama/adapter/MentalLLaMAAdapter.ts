@@ -60,9 +60,8 @@ export class MentalLLaMAAdapter {
     // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
     try {
       // @ts-expect-error: Module may not exist in all environments
-      this.crisisSessionFlaggingServiceImport = import(
-        '../../crisis/CrisisSessionFlaggingService.ts'
-      )
+      this.crisisSessionFlaggingServiceImport =
+        import('../../crisis/CrisisSessionFlaggingService.ts')
     } catch {
       logger.warn(
         'CrisisSessionFlaggingService module not found, continuing without it.',

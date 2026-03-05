@@ -35,8 +35,7 @@ import type {
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 
 // Extended analysis result that might include additional fields
-interface ExtendedMentalHealthAnalysisResult
-  extends MentalHealthAnalysisResult {
+interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
   expertGuidance?: unknown
   categoryScores?: {
     depression?: number

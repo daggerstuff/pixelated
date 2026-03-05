@@ -12,4 +12,3 @@ export function IntegrationPage({ sessionId }: IntegrationPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

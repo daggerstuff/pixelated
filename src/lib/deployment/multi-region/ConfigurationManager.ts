@@ -751,7 +751,7 @@ export class ConfigurationManager extends EventEmitter {
   getEnvironmentConfig(environment: string): EnvironmentConfig {
     return {
       ...this.config.environments[
-      environment as keyof typeof this.config.environments
+        environment as keyof typeof this.config.environments
       ],
     }
   }

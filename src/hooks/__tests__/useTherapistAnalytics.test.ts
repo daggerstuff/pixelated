@@ -177,7 +177,9 @@ describe('useTherapistAnalytics', () => {
 
   it('handles empty sessions array', async () => {
     const emptySessions: TherapistSession[] = []
-    const { result } = renderHook(() => useTherapistAnalytics(mockFilters, emptySessions))
+    const { result } = renderHook(() =>
+      useTherapistAnalytics(mockFilters, emptySessions),
+    )
 
     // Wait for data to load
     await act(async () => {

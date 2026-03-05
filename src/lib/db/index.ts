@@ -85,7 +85,7 @@ export async function query<T = unknown>(
 ): Promise<QueryResult<T>> {
   const client = await getPool().connect()
   try {
-    return await client.query(text, params);
+    return await client.query(text, params)
   } finally {
     client.release()
   }
@@ -165,7 +165,15 @@ export async function closeDatabase(): Promise<void> {
 /**
  * Create content hash for caching bias analysis results
  */
-export function createContentHash(content: string, demographics: { age?: unknown; gender?: unknown; ethnicity?: unknown; primaryLanguage?: unknown }): string {
+export function createContentHash(
+  content: string,
+  demographics: {
+    age?: unknown
+    gender?: unknown
+    ethnicity?: unknown
+    primaryLanguage?: unknown
+  },
+): string {
   const hashInput = JSON.stringify({
     content: content.trim().toLowerCase(),
     demographics: {

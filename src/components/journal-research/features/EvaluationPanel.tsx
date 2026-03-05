@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { EvaluationList } from '../lists/EvaluationList'
 import { EvaluationForm } from '../forms/EvaluationForm'
 import {
@@ -15,7 +20,10 @@ export interface EvaluationPanelProps {
   className?: string
 }
 
-export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) {
+export function EvaluationPanel({
+  sessionId,
+  className,
+}: EvaluationPanelProps) {
   const [isInitiating, setIsInitiating] = useState(false)
   const [editingEvaluationId, setEditingEvaluationId] = useState<string | null>(
     null,
@@ -125,7 +133,15 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
             </div>
           ) : (
             <EvaluationList
-              evaluations={evaluations ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
+              evaluations={
+                evaluations ?? {
+                  items: [],
+                  total: 0,
+                  page: 1,
+                  pageSize: 25,
+                  totalPages: 0,
+                }
+              }
               isLoading={isLoading}
               onEvaluationClick={(evaluation) => {
                 setEditingEvaluationId(evaluation.evaluationId)
@@ -137,4 +153,3 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
     </div>
   )
 }
-

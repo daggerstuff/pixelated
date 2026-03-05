@@ -131,7 +131,7 @@ export class RegressionUtils {
 
     // Start performance monitoring
     await page.evaluate(() => {
-      ; (window as any).performanceMarks = []
+      ;(window as any).performanceMarks = []
       performance.mark('test-start')
     })
 
@@ -151,10 +151,10 @@ export class RegressionUtils {
             duration: measure ? measure.duration : 0,
             memory: memory
               ? {
-                used: memory.usedJSHeapSize,
-                total: memory.totalJSHeapSize,
-                limit: memory.jsHeapSizeLimit,
-              }
+                  used: memory.usedJSHeapSize,
+                  total: memory.totalJSHeapSize,
+                  limit: memory.jsHeapSizeLimit,
+                }
               : null,
           }
         })
@@ -262,8 +262,8 @@ Generated: ${new Date().toISOString()}
 
 ## Fixed Bugs Validated
 ${this.getFixedBugs()
-        .map((bug) => `- ✅ ${bug}`)
-        .join('\n')}
+  .map((bug) => `- ✅ ${bug}`)
+  .join('\n')}
 
 ## Failed Tests
 ${failedTests.map((test) => `- ❌ ${test.name}: ${test.error}`).join('\n')}

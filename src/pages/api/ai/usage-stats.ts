@@ -36,7 +36,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
     }
 
     if (!cookies) {
@@ -45,7 +45,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
     }
     // Verify session and permissions
     session = await getSession()

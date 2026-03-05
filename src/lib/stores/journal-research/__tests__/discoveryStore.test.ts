@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useDiscoveryStore, } from '../discoveryStore'
+import { useDiscoveryStore } from '../discoveryStore'
 
 describe('discoveryStore', () => {
   beforeEach(() => {
@@ -168,4 +168,3 @@ describe('discoveryStore', () => {
     })
   })
 })
-
