@@ -32,7 +32,7 @@
     "format": "oxfmt --write . && prettier --write \"**/*.{astro,mdx}\"",
     "format:check": "oxfmt --check . && prettier --check \"**/*.{astro,mdx}\"",
     "lint": "oxlint --type-aware --tsconfig config/tsconfig.json -c .oxlintrc.json .",
-    "lint:ci": "oxlint --type-aware --tsconfig config/tsconfig.json -c .oxlintrc.json . || exit 0",
+    "lint:ci": "oxlint --type-aware --tsconfig config/tsconfig.json -c .oxlintrc.json .",
     "lint:fix": "oxlint --type-aware --tsconfig config/tsconfig.json -c .oxlintrc.json --fix .",
     "typecheck": "astro check && tsc --noEmit",
     "typecheck:strict": "tsx scripts/validate-typescript.ts",
