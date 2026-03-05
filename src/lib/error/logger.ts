@@ -117,7 +117,8 @@ class ErrorLoggingService {
     if (!this.monitoringService) return
 
     try {
-      const errorObj = error.cause instanceof Error ? error.cause : new Error(error.message)
+      const errorObj =
+        error.cause instanceof Error ? error.cause : new Error(error.message)
 
       const context: Record<string, unknown> = {
         severity: error.severity,
@@ -270,4 +271,3 @@ export function normalizeErrorForLogging(
     recoverable: true,
   })
 }
-

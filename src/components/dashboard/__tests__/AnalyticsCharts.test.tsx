@@ -6,12 +6,12 @@ vi.mock('@/hooks/useAnalyticsDashboard', () => ({
     data: {
       summaryStats: [],
       sessionMetrics: [],
-      skillProgress: []
+      skillProgress: [],
     },
     isLoading: false,
     error: null,
-    refetch: vi.fn()
-  }))
+    refetch: vi.fn(),
+  })),
 }))
 
 describe('AnalyticsCharts', () => {
@@ -22,7 +22,7 @@ describe('AnalyticsCharts', () => {
       json: async () => ({
         sessionMetrics: {},
         skillProgress: {},
-        summaryStats: {}
+        summaryStats: {},
       }),
     })
   })

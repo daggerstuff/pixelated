@@ -284,7 +284,10 @@ class PrivacyEngine {
     const mu = 0.01 // Proximal term weight
     const globalWeights = this.globalModel?.weights || updates[0].weights
 
-    const proximalWeights = Array.from({ length: globalWeights.length }, () => 0)
+    const proximalWeights = Array.from(
+      { length: globalWeights.length },
+      () => 0,
+    )
 
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
@@ -332,7 +335,7 @@ class PrivacyEngine {
     const weightMagnitude = Math.sqrt(
       update.weights.reduce((sum, w) => sum + w * w, 0),
     )
-    return Math.min(weightMagnitude / 10, 1);
+    return Math.min(weightMagnitude / 10, 1)
   }
 
   /**

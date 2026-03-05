@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import {
-  componentIntegrationService,
-  } from '@/lib/services/ComponentIntegrationService'
+import { componentIntegrationService } from '@/lib/services/ComponentIntegrationService'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('component-integration-hooks')

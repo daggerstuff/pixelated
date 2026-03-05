@@ -35,7 +35,10 @@ async function testConnection() {
       WHERE table_schema = 'public'
       ORDER BY table_name
     `)
-    console.log('Existing tables:', tables.rows.map(row => row.table_name))
+    console.log(
+      'Existing tables:',
+      tables.rows.map((row) => row.table_name),
+    )
 
     // Count users
     const userCount = await client.query('SELECT COUNT(*) as count FROM users')

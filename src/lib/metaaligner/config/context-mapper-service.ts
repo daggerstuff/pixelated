@@ -54,9 +54,7 @@ export class ContextMapperService {
       const errorMessages = validation.errors
         .map((e) => `${e.type}: ${e.message}`)
         .join('\n')
-      throw new Error(
-        `Invalid mapping configuration:\n${errorMessages}`,
-      )
+      throw new Error(`Invalid mapping configuration:\n${errorMessages}`)
     }
 
     logger.info('Context mapper service initialized', {
@@ -88,7 +86,9 @@ export class ContextMapperService {
     const reasoning: string[] = []
     let safetyFloorApplied = false
 
-    reasoning.push(`Mapped to ${context} context (precedence: ${mapping.precedence})`)
+    reasoning.push(
+      `Mapped to ${context} context (precedence: ${mapping.precedence})`,
+    )
     reasoning.push(mapping.description)
 
     // Apply safety floor if required
@@ -235,18 +235,17 @@ export class ContextMapperService {
    * Get mapping with explainability for a context
    * Includes reasoning for the mapping decision
    */
-  getMappingWithExplainability(
-    context: ContextType,
-  ): MappingResolutionResult {
+  getMappingWithExplainability(context: ContextType): MappingResolutionResult {
     return this.getWeightsForContext(context)
   }
 
   /**
    * Validate a custom configuration without applying it
    */
-  static validateConfiguration(
-    config: MappingConfiguration,
-  ): { valid: boolean; errors: ValidationError[] } {
+  static validateConfiguration(config: MappingConfiguration): {
+    valid: boolean
+    errors: ValidationError[]
+  } {
     return validateMappingConfiguration(config)
   }
 

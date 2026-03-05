@@ -220,4 +220,3 @@ describe('EmbeddingModelSchema', () => {
     expect(result.success).toBe(false)
   })
 })
-

@@ -7,16 +7,26 @@ import {
   type Session,
 } from '@/lib/api/journal-research/types'
 import { z } from 'zod'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button/button'
 import { cn } from '@/lib/utils'
 import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import {
+  ErrorMessage,
+  FieldError,
+} from '@/components/journal-research/shared/ErrorMessage'
 
 export interface SessionFormProps {
   session?: Session
-  onSubmit: (data: CreateSessionPayload | UpdateSessionPayload) => void | Promise<void>
+  onSubmit: (
+    data: CreateSessionPayload | UpdateSessionPayload,
+  ) => void | Promise<void>
   onCancel?: () => void
   isLoading?: boolean
   className?: string
@@ -32,9 +42,13 @@ export function SessionForm({
   className,
 }: SessionFormProps) {
   const isEdit = !!session
-  const schema = isEdit ? UpdateSessionPayloadSchema : CreateSessionPayloadSchema
+  const schema = isEdit
+    ? UpdateSessionPayloadSchema
+    : CreateSessionPayloadSchema
 
-  const [formData, setFormData] = useState<CreateSessionPayload | UpdateSessionPayload>({
+  const [formData, setFormData] = useState<
+    CreateSessionPayload | UpdateSessionPayload
+  >({
     sessionId: session?.sessionId,
     targetSources: session?.targetSources ?? ['pubmed', 'doaj'],
     searchKeywords: session?.searchKeywords ?? {},
@@ -88,9 +102,8 @@ export function SessionForm({
       const validated = schema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -113,7 +126,7 @@ export function SessionForm({
     const keywords = formData.searchKeywords ?? {}
     const category = keywordCategory || 'default'
     const categoryKeywords = keywords[category] ?? []
-    
+
     if (!categoryKeywords.includes(keywordInput.trim())) {
       setFormData({
         ...formData,
@@ -173,7 +186,10 @@ export function SessionForm({
                 }}
                 onBlur={() => {
                   setTouched((prev) => ({ ...prev, sessionId: true }))
-                  validateField('sessionId', (formData as CreateSessionPayload).sessionId)
+                  validateField(
+                    'sessionId',
+                    (formData as CreateSessionPayload).sessionId,
+                  )
                 }}
                 className={cn(
                   'w-full rounded-md border bg-background px-3 py-2 text-sm',
@@ -183,9 +199,19 @@ export function SessionForm({
                 )}
                 placeholder="Leave empty for auto-generated ID"
                 aria-invalid={!!errors.sessionId && touched.sessionId}
-                aria-describedby={errors.sessionId && touched.sessionId ? 'sessionId-error' : undefined}
+                aria-describedby={
+                  errors.sessionId && touched.sessionId
+                    ? 'sessionId-error'
+                    : undefined
+                }
               />
-              <FieldError error={errors.sessionId && touched.sessionId ? errors.sessionId : undefined} />
+              <FieldError
+                error={
+                  errors.sessionId && touched.sessionId
+                    ? errors.sessionId
+                    : undefined
+                }
+              />
             </div>
           )}
 
@@ -259,7 +285,9 @@ export function SessionForm({
                             {keyword}
                             <button
                               type="button"
-                              onClick={() => handleRemoveKeyword(category, keyword)}
+                              onClick={() =>
+                                handleRemoveKeyword(category, keyword)
+                              }
                               className="text-muted-foreground hover:text-foreground"
                               aria-label={`Remove ${keyword}`}
                             >
@@ -328,7 +356,11 @@ export function SessionForm({
               </Button>
             )}
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : isEdit ? 'Update Session' : 'Create Session'}
+              {isLoading
+                ? 'Saving...'
+                : isEdit
+                  ? 'Update Session'
+                  : 'Create Session'}
             </Button>
           </div>
         </form>
@@ -336,4 +368,3 @@ export function SessionForm({
     </Card>
   )
 }
-

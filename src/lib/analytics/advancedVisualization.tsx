@@ -14,13 +14,13 @@ export interface DataDimension {
 
 export interface VisualizationConfig {
   type:
-  | 'scatter'
-  | 'line'
-  | 'bar'
-  | 'heatmap'
-  | 'network'
-  | 'parallel'
-  | 'treemap'
+    | 'scatter'
+    | 'line'
+    | 'bar'
+    | 'heatmap'
+    | 'network'
+    | 'parallel'
+    | 'treemap'
   dimensions: {
     x: DataDimension
     y: DataDimension
@@ -101,14 +101,16 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Interactive:</span>
             <button
-              className={`w-10 h-5 rounded-full transition-colors ${config.interactive
+              className={`w-10 h-5 rounded-full transition-colors ${
+                config.interactive
                   ? 'bg-blue-500'
                   : 'bg-gray-300 dark:bg-gray-600'
-                }`}
+              }`}
             >
               <div
-                className={`w-4 h-4 bg-white rounded-full transition-transform ${config.interactive ? 'translate-x-5' : 'translate-x-1'
-                  }`}
+                className={`w-4 h-4 bg-white rounded-full transition-transform ${
+                  config.interactive ? 'translate-x-5' : 'translate-x-1'
+                }`}
               />
             </button>
           </div>
@@ -194,18 +196,20 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
                 Trend
               </div>
               <div
-                className={`text-lg font-bold ${calculateTrend(
-                  selectedDataPoints,
-                  config.dimensions.x.field,
-                ) > 0
+                className={`text-lg font-bold ${
+                  calculateTrend(
+                    selectedDataPoints,
+                    config.dimensions.x.field,
+                  ) > 0
                     ? 'text-green-600'
                     : 'text-red-600'
-                  }`}
+                }`}
               >
                 {calculateTrend(selectedDataPoints, config.dimensions.x.field) >
-                  0
+                0
                   ? '\u2197' // ↗
-                  : '\u2198'} {/* ↘ */}
+                  : '\u2198'}{' '}
+                {/* ↘ */}
               </div>
             </div>
           </div>
@@ -253,13 +257,13 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
   const getPointPosition = (point: any) => {
     const x =
       (((point[config.dimensions.x.field] || 0) - xMin) / xRange) *
-      (chartWidth - 40) +
+        (chartWidth - 40) +
       20
     const y =
       chartHeight -
       20 -
       (((point[config.dimensions.y.field] || 0) - yMin) / yRange) *
-      (chartHeight - 40)
+        (chartHeight - 40)
     return { x, y }
   }
 
@@ -347,10 +351,8 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
 
   const impactColors = {
     low: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    medium:
-      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-    high:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
+    medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
+    high: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
   }
 
   const typeIcons: Record<string, string> = {
@@ -370,8 +372,9 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
             <h4 className="font-medium text-sm">{insight.title}</h4>
           </div>
           <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${impactColors[insight.impact]
-              }`}
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              impactColors[insight.impact]
+            }`}
           >
             {insight.impact}
           </span>
@@ -432,9 +435,11 @@ function generateInsights(
       id: `trend_${Date.now()}`,
       type: 'trend',
       title: `${trend > 0 ? 'Increasing' : 'Decreasing'} Trend Detected`,
-      description: `The data shows a ${trend > 0 ? 'positive' : 'negative'
-        } trend in ${config.dimensions.y.label} over ${config.dimensions.x.label
-        }`,
+      description: `The data shows a ${
+        trend > 0 ? 'positive' : 'negative'
+      } trend in ${config.dimensions.y.label} over ${
+        config.dimensions.x.label
+      }`,
       confidence: Math.min(Math.abs(trend) * 2, 0.95),
       data: { trend, field: config.dimensions.y.field },
       recommendations: [
@@ -451,7 +456,7 @@ function generateInsights(
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
   const stdDev = Math.sqrt(
     yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    yValues.length,
+      yValues.length,
   )
 
   const anomalies = data.filter((d) => {
@@ -467,8 +472,9 @@ function generateInsights(
       id: `anomaly_${Date.now()}`,
       type: 'anomaly',
       title: 'Data Anomalies Detected',
-      description: `${anomalies.length} unusual data point${anomalies.length > 1 ? 's' : ''
-        } found that deviate significantly from the norm`,
+      description: `${anomalies.length} unusual data point${
+        anomalies.length > 1 ? 's' : ''
+      } found that deviate significantly from the norm`,
       confidence: 0.85,
       data: { anomalies: anomalies.length, threshold: 2 * stdDev },
       recommendations: [
@@ -492,9 +498,11 @@ function generateInsights(
         id: `correlation_${Date.now()}`,
         type: 'correlation',
         title: 'Strong Correlation Found',
-        description: `Significant ${correlation > 0 ? 'positive' : 'negative'
-          } correlation detected between ${config.dimensions.x.label} and ${config.dimensions.color.label
-          }`,
+        description: `Significant ${
+          correlation > 0 ? 'positive' : 'negative'
+        } correlation detected between ${config.dimensions.x.label} and ${
+          config.dimensions.color.label
+        }`,
         confidence: Math.abs(correlation),
         data: {
           correlation,

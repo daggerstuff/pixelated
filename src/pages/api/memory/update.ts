@@ -45,27 +45,24 @@ export const PUT = async ({ request, cookies }) => {
     }
 
     // Update memory
-    const result = await memoryService.updateMemory(
-      memoryId,
-      user.id,
-      {
-        content,
-        ...metadata,
-      }
-    )
+    const result = await memoryService.updateMemory(memoryId, user.id, {
+      content,
+      ...metadata,
+    })
 
     if (result === null) {
       return new Response(
         JSON.stringify({
           error: 'Not Found',
-          message: 'Memory not found or you do not have permission to update it',
+          message:
+            'Memory not found or you do not have permission to update it',
         }),
         {
           status: 404,
           headers: {
             'Content-Type': 'application/json',
           },
-        }
+        },
       )
     }
 

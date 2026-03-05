@@ -1,1 +1,1 @@
-export { AIEnhancedMonitoringService as EnhancedMonitoringService } from './ai-enhanced-monitoring';
+export { AIEnhancedMonitoringService as EnhancedMonitoringService } from './ai-enhanced-monitoring'

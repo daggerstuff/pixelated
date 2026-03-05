@@ -12,4 +12,3 @@ export function AcquisitionPage({ sessionId }: AcquisitionPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

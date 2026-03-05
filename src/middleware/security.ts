@@ -118,9 +118,12 @@ export const RATE_LIMITS = {
   maxRequests: 100, // limit each IP to 100 requests per windowMs
   keyGenerator: (request: Request): string => {
     // Use x-forwarded-for header, or fallback to a default for local dev
-    return request.headers.get('x-forwarded-for')?.split(',')[0].trim() || '127.0.0.1'
+    return (
+      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+      '127.0.0.1'
+    )
   },
-};
+}
 
 class RateLimiter {
   private requests = new Map<string, { count: number; resetTime: number }>()

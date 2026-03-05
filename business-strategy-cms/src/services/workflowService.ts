@@ -440,12 +440,12 @@ export class WorkflowService {
     const averageReviewTime =
       completedInstances.length > 0
         ? completedInstances.reduce(
-          (sum, i) =>
-            sum + (i.completedAt!.getTime() - i.createdAt.getTime()),
-          0,
-        ) /
-        completedInstances.length /
-        (1000 * 60 * 60) // Convert to hours
+            (sum, i) =>
+              sum + (i.completedAt!.getTime() - i.createdAt.getTime()),
+            0,
+          ) /
+          completedInstances.length /
+          (1000 * 60 * 60) // Convert to hours
         : 0
 
     // Calculate approval/rejection rates

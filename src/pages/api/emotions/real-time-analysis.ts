@@ -114,7 +114,10 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       sessionType: sessionId ? 'session' : 'standalone',
       success: true,
     })
-    emotionMetrics.analysisLatency(analysisDurationMs, 'multidimensional-emotion-mapper')
+    emotionMetrics.analysisLatency(
+      analysisDurationMs,
+      'multidimensional-emotion-mapper',
+    )
 
     logger.info('Emotion analysis completed successfully', {
       sessionId,
@@ -133,7 +136,8 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
     })
   } catch (error: unknown) {
     const durationMs = Date.now() - startTime
-    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+    const errorType =
+      error instanceof Error ? error.constructor.name : 'UnknownError'
 
     // Track error metrics
     trackApiError(endpoint, errorType, 'POST')

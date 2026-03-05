@@ -2,8 +2,7 @@ import React, { useState, forwardRef } from 'react'
 import { usePasswordStrength } from '../../hooks/usePasswordStrength'
 import { Eye, EyeOff } from 'lucide-react'
 
-interface PasswordInputWithStrengthProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+interface PasswordInputWithStrengthProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string
   name: string
   error?: string

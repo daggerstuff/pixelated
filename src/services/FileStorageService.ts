@@ -123,7 +123,10 @@ export class FileStorageService {
     return metadata
   }
 
-  async getFile(_fileId: string, _userId: string): Promise<FileMetadata | null> {
+  async getFile(
+    _fileId: string,
+    _userId: string,
+  ): Promise<FileMetadata | null> {
     // This would typically query your database
     // For now, return a mock structure
     return null

@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -82,7 +82,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -122,7 +122,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 404,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
 
@@ -172,7 +172,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.emotions.map.access',
         user.id,
         'auth-emotions',
-        { action: 'get_emotion_map', count: dimensionalMaps.length }
+        { action: 'get_emotion_map', count: dimensionalMaps.length },
       )
 
       logger.info('Returning dimensional maps', {
@@ -201,7 +201,7 @@ export const GET: APIRoute = async ({ request }) => {
         'auth.emotions.patterns.access',
         user.id,
         'auth-emotions',
-        { action: 'get_emotion_patterns', count: patterns.length }
+        { action: 'get_emotion_patterns', count: patterns.length },
       )
 
       logger.info('Returning multidimensional patterns', {
@@ -219,7 +219,7 @@ export const GET: APIRoute = async ({ request }) => {
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
-        }
+        },
       )
     }
   } catch (error: unknown) {
@@ -234,7 +234,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
+      },
     )
 
     return new Response(
@@ -245,7 +245,7 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      }
+      },
     )
   }
 }

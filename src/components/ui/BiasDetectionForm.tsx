@@ -203,7 +203,8 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
       } catch (error) {
         console.error('Form submission error:', error)
         const { countMetric } = await import('@/lib/sentry/utils')
-        const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+        const errorType =
+          error instanceof Error ? error.constructor.name : 'UnknownError'
         countMetric('form.submission_error', 1, {
           form: 'BiasDetectionForm',
           error_type: errorType,

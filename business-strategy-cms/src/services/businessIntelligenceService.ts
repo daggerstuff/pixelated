@@ -73,10 +73,10 @@ export class BusinessIntelligenceService {
     return Math.min(
       100,
       marketScore +
-      growthScore +
-      competitionScore +
-      barrierScore +
-      economicScore,
+        growthScore +
+        competitionScore +
+        barrierScore +
+        economicScore,
     )
   }
 

@@ -38,7 +38,8 @@ export function ErrorMessage({
   }
 
   const normalizedError = error ? normalizeError(error) : null
-  const displayMessage = message || (normalizedError ? formatErrorForUser(normalizedError) : null)
+  const displayMessage =
+    message || (normalizedError ? formatErrorForUser(normalizedError) : null)
   const fieldErrs = fieldErrors || (error ? getFieldErrors(error) : undefined)
 
   if (fallback && !displayMessage && !fieldErrs) {
@@ -50,7 +51,8 @@ export function ErrorMessage({
       <div className={cn('space-y-2', className)}>
         {Object.entries(fieldErrs).map(([field, errorMessage]) => (
           <Alert key={field} variant="error" className="text-sm">
-            <strong className="font-medium capitalize">{field}:</strong> {errorMessage}
+            <strong className="font-medium capitalize">{field}:</strong>{' '}
+            {errorMessage}
           </Alert>
         ))}
       </div>
@@ -93,4 +95,3 @@ export function FieldError({ error, className }: FieldErrorProps) {
     </p>
   )
 }
-

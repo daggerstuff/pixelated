@@ -7,7 +7,7 @@ export function createServer() {
     listen: () => {},
     on: () => {},
     close: () => {},
-  };
+  }
 }
 
 export function connect() {
@@ -15,15 +15,15 @@ export function connect() {
     on: () => {},
     write: () => {},
     end: () => {},
-  };
+  }
 }
 
 export function createConnection() {
-  return connect();
+  return connect()
 }
 
 export default {
   createServer,
   connect,
   createConnection,
-};
+}

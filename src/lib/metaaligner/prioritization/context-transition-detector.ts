@@ -1,9 +1,9 @@
 /**
  * Context Transition Detection & Handling System for MetaAligner
- * 
+ *
  * Tracks context changes across conversation turns and manages smooth transitions
  * between different context types (crisis, educational, support, clinical, informational).
- * 
+ *
  * Features:
  * - History-based transition detection
  * - Crisis elevation with immediate switching
@@ -64,7 +64,7 @@ export interface TransitionDetectorConfig {
 
 /**
  * Context Transition Detector
- * 
+ *
  * Manages detection and handling of context transitions across conversation turns.
  * Implements smoothing to prevent oscillation and immediate crisis elevation.
  */
@@ -121,12 +121,12 @@ export class ContextTransitionDetector {
     curr: ContextEvent,
   ): ContextTransition {
     // Use lastConfirmedEvent for stable comparison, falling back to prev if not set
-    const stableContext = this.lastConfirmedEvent?.contextType ?? prev.contextType
+    const stableContext =
+      this.lastConfirmedEvent?.contextType ?? prev.contextType
     const contextChanged = stableContext !== curr.contextType
 
     // Capture the 'from' event before any state updates
     const fromEvent = this.lastConfirmedEvent ?? prev
-
 
     // Determine transition type
     let transitionType: ContextTransition['transitionType'] = 'none'
@@ -194,7 +194,9 @@ export class ContextTransitionDetector {
    * Get the current context (most recent event)
    */
   getCurrentContext(): ContextEvent | null {
-    return this.history.length > 0 ? this.history[this.history.length - 1]! : null
+    return this.history.length > 0
+      ? this.history[this.history.length - 1]!
+      : null
   }
 
   /**
@@ -224,7 +226,8 @@ export class ContextTransitionDetector {
   } {
     let transitions = 0
     let crisisElevations = 0
-    let totalConfidence = this.history.length > 0 ? this.history[0]!.confidence : 0
+    let totalConfidence =
+      this.history.length > 0 ? this.history[0]!.confidence : 0
 
     for (let i = 1; i < this.history.length; i++) {
       const prev = this.history[i - 1]!
@@ -279,7 +282,11 @@ export function detectContextTransition(
     from: prev,
     to: curr,
     detected,
-    transitionType: isCrisis ? 'crisis_elevation' : detected ? 'standard' : 'none',
+    transitionType: isCrisis
+      ? 'crisis_elevation'
+      : detected
+        ? 'standard'
+        : 'none',
     shouldSmooth: !isCrisis && detected,
     confidence: curr.confidence,
   }

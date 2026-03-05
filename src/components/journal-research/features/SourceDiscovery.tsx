@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/card'
 import { SourceList } from '../lists/SourceList'
 import { DiscoveryForm } from '../forms/DiscoveryForm'
 import {
@@ -14,7 +19,10 @@ export interface SourceDiscoveryProps {
   className?: string
 }
 
-export function SourceDiscovery({ sessionId, className }: SourceDiscoveryProps) {
+export function SourceDiscovery({
+  sessionId,
+  className,
+}: SourceDiscoveryProps) {
   const [isInitiating, setIsInitiating] = useState(false)
   const { data: sources, isLoading } = useDiscoveryListQuery(sessionId, {
     page: 1,
@@ -84,7 +92,15 @@ export function SourceDiscovery({ sessionId, className }: SourceDiscoveryProps) 
             </div>
           ) : (
             <SourceList
-              sources={sources ?? { items: [], total: 0, page: 1, pageSize: 25, totalPages: 0 }}
+              sources={
+                sources ?? {
+                  items: [],
+                  total: 0,
+                  page: 1,
+                  pageSize: 25,
+                  totalPages: 0,
+                }
+              }
               isLoading={isLoading}
               onSourceClick={(_source) => {
                 // Navigate to source detail
@@ -96,4 +112,3 @@ export function SourceDiscovery({ sessionId, className }: SourceDiscoveryProps) 
     </div>
   )
 }
-

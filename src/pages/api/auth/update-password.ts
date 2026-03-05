@@ -51,7 +51,8 @@ export const POST = async ({ request, cookies }: APIContext) => {
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Password updates should be performed via Auth0 Universal Login or Management Dashboard.',
+        message:
+          'Password updates should be performed via Auth0 Universal Login or Management Dashboard.',
       }),
       {
         status: 501,

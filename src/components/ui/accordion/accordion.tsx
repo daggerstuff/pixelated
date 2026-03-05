@@ -29,7 +29,7 @@ const AccordionContext = React.createContext<{
   openItems: string[]
   toggleItem: (value: string) => void
   type: 'single' | 'multiple'
-}>({ openItems: [], toggleItem: () => { }, type: 'single' })
+}>({ openItems: [], toggleItem: () => {}, type: 'single' })
 
 const AccordionItemContext = React.createContext<{
   value: string
@@ -103,7 +103,9 @@ const AccordionTrigger = React.forwardRef<
   // Simplifying for this specific refactor to keep it contained.
 
   return (
-    <AccordionItemContext.Provider value={{ value, isOpen, contentId, triggerId } as any}>
+    <AccordionItemContext.Provider
+      value={{ value, isOpen, contentId, triggerId } as any}
+    >
       <button
         ref={ref}
         id={triggerId}
@@ -133,7 +135,9 @@ const AccordionContent = React.forwardRef<
   HTMLDivElement,
   AccordionContentProps
 >(({ className, children, ...props }, ref) => {
-  const { isOpen, contentId, triggerId } = React.useContext(AccordionItemContext) as any
+  const { isOpen, contentId, triggerId } = React.useContext(
+    AccordionItemContext,
+  ) as any
 
   return (
     <div

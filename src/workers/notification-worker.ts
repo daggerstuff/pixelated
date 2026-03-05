@@ -20,7 +20,6 @@ async function startWorker() {
   // Create WebSocket server
   wsServer = new WebSocketServer()
 
-
   // Handle WebSocket errors
   wsServer.on('error', (error: Error) => {
     logger.error('WebSocket server error', {

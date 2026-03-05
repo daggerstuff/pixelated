@@ -151,8 +151,5 @@ export const FEATURES: Features = {
       maxItemsPerPage: [true, [3]],
     },
   ],
-  giscus: [
-    true,
-    [] as const,
-  ],
+  giscus: [true, [] as const],
 }

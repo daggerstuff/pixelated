@@ -62,7 +62,7 @@ export interface EmotionCorrelation {
 }
 
 export class EmotionTemporalAnalyzer {
-  constructor(private repository: AIRepository) { }
+  constructor(private repository: AIRepository) {}
 
   async analyzeSessionEmotions(
     sessionIds: string[],

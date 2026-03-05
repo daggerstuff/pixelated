@@ -270,7 +270,9 @@ export class EnhancedTechniqueClassificationService {
       return tracking
     } catch (error: unknown) {
       logger.error('Error tracking session progress', { error })
-      throw new Error(`Failed to track session progress: ${error}`, { cause: error })
+      throw new Error(`Failed to track session progress: ${error}`, {
+        cause: error,
+      })
     }
   }
 

@@ -47,7 +47,9 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
   toggleSourceType: (sourceType) =>
     set((state) => {
       const sourceTypes = state.filters.sourceTypes.includes(sourceType)
-        ? state.filters.sourceTypes.filter((existing) => existing !== sourceType)
+        ? state.filters.sourceTypes.filter(
+            (existing) => existing !== sourceType,
+          )
         : [...state.filters.sourceTypes, sourceType]
 
       return {
@@ -91,5 +93,3 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
 
   resetFilters: () => set({ filters: defaultFilters }),
 }))
-
-

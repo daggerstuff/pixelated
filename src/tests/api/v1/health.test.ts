@@ -14,9 +14,8 @@ describe('GET /api/v1/health', () => {
   })
 
   it('should return healthy status when all systems are operational', async () => {
-    const { healthMonitor } = await import(
-      '../../../lib/services/health-monitor'
-    )
+    const { healthMonitor } =
+      await import('../../../lib/services/health-monitor')
 
     vi.mocked(healthMonitor.getHealth).mockResolvedValue({
       status: 'healthy',
@@ -66,9 +65,8 @@ describe('GET /api/v1/health', () => {
   })
 
   it('should return degraded status when some systems have issues', async () => {
-    const { healthMonitor } = await import(
-      '../../../lib/services/health-monitor'
-    )
+    const { healthMonitor } =
+      await import('../../../lib/services/health-monitor')
 
     vi.mocked(healthMonitor.getHealth).mockResolvedValue({
       status: 'degraded',
@@ -117,9 +115,8 @@ describe('GET /api/v1/health', () => {
   })
 
   it('should return unhealthy status when critical systems fail', async () => {
-    const { healthMonitor } = await import(
-      '../../../lib/services/health-monitor'
-    )
+    const { healthMonitor } =
+      await import('../../../lib/services/health-monitor')
 
     vi.mocked(healthMonitor.getHealth).mockResolvedValue({
       status: 'unhealthy',
@@ -168,9 +165,8 @@ describe('GET /api/v1/health', () => {
   })
 
   it('should handle health monitor errors gracefully', async () => {
-    const { healthMonitor } = await import(
-      '../../../lib/services/health-monitor'
-    )
+    const { healthMonitor } =
+      await import('../../../lib/services/health-monitor')
 
     vi.mocked(healthMonitor.getHealth).mockRejectedValue(
       new Error('Health monitor failed'),

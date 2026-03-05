@@ -14,7 +14,11 @@ export const prerender = false
 export const GET = async ({ request, cookies }) => {
   try {
     // Enforce authentication (throws if not authenticated)
-    await requirePageAuth({ request, cookies, requestIp: request.headers.get('x-forwarded-for') })
+    await requirePageAuth({
+      request,
+      cookies,
+      requestIp: request.headers.get('x-forwarded-for'),
+    })
 
     // TODO: Replace with real data fetching logic
     // For now, return static/mock data

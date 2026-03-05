@@ -1,7 +1,7 @@
 /**
  * Dynamic Weighting System with Smoothing and Hysteresis
  * Implements weighted blending, crisis overrides, and stability guards
- * 
+ *
  * PIX-22: Dynamic weighting based on context
  */
 
@@ -114,10 +114,10 @@ export class DynamicWeightingEngine {
     context: ContextType | null
     timestamp: number
   } = {
-      weights: null,
-      context: null,
-      timestamp: 0,
-    }
+    weights: null,
+    context: null,
+    timestamp: 0,
+  }
 
   constructor(config?: Partial<DynamicWeightingConfig>) {
     this.config = { ...DEFAULT_DYNAMIC_WEIGHTING_CONFIG, ...config }
@@ -126,9 +126,7 @@ export class DynamicWeightingEngine {
   /**
    * Calculate dynamic weights for a given context with smoothing and stability
    */
-  calculateDynamicWeights(
-    context: AlignmentContext,
-  ): WeightUpdateResult {
+  calculateDynamicWeights(context: AlignmentContext): WeightUpdateResult {
     const startTime = performance.now()
     const reasoning: string[] = []
 
@@ -210,9 +208,7 @@ export class DynamicWeightingEngine {
     if (this.config.blendingEnabled && previousWeights) {
       newWeights = this.applyBlending(newWeights, previousWeights)
       blendingApplied = true
-      reasoning.push(
-        `Blending applied (alpha: ${this.config.blendingAlpha})`,
-      )
+      reasoning.push(`Blending applied (alpha: ${this.config.blendingAlpha})`)
     }
 
     // Detect oscillation
@@ -474,10 +470,11 @@ export class DynamicWeightingEngine {
     })
 
     // Keep only recent history
-    const maxHistory = Math.max(
-      this.config.hysteresisWindow,
-      this.config.oscillationDetectionWindow,
-    ) * 2
+    const maxHistory =
+      Math.max(
+        this.config.hysteresisWindow,
+        this.config.oscillationDetectionWindow,
+      ) * 2
 
     if (this.weightHistory.length > maxHistory) {
       this.weightHistory = this.weightHistory.slice(-maxHistory)

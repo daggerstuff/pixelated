@@ -186,7 +186,8 @@ describe('BiasMetricsCollector', () => {
 
     it('should handle metrics storage failures gracefully', async () => {
       // Mock a storage failure
-      const storeSpy = vi.spyOn(metricsCollector, 'storeAnalysisResult')
+      const storeSpy = vi
+        .spyOn(metricsCollector, 'storeAnalysisResult')
         .mockRejectedValue(new Error('Storage failed'))
 
       await expect(
@@ -206,7 +207,8 @@ describe('BiasMetricsCollector', () => {
     })
 
     it('should handle performance metrics retrieval failures', async () => {
-      const perfSpy = vi.spyOn(metricsCollector, 'getCurrentPerformanceMetrics')
+      const perfSpy = vi
+        .spyOn(metricsCollector, 'getCurrentPerformanceMetrics')
         .mockRejectedValue(new Error('Performance metrics failed'))
 
       await expect(
@@ -276,7 +278,8 @@ describe('BiasMetricsCollector', () => {
     })
 
     it('should handle network failures during metrics storage', async () => {
-      const storeSpy = vi.spyOn(metricsCollector, 'storeAnalysisResult')
+      const storeSpy = vi
+        .spyOn(metricsCollector, 'storeAnalysisResult')
         .mockRejectedValue(new Error('Network error'))
 
       await expect(

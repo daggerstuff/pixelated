@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
   const messages = [
     {
       role: 'system',
-      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context.join('\n')}`
+      content: `User context:\nStatic facts: ${profile.static.join('\n')}\nRecent context: ${profile.dynamic.join('\n')}\nSearch context: ${context.join('\n')}`,
     },
-    { role: 'user', content: message }
+    { role: 'user', content: message },
   ]
 
   // Stream response with Supermemory tools
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
     model: anthropic('claude-3-5-sonnet-20241022'),
     messages,
     tools: supermemoryTools(process.env.SUPERMEMORY_API_KEY ?? '', {
-      containerTags: [userId]
-    })
+      containerTags: [userId],
+    }),
   })
 
   // Store conversation
