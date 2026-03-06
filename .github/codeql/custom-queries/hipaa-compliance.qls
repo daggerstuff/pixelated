@@ -1,0 +1,11 @@
+name: hipaa-compliance
+description: HIPAA compliance security checks
+queries:
+  - fhir/unvalidated-fhir-access.ql
+  - fhir/insecure-fhir-ops.ql
+  - fhir/missing-fhir-version.ql
+  - fhir/insecure-fhir-search.ql
+  - ehr/unencrypted-ehr-data.ql
+  - ehr/insecure-ehr-auth.ql
+  - ehr/missing-audit-log.ql
+  - ehr/ehr-security-patterns.ql
