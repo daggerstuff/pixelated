@@ -271,3 +271,8 @@ node_modules
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# Beads issue tracker runtime files
+.beads/dolt-*.pid
+.beads/dolt-*.activity
+.beads/dolt-*.port
