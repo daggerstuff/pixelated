@@ -19,7 +19,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-        with:
           fetch-depth: 0
 
       - name: Install UV and pip (secure versions)
@@ -31,7 +30,6 @@ jobs:
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.33.1
         continue-on-error: true
-        with:
           scan-type: "fs"
           scanners: "vuln,secret,misconfig"
           format: "sarif"
@@ -39,7 +37,6 @@ jobs:
       - name: Run Checkov scan
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
-        with:
           directory: .
           framework: all
           output_format: sarif
@@ -77,7 +74,6 @@ jobs:
         if: ${{ steps.trivy_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@v5
         continue-on-error: true
-        with:
           name: trivy-diagnostic
           path: trivy-missing.txt
 
@@ -85,14 +81,12 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         continue-on-error: true
-        with:
           sarif_file: "trivy-results.sarif"
 
       - name: Upload Trivy SARIF as artifact
         uses: actions/upload-artifact@v5
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         continue-on-error: true
-        with:
           name: trivy-sarif
           path: trivy-results.sarif
 
@@ -100,7 +94,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
         continue-on-error: true
-        with:
           sarif_file: "checkov-results.sarif"
 
       - name: Create diagnostic artifact when Checkov SARIF missing
@@ -113,7 +106,6 @@ jobs:
         if: ${{ steps.checkov_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@v5
         continue-on-error: true
-        with:
           name: checkov-diagnostic
           path: checkov-missing.txt
 
@@ -121,7 +113,6 @@ jobs:
         uses: actions/upload-artifact@v5
         if: ${{ always() && steps.checkov_sarif.outputs.found == 'true' }}
         continue-on-error: true
-        with:
           name: checkov-sarif
           path: checkov-results.sarif
 
@@ -134,7 +125,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: "24"
 
       - name: Install pnpm
@@ -156,6 +146,5 @@ jobs:
 
       - name: Upload audit results
         uses: actions/upload-artifact@v5
-        with:
           name: security-audit-results
           path: audit-results.json

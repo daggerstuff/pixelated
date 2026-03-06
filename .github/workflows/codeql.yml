@@ -17,7 +17,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+  PNPM_VERSION: 10.30.1
 
 jobs:
   analyze:
@@ -32,12 +32,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        with:
           fetch-depth: 0
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
-        with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
           queries: security-and-quality,security-extended${{ matrix.language == 'javascript' && ',./.github/codeql/custom-queries/fhir-security.ql,./.github/codeql/custom-queries/ehr-security.ql' || '' }}
@@ -47,7 +45,6 @@ jobs:
       - name: Setup Node.js
         if: matrix.language == 'javascript'
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -57,8 +54,6 @@ jobs:
       - name: Setup pnpm
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -71,7 +66,6 @@ jobs:
       - name: Setup pnpm cache
         if: matrix.language == 'javascript'
         uses: actions/cache@v4
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -88,7 +82,6 @@ jobs:
       - name: Setup Python
         if: matrix.language == 'python'
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Ensure `uv` shim is available
@@ -107,7 +100,6 @@ jobs:
         if: matrix.language == 'python'
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-        with:
           service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Install Python dependencies
@@ -139,7 +131,6 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
-        with:
           category: "/language:${{ matrix.language }}"
           # Upload SARIF file to GitHub Security tab
           upload: true
@@ -149,7 +140,6 @@ jobs:
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v4
         if: always()
-        with:
           name: codeql-sarif-${{ matrix.language }}
           path: /home/runner/work/_temp/codeql_databases/*/results/*.sarif
           retention-days: 30
@@ -157,7 +147,6 @@ jobs:
       - name: Upload CodeQL database (for advanced analysis)
         uses: actions/upload-artifact@v4
         if: failure()
-        with:
           name: codeql-database-${{ matrix.language }}
           path: /home/runner/work/_temp/codeql_databases
           retention-days: 7

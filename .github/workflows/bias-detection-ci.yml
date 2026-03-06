@@ -32,7 +32,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+  PNPM_VERSION: 10.30.1
 
 jobs:
   security-scan:
@@ -44,7 +44,6 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.33.1
-        with:
           scan-type: fs
           scan-ref: .
           format: sarif
@@ -65,7 +64,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         continue-on-error: true
-        with:
           sarif_file: trivy-results.sarif
 
   # Code quality and linting
@@ -78,7 +76,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -86,8 +83,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -98,7 +93,6 @@ jobs:
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -170,7 +164,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -178,8 +171,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -190,7 +181,6 @@ jobs:
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -223,7 +213,6 @@ jobs:
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v5
-        with:
           files: ./coverage/lcov.info
           flags: typescript
           name: typescript-coverage
@@ -239,7 +228,6 @@ jobs:
 
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Ensure `uv` shim is available
@@ -255,7 +243,6 @@ jobs:
 
       - name: Cache pip dependencies
         uses: actions/cache@v4.2.3
-        with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
@@ -264,7 +251,6 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-        with:
           service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Install Python dependencies
@@ -310,7 +296,6 @@ jobs:
 
       - name: Upload Python coverage
         uses: codecov/codecov-action@v5
-        with:
           files: ./src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python
           name: python-coverage
@@ -337,7 +322,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -345,8 +329,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -357,7 +339,6 @@ jobs:
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -373,7 +354,6 @@ jobs:
 
       - name: Setup Python for ML service
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Ensure `uv` shim is available
@@ -390,7 +370,6 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-        with:
           service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Install Python ML dependencies
@@ -459,7 +438,6 @@ jobs:
       - name: Upload E2E test results
         uses: actions/upload-artifact@v5
         if: failure()
-        with:
           name: e2e-test-results
           path: |
             test-results/
@@ -476,7 +454,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -484,8 +461,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -496,7 +471,6 @@ jobs:
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -541,7 +515,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
-        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
@@ -549,8 +522,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -561,7 +532,6 @@ jobs:
 
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -627,7 +597,6 @@ jobs:
         if: needs.build-and-deploy.result == 'success'
         uses: 8398a7/action-slack@v3
         continue-on-error: true
-        with:
           status: success
           channel: "#deployments"
           text: ✅ Bias Detection Engine deployment successful!
@@ -638,7 +607,6 @@ jobs:
         if: needs.build-and-deploy.result == 'failure'
         uses: 8398a7/action-slack@v3
         continue-on-error: true
-        with:
           status: failure
           channel: "#deployments"
           text: ❌ Bias Detection Engine deployment failed!

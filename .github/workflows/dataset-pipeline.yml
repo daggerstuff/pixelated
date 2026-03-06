@@ -39,7 +39,6 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv and pip (secure versions)
@@ -73,7 +72,6 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv and pip (secure versions)
@@ -147,7 +145,6 @@ jobs:
       - name: Upload export artifacts
         if: steps.export.outcome == 'success'
         uses: actions/upload-artifact@v5
-        with:
           name: dataset-export-test-ci
           path: |
             ai/dataset_pipeline/production_exports/test-ci/*
@@ -164,7 +161,6 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@v6
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install uv and pip (secure versions)
