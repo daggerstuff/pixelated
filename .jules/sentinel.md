@@ -1,0 +1,4 @@
+## 2025-05-22 - [Broken Access Control and NoSQL Injection in API Routes]
+**Vulnerability:** Placeholder authentication/authorization middleware was being used in several business-critical API routes (`documents.ts`), and unsanitized query parameters were being passed directly to MongoDB filters (`documents.ts`, `projects.ts`, `strategic-plans.ts`).
+**Learning:** Security controls were partially implemented or commented out during a migration (likely to Astro Auth0), leaving the Express backend exposed. Additionally, a lack of strict typing for `req.query` objects allowed for potential NoSQL operator injection.
+**Prevention:** Never leave "next()" as a placeholder in security-critical middleware. Always sanitize `req.query` parameters before using them in database filters by ensuring they are of the expected primitive type (e.g., string).

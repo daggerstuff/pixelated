@@ -24,7 +24,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const result = await listStrategicPlans(user.id, {
         page: page ? parseInt(page as string) : 1,
         limit: limit ? parseInt(limit as string) : 50,
-        status: status as string
+        status: typeof status === 'string' ? status : undefined
     })
 
     res.json({
