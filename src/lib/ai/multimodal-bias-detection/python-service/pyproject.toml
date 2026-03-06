@@ -75,6 +75,9 @@ dependencies = [
   "urllib3>=2.6.2", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
 ]
 
+[project.scripts]
+app = "multimodal_bias_detection.app:app"
+
 [project.urls]
 Homepage = "https://pixelatedempathy.com"
 Repository = "https://github.com/pixelated/multimodal-bias-detection-service"

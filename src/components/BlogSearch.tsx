@@ -39,16 +39,20 @@ export function BlogSearch() {
 
   return (
     <div className='mx-auto w-full max-w-2xl'>
-      <form onSubmit={handleSearch} className='relative'>
+      <form onSubmit={handleSearch} className='relative' role='search'>
         <Input
           type='search'
           placeholder='Search blog posts...'
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className='w-full pl-10'
+          aria-label='Search blog posts'
         />
 
-        <Search className='text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2' />
+        <Search
+          className='text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2'
+          aria-hidden='true'
+        />
 
         <Button
           type='submit'
@@ -59,6 +63,7 @@ export function BlogSearch() {
             isSearching && 'opacity-50 cursor-not-allowed',
           )}
           disabled={isSearching}
+          aria-label={isSearching ? 'Searching...' : 'Search'}
         >
           {isSearching ? 'Searching...' : 'Search'}
         </Button>

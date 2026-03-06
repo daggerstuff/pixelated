@@ -5,6 +5,7 @@ import { Command } from 'commander'
 import dotenv from 'dotenv'
 
 import { logger } from '../lib/logger'
+import type { BreachDetails } from '../lib/security/breach-notification'
 import { BreachNotificationSystem } from '../lib/security/breach-notification'
 
 // Load environment variables
@@ -26,16 +27,41 @@ program
   .action(
     async (options: { type: string; severity: string; users: string }) => {
       try {
-        const type = options.type as
-          | 'unauthorized_access'
-          | 'data_leak'
-          | 'system_compromise'
-          | 'other'
-        const severity = options.severity as
-          | 'low'
-          | 'medium'
-          | 'high'
-          | 'critical'
+        const breachTypes = [
+          'unauthorized_access',
+          'data_leak',
+          'system_compromise',
+          'other',
+        ] as const
+        const breachSeverities = ['low', 'medium', 'high', 'critical'] as const
+
+        type BreachType = (typeof breachTypes)[number]
+        type BreachSeverity = (typeof breachSeverities)[number]
+
+        const breachTypeSet: ReadonlySet<string> = new Set(breachTypes)
+        const breachSeveritySet: ReadonlySet<string> = new Set(breachSeverities)
+
+        const isBreachType = (value: string): value is BreachType =>
+          breachTypeSet.has(value)
+        const isBreachSeverity = (value: string): value is BreachSeverity =>
+          breachSeveritySet.has(value)
+
+        if (!isBreachType(options.type)) {
+          logger.error(
+            `Invalid breach type "${options.type}". Expected one of: ${breachTypes.join(', ')}`,
+          )
+          process.exit(1)
+        }
+
+        if (!isBreachSeverity(options.severity)) {
+          logger.error(
+            `Invalid severity "${options.severity}". Expected one of: ${breachSeverities.join(', ')}`,
+          )
+          process.exit(1)
+        }
+
+        const type = options.type
+        const severity = options.severity
         const users = parseInt(options.users, 10)
 
         console.log(chalk.blue('\n📋 Running test breach notification:'))
@@ -150,13 +176,11 @@ program
           )
         }
 
-        type BreachSeverity = 'low' | 'medium' | 'high' | 'critical'
-
         console.log(chalk.blue('\nBreak details:'))
         console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
-        console.log(`- Type: ${chalk.yellow(options.type)}`)
+        console.log(`- Type: ${chalk.yellow(type)}`)
         console.log(
-          `- Severity: ${getSeverityColor(options.severity as BreachSeverity)(options.severity)}`,
+          `- Severity: ${getSeverityColor(severity)(severity)}`,
         )
         console.log(`- Affected Users: ${chalk.yellow(userCount.toString())}`)
         console.log(`- Description: ${chalk.gray(options.description)}`)
@@ -188,12 +212,8 @@ program
         }
 
         const breachId = await BreachNotificationSystem.reportBreach({
-          type: options.type as
-            | 'unauthorized_access'
-            | 'data_leak'
-            | 'system_compromise'
-            | 'other',
-          severity: options.severity as 'low' | 'medium' | 'high' | 'critical',
+          type: type satisfies BreachDetails['type'],
+          severity: severity satisfies BreachDetails['severity'],
           description: options.description,
           affectedUsers: options.users.split(','),
           affectedData: options['affected-data'].split(','),

@@ -104,11 +104,12 @@ export function scanForPII(text: string): {
     count: 0,
   }
 
-  for (const [category, pattern] of Object.entries(PII_PATTERNS)) {
+  const patterns = Object.entries(PII_PATTERNS) as [PIICategory, RegExp][];
+  for (const [category, pattern] of patterns) {
     const matches = text.match(pattern)
     if (matches && matches.length > 0) {
       result.found = true
-      result.categories.push(category as PIICategory)
+      result.categories.push(category)
       result.count += matches.length
     }
   }

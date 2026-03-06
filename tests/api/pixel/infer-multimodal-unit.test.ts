@@ -52,7 +52,7 @@ describe('POST /api/ai/pixel/infer-multimodal - Unit Tests', () => {
       const mockSession = { user: { id: 'user123', role: 'therapist' } }
       mockGetSession.mockResolvedValueOnce(mockSession)
 
-      const result = await mockGetSession({} as Request)
+      const result = await mockGetSession({})
       expect(result.user?.id).toBe('user123')
     })
   })

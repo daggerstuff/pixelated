@@ -234,7 +234,7 @@ describe('Bias Detection API Integration Tests', () => {
               if (path === '/api/bias-detection/analyze' && method === 'POST') {
                 try {
                   if (!init?.body) throw new Error('Missing body')
-                  const body = JSON.parse(init.body as string)
+                  const body = JSON.parse(init.body || '{}')
 
                   if (!body.session) {
                     return new Response(

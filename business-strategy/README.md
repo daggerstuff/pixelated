@@ -106,12 +106,12 @@ solution for mental health professional training, featuring:
 
 ### Secondary Markets
 
-3. **Individual Practitioners** (Target 20% of market focus)
+1. **Individual Practitioners** (Target 20% of market focus)
    - Licensed therapists and counselors
    - Professional development requirements
    - Continuing education needs
 
-4. **Corporate Wellness Programs** (Target 15% of market focus)
+2. **Corporate Wellness Programs** (Target 15% of market focus)
    - Large enterprises with wellness initiatives
    - Employee assistance programs
    - HR internal training capabilities
@@ -246,6 +246,22 @@ solution for mental health professional training, featuring:
 - **Strategy**: Strong compliance expertise and flexible adaptation capabilities
 - **Partnership**: Industry relationship building and influence development
 
+## Strategy review and version
+
+- **Last strategy review:** December 2025
+- **Version:** 1.0
+- **Next planned review:** Q2 2026
+
+### Version history
+
+| Date | Version | Summary |
+| --- | --- | --- |
+| Dec 2025 | 1.0 | Initial consolidated strategy; METRICS-SOURCES and pipeline stages added |
+
+Key numbers and their sources are documented in [METRICS-SOURCES.md](METRICS-SOURCES.md).
+Pilot pipeline stages and tracker definitions are in
+[outreach/README.md](outreach/README.md).
+
 ## Conclusion
 
 This comprehensive business strategy provides the roadmap for transforming
@@ -276,5 +292,5 @@ Empathy brand.
 
 ---
 
-_Created for the Pixelated Empathy AI Platform Business Strategy Development_
-_Last Updated: December 2025_ _Document Version: 1.0_
+_Created for the Pixelated Empathy AI Platform Business Strategy Development._
+_Last Updated: December 2025. Document Version: 1.0. See [Strategy review and version](#strategy-review-and-version) and [METRICS-SOURCES.md](METRICS-SOURCES.md)._

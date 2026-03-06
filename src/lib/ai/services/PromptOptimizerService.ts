@@ -665,7 +665,7 @@ export class PromptOptimizerService {
   private selectOptimizationStrategy(
     context: PromptOptimization['therapeuticContext'],
   ): string {
-    const { sessionPhase, patientState, _primaryConcern } = context
+    const { sessionPhase, patientState, primaryConcern } = context
 
     // Strategy selection logic
     if (patientState === 'distressed') {
@@ -786,7 +786,7 @@ export class PromptOptimizerService {
 
     const randomPhrase =
       consolidationPhrases[
-        Math.floor(Math.random() * consolidationPhrases.length)
+      Math.floor(Math.random() * consolidationPhrases.length)
       ]
     return `${randomPhrase}, ${prompt.toLowerCase()}`
   }

@@ -113,8 +113,8 @@ export const FEATURES: Features = {
   ogImage: [
     false,
     {
-      authorOrBrand: `${SITE.title}`,
-      fallbackTitle: `${SITE.description}`,
+      authorOrBrand: SITE.title,
+      fallbackTitle: SITE.description,
       fallbackBgType: 'plum',
     },
   ],

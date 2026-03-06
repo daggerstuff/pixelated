@@ -4,6 +4,12 @@ export interface BiasThresholdsConfig {
   warning: number
   high: number
   critical: number
+  /** @deprecated Use warning */
+  warningLevel?: number
+  /** @deprecated Use high */
+  highLevel?: number
+  /** @deprecated Use critical */
+  criticalLevel?: number
 }
 
 export interface BiasLayerWeights {
@@ -221,12 +227,12 @@ export interface ParticipantDemographics {
 export interface TrainingScenario {
   scenarioId: string
   type:
-    | 'depression'
-    | 'anxiety'
-    | 'trauma'
-    | 'substance-abuse'
-    | 'relationship-issues'
-    | 'general-wellness'
+  | 'depression'
+  | 'anxiety'
+  | 'trauma'
+  | 'substance-abuse'
+  | 'relationship-issues'
+  | 'general-wellness'
 }
 
 export interface SessionContent {
@@ -390,6 +396,7 @@ export interface BiasDashboardSummary {
   activeAlerts: number
   trendDirection: 'up' | 'down' | 'stable'
   alerts: Record<AlertLevel, number>
+  complianceScore: number
 }
 
 export interface DashboardRecommendation {

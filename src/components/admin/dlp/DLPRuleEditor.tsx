@@ -1,196 +1,34 @@
-import React, { useState, useEffect, forwardRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
 
-/**
- * Workaround: Inline minimal UI components due to persistent import/alias resolution errors.
- * Remove these and restore imports when tooling is fixed.
- */
-const Card = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className='bg-card text-card-foreground rounded-lg border shadow-sm'
-    {...props}
-  >
-    {children}
-  </div>
-)
-
-const CardHeader = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className='flex flex-col space-y-1.5 p-6' {...props}>
-    {children}
-  </div>
-)
-
-const CardTitle = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <h3 className='text-2xl font-semibold leading-none tracking-tight' {...props}>
-    {children}
-  </h3>
-)
-
-const CardDescription = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement>) => (
-  <p className='text-muted-foreground text-sm' {...props}>
-    {children}
-  </p>
-)
-
-const CardContent = ({
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className='p-6 pt-0' {...props}>
-    {children}
-  </div>
-)
-
-const Switch = ({
-  checked,
-  onCheckedChange,
-  id,
-}: {
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
-  id: string
-}) => (
-  <input
-    type='checkbox'
-    id={id}
-    checked={checked}
-    onChange={(e) => onCheckedChange(e.target.checked)}
-    className='border-transparent focus-visible:ring-ring peer-checked:bg-primary peer-unchecked:bg-input bg-input peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50'
-  />
-)
-
-const Button = ({
-  children,
-  ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-  <button
-    className='focus-visible:ring-ring border-input hover:bg-accent hover:text-accent-foreground inline-flex h-10 items-center justify-center rounded-md border bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
-    {...props}
-  >
-    {children}
-  </button>
-)
-
-/**
- * Workaround: Inline Input component due to persistent import/alias resolution error.
- * Remove this and restore import when tooling is fixed.
- */
-type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  className?: string
-  type?: string
-}
-
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, ...props }, ref) => (
-    <input
-      type={type}
-      className={
-        'border-input file:bg-transparent placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
-        (className ? ' ' + className : '')
-      }
-      ref={ref}
-      {...props}
-    />
-  ),
-)
-Input.displayName = 'Input'
-
-// Create an inline Label component
-interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-  htmlFor: string
-  children: ReactNode
-}
-
-const Label = ({ htmlFor, children, ...props }: LabelProps) => (
-  <label
-    htmlFor={htmlFor}
-    className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-    {...props}
-  >
-    {children}
-  </label>
-)
-
-// Create an inline Textarea component
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  id?: string
-  placeholder?: string
-  value?: string
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  rows?: number
-}
-
-const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ id, placeholder, value, onChange, rows, ...props }, ref) => (
-    <textarea
-      id={id}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      rows={rows}
-      ref={ref}
-      className='border-input placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
-      {...props}
-    />
-  ),
-)
-
-Textarea.displayName = 'Textarea'
-
-/**
- * Minimal Select component workaround.
- * Replace with import when alias resolution is fixed.
- */
-const Select = ({
-  value,
-  onValueChange,
-  children,
-}: {
-  value: string
-  onValueChange: (value: string) => void
-  children: React.ReactNode
-}) => (
-  <select
-    value={value}
-    onChange={(e) => onValueChange(e.target.value)}
-    className='border-input focus-visible:ring-ring block w-full rounded-md border bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2'
-  >
-    {children}
-  </select>
-)
-const SelectContent = ({ children }: { children: React.ReactNode }) => (
-  <>{children}</>
-)
-const SelectItem = ({
-  value,
-  children,
-}: {
-  value: string
-  children: React.ReactNode
-}) => <option value={value}>{children}</option>
-const SelectTrigger = ({ children }: { children: React.ReactNode }) => (
-  <>{children}</>
-)
-const SelectValue = () => null
-
-// Default empty rule
+// Default empty rule (matchPattern is the functional pattern; name is descriptive only)
 const defaultRule = {
   id: '',
   name: '',
   description: '',
+  matchPattern: '',
   action: DLPAction.REDACT,
   isActive: true,
+}
+
+/** Escape special regex characters so the pattern is treated as a literal string. */
+function escapeRegexLiteral(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 /**
@@ -198,15 +36,21 @@ const defaultRule = {
  *
  * Handles creating new rules and editing existing ones
  */
+/** Editor state: DLPRule fields plus matchPattern (not persisted on DLPRule, used to build matches/redact). */
+type EditorRule = Partial<DLPRule> & { matchPattern?: string }
+
 export default function DLPRuleEditor() {
-  // State for the rule being edited
-  const [currentRule, setCurrentRule] = useState<Partial<DLPRule>>(defaultRule)
+  const [currentRule, setCurrentRule] = useState<EditorRule>(defaultRule)
   const [isEditing, setIsEditing] = useState(false)
 
   // Listen for edit-rule events
   useEffect(() => {
-    const handleEditRule = (event: CustomEvent) => {
-      setCurrentRule(event.detail)
+    const handleEditRule = (event: Event) => {
+      if (!(event instanceof CustomEvent)) {
+        return
+      }
+      const detail = event.detail as EditorRule
+      setCurrentRule({ ...defaultRule, ...detail, matchPattern: detail.matchPattern ?? '' })
       setIsEditing(true)
     }
 
@@ -216,20 +60,16 @@ export default function DLPRuleEditor() {
     }
 
     // Add event listeners
-    document.addEventListener('dlp:edit-rule', handleEditRule as EventListener)
+    document.addEventListener('dlp:edit-rule', handleEditRule)
     document.addEventListener('dlp:new-rule', handleNewRule)
 
     // Clean up event listeners on unmount
     return () => {
-      document.removeEventListener(
-        'dlp:edit-rule',
-        handleEditRule as EventListener,
-      )
+      document.removeEventListener('dlp:edit-rule', handleEditRule)
       document.removeEventListener('dlp:new-rule', handleNewRule)
     }
   }, [])
 
-  // Handle input changes
   const handleChange = (field: string, value: string | boolean) => {
     setCurrentRule({
       ...currentRule,
@@ -239,7 +79,7 @@ export default function DLPRuleEditor() {
 
   // Save rule
   const saveRule = () => {
-    // Validation
+    const pattern = currentRule.matchPattern?.trim() ?? ''
     if (!currentRule.id || !currentRule.name) {
       document.dispatchEvent(
         new CustomEvent('dlp:error', {
@@ -248,28 +88,32 @@ export default function DLPRuleEditor() {
       )
       return
     }
+    if (!pattern) {
+      document.dispatchEvent(
+        new CustomEvent('dlp:error', {
+          detail: { message: 'Match pattern is required (this is the term or regex to detect)' },
+        }),
+      )
+      return
+    }
 
     try {
-      // Need to construct a valid rule with a matches function
+      const escaped = escapeRegexLiteral(pattern)
       const ruleToSave: DLPRule = {
         id: currentRule.id || '',
         name: currentRule.name || '',
         description: currentRule.description || '',
-        action: (currentRule.action as DLPAction) || DLPAction.REDACT,
+        action: currentRule.action ?? DLPAction.REDACT,
         isActive:
           currentRule.isActive === undefined ? true : !!currentRule.isActive,
-        // Default matcher looks for the term specified in the rule name
         matches: (content: string) => {
-          const searchTerm = currentRule.name?.toLowerCase() || ''
-          return content.toLowerCase().includes(searchTerm)
+          return content.toLowerCase().includes(pattern.toLowerCase())
         },
       }
 
-      // If it's a REDACT rule, add a redact function
       if (ruleToSave.action === DLPAction.REDACT) {
         ruleToSave.redact = (content: string) => {
-          const searchTerm = currentRule.name?.toLowerCase() || ''
-          return content.replace(new RegExp(searchTerm, 'gi'), '[REDACTED]')
+          return content.replace(new RegExp(escaped, 'gi'), '[REDACTED]')
         }
       }
 
@@ -291,10 +135,8 @@ export default function DLPRuleEditor() {
       setIsEditing(false)
 
       // Switch back to rules tab
-      const rulesTab = document.querySelector(
-        '[value="rules"]',
-      ) as HTMLElement
-      if (rulesTab) {
+      const rulesTab = document.querySelector('[value="rules"]')
+      if (rulesTab instanceof HTMLElement) {
         setTimeout(() => {
           rulesTab.click()
 
@@ -355,7 +197,23 @@ export default function DLPRuleEditor() {
                 value={currentRule.name}
                 onChange={(e) => handleChange('name', e.target.value)}
               />
+              <p className='text-muted-foreground text-xs'>
+                Descriptive label only; not used for matching.
+              </p>
             </div>
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='rule-pattern'>Match pattern</Label>
+            <Input
+              id='rule-pattern'
+              placeholder='e.g. SSN, \\d{3}-\\d{2}-\\d{4}, or literal phrase'
+              value={currentRule.matchPattern ?? ''}
+              onChange={(e) => handleChange('matchPattern', e.target.value)}
+            />
+            <p className='text-muted-foreground text-xs'>
+              Literal text or regex to detect. Content matching this will trigger the rule.
+            </p>
           </div>
 
           <div className='space-y-2'>
@@ -375,7 +233,7 @@ export default function DLPRuleEditor() {
             <div className='space-y-2'>
               <Label htmlFor='rule-action'>Action</Label>
               <Select
-                value={currentRule.action as string}
+                value={currentRule.action ?? DLPAction.REDACT}
                 onValueChange={(value: string) => handleChange('action', value)}
               >
                 <SelectTrigger>
@@ -414,7 +272,7 @@ export default function DLPRuleEditor() {
               <div className='text-sm'>
                 <span>Original: </span>
                 <span className='font-mono'>
-                  This contains {currentRule.name || '[term]'}
+                  This contains {currentRule.matchPattern || '[pattern]'}
                 </span>
               </div>
               <div className='text-sm'>
@@ -432,10 +290,8 @@ export default function DLPRuleEditor() {
                 setIsEditing(false)
 
                 // Switch back to rules tab
-                const rulesTab = document.querySelector(
-                  '[value="rules"]',
-                ) as HTMLElement
-                if (rulesTab) {
+                const rulesTab = document.querySelector('[value="rules"]')
+                if (rulesTab instanceof HTMLElement) {
                   rulesTab.click()
                 }
               }}

@@ -1,5 +1,4 @@
-// @ts-ignore
-import AWS from 'aws-sdk'
+import * as AWS from 'aws-sdk'
 import { v4 as uuidv4 } from 'uuid'
 
 // OVHCloud Object Storage configuration (S3-compatible)

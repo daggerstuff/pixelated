@@ -9,7 +9,7 @@ const mockAIService: AIService = {
   createChatCompletionWithTracking: vi.fn(),
   generateCompletion: vi.fn(),
   dispose: vi.fn(),
-} as AIService // Add type assertion to ensure compatibility
+}
 
 describe('responseGenerationService', () => {
   let responseService: ResponseGenerationService

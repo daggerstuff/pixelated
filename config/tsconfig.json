@@ -65,7 +65,6 @@
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
     "types": [
-      "astro/client",
       "node",
       "react",
       "react-dom"

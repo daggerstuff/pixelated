@@ -1,8 +1,8 @@
 import type { AIService } from '@/lib/ai/models/types'
 import { SentimentAnalysisService } from '@/lib/ai/services/sentiment-analysis'
 
-// Mock AI service with type assertion to handle incompatible interfaces
-const mockAIService = {
+// Properly typed mock AI service
+const mockAIService: AIService = {
   generateCompletion: vi.fn(),
   createChatCompletion: vi.fn(),
   createStreamingChatCompletion: vi.fn(),
@@ -34,7 +34,7 @@ const mockAIService = {
     }),
   ),
   dispose: vi.fn(),
-} as unknown as AIService
+}
 
 describe('sentimentAnalysisService', () => {
   let sentimentService: SentimentAnalysisService
@@ -199,7 +199,7 @@ describe('sentimentAnalysisService', () => {
   describe('analyzeBatch', () => {
     it('should analyze multiple texts in parallel', async () => {
       // Mock the AI service response for multiple calls
-      ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>)
+      ;vi.mocked(mockAIService.createChatCompletion)
         .mockResolvedValueOnce({
           content: JSON.stringify({
             sentiment: 'positive',
@@ -247,7 +247,7 @@ describe('sentimentAnalysisService', () => {
 
     it('should handle errors in batch processing', async () => {
       // Mock the AI service to succeed for first call and fail for second
-      ;(mockAIService.createChatCompletion as ReturnType<typeof vi.fn>)
+      ;vi.mocked(mockAIService.createChatCompletion)
         .mockResolvedValueOnce({
           content: JSON.stringify({
             sentiment: 'positive',

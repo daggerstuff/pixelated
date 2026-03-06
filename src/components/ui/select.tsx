@@ -83,12 +83,16 @@ export function Select({
   // Close the dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
       if (
         isOpen &&
         contentRef.current &&
         triggerRef.current &&
-        !contentRef.current.contains(event.target as Node) &&
-        !triggerRef.current.contains(event.target as Node)
+        !contentRef.current.contains(target) &&
+        !triggerRef.current.contains(target)
       ) {
         setIsOpen(false)
       }
@@ -284,7 +288,15 @@ export function SelectItem({
 
   // Register/unregister this option on mount/unmount
   useEffect(() => {
-    registerOption(value, children as string)
+    const label = React.Children.toArray(children)
+      .map((child) =>
+        typeof child === 'string' || typeof child === 'number'
+          ? String(child)
+          : '',
+      )
+      .join(' ')
+      .trim()
+    registerOption(value, label)
     return () => unregisterOption(value)
   }, [value, children, registerOption, unregisterOption])
 

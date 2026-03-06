@@ -321,8 +321,10 @@ class PerformanceBenchmarkRunner {
 
     for (const scenario of scenarios) {
       const scenarioResults = results.filter((r) => r.scenario === scenario)
+      const scenarioLabel =
+        typeof scenario === 'string' ? scenario : String(scenario)
 
-      report.push(`### ${scenario}`)
+      report.push(`### ${scenarioLabel}`)
       report.push('')
       report.push(
         '| Users | Avg Response | P95 Response | Throughput | Error Rate |',

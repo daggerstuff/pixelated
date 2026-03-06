@@ -351,7 +351,7 @@ export class PredictiveCrisisModelingService {
         .slice(-2)
         .reduce((a, b) => a + b, 0) /
         2) *
-        0.4 +
+      0.4 +
       (1 - riskFactors.behavioral.sessionEngagement) * 0.3 +
       (riskFactors.temporal.daysSinceLastSession > 7 ? 0.8 : 0.2) * 0.3
 
@@ -373,7 +373,7 @@ export class PredictiveCrisisModelingService {
   }
 
   private identifyPrimaryRiskFactors(
-    _riskFactors: CrisisRiskFactors,
+    riskFactors: CrisisRiskFactors,
     _compositeRisk: number,
   ): string[] {
     const factors: string[] = []

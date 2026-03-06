@@ -3,6 +3,15 @@
  *
  * This file contains shared configuration for Sentry error monitoring
  * across both client and server environments.
+ *
+ * RELEASE HEALTH:
+ * This configuration includes automatic session tracking (autoSessionTracking: true)
+ * which enables Sentry Release Health metrics:
+ * - Crash-free user rate: % of users without crashes
+ * - Crash-free session rate: % of sessions without crashes
+ * - User adoption: distribution of users across releases
+ *
+ * See: https://docs.sentry.io/product/releases/health/
  */
 
 import type { Event } from '@sentry/astro'
@@ -51,6 +60,9 @@ export const SENTRY_CONFIG = {
 
   environment: import.meta.env.MODE || 'production',
   release: resolveSentryRelease('0.0.1'),
+
+  // Enable Release Health - automatic session tracking for crash-free metrics
+  autoSessionTracking: true,
 
   tracesSampleRate: Number(
     import.meta.env['PUBLIC_SENTRY_TRACES_SAMPLE_RATE'] ??
