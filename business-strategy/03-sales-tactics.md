@@ -236,11 +236,11 @@ pays for itself many times over."
 
 ### Competitive Analysis Matrix
 
-| Competitor         | Strength  | Our Response                   | Unique Advantage        |
-| ------------------ | --------- | ------------------------------ | ----------------------- |
-| Human Simulation   | Realistic | We replicate + enhance with AI | Unlimited scenarios     |
-| Generic AI Tutors  | Flexible  | We specialize in mental health | Clinical knowledge base |
-| Generic Simulators | Scalable  | We adapt to individual needs   | Personalization         |
+| Competitor | Strength | Our Response | Unique Advantage |
+| --- | --- | --- | --- |
+| Human Simulation | Realistic | We replicate + enhance with AI | Unlimited scenarios |
+| Generic AI Tutors | Flexible | We specialize in mental health | Clinical knowledge base |
+| Generic Simulators | Scalable | We adapt to individual needs | Personalization |
 
 ### ROI Calculator Tools
 

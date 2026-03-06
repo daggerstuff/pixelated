@@ -62,7 +62,6 @@ export function FilterControls({
         value < newOptions.startDate)
     ) {
       setDateError('End date cannot be earlier than start date.')
-      return
     } else {
       setDateError(null)
     }
@@ -70,14 +69,23 @@ export function FilterControls({
   }
 
   return (
-    <div className='filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4'>
+    <div
+      className='filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4'
+      role='region'
+      aria-label='Filter options'
+    >
       <div className='mb-2 flex items-center justify-between'>
         <h4 className='text-sm font-medium'>Filter Options</h4>
         <div className='space-x-2'>
-          <Button variant='outline' size='sm' onClick={onReset}>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={onReset}
+            aria-label='Reset all filters'
+          >
             Reset
           </Button>
-          <Button size='sm' onClick={onApply}>
+          <Button size='sm' onClick={onApply} aria-label='Apply current filters'>
             Apply Filters
           </Button>
         </div>
@@ -97,6 +105,7 @@ export function FilterControls({
                 const date = e.target.value ? new Date(e.target.value) : null
                 handleChange('startDate', date)
               }}
+              aria-describedby={dateError ? 'date-error' : undefined}
             />
           </div>
 
@@ -112,13 +121,16 @@ export function FilterControls({
                 const date = e.target.value ? new Date(e.target.value) : null
                 handleChange('endDate', date)
               }}
+              aria-describedby={dateError ? 'date-error' : undefined}
             />
           </div>
         </div>
       )}
 
       {dateError && (
-        <div className='text-red-500 mb-2 text-xs'>{dateError}</div>
+        <div id='date-error' className='text-red-500 mb-2 text-xs' role='alert'>
+          {dateError}
+        </div>
       )}
 
       {activeTab === 'patterns' && (
@@ -129,7 +141,7 @@ export function FilterControls({
               value={options.patternType || ''}
               onValueChange={(value) => handleChange('patternType', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger id='patternType' aria-label='Select pattern type'>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

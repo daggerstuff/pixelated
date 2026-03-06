@@ -1,6 +1,6 @@
 [submodule "ai"]
 	path = ai
-	url = git@github.com:pixelatedempathy/ai.git
+	url = git@github.com:daggerstuff/ai.git
 	branch = .
 	ignore = all
 

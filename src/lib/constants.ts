@@ -21,3 +21,16 @@ export const ALLOWED_IPS = [
   '185.92.25.0/24', // Example CIDR - in real implementation, use actual resolved IPs
   // Add actual resolved IPs for each service
 ]
+
+// ---------------------------------------------------------------------------
+// Markdown parsing regular expressions (used by src/lib/markdown.ts)
+// ---------------------------------------------------------------------------
+
+/** Matches ATX headings: `## Heading text` */
+export const HEADING_REGEX = /^(#{1,6})\s(.+)$/gm
+
+/** Matches inline code spans: `` `code` `` */
+export const CODE_REGEX = /`([^`]+)`/g
+
+/** Matches Markdown links: `[text](url)` */
+export const LINK_REGEX = /\[([^\]]+)\]\(([^)]+)\)/g

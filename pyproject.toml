@@ -56,7 +56,7 @@ dependencies = [
   "ruff>=0.12.5",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
-  "sentry-sdk>=2.37.0",
+  "sentry-sdk>=2.44.0",
   "openai>=1.107.2",
   "pytest>=8.4.2",
   "ffmpeg>=1.4",
@@ -68,6 +68,7 @@ dependencies = [
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
   "python-socketio>=5.14.0",
+  "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
   "nbqa>=1.9.1",
@@ -122,6 +123,7 @@ dependencies = [
   "bitsandbytes>=0.43.0",
   "lightning>=2.1.0",
   "wandb>=0.16.0",
+  "lightning-sdk>=2025.12.2",
 ]
 [project.optional-dependencies]
 test = [

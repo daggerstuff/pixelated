@@ -81,6 +81,19 @@ export function Sidebar() {
             </svg>
           ),
         },
+        {
+          name: 'Agent Notes',
+          href: '/dashboard/agent-notes',
+          icon: (
+            <svg className='h-5 w-5' fill='currentColor' viewBox='0 0 20 20'>
+              <path
+                fillRule='evenodd'
+                d='M4 3a2 2 0 00-2 2v10a2 2 0 002 2h2v3.586L11.586 17H16a2 2 0 002-2V9.828a2 2 0 00-.586-1.414L15 6.586A2 2 0 0013.586 6H12V5a2 2 0 00-2-2H4zm8 2.414L14.586 8H13a1 1 0 01-1-1V4.414zM7 8h6a1 1 0 110 2H7a1 1 0 010-2zm0 4h6a1 1 0 110 2H7a1 1 0 110-2z'
+                clipRule='evenodd'
+              />
+            </svg>
+          ),
+        },
       ],
     },
     {

@@ -12,6 +12,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { WebSocket } from 'ws'
 
+const parseWsMessage = (data: unknown) => JSON.parse(String(data))
+
 vi.mock('ws', () => {
   return vi.importActual('ws')
 })
@@ -53,7 +55,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       let receivedStatus = false
 
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status' && message.status === 'connected') {
           receivedStatus = true
           ws.close()
@@ -131,7 +133,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       })
 
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status' && message.status === 'text_received') {
           expect(message.contextType).toBe('therapeutic')
           ws.close()
@@ -160,7 +162,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let received = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.contextType === 'crisis_response') {
           received = true
         }
@@ -195,7 +197,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let statusReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status') {
           statusReceived = true
         }
@@ -269,7 +271,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let errorReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'error' && message.message.includes('too large')) {
           errorReceived = true
         }
@@ -359,7 +361,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let resultReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'result') {
           resultReceived = true
           expect(message.data).toBeDefined()
@@ -415,7 +417,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let resultReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'result') {
           resultReceived = true
         }
@@ -455,7 +457,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       })
 
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'result') {
           expect(message.data.latency_ms).toBeLessThan(200)
           ws.close()
@@ -479,7 +481,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let errorReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'error') {
           errorReceived = true
         }
@@ -510,7 +512,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let errorReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'error') {
           errorReceived = true
         }
@@ -546,7 +548,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let errorReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'error') {
           errorReceived = true
         }
@@ -569,7 +571,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status' && message.status === 'connected') {
           expect(message.port).toBe(8091)
           ws.close()
@@ -597,7 +599,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let textStatusReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status' && message.status === 'text_received') {
           textStatusReceived = true
         }
@@ -634,7 +636,7 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       let processingReceived = false
       ws.on('message', (data) => {
-        const message = JSON.parse((data as any).toString())
+        const message = parseWsMessage(data)
         if (message.type === 'status' && message.status === 'processing') {
           processingReceived = true
         }

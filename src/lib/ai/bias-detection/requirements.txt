@@ -447,7 +447,7 @@ networkx==3.6.1
     #   -r requirements.txt
     #   scikit-image
     #   torch
-nltk==3.9.2
+nltk==3.9.3  # Fixes GHSA-pg7x-xvh5-64q5 (Zip Slip vulnerability)
     # via
     #   -r requirements.txt
     #   textblob

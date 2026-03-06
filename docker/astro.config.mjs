@@ -13,37 +13,12 @@ import { visualizer } from 'rollup-plugin-visualizer'
 const isDockerBuild =
   process.env.DOCKER_BUILD === 'true' || process.env.CI === 'true'
 
-const isCloudflareDeploy =
-  process.env.DEPLOY_TARGET === 'cloudflare' || process.env.CF_PAGES === '1'
-let cloudflareAdapter
-if (isCloudflareDeploy) {
-  try {
-    const cloudflareModule = await import('@astrojs/cloudflare')
-    cloudflareAdapter = cloudflareModule.default
-  } catch (e) {
-    console.warn(
-      '⚠️  Cloudflare adapter not available, will use Node adapter:',
-      e.message,
-    )
-    cloudflareAdapter = undefined
-  }
-}
-
-if (isCloudflareDeploy && !cloudflareAdapter) {
-  console.log(
-    '🟡 Cloudflare deployment requested but adapter unavailable, using Node adapter',
-  )
-}
-
-// No longer using individual cloud platform flags as we've shifted to Docker-first.
-
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
 // Detect if we're running a build command (not dev server)
 const isBuildCommand =
   process.argv.includes('build') ||
   process.env.CI === 'true' ||
-  !!process.env.CF_PAGES ||
   !!process.env.VERCEL
 const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === '1'
 const hasSentryDSN = !!process.env.SENTRY_DSN || !!process.env.PUBLIC_SENTRY_DSN // Only enable if DSN is actually present
@@ -97,30 +72,6 @@ function getChunkName(id) {
 }
 
 const adapter = (() => {
-  if (isCloudflareDeploy && cloudflareAdapter) {
-    console.log('🔵 Using Cloudflare adapter for Pages deployment')
-    // Only enable platformProxy for local dev (not during builds)
-    // During Cloudflare Pages builds, platformProxy requires Wrangler auth which isn't available
-    const adapterConfig = {
-      mode: 'directory',
-      functionPerRoute: false,
-    }
-    // Only include platformProxy when running dev server locally (not during builds)
-    if (isDevelopment && !isBuildCommand) {
-      adapterConfig.platformProxy = {
-        enabled: true,
-      }
-    }
-    return cloudflareAdapter(adapterConfig)
-  }
-
-  if (isCloudflareDeploy) {
-    console.log('🟡 Cloudflare adapter unavailable, using Node adapter')
-    return node({
-      mode: 'standalone',
-    })
-  }
-
   // Default to Node adapter for standard deployments (Docker, Kubernetes, VPS)
   console.log('📦 Using Node adapter for deployment')
   return node({

@@ -68,7 +68,7 @@
 - **75%+ diagnostic accuracy improvement** (guaranteed)
 - **95%+ student satisfaction** (measured via surveys)
 - **90%+ program completion rate** (tracked via platform analytics)
-- **100% safety incident rate** (zero tolerance monitoring)
+- **Zero safety incidents** (zero tolerance monitoring)
 
 ### Research Validation
 

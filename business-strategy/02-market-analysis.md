@@ -493,5 +493,7 @@ platform is well-positioned to capture significant market share while
 establishing the gold standard for therapeutic training technology.
 
 The combination of market size, growth trends, competitive positioning, and
-customer validation creates a compelling case for accelerated growth and market
-leadership in this rapidly expanding market segment.
+customer validation creates a compelling case for accelerated growth and
+market leadership in this rapidly expanding market segment. Sources and
+refresh cadence for key figures (e.g. $5.8B, 152,173+ conversations, 410+
+edge cases) are in [METRICS-SOURCES.md](METRICS-SOURCES.md).

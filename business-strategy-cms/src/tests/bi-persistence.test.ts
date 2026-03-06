@@ -13,6 +13,7 @@ describe('Business Intelligence Persistence Tests', () => {
   })
 
   it('should store and retrieve market data correctly in MongoDB', async () => {
+    expect.assertions(4)
     const marketData: Omit<MarketData, 'id'> = {
       industry: 'test-industry-' + Date.now(),
       marketSize: 1000000,
@@ -56,11 +57,7 @@ describe('Business Intelligence Persistence Tests', () => {
       lastUpdated: new Date(),
     }
 
-    await dbService.storeCompetitorAnalysis(analysis)
-
-    // Competitor analysis doesn't have a specific GET by unique key in DatabaseService yet,
-    // but we can check if it creates a record.
-    // Let's check the DatabaseService implementation for a getter.
+    await expect(dbService.storeCompetitorAnalysis(analysis)).resolves.toBeUndefined()
   })
 
   it('should store and retrieve business metrics correctly in MongoDB', async () => {

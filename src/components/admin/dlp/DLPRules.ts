@@ -14,16 +14,14 @@ function handleRuleDeleted(event: CustomEvent): void {
   console.log(`Rule deleted: ${name} (${id})`)
 
   // Find and remove the deleted rule element
-  const ruleElement = document.querySelector(
-    `[data-rule-id="${id}"]`,
-  ) as HTMLElement
-  ruleElement?.parentElement?.remove()
+  const ruleElement = document.querySelector(`[data-rule-id="${id}"]`)
+  if (ruleElement instanceof HTMLElement) {
+    ruleElement.parentElement?.remove()
+  }
 
   // Check if there are no more rules after removal
-  const rulesList = document.querySelector(
-    '.rules-list .space-y-4',
-  ) as HTMLElement
-  if (rulesList && rulesList.children.length === 0) {
+  const rulesList = document.querySelector('.rules-list .space-y-4')
+  if (rulesList instanceof HTMLElement && rulesList.children.length === 0) {
     // Show the "No rules" message
     const noRulesCard = document.createElement('div')
     noRulesCard.className = 'card'
@@ -43,7 +41,10 @@ function handleDeleteClick(e: Event): void {
   e.preventDefault()
   e.stopPropagation()
 
-  const button = e.currentTarget as HTMLButtonElement
+  if (!(e.currentTarget instanceof HTMLButtonElement)) {
+    return
+  }
+  const button = e.currentTarget
   const ruleId = button.getAttribute('data-rule-id')
   const ruleName = button.getAttribute('data-rule-name')
 
@@ -67,10 +68,16 @@ function handleDeleteClick(e: Event): void {
 
 // Set up event listeners when the script loads
 function setupEventListeners() {
-  const handleRuleUpdatedListener = (e: Event) =>
-    handleRuleUpdated(e as CustomEvent)
-  const handleRuleDeletedListener = (e: Event) =>
-    handleRuleDeleted(e as CustomEvent)
+  const handleRuleUpdatedListener = (e: Event) => {
+    if (e instanceof CustomEvent) {
+      handleRuleUpdated(e)
+    }
+  }
+  const handleRuleDeletedListener = (e: Event) => {
+    if (e instanceof CustomEvent) {
+      handleRuleDeleted(e)
+    }
+  }
 
   // Add click handlers to delete buttons
   document.querySelectorAll('.delete-rule-btn').forEach((button) => {

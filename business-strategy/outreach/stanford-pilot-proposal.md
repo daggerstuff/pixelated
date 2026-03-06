@@ -55,13 +55,13 @@ students.
 
 ## Implementation Timeline
 
-| Phase           | Timeline        | Activities                                               |
-| --------------- | --------------- | -------------------------------------------------------- |
-| **Setup**       | Jan 1-15        | Technical setup, student onboarding, baseline assessment |
-| **Training**    | Jan 16 - May 31 | Active training with weekly progress monitoring          |
-| **Assessment**  | June 1-15       | Post-training assessment and outcome measurement         |
-| **Analysis**    | June 16-30      | Data analysis and report preparation                     |
-| **Publication** | July-August     | Manuscript preparation and submission                    |
+| Phase | Timeline | Activities |
+| --- | --- | --- |
+| **Setup** | Jan 1-15 | Technical setup, student onboarding, baseline assessment |
+| **Training** | Jan 16 - May 31 | Active training with weekly progress monitoring |
+| **Assessment** | June 1-15 | Post-training assessment and outcome measurement |
+| **Analysis** | June 16-30 | Data analysis and report preparation |
+| **Publication** | July-August | Manuscript preparation and submission |
 
 ## Budget & ROI
 
@@ -104,7 +104,7 @@ students.
 
 ---
 
-**Ready to proceed?** Reply with "YES" and preferred call time this week.
+**Next step:** Reply with "YES" and your preferred call time this week, or
+confirm receipt and we will send the one-page agreement for review.
 
-**Questions?** Contact directly at [contact] or schedule call via [calendar
-link]
+**Questions?** Contact directly at [contact] or schedule a call via [calendar link].

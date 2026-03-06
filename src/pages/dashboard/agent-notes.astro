@@ -1,0 +1,15 @@
+---
+export const prerender = false
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import AgentNoteCollabDashboard from '@/components/agent-note-collab/AgentNoteCollabDashboard'
+---
+
+<DashboardLayout
+  title='Agent Notes Dashboard | Pixelated Empathy Therapy'
+  description='Monitor agent note collaboration, unresolved questions, and phase progress'
+>
+  <div class='container mx-auto py-6'>
+    <AgentNoteCollabDashboard client:load />
+  </div>
+</DashboardLayout>

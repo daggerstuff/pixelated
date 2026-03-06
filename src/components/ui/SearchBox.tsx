@@ -127,10 +127,14 @@ export default function SearchBox({
   // Close results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
       if (
         resultsRef.current &&
-        !resultsRef.current.contains(event.target as Node) &&
-        !inputRef.current?.contains(event.target as Node)
+        !resultsRef.current.contains(target) &&
+        !inputRef.current?.contains(target)
       ) {
         setIsOpen(false)
       }

@@ -9,18 +9,17 @@
 
 import crypto from 'crypto'
 
-import { ThreatData, ThreatPattern, ThreatFinding } from '../types'
+import { isObject } from '@/lib/utils'
+import { ThreatData, ThreatPattern, ThreatFinding, ThreatSeverity } from '../types'
 
 // crypto-backed stable id generation with safe fallback
 function secureId(prefix = ''): string {
   try {
-    const c: unknown = crypto
-    const asObj = c as Record<string, unknown> | undefined
-    if (asObj && typeof asObj['randomUUID'] === 'function') {
-      return `${prefix}${(asObj['randomUUID'] as () => string)()}`
+    if (typeof crypto.randomUUID === 'function') {
+      return `${prefix}${crypto.randomUUID()}`
     }
-    if (asObj && typeof asObj['randomBytes'] === 'function') {
-      return `${prefix}${(asObj['randomBytes'] as (n: number) => Buffer)(16).toString('hex')}`
+    if (typeof crypto.randomBytes === 'function') {
+      return `${prefix}${crypto.randomBytes(16).toString('hex')}`
     }
   } catch (_err) {
     // ignore and fall through to fallback
@@ -46,9 +45,6 @@ function escapeXml(unsafe: string): string {
 }
 
 export function processThreatData(rawData: unknown[]): ThreatData[] {
-  const isObject = (v: unknown): v is Record<string, unknown> =>
-    typeof v === 'object' && v !== null
-
   return rawData.map((item, idx) => {
     if (!isObject(item))
       throw new Error(
@@ -56,41 +52,45 @@ export function processThreatData(rawData: unknown[]): ThreatData[] {
       )
     const obj = item
     return {
-      id: typeof obj.id === 'string' ? obj.id : secureId('threat_'),
-      timestamp: safeParseTimestamp(obj.timestamp),
+      id: typeof obj['id'] === 'string' ? obj['id'] : secureId('threat_'),
+      timestamp: safeParseTimestamp(obj['timestamp']),
       source:
-        typeof obj.source === 'string' ? (obj.source) : 'unknown',
-      type: typeof obj.type === 'string' ? (obj.type) : 'unknown',
+        typeof obj['source'] === 'string' ? obj['source'] : 'unknown',
+      type: typeof obj['type'] === 'string' ? obj['type'] : 'unknown',
       severity:
-        typeof obj.severity === 'string' ? (obj.severity) : 'medium',
+        (typeof obj['severity'] === 'string' ? obj['severity'] : 'medium') as ThreatSeverity,
       description:
-        typeof obj.description === 'string' ? (obj.description) : '',
+        typeof obj['description'] === 'string' ? obj['description'] : '',
       raw_data: item,
       processed_at: new Date().toISOString(),
-    } as ThreatData
+    }
   })
 }
 
 export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
-  const groups = threatData.reduce(
+  const groups = threatData.reduce<Record<string, ThreatData[]>>(
     (acc, t) => {
       const key = JSON.stringify({ type: t.type, source: t.source })
-      ;(acc[key] = acc[key] || []).push(t)
+      if (!acc[key]) {
+        acc[key] = []
+      }
+      acc[key].push(t)
       return acc
     },
-    {} as Record<string, ThreatData[]>,
+    {},
   )
 
   const patterns: ThreatPattern[] = []
   for (const [key, items] of Object.entries(groups)) {
     if (items.length < 3) continue
-    const { type, source } = JSON.parse(key) as { type: string; source: string }
-    const sorted = items
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-      )
+    const parsedKey = JSON.parse(key) as { type: string; source: string }
+    const { type, source } = parsedKey
+
+    const sorted = [...items].sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    )
+
     const first_seen = Math.min(
       ...sorted.map((s) => new Date(s.timestamp).getTime()),
     )
@@ -108,7 +108,7 @@ export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
       confidence: calculatePatternConfidence(sorted),
       description: `Detected pattern of ${type} threats from ${source}`,
       related_threats: sorted.map((s) => s.id),
-    } as ThreatPattern)
+    })
   }
 
   return patterns
@@ -133,31 +133,29 @@ export function generateFindings(
     const related = threatData.filter((t) =>
       pattern.related_threats.includes(t.id),
     )
-    const patRec = pattern as unknown as Record<string, unknown>
-    const confidence =
-      typeof patRec.confidence === 'number' ? (patRec.confidence) : 0
+
     return {
       id: secureId('finding_'),
       pattern_id: pattern.id,
       title: `Pattern: ${pattern.type} from ${pattern.source}`,
       description: pattern.description,
       severity: calculateFindingSeverity(pattern, related),
-      confidence,
+      confidence: pattern.confidence,
       related_threats: pattern.related_threats,
       created_at: new Date().toISOString(),
       status: 'new',
-    } as ThreatFinding
+    }
   })
 }
 
 function calculateFindingSeverity(
   pattern: ThreatPattern,
   threats: ThreatData[],
-): 'low' | 'medium' | 'high' | 'critical' {
+): ThreatSeverity {
   if (!threats || threats.length === 0) {
     return 'low'
   }
-  const severityMap: Record<string, number> = {
+  const severityMap: Record<ThreatSeverity, number> = {
     low: 1,
     medium: 2,
     high: 3,
@@ -165,28 +163,19 @@ function calculateFindingSeverity(
   }
   const avgSeverity =
     threats.reduce(
-      (sum, t) => sum + (severityMap[(t).severity] || 2),
+      (sum, t) => sum + (severityMap[t.severity] || 2),
       0,
     ) / threats.length
-  const frequencyScore = Math.min(
-    ((pattern).frequency || 0) / 20,
-    1,
-  )
-  const confidenceScore =
-    typeof (pattern).confidence === 'number'
-      ? ((pattern).confidence as number)
-      : 0
+
+  const frequencyScore = Math.min(pattern.frequency / 20, 1)
+  const confidenceScore = pattern.confidence
+
   const combined =
     avgSeverity * 0.4 + frequencyScore * 0.3 + confidenceScore * 0.3
-  if (combined >= 3.5) {
-    return 'critical'
-  }
-  if (combined >= 2.5) {
-    return 'high'
-  }
-  if (combined >= 1.5) {
-    return 'medium'
-  }
+
+  if (combined >= 3.5) return 'critical'
+  if (combined >= 2.5) return 'high'
+  if (combined >= 1.5) return 'medium'
   return 'low'
 }
 
@@ -203,10 +192,10 @@ export function filterByTimeRange(
 
 export function filterBySeverity(
   threatData: ThreatData[],
-  severities: ('low' | 'medium' | 'high' | 'critical')[],
+  severities: ThreatSeverity[],
 ): ThreatData[] {
   return threatData.filter((t) =>
-    severities.includes((t).severity),
+    severities.includes(t.severity),
   )
 }
 
@@ -214,12 +203,12 @@ export function filterByType(
   threatData: ThreatData[],
   types: string[],
 ): ThreatData[] {
-  return threatData.filter((t) => types.includes((t).type))
+  return threatData.filter((t) => types.includes(t.type))
 }
 
 export function aggregateThreatStats(threatData: ThreatData[]) {
   const timestamps = threatData
-    .map((t) => new Date((t).timestamp).getTime())
+    .map((t) => new Date(t.timestamp).getTime())
     .filter((n) => !isNaN(n))
   const earliest =
     timestamps.length > 0 ? new Date(Math.min(...timestamps)) : null
@@ -232,8 +221,7 @@ export function aggregateThreatStats(threatData: ThreatData[]) {
     by_source: {} as Record<string, number>,
     time_range: { earliest, latest },
   }
-  threatData.forEach((threat) => {
-    const t = threat
+  threatData.forEach((t) => {
     stats.by_type[t.type] = (stats.by_type[t.type] || 0) + 1
     stats.by_severity[t.severity] = (stats.by_severity[t.severity] || 0) + 1
     stats.by_source[t.source] = (stats.by_source[t.source] || 0) + 1
@@ -257,29 +245,25 @@ export function exportThreatData(
         'severity',
         'description',
       ]
-      const rows = data.map((threat) => {
-        const t = threat
-        return [
-          t.id,
-          t.timestamp,
-          t.source,
-          t.type,
-          t.severity,
-          `"${(t.description || '').replace(/"/g, '""')}"`,
-        ]
-      })
+      const rows = data.map((t) => [
+        t.id,
+        t.timestamp,
+        t.source,
+        t.type,
+        t.severity,
+        `"${(t.description || '').replace(/"/g, '""')}"`,
+      ])
       return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
     }
     case 'xml': {
       const xmlItems = data
-        .map((threat) => {
-          const t = threat
-          return `  <threat>\n    <id>${escapeXml(String(t.id || ''))}</id>\n    <timestamp>${escapeXml(String(t.timestamp || ''))}</timestamp>\n    <source>${escapeXml(String(t.source || ''))}</source>\n    <type>${escapeXml(String(t.type || ''))}</type>\n    <severity>${escapeXml(String(t.severity || ''))}</severity>\n    <description>${escapeXml(String(t.description || ''))}</description>\n  </threat>`
-        })
+        .map((t) => `  <threat>\n    <id>${escapeXml(t.id)}</id>\n    <timestamp>${escapeXml(t.timestamp)}</timestamp>\n    <source>${escapeXml(t.source)}</source>\n    <type>${escapeXml(t.type)}</type>\n    <severity>${escapeXml(t.severity)}</severity>\n    <description>${escapeXml(t.description)}</description>\n  </threat>`)
         .join('\n')
       return `<?xml version="1.0" encoding="UTF-8"?>\n<threat_data>\n  <count>${data.length}</count>\n  <items>\n${xmlItems}\n  </items>\n</threat_data>`
     }
-    default:
-      throw new Error(`Unsupported export format: ${format}`)
+    default: {
+      const unsupported = format as string
+      throw new Error(`Unsupported export format: ${unsupported}`)
+    }
   }
 }

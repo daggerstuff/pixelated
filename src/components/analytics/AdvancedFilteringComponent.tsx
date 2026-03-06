@@ -199,12 +199,12 @@ export function AdvancedFilteringComponent({
                     'timeRange',
                     'presetRange',
                     value as
-                      | 'day'
-                      | 'week'
-                      | 'month'
-                      | 'quarter'
-                      | 'year'
-                      | 'custom',
+                    | 'day'
+                    | 'week'
+                    | 'month'
+                    | 'quarter'
+                    | 'year'
+                    | 'custom',
                   )
                 }
                 placeholder='Select time range'
@@ -369,7 +369,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                      .valence[1]
+                                    .valence[1]
                                   : 1,
                               ],
                             )
@@ -395,7 +395,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                      .valence[0]
+                                    .valence[0]
                                   : -1,
                                 max,
                               ],
@@ -438,7 +438,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                      .arousal[1]
+                                    .arousal[1]
                                   : 1,
                               ],
                             )
@@ -464,7 +464,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                      .arousal[0]
+                                    .arousal[0]
                                   : -1,
                                 max,
                               ],
@@ -509,7 +509,7 @@ export function AdvancedFilteringComponent({
                                 min,
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                      .dominance[1]
+                                    .dominance[1]
                                   : 1,
                               ],
                             )
@@ -535,7 +535,7 @@ export function AdvancedFilteringComponent({
                               [
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                      .dominance[0]
+                                    .dominance[0]
                                   : -1,
                                 max,
                               ],
@@ -786,12 +786,16 @@ export function AdvancedFilteringComponent({
                 </Button>
               </div>
 
-              <div className='mb-4 flex border-b'>
+              <div className='mb-4 flex border-b' role='tablist'>
                 {(
                   ['time', 'emotions', 'patterns', 'visualization'] as const
                 ).map((tab) => (
                   <button
                     key={tab}
+                    role='tab'
+                    aria-selected={activeTab === tab}
+                    aria-controls={`${tab}-panel`}
+                    id={`${tab}-tab`}
                     className={cn(
                       'py-2 px-3 text-sm capitalize',
                       activeTab === tab
@@ -805,7 +809,12 @@ export function AdvancedFilteringComponent({
                 ))}
               </div>
 
-              <div className='max-h-96 overflow-y-auto'>
+              <div
+                className='max-h-96 overflow-y-auto'
+                id={`${activeTab}-panel`}
+                role='tabpanel'
+                aria-labelledby={`${activeTab}-tab`}
+              >
                 {renderFilterSection()}
               </div>
 

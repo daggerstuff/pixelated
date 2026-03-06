@@ -1,13 +1,24 @@
 declare module '@react-three/fiber' {
   import type * as React from 'react'
-  import type * as THREE from 'three'
+  import type {
+    BufferGeometry,
+    Camera,
+    Clock,
+    Material,
+    Object3D,
+    Raycaster,
+    Scene,
+    Vector2,
+    WebGLRenderer,
+    WebGLRendererParameters,
+  } from 'three'
 
   interface CanvasProps {
     children?: React.ReactNode
-    camera?: THREE.Camera | Partial<THREE.CameraProps>
-    gl?: THREE.WebGLRenderer | Partial<THREE.WebGLRendererParameters>
+    camera?: Camera | Partial<Camera>
+    gl?: WebGLRenderer | Partial<WebGLRendererParameters>
     shadows?: boolean
-    raycaster?: THREE.Raycaster
+    raycaster?: Raycaster
     frameloop?: 'always' | 'demand' | 'never'
     performance?: {
       current?: number
@@ -27,14 +38,14 @@ declare module '@react-three/fiber' {
   }
 
   interface RootState {
-    camera: THREE.Camera
-    scene: THREE.Scene
-    gl: THREE.WebGLRenderer
+    camera: Camera
+    scene: Scene
+    gl: WebGLRenderer
     size: { width: number; height: number }
     viewport: { width: number; height: number }
-    pointer: THREE.Vector2
-    clock: THREE.Clock
-    mouse: THREE.Vector2
+    pointer: Vector2
+    clock: Clock
+    mouse: Vector2
     frameloop: 'always' | 'demand' | 'never'
     performance: {
       current: number
@@ -56,7 +67,7 @@ declare module '@react-three/fiber' {
   ): void
 
   export function extend(
-    objects: Record<string, THREE.Object3D | THREE.Material | THREE.Geometry>,
+    objects: Record<string, Object3D | Material | BufferGeometry>,
   ): void
 
   export function useThree(): RootState

@@ -44,7 +44,7 @@ import type React from 'react'
 // Lazy load the charts component to reduce initial bundle size
 // const BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 
 import { Alert } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
@@ -81,10 +81,23 @@ import type {
   BiasDashboardData,
   BiasAnalysisResult,
   DashboardRecommendation,
-  BiasAlert,
   BiasDashboardSummary,
 } from '@/lib/ai/bias-detection'
+import { exportBiasDashboardData } from '@/components/admin/bias-detection/utils/export-dashboard-data'
+import {
+  isAlertItem,
+  isAlertItemArray,
+  isAlertLevel,
+  isBiasAnalysisItem,
+  isBiasAnalysisItemArray,
+  isBiasAnalysisResult,
+  isExportFormat,
+  isPartialBiasDashboardSummary,
+  isTrendItemArray,
+} from '@/components/admin/bias-detection/utils/dashboard-type-guards'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { cn, isObject } from '@/lib/utils'
+import { useBiasDashboardWebSocket } from '@/components/admin/bias-detection/hooks/useBiasDashboardWebSocket'
 
 const logger = createBuildSafeLogger('bias-dashboard')
 
@@ -113,11 +126,6 @@ interface AlertAction {
   notes?: string
 }
 
-// Extended WebSocket interface for heartbeat
-interface ExtendedWebSocket extends WebSocket {
-  heartbeatInterval?: ReturnType<typeof setInterval>
-}
-
 // Type for filtered data
 interface BaseFilterableItem {
   timestamp?: string | Date
@@ -132,10 +140,11 @@ interface BiasAnalysisItem extends BaseFilterableItem {
 
 interface AlertItem extends BaseFilterableItem {
   alertId: string
-  type: string
+  type?: string
   message: string
   level: string
   sessionId: string
+  timestamp: string | Date
   acknowledged?: boolean
   status?: string
 }
@@ -151,14 +160,18 @@ interface AlertItem extends BaseFilterableItem {
 //   | { type: 'heartbeat_response' }
 
 interface TrendItem extends BaseFilterableItem {
+  date: string
+  time?: string
   biasScore: number
   sessionCount: number
   alertCount: number
 }
 
-type FilterableData = Array<
-  BaseFilterableItem | BiasAnalysisItem | AlertItem | TrendItem
->
+type FilterableData =
+  | BaseFilterableItem[]
+  | BiasAnalysisItem[]
+  | AlertItem[]
+  | TrendItem[]
 
 // Tooltip props type
 interface TooltipProps {
@@ -195,7 +208,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     'disconnected' | 'connecting' | 'connected' | 'error' | 'reconnecting'
   >('disconnected')
   const [wsReconnectAttempts, setWsReconnectAttempts] = useState(0)
-  const wsRef = useRef<ExtendedWebSocket | null>(null)
+  const wsRef = useRef<WebSocket | null>(null)
 
   // Filtering state
   const [biasScoreFilter, setBiasScoreFilter] = useState<
@@ -450,13 +463,12 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
       return data.filter((item) => {
         // Type guard to check if item has bias score properties
-        const score = (
-          'biasScore' in item
-            ? item.biasScore
-            : 'overallBiasScore' in item
-              ? item.overallBiasScore
-              : 0
-        )
+        let score = 0
+        if ('biasScore' in item && typeof item.biasScore === 'number') {
+          score = item.biasScore
+        } else if ('overallBiasScore' in item && typeof item.overallBiasScore === 'number') {
+          score = item.overallBiasScore
+        }
         switch (filter) {
           case 'low':
             return score < 0.3
@@ -550,28 +562,36 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             if (!prev) {
               return prev
             }
+            // Helper function to normalize timestamp to always be defined
+            const normalizeTimestamp = (
+              ts: string | Date | undefined,
+            ): Date | string => {
+              if (ts === undefined) {
+                return new Date().toISOString()
+              }
+              if (ts instanceof Date) {
+                return ts
+              }
+              return ts
+            }
+
             return {
               ...prev,
-              alerts: prev.alerts.map((alert: AlertItem) => {
+              alerts: prev.alerts.map((alert) => {
+                const normalizedTimestamp = normalizeTimestamp(alert.timestamp)
+
                 if (alert.alertId === alertId) {
-                  // Ensure timestamp is a Date and all BiasAlert fields are present
                   return {
                     ...alert,
                     acknowledged: true,
                     status: action,
-                    timestamp:
-                      alert.timestamp instanceof Date
-                        ? alert.timestamp
-                        : new Date(alert.timestamp!),
-                  } as typeof alert
+                    timestamp: normalizedTimestamp,
+                  }
                 }
                 return {
                   ...alert,
-                  timestamp:
-                    alert.timestamp instanceof Date
-                      ? alert.timestamp
-                      : new Date(alert.timestamp!),
-                } as typeof alert
+                  timestamp: normalizedTimestamp,
+                }
               }),
             }
           })
@@ -652,7 +672,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     setSelectedAlerts(
       new Set(
         filteredAlerts
-          .map((alert) => ('alertId' in alert ? alert.alertId : ''))
+          .map((alert: BaseFilterableItem | AlertItem) => ('alertId' in alert ? alert.alertId : ''))
           .filter(Boolean),
       ),
     )
@@ -757,336 +777,179 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     }
   }, [])
 
-  // WebSocket connection setup
-  useEffect(() => {
-    if (!enableRealTimeUpdates) {
-      return
-    }
+  const handleWebSocketMessage = useCallback((event: MessageEvent, socket: WebSocket) => {
+    try {
+      const data: unknown = JSON.parse(event.data)
 
-    let reconnectAttempts = 0
-    const maxReconnectAttempts = 5
-    const reconnectDelay = 1000 // Start with 1 second
+      if (!isObject(data) || typeof data['type'] !== 'string') {
+        logger.warn('WS message missing type', { data })
+        return
+      }
 
-    const connectWebSocket = () => {
-      try {
-        setWsConnectionStatus('connecting')
-        const wsUrl =
-          process.env['NEXT_PUBLIC_WS_URL'] ||
-          'ws://localhost:8000/bias-detection'
-        const ws = new WebSocket(wsUrl)
-        wsRef.current = ws
+      const message = data as Record<string, unknown>
 
-        ws.onopen = () => {
-          setWsConnected(true)
-          setWsConnectionStatus('connected')
-          setWsReconnectAttempts(0)
-          reconnectAttempts = 0 // Reset attempts on successful connection
-          // Use distinct message for screen readers to avoid duplicating visible label text
-          announceToScreenReader('Live updates connection established')
-          logger.info('WebSocket connection established', { url: wsUrl })
-
-          // Send initial subscription message
-          ws.send(
-            JSON.stringify({
-              type: 'subscribe',
-              channels: [
-                'bias_alerts',
-                'session_updates',
-                'metrics_updates',
-                'trends_updates',
-              ],
-              filters: {
-                timeRange: selectedTimeRange,
-                biasScoreFilter,
-                alertLevelFilter,
-              },
-            }),
-          )
+      const getObject = (
+        obj: Record<string, unknown>,
+        key: string,
+      ): Record<string, unknown> | undefined => {
+        if (isObject(obj) && key in obj) {
+          const v = obj[key]
+          return isObject(v) ? (v as Record<string, unknown>) : undefined
         }
+        return undefined
+      }
 
-        ws.onclose = (event) => {
-          setWsConnected(false)
-          // Use distinct message for screen readers
-          announceToScreenReader('Live updates connection closed')
-          logger.info('WebSocket connection closed', {
-            code: event.code,
-            reason: event.reason,
-            wasClean: event.wasClean,
-          })
-
-          // Attempt to reconnect with exponential backoff
-          if (reconnectAttempts < maxReconnectAttempts) {
-            setWsConnectionStatus('reconnecting')
-            const delay = reconnectDelay * 2 ** reconnectAttempts
-            reconnectAttempts++
-            setWsReconnectAttempts(reconnectAttempts)
-
-            logger.info('Attempting to reconnect WebSocket', {
-              attempt: reconnectAttempts,
-              delay,
-              maxAttempts: maxReconnectAttempts,
-            })
-
-            setTimeout(() => {
-              if (wsRef.current?.readyState === WebSocket.CLOSED) {
-                connectWebSocket()
-              }
-            }, delay)
-          } else {
-            setWsConnectionStatus('error')
-            logger.error('Max WebSocket reconnection attempts reached')
+      if (message['type'] === 'bias_alert') {
+        const alertObj = getObject(message, 'alert')
+        if (alertObj && isAlertItem(alertObj)) {
+          const newAlert: AlertItem = alertObj
+          setDashboardData((prev) => {
+            if (!prev) {
+              return prev
+            }
+            if (newAlert.level === 'high' || newAlert.level === 'critical') {
+              setNewHighBiasAlert({
+                ...newAlert,
+                type: 'bias_alert',
+              })
+            }
             announceToScreenReader(
-              'Live updates failed to reconnect. Please refresh the page.',
+              `New ${newAlert.level} bias alert: ${newAlert.message}`,
             )
-          }
+            return {
+              ...prev,
+              alerts: [newAlert, ...(prev.alerts || [])],
+              summary: {
+                ...prev.summary,
+                alertsLast24h: prev.summary.alertsLast24h + 1,
+              },
+            }
+          })
         }
-
-        ws.onerror = (error) => {
-          setWsConnectionStatus('error')
-          setWsConnected(false)
-          logger.error('WebSocket error', { error })
-          // Keep error message distinct from visible label 'Live updates failed'
-          announceToScreenReader('Live updates encountered a connection error')
-        }
-
-        ws.onmessage = (event) => {
-          try {
-            const data: unknown = JSON.parse(event.data)
-
-            const isObject = (v: unknown): v is Record<string, unknown> =>
-              typeof v === 'object' && v !== null
-
-            const hasStringProp = (
-              v: Record<string, unknown>,
-              prop: string,
-            ): boolean => prop in v && typeof v[prop] === 'string'
-
-            if (!isObject(data) || !hasStringProp(data, 'type')) {
-              logger.warn('WS message missing type', { data })
-              return
-            }
-
-            const message = data
-
-            // Helper to safely read nested object fields
-            const getObject = (
-              obj: Record<string, unknown>,
-              key: string,
-            ): Record<string, unknown> | undefined => {
-              const v = obj[key]
-              return isObject(v) ? v : undefined
-            }
-
-            // Handler for bias_alert
-            if (message.type === 'bias_alert') {
-              const alertObj = getObject(message, 'alert')
-              if (alertObj) {
-                const newAlert = alertObj as unknown as BiasAlert // rely on structural typing
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  if (
-                    newAlert.level === 'high' ||
-                    newAlert.level === 'critical'
-                  ) {
-                    setNewHighBiasAlert(newAlert)
-                  }
-                  announceToScreenReader(
-                    `New ${newAlert.level} bias alert: ${newAlert.message}`,
-                  )
-                  return {
-                    ...prev,
-                    alerts: [newAlert, ...(prev.alerts || [])],
-                    summary: {
-                      ...prev.summary,
-                      alertsLast24h: prev.summary.alertsLast24h + 1,
-                    },
-                  }
-                })
-              }
-              setLastUpdated(new Date())
-              return
-            }
-
-            // Handler for session_update
-            if (message.type === 'session_update') {
-              const sessionObj = getObject(message, 'session')
-              if (sessionObj) {
-                const updatedSession =
-                  sessionObj as unknown as BiasAnalysisResult
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    recentAnalyses: prev.recentAnalyses.map(
-                      (session: BiasAnalysisResult) =>
-                        session.sessionId === updatedSession.sessionId
-                          ? updatedSession
-                          : session,
-                    ),
-                  }
-                })
-                announceToScreenReader(
-                  `Session updated: ${updatedSession.sessionId}`,
-                )
-              }
-              setLastUpdated(new Date())
-              return
-            }
-
-            // Handler for metrics_update
-            if (message.type === 'metrics_update') {
-              const metricsObj = getObject(message, 'metrics')
-              if (metricsObj) {
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    summary: {
-                      ...prev.summary,
-                      ...(metricsObj as unknown as Partial<BiasDashboardSummary>),
-                    },
-                  }
-                })
-                announceToScreenReader('Dashboard metrics updated')
-              }
-              setLastUpdated(new Date())
-              return
-            }
-
-            // Handler for trends_update
-            if (message.type === 'trends_update') {
-              const trends = message['trends']
-              if (trends !== undefined) {
-                setDashboardData((prev: BiasDashboardData | null) => {
-                  if (!prev) {
-                    return prev
-                  }
-                  return {
-                    ...prev,
-                    trends: (trends as unknown as TrendItem[]) || prev.trends,
-                  }
-                })
-                announceToScreenReader('Trend data updated')
-              }
-              setLastUpdated(new Date())
-              return
-            }
-
-            // Handler for connection_status
-            if (message.type === 'connection_status') {
-              const status =
-                typeof message['status'] === 'string'
-                  ? (message['status'])
-                  : undefined
-              if (status === 'authenticated') {
-                logger.info('WebSocket authenticated successfully')
-              } else if (status === 'error') {
-                const err = message['error']
-                logger.error('WebSocket authentication failed', {
-                  error: isObject(err) ? err : undefined,
-                })
-              }
-              setLastUpdated(new Date())
-              return
-            }
-
-            // Handle heartbeat messages
-            if (message.type === 'heartbeat') {
-              // Respond to server heartbeat with heartbeat_response
-              if (ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'heartbeat_response' }))
-              }
-              return
-            }
-
-            // Update last updated timestamp for any other message types
-            setLastUpdated(new Date())
-          } catch (error: unknown) {
-            logger.error('Failed to process WebSocket message', {
-              error,
-              rawData: event.data,
-            })
-          }
-        }
-
-        // Set up heartbeat to keep connection alive
-        const heartbeatInterval = setInterval(() => {
-          if (ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'heartbeat' }))
-          }
-        }, 30000) // Send heartbeat every 30 seconds
-
-        // Store interval reference for cleanup
-        // Store interval reference for cleanup using extended interface
-        ;(ws as ExtendedWebSocket).heartbeatInterval = heartbeatInterval
-      } catch (error: unknown) {
-        setWsConnectionStatus('error')
-        logger.error('Failed to create WebSocket connection', { error })
-        setWsConnected(false)
+        setLastUpdated(new Date())
+        return
       }
-    }
 
-    connectWebSocket()
-
-    return () => {
-      if (wsRef.current) {
-        // Clear heartbeat interval
-        if ((wsRef.current).heartbeatInterval) {
-          clearInterval((wsRef.current).heartbeatInterval)
+      if (message['type'] === 'session_update') {
+        const sessionObj = getObject(message, 'session')
+        if (sessionObj && isBiasAnalysisResult(sessionObj)) {
+          const updatedSession: BiasAnalysisResult = sessionObj
+          setDashboardData((prev) => {
+            if (!prev) {
+              return prev
+            }
+            return {
+              ...prev,
+              recentAnalyses: prev.recentAnalyses.map((session) =>
+                session.sessionId === updatedSession.sessionId
+                  ? updatedSession
+                  : session,
+              ),
+            }
+          })
+          announceToScreenReader(`Session updated: ${updatedSession.sessionId}`)
         }
-        // Attempt graceful unsubscribe
-        if (wsRef.current.readyState === WebSocket.OPEN) {
-          try {
-            wsRef.current?.send(JSON.stringify({ type: 'unsubscribe' }))
-          } catch {
-            // Intentionally ignore errors during WebSocket unsubscribe/close
-          }
-        }
-        wsRef.current.close(1000, 'Component unmounting')
-        wsRef.current = null
+        setLastUpdated(new Date())
+        return
       }
-    }
-  }, [
-    enableRealTimeUpdates,
-    selectedTimeRange,
-    biasScoreFilter,
-    alertLevelFilter,
-    announceToScreenReader,
-  ])
 
-  // Update WebSocket subscription when filters change
-  useEffect(() => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current?.send(
-        JSON.stringify({
-          type: 'update_subscription',
-          filters: {
-            timeRange: selectedTimeRange,
-            biasScoreFilter,
-            alertLevelFilter,
-            demographicFilter: selectedDemographicFilter,
-          },
-        }),
-      )
-      logger.info('Updated WebSocket subscription filters', {
-        timeRange: selectedTimeRange,
-        biasScoreFilter,
-        alertLevelFilter,
-        demographicFilter: selectedDemographicFilter,
+      if (message['type'] === 'metrics_update') {
+        const metricsObj = getObject(message, 'metrics')
+        if (metricsObj && isPartialBiasDashboardSummary(metricsObj)) {
+          setDashboardData((prev) => {
+            if (!prev) {
+              return prev
+            }
+            return {
+              ...prev,
+              summary: {
+                ...prev.summary,
+                ...metricsObj,
+              },
+            }
+          })
+          announceToScreenReader('Dashboard metrics updated')
+        }
+        setLastUpdated(new Date())
+        return
+      }
+
+      if (message['type'] === 'trends_update') {
+        const trends = message['trends']
+        if (trends !== undefined) {
+          setDashboardData((prev: BiasDashboardData | null) => {
+            if (!prev) {
+              return prev
+            }
+            if (isTrendItemArray(trends)) {
+              return {
+                ...prev,
+                trends,
+              }
+            }
+            return prev
+          })
+          announceToScreenReader('Trend data updated')
+        }
+        setLastUpdated(new Date())
+        return
+      }
+
+      if (message['type'] === 'connection_status') {
+        const status = message['status']
+        if (status === 'authenticated') {
+          logger.info('WebSocket authenticated successfully')
+        } else if (status === 'error') {
+          const err = message['error']
+          logger.error('WebSocket authentication failed', {
+            error: isObject(err) ? err : undefined,
+          })
+        }
+        setLastUpdated(new Date())
+        return
+      }
+
+      if (message['type'] === 'heartbeat') {
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({ type: 'heartbeat_response' }))
+        }
+        return
+      }
+
+      setLastUpdated(new Date())
+    } catch (error: unknown) {
+      logger.error('Failed to process WebSocket message', {
+        error,
+        rawData: event.data,
       })
     }
   }, [
+    announceToScreenReader,
+    logger,
+    setDashboardData,
+    setLastUpdated,
+    setNewHighBiasAlert,
+  ])
+
+  useBiasDashboardWebSocket({
+    enableRealTimeUpdates,
+    wsRef,
     selectedTimeRange,
     biasScoreFilter,
     alertLevelFilter,
     selectedDemographicFilter,
-  ])
+    setWsConnectionStatus,
+    setWsConnected,
+    setWsReconnectAttempts,
+    announceToScreenReader,
+    logger: {
+      info: (message: string, details?: Record<string, unknown>) =>
+        logger.info(message, details),
+      error: (message: string, details?: Record<string, unknown>) =>
+        logger.error(message, details),
+    },
+    onMessage: handleWebSocketMessage,
+  })
 
   // Auto-refresh effect
   useEffect(() => {
@@ -1171,143 +1034,39 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // Export dashboard data
 
   // Enhanced export function with progress tracking
-  const exportDataWithOptions = async () => {
-    try {
-      setExportProgress({
-        isExporting: true,
-        progress: 0,
-        status: 'Preparing export...',
-      })
-
-      // Prepare export parameters
-      const exportParams = {
-        format: exportFormat,
-        dateRange: exportDateRange,
-        dataTypes: exportDataTypes,
-        filters: exportFilters,
-        currentFilters: exportFilters.applyCurrentFilters
-          ? {
-              timeRange: selectedTimeRange,
-              biasScoreFilter,
-              alertLevelFilter,
-              demographicFilter: selectedDemographicFilter,
-              customDateRange:
-                selectedTimeRange === 'custom' ? customDateRange : undefined,
-            }
-          : undefined,
-      }
-
-      setExportProgress((prev) => ({
-        ...prev,
-        progress: 25,
-        status: 'Gathering data...',
-      }))
-
-      const response = await fetch('/api/bias-detection/export', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(exportParams),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Export failed: ${response.statusText}`)
-      }
-
-      setExportProgress((prev) => ({
-        ...prev,
-        progress: 75,
-        status: 'Generating file...',
-      }))
-
-      // Handle different response types based on format
-      let blob: Blob
-      let filename: string
-      const timestamp = new Date().toISOString().split('T')[0]
-
-      switch (exportFormat) {
-        case 'json':
-          blob = await response.blob()
-          filename = `bias-dashboard-${timestamp}.json`
-          break
-        case 'csv':
-          blob = await response.blob()
-          filename = `bias-dashboard-${timestamp}.csv`
-          break
-        case 'pdf':
-          blob = await response.blob()
-          filename = `bias-dashboard-report-${timestamp}.pdf`
-          break
-        default:
-          throw new Error('Unsupported export format')
-      }
-
-      setExportProgress((prev) => ({
-        ...prev,
-        progress: 90,
-        status: 'Downloading file...',
-      }))
-
-      // Download the file
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-
-      setExportProgress((prev) => ({
-        ...prev,
-        progress: 100,
-        status: 'Export completed!',
-      }))
-
-      // Close dialog after successful export
-      setTimeout(() => {
-        setShowExportDialog(false)
-        setExportProgress({
-          isExporting: false,
-          progress: 0,
-          status: '',
-        })
-      }, 1500)
-
-      logger.info('Dashboard data exported successfully', {
-        format: exportFormat,
-        dataTypes: Object.keys(exportDataTypes).filter(
-          (key) => exportDataTypes[key as keyof typeof exportDataTypes],
-        ),
-        dateRange: exportDateRange,
-        filename,
-      })
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error
-          ? (err)?.message || String(err)
-          : 'Export failed'
-      setExportProgress({
-        isExporting: false,
-        progress: 0,
-        status: `Error: ${errorMessage}`,
-      })
-      logger.error('Export failed', {
-        error: errorMessage,
-        exportParams: { format: exportFormat, dataTypes: exportDataTypes },
-      })
-
-      // Clear error after 3 seconds
-      setTimeout(() => {
-        setExportProgress({
-          isExporting: false,
-          progress: 0,
-          status: '',
-        })
-      }, 3000)
-    }
-  }
+  const exportDataWithOptions = useCallback(() => {
+    return exportBiasDashboardData({
+      format: exportFormat,
+      exportDateRange,
+      exportDataTypes,
+      exportFilters,
+      selectedTimeRange,
+      biasScoreFilter,
+      alertLevelFilter,
+      selectedDemographicFilter,
+      customDateRange,
+      setExportProgress,
+      setShowExportDialog,
+      logger: {
+        info: (message, details) => logger.info(message, details),
+        error: (message, details) => logger.error(message, details),
+      },
+      dashboardData,
+    })
+  }, [
+    alertLevelFilter,
+    biasScoreFilter,
+    customDateRange,
+    dashboardData,
+    exportDateRange,
+    exportDataTypes,
+    exportFilters,
+    exportFormat,
+    selectedDemographicFilter,
+    selectedTimeRange,
+    setExportProgress,
+    setShowExportDialog,
+  ])
 
   // Add new helper functions
   const getChartColors = (index: number, total: number) => {
@@ -1473,8 +1232,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     summary = {
       totalSessions: 0,
       averageBiasScore: 0,
-      highBiasSessions: 0,
-      totalAlerts: 0,
+      alertsLayerBreakdown: {},
+      alertsLast24h: 0,
+      activeAlerts: 0,
+      trendDirection: 'stable',
+      alerts: { low: 0, medium: 0, high: 0, critical: 0 },
       complianceScore: 0,
     },
     recentAnalyses = [],
@@ -1489,12 +1251,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   } = dashboardData
 
   // Apply filters to data
-  const filteredTrends =
-    (getFilteredData(trends, 'trends') as TrendItem[]) || []
-  const filteredAlerts =
-    (getFilteredData(alerts, 'alerts') as AlertItem[]) || []
-  const filteredSessions =
-    (getFilteredData(recentAnalyses, 'sessions') as BiasAnalysisItem[]) || []
+  // Apply filters to data with memoization
+  const filteredTrends = useMemo<BiasDashboardData['trends']>(() => {
+    const data = getFilteredData(trends, 'trends')
+    return isTrendItemArray(data) ? data : []
+  }, [getFilteredData, trends])
+
+  const filteredAlerts = useMemo<AlertItem[]>(() => {
+    const data = getFilteredData(alerts, 'alerts')
+    return isAlertItemArray(data) ? data : []
+  }, [getFilteredData, alerts])
+
+  const filteredSessions = useMemo<BiasAnalysisItem[]>(() => {
+    const data = getFilteredData(recentAnalyses, 'sessions')
+    return isBiasAnalysisItemArray(data) ? data : []
+  }, [getFilteredData, recentAnalyses])
 
   return (
     <div
@@ -1558,16 +1329,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
       {/* Header */}
       <header
-        className={`flex ${isMobile ? 'flex-col space-y-4' : 'flex-row items-center justify-between'}`}
+        className={cn('flex', isMobile ? 'flex-col space-y-4' : 'flex-row items-center justify-between')}
       >
         <div>
-          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold`}>
+          <h1 className={cn('font-bold', isMobile ? 'text-2xl' : 'text-3xl')}>
             Bias Detection Dashboard
           </h1>
-          <p className={`text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>
+          <p className={cn('text-muted-foreground', isMobile && 'text-sm')}>
             Real-time monitoring of therapeutic training bias
             {lastUpdated && (
-              <span className={`${isMobile ? 'block' : 'ml-2'}`}>
+              <span className={isMobile ? 'block' : 'ml-2'}>
                 • Last updated: {lastUpdated.toLocaleTimeString()}
               </span>
             )}
@@ -1669,567 +1440,364 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             Export Data
           </Button>
         </div>
-      </header>
+      </header >
 
       {/* Notification Settings Panel */}
-      {showNotificationSettings && (
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
-              <span className='flex items-center'>
-                <Bell className='mr-2 h-5 w-5' />
-                Notification Settings Panel
-              </span>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={() => setShowNotificationSettings(false)}
-                aria-label='Close notification settings panel'
-                data-testid='close-notification-settings'
-              >
-                <X className='h-4 w-4' />
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-              {/* Notification Channels */}
-              <div className='space-y-4'>
-                <h4 className='flex items-center font-semibold'>
-                  <MessageSquare className='mr-2 h-4 w-4' />
-                  Notification Channels
-                </h4>
-
-                <div className='space-y-3'>
-                  <label
-                    htmlFor='inAppNotificationsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='inAppNotificationsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.inAppEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          inAppEnabled: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                      aria-label='Enable in-app notifications'
-                    />
-                    <Bell className='h-4 w-4' />
-                    <span>In-App Notifications</span>
-                  </label>
-
-                  <label
-                    htmlFor='emailNotificationsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='emailNotificationsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.emailEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          emailEnabled: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                      aria-label='Enable email notifications'
-                    />
-                    <Mail className='h-4 w-4' />
-                    <span>Email Notifications</span>
-                  </label>
-
-                  <label
-                    htmlFor='smsNotificationsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='smsNotificationsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.smsEnabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          smsEnabled: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                      aria-label='Enable SMS notifications'
-                    />
-                    <MessageSquare className='h-4 w-4' />
-                    <span>SMS Notifications</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Alert Level Settings */}
-              <div className='space-y-4'>
-                <h4 className='flex items-center font-semibold'>
-                  <AlertTriangle className='mr-2 h-4 w-4' />
-                  Alert Level Notifications
-                </h4>
-
-                <div className='space-y-3'>
-                  <label
-                    htmlFor='criticalAlertsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='criticalAlertsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.criticalAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          criticalAlerts: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                    />
-                    <AlertCircle className='text-red-500 h-4 w-4' />
-                    <span>Critical Alerts</span>
-                  </label>
-
-                  <label
-                    htmlFor='highAlertsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='highAlertsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.highAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          highAlerts: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                    />
-                    <AlertTriangle className='text-orange-500 h-4 w-4' />
-                    <span>High Priority Alerts</span>
-                  </label>
-
-                  <label
-                    htmlFor='mediumAlertsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='mediumAlertsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.mediumAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          mediumAlerts: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                    />
-                    <Info className='text-yellow-500 h-4 w-4' />
-                    <span>Medium Priority Alerts</span>
-                  </label>
-
-                  <label
-                    htmlFor='lowAlertsCheckbox'
-                    className='flex items-center space-x-3'
-                  >
-                    <input
-                      id='lowAlertsCheckbox'
-                      type='checkbox'
-                      checked={notificationSettings.lowAlerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        updateNotificationSettings({
-                          lowAlerts: e.target.checked,
-                        })
-                      }
-                      className='rounded'
-                    />
-                    <CheckCircle className='text-blue-500 h-4 w-4' />
-                    <span>Low Priority Alerts</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            {/* Test Notification */}
-            <div className='mt-6 border-t pt-4'>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <h4 className='font-semibold'>Test Notifications</h4>
-                  <p className='text-muted-foreground text-sm'>
-                    Send a test notification to verify your settings
-                  </p>
-                </div>
+      {
+        showNotificationSettings && (
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center justify-between'>
+                <span className='flex items-center'>
+                  <Bell className='mr-2 h-5 w-5' />
+                  Notification Settings Panel
+                </span>
                 <Button
-                  variant='outline'
-                  onClick={sendTestNotification}
-                  disabled={
-                    !notificationSettings.emailEnabled &&
-                    !notificationSettings.smsEnabled &&
-                    !notificationSettings.inAppEnabled
-                  }
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => setShowNotificationSettings(false)}
+                  aria-label='Close notification settings panel'
+                  data-testid='close-notification-settings'
                 >
-                  <Bell className='mr-2 h-4 w-4' />
-                  Send Test
+                  <X className='h-4 w-4' />
                 </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                {/* Notification Channels */}
+                <div className='space-y-4'>
+                  <h4 className='flex items-center font-semibold'>
+                    <MessageSquare className='mr-2 h-4 w-4' />
+                    Notification Channels
+                  </h4>
+
+                  <div className='space-y-3'>
+                    <label
+                      htmlFor='inAppNotificationsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='inAppNotificationsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.inAppEnabled}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            inAppEnabled: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                        aria-label='Enable in-app notifications'
+                      />
+                      <Bell className='h-4 w-4' />
+                      <span>In-App Notifications</span>
+                    </label>
+
+                    <label
+                      htmlFor='emailNotificationsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='emailNotificationsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.emailEnabled}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            emailEnabled: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                        aria-label='Enable email notifications'
+                      />
+                      <Mail className='h-4 w-4' />
+                      <span>Email Notifications</span>
+                    </label>
+
+                    <label
+                      htmlFor='smsNotificationsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='smsNotificationsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.smsEnabled}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            smsEnabled: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                        aria-label='Enable SMS notifications'
+                      />
+                      <MessageSquare className='h-4 w-4' />
+                      <span>SMS Notifications</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Alert Level Settings */}
+                <div className='space-y-4'>
+                  <h4 className='flex items-center font-semibold'>
+                    <AlertTriangle className='mr-2 h-4 w-4' />
+                    Alert Level Notifications
+                  </h4>
+
+                  <div className='space-y-3'>
+                    <label
+                      htmlFor='criticalAlertsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='criticalAlertsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.criticalAlerts}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            criticalAlerts: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                      />
+                      <AlertCircle className='text-red-500 h-4 w-4' />
+                      <span>Critical Alerts</span>
+                    </label>
+
+                    <label
+                      htmlFor='highAlertsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='highAlertsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.highAlerts}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            highAlerts: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                      />
+                      <AlertTriangle className='text-orange-500 h-4 w-4' />
+                      <span>High Priority Alerts</span>
+                    </label>
+
+                    <label
+                      htmlFor='mediumAlertsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='mediumAlertsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.mediumAlerts}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            mediumAlerts: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                      />
+                      <Info className='text-yellow-500 h-4 w-4' />
+                      <span>Medium Priority Alerts</span>
+                    </label>
+
+                    <label
+                      htmlFor='lowAlertsCheckbox'
+                      className='flex items-center space-x-3'
+                    >
+                      <input
+                        id='lowAlertsCheckbox'
+                        type='checkbox'
+                        checked={notificationSettings.lowAlerts}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          updateNotificationSettings({
+                            lowAlerts: e.target.checked,
+                          })
+                        }
+                        className='rounded'
+                      />
+                      <CheckCircle className='text-blue-500 h-4 w-4' />
+                      <span>Low Priority Alerts</span>
+                    </label>
+                  </div>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
+              {/* Test Notification */}
+              <div className='mt-6 border-t pt-4'>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <h4 className='font-semibold'>Test Notifications</h4>
+                    <p className='text-muted-foreground text-sm'>
+                      Send a test notification to verify your settings
+                    </p>
+                  </div>
+                  <Button
+                    variant='outline'
+                    onClick={sendTestNotification}
+                    disabled={
+                      !notificationSettings.emailEnabled &&
+                      !notificationSettings.smsEnabled &&
+                      !notificationSettings.inAppEnabled
+                    }
+                  >
+                    <Bell className='mr-2 h-4 w-4' />
+                    Send Test
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )
+      }
 
       {/* Data Export Dialog */}
-      {showExportDialog && (
-        <Card>
-          <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
-              <span className='flex items-center'>
-                <Download className='mr-2 h-5 w-5' />
-                Export Dashboard Data Dialog
-              </span>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={() => setShowExportDialog(false)}
-                disabled={exportProgress.isExporting}
-                aria-label='Close export dialog'
-                data-testid='close-export-dialog'
-              >
-                <X className='h-4 w-4' />
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-6'>
-              {/* Export Format Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <PieChartIcon className='mr-2 h-4 w-4' />
-                  Export Format
-                </h4>
-                <div className='grid grid-cols-3 gap-3'>
-                  <label
-                    htmlFor='exportFormatJson'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as JSON format'
-                  >
-                    <input
-                      id='exportFormatJson'
-                      type='radio'
-                      name='exportFormat'
-                      value='json'
-                      checked={exportFormat === 'json'}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportFormat(e.target.value as 'json')
-                      }
-                      className='rounded'
-                      aria-describedby='json-format-description'
-                    />
-                    <div>
-                      <div className='font-medium'>JSON</div>
-                      <div
-                        className='text-muted-foreground text-xs'
-                        id='json-format-description'
-                      >
-                        Raw data format
-                      </div>
-                    </div>
-                  </label>
-
-                  <label
-                    htmlFor='exportFormatCsv'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as CSV format'
-                  >
-                    <input
-                      id='exportFormatCsv'
-                      type='radio'
-                      name='exportFormat'
-                      value='csv'
-                      checked={exportFormat === 'csv'}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportFormat(e.target.value as 'csv')
-                      }
-                      className='rounded'
-                      aria-describedby='csv-format-description'
-                    />
-                    <div>
-                      <div className='font-medium'>CSV</div>
-                      <div
-                        className='text-muted-foreground text-xs'
-                        id='csv-format-description'
-                      >
-                        Spreadsheet format
-                      </div>
-                    </div>
-                  </label>
-
-                  <label
-                    htmlFor='exportFormatPdf'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as PDF format'
-                  >
-                    <input
-                      id='exportFormatPdf'
-                      type='radio'
-                      name='exportFormat'
-                      value='pdf'
-                      checked={exportFormat === 'pdf'}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportFormat(e.target.value as 'pdf')
-                      }
-                      className='rounded'
-                      aria-describedby='pdf-format-description'
-                    />
-                    <div>
-                      <div className='font-medium'>PDF</div>
-                      <div
-                        className='text-muted-foreground text-xs'
-                        id='pdf-format-description'
-                      >
-                        Report format
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {/* Date Range Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <Calendar className='mr-2 h-4 w-4' />
-                  Date Range
-                </h4>
-                <div className='grid grid-cols-2 gap-3'>
-                  <div>
-                    <label
-                      htmlFor='export-start-date'
-                      className='text-sm font-medium'
-                    >
-                      Start Date
-                    </label>
-                    <input
-                      id='export-start-date'
-                      type='date'
-                      value={exportDateRange.start}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDateRange((prev) => ({
-                          ...prev,
-                          start: e.target.value,
-                        }))
-                      }
-                      className='mt-1 w-full rounded-md border bg-background p-2'
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor='export-end-date'
-                      className='text-sm font-medium'
-                    >
-                      End Date
-                    </label>
-                    <input
-                      id='export-end-date'
-                      type='date'
-                      value={exportDateRange.end}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDateRange((prev) => ({
-                          ...prev,
-                          end: e.target.value,
-                        }))
-                      }
-                      className='mt-1 w-full rounded-md border bg-background p-2'
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Data Types Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <BarChart3 className='mr-2 h-4 w-4' />
-                  Data to Include
-                </h4>
-                <div className='grid grid-cols-2 gap-3'>
-                  <label
-                    htmlFor='exportSummaryCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportSummaryCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.summary}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          summary: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Summary Metrics</span>
-                  </label>
-
-                  <label
-                    htmlFor='exportAlertsCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportAlertsCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.alerts}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          alerts: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Alerts</span>
-                  </label>
-
-                  <label
-                    htmlFor='exportTrendsCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportTrendsCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.trends}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          trends: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Trend Data</span>
-                  </label>
-
-                  <label
-                    htmlFor='exportDemographicsCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportDemographicsCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.demographics}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          demographics: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Demographics</span>
-                  </label>
-
-                  <label
-                    htmlFor='exportSessionsCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportSessionsCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.sessions}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          sessions: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Session Data</span>
-                  </label>
-
-                  <label
-                    htmlFor='exportRecommendationsCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='exportRecommendationsCheckbox'
-                      type='checkbox'
-                      checked={exportDataTypes.recommendations}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportDataTypes((prev) => ({
-                          ...prev,
-                          recommendations: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Recommendations</span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Export Filters */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <Filter className='mr-2 h-4 w-4' />
-                  Export Options
-                </h4>
+      {
+        showExportDialog && (
+          <Card>
+            <CardHeader>
+              <CardTitle className='flex items-center justify-between'>
+                <span className='flex items-center'>
+                  <Download className='mr-2 h-5 w-5' />
+                  Export Dashboard Data Dialog
+                </span>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  onClick={() => setShowExportDialog(false)}
+                  disabled={exportProgress.isExporting}
+                  aria-label='Close export dialog'
+                  data-testid='close-export-dialog'
+                >
+                  <X className='h-4 w-4' />
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='space-y-6'>
+                {/* Export Format Selection */}
                 <div className='space-y-3'>
-                  <label
-                    htmlFor='applyCurrentFiltersCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='applyCurrentFiltersCheckbox'
-                      type='checkbox'
-                      checked={exportFilters.applyCurrentFilters}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportFilters((prev) => ({
-                          ...prev,
-                          applyCurrentFilters: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Apply current dashboard filters</span>
-                  </label>
+                  <h4 className='flex items-center font-semibold'>
+                    <PieChartIcon className='mr-2 h-4 w-4' />
+                    Export Format
+                  </h4>
+                  <div className='grid grid-cols-3 gap-3'>
+                    <label
+                      htmlFor='exportFormatJson'
+                      className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
+                      aria-label='Export data as JSON format'
+                    >
+                      <input
+                        id='exportFormatJson'
+                        type='radio'
+                        name='exportFormat'
+                        value='json'
+                        checked={exportFormat === 'json'}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value
+                          if (isExportFormat(value)) {
+                            setExportFormat(value)
+                          }
+                        }}
+                        className='rounded'
+                        aria-describedby='json-format-description'
+                      />
+                      <div>
+                        <div className='font-medium'>JSON</div>
+                        <div
+                          className='text-muted-foreground text-xs'
+                          id='json-format-description'
+                        >
+                          Raw data format
+                        </div>
+                      </div>
+                    </label>
 
-                  <label
-                    htmlFor='includeArchivedCheckbox'
-                    className='flex items-center space-x-2'
-                  >
-                    <input
-                      id='includeArchivedCheckbox'
-                      type='checkbox'
-                      checked={exportFilters.includeArchived}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                        setExportFilters((prev) => ({
-                          ...prev,
-                          includeArchived: e.target.checked,
-                        }))
-                      }
-                      className='rounded'
-                    />
-                    <span>Include archived alerts</span>
-                  </label>
+                    <label
+                      htmlFor='exportFormatCsv'
+                      className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
+                      aria-label='Export data as CSV format'
+                    >
+                      <input
+                        id='exportFormatCsv'
+                        type='radio'
+                        name='exportFormat'
+                        value='csv'
+                        checked={exportFormat === 'csv'}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value
+                          if (isExportFormat(value)) {
+                            setExportFormat(value)
+                          }
+                        }}
+                        className='rounded'
+                        aria-describedby='csv-format-description'
+                      />
+                      <div>
+                        <div className='font-medium'>CSV</div>
+                        <div
+                          className='text-muted-foreground text-xs'
+                          id='csv-format-description'
+                        >
+                          Spreadsheet format
+                        </div>
+                      </div>
+                    </label>
 
+                    <label
+                      htmlFor='exportFormatPdf'
+                      className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
+                      aria-label='Export data as PDF format'
+                    >
+                      <input
+                        id='exportFormatPdf'
+                        type='radio'
+                        name='exportFormat'
+                        value='pdf'
+                        checked={exportFormat === 'pdf'}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const value = e.target.value
+                          if (isExportFormat(value)) {
+                            setExportFormat(value)
+                          }
+                        }}
+                        className='rounded'
+                        aria-describedby='pdf-format-description'
+                      />
+                      <div>
+                        <div className='font-medium'>PDF</div>
+                        <div
+                          className='text-muted-foreground text-xs'
+                          id='pdf-format-description'
+                        >
+                          Report format
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Date Range Selection */}
+                <div className='space-y-3'>
+                  <h4 className='flex items-center font-semibold'>
+                    <Calendar className='mr-2 h-4 w-4' />
+                    Date Range
+                  </h4>
                   <div className='grid grid-cols-2 gap-3'>
                     <div>
                       <label
-                        htmlFor='export-min-bias'
+                        htmlFor='export-start-date'
                         className='text-sm font-medium'
                       >
-                        Min Bias Score
+                        Start Date
                       </label>
                       <input
-                        id='export-min-bias'
-                        type='number'
-                        min='0'
-                        max='1'
-                        step='0.1'
-                        value={exportFilters.minBiasScore}
+                        id='export-start-date'
+                        type='date'
+                        value={exportDateRange.start}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setExportFilters((prev) => ({
+                          setExportDateRange((prev) => ({
                             ...prev,
-                            minBiasScore: Number.parseFloat(e.target.value),
+                            start: e.target.value,
                           }))
                         }
                         className='mt-1 w-full rounded-md border bg-background p-2'
@@ -2237,22 +1805,19 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     </div>
                     <div>
                       <label
-                        htmlFor='export-max-bias'
+                        htmlFor='export-end-date'
                         className='text-sm font-medium'
                       >
-                        Max Bias Score
+                        End Date
                       </label>
                       <input
-                        id='export-max-bias'
-                        type='number'
-                        min='0'
-                        max='1'
-                        step='0.1'
-                        value={exportFilters.maxBiasScore}
+                        id='export-end-date'
+                        type='date'
+                        value={exportDateRange.end}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                          setExportFilters((prev) => ({
+                          setExportDateRange((prev) => ({
                             ...prev,
-                            maxBiasScore: Number.parseFloat(e.target.value),
+                            end: e.target.value,
                           }))
                         }
                         className='mt-1 w-full rounded-md border bg-background p-2'
@@ -2260,89 +1825,307 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Export Progress */}
-              {exportProgress.isExporting && (
+                {/* Data Types Selection */}
                 <div className='space-y-3'>
                   <h4 className='flex items-center font-semibold'>
-                    <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
-                    Export Progress
+                    <BarChart3 className='mr-2 h-4 w-4' />
+                    Data to Include
                   </h4>
-                  <div className='space-y-2'>
-                    <div className='flex items-center justify-between text-sm'>
-                      <span>{exportProgress.status}</span>
-                      <span>{exportProgress.progress}%</span>
-                    </div>
-                    <Progress
-                      value={exportProgress.progress}
-                      className='w-full'
-                    />
+                  <div className='grid grid-cols-2 gap-3'>
+                    <label
+                      htmlFor='exportSummaryCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportSummaryCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.summary}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            summary: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Summary Metrics</span>
+                    </label>
+
+                    <label
+                      htmlFor='exportAlertsCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportAlertsCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.alerts}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            alerts: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Alerts</span>
+                    </label>
+
+                    <label
+                      htmlFor='exportTrendsCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportTrendsCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.trends}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            trends: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Trend Data</span>
+                    </label>
+
+                    <label
+                      htmlFor='exportDemographicsCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportDemographicsCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.demographics}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            demographics: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Demographics</span>
+                    </label>
+
+                    <label
+                      htmlFor='exportSessionsCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportSessionsCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.sessions}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            sessions: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Session Data</span>
+                    </label>
+
+                    <label
+                      htmlFor='exportRecommendationsCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='exportRecommendationsCheckbox'
+                        type='checkbox'
+                        checked={exportDataTypes.recommendations}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportDataTypes((prev) => ({
+                            ...prev,
+                            recommendations: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Recommendations</span>
+                    </label>
                   </div>
                 </div>
-              )}
 
-              {/* Export Status */}
-              {exportProgress.status && !exportProgress.isExporting && (
-                <div
-                  className={`rounded-md p-3 ${
-                    exportProgress.status.startsWith('Error')
+                {/* Export Filters */}
+                <div className='space-y-3'>
+                  <h4 className='flex items-center font-semibold'>
+                    <Filter className='mr-2 h-4 w-4' />
+                    Export Options
+                  </h4>
+                  <div className='space-y-3'>
+                    <label
+                      htmlFor='applyCurrentFiltersCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='applyCurrentFiltersCheckbox'
+                        type='checkbox'
+                        checked={exportFilters.applyCurrentFilters}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportFilters((prev) => ({
+                            ...prev,
+                            applyCurrentFilters: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Apply current dashboard filters</span>
+                    </label>
+
+                    <label
+                      htmlFor='includeArchivedCheckbox'
+                      className='flex items-center space-x-2'
+                    >
+                      <input
+                        id='includeArchivedCheckbox'
+                        type='checkbox'
+                        checked={exportFilters.includeArchived}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                          setExportFilters((prev) => ({
+                            ...prev,
+                            includeArchived: e.target.checked,
+                          }))
+                        }
+                        className='rounded'
+                      />
+                      <span>Include archived alerts</span>
+                    </label>
+
+                    <div className='grid grid-cols-2 gap-3'>
+                      <div>
+                        <label
+                          htmlFor='export-min-bias'
+                          className='text-sm font-medium'
+                        >
+                          Min Bias Score
+                        </label>
+                        <input
+                          id='export-min-bias'
+                          type='number'
+                          min='0'
+                          max='1'
+                          step='0.1'
+                          value={exportFilters.minBiasScore}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setExportFilters((prev) => ({
+                              ...prev,
+                              minBiasScore: Number.parseFloat(e.target.value),
+                            }))
+                          }
+                          className='mt-1 w-full rounded-md border bg-background p-2'
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor='export-max-bias'
+                          className='text-sm font-medium'
+                        >
+                          Max Bias Score
+                        </label>
+                        <input
+                          id='export-max-bias'
+                          type='number'
+                          min='0'
+                          max='1'
+                          step='0.1'
+                          value={exportFilters.maxBiasScore}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setExportFilters((prev) => ({
+                              ...prev,
+                              maxBiasScore: Number.parseFloat(e.target.value),
+                            }))
+                          }
+                          className='mt-1 w-full rounded-md border bg-background p-2'
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Export Progress */}
+                {exportProgress.isExporting && (
+                  <div className='space-y-3'>
+                    <h4 className='flex items-center font-semibold'>
+                      <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                      Export Progress
+                    </h4>
+                    <div className='space-y-2'>
+                      <div className='flex items-center justify-between text-sm'>
+                        <span>{exportProgress.status}</span>
+                        <span>{exportProgress.progress}%</span>
+                      </div>
+                      <Progress
+                        value={exportProgress.progress}
+                        className='w-full'
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Export Status */}
+                {exportProgress.status && !exportProgress.isExporting && (
+                  <div
+                    className={`rounded-md p-3 ${exportProgress.status.startsWith('Error')
                       ? 'bg-red-50 text-red-700 border-red-200 border'
                       : 'bg-green-50 text-green-700 border-green-200 border'
-                  }`}
-                >
-                  <div className='flex items-center'>
-                    {exportProgress.status.startsWith('Error') ? (
-                      <AlertTriangle className='mr-2 h-4 w-4' />
-                    ) : (
-                      <CheckCircle className='mr-2 h-4 w-4' />
-                    )}
-                    {exportProgress.status}
+                      }`}
+                  >
+                    <div className='flex items-center'>
+                      {exportProgress.status.startsWith('Error') ? (
+                        <AlertTriangle className='mr-2 h-4 w-4' />
+                      ) : (
+                        <CheckCircle className='mr-2 h-4 w-4' />
+                      )}
+                      {exportProgress.status}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className='flex items-center justify-between border-t pt-4'>
+                  <div className='text-muted-foreground text-sm'>
+                    {Object.values(exportDataTypes).filter(Boolean).length} data
+                    types selected
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <Button
+                      variant='outline'
+                      onClick={() => setShowExportDialog(false)}
+                      disabled={exportProgress.isExporting}
+                      data-testid='cancel-export'
+                    >
+                      Cancel Export
+                    </Button>
+                    <Button
+                      onClick={exportDataWithOptions}
+                      disabled={
+                        exportProgress.isExporting ||
+                        !Object.values(exportDataTypes).some(Boolean)
+                      }
+                      data-testid='export-data-button'
+                    >
+                      {exportProgress.isExporting ? (
+                        <>
+                          <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                          Exporting Data...
+                        </>
+                      ) : (
+                        <>
+                          <Download className='mr-2 h-4 w-4' />
+                          Export as {exportFormat.toUpperCase()}
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className='flex items-center justify-between border-t pt-4'>
-                <div className='text-muted-foreground text-sm'>
-                  {Object.values(exportDataTypes).filter(Boolean).length} data
-                  types selected
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <Button
-                    variant='outline'
-                    onClick={() => setShowExportDialog(false)}
-                    disabled={exportProgress.isExporting}
-                    data-testid='cancel-export'
-                  >
-                    Cancel Export
-                  </Button>
-                  <Button
-                    onClick={exportDataWithOptions}
-                    disabled={
-                      exportProgress.isExporting ||
-                      !Object.values(exportDataTypes).some(Boolean)
-                    }
-                    data-testid='export-data-button'
-                  >
-                    {exportProgress.isExporting ? (
-                      <>
-                        <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
-                        Exporting Data...
-                      </>
-                    ) : (
-                      <>
-                        <Download className='mr-2 h-4 w-4' />
-                        Export as {exportFormat.toUpperCase()}
-                      </>
-                    )}
-                  </Button>
-                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+        )
+      }
 
       {/* Filtering Controls */}
       <Card>
@@ -2439,11 +2222,12 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               <select
                 id='bias-score-filter'
                 value={biasScoreFilter}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setBiasScoreFilter(
-                    e.target.value as 'all' | 'low' | 'medium' | 'high',
-                  )
-                }
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  const val = e.target.value
+                  if (val === 'all' || val === 'low' || val === 'medium' || val === 'high') {
+                    setBiasScoreFilter(val)
+                  }
+                }}
                 className='w-full rounded-md border bg-background p-2'
               >
                 <option value='all'>All Levels</option>
@@ -2465,16 +2249,12 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               <select
                 id='alert-level-filter'
                 value={alertLevelFilter}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setAlertLevelFilter(
-                    e.target.value as
-                      | 'all'
-                      | 'low'
-                      | 'medium'
-                      | 'high'
-                      | 'critical',
-                  )
-                }
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  const value = e.target.value
+                  if (isAlertLevel(value)) {
+                    setAlertLevelFilter(value)
+                  }
+                }}
                 className='w-full rounded-md border bg-background p-2'
               >
                 <option value='all'>All Alerts</option>
@@ -2550,16 +2330,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       </Card>
 
       {/* Critical Alerts */}
-      {filteredAlerts.filter(
-        (alert) => alert.level === 'critical' || alert.level === 'high',
-      ).length > 0 && (
-        <Alert
-          variant='error'
-          title='High Priority Bias Alerts'
-          description={`${filteredAlerts.filter((alert) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
-          icon={<AlertTriangle className='h-4 w-4' />}
-        />
-      )}
+      {
+        filteredAlerts.filter(
+          (alert: AlertItem) => alert.level === 'critical' || alert.level === 'high',
+        ).length > 0 && (
+          <Alert
+            variant='error'
+            title='High Priority Bias Alerts'
+            description={`${filteredAlerts.filter((alert: AlertItem) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
+            icon={<AlertTriangle className='h-4 w-4' />}
+          />
+        )
+      }
 
       {/* Summary Cards - Update with filtered data counts */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
@@ -2593,21 +2375,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               className={`text-2xl font-bold ${getBiasScoreColor(
                 filteredSessions.length > 0
                   ? filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) / filteredSessions.length
+                    (sum: number, session: BiasAnalysisItem) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) / filteredSessions.length
                   : (summary?.averageBiasScore ?? 0),
               )}`}
             >
               {filteredSessions.length > 0
                 ? (
-                    (filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
-                  ).toFixed(1)
+                  (filteredSessions.reduce(
+                    (sum: number, session: BiasAnalysisItem) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) /
+                    filteredSessions.length) *
+                  100
+                ).toFixed(1)
                 : ((summary?.averageBiasScore ?? 0) * 100).toFixed(1)}
               %
             </div>
@@ -2615,11 +2397,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               value={
                 filteredSessions.length > 0
                   ? (filteredSessions.reduce(
-                      (sum, session) => sum + (session.overallBiasScore || 0),
-                      0,
-                    ) /
-                      filteredSessions.length) *
-                    100
+                    (sum: number, session: BiasAnalysisItem) => sum + (session.overallBiasScore || 0),
+                    0,
+                  ) /
+                    filteredSessions.length) *
+                  100
                   : (summary?.averageBiasScore ?? 0) * 100
               }
               className='mt-2'
@@ -2652,10 +2434,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <div className='text-green-600 text-2xl font-bold'>
-              {((summary?.complianceScore ?? 0) * 100).toFixed(1)}%
+              {(summary.complianceScore * 100).toFixed(1)}%
             </div>
             <Progress
-              value={(summary?.complianceScore ?? 0) * 100}
+              value={summary.complianceScore * 100}
               className='mt-2'
             />
           </CardContent>
@@ -3207,7 +2989,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       <Badge variant='destructive'>
                         {
                           filteredAlerts.filter(
-                            (a) => a.level === 'critical' || a.level === 'high',
+                            (a: AlertItem) => a.level === 'critical' || a.level === 'high',
                           ).length
                         }{' '}
                         high priority
@@ -3250,7 +3032,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 return (
                   <Card
                     key={alert.alertId}
-                    className={`${isSelected ? 'ring-blue-500 ring-2' : ''}`}
+                    className={isSelected ? 'ring-blue-500 ring-2' : ''}
                   >
                     <CardContent className='p-4'>
                       <div className='flex items-start space-x-3'>
@@ -3456,7 +3238,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 </CardContent>
               </Card>
             ) : (
-              filteredSessions.map((analysis) => (
+              filteredSessions.map((analysis: BiasAnalysisItem) => (
                 <Card key={analysis['sessionId']}>
                   <CardContent className='p-4'>
                     <div className='flex items-center justify-between'>
@@ -3546,6 +3328,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+    </div >
   )
 }
