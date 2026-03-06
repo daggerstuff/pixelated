@@ -40,7 +40,6 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          packs: ${{ matrix.language == 'javascript' && 'pixelated-empathy/custom-security-queries' || '' }}
           queries: security-and-quality,security-extended${{ matrix.language == 'javascript' && ',./.github/codeql/custom-queries/hipaa-compliance.qls' || '' }}
           # Increase RAM allocation for analysis
           ram: 16384
