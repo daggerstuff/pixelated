@@ -87,7 +87,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -179,7 +178,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -346,7 +344,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -485,7 +482,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -550,7 +546,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
