@@ -12,9 +12,9 @@ version: 1.1
 priority: critical
 ---
 
-# Executive Summary - Pixelated Empathy AI Business Strategy
+## Executive Summary - Pixelated Empathy AI Business Strategy
 
-## Platform Overview
+### Platform Overview
 
 Pixelated Empathy is the world's most sophisticated AI-powered mental health
 training platform, uniquely designed to serve a dual purpose:
@@ -124,4 +124,5 @@ The platform measures success through:
 
 This executive summary represents our commitment to revolutionizing mental
 health training through responsible AI innovation while maintaining the highest
-standards of quality, safety, and ethical practice.
+standards of quality, safety, and ethical practice. Key metrics and sources
+are documented in [METRICS-SOURCES.md](METRICS-SOURCES.md).

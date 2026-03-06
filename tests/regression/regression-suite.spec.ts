@@ -211,8 +211,8 @@ test.describe('Regression Test Suite', () => {
       // Check memory usage doesn't spike excessively
       const metrics = await page.evaluate(() => {
         return {
-          usedJSHeapSize: (performance as any).memory?.usedJSHeapSize || 0,
-          totalJSHeapSize: (performance as any).memory?.totalJSHeapSize || 0,
+          usedJSHeapSize: performance.memory?.usedJSHeapSize || 0,
+          totalJSHeapSize: performance.memory?.totalJSHeapSize || 0,
         }
       })
 
@@ -332,13 +332,13 @@ export class RegressionTestUtils {
       for (let i = 0; i < 100; i++) {
         arrays.push(new Array(10000).fill('memory-pressure-test'))
       }
-      ;(window as any).memoryPressureArrays = arrays
+      ;window.memoryPressureArrays = arrays
     })
   }
 
   static async cleanupMemoryPressure(page: any) {
     await page.evaluate(() => {
-      delete (window as any).memoryPressureArrays
+      delete window.memoryPressureArrays
       if (window.gc) {
         window.gc()
       }

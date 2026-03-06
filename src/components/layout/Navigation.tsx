@@ -65,7 +65,17 @@ export function Navigation({
         return false
       }
 
-      const hasRequiredRole = item.roles.includes(user.user.role as UserRole)
+      const isUserRole = (value: unknown): value is UserRole =>
+        value === 'admin' ||
+        value === 'therapist' ||
+        value === 'client' ||
+        value === 'guest'
+
+      if (!isUserRole(user.user.role)) {
+        return false
+      }
+
+      const hasRequiredRole = item.roles.includes(user.user.role)
 
       if (!hasRequiredRole) {
         return false

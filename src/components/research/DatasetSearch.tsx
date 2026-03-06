@@ -10,10 +10,21 @@ export default function DatasetSearch() {
   const [results, setResults] = useState<DatasetMetadata[]>([])
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   // Filters
   const [minTurns, setMinTurns] = useState(1)
   const [minQuality, setMinQuality] = useState(0.0)
+
+  // Automatically search when filters change
+  React.useEffect(() => {
+    if (hasSearched) {
+      const timer = setTimeout(() => {
+        void handleSearch().catch((err) => {
+          console.error('Auto-search failure:', err)
+        })
+      }, 250)
+      return () => clearTimeout(timer)
+    }
+  }, [minTurns, minQuality])
 
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -21,7 +32,6 @@ export default function DatasetSearch() {
     setLoading(true)
     setHasSearched(true)
     setError(null)
-    setResults([])
 
     try {
       // Track search event
@@ -38,12 +48,12 @@ export default function DatasetSearch() {
         limit: 20,
       })
 
-      setResults(data.results)
+      setResults(data.results || [])
     } catch (err: any) {
       console.error('Dataset search error:', err)
       setError(
         err.message ||
-          'Failed to fetch datasets. Please ensure the backend services are running.',
+        'Failed to fetch datasets. Please ensure the backend services are running.',
       )
     } finally {
       setLoading(false)
@@ -51,33 +61,43 @@ export default function DatasetSearch() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-6xl p-4'>
+    <div className='mx-auto w-full max-w-6xl p-4' role='main'>
       <div className='flex flex-col gap-8'>
         {/* Search Header & Controls */}
-        <div className='bg-slate-800/50 border-slate-700 flex flex-col items-end gap-4 rounded-2xl border p-6 md:flex-row'>
+        <div
+          className='bg-slate-800/50 border-slate-700 flex flex-col items-end gap-4 rounded-2xl border p-6 md:flex-row'
+          role='search'
+        >
           <div className='w-full flex-grow'>
-            <label className='text-slate-300 mb-2 block text-sm font-medium'>
+            <label
+              htmlFor='dataset-search'
+              className='text-slate-300 mb-2 block text-sm font-medium'
+            >
               Search Datasets
             </label>
             <div className='relative'>
               <input
+                id='dataset-search'
                 type='text'
                 className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent w-full rounded-lg border px-4 py-3 outline-none focus:ring-2'
                 placeholder='e.g., cbt therapy, depression, multi-turn'
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyDown={(e) => e.key === 'Enter' && void handleSearch()}
+                aria-label='Search therapeutic datasets'
               />
               <div className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
                 <button
-                  onClick={() => handleSearch()}
+                  onClick={() => void handleSearch()}
                   className='bg-pink-600 hover:bg-pink-700 text-white rounded-md p-2 transition-colors'
+                  aria-label='Run search'
                 >
                   <svg
                     className='h-5 w-5'
                     fill='none'
                     stroke='currentColor'
                     viewBox='0 0 24 24'
+                    aria-hidden='true'
                   >
                     <path
                       strokeLinecap='round'
@@ -94,29 +114,36 @@ export default function DatasetSearch() {
           <div className='flex w-full gap-4 md:w-auto'>
             <div className='w-full md:w-40'>
               <div className='mb-1 flex justify-between'>
-                <label className='text-slate-400 text-xs'>Min Turns</label>
+                <label htmlFor='min-turns' className='text-slate-400 text-xs'>
+                  Min Turns
+                </label>
                 <span className='text-pink-400 font-mono text-xs'>
                   {minTurns}
                 </span>
               </div>
               <input
+                id='min-turns'
                 type='range'
                 min='1'
                 max='50'
                 value={minTurns}
                 onChange={(e) => setMinTurns(parseInt(e.target.value))}
                 className='bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg'
+                aria-label='Minimum conversation turns'
               />
             </div>
 
             <div className='w-full md:w-40'>
               <div className='mb-1 flex justify-between'>
-                <label className='text-slate-400 text-xs'>Min Quality</label>
+                <label htmlFor='min-quality' className='text-slate-400 text-xs'>
+                  Min Quality
+                </label>
                 <span className='text-pink-400 font-mono text-xs'>
                   {minQuality.toFixed(1)}
                 </span>
               </div>
               <input
+                id='min-quality'
                 type='range'
                 min='0'
                 max='1'
@@ -124,6 +151,7 @@ export default function DatasetSearch() {
                 value={minQuality}
                 onChange={(e) => setMinQuality(parseFloat(e.target.value))}
                 className='bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg'
+                aria-label='Minimum dataset quality score'
               />
             </div>
           </div>
@@ -156,7 +184,7 @@ export default function DatasetSearch() {
                 high-quality, multi-turn therapeutic conversations.
               </p>
               <button
-                onClick={() => handleSearch()}
+                onClick={() => void handleSearch()}
                 className='bg-slate-800 hover:bg-slate-700 text-pink-400 border-slate-700 mt-6 rounded-full border px-6 py-2 transition-colors'
               >
                 Browse All Datasets

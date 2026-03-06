@@ -6,7 +6,7 @@ interface VNode {
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
 
-import type { ProjectGroupsSchema } from '@/lib/schema'
+import type { ProjectGroupsSchema, ProjectSchema } from '@/lib/schema'
 
 import type { NavBarLayout } from '../types'
 
@@ -30,7 +30,9 @@ export function slug(text: string): string {
 export function extractIconsStartingWithI(data: ProjectGroupsSchema): string[] {
   const icons = new Set<string>()
 
-  for (const projects of Object.values(data)) {
+  for (const group in data) {
+    const projects = data[group]
+    if (!Array.isArray(projects)) continue
     for (const project of projects) {
       if (project.icon?.startsWith('i')) {
         icons.add(project.icon)

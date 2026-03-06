@@ -5,23 +5,8 @@
 
 import React from 'react'
 
+import type { TherapistAnalyticsChartData } from '@/types/analytics'
 import { AnalyticsCharts } from './AnalyticsCharts'
-
-export interface TherapistAnalyticsChartData {
-  progressData?: Array<{
-    date: string
-    sessions: number
-    avgProgress: number
-  }>
-  skillData?: Array<{
-    skill: string
-    score: number
-  }>
-  engagementData?: Array<{
-    week: string
-    value: number
-  }>
-}
 
 interface TherapyProgressChartsProps {
   data: TherapistAnalyticsChartData | null

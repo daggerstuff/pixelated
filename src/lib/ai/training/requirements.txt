@@ -294,7 +294,7 @@ networkx==3.6.1
     # via torch
 ninja==1.13.0
     # via deepspeed
-nltk==3.9.2
+nltk==3.9.3  # Fixes GHSA-pg7x-xvh5-64q5 (Zip Slip vulnerability)
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   textstat

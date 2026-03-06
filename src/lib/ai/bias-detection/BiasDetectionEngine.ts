@@ -15,6 +15,7 @@ import type {
 } from './types'
 import {
   getCachedAnalysisResult,
+  cacheAnalysisResult,
   cacheReport,
   getCachedReport,
   getCacheManager,
@@ -71,19 +72,18 @@ export class BiasDetectionEngine {
     const thresholds = cfg['thresholds'] ?? DEFAULT_THRESHOLDS
 
     // Normalize threshold property names for backward compatibility
-    const legacyThresholds = thresholds as unknown as Record<string, number | undefined>
     const normalizedThresholds = {
       warning:
         thresholds.warning ??
-        legacyThresholds['warningLevel'] ??
+        thresholds.warningLevel ??
         DEFAULT_THRESHOLDS.warning,
       high:
         thresholds.high ??
-        legacyThresholds['highLevel'] ??
+        thresholds.highLevel ??
         DEFAULT_THRESHOLDS.high,
       critical:
         thresholds.critical ??
-        legacyThresholds['criticalLevel'] ??
+        thresholds.criticalLevel ??
         DEFAULT_THRESHOLDS.critical,
     }
 
@@ -209,18 +209,17 @@ export class BiasDetectionEngine {
     const validated = { ...DEFAULT_THRESHOLDS }
 
     // Handle both new and legacy property names for backward compatibility
-    const legacy = thresholds as unknown as Record<string, number | undefined>
     validated.warning =
       thresholds.warning ??
-      legacy['warningLevel'] ??
+      thresholds.warningLevel ??
       DEFAULT_THRESHOLDS.warning
     validated.high =
       thresholds.high ??
-      legacy['highLevel'] ??
+      thresholds.highLevel ??
       DEFAULT_THRESHOLDS.high
     validated.critical =
       thresholds.critical ??
-      legacy['criticalLevel'] ??
+      thresholds.criticalLevel ??
       DEFAULT_THRESHOLDS.critical
 
     // Ensure thresholds are in valid range and properly ordered
@@ -733,11 +732,41 @@ export class BiasDetectionEngine {
     if (cachedReport) {
       return cachedReport
     }
-    const results = await Promise.all(
-      sessions.map(
-        (s) => getCachedAnalysisResult(s.sessionId) ?? this.analyzeSession(s),
-      ),
-    )
+    const batchResult =
+      this.performanceOptimizer !== null
+        ? await this.performanceOptimizer.processBatch(
+            sessions,
+            async (session: SessionData) =>
+              (await getCachedAnalysisResult(session.sessionId)) ??
+              this.analyzeSession(session),
+            {
+              concurrency: this.config.batchProcessingConfig?.concurrency,
+              batchSize: this.config.batchProcessingConfig?.batchSize,
+            },
+          )
+        : null
+
+    const results =
+      batchResult !== null
+        ? batchResult.results.filter(Boolean)
+        : []
+
+    if (batchResult === null) {
+      for (const session of sessions) {
+        const cached = await getCachedAnalysisResult(session.sessionId)
+        if (cached) {
+          results.push(cached)
+          continue
+        }
+
+        const analysis = await this.analyzeSession(session)
+        results.push(analysis)
+      }
+    }
+
+    if (batchResult?.errors.length) {
+      throw batchResult.errors[0].error
+    }
     const averageBias =
       results.length > 0
         ? results
@@ -760,6 +789,9 @@ export class BiasDetectionEngine {
           {} as Record<string, number>,
         ),
     }
+    // Derive fairness from analysis: 1 - averageBias (bias in [0,1], so fairness = 1 - bias)
+    const overallFairnessScore = Math.max(0, Math.min(1, 1 - averageBias))
+
     await cacheReport(reportKey, {
       ...report,
       reportId: reportKey,
@@ -771,7 +803,7 @@ export class BiasDetectionEngine {
       timeRange: _range
         ? { start: _range.start, end: _range.end }
         : { start: new Date(0), end: new Date(0) },
-      overallFairnessScore: 1,
+      overallFairnessScore,
       recommendations: [],
       executiveSummary: {
         keyFindings: [],

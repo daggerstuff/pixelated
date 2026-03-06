@@ -578,7 +578,7 @@ export type BgType =
   | 'stars'
   | 'animated'
 type Mentioned = `@${string}` | `@${string}@${string}` | ''
-type FeatureConfig<T> = false | [boolean, T]
+type FeatureConfig<T> = boolean | [boolean, T]
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 
 export interface ShareConfig {
@@ -598,7 +598,7 @@ export interface ShareConfig {
    *
    * If an empty string is used, '@userName' will not appear in the pre-filled sharing text.
    */
-  bluesky?: FeatureConfig<Mentioned> | boolean
+  bluesky?: FeatureConfig<Mentioned>
 
   /**
    * Configures Mastodon sharing:

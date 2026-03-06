@@ -58,10 +58,7 @@ async function generateOgImage(
   )
 
   try {
-    const node = ogImageMarkup(authorOrBrand, title, bgType) as VNode<
-      RendererNode,
-      RendererElement
-    >
+    const node = ogImageMarkup(authorOrBrand, title, bgType) as VNode
     const unescapedNode = unescapeHTML(node) as ReactNode
     const svg = await satori(unescapedNode, satoriOptions)
 

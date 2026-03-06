@@ -15,7 +15,11 @@ export function UserMenu({ className = '' }: UserMenuProps) {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target
+      if (!(target instanceof Node)) {
+        return
+      }
+      if (menuRef.current && !menuRef.current.contains(target)) {
         setIsOpen(false)
       }
     }
@@ -57,7 +61,12 @@ export function UserMenu({ className = '' }: UserMenuProps) {
         <span className='sr-only'>Open user menu</span>
         <Avatar
           src={user.user_metadata?.avatar_url}
-          initials={((user.email as string)?.[0] || 'U').toUpperCase()}
+          initials={(() => {
+            if (typeof user.email === 'string' && user.email.length > 0) {
+              return user.email[0].toUpperCase()
+            }
+            return 'U'
+          })()}
           size='sm'
           className='h-8 w-8'
         />

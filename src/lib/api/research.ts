@@ -82,9 +82,9 @@ export class ResearchAPI {
 
   private async fetchWithTimeout(
     resource: RequestInfo,
-    options: RequestInit = {},
+    options: RequestInit & { timeout?: number } = {},
   ) {
-    const { timeout = 30000 } = options as any
+    const timeout = options.timeout ?? 30000
 
     const controller = new AbortController()
     const id = setTimeout(() => controller.abort(), timeout)

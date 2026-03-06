@@ -10,6 +10,7 @@ import { markSpanError } from './lib/tracing/utils'
 const protectedRoutePatterns: RegExp[] = [
   /\/api\/protected(.*)/,
   /\/api\/journal-research(.*)/, // Protect journal-research API endpoints
+  /\/api\/agent-notes(.*)/, // Protect agent note collaboration APIs
   /\/journal-research(.*)/, // Protect journal-research pages
 ]
 

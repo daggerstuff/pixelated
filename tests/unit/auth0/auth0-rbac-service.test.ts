@@ -428,7 +428,7 @@ describe('Auth0 RBAC Service', () => {
 
     it('should return false for non-existent role', () => {
       const hasPermission = auth0RbacService.roleHasPermission(
-        'nonexistent' as any,
+        'nonexistent',
         'read:patients',
       )
       expect(hasPermission).toBe(false)
@@ -451,7 +451,7 @@ describe('Auth0 RBAC Service', () => {
 
     it('should return false for non-existent roles', () => {
       const hasRequired = auth0RbacService.hasRequiredRole(
-        'nonexistent' as any,
+        'nonexistent',
         'therapist',
       )
       expect(hasRequired).toBe(false)
@@ -475,7 +475,7 @@ describe('Auth0 RBAC Service', () => {
 
     it('should return empty array for non-existent role', () => {
       const permissions = auth0RbacService.getRolePermissions(
-        'nonexistent' as any,
+        'nonexistent',
       )
       expect(permissions).toEqual([])
     })
@@ -550,7 +550,7 @@ describe('Auth0 RBAC Service', () => {
 
     it('should return false for non-existent roles', () => {
       const canAssign = auth0RbacService.canAssignRole(
-        'nonexistent' as any,
+        'nonexistent',
         'therapist',
       )
       expect(canAssign).toBe(false)
@@ -580,7 +580,7 @@ describe('Auth0 RBAC Service', () => {
 
     it('should return empty array for non-existent role', () => {
       const assignableRoles = auth0RbacService.getAssignableRoles(
-        'nonexistent' as any,
+        'nonexistent',
       )
       expect(assignableRoles).toEqual([])
     })
@@ -622,7 +622,7 @@ describe('Auth0 RBAC Service', () => {
     it('should throw error for invalid roles', () => {
       expect(() =>
         auth0RbacService.validateRoleTransition(
-          'nonexistent' as any,
+          'nonexistent',
           'therapist',
         ),
       ).toThrow('Invalid role specified')

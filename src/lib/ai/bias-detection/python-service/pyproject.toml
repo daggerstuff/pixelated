@@ -52,7 +52,7 @@ dependencies = [
   # Data Processing
   "pandas>=2.0.0",
   "numpy>=1.24.0",
-  "nltk>=3.8.0",
+  "nltk>=3.9.3",  # Fixes GHSA-pg7x-xvh5-64q5 (Zip Slip vulnerability)
   "spacy>=3.7.0",
   "textblob>=0.17.0",
   # Database and Caching
@@ -77,6 +77,9 @@ dependencies = [
   "filelock>=3.20.1", # Fixes SNYK-PYTHON-FILELOCK-14458335
   "numba>=0.57.0",
 ]
+
+[project.scripts]
+app = "bias_detection.app:app"
 
 [project.urls]
 Homepage = "https://pixelatedempathy.com"

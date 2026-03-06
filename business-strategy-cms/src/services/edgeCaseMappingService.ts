@@ -86,7 +86,7 @@ export class EdgeCaseMappingService {
   ): { score: number; reason: string } {
     const name = fileName.toLowerCase()
     let matches = 0
-    let matchedKeywords: string[] = []
+    const matchedKeywords: string[] = []
 
     for (const kw of keywords) {
       if (name.includes(kw)) {

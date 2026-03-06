@@ -23,7 +23,8 @@ import {
 interface BiasChartsProps {
   biasData: Array<{ name: string; value: number }>
   demographicData: Array<{ name: string; value: number }>
-  timeSeriesData: Array<{ date: string; bias: number; accuracy: number }>
+  /** Time series points; use biasScore to align with TrendItem from BiasDashboard */
+  timeSeriesData: Array<{ date: string; biasScore: number; accuracy?: number }>
   radarData: Array<{ subject: string; A: number; B: number; fullMark: number }>
 }
 
@@ -42,11 +43,11 @@ export function BiasCharts({
         <ResponsiveContainer width='100%' height='100%'>
           <BarChart data={biasData}>
             <CartesianGrid strokeDasharray='3 3' />
-            <XAxis dataKey='type' />
+            <XAxis dataKey='name' />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey='count' fill='#8884d8' />
+            <Bar dataKey='value' fill='#8884d8' />
             <ReferenceLine y={50} stroke='red' strokeDasharray='5 5' />
           </BarChart>
         </ResponsiveContainer>
@@ -61,8 +62,8 @@ export function BiasCharts({
               cx='50%'
               cy='50%'
               labelLine={false}
-              label={({ name, percent }: { name: string; percent?: number }) =>
-                `${name} ${((percent || 0) * 100).toFixed(0)}%`
+              label={({ name, percent }: { name?: string; percent?: number }) =>
+                `${name || ''} ${((percent || 0) * 100).toFixed(0)}%`
               }
               outerRadius={80}
               fill='#8884d8'

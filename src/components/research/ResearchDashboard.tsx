@@ -53,6 +53,13 @@ export const ResearchDashboard: FC = () => {
     'research_selected_studies',
     [],
   )
+  const dashboardTabs = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'studies', label: 'Studies', icon: '🔬' },
+    { id: 'datasets', label: 'Datasets', icon: '💾' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'publications', label: 'Publications', icon: '📚' },
+  ] as const
 
   // Mock data - in real app would come from API
   const researchMetrics: ResearchMetrics = {
@@ -164,7 +171,17 @@ export const ResearchDashboard: FC = () => {
                 <OfflineIndicator position='inline' />
                 <select
                   value={timeRange}
-                  onChange={(e) => setTimeRange(e.target.value as any)}
+                  onChange={(e) => {
+                    const nextValue = e.target.value
+                    if (
+                      nextValue === 'month' ||
+                      nextValue === 'quarter' ||
+                      nextValue === 'year' ||
+                      nextValue === 'all'
+                    ) {
+                      setTimeRange(nextValue)
+                    }
+                  }}
                   className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
                 >
                   <option value='month'>This Month</option>
@@ -179,16 +196,10 @@ export const ResearchDashboard: FC = () => {
           {/* Navigation Tabs */}
           <div className='px-6'>
             <nav className='flex space-x-8'>
-              {[
-                { id: 'overview', label: 'Overview', icon: '📊' },
-                { id: 'studies', label: 'Studies', icon: '🔬' },
-                { id: 'datasets', label: 'Datasets', icon: '💾' },
-                { id: 'analytics', label: 'Analytics', icon: '📈' },
-                { id: 'publications', label: 'Publications', icon: '📚' },
-              ].map((tab) => (
+              {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setDashboardView(tab.id as any)}
+                  onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
