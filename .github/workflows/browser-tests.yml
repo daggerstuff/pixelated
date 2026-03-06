@@ -12,7 +12,6 @@ on:
   workflow_dispatch:
 env:
   NODE_VERSION: 24.13.0
-  PNPM_VERSION: 10.29.2
   NODE_ENV: test
   DISABLE_AUTH: "true"
 
@@ -34,8 +33,6 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.29.2
-
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -43,27 +40,21 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
       - name: Validate package.json
         run: |
           echo "Validating package.json syntax..."
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
-
       - name: Rebuild critical native modules
         run: |
           # Rebuild only essential native modules that need post-install scripts
           # Skip @tensorflow/tfjs-node as it's incompatible with Node.js 24
           pnpm rebuild sharp esbuild @sentry/cli || echo "Some rebuilds failed, continuing..."
-
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
-
       - name: Build project
         run: pnpm run build
-
       - name: Run browser tests
         run: |
           # Set test environment variables
@@ -83,7 +74,6 @@ jobs:
           SKIP_MSW: true
           PUBLIC_AUTH_URL: http://localhost:4321/api/auth
           SITE_URL: http://localhost:4321
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v5
@@ -95,24 +85,20 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
           compression-level: 6
-
   generate-report:
     name: Generate Test Report
     runs-on: ubuntu-latest
     needs: [browser-tests]
     if: always()
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-
       - name: Download all test artifacts
         uses: actions/download-artifact@v6
         with:
           path: all-test-results
           pattern: "*-test-results-*"
           merge-multiple: true
-
       - name: Generate comprehensive HTML report
         id: generate_report
         run: |
@@ -142,17 +128,14 @@ jobs:
                   <p><strong>Workflow Run:</strong> <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a></p>
               </div>
           EOF
-
           # Count issues and generate summary
           ISSUE_COUNT=0
           TOTAL_TESTS=0
           PASSED_TESTS=0
-
           # Process test results if available
           if find all-test-results -name "*.json" -type f | head -1 > /dev/null 2>&1; then
               echo '<div class="summary">' >> report.html
               echo '<h2>📊 Test Summary</h2>' >> report.html
-
               # Extract basic metrics from any JSON files
               for json_file in $(find all-test-results -name "*.json" -type f); do
                   if command -v jq >/dev/null 2>&1; then
@@ -164,12 +147,10 @@ jobs:
                       FAILED=$(grep -o '"failures":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
                       PASSED=$(grep -o '"passes":\s*\[[^]]*\]' "$json_file" 2>/dev/null | wc -l || echo "0")
                   fi
-
                   ISSUE_COUNT=$((ISSUE_COUNT + FAILED))
                   PASSED_TESTS=$((PASSED_TESTS + PASSED))
                   TOTAL_TESTS=$((TOTAL_TESTS + FAILED + PASSED))
               done
-
               echo "<p><strong>Total Tests:</strong> $TOTAL_TESTS</p>" >> report.html
               echo "<p><strong>Passed:</strong> $PASSED_TESTS</p>" >> report.html
               echo "<p><strong>Failed:</strong> $ISSUE_COUNT</p>" >> report.html
@@ -180,7 +161,6 @@ jobs:
               echo '<p>No test result files were found in the artifacts.</p>' >> report.html
               echo '</div>' >> report.html
           fi
-
           # Add issues section
           if [ "$ISSUE_COUNT" -gt 0 ]; then
               echo '<div class="issues">' >> report.html
@@ -193,7 +173,6 @@ jobs:
               echo '<p>No compatibility issues detected. Great work!</p>' >> report.html
               echo '</div>' >> report.html
           fi
-
           # Add artifacts info
           echo '<div class="summary">' >> report.html
           echo '<h2>📁 Available Artifacts</h2>' >> report.html
@@ -204,15 +183,12 @@ jobs:
           echo '<li>Browser Compatibility Report - This consolidated report</li>' >> report.html
           echo '</ul>' >> report.html
           echo '</div>' >> report.html
-
           echo '</body></html>' >> report.html
-
           # Set outputs for use in subsequent steps
           echo "ISSUE_COUNT=$ISSUE_COUNT" >> $GITHUB_ENV
           echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
           echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
           echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
-
       - name: Upload consolidated report
         uses: actions/upload-artifact@v5
         with:
@@ -220,7 +196,6 @@ jobs:
           path: report.html
           retention-days: 90
           if-no-files-found: error
-
       - name: Send notifications
         if: ${{ steps.generate_report.outputs.issue_count > 0 && !cancelled() }}
         env:
@@ -231,19 +206,15 @@ jobs:
           # Prepare notification content
           cat > notification.txt << EOF
           🚨 Browser Compatibility Issues Detected
-
           Repository: ${{ github.repository }}
           Branch: ${{ github.ref_name }}
           Commit: ${{ github.sha }}
-
           Test Results:
           - Total Tests: ${TOTAL_TESTS:-Unknown}
           - Failed Tests: ${ISSUE_COUNT}
           - Workflow: ${WORKFLOW_URL}
-
           Please review the test results and address any compatibility issues.
           EOF
-
           # Send Slack notification if webhook is configured
           if [ -n "${SLACK_WEBHOOK:-}" ]; then
             echo "Sending Slack notification..."
@@ -253,7 +224,6 @@ jobs:
           else
             echo "SLACK_WEBHOOK not configured, skipping Slack notification"
           fi
-
           # Send email notification if configured
           if [ -n "${EMAIL_API_KEY:-}" ] && [ -n "${TEAM_EMAIL:-}" ]; then
             echo "Sending email notification..."
@@ -269,5 +239,4 @@ jobs:
           else
             echo "Email configuration not complete, skipping email notification"
           fi
-
           echo "Notification process completed"

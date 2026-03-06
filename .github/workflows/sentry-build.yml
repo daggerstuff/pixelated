@@ -21,18 +21,14 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.29.2
-
       - name: Use Node.js
         uses: actions/setup-node@v6
         with:
           node-version: "24"
-
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -40,15 +36,12 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
       - name: Validate package.json
         run: |
           echo "Validating package.json syntax..."
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
-
       - name: Install dependencies
         run: pnpm install
-
       - name: Build (with Sentry envs if provided)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -58,7 +51,6 @@ jobs:
         run: |
           echo "Building with SENTRY_RELEASE=${SENTRY_RELEASE}"
           pnpm build
-
       - name: Create Sentry release and upload source maps (optional)
         if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
         env:
@@ -73,7 +65,6 @@ jobs:
           sentry-cli releases new ${SENTRY_RELEASE}
           sentry-cli sourcemaps upload --release ${SENTRY_RELEASE} ./dist
           sentry-cli releases finalize ${SENTRY_RELEASE}
-
       - name: Build Docker image (automated)
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -85,7 +76,6 @@ jobs:
           IMAGE_TAG_SHA=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           IMAGE_TAG_BRANCH=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.ref_name }}-${{ github.sha }}
           IMAGE_TAG_LATEST=ghcr.io/${{ github.repository_owner }}/pixelated:latest
-
           echo "🔧 Building Docker image with multiple tags..."
           docker build \
             --tag $IMAGE_TAG_SHA \
@@ -96,12 +86,10 @@ jobs:
             --build-arg SENTRY_RELEASE="${SENTRY_RELEASE}" \
             --build-arg PUBLIC_SENTRY_DSN="${PUBLIC_SENTRY_DSN}" \
             .
-
           # Store image tags for later steps
           echo "IMAGE_TAG_SHA=$IMAGE_TAG_SHA" >> $GITHUB_ENV
           echo "IMAGE_TAG_BRANCH=$IMAGE_TAG_BRANCH" >> $GITHUB_ENV
           echo "IMAGE_TAG_LATEST=$IMAGE_TAG_LATEST" >> $GITHUB_ENV
-
       - name: Authenticate with GitHub Container Registry
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: docker/login-action@v3
@@ -110,14 +98,12 @@ jobs:
           username: ${{ github.actor }}
           # Use GITHUB_TOKEN for authentication (more secure, no need for separate PAT)
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Push Docker images
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "📤 Pushing Docker images..."
-
           # Verify authentication status before pushing
           echo "🔍 Verifying Docker authentication with GHCR..."
           if docker info | grep -q "ghcr.io"; then
@@ -132,7 +118,6 @@ jobs:
               exit 1
             fi
           fi
-
           # Push images with individual error handling
           echo "📦 Pushing $IMAGE_TAG_SHA..."
           if docker push $IMAGE_TAG_SHA; then
@@ -141,7 +126,6 @@ jobs:
             echo "❌ Failed to push $IMAGE_TAG_SHA"
             exit 1
           fi
-
           echo "📦 Pushing $IMAGE_TAG_BRANCH..."
           if docker push $IMAGE_TAG_BRANCH; then
             echo "✅ Successfully pushed $IMAGE_TAG_BRANCH"
@@ -149,7 +133,6 @@ jobs:
             echo "❌ Failed to push $IMAGE_TAG_BRANCH"
             exit 1
           fi
-
           echo "📦 Pushing $IMAGE_TAG_LATEST..."
           if docker push $IMAGE_TAG_LATEST; then
             echo "✅ Successfully pushed $IMAGE_TAG_LATEST"
@@ -157,9 +140,7 @@ jobs:
             echo "❌ Failed to push $IMAGE_TAG_LATEST"
             exit 1
           fi
-
           echo "🎉 All Docker images pushed successfully!"
-
           # Create deployment metadata
           cat > deployment-metadata.json << EOF
           {
@@ -174,7 +155,6 @@ jobs:
             "sentry_release": "${{ github.sha }}"
           }
           EOF
-
       - name: Check Docker Hub credentials
         id: check_dockerhub_creds
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
@@ -195,7 +175,6 @@ jobs:
           else
             echo "has_creds=false" >> $GITHUB_OUTPUT
           fi
-
       - name: Login to Docker Hub (optional)
         if: steps.check_dockerhub_creds.outputs.has_creds == 'true'
         id: dockerhub_login
@@ -204,31 +183,24 @@ jobs:
           username: ${{ steps.check_dockerhub_creds.outputs.docker_username }}
           password: ${{ steps.check_dockerhub_creds.outputs.docker_password }}
           logout: true
-
       - name: Push Docker images to Docker Hub (optional)
         if: ${{ steps.dockerhub_login.outcome == 'success' }}
         run: |
           echo "📤 Pushing Docker images to Docker Hub..."
-
           DOCKERHUB_SHA=pixelatedempathy/pixelated:${{ github.sha }}
           DOCKERHUB_BRANCH=pixelatedempathy/pixelated:${{ github.ref_name }}-${{ github.sha }}
           DOCKERHUB_LATEST=pixelatedempathy/pixelated:latest
-
           # Retag GHCR-built image to Docker Hub tags
           docker tag $IMAGE_TAG_SHA $DOCKERHUB_SHA
           docker tag $IMAGE_TAG_SHA $DOCKERHUB_BRANCH
           docker tag $IMAGE_TAG_SHA $DOCKERHUB_LATEST
-
           # Push with individual error handling
           echo "📦 Pushing $DOCKERHUB_SHA..."
           if docker push $DOCKERHUB_SHA; then echo "✅ Pushed $DOCKERHUB_SHA"; else echo "❌ Failed to push $DOCKERHUB_SHA"; exit 1; fi
-
           echo "📦 Pushing $DOCKERHUB_BRANCH..."
           if docker push $DOCKERHUB_BRANCH; then echo "✅ Pushed $DOCKERHUB_BRANCH"; else echo "❌ Failed to push $DOCKERHUB_BRANCH"; exit 1; fi
-
           echo "📦 Pushing $DOCKERHUB_LATEST..."
           if docker push $DOCKERHUB_LATEST; then echo "✅ Pushed $DOCKERHUB_LATEST"; else echo "❌ Failed to push $DOCKERHUB_LATEST"; exit 1; fi
-
       - name: Create deployment notification
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
@@ -236,10 +208,8 @@ jobs:
           echo "📦 Image: $IMAGE_TAG_SHA"
           echo "🎯 Branch: ${{ github.ref_name }}"
           echo "🔖 Commit: ${{ github.sha }}"
-
           # Output deployment information
           cat deployment-metadata.json
-
           # Trigger deployment workflow if configured
           if [ -n "${{ secrets.DEPLOYMENT_WEBHOOK_URL }}" ]; then
             curl -X POST \
