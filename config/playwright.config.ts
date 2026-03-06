@@ -67,7 +67,8 @@ try {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '../tests',
+  testMatch: '**/*.spec.ts',
   testIgnore: ['tests/accessibility/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
