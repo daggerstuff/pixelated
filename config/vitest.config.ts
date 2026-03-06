@@ -39,7 +39,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts', './vitest.setup.ts'],
+    setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',
@@ -75,12 +75,8 @@ export default defineConfig({
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     ...(process.env['CI']
       ? {
-          poolOptions: {
-            threads: {
-              minThreads: 1,
-              maxThreads: 2,
-            },
-          },
+          minThreads: 1,
+          maxThreads: 2,
         }
       : {}),
     environmentOptions: {
