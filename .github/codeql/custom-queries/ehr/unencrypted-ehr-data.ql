@@ -42,11 +42,12 @@ predicate isEHRData(DataFlow::Node node) {
 from CallExpr call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
+  data = DataFlow::exprNode(call.getAnArgument()) and
   isEHRData(data) and
   not exists(CallExpr encryptCall |
     encryptCall.getEnclosingFunction() = call.getEnclosingFunction() and
     encryptCall.getCalleeName().matches("%encrypt%") and
-    DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument()))
+    data.flowsTo(DataFlow::exprNode(encryptCall.getAnArgument()))
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
