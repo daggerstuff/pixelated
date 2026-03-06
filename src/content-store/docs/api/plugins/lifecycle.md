@@ -40,17 +40,17 @@ When a plugin is installed, the following steps occur:
 ```typescript
 // Installation process
 const installation = await pluginService.installPlugin({
-  id: 'appointment-scheduler',
-  version: '1.0.0',
+  id: "appointment-scheduler",
+  version: "1.0.0",
   code: pluginCode,
   metadata: {
-    name: 'Appointment Scheduler',
-    description: 'Advanced scheduling capabilities',
-    permissions: ['read:appointments', 'write:appointments'],
-    author: 'Pixelated',
-    homepage: 'https://example.com/plugins/scheduler'
-  }
-})
+    name: "Appointment Scheduler",
+    description: "Advanced scheduling capabilities",
+    permissions: ["read:appointments", "write:appointments"],
+    author: "Pixelated",
+    homepage: "https://example.com/plugins/scheduler",
+  },
+});
 ```
 
 ### 2. Initialization
@@ -77,16 +77,16 @@ When a plugin is enabled, these initialization steps occur:
 
 ```typescript
 // Initialization process
-await pluginService.enablePlugin('appointment-scheduler', {
+await pluginService.enablePlugin("appointment-scheduler", {
   config: {
     defaultDuration: 60,
-    timezone: 'America/New_York',
+    timezone: "America/New_York",
     workingHours: {
-      start: '09:00',
-      end: '17:00'
-    }
-  }
-})
+      start: "09:00",
+      end: "17:00",
+    },
+  },
+});
 ```
 
 ### 3. Execution
@@ -113,14 +113,14 @@ During plugin execution:
 
 ```typescript
 // Execution monitoring
-pluginService.on('plugin:resource:usage', ({ pluginId, metrics }) => {
+pluginService.on("plugin:resource:usage", ({ pluginId, metrics }) => {
   console.log(`Plugin ${pluginId} metrics:`, {
     memory: metrics.memory,
     cpu: metrics.cpu,
     storage: metrics.storage,
-    network: metrics.network
-  })
-})
+    network: metrics.network,
+  });
+});
 ```
 
 ### 4. Deactivation
@@ -147,10 +147,10 @@ When a plugin is disabled:
 
 ```typescript
 // Deactivation process
-await pluginService.disablePlugin('appointment-scheduler', {
+await pluginService.disablePlugin("appointment-scheduler", {
   saveState: true,
-  timeout: 5000 // ms
-})
+  timeout: 5000, // ms
+});
 ```
 
 ### 5. Uninstallation
@@ -177,10 +177,10 @@ During plugin removal:
 
 ```typescript
 // Uninstallation process
-await pluginService.uninstallPlugin('appointment-scheduler', {
+await pluginService.uninstallPlugin("appointment-scheduler", {
   preserveData: false,
-  force: false
-})
+  force: false,
+});
 ```
 
 ## Lifecycle Events
@@ -189,49 +189,49 @@ The Plugin System emits events during lifecycle changes:
 
 ```typescript
 // Installation events
-pluginService.on('plugin:installing', ({ pluginId, version }) => {
-  console.log(`Installing plugin ${pluginId}@${version}`)
-})
+pluginService.on("plugin:installing", ({ pluginId, version }) => {
+  console.log(`Installing plugin ${pluginId}@${version}`);
+});
 
-pluginService.on('plugin:installed', ({ pluginId, version }) => {
-  console.log(`Plugin ${pluginId}@${version} installed successfully`)
-})
+pluginService.on("plugin:installed", ({ pluginId, version }) => {
+  console.log(`Plugin ${pluginId}@${version} installed successfully`);
+});
 
 // Initialization events
-pluginService.on('plugin:enabling', ({ pluginId }) => {
-  console.log(`Enabling plugin ${pluginId}`)
-})
+pluginService.on("plugin:enabling", ({ pluginId }) => {
+  console.log(`Enabling plugin ${pluginId}`);
+});
 
-pluginService.on('plugin:enabled', ({ pluginId }) => {
-  console.log(`Plugin ${pluginId} enabled successfully`)
-})
+pluginService.on("plugin:enabled", ({ pluginId }) => {
+  console.log(`Plugin ${pluginId} enabled successfully`);
+});
 
 // Execution events
-pluginService.on('plugin:error', ({ pluginId, error }) => {
-  console.error(`Plugin ${pluginId} error:`, error)
-})
+pluginService.on("plugin:error", ({ pluginId, error }) => {
+  console.error(`Plugin ${pluginId} error:`, error);
+});
 
-pluginService.on('plugin:warning', ({ pluginId, message }) => {
-  console.warn(`Plugin ${pluginId} warning:`, message)
-})
+pluginService.on("plugin:warning", ({ pluginId, message }) => {
+  console.warn(`Plugin ${pluginId} warning:`, message);
+});
 
 // Deactivation events
-pluginService.on('plugin:disabling', ({ pluginId }) => {
-  console.log(`Disabling plugin ${pluginId}`)
-})
+pluginService.on("plugin:disabling", ({ pluginId }) => {
+  console.log(`Disabling plugin ${pluginId}`);
+});
 
-pluginService.on('plugin:disabled', ({ pluginId }) => {
-  console.log(`Plugin ${pluginId} disabled successfully`)
-})
+pluginService.on("plugin:disabled", ({ pluginId }) => {
+  console.log(`Plugin ${pluginId} disabled successfully`);
+});
 
 // Uninstallation events
-pluginService.on('plugin:uninstalling', ({ pluginId }) => {
-  console.log(`Uninstalling plugin ${pluginId}`)
-})
+pluginService.on("plugin:uninstalling", ({ pluginId }) => {
+  console.log(`Uninstalling plugin ${pluginId}`);
+});
 
-pluginService.on('plugin:uninstalled', ({ pluginId }) => {
-  console.log(`Plugin ${pluginId} uninstalled successfully`)
-})
+pluginService.on("plugin:uninstalled", ({ pluginId }) => {
+  console.log(`Plugin ${pluginId} uninstalled successfully`);
+});
 ```
 
 ## State Management
@@ -244,12 +244,12 @@ await plugin.setState({
   lastSync: new Date(),
   preferences: {
     notifications: true,
-    theme: 'dark'
-  }
-})
+    theme: "dark",
+  },
+});
 
 // Load state
-const state = await plugin.getState()
+const state = await plugin.getState();
 ```
 
 ## Error Handling
@@ -258,21 +258,20 @@ The Plugin System handles various lifecycle errors:
 
 ```typescript
 try {
-  await pluginService.enablePlugin('appointment-scheduler')
-}
-catch (error) {
+  await pluginService.enablePlugin("appointment-scheduler");
+} catch (error) {
   switch (error.code) {
-    case 'INITIALIZATION_FAILED':
-      console.error('Plugin failed to initialize:', error.message)
-      break
-    case 'DEPENDENCY_MISSING':
-      console.error('Missing dependency:', error.details.dependency)
-      break
-    case 'RESOURCE_EXHAUSTED':
-      console.error('Insufficient resources:', error.details.resource)
-      break
+    case "INITIALIZATION_FAILED":
+      console.error("Plugin failed to initialize:", error.message);
+      break;
+    case "DEPENDENCY_MISSING":
+      console.error("Missing dependency:", error.details.dependency);
+      break;
+    case "RESOURCE_EXHAUSTED":
+      console.error("Insufficient resources:", error.details.resource);
+      break;
     default:
-      console.error('Unknown error:', error)
+      console.error("Unknown error:", error);
   }
 }
 ```

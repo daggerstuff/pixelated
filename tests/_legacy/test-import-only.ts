@@ -22,7 +22,6 @@ async function testImportOnly() {
     console.log("User ID:", user.user.id);
 
     console.log("\n🎉 Import only test completed!");
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

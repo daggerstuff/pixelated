@@ -1,6 +1,6 @@
-import type { SecurityLevel } from '../../hooks/useSecurity'
-import type { Message } from '../../types/chat'
-import { useEffect, useMemo, useState } from 'react'
+import type { SecurityLevel } from "../../hooks/useSecurity";
+import type { Message } from "../../types/chat";
+import { useEffect, useMemo, useState } from "react";
 // Dynamic imports for FHE to reduce bundle size
 // import { fheService } from '../../lib/fhe'
 // import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
@@ -8,22 +8,22 @@ import { useEffect, useMemo, useState } from 'react'
 // Dynamic FHE imports
 async function loadFHE() {
   const [fheService, fheAnalytics] = await Promise.all([
-    import('../../lib/fhe').then((m) => m.fheService),
-    import('../../lib/fhe/analytics').then((m) => ({
+    import("../../lib/fhe").then((m) => m.fheService),
+    import("../../lib/fhe/analytics").then((m) => ({
       AnalyticsType: m.AnalyticsType,
       fheAnalytics: m.fheAnalytics,
     })),
-  ])
-  return { fheService, ...fheAnalytics }
+  ]);
+  return { fheService, ...fheAnalytics };
 }
 
 // Temporary type definition for AnalyticsType
 enum AnalyticsType {
-  SENTIMENT_TREND = 'sentiment_trend',
-  TOPIC_CLUSTERING = 'topic_clustering',
-  RISK_ASSESSMENT = 'risk_assessment',
-  INTERVENTION_EFFECTIVENESS = 'intervention_effectiveness',
-  EMOTIONAL_PATTERNS = 'emotional_patterns',
+  SENTIMENT_TREND = "sentiment_trend",
+  TOPIC_CLUSTERING = "topic_clustering",
+  RISK_ASSESSMENT = "risk_assessment",
+  INTERVENTION_EFFECTIVENESS = "intervention_effectiveness",
+  EMOTIONAL_PATTERNS = "emotional_patterns",
 }
 import {
   IconAlertTriangle,
@@ -32,65 +32,65 @@ import {
   IconLock,
   IconPieChart,
   IconRefresh,
-} from './icons'
-import React from 'react'
+} from "./icons";
+import React from "react";
 
 enum EncryptionMode {
-  NONE = 'none',
-  STANDARD = 'standard',
-  HIPAA = 'hipaa',
-  FHE = 'fhe',
+  NONE = "none",
+  STANDARD = "standard",
+  HIPAA = "hipaa",
+  FHE = "fhe",
 }
 
 interface AnalyticsItem {
-  type: AnalyticsType
-  data: AnalyticsData
-  isEncrypted?: boolean
+  type: AnalyticsType;
+  data: AnalyticsData;
+  isEncrypted?: boolean;
 }
 
 interface AnalyticsData {
-  sentimentData?: SentimentItem[]
-  topicData?: TopicItem[]
-  riskData?: RiskItem[]
-  interventionData?: InterventionItem[]
-  windowResults?: EmotionalPatternItem[]
-  userMessageCount?: number
-  messageCount?: number
-  exchangeCount?: number
-  processedCount?: number
-  errorCount?: number
+  sentimentData?: SentimentItem[];
+  topicData?: TopicItem[];
+  riskData?: RiskItem[];
+  interventionData?: InterventionItem[];
+  windowResults?: EmotionalPatternItem[];
+  userMessageCount?: number;
+  messageCount?: number;
+  exchangeCount?: number;
+  processedCount?: number;
+  errorCount?: number;
 }
 
 interface SentimentItem {
-  messageIndex: number
-  sentiment?: number
+  messageIndex: number;
+  sentiment?: number;
 }
 
 interface TopicItem {
-  topic: string
-  weight: number
+  topic: string;
+  weight: number;
 }
 
 interface RiskItem {
-  type: string
-  score: number
+  type: string;
+  score: number;
 }
 
 interface InterventionItem {
-  type: string
-  effectiveness: number
+  type: string;
+  effectiveness: number;
 }
 
 interface EmotionalPatternItem {
-  emotion: string
-  values: number[]
+  emotion: string;
+  values: number[];
 }
 
 interface AnalyticsDashboardProps {
-  messages: Message[]
-  securityLevel: SecurityLevel
-  encryptionEnabled: boolean
-  scenario: string
+  messages: Message[];
+  securityLevel: SecurityLevel;
+  encryptionEnabled: boolean;
+  scenario: string;
 }
 
 export default function AnalyticsDashboard({
@@ -99,80 +99,80 @@ export default function AnalyticsDashboard({
   encryptionEnabled,
   scenario,
 }: AnalyticsDashboardProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsItem[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsItem[]>([]);
   const [activeTab, setActiveTab] = useState<AnalyticsType>(
     AnalyticsType.SENTIMENT_TREND,
-  )
-  const [refreshInterval] = useState<number | null>(30000)
-  const [fheInitialized, setFheInitialized] = useState(false)
+  );
+  const [refreshInterval] = useState<number | null>(30000);
+  const [fheInitialized, setFheInitialized] = useState(false);
 
   const showPrivacyWarning = useMemo(() => {
-    return !encryptionEnabled || securityLevel === 'standard'
-  }, [encryptionEnabled, securityLevel])
+    return !encryptionEnabled || securityLevel === "standard";
+  }, [encryptionEnabled, securityLevel]);
 
   useEffect(() => {
     const initFHE = async () => {
       try {
         // Dynamically load FHE services
-        const { fheService, fheAnalytics } = await loadFHE()
+        const { fheService, fheAnalytics } = await loadFHE();
 
         const encryptionMode =
-          securityLevel === 'maximum'
+          securityLevel === "maximum"
             ? EncryptionMode.FHE
-            : securityLevel === 'hipaa'
+            : securityLevel === "hipaa"
               ? EncryptionMode.HIPAA
-              : EncryptionMode.STANDARD
+              : EncryptionMode.STANDARD;
 
         await fheService.initialize({
           mode: encryptionEnabled ? encryptionMode : EncryptionMode.NONE,
           keySize: 2048,
-          securityLevel: 'tc128',
-        })
+          securityLevel: "tc128",
+        });
 
-        await fheAnalytics.initialize()
+        await fheAnalytics.initialize();
 
-        setFheInitialized(true)
+        setFheInitialized(true);
       } catch (error: unknown) {
-        setError('Failed to initialize FHE system')
-        console.error('FHE initialization error:', error)
+        setError("Failed to initialize FHE system");
+        console.error("FHE initialization error:", error);
       }
-    }
+    };
 
-    initFHE()
-  }, [securityLevel, encryptionEnabled])
+    initFHE();
+  }, [securityLevel, encryptionEnabled]);
 
   const generateId = () => {
     try {
-      return crypto.randomUUID()
+      return crypto.randomUUID();
     } catch (error: unknown) {
-      console.error('Failed to generate UUID:', error)
-      return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+      console.error("Failed to generate UUID:", error);
+      return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
     }
-  }
+  };
 
   // Load analytics data
   const loadAnalytics = React.useCallback(async () => {
     if (!fheInitialized || messages.length === 0) {
-      return
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       // Dynamically load FHE analytics
-      const { fheAnalytics } = await loadFHE()
+      const { fheAnalytics } = await loadFHE();
 
       // Create configuration based on security level
       const config = {
-        encryptResults: securityLevel === 'maximum', // Keep results encrypted for maximum security
+        encryptResults: securityLevel === "maximum", // Keep results encrypted for maximum security
         timeWindow: {
           startTime: 0,
           endTime: Date.now(),
         },
-      }
+      };
 
       // Get analytics data
       const results = await fheAnalytics.createAnalyticsDashboard(
@@ -181,58 +181,58 @@ export default function AnalyticsDashboard({
           ...msg,
         })),
         config,
-      )
+      );
 
       // Decrypt results if needed
       const processedResults = await Promise.all(
         results.map(async (result) => {
-          if (result.isEncrypted && typeof result.data === 'string') {
-            const parsedData = JSON.parse(result.data) as AnalyticsData
+          if (result.isEncrypted && typeof result.data === "string") {
+            const parsedData = JSON.parse(result.data) as AnalyticsData;
             return {
               ...result,
               data: parsedData,
               isEncrypted: false,
-            }
+            };
           }
-          return result
+          return result;
         }),
-      )
+      );
 
-      setAnalyticsData(processedResults)
+      setAnalyticsData(processedResults);
     } catch (error: unknown) {
-      console.error('Analytics error:', error)
-      setError('Failed to generate analytics')
+      console.error("Analytics error:", error);
+      setError("Failed to generate analytics");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [fheInitialized, messages, securityLevel])
+  }, [fheInitialized, messages, securityLevel]);
 
   // Load analytics when messages or FHE initialization changes
   useEffect(() => {
     if (fheInitialized && messages.length > 0) {
-      loadAnalytics()
+      loadAnalytics();
     }
-  }, [messages, fheInitialized, loadAnalytics])
+  }, [messages, fheInitialized, loadAnalytics]);
 
   // Set up refresh interval
   useEffect(() => {
     if (!refreshInterval) {
-      return
+      return;
     }
 
     const intervalId = setInterval(() => {
       if (messages.length > 0 && fheInitialized) {
-        loadAnalytics()
+        loadAnalytics();
       }
-    }, refreshInterval)
+    }, refreshInterval);
 
-    return () => clearInterval(intervalId)
-  }, [refreshInterval, messages, fheInitialized, loadAnalytics])
+    return () => clearInterval(intervalId);
+  }, [refreshInterval, messages, fheInitialized, loadAnalytics]);
 
   // Get the current analytics data based on active tab
   const currentAnalytics = useMemo(() => {
-    return analyticsData.find((data) => data.type === activeTab)
-  }, [analyticsData, activeTab])
+    return analyticsData.find((data) => data.type === activeTab);
+  }, [analyticsData, activeTab]);
 
   // Helper functions to render different analytics visualizations
   const renderSentimentTrend = (data: AnalyticsData) => {
@@ -241,7 +241,7 @@ export default function AnalyticsDashboard({
         <div className="text-gray-400 text-center p-4">
           No sentiment data available
         </div>
-      )
+      );
     }
 
     return (
@@ -258,7 +258,7 @@ export default function AnalyticsDashboard({
                 Processing Success Rate:
               </span>
               <span
-                className={`ml-2 font-medium ${(data.errorCount ?? 0) > 0 ? 'text-yellow-400' : 'text-green-400'}`}
+                className={`ml-2 font-medium ${(data.errorCount ?? 0) > 0 ? "text-yellow-400" : "text-green-400"}`}
               >
                 {Math.round(
                   ((data.processedCount ?? 0) /
@@ -274,14 +274,14 @@ export default function AnalyticsDashboard({
           <div className="h-40 bg-gray-800 rounded-lg flex items-end p-2 space-x-1">
             {data.sentimentData.map((item: SentimentItem) => {
               // Get mock sentiment values (would be real in production)
-              const sentimentValue = Math.random()
-              const height = `${Math.max(10, Math.round(sentimentValue * 100))}%`
+              const sentimentValue = Math.random();
+              const height = `${Math.max(10, Math.round(sentimentValue * 100))}%`;
               const color =
                 sentimentValue > 0.7
-                  ? 'bg-green-500'
+                  ? "bg-green-500"
                   : sentimentValue > 0.4
-                    ? 'bg-blue-500'
-                    : 'bg-purple-500'
+                    ? "bg-blue-500"
+                    : "bg-purple-500";
 
               return (
                 <div
@@ -294,7 +294,7 @@ export default function AnalyticsDashboard({
                     style={{ height }}
                   ></div>
                 </div>
-              )
+              );
             })}
           </div>
 
@@ -303,7 +303,7 @@ export default function AnalyticsDashboard({
               Sentiment analysis shows emotional valence across the conversation
               timeline.
             </p>
-            {securityLevel === 'maximum' && (
+            {securityLevel === "maximum" && (
               <p className="text-green-400 flex items-center mt-1">
                 <IconLock className="h-3 w-3 mr-1" />
                 Analysis performed with FHE, maintaining complete privacy
@@ -312,8 +312,8 @@ export default function AnalyticsDashboard({
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderTopicClusters = (data: AnalyticsData) => {
     if (!data || !data.topicData || data.topicData.length === 0) {
@@ -321,7 +321,7 @@ export default function AnalyticsDashboard({
         <div className="text-gray-400 text-center p-4">
           No topic data available
         </div>
-      )
+      );
     }
 
     // Create mock topic distribution (would be real in production)
@@ -332,12 +332,12 @@ export default function AnalyticsDashboard({
       relationships: Math.random() * 0.25,
       work: Math.random() * 0.15,
       health: Math.random() * 0.1,
-    }
+    };
 
     // Sort topics for display
     const sortedTopics = Object.entries(mockTopics)
       .sort(([, a], [, b]) => (b as number) - (a as number))
-      .slice(0, 5)
+      .slice(0, 5);
 
     return (
       <div className="p-4">
@@ -370,7 +370,7 @@ export default function AnalyticsDashboard({
 
           <div className="mt-4 text-sm text-gray-300">
             <p>Topic analysis identifies key themes in the conversation.</p>
-            {securityLevel === 'maximum' && (
+            {securityLevel === "maximum" && (
               <p className="text-green-400 flex items-center mt-1">
                 <IconLock className="h-3 w-3 mr-1" />
                 Topic extraction performed with FHE, maintaining complete
@@ -380,8 +380,8 @@ export default function AnalyticsDashboard({
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderRiskAssessment = (data: AnalyticsData) => {
     if (!data || !data.riskData || data.riskData.length === 0) {
@@ -389,19 +389,19 @@ export default function AnalyticsDashboard({
         <div className="text-gray-400 text-center p-4">
           No risk data available
         </div>
-      )
+      );
     }
 
     // Generate mock risk score (would be real in production)
-    const riskScore = Math.random()
+    const riskScore = Math.random();
     const riskLevel =
-      riskScore > 0.7 ? 'High' : riskScore > 0.3 ? 'Medium' : 'Low'
+      riskScore > 0.7 ? "High" : riskScore > 0.3 ? "Medium" : "Low";
     const riskColor =
       riskScore > 0.7
-        ? 'text-red-500'
+        ? "text-red-500"
         : riskScore > 0.3
-          ? 'text-yellow-500'
-          : 'text-green-500'
+          ? "text-yellow-500"
+          : "text-green-500";
 
     return (
       <div className="p-4">
@@ -426,14 +426,14 @@ export default function AnalyticsDashboard({
             <div
               className={
                 riskScore > 0.7
-                  ? 'bg-red-500'
+                  ? "bg-red-500"
                   : riskScore > 0.3
-                    ? 'bg-yellow-500'
-                    : 'bg-green-500'
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
               }
               style={{
                 width: `${Math.round(riskScore * 100)}%`,
-                height: '100%',
+                height: "100%",
               }}
             ></div>
             <div
@@ -457,7 +457,7 @@ export default function AnalyticsDashboard({
               Risk assessment identifies potential safety concerns while
               maintaining privacy.
             </p>
-            {securityLevel === 'maximum' && (
+            {securityLevel === "maximum" && (
               <p className="text-green-400 flex items-center mt-1">
                 <IconLock className="h-3 w-3 mr-1" />
                 Assessment performed with FHE, maintaining complete privacy
@@ -466,8 +466,8 @@ export default function AnalyticsDashboard({
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderInterventionEffectiveness = (data: AnalyticsData) => {
     if (!data || !data.interventionData || data.interventionData.length === 0) {
@@ -475,17 +475,17 @@ export default function AnalyticsDashboard({
         <div className="text-gray-400 text-center p-4">
           No intervention data available
         </div>
-      )
+      );
     }
 
     // Mock intervention types effectiveness (would be real in production)
     const mockInterventions = [
-      { type: 'reflective', effectiveness: Math.random() * 0.8 + 0.2 },
-      { type: 'clarifying', effectiveness: Math.random() * 0.7 + 0.2 },
-      { type: 'challenging', effectiveness: Math.random() * 0.6 + 0.1 },
-      { type: 'supportive', effectiveness: Math.random() * 0.9 + 0.1 },
-      { type: 'directive', effectiveness: Math.random() * 0.5 + 0.3 },
-    ]
+      { type: "reflective", effectiveness: Math.random() * 0.8 + 0.2 },
+      { type: "clarifying", effectiveness: Math.random() * 0.7 + 0.2 },
+      { type: "challenging", effectiveness: Math.random() * 0.6 + 0.1 },
+      { type: "supportive", effectiveness: Math.random() * 0.9 + 0.1 },
+      { type: "directive", effectiveness: Math.random() * 0.5 + 0.3 },
+    ];
 
     return (
       <div className="p-4">
@@ -512,10 +512,10 @@ export default function AnalyticsDashboard({
                   <div
                     className={`h-2.5 rounded-full ${
                       intervention.effectiveness > 0.7
-                        ? 'bg-green-600'
+                        ? "bg-green-600"
                         : intervention.effectiveness > 0.4
-                          ? 'bg-blue-600'
-                          : 'bg-purple-600'
+                          ? "bg-blue-600"
+                          : "bg-purple-600"
                     }`}
                     style={{
                       width: `${Math.round(intervention.effectiveness * 100)}%`,
@@ -531,7 +531,7 @@ export default function AnalyticsDashboard({
               Intervention analysis shows which therapeutic approaches are mos
               effective with this client.
             </p>
-            {securityLevel === 'maximum' && (
+            {securityLevel === "maximum" && (
               <p className="text-green-400 flex items-center mt-1">
                 <IconLock className="h-3 w-3 mr-1" />
                 Analysis performed with FHE, maintaining complete privacy
@@ -540,8 +540,8 @@ export default function AnalyticsDashboard({
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   const renderEmotionalPatterns = (data: AnalyticsData) => {
     if (!data || !data.windowResults || data.windowResults.length === 0) {
@@ -549,17 +549,17 @@ export default function AnalyticsDashboard({
         <div className="text-gray-400 text-center p-4">
           No emotional pattern data available
         </div>
-      )
+      );
     }
 
     // Mock emotional data (would be real in production)
-    const emotions = ['anger', 'sadness', 'fear', 'joy', 'surprise', 'disgust']
+    const emotions = ["anger", "sadness", "fear", "joy", "surprise", "disgust"];
     const mockEmotionData = emotions.map((emotion) => {
       return {
         emotion,
         values: Array.from({ length: 5 }, () => Math.random()),
-      }
-    })
+      };
+    });
 
     return (
       <div className="p-4">
@@ -576,21 +576,21 @@ export default function AnalyticsDashboard({
               <div key={item.emotion} className="absolute">
                 {item.values.map((value, index) => {
                   // Position points along the x-axis
-                  const x = `${(index / (item.values.length - 1)) * 100}%`
+                  const x = `${(index / (item.values.length - 1)) * 100}%`;
                   // Position points along the y-axis (inverted)
-                  const y = `${(1 - value) * 100}%`
+                  const y = `${(1 - value) * 100}%`;
 
                   // Determine color based on emotion
                   const colors = {
-                    anger: 'bg-red-500',
-                    sadness: 'bg-blue-500',
-                    fear: 'bg-purple-500',
-                    joy: 'bg-green-500',
-                    surprise: 'bg-yellow-500',
-                    disgust: 'bg-orange-500',
-                  }
+                    anger: "bg-red-500",
+                    sadness: "bg-blue-500",
+                    fear: "bg-purple-500",
+                    joy: "bg-green-500",
+                    surprise: "bg-yellow-500",
+                    disgust: "bg-orange-500",
+                  };
 
-                  const color = colors[item.emotion as keyof typeof colors]
+                  const color = colors[item.emotion as keyof typeof colors];
 
                   return (
                     <div
@@ -599,7 +599,7 @@ export default function AnalyticsDashboard({
                       style={{ left: x, top: y }}
                       title={`${item.emotion}: ${Math.round(value * 100)}%`}
                     ></div>
-                  )
+                  );
                 })}
               </div>
             ))}
@@ -609,28 +609,28 @@ export default function AnalyticsDashboard({
           <div className="flex flex-wrap gap-3 mt-3">
             {emotions.map((emotion) => {
               const colors = {
-                anger: 'bg-red-500',
-                sadness: 'bg-blue-500',
-                fear: 'bg-purple-500',
-                joy: 'bg-green-500',
-                surprise: 'bg-yellow-500',
-                disgust: 'bg-orange-500',
-              }
+                anger: "bg-red-500",
+                sadness: "bg-blue-500",
+                fear: "bg-purple-500",
+                joy: "bg-green-500",
+                surprise: "bg-yellow-500",
+                disgust: "bg-orange-500",
+              };
 
-              const color = colors[emotion as keyof typeof colors]
+              const color = colors[emotion as keyof typeof colors];
 
               return (
                 <div key={emotion} className="flex items-center">
                   <div className={`${color} w-2 h-2 rounded-full mr-1`}></div>
                   <span className="text-xs capitalize">{emotion}</span>
                 </div>
-              )
+              );
             })}
           </div>
 
           <div className="mt-4 text-sm text-gray-300">
             <p>Emotional patterns show changes in client emotions over time.</p>
-            {securityLevel === 'maximum' && (
+            {securityLevel === "maximum" && (
               <p className="text-green-400 flex items-center mt-1">
                 <IconLock className="h-3 w-3 mr-1" />
                 Analysis performed with FHE, maintaining complete privacy
@@ -639,8 +639,8 @@ export default function AnalyticsDashboard({
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   // Render the analytics content based on active tab
   const renderAnalyticsContent = () => {
@@ -654,7 +654,7 @@ export default function AnalyticsDashboard({
             This may take a moment as we set up secure homomorphic encryption.
           </div>
         </div>
-      )
+      );
     }
 
     if (error) {
@@ -668,7 +668,7 @@ export default function AnalyticsDashboard({
             Try Again
           </button>
         </div>
-      )
+      );
     }
 
     if (isLoading) {
@@ -678,12 +678,12 @@ export default function AnalyticsDashboard({
             Generating secure analytics...
           </div>
           <div className="text-sm text-gray-400">
-            {securityLevel === 'maximum'
-              ? 'Performing homomorphic operations on encrypted data'
-              : 'Processing analytics data securely'}
+            {securityLevel === "maximum"
+              ? "Performing homomorphic operations on encrypted data"
+              : "Processing analytics data securely"}
           </div>
         </div>
-      )
+      );
     }
 
     if (!currentAnalytics) {
@@ -691,24 +691,26 @@ export default function AnalyticsDashboard({
         <div className="p-8 text-center text-gray-400">
           No analytics data available
         </div>
-      )
+      );
     }
 
     switch (activeTab) {
       case AnalyticsType.SENTIMENT_TREND:
-        return renderSentimentTrend(currentAnalytics.data)
+        return renderSentimentTrend(currentAnalytics.data);
       case AnalyticsType.TOPIC_CLUSTERING:
-        return renderTopicClusters(currentAnalytics.data)
+        return renderTopicClusters(currentAnalytics.data);
       case AnalyticsType.RISK_ASSESSMENT:
-        return renderRiskAssessment(currentAnalytics.data)
+        return renderRiskAssessment(currentAnalytics.data);
       case AnalyticsType.INTERVENTION_EFFECTIVENESS:
-        return renderInterventionEffectiveness(currentAnalytics.data)
+        return renderInterventionEffectiveness(currentAnalytics.data);
       case AnalyticsType.EMOTIONAL_PATTERNS:
-        return renderEmotionalPatterns(currentAnalytics.data)
+        return renderEmotionalPatterns(currentAnalytics.data);
       default:
-        return <div className="p-4 text-gray-400">Select an analytics view</div>
+        return (
+          <div className="p-4 text-gray-400">Select an analytics view</div>
+        );
     }
-  }
+  };
 
   return (
     <div className="bg-gray-900 text-gray-100 rounded-lg border border-gray-800 overflow-hidden">
@@ -716,7 +718,7 @@ export default function AnalyticsDashboard({
       <div className="bg-gradient-to-r from-black via-purple-900 to-black p-3 flex items-center justify-between">
         <h2 className="text-lg font-medium">Therapy Analytics</h2>
         <div className="flex items-center space-x-2">
-          {securityLevel === 'maximum' && (
+          {securityLevel === "maximum" && (
             <span className="text-xs text-green-400 bg-black bg-opacity-50 px-2 py-1 rounded flex items-center">
               <IconLock className="h-3 w-3 mr-1" />
               FHE Secured
@@ -751,8 +753,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.SENTIMENT_TREND
-                ? 'text-purple-400 border-b-2 border-purple-400'
-                : 'text-gray-400 hover:text-gray-300'
+                ? "text-purple-400 border-b-2 border-purple-400"
+                : "text-gray-400 hover:text-gray-300"
             }`}
             onClick={() => setActiveTab(AnalyticsType.SENTIMENT_TREND)}
           >
@@ -765,8 +767,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.TOPIC_CLUSTERING
-                ? 'text-purple-400 border-b-2 border-purple-400'
-                : 'text-gray-400 hover:text-gray-300'
+                ? "text-purple-400 border-b-2 border-purple-400"
+                : "text-gray-400 hover:text-gray-300"
             }`}
             onClick={() => setActiveTab(AnalyticsType.TOPIC_CLUSTERING)}
           >
@@ -779,8 +781,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.EMOTIONAL_PATTERNS
-                ? 'text-purple-400 border-b-2 border-purple-400'
-                : 'text-gray-400 hover:text-gray-300'
+                ? "text-purple-400 border-b-2 border-purple-400"
+                : "text-gray-400 hover:text-gray-300"
             }`}
             onClick={() => setActiveTab(AnalyticsType.EMOTIONAL_PATTERNS)}
           >
@@ -793,8 +795,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.INTERVENTION_EFFECTIVENESS
-                ? 'text-purple-400 border-b-2 border-purple-400'
-                : 'text-gray-400 hover:text-gray-300'
+                ? "text-purple-400 border-b-2 border-purple-400"
+                : "text-gray-400 hover:text-gray-300"
             }`}
             onClick={() =>
               setActiveTab(AnalyticsType.INTERVENTION_EFFECTIVENESS)
@@ -809,8 +811,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.RISK_ASSESSMENT
-                ? 'text-purple-400 border-b-2 border-purple-400'
-                : 'text-gray-400 hover:text-gray-300'
+                ? "text-purple-400 border-b-2 border-purple-400"
+                : "text-gray-400 hover:text-gray-300"
             }`}
             onClick={() => setActiveTab(AnalyticsType.RISK_ASSESSMENT)}
           >
@@ -828,14 +830,14 @@ export default function AnalyticsDashboard({
       {/* Footer */}
       <div className="bg-black bg-opacity-40 p-2 text-xs text-gray-500 flex justify-between">
         <div>
-          {scenario ? `Analysis for ${scenario} scenario` : 'All client data'}
+          {scenario ? `Analysis for ${scenario} scenario` : "All client data"}
         </div>
         <div>
           {messages.length > 0
-            ? `${messages.filter((m) => m.role === 'user').length} client messages analyzed`
-            : 'No messages available'}
+            ? `${messages.filter((m) => m.role === "user").length} client messages analyzed`
+            : "No messages available"}
         </div>
       </div>
     </div>
-  )
+  );
 }

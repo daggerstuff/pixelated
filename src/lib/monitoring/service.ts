@@ -1,16 +1,16 @@
-import type { MonitoringConfig } from './config'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { getMonitoringConfig } from './config'
+import type { MonitoringConfig } from "./config";
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { getMonitoringConfig } from "./config";
 
-const logger = createBuildSafeLogger('default')
+const logger = createBuildSafeLogger("default");
 
 // Define extended Performance interface to include memory property
 interface ExtendedPerformance extends Performance {
   memory?: {
-    usedJSHeapSize: number
-    totalJSHeapSize: number
-    jsHeapSizeLimit: number
-  }
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
 }
 
 // Helper function to convert unknown error to a structured format
@@ -20,142 +20,142 @@ function formatError(error: unknown): Record<string, unknown> {
       name: (error as Error)?.name,
       message: String(error),
       stack: (error as Error)?.stack,
-    }
+    };
   }
-  return { unknownError: error }
+  return { unknownError: error };
 }
 
 export class MonitoringService {
-  private static instance: MonitoringService
-  private config: MonitoringConfig
-  private initialized: boolean = false
+  private static instance: MonitoringService;
+  private config: MonitoringConfig;
+  private initialized: boolean = false;
 
   private constructor() {
-    this.config = getMonitoringConfig()
+    this.config = getMonitoringConfig();
   }
 
   public static getInstance(): MonitoringService {
     if (!MonitoringService.instance) {
-      MonitoringService.instance = new MonitoringService()
+      MonitoringService.instance = new MonitoringService();
     }
-    return MonitoringService.instance
+    return MonitoringService.instance;
   }
 
   public async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('MonitoringService already initialized')
-      return
+      logger.warn("MonitoringService already initialized");
+      return;
     }
 
     try {
-      logger.info('Initializing monitoring service...')
+      logger.info("Initializing monitoring service...");
 
       // Initialize Grafana Cloud Frontend Observability
-      await this.initializeRUM()
+      await this.initializeRUM();
 
       // Initialize performance metrics collection
       if (this.config.metrics.enablePerformanceMetrics) {
-        await this.initializePerformanceMetrics()
+        await this.initializePerformanceMetrics();
       }
 
       // Initialize alerting
       if (this.config.alerts.enableAlerts) {
-        await this.initializeAlerts()
+        await this.initializeAlerts();
       }
 
-      this.initialized = true
-      logger.info('Monitoring service initialized successfully')
+      this.initialized = true;
+      logger.info("Monitoring service initialized successfully");
     } catch (error: unknown) {
       logger.error(
-        'Failed to initialize monitoring service',
+        "Failed to initialize monitoring service",
         formatError(error),
-      )
-      throw error
+      );
+      throw error;
     }
   }
 
   private async initializeRUM(): Promise<void> {
     if (!this.config.grafana.enableRUM) {
-      logger.info('RUM is disabled, skipping initialization')
-      return
+      logger.info("RUM is disabled, skipping initialization");
+      return;
     }
 
     try {
       const { apiKey, rumApplicationName, rumSamplingRate } =
-        this.config.grafana
+        this.config.grafana;
 
       // Initialize Grafana Faro Web SDK
-      const script = document.createElement('script')
+      const script = document.createElement("script");
       script.src =
-        'https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js'
-      script.async = true
+        "https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js";
+      script.async = true;
       script.onload = () => {
         window.faro.init({
           url: this.config.grafana.url,
           apiKey,
           app: {
             name: rumApplicationName,
-            version: process.env['APP_VERSION'] || '1.0.0',
-            environment: process.env['NODE_ENV'] || 'production',
+            version: process.env["APP_VERSION"] || "1.0.0",
+            environment: process.env["NODE_ENV"] || "production",
           },
-          instrumentations: ['errors', 'webVitals', 'fetch', 'history'],
+          instrumentations: ["errors", "webVitals", "fetch", "history"],
           samplingRate: rumSamplingRate,
-        })
-      }
-      document.head.appendChild(script)
+        });
+      };
+      document.head.appendChild(script);
 
-      logger.info('RUM initialized successfully')
+      logger.info("RUM initialized successfully");
     } catch (error: unknown) {
-      logger.error('Failed to initialize RUM', formatError(error))
-      throw error
+      logger.error("Failed to initialize RUM", formatError(error));
+      throw error;
     }
   }
 
   private async initializePerformanceMetrics(): Promise<void> {
     try {
       // Initialize performance observers
-      this.initializePerformanceObservers()
+      this.initializePerformanceObservers();
 
       // Set up periodic metric collection
       setInterval(() => {
-        this.collectPerformanceMetrics()
-      }, 60000) // Collect metrics every minute
+        this.collectPerformanceMetrics();
+      }, 60000); // Collect metrics every minute
 
-      logger.info('Performance metrics initialized successfully')
+      logger.info("Performance metrics initialized successfully");
     } catch (error: unknown) {
       logger.error(
-        'Failed to initialize performance metrics',
+        "Failed to initialize performance metrics",
         formatError(error),
-      )
-      throw error
+      );
+      throw error;
     }
   }
 
   private initializePerformanceObservers() {
     // Performance Observer for Core Web Vitals
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       // Largest Contentful Paint
       new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
-        const lastEntry = entries[entries.length - 1]
-        this.reportWebVital('LCP', lastEntry)
-      }).observe({ entryTypes: ['largest-contentful-paint'] })
+        const entries = entryList.getEntries();
+        const lastEntry = entries[entries.length - 1];
+        this.reportWebVital("LCP", lastEntry);
+      }).observe({ entryTypes: ["largest-contentful-paint"] });
 
       // First Input Delay
       new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
+        const entries = entryList.getEntries();
         entries.forEach((entry) => {
-          this.reportWebVital('FID', entry)
-        })
-      }).observe({ entryTypes: ['first-input'] })
+          this.reportWebVital("FID", entry);
+        });
+      }).observe({ entryTypes: ["first-input"] });
 
       // Cumulative Layout Shift
       new PerformanceObserver((entryList) => {
-        const entries = entryList.getEntries()
+        const entries = entryList.getEntries();
         entries.forEach((entry) => {
-          this.reportWebVital('CLS', entry)
-        })
-      }).observe({ entryTypes: ['layout-shift'] })
+          this.reportWebVital("CLS", entry);
+        });
+      }).observe({ entryTypes: ["layout-shift"] });
     }
   }
 
@@ -163,8 +163,8 @@ export class MonitoringService {
     if (window.faro) {
       window.faro.api.pushMeasurement(metric, {
         value: entry.startTime,
-        unit: 'ms',
-      })
+        unit: "ms",
+      });
     }
   }
 
@@ -172,90 +172,94 @@ export class MonitoringService {
     const metrics = {
       timestamp: Date.now(),
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize || 0,
-      navigation: performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming,
-      resources: performance.getEntriesByType('resource') as PerformanceResourceTiming[],
-    }
+      navigation: performance.getEntriesByType(
+        "navigation",
+      )[0] as PerformanceNavigationTiming,
+      resources: performance.getEntriesByType(
+        "resource",
+      ) as PerformanceResourceTiming[],
+    };
 
     if (window.faro) {
-      window.faro.api.pushMeasurement('performance', {
+      window.faro.api.pushMeasurement("performance", {
         value: metrics,
-      })
+      });
     }
 
     // Check for performance issues
-    this.checkPerformanceThresholds(metrics)
+    this.checkPerformanceThresholds(metrics);
   }
 
   private checkPerformanceThresholds(metrics: {
-    timestamp: number
-    memory: number
-    navigation: PerformanceNavigationTiming | undefined
-    resources: PerformanceResourceTiming[]
+    timestamp: number;
+    memory: number;
+    navigation: PerformanceNavigationTiming | undefined;
+    resources: PerformanceResourceTiming[];
   }): void {
-    const { slowRequestThreshold } = this.config.metrics
+    const { slowRequestThreshold } = this.config.metrics;
 
     // Check navigation timing
     if (
       metrics.navigation &&
       metrics.navigation.duration > slowRequestThreshold
     ) {
-      void this.triggerAlert('performance', {
+      void this.triggerAlert("performance", {
         message: `Slow page load detected: ${metrics.navigation.duration}ms`,
-        level: 'warning',
-      })
+        level: "warning",
+      });
     }
 
     // Check resource timing
     metrics.resources.forEach((resource: PerformanceResourceTiming) => {
       if (resource.duration > slowRequestThreshold) {
-        void this.triggerAlert('performance', {
+        void this.triggerAlert("performance", {
           message: `Slow resource load detected: ${resource.name} (${resource.duration}ms)`,
-          level: 'warning',
-        })
+          level: "warning",
+        });
       }
-    })
+    });
   }
 
   private async initializeAlerts(): Promise<void> {
     try {
       // Set up alert handlers
-      this.setupAlertHandlers()
+      this.setupAlertHandlers();
 
-      logger.info('Alerts initialized successfully')
+      logger.info("Alerts initialized successfully");
     } catch (error: unknown) {
-      logger.error('Failed to initialize alerts', formatError(error))
-      throw error
+      logger.error("Failed to initialize alerts", formatError(error));
+      throw error;
     }
   }
 
   private setupAlertHandlers() {
-    window.addEventListener('error', (event) => {
-      void this.triggerAlert('error', {
+    window.addEventListener("error", (event) => {
+      void this.triggerAlert("error", {
         message: event.message,
         error: event.error,
-        level: 'error',
-      })
-    })
+        level: "error",
+      });
+    });
 
-    window.addEventListener('unhandledrejection', (event) => {
-      void this.triggerAlert('error', {
-        message: 'Unhandled Promise Rejection',
+    window.addEventListener("unhandledrejection", (event) => {
+      void this.triggerAlert("error", {
+        message: "Unhandled Promise Rejection",
         error: event.reason,
-        level: 'error',
-      })
-    })
+        level: "error",
+      });
+    });
   }
 
   private async triggerAlert(
     type: string,
     data: {
-      message: string
-      error?: unknown
-      level: string
+      message: string;
+      error?: unknown;
+      level: string;
     },
   ): Promise<void> {
     if (!this.config.alerts.enableAlerts) {
-      return
+      return;
     }
 
     try {
@@ -265,27 +269,27 @@ export class MonitoringService {
           type,
           level: data.level,
           context: data,
-        })
+        });
       }
 
       // Send to Slack if configured
       if (this.config.alerts.slackWebhookUrl) {
         await fetch(this.config.alerts.slackWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             text: `*${type.toUpperCase()} ALERT*\n${data.message}`,
             attachments: [
               {
-                color: data.level === 'error' ? 'danger' : 'warning',
+                color: data.level === "error" ? "danger" : "warning",
                 fields: [
                   {
-                    title: 'Level',
+                    title: "Level",
                     value: data.level,
                     short: true,
                   },
                   {
-                    title: 'Timestamp',
+                    title: "Timestamp",
                     value: new Date().toISOString(),
                     short: true,
                   },
@@ -293,7 +297,7 @@ export class MonitoringService {
               },
             ],
           }),
-        })
+        });
       }
 
       // Send email if configured
@@ -301,7 +305,7 @@ export class MonitoringService {
         // Implement email sending logic here
       }
     } catch (error: unknown) {
-      logger.error('Failed to trigger alert', formatError(error))
+      logger.error("Failed to trigger alert", formatError(error));
     }
   }
 }

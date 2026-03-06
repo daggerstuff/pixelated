@@ -1,15 +1,15 @@
-import React from 'react'
+import React from "react";
 
 interface CheckboxProps {
-  checked?: boolean
-  defaultChecked?: boolean
-  disabled?: boolean
-  id?: string
-  name?: string
-  value?: string
-  onChange?: (checked: boolean) => void
-  className?: string
-  children?: React.ReactNode
+  checked?: boolean;
+  defaultChecked?: boolean;
+  disabled?: boolean;
+  id?: string;
+  name?: string;
+  value?: string;
+  onChange?: (checked: boolean) => void;
+  className?: string;
+  children?: React.ReactNode;
 }
 
 export const Checkbox: FC<CheckboxProps> = ({
@@ -20,16 +20,16 @@ export const Checkbox: FC<CheckboxProps> = ({
   name,
   value,
   onChange,
-  className = '',
+  className = "",
   children,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange?.(e.target.checked)
-  }
+    onChange?.(e.target.checked);
+  };
 
   return (
     <label
-      className={`flex items-center cursor-pointer ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
+      className={`flex items-center cursor-pointer ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
     >
       <input
         type="checkbox"
@@ -44,7 +44,7 @@ export const Checkbox: FC<CheckboxProps> = ({
       />
       {children}
     </label>
-  )
-}
+  );
+};
 
-export default Checkbox
+export default Checkbox;

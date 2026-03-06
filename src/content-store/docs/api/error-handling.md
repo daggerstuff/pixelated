@@ -1,8 +1,8 @@
 ---
-title: 'API Error Handling'
-description: 'Standardized error handling for API endpoints'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "API Error Handling"
+description: "Standardized error handling for API endpoints"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -252,40 +252,40 @@ When consuming the API in client-side code, you can handle errors like this:
 ```typescript
 async function fetchResource(id: string) {
   try {
-    const response = await fetch(`/api/resources/${id}`)
+    const response = await fetch(`/api/resources/${id}`);
 
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorData = await response.json();
 
       // Handle specific error types
       switch (errorData.error.code) {
-        case 'api.resource_not_found':
+        case "api.resource_not_found":
           // Handle not found
-          showNotFoundMessage(errorData.error.message)
-          break
-        case 'api.authentication_error':
+          showNotFoundMessage(errorData.error.message);
+          break;
+        case "api.authentication_error":
           // Handle authentication error
-          redirectToLogin()
-          break
-        case 'api.rate_limit_exceeded':
+          redirectToLogin();
+          break;
+        case "api.rate_limit_exceeded":
           // Handle rate limiting
-          const retryAfter = errorData.error.details?.retryAfter || 60
-          scheduleRetry(retryAfter)
-          break
+          const retryAfter = errorData.error.details?.retryAfter || 60;
+          scheduleRetry(retryAfter);
+          break;
         default:
           // Handle other errors
-          showErrorMessage(errorData.error.message)
+          showErrorMessage(errorData.error.message);
       }
 
-      return null
+      return null;
     }
 
-    const data = await response.json()
-    return data
+    const data = await response.json();
+    return data;
   } catch (error) {
     // Handle network or parsing errors
-    showErrorMessage('Unable to connect to the server')
-    return null
+    showErrorMessage("Unable to connect to the server");
+    return null;
   }
 }
 ```

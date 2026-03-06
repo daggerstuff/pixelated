@@ -1,1 +1,1 @@
-export type { MultidimensionalPattern } from '../emotions/types'
+export type { MultidimensionalPattern } from "../emotions/types";

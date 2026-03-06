@@ -3,18 +3,18 @@
  */
 
 export interface AIUsageStatsOptions {
-  period?: string
-  userId?: string
-  startDate?: Date
-  endDate?: Date
+  period?: string;
+  userId?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 export interface AIUsageStats {
-  totalRequests: number
-  successfulRequests: number
-  failedRequests: number
-  averageResponseTime: number
-  period: string
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  averageResponseTime: number;
+  period: string;
 }
 
 /**
@@ -29,6 +29,6 @@ export async function getAIUsageStats(
     successfulRequests: 0,
     failedRequests: 0,
     averageResponseTime: 0,
-    period: options.period || 'day',
-  }
+    period: options.period || "day",
+  };
 }

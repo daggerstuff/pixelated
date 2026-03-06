@@ -1,12 +1,12 @@
-import { WebSocket, WebSocketServer } from 'ws'
-import { IncomingMessage } from 'http'
-import { randomUUID } from 'crypto'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { validateToken } from '../../auth/jwt-service'
-import type { UserRole } from '../../auth/roles'
-import { GestaltClient } from '../ai/GestaltClient'
+import { WebSocket, WebSocketServer } from "ws";
+import { IncomingMessage } from "http";
+import { randomUUID } from "crypto";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+import { validateToken } from "../../auth/jwt-service";
+import type { UserRole } from "../../auth/roles";
+import { GestaltClient } from "../ai/GestaltClient";
 
-const logger = createBuildSafeLogger('TrainingWebSocketServer')
+const logger = createBuildSafeLogger("TrainingWebSocketServer");
 
 /**
  * Training WebSocket Server - Real-time collaboration for clinical training sessions
@@ -37,23 +37,23 @@ const logger = createBuildSafeLogger('TrainingWebSocketServer')
  */
 
 interface TrainingSessionClient {
-  id: string
-  ws: WebSocket
-  sessionId?: string
-  role: 'trainee' | 'observer' | 'supervisor'
-  userId: string
-  isAuthenticated: boolean
-  authenticatedAt?: Date
+  id: string;
+  ws: WebSocket;
+  sessionId?: string;
+  role: "trainee" | "observer" | "supervisor";
+  userId: string;
+  isAuthenticated: boolean;
+  authenticatedAt?: Date;
 }
 
 interface ClientAuthResult {
-  userId: string
-  role: 'trainee' | 'observer' | 'supervisor'
+  userId: string;
+  role: "trainee" | "observer" | "supervisor";
 }
 
 interface WebSocketMessage {
-  type: string
-  payload: any
+  type: string;
+  payload: any;
 }
 
 interface SessionState {
@@ -63,161 +63,171 @@ interface SessionState {
 }
 
 export class TrainingWebSocketServer {
-  private wss: WebSocketServer
-  private clients: Map<string, TrainingSessionClient> = new Map()
-  private sessions: Map<string, SessionState> = new Map()
-  private readonly AUTH_TIMEOUT_MS = 10000 // 10 seconds to authenticate
+  private wss: WebSocketServer;
+  private clients: Map<string, TrainingSessionClient> = new Map();
+  private sessions: Map<string, SessionState> = new Map();
+  private readonly AUTH_TIMEOUT_MS = 10000; // 10 seconds to authenticate
 
   constructor(port: number) {
-    this.wss = new WebSocketServer({ port })
+    this.wss = new WebSocketServer({ port });
 
-    this.wss.on('connection', (ws, req) => {
-      this.handleConnection(ws, req)
-    })
+    this.wss.on("connection", (ws, req) => {
+      this.handleConnection(ws, req);
+    });
 
-    logger.info(`Training WebSocket Server started on port ${port}`)
+    logger.info(`Training WebSocket Server started on port ${port}`);
   }
 
   private handleConnection(ws: WebSocket, req: IncomingMessage) {
-    const id = randomUUID()
+    const id = randomUUID();
 
     // Extract token from query string if present
-    let initialToken: string | null = null
+    let initialToken: string | null = null;
     try {
-      const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`)
-      initialToken = url.searchParams.get('token')
+      const url = new URL(
+        req.url || "",
+        `http://${req.headers.host || "localhost"}`,
+      );
+      initialToken = url.searchParams.get("token");
     } catch (err) {
-      logger.warn('Failed to parse connection URL', { error: err })
+      logger.warn("Failed to parse connection URL", { error: err });
     }
 
     // Initialize client as unauthenticated
     this.clients.set(id, {
       id,
       ws,
-      role: 'trainee', // Default, will be validated on join_session
-      userId: '', // Will be set after authentication
-      isAuthenticated: false
-    })
+      role: "trainee", // Default, will be validated on join_session
+      userId: "", // Will be set after authentication
+      isAuthenticated: false,
+    });
 
     // If token provided in query string, attempt immediate authentication
     if (initialToken) {
-      void this.attemptAuthentication(id, initialToken)
+      void this.attemptAuthentication(id, initialToken);
     }
 
     // Set up authentication timeout - close connection if not authenticated
     const authTimeout = setTimeout(() => {
-      const client = this.clients.get(id)
+      const client = this.clients.get(id);
       if (client && !client.isAuthenticated) {
-        logger.warn('Client failed to authenticate within timeout', { clientId: id })
-        this.sendError(ws, 'Authentication timeout - connection closed')
-        ws.close(1008, 'Authentication timeout')
-        this.clients.delete(id)
+        logger.warn("Client failed to authenticate within timeout", {
+          clientId: id,
+        });
+        this.sendError(ws, "Authentication timeout - connection closed");
+        ws.close(1008, "Authentication timeout");
+        this.clients.delete(id);
       }
-    }, this.AUTH_TIMEOUT_MS)
+    }, this.AUTH_TIMEOUT_MS);
 
-    ws.on('message', (data) => {
+    ws.on("message", (data) => {
       try {
-        let messageStr: string
+        let messageStr: string;
         if (data instanceof Buffer) {
-          messageStr = data.toString()
-        } else if (typeof data === 'string') {
-          messageStr = data
+          messageStr = data.toString();
+        } else if (typeof data === "string") {
+          messageStr = data;
         } else if (data instanceof ArrayBuffer) {
-          messageStr = Buffer.from(data).toString()
+          messageStr = Buffer.from(data).toString();
         } else if (ArrayBuffer.isView(data)) {
-          messageStr = Buffer.from(data).toString()
+          messageStr = Buffer.from(data).toString();
         } else {
           // Fallback for any other type - should not happen but safe to handle
-          messageStr = String(data)
+          messageStr = String(data);
         }
-        const message = JSON.parse(messageStr) as WebSocketMessage
+        const message = JSON.parse(messageStr) as WebSocketMessage;
 
         // Handle authentication message
-        if (message.type === 'authenticate') {
-          clearTimeout(authTimeout)
-          this.handleAuthenticateMessage(id, message.payload)
-          return
+        if (message.type === "authenticate") {
+          clearTimeout(authTimeout);
+          this.handleAuthenticateMessage(id, message.payload);
+          return;
         }
 
         // Reject all other messages from unauthenticated clients
-        const client = this.clients.get(id)
+        const client = this.clients.get(id);
         if (!client || !client.isAuthenticated) {
-          logger.warn('Unauthenticated client attempted to send message', {
+          logger.warn("Unauthenticated client attempted to send message", {
             clientId: id,
-            messageType: message.type
-          })
-          this.sendError(ws, 'Authentication required')
-          return
+            messageType: message.type,
+          });
+          this.sendError(ws, "Authentication required");
+          return;
         }
 
-        this.handleMessage(ws, id, message)
+        this.handleMessage(ws, id, message);
       } catch (err) {
-        logger.error('Failed to parse message', { error: err })
+        logger.error("Failed to parse message", { error: err });
       }
-    })
+    });
 
-    ws.on('close', () => {
-      clearTimeout(authTimeout)
-      this.handleDisconnect(id)
-    })
+    ws.on("close", () => {
+      clearTimeout(authTimeout);
+      this.handleDisconnect(id);
+    });
   }
 
   /**
    * Handle authentication message from client
    */
-  private handleAuthenticateMessage(clientId: string, payload: { token?: string }) {
-    const client = this.clients.get(clientId)
-    if (!client) return
+  private handleAuthenticateMessage(
+    clientId: string,
+    payload: { token?: string },
+  ) {
+    const client = this.clients.get(clientId);
+    if (!client) return;
 
     if (!payload.token) {
-      logger.warn('Authentication message missing token', { clientId })
-      this.sendError(client.ws, 'Authentication failed: token required')
-      return
+      logger.warn("Authentication message missing token", { clientId });
+      this.sendError(client.ws, "Authentication failed: token required");
+      return;
     }
 
-    void this.attemptAuthentication(clientId, payload.token)
+    void this.attemptAuthentication(clientId, payload.token);
   }
 
   /**
    * Attempt to authenticate a client with the provided token
    */
   private async attemptAuthentication(clientId: string, token: string) {
-    const client = this.clients.get(clientId)
-    if (!client) return
+    const client = this.clients.get(clientId);
+    if (!client) return;
 
     try {
-      const authResult = await this.validateClient(token)
+      const authResult = await this.validateClient(token);
 
       if (authResult) {
-        client.userId = authResult.userId
-        client.role = authResult.role
-        client.isAuthenticated = true
-        client.authenticatedAt = new Date()
+        client.userId = authResult.userId;
+        client.role = authResult.role;
+        client.isAuthenticated = true;
+        client.authenticatedAt = new Date();
 
-        logger.info('Client authenticated', {
+        logger.info("Client authenticated", {
           clientId,
           userId: authResult.userId,
-          role: authResult.role
-        })
+          role: authResult.role,
+        });
 
-        client.ws.send(JSON.stringify({
-          type: 'authenticated',
-          payload: {
-            userId: authResult.userId,
-            role: authResult.role
-          }
-        }))
+        client.ws.send(
+          JSON.stringify({
+            type: "authenticated",
+            payload: {
+              userId: authResult.userId,
+              role: authResult.role,
+            },
+          }),
+        );
       } else {
-        logger.warn('Client authentication failed', { clientId })
-        this.sendError(client.ws, 'Authentication failed: invalid token')
-        client.ws.close(1008, 'Authentication failed')
-        this.clients.delete(clientId)
+        logger.warn("Client authentication failed", { clientId });
+        this.sendError(client.ws, "Authentication failed: invalid token");
+        client.ws.close(1008, "Authentication failed");
+        this.clients.delete(clientId);
       }
     } catch (err) {
-      logger.error('Authentication error', { clientId, error: err })
-      this.sendError(client.ws, 'Authentication error')
-      client.ws.close(1008, 'Authentication error')
-      this.clients.delete(clientId)
+      logger.error("Authentication error", { clientId, error: err });
+      this.sendError(client.ws, "Authentication error");
+      client.ws.close(1008, "Authentication error");
+      this.clients.delete(clientId);
     }
   }
 
@@ -227,56 +237,60 @@ export class TrainingWebSocketServer {
    * @param token - Authentication token (JWT access token)
    * @returns ClientAuthResult if valid, null otherwise
    */
-  private async validateClient(token: string): Promise<ClientAuthResult | null> {
-    const isDevelopment = process.env.NODE_ENV === 'development'
+  private async validateClient(
+    token: string,
+  ): Promise<ClientAuthResult | null> {
+    const isDevelopment = process.env.NODE_ENV === "development";
 
     // Development mode: Allow authentication with any token (or no token)
     // This bypasses authentication for local development/testing
     if (isDevelopment) {
-      logger.warn('Development mode: Authentication bypassed', {
+      logger.warn("Development mode: Authentication bypassed", {
         tokenLength: token.length,
-        warning: 'This should NEVER be enabled in production'
-      })
+        warning: "This should NEVER be enabled in production",
+      });
 
       // In development, extract userId from token if it looks like a JWT or use a default
       // For now, use a simple default for development
       return {
-        userId: token || 'dev-user',
-        role: 'trainee' // Default role, can be overridden by client in development
-      }
+        userId: token || "dev-user",
+        role: "trainee", // Default role, can be overridden by client in development
+      };
     }
 
     // Production mode: Validate JWT token
     try {
-      const validationResult = await validateToken(token, 'access')
+      const validationResult = await validateToken(token, "access");
 
       if (!validationResult.valid || !validationResult.userId) {
-        logger.warn('Token validation failed', {
+        logger.warn("Token validation failed", {
           error: validationResult.error,
-          tokenLength: token.length
-        })
-        return null
+          tokenLength: token.length,
+        });
+        return null;
       }
 
       // Map auth role to training role
-      const trainingRole = this.mapAuthRoleToTrainingRole(validationResult.role)
+      const trainingRole = this.mapAuthRoleToTrainingRole(
+        validationResult.role,
+      );
 
-      logger.info('Token validated successfully', {
+      logger.info("Token validated successfully", {
         userId: validationResult.userId,
         authRole: validationResult.role,
-        trainingRole
-      })
+        trainingRole,
+      });
 
       return {
         userId: validationResult.userId,
-        role: trainingRole
-      }
+        role: trainingRole,
+      };
     } catch (err) {
-      logger.error('Token validation error', {
+      logger.error("Token validation error", {
         error: err instanceof Error ? err.message : String(err),
-        tokenLength: token.length
-      })
-      return null
+        tokenLength: token.length,
+      });
+      return null;
     }
   }
 
@@ -286,20 +300,22 @@ export class TrainingWebSocketServer {
    * @param authRole - User role from authentication system
    * @returns Training session role (trainee, observer, or supervisor)
    */
-  private mapAuthRoleToTrainingRole(authRole?: UserRole): 'trainee' | 'observer' | 'supervisor' {
+  private mapAuthRoleToTrainingRole(
+    authRole?: UserRole,
+  ): "trainee" | "observer" | "supervisor" {
     // Admin and therapist can supervise training sessions
-    if (authRole === 'admin' || authRole === 'therapist') {
-      return 'supervisor'
+    if (authRole === "admin" || authRole === "therapist") {
+      return "supervisor";
     }
 
     // Researchers and support staff can observe but not supervise
-    if (authRole === 'researcher' || authRole === 'support') {
-      return 'observer'
+    if (authRole === "researcher" || authRole === "support") {
+      return "observer";
     }
 
     // Patients and guests participate as trainees
     // Default to trainee for unknown roles
-    return 'trainee'
+    return "trainee";
   }
 
   /**
@@ -307,40 +323,54 @@ export class TrainingWebSocketServer {
    */
   private sendError(ws: WebSocket, message: string) {
     if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({
-        type: 'error',
-        payload: { message }
-      }))
+      ws.send(
+        JSON.stringify({
+          type: "error",
+          payload: { message },
+        }),
+      );
     }
   }
 
-  private handleMessage(ws: WebSocket, clientId: string, message: WebSocketMessage) {
+  private handleMessage(
+    ws: WebSocket,
+    clientId: string,
+    message: WebSocketMessage,
+  ) {
     switch (message.type) {
-      case 'join_session':
-        this.handleJoinSession(ws, clientId, message.payload)
-        break
-      case 'session_message':
-        this.handleSessionMessage(clientId, message.payload)
-        break
-      case 'coaching_note':
-        this.handleCoachingNote(clientId, message.payload)
-        break
+      case "join_session":
+        this.handleJoinSession(ws, clientId, message.payload);
+        break;
+      case "session_message":
+        this.handleSessionMessage(clientId, message.payload);
+        break;
+      case "coaching_note":
+        this.handleCoachingNote(clientId, message.payload);
+        break;
       default:
-        logger.warn('Unknown message type', { type: message.type })
+        logger.warn("Unknown message type", { type: message.type });
     }
   }
 
-  private handleJoinSession(ws: WebSocket, clientId: string, payload: { sessionId: string, role: 'trainee' | 'observer' | 'supervisor', userId: string }) {
-    const client = this.clients.get(clientId)
+  private handleJoinSession(
+    ws: WebSocket,
+    clientId: string,
+    payload: {
+      sessionId: string;
+      role: "trainee" | "observer" | "supervisor";
+      userId: string;
+    },
+  ) {
+    const client = this.clients.get(clientId);
 
     // Require authentication before joining session
     if (!client || !client.isAuthenticated) {
-      logger.warn('Unauthenticated client attempted to join session', {
+      logger.warn("Unauthenticated client attempted to join session", {
         clientId,
-        sessionId: payload.sessionId
-      })
-      this.sendError(ws, 'Authentication required to join session')
-      return
+        sessionId: payload.sessionId,
+      });
+      this.sendError(ws, "Authentication required to join session");
+      return;
     }
 
     // TODO: Validate session access permissions
@@ -351,47 +381,52 @@ export class TrainingWebSocketServer {
 
     // In development mode, allow role to be set from payload (for testing different roles)
     // In production, role should come from authentication token only
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isDevelopment = process.env.NODE_ENV === "development";
     if (isDevelopment && payload.role) {
-      client.role = payload.role
+      client.role = payload.role;
     }
 
     // Use authenticated user info, but allow userId from payload in development
     if (isDevelopment && payload.userId) {
-      client.userId = payload.userId
+      client.userId = payload.userId;
     }
 
     // Use authenticated user info, not payload (prevent role spoofing)
-    client.sessionId = payload.sessionId
+    client.sessionId = payload.sessionId;
 
-    logger.info('Client joined session', {
+    logger.info("Client joined session", {
       clientId,
       sessionId: payload.sessionId,
       role: client.role,
-      userId: client.userId
-    })
+      userId: client.userId,
+    });
 
     // Notify others in the session
     this.broadcastToSession(payload.sessionId, {
-      type: 'participant_joined',
-      payload: { userId: client.userId, role: client.role }
-    })
+      type: "participant_joined",
+      payload: { userId: client.userId, role: client.role },
+    });
 
     // Send confirmation to the client
-    ws.send(JSON.stringify({
-      type: 'session_joined',
-      payload: {
-        sessionId: payload.sessionId,
-        role: client.role,
-        userId: client.userId
-      }
-    }))
+    ws.send(
+      JSON.stringify({
+        type: "session_joined",
+        payload: {
+          sessionId: payload.sessionId,
+          role: client.role,
+          userId: client.userId,
+        },
+      }),
+    );
   }
 
-  private handleSessionMessage(clientId: string, payload: { content: string, role: string }) {
-    const client = this.clients.get(clientId)
+  private handleSessionMessage(
+    clientId: string,
+    payload: { content: string; role: string },
+  ) {
+    const client = this.clients.get(clientId);
     if (!client || !client.sessionId || !client.isAuthenticated) {
-      return
+      return;
     }
 
     // TODO: Validate user has permission to send messages in this session
@@ -400,17 +435,17 @@ export class TrainingWebSocketServer {
 
     // Broadcast chat message to everyone in the session
     this.broadcastToSession(client.sessionId, {
-      type: 'session_message',
+      type: "session_message",
       payload: {
         userId: client.userId,
         role: payload.role, // 'client' (AI) or 'therapist' (User)
         content: payload.content,
-        timestamp: new Date().toISOString()
-      }
-    })
+        timestamp: new Date().toISOString(),
+      },
+    });
 
     // Trigger Gestalt analysis for Seeker messages
-    if (payload.role === 'client' || payload.role === 'seeker') {
+    if (payload.role === "client" || payload.role === "seeker") {
       void this.runGestaltAnalysis(client.sessionId, payload.content);
     }
   }
@@ -425,91 +460,105 @@ export class TrainingWebSocketServer {
         state = {
           dialogue: [],
           plutchikScores: {
-            joy: 0.1, trust: 0.1, fear: 0.1, surprise: 0.1,
-            sadness: 0.1, disgust: 0.1, anger: 0.1, anticipation: 0.1
+            joy: 0.1,
+            trust: 0.1,
+            fear: 0.1,
+            surprise: 0.1,
+            sadness: 0.1,
+            disgust: 0.1,
+            anger: 0.1,
+            anticipation: 0.1,
           },
           oceanScores: {
-            openness: 0.5, conscientiousness: 0.5,
-            extraversion: 0.5, agreeableness: 0.5, neuroticism: 0.5
-          }
+            openness: 0.5,
+            conscientiousness: 0.5,
+            extraversion: 0.5,
+            agreeableness: 0.5,
+            neuroticism: 0.5,
+          },
         };
         this.sessions.set(sessionId, state);
       }
 
       // Add turn to history
-      state.dialogue.push({ speaker: 'Seeker', text: targetUtterance });
+      state.dialogue.push({ speaker: "Seeker", text: targetUtterance });
       if (state.dialogue.length > 40) state.dialogue.shift();
 
       const gestalt = await GestaltClient.analyzeGestalt({
         dialogue: state.dialogue,
         target_utterance: targetUtterance,
         plutchik_scores: state.plutchikScores,
-        ocean_scores: state.oceanScores
+        ocean_scores: state.oceanScores,
       });
 
       // Broadcast Gestalt updates as 'gestalt_update' to all roles
       // Usually supervisors/observers use this for the Resistance Monitor,
       // but trainees can see it too if configured.
       this.broadcastToSession(sessionId, {
-        type: 'gestalt_update',
-        payload: gestalt
+        type: "gestalt_update",
+        payload: gestalt,
       });
 
-      logger.info('Gestalt update broadcasted', { sessionId, defense: gestalt.defense_label_name });
+      logger.info("Gestalt update broadcasted", {
+        sessionId,
+        defense: gestalt.defense_label_name,
+      });
     } catch (error) {
-      logger.error('Gestalt analysis failed during websocket broadcast', { sessionId, error });
+      logger.error("Gestalt analysis failed during websocket broadcast", {
+        sessionId,
+        error,
+      });
     }
   }
 
   private handleCoachingNote(clientId: string, payload: { content: string }) {
-    const client = this.clients.get(clientId)
+    const client = this.clients.get(clientId);
     if (!client || !client.sessionId || !client.isAuthenticated) {
-      return
+      return;
     }
 
     // TODO: Validate user has permission to send coaching notes
     // - Only supervisors/observers should be able to send coaching notes
     // - Verify role matches 'supervisor' or 'observer'
 
-    if (client.role !== 'supervisor' && client.role !== 'observer') {
-      logger.warn('Unauthorized coaching note attempt', {
+    if (client.role !== "supervisor" && client.role !== "observer") {
+      logger.warn("Unauthorized coaching note attempt", {
         clientId,
         userId: client.userId,
-        role: client.role
-      })
-      return
+        role: client.role,
+      });
+      return;
     }
 
     // Coaching notes are "hidden" from trainees - only observers and supervisors receive them
-    this.broadcastToSessionRoles(
-      client.sessionId,
-      ['observer', 'supervisor'],
-      {
-        type: 'coaching_note',
-        payload: {
-          authorId: client.userId,
-          content: payload.content,
-          timestamp: new Date().toISOString()
-        }
-      }
-    )
+    this.broadcastToSessionRoles(client.sessionId, ["observer", "supervisor"], {
+      type: "coaching_note",
+      payload: {
+        authorId: client.userId,
+        content: payload.content,
+        timestamp: new Date().toISOString(),
+      },
+    });
   }
 
   private handleDisconnect(clientId: string) {
-    const client = this.clients.get(clientId)
+    const client = this.clients.get(clientId);
     if (client && client.sessionId) {
       this.broadcastToSession(client.sessionId, {
-        type: 'participant_left',
-        payload: { userId: client.userId }
-      })
+        type: "participant_left",
+        payload: { userId: client.userId },
+      });
     }
-    this.clients.delete(clientId)
+    this.clients.delete(clientId);
   }
 
   private broadcastToSession(sessionId: string, message: WebSocketMessage) {
     for (const client of this.clients.values()) {
-      if (client.sessionId === sessionId && client.ws.readyState === WebSocket.OPEN) {
-        client.ws.send(JSON.stringify(message))
+      if (
+        client.sessionId === sessionId &&
+        client.ws.readyState === WebSocket.OPEN
+      ) {
+        client.ws.send(JSON.stringify(message));
       }
     }
   }
@@ -523,8 +572,8 @@ export class TrainingWebSocketServer {
    */
   private broadcastToSessionRoles(
     sessionId: string,
-    allowedRoles: Array<'trainee' | 'observer' | 'supervisor'>,
-    message: WebSocketMessage
+    allowedRoles: Array<"trainee" | "observer" | "supervisor">,
+    message: WebSocketMessage,
   ) {
     for (const client of this.clients.values()) {
       if (
@@ -532,12 +581,12 @@ export class TrainingWebSocketServer {
         client.ws.readyState === WebSocket.OPEN &&
         allowedRoles.includes(client.role)
       ) {
-        client.ws.send(JSON.stringify(message))
+        client.ws.send(JSON.stringify(message));
       }
     }
   }
 
   public close() {
-    this.wss.close()
+    this.wss.close();
   }
 }

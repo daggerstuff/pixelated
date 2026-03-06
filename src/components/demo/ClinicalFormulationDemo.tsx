@@ -1,38 +1,38 @@
-import { useState } from 'react'
-import type { FC } from 'react'
+import { useState } from "react";
+import type { FC } from "react";
 
 interface ClinicalFormulation {
-  id: string
-  patientId: string
-  presentingProblems: string[]
-  precipitatingFactors: string[]
-  predisposingFactors: string[]
-  perpetuatingFactors: string[]
-  protectiveFactors: string[]
+  id: string;
+  patientId: string;
+  presentingProblems: string[];
+  precipitatingFactors: string[];
+  predisposingFactors: string[];
+  perpetuatingFactors: string[];
+  protectiveFactors: string[];
   hypotheses: {
-    primary: string
-    alternative: string[]
-  }
-  treatmentGoals: string[]
-  interventionPlan: string[]
+    primary: string;
+    alternative: string[];
+  };
+  treatmentGoals: string[];
+  interventionPlan: string[];
   riskAssessment: {
-    level: 'low' | 'moderate' | 'high'
-    factors: string[]
-  }
-  prognosis: string
-  reviewDate: string
+    level: "low" | "moderate" | "high";
+    factors: string[];
+  };
+  prognosis: string;
+  reviewDate: string;
 }
 
 interface ClinicalFormulationDemoProps {
   patientData?: {
-    presentingProblem: string
+    presentingProblem: string;
     demographics: {
-      age: number
-      gender: string
-      culturalBackground: string[]
-    }
-    history: string[]
-  }
+      age: number;
+      gender: string;
+      culturalBackground: string[];
+    };
+    history: string[];
+  };
 }
 
 const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
@@ -40,97 +40,97 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
 }) => {
   const [formulation, setFormulation] = useState<ClinicalFormulation | null>(
     null,
-  )
-  const [isGenerating, setIsGenerating] = useState(false)
+  );
+  const [isGenerating, setIsGenerating] = useState(false);
   const [selectedApproach, setSelectedApproach] = useState<
-    'cbt' | 'psychodynamic' | 'humanistic' | 'systemic'
-  >('cbt')
+    "cbt" | "psychodynamic" | "humanistic" | "systemic"
+  >("cbt");
 
   // Mock formulation data
   const mockFormulation: ClinicalFormulation = {
-    id: 'form-001',
-    patientId: 'patient-001',
+    id: "form-001",
+    patientId: "patient-001",
     presentingProblems: [
-      'Persistent low mood and loss of interest',
-      'Sleep disturbances and fatigue',
-      'Difficulty concentrating at work',
-      'Social withdrawal from friends and family',
+      "Persistent low mood and loss of interest",
+      "Sleep disturbances and fatigue",
+      "Difficulty concentrating at work",
+      "Social withdrawal from friends and family",
     ],
     precipitatingFactors: [
-      'Recent job loss 3 months ago',
-      'End of long-term relationship',
-      'Financial stress and uncertainty',
+      "Recent job loss 3 months ago",
+      "End of long-term relationship",
+      "Financial stress and uncertainty",
     ],
     predisposingFactors: [
-      'Family history of depression',
-      'Previous episode of depression in late teens',
-      'Perfectionist personality traits',
-      'Limited emotional regulation skills',
+      "Family history of depression",
+      "Previous episode of depression in late teens",
+      "Perfectionist personality traits",
+      "Limited emotional regulation skills",
     ],
     perpetuatingFactors: [
-      'Negative thinking patterns and rumination',
-      'Social isolation and reduced activity',
-      'Poor sleep hygiene',
-      'Avoidance of challenging situations',
+      "Negative thinking patterns and rumination",
+      "Social isolation and reduced activity",
+      "Poor sleep hygiene",
+      "Avoidance of challenging situations",
     ],
     protectiveFactors: [
-      'Strong family support system',
-      'Previous successful therapy experience',
-      'Good physical health',
-      'Creative hobbies and interests',
-      'Stable housing situation',
+      "Strong family support system",
+      "Previous successful therapy experience",
+      "Good physical health",
+      "Creative hobbies and interests",
+      "Stable housing situation",
     ],
     hypotheses: {
       primary:
-        'Major Depressive Episode triggered by multiple life stressors, maintained by cognitive patterns and behavioral withdrawal',
+        "Major Depressive Episode triggered by multiple life stressors, maintained by cognitive patterns and behavioral withdrawal",
       alternative: [
-        'Adjustment Disorder with mixed anxiety and depressed mood',
-        'Persistent Depressive Disorder with acute exacerbation',
+        "Adjustment Disorder with mixed anxiety and depressed mood",
+        "Persistent Depressive Disorder with acute exacerbation",
       ],
     },
     treatmentGoals: [
-      'Reduce depressive symptoms to manageable levels',
-      'Improve sleep quality and energy levels',
-      'Develop effective coping strategies for stress',
-      'Increase social engagement and activity levels',
-      'Enhance emotional regulation skills',
+      "Reduce depressive symptoms to manageable levels",
+      "Improve sleep quality and energy levels",
+      "Develop effective coping strategies for stress",
+      "Increase social engagement and activity levels",
+      "Enhance emotional regulation skills",
     ],
     interventionPlan: [
-      'Cognitive Behavioral Therapy (CBT) - 16-20 sessions',
-      'Behavioral activation techniques',
-      'Cognitive restructuring for negative thought patterns',
-      'Sleep hygiene education',
-      'Graded exposure to avoided activities',
-      'Mindfulness and relaxation training',
+      "Cognitive Behavioral Therapy (CBT) - 16-20 sessions",
+      "Behavioral activation techniques",
+      "Cognitive restructuring for negative thought patterns",
+      "Sleep hygiene education",
+      "Graded exposure to avoided activities",
+      "Mindfulness and relaxation training",
     ],
     riskAssessment: {
-      level: 'moderate',
+      level: "moderate",
       factors: [
-        'History of suicidal ideation',
-        'Current hopelessness',
-        'Social isolation',
+        "History of suicidal ideation",
+        "Current hopelessness",
+        "Social isolation",
       ],
     },
-    prognosis: 'Good with appropriate treatment engagement and support',
-    reviewDate: '2024-04-01',
-  }
+    prognosis: "Good with appropriate treatment engagement and support",
+    reviewDate: "2024-04-01",
+  };
 
   const generateFormulation = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
 
     // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    setFormulation(mockFormulation)
-    setIsGenerating(false)
-  }
+    setFormulation(mockFormulation);
+    setIsGenerating(false);
+  };
 
   const approaches = {
-    cbt: 'Cognitive Behavioral Therapy',
-    psychodynamic: 'Psychodynamic Therapy',
-    humanistic: 'Humanistic Therapy',
-    systemic: 'Systemic Therapy',
-  }
+    cbt: "Cognitive Behavioral Therapy",
+    psychodynamic: "Psychodynamic Therapy",
+    humanistic: "Humanistic Therapy",
+    systemic: "Systemic Therapy",
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
@@ -157,7 +157,7 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
             </h3>
             <p className="text-gray-600 bg-gray-50 p-3 rounded">
               {patientData?.presentingProblem ||
-                'Patient reports feeling depressed for the past 3 months, with difficulty sleeping, loss of appetite, and decreased motivation following job loss.'}
+                "Patient reports feeling depressed for the past 3 months, with difficulty sleeping, loss of appetite, and decreased motivation following job loss."}
             </p>
           </div>
 
@@ -165,11 +165,11 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
             <h3 className="font-medium text-gray-700 mb-2">Demographics</h3>
             <div className="text-gray-600 bg-gray-50 p-3 rounded space-y-1">
               <div>Age: {patientData?.demographics?.age || 32}</div>
-              <div>Gender: {patientData?.demographics?.gender || 'Female'}</div>
+              <div>Gender: {patientData?.demographics?.gender || "Female"}</div>
               <div>
-                Background:{' '}
-                {patientData?.demographics?.culturalBackground?.join(', ') ||
-                  'Caucasian, Urban'}
+                Background:{" "}
+                {patientData?.demographics?.culturalBackground?.join(", ") ||
+                  "Caucasian, Urban"}
               </div>
             </div>
           </div>
@@ -201,8 +201,8 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
             className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
           >
             {isGenerating
-              ? 'Generating Formulation...'
-              : 'Generate Clinical Formulation'}
+              ? "Generating Formulation..."
+              : "Generate Clinical Formulation"}
           </button>
         </div>
       </div>
@@ -377,11 +377,11 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
               <span className="text-gray-700">Risk Level:</span>
               <span
                 className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  formulation.riskAssessment.level === 'high'
-                    ? 'bg-red-100 text-red-800'
-                    : formulation.riskAssessment.level === 'moderate'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-green-100 text-green-800'
+                  formulation.riskAssessment.level === "high"
+                    ? "bg-red-100 text-red-800"
+                    : formulation.riskAssessment.level === "moderate"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-green-100 text-green-800"
                 }`}
               >
                 {formulation.riskAssessment.level.charAt(0).toUpperCase() +
@@ -432,7 +432,7 @@ const ClinicalFormulationDemo: FC<ClinicalFormulationDemoProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ClinicalFormulationDemo
+export default ClinicalFormulationDemo;

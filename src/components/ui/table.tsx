@@ -1,37 +1,38 @@
-import React from 'react'
-import { cn } from '../../lib/utils'
+import React from "react";
+import { cn } from "../../lib/utils";
 import type {
   TableColumn,
   TableRowData,
   TableDataSource,
   TableState,
   SortDirection,
-} from './table-types'
+} from "./table-types";
 
-export interface TableProps<T extends TableRowData>
-  extends React.HTMLAttributes<HTMLTableElement> {
+export interface TableProps<
+  T extends TableRowData,
+> extends React.HTMLAttributes<HTMLTableElement> {
   /** Column definitions */
-  columns: TableColumn<T>[]
+  columns: TableColumn<T>[];
   /** Data source */
-  dataSource: TableDataSource<T>
+  dataSource: TableDataSource<T>;
   /** Table state */
-  tableState: TableState
+  tableState: TableState;
   /** Function to update table state */
-  onStateChange: (newState: Partial<TableState>) => void
+  onStateChange: (newState: Partial<TableState>) => void;
   /** Whether the table should have a border */
-  bordered?: boolean
+  bordered?: boolean;
   /** Whether the table should have striped rows */
-  striped?: boolean
+  striped?: boolean;
   /** Whether the table should be hoverable */
-  hoverable?: boolean
+  hoverable?: boolean;
   /** Whether the table should be compact */
-  compact?: boolean
+  compact?: boolean;
   /** Whether the table should be full width */
-  fullWidth?: boolean
+  fullWidth?: boolean;
   /** Whether the table should have a sticky header */
-  stickyHeader?: boolean
+  stickyHeader?: boolean;
   /** Additional class name */
-  className?: string
+  className?: string;
 }
 
 function Table<T extends TableRowData>({
@@ -49,40 +50,40 @@ function Table<T extends TableRowData>({
   ...props
 }: TableProps<T>) {
   const handleSort = (columnId: string) => {
-    const currentSort = tableState.sort
-    let direction: SortDirection = 'asc'
+    const currentSort = tableState.sort;
+    let direction: SortDirection = "asc";
 
     if (currentSort?.sortBy === columnId) {
-      if (currentSort.direction === 'asc') {
-        direction = 'desc'
-      } else if (currentSort.direction === 'desc') {
-        direction = null
+      if (currentSort.direction === "asc") {
+        direction = "desc";
+      } else if (currentSort.direction === "desc") {
+        direction = null;
       }
     }
 
     onStateChange({
       sort: direction ? { sortBy: columnId, direction } : undefined,
-    })
-  }
+    });
+  };
 
   return (
     <div
-      className={cn('relative w-full overflow-auto', {
-        'overflow-x-auto': true,
+      className={cn("relative w-full overflow-auto", {
+        "overflow-x-auto": true,
       })}
     >
       <table
         className={cn(
-          'border-collapse w-full text-sm',
+          "border-collapse w-full text-sm",
           {
-            'w-full': fullWidth,
-            'border border-gray-200 dark:border-gray-700': bordered,
-            '[&>tbody>tr:nth-child(odd)]:bg-gray-50 dark:[&>tbody>tr:nth-child(odd)]:bg-gray-800/50':
+            "w-full": fullWidth,
+            "border border-gray-200 dark:border-gray-700": bordered,
+            "[&>tbody>tr:nth-child(odd)]:bg-gray-50 dark:[&>tbody>tr:nth-child(odd)]:bg-gray-800/50":
               striped,
-            '[&>tbody>tr:hover]:bg-gray-100 dark:[&>tbody>tr:hover]:bg-gray-800/70':
+            "[&>tbody>tr:hover]:bg-gray-100 dark:[&>tbody>tr:hover]:bg-gray-800/70":
               hoverable,
-            '[&_td]:p-2 [&_th]:p-2': compact,
-            '[&>thead]:sticky [&>thead]:top-0 [&>thead]:bg-inherit':
+            "[&_td]:p-2 [&_th]:p-2": compact,
+            "[&>thead]:sticky [&>thead]:top-0 [&>thead]:bg-inherit":
               stickyHeader,
           },
           className,
@@ -97,18 +98,18 @@ function Table<T extends TableRowData>({
                 sortable={column.sortable}
                 sortAsc={
                   tableState.sort?.sortBy === column.id &&
-                  tableState.sort.direction === 'asc'
+                  tableState.sort.direction === "asc"
                 }
                 sortDesc={
                   tableState.sort?.sortBy === column.id &&
-                  tableState.sort.direction === 'desc'
+                  tableState.sort.direction === "desc"
                 }
                 onSort={() => column.sortable && handleSort(column.id)}
                 style={{ width: column.width }}
                 className={cn({
-                  'text-right': column.align === 'right',
-                  'text-center': column.align === 'center',
-                  'hidden md:table-cell': column.hideMobile,
+                  "text-right": column.align === "right",
+                  "text-center": column.align === "center",
+                  "hidden md:table-cell": column.hideMobile,
                 })}
               >
                 {column.Header || column.header}
@@ -145,16 +146,16 @@ function Table<T extends TableRowData>({
                 key={row.id}
                 selected={tableState.selectedRows?.has(row.id)}
                 className={cn(row.className, {
-                  'opacity-50': row.disabled,
+                  "opacity-50": row.disabled,
                 })}
               >
                 {columns.map((column) => (
                   <TableCell
                     key={`${row.id}-${column.id}`}
                     className={cn({
-                      'text-right': column.align === 'right',
-                      'text-center': column.align === 'center',
-                      'hidden md:table-cell': column.hideMobile,
+                      "text-right": column.align === "right",
+                      "text-center": column.align === "center",
+                      "hidden md:table-cell": column.hideMobile,
                     })}
                   >
                     {column.Cell ? (
@@ -183,55 +184,53 @@ function Table<T extends TableRowData>({
         />
       )}
     </div>
-  )
+  );
 }
 
-export interface TableHeaderProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
+export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  className?: string;
 }
 
 function TableHeader({ className, ...props }: TableHeaderProps) {
   return (
     <thead
-      className={cn('bg-gray-50 dark:bg-gray-800', className)}
+      className={cn("bg-gray-50 dark:bg-gray-800", className)}
       {...props}
     />
-  )
+  );
 }
 
-export interface TableBodyProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
+export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  className?: string;
 }
 
 function TableBody({ className, ...props }: TableBodyProps) {
   return (
     <tbody
-      className={cn('divide-y divide-gray-200 dark:divide-gray-700', className)}
+      className={cn("divide-y divide-gray-200 dark:divide-gray-700", className)}
       {...props}
     />
-  )
+  );
 }
 
-export interface TableFooterProps
-  extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
+export interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+  className?: string;
 }
 
 function TableFooter({ className, ...props }: TableFooterProps) {
   return (
     <tfoot
-      className={cn('bg-gray-50 dark:bg-gray-800 font-medium', className)}
+      className={cn("bg-gray-50 dark:bg-gray-800 font-medium", className)}
       {...props}
     />
-  )
+  );
 }
 
 export interface TableRowProps
-  extends React.HTMLAttributes<HTMLTableRowElement>,
-    Pick<TableRowData, 'selected' | 'disabled'> {
-  className?: string
+  extends
+    React.HTMLAttributes<HTMLTableRowElement>,
+    Pick<TableRowData, "selected" | "disabled"> {
+  className?: string;
 }
 
 function TableRow({
@@ -243,11 +242,11 @@ function TableRow({
   return (
     <tr
       className={cn(
-        'transition-colors',
+        "transition-colors",
         {
-          'hover:bg-gray-100 dark:hover:bg-gray-800/50': !disabled,
-          'bg-blue-50 dark:bg-blue-900/20': selected,
-          'opacity-50 cursor-not-allowed': disabled,
+          "hover:bg-gray-100 dark:hover:bg-gray-800/50": !disabled,
+          "bg-blue-50 dark:bg-blue-900/20": selected,
+          "opacity-50 cursor-not-allowed": disabled,
         },
         className,
       )}
@@ -255,26 +254,25 @@ function TableRow({
       aria-disabled={disabled}
       {...props}
     />
-  )
+  );
 }
 
-export interface TableHeadProps
-  extends React.ThHTMLAttributes<HTMLTableCellElement> {
+export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   /** Whether the column is sortable */
-  sortable?: boolean
+  sortable?: boolean;
   /** Whether the column is currently sorted ascending */
-  sortAsc?: boolean
+  sortAsc?: boolean;
   /** Whether the column is currently sorted descending */
-  sortDesc?: boolean
+  sortDesc?: boolean;
   /** Function to call when sort direction is changed */
-  onSort?: () => void
+  onSort?: () => void;
   /** Column alignment */
-  align?: 'left' | 'center' | 'right'
+  align?: "left" | "center" | "right";
   /** Whether to hide on mobile */
-  hideMobile?: boolean
+  hideMobile?: boolean;
   /** Column width */
-  width?: string
-  className?: string
+  width?: string;
+  className?: string;
 }
 
 function TableHead({
@@ -282,7 +280,7 @@ function TableHead({
   sortAsc = false,
   sortDesc = false,
   onSort,
-  align = 'left',
+  align = "left",
   hideMobile = false,
   width,
   className,
@@ -293,13 +291,13 @@ function TableHead({
   return (
     <th
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400',
-        'border-b border-gray-200 dark:border-gray-700',
+        "h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400",
+        "border-b border-gray-200 dark:border-gray-700",
         {
-          'cursor-pointer select-none': sortable,
-          'text-right': align === 'right',
-          'text-center': align === 'center',
-          'hidden md:table-cell': hideMobile,
+          "cursor-pointer select-none": sortable,
+          "text-right": align === "right",
+          "text-center": align === "center",
+          "hidden md:table-cell": hideMobile,
         },
         className,
       )}
@@ -307,23 +305,23 @@ function TableHead({
       onKeyDown={
         sortable
           ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onSort?.()
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onSort?.();
               }
             }
           : undefined
       }
       style={{ ...style, width }}
       tabIndex={sortable ? 0 : undefined}
-      role={sortable ? 'button' : undefined}
+      role={sortable ? "button" : undefined}
       aria-sort={
         sortable
           ? sortAsc
-            ? 'ascending'
+            ? "ascending"
             : sortDesc
-              ? 'descending'
-              : 'none'
+              ? "descending"
+              : "none"
           : undefined
       }
       {...props}
@@ -334,9 +332,9 @@ function TableHead({
           <span className="flex flex-col">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={cn('h-2 w-2', {
-                'text-gray-700 dark:text-gray-300': sortAsc,
-                'text-gray-400 dark:text-gray-600': !sortAsc,
+              className={cn("h-2 w-2", {
+                "text-gray-700 dark:text-gray-300": sortAsc,
+                "text-gray-400 dark:text-gray-600": !sortAsc,
               })}
               fill="none"
               viewBox="0 0 24 24"
@@ -352,9 +350,9 @@ function TableHead({
             </svg>
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className={cn('h-2 w-2', {
-                'text-gray-700 dark:text-gray-300': sortDesc,
-                'text-gray-400 dark:text-gray-600': !sortDesc,
+              className={cn("h-2 w-2", {
+                "text-gray-700 dark:text-gray-300": sortDesc,
+                "text-gray-400 dark:text-gray-600": !sortDesc,
               })}
               fill="none"
               viewBox="0 0 24 24"
@@ -374,20 +372,19 @@ function TableHead({
         children
       )}
     </th>
-  )
+  );
 }
 
-export interface TableCellProps
-  extends React.TdHTMLAttributes<HTMLTableCellElement> {
+export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
   /** Cell alignment */
-  align?: 'left' | 'center' | 'right'
+  align?: "left" | "center" | "right";
   /** Whether to hide on mobile */
-  hideMobile?: boolean
-  className?: string
+  hideMobile?: boolean;
+  className?: string;
 }
 
 function TableCell({
-  align = 'left',
+  align = "left",
   hideMobile = false,
   className,
   ...props
@@ -395,37 +392,36 @@ function TableCell({
   return (
     <td
       className={cn(
-        'p-4 align-middle',
+        "p-4 align-middle",
         {
-          'text-right': align === 'right',
-          'text-center': align === 'center',
-          'hidden md:table-cell': hideMobile,
+          "text-right": align === "right",
+          "text-center": align === "center",
+          "hidden md:table-cell": hideMobile,
         },
         className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export interface TablePaginationProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface TablePaginationProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Current page (1-based) */
-  currentPage: number
+  currentPage: number;
   /** Total number of pages */
-  totalPages: number
+  totalPages: number;
   /** Function to call when page is changed */
-  onPageChange: (page: number) => void
+  onPageChange: (page: number) => void;
   /** Whether to show page size select */
-  showPageSize?: boolean
+  showPageSize?: boolean;
   /** Available page sizes */
-  pageSizes?: number[]
+  pageSizes?: number[];
   /** Current page size */
-  pageSize?: number
+  pageSize?: number;
   /** Function to call when page size is changed */
-  onPageSizeChange?: (pageSize: number) => void
+  onPageSizeChange?: (pageSize: number) => void;
   /** Additional class name */
-  className?: string
+  className?: string;
 }
 
 function TablePagination({
@@ -441,25 +437,25 @@ function TablePagination({
 }: TablePaginationProps) {
   // Calculate visible page range
   const getVisiblePages = () => {
-    const pages = []
-    let startPage = Math.max(1, currentPage - 2)
-    const endPage = Math.min(totalPages, startPage + 4)
+    const pages = [];
+    let startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, startPage + 4);
 
     if (endPage - startPage < 4) {
-      startPage = Math.max(1, endPage - 4)
+      startPage = Math.max(1, endPage - 4);
     }
 
     for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
+      pages.push(i);
     }
 
-    return pages
-  }
+    return pages;
+  };
 
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 px-4 py-3 dark:border-gray-700',
+        "flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 px-4 py-3 dark:border-gray-700",
         className,
       )}
       {...props}
@@ -484,10 +480,10 @@ function TablePagination({
       <div className="flex items-center gap-2">
         <button
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md',
-            'text-gray-500 dark:text-gray-400',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
-            'disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent',
+            "flex h-8 w-8 items-center justify-center rounded-md",
+            "text-gray-500 dark:text-gray-400",
+            "hover:bg-gray-100 dark:hover:bg-gray-800",
+            "disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent",
           )}
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
@@ -513,16 +509,16 @@ function TablePagination({
           <button
             key={page}
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-md text-sm',
+              "flex h-8 w-8 items-center justify-center rounded-md text-sm",
               {
-                'bg-primary text-white': currentPage === page,
-                'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800':
+                "bg-primary text-white": currentPage === page,
+                "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800":
                   currentPage !== page,
               },
             )}
             onClick={() => onPageChange(page)}
             aria-label={`Page ${page}`}
-            aria-current={currentPage === page ? 'page' : undefined}
+            aria-current={currentPage === page ? "page" : undefined}
           >
             {page}
           </button>
@@ -530,10 +526,10 @@ function TablePagination({
 
         <button
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md',
-            'text-gray-500 dark:text-gray-400',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
-            'disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent',
+            "flex h-8 w-8 items-center justify-center rounded-md",
+            "text-gray-500 dark:text-gray-400",
+            "hover:bg-gray-100 dark:hover:bg-gray-800",
+            "disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent",
           )}
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
@@ -557,11 +553,11 @@ function TablePagination({
       </div>
 
       <div className="text-sm text-gray-700 dark:text-gray-300">
-        Page <span className="font-medium">{currentPage}</span> of{' '}
+        Page <span className="font-medium">{currentPage}</span> of{" "}
         <span className="font-medium">{totalPages}</span>
       </div>
     </div>
-  )
+  );
 }
 
 export {
@@ -573,4 +569,4 @@ export {
   TableHeader,
   TablePagination,
   TableRow,
-}
+};

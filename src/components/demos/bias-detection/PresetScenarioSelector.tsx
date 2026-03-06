@@ -1,13 +1,13 @@
 // Interactive preset scenario selector with filtering and preview
 
-import { useState, useMemo, type FC } from 'react'
-import type { PresetScenario } from '../../../lib/types/bias-detection'
+import { useState, useMemo, type FC } from "react";
+import type { PresetScenario } from "../../../lib/types/bias-detection";
 
 interface PresetScenarioSelectorProps {
-  scenarios: PresetScenario[]
-  selectedScenario: PresetScenario | null
-  onScenarioSelect: (scenario: PresetScenario) => void
-  disabled?: boolean
+  scenarios: PresetScenario[];
+  selectedScenario: PresetScenario | null;
+  onScenarioSelect: (scenario: PresetScenario) => void;
+  disabled?: boolean;
 }
 
 export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
@@ -16,69 +16,69 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
   onScenarioSelect,
   disabled = false,
 }) => {
-  const [filterCategory, setFilterCategory] = useState<string>('all')
-  const [filterRiskLevel, setFilterRiskLevel] = useState<string>('all')
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterRiskLevel, setFilterRiskLevel] = useState<string>("all");
   const [previewScenario, setPreviewScenario] = useState<PresetScenario | null>(
     null,
-  )
+  );
 
   // Get unique categories and risk levels
   const categories = useMemo(() => {
-    const cats = [...new Set(scenarios.map((s: PresetScenario) => s.category))]
-    return cats.sort()
-  }, [scenarios])
+    const cats = [...new Set(scenarios.map((s: PresetScenario) => s.category))];
+    return cats.sort();
+  }, [scenarios]);
 
   const riskLevels = useMemo(() => {
     const levels = [
       ...new Set(scenarios.map((s: PresetScenario) => s.riskLevel)),
-    ]
+    ];
     return levels.sort((a, b) => {
-      const order = { low: 1, medium: 2, high: 3, critical: 4 }
-      return order[a as keyof typeof order] - order[b as keyof typeof order]
-    })
-  }, [scenarios])
+      const order = { low: 1, medium: 2, high: 3, critical: 4 };
+      return order[a as keyof typeof order] - order[b as keyof typeof order];
+    });
+  }, [scenarios]);
 
   // Filter scenarios
   const filteredScenarios = useMemo(() => {
     return scenarios.filter((scenario) => {
       const categoryMatch =
-        filterCategory === 'all' || scenario.category === filterCategory
+        filterCategory === "all" || scenario.category === filterCategory;
       const riskMatch =
-        filterRiskLevel === 'all' || scenario.riskLevel === filterRiskLevel
-      return categoryMatch && riskMatch
-    })
-  }, [scenarios, filterCategory, filterRiskLevel])
+        filterRiskLevel === "all" || scenario.riskLevel === filterRiskLevel;
+      return categoryMatch && riskMatch;
+    });
+  }, [scenarios, filterCategory, filterRiskLevel]);
 
   // Helper function to get risk level styling
   const getRiskLevelStyle = (level: string) => {
     switch (level) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200'
-      case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200'
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'low':
-        return 'bg-green-100 text-green-800 border-green-200'
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "low":
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   // Helper function to get category color
   const getCategoryColor = (category: string) => {
     const colors = {
-      cultural: 'bg-purple-100 text-purple-800',
-      gender: 'bg-pink-100 text-pink-800',
-      age: 'bg-blue-100 text-blue-800',
-      linguistic: 'bg-indigo-100 text-indigo-800',
-      intersectional: 'bg-gray-100 text-gray-800',
-      inclusive: 'bg-green-100 text-green-800',
-    }
+      cultural: "bg-purple-100 text-purple-800",
+      gender: "bg-pink-100 text-pink-800",
+      age: "bg-blue-100 text-blue-800",
+      linguistic: "bg-indigo-100 text-indigo-800",
+      intersectional: "bg-gray-100 text-gray-800",
+      inclusive: "bg-green-100 text-green-800",
+    };
     return (
-      colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'
-    )
-  }
+      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800"
+    );
+  };
 
   return (
     <div className="preset-scenario-selector">
@@ -147,18 +147,18 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
             key={scenario.id}
             className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md w-full text-left ${
               selectedScenario?.id === scenario.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
-            } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300"
+            } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => !disabled && onScenarioSelect(scenario)}
             onKeyDown={(e) => {
-              if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
-                e.preventDefault()
-                onScenarioSelect(scenario)
+              if ((e.key === "Enter" || e.key === " ") && !disabled) {
+                e.preventDefault();
+                onScenarioSelect(scenario);
               }
             }}
             tabIndex={disabled ? -1 : 0}
-            aria-label={`Select scenario: ${scenario['title']}`}
+            aria-label={`Select scenario: ${scenario["title"]}`}
             aria-disabled={disabled}
             onMouseEnter={() => setPreviewScenario(scenario)}
             onMouseLeave={() => setPreviewScenario(null)}
@@ -217,7 +217,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
               <div className="text-sm text-gray-700 italic">
                 &quot;
                 {scenario.content.length > 100
-                  ? scenario.content.substring(0, 100) + '...'
+                  ? scenario.content.substring(0, 100) + "..."
                   : scenario.content}
                 &quot;
               </div>
@@ -283,8 +283,8 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
           <p>No scenarios match the selected filters</p>
           <button
             onClick={() => {
-              setFilterCategory('all')
-              setFilterRiskLevel('all')
+              setFilterCategory("all");
+              setFilterRiskLevel("all");
             }}
             className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
@@ -349,7 +349,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PresetScenarioSelector
+export default PresetScenarioSelector;

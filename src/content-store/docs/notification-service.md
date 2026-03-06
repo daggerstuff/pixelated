@@ -1,12 +1,12 @@
 ---
-title: 'Notification Service'
-description: 'Documentation for Pixelated Healths notification system and real-time alerts'
+title: "Notification Service"
+description: "Documentation for Pixelated Healths notification system and real-time alerts"
 pubDate: 2025-03-27
 share: true
 toc: true
 lastModDate: 2025-03-27
-tags: ['notifications', 'services', 'real-time']
-author: 'Pixelated Team'
+tags: ["notifications", "services", "real-time"]
+author: "Pixelated Team"
 ---
 
 ## Notification Service
@@ -33,73 +33,71 @@ it offers a scalable solution for handling notifications across the application.
 ### Initializing the Service
 
 ```typescript
-
-const notificationService = new NotificationService()
+const notificationService = new NotificationService();
 ```
 
 ### Registering Notification Templates
 
 ```typescript
 await notificationService.registerTemplate({
-  id: 'appointment-reminder',
-  title: 'Upcoming Appointment',
-  body: 'You have an appointment with {{therapistName}} on {{date}} at {{time}}',
+  id: "appointment-reminder",
+  title: "Upcoming Appointment",
+  body: "You have an appointment with {{therapistName}} on {{date}} at {{time}}",
   channels: [NotificationChannel.IN_APP, NotificationChannel.EMAIL],
   priority: NotificationPriority.NORMAL,
-})
+});
 ```
 
 ### Queuing a Notification
 
 ```typescript
 const notificationId = await notificationService.queueNotification({
-  userId: 'user-123',
-  templateId: 'appointment-reminder',
+  userId: "user-123",
+  templateId: "appointment-reminder",
   data: {
-    therapistName: 'Dr. Smith',
-    date: '2025-03-15',
-    time: '2:00 PM',
+    therapistName: "Dr. Smith",
+    date: "2025-03-15",
+    time: "2:00 PM",
   },
-})
+});
 ```
 
 ### Handling WebSocket Connections
 
 ```typescript
-
-const wss = new WebSocketServer({ port: 8082 }, notificationService)
+const wss = new WebSocketServer({ port: 8082 }, notificationService);
 
 // In your client code:
-const ws = new WebSocket('ws://localhost:8082')
+const ws = new WebSocket("ws://localhost:8082");
 ws.send(
   JSON.stringify({
-    type: 'authenticate',
-    token: 'user-auth-token',
+    type: "authenticate",
+    token: "user-auth-token",
   }),
-)
+);
 ```
 
 ### Marking Notifications as Read
 
 ```typescript
-await notificationService.markAsRead('user-123', 'notification-456')
+await notificationService.markAsRead("user-123", "notification-456");
 ```
 
 ### Retrieving Notifications
 
 ```typescript
 // Get all notifications for a user
-const notifications = await notificationService.getNotifications('user-123')
+const notifications = await notificationService.getNotifications("user-123");
 
 // With pagination
 const paginatedNotifications = await notificationService.getNotifications(
-  'user-123',
+  "user-123",
   10,
   0,
-)
+);
 
 // Get unread count
-const unreadCount = await notificationService.getUnreadCount('user-123')
+const unreadCount = await notificationService.getUnreadCount("user-123");
 ```
 
 ### Configuration
@@ -132,19 +130,19 @@ The notification service uses Redis for reliable message queuing:
 ```typescript
 // WebSocket message types
 type WebSocketMessage = {
-  type: 'authenticate' | 'markAsRead' | 'getNotifications'
-  token?: string
-  notificationId?: string
-  limit?: number
-  offset?: number
-}
+  type: "authenticate" | "markAsRead" | "getNotifications";
+  token?: string;
+  notificationId?: string;
+  limit?: number;
+  offset?: number;
+};
 
 // Server response types
 type ServerResponse = {
-  type: 'authenticated' | 'notification' | 'unreadCount' | 'error'
-  data?: any
-  error?: string
-}
+  type: "authenticated" | "notification" | "unreadCount" | "error";
+  data?: any;
+  error?: string;
+};
 ```
 
 ### Error Handling
@@ -287,24 +285,24 @@ The worker process handles:
 ```typescript
 class NotificationService {
   // Template management
-  async registerTemplate(template: NotificationTemplate): Promise<void>
+  async registerTemplate(template: NotificationTemplate): Promise<void>;
 
   // Notification operations
-  async queueNotification(notification: NotificationData): Promise<string>
-  async markAsRead(userId: string, notificationId: string): Promise<void>
+  async queueNotification(notification: NotificationData): Promise<string>;
+  async markAsRead(userId: string, notificationId: string): Promise<void>;
   async getNotifications(
     userId: string,
     limit?: number,
     offset?: number,
-  ): Promise<Notification[]>
-  async getUnreadCount(userId: string): Promise<number>
+  ): Promise<Notification[]>;
+  async getUnreadCount(userId: string): Promise<number>;
 
   // WebSocket client management
-  registerClient(userId: string, ws: WebSocket): void
-  unregisterClient(userId: string): void
+  registerClient(userId: string, ws: WebSocket): void;
+  unregisterClient(userId: string): void;
 
   // Queue processing
-  async processQueue(): Promise<void>
+  async processQueue(): Promise<void>;
 }
 ```
 
@@ -312,12 +310,12 @@ class NotificationService {
 
 ```typescript
 class WebSocketServer {
-  constructor(wss: WSServer, notificationService: NotificationService)
+  constructor(wss: WSServer, notificationService: NotificationService);
 
-  private async handleConnection(ws: WebSocket): Promise<void>
-  private async verifyToken(token: string): Promise<string>
-  private async sendUnreadCount(userId: string, ws: WebSocket): Promise<void>
-  private handleError(error: Error): void
+  private async handleConnection(ws: WebSocket): Promise<void>;
+  private async verifyToken(token: string): Promise<string>;
+  private async sendUnreadCount(userId: string, ws: WebSocket): Promise<void>;
+  private handleError(error: Error): void;
 }
 ```
 

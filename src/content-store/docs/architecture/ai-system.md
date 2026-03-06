@@ -1,9 +1,9 @@
 ---
-title: 'AI System Architecture'
-description: 'AI System Architecture documentation'
+title: "AI System Architecture"
+description: "AI System Architecture documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -231,14 +231,14 @@ interface AIService {
   createChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AICompletion>
+  ): Promise<AICompletion>;
 
   createStreamingChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AIStreamingCompletion>
+  ): Promise<AIStreamingCompletion>;
 
-  getModelInfo(model: string): ModelInfo
+  getModelInfo(model: string): ModelInfo;
 }
 ```
 
@@ -249,16 +249,16 @@ interface AIProvider {
   createChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AICompletion>
+  ): Promise<AICompletion>;
 
   createStreamingChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AIStreamingCompletion>
+  ): Promise<AIStreamingCompletion>;
 
-  getModelInfo(model: string): ModelInfo
+  getModelInfo(model: string): ModelInfo;
 
-  getSupportedModels(): string[]
+  getSupportedModels(): string[];
 }
 ```
 
@@ -266,19 +266,19 @@ interface AIProvider {
 
 ```typescript
 interface AIErrorOptions {
-  code: AIErrorCode
-  statusCode?: number
-  context?: Record<string, any>
-  cause?: Error
+  code: AIErrorCode;
+  statusCode?: number;
+  context?: Record<string, any>;
+  cause?: Error;
 }
 
 class AIError extends Error {
-  code: AIErrorCode
-  statusCode: number
-  context?: Record<string, any>
-  cause?: Error
+  code: AIErrorCode;
+  statusCode: number;
+  context?: Record<string, any>;
+  cause?: Error;
 
-  constructor(message: string, options: AIErrorOptions)
+  constructor(message: string, options: AIErrorOptions);
 }
 ```
 

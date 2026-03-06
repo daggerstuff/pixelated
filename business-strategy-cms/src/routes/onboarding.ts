@@ -1,20 +1,20 @@
-import { Router } from 'express'
-import { UserService } from '@/services/userService'
-import { AuthService } from '@/services/authService'
+import { Router } from "express";
+import { UserService } from "@/services/userService";
+import { AuthService } from "@/services/authService";
 
-const router = Router()
+const router = Router();
 
 // Complete user onboarding
-router.post('/complete', async (req, res) => {
+router.post("/complete", async (req, res) => {
   try {
-    const { userId, firstName, lastName, newPassword } = req.body
+    const { userId, firstName, lastName, newPassword } = req.body;
 
     if (!userId || !firstName || !lastName || !newPassword) {
       res.status(400).json({
         success: false,
-        error: { message: 'All fields are required' },
-      })
-      return
+        error: { message: "All fields are required" },
+      });
+      return;
     }
 
     const user = await UserService.completeOnboarding(
@@ -22,13 +22,13 @@ router.post('/complete', async (req, res) => {
       firstName,
       lastName,
       newPassword,
-    )
+    );
     if (!user) {
       res.status(404).json({
         success: false,
-        error: { message: 'User not found' },
-      })
-      return
+        error: { message: "User not found" },
+      });
+      return;
     }
 
     // Generate real tokens for the user
@@ -36,39 +36,39 @@ router.post('/complete', async (req, res) => {
       userId: user.id!,
       email: user.email,
       role: user.role,
-    })
+    });
 
     res.json({
       success: true,
       data: { user, tokens },
-      message: 'Onboarding completed successfully',
-    })
+      message: "Onboarding completed successfully",
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: {
-        message: error instanceof Error ? error.message : 'Onboarding failed',
+        message: error instanceof Error ? error.message : "Onboarding failed",
       },
-    })
+    });
   }
-})
+});
 
 // Check if user needs onboarding
-router.get('/status/:userId', async (req, res) => {
+router.get("/status/:userId", async (req, res) => {
   try {
-    const { userId } = req.params
-    const user = await UserService.getUserById(userId)
+    const { userId } = req.params;
+    const user = await UserService.getUserById(userId);
 
     if (!user) {
       res.status(404).json({
         success: false,
-        error: { message: 'User not found' },
-      })
-      return
+        error: { message: "User not found" },
+      });
+      return;
     }
 
     const needsOnboarding =
-      !user.firstName || !user.lastName || !user.isEmailVerified
+      !user.firstName || !user.lastName || !user.isEmailVerified;
 
     res.json({
       success: true,
@@ -83,7 +83,7 @@ router.get('/status/:userId', async (req, res) => {
           isEmailVerified: user.isEmailVerified,
         },
       },
-    })
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -91,10 +91,10 @@ router.get('/status/:userId', async (req, res) => {
         message:
           error instanceof Error
             ? error.message
-            : 'Failed to check onboarding status',
+            : "Failed to check onboarding status",
       },
-    })
+    });
   }
-})
+});
 
-export { router as onboardingRouter }
+export { router as onboardingRouter };

@@ -1,40 +1,40 @@
-import type { FC } from 'react'
-import React from 'react'
-import { usePersistentState } from '@/hooks/usePersistentState'
-import { AdvancedVisualization } from '@/lib/analytics/advancedVisualization'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
+import type { FC } from "react";
+import React from "react";
+import { usePersistentState } from "@/hooks/usePersistentState";
+import { AdvancedVisualization } from "@/lib/analytics/advancedVisualization";
+import { OfflineIndicator } from "@/components/layout/OfflineIndicator";
+import { FadeIn, SlideUp } from "@/components/layout/AdvancedAnimations";
+import { ResponsiveContainer } from "@/components/layout/ResponsiveUtils";
 
 interface ResearchStudy {
-  id: string
-  title: string
-  description: string
-  status: 'planning' | 'active' | 'completed' | 'published'
-  participants: number
-  startDate: Date
-  endDate?: Date
-  methodology: string
-  outcomes: string[]
+  id: string;
+  title: string;
+  description: string;
+  status: "planning" | "active" | "completed" | "published";
+  participants: number;
+  startDate: Date;
+  endDate?: Date;
+  methodology: string;
+  outcomes: string[];
 }
 
 interface ResearchMetrics {
-  totalStudies: number
-  activeStudies: number
-  totalParticipants: number
-  publications: number
-  avgEffectSize: number
-  dataQuality: number
+  totalStudies: number;
+  activeStudies: number;
+  totalParticipants: number;
+  publications: number;
+  avgEffectSize: number;
+  dataQuality: number;
 }
 
 interface DatasetInfo {
-  id: string
-  name: string
-  description: string
-  size: number
-  format: string
-  accessLevel: 'public' | 'restricted' | 'private'
-  lastUpdated: Date
+  id: string;
+  name: string;
+  description: string;
+  size: number;
+  format: string;
+  accessLevel: "public" | "restricted" | "private";
+  lastUpdated: Date;
 }
 
 /**
@@ -43,15 +43,15 @@ interface DatasetInfo {
 export const ResearchDashboard: FC = () => {
   // Persistent dashboard preferences
   const [dashboardView, setDashboardView] = usePersistentState<
-    'overview' | 'studies' | 'datasets' | 'analytics' | 'publications'
-  >('research_dashboard_view', 'overview')
+    "overview" | "studies" | "datasets" | "analytics" | "publications"
+  >("research_dashboard_view", "overview");
   const [timeRange, setTimeRange] = usePersistentState<
-    'month' | 'quarter' | 'year' | 'all'
-  >('research_dashboard_timerange', 'year')
+    "month" | "quarter" | "year" | "all"
+  >("research_dashboard_timerange", "year");
   const [selectedStudies, setSelectedStudies] = usePersistentState<string[]>(
-    'research_selected_studies',
+    "research_selected_studies",
     [],
-  )
+  );
 
   // Mock data - in real app would come from API
   const researchMetrics: ResearchMetrics = {
@@ -61,71 +61,71 @@ export const ResearchDashboard: FC = () => {
     publications: 23,
     avgEffectSize: 0.67,
     dataQuality: 94,
-  }
+  };
 
   const studies: ResearchStudy[] = [
     {
-      id: '1',
-      title: 'AI-Assisted Therapy Outcomes',
-      description: 'Longitudinal study on AI intervention effectiveness',
-      status: 'active',
+      id: "1",
+      title: "AI-Assisted Therapy Outcomes",
+      description: "Longitudinal study on AI intervention effectiveness",
+      status: "active",
       participants: 245,
-      startDate: new Date('2023-06-01'),
-      methodology: 'Randomized Controlled Trial',
-      outcomes: ['Improved patient outcomes', 'Reduced therapist burden'],
+      startDate: new Date("2023-06-01"),
+      methodology: "Randomized Controlled Trial",
+      outcomes: ["Improved patient outcomes", "Reduced therapist burden"],
     },
     {
-      id: '2',
-      title: 'Privacy-Preserving Analytics',
-      description: 'Federated learning approaches in mental health',
-      status: 'completed',
+      id: "2",
+      title: "Privacy-Preserving Analytics",
+      description: "Federated learning approaches in mental health",
+      status: "completed",
       participants: 189,
-      startDate: new Date('2023-01-15'),
-      endDate: new Date('2023-12-15'),
-      methodology: 'Multi-center Study',
-      outcomes: ['Validated privacy techniques', 'Maintained data utility'],
+      startDate: new Date("2023-01-15"),
+      endDate: new Date("2023-12-15"),
+      methodology: "Multi-center Study",
+      outcomes: ["Validated privacy techniques", "Maintained data utility"],
     },
     {
-      id: '3',
-      title: 'Real-Time Intervention Efficacy',
-      description: 'Live therapy session analysis and intervention timing',
-      status: 'planning',
+      id: "3",
+      title: "Real-Time Intervention Efficacy",
+      description: "Live therapy session analysis and intervention timing",
+      status: "planning",
       participants: 0,
-      startDate: new Date('2024-03-01'),
-      methodology: 'Prospective Cohort Study',
+      startDate: new Date("2024-03-01"),
+      methodology: "Prospective Cohort Study",
       outcomes: [],
     },
-  ]
+  ];
 
   const datasets: DatasetInfo[] = [
     {
-      id: '1',
-      name: 'Depression Treatment Outcomes',
-      description: 'Anonymized treatment outcome data from 50+ institutions',
+      id: "1",
+      name: "Depression Treatment Outcomes",
+      description: "Anonymized treatment outcome data from 50+ institutions",
       size: 2500000,
-      format: 'JSON/CSV',
-      accessLevel: 'restricted',
-      lastUpdated: new Date('2024-01-10'),
+      format: "JSON/CSV",
+      accessLevel: "restricted",
+      lastUpdated: new Date("2024-01-10"),
     },
     {
-      id: '2',
-      name: 'Anxiety Intervention Study',
-      description: 'Clinical trial data on anxiety treatment effectiveness',
+      id: "2",
+      name: "Anxiety Intervention Study",
+      description: "Clinical trial data on anxiety treatment effectiveness",
       size: 890000,
-      format: 'CSV',
-      accessLevel: 'private',
-      lastUpdated: new Date('2024-01-08'),
+      format: "CSV",
+      accessLevel: "private",
+      lastUpdated: new Date("2024-01-08"),
     },
     {
-      id: '3',
-      name: 'Therapeutic Alliance Metrics',
-      description: 'Therapist-patient relationship quality indicators',
+      id: "3",
+      name: "Therapeutic Alliance Metrics",
+      description: "Therapist-patient relationship quality indicators",
       size: 450000,
-      format: 'JSON',
-      accessLevel: 'public',
-      lastUpdated: new Date('2024-01-12'),
+      format: "JSON",
+      accessLevel: "public",
+      lastUpdated: new Date("2024-01-12"),
     },
-  ]
+  ];
 
   const analyticsData = studies.map((study, _index) => ({
     studyId: study.id,
@@ -138,7 +138,7 @@ export const ResearchDashboard: FC = () => {
     status: study.status,
     outcomesCount: study.outcomes.length,
     methodology: study.methodology,
-  }))
+  }));
 
   return (
     <ResponsiveContainer size="full">
@@ -152,9 +152,9 @@ export const ResearchDashboard: FC = () => {
                   Research Portal
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Evidence-Based Mental Health Research •{' '}
-                  {researchMetrics.totalStudies} studies •{' '}
-                  {researchMetrics.totalParticipants.toLocaleString()}{' '}
+                  Evidence-Based Mental Health Research •{" "}
+                  {researchMetrics.totalStudies} studies •{" "}
+                  {researchMetrics.totalParticipants.toLocaleString()}{" "}
                   participants
                 </p>
               </div>
@@ -179,19 +179,19 @@ export const ResearchDashboard: FC = () => {
           <div className="px-6">
             <nav className="flex space-x-8">
               {[
-                { id: 'overview', label: 'Overview', icon: '📊' },
-                { id: 'studies', label: 'Studies', icon: '🔬' },
-                { id: 'datasets', label: 'Datasets', icon: '💾' },
-                { id: 'analytics', label: 'Analytics', icon: '📈' },
-                { id: 'publications', label: 'Publications', icon: '📚' },
+                { id: "overview", label: "Overview", icon: "📊" },
+                { id: "studies", label: "Studies", icon: "🔬" },
+                { id: "datasets", label: "Datasets", icon: "💾" },
+                { id: "analytics", label: "Analytics", icon: "📈" },
+                { id: "publications", label: "Publications", icon: "📚" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
                   className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                     dashboardView === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
                   <span>{tab.icon}</span>
@@ -204,7 +204,7 @@ export const ResearchDashboard: FC = () => {
 
         {/* Main Content */}
         <main className="p-6">
-          {dashboardView === 'overview' && (
+          {dashboardView === "overview" && (
             <OverviewTab
               metrics={researchMetrics}
               studies={studies}
@@ -212,52 +212,52 @@ export const ResearchDashboard: FC = () => {
                 if (selectedStudies.includes(studyId)) {
                   setSelectedStudies((prev) =>
                     prev.filter((id) => id !== studyId),
-                  )
+                  );
                 } else {
-                  setSelectedStudies((prev) => [...prev, studyId])
+                  setSelectedStudies((prev) => [...prev, studyId]);
                 }
               }}
               selectedStudies={selectedStudies}
             />
           )}
 
-          {dashboardView === 'studies' && (
+          {dashboardView === "studies" && (
             <StudiesTab
               studies={studies}
               onStudySelect={(studyId) => {
                 if (selectedStudies.includes(studyId)) {
                   setSelectedStudies((prev) =>
                     prev.filter((id) => id !== studyId),
-                  )
+                  );
                 } else {
-                  setSelectedStudies((prev) => [...prev, studyId])
+                  setSelectedStudies((prev) => [...prev, studyId]);
                 }
               }}
               selectedStudies={selectedStudies}
             />
           )}
 
-          {dashboardView === 'datasets' && <DatasetsTab datasets={datasets} />}
+          {dashboardView === "datasets" && <DatasetsTab datasets={datasets} />}
 
-          {dashboardView === 'analytics' && (
+          {dashboardView === "analytics" && (
             <AnalyticsTab data={analyticsData} />
           )}
 
-          {dashboardView === 'publications' && <PublicationsTab />}
+          {dashboardView === "publications" && <PublicationsTab />}
         </main>
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
 /**
  * Overview Tab Component
  */
 const OverviewTab: FC<{
-  metrics: ResearchMetrics
-  studies: ResearchStudy[]
-  onStudySelect: (studyId: string) => void
-  selectedStudies: string[]
+  metrics: ResearchMetrics;
+  studies: ResearchStudy[];
+  onStudySelect: (studyId: string) => void;
+  selectedStudies: string[];
 }> = ({ metrics, studies, onStudySelect, selectedStudies }) => {
   return (
     <div className="space-y-6">
@@ -352,7 +352,7 @@ const OverviewTab: FC<{
           </h3>
           <div className="space-y-4">
             {studies
-              .filter((study) => study.status === 'active')
+              .filter((study) => study.status === "active")
               .map((study) => (
                 <div
                   key={study.id}
@@ -436,24 +436,24 @@ const OverviewTab: FC<{
             <div className="space-y-3">
               {[
                 {
-                  title: 'AI Ethics Review',
-                  date: '2024-01-25',
-                  priority: 'high',
+                  title: "AI Ethics Review",
+                  date: "2024-01-25",
+                  priority: "high",
                 },
                 {
-                  title: 'Data Privacy Audit',
-                  date: '2024-02-01',
-                  priority: 'medium',
+                  title: "Data Privacy Audit",
+                  date: "2024-02-01",
+                  priority: "medium",
                 },
                 {
-                  title: 'Publication Deadline',
-                  date: '2024-02-15',
-                  priority: 'high',
+                  title: "Publication Deadline",
+                  date: "2024-02-15",
+                  priority: "high",
                 },
                 {
-                  title: 'Conference Presentation',
-                  date: '2024-03-01',
-                  priority: 'medium',
+                  title: "Conference Presentation",
+                  date: "2024-03-01",
+                  priority: "medium",
                 },
               ].map((milestone, index) => (
                 <div
@@ -470,9 +470,9 @@ const OverviewTab: FC<{
                   </div>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      milestone.priority === 'high'
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                      milestone.priority === "high"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
                     }`}
                   >
                     {milestone.priority}
@@ -484,16 +484,16 @@ const OverviewTab: FC<{
         </SlideUp>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Studies Tab Component
  */
 const StudiesTab: FC<{
-  studies: ResearchStudy[]
-  onStudySelect: (studyId: string) => void
-  selectedStudies: string[]
+  studies: ResearchStudy[];
+  onStudySelect: (studyId: string) => void;
+  selectedStudies: string[];
 }> = ({ studies, onStudySelect, selectedStudies }) => {
   return (
     <div className="space-y-6">
@@ -547,13 +547,13 @@ const StudiesTab: FC<{
                     </h3>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        study.status === 'active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-                          : study.status === 'completed'
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
-                            : study.status === 'planning'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
-                              : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200'
+                        study.status === "active"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
+                          : study.status === "completed"
+                            ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+                            : study.status === "planning"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
+                              : "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200"
                       }`}
                     >
                       {study.status}
@@ -606,14 +606,14 @@ const StudiesTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Datasets Tab Component
  */
 const DatasetsTab: FC<{
-  datasets: DatasetInfo[]
+  datasets: DatasetInfo[];
 }> = ({ datasets }) => {
   return (
     <div className="space-y-6">
@@ -647,11 +647,11 @@ const DatasetsTab: FC<{
                   </span>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      dataset.accessLevel === 'public'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-                        : dataset.accessLevel === 'restricted'
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                      dataset.accessLevel === "public"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
+                        : dataset.accessLevel === "restricted"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
+                          : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
                     }`}
                   >
                     {dataset.accessLevel}
@@ -677,34 +677,34 @@ const DatasetsTab: FC<{
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Analytics Tab Component
  */
 const AnalyticsTab: FC<{
-  data: any[]
+  data: any[];
 }> = ({ data }) => {
   const visualizationConfig = {
-    type: 'scatter' as const,
+    type: "scatter" as const,
     dimensions: {
       x: {
-        field: 'participants',
-        label: 'Participants',
-        type: 'numeric' as const,
+        field: "participants",
+        label: "Participants",
+        type: "numeric" as const,
       },
       y: {
-        field: 'outcomesCount',
-        label: 'Outcomes Measured',
-        type: 'numeric' as const,
+        field: "outcomesCount",
+        label: "Outcomes Measured",
+        type: "numeric" as const,
       },
-      color: { field: 'status', label: 'Status', type: 'categorical' as const },
+      color: { field: "status", label: "Status", type: "categorical" as const },
     },
     filters: {},
     interactive: true,
     realTime: false,
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -722,12 +722,12 @@ const AnalyticsTab: FC<{
         data={data}
         config={visualizationConfig}
         onInsightGenerated={(insight) => {
-          console.log('Research insight generated:', insight)
+          console.log("Research insight generated:", insight);
         }}
       />
     </div>
-  )
-}
+  );
+};
 
 /**
  * Publications Tab Component
@@ -735,36 +735,36 @@ const AnalyticsTab: FC<{
 const PublicationsTab: FC = () => {
   const publications = [
     {
-      id: '1',
-      title: 'Effectiveness of AI-Assisted Therapy in Depression Treatment',
-      journal: 'Journal of Mental Health Technology',
-      authors: ['Dr. Sarah Johnson', 'Dr. Michael Chen', 'Dr. Emily Rodriguez'],
-      publicationDate: '2024-01-10',
-      doi: '10.1234/jmht.2024.001',
+      id: "1",
+      title: "Effectiveness of AI-Assisted Therapy in Depression Treatment",
+      journal: "Journal of Mental Health Technology",
+      authors: ["Dr. Sarah Johnson", "Dr. Michael Chen", "Dr. Emily Rodriguez"],
+      publicationDate: "2024-01-10",
+      doi: "10.1234/jmht.2024.001",
       citations: 23,
-      status: 'published',
+      status: "published",
     },
     {
-      id: '2',
-      title: 'Privacy-Preserving Machine Learning in Mental Healthcare',
-      journal: 'Privacy and Security in Healthcare',
-      authors: ['Dr. Michael Chen', 'Dr. Sarah Johnson'],
-      publicationDate: '2023-12-15',
-      doi: '10.1234/psh.2023.045',
+      id: "2",
+      title: "Privacy-Preserving Machine Learning in Mental Healthcare",
+      journal: "Privacy and Security in Healthcare",
+      authors: ["Dr. Michael Chen", "Dr. Sarah Johnson"],
+      publicationDate: "2023-12-15",
+      doi: "10.1234/psh.2023.045",
       citations: 18,
-      status: 'published',
+      status: "published",
     },
     {
-      id: '3',
-      title: 'Real-Time Intervention Systems: A New Paradigm in Therapy',
-      journal: 'Under Review - American Psychologist',
-      authors: ['Dr. Emily Rodriguez', 'Dr. Sarah Johnson'],
-      publicationDate: 'Pending',
-      doi: 'Preprint Available',
+      id: "3",
+      title: "Real-Time Intervention Systems: A New Paradigm in Therapy",
+      journal: "Under Review - American Psychologist",
+      authors: ["Dr. Emily Rodriguez", "Dr. Sarah Johnson"],
+      publicationDate: "Pending",
+      doi: "Preprint Available",
       citations: 0,
-      status: 'under_review',
+      status: "under_review",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -808,12 +808,12 @@ const PublicationsTab: FC = () => {
                     </h3>
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        publication.status === 'published'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                        publication.status === "published"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
                       }`}
                     >
-                      {publication.status.replace('_', ' ')}
+                      {publication.status.replace("_", " ")}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -821,7 +821,7 @@ const PublicationsTab: FC = () => {
                   </p>
                   <div className="flex items-center gap-4 text-sm">
                     <span className="text-gray-600 dark:text-gray-400">
-                      Authors: {publication.authors.join(', ')}
+                      Authors: {publication.authors.join(", ")}
                     </span>
                     <span className="text-gray-600 dark:text-gray-400">
                       Citations: {publication.citations}
@@ -845,7 +845,7 @@ const PublicationsTab: FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ResearchDashboard
+export default ResearchDashboard;

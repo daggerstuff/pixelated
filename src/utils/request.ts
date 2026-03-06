@@ -6,12 +6,12 @@
  */
 export function getBrowserLanguage(): string {
   // This function will only run on the client side
-  if (typeof window !== 'undefined') {
-    return window.navigator.language || 'en-US'
+  if (typeof window !== "undefined") {
+    return window.navigator.language || "en-US";
   }
 
   // Return default for SSR environment
-  return 'en-US'
+  return "en-US";
 }
 
 /**
@@ -21,12 +21,12 @@ export function getBrowserLanguage(): string {
  * @returns {boolean} True if the user prefers dark mode
  */
 export function prefersDarkMode(): boolean {
-  if (typeof window !== 'undefined') {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  if (typeof window !== "undefined") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
 
   // Default for SSR environment
-  return false
+  return false;
 }
 
 /**
@@ -36,10 +36,10 @@ export function prefersDarkMode(): boolean {
  * @returns {readonly string[]} Array of language preference strings
  */
 export function getUserLanguages(): readonly string[] {
-  if (typeof window !== 'undefined') {
-    return window.navigator.languages || [window.navigator.language || 'en-US']
+  if (typeof window !== "undefined") {
+    return window.navigator.languages || [window.navigator.language || "en-US"];
   }
 
   // Default for SSR environment
-  return ['en-US']
+  return ["en-US"];
 }

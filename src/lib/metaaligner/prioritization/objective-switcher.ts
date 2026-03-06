@@ -12,22 +12,19 @@
  * - No lost updates guarantee
  */
 
-import {
-  ContextEvent,
-  ContextTransition,
-} from './context-transition-detector'
+import { ContextEvent, ContextTransition } from "./context-transition-detector";
 import {
   getPrioritizedObjectivesForContext,
   ObjectivePriority,
-} from './context-objective-mapping'
+} from "./context-objective-mapping";
 import {
   defaultWeightingStrategy,
   WeightingParams,
   ObjectiveWeightingStrategy,
-} from './objective-weighting-strategy'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+} from "./objective-weighting-strategy";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('objective-switcher')
+const logger = createBuildSafeLogger("objective-switcher");
 
 /**
  * Observer callback for objective changes
@@ -35,32 +32,32 @@ const logger = createBuildSafeLogger('objective-switcher')
 export type ObjectiveSwitchObserver = (
   objectives: ObjectivePriority[],
   metadata: SwitchMetadata,
-) => void | Promise<void>
+) => void | Promise<void>;
 
 /**
  * Metadata about an objective switch event
  */
 export interface SwitchMetadata {
-  fromContext?: string
-  toContext: string
-  timestamp: number
-  duration: number
-  switchCount: number
-  urgency: 'low' | 'medium' | 'high' | 'critical'
+  fromContext?: string;
+  toContext: string;
+  timestamp: number;
+  duration: number;
+  switchCount: number;
+  urgency: "low" | "medium" | "high" | "critical";
 }
 
 /**
  * Audit log entry for switch history
  */
 export interface SwitchAuditLog {
-  id: string
-  fromContext?: string
-  toContext: string
-  objectives: ObjectivePriority[]
-  timestamp: number
-  duration: number
-  success: boolean
-  error?: string
+  id: string;
+  fromContext?: string;
+  toContext: string;
+  objectives: ObjectivePriority[];
+  timestamp: number;
+  duration: number;
+  success: boolean;
+  error?: string;
 }
 
 /**
@@ -68,26 +65,26 @@ export interface SwitchAuditLog {
  */
 export interface ObjectiveSwitcherConfig {
   /** Initial context to start with */
-  initialContext?: ContextEvent
+  initialContext?: ContextEvent;
   /** Custom weighting strategy */
-  weightingStrategy?: ObjectiveWeightingStrategy
+  weightingStrategy?: ObjectiveWeightingStrategy;
   /** Enable telemetry tracking */
-  enableTelemetry?: boolean
+  enableTelemetry?: boolean;
   /** Enable audit logging */
-  enableAuditLog?: boolean
+  enableAuditLog?: boolean;
   /** Maximum audit log size */
-  maxAuditLogSize?: number
+  maxAuditLogSize?: number;
 }
 
 /**
  * Telemetry data for monitoring
  */
 export interface SwitcherTelemetry {
-  objective_switch_count: number
-  total_switch_duration_ms: number
-  average_switch_duration_ms: number
-  failed_switches: number
-  observer_notifications: number
+  objective_switch_count: number;
+  total_switch_duration_ms: number;
+  average_switch_duration_ms: number;
+  failed_switches: number;
+  observer_notifications: number;
 }
 
 /**
@@ -96,21 +93,21 @@ export interface SwitcherTelemetry {
  * Manages objective transitions based on context changes with performance guarantees.
  */
 export class ObjectiveSwitcher {
-  private currentObjectives: ObjectivePriority[] = []
-  private lastContext?: ContextEvent
-  private observers: Set<ObjectiveSwitchObserver> = new Set()
-  private weightingStrategy: ObjectiveWeightingStrategy
-  private auditLog: SwitchAuditLog[] = []
+  private currentObjectives: ObjectivePriority[] = [];
+  private lastContext?: ContextEvent;
+  private observers: Set<ObjectiveSwitchObserver> = new Set();
+  private weightingStrategy: ObjectiveWeightingStrategy;
+  private auditLog: SwitchAuditLog[] = [];
   private telemetry: SwitcherTelemetry = {
     objective_switch_count: 0,
     total_switch_duration_ms: 0,
     average_switch_duration_ms: 0,
     failed_switches: 0,
     observer_notifications: 0,
-  }
-  private config: Required<Omit<ObjectiveSwitcherConfig, 'initialContext'>>
-  private switchInProgress = false
-  private pendingSwitch: ContextTransition | null = null
+  };
+  private config: Required<Omit<ObjectiveSwitcherConfig, "initialContext">>;
+  private switchInProgress = false;
+  private pendingSwitch: ContextTransition | null = null;
 
   constructor(config: ObjectiveSwitcherConfig = {}) {
     this.config = {
@@ -118,12 +115,12 @@ export class ObjectiveSwitcher {
       enableTelemetry: config.enableTelemetry ?? true,
       enableAuditLog: config.enableAuditLog ?? true,
       maxAuditLogSize: config.maxAuditLogSize ?? 100,
-    }
+    };
 
-    this.weightingStrategy = this.config.weightingStrategy
+    this.weightingStrategy = this.config.weightingStrategy;
 
     if (config.initialContext) {
-      this.initializeFromContext(config.initialContext)
+      this.initializeFromContext(config.initialContext);
     }
   }
 
@@ -131,28 +128,28 @@ export class ObjectiveSwitcher {
    * Initialize objectives from a context event
    */
   private initializeFromContext(context: ContextEvent): void {
-    const objectives = getPrioritizedObjectivesForContext(context.contextType)
+    const objectives = getPrioritizedObjectivesForContext(context.contextType);
     const params: WeightingParams = {
       urgency: context.urgency,
       needsSpecialHandling: false,
-    }
+    };
 
-    this.currentObjectives = this.weightingStrategy(objectives, params)
-    this.lastContext = context
+    this.currentObjectives = this.weightingStrategy(objectives, params);
+    this.lastContext = context;
   }
 
   /**
    * Register an observer to be notified of objective changes
    */
   public addObserver(observer: ObjectiveSwitchObserver): void {
-    this.observers.add(observer)
+    this.observers.add(observer);
   }
 
   /**
    * Remove an observer
    */
   public removeObserver(observer: ObjectiveSwitchObserver): void {
-    this.observers.delete(observer)
+    this.observers.delete(observer);
   }
 
   /**
@@ -164,22 +161,22 @@ export class ObjectiveSwitcher {
     weightingParams?: WeightingParams,
   ): Promise<void> {
     if (!transition.detected) {
-      return
+      return;
     }
 
     // Handle concurrent switch attempts
     if (this.switchInProgress) {
-      this.pendingSwitch = transition
-      return
+      this.pendingSwitch = transition;
+      return;
     }
 
-    await this.performSwitch(transition, weightingParams)
+    await this.performSwitch(transition, weightingParams);
 
     // Process pending switch if any
     if (this.pendingSwitch) {
-      const pending = this.pendingSwitch
-      this.pendingSwitch = null
-      await this.performSwitch(pending, weightingParams)
+      const pending = this.pendingSwitch;
+      this.pendingSwitch = null;
+      await this.performSwitch(pending, weightingParams);
     }
   }
 
@@ -190,35 +187,35 @@ export class ObjectiveSwitcher {
     transition: ContextTransition,
     weightingParams?: WeightingParams,
   ): Promise<void> {
-    const startTime = performance.now()
-    const auditId = `switch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const startTime = performance.now();
+    const auditId = `switch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    this.switchInProgress = true
+    this.switchInProgress = true;
 
     try {
       // Get prioritized objectives for new context
       const baseObjectives = getPrioritizedObjectivesForContext(
         transition.to.contextType,
-      )
+      );
 
       // Apply dynamic weighting
       const params: WeightingParams = {
         urgency: transition.to.urgency,
-        needsSpecialHandling: transition.transitionType === 'crisis_elevation',
+        needsSpecialHandling: transition.transitionType === "crisis_elevation",
         ...weightingParams,
-      }
+      };
 
-      const weightedObjectives = this.weightingStrategy(baseObjectives, params)
+      const weightedObjectives = this.weightingStrategy(baseObjectives, params);
 
       // Update current objectives (atomic)
-      this.currentObjectives = weightedObjectives
-      this.lastContext = transition.to
+      this.currentObjectives = weightedObjectives;
+      this.lastContext = transition.to;
 
-      const duration = performance.now() - startTime
+      const duration = performance.now() - startTime;
 
       // Update telemetry
       if (this.config.enableTelemetry) {
-        this.updateTelemetry(duration, true)
+        this.updateTelemetry(duration, true);
       }
 
       // Create metadata
@@ -229,7 +226,7 @@ export class ObjectiveSwitcher {
         duration,
         switchCount: this.telemetry.objective_switch_count,
         urgency: transition.to.urgency,
-      }
+      };
 
       // Audit log
       if (this.config.enableAuditLog) {
@@ -241,25 +238,25 @@ export class ObjectiveSwitcher {
           timestamp: metadata.timestamp,
           duration,
           success: true,
-        })
+        });
       }
 
       // Notify observers (non-blocking)
-      this.notifyObservers(weightedObjectives, metadata)
+      this.notifyObservers(weightedObjectives, metadata);
 
       // Performance check
       if (duration > 150) {
-        logger.warn('Objective switch exceeded 150ms threshold', {
+        logger.warn("Objective switch exceeded 150ms threshold", {
           duration,
           fromContext: transition.from.contextType,
           toContext: transition.to.contextType,
-        })
+        });
       }
     } catch (error) {
-      const duration = performance.now() - startTime
+      const duration = performance.now() - startTime;
 
       if (this.config.enableTelemetry) {
-        this.updateTelemetry(duration, false)
+        this.updateTelemetry(duration, false);
       }
 
       if (this.config.enableAuditLog) {
@@ -271,19 +268,19 @@ export class ObjectiveSwitcher {
           timestamp: Date.now(),
           duration,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        })
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       }
 
-      logger.error('Objective switch failed', {
+      logger.error("Objective switch failed", {
         error,
         fromContext: transition.from?.contextType,
         toContext: transition.to.contextType,
-      })
+      });
 
       // Graceful degradation - keep current objectives
     } finally {
-      this.switchInProgress = false
+      this.switchInProgress = false;
     }
   }
 
@@ -296,14 +293,14 @@ export class ObjectiveSwitcher {
   ): void {
     this.observers.forEach(async (observer) => {
       try {
-        await observer(objectives, metadata)
+        await observer(objectives, metadata);
         if (this.config.enableTelemetry) {
-          this.telemetry.observer_notifications++
+          this.telemetry.observer_notifications++;
         }
       } catch (error) {
-        logger.error('Observer notification failed', { error })
+        logger.error("Observer notification failed", { error });
       }
-    })
+    });
   }
 
   /**
@@ -311,13 +308,13 @@ export class ObjectiveSwitcher {
    */
   private updateTelemetry(duration: number, success: boolean): void {
     if (success) {
-      this.telemetry.objective_switch_count++
-      this.telemetry.total_switch_duration_ms += duration
+      this.telemetry.objective_switch_count++;
+      this.telemetry.total_switch_duration_ms += duration;
       this.telemetry.average_switch_duration_ms =
         this.telemetry.total_switch_duration_ms /
-        this.telemetry.objective_switch_count
+        this.telemetry.objective_switch_count;
     } else {
-      this.telemetry.failed_switches++
+      this.telemetry.failed_switches++;
     }
   }
 
@@ -325,11 +322,11 @@ export class ObjectiveSwitcher {
    * Add entry to audit log
    */
   private addAuditLog(entry: SwitchAuditLog): void {
-    this.auditLog.push(entry)
+    this.auditLog.push(entry);
 
     // Keep log bounded
     if (this.auditLog.length > this.config.maxAuditLogSize) {
-      this.auditLog.shift()
+      this.auditLog.shift();
     }
   }
 
@@ -337,36 +334,36 @@ export class ObjectiveSwitcher {
    * Get current objectives (read-only)
    */
   public getObjectives(): Readonly<ObjectivePriority[]> {
-    return Object.freeze([...this.currentObjectives])
+    return Object.freeze([...this.currentObjectives]);
   }
 
   /**
    * Get current context
    */
   public getCurrentContext(): ContextEvent | undefined {
-    return this.lastContext
+    return this.lastContext;
   }
 
   /**
    * Get telemetry data
    */
   public getTelemetry(): Readonly<SwitcherTelemetry> {
-    return Object.freeze({ ...this.telemetry })
+    return Object.freeze({ ...this.telemetry });
   }
 
   /**
    * Get audit log (for explainability)
    */
   public getAuditLog(limit?: number): SwitchAuditLog[] {
-    const log = [...this.auditLog]
-    return limit ? log.slice(-limit) : log
+    const log = [...this.auditLog];
+    return limit ? log.slice(-limit) : log;
   }
 
   /**
    * Clear audit log
    */
   public clearAuditLog(): void {
-    this.auditLog = []
+    this.auditLog = [];
   }
 
   /**
@@ -379,13 +376,13 @@ export class ObjectiveSwitcher {
       average_switch_duration_ms: 0,
       failed_switches: 0,
       observer_notifications: 0,
-    }
+    };
   }
 
   /**
    * Check if a switch is currently in progress
    */
   public isSwitching(): boolean {
-    return this.switchInProgress
+    return this.switchInProgress;
   }
 }

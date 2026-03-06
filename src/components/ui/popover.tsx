@@ -1,29 +1,29 @@
-import React, { useState, useContext, createContext } from 'react'
+import React, { useState, useContext, createContext } from "react";
 
 interface PopoverContextType {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
-const PopoverContext = createContext<PopoverContextType | null>(null)
+const PopoverContext = createContext<PopoverContextType | null>(null);
 
 interface PopoverProps {
-  trigger?: React.ReactNode
-  children: React.ReactNode
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  className?: string
+  trigger?: React.ReactNode;
+  children: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  className?: string;
 }
 
 interface PopoverTriggerProps {
-  children: React.ReactNode
-  onClick?: () => void
-  className?: string
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
 }
 
 interface PopoverContentProps {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }
 
 export const Popover: FC<PopoverProps> = ({
@@ -31,15 +31,15 @@ export const Popover: FC<PopoverProps> = ({
   children,
   open,
   onOpenChange,
-  className = '',
+  className = "",
 }) => {
-  const [isOpen, setIsOpen] = useState(open || false)
+  const [isOpen, setIsOpen] = useState(open || false);
 
   const handleToggle = () => {
-    const newOpen = !isOpen
-    setIsOpen(newOpen)
-    onOpenChange?.(newOpen)
-  }
+    const newOpen = !isOpen;
+    setIsOpen(newOpen);
+    onOpenChange?.(newOpen);
+  };
 
   // If trigger prop is provided, use the simple API
   if (trigger) {
@@ -59,7 +59,7 @@ export const Popover: FC<PopoverProps> = ({
           </div>
         )}
       </div>
-    )
+    );
   }
 
   // Otherwise, use compound component API
@@ -67,36 +67,36 @@ export const Popover: FC<PopoverProps> = ({
     <PopoverContext.Provider value={{ isOpen, setIsOpen }}>
       <div className={`relative ${className}`}>{children}</div>
     </PopoverContext.Provider>
-  )
-}
+  );
+};
 
 export const PopoverTrigger: FC<PopoverTriggerProps> = ({
   children,
   onClick,
-  className = '',
+  className = "",
 }) => {
-  const context = useContext(PopoverContext)
+  const context = useContext(PopoverContext);
 
   const handleClick = () => {
-    context?.setIsOpen(!context.isOpen)
-    onClick?.()
-  }
+    context?.setIsOpen(!context.isOpen);
+    onClick?.();
+  };
 
   return (
     <button onClick={handleClick} className={className}>
       {children}
     </button>
-  )
-}
+  );
+};
 
 export const PopoverContent: FC<PopoverContentProps> = ({
   children,
-  className = '',
+  className = "",
 }) => {
-  const context = useContext(PopoverContext)
+  const context = useContext(PopoverContext);
 
   if (!context?.isOpen) {
-    return null
+    return null;
   }
 
   return (
@@ -105,7 +105,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
-export default Popover
+export default Popover;

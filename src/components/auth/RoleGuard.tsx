@@ -1,12 +1,12 @@
-import { authClient } from '@/lib/auth-client'
-import type { AuthRole } from '@/config/auth.config'
-import type { UserRole } from '@/types/auth'
+import { authClient } from "@/lib/auth-client";
+import type { AuthRole } from "@/config/auth.config";
+import type { UserRole } from "@/types/auth";
 
 export interface RoleGuardProps {
-  children: React.ReactNode
-  requiredRole: AuthRole | AuthRole[] | UserRole | UserRole[]
-  fallback?: React.ReactNode
-  showError?: boolean
+  children: React.ReactNode;
+  requiredRole: AuthRole | AuthRole[] | UserRole | UserRole[];
+  fallback?: React.ReactNode;
+  showError?: boolean;
 }
 
 /**
@@ -19,26 +19,28 @@ export function RoleGuard({
   fallback = null,
   showError = false,
 }: RoleGuardProps) {
-  const { data: session, isPending: loading } = authClient.useSession()
+  const { data: session, isPending: loading } = authClient.useSession();
 
   // Simple role check function
-  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
+  const hasRole = (
+    role: AuthRole | AuthRole[] | UserRole | UserRole[],
+  ): boolean => {
     if (!session?.user) {
-      return false
+      return false;
     }
 
-    const userRole = session.user.role
+    const userRole = session.user.role;
 
     if (Array.isArray(role)) {
-      return (role as string[]).includes(userRole)
+      return (role as string[]).includes(userRole);
     }
 
-    return userRole === role
-  }
+    return userRole === role;
+  };
 
   // Show nothing while loading
   if (loading) {
-    return null
+    return null;
   }
 
   // Not authenticated
@@ -49,7 +51,7 @@ export function RoleGuard({
       </div>
     ) : (
       <>{fallback}</>
-    )
+    );
   }
 
   // Check role
@@ -60,8 +62,8 @@ export function RoleGuard({
       </div>
     ) : (
       <>{fallback}</>
-    )
+    );
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

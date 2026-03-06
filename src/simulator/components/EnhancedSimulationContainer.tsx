@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { v4 as uuidv4 } from 'uuid'
-import { cn } from '../../lib/utils'
-import { checkBrowserCompatibility } from '../utils/privacy'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import { v4 as uuidv4 } from "uuid";
+import { cn } from "../../lib/utils";
+import { checkBrowserCompatibility } from "../utils/privacy";
 import type {
   Scenario,
   ScenarioDifficulty,
@@ -9,22 +15,22 @@ import type {
   RealTimeFeedback,
   TherapeuticTechnique,
   DetectedTechnique,
-} from '../types'
-import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
-import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
-import { FeedbackType } from '../types'
+} from "../types";
+import { useRealTimeAnalysis } from "../hooks/useRealTimeAnalysis";
+import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
+import { FeedbackType } from "../types";
 
 // Components
-import ScenarioInfo from './ScenarioInfo'
-import RealTimeFeedbackPanel from './RealTimeFeedbackPanel'
-import EmpathyMeter from './EmpathyMeter'
-import RealTimePrompts from './RealTimePrompts'
-import ResistanceMonitor from './ResistanceMonitor'
+import ScenarioInfo from "./ScenarioInfo";
+import RealTimeFeedbackPanel from "./RealTimeFeedbackPanel";
+import EmpathyMeter from "./EmpathyMeter";
+import RealTimePrompts from "./RealTimePrompts";
+import ResistanceMonitor from "./ResistanceMonitor";
 
 interface EnhancedSimulationContainerProps {
-  scenarioId: string
-  className?: string
-  onBackToScenarios?: () => void
+  scenarioId: string;
+  className?: string;
+  onBackToScenarios?: () => void;
 }
 
 /**
@@ -34,50 +40,53 @@ interface EnhancedSimulationContainerProps {
  */
 export function EnhancedSimulationContainer({
   scenarioId,
-  className = '',
+  className = "",
   onBackToScenarios,
 }: EnhancedSimulationContainerProps) {
   // State
-  const [userResponse, setUserResponse] = useState<string>('')
+  const [userResponse, setUserResponse] = useState<string>("");
   const [conversationHistory, setConversationHistory] = useState<
-    Array<{ role: 'user' | 'system'; text: string }>
-  >([])
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [isCompatible, setIsCompatible] = useState<boolean>(true)
-  const [compatibilityError, setCompatibilityError] = useState<string[]>([])
-  const [empathyScore, setEmpathyScore] = useState<number>(0.5)
+    Array<{ role: "user" | "system"; text: string }>
+  >([]);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isCompatible, setIsCompatible] = useState<boolean>(true);
+  const [compatibilityError, setCompatibilityError] = useState<string[]>([]);
+  const [empathyScore, setEmpathyScore] = useState<number>(0.5);
   const [techniqueScores, setTechniqueScores] = useState<
     Record<string, number>
-  >({})
-  const [autoScroll, setAutoScroll] = useState<boolean>(true)
+  >({});
+  const [autoScroll, setAutoScroll] = useState<boolean>(true);
   const [showTechniqueHighlights, setShowTechniqueHighlights] =
-    useState<boolean>(true)
-  const [currentPrompt, setCurrentPrompt] = useState<string>('')
-  const [feedback, setFeedback] = useState<RealTimeFeedback[]>([])
+    useState<boolean>(true);
+  const [currentPrompt, setCurrentPrompt] = useState<string>("");
+  const [feedback, setFeedback] = useState<RealTimeFeedback[]>([]);
 
   // Use currentPrompt as a key in React elements for optimization
-  const conversationKey = currentPrompt.length > 0 ? 'prompted' : 'unprompted'
+  const conversationKey = currentPrompt.length > 0 ? "prompted" : "unprompted";
 
   // Unique session ID for the Gestalt WebSocket connection
-  const sessionId = useMemo(() => `session-${scenarioId}-${uuidv4().slice(0, 8)}`, [scenarioId])
+  const sessionId = useMemo(
+    () => `session-${scenarioId}-${uuidv4().slice(0, 8)}`,
+    [scenarioId],
+  );
 
   // Get scenario details and simulator functions
   // Use getScenarioById from imported function instead of from hook
   const scenario = scenarioId
     ? ({
-      id: scenarioId,
-      title: `Scenario ${scenarioId}`,
-      domain: 'DEPRESSION' as TherapeuticDomain,
-      difficulty: 'BEGINNER' as ScenarioDifficulty,
-      initialPrompt: 'Welcome to the simulation. How are you feeling today?',
-      description: 'Practice scenario for depression treatment',
-      techniques: [],
-      contextDescription: 'Initial therapy session',
-      clientBackground: 'Client presenting with depressive symptoms',
-      presentingIssue: 'Persistent low mood and difficulty concentrating',
-      objectives: ['Build rapport', 'Identify symptoms'],
-    } as Scenario)
-    : null
+        id: scenarioId,
+        title: `Scenario ${scenarioId}`,
+        domain: "DEPRESSION" as TherapeuticDomain,
+        difficulty: "BEGINNER" as ScenarioDifficulty,
+        initialPrompt: "Welcome to the simulation. How are you feeling today?",
+        description: "Practice scenario for depression treatment",
+        techniques: [],
+        contextDescription: "Initial therapy session",
+        clientBackground: "Client presenting with depressive symptoms",
+        presentingIssue: "Persistent low mood and difficulty concentrating",
+        objectives: ["Build rapport", "Identify symptoms"],
+      } as Scenario)
+    : null;
 
   // Real-time analysis
   const {
@@ -85,12 +94,12 @@ export function EnhancedSimulationContainer({
     stopAnalysis,
     emotionState,
     detectedTechniques = [],
-  } = useRealTimeAnalysis()
+  } = useRealTimeAnalysis();
 
   // Convert DetectedTechnique[] to TherapeuticTechnique[] for the component
   const mappedTechniques: TherapeuticTechnique[] = detectedTechniques.map(
     (technique: DetectedTechnique) => technique.name as TherapeuticTechnique,
-  )
+  );
 
   // Speech recognition
   const {
@@ -103,134 +112,134 @@ export function EnhancedSimulationContainer({
     resetTranscript,
     toggleListening,
   } = useSpeechRecognition({
-    domain: scenario?.domain.toLowerCase() || 'general',
+    domain: scenario?.domain.toLowerCase() || "general",
     onFinalResult: (result) => {
       // Update user response with the final recognized text
       if (result.text.trim()) {
-        setUserResponse((prev) => `${prev} ${result.text}`.trim())
+        setUserResponse((prev) => `${prev} ${result.text}`.trim());
 
         // Update technique scores based on detected techniques
         if (Object.keys(result.detectedTechniques).length > 0) {
           setTechniqueScores((prev) => ({
             ...prev,
             ...result.detectedTechniques,
-          }))
+          }));
 
           // Calculate overall empathy score
           // This is a simplified calculation - in a real app this would be more sophisticated
-          if (result.detectedTechniques['empathy']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.1))
-          } else if (result.detectedTechniques['validation']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.05))
-          } else if (result.detectedTechniques['reflection']) {
-            setEmpathyScore((prev) => Math.min(1, prev + 0.05))
+          if (result.detectedTechniques["empathy"]) {
+            setEmpathyScore((prev) => Math.min(1, prev + 0.1));
+          } else if (result.detectedTechniques["validation"]) {
+            setEmpathyScore((prev) => Math.min(1, prev + 0.05));
+          } else if (result.detectedTechniques["reflection"]) {
+            setEmpathyScore((prev) => Math.min(1, prev + 0.05));
           }
         }
       }
     },
-  })
+  });
 
   // Refs
-  const formRef = useRef<HTMLFormElement>(null)
-  const conversationEndRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null);
+  const conversationEndRef = useRef<HTMLDivElement>(null);
 
   // Use stable reference for scenario to avoid dependency issues
-  const scenarioRef = useRef(scenario)
-  scenarioRef.current = scenario
+  const scenarioRef = useRef(scenario);
+  scenarioRef.current = scenario;
 
   // Use refs to capture the latest function references to avoid dependency issues
-  const startAnalysisRef = useRef(startAnalysis)
-  const stopAnalysisRef = useRef(stopAnalysis)
-  const stopListeningRef = useRef(stopListening)
+  const startAnalysisRef = useRef(startAnalysis);
+  const stopAnalysisRef = useRef(stopAnalysis);
+  const stopListeningRef = useRef(stopListening);
 
   // Update refs when functions change
   useEffect(() => {
-    startAnalysisRef.current = startAnalysis
-    stopAnalysisRef.current = stopAnalysis
-    stopListeningRef.current = stopListening
-  })
+    startAnalysisRef.current = startAnalysis;
+    stopAnalysisRef.current = stopAnalysis;
+    stopListeningRef.current = stopListening;
+  });
 
   // Effect to start simulation when component mounts
   useEffect(() => {
-    const currentScenario = scenarioRef.current
+    const currentScenario = scenarioRef.current;
     if (currentScenario) {
       // Add initial scenario prompt to conversation history
       setConversationHistory([
         {
-          role: 'system',
-          text: currentScenario.initialPrompt || 'Welcome to the simulation.',
+          role: "system",
+          text: currentScenario.initialPrompt || "Welcome to the simulation.",
         },
-      ])
+      ]);
 
       // Start real-time analysis
-      void startAnalysisRef.current()
+      void startAnalysisRef.current();
     }
 
     return () => {
       // Stop analysis and speech recognition when component unmounts
-      stopAnalysisRef.current()
-      stopListeningRef.current()
-    }
-  }, [scenarioId]) // Use scenarioId instead of scenario object
+      stopAnalysisRef.current();
+      stopListeningRef.current();
+    };
+  }, [scenarioId]); // Use scenarioId instead of scenario object
 
   // Auto-scroll to bottom of conversation when new messages are added
   useEffect(() => {
     if (autoScroll && conversationEndRef.current) {
-      conversationEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      conversationEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [conversationHistory, autoScroll])
+  }, [conversationHistory, autoScroll]);
 
   // Check browser compatibility
   useEffect(() => {
-    const { compatible, missingFeatures } = checkBrowserCompatibility()
-    setIsCompatible(compatible)
-    setCompatibilityError(missingFeatures)
-  }, [])
+    const { compatible, missingFeatures } = checkBrowserCompatibility();
+    setIsCompatible(compatible);
+    setCompatibilityError(missingFeatures);
+  }, []);
 
   // Handle form submission
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
 
       if (!userResponse.trim() || isSubmitting) {
-        return
+        return;
       }
 
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       // Add user response to conversation history
       setConversationHistory(
-        (prev: Array<{ role: 'user' | 'system'; text: string }>) => [
+        (prev: Array<{ role: "user" | "system"; text: string }>) => [
           ...prev,
-          { role: 'user', text: userResponse },
+          { role: "user", text: userResponse },
         ],
-      )
+      );
 
       // Simulate API call for response
       setTimeout(() => {
         // In a real app, this would call an API to get a response
         // based on the scenario and user input
         const simulatedResponse = {
-          text: 'Thank you for sharing that. How has this been affecting your daily life?',
+          text: "Thank you for sharing that. How has this been affecting your daily life?",
           feedbackPoints: [
             {
-              type: 'positive',
-              text: 'Good use of open-ended question',
+              type: "positive",
+              text: "Good use of open-ended question",
             },
             {
-              type: 'suggestion',
-              text: 'Consider reflecting back feelings to show understanding',
+              type: "suggestion",
+              text: "Consider reflecting back feelings to show understanding",
             },
           ],
-        }
+        };
 
         // Add system response to conversation history
         setConversationHistory(
-          (prev: Array<{ role: 'user' | 'system'; text: string }>) => [
+          (prev: Array<{ role: "user" | "system"; text: string }>) => [
             ...prev,
-            { role: 'system', text: simulatedResponse.text },
+            { role: "system", text: simulatedResponse.text },
           ],
-        )
+        );
 
         // Generate feedback based on the response
         setFeedback([
@@ -238,36 +247,36 @@ export function EnhancedSimulationContainer({
             id: `feedback-${Date.now()}`,
             type: FeedbackType.POSITIVE,
             timestamp: Date.now(),
-            suggestion: 'Good use of open-ended question',
+            suggestion: "Good use of open-ended question",
             rationale:
-              'Open-ended questions encourage detailed responses and exploration of feelings',
-            priority: 'medium',
+              "Open-ended questions encourage detailed responses and exploration of feelings",
+            priority: "medium",
           },
           {
             id: `feedback-${Date.now() + 1}`,
             type: FeedbackType.TECHNIQUE_SUGGESTION,
             timestamp: Date.now() + 1,
             suggestion:
-              'Consider reflecting back feelings to show understanding',
+              "Consider reflecting back feelings to show understanding",
             rationale:
-              'Reflecting feelings helps the client feel understood and validates their experience',
-            priority: 'medium',
+              "Reflecting feelings helps the client feel understood and validates their experience",
+            priority: "medium",
           },
-        ])
+        ]);
 
         // Reset user response
-        setUserResponse('')
-        setIsSubmitting(false)
-      }, 1000)
+        setUserResponse("");
+        setIsSubmitting(false);
+      }, 1000);
     },
     [userResponse, isSubmitting],
-  )
+  );
 
   // Handle prompt selection
   const handlePromptSelect = useCallback((prompt: string) => {
-    setUserResponse(prompt)
-    setCurrentPrompt(prompt)
-  }, [])
+    setUserResponse(prompt);
+    setCurrentPrompt(prompt);
+  }, []);
 
   // If scenario not found, show error
   if (!scenario) {
@@ -286,7 +295,7 @@ export function EnhancedSimulationContainer({
           Return to Scenario Selection
         </button>
       </div>
-    )
+    );
   }
 
   // If browser not compatible, show warning
@@ -317,16 +326,14 @@ export function EnhancedSimulationContainer({
           Return to Scenario Selection
         </button>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('flex flex-col h-full overflow-hidden', className)}>
+    <div className={cn("flex flex-col h-full overflow-hidden", className)}>
       {/* Header with scenario information */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <ScenarioInfo
-          scenario={scenario}
-        />
+        <ScenarioInfo scenario={scenario} />
 
         <div className="flex items-center space-x-3">
           <div className="flex items-center">
@@ -396,8 +403,8 @@ export function EnhancedSimulationContainer({
               <div
                 key={`message-${index}-${message.role}-${message.text.slice(0, 20)}`}
                 className={cn(
-                  'flex p-3 rounded-lg max-w-3/4',
-                  message.role === 'user' ? 'bg-blue-50 ml-auto' : 'bg-gray-50',
+                  "flex p-3 rounded-lg max-w-3/4",
+                  message.role === "user" ? "bg-blue-50 ml-auto" : "bg-gray-50",
                 )}
               >
                 <div className="text-sm">{message.text}</div>
@@ -438,14 +445,14 @@ export function EnhancedSimulationContainer({
                   type="button"
                   onClick={toggleListening}
                   className={cn(
-                    'absolute right-3 bottom-3 p-2 rounded-full',
+                    "absolute right-3 bottom-3 p-2 rounded-full",
                     isListening
-                      ? 'bg-red-100 text-red-600 animate-pulse'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                      ? "bg-red-100 text-red-600 animate-pulse"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                   )}
-                  title={isListening ? 'Stop listening' : 'Start voice input'}
+                  title={isListening ? "Stop listening" : "Start voice input"}
                   aria-label={
-                    isListening ? 'Stop listening' : 'Start voice input'
+                    isListening ? "Stop listening" : "Start voice input"
                   }
                 >
                   {isListening ? (
@@ -503,13 +510,13 @@ export function EnhancedSimulationContainer({
                 type="submit"
                 disabled={!userResponse.trim() || isSubmitting}
                 className={cn(
-                  'px-4 py-2 rounded-md text-white',
+                  "px-4 py-2 rounded-md text-white",
                   !userResponse.trim() || isSubmitting
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-blue-500 hover:bg-blue-600',
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600",
                 )}
               >
-                {isSubmitting ? 'Sending...' : 'Send Response'}
+                {isSubmitting ? "Sending..." : "Send Response"}
               </button>
             </div>
           </form>
@@ -550,7 +557,7 @@ export function EnhancedSimulationContainer({
                       className="flex justify-between items-center"
                     >
                       <span className="text-xs capitalize">
-                        {technique.replace('_', ' ')}
+                        {technique.replace("_", " ")}
                       </span>
                       <div className="h-2 w-24 bg-gray-200 rounded overflow-hidden">
                         <div
@@ -593,15 +600,15 @@ export function EnhancedSimulationContainer({
                   // Reset conversation
                   setConversationHistory([
                     {
-                      role: 'system',
+                      role: "system",
                       text:
-                        scenario.initialPrompt || 'Welcome to the simulation.',
+                        scenario.initialPrompt || "Welcome to the simulation.",
                     },
-                  ])
-                  setUserResponse('')
-                  setEmpathyScore(0.5)
-                  setTechniqueScores({})
-                  resetTranscript()
+                  ]);
+                  setUserResponse("");
+                  setEmpathyScore(0.5);
+                  setTechniqueScores({});
+                  resetTranscript();
                 }}
                 className="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
               >
@@ -610,9 +617,9 @@ export function EnhancedSimulationContainer({
 
               <button
                 onClick={() => {
-                  stopAnalysis()
-                  stopListening()
-                  onBackToScenarios?.()
+                  stopAnalysis();
+                  stopListening();
+                  onBackToScenarios?.();
                 }}
                 className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
               >
@@ -623,7 +630,7 @@ export function EnhancedSimulationContainer({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Example PHI audit logging - uncomment and customize as needed

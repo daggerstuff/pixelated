@@ -1,8 +1,8 @@
 interface IconProps {
-  className?: string
+  className?: string;
 }
 
-export default function IconFilePdf({ className = 'w-6 h-6' }: IconProps) {
+export default function IconFilePdf({ className = "w-6 h-6" }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -32,5 +32,5 @@ export default function IconFilePdf({ className = 'w-6 h-6' }: IconProps) {
         fill="currentColor"
       />
     </svg>
-  )
+  );
 }

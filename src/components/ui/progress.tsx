@@ -1,31 +1,31 @@
-import React from 'react'
-import { cn } from '../../lib/utils'
+import React from "react";
+import { cn } from "../../lib/utils";
 
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Progress value (0-100) */
-  value?: number
+  value?: number;
   /** Maximum value */
-  max?: number
+  max?: number;
   /** Show indeterminate loading animation */
-  indeterminate?: boolean
+  indeterminate?: boolean;
   /** Show percentage text */
-  showValue?: boolean
+  showValue?: boolean;
   /** Progress bar color variant */
   variant?:
-    | 'default'
-    | 'primary'
-    | 'secondary'
-    | 'success'
-    | 'warning'
-    | 'error'
+    | "default"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "error";
   /** Progress bar size */
-  size?: 'xs' | 'sm' | 'md' | 'lg'
+  size?: "xs" | "sm" | "md" | "lg";
   /** Additional class name */
-  className?: string
+  className?: string;
   /** Additional class name for the value bar */
-  valueClassName?: string
+  valueClassName?: string;
   /** Additional class name for the background bar */
-  bgClassName?: string
+  bgClassName?: string;
 }
 
 export function Progress({
@@ -33,50 +33,50 @@ export function Progress({
   max = 100,
   indeterminate = false,
   showValue = false,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   className,
   valueClassName,
   bgClassName,
   ...props
 }: ProgressProps) {
   // Calculate percentage
-  const percentage = Math.min(Math.max(0, (value / max) * 100), 100)
+  const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
 
   // Size classes
   const sizeClasses = {
-    xs: 'h-1',
-    sm: 'h-2',
-    md: 'h-3',
-    lg: 'h-4',
-  }
+    xs: "h-1",
+    sm: "h-2",
+    md: "h-3",
+    lg: "h-4",
+  };
 
   // Variant classes for the progress bar
   const variantClasses = {
-    default: 'bg-gray-600 dark:bg-gray-400',
-    primary: 'bg-primary dark:bg-primary-dark',
-    secondary: 'bg-gray-500 dark:bg-gray-400',
-    success: 'bg-green-500 dark:bg-green-600',
-    warning: 'bg-yellow-500 dark:bg-yellow-600',
-    error: 'bg-red-500 dark:bg-red-600',
-  }
+    default: "bg-gray-600 dark:bg-gray-400",
+    primary: "bg-primary dark:bg-primary-dark",
+    secondary: "bg-gray-500 dark:bg-gray-400",
+    success: "bg-green-500 dark:bg-green-600",
+    warning: "bg-yellow-500 dark:bg-yellow-600",
+    error: "bg-red-500 dark:bg-red-600",
+  };
 
   // Base background classes
   const baseBackgroundClasses =
-    'bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden'
+    "bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden";
 
   // Base progress classes
   const baseProgressClasses =
-    'h-full rounded-full transition-all duration-300 ease-in-out'
+    "h-full rounded-full transition-all duration-300 ease-in-out";
 
   return (
     <div
-      className={cn('w-full', className)}
+      className={cn("w-full", className)}
       role="progressbar"
       aria-valuenow={indeterminate ? undefined : value}
       aria-valuemin={0}
       aria-valuemax={max}
-      aria-label={indeterminate ? 'Loading' : `${percentage}% loaded`}
+      aria-label={indeterminate ? "Loading" : `${percentage}% loaded`}
       {...props}
     >
       {/* Progress bar with label */}
@@ -84,7 +84,7 @@ export function Progress({
         {/* Progress bar container */}
         <div
           className={cn(
-            'w-full',
+            "w-full",
             baseBackgroundClasses,
             sizeClasses[size],
             bgClassName,
@@ -95,8 +95,8 @@ export function Progress({
               baseProgressClasses,
               variantClasses[variant],
               {
-                'animate-pulse': indeterminate,
-                'animate-progress-indeterminate w-3/4': indeterminate,
+                "animate-pulse": indeterminate,
+                "animate-progress-indeterminate w-3/4": indeterminate,
               },
               valueClassName,
             )}
@@ -112,7 +112,7 @@ export function Progress({
         )}
       </div>
     </div>
-  )
+  );
 }
 
 export function ProgressCircular({
@@ -120,39 +120,39 @@ export function ProgressCircular({
   max = 100,
   indeterminate = false,
   showValue = false,
-  variant = 'primary',
+  variant = "primary",
   size = 40,
   strokeWidth = 4,
   className,
   ...props
-}: Omit<ProgressProps, 'size'> & {
-  /** Size of the circular progress in pixels */ size?: number
-  /** Width of the progress stroke */ strokeWidth?: number
+}: Omit<ProgressProps, "size"> & {
+  /** Size of the circular progress in pixels */ size?: number;
+  /** Width of the progress stroke */ strokeWidth?: number;
 }) {
   // Calculate percentage and circle properties
-  const percentage = Math.min(Math.max(0, (value / max) * 100), 100)
-  const radius = (size - strokeWidth) / 2
-  const circumference = radius * 2 * Math.PI
-  const strokeDashoffset = circumference - (percentage / 100) * circumference
+  const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   // Variant classes for the progress stroke
   const variantClasses = {
-    default: 'stroke-gray-600 dark:stroke-gray-400',
-    primary: 'stroke-primary dark:stroke-primary-dark',
-    secondary: 'stroke-gray-500 dark:stroke-gray-400',
-    success: 'stroke-green-500 dark:stroke-green-600',
-    warning: 'stroke-yellow-500 dark:stroke-yellow-600',
-    error: 'stroke-red-500 dark:stroke-red-600',
-  }
+    default: "stroke-gray-600 dark:stroke-gray-400",
+    primary: "stroke-primary dark:stroke-primary-dark",
+    secondary: "stroke-gray-500 dark:stroke-gray-400",
+    success: "stroke-green-500 dark:stroke-green-600",
+    warning: "stroke-yellow-500 dark:stroke-yellow-600",
+    error: "stroke-red-500 dark:stroke-red-600",
+  };
 
   return (
     <div
-      className={cn('inline-flex items-center justify-center', className)}
+      className={cn("inline-flex items-center justify-center", className)}
       {...props}
     >
       <svg
-        className={cn('transform -rotate-90', {
-          'animate-spin': indeterminate,
+        className={cn("transform -rotate-90", {
+          "animate-spin": indeterminate,
         })}
         width={size}
         height={size}
@@ -163,7 +163,7 @@ export function ProgressCircular({
         aria-valuenow={indeterminate ? undefined : value}
         aria-valuemin={0}
         aria-valuemax={max}
-        aria-label={indeterminate ? 'Loading' : `${percentage}% loaded`}
+        aria-label={indeterminate ? "Loading" : `${percentage}% loaded`}
       >
         {/* Background circle */}
         <circle
@@ -181,7 +181,7 @@ export function ProgressCircular({
           cy={size / 2}
           r={radius}
           className={cn(variantClasses[variant], {
-            'animate-pulse': indeterminate,
+            "animate-pulse": indeterminate,
           })}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
@@ -200,7 +200,7 @@ export function ProgressCircular({
         </span>
       )}
     </div>
-  )
+  );
 }
 
-export default Progress
+export default Progress;

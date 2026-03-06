@@ -1,26 +1,26 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
 // TODO: Implement WebSocketService or use existing WebSocket implementation
 // import { WebSocketService } from './WebSocketService'
 
-const logger = createBuildSafeLogger('WebRTCSignaling')
+const logger = createBuildSafeLogger("WebRTCSignaling");
 
 export interface SignalingMessage {
-  type: 'offer' | 'answer' | 'ice-candidate'
-  sessionId: string
-  userId: string
-  data: RTCSessionDescriptionInit | RTCIceCandidateInit | null
+  type: "offer" | "answer" | "ice-candidate";
+  sessionId: string;
+  userId: string;
+  data: RTCSessionDescriptionInit | RTCIceCandidateInit | null;
 }
 
 class WebRTCSignalingService {
-  private static instance: WebRTCSignalingService
+  private static instance: WebRTCSignalingService;
   // TODO: Implement WebSocketService integration
   // private wsService: WebSocketService
-  private messageHandlers: Map<string, (message: SignalingMessage) => void>
+  private messageHandlers: Map<string, (message: SignalingMessage) => void>;
 
   private constructor() {
     // TODO: Initialize WebSocketService when available
     // this.wsService = WebSocketService.getInstance()
-    this.messageHandlers = new Map()
+    this.messageHandlers = new Map();
 
     // TODO: Listen for WebRTC signaling messages when WebSocketService is available
     // this.wsService.on('webrtc', this.handleSignalingMessage.bind(this))
@@ -28,9 +28,9 @@ class WebRTCSignalingService {
 
   public static getInstance(): WebRTCSignalingService {
     if (!WebRTCSignalingService.instance) {
-      WebRTCSignalingService.instance = new WebRTCSignalingService()
+      WebRTCSignalingService.instance = new WebRTCSignalingService();
     }
-    return WebRTCSignalingService.instance
+    return WebRTCSignalingService.instance;
   }
 
   /**
@@ -49,11 +49,11 @@ class WebRTCSignalingService {
       //   userId,
       //   data: offer,
       // })
-      logger.info('WebRTC offer would be sent', { sessionId, userId, offer })
-      logger.debug('Sent offer', { sessionId, userId })
+      logger.info("WebRTC offer would be sent", { sessionId, userId, offer });
+      logger.debug("Sent offer", { sessionId, userId });
     } catch (error: unknown) {
-      logger.error('Failed to send offer', { error, sessionId, userId })
-      throw error
+      logger.error("Failed to send offer", { error, sessionId, userId });
+      throw error;
     }
   }
 
@@ -73,11 +73,11 @@ class WebRTCSignalingService {
       //   userId,
       //   data: answer,
       // })
-      logger.info('WebRTC answer would be sent', { sessionId, userId, answer })
-      logger.debug('Sent answer', { sessionId, userId })
+      logger.info("WebRTC answer would be sent", { sessionId, userId, answer });
+      logger.debug("Sent answer", { sessionId, userId });
     } catch (error: unknown) {
-      logger.error('Failed to send answer', { error, sessionId, userId })
-      throw error
+      logger.error("Failed to send answer", { error, sessionId, userId });
+      throw error;
     }
   }
 
@@ -97,15 +97,19 @@ class WebRTCSignalingService {
       //   userId,
       //   data: candidate,
       // })
-      logger.info('WebRTC ICE candidate would be sent', {
+      logger.info("WebRTC ICE candidate would be sent", {
         sessionId,
         userId,
         candidate,
-      })
-      logger.debug('Sent ICE candidate', { sessionId, userId })
+      });
+      logger.debug("Sent ICE candidate", { sessionId, userId });
     } catch (error: unknown) {
-      logger.error('Failed to send ICE candidate', { error, sessionId, userId })
-      throw error
+      logger.error("Failed to send ICE candidate", {
+        error,
+        sessionId,
+        userId,
+      });
+      throw error;
     }
   }
 
@@ -116,8 +120,8 @@ class WebRTCSignalingService {
     sessionId: string,
     handler: (message: SignalingMessage) => void,
   ): () => void {
-    this.messageHandlers.set(sessionId, handler)
-    return () => this.messageHandlers.delete(sessionId)
+    this.messageHandlers.set(sessionId, handler);
+    return () => this.messageHandlers.delete(sessionId);
   }
 
   /**
@@ -139,4 +143,4 @@ class WebRTCSignalingService {
   // }
 }
 
-export const signalingService = WebRTCSignalingService.getInstance()
+export const signalingService = WebRTCSignalingService.getInstance();

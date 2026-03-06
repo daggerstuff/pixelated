@@ -1,15 +1,18 @@
-import React, { useState, type FC } from 'react'
-import type { TherapyStyleId, TherapyStyle } from '../../lib/ai/types/TherapyStyles'
+import React, { useState, type FC } from "react";
+import type {
+  TherapyStyleId,
+  TherapyStyle,
+} from "../../lib/ai/types/TherapyStyles";
 import {
   therapyStyleConfigs,
   getRecommendedStyles,
-} from '../../lib/ai/types/TherapyStyles'
+} from "../../lib/ai/types/TherapyStyles";
 
 interface TherapyStyleSelectorProps {
-  selectedStyle: TherapyStyleId
-  onSelectStyle: (styleId: TherapyStyleId) => void
-  issue?: string
-  showRecommendations?: boolean
+  selectedStyle: TherapyStyleId;
+  onSelectStyle: (styleId: TherapyStyleId) => void;
+  issue?: string;
+  showRecommendations?: boolean;
 }
 
 export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
@@ -18,35 +21,35 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
   issue,
   showRecommendations = false,
 }) => {
-  const [hoveredStyle, setHoveredStyle] = useState<TherapyStyleId | null>(null)
+  const [hoveredStyle, setHoveredStyle] = useState<TherapyStyleId | null>(null);
 
   // Get the style to display details for (either hovered or selected)
-  const detailStyle: TherapyStyleId = hoveredStyle || selectedStyle
+  const detailStyle: TherapyStyleId = hoveredStyle || selectedStyle;
 
   // Get recommended styles if enabled and an issue is provided
   const recommendedStyles =
-    showRecommendations && issue ? getRecommendedStyles(issue) : []
+    showRecommendations && issue ? getRecommendedStyles(issue) : [];
 
   // Create a set of recommended style IDs for easy lookup
-  const recommendedStyleIds = new Set(recommendedStyles)
+  const recommendedStyleIds = new Set(recommendedStyles);
 
   // Handler for style button click
   const handleStyleClick = (styleId: TherapyStyleId) => {
-    onSelectStyle(styleId)
-  }
+    onSelectStyle(styleId);
+  };
 
   // Handler for mouse enter on style button
   const handleMouseEnter = (styleId: TherapyStyleId) => {
-    setHoveredStyle(styleId)
-  }
+    setHoveredStyle(styleId);
+  };
 
   // Handler for mouse leave on style button
   const handleMouseLeave = () => {
-    setHoveredStyle(null)
-  }
+    setHoveredStyle(null);
+  };
 
   // Get the current style details to display in the panel
-  const currentStyle: TherapyStyle = therapyStyleConfigs[detailStyle]
+  const currentStyle: TherapyStyle = therapyStyleConfigs[detailStyle];
 
   return (
     <div className="therapy-style-selector">
@@ -54,13 +57,13 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         <h3>Select Therapy Approach</h3>
         <div className="style-buttons">
           {Object.entries(therapyStyleConfigs).map(([id, style]) => {
-            const isActive = id === selectedStyle
-            const isRecommended = recommendedStyleIds.has(id as TherapyStyleId)
+            const isActive = id === selectedStyle;
+            const isRecommended = recommendedStyleIds.has(id as TherapyStyleId);
 
             return (
               <button
                 key={id}
-                className={`style-button ${isActive ? 'active' : ''} ${isRecommended ? 'recommended' : ''}`}
+                className={`style-button ${isActive ? "active" : ""} ${isRecommended ? "recommended" : ""}`}
                 onClick={() => handleStyleClick(id as TherapyStyleId)}
                 onMouseEnter={() => handleMouseEnter(id as TherapyStyleId)}
                 onMouseLeave={handleMouseLeave}
@@ -70,7 +73,7 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
                   <span className="recommendation-badge">✓ Recommended</span>
                 )}
               </button>
-            )
+            );
           })}
         </div>
       </div>
@@ -217,5 +220,5 @@ export const TherapyStyleSelector: FC<TherapyStyleSelectorProps> = ({
         }
       `}</style>
     </div>
-  )
-}
+  );
+};

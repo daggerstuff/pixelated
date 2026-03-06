@@ -4,27 +4,27 @@
 
 export class Worker {
   constructor() {
-    throw new Error('Worker threads are not supported in this environment')
+    throw new Error("Worker threads are not supported in this environment");
   }
   terminate() {}
 }
 
-export const isMainThread = true
-export const parentPort = null
-export const threadId = 0
-export const workerData = null
+export const isMainThread = true;
+export const parentPort = null;
+export const threadId = 0;
+export const workerData = null;
 
 export function markAsUntransferable() {}
 export function moveMessagePortToContext() {}
 export function receiveMessageOnPort() {
-  return null
+  return null;
 }
 export function resourceLimits() {
-  return {}
+  return {};
 }
 export function setEnvironmentData() {}
 export function getEnvironmentData() {
-  return null
+  return null;
 }
 
 export default {
@@ -39,4 +39,4 @@ export default {
   resourceLimits,
   setEnvironmentData,
   getEnvironmentData,
-}
+};

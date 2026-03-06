@@ -1,33 +1,33 @@
-import { useState } from 'react'
-import { authClient } from '@/lib/auth-client'
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 interface ResetPasswordFormProps {
-  token: string
-  email: string
+  token: string;
+  email: string;
 }
 
 export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     // Basic validation
     if (password.length < 8) {
-      setError('Password must be at least 8 characters')
-      return
+      setError("Password must be at least 8 characters");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Call auth service to verify token and set new password
@@ -35,31 +35,31 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
         newPassword: password,
         token,
         email,
-      })
+      });
 
       if (!response.error) {
         // Dispatch custom event that the parent page is listening for
-        const event = new CustomEvent('password-reset-success')
-        document.dispatchEvent(event)
+        const event = new CustomEvent("password-reset-success");
+        document.dispatchEvent(event);
       } else {
-        throw new Error(response.error.message || 'Password reset failed')
+        throw new Error(response.error.message || "Password reset failed");
       }
     } catch (err: unknown) {
       const message =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'An error occurred'
-      setError(message)
+          : "An error occurred";
+      setError(message);
 
       // Dispatch error event
-      const event = new CustomEvent('password-reset-error', {
+      const event = new CustomEvent("password-reset-error", {
         detail: { message },
-      })
-      document.dispatchEvent(event)
+      });
+      document.dispatchEvent(event);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="reset-password-form">
@@ -118,9 +118,9 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
           className="w-full py-2 px-4 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors"
           disabled={isLoading}
         >
-          {isLoading ? 'Resetting Password...' : 'Reset Password'}
+          {isLoading ? "Resetting Password..." : "Reset Password"}
         </button>
       </form>
     </div>
-  )
+  );
 }

@@ -7,46 +7,46 @@ import type {
   AnalyticsError,
   GA4Event,
   MixpanelEvent,
-} from './types'
+} from "./types";
 
 // In-memory storage for demo (replace with database in production)
-const analyticsData: EnrichedAnalyticsEvent[] = []
+const analyticsData: EnrichedAnalyticsEvent[] = [];
 
 export const POST = async ({ request }) => {
   try {
-    const eventData = (await request.json()) as DemoAnalyticsEvent
+    const eventData = (await request.json()) as DemoAnalyticsEvent;
 
     // Validate required fields
-    const validationErrors: AnalyticsError['details'] = []
+    const validationErrors: AnalyticsError["details"] = [];
     if (!eventData.event) {
       validationErrors.push({
-        field: 'event',
-        message: 'Event name is required',
-      })
+        field: "event",
+        message: "Event name is required",
+      });
     }
     if (!eventData.session_id) {
       validationErrors.push({
-        field: 'session_id',
-        message: 'Session ID is required',
-      })
+        field: "session_id",
+        message: "Session ID is required",
+      });
     }
     if (!eventData.ab_variant) {
       validationErrors.push({
-        field: 'ab_variant',
-        message: 'A/B variant is required',
-      })
+        field: "ab_variant",
+        message: "A/B variant is required",
+      });
     }
 
     if (validationErrors.length > 0) {
       const error: AnalyticsError = {
-        code: 'VALIDATION_ERROR',
-        errorMessage: 'Invalid analytics event data',
+        code: "VALIDATION_ERROR",
+        errorMessage: "Invalid analytics event data",
         details: validationErrors,
-      }
+      };
       return new Response(JSON.stringify(error), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Add server-side timestamp and IP
@@ -54,147 +54,147 @@ export const POST = async ({ request }) => {
       ...eventData,
       server_timestamp: Date.now(),
       ip_address:
-        request.headers.get('x-forwarded-for') ||
-        request.headers.get('x-real-ip') ||
-        'unknown',
-      user_agent: request.headers.get('user-agent') || eventData.user_agent,
-    }
+        request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        "unknown",
+      user_agent: request.headers.get("user-agent") || eventData.user_agent,
+    };
 
     // Store the event (in production, save to database)
-    analyticsData.push(enrichedEvent)
+    analyticsData.push(enrichedEvent);
 
     // Log for debugging
-    console.log('Demo Analytics Event:', {
+    console.log("Demo Analytics Event:", {
       event: enrichedEvent.event,
       session_id: enrichedEvent.session_id,
       ab_variant: enrichedEvent.ab_variant,
       timestamp: new Date(enrichedEvent.timestamp).toISOString(),
-    })
+    });
 
     // Log which analytics integrations will be attempted
     const hasGA = Boolean(
       import.meta.env.PUBLIC_GA_MEASUREMENT_ID && import.meta.env.GA_API_SECRET,
-    )
-    const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN)
+    );
+    const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN);
     const hasCustom = Boolean(
       import.meta.env.CUSTOM_ANALYTICS_ENDPOINT &&
-        import.meta.env.CUSTOM_ANALYTICS_TOKEN,
-    )
-    console.log('Attempting analytics integrations:', {
+      import.meta.env.CUSTOM_ANALYTICS_TOKEN,
+    );
+    console.log("Attempting analytics integrations:", {
       hasGA,
       hasMixpanel,
       hasCustom,
-    })
+    });
 
     // Only call analytics integrations if credentials are present
-    const analyticsPromises: Promise<void>[] = []
+    const analyticsPromises: Promise<void>[] = [];
     if (hasGA) {
-      analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent))
+      analyticsPromises.push(sendToGoogleAnalytics(enrichedEvent));
     }
     if (hasMixpanel) {
-      analyticsPromises.push(sendToMixpanel(enrichedEvent))
+      analyticsPromises.push(sendToMixpanel(enrichedEvent));
     }
     if (hasCustom) {
-      analyticsPromises.push(sendToCustomAnalytics(enrichedEvent))
+      analyticsPromises.push(sendToCustomAnalytics(enrichedEvent));
     }
-    await Promise.allSettled(analyticsPromises)
+    await Promise.allSettled(analyticsPromises);
 
     const response: DemoAnalyticsSuccessResponse = {
       success: true,
-      event_id: enrichedEvent.session_id + '_' + enrichedEvent.timestamp,
-    }
+      event_id: enrichedEvent.session_id + "_" + enrichedEvent.timestamp,
+    };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    console.error('Demo analytics error:', error)
+    console.error("Demo analytics error:", error);
 
     const apiError: AnalyticsError = {
-      code: 'PROCESSING_ERROR',
-      errorMessage: 'Failed to process analytics event',
+      code: "PROCESSING_ERROR",
+      errorMessage: "Failed to process analytics event",
       details: {
-        source: 'demo-tracking',
+        source: "demo-tracking",
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    };
 
     return new Response(JSON.stringify(apiError), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
-}
+};
 
 export const GET = async ({ url }) => {
   try {
-    const { searchParams } = new URL(url)
-    const sessionId = searchParams.get('session_id')
-    const abVariant = searchParams.get('ab_variant')
-    const event = searchParams.get('event')
+    const { searchParams } = new URL(url);
+    const sessionId = searchParams.get("session_id");
+    const abVariant = searchParams.get("ab_variant");
+    const event = searchParams.get("event");
 
     // Filter analytics data based on query parameters
-    let filteredData = analyticsData
+    let filteredData = analyticsData;
 
     if (sessionId) {
       filteredData = filteredData.filter(
         (item) => item.session_id === sessionId,
-      )
+      );
     }
 
     if (abVariant) {
       filteredData = filteredData.filter(
         (item) => item.ab_variant === abVariant,
-      )
+      );
     }
 
     if (event) {
-      filteredData = filteredData.filter((item) => item.event === event)
+      filteredData = filteredData.filter((item) => item.event === event);
     }
 
     // Generate analytics summary
-    const summary = generateAnalyticsSummary(filteredData)
+    const summary = generateAnalyticsSummary(filteredData);
 
     const response: DemoAnalyticsGetResponse = {
       total_events: filteredData.length,
       events: filteredData.slice(-100), // Return last 100 events
       summary,
-    }
+    };
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    console.error('Demo analytics query error:', error)
+    console.error("Demo analytics query error:", error);
 
     const apiError: AnalyticsError = {
-      code: 'PROCESSING_ERROR',
-      errorMessage: 'Failed to retrieve analytics data',
+      code: "PROCESSING_ERROR",
+      errorMessage: "Failed to retrieve analytics data",
       details: {
-        source: 'demo-tracking',
+        source: "demo-tracking",
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    };
 
     return new Response(JSON.stringify(apiError), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
-}
+};
 
 async function sendToGoogleAnalytics(
   event: EnrichedAnalyticsEvent,
 ): Promise<void> {
   // Google Analytics 4 Measurement Protocol
-  const GA_MEASUREMENT_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID
-  const { GA_API_SECRET } = import.meta.env
+  const GA_MEASUREMENT_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+  const { GA_API_SECRET } = import.meta.env;
 
   if (!GA_MEASUREMENT_ID || !GA_API_SECRET) {
-    console.warn('Google Analytics credentials not configured')
-    return
+    console.warn("Google Analytics credentials not configured");
+    return;
   }
 
   try {
@@ -202,7 +202,7 @@ async function sendToGoogleAnalytics(
       name: event.event,
       parameters: {
         ab_variant: event.ab_variant,
-        page_title: 'ClinicalVault Trainer Demo',
+        page_title: "ClinicalVault Trainer Demo",
         page_location: event.url,
         custom_parameter_1: event.session_id,
         custom_parameter_2: event.ab_variant,
@@ -210,45 +210,45 @@ async function sendToGoogleAnalytics(
           Object.entries(event).filter(
             ([key]) =>
               ![
-                'event',
-                'timestamp',
-                'session_id',
-                'ab_variant',
-                'url',
+                "event",
+                "timestamp",
+                "session_id",
+                "ab_variant",
+                "url",
               ].includes(key),
           ),
         ),
       },
-    }
+    };
 
     const response = await fetch(
       `https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           client_id: event.session_id,
           events: [gaEvent],
         }),
       },
-    )
+    );
 
     if (!response.ok) {
-      throw new Error(`GA4 API error: ${response.status}`)
+      throw new Error(`GA4 API error: ${response.status}`);
     }
   } catch (error: unknown) {
-    console.error('Failed to send to Google Analytics:', error)
+    console.error("Failed to send to Google Analytics:", error);
   }
 }
 
 async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
-  const { MIXPANEL_TOKEN } = import.meta.env
+  const { MIXPANEL_TOKEN } = import.meta.env;
 
   if (!MIXPANEL_TOKEN) {
-    console.warn('Mixpanel token not configured')
-    return
+    console.warn("Mixpanel token not configured");
+    return;
   }
 
   try {
@@ -260,21 +260,21 @@ async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
         time: Math.floor(event.timestamp / 1000),
         ...event,
       },
-    }
+    };
 
-    const response = await fetch('https://api.mixpanel.com/track', {
-      method: 'POST',
+    const response = await fetch("https://api.mixpanel.com/track", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify([mixpanelEvent]),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Mixpanel API error: ${response.status}`)
+      throw new Error(`Mixpanel API error: ${response.status}`);
     }
   } catch (error: unknown) {
-    console.error('Failed to send to Mixpanel:', error)
+    console.error("Failed to send to Mixpanel:", error);
   }
 }
 
@@ -282,27 +282,27 @@ async function sendToCustomAnalytics(
   event: EnrichedAnalyticsEvent,
 ): Promise<void> {
   // Send to your custom analytics service
-  const { CUSTOM_ANALYTICS_ENDPOINT, CUSTOM_ANALYTICS_TOKEN } = import.meta.env
+  const { CUSTOM_ANALYTICS_ENDPOINT, CUSTOM_ANALYTICS_TOKEN } = import.meta.env;
 
   if (!CUSTOM_ANALYTICS_ENDPOINT || !CUSTOM_ANALYTICS_TOKEN) {
-    return
+    return;
   }
 
   try {
     const response = await fetch(CUSTOM_ANALYTICS_ENDPOINT, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
       },
       body: JSON.stringify(event),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Custom analytics API error: ${response.status}`)
+      throw new Error(`Custom analytics API error: ${response.status}`);
     }
   } catch (error: unknown) {
-    console.error('Failed to send to custom analytics:', error)
+    console.error("Failed to send to custom analytics:", error);
   }
 }
 
@@ -322,53 +322,53 @@ function generateAnalyticsSummary(
     },
     avg_time_to_cta: 0,
     scroll_depth_avg: 0,
-  }
+  };
 
   // Count A/B variants
   events.forEach((event) => {
     summary.ab_variants[event.ab_variant] =
-      (summary.ab_variants[event.ab_variant] || 0) + 1
+      (summary.ab_variants[event.ab_variant] || 0) + 1;
     summary.event_types[event.event] =
-      (summary.event_types[event.event] || 0) + 1
-  })
+      (summary.event_types[event.event] || 0) + 1;
+  });
 
   // Calculate conversion funnel
   summary.conversion_funnel.page_views = events.filter(
-    (e) => e.event === 'demo_page_view',
-  ).length
+    (e) => e.event === "demo_page_view",
+  ).length;
   summary.conversion_funnel.demo_interactions = events.filter(
-    (e) => e.event === 'demo_interaction',
-  ).length
+    (e) => e.event === "demo_interaction",
+  ).length;
   summary.conversion_funnel.cta_clicks = events.filter(
-    (e) => e.event === 'demo_cta_click',
-  ).length
+    (e) => e.event === "demo_cta_click",
+  ).length;
 
   if (summary.conversion_funnel.page_views > 0) {
     summary.conversion_funnel.conversion_rate =
       (summary.conversion_funnel.cta_clicks /
         summary.conversion_funnel.page_views) *
-      100
+      100;
   }
 
   // Calculate average time to CTA
   const ctaEvents = events.filter(
-    (e) => e.event === 'demo_cta_click' && e.time_to_click,
-  )
+    (e) => e.event === "demo_cta_click" && e.time_to_click,
+  );
   if (ctaEvents.length > 0) {
     summary.avg_time_to_cta =
       ctaEvents.reduce((sum, e) => sum + (e.time_to_click || 0), 0) /
-      ctaEvents.length
+      ctaEvents.length;
   }
 
   // Calculate average scroll depth
   const scrollEvents = events.filter(
-    (e) => e.event === 'demo_scroll_depth' && e.depth_percent,
-  )
+    (e) => e.event === "demo_scroll_depth" && e.depth_percent,
+  );
   if (scrollEvents.length > 0) {
     summary.scroll_depth_avg =
       scrollEvents.reduce((sum, e) => sum + (e.depth_percent || 0), 0) /
-      scrollEvents.length
+      scrollEvents.length;
   }
 
-  return summary
+  return summary;
 }

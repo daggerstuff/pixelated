@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useId } from 'react'
+import React, { useState, useEffect, useCallback, useId } from "react";
 import type {
   TreatmentPlan,
   NewTreatmentPlanData,
@@ -7,25 +7,25 @@ import type {
   NewTreatmentGoalData,
   TreatmentObjective,
   NewTreatmentObjectiveData,
-} from '@/types/treatment'
-import { Button } from '@/components/ui/button'
+} from "@/types/treatment";
+import { Button } from "@/components/ui/button";
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { DialogModal } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
+} from "@/components/ui/table";
+import { DialogModal } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,117 +36,123 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { toast } from 'sonner'
-import { PlusCircle, Trash2 } from 'lucide-react'
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import { PlusCircle, Trash2 } from "lucide-react";
 
 const formatDate = (dateString?: string | Date) => {
   if (!dateString) {
-    return 'N/A'
+    return "N/A";
   }
   try {
     if (
-      typeof dateString === 'string' &&
+      typeof dateString === "string" &&
       /^\d{4}-\d{2}-\d{2}$/.test(dateString)
     ) {
-      return new Date(dateString + 'T00:00:00').toLocaleDateString()
+      return new Date(dateString + "T00:00:00").toLocaleDateString();
     }
-    return new Date(dateString).toLocaleDateString()
+    return new Date(dateString).toLocaleDateString();
   } catch {
-    return String(dateString)
+    return String(dateString);
   }
-}
+};
 
 interface ClientSideNewObjective
-  extends Required<Pick<NewTreatmentObjectiveData, 'description' | 'status'>>,
-    Omit<NewTreatmentObjectiveData, 'description' | 'status'> {
-  tempId: string
+  extends
+    Required<Pick<NewTreatmentObjectiveData, "description" | "status">>,
+    Omit<NewTreatmentObjectiveData, "description" | "status"> {
+  tempId: string;
 }
 
 interface ClientSideNewGoal
-  extends Required<Pick<NewTreatmentGoalData, 'description' | 'status'>>,
-    Omit<NewTreatmentGoalData, 'description' | 'status'> {
-  tempId: string
-  objectives: ClientSideNewObjective[]
+  extends
+    Required<Pick<NewTreatmentGoalData, "description" | "status">>,
+    Omit<NewTreatmentGoalData, "description" | "status"> {
+  tempId: string;
+  objectives: ClientSideNewObjective[];
 }
 
-interface FormNewPlanData
-  extends Omit<NewTreatmentPlanData, 'goals' | 'startDate'> {
-  userId: string
-  startDate?: string
-  goals: ClientSideNewGoal[]
+interface FormNewPlanData extends Omit<
+  NewTreatmentPlanData,
+  "goals" | "startDate"
+> {
+  userId: string;
+  startDate?: string;
+  goals: ClientSideNewGoal[];
 }
 
 type EditableObjective =
   | (TreatmentObjective & { tempId?: undefined })
-  | ClientSideNewObjective
+  | ClientSideNewObjective;
 
 type EditableGoal =
-  | (Omit<TreatmentGoal, 'objectives' | 'id'> & {
-      id?: string
-      objectives: EditableObjective[]
-      tempId?: string
+  | (Omit<TreatmentGoal, "objectives" | "id"> & {
+      id?: string;
+      objectives: EditableObjective[];
+      tempId?: string;
     })
-  | ClientSideNewGoal
+  | ClientSideNewGoal;
 
-interface FormUpdatePlanData
-  extends Omit<UpdateTreatmentPlanData, 'goals' | 'startDate'> {
-  id: string
-  startDate?: string
-  goals?: EditableGoal[]
+interface FormUpdatePlanData extends Omit<
+  UpdateTreatmentPlanData,
+  "goals" | "startDate"
+> {
+  id: string;
+  startDate?: string;
+  goals?: EditableGoal[];
 }
 
 const initialNewPlanData: FormNewPlanData = {
-  title: '',
-  clientId: '',
-  userId: '',
-  status: 'Draft',
-  startDate: new Date().toISOString().split('T')[0],
+  title: "",
+  clientId: "",
+  userId: "",
+  status: "Draft",
+  startDate: new Date().toISOString().split("T")[0],
   goals: [],
-}
+};
 
 const TreatmentPlanManager: FC = () => {
-  const [plans, setPlans] = useState<TreatmentPlan[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [plans, setPlans] = useState<TreatmentPlan[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
     JSON.parse(JSON.stringify(initialNewPlanData) as unknown),
-  )
+  );
 
-  const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPlanData, setEditingPlanData] =
-    useState<FormUpdatePlanData | null>(null)
-  const formId = useId()
+    useState<FormUpdatePlanData | null>(null);
+  const formId = useId();
 
   const fetchPlans = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
     try {
-      const response = await fetch('/api/treatment-plans')
+      const response = await fetch("/api/treatment-plans");
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to fetch treatment plans')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch treatment plans");
       }
-      const data: TreatmentPlan[] = await response.json()
-      setPlans(data)
+      const data: TreatmentPlan[] = await response.json();
+      setPlans(data);
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'An unknown error occurred'
-      setError(errorMessage)
-      toast.error(`Failed to load plans: ${errorMessage}`)
+          : "An unknown error occurred";
+      setError(errorMessage);
+      toast.error(`Failed to load plans: ${errorMessage}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    fetchPlans()
-  }, [fetchPlans])
+    fetchPlans();
+  }, [fetchPlans]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -157,50 +163,50 @@ const TreatmentPlanManager: FC = () => {
     const target = e.target as
       | HTMLInputElement
       | HTMLTextAreaElement
-      | HTMLSelectElement
-    const { name, value } = target
+      | HTMLSelectElement;
+    const { name, value } = target;
     if (isEdit && editingPlanData) {
       setEditingPlanData((prev: FormUpdatePlanData | null) =>
         prev ? { ...prev, [name]: value } : null,
-      )
+      );
     } else {
-      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }))
+      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }));
     }
-  }
+  };
 
   const handleSelectChange = (name: string, value: string, isEdit = false) => {
     if (isEdit && editingPlanData) {
       setEditingPlanData((prev: FormUpdatePlanData | null) =>
         prev ? { ...prev, [name]: value } : null,
-      )
+      );
     } else {
-      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }))
+      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }));
     }
-  }
+  };
 
   // --- Goal Management Functions ---
   const addGoal = (isEdit = false) => {
     const newGoal: ClientSideNewGoal = {
-      description: '',
-      status: 'Not Started',
+      description: "",
+      status: "Not Started",
       objectives: [],
       tempId: `goal-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-    }
+    };
     if (isEdit && editingPlanData) {
       setEditingPlanData((prev: FormUpdatePlanData | null) => {
         if (!prev) {
-          return null
+          return null;
         }
-        const currentGoals = prev.goals || []
-        return { ...prev, goals: [...currentGoals, newGoal] }
-      })
+        const currentGoals = prev.goals || [];
+        return { ...prev, goals: [...currentGoals, newGoal] };
+      });
     } else {
       setNewPlanData((prev: FormNewPlanData) => ({
         ...prev,
         goals: [...prev.goals, newGoal],
-      }))
+      }));
     }
-  }
+  };
 
   const handleGoalChange = (
     index: number,
@@ -209,83 +215,83 @@ const TreatmentPlanManager: FC = () => {
     isEdit = false,
   ) => {
     if (isEdit && editingPlanData) {
-      const updatedGoals = [...(editingPlanData.goals || [])]
+      const updatedGoals = [...(editingPlanData.goals || [])];
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as EditableGoal)[field as keyof EditableGoal] =
-          value as never // Type-safe cast for EditableGoal union
+        (updatedGoals[index] as EditableGoal)[field as keyof EditableGoal] =
+          value as never; // Type-safe cast for EditableGoal union
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
-        )
+        );
       }
     } else {
-      const updatedGoals = [...newPlanData.goals]
+      const updatedGoals = [...newPlanData.goals];
       if (updatedGoals[index]) {
-        ;(updatedGoals[index] as ClientSideNewGoal)[
+        (updatedGoals[index] as ClientSideNewGoal)[
           field as keyof ClientSideNewGoal
-        ] = value as never // ClientSideNewGoal is more straightforward
+        ] = value as never; // ClientSideNewGoal is more straightforward
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedGoals,
-        }))
+        }));
       }
     }
-  }
+  };
 
   const removeGoal = (index: number, isEdit = false) => {
     if (isEdit && editingPlanData) {
-      const updatedGoals = [...(editingPlanData.goals || [])]
-      updatedGoals.splice(index, 1)
+      const updatedGoals = [...(editingPlanData.goals || [])];
+      updatedGoals.splice(index, 1);
       setEditingPlanData((prev: FormUpdatePlanData | null) =>
         prev ? { ...prev, goals: updatedGoals } : null,
-      )
+      );
     } else {
-      const updatedGoals = [...newPlanData.goals]
-      updatedGoals.splice(index, 1)
+      const updatedGoals = [...newPlanData.goals];
+      updatedGoals.splice(index, 1);
       setNewPlanData((prev: FormNewPlanData) => ({
         ...prev,
         goals: updatedGoals,
-      }))
+      }));
     }
-  }
+  };
   // --- End Goal Management ---
 
   // --- Objective Management Functions ---
   const addObjective = (goalIndex: number, isEdit = false) => {
     const newObjective: ClientSideNewObjective = {
-      description: '',
-      status: 'Not Started',
+      description: "",
+      status: "Not Started",
       tempId: `obj-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-    }
+    };
 
     if (isEdit && editingPlanData) {
       const updatedGoals = JSON.parse(
         JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
+      ) as EditableGoal[];
       if (updatedGoals[goalIndex]) {
         updatedGoals[goalIndex].objectives = [
           ...(updatedGoals[goalIndex].objectives || []),
           newObjective,
-        ]
+        ];
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
-        )
+        );
       }
     } else {
       const updatedGoals = JSON.parse(
         JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
+      ) as ClientSideNewGoal[];
       if (updatedGoals[goalIndex]) {
         updatedGoals[goalIndex].objectives = [
           ...updatedGoals[goalIndex].objectives,
           newObjective,
-        ]
+        ];
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedGoals,
-        }))
+        }));
       }
     }
-  }
+  };
 
   const handleObjectiveChange = (
     goalIndex: number,
@@ -297,38 +303,38 @@ const TreatmentPlanManager: FC = () => {
     if (isEdit && editingPlanData) {
       const updatedGoals = JSON.parse(
         JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
+      ) as EditableGoal[];
       if (
         updatedGoals[goalIndex] &&
         updatedGoals[goalIndex].objectives[objIndex]
       ) {
-        ;(updatedGoals[goalIndex].objectives[objIndex] as EditableObjective)[
+        (updatedGoals[goalIndex].objectives[objIndex] as EditableObjective)[
           field as keyof EditableObjective
-        ] = value as never
+        ] = value as never;
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
-        )
+        );
       }
     } else {
       const updatedNewGoals = JSON.parse(
         JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
+      ) as ClientSideNewGoal[];
       if (
         updatedNewGoals[goalIndex] &&
         updatedNewGoals[goalIndex].objectives[objIndex]
       ) {
-        ;(
+        (
           updatedNewGoals[goalIndex].objectives[
             objIndex
           ] as ClientSideNewObjective
-        )[field as keyof ClientSideNewObjective] = value as never
+        )[field as keyof ClientSideNewObjective] = value as never;
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedNewGoals,
-        }))
+        }));
       }
     }
-  }
+  };
 
   const removeObjective = (
     goalIndex: number,
@@ -338,26 +344,26 @@ const TreatmentPlanManager: FC = () => {
     if (isEdit && editingPlanData) {
       const updatedGoals = JSON.parse(
         JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
+      ) as EditableGoal[];
       if (updatedGoals[goalIndex] && updatedGoals[goalIndex].objectives) {
-        updatedGoals[goalIndex].objectives.splice(objIndex, 1)
+        updatedGoals[goalIndex].objectives.splice(objIndex, 1);
         setEditingPlanData((prev: FormUpdatePlanData | null) =>
           prev ? { ...prev, goals: updatedGoals } : null,
-        )
+        );
       }
     } else {
       const updatedNewGoals = JSON.parse(
         JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
+      ) as ClientSideNewGoal[];
       if (updatedNewGoals[goalIndex] && updatedNewGoals[goalIndex].objectives) {
-        updatedNewGoals[goalIndex].objectives.splice(objIndex, 1)
+        updatedNewGoals[goalIndex].objectives.splice(objIndex, 1);
         setNewPlanData((prev: FormNewPlanData) => ({
           ...prev,
           goals: updatedNewGoals,
-        }))
+        }));
       }
     }
-  }
+  };
   // --- End Objective Management ---
 
   const stripTempIds = (goals: (ClientSideNewGoal | EditableGoal)[]) => {
@@ -366,7 +372,7 @@ const TreatmentPlanManager: FC = () => {
       const { objectives, ...goalDetails } = g as (
         | ClientSideNewGoal
         | EditableGoal
-      ) & { tempId?: string }
+      ) & { tempId?: string };
       return {
         ...goalDetails,
         objectives: (objectives || []).map(
@@ -375,124 +381,124 @@ const TreatmentPlanManager: FC = () => {
             const { ...objDetails } = obj as (
               | ClientSideNewObjective
               | EditableObjective
-            ) & { tempId?: string }
-            return objDetails
+            ) & { tempId?: string };
+            return objDetails;
           },
         ),
-      }
-    })
-  }
+      };
+    });
+  };
 
   const handleCreatePlan = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     const payload = {
       ...newPlanData,
       goals: stripTempIds(newPlanData.goals || []), // Ensure goals is an array
-    }
+    };
     try {
-      const response = await fetch('/api/treatment-plans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/treatment-plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create treatment plan')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create treatment plan");
       }
-      await fetchPlans()
-      setIsCreateModalOpen(false)
-      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown))
-      toast.success('Treatment plan created successfully!')
+      await fetchPlans();
+      setIsCreateModalOpen(false);
+      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown));
+      toast.success("Treatment plan created successfully!");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'An unknown error occurred'
-      toast.error(`Failed to create plan: ${errorMessage}`)
+          : "An unknown error occurred";
+      toast.error(`Failed to create plan: ${errorMessage}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeletePlan = async () => {
     if (!planToDelete) {
-      return
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/treatment-plans/${planToDelete.id}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to delete treatment plan')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to delete treatment plan");
       }
-      await fetchPlans() // Refresh list
-      setPlanToDelete(null) // Close dialog
-      toast.success('Treatment plan deleted successfully!')
+      await fetchPlans(); // Refresh list
+      setPlanToDelete(null); // Close dialog
+      toast.success("Treatment plan deleted successfully!");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'An unknown error occurred'
-      toast.error(`Failed to delete plan: ${errorMessage}`)
+          : "An unknown error occurred";
+      toast.error(`Failed to delete plan: ${errorMessage}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleUpdatePlan = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!editingPlanData || !editingPlanData.id) {
-      return
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
 
     const payload = {
       ...editingPlanData,
       goals: stripTempIds(editingPlanData.goals || []), // Ensure goals is an array
-    }
+    };
 
     try {
-      const { id, ...updateData } = payload
-      if (updateData.startDate && typeof updateData.startDate === 'string') {
-        updateData.startDate = new Date(updateData.startDate + 'T00:00:00')
+      const { id, ...updateData } = payload;
+      if (updateData.startDate && typeof updateData.startDate === "string") {
+        updateData.startDate = new Date(updateData.startDate + "T00:00:00")
           .toISOString()
-          .split('T')[0]
+          .split("T")[0];
       }
 
       const response = await fetch(`/api/treatment-plans/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updateData),
-      })
+      });
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update treatment plan')
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to update treatment plan");
       }
-      await fetchPlans()
-      setIsEditModalOpen(false)
-      setEditingPlanData(null)
-      toast.success('Treatment plan updated successfully!')
+      await fetchPlans();
+      setIsEditModalOpen(false);
+      setEditingPlanData(null);
+      toast.success("Treatment plan updated successfully!");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'An unknown error occurred'
-      toast.error(`Failed to update plan: ${errorMessage}`)
+          : "An unknown error occurred";
+      toast.error(`Failed to update plan: ${errorMessage}`);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const openEditModal = (plan: TreatmentPlan) => {
     setEditingPlanData({
       ...plan,
       id: plan.id, // ensure id is explicitly passed
       startDate: plan.startDate
-        ? new Date(plan.startDate).toISOString().split('T')[0]
-        : '',
+        ? new Date(plan.startDate).toISOString().split("T")[0]
+        : "",
       goals: plan.goals
         ? JSON.parse(
             JSON.stringify(
@@ -500,21 +506,21 @@ const TreatmentPlanManager: FC = () => {
             ),
           )
         : [], // Deep copy goals, ensure objectives is array
-    } as FormUpdatePlanData) // Cast to ensure type compatibility
-    setIsEditModalOpen(true)
-  }
+    } as FormUpdatePlanData); // Cast to ensure type compatibility
+    setIsEditModalOpen(true);
+  };
 
   const openCreateModal = () => {
-    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown)) // Reset with deep copy
-    setIsCreateModalOpen(true)
-  }
+    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown)); // Reset with deep copy
+    setIsCreateModalOpen(true);
+  };
 
   if (isLoading && plans.length === 0) {
-    return <p>Loading treatment plans...</p>
+    return <p>Loading treatment plans...</p>;
   }
 
   if (error) {
-    return <p className="text-red-500">Error: {error}</p>
+    return <p className="text-red-500">Error: {error}</p>;
   }
 
   const renderObjectivesSection = (
@@ -557,7 +563,7 @@ const TreatmentPlanManager: FC = () => {
                 handleObjectiveChange(
                   goalIndex,
                   objIndex,
-                  'description',
+                  "description",
                   e.target.value,
                   isEdit,
                 )
@@ -571,7 +577,7 @@ const TreatmentPlanManager: FC = () => {
                 handleObjectiveChange(
                   goalIndex,
                   objIndex,
-                  'status',
+                  "status",
                   value,
                   isEdit,
                 )
@@ -601,7 +607,7 @@ const TreatmentPlanManager: FC = () => {
         </div>
       ))}
     </div>
-  )
+  );
 
   const renderGoalsSection = (
     goals: (ClientSideNewGoal | EditableGoal)[],
@@ -633,7 +639,7 @@ const TreatmentPlanManager: FC = () => {
               name={`goal-description-${index}`}
               value={goal.description}
               onChange={(e) =>
-                handleGoalChange(index, 'description', e.target.value, isEdit)
+                handleGoalChange(index, "description", e.target.value, isEdit)
               }
               className="md:col-span-4 min-h-[60px]"
               required
@@ -641,7 +647,7 @@ const TreatmentPlanManager: FC = () => {
             <Select
               value={goal.status}
               onValueChange={(value) =>
-                handleGoalChange(index, 'status', value, isEdit)
+                handleGoalChange(index, "status", value, isEdit)
               }
             >
               <SelectTrigger className="md:col-span-1">
@@ -669,7 +675,7 @@ const TreatmentPlanManager: FC = () => {
         </div>
       ))}
     </div>
-  )
+  );
 
   return (
     <div className="p-4 md:p-6">
@@ -752,7 +758,7 @@ const TreatmentPlanManager: FC = () => {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : 'Save Plan'}
+              {isLoading ? "Saving..." : "Save Plan"}
             </Button>
           </>
         }
@@ -788,7 +794,7 @@ const TreatmentPlanManager: FC = () => {
               <Input
                 id={`clientId-${formId}`}
                 name="clientId"
-                value={newPlanData.clientId || ''}
+                value={newPlanData.clientId || ""}
                 onChange={(e) => handleInputChange(e)}
                 className="col-span-3"
                 placeholder="e.g., user_xyz123 or numerical ID"
@@ -804,7 +810,7 @@ const TreatmentPlanManager: FC = () => {
               </label>
               <Select
                 value={newPlanData.status}
-                onValueChange={(value) => handleSelectChange('status', value)}
+                onValueChange={(value) => handleSelectChange("status", value)}
               >
                 <SelectTrigger className="col-span-3">
                   <SelectValue />
@@ -865,7 +871,7 @@ const TreatmentPlanManager: FC = () => {
               disabled={isLoading}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isLoading ? 'Deleting...' : 'Yes, delete plan'}
+              {isLoading ? "Deleting..." : "Yes, delete plan"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -875,8 +881,8 @@ const TreatmentPlanManager: FC = () => {
       <DialogModal
         isOpen={isEditModalOpen}
         onClose={() => {
-          setIsEditModalOpen(false)
-          setEditingPlanData(null)
+          setIsEditModalOpen(false);
+          setEditingPlanData(null);
         }}
         title="Edit Treatment Plan"
         showCloseButton={true}
@@ -887,8 +893,8 @@ const TreatmentPlanManager: FC = () => {
               type="button"
               variant="outline"
               onClick={() => {
-                setIsEditModalOpen(false)
-                setEditingPlanData(null)
+                setIsEditModalOpen(false);
+                setEditingPlanData(null);
               }}
             >
               Cancel
@@ -898,7 +904,7 @@ const TreatmentPlanManager: FC = () => {
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </>
         }
@@ -919,7 +925,7 @@ const TreatmentPlanManager: FC = () => {
                 <Input
                   id={`edit-title-${formId}`}
                   name="title"
-                  value={editingPlanData.title || ''}
+                  value={editingPlanData.title || ""}
                   onChange={(e) => handleInputChange(e, true)}
                   className="col-span-3"
                   required
@@ -935,7 +941,7 @@ const TreatmentPlanManager: FC = () => {
                 <Input
                   id={`edit-clientId-${formId}`}
                   name="clientId"
-                  value={editingPlanData.clientId || ''}
+                  value={editingPlanData.clientId || ""}
                   onChange={(e) => handleInputChange(e, true)}
                   className="col-span-3"
                   placeholder="e.g., user_xyz123 or numerical ID"
@@ -952,7 +958,7 @@ const TreatmentPlanManager: FC = () => {
                 <Select
                   value={editingPlanData.status}
                   onValueChange={(value) =>
-                    handleSelectChange('status', value, true)
+                    handleSelectChange("status", value, true)
                   }
                 >
                   <SelectTrigger className="col-span-3">
@@ -980,8 +986,8 @@ const TreatmentPlanManager: FC = () => {
                   type="date"
                   value={
                     editingPlanData.startDate
-                      ? editingPlanData.startDate.toString().split('T')[0]
-                      : ''
+                      ? editingPlanData.startDate.toString().split("T")[0]
+                      : ""
                   }
                   onChange={(e) => handleInputChange(e, true)}
                   className="col-span-3"
@@ -994,7 +1000,7 @@ const TreatmentPlanManager: FC = () => {
         )}
       </DialogModal>
     </div>
-  )
-}
+  );
+};
 
-export default TreatmentPlanManager
+export default TreatmentPlanManager;

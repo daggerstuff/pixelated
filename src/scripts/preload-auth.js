@@ -11,32 +11,32 @@
 export function preloadAuthResources() {
   // Preconnect to auth providers
   const connectDomains = [
-    'accounts.google.com',
-    'api.mongodb.com',
-    'cloud.mongodb.com',
-  ]
+    "accounts.google.com",
+    "api.mongodb.com",
+    "cloud.mongodb.com",
+  ];
 
   connectDomains.forEach((domain) => {
-    const preconnect = document.createElement('link')
-    preconnect.rel = 'preconnect'
-    preconnect.href = `https://${domain}`
-    preconnect.crossOrigin = 'anonymous'
-    document.head.appendChild(preconnect)
-  })
+    const preconnect = document.createElement("link");
+    preconnect.rel = "preconnect";
+    preconnect.href = `https://${domain}`;
+    preconnect.crossOrigin = "anonymous";
+    document.head.appendChild(preconnect);
+  });
 
   // Preload critical auth JS
-  const authScripts = ['/js/auth-helpers.js']
+  const authScripts = ["/js/auth-helpers.js"];
 
   authScripts.forEach((src) => {
-    const preloadLink = document.createElement('link')
-    preloadLink.rel = 'preload'
-    preloadLink.as = 'script'
-    preloadLink.href = src
-    document.head.appendChild(preloadLink)
-  })
+    const preloadLink = document.createElement("link");
+    preloadLink.rel = "preload";
+    preloadLink.as = "script";
+    preloadLink.href = src;
+    document.head.appendChild(preloadLink);
+  });
 
   // Font optimization for auth pages
-  const fontDisplay = document.createElement('style')
+  const fontDisplay = document.createElement("style");
   fontDisplay.textContent = `
     @font-face {
       font-family: 'Inter';
@@ -45,11 +45,11 @@ export function preloadAuthResources() {
       font-display: swap;
       src: url('/fonts/inter-regular.woff2') format('woff2');
     }
-  `
-  document.head.appendChild(fontDisplay)
+  `;
+  document.head.appendChild(fontDisplay);
 
   // Lazy load non-critical parts
-  setupLazyLoading()
+  setupLazyLoading();
 }
 
 /**
@@ -57,53 +57,53 @@ export function preloadAuthResources() {
  */
 function setupLazyLoading() {
   // Lazy load remaining elements as they come into view
-  if ('IntersectionObserver' in window) {
-    const lazyElements = document.querySelectorAll('.auth-lazy-load')
+  if ("IntersectionObserver" in window) {
+    const lazyElements = document.querySelectorAll(".auth-lazy-load");
 
     const lazyObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const element = entry.target
+            const element = entry.target;
 
             // Handle images
-            if (element.tagName === 'IMG') {
-              element.src = element.dataset.src
+            if (element.tagName === "IMG") {
+              element.src = element.dataset.src;
               if (element.dataset.srcset) {
-                element.srcset = element.dataset.srcset
+                element.srcset = element.dataset.srcset;
               }
             }
 
             // Handle background images
             if (element.dataset.background) {
-              element.style.backgroundImage = `url('${element.dataset.background}')`
+              element.style.backgroundImage = `url('${element.dataset.background}')`;
             }
 
-            element.classList.add('loaded')
-            lazyObserver.unobserve(element)
+            element.classList.add("loaded");
+            lazyObserver.unobserve(element);
           }
-        })
+        });
       },
       {
-        rootMargin: '100px',
+        rootMargin: "100px",
       },
-    )
+    );
 
     lazyElements.forEach((element) => {
-      lazyObserver.observe(element)
-    })
+      lazyObserver.observe(element);
+    });
   } else {
     // Fallback for browsers without intersection observer
-    const lazyElements = document.querySelectorAll('.auth-lazy-load')
+    const lazyElements = document.querySelectorAll(".auth-lazy-load");
     lazyElements.forEach((element) => {
-      if (element.tagName === 'IMG') {
-        element.src = element.dataset.src
+      if (element.tagName === "IMG") {
+        element.src = element.dataset.src;
       }
       if (element.dataset.background) {
-        element.style.backgroundImage = `url('${element.dataset.background}')`
+        element.style.backgroundImage = `url('${element.dataset.background}')`;
       }
-      element.classList.add('loaded')
-    })
+      element.classList.add("loaded");
+    });
   }
 }
 
@@ -138,11 +138,11 @@ export function injectCriticalAuthCSS() {
     .auth-lazy-load.loaded {
       opacity: 1;
     }
-  `
+  `;
 
-  const style = document.createElement('style')
-  style.textContent = criticalCSS
-  document.head.appendChild(style)
+  const style = document.createElement("style");
+  style.textContent = criticalCSS;
+  document.head.appendChild(style);
 }
 
 // Initialize when used on a page
@@ -150,69 +150,71 @@ export function initAuthPageOptimizations() {
   // Only initialize on auth pages
   const isAuthPage = window.location.pathname.match(
     /\/(login|register|signin|signup|reset-password)/,
-  )
+  );
   if (!isAuthPage) {
-    return
+    return;
   }
 
   // Apply optimizations
-  preloadAuthResources()
-  injectCriticalAuthCSS()
+  preloadAuthResources();
+  injectCriticalAuthCSS();
 
   // Report performance metrics
-  if ('performance' in window) {
-    window.addEventListener('load', () => {
+  if ("performance" in window) {
+    window.addEventListener("load", () => {
       // Capture key metrics
       setTimeout(() => {
-        const perfEntries = performance.getEntriesByType('navigation')
+        const perfEntries = performance.getEntriesByType("navigation");
         if (perfEntries.length > 0) {
           const metrics = {
             fcp:
-              performance.getEntriesByName('first-contentful-paint')[0]
+              performance.getEntriesByName("first-contentful-paint")[0]
                 ?.startTime || 0,
             lcp: getLargestContentfulPaint(),
             ttfb: perfEntries[0].responseStart - perfEntries[0].requestStart,
             fid: getFirstInputDelay(),
-          }
+          };
 
-          console.info('Auth page performance metrics:', metrics)
+          console.info("Auth page performance metrics:", metrics);
 
           // Here you could send these metrics to an analytics endpoint
         }
-      }, 1000)
-    })
+      }, 1000);
+    });
   }
 }
 
 // Helper to get LCP metric
 function getLargestContentfulPaint() {
-  const lcpEntries = performance.getEntriesByType('largest-contentful-paint')
-  return lcpEntries.length > 0 ? lcpEntries[lcpEntries.length - 1].startTime : 0
+  const lcpEntries = performance.getEntriesByType("largest-contentful-paint");
+  return lcpEntries.length > 0
+    ? lcpEntries[lcpEntries.length - 1].startTime
+    : 0;
 }
 
 // Helper to get FID metric
 function getFirstInputDelay() {
-  const fidEntries = performance.getEntriesByType('first-input')
+  const fidEntries = performance.getEntriesByType("first-input");
   return fidEntries.length > 0
     ? fidEntries[0].processingStart - fidEntries[0].startTime
-    : 0
+    : 0;
 }
 !(function () {
   try {
     var e =
-        'undefined' != typeof window
+        "undefined" != typeof window
           ? window
-          : 'undefined' != typeof global
+          : "undefined" != typeof global
             ? global
-            : 'undefined' != typeof globalThis
+            : "undefined" != typeof globalThis
               ? globalThis
-              : 'undefined' != typeof self
+              : "undefined" != typeof self
                 ? self
                 : {},
-      n = new e.Error().stack
+      n = new e.Error().stack;
     n &&
       ((e._sentryDebugIds = e._sentryDebugIds || {}),
-      (e._sentryDebugIds[n] = '2cc628ec-2a7b-516a-8129-de92553dbdb7'))
+      (e._sentryDebugIds[n] = "2cc628ec-2a7b-516a-8129-de92553dbdb7"));
   } catch (e) {}
-})()
+})();
 //# debugId=2cc628ec-2a7b-516a-8129-de92553dbdb7

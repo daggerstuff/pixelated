@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -7,33 +7,33 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 import {
   InfoIcon,
   BrainIcon,
   MessageSquareIcon,
   RefreshCwIcon,
   DownloadIcon,
-} from 'lucide-react'
-import { DisorderCategory } from '@/lib/ai/mental-arena/types'
+} from "lucide-react";
+import { DisorderCategory } from "@/lib/ai/mental-arena/types";
 
 /**
  * Generate cryptographically secure random integer within a range
@@ -42,10 +42,10 @@ import { DisorderCategory } from '@/lib/ai/mental-arena/types'
  * @returns Secure random integer
  */
 function getSecureRandomInt(min: number, max: number): number {
-  const range = max - min + 1
-  const array = new Uint32Array(1)
-  crypto.getRandomValues(array)
-  return min + ((array[0] ?? 0) % range)
+  const range = max - min + 1;
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  return min + ((array[0] ?? 0) % range);
 }
 
 /**
@@ -53,81 +53,81 @@ function getSecureRandomInt(min: number, max: number): number {
  * @returns Secure random boolean
  */
 function getSecureRandomBoolean(): boolean {
-  const array = new Uint8Array(1)
-  crypto.getRandomValues(array)
-  return (array[0] ?? 0) >= 128
+  const array = new Uint8Array(1);
+  crypto.getRandomValues(array);
+  return (array[0] ?? 0) >= 128;
 }
 
 interface SyntheticConversation {
-  patientText: string
-  therapistText: string
+  patientText: string;
+  therapistText: string;
   encodedSymptoms: Array<{
-    name: string
-    severity: number
-    duration: string
-    manifestations: string[]
-    cognitions: string[]
-  }>
-  decodedSymptoms: string[]
-  sessionSummary?: string
-  accuracyScore?: number
+    name: string;
+    severity: number;
+    duration: string;
+    manifestations: string[];
+    cognitions: string[];
+  }>;
+  decodedSymptoms: string[];
+  sessionSummary?: string;
+  accuracyScore?: number;
 }
 
 interface ScenarioSymptom {
-  name: string
-  severity: number
-  duration: string
-  indicators: string[]
-  cognitivePatterns?: string[]
+  name: string;
+  severity: number;
+  duration: string;
+  indicators: string[];
+  cognitivePatterns?: string[];
 }
 
 interface IdentifiedSymptom {
-  name: string
+  name: string;
 }
 
 interface ScenarioResult {
   scenario: {
-    clientStatement: string
-    therapistResponse: string
-    symptoms: ScenarioSymptom[]
-  }
+    clientStatement: string;
+    therapistResponse: string;
+    symptoms: ScenarioSymptom[];
+  };
   analysis: {
-    identifiedSymptoms: IdentifiedSymptom[]
-    clinicalSummary: string
-    accuracyScore: number
-  }
+    identifiedSymptoms: IdentifiedSymptom[];
+    clinicalSummary: string;
+    accuracyScore: number;
+  };
 }
 
 /**
  * Component for demonstrating synthetic therapy conversation generation
  */
 export default function SyntheticTherapyDemo() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState<SyntheticConversation[]>(
     [],
-  )
-  const [selectedConversationIndex, setSelectedConversationIndex] = useState(0)
+  );
+  const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
   const [config, setConfig] = useState({
     numSessions: 1,
     maxTurns: 3,
     disorders: [DisorderCategory.Anxiety, DisorderCategory.Depression],
     usePythonBridge: false,
-    model: 'gpt-3.5-turbo',
-  })
+    model: "gpt-3.5-turbo",
+  });
 
   // Handle generating therapy conversations
   const handleGenerateConversations = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Call our new psychology scenario generation API
-      const response = await fetch('/api/psychology/generate-scenario', {
-        method: 'POST',
+      const response = await fetch("/api/psychology/generate-scenario", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          type: 'therapy_conversation',
-          difficulty: config.disorders.length > 1 ? 'moderate' : 'basic',
+          type: "therapy_conversation",
+          difficulty: config.disorders.length > 1 ? "moderate" : "basic",
           clientProfile: {
             disorders: config.disorders,
             sessionNumber: getSecureRandomInt(1, 10),
@@ -136,10 +136,10 @@ export default function SyntheticTherapyDemo() {
             ),
             demographics: {
               age: getSecureRandomInt(20, 59),
-              gender: getSecureRandomBoolean() ? 'female' : 'male',
+              gender: getSecureRandomBoolean() ? "female" : "male",
             },
           },
-          therapeuticFramework: 'CBT', // Default to CBT
+          therapeuticFramework: "CBT", // Default to CBT
           options: {
             includeSymptoms: true,
             includeAnalysis: true,
@@ -147,13 +147,13 @@ export default function SyntheticTherapyDemo() {
             evidenceBased: true,
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`)
+        throw new Error(`API request failed: ${response.status}`);
       }
 
-      const scenarioResult = (await response.json()) as ScenarioResult
+      const scenarioResult = (await response.json()) as ScenarioResult;
 
       // Transform API response to match our conversation format
       const apiConversations: SyntheticConversation[] = [
@@ -175,11 +175,11 @@ export default function SyntheticTherapyDemo() {
           sessionSummary: scenarioResult.analysis.clinicalSummary,
           accuracyScore: scenarioResult.analysis.accuracyScore || 0.8,
         },
-      ]
+      ];
 
-      setConversations(apiConversations)
+      setConversations(apiConversations);
     } catch (error: unknown) {
-      console.error('Failed to generate conversations:', error)
+      console.error("Failed to generate conversations:", error);
 
       // Fallback to mock data on API failure
       const mockConversations: SyntheticConversation[] = [
@@ -190,55 +190,55 @@ export default function SyntheticTherapyDemo() {
             "I hear that you've been dealing with excessive worry for quite some time, and it's been affecting your sleep and causing physical symptoms like restlessness and fatigue. That sounds really challenging. When you mention catastrophizing, could you share an example of the kinds of thoughts you have when you're worried?",
           encodedSymptoms: [
             {
-              name: 'excessive worry',
+              name: "excessive worry",
               severity: 0.7,
-              duration: '6 months',
+              duration: "6 months",
               manifestations: [
-                'difficulty sleeping',
-                'restlessness',
-                'physical tension',
-                'avoidance of anxiety-provoking situations',
+                "difficulty sleeping",
+                "restlessness",
+                "physical tension",
+                "avoidance of anxiety-provoking situations",
               ],
               cognitions: [
-                'catastrophizing',
-                'overestimation of threat',
-                'intolerance of uncertainty',
+                "catastrophizing",
+                "overestimation of threat",
+                "intolerance of uncertainty",
               ],
             },
             {
-              name: 'restlessness',
+              name: "restlessness",
               severity: 0.6,
-              duration: '3 months',
-              manifestations: ['fidgeting', 'unable to sit still', 'pacing'],
-              cognitions: ['feeling on edge', 'anticipating danger'],
+              duration: "3 months",
+              manifestations: ["fidgeting", "unable to sit still", "pacing"],
+              cognitions: ["feeling on edge", "anticipating danger"],
             },
             {
-              name: 'fatigue',
+              name: "fatigue",
               severity: 0.5,
-              duration: '2 months',
+              duration: "2 months",
               manifestations: [
-                'decreased energy',
-                'difficulty completing tasks',
-                'requiring more rest than usual',
+                "decreased energy",
+                "difficulty completing tasks",
+                "requiring more rest than usual",
               ],
-              cognitions: ['feeling overwhelmed', 'diminished self-efficacy'],
+              cognitions: ["feeling overwhelmed", "diminished self-efficacy"],
             },
           ],
-          decodedSymptoms: ['anxiety', 'insomnia', 'fatigue'],
+          decodedSymptoms: ["anxiety", "insomnia", "fatigue"],
           sessionSummary:
             "Session Summary:\n\nPatient presented with excessive worry, restlessness, fatigue.\nTherapist identified: anxiety, insomnia, fatigue.\n\nSymptom detection accuracy: 67%\n\nThe conversation covered the patient's experiences with excessive worry, fatigue.\nThe therapist may have missed: restlessness.\n\nThis simulated interaction demonstrates the importance of thorough assessment and active listening in the therapeutic relationship.",
           accuracyScore: 0.67,
         },
-      ]
+      ];
 
-      setConversations(mockConversations)
-      setSelectedConversationIndex(0)
+      setConversations(mockConversations);
+      setSelectedConversationIndex(0);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const selectedConversation = conversations[selectedConversationIndex] || null
+  const selectedConversation = conversations[selectedConversationIndex] || null;
 
   return (
     <div className="flex flex-col w-full max-w-6xl mx-auto gap-6">
@@ -340,8 +340,8 @@ export default function SyntheticTherapyDemo() {
                       key={disorder}
                       variant={
                         config.disorders.includes(disorder as DisorderCategory)
-                          ? 'default'
-                          : 'outline'
+                          ? "default"
+                          : "outline"
                       }
                       className="cursor-pointer"
                       onClick={() => {
@@ -349,8 +349,8 @@ export default function SyntheticTherapyDemo() {
                           disorder as DisorderCategory,
                         )
                           ? config.disorders.filter((d) => d !== disorder)
-                          : [...config.disorders, disorder as DisorderCategory]
-                        setConfig({ ...config, disorders })
+                          : [...config.disorders, disorder as DisorderCategory];
+                        setConfig({ ...config, disorders });
                       }}
                     >
                       {disorder}
@@ -532,15 +532,15 @@ export default function SyntheticTherapyDemo() {
                                     (s) =>
                                       s.name.includes(symptom) ||
                                       symptom.includes(s.name),
-                                  )
+                                  );
                                 return (
                                   <Badge
                                     key={symptom}
-                                    variant={isCorrect ? 'default' : 'outline'}
+                                    variant={isCorrect ? "default" : "outline"}
                                   >
                                     {symptom}
                                   </Badge>
-                                )
+                                );
                               },
                             )}
                           </div>
@@ -638,9 +638,9 @@ export default function SyntheticTherapyDemo() {
                         <Badge
                           variant={
                             selectedConversation.accuracyScore &&
-                              selectedConversation.accuracyScore >= 0.7
-                              ? 'default'
-                              : 'destructive'
+                            selectedConversation.accuracyScore >= 0.7
+                              ? "default"
+                              : "destructive"
                           }
                         >
                           {(
@@ -676,5 +676,5 @@ export default function SyntheticTherapyDemo() {
         </div>
       </div>
     </div>
-  )
+  );
 }

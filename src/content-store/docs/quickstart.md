@@ -1,8 +1,8 @@
 ---
-title: 'Quick Start Guide'
-description: 'Get started with Pixelated in minutes'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Quick Start Guide"
+description: "Get started with Pixelated in minutes"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -132,11 +132,14 @@ Access session management features:
 ## Next Steps
 
     Learn about Pixelated Healths architecture and key concepts
-  <Card
-    title="API Documentation"
-    icon="code"
-    href="/api-reference/introduction"
-  >
+
+<Card
+title="API Documentation"
+icon="code"
+href="/api-reference/introduction"
+
+>
+
     Explore the API for custom integrations
     Learn how to deploy to production
 

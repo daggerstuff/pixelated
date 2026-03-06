@@ -1,7 +1,7 @@
 ---
-title: 'Management Strategies'
-description: 'Detailed strategies for managing CPTSD and addiction recovery'
-author: 'Resource Team'
+title: "Management Strategies"
+description: "Detailed strategies for managing CPTSD and addiction recovery"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

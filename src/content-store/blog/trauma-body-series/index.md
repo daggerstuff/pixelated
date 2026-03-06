@@ -1,18 +1,17 @@
 ---
-title: 'Trauma and the Body Series'
-description: 'Understanding the physical manifestations of trauma and body-based approaches to healing'
-author: 'Dr. Maya Patel'
+title: "Trauma and the Body Series"
+description: "Understanding the physical manifestations of trauma and body-based approaches to healing"
+author: "Dr. Maya Patel"
 pubDate: 2024-03-01
-tags: ['trauma', 'body', 'healing', 'series']
-series: 'Trauma and the Body'
+tags: ["trauma", "body", "healing", "series"]
+series: "Trauma and the Body"
 seriesOrder: 0
 image:
   {
-    url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'A serene scene representing healing from trauma',
+    url: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "A serene scene representing healing from trauma",
   }
 ---
-
 
 # Trauma and the Body Series
 
@@ -23,45 +22,45 @@ This series explores the intricate connection between trauma and its physical ma
 ### [The Physical Impact of Trauma](/blog/trauma-body-series/physical-impact)
 
 <ArticleCard
-  title="The Physical Impact of Trauma"
-  description="Explore how trauma affects the nervous system and manifests in physical symptoms."
-  author="Dr. Maya Patel"
-  date="2024-03-04"
-  readingTime="15 min"
-  tags={['trauma', 'neuroscience', 'body', 'healing']}
+title="The Physical Impact of Trauma"
+description="Explore how trauma affects the nervous system and manifests in physical symptoms."
+author="Dr. Maya Patel"
+date="2024-03-04"
+readingTime="15 min"
+tags={['trauma', 'neuroscience', 'body', 'healing']}
 />
 
 ### [Understanding Somatic Responses](/blog/trauma-body-series/somatic-responses)
 
 <ArticleCard
-  title="Understanding Somatic Responses"
-  description="Dive deep into how the body stores and processes traumatic experiences."
-  author="Dr. James Chen"
-  date="2024-03-06"
-  readingTime="14 min"
-  tags={['somatic', 'trauma', 'healing', 'body']}
+title="Understanding Somatic Responses"
+description="Dive deep into how the body stores and processes traumatic experiences."
+author="Dr. James Chen"
+date="2024-03-06"
+readingTime="14 min"
+tags={['somatic', 'trauma', 'healing', 'body']}
 />
 
 ### [Body-Based Healing Approaches](/blog/trauma-body-series/healing-approaches)
 
 <ArticleCard
-  title="Body-Based Healing Approaches"
-  description="Explore various somatic approaches to trauma healing and recovery."
-  author="Dr. Sarah Martinez"
-  date="2024-03-08"
-  readingTime="16 min"
-  tags={['healing', 'somatic', 'therapy', 'trauma']}
+title="Body-Based Healing Approaches"
+description="Explore various somatic approaches to trauma healing and recovery."
+author="Dr. Sarah Martinez"
+date="2024-03-08"
+readingTime="16 min"
+tags={['healing', 'somatic', 'therapy', 'trauma']}
 />
 
 ### [Movement and Trauma Recovery](/blog/trauma-body-series/movement-recovery)
 
 <ArticleCard
-  title="Movement and Trauma Recovery"
-  description="Learn how movement and physical practices support trauma recovery."
-  author="Dr. Michael Thompson"
-  date="2024-03-10"
-  readingTime="13 min"
-  tags={['movement', 'recovery', 'trauma', 'healing']}
+title="Movement and Trauma Recovery"
+description="Learn how movement and physical practices support trauma recovery."
+author="Dr. Michael Thompson"
+date="2024-03-10"
+readingTime="13 min"
+tags={['movement', 'recovery', 'trauma', 'healing']}
 />
 
 ## Series Overview
@@ -99,13 +98,12 @@ While each article provides valuable standalone insights, we recommend this read
 
 Subscribe to receive notifications about new articles in this series:
 
-
 ## Share This Series
 
 Help others discover these insights:
 
 <SocialShare
-  platforms={['twitter', 'linkedin', 'facebook', 'email']}
-  title="Trauma and the Body Series"
-  url="/blog/trauma-body-series"
+platforms={['twitter', 'linkedin', 'facebook', 'email']}
+title="Trauma and the Body Series"
+url="/blog/trauma-body-series"
 />

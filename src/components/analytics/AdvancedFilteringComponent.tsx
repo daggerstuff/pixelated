@@ -3,93 +3,93 @@
  * this is a project-level configuration or dependency issue. Ensure your TypeScript version
  * and @types/react are up to date and compatible with your React version.
  */
-import * as React from 'react'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Slider } from '@/components/ui/slider'
-import { Switch } from '@/components/ui/switch'
+import * as React from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import Popover, {
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { IconFilter, IconX } from '@/components/ui/icons'
-import { format } from 'date-fns'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { IconFilter, IconX } from "@/components/ui/icons";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export interface AdvancedFilterOptions {
   // Time filters
   timeRange?: {
-    startDate?: Date
-    endDate?: Date
-    presetRange?: 'day' | 'week' | 'month' | 'quarter' | 'year' | 'custom'
-  }
+    startDate?: Date;
+    endDate?: Date;
+    presetRange?: "day" | "week" | "month" | "quarter" | "year" | "custom";
+  };
 
   // Emotion filters
   emotions?: {
-    types?: string[]
-    minIntensity?: number
-    maxIntensity?: number
+    types?: string[];
+    minIntensity?: number;
+    maxIntensity?: number;
     dimensionalRanges?: {
-      valence?: [number, number]
-      arousal?: [number, number]
-      dominance?: [number, number]
-    }
-  }
+      valence?: [number, number];
+      arousal?: [number, number];
+      dominance?: [number, number];
+    };
+  };
 
   // Pattern filters
   patterns?: {
-    types?: string[]
-    minStrength?: number
-    minConfidence?: number
-    categories?: string[]
-  }
+    types?: string[];
+    minStrength?: number;
+    minConfidence?: number;
+    categories?: string[];
+  };
 
   // Visualization filters
   visualization?: {
-    groupBy?: 'session' | 'day' | 'week' | 'month'
-    smoothing?: number
-    showRawData?: boolean
-    showTrendlines?: boolean
-    showConfidenceIntervals?: boolean
-    showAnnotations?: boolean
-  }
+    groupBy?: "session" | "day" | "week" | "month";
+    smoothing?: number;
+    showRawData?: boolean;
+    showTrendlines?: boolean;
+    showConfidenceIntervals?: boolean;
+    showAnnotations?: boolean;
+  };
 
   // Additional metadata filters
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 
   // Custom logic filter
-  customLogic?: string
+  customLogic?: string;
 
   // Keyword filter
-  keywords?: string
+  keywords?: string;
 
   // Sentiment score filter
   sentimentScore?: {
-    min?: number
-    max?: number
-  }
+    min?: number;
+    max?: number;
+  };
 }
 
 interface AdvancedFilteringComponentProps {
-  options: AdvancedFilterOptions
-  onChange: (options: AdvancedFilterOptions) => void
-  onApply: () => void
-  onReset?: () => void
-  availableEmotionTypes?: string[]
-  availablePatternTypes?: string[]
-  availablePatternCategories?: string[]
-  className?: string
-  compact?: boolean
+  options: AdvancedFilterOptions;
+  onChange: (options: AdvancedFilterOptions) => void;
+  onApply: () => void;
+  onReset?: () => void;
+  availableEmotionTypes?: string[];
+  availablePatternTypes?: string[];
+  availablePatternCategories?: string[];
+  className?: string;
+  compact?: boolean;
 }
 
 /**
@@ -110,8 +110,8 @@ export function AdvancedFilteringComponent({
   compact = false,
 }: AdvancedFilteringComponentProps) {
   const [activeTab, setActiveTab] = useState<
-    'time' | 'emotions' | 'patterns' | 'visualization'
-  >('time')
+    "time" | "emotions" | "patterns" | "visualization"
+  >("time");
 
   // Handle changes to individual filter options
   const handleChange = <K extends keyof AdvancedFilterOptions>(
@@ -125,8 +125,8 @@ export function AdvancedFilteringComponent({
         ...(options[category] as Record<string, unknown>),
         [key]: value,
       },
-    })
-  }
+    });
+  };
 
   // Handle nested changes (for dimensional ranges, etc.)
   const handleNestedChange = <K extends keyof AdvancedFilterOptions>(
@@ -146,8 +146,8 @@ export function AdvancedFilteringComponent({
           [key]: value,
         },
       },
-    })
-  }
+    });
+  };
 
   // Handle array-based filters (like emotion types)
   const handleArrayToggle = <K extends keyof AdvancedFilterOptions>(
@@ -156,54 +156,54 @@ export function AdvancedFilteringComponent({
     value: string,
   ) => {
     const currentArray =
-      ((options[category] as Record<string, unknown>)?.[key] as string[]) || []
+      ((options[category] as Record<string, unknown>)?.[key] as string[]) || [];
     const newArray = currentArray.includes(value)
       ? currentArray.filter((item) => item !== value)
-      : [...currentArray, value]
+      : [...currentArray, value];
 
-    handleChange(category, key, newArray)
-  }
+    handleChange(category, key, newArray);
+  };
 
   // Reset all filters
   const resetFilters = () => {
-    onChange({})
-    onReset?.()
-  }
+    onChange({});
+    onReset?.();
+  };
 
   // Apply filters
   const applyFilters = () => {
-    onApply()
-  }
+    onApply();
+  };
 
   // Format the range values for display
   const formatRange = (range: [number, number] | undefined, precision = 1) => {
     if (!range) {
-      return 'Any'
+      return "Any";
     }
-    return `${range[0].toFixed(precision)} - ${range[1].toFixed(precision)}`
-  }
+    return `${range[0].toFixed(precision)} - ${range[1].toFixed(precision)}`;
+  };
 
   // Render different filter sections based on active tab
   const renderFilterSection = () => {
     switch (activeTab) {
-      case 'time':
+      case "time":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Time Range</Label>
               <Select
-                value={options.timeRange?.presetRange || 'custom'}
+                value={options.timeRange?.presetRange || "custom"}
                 onValueChange={(value) =>
                   handleChange(
-                    'timeRange',
-                    'presetRange',
+                    "timeRange",
+                    "presetRange",
                     value as
-                    | 'day'
-                    | 'week'
-                    | 'month'
-                    | 'quarter'
-                    | 'year'
-                    | 'custom',
+                      | "day"
+                      | "week"
+                      | "month"
+                      | "quarter"
+                      | "year"
+                      | "custom",
                   )
                 }
                 placeholder="Select time range"
@@ -222,7 +222,7 @@ export function AdvancedFilteringComponent({
               </Select>
             </div>
 
-            {options.timeRange?.presetRange === 'custom' && (
+            {options.timeRange?.presetRange === "custom" && (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="startDate">Start Date</Label>
@@ -231,14 +231,14 @@ export function AdvancedFilteringComponent({
                     type="date"
                     value={
                       options.timeRange?.startDate
-                        ? format(options.timeRange.startDate, 'yyyy-MM-dd')
-                        : ''
+                        ? format(options.timeRange.startDate, "yyyy-MM-dd")
+                        : ""
                     }
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const date = e.target.value
                         ? new Date(e.target.value)
-                        : undefined
-                      handleChange('timeRange', 'startDate', date)
+                        : undefined;
+                      handleChange("timeRange", "startDate", date);
                     }}
                   />
                 </div>
@@ -250,23 +250,23 @@ export function AdvancedFilteringComponent({
                     type="date"
                     value={
                       options.timeRange?.endDate
-                        ? format(options.timeRange.endDate, 'yyyy-MM-dd')
-                        : ''
+                        ? format(options.timeRange.endDate, "yyyy-MM-dd")
+                        : ""
                     }
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const date = e.target.value
                         ? new Date(e.target.value)
-                        : undefined
-                      handleChange('timeRange', 'endDate', date)
+                        : undefined;
+                      handleChange("timeRange", "endDate", date);
                     }}
                   />
                 </div>
               </div>
             )}
           </div>
-        )
+        );
 
-      case 'emotions':
+      case "emotions":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -278,7 +278,7 @@ export function AdvancedFilteringComponent({
                       id={`emotion-${type}`}
                       checked={(options.emotions?.types || []).includes(type)}
                       onChange={() =>
-                        handleArrayToggle('emotions', 'types', type)
+                        handleArrayToggle("emotions", "types", type)
                       }
                     />
 
@@ -297,8 +297,8 @@ export function AdvancedFilteringComponent({
               <div className="flex justify-between">
                 <Label>Intensity Range</Label>
                 <span className="text-xs text-gray-500">
-                  {options.emotions?.minIntensity?.toFixed(1) || '0.0'} -{' '}
-                  {options.emotions?.maxIntensity?.toFixed(1) || '1.0'}
+                  {options.emotions?.minIntensity?.toFixed(1) || "0.0"} -{" "}
+                  {options.emotions?.maxIntensity?.toFixed(1) || "1.0"}
                 </span>
               </div>
               <div className="pt-2 px-2">
@@ -311,7 +311,7 @@ export function AdvancedFilteringComponent({
                       max={1}
                       step={0.1}
                       onValueChange={([min]: number[]) => {
-                        handleChange('emotions', 'minIntensity', min)
+                        handleChange("emotions", "minIntensity", min);
                       }}
                     />
                   </div>
@@ -323,7 +323,7 @@ export function AdvancedFilteringComponent({
                       max={1}
                       step={0.1}
                       onValueChange={([max]: number[]) => {
-                        handleChange('emotions', 'maxIntensity', max)
+                        handleChange("emotions", "maxIntensity", max);
                       }}
                     />
                   </div>
@@ -361,14 +361,14 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([min]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'valence',
+                              "emotions",
+                              "dimensionalRanges",
+                              "valence",
                               [
                                 min,
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[1]
+                                      .valence[1]
                                   : 1,
                               ],
                             )
@@ -388,13 +388,13 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([max]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'valence',
+                              "emotions",
+                              "dimensionalRanges",
+                              "valence",
                               [
                                 options.emotions?.dimensionalRanges?.valence
                                   ? options.emotions.dimensionalRanges
-                                    .valence[0]
+                                      .valence[0]
                                   : -1,
                                 max,
                               ],
@@ -430,14 +430,14 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([min]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'arousal',
+                              "emotions",
+                              "dimensionalRanges",
+                              "arousal",
                               [
                                 min,
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[1]
+                                      .arousal[1]
                                   : 1,
                               ],
                             )
@@ -457,13 +457,13 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([max]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'arousal',
+                              "emotions",
+                              "dimensionalRanges",
+                              "arousal",
                               [
                                 options.emotions?.dimensionalRanges?.arousal
                                   ? options.emotions.dimensionalRanges
-                                    .arousal[0]
+                                      .arousal[0]
                                   : -1,
                                 max,
                               ],
@@ -501,14 +501,14 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([min]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'dominance',
+                              "emotions",
+                              "dimensionalRanges",
+                              "dominance",
                               [
                                 min,
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[1]
+                                      .dominance[1]
                                   : 1,
                               ],
                             )
@@ -528,13 +528,13 @@ export function AdvancedFilteringComponent({
                           step={0.1}
                           onValueChange={([max]: number[]) =>
                             handleNestedChange(
-                              'emotions',
-                              'dimensionalRanges',
-                              'dominance',
+                              "emotions",
+                              "dimensionalRanges",
+                              "dominance",
                               [
                                 options.emotions?.dimensionalRanges?.dominance
                                   ? options.emotions.dimensionalRanges
-                                    .dominance[0]
+                                      .dominance[0]
                                   : -1,
                                 max,
                               ],
@@ -548,9 +548,9 @@ export function AdvancedFilteringComponent({
               </div>
             </div>
           </div>
-        )
+        );
 
-      case 'patterns':
+      case "patterns":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
@@ -562,7 +562,7 @@ export function AdvancedFilteringComponent({
                       id={`pattern-${type}`}
                       checked={(options.patterns?.types || []).includes(type)}
                       onChange={() =>
-                        handleArrayToggle('patterns', 'types', type)
+                        handleArrayToggle("patterns", "types", type)
                       }
                     />
 
@@ -581,7 +581,7 @@ export function AdvancedFilteringComponent({
               <div className="flex justify-between">
                 <Label>Minimum Pattern Strength</Label>
                 <span className="text-xs text-gray-500">
-                  {options.patterns?.minStrength?.toFixed(1) || '0.0'}
+                  {options.patterns?.minStrength?.toFixed(1) || "0.0"}
                 </span>
               </div>
               <div className="pt-2 px-2">
@@ -591,7 +591,7 @@ export function AdvancedFilteringComponent({
                   max={1}
                   step={0.1}
                   onValueChange={(value: number[]) =>
-                    handleChange('patterns', 'minStrength', value[0])
+                    handleChange("patterns", "minStrength", value[0])
                   }
                 />
               </div>
@@ -601,7 +601,7 @@ export function AdvancedFilteringComponent({
               <div className="flex justify-between">
                 <Label>Minimum Confidence</Label>
                 <span className="text-xs text-gray-500">
-                  {options.patterns?.minConfidence?.toFixed(1) || '0.0'}
+                  {options.patterns?.minConfidence?.toFixed(1) || "0.0"}
                 </span>
               </div>
               <div className="pt-2 px-2">
@@ -611,7 +611,7 @@ export function AdvancedFilteringComponent({
                   max={1}
                   step={0.1}
                   onValueChange={(value: number[]) => {
-                    handleChange('patterns', 'minConfidence', value[0])
+                    handleChange("patterns", "minConfidence", value[0]);
                   }}
                 />
               </div>
@@ -629,7 +629,7 @@ export function AdvancedFilteringComponent({
                           category,
                         )}
                         onChange={() =>
-                          handleArrayToggle('patterns', 'categories', category)
+                          handleArrayToggle("patterns", "categories", category)
                         }
                       />
 
@@ -645,20 +645,20 @@ export function AdvancedFilteringComponent({
               </div>
             )}
           </div>
-        )
+        );
 
-      case 'visualization':
+      case "visualization":
         return (
           <div className="space-y-4">
             <div className="space-y-2">
               <Label>Group By</Label>
               <Select
-                value={options.visualization?.groupBy || 'session'}
+                value={options.visualization?.groupBy || "session"}
                 onValueChange={(value) =>
                   handleChange(
-                    'visualization',
-                    'groupBy',
-                    value as 'day' | 'week' | 'month' | 'session',
+                    "visualization",
+                    "groupBy",
+                    value as "day" | "week" | "month" | "session",
                   )
                 }
                 placeholder="Select grouping"
@@ -689,7 +689,7 @@ export function AdvancedFilteringComponent({
                   max={10}
                   step={1}
                   onValueChange={(value: number[]) =>
-                    handleChange('visualization', 'smoothing', value[0])
+                    handleChange("visualization", "smoothing", value[0])
                   }
                 />
               </div>
@@ -702,7 +702,7 @@ export function AdvancedFilteringComponent({
                   id="showRawData"
                   checked={options.visualization?.showRawData || false}
                   onCheckedChange={(checked: boolean) =>
-                    handleChange('visualization', 'showRawData', checked)
+                    handleChange("visualization", "showRawData", checked)
                   }
                 />
               </div>
@@ -713,7 +713,7 @@ export function AdvancedFilteringComponent({
                   id="showTrendlines"
                   checked={options.visualization?.showTrendlines || false}
                   onCheckedChange={(checked: boolean) =>
-                    handleChange('visualization', 'showTrendlines', checked)
+                    handleChange("visualization", "showTrendlines", checked)
                   }
                 />
               </div>
@@ -729,8 +729,8 @@ export function AdvancedFilteringComponent({
                   }
                   onCheckedChange={(checked: boolean) =>
                     handleChange(
-                      'visualization',
-                      'showConfidenceIntervals',
+                      "visualization",
+                      "showConfidenceIntervals",
                       checked,
                     )
                   }
@@ -743,23 +743,23 @@ export function AdvancedFilteringComponent({
                   id="showAnnotations"
                   checked={options.visualization?.showAnnotations || false}
                   onCheckedChange={(checked: boolean) =>
-                    handleChange('visualization', 'showAnnotations', checked)
+                    handleChange("visualization", "showAnnotations", checked)
                   }
                 />
               </div>
             </div>
           </div>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   // Render compact version (dropdown with popover)
   if (compact) {
     return (
-      <div className={cn('advanced-filtering-compact', className)}>
+      <div className={cn("advanced-filtering-compact", className)}>
         <Popover>
           <PopoverTrigger>
             <Button
@@ -787,15 +787,15 @@ export function AdvancedFilteringComponent({
 
               <div className="flex border-b mb-4">
                 {(
-                  ['time', 'emotions', 'patterns', 'visualization'] as const
+                  ["time", "emotions", "patterns", "visualization"] as const
                 ).map((tab) => (
                   <button
                     key={tab}
                     className={cn(
-                      'py-2 px-3 text-sm capitalize',
+                      "py-2 px-3 text-sm capitalize",
                       activeTab === tab
-                        ? 'border-b-2 border-primary font-medium'
-                        : 'text-gray-500 hover:text-gray-700',
+                        ? "border-b-2 border-primary font-medium"
+                        : "text-gray-500 hover:text-gray-700",
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
@@ -817,14 +817,14 @@ export function AdvancedFilteringComponent({
           </PopoverContent>
         </Popover>
       </div>
-    )
+    );
   }
 
   // Render full version
   return (
     <div
       className={cn(
-        'advanced-filtering p-4 border rounded-md bg-gray-50 dark:bg-gray-900',
+        "advanced-filtering p-4 border rounded-md bg-gray-50 dark:bg-gray-900",
         className,
       )}
     >
@@ -841,15 +841,15 @@ export function AdvancedFilteringComponent({
       </div>
 
       <div className="flex border-b mb-4">
-        {(['time', 'emotions', 'patterns', 'visualization'] as const).map(
+        {(["time", "emotions", "patterns", "visualization"] as const).map(
           (tab) => (
             <button
               key={tab}
               className={cn(
-                'py-2 px-4 text-sm capitalize',
+                "py-2 px-4 text-sm capitalize",
                 activeTab === tab
-                  ? 'border-b-2 border-primary font-medium'
-                  : 'text-gray-500 hover:text-gray-700',
+                  ? "border-b-2 border-primary font-medium"
+                  : "text-gray-500 hover:text-gray-700",
               )}
               onClick={() => setActiveTab(tab)}
             >
@@ -861,7 +861,7 @@ export function AdvancedFilteringComponent({
 
       {renderFilterSection()}
     </div>
-  )
+  );
 }
 
-export default AdvancedFilteringComponent
+export default AdvancedFilteringComponent;

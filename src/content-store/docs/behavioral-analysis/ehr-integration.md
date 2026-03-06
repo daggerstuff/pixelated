@@ -1,9 +1,9 @@
 ---
-title: 'EHR Integration for Behavioral Analysis'
-description: 'EHR Integration for Behavioral Analysis documentation'
+title: "EHR Integration for Behavioral Analysis"
+description: "EHR Integration for Behavioral Analysis documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -21,26 +21,26 @@ Electronic Health Record (EHR) integration enables secure sharing of behavioral 
 ```typescript
 interface EHRIntegrationSystem {
   connectors: {
-    fhir: FHIRConnector
-    hl7: HL7Connector
-    proprietary: ProprietaryConnectors
-  }
+    fhir: FHIRConnector;
+    hl7: HL7Connector;
+    proprietary: ProprietaryConnectors;
+  };
   adapters: {
-    dataMappers: DataMapperRegistry
-    transformers: TransformerRegistry
-    validators: ValidatorRegistry
-  }
+    dataMappers: DataMapperRegistry;
+    transformers: TransformerRegistry;
+    validators: ValidatorRegistry;
+  };
   exporters: {
-    clinical: ClinicalDataExporter
-    analytical: AnalyticalDataExporter
-    administrative: AdministrativeDataExporter
-  }
+    clinical: ClinicalDataExporter;
+    analytical: AnalyticalDataExporter;
+    administrative: AdministrativeDataExporter;
+  };
   security: {
-    authentication: AuthenticationManager
-    authorization: AuthorizationManager
-    audit: AuditManager
-    encryption: EncryptionManager
-  }
+    authentication: AuthenticationManager;
+    authorization: AuthorizationManager;
+    audit: AuditManager;
+    encryption: EncryptionManager;
+  };
 }
 ```
 
@@ -49,11 +49,11 @@ interface EHRIntegrationSystem {
 ```typescript
 class EHRIntegrationService {
   constructor(options: {
-    connectors: ConnectorConfigurations
-    mappingConfig: MappingConfiguration
-    securityConfig: SecurityConfiguration
-    complianceConfig: ComplianceConfiguration
-    auditConfig: AuditConfiguration
+    connectors: ConnectorConfigurations;
+    mappingConfig: MappingConfiguration;
+    securityConfig: SecurityConfiguration;
+    complianceConfig: ComplianceConfiguration;
+    auditConfig: AuditConfiguration;
   }) {
     // Initialize EHR integration service
   }
@@ -101,26 +101,26 @@ class EHRIntegrationService {
 
 ```typescript
 interface FHIRExportOptions extends ExportOptions {
-  fhirVersion: 'R4' | 'STU3' | 'DSTU2'
+  fhirVersion: "R4" | "STU3" | "DSTU2";
   resourceType:
-    | 'Observation'
-    | 'DocumentReference'
-    | 'DiagnosticReport'
-    | 'ClinicalImpression'
-  includedProfiles: string[]
-  extensions: FHIRExtensionMapping[]
+    | "Observation"
+    | "DocumentReference"
+    | "DiagnosticReport"
+    | "ClinicalImpression";
+  includedProfiles: string[];
+  extensions: FHIRExtensionMapping[];
 }
 
 interface FHIRResourceMapping {
   source: {
-    resource: string
-    fields: string[]
-  }
+    resource: string;
+    fields: string[];
+  };
   target: {
-    resource: string
-    fields: Record<string, string>
-  }
-  transformations: RecordTransformation[]
+    resource: string;
+    fields: Record<string, string>;
+  };
+  transformations: RecordTransformation[];
 }
 ```
 
@@ -148,18 +148,18 @@ interface FHIRResourceMapping {
 
 ```typescript
 interface HL7Options extends ExportOptions {
-  version: 'v2.5' | 'v2.6' | 'v2.7' | 'v3'
-  messageType: 'MDM' | 'ORU' | 'REF' | 'SIU'
-  segmentMapping: SegmentMapping[]
+  version: "v2.5" | "v2.6" | "v2.7" | "v3";
+  messageType: "MDM" | "ORU" | "REF" | "SIU";
+  segmentMapping: SegmentMapping[];
 }
 
 interface SegmentMapping {
-  source: string
+  source: string;
   target: {
-    segment: string
-    fields: Record<string, string>
-  }
-  transformations: FieldTransformation[]
+    segment: string;
+    fields: Record<string, string>;
+  };
+  transformations: FieldTransformation[];
 }
 ```
 
@@ -187,11 +187,11 @@ interface SegmentMapping {
 
 ```typescript
 interface CDAOptions extends ExportOptions {
-  documentType: 'ConsultationNote' | 'ProgressNote' | 'DischargeSummary'
-  templateIds: string[]
-  includeAttachments: boolean
-  structuredDataSections: string[]
-  narrativeGeneration: 'auto' | 'template' | 'manual'
+  documentType: "ConsultationNote" | "ProgressNote" | "DischargeSummary";
+  templateIds: string[];
+  includeAttachments: boolean;
+  structuredDataSections: string[];
+  narrativeGeneration: "auto" | "template" | "manual";
 }
 ```
 
@@ -221,26 +221,26 @@ interface CDAOptions extends ExportOptions {
 
 ```typescript
 interface AuthenticationConfig {
-  mechanisms: Array<'oauth2' | 'saml' | 'openid-connect' | 'jwt' | 'basic'>
-  providers: AuthProviderConfig[]
-  tokenManagement: TokenManagementConfig
-  certificateManagement: CertificateConfig
+  mechanisms: Array<"oauth2" | "saml" | "openid-connect" | "jwt" | "basic">;
+  providers: AuthProviderConfig[];
+  tokenManagement: TokenManagementConfig;
+  certificateManagement: CertificateConfig;
 }
 
 interface AuthorizationConfig {
-  model: 'rbac' | 'abac' | 'pbac'
-  policies: AuthorizationPolicy[]
-  consentManagement: ConsentConfig
-  purposeOfUse: string[]
+  model: "rbac" | "abac" | "pbac";
+  policies: AuthorizationPolicy[];
+  consentManagement: ConsentConfig;
+  purposeOfUse: string[];
 }
 
 interface AuthorizationPolicy {
-  id: string
-  effect: 'allow' | 'deny'
-  principals: string[]
-  actions: string[]
-  resources: string[]
-  conditions?: Record<string, any>
+  id: string;
+  effect: "allow" | "deny";
+  principals: string[];
+  actions: string[];
+  resources: string[];
+  conditions?: Record<string, any>;
 }
 ```
 
@@ -268,17 +268,17 @@ interface AuthorizationPolicy {
 
 ```typescript
 interface DataProtectionConfig {
-  encryptionAlgorithms: EncryptionAlgorithm[]
-  keyManagement: KeyManagementConfig
-  dataSegregation: SegregationPolicy[]
-  minimization: MinimizationRule[]
+  encryptionAlgorithms: EncryptionAlgorithm[];
+  keyManagement: KeyManagementConfig;
+  dataSegregation: SegregationPolicy[];
+  minimization: MinimizationRule[];
 }
 
 interface MinimizationRule {
-  dataCategory: string
-  purpose: string[]
-  minimizationStrategy: 'redact' | 'generalize' | 'aggregate' | 'pseudonymize'
-  parameters?: Record<string, any>
+  dataCategory: string;
+  purpose: string[];
+  minimizationStrategy: "redact" | "generalize" | "aggregate" | "pseudonymize";
+  parameters?: Record<string, any>;
 }
 ```
 
@@ -306,10 +306,10 @@ interface MinimizationRule {
 
 ```typescript
 interface ComplianceLoggingConfig {
-  eventTypes: string[]
-  detailLevel: 'basic' | 'detailed' | 'comprehensive'
-  retentionPolicy: RetentionPolicyConfig
-  reportingRequirements: ReportingConfig[]
+  eventTypes: string[];
+  detailLevel: "basic" | "detailed" | "comprehensive";
+  retentionPolicy: RetentionPolicyConfig;
+  reportingRequirements: ReportingConfig[];
 }
 ```
 
@@ -339,10 +339,10 @@ interface ComplianceLoggingConfig {
 
 ```typescript
 interface EpicIntegrationConfig extends IntegrationConfig {
-  apiType: 'FHIR' | 'Epic-API' | 'Interconnect'
-  appCredentials: AppCredentialsConfig
-  endpoints: EpicEndpointConfig
-  serviceIntegrations: string[]
+  apiType: "FHIR" | "Epic-API" | "Interconnect";
+  appCredentials: AppCredentialsConfig;
+  endpoints: EpicEndpointConfig;
+  serviceIntegrations: string[];
 }
 ```
 
@@ -370,10 +370,10 @@ interface EpicIntegrationConfig extends IntegrationConfig {
 
 ```typescript
 interface CernerIntegrationConfig extends IntegrationConfig {
-  apiType: 'FHIR' | 'Millennium' | 'CareAware'
-  tenantConfiguration: TenantConfig
-  endpoints: CernerEndpointConfig
-  serviceIntegrations: string[]
+  apiType: "FHIR" | "Millennium" | "CareAware";
+  tenantConfiguration: TenantConfig;
+  endpoints: CernerEndpointConfig;
+  serviceIntegrations: string[];
 }
 ```
 
@@ -401,10 +401,10 @@ interface CernerIntegrationConfig extends IntegrationConfig {
 
 ```typescript
 interface AthenahealthIntegrationConfig extends IntegrationConfig {
-  apiVersion: string
-  practiceIds: string[]
-  endpoints: AthenahealthEndpointConfig
-  marketplaceAuthentication: MarketplaceAuthConfig
+  apiVersion: string;
+  practiceIds: string[];
+  endpoints: AthenahealthEndpointConfig;
+  marketplaceAuthentication: MarketplaceAuthConfig;
 }
 ```
 
@@ -434,21 +434,21 @@ interface AthenahealthIntegrationConfig extends IntegrationConfig {
 
 ```typescript
 interface BehavioralDataMapping {
-  emotionModels: EmotionModelMapping[]
-  patternCategories: PatternCategoryMapping[]
-  techniqueClassification: TechniqueMapping[]
-  measurementScales: ScaleMapping[]
+  emotionModels: EmotionModelMapping[];
+  patternCategories: PatternCategoryMapping[];
+  techniqueClassification: TechniqueMapping[];
+  measurementScales: ScaleMapping[];
 }
 
 interface EmotionModelMapping {
-  sourceModel: string
+  sourceModel: string;
   targetCoding: {
-    system: string
-    valueSet?: string
-    defaultCode?: string
-    mappingTable: Record<string, string>
-  }
-  transformationRules: TransformationRule[]
+    system: string;
+    valueSet?: string;
+    defaultCode?: string;
+    mappingTable: Record<string, string>;
+  };
+  transformationRules: TransformationRule[];
 }
 ```
 
@@ -476,20 +476,20 @@ interface EmotionModelMapping {
 
 ```typescript
 interface DocumentMappingConfig {
-  templateTypes: TemplateMapping[]
-  sectionOrganization: SectionMapping[]
-  narrativeGeneration: NarrativeGenerationRule[]
-  metadataEnrichment: MetadataEnrichmentRule[]
+  templateTypes: TemplateMapping[];
+  sectionOrganization: SectionMapping[];
+  narrativeGeneration: NarrativeGenerationRule[];
+  metadataEnrichment: MetadataEnrichmentRule[];
 }
 
 interface SectionMapping {
-  source: string
+  source: string;
   target: {
-    sectionCode: string
-    sectionTitle: string
-    templateId?: string
-  }
-  contentTransformation: TransformationRule[]
+    sectionCode: string;
+    sectionTitle: string;
+    templateId?: string;
+  };
+  contentTransformation: TransformationRule[];
 }
 ```
 
@@ -517,20 +517,20 @@ interface SectionMapping {
 
 ```typescript
 interface AdministrativeMapping {
-  procedureCodes: ProcedureCodeMapping[]
-  diagnosticCodes: DiagnosticCodeMapping[]
-  serviceCodes: ServiceCodeMapping[]
-  documentationRequirements: DocumentationRequirementMapping[]
+  procedureCodes: ProcedureCodeMapping[];
+  diagnosticCodes: DiagnosticCodeMapping[];
+  serviceCodes: ServiceCodeMapping[];
+  documentationRequirements: DocumentationRequirementMapping[];
 }
 
 interface ProcedureCodeMapping {
-  sourceService: string
+  sourceService: string;
   targetCoding: {
-    system: 'CPT' | 'HCPCS' | 'ICD-10-PCS'
-    codes: Record<string, string>
-    modifiers?: Record<string, string>
-  }
-  requirementRules: CodingRequirementRule[]
+    system: "CPT" | "HCPCS" | "ICD-10-PCS";
+    codes: Record<string, string>;
+    modifiers?: Record<string, string>;
+  };
+  requirementRules: CodingRequirementRule[];
 }
 ```
 
@@ -566,30 +566,30 @@ async function exportSessionToEpic(
   ehrIntegrationService: EHRIntegrationService,
 ) {
   // Fetch session data
-  const sessionData = await fetchSessionData(sessionId)
+  const sessionData = await fetchSessionData(sessionId);
 
   // Configure export options for Epic
   const exportOptions: FHIRExportOptions = {
-    fhirVersion: 'R4',
-    resourceType: 'DocumentReference',
+    fhirVersion: "R4",
+    resourceType: "DocumentReference",
     target: {
-      system: 'Epic',
-      endpoint: 'https://epicfhir.example.org/api/FHIR/R4/',
-      credentials: 'epic-credentials',
+      system: "Epic",
+      endpoint: "https://epicfhir.example.org/api/FHIR/R4/",
+      credentials: "epic-credentials",
     },
     patientIdentifier: {
-      system: 'urn:oid:1.2.3.4.5',
+      system: "urn:oid:1.2.3.4.5",
       value: patientId,
     },
     includedProfiles: [
-      'http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference',
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference",
     ],
     extensions: [
       {
-        url: 'http://example.org/fhir/StructureDefinition/emotional-assessment',
+        url: "http://example.org/fhir/StructureDefinition/emotional-assessment",
         mapping: {
-          sourceField: 'emotionalAssessment',
-          valueType: 'CodeableConcept',
+          sourceField: "emotionalAssessment",
+          valueType: "CodeableConcept",
         },
       },
     ],
@@ -598,30 +598,30 @@ async function exportSessionToEpic(
       providerNPI: sessionData.therapistNPI,
       department: sessionData.departmentId,
     },
-  }
+  };
 
   // Export to Epic
   const result = await ehrIntegrationService.exportSessionData(
     sessionId,
     exportOptions,
-  )
+  );
 
   if (result.success) {
     // Update session record with export metadata
     await updateSessionExportStatus(sessionId, {
       exported: true,
       exportTimestamp: new Date(),
-      exportTarget: 'Epic',
+      exportTarget: "Epic",
       externalReference: result.resourceId,
       version: result.version,
-    })
+    });
   } else {
     // Handle export failure
-    logExportFailure(sessionId, 'Epic', result.error)
-    throw new Error(`Failed to export to Epic: ${result.error.message}`)
+    logExportFailure(sessionId, "Epic", result.error);
+    throw new Error(`Failed to export to Epic: ${result.error.message}`);
   }
 
-  return result
+  return result;
 }
 ```
 
@@ -636,55 +636,55 @@ async function exportProgressNoteToCerner(
   ehrIntegrationService: EHRIntegrationService,
 ) {
   // Fetch progress note data
-  const noteData = await fetchProgressNote(noteId)
+  const noteData = await fetchProgressNote(noteId);
 
   // Configure CDA export for Cerner
   const exportOptions: CDAOptions = {
-    documentType: 'ProgressNote',
+    documentType: "ProgressNote",
     target: {
-      system: 'Cerner',
-      endpoint: 'https://cernerintegration.example.org/api/document',
-      credentials: 'cerner-credentials',
+      system: "Cerner",
+      endpoint: "https://cernerintegration.example.org/api/document",
+      credentials: "cerner-credentials",
     },
     patientIdentifier: {
-      system: 'urn:oid:2.16.840.1.113883.3.787.0.0',
+      system: "urn:oid:2.16.840.1.113883.3.787.0.0",
       value: patientId,
     },
     templateIds: [
-      '2.16.840.1.113883.10.20.22.1.9', // Progress Note template
+      "2.16.840.1.113883.10.20.22.1.9", // Progress Note template
     ],
     includeAttachments: true,
     structuredDataSections: [
-      'assessment',
-      'plan',
-      'interventions',
-      'mentalStatus',
+      "assessment",
+      "plan",
+      "interventions",
+      "mentalStatus",
     ],
-    narrativeGeneration: 'auto',
+    narrativeGeneration: "auto",
     contextParameters: {
       encounterId: encounterId,
       authorId: noteData.authorId,
       custodianId: noteData.facilityId,
       careTeamIds: noteData.careTeamIds,
     },
-  }
+  };
 
   // Export to Cerner
   const result = await ehrIntegrationService.exportAnalysisReport(
     noteId,
     exportOptions,
-  )
+  );
 
   // Update progress note with export status
   await updateProgressNoteStatus(noteId, {
-    exportStatus: result.success ? 'completed' : 'failed',
+    exportStatus: result.success ? "completed" : "failed",
     exportTimestamp: new Date(),
     exportReference: result.documentId,
     exportVersion: result.version,
-    exportSystem: 'Cerner',
-  })
+    exportSystem: "Cerner",
+  });
 
-  return result
+  return result;
 }
 ```
 
@@ -698,57 +698,57 @@ async function syncTreatmentPlanWithAthena(
   ehrIntegrationService: EHRIntegrationService,
 ) {
   // Fetch treatment plan
-  const treatmentPlan = await fetchTreatmentPlan(treatmentPlanId)
+  const treatmentPlan = await fetchTreatmentPlan(treatmentPlanId);
 
   // Configure sync options
   const syncOptions: SyncOptions = {
-    direction: 'bidirectional',
+    direction: "bidirectional",
     target: {
-      system: 'Athenahealth',
-      endpoint: 'https://api.athenahealth.com/preview1/195900/patients',
-      credentials: 'athena-credentials',
+      system: "Athenahealth",
+      endpoint: "https://api.athenahealth.com/preview1/195900/patients",
+      credentials: "athena-credentials",
     },
     patientIdentifier: {
-      system: 'athena',
+      system: "athena",
       value: patientId,
     },
-    mappingProfile: 'treatment-plan-athena',
-    conflictResolution: 'prefer-remote',
-    synchronizationScope: ['goals', 'interventions', 'progress', 'assessments'],
+    mappingProfile: "treatment-plan-athena",
+    conflictResolution: "prefer-remote",
+    synchronizationScope: ["goals", "interventions", "progress", "assessments"],
     contextParameters: {
       practiceId: treatmentPlan.practiceId,
       departmentId: treatmentPlan.departmentId,
       providerId: treatmentPlan.providerId,
     },
-  }
+  };
 
   // Perform synchronization
   const result = await ehrIntegrationService.syncTreatmentPlan(
     treatmentPlanId,
     syncOptions,
-  )
+  );
 
   // Handle sync result
   if (result.success) {
     // Update local records with remote data if needed
     if (result.remoteChangesDetected) {
-      await updateTreatmentPlanFromRemote(treatmentPlanId, result.remoteData)
+      await updateTreatmentPlanFromRemote(treatmentPlanId, result.remoteData);
     }
 
     // Update sync metadata
     await updateTreatmentPlanSyncStatus(treatmentPlanId, {
       lastSyncTimestamp: new Date(),
-      syncStatus: 'completed',
+      syncStatus: "completed",
       remoteVersion: result.remoteVersion,
       remoteReference: result.remoteId,
-    })
+    });
   } else {
     // Handle sync failure
-    logSyncFailure(treatmentPlanId, 'Athenahealth', result.error)
-    throw new Error(`Treatment plan sync failed: ${result.error.message}`)
+    logSyncFailure(treatmentPlanId, "Athenahealth", result.error);
+    throw new Error(`Treatment plan sync failed: ${result.error.message}`);
   }
 
-  return result
+  return result;
 }
 ```
 
@@ -814,20 +814,20 @@ async function syncTreatmentPlanWithAthena(
 
 ```typescript
 interface ConnectivityTest {
-  targetSystem: string
-  testType: 'authentication' | 'data-exchange' | 'performance' | 'security'
-  parameters: Record<string, any>
-  expectedResults: TestExpectation
-  testData?: Record<string, any>
+  targetSystem: string;
+  testType: "authentication" | "data-exchange" | "performance" | "security";
+  parameters: Record<string, any>;
+  expectedResults: TestExpectation;
+  testData?: Record<string, any>;
 }
 
 interface TestResult {
-  success: boolean
-  executionTime: number
-  statusCode?: number
-  responseData?: any
-  errors?: Error[]
-  warnings?: string[]
+  success: boolean;
+  executionTime: number;
+  statusCode?: number;
+  responseData?: any;
+  errors?: Error[];
+  warnings?: string[];
 }
 ```
 

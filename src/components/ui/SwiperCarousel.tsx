@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import React, { useRef, useEffect, useState, useMemo } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import {
   Navigation,
   Pagination,
@@ -9,51 +9,51 @@ import {
   Keyboard,
   Mousewheel,
   A11y,
-} from 'swiper/modules'
-import type { Swiper as SwiperType } from 'swiper'
+} from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
 
 // Import Swiper styles
-import 'swiper/css'
-import 'swiper/css/navigation'
-import 'swiper/css/pagination'
-import 'swiper/css/effect-fade'
-import 'swiper/css/effect-coverflow'
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/effect-fade";
+import "swiper/css/effect-coverflow";
 
 interface CarouselItem {
-  id: string
-  content?: React.ReactNode
-  title?: string
-  description?: string
-  image?: string
-  link?: string
-  icon?: string
-  gradient?: string
-  subtitle?: string
+  id: string;
+  content?: React.ReactNode;
+  title?: string;
+  description?: string;
+  image?: string;
+  link?: string;
+  icon?: string;
+  gradient?: string;
+  subtitle?: string;
 }
 
 interface SwiperCarouselProps {
-  items?: CarouselItem[]
-  effect?: 'slide' | 'fade' | 'coverflow' | 'flip' | 'cube'
-  autoplay?: boolean | { delay: number; disableOnInteraction?: boolean }
-  navigation?: boolean
-  pagination?: boolean | { clickable?: boolean; dynamicBullets?: boolean }
-  loop?: boolean
-  slidesPerView?: number | 'auto'
-  spaceBetween?: number
-  centeredSlides?: boolean
-  grabCursor?: boolean
-  keyboard?: boolean
-  mousewheel?: boolean
-  className?: string
-  height?: string
-  breakpoints?: Record<number, unknown>
-  onSlideChange?: (swiper: SwiperType) => void
-  onSwiper?: (swiper: SwiperType) => void
+  items?: CarouselItem[];
+  effect?: "slide" | "fade" | "coverflow" | "flip" | "cube";
+  autoplay?: boolean | { delay: number; disableOnInteraction?: boolean };
+  navigation?: boolean;
+  pagination?: boolean | { clickable?: boolean; dynamicBullets?: boolean };
+  loop?: boolean;
+  slidesPerView?: number | "auto";
+  spaceBetween?: number;
+  centeredSlides?: boolean;
+  grabCursor?: boolean;
+  keyboard?: boolean;
+  mousewheel?: boolean;
+  className?: string;
+  height?: string;
+  breakpoints?: Record<number, unknown>;
+  onSlideChange?: (swiper: SwiperType) => void;
+  onSwiper?: (swiper: SwiperType) => void;
 }
 
 const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
   items,
-  effect = 'slide',
+  effect = "slide",
   autoplay = false,
   navigation = true,
   pagination = { clickable: true, dynamicBullets: true },
@@ -64,23 +64,23 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
   grabCursor = true,
   keyboard = true,
   mousewheel = false,
-  className = '',
-  height = '400px',
+  className = "",
+  height = "400px",
   breakpoints,
   onSlideChange,
   onSwiper,
 }) => {
-  const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([])
-  const [isReady, setIsReady] = useState(false)
-  const swiperRef = useRef<SwiperType>()
+  const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
+  const [isReady, setIsReady] = useState(false);
+  const swiperRef = useRef<SwiperType>();
 
   // Default demo content - memoized to prevent recreation
   const defaultItems: CarouselItem[] = useMemo(
     () => [
       {
-        id: '1',
-        title: 'Therapeutic Journey',
-        description: 'Explore your emotional landscape with guided sessions',
+        id: "1",
+        title: "Therapeutic Journey",
+        description: "Explore your emotional landscape with guided sessions",
         content: (
           <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-purple-600 text-white p-8 rounded-lg">
             <div className="text-6xl mb-4">🧠</div>
@@ -92,9 +92,9 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         ),
       },
       {
-        id: '2',
-        title: 'Progress Tracking',
-        description: 'Monitor your emotional growth over time',
+        id: "2",
+        title: "Progress Tracking",
+        description: "Monitor your emotional growth over time",
         content: (
           <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-teal-600 text-white p-8 rounded-lg">
             <div className="text-6xl mb-4">📈</div>
@@ -106,9 +106,9 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         ),
       },
       {
-        id: '3',
-        title: 'Community Support',
-        description: 'Connect with others on similar journeys',
+        id: "3",
+        title: "Community Support",
+        description: "Connect with others on similar journeys",
         content: (
           <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-pink-500 to-rose-600 text-white p-8 rounded-lg">
             <div className="text-6xl mb-4">🤝</div>
@@ -120,9 +120,9 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         ),
       },
       {
-        id: '4',
-        title: 'Personalized Tools',
-        description: 'AI-powered tools tailored to your needs',
+        id: "4",
+        title: "Personalized Tools",
+        description: "AI-powered tools tailored to your needs",
         content: (
           <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-8 rounded-lg">
             <div className="text-6xl mb-4">🎯</div>
@@ -134,9 +134,9 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         ),
       },
       {
-        id: '5',
-        title: 'Secure & Private',
-        description: 'Your data is protected with enterprise-grade security',
+        id: "5",
+        title: "Secure & Private",
+        description: "Your data is protected with enterprise-grade security",
         content: (
           <div className="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-8 rounded-lg">
             <div className="text-6xl mb-4">🔒</div>
@@ -149,7 +149,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
       },
     ],
     [],
-  )
+  );
 
   // Default responsive breakpoints
   const defaultBreakpoints = {
@@ -159,24 +159,24 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
     },
     640: {
       slidesPerView:
-        slidesPerView === 'auto'
-          ? 'auto'
-          : Math.min(2, typeof slidesPerView === 'number' ? slidesPerView : 1),
+        slidesPerView === "auto"
+          ? "auto"
+          : Math.min(2, typeof slidesPerView === "number" ? slidesPerView : 1),
       spaceBetween: 20,
     },
     1024: {
       slidesPerView:
-        slidesPerView === 'auto'
-          ? 'auto'
-          : Math.min(3, typeof slidesPerView === 'number' ? slidesPerView : 1),
+        slidesPerView === "auto"
+          ? "auto"
+          : Math.min(3, typeof slidesPerView === "number" ? slidesPerView : 1),
       spaceBetween: 30,
     },
-  }
+  };
 
   useEffect(() => {
-    setCarouselItems(items || defaultItems)
-    setIsReady(true)
-  }, [items, defaultItems])
+    setCarouselItems(items || defaultItems);
+    setIsReady(true);
+  }, [items, defaultItems]);
 
   const modules = [
     Navigation,
@@ -185,9 +185,9 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
     ...(autoplay ? [Autoplay] : []),
     ...(keyboard ? [Keyboard] : []),
     ...(mousewheel ? [Mousewheel] : []),
-    ...(effect === 'fade' ? [EffectFade] : []),
-    ...(effect === 'coverflow' ? [EffectCoverflow] : []),
-  ]
+    ...(effect === "fade" ? [EffectFade] : []),
+    ...(effect === "coverflow" ? [EffectCoverflow] : []),
+  ];
 
   const swiperProps = {
     modules,
@@ -199,20 +199,20 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
     grabCursor,
     navigation: navigation
       ? {
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev',
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
         }
       : false,
     pagination: pagination
       ? {
           clickable:
-            typeof pagination === 'object' ? pagination.clickable : true,
+            typeof pagination === "object" ? pagination.clickable : true,
           dynamicBullets:
-            typeof pagination === 'object' ? pagination.dynamicBullets : true,
+            typeof pagination === "object" ? pagination.dynamicBullets : true,
         }
       : false,
     autoplay: autoplay
-      ? typeof autoplay === 'object'
+      ? typeof autoplay === "object"
         ? autoplay
         : { delay: 3000 }
       : false,
@@ -229,12 +229,12 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
       : false,
     breakpoints: breakpoints || defaultBreakpoints,
     onSwiper: (swiper: SwiperType) => {
-      swiperRef.current = swiper
-      onSwiper?.(swiper)
+      swiperRef.current = swiper;
+      onSwiper?.(swiper);
     },
     onSlideChange,
     // Effect-specific props
-    ...(effect === 'coverflow' && {
+    ...(effect === "coverflow" && {
       coverflowEffect: {
         rotate: 50,
         stretch: 0,
@@ -243,12 +243,12 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         slideShadows: true,
       },
     }),
-    ...(effect === 'fade' && {
+    ...(effect === "fade" && {
       fadeEffect: {
         crossFade: true,
       },
     }),
-  }
+  };
 
   if (!isReady) {
     return (
@@ -259,7 +259,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         <span className="ml-2 text-gray-600">Loading carousel...</span>
       </div>
-    )
+    );
   }
 
   return (
@@ -271,12 +271,12 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
             className="flex items-center justify-center"
           >
             {item.content ? (
-              typeof item.content === 'string' ? (
+              typeof item.content === "string" ? (
                 <div className="flex flex-col items-center justify-center h-full p-4 text-center">
                   {item.image && (
                     <img
                       src={item.image}
-                      alt={item.title || 'Carousel item'}
+                      alt={item.title || "Carousel item"}
                       className="w-full h-48 object-cover rounded-lg mb-4"
                     />
                   )}
@@ -301,7 +301,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
               )
             ) : (
               <div
-                className={`flex flex-col items-center justify-center h-full bg-gradient-to-br ${item.gradient || 'from-gray-500 to-gray-600'} text-white p-6 rounded-lg`}
+                className={`flex flex-col items-center justify-center h-full bg-gradient-to-br ${item.gradient || "from-gray-500 to-gray-600"} text-white p-6 rounded-lg`}
               >
                 {item.icon && <div className="text-5xl mb-4">{item.icon}</div>}
                 {item.title && (
@@ -331,7 +331,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         Carousel with {carouselItems.length} items
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SwiperCarousel
+export default SwiperCarousel;

@@ -1,79 +1,79 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 interface TodoItem {
-  id: string
-  text: string
-  completed: boolean
+  id: string;
+  text: string;
+  completed: boolean;
 }
 
 interface TodoProps {
-  title?: string
-  initialTodos?: TodoItem[]
+  title?: string;
+  initialTodos?: TodoItem[];
 }
 
-export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
-  const [todos, setTodos] = useState<TodoItem[]>([])
-  const [inputValue, setInputValue] = useState('')
+export function Todo({ title = "Todo List", initialTodos = [] }: TodoProps) {
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [inputValue, setInputValue] = useState("");
 
   useEffect(() => {
     const loadTodos = (): TodoItem[] => {
       try {
-        const savedTodos = localStorage.getItem('todos')
-        return savedTodos ? JSON.parse(savedTodos) : initialTodos
+        const savedTodos = localStorage.getItem("todos");
+        return savedTodos ? JSON.parse(savedTodos) : initialTodos;
       } catch (err: unknown) {
-        console.error('Error loading todos:', err)
-        return initialTodos
+        console.error("Error loading todos:", err);
+        return initialTodos;
       }
-    }
+    };
 
-    setTodos(loadTodos())
-  }, [initialTodos])
+    setTodos(loadTodos());
+  }, [initialTodos]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('todos', JSON.stringify(todos))
+      localStorage.setItem("todos", JSON.stringify(todos));
     } catch (err: unknown) {
-      console.error('Error saving todos:', err)
+      console.error("Error saving todos:", err);
     }
-  }, [todos])
+  }, [todos]);
 
   const addTodo = () => {
-    const text = inputValue.trim()
+    const text = inputValue.trim();
     if (!text) {
-      return
+      return;
     }
 
     const newTodo = {
       id: generateTodoId(),
       text,
       completed: false,
-    }
+    };
 
-    setTodos((prevTodos) => [...prevTodos, newTodo])
-    setInputValue('')
-  }
+    setTodos((prevTodos) => [...prevTodos, newTodo]);
+    setInputValue("");
+  };
 
   const toggleTodoComplete = (id: string) => {
     setTodos((prevTodos) =>
       prevTodos.map((todo) =>
         todo.id === id ? { ...todo, completed: !todo.completed } : todo,
       ),
-    )
-  }
+    );
+  };
 
   const deleteTodo = (id: string) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id))
-  }
+    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value)
-  }
+    setInputValue(e.target.value);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      addTodo()
+    if (e.key === "Enter") {
+      addTodo();
     }
-  }
+  };
 
   return (
     <div className="todo-component">
@@ -100,7 +100,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
         {todos.map((todo) => (
           <li
             key={todo.id}
-            className={`todo-item ${todo.completed ? 'completed' : ''}`}
+            className={`todo-item ${todo.completed ? "completed" : ""}`}
             data-id={todo.id}
           >
             <span className="todo-text">{todo.text}</span>
@@ -109,7 +109,7 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
                 className="todo-button complete-button"
                 onClick={() => toggleTodoComplete(todo.id)}
               >
-                {todo.completed ? '↩️' : '✓'}
+                {todo.completed ? "↩️" : "✓"}
               </button>
               <button
                 className="todo-button delete-button"
@@ -224,9 +224,9 @@ export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
         }
       `}</style>
     </div>
-  )
+  );
 }
 
 export const generateTodoId = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substring(2)
-}
+  return Date.now().toString(36) + Math.random().toString(36).substring(2);
+};

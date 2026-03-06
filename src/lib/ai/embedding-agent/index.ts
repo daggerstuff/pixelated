@@ -27,7 +27,7 @@ export {
   EmbeddingAgentError,
   createEmbeddingAgentClient,
   type EmbeddingAgentClientConfig,
-} from './client'
+} from "./client";
 
 // Type exports
 export type {
@@ -49,7 +49,7 @@ export type {
   SimilarityMatch,
   SimilaritySearchRequest,
   SimilaritySearchResponse,
-} from './types'
+} from "./types";
 
 // Schema exports
 export {
@@ -76,4 +76,4 @@ export {
   type EmbeddingRequestInput,
   type EmbeddingRequestOutput,
   type SimilaritySearchRequestInput,
-} from './schemas'
+} from "./schemas";

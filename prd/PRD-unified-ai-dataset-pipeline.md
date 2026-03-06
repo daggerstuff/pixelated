@@ -15,6 +15,7 @@ The Unified AI Dataset Pipeline solves the critical challenge of fragmented data
 The Unified AI Dataset Pipeline consolidates fragmented data sourcing, processing, and validation components into a cohesive, production-ready system. This pipeline addresses the critical need for high-quality, ethically-sound, and psychologically-validated datasets that power the Empathy Gym™ platform. By unifying academic sourcing, synthetic generation, quality assurance, and infrastructure components, we ensure consistent, reproducible, and safe dataset creation at scale.
 
 **Who benefits:**
+
 - **AI/ML Engineers**: Single orchestration point for all dataset operations
 - **Mental Health Professionals**: Access to validated, therapeutically-sound training data
 - **Data Scientists**: Reproducible pipelines with clear quality gates
@@ -24,16 +25,16 @@ The Unified AI Dataset Pipeline consolidates fragmented data sourcing, processin
 
 ## Technical Stack
 
-| Category | Technology | Version | Purpose |
-|----------|-----------|---------|---------|
-| **Runtime** | Python | 3.11+ | Core pipeline logic |
-| **Package Manager** | uv | Latest | Dependency management (never pip/conda) |
-| **Object Storage** | OVH S3 | - | Dataset persistence via boto3 |
-| **Distributed Processing** | Ray | 2.9+ | Parallel dataset processing at scale |
-| **Database** | PostgreSQL | 15+ | Metadata and state persistence |
-| **Testing** | pytest | 8.0+ | Unit and integration testing |
-| **AI/Synthetic** | NeMo Data Designer | - | Synthetic data generation |
-| **Safety** | ProductionCrisisDetector | - | Crisis detection (>95% sensitivity) |
+| Category                   | Technology               | Version | Purpose                                 |
+| -------------------------- | ------------------------ | ------- | --------------------------------------- |
+| **Runtime**                | Python                   | 3.11+   | Core pipeline logic                     |
+| **Package Manager**        | uv                       | Latest  | Dependency management (never pip/conda) |
+| **Object Storage**         | OVH S3                   | -       | Dataset persistence via boto3           |
+| **Distributed Processing** | Ray                      | 2.9+    | Parallel dataset processing at scale    |
+| **Database**               | PostgreSQL               | 15+     | Metadata and state persistence          |
+| **Testing**                | pytest                   | 8.0+    | Unit and integration testing            |
+| **AI/Synthetic**           | NeMo Data Designer       | -       | Synthetic data generation               |
+| **Safety**                 | ProductionCrisisDetector | -       | Crisis detection (>95% sensitivity)     |
 
 ---
 
@@ -156,11 +157,13 @@ The Unified AI Dataset Pipeline consolidates fragmented data sourcing, processin
 ## User Stories
 
 ### Story 1: Academic Dataset Integration
+
 As a **Data Scientist**, I want to automatically fetch and process academic findings from PubMed/Scholar so that I can ground therapeutic conversations in peer-reviewed research.
 
 Files to modify: `ai/sourcing/academic/academic_sourcing.py`, `ai/pipelines/orchestrator/quality_gates.py`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/sourcing/academic/academic_sourcing.py` successfully fetches findings
 - [ ] **MUST:** `ai/journal_dataset_research/pipeline.py` triggers for therapeutic queries
 - [ ] **MUST:** Findings pass through `ai/pipelines/orchestrator/quality_gates.py`
@@ -169,11 +172,13 @@ Files to modify: `ai/sourcing/academic/academic_sourcing.py`, `ai/pipelines/orch
 **Depends on:** Phase 1 orchestrator, Phase 2 sourcing
 
 ### Story 2: Synthetic Data Generation
+
 As an **AI Engineer**, I want to generate 10,000+ therapeutic samples using NeMo Data Designer so that I can augment real-world data with controlled, diverse scenarios.
 
 Files to modify: `ai/data_designer/service.py`, `ai/pipelines/orchestrator/ears_compliance_gate.py`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/data_designer/service.py` generates 10,000 therapeutic samples
 - [ ] **MUST:** `ai/training/ready_packages/scripts/generate_nemo_synthetic_data.py` generates 5,000 bias samples
 - [ ] **MUST:** `ai/training/ready_packages/scripts/generate_ultra_nightmares.py` produces edge cases
@@ -182,11 +187,13 @@ Files to modify: `ai/data_designer/service.py`, `ai/pipelines/orchestrator/ears_
 **Depends on:** Phase 2 sourcing, Phase 3 EARS gate
 
 ### Story 3: Unused Material Hydration
+
 As a **Platform Engineer**, I want to convert static texts (books, transcripts) into training conversations so that I can maximize value from existing intellectual property.
 
 Files to modify: `ai/training/ready_packages/scripts/extract_all_books_to_training.py`, `ai/training/ready_packages/scripts/extract_all_youtube_transcripts.py`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/training/ready_packages/scripts/extract_all_books_to_training.py` processes books
 - [ ] **MUST:** `ai/training/ready_packages/scripts/extract_all_youtube_transcripts.py` generates transcripts
 - [ ] **MUST:** `ai/sourcing/youtube/processed_transcripts_loader.py` creates grounding datasets
@@ -195,11 +202,13 @@ Files to modify: `ai/training/ready_packages/scripts/extract_all_books_to_traini
 **Depends on:** Phase 2 sourcing integration
 
 ### Story 4: Pipeline Orchestration
+
 As a **DevOps Engineer**, I want a single Python entry point for all pipeline operations so that I can execute, monitor, and debug the entire pipeline programmatically.
 
 Files to modify: `ai/pipelines/orchestrator/main_orchestrator.py`, `scripts/run_phase1_production.sh`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/pipelines/orchestrator/main_orchestrator.py` subsumes shell script logic
 - [ ] **MUST:** Preprocessing via `ai/pipelines/orchestrator/unified_preprocessing_pipeline.py`
 - [ ] **SHOULD:** Resume from checkpoint via `ai/pipelines/orchestrator/checkpoint_manager.py`
@@ -208,11 +217,13 @@ Files to modify: `ai/pipelines/orchestrator/main_orchestrator.py`, `scripts/run_
 **Depends on:** Phase 1 foundation, Phase 5 consolidation
 
 ### Story 5: Safety and Quality Enforcement
+
 As a **Compliance Officer**, I want all datasets to pass through rigorous safety and quality gates so that we ensure psychological safety and ethical standards.
 
 Files to modify: `ai/safety/crisis_detection/production_crisis_detector.py`, `ai/pipelines/orchestrator/ears_compliance_gate.py`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/safety/crisis_detection/production_crisis_detector.py` achieves >95% sensitivity
 - [ ] **MUST:** `ai/pipelines/orchestrator/ears_compliance_gate.py` validates conversations
 - [ ] **MUST:** `ai/safety/content_filter.py` filters harmful content
@@ -221,11 +232,13 @@ Files to modify: `ai/safety/crisis_detection/production_crisis_detector.py`, `ai
 **Depends on:** Phase 3 quality gates
 
 ### Story 6: Production Infrastructure
+
 As a **Platform Engineer**, I want distributed processing and S3 integration so that I can scale dataset generation to production workloads.
 
 Files to modify: `ai/infrastructure/distributed/ray_executor.py`, `ai/infrastructure/s3/s3_dataset_loader.py`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/infrastructure/distributed/ray_executor.py` handles parallel processing
 - [ ] **MUST:** `ai/infrastructure/database/persistence.py` serves as sole persistence
 - [ ] **MUST:** `ai/infrastructure/s3/s3_dataset_loader.py` supports resumable uploads
@@ -234,11 +247,13 @@ Files to modify: `ai/infrastructure/distributed/ray_executor.py`, `ai/infrastruc
 **Depends on:** Phase 4 infrastructure
 
 ### Story 7: Component Consolidation
+
 As a **Tech Lead**, I want to eliminate redundant components and clarify module boundaries so that the codebase is maintainable and scalable.
 
 Files to modify: `ai/dataset_pipeline/`, `ai/training_ready/`, `ai/pipelines/orchestrator/`
 
 **Acceptance Criteria:**
+
 - [ ] **MUST:** `ai/dataset_pipeline/` logic merged into `ai/pipelines/orchestrator/`
 - [ ] **MUST:** `ai/training_ready/` migrated to `ai/training/ready_packages/`
 - [ ] **MUST:** Clear separation between `ai/models/pixel/` and `ai/pixel/`
@@ -287,6 +302,7 @@ Files to modify: `ai/dataset_pipeline/`, `ai/training_ready/`, `ai/pipelines/orc
 > ⚠️ **MANDATORY: No Stubs or Filler Logic**
 >
 > All implementations MUST be complete and production-ready. The following are **absolutely prohibited**:
+>
 > - Stub functions (`pass`, `...`, `NotImplementedError`)
 > - Placeholder logic (`return True`, `return []`, hardcoded dummy values)
 > - TODO/FIXME comments in production code
@@ -329,7 +345,7 @@ Files to modify: `ai/dataset_pipeline/`, `ai/training_ready/`, `ai/pipelines/orc
 
 ### Related Documents
 
-- *(Task breakdown embedded in Phases 1-5 above)*
+- _(Task breakdown embedded in Phases 1-5 above)_
 - [EMPATHY_RESPONSE_STYLE.md](../docs/guides/EMPATHY_RESPONSE_STYLE.md) — EARS compliance specification
 - [PIX-58: S3 Infrastructure]() — OVH S3 integration spec
 - [PIX-48: Edge Case Generator]() — Synthetic edge case generation

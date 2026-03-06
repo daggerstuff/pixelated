@@ -1,8 +1,8 @@
 ---
-title: 'Encryption & Zero-Knowledge System'
-description: 'Learn about Pixelated Healths encryption architecture and zero-knowledge implementation'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Encryption & Zero-Knowledge System"
+description: "Learn about Pixelated Healths encryption architecture and zero-knowledge implementation"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -14,11 +14,13 @@ Pixelated Healths encryption system provides end-to-end security through zero-kn
 
 ## Architecture Overview
 
-  <Card
-    title="Zero-Knowledge Proofs"
-    icon="lock-keyhole"
-    href="#zero-knowledge-proofs"
-  >
+<Card
+title="Zero-Knowledge Proofs"
+icon="lock-keyhole"
+href="#zero-knowledge-proofs"
+
+>
+
     Privacy-preserving verification
     Secure key lifecycle
     End-to-end encryption
@@ -28,7 +30,7 @@ Pixelated Healths encryption system provides end-to-end security through zero-kn
 
 ### Implementation
 
-  Our zero-knowledge system ensures data privacy while enabling verification
+Our zero-knowledge system ensures data privacy while enabling verification
 
 ```mermaid
 graph TD
@@ -41,32 +43,28 @@ graph TD
 ### Circuit Components
 
 ```typescript Session Circuit
-
 const circuit = new SessionDataCircuit({
-hashFunction: 'Poseidon',
-curveType: 'BN254',
-merkleTreeDepth: 20
+  hashFunction: "Poseidon",
+  curveType: "BN254",
+  merkleTreeDepth: 20,
 });
 
 const proof = await circuit.generateProof({
-sessionData: encryptedData,
-publicInputs: publicParams
+  sessionData: encryptedData,
+  publicInputs: publicParams,
 });
-
-````
+```
 
 ```typescript Verification
 const isValid = await circuit.verifyProof({
   proof: proof,
-  publicInputs: publicParams
+  publicInputs: publicParams,
 });
-````
-
+```
 
 ## Key Management
 
 ### Key Hierarchy
-
 
 - Master Key (KMS)
 - Key Encryption Keys (KEKs)
@@ -78,26 +76,26 @@ const isValid = await circuit.verifyProof({
 
 ```typescript
 const keyManager = new KeyManager({
-  kmsProvider: 'aws',
-  region: 'us-east-1',
-  keyRotationPeriod: '30d',
+  kmsProvider: "aws",
+  region: "us-east-1",
+  keyRotationPeriod: "30d",
   backupEnabled: true,
-})
+});
 
 // Generate new data encryption key
 const dek = await keyManager.generateDataKey({
-  keySpec: 'AES_256',
+  keySpec: "AES_256",
   context: {
-    purpose: 'session_encryption',
-    userId: 'user_123',
+    purpose: "session_encryption",
+    userId: "user_123",
   },
-})
+});
 
 // Rotate keys
 await keyManager.rotateKeys({
-  keyType: 'data',
-  gracePeriod: '7d',
-})
+  keyType: "data",
+  gracePeriod: "7d",
+});
 ```
 
 ## Data Encryption
@@ -113,36 +111,32 @@ await keyManager.rotateKeys({
 ### Implementation
 
 ```typescript Encryption
-
 const encryption = new DataEncryption({
-algorithm: 'AES-256-GCM',
-keyDerivation: 'HKDF',
-padding: 'PKCS7'
+  algorithm: "AES-256-GCM",
+  keyDerivation: "HKDF",
+  padding: "PKCS7",
 });
 
 // Encrypt data
 const encrypted = await encryption.encrypt({
-data: sensitiveData,
-key: dek,
-associated: metadata
+  data: sensitiveData,
+  key: dek,
+  associated: metadata,
 });
-
-````
+```
 
 ```typescript Decryption
 // Decrypt data
 const decrypted = await encryption.decrypt({
   data: encrypted,
   key: dek,
-  associated: metadata
+  associated: metadata,
 });
-````
-
+```
 
 ## Quantum Resistance
 
 ### Algorithms
-
 
 - CRYSTALS-Kyber (Key Encapsulation)
 - CRYSTALS-Dilithium (Digital Signatures)
@@ -153,30 +147,29 @@ const decrypted = await encryption.decrypt({
 
 ```typescript
 const quantumResistant = new QuantumResistantCrypto({
-  kemAlgorithm: 'Kyber1024',
-  signatureAlgorithm: 'Dilithium5',
+  kemAlgorithm: "Kyber1024",
+  signatureAlgorithm: "Dilithium5",
   useHybridMode: true,
-})
+});
 
 // Generate quantum-resistant keypair
-const keyPair = await quantumResistant.generateKeyPair()
+const keyPair = await quantumResistant.generateKeyPair();
 
 // Encapsulate key
 const { ciphertext, sharedSecret } = await quantumResistant.encapsulate({
   publicKey: keyPair.publicKey,
-})
+});
 
 // Decapsulate key
 const decapsulated = await quantumResistant.decapsulate({
   ciphertext: ciphertext,
   privateKey: keyPair.privateKey,
-})
+});
 ```
 
 ## Homomorphic Encryption
 
 ### Features
-
 
 - Partial homomorphic encryption
 - Somewhat homomorphic encryption
@@ -187,26 +180,25 @@ const decapsulated = await quantumResistant.decapsulate({
 
 ```typescript
 const homomorphic = new HomomorphicEncryption({
-  scheme: 'BFV',
+  scheme: "BFV",
   securityLevel: 128,
   polyModulusDegree: 4096,
-})
+});
 
 // Encrypt numbers
-const encrypted1 = await homomorphic.encrypt(5)
-const encrypted2 = await homomorphic.encrypt(3)
+const encrypted1 = await homomorphic.encrypt(5);
+const encrypted2 = await homomorphic.encrypt(3);
 
 // Perform operation on encrypted data
-const encryptedSum = await homomorphic.add(encrypted1, encrypted2)
+const encryptedSum = await homomorphic.add(encrypted1, encrypted2);
 
 // Decrypt result
-const sum = await homomorphic.decrypt(encryptedSum) // 8
+const sum = await homomorphic.decrypt(encryptedSum); // 8
 ```
 
 ## Forward Secrecy
 
 ### Protocol
-
 
 ```mermaid
 sequenceDiagram
@@ -224,22 +216,22 @@ sequenceDiagram
 
 ```typescript
 const forwardSecrecy = new ForwardSecrecyProtocol({
-  ratchetAlgorithm: 'Double',
-  kdf: 'HKDF-SHA256',
+  ratchetAlgorithm: "Double",
+  kdf: "HKDF-SHA256",
   messageKeyLimit: 100,
-})
+});
 
 // Initialize session
 const session = await forwardSecrecy.initSession({
   identityKey: localIdentityKey,
   preKey: remotePreKey,
-})
+});
 
 // Send message
-const encrypted = await session.encrypt('Hello')
+const encrypted = await session.encrypt("Hello");
 
 // Receive message
-const decrypted = await session.decrypt(encrypted)
+const decrypted = await session.decrypt(encrypted);
 ```
 
 ## Best Practices
@@ -262,10 +254,12 @@ const decrypted = await session.decrypt(encrypted)
 
 Need help with encryption? Contact our security team:
 
-  <Card
-    title="Security Support"
-    icon="shield"
-    href="mailto:security@gradiant.dev"
-  >
+<Card
+title="Security Support"
+icon="shield"
+href="mailto:security@gradiant.dev"
+
+>
+
     Contact security team
     View technical guides

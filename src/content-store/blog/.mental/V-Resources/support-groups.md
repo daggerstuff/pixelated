@@ -1,7 +1,7 @@
 ---
-title: 'Support Groups'
-description: 'Guide to support groups and peer support resources'
-author: 'Resource Team'
+title: "Support Groups"
+description: "Guide to support groups and peer support resources"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

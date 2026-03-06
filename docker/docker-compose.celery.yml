@@ -30,10 +30,10 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
 
   # Celery Worker for batch processing tasks
@@ -67,10 +67,10 @@ services:
       replicas: 3
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 4G
         reservations:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 2G
 
   # Celery Worker for quality validation tasks
@@ -104,10 +104,10 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1G
         reservations:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
 
   # Celery Worker for export processing tasks
@@ -142,10 +142,10 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: '1.5'
+          cpus: "1.5"
           memory: 3G
         reservations:
-          cpus: '0.75'
+          cpus: "0.75"
           memory: 1.5G
 
   # Celery Beat scheduler for periodic tasks
@@ -179,10 +179,10 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 256M
 
   # Flower monitoring dashboard for Celery
@@ -217,10 +217,10 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: '0.25'
+          cpus: "0.25"
           memory: 512M
         reservations:
-          cpus: '0.1'
+          cpus: "0.1"
           memory: 256M
 
 networks:

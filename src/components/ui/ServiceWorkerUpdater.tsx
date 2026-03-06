@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { toast } from 'react-hot-toast'
-import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
+import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import { serviceWorkerManager } from "../../utils/serviceWorkerRegistration";
 
 interface ServiceWorkerUpdaterProps {
-  onUpdateAvailable?: () => void
-  onUpdateComplete?: () => void
+  onUpdateAvailable?: () => void;
+  onUpdateComplete?: () => void;
 }
 
 /**
@@ -18,28 +18,28 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
   onUpdateAvailable,
   onUpdateComplete,
 }) => {
-  const [, setUpdateAvailable] = useState(false)
+  const [, setUpdateAvailable] = useState(false);
 
   useEffect(() => {
     if (!serviceWorkerManager.isSupported()) {
-      return
+      return;
     }
 
     // Register service worker
     serviceWorkerManager.register().catch(() => {
-      console.error('Service Worker registration failed')
-    })
+      console.error("Service Worker registration failed");
+    });
 
     // Listen for updates
     const handleUpdateAvailable = () => {
-      setUpdateAvailable(true)
-      onUpdateAvailable?.()
+      setUpdateAvailable(true);
+      onUpdateAvailable?.();
 
       toast.custom(
         (t) => (
           <div
             className={`
-          ${t.visible ? 'animate-enter' : 'animate-leave'}
+          ${t.visible ? "animate-enter" : "animate-leave"}
           max-w-md w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg pointer-events-auto flex ring-1 ring-black ring-opacity-5
         `}
           >
@@ -58,9 +58,9 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
             <div className="flex border-l border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => {
-                  window.location.reload()
-                  toast.dismiss(t.id)
-                  onUpdateComplete?.()
+                  window.location.reload();
+                  toast.dismiss(t.id);
+                  onUpdateComplete?.();
                 }}
                 className="w-full border border-transparent rounded-none rounded-r-lg p-4 flex items-center justify-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
@@ -72,51 +72,51 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
 
         {
           duration: Infinity,
-          position: 'bottom-right',
+          position: "bottom-right",
         },
-      )
-    }
+      );
+    };
 
     window.addEventListener(
-      'serviceWorkerUpdateAvailable',
+      "serviceWorkerUpdateAvailable",
       handleUpdateAvailable,
-    )
+    );
 
     // Check for updates periodically
     const checkForUpdates = () => {
       serviceWorkerManager.update().catch(() => {
-        console.error('Service Worker update check failed')
-      })
-    }
+        console.error("Service Worker update check failed");
+      });
+    };
 
     // Check after component mounts and then periodically
-    checkForUpdates()
-    const updateInterval = setInterval(checkForUpdates, 60 * 60 * 1000) // Check every hour
+    checkForUpdates();
+    const updateInterval = setInterval(checkForUpdates, 60 * 60 * 1000); // Check every hour
 
     return () => {
       window.removeEventListener(
-        'serviceWorkerUpdateAvailable',
+        "serviceWorkerUpdateAvailable",
         handleUpdateAvailable,
-      )
-      clearInterval(updateInterval)
-    }
-  }, [onUpdateAvailable, onUpdateComplete])
+      );
+      clearInterval(updateInterval);
+    };
+  }, [onUpdateAvailable, onUpdateComplete]);
 
   // Request notification permission if needed
   useEffect(() => {
     const requestNotificationPermission = async () => {
-      if ('Notification' in window && Notification.permission === 'default') {
+      if ("Notification" in window && Notification.permission === "default") {
         try {
-          await Notification.requestPermission()
-          toast.success('Notifications enabled')
+          await Notification.requestPermission();
+          toast.success("Notifications enabled");
         } catch {
-          console.error('Failed to request notification permission')
+          console.error("Failed to request notification permission");
         }
       }
-    }
+    };
 
-    requestNotificationPermission()
-  }, [])
+    requestNotificationPermission();
+  }, []);
 
-  return null // This is a utility component, it doesn't render anything
-}
+  return null; // This is a utility component, it doesn't render anything
+};
