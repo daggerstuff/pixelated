@@ -19,7 +19,7 @@
   .responsive-auth-container {
     padding-top: calc(var(--space-6) + 80px); /* Account for fixed header */
   }
-  
+
   /* Ensure form buttons and inputs have proper stacking context */
   .form-responsive button,
   .form-responsive input,

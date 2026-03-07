@@ -1,39 +1,38 @@
-import { generateCspNonce } from './lib/middleware/csp'
-import { securityHeaders } from './lib/middleware/securityHeaders'
-import { sequence, defineMiddleware } from 'astro:middleware'
-import { tracingMiddleware } from './lib/tracing/middleware'
-import { markSpanError } from './lib/tracing/utils'
-import { authenticateRequest } from './lib/auth/auth0-middleware'
-
+import { generateCspNonce } from "./lib/middleware/csp";
+import { securityHeaders } from "./lib/middleware/securityHeaders";
+import { sequence, defineMiddleware } from "astro:middleware";
+import { tracingMiddleware } from "./lib/tracing/middleware";
+import { markSpanError } from "./lib/tracing/utils";
+import { authenticateRequest } from "./lib/auth/auth0-middleware";
 
 // Simple route matcher for protected API routes and journal-research pages
 const protectedRoutePatterns: RegExp[] = [
   /\/api\/protected(.*)/,
   /\/api\/journal-research(.*)/, // Protect journal-research API endpoints
   /\/journal-research(.*)/, // Protect journal-research pages
-]
+];
 
 function isProtectedRoute(request: Request) {
   try {
-    const url = new URL(request.url)
-    const { pathname } = url
+    const url = new URL(request.url);
+    const { pathname } = url;
 
     // Allow public API routes (auth endpoints, health checks, etc.)
-    if (pathname.startsWith('/api/auth/')) {
-      return false
+    if (pathname.startsWith("/api/auth/")) {
+      return false;
     }
 
     // Allow health check endpoints (used by smoke tests and monitoring)
-    if (pathname.includes('/health') || pathname.endsWith('/health')) {
-      return false
+    if (pathname.includes("/health") || pathname.endsWith("/health")) {
+      return false;
     }
 
-    return protectedRoutePatterns.some((r) => r.test(pathname))
+    return protectedRoutePatterns.some((r) => r.test(pathname));
   } catch (err) {
     // If URL parsing fails, be conservative and treat as not protected
     // Log the error for observability without exposing PII
-    markSpanError(err instanceof Error ? err : new Error(String(err)))
-    return false
+    markSpanError(err instanceof Error ? err : new Error(String(err)));
+    return false;
   }
 }
 
@@ -42,31 +41,33 @@ function isProtectedRoute(request: Request) {
  * If a request targets a protected route and there's no valid Auth0 session, return 401.
  */
 const projectAuthMiddleware = defineMiddleware(async (context, next) => {
-  const { request } = context
+  const { request } = context;
 
   // Allow non-protected routes through quickly
   if (!isProtectedRoute(request)) {
-    return next()
+    return next();
   }
 
   // Check authentication using Auth0
   try {
-    const authResult = await authenticateRequest(request)
+    const authResult = await authenticateRequest(request);
 
     if (!authResult.success) {
       // If authentication failed, return the response from Auth0 middleware
       if (authResult.response) {
-        return authResult.response
+        return authResult.response;
       }
 
       // Fallback to 401 if no response provided
       return new Response(
-        JSON.stringify({ error: authResult.error || 'Authentication required' }),
+        JSON.stringify({
+          error: authResult.error || "Authentication required",
+        }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Type assertion required: Astro's defineMiddleware doesn't infer App.Locals
@@ -82,25 +83,22 @@ const projectAuthMiddleware = defineMiddleware(async (context, next) => {
       // Create the user object first, then assign with proper typing
       const userData = {
         ...authResult.request.user,
-        emailVerified: authResult.request.user.emailVerified ?? false
-      }
+        emailVerified: authResult.request.user.emailVerified ?? false,
+      };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(context.locals as any).user = userData
+      (context.locals as any).user = userData;
     }
   } catch (err) {
     // If authentication check fails, treat as unauthenticated
-    markSpanError(err instanceof Error ? err : new Error(String(err)))
-    return new Response(
-      JSON.stringify({ error: 'Authentication failed' }),
-      {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    markSpanError(err instanceof Error ? err : new Error(String(err)));
+    return new Response(JSON.stringify({ error: "Authentication failed" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  return next()
-})
+  return next();
+});
 
 // Single, clean middleware sequence
 // Tracing middleware is first to capture all requests
@@ -109,4 +107,4 @@ export const onRequest = sequence(
   generateCspNonce as any,
   securityHeaders as any,
   projectAuthMiddleware as any,
-)
+);

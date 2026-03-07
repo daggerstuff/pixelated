@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ComponentType } from "react";
 
 /**
  * Types related to testing, including browser compatibility testing
@@ -11,72 +11,72 @@ export interface CompatibilityIssue {
   /**
    * Unique identifier for the issue
    */
-  id?: number | string
+  id?: number | string;
 
   /**
    * Browser where the issue was detected
    */
-  browser: string
+  browser: string;
 
   /**
    * Component or feature affected by the issue
    */
-  component: string
+  component: string;
 
   /**
    * Description of the issue
    */
-  description: string
+  description: string;
 
   /**
    * Severity level of the issue
    */
-  severity: 'critical' | 'major' | 'minor'
+  severity: "critical" | "major" | "minor";
 
   /**
    * Timestamp when the issue was detected
    */
-  timestamp?: string
+  timestamp?: string;
 
   /**
    * URL where the issue was detected
    */
-  url?: string
+  url?: string;
 
   /**
    * The specific version of the browser
    */
-  browserVersion?: string
+  browserVersion?: string;
 
   /**
    * The type of device (desktop, mobile, tablet)
    */
-  deviceType?: 'desktop' | 'mobile' | 'tablet'
+  deviceType?: "desktop" | "mobile" | "tablet";
 
   /**
    * Operating system where the issue was detected
    */
-  os?: string
+  os?: string;
 
   /**
    * Screenshots or visual evidence of the issue
    */
-  screenshotUrl?: string
+  screenshotUrl?: string;
 
   /**
    * Person or system who reported the issue
    */
-  reporter?: string
+  reporter?: string;
 
   /**
    * Status of the issue
    */
-  status?: 'open' | 'investigating' | 'fixed' | 'wontfix' | 'duplicate'
+  status?: "open" | "investigating" | "fixed" | "wontfix" | "duplicate";
 
   /**
    * Additional metadata
    */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -86,97 +86,97 @@ export interface BrowserCompatibilityTestResult {
   /**
    * Unique identifier for the test result
    */
-  id: number | string
+  id: number | string;
 
   /**
    * Name of the test
    */
-  name: string
+  name: string;
 
   /**
    * Browser where the test was run
    */
-  browser: string
+  browser: string;
 
   /**
    * Browser version
    */
-  browserVersion: string
+  browserVersion: string;
 
   /**
    * Test status
    */
-  status: 'passed' | 'failed' | 'skipped' | 'error'
+  status: "passed" | "failed" | "skipped" | "error";
 
   /**
    * Description of the failure (if applicable)
    */
-  failureReason?: string
+  failureReason?: string;
 
   /**
    * Timestamp when the test was run
    */
-  timestamp: string
+  timestamp: string;
 
   /**
    * Duration of the test in milliseconds
    */
-  duration: number
+  duration: number;
 
   /**
    * URL that was tested
    */
-  url?: string
+  url?: string;
 
   /**
    * Type of test (functional, visual, performance)
    */
-  type: 'functional' | 'visual' | 'performance'
+  type: "functional" | "visual" | "performance";
 
   /**
    * Device type used for testing
    */
-  deviceType?: 'desktop' | 'mobile' | 'tablet'
+  deviceType?: "desktop" | "mobile" | "tablet";
 
   /**
    * Operating system where the test was run
    */
-  os?: string
+  os?: string;
 
   /**
    * Screenshot URL (for visual tests)
    */
-  screenshotUrl?: string
+  screenshotUrl?: string;
 
   /**
    * Baseline screenshot URL (for visual comparison)
    */
-  baselineScreenshotUrl?: string
+  baselineScreenshotUrl?: string;
 
   /**
    * Diff screenshot URL (for visual comparison)
    */
-  diffScreenshotUrl?: string
+  diffScreenshotUrl?: string;
 
   /**
    * Visual difference percentage (for visual tests)
    */
-  visualDiffPercentage?: number
+  visualDiffPercentage?: number;
 
   /**
    * Test artifacts (logs, videos, etc.)
    */
   artifacts?: {
-    logs?: string
-    video?: string
-    console?: string[]
-    network?: unknown[]
-  }
+    logs?: string;
+    video?: string;
+    console?: string[];
+    network?: unknown[];
+  };
 
   /**
    * Additional metadata
    */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -187,82 +187,82 @@ export interface BrowserCompatibilityConfig {
    * Browsers to test
    */
   browsers: {
-    name: string
-    version?: string
-    deviceType?: 'desktop' | 'mobile' | 'tablet'
-  }[]
+    name: string;
+    version?: string;
+    deviceType?: "desktop" | "mobile" | "tablet";
+  }[];
 
   /**
    * URLs to test
    */
-  urls: string[]
+  urls: string[];
 
   /**
    * Test types to run
    */
-  testTypes: ('functional' | 'visual' | 'performance')[]
+  testTypes: ("functional" | "visual" | "performance")[];
 
   /**
    * Viewport sizes to test
    */
   viewports?: {
-    width: number
-    height: number
-    name: string
-  }[]
+    width: number;
+    height: number;
+    name: string;
+  }[];
 
   /**
    * Visual comparison threshold (percentage)
    */
-  visualThreshold?: number
+  visualThreshold?: number;
 
   /**
    * Performance budgets
    */
   performanceBudgets?: {
-    firstContentfulPaint?: number
-    largestContentfulPaint?: number
-    timeToInteractive?: number
-    totalBlockingTime?: number
-    cumulativeLayoutShift?: number
-  }
+    firstContentfulPaint?: number;
+    largestContentfulPaint?: number;
+    timeToInteractive?: number;
+    totalBlockingTime?: number;
+    cumulativeLayoutShift?: number;
+  };
 
   /**
    * Notification settings
    */
   notifications?: {
-    email?: string[]
-    slack?: string
-    failureOnly?: boolean
-    includeScreenshots?: boolean
-  }
+    email?: string[];
+    slack?: string;
+    failureOnly?: boolean;
+    includeScreenshots?: boolean;
+  };
 }
 
 export interface TestSection<P = unknown> {
-  title: string
-  component?: ComponentType<P>
-  instructions?: string[]
-  props?: P
+  title: string;
+  component?: ComponentType<P>;
+  instructions?: string[];
+  props?: P;
 }
 
 export type TestSections = {
-  [key: string]: TestSection
-}
+  [key: string]: TestSection;
+};
 
 export interface LoadingSize {
-  width: number
-  height: number
+  width: number;
+  height: number;
 }
 
 export interface LoadingSizes {
-  [key: string]: LoadingSize
+  [key: string]: LoadingSize;
 }
 
 export interface SeverityStyle {
-  backgroundColor: string
-  color: string
+  backgroundColor: string;
+  color: string;
 }
 
 export interface SeverityStyles {
-  [key: string]: SeverityStyle
+  [key: string]: SeverityStyle;
 }

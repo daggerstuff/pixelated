@@ -19,12 +19,14 @@ To ensure that browser compatibility tests pass successfully, maintain these spe
 ### 1. Header and Navigation
 
 The main navigation must have this structure:
+
 - `<header>` element at the top level
 - `<nav>` element inside the header
 - `<ul>` element inside the nav for navigation items
 - `<li>` elements containing navigation links
 
 Example (from `MainNav.astro`):
+
 ```html
 <header class="...">
   <div class="..."><!-- Logo --></div>
@@ -53,9 +55,7 @@ The footer must be present on all pages with the class `site-footer`:
 The contact form must display "Thank you for your message" text when submitted:
 
 ```html
-<div id="success-message">
-  Thank you for your message
-</div>
+<div id="success-message">Thank you for your message</div>
 ```
 
 ## Testing Requirements
@@ -76,6 +76,7 @@ pnpm run test:browser
 ## Common Issues
 
 If tests fail with "element not found" errors:
+
 - Verify the DOM structure matches what the tests expect
 - Check if elements are being rendered server-side (not just client-side)
 - Verify elements aren't hidden by CSS (especially in specific browsers)

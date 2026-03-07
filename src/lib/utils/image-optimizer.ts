@@ -3,13 +3,13 @@
  * Compress and optimize static assets for better performance
  */
 
-import { readFile, mkdir } from 'fs/promises'
-import { existsSync, statSync } from 'fs'
-import { join } from 'path'
-import { getLogger } from '@/lib/logging'
-import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
+import { readFile, mkdir } from "fs/promises";
+import { existsSync, statSync } from "fs";
+import { join } from "path";
+import { getLogger } from "@/lib/logging";
+import { validatePath, ALLOWED_DIRECTORIES } from "../../utils/path-security";
 
-const logger = getLogger('image-optimizer')
+const logger = getLogger("image-optimizer");
 
 // Optimization configuration
 const IMAGE_CONFIG = {
@@ -45,41 +45,41 @@ const IMAGE_CONFIG = {
 
   // Output directories
   OUTPUT_DIRS: {
-    optimized: './public/assets/optimized',
-    webp: './public/assets/webp',
-    avif: './public/assets/avif',
+    optimized: "./public/assets/optimized",
+    webp: "./public/assets/webp",
+    avif: "./public/assets/avif",
   },
-}
+};
 
 /**
  * Image optimization result
  */
 export interface OptimizationResult {
-  originalPath: string
-  originalSize: number
-  optimizedPath?: string
-  optimizedSize?: number
-  webpPath?: string
-  webpSize?: number
-  avifPath?: string
-  avifSize?: number
-  savings: number
-  compressionRatio: number
+  originalPath: string;
+  originalSize: number;
+  optimizedPath?: string;
+  optimizedSize?: number;
+  webpPath?: string;
+  webpSize?: number;
+  avifPath?: string;
+  avifSize?: number;
+  savings: number;
+  compressionRatio: number;
 }
 
 /**
  * Image optimization service
  */
 export class ImageOptimizer {
-  private outputDirs: string[]
+  private outputDirs: string[];
 
   constructor() {
     this.outputDirs = [
       IMAGE_CONFIG.OUTPUT_DIRS.optimized,
       IMAGE_CONFIG.OUTPUT_DIRS.webp,
       IMAGE_CONFIG.OUTPUT_DIRS.avif,
-    ]
-    void this.ensureOutputDirectories()
+    ];
+    void this.ensureOutputDirectories();
   }
 
   /**
@@ -88,9 +88,9 @@ export class ImageOptimizer {
   private async ensureOutputDirectories(): Promise<void> {
     for (const dir of this.outputDirs) {
       try {
-        await mkdir(dir, { recursive: true })
+        await mkdir(dir, { recursive: true });
       } catch (error) {
-        logger.warn(`Failed to create output directory: ${dir}`, { error })
+        logger.warn(`Failed to create output directory: ${dir}`, { error });
       }
     }
   }
@@ -101,51 +101,60 @@ export class ImageOptimizer {
   async optimizeImage(imagePath: string): Promise<OptimizationResult> {
     // Validate path to prevent traversal attacks
     try {
-      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT);
     } catch (error) {
-      throw new Error(`Invalid image path: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(
+        `Invalid image path: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
-    const startTime = Date.now()
+    const startTime = Date.now();
 
     try {
       // Security: Validate path to prevent traversal
-      if (!validatePath(imagePath, [ALLOWED_DIRECTORIES.PUBLIC, ALLOWED_DIRECTORIES.ASSETS])) {
-        throw new Error(`Access denied: Path is outside allowed directories: ${imagePath}`)
+      if (
+        !validatePath(imagePath, [
+          ALLOWED_DIRECTORIES.PUBLIC,
+          ALLOWED_DIRECTORIES.ASSETS,
+        ])
+      ) {
+        throw new Error(
+          `Access denied: Path is outside allowed directories: ${imagePath}`,
+        );
       }
 
       // Check if file exists
       if (!existsSync(imagePath)) {
-        throw new Error(`Image file not found: ${imagePath}`)
+        throw new Error(`Image file not found: ${imagePath}`);
       }
 
-      const stat = statSync(imagePath)
-      const originalSize = stat.size
+      const stat = statSync(imagePath);
+      const originalSize = stat.size;
 
-      logger.info('Starting image optimization', {
+      logger.info("Starting image optimization", {
         imagePath,
         originalSize,
         sizeKB: Math.round(originalSize / 1024),
-      })
+      });
 
       // Read image file
-      const imageBuffer = await readFile(imagePath)
+      const imageBuffer = await readFile(imagePath);
 
       // Determine image format
-      const format = this.detectImageFormat(imagePath, imageBuffer)
+      const format = this.detectImageFormat(imagePath, imageBuffer);
 
       // Skip optimization for very small files
       if (originalSize < IMAGE_CONFIG.THRESHOLDS.SMALL_FILE) {
-        logger.info('Skipping optimization for small file', {
+        logger.info("Skipping optimization for small file", {
           imagePath,
           size: originalSize,
-        })
+        });
         return {
           originalPath: imagePath,
           originalSize,
           savings: 0,
           compressionRatio: 1,
-        }
+        };
       }
 
       // Optimize based on format
@@ -154,51 +163,52 @@ export class ImageOptimizer {
         originalSize,
         savings: 0,
         compressionRatio: 1,
-      }
+      };
 
       // Generate optimized versions
-      if (format === 'jpeg' || format === 'png') {
+      if (format === "jpeg" || format === "png") {
         // Generate WebP version
-        const webpResult = await this.generateWebP(imagePath, imageBuffer)
+        const webpResult = await this.generateWebP(imagePath, imageBuffer);
         if (webpResult) {
-          result.webpPath = webpResult.path
-          result.webpSize = webpResult.size
+          result.webpPath = webpResult.path;
+          result.webpSize = webpResult.size;
         }
 
         // Generate AVIF version for modern browsers
-        const avifResult = await this.generateAVIF(imagePath, imageBuffer)
+        const avifResult = await this.generateAVIF(imagePath, imageBuffer);
         if (avifResult) {
-          result.avifPath = avifResult.path
-          result.avifSize = avifResult.size
+          result.avifPath = avifResult.path;
+          result.avifSize = avifResult.size;
         }
       }
 
       // Calculate total savings
-      const totalOptimizedSize = (result.webpSize || 0) + (result.avifSize || 0)
+      const totalOptimizedSize =
+        (result.webpSize || 0) + (result.avifSize || 0);
       if (totalOptimizedSize > 0) {
-        result.savings = originalSize - totalOptimizedSize / 2 // Average savings
-        result.compressionRatio = originalSize / (totalOptimizedSize / 2)
+        result.savings = originalSize - totalOptimizedSize / 2; // Average savings
+        result.compressionRatio = originalSize / (totalOptimizedSize / 2);
       }
 
-      const processingTime = Date.now() - startTime
+      const processingTime = Date.now() - startTime;
 
-      logger.info('Image optimization completed', {
+      logger.info("Image optimization completed", {
         imagePath,
         originalSize,
         totalOptimizedSize,
         savings: result.savings,
         compressionRatio: Math.round(result.compressionRatio * 100) / 100,
         processingTime,
-      })
+      });
 
-      return result
+      return result;
     } catch (error) {
-      logger.error('Image optimization failed', {
+      logger.error("Image optimization failed", {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
-      })
+      });
 
-      throw error
+      throw error;
     }
   }
 
@@ -207,32 +217,32 @@ export class ImageOptimizer {
    */
   private detectImageFormat(filePath: string, buffer: Buffer): string {
     // Check file extension first
-    const ext = filePath.toLowerCase().split('.').pop()
+    const ext = filePath.toLowerCase().split(".").pop();
 
-    if (['jpg', 'jpeg'].includes(ext || '')) return 'jpeg'
-    if (ext === 'png') return 'png'
-    if (ext === 'webp') return 'webp'
-    if (ext === 'avif') return 'avif'
-    if (ext === 'gif') return 'gif'
+    if (["jpg", "jpeg"].includes(ext || "")) return "jpeg";
+    if (ext === "png") return "png";
+    if (ext === "webp") return "webp";
+    if (ext === "avif") return "avif";
+    if (ext === "gif") return "gif";
 
     // Check magic bytes if extension is unclear
-    const magic = buffer.slice(0, 12).toString('hex')
+    const magic = buffer.slice(0, 12).toString("hex");
 
-    if (magic.startsWith('ffd8ff')) return 'jpeg'
-    if (magic.startsWith('89504e47')) return 'png'
+    if (magic.startsWith("ffd8ff")) return "jpeg";
+    if (magic.startsWith("89504e47")) return "png";
     if (
-      magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '57454250'
+      magic.startsWith("52494646") &&
+      buffer.slice(8, 12).toString("hex") === "57454250"
     )
-      return 'webp'
+      return "webp";
     if (
-      magic.startsWith('52494646') &&
-      buffer.slice(8, 12).toString('hex') === '41564946'
+      magic.startsWith("52494646") &&
+      buffer.slice(8, 12).toString("hex") === "41564946"
     )
-      return 'avif'
+      return "avif";
 
     // Default to jpeg if unknown
-    return 'jpeg'
+    return "jpeg";
   }
 
   /**
@@ -248,28 +258,28 @@ export class ImageOptimizer {
 
       const outputPath = join(
         IMAGE_CONFIG.OUTPUT_DIRS.webp,
-        this.getOptimizedFilename(imagePath, 'webp'),
-      )
+        this.getOptimizedFilename(imagePath, "webp"),
+      );
 
       // Placeholder: in real implementation, would convert to WebP
-      const estimatedSize = Math.round(buffer.length * 0.75) // WebP typically 25% smaller
+      const estimatedSize = Math.round(buffer.length * 0.75); // WebP typically 25% smaller
 
-      logger.info('WebP generation completed', {
+      logger.info("WebP generation completed", {
         inputPath: imagePath,
         outputPath,
         estimatedSize,
-      })
+      });
 
       return {
         path: outputPath,
         size: estimatedSize,
-      }
+      };
     } catch (error) {
-      logger.warn('WebP generation failed', {
+      logger.warn("WebP generation failed", {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
-      })
-      return null
+      });
+      return null;
     }
   }
 
@@ -286,28 +296,28 @@ export class ImageOptimizer {
 
       const outputPath = join(
         IMAGE_CONFIG.OUTPUT_DIRS.avif,
-        this.getOptimizedFilename(imagePath, 'avif'),
-      )
+        this.getOptimizedFilename(imagePath, "avif"),
+      );
 
       // Placeholder: in real implementation, would convert to AVIF
-      const estimatedSize = Math.round(buffer.length * 0.6) // AVIF typically 40% smaller
+      const estimatedSize = Math.round(buffer.length * 0.6); // AVIF typically 40% smaller
 
-      logger.info('AVIF generation completed', {
+      logger.info("AVIF generation completed", {
         inputPath: imagePath,
         outputPath,
         estimatedSize,
-      })
+      });
 
       return {
         path: outputPath,
         size: estimatedSize,
-      }
+      };
     } catch (error) {
-      logger.warn('AVIF generation failed', {
+      logger.warn("AVIF generation failed", {
         imagePath,
         error: error instanceof Error ? error.message : String(error),
-      })
-      return null
+      });
+      return null;
     }
   }
 
@@ -317,58 +327,58 @@ export class ImageOptimizer {
   private getOptimizedFilename(originalPath: string, format: string): string {
     const basename =
       originalPath
-        .split('/')
+        .split("/")
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
-    return `${basename}-optimized.${format}`
+        ?.replace(/\.[^/.]+$/, "") || "image";
+    return `${basename}-optimized.${format}`;
   }
 
   /**
    * Batch optimize multiple images
    */
   async optimizeImages(imagePaths: string[]): Promise<OptimizationResult[]> {
-    const results: OptimizationResult[] = []
+    const results: OptimizationResult[] = [];
 
-    logger.info('Starting batch image optimization', {
+    logger.info("Starting batch image optimization", {
       count: imagePaths.length,
-    })
+    });
 
     // Process in batches to avoid overwhelming the system
-    const batchSize = 5
+    const batchSize = 5;
     for (let i = 0; i < imagePaths.length; i += batchSize) {
-      const batch = imagePaths.slice(i, i + batchSize)
+      const batch = imagePaths.slice(i, i + batchSize);
 
-      const batchPromises = batch.map((path) => this.optimizeImage(path))
-      const batchResults = await Promise.all(batchPromises)
+      const batchPromises = batch.map((path) => this.optimizeImage(path));
+      const batchResults = await Promise.all(batchPromises);
 
-      results.push(...batchResults)
+      results.push(...batchResults);
 
       // Small delay between batches
       if (i + batchSize < imagePaths.length) {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
     const totalOriginalSize = results.reduce(
       (sum, r) => sum + r.originalSize,
       0,
-    )
+    );
     const totalOptimizedSize = results.reduce(
       (sum, r) => sum + (r.webpSize || r.originalSize),
       0,
-    )
-    const totalSavings = totalOriginalSize - totalOptimizedSize
+    );
+    const totalSavings = totalOriginalSize - totalOptimizedSize;
 
-    logger.info('Batch image optimization completed', {
+    logger.info("Batch image optimization completed", {
       processed: results.length,
       totalOriginalSize: Math.round(totalOriginalSize / 1024),
       totalOptimizedSize: Math.round(totalOptimizedSize / 1024),
       totalSavings: Math.round(totalSavings / 1024),
       avgCompressionRatio:
         Math.round((totalOptimizedSize / totalOriginalSize) * 100) / 100,
-    })
+    });
 
-    return results
+    return results;
   }
 
   /**
@@ -377,60 +387,60 @@ export class ImageOptimizer {
   generateResponsiveImage(result: OptimizationResult): string {
     const alt =
       result.originalPath
-        .split('/')
+        .split("/")
         .pop()
-        ?.replace(/\.[^/.]+$/, '') || 'image'
+        ?.replace(/\.[^/.]+$/, "") || "image";
 
-    let html = `<!-- Responsive image: ${alt} -->\n`
-    html += `<picture>\n`
+    let html = `<!-- Responsive image: ${alt} -->\n`;
+    html += `<picture>\n`;
 
     // AVIF for modern browsers (smallest file size)
     if (result.avifPath) {
-      html += `  <source srcset="${result.avifPath}" type="image/avif">\n`
+      html += `  <source srcset="${result.avifPath}" type="image/avif">\n`;
     }
 
     // WebP for better compression
     if (result.webpPath) {
-      html += `  <source srcset="${result.webpPath}" type="image/webp">\n`
+      html += `  <source srcset="${result.webpPath}" type="image/webp">\n`;
     }
 
     // Original format as fallback
-    const fallbackPath = result.optimizedPath || result.originalPath
-    html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`
-    html += `</picture>`
+    const fallbackPath = result.optimizedPath || result.originalPath;
+    html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`;
+    html += `</picture>`;
 
-    return html
+    return html;
   }
 
   /**
    * Get optimization statistics
    */
   getOptimizationStats(results: OptimizationResult[]): {
-    totalFiles: number
-    totalOriginalSize: number
-    totalOptimizedSize: number
-    totalSavings: number
-    avgCompressionRatio: number
-    formatBreakdown: Record<string, number>
+    totalFiles: number;
+    totalOriginalSize: number;
+    totalOptimizedSize: number;
+    totalSavings: number;
+    avgCompressionRatio: number;
+    formatBreakdown: Record<string, number>;
   } {
     const totalOriginalSize = results.reduce(
       (sum, r) => sum + r.originalSize,
       0,
-    )
+    );
     const totalOptimizedSize =
       results.reduce((sum, r) => {
-        return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0)
-      }, 0) / 2 // Average of available formats
+        return sum + (r.webpSize || r.originalSize) + (r.avifSize || 0);
+      }, 0) / 2; // Average of available formats
 
-    const totalSavings = totalOriginalSize - totalOptimizedSize
+    const totalSavings = totalOriginalSize - totalOptimizedSize;
 
-    const formatBreakdown: Record<string, number> = {}
+    const formatBreakdown: Record<string, number> = {};
     results.forEach((result) => {
       if (result.webpSize)
-        formatBreakdown.webp = (formatBreakdown.webp || 0) + 1
+        formatBreakdown.webp = (formatBreakdown.webp || 0) + 1;
       if (result.avifSize)
-        formatBreakdown.avif = (formatBreakdown.avif || 0) + 1
-    })
+        formatBreakdown.avif = (formatBreakdown.avif || 0) + 1;
+    });
 
     return {
       totalFiles: results.length,
@@ -439,29 +449,29 @@ export class ImageOptimizer {
       totalSavings,
       avgCompressionRatio: totalOriginalSize / Math.max(totalOptimizedSize, 1),
       formatBreakdown,
-    }
+    };
   }
 }
 
 /**
  * Image optimization utilities
  */
-export const imageOptimizer = new ImageOptimizer()
+export const imageOptimizer = new ImageOptimizer();
 
 /**
  * Optimize all images in public directory
  */
 export async function optimizePublicImages(): Promise<void> {
-  logger.info('Starting public image optimization')
+  logger.info("Starting public image optimization");
 
-  const imagePaths: string[] = []
+  const imagePaths: string[] = [];
 
   // Recursively find all images (this would need a proper implementation)
   // For now, we'll work with a placeholder
 
-  logger.info('Public image optimization completed', {
+  logger.info("Public image optimization completed", {
     optimized: imagePaths.length,
-  })
+  });
 }
 
 /**
@@ -470,25 +480,25 @@ export async function optimizePublicImages(): Promise<void> {
 export async function generateOptimizationReport(
   results: OptimizationResult[],
 ): Promise<string> {
-  const stats = imageOptimizer.getOptimizationStats(results)
+  const stats = imageOptimizer.getOptimizationStats(results);
 
-  let report = `# Image Optimization Report\n\n`
-  report += `## Summary\n`
-  report += `- **Total Files**: ${stats.totalFiles}\n`
-  report += `- **Original Size**: ${Math.round(stats.totalOriginalSize / 1024)}KB\n`
-  report += `- **Optimized Size**: ${Math.round(stats.totalOptimizedSize / 1024)}KB\n`
-  report += `- **Space Saved**: ${Math.round(stats.totalSavings / 1024)}KB (${Math.round((stats.totalSavings / stats.totalOriginalSize) * 100)}%)\n`
-  report += `- **Avg Compression**: ${Math.round(stats.avgCompressionRatio * 100) / 100}x\n\n`
+  let report = `# Image Optimization Report\n\n`;
+  report += `## Summary\n`;
+  report += `- **Total Files**: ${stats.totalFiles}\n`;
+  report += `- **Original Size**: ${Math.round(stats.totalOriginalSize / 1024)}KB\n`;
+  report += `- **Optimized Size**: ${Math.round(stats.totalOptimizedSize / 1024)}KB\n`;
+  report += `- **Space Saved**: ${Math.round(stats.totalSavings / 1024)}KB (${Math.round((stats.totalSavings / stats.totalOriginalSize) * 100)}%)\n`;
+  report += `- **Avg Compression**: ${Math.round(stats.avgCompressionRatio * 100) / 100}x\n\n`;
 
-  report += `## Format Breakdown\n`
+  report += `## Format Breakdown\n`;
   Object.entries(stats.formatBreakdown).forEach(([format, count]) => {
-    report += `- **${format.toUpperCase()}**: ${count} files\n`
-  })
+    report += `- **${format.toUpperCase()}**: ${count} files\n`;
+  });
 
-  report += `\n## Performance Impact\n`
-  report += `- **Load Time Improvement**: ~${Math.round((stats.totalSavings / stats.totalOriginalSize) * 50)}% faster\n`
-  report += `- **Bandwidth Savings**: ${Math.round(stats.totalSavings / 1024)}KB per page load\n`
-  report += `- **CDN Cost Reduction**: ~${Math.round((stats.totalSavings / stats.totalOriginalSize) * 30)}% savings\n\n`
+  report += `\n## Performance Impact\n`;
+  report += `- **Load Time Improvement**: ~${Math.round((stats.totalSavings / stats.totalOriginalSize) * 50)}% faster\n`;
+  report += `- **Bandwidth Savings**: ${Math.round(stats.totalSavings / 1024)}KB per page load\n`;
+  report += `- **CDN Cost Reduction**: ~${Math.round((stats.totalSavings / stats.totalOriginalSize) * 30)}% savings\n\n`;
 
-  return report
+  return report;
 }

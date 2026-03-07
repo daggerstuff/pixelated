@@ -6,244 +6,244 @@ export interface RateLimitConfig {
   /** Global configuration for rate limiting */
   global: {
     /** Enable rate limiting globally */
-    enabled: boolean
+    enabled: boolean;
     /** Default window size in milliseconds */
-    defaultWindowMs: number
+    defaultWindowMs: number;
     /** Enable attack pattern detection */
-    enableAttackDetection: boolean
+    enableAttackDetection: boolean;
     /** Enable analytics collection */
-    enableAnalytics: boolean
-  }
+    enableAnalytics: boolean;
+  };
   /** Redis configuration */
   redis?: {
     /** Key prefix for rate limiting data */
-    keyPrefix?: string
+    keyPrefix?: string;
     /** Analytics data retention in days */
-    analyticsRetentionDays?: number
+    analyticsRetentionDays?: number;
     /** Security event retention in days */
-    securityEventRetentionDays?: number
-  }
+    securityEventRetentionDays?: number;
+  };
 }
 
 export interface RateLimitRule {
   /** Unique name for the rule */
-  name: string
+  name: string;
   /** Maximum number of requests allowed */
-  maxRequests: number
+  maxRequests: number;
   /** Time window in milliseconds */
-  windowMs: number
+  windowMs: number;
   /** Rule priority (higher number = higher priority) */
-  priority?: number
+  priority?: number;
   /** Enable attack pattern detection for this rule */
-  enableAttackDetection?: boolean
+  enableAttackDetection?: boolean;
   /** Rule description */
-  description?: string
+  description?: string;
   /** Rule tags for categorization */
-  tags?: string[]
+  tags?: string[];
 }
 
 export interface RateLimitResult {
   /** Whether the request is allowed */
-  allowed: boolean
+  allowed: boolean;
   /** Maximum requests allowed */
-  limit: number
+  limit: number;
   /** Remaining requests in current window */
-  remaining: number
+  remaining: number;
   /** Time when the current window resets */
-  resetTime: Date
+  resetTime: Date;
   /** Seconds to wait before retrying (null if allowed) */
-  retryAfter: number | null
+  retryAfter: number | null;
 }
 
 export interface AttackPattern {
   /** Whether the pattern is suspicious */
-  isSuspicious: boolean
+  isSuspicious: boolean;
   /** Type of attack pattern detected */
-  type: 'regular_intervals' | 'rapid_fire' | 'normal'
+  type: "regular_intervals" | "rapid_fire" | "normal";
   /** Confidence level (0-1) */
-  confidence: number
+  confidence: number;
   /** Additional metadata */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 export interface RateLimitContext {
   /** User identifier (IP, user ID, session ID, etc.) */
-  identifier: string
+  identifier: string;
   /** Request method */
-  method?: string
+  method?: string;
   /** Request path */
-  path?: string
+  path?: string;
   /** User agent */
-  userAgent?: string
+  userAgent?: string;
   /** User role (if authenticated) */
-  userRole?: string
+  userRole?: string;
   /** Additional context */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 export interface RateLimitRuleSet {
   /** Rule set name */
-  name: string
+  name: string;
   /** Rules in priority order (highest first) */
-  rules: RateLimitRule[]
+  rules: RateLimitRule[];
   /** Default rule to apply if no specific rules match */
-  defaultRule?: RateLimitRule
+  defaultRule?: RateLimitRule;
   /** Rule set description */
-  description?: string
+  description?: string;
 }
 
 export interface RateLimitAnalytics {
   /** Date of analytics data */
-  date: string
+  date: string;
   /** Total requests */
-  totalRequests: number
+  totalRequests: number;
   /** Blocked requests */
-  blockedRequests: number
+  blockedRequests: number;
   /** Unique identifiers */
-  uniqueIdentifiers: number
+  uniqueIdentifiers: number;
   /** Top blocked identifiers */
   topBlocked: Array<{
-    identifier: string
-    count: number
-    rule: string
-  }>
+    identifier: string;
+    count: number;
+    rule: string;
+  }>;
   /** Attack patterns detected */
   attackPatterns: Array<{
-    type: string
-    count: number
-    confidence: number
-  }>
+    type: string;
+    count: number;
+    confidence: number;
+  }>;
 }
 
 export interface SecurityEvent {
   /** Event type */
-  type: string
+  type: string;
   /** Event timestamp */
-  timestamp: number
+  timestamp: number;
   /** Event details */
-  details: Record<string, unknown>
+  details: Record<string, unknown>;
 }
 
 export interface RateLimitBypassRule {
   /** Bypass rule name */
-  name: string
+  name: string;
   /** Conditions that must be met for bypass */
   conditions: {
     /** User roles that can bypass */
-    roles?: string[]
+    roles?: string[];
     /** IP addresses that can bypass */
-    ips?: string[]
+    ips?: string[];
     /** Paths that can bypass */
-    paths?: string[]
+    paths?: string[];
     /** Custom condition function */
-    custom?: (context: RateLimitContext) => boolean | Promise<boolean>
-  }
+    custom?: (context: RateLimitContext) => boolean | Promise<boolean>;
+  };
   /** Bypass description */
-  description?: string
+  description?: string;
 }
 
 export interface DDoSProtectionConfig {
   /** Enable DDoS protection */
-  enabled: boolean
+  enabled: boolean;
   /** Threshold for considering traffic as DDoS (requests per second) */
-  threshold: number
+  threshold: number;
   /** Time window for DDoS detection in milliseconds */
-  windowMs: number
+  windowMs: number;
   /** Block duration in milliseconds */
-  blockDurationMs: number
+  blockDurationMs: number;
   /** Enable automatic IP blocking */
-  enableAutoBlock: boolean
+  enableAutoBlock: boolean;
   /** Enable alerting */
-  enableAlerting: boolean
+  enableAlerting: boolean;
 }
 
 export interface RateLimitMiddlewareConfig {
   /** Rule sets to apply */
-  ruleSets: RateLimitRuleSet[]
+  ruleSets: RateLimitRuleSet[];
   /** Bypass rules */
-  bypassRules?: RateLimitBypassRule[]
+  bypassRules?: RateLimitBypassRule[];
   /** DDoS protection configuration */
-  ddosProtection?: DDoSProtectionConfig
+  ddosProtection?: DDoSProtectionConfig;
   /** Global rate limit configuration */
-  globalConfig?: Partial<RateLimitConfig['global']>
+  globalConfig?: Partial<RateLimitConfig["global"]>;
   /** Redis configuration */
-  redisConfig?: RateLimitConfig['redis']
+  redisConfig?: RateLimitConfig["redis"];
 }
 
 export interface RateLimitHeaders {
   /** Remaining requests */
-  'X-RateLimit-Remaining': string
+  "X-RateLimit-Remaining": string;
   /** Total limit */
-  'X-RateLimit-Limit': string
+  "X-RateLimit-Limit": string;
   /** Reset time */
-  'X-RateLimit-Reset': string
+  "X-RateLimit-Reset": string;
   /** Retry after seconds (if blocked) */
-  'X-RateLimit-RetryAfter'?: string
+  "X-RateLimit-RetryAfter"?: string;
   /** Rate limit rule name */
-  'X-RateLimit-Rule'?: string
+  "X-RateLimit-Rule"?: string;
 }
 
 // Better-Auth integration types
 export interface BetterAuthRateLimitConfig {
   /** Enable rate limiting for Better-Auth endpoints */
-  enabled: boolean
+  enabled: boolean;
   /** Specific rules for auth endpoints */
   authRules?: {
-    login?: RateLimitRule
-    register?: RateLimitRule
-    passwordReset?: RateLimitRule
-    emailVerification?: RateLimitRule
-  }
+    login?: RateLimitRule;
+    register?: RateLimitRule;
+    passwordReset?: RateLimitRule;
+    emailVerification?: RateLimitRule;
+  };
   /** Bypass for authenticated users */
-  bypassAuthenticated?: boolean
+  bypassAuthenticated?: boolean;
   /** Bypass for specific user roles */
-  bypassRoles?: string[]
+  bypassRoles?: string[];
 }
 
 // WebSocket rate limiting types
 export interface WebSocketRateLimitConfig {
   /** Enable WebSocket rate limiting */
-  enabled: boolean
+  enabled: boolean;
   /** Maximum messages per connection */
-  maxMessagesPerConnection: number
+  maxMessagesPerConnection: number;
   /** Maximum connections per IP */
-  maxConnectionsPerIp: number
+  maxConnectionsPerIp: number;
   /** Connection timeout in milliseconds */
-  connectionTimeoutMs: number
+  connectionTimeoutMs: number;
 }
 
 // Real-time monitoring types
 export interface RateLimitAlert {
   /** Alert type */
   type:
-    | 'attack_detected'
-    | 'ddos_detected'
-    | 'rate_limit_exceeded'
-    | 'system_error'
+    | "attack_detected"
+    | "ddos_detected"
+    | "rate_limit_exceeded"
+    | "system_error";
   /** Alert severity */
-  severity: 'low' | 'medium' | 'high' | 'critical'
+  severity: "low" | "medium" | "high" | "critical";
   /** Alert message */
-  message: string
+  message: string;
   /** Alert timestamp */
-  timestamp: number
+  timestamp: number;
   /** Alert details */
-  details: Record<string, unknown>
+  details: Record<string, unknown>;
 }
 
 export interface RateLimitMonitor {
   /** Monitor name */
-  name: string
+  name: string;
   /** Check interval in milliseconds */
-  checkIntervalMs: number
+  checkIntervalMs: number;
   /** Alert thresholds */
   thresholds: {
     /** Requests per second threshold */
-    rps?: number
+    rps?: number;
     /** Blocked requests percentage threshold */
-    blockedPercentage?: number
+    blockedPercentage?: number;
     /** Error rate threshold */
-    errorRate?: number
-  }
+    errorRate?: number;
+  };
   /** Alert handlers */
-  handlers: Array<(alert: RateLimitAlert) => void | Promise<void>>
+  handlers: Array<(alert: RateLimitAlert) => void | Promise<void>>;
 }

@@ -1,60 +1,60 @@
-import { useState } from 'react'
-import type { FunnelConfig } from '../../hooks/useConversionTracking'
-import useConversionTracking from '../../hooks/useConversionTracking'
+import { useState } from "react";
+import type { FunnelConfig } from "../../hooks/useConversionTracking";
+import useConversionTracking from "../../hooks/useConversionTracking";
 
 // Example component to demonstrate conversion tracking
 export default function ConversionTrackingExample() {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(0);
 
   // Define a funnel config to track a multi-step process
   const funnelConfig: FunnelConfig = {
-    id: 'signup-funnel',
+    id: "signup-funnel",
     stages: [
-      { id: 'step1', index: 0 },
-      { id: 'step2', index: 1 },
-      { id: 'step3', index: 2 },
-      { id: 'completed', index: 3 },
+      { id: "step1", index: 0 },
+      { id: "step2", index: 1 },
+      { id: "step3", index: 2 },
+      { id: "completed", index: 3 },
     ],
-  }
+  };
 
   // Initialize the hook with our funnel configuration
   const { trackEvent, trackConversion, trackFunnelStage } =
     useConversionTracking({
       funnels: [funnelConfig],
-    })
+    });
 
   // Handle moving to next step
   const nextStep = () => {
-    const newStep = step + 1
-    setStep(newStep)
+    const newStep = step + 1;
+    setStep(newStep);
 
     // Track the funnel stage progress
     if (newStep < funnelConfig.stages.length) {
-      const nextStage = funnelConfig.stages[newStep]
+      const nextStage = funnelConfig.stages[newStep];
       if (nextStage) {
-        trackFunnelStage(funnelConfig.id, nextStage.id)
+        trackFunnelStage(funnelConfig.id, nextStage.id);
       }
     }
 
     // If reaching the final step, track a conversion
     if (newStep === funnelConfig.stages.length - 1) {
-      trackConversion('signup-complete')
+      trackConversion("signup-complete");
     }
-  }
+  };
 
   // Track a simple event
   const handleSimpleEvent = () => {
-    trackEvent('button-clicked', { buttonType: 'example' })
-  }
+    trackEvent("button-clicked", { buttonType: "example" });
+  };
 
   // Reset the demo
   const resetDemo = () => {
-    setStep(0)
-    const firstStage = funnelConfig.stages[0]
+    setStep(0);
+    const firstStage = funnelConfig.stages[0];
     if (firstStage) {
-      trackFunnelStage(funnelConfig.id, firstStage.id)
+      trackFunnelStage(funnelConfig.id, firstStage.id);
     }
-  }
+  };
 
   return (
     <div className="conversion-example">
@@ -62,7 +62,7 @@ export default function ConversionTrackingExample() {
         {funnelConfig.stages.map((stage, idx) => (
           <div
             key={stage.id}
-            className={`progress-step ${idx <= step ? 'active' : ''}`}
+            className={`progress-step ${idx <= step ? "active" : ""}`}
           >
             {stage.id}
           </div>
@@ -73,7 +73,7 @@ export default function ConversionTrackingExample() {
         {step < funnelConfig.stages.length - 1 ? (
           <div className="step-content">
             <h3>
-              Step {step + 1}: {funnelConfig.stages[step]?.id || 'Unknown'}
+              Step {step + 1}: {funnelConfig.stages[step]?.id || "Unknown"}
             </h3>
             <p>This is step {step + 1} of the funnel.</p>
             <button onClick={nextStep}>Next Step</button>
@@ -164,5 +164,5 @@ export default function ConversionTrackingExample() {
         }
       `}</style>
     </div>
-  )
+  );
 }

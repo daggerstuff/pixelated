@@ -12,4 +12,4 @@ export default {
   },
   // Disable telemetry
   telemetry: false,
-}
+};

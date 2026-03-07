@@ -1,4 +1,4 @@
-import type { AuthRole } from '../config/auth.config.js'
+import type { AuthRole } from "../config/auth.config.js";
 import type {
   AuthResult,
   AuthState,
@@ -6,23 +6,23 @@ import type {
   Provider,
   UserRole,
   Session,
-} from '../types/auth.js'
+} from "../types/auth.js";
 
 /**
  * Role mapping type
  */
-export type RoleMapping = Record<AuthRole, UserRole>
+export type RoleMapping = Record<AuthRole, UserRole>;
 
 /**
  * Profile update parameters
  */
 export interface ProfileUpdateParams {
   /** User's full name */
-  fullName?: string
+  fullName?: string;
   /** URL to user's avatar */
-  avatarUrl?: string
+  avatarUrl?: string;
   /** Additional metadata */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -30,13 +30,13 @@ export interface ProfileUpdateParams {
  */
 export interface OtpVerificationParams {
   /** The OTP token */
-  token: string
+  token: string;
   /** Type of OTP verification */
-  type?: 'email' | 'sms' | 'recovery' | 'email_change'
+  type?: "email" | "sms" | "recovery" | "email_change";
   /** Email address for verification */
-  email?: string
+  email?: string;
   /** Phone number for verification */
-  phone?: string
+  phone?: string;
 }
 
 /**
@@ -44,11 +44,11 @@ export interface OtpVerificationParams {
  */
 export interface AuthError extends Error {
   /** Error code */
-  code?: string
+  code?: string;
   /** HTTP status code if applicable */
-  status?: number
+  status?: number;
   /** Additional error details */
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>;
 }
 
 /**
@@ -56,13 +56,13 @@ export interface AuthError extends Error {
  */
 export interface AuthHookState extends AuthState {
   /** Current error if any */
-  error: AuthError | null
+  error: AuthError | null;
   /** Whether authentication is in progress */
-  isLoading: boolean
+  isLoading: boolean;
   /** Whether user is authenticated */
-  isAuthenticated: boolean
+  isAuthenticated: boolean;
   /** Function to check if user has specific role(s) */
-  hasRole: (role: AuthRole | AuthRole[] | UserRole | UserRole[]) => boolean
+  hasRole: (role: AuthRole | AuthRole[] | UserRole | UserRole[]) => boolean;
 }
 
 /**
@@ -70,64 +70,64 @@ export interface AuthHookState extends AuthState {
  */
 export interface AuthHookMethods {
   /** Sign in with email and password */
-  signIn: (email: string, password: string) => Promise<AuthResult>
+  signIn: (email: string, password: string) => Promise<AuthResult>;
   /** Sign up with email and password */
   signUp: (
     email: string,
     password: string,
     fullName: string,
-  ) => Promise<AuthResult>
+  ) => Promise<AuthResult>;
   /** Sign out current user */
-  signOut: () => Promise<void>
+  signOut: () => Promise<void>;
   /** Sign in with OAuth provider */
-  signInWithOAuth: (provider: Provider, redirectTo?: string) => Promise<void>
+  signInWithOAuth: (provider: Provider, redirectTo?: string) => Promise<void>;
   /** Reset password for email */
-  resetPassword: (email: string, redirectTo?: string) => Promise<boolean>
+  resetPassword: (email: string, redirectTo?: string) => Promise<boolean>;
   /** Verify OTP token */
-  verifyOtp?: (params: OtpVerificationParams) => Promise<AuthResult>
+  verifyOtp?: (params: OtpVerificationParams) => Promise<AuthResult>;
   /** Update user profile */
-  updateProfile: (profile: ProfileUpdateParams) => Promise<void>
+  updateProfile: (profile: ProfileUpdateParams) => Promise<void>;
 }
 
 /**
  * Complete auth hook return type
  */
-export type UseAuthReturn = AuthHookState & AuthHookMethods
+export type UseAuthReturn = AuthHookState & AuthHookMethods;
 
 /**
  * Auth operation result type
  */
 export type AuthOperationResult<T> = Promise<{
-  success: boolean
-  data?: T
-  error?: AuthError
-  session?: Session
-}>
+  success: boolean;
+  data?: T;
+  error?: AuthError;
+  session?: Session;
+}>;
 
 /**
  * Auth error codes
  */
 export const AuthErrorCode = {
-  AUTH_FAILED: 'AUTH_FAILED',
-  SIGNUP_FAILED: 'SIGNUP_FAILED',
-  OAUTH_FAILED: 'OAUTH_FAILED',
-  SIGNOUT_FAILED: 'SIGNOUT_FAILED',
-  RESET_FAILED: 'RESET_FAILED',
-  OTP_FAILED: 'OTP_FAILED',
-  UPDATE_FAILED: 'UPDATE_FAILED',
-  NO_USER: 'NO_USER',
-  INVALID_USER: 'INVALID_USER',
-  INVALID_TOKEN: 'INVALID_TOKEN',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-} as const
+  AUTH_FAILED: "AUTH_FAILED",
+  SIGNUP_FAILED: "SIGNUP_FAILED",
+  OAUTH_FAILED: "OAUTH_FAILED",
+  SIGNOUT_FAILED: "SIGNOUT_FAILED",
+  RESET_FAILED: "RESET_FAILED",
+  OTP_FAILED: "OTP_FAILED",
+  UPDATE_FAILED: "UPDATE_FAILED",
+  NO_USER: "NO_USER",
+  INVALID_USER: "INVALID_USER",
+  INVALID_TOKEN: "INVALID_TOKEN",
+  NETWORK_ERROR: "NETWORK_ERROR",
+} as const;
 
-export type AuthErrorCode = (typeof AuthErrorCode)[keyof typeof AuthErrorCode]
+export type AuthErrorCode = (typeof AuthErrorCode)[keyof typeof AuthErrorCode];
 
 /**
  * Type guard to check if a value is an AuthError
  */
 export function isAuthError(error: unknown): error is AuthError {
-  return error instanceof Error && 'code' in error
+  return error instanceof Error && "code" in error;
 }
 
 /**
@@ -135,11 +135,11 @@ export function isAuthError(error: unknown): error is AuthError {
  */
 export function isAuthUser(user: unknown): user is AuthUser {
   return (
-    typeof user === 'object' &&
+    typeof user === "object" &&
     user !== null &&
-    'id' in user &&
-    typeof (user as AuthUser).id === 'string'
-  )
+    "id" in user &&
+    typeof (user as AuthUser).id === "string"
+  );
 }
 
 /**
@@ -147,11 +147,11 @@ export function isAuthUser(user: unknown): user is AuthUser {
  */
 export function isAuthResult(result: unknown): result is AuthResult {
   return (
-    typeof result === 'object' &&
+    typeof result === "object" &&
     result !== null &&
-    'success' in result &&
-    typeof (result as AuthResult).success === 'boolean'
-  )
+    "success" in result &&
+    typeof (result as AuthResult).success === "boolean"
+  );
 }
 
 /**
@@ -162,16 +162,16 @@ export function createAuthError(
   code?: AuthErrorCode,
   details?: Record<string, unknown>,
 ): AuthError {
-  const error = new Error(message) as AuthError
-  error.name = 'AuthError'
+  const error = new Error(message) as AuthError;
+  error.name = "AuthError";
   if (code) {
-    error.code = code
+    error.code = code;
   }
   if (details) {
-    error.details = details
+    error.details = details;
   }
-  return error
+  return error;
 }
 
 // Re-export auth types for convenience
-export type { AuthResult, AuthState, AuthUser, Provider, UserRole, Session }
+export type { AuthResult, AuthState, AuthUser, Provider, UserRole, Session };

@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity,
   TrendingUp,
@@ -15,196 +15,196 @@ import {
   Heart,
   BarChart3,
   PieChart,
-} from 'lucide-react'
+} from "lucide-react";
 
 interface PerformanceMetric {
-  id: string
-  name: string
-  value: number
-  unit: string
-  trend: 'up' | 'down' | 'stable'
-  status: 'good' | 'warning' | 'critical'
-  threshold: number
-  history: Array<{ timestamp: number; value: number }>
+  id: string;
+  name: string;
+  value: number;
+  unit: string;
+  trend: "up" | "down" | "stable";
+  status: "good" | "warning" | "critical";
+  threshold: number;
+  history: Array<{ timestamp: number; value: number }>;
 }
 
 interface SystemHealth {
   apis: Array<{
-    name: string
-    endpoint: string
-    status: 'online' | 'degraded' | 'offline'
-    responseTime: number
-    successRate: number
-    lastCheck: number
-  }>
+    name: string;
+    endpoint: string;
+    status: "online" | "degraded" | "offline";
+    responseTime: number;
+    successRate: number;
+    lastCheck: number;
+  }>;
   database: {
-    status: 'online' | 'degraded' | 'offline'
-    responseTime: number
-    connections: number
-    maxConnections: number
-  }
+    status: "online" | "degraded" | "offline";
+    responseTime: number;
+    connections: number;
+    maxConnections: number;
+  };
   cache: {
-    status: 'online' | 'offline'
-    hitRate: number
-    memory: number
-    maxMemory: number
-  }
+    status: "online" | "offline";
+    hitRate: number;
+    memory: number;
+    maxMemory: number;
+  };
 }
 
 interface UsageAnalytics {
-  totalSessions: number
-  activeSessions: number
-  averageSessionDuration: number
-  crisisInterventions: number
-  successfulInterventions: number
-  userSatisfaction: number
-  peakUsageTime: string
-  dailyActiveUsers: number
-  weeklyActiveUsers: number
-  monthlyActiveUsers: number
+  totalSessions: number;
+  activeSessions: number;
+  averageSessionDuration: number;
+  crisisInterventions: number;
+  successfulInterventions: number;
+  userSatisfaction: number;
+  peakUsageTime: string;
+  dailyActiveUsers: number;
+  weeklyActiveUsers: number;
+  monthlyActiveUsers: number;
 }
 
 export default function EnterpriseMonitoringDashboard() {
   const [performanceMetrics, setPerformanceMetrics] = useState<
     PerformanceMetric[]
-  >([])
-  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null)
+  >([]);
+  const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null);
   const [usageAnalytics, setUsageAnalytics] = useState<UsageAnalytics | null>(
     null,
-  )
-  const [isLoading, setIsLoading] = useState(true)
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   // Initialize demo data
   useEffect(() => {
     const initializeData = () => {
       const metrics: PerformanceMetric[] = [
         {
-          id: 'response_time',
-          name: 'Average Response Time',
+          id: "response_time",
+          name: "Average Response Time",
           value: 234,
-          unit: 'ms',
-          trend: 'down',
-          status: 'good',
+          unit: "ms",
+          trend: "down",
+          status: "good",
           threshold: 500,
           history: generateTimeSeriesData(50, 200, 300),
         },
         {
-          id: 'accuracy',
-          name: 'Crisis Detection Accuracy',
+          id: "accuracy",
+          name: "Crisis Detection Accuracy",
           value: 94.7,
-          unit: '%',
-          trend: 'up',
-          status: 'good',
+          unit: "%",
+          trend: "up",
+          status: "good",
           threshold: 90,
           history: generateTimeSeriesData(50, 92, 96),
         },
         {
-          id: 'throughput',
-          name: 'Requests per Minute',
+          id: "throughput",
+          name: "Requests per Minute",
           value: 1247,
-          unit: 'req/min',
-          trend: 'up',
-          status: 'good',
+          unit: "req/min",
+          trend: "up",
+          status: "good",
           threshold: 1000,
           history: generateTimeSeriesData(50, 800, 1400),
         },
         {
-          id: 'error_rate',
-          name: 'Error Rate',
+          id: "error_rate",
+          name: "Error Rate",
           value: 0.3,
-          unit: '%',
-          trend: 'down',
-          status: 'good',
+          unit: "%",
+          trend: "down",
+          status: "good",
           threshold: 1,
           history: generateTimeSeriesData(50, 0.1, 0.8),
         },
         {
-          id: 'intervention_success',
-          name: 'Intervention Success Rate',
+          id: "intervention_success",
+          name: "Intervention Success Rate",
           value: 89.2,
-          unit: '%',
-          trend: 'stable',
-          status: 'good',
+          unit: "%",
+          trend: "stable",
+          status: "good",
           threshold: 85,
           history: generateTimeSeriesData(50, 87, 92),
         },
         {
-          id: 'user_satisfaction',
-          name: 'User Satisfaction',
+          id: "user_satisfaction",
+          name: "User Satisfaction",
           value: 4.6,
-          unit: '/5',
-          trend: 'up',
-          status: 'good',
+          unit: "/5",
+          trend: "up",
+          status: "good",
           threshold: 4,
           history: generateTimeSeriesData(50, 4.2, 4.8),
         },
-      ]
+      ];
 
       const health: SystemHealth = {
         apis: [
           {
-            name: 'Psychology Parse API',
-            endpoint: '/api/psychology/parse',
-            status: 'online',
+            name: "Psychology Parse API",
+            endpoint: "/api/psychology/parse",
+            status: "online",
             responseTime: 187,
             successRate: 99.8,
             lastCheck: Date.now(),
           },
           {
-            name: 'Scenario Generation API',
-            endpoint: '/api/psychology/generate-scenario',
-            status: 'online',
+            name: "Scenario Generation API",
+            endpoint: "/api/psychology/generate-scenario",
+            status: "online",
             responseTime: 312,
             successRate: 99.2,
             lastCheck: Date.now(),
           },
           {
-            name: 'Mental Health Chat API',
-            endpoint: '/api/mental-health/chat',
-            status: 'online',
+            name: "Mental Health Chat API",
+            endpoint: "/api/mental-health/chat",
+            status: "online",
             responseTime: 256,
             successRate: 99.9,
             lastCheck: Date.now(),
           },
           {
-            name: 'Crisis Detection API',
-            endpoint: '/api/mental-health/crisis-detection',
-            status: 'online',
+            name: "Crisis Detection API",
+            endpoint: "/api/mental-health/crisis-detection",
+            status: "online",
             responseTime: 423,
             successRate: 99.7,
             lastCheck: Date.now(),
           },
           {
-            name: 'Frameworks API',
-            endpoint: '/api/psychology/frameworks',
-            status: 'online',
+            name: "Frameworks API",
+            endpoint: "/api/psychology/frameworks",
+            status: "online",
             responseTime: 89,
             successRate: 99.9,
             lastCheck: Date.now(),
           },
           {
-            name: 'Clinical Analysis API',
-            endpoint: '/api/psychology/analyze',
-            status: 'online',
+            name: "Clinical Analysis API",
+            endpoint: "/api/psychology/analyze",
+            status: "online",
             responseTime: 445,
             successRate: 99.5,
             lastCheck: Date.now(),
           },
         ],
         database: {
-          status: 'online',
+          status: "online",
           responseTime: 23,
           connections: 12,
           maxConnections: 100,
         },
         cache: {
-          status: 'online',
+          status: "online",
           hitRate: 94.3,
           memory: 2.1,
           maxMemory: 8,
         },
-      }
+      };
 
       const analytics: UsageAnalytics = {
         totalSessions: 15247,
@@ -213,86 +213,86 @@ export default function EnterpriseMonitoringDashboard() {
         crisisInterventions: 342,
         successfulInterventions: 305,
         userSatisfaction: 4.6,
-        peakUsageTime: '14:00-16:00',
+        peakUsageTime: "14:00-16:00",
         dailyActiveUsers: 1834,
         weeklyActiveUsers: 8921,
         monthlyActiveUsers: 28456,
-      }
+      };
 
-      setPerformanceMetrics(metrics)
-      setSystemHealth(health)
-      setUsageAnalytics(analytics)
-      setIsLoading(false)
-      setLastUpdate(new Date())
-    }
+      setPerformanceMetrics(metrics);
+      setSystemHealth(health);
+      setUsageAnalytics(analytics);
+      setIsLoading(false);
+      setLastUpdate(new Date());
+    };
 
-    initializeData()
+    initializeData();
 
     // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
-      initializeData()
-    }, 30000)
+      initializeData();
+    }, 30000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   // Cryptographically secure random number generator for browser
   const secureRandom = () => {
-    const array = new Uint32Array(1)
-    window.crypto.getRandomValues(array)
+    const array = new Uint32Array(1);
+    window.crypto.getRandomValues(array);
     // Defensive: array is always length 1, but TypeScript may warn
-    return (array?.[0] ?? 0) / (0xffffffff + 1)
-  }
+    return (array?.[0] ?? 0) / (0xffffffff + 1);
+  };
 
   const generateTimeSeriesData = (points: number, min: number, max: number) => {
     return Array.from({ length: points }, (_, i) => ({
       timestamp: Date.now() - (points - i) * 60000,
       value: min + secureRandom() * (max - min),
-    }))
-  }
+    }));
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'good':
-      case 'online':
-        return 'text-green-600 bg-green-50 border-green-200'
-      case 'warning':
-      case 'degraded':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'critical':
-      case 'offline':
-        return 'text-red-600 bg-red-50 border-red-200'
+      case "good":
+      case "online":
+        return "text-green-600 bg-green-50 border-green-200";
+      case "warning":
+      case "degraded":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      case "critical":
+      case "offline":
+        return "text-red-600 bg-red-50 border-red-200";
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return "text-gray-600 bg-gray-50 border-gray-200";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'good':
-      case 'online':
-        return <CheckCircle className="w-4 h-4" />
-      case 'warning':
-      case 'degraded':
-        return <AlertTriangle className="w-4 h-4" />
-      case 'critical':
-      case 'offline':
-        return <AlertTriangle className="w-4 h-4" />
+      case "good":
+      case "online":
+        return <CheckCircle className="w-4 h-4" />;
+      case "warning":
+      case "degraded":
+        return <AlertTriangle className="w-4 h-4" />;
+      case "critical":
+      case "offline":
+        return <AlertTriangle className="w-4 h-4" />;
       default:
-        return <Activity className="w-4 h-4" />
+        return <Activity className="w-4 h-4" />;
     }
-  }
+  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'up':
-        return <TrendingUp className="w-4 h-4 text-green-600" />
-      case 'down':
-        return <TrendingUp className="w-4 h-4 text-red-600 rotate-180" />
+      case "up":
+        return <TrendingUp className="w-4 h-4 text-green-600" />;
+      case "down":
+        return <TrendingUp className="w-4 h-4 text-red-600 rotate-180" />;
       default:
-        return <Activity className="w-4 h-4 text-gray-600" />
+        return <Activity className="w-4 h-4 text-gray-600" />;
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -302,7 +302,7 @@ export default function EnterpriseMonitoringDashboard() {
           <p className="text-gray-600">Loading monitoring dashboard...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -314,7 +314,7 @@ export default function EnterpriseMonitoringDashboard() {
             Enterprise Monitoring Dashboard
           </h1>
           <p className="text-gray-600 mt-1">
-            Real-time system performance and analytics • Last updated:{' '}
+            Real-time system performance and analytics • Last updated:{" "}
             {lastUpdate.toLocaleTimeString()}
           </p>
         </div>
@@ -448,9 +448,9 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className="text-sm text-gray-600">Status</span>
                     <Badge
                       variant="outline"
-                      className={`${getStatusColor(systemHealth?.database.status || '')}`}
+                      className={`${getStatusColor(systemHealth?.database.status || "")}`}
                     >
-                      {getStatusIcon(systemHealth?.database.status || '')}
+                      {getStatusIcon(systemHealth?.database.status || "")}
                       <span className="ml-1 capitalize">
                         {systemHealth?.database.status}
                       </span>
@@ -494,9 +494,9 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className="text-sm text-gray-600">Status</span>
                     <Badge
                       variant="outline"
-                      className={`${getStatusColor(systemHealth?.cache.status || '')}`}
+                      className={`${getStatusColor(systemHealth?.cache.status || "")}`}
                     >
-                      {getStatusIcon(systemHealth?.cache.status || '')}
+                      {getStatusIcon(systemHealth?.cache.status || "")}
                       <span className="ml-1 capitalize">
                         {systemHealth?.cache.status}
                       </span>
@@ -511,7 +511,7 @@ export default function EnterpriseMonitoringDashboard() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Memory Usage</span>
                     <span className="font-medium">
-                      {systemHealth?.cache.memory}GB /{' '}
+                      {systemHealth?.cache.memory}GB /{" "}
                       {systemHealth?.cache.maxMemory}GB
                     </span>
                   </div>
@@ -693,5 +693,5 @@ export default function EnterpriseMonitoringDashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

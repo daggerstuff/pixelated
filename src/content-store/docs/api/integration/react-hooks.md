@@ -24,21 +24,15 @@ This guide explains how to use the React hooks provided by our API client librar
 The `useAuth` hook provides authentication functionality for React components.
 
 ```tsx
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from "../../hooks/useAuth";
 
 function LoginComponent() {
-  const {
-    signIn,
-    signInWithOAuth,
-    resetPassword,
-    user,
-    isLoading
-  } = useAuth()
+  const { signIn, signInWithOAuth, resetPassword, user, isLoading } = useAuth();
 
   const handleLogin = async (email, password) => {
-    const response = await signIn(email, password)
+    const response = await signIn(email, password);
     // Handle response
-  }
+  };
 
   return (
     <div>
@@ -48,7 +42,7 @@ function LoginComponent() {
         <button onClick={handleLogin}>Login</button>
       )}
     </div>
-  )
+  );
 }
 ```
 
@@ -57,66 +51,78 @@ function LoginComponent() {
 ### Loading States
 
 ```tsx
-const { data, isLoading, error } = useData('endpoint')
+const { data, isLoading, error } = useData("endpoint");
 
-if (isLoading) return <LoadingSpinner />
-if (error) return <ErrorMessage error={error} />
-return <DataDisplay data={data} />
+if (isLoading) return <LoadingSpinner />;
+if (error) return <ErrorMessage error={error} />;
+return <DataDisplay data={data} />;
 ```
 
 ### Authentication-Aware Requests
 
 ```tsx
-const { user } = useAuth()
-const { fetchData } = useData()
+const { user } = useAuth();
+const { fetchData } = useData();
 
 const fetchProtectedData = async () => {
   if (!user) {
     // Handle unauthenticated state
-    return
+    return;
   }
 
-  const data = await fetchData('/protected-endpoint')
+  const data = await fetchData("/protected-endpoint");
   // Process data
-}
+};
 ```
 
 ### Real-time Updates
 
 ```tsx
-const { subscribe, unsubscribe } = useNotifications()
+const { subscribe, unsubscribe } = useNotifications();
 
 useEffect(() => {
-  const subscription = subscribe('channel', (message) => {
+  const subscription = subscribe("channel", (message) => {
     // Handle incoming message
-  })
+  });
 
-  return () => unsubscribe(subscription)
-}, [])
+  return () => unsubscribe(subscription);
+}, []);
 ```
 
 ## Best Practices
 
 1. **Handle loading and error states consistently**
+
    ```tsx
-   {isLoading && <LoadingIndicator />}
-   {error && <ErrorMessage error={error} />}
-   {data && <DataView data={data} />}
+   {
+     isLoading && <LoadingIndicator />;
+   }
+   {
+     error && <ErrorMessage error={error} />;
+   }
+   {
+     data && <DataView data={data} />;
+   }
    ```
 
 2. **Use the useCallback hook for memoization**
+
    ```tsx
-   const handleSubmit = useCallback((data) => {
-     // Submit data
-   }, [dependencies])
+   const handleSubmit = useCallback(
+     (data) => {
+       // Submit data
+     },
+     [dependencies],
+   );
    ```
 
 3. **Separate data fetching from presentation**
+
    ```tsx
    // Data fetching component
    function UserDataProvider({ children }) {
-     const { data, isLoading, error } = useData('users')
-     return children({ data, isLoading, error })
+     const { data, isLoading, error } = useData("users");
+     return children({ data, isLoading, error });
    }
 
    // Presentation component
@@ -124,23 +130,24 @@ useEffect(() => {
      return (
        <UserDataProvider>
          {({ data, isLoading, error }) => {
-           if (isLoading) return <LoadingSpinner />
-           if (error) return <ErrorMessage error={error} />
-           return <List items={data} />
+           if (isLoading) return <LoadingSpinner />;
+           if (error) return <ErrorMessage error={error} />;
+           return <List items={data} />;
          }}
        </UserDataProvider>
-     )
+     );
    }
    ```
 
 4. **Use the useEffect cleanup function**
+
    ```tsx
    useEffect(() => {
-     const controller = new AbortController()
+     const controller = new AbortController();
      // Fetch data with controller.signal
 
-     return () => controller.abort()
-   }, [])
+     return () => controller.abort();
+   }, []);
    ```
 
 ## Advanced Usage

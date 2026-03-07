@@ -1,54 +1,54 @@
-import { getCollection } from 'astro:content'
-import { blogSearch } from '@/lib/search'
+import { getCollection } from "astro:content";
+import { blogSearch } from "@/lib/search";
 
-let isIndexed = false
+let isIndexed = false;
 
 async function indexPosts() {
   if (isIndexed) {
-    return
+    return;
   }
 
-  const posts = await getCollection('blog')
+  const posts = await getCollection("blog");
   for (const post of posts) {
-    const { Content } = await post.render()
-    const content = Content.toString()
-    blogSearch.addPost(post, content)
+    const { Content } = await post.render();
+    const content = Content.toString();
+    blogSearch.addPost(post, content);
   }
-  isIndexed = true
+  isIndexed = true;
 }
 
 export const GET = async ({ url }) => {
-  const query = url.searchParams.get('q')
+  const query = url.searchParams.get("q");
   if (!query) {
     return new Response(
       JSON.stringify({
-        version: 'v1',
+        version: "v1",
         results: [],
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'X-API-Version': 'v1',
+          "Content-Type": "application/json",
+          "X-API-Version": "v1",
         },
       },
-    )
+    );
   }
 
-  await indexPosts()
-  const results = blogSearch.search(query)
+  await indexPosts();
+  const results = blogSearch.search(query);
 
   return new Response(
     JSON.stringify({
-      version: 'v1',
+      version: "v1",
       results,
     }),
     {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'X-API-Version': 'v1',
+        "Content-Type": "application/json",
+        "X-API-Version": "v1",
       },
     },
-  )
-}
+  );
+};

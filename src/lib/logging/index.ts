@@ -5,10 +5,10 @@
 
 // Log levels
 export enum LogLevel {
-  DEBUG = 'debug',
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
+  DEBUG = "debug",
+  INFO = "info",
+  WARN = "warn",
+  ERROR = "error",
 }
 
 // Define a type for log metadata that is more specific than 'any'
@@ -19,14 +19,14 @@ export type LogMetadataValue =
   | null
   | undefined
   | LogMetadataObject
-  | LogMetadataArray
+  | LogMetadataArray;
 
 export interface LogMetadataObject {
-  [key: string]: LogMetadataValue
+  [key: string]: LogMetadataValue;
 }
 
-export type LogMetadataArray = LogMetadataValue[]
-export type LogMetadata = Record<string, LogMetadataValue>
+export type LogMetadataArray = LogMetadataValue[];
+export type LogMetadata = Record<string, LogMetadataValue>;
 
 // Default PHI/PII patterns -  example, to be expanded
 // Simple Social Security Number
@@ -37,48 +37,48 @@ const DEFAULT_PHI_PATTERNS: RegExp[] = [
   // /\b(?:\d[ -]*?){13,16}\b/g,
   // Example: Email Addresses (might be too broad for some logs, consider context)
   // /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
-]
+];
 
 // Logger options
 export interface LoggerOptions {
-  level?: LogLevel
-  prefix?: string
-  includeTimestamp?: boolean
-  console?: Console
-  enableLogCollection?: boolean
-  phiPatterns?: RegExp[] // Allow custom PHI patterns
-  sanitizeFields?: string[] // Specify fields to always sanitize if found nested
+  level?: LogLevel;
+  prefix?: string;
+  includeTimestamp?: boolean;
+  console?: Console;
+  enableLogCollection?: boolean;
+  phiPatterns?: RegExp[]; // Allow custom PHI patterns
+  sanitizeFields?: string[]; // Specify fields to always sanitize if found nested
 }
 
 // Log message format
 export interface LogMessage {
-  level: LogLevel
-  message: string
-  timestamp: Date
-  prefix?: string
-  metadata?: LogMetadata
+  level: LogLevel;
+  message: string;
+  timestamp: Date;
+  prefix?: string;
+  metadata?: LogMetadata;
 }
 
 // Default options
 const DEFAULT_OPTIONS: LoggerOptions = {
   level: LogLevel.INFO,
-  prefix: '',
+  prefix: "",
   includeTimestamp: true,
   console,
   enableLogCollection: false,
   phiPatterns: DEFAULT_PHI_PATTERNS, // Initialize with default patterns
-  sanitizeFields: ['patientId', 'ssn', 'address', 'email', 'phone', 'dob'], // Example sensitive fields
-}
+  sanitizeFields: ["patientId", "ssn", "address", "email", "phone", "dob"], // Example sensitive fields
+};
 
 // Collected logs for debugging/telemetry
-const collectedLogs: LogMessage[] = []
-const MAX_COLLECTED_LOGS = 1000
+const collectedLogs: LogMessage[] = [];
+const MAX_COLLECTED_LOGS = 1000;
 
 /**
  * Logger class for consistent logging
  */
 export class Logger {
-  private options: LoggerOptions
+  private options: LoggerOptions;
 
   constructor(options?: Partial<LoggerOptions>) {
     this.options = {
@@ -93,7 +93,7 @@ export class Logger {
         ...(DEFAULT_OPTIONS.sanitizeFields || []),
         ...(options?.sanitizeFields || []),
       ],
-    }
+    };
   }
 
   /**
@@ -102,7 +102,7 @@ export class Logger {
    * @param metadata Optional metadata to include
    */
   debug(message: string, metadata?: LogMetadata): void {
-    this.log(LogLevel.DEBUG, message, metadata)
+    this.log(LogLevel.DEBUG, message, metadata);
   }
 
   /**
@@ -111,7 +111,7 @@ export class Logger {
    * @param metadata Optional metadata to include
    */
   info(message: string, metadata?: LogMetadata): void {
-    this.log(LogLevel.INFO, message, metadata)
+    this.log(LogLevel.INFO, message, metadata);
   }
 
   /**
@@ -120,7 +120,7 @@ export class Logger {
    * @param metadata Optional metadata to include
    */
   warn(message: string, metadata?: LogMetadata): void {
-    this.log(LogLevel.WARN, message, metadata)
+    this.log(LogLevel.WARN, message, metadata);
   }
 
   /**
@@ -130,29 +130,29 @@ export class Logger {
    * @param metadata Optional metadata to include
    */
   error(message: string, error?: unknown, metadata?: LogMetadata): void {
-    const errorObject = error instanceof Error ? error : undefined
-    let sanitizedErrorMessage = message
+    const errorObject = error instanceof Error ? error : undefined;
+    let sanitizedErrorMessage = message;
 
     // Sanitize the main error message
-    sanitizedErrorMessage = this.sanitizeString(message)
+    sanitizedErrorMessage = this.sanitizeString(message);
 
     // Sanitize error object properties if it exists
     const processedError = errorObject
       ? {
-        name: errorObject.name, // Typically safe
-        message: this.sanitizeString(errorObject.message),
-        stack: errorObject.stack
-          ? this.sanitizeString(errorObject.stack)
-          : undefined,
-      }
-      : undefined
+          name: errorObject.name, // Typically safe
+          message: this.sanitizeString(errorObject.message),
+          stack: errorObject.stack
+            ? this.sanitizeString(errorObject.stack)
+            : undefined,
+        }
+      : undefined;
 
     const errorMetadata = {
       ...metadata, // Original metadata will be sanitized in this.log()
       error: processedError, // Use the sanitized error object
-    }
+    };
 
-    this.log(LogLevel.ERROR, sanitizedErrorMessage, errorMetadata)
+    this.log(LogLevel.ERROR, sanitizedErrorMessage, errorMetadata);
   }
 
   /**
@@ -167,45 +167,45 @@ export class Logger {
     patterns?: RegExp[],
     sensitiveKeys?: string[],
   ): LogMetadataValue {
-    const currentPatterns = patterns || this.options.phiPatterns || []
+    const currentPatterns = patterns || this.options.phiPatterns || [];
     const currentSensitiveKeys =
-      sensitiveKeys || this.options.sanitizeFields || []
+      sensitiveKeys || this.options.sanitizeFields || [];
 
-    if (typeof data === 'string') {
-      return this.sanitizeString(data, currentPatterns)
+    if (typeof data === "string") {
+      return this.sanitizeString(data, currentPatterns);
     }
 
     if (Array.isArray(data)) {
       return data.map((item) =>
         this.sanitizeData(item, currentPatterns, currentSensitiveKeys),
-      ) as LogMetadataArray
+      ) as LogMetadataArray;
     }
 
-    if (typeof data === 'object' && data !== null) {
-      const sanitizedObject: LogMetadataObject = {}
+    if (typeof data === "object" && data !== null) {
+      const sanitizedObject: LogMetadataObject = {};
       for (const key in data) {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           if (
             currentSensitiveKeys.includes(key) &&
-            typeof data[key] === 'string'
+            typeof data[key] === "string"
           ) {
             sanitizedObject[key] = this.sanitizeString(
               data[key] as string,
               currentPatterns,
               `[SANITIZED_${key.toUpperCase()}]`,
-            )
+            );
           } else {
             sanitizedObject[key] = this.sanitizeData(
               data[key],
               currentPatterns,
               currentSensitiveKeys,
-            )
+            );
           }
         }
       }
-      return sanitizedObject
+      return sanitizedObject;
     }
-    return data // Return numbers, booleans, null, undefined as is
+    return data; // Return numbers, booleans, null, undefined as is
   }
 
   /**
@@ -218,22 +218,22 @@ export class Logger {
   private sanitizeString(
     str: string | undefined,
     patterns?: RegExp[],
-    replacement: string = '[SANITIZED]',
+    replacement: string = "[SANITIZED]",
   ): string {
-    if (typeof str !== 'string') {
-      return str === undefined ? '' : String(str) // Handle undefined or non-string types gracefully
+    if (typeof str !== "string") {
+      return str === undefined ? "" : String(str); // Handle undefined or non-string types gracefully
     }
-    let sanitizedStr = str
-    const currentPatterns = patterns || this.options.phiPatterns || []
+    let sanitizedStr = str;
+    const currentPatterns = patterns || this.options.phiPatterns || [];
     for (const pattern of currentPatterns) {
       // Ensure the pattern has the global flag for multiple replacements
       const globalPattern = new RegExp(
         pattern.source,
-        pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g',
-      )
-      sanitizedStr = sanitizedStr.replace(globalPattern, replacement)
+        pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+      );
+      sanitizedStr = sanitizedStr.replace(globalPattern, replacement);
     }
-    return sanitizedStr
+    return sanitizedStr;
   }
 
   /**
@@ -242,14 +242,14 @@ export class Logger {
   private log(level: LogLevel, message: string, metadata?: LogMetadata): void {
     // Skip if log level is too low
     if (!this.shouldLog(level)) {
-      return
+      return;
     }
 
     // Sanitize message and metadata
-    const sanitizedMessage = this.sanitizeString(message)
+    const sanitizedMessage = this.sanitizeString(message);
     const sanitizedMetadata = metadata
       ? (this.sanitizeData(metadata) as LogMetadata)
-      : undefined
+      : undefined;
 
     // Only include prefix if it is defined, to satisfy exactOptionalPropertyTypes
     // Only include prefix and metadata if they are defined, to satisfy exactOptionalPropertyTypes
@@ -263,36 +263,36 @@ export class Logger {
       ...(sanitizedMetadata !== undefined
         ? { metadata: sanitizedMetadata }
         : {}),
-    }
+    };
 
     // Format the log message (using sanitized components)
-    const formattedMessage = this.formatLogMessage(logMessage)
+    const formattedMessage = this.formatLogMessage(logMessage);
 
     // Output to console
     // Important: Ensure the console methods themselves don't cause issues or bypass sanitization
     // if a custom console object is used that does its own formatting with raw objects.
     // Here, we pass the already formatted string and the sanitized metadata separately.
-    const consoleOutputMetadata = sanitizedMetadata || {}
+    const consoleOutputMetadata = sanitizedMetadata || {};
 
     switch (level) {
       case LogLevel.DEBUG:
-        this.options.console?.debug(formattedMessage, consoleOutputMetadata)
-        break
+        this.options.console?.debug(formattedMessage, consoleOutputMetadata);
+        break;
       case LogLevel.INFO:
-        this.options.console?.info(formattedMessage, consoleOutputMetadata)
-        break
+        this.options.console?.info(formattedMessage, consoleOutputMetadata);
+        break;
       case LogLevel.WARN:
-        this.options.console?.warn(formattedMessage, consoleOutputMetadata)
-        break
+        this.options.console?.warn(formattedMessage, consoleOutputMetadata);
+        break;
       case LogLevel.ERROR:
         // The 'error' field within metadata was already sanitized by the error() method.
-        this.options.console?.error(formattedMessage, consoleOutputMetadata)
-        break
+        this.options.console?.error(formattedMessage, consoleOutputMetadata);
+        break;
     }
 
     // Add to collected logs if enabled
     if (this.options.enableLogCollection) {
-      this.collectLog(logMessage)
+      this.collectLog(logMessage);
     }
   }
 
@@ -305,49 +305,49 @@ export class Logger {
       LogLevel.INFO,
       LogLevel.WARN,
       LogLevel.ERROR,
-    ]
+    ];
     const configuredLevelIndex = levels.indexOf(
       this.options.level || LogLevel.INFO,
-    )
-    const logLevelIndex = levels.indexOf(level)
+    );
+    const logLevelIndex = levels.indexOf(level);
 
-    return logLevelIndex >= configuredLevelIndex
+    return logLevelIndex >= configuredLevelIndex;
   }
 
   /**
    * Format a log message
    */
   private formatLogMessage(logMessage: LogMessage): string {
-    const parts: string[] = []
+    const parts: string[] = [];
 
     // Add timestamp if configured
     if (this.options.includeTimestamp) {
-      parts.push(`[${logMessage.timestamp.toISOString()}]`)
+      parts.push(`[${logMessage.timestamp.toISOString()}]`);
     }
 
     // Add log level
-    parts.push(`[${logMessage.level.toUpperCase()}]`)
+    parts.push(`[${logMessage.level.toUpperCase()}]`);
 
     // Add prefix if configured
     if (logMessage.prefix) {
-      parts.push(`[${logMessage.prefix}]`)
+      parts.push(`[${logMessage.prefix}]`);
     }
 
     // Add message
-    parts.push(logMessage.message)
+    parts.push(logMessage.message);
 
-    return parts.join(' ')
+    return parts.join(" ");
   }
 
   /**
    * Collect a log message for debugging/telemetry
    */
   private collectLog(logMessage: LogMessage): void {
-    collectedLogs.push(logMessage)
+    collectedLogs.push(logMessage);
 
     // Keep log collection under the maximum size
     if (collectedLogs.length > MAX_COLLECTED_LOGS) {
-      collectedLogs.shift()
+      collectedLogs.shift();
     }
   }
 
@@ -359,12 +359,12 @@ export class Logger {
     return new Logger({
       ...this.options,
       prefix: this.options.prefix ? `${this.options.prefix}:${prefix}` : prefix,
-    })
+    });
   }
 }
 
 // Module-level singleton instance
-let _globalLoggerInstance: Logger | undefined
+let _globalLoggerInstance: Logger | undefined;
 
 /**
  * Get the global logger instance
@@ -373,30 +373,30 @@ let _globalLoggerInstance: Logger | undefined
  */
 export function getLogger(options?: Partial<LoggerOptions>): Logger {
   if (!_globalLoggerInstance || options) {
-    _globalLoggerInstance = new Logger(options || {})
+    _globalLoggerInstance = new Logger(options || {});
   }
-  return _globalLoggerInstance
+  return _globalLoggerInstance;
 }
 
 /**
  * Get collected logs (for debugging/telemetry)
  */
 export function getCollectedLogs(): LogMessage[] {
-  return [...collectedLogs]
+  return [...collectedLogs];
 }
 
 /**
  * Clear collected logs
  */
 export function clearCollectedLogs() {
-  collectedLogs.length = 0
+  collectedLogs.length = 0;
 }
 
 /**
  * Configure global logging
  */
 export function configureLogging(options: Partial<LoggerOptions>): void {
-  _globalLoggerInstance = new Logger(options)
+  _globalLoggerInstance = new Logger(options);
 }
 
 /**

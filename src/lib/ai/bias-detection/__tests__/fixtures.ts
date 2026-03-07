@@ -1,22 +1,22 @@
-import type { TherapeuticSession } from '../types'
-import { vi } from 'vitest'
+import type { TherapeuticSession } from "../types";
+import { vi } from "vitest";
 /**
  * Test fixtures for bias detection scenarios
  */
 
 export const baselineAnxietyScenario: TherapeuticSession = {
-  sessionId: 'baseline-anxiety-001',
+  sessionId: "baseline-anxiety-001",
   sessionDate: new Date().toISOString(),
   participantDemographics: {
-    age: '25-35',
-    gender: 'female',
-    ethnicity: 'white',
-    primaryLanguage: 'en',
-    education: 'bachelors',
+    age: "25-35",
+    gender: "female",
+    ethnicity: "white",
+    primaryLanguage: "en",
+    education: "bachelors",
   },
   scenario: {
-    scenarioId: 'anxiety-baseline-001',
-    type: 'anxiety',
+    scenarioId: "anxiety-baseline-001",
+    type: "anxiety",
   },
   content: {
     transcript: `Patient presents with moderate anxiety symptoms. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
@@ -25,23 +25,23 @@ export const baselineAnxietyScenario: TherapeuticSession = {
   },
   aiResponses: [
     {
-      responseId: 'resp-001',
-      text: 'I understand your concerns about work stress',
-      metadata: { confidence: 0.85, modelUsed: 'gpt-4' },
+      responseId: "resp-001",
+      text: "I understand your concerns about work stress",
+      metadata: { confidence: 0.85, modelUsed: "gpt-4" },
       timestamp: new Date(),
     },
   ],
   expectedOutcomes: [
     {
-      outcomeId: 'outcome-001',
-      description: 'therapeutic-alliance',
+      outcomeId: "outcome-001",
+      description: "therapeutic-alliance",
       achieved: true,
     },
   ],
   transcripts: [
     {
-      speaker: 'user',
-      text: 'I feel anxious about work deadlines',
+      speaker: "user",
+      text: "I feel anxious about work deadlines",
       timestamp: new Date(),
     },
   ],
@@ -51,34 +51,34 @@ export const baselineAnxietyScenario: TherapeuticSession = {
     sessionEndTime: new Date(Date.now() + 30 * 60000),
     tags: [],
   },
-}
+};
 
 export const ageBiasYoungPatient: TherapeuticSession = {
   ...baselineAnxietyScenario,
-  sessionId: 'young-patient-001',
+  sessionId: "young-patient-001",
   participantDemographics: {
     ...baselineAnxietyScenario.participantDemographics,
-    age: '18-25',
+    age: "18-25",
   },
   content: {
     ...baselineAnxietyScenario.content,
     transcript: `Young patient with anxiety about college. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
   },
-}
+};
 
 export const ageBiasElderlyPatient: TherapeuticSession = {
   ...baselineAnxietyScenario,
-  sessionId: 'elderly-patient-001',
+  sessionId: "elderly-patient-001",
   participantDemographics: {
     ...baselineAnxietyScenario.participantDemographics,
-    age: '65+',
-    gender: 'female',
+    age: "65+",
+    gender: "female",
   },
   content: {
     ...baselineAnxietyScenario.content,
     transcript: `Elderly patient with anxiety about health. Therapeutic interventions: Active listening, Cognitive restructuring. Patient responses: I feel anxious about work, That makes sense. Session notes: Patient responsive to interventions.`,
   },
-}
+};
 
 export function getComparativeBiasScenarios(): [
   TherapeuticSession,
@@ -86,25 +86,25 @@ export function getComparativeBiasScenarios(): [
 ][] {
   const favorableScenario: TherapeuticSession = {
     ...baselineAnxietyScenario,
-    sessionId: 'favorable-001',
+    sessionId: "favorable-001",
     participantDemographics: {
       ...baselineAnxietyScenario.participantDemographics,
-      ethnicity: 'white',
-      gender: 'male',
+      ethnicity: "white",
+      gender: "male",
     },
-  }
+  };
 
   const unfavorableScenario: TherapeuticSession = {
     ...baselineAnxietyScenario,
-    sessionId: 'unfavorable-001',
+    sessionId: "unfavorable-001",
     participantDemographics: {
       ...baselineAnxietyScenario.participantDemographics,
-      ethnicity: 'black',
-      gender: 'female',
+      ethnicity: "black",
+      gender: "female",
     },
-  }
+  };
 
-  return [[favorableScenario, unfavorableScenario]]
+  return [[favorableScenario, unfavorableScenario]];
 }
 
 // =======================
@@ -119,7 +119,7 @@ export const mockPythonBridge = {
   runInteractiveAnalysis: vi.fn(),
   runEvaluationAnalysis: vi.fn(),
   analyze_session: vi.fn(),
-}
+};
 
 export function createDefaultAnalysisResult() {
   return {
@@ -153,7 +153,7 @@ export function createDefaultAnalysisResult() {
       missingDataByDemographic: {},
     },
     recommendations: [],
-  }
+  };
 }
 
 export function createModelLevelAnalysisResult() {
@@ -178,7 +178,7 @@ export function createModelLevelAnalysisResult() {
     },
     groupPerformanceComparison: [],
     recommendations: [],
-  }
+  };
 }
 
 export function createInteractiveAnalysisResult() {
@@ -193,7 +193,7 @@ export function createInteractiveAnalysisResult() {
     featureImportance: [],
     whatIfScenarios: [],
     recommendations: [],
-  }
+  };
 }
 
 export function createEvaluationAnalysisResult() {
@@ -213,11 +213,11 @@ export function createEvaluationAnalysisResult() {
       patientSafety: 0,
     },
     temporalAnalysis: {
-      trendDirection: 'stable',
+      trendDirection: "stable",
       changeRate: 0,
       seasonalPatterns: [],
       interventionEffectiveness: [],
     },
     recommendations: [],
-  }
+  };
 }

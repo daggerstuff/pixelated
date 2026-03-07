@@ -1,14 +1,14 @@
-import { createContext, useContext } from 'react'
+import { createContext, useContext } from "react";
 import type {
   SimulatorContext as SimulatorContextType,
   SimulatorProviderProps,
-} from '../types'
-import { useSimulator } from '../hooks/useSimulator'
+} from "../types";
+import { useSimulator } from "../hooks/useSimulator";
 
 // Create the simulator context
 const SimulatorContext = createContext<SimulatorContextType | undefined>(
   undefined,
-)
+);
 
 /**
  * Provider component for simulator functionality
@@ -16,13 +16,13 @@ const SimulatorContext = createContext<SimulatorContextType | undefined>(
  */
 export function SimulatorProvider({ children }: SimulatorProviderProps) {
   // Use the simulator hook to get all functionality
-  const simulatorState = useSimulator()
+  const simulatorState = useSimulator();
 
   return (
     <SimulatorContext.Provider value={simulatorState}>
       {children}
     </SimulatorContext.Provider>
-  )
+  );
 }
 
 /**
@@ -30,13 +30,13 @@ export function SimulatorProvider({ children }: SimulatorProviderProps) {
  * Provides access to all simulator functionality
  */
 export function useSimulatorContext(): SimulatorContextType {
-  const context = useContext(SimulatorContext)
+  const context = useContext(SimulatorContext);
 
   if (context === undefined) {
     throw new Error(
-      'useSimulatorContext must be used within a SimulatorProvider',
-    )
+      "useSimulatorContext must be used within a SimulatorProvider",
+    );
   }
 
-  return context
+  return context;
 }

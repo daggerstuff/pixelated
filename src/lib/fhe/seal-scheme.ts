@@ -4,15 +4,15 @@
  * Provides a concrete implementation of the FHEScheme interface for Microsoft SEAL
  */
 
-import { FHEOperation } from './types'
-import type { FHEScheme } from './types'
-import { SEAL_SUPPORTED_OPERATIONS, SealSchemeType } from './seal-types'
+import { FHEOperation } from "./types";
+import type { FHEScheme } from "./types";
+import { SEAL_SUPPORTED_OPERATIONS, SealSchemeType } from "./seal-types";
 
 /**
  * Implementation of the SEAL FHE scheme
  */
 export class SealScheme implements FHEScheme {
-  private schemeType: SealSchemeType
+  private schemeType: SealSchemeType;
 
   /**
    * Create a new SealScheme instance
@@ -20,21 +20,21 @@ export class SealScheme implements FHEScheme {
    * @param schemeType The SEAL scheme type (BFV, BGV, or CKKS)
    */
   constructor(schemeType: SealSchemeType) {
-    this.schemeType = schemeType
+    this.schemeType = schemeType;
   }
 
   /**
    * Get the name of the scheme
    */
   get name(): string {
-    return `Microsoft SEAL (${this.schemeType.toUpperCase()})`
+    return `Microsoft SEAL (${this.schemeType.toUpperCase()})`;
   }
 
   /**
    * Get the version of the scheme
    */
   get version(): string {
-    return '1.0.0' // SEAL version
+    return "1.0.0"; // SEAL version
   }
 
   /**
@@ -44,7 +44,7 @@ export class SealScheme implements FHEScheme {
    * @returns True if the operation is supported by this scheme
    */
   public supportsOperation(operation: FHEOperation): boolean {
-    return SEAL_SUPPORTED_OPERATIONS[this.schemeType].includes(operation)
+    return SEAL_SUPPORTED_OPERATIONS[this.schemeType].includes(operation);
   }
 
   /**
@@ -53,14 +53,14 @@ export class SealScheme implements FHEScheme {
    * @returns Array of supported operations
    */
   public getOperations(): FHEOperation[] {
-    return [...SEAL_SUPPORTED_OPERATIONS[this.schemeType]]
+    return [...SEAL_SUPPORTED_OPERATIONS[this.schemeType]];
   }
 
   /**
    * Get the SEAL scheme type
    */
   public getSchemeType(): SealSchemeType {
-    return this.schemeType
+    return this.schemeType;
   }
 
   /**
@@ -69,26 +69,26 @@ export class SealScheme implements FHEScheme {
   public getDescription(): string {
     const operations = this.getOperations()
       .map((op) => op.charAt(0).toUpperCase() + op.slice(1))
-      .join(', ')
+      .join(", ");
 
-    let description = `Microsoft SEAL ${this.schemeType.toUpperCase()} scheme.`
+    let description = `Microsoft SEAL ${this.schemeType.toUpperCase()} scheme.`;
 
     switch (this.schemeType) {
       case SealSchemeType.BFV:
-        description += ' Optimized for integer arithmetic.'
-        break
+        description += " Optimized for integer arithmetic.";
+        break;
       case SealSchemeType.BGV:
-        description += ' Efficient for modular arithmetic.'
-        break
+        description += " Efficient for modular arithmetic.";
+        break;
       case SealSchemeType.CKKS:
         description +=
-          ' Designed for approximate arithmetic on real and complex numbers.'
-        break
+          " Designed for approximate arithmetic on real and complex numbers.";
+        break;
     }
 
-    description += ` Supported operations: ${operations}.`
+    description += ` Supported operations: ${operations}.`;
 
-    return description
+    return description;
   }
 
   /**
@@ -101,26 +101,26 @@ export class SealScheme implements FHEScheme {
   public static forOperations(requiredOperations: FHEOperation[]): SealScheme {
     // Check CKKS first if floating-point operations are needed
     if (requiredOperations.includes(FHEOperation.Rescale)) {
-      return new SealScheme(SealSchemeType.CKKS)
+      return new SealScheme(SealSchemeType.CKKS);
     }
 
     // For operations without rescaling, both BFV and BGV could work
     // Prefer BFV as it's generally more efficient for most operations
     const bfvSupported = requiredOperations.every((op) =>
       SEAL_SUPPORTED_OPERATIONS[SealSchemeType.BFV].includes(op),
-    )
+    );
 
     if (bfvSupported) {
-      return new SealScheme(SealSchemeType.BFV)
+      return new SealScheme(SealSchemeType.BFV);
     }
 
     // Try BGV
     const bgvSupported = requiredOperations.every((op) =>
       SEAL_SUPPORTED_OPERATIONS[SealSchemeType.BGV].includes(op),
-    )
+    );
 
     if (bgvSupported) {
-      return new SealScheme(SealSchemeType.BGV)
+      return new SealScheme(SealSchemeType.BGV);
     }
 
     // If we get here, no scheme supports all required operations
@@ -129,10 +129,10 @@ export class SealScheme implements FHEScheme {
         !SEAL_SUPPORTED_OPERATIONS[SealSchemeType.CKKS].includes(op) &&
         !SEAL_SUPPORTED_OPERATIONS[SealSchemeType.BFV].includes(op) &&
         !SEAL_SUPPORTED_OPERATIONS[SealSchemeType.BGV].includes(op),
-    )
+    );
 
     throw new Error(
-      `No suitable SEAL scheme found for all required operations. Unsupported operations: ${unsupportedOps.join(', ')}`,
-    )
+      `No suitable SEAL scheme found for all required operations. Unsupported operations: ${unsupportedOps.join(", ")}`,
+    );
   }
 }

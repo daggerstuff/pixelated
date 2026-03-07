@@ -4,22 +4,22 @@
  * Handles storage and retrieval of security breach data using MongoDB Atlas
  */
 
-import mongodb from '@/config/mongodb.config'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { SecurityError } from '../security/errors'
+import mongodb from "@/config/mongodb.config";
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { SecurityError } from "../security/errors";
 // Import shared types to avoid circular dependencies
-import type { SecurityBreach, BreachSeverity } from './types'
+import type { SecurityBreach, BreachSeverity } from "./types";
 
-const logger = createBuildSafeLogger('breach-data')
+const logger = createBuildSafeLogger("breach-data");
 
 // Initialize MongoDB client
-const mongoUri = process.env['MONGODB_URI']
-const mongoDbName = process.env.MONGODB_DB_NAME
+const mongoUri = process.env["MONGODB_URI"];
+const mongoDbName = process.env.MONGODB_DB_NAME;
 
 if (!mongoUri || !mongoDbName) {
   throw new Error(
-    'Missing required MongoDB configuration for breach data management',
-  )
+    "Missing required MongoDB configuration for breach data management",
+  );
 }
 
 // MongoDB connection will be handled by the mongodb config singleton
@@ -28,19 +28,19 @@ if (!mongoUri || !mongoDbName) {
  * Interface for breach data storage
  */
 interface StoredBreach {
-  id: string
-  severity: BreachSeverity
-  timestamp: string
-  affected_users: string[]
-  data_types: string[]
-  attack_vector: string | null
-  detection_time: string
-  response_time: string
-  remediation_status: 'pending' | 'in_progress' | 'completed'
-  description: string
-  metadata: Record<string, unknown> | null
-  created_at: string
-  updated_at: string
+  id: string;
+  severity: BreachSeverity;
+  timestamp: string;
+  affected_users: string[];
+  data_types: string[];
+  attack_vector: string | null;
+  detection_time: string;
+  response_time: string;
+  remediation_status: "pending" | "in_progress" | "completed";
+  description: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
 }
 
 /**
@@ -48,7 +48,7 @@ interface StoredBreach {
  */
 function toStoredBreach(
   breach: SecurityBreach,
-): Omit<StoredBreach, 'created_at' | 'updated_at'> {
+): Omit<StoredBreach, "created_at" | "updated_at"> {
   return {
     id: breach.id,
     severity: breach.severity,
@@ -61,7 +61,7 @@ function toStoredBreach(
     remediation_status: breach.remediationStatus,
     description: breach.description,
     metadata: breach.metadata || null,
-  }
+  };
 }
 
 /**
@@ -80,7 +80,7 @@ function fromStoredBreach(stored: StoredBreach): SecurityBreach {
     remediationStatus: stored.remediation_status,
     description: stored.description,
     metadata: stored.metadata || undefined,
-  }
+  };
 }
 
 /**
@@ -88,24 +88,24 @@ function fromStoredBreach(stored: StoredBreach): SecurityBreach {
  */
 export async function createBreach(breach: SecurityBreach): Promise<void> {
   try {
-    const db = await mongodb.connect()
-    const collection = db.collection<StoredBreach>('security_breaches')
+    const db = await mongodb.connect();
+    const collection = db.collection<StoredBreach>("security_breaches");
 
     await collection.insertOne({
       ...toStoredBreach(breach),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
+    });
 
-    logger.info('Security breach recorded', { breachId: breach.id })
+    logger.info("Security breach recorded", { breachId: breach.id });
   } catch (error: unknown) {
-    logger.error('Failed to store security breach', {
+    logger.error("Failed to store security breach", {
       error,
       breachId: breach.id,
-    })
-    throw new SecurityError('Failed to store security breach', {
+    });
+    throw new SecurityError("Failed to store security breach", {
       cause: error,
-    })
+    });
   }
 }
 
@@ -114,23 +114,23 @@ export async function createBreach(breach: SecurityBreach): Promise<void> {
  */
 export async function getBreachesSince(date: Date): Promise<SecurityBreach[]> {
   try {
-    const db = await mongodb.connect()
-    const collection = db.collection<StoredBreach>('security_breaches')
+    const db = await mongodb.connect();
+    const collection = db.collection<StoredBreach>("security_breaches");
 
     const data = await collection
       .find({ timestamp: { $gte: date.toISOString() } })
       .sort({ timestamp: -1 })
-      .toArray()
+      .toArray();
 
-    return data.map(fromStoredBreach)
+    return data.map(fromStoredBreach);
   } catch (error: unknown) {
-    logger.error('Failed to retrieve security breaches', {
+    logger.error("Failed to retrieve security breaches", {
       error,
       since: date,
-    })
-    throw new SecurityError('Failed to retrieve security breaches', {
+    });
+    throw new SecurityError("Failed to retrieve security breaches", {
       cause: error,
-    })
+    });
   }
 }
 
@@ -139,11 +139,11 @@ export async function getBreachesSince(date: Date): Promise<SecurityBreach[]> {
  */
 export async function updateRemediationStatus(
   breachId: string,
-  status: 'pending' | 'in_progress' | 'completed',
+  status: "pending" | "in_progress" | "completed",
 ): Promise<void> {
   try {
-    const db = await mongodb.connect()
-    const collection = db.collection<StoredBreach>('security_breaches')
+    const db = await mongodb.connect();
+    const collection = db.collection<StoredBreach>("security_breaches");
 
     const result = await collection.updateOne(
       { id: breachId },
@@ -153,18 +153,18 @@ export async function updateRemediationStatus(
           updated_at: new Date().toISOString(),
         },
       },
-    )
+    );
 
     if (result.matchedCount === 0) {
-      throw new Error(`Breach with id ${breachId} not found`)
+      throw new Error(`Breach with id ${breachId} not found`);
     }
 
-    logger.info('Updated breach remediation status', { breachId, status })
+    logger.info("Updated breach remediation status", { breachId, status });
   } catch (error: unknown) {
-    logger.error('Failed to update breach status', { error, breachId })
-    throw new SecurityError('Failed to update breach status', {
+    logger.error("Failed to update breach status", { error, breachId });
+    throw new SecurityError("Failed to update breach status", {
       cause: error,
-    })
+    });
   }
 }
 
@@ -175,24 +175,24 @@ export async function getBreachById(
   id: string,
 ): Promise<SecurityBreach | null> {
   try {
-    const db = await mongodb.connect()
-    const collection = db.collection<StoredBreach>('security_breaches')
+    const db = await mongodb.connect();
+    const collection = db.collection<StoredBreach>("security_breaches");
 
-    const data = await collection.findOne({ id })
+    const data = await collection.findOne({ id });
 
     if (!data) {
-      return null
+      return null;
     }
 
-    return fromStoredBreach(data)
+    return fromStoredBreach(data);
   } catch (error: unknown) {
-    logger.error('Failed to retrieve security breach', {
+    logger.error("Failed to retrieve security breach", {
       error,
       breachId: id,
-    })
-    throw new SecurityError('Failed to retrieve security breach', {
+    });
+    throw new SecurityError("Failed to retrieve security breach", {
       cause: error,
-    })
+    });
   }
 }
 
@@ -201,20 +201,20 @@ export async function getBreachById(
  */
 export async function deleteBreach(id: string): Promise<void> {
   try {
-    const db = await mongodb.connect()
-    const collection = db.collection<StoredBreach>('security_breaches')
+    const db = await mongodb.connect();
+    const collection = db.collection<StoredBreach>("security_breaches");
 
-    const result = await collection.deleteOne({ id })
+    const result = await collection.deleteOne({ id });
 
     if (result.deletedCount === 0) {
-      throw new Error(`Breach with id ${id} not found`)
+      throw new Error(`Breach with id ${id} not found`);
     }
 
-    logger.info('Deleted security breach record', { breachId: id })
+    logger.info("Deleted security breach record", { breachId: id });
   } catch (error: unknown) {
-    logger.error('Failed to delete security breach', { error, breachId: id })
-    throw new SecurityError('Failed to delete security breach', {
+    logger.error("Failed to delete security breach", { error, breachId: id });
+    throw new SecurityError("Failed to delete security breach", {
       cause: error,
-    })
+    });
   }
 }

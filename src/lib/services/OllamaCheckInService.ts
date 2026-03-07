@@ -1,54 +1,56 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { getEnv } from '@/lib/utils/env'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { getEnv } from "@/lib/utils/env";
 
-const logger = createBuildSafeLogger('ollama-checkin')
+const logger = createBuildSafeLogger("ollama-checkin");
 
 export interface OllamaCheckInRequest {
-  model: string
-  prompt: string
+  model: string;
+  prompt: string;
   options?: {
-    temperature?: number
-    top_p?: number
-    max_tokens?: number
-  }
+    temperature?: number;
+    top_p?: number;
+    max_tokens?: number;
+  };
 }
 
 export interface OllamaResponse {
-  response: string
-  done: boolean
+  response: string;
+  done: boolean;
 }
 
 export interface ImprovementSuggestion {
-  id: string
-  suggestion: string
-  reasoning?: string
-  priority: 'low' | 'medium' | 'high'
+  id: string;
+  suggestion: string;
+  reasoning?: string;
+  priority: "low" | "medium" | "high";
   category:
-    | 'code-quality'
-    | 'architecture'
-    | 'testing'
-    | 'documentation'
-    | 'implementation'
-    | 'security'
-    | 'performance'
+    | "code-quality"
+    | "architecture"
+    | "testing"
+    | "documentation"
+    | "implementation"
+    | "security"
+    | "performance";
 }
 
 export interface CheckInResult {
-  shouldContinue: boolean
-  improvements: ImprovementSuggestion[]
-  rawResponse: string
-  decision: 'yes' | 'no'
-  reasoningLog: string[]
+  shouldContinue: boolean;
+  improvements: ImprovementSuggestion[];
+  rawResponse: string;
+  decision: "yes" | "no";
+  reasoningLog: string[];
 }
 
 export class OllamaCheckInService {
-  private baseUrl: string
-  private defaultModel: string
+  private baseUrl: string;
+  private defaultModel: string;
 
   constructor(baseUrl?: string, defaultModel?: string) {
     this.baseUrl =
-      baseUrl || getEnv('OLLAMA_BASE_URL') || 'https://api.pixelatedempathy.com'
-    this.defaultModel = defaultModel || 'granite3.3'
+      baseUrl ||
+      getEnv("OLLAMA_BASE_URL") ||
+      "https://api.pixelatedempathy.com";
+    this.defaultModel = defaultModel || "granite3.3";
   }
 
   /**
@@ -74,7 +76,7 @@ Remember:
 - Always suggest improvements unless the task is perfect
 - Only say "no" if there are critical errors, failures, or security issues
 - Consider maintainability, scalability, and best practices
-- Be constructive and specific in your suggestions`
+- Be constructive and specific in your suggestions`;
   }
 
   /**
@@ -91,47 +93,47 @@ Remember:
         temperature: 0.3, // Lower temperature for more consistent responses
         max_tokens: 1000,
       },
-    }
+    };
 
-    logger.info('Sending check-in request to Ollama', {
+    logger.info("Sending check-in request to Ollama", {
       model: requestBody.model,
       promptLength: prompt.length,
-    })
+    });
 
     try {
       const response = await fetch(`${this.baseUrl}/api/generate`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
-      })
+      });
 
       if (!response.ok) {
-        const errorText = await response.text()
-        logger.error('Ollama API error', {
+        const errorText = await response.text();
+        logger.error("Ollama API error", {
           status: response.status,
           statusText: response.statusText,
           errorText,
-        })
+        });
         throw new Error(
           `Ollama API error: ${response.status} ${response.statusText} - ${errorText}`,
-        )
+        );
       }
 
-      const result = (await response.json()) as OllamaResponse
-      logger.info('Received Ollama response', {
+      const result = (await response.json()) as OllamaResponse;
+      logger.info("Received Ollama response", {
         responseLength: result.response?.length || 0,
         done: result.done,
-      })
+      });
 
-      return result
+      return result;
     } catch (error: unknown) {
-      logger.error('Failed to send Ollama request', {
+      logger.error("Failed to send Ollama request", {
         error: error instanceof Error ? String(error) : String(error),
         baseUrl: this.baseUrl,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -139,66 +141,66 @@ Remember:
    * Parse Ollama response to extract improvements and decision
    */
   private parseOllamaResponse(response: string): {
-    improvements: ImprovementSuggestion[]
-    decision: 'yes' | 'no'
+    improvements: ImprovementSuggestion[];
+    decision: "yes" | "no";
   } {
-    const improvements: ImprovementSuggestion[] = []
-    let decision: 'yes' | 'no' = 'yes' // Default to yes if parsing fails
+    const improvements: ImprovementSuggestion[] = [];
+    let decision: "yes" | "no" = "yes"; // Default to yes if parsing fails
 
     try {
       // Extract improvements section
       const improvementsMatch = response.match(
         /IMPROVEMENTS:\s*([\s\S]*?)(?=DECISION:|$)/i,
-      )
+      );
       if (improvementsMatch) {
-        const improvementsText = improvementsMatch[1].trim()
+        const improvementsText = improvementsMatch[1].trim();
         const improvementLines = improvementsText
-          .split('\n')
+          .split("\n")
           .map((line) => line.trim())
           .filter(
             (line) =>
-              line.startsWith('-') ||
-              line.startsWith('•') ||
+              line.startsWith("-") ||
+              line.startsWith("•") ||
               line.match(/^\d+\./),
-          )
+          );
 
         improvementLines.forEach((line, index) => {
-          const cleanedLine = line.replace(/^[-•]\s*|\d+\.\s*/, '').trim()
+          const cleanedLine = line.replace(/^[-•]\s*|\d+\.\s*/, "").trim();
           if (cleanedLine) {
             improvements.push({
               id: `improvement-${Date.now()}-${index}`,
               suggestion: cleanedLine,
-              priority: 'medium', // Default priority
+              priority: "medium", // Default priority
               category: this.categorizeImprovement(cleanedLine),
-            })
+            });
           }
-        })
+        });
       }
 
       // Extract decision
-      const decisionMatch = response.match(/DECISION:\s*(yes|no)/i)
+      const decisionMatch = response.match(/DECISION:\s*(yes|no)/i);
       if (decisionMatch) {
-        decision = decisionMatch[1].toLowerCase() as 'yes' | 'no'
+        decision = decisionMatch[1].toLowerCase() as "yes" | "no";
       } else {
         // Fallback: look for yes/no anywhere in the response
-        const fallbackMatch = response.match(/\b(yes|no)\b/i)
+        const fallbackMatch = response.match(/\b(yes|no)\b/i);
         if (fallbackMatch) {
-          decision = fallbackMatch[1].toLowerCase() as 'yes' | 'no'
+          decision = fallbackMatch[1].toLowerCase() as "yes" | "no";
         }
       }
 
-      logger.info('Parsed Ollama response', {
+      logger.info("Parsed Ollama response", {
         improvementsCount: improvements.length,
         decision,
-      })
+      });
     } catch (error: unknown) {
-      logger.warn('Failed to parse Ollama response, using defaults', {
+      logger.warn("Failed to parse Ollama response, using defaults", {
         error: error instanceof Error ? String(error) : String(error),
-        response: response.substring(0, 200) + '...',
-      })
+        response: response.substring(0, 200) + "...",
+      });
     }
 
-    return { improvements, decision }
+    return { improvements, decision };
   }
 
   /**
@@ -206,53 +208,53 @@ Remember:
    */
   private categorizeImprovement(
     suggestion: string,
-  ): ImprovementSuggestion['category'] {
-    const lowerSuggestion = suggestion.toLowerCase()
+  ): ImprovementSuggestion["category"] {
+    const lowerSuggestion = suggestion.toLowerCase();
 
     if (
-      lowerSuggestion.includes('test') ||
-      lowerSuggestion.includes('spec') ||
-      lowerSuggestion.includes('coverage')
+      lowerSuggestion.includes("test") ||
+      lowerSuggestion.includes("spec") ||
+      lowerSuggestion.includes("coverage")
     ) {
-      return 'testing'
+      return "testing";
     }
     if (
-      lowerSuggestion.includes('document') ||
-      lowerSuggestion.includes('comment') ||
-      lowerSuggestion.includes('readme')
+      lowerSuggestion.includes("document") ||
+      lowerSuggestion.includes("comment") ||
+      lowerSuggestion.includes("readme")
     ) {
-      return 'documentation'
+      return "documentation";
     }
     if (
-      lowerSuggestion.includes('security') ||
-      lowerSuggestion.includes('auth') ||
-      lowerSuggestion.includes('permission')
+      lowerSuggestion.includes("security") ||
+      lowerSuggestion.includes("auth") ||
+      lowerSuggestion.includes("permission")
     ) {
-      return 'security'
+      return "security";
     }
     if (
-      lowerSuggestion.includes('performance') ||
-      lowerSuggestion.includes('optimize') ||
-      lowerSuggestion.includes('speed')
+      lowerSuggestion.includes("performance") ||
+      lowerSuggestion.includes("optimize") ||
+      lowerSuggestion.includes("speed")
     ) {
-      return 'performance'
+      return "performance";
     }
     if (
-      lowerSuggestion.includes('architecture') ||
-      lowerSuggestion.includes('structure') ||
-      lowerSuggestion.includes('pattern')
+      lowerSuggestion.includes("architecture") ||
+      lowerSuggestion.includes("structure") ||
+      lowerSuggestion.includes("pattern")
     ) {
-      return 'architecture'
+      return "architecture";
     }
     if (
-      lowerSuggestion.includes('implement') ||
-      lowerSuggestion.includes('logic') ||
-      lowerSuggestion.includes('algorithm')
+      lowerSuggestion.includes("implement") ||
+      lowerSuggestion.includes("logic") ||
+      lowerSuggestion.includes("algorithm")
     ) {
-      return 'implementation'
+      return "implementation";
     }
 
-    return 'code-quality' // Default category
+    return "code-quality"; // Default category
   }
 
   /**
@@ -262,66 +264,68 @@ Remember:
     improvements: ImprovementSuggestion[],
     taskContext: string,
   ): string[] {
-    const reasoningLog: string[] = []
+    const reasoningLog: string[] = [];
 
     improvements.forEach((improvement) => {
       // Simple reasoning logic - in a real implementation, this could be more sophisticated
-      let shouldAdd = false
-      let reasoning = ''
+      let shouldAdd = false;
+      let reasoning = "";
 
       // Security improvements are always high priority
-      if (improvement.category === 'security') {
-        shouldAdd = true
+      if (improvement.category === "security") {
+        shouldAdd = true;
         reasoning =
-          'Security improvements are critical and should always be addressed'
+          "Security improvements are critical and should always be addressed";
       }
       // Testing improvements for new features
       else if (
-        improvement.category === 'testing' &&
-        taskContext.toLowerCase().includes('implement')
+        improvement.category === "testing" &&
+        taskContext.toLowerCase().includes("implement")
       ) {
-        shouldAdd = true
+        shouldAdd = true;
         reasoning =
-          'Testing is essential for new implementations to ensure reliability'
+          "Testing is essential for new implementations to ensure reliability";
       }
       // Documentation for new features or APIs
       else if (
-        improvement.category === 'documentation' &&
-        (taskContext.toLowerCase().includes('api') ||
-          taskContext.toLowerCase().includes('service'))
+        improvement.category === "documentation" &&
+        (taskContext.toLowerCase().includes("api") ||
+          taskContext.toLowerCase().includes("service"))
       ) {
-        shouldAdd = true
+        shouldAdd = true;
         reasoning =
-          'Documentation is important for APIs and services to ensure proper usage'
+          "Documentation is important for APIs and services to ensure proper usage";
       }
       // Architecture improvements for complex features
       else if (
-        improvement.category === 'architecture' &&
-        taskContext.toLowerCase().includes('complex')
+        improvement.category === "architecture" &&
+        taskContext.toLowerCase().includes("complex")
       ) {
-        shouldAdd = true
+        shouldAdd = true;
         reasoning =
-          'Architecture improvements are valuable for complex features to maintain maintainability'
+          "Architecture improvements are valuable for complex features to maintain maintainability";
       }
       // Performance improvements if explicitly mentioned
       else if (
-        improvement.category === 'performance' &&
-        improvement.suggestion.toLowerCase().includes('critical')
+        improvement.category === "performance" &&
+        improvement.suggestion.toLowerCase().includes("critical")
       ) {
-        shouldAdd = true
+        shouldAdd = true;
         reasoning =
-          'Critical performance improvements should be addressed immediately'
+          "Critical performance improvements should be addressed immediately";
       } else {
-        shouldAdd = false
+        shouldAdd = false;
         reasoning =
-          'Improvement is valuable but not critical for current task completion'
+          "Improvement is valuable but not critical for current task completion";
       }
 
-      const decision = shouldAdd ? 'ACCEPTED' : 'DEFERRED'
-      reasoningLog.push(`${decision}: ${improvement.suggestion} - ${reasoning}`)
-    })
+      const decision = shouldAdd ? "ACCEPTED" : "DEFERRED";
+      reasoningLog.push(
+        `${decision}: ${improvement.suggestion} - ${reasoning}`,
+      );
+    });
 
-    return reasoningLog
+    return reasoningLog;
   }
 
   /**
@@ -331,57 +335,57 @@ Remember:
     taskSummary: string,
     taskContext?: string,
   ): Promise<CheckInResult> {
-    logger.info('Performing Ollama check-in', { taskSummary })
+    logger.info("Performing Ollama check-in", { taskSummary });
 
     try {
       // Generate enhanced prompt
-      const prompt = this.generateEnhancedPrompt(taskSummary)
+      const prompt = this.generateEnhancedPrompt(taskSummary);
 
       // Send request to Ollama
-      const ollamaResponse = await this.sendOllamaRequest(prompt)
+      const ollamaResponse = await this.sendOllamaRequest(prompt);
 
       // Parse response
       const { improvements, decision } = this.parseOllamaResponse(
         ollamaResponse.response,
-      )
+      );
 
       // Reason about improvements
       const reasoningLog = this.reasonAboutImprovements(
         improvements,
         taskContext || taskSummary,
-      )
+      );
 
       const result: CheckInResult = {
-        shouldContinue: decision === 'yes',
+        shouldContinue: decision === "yes",
         improvements,
         rawResponse: ollamaResponse.response,
         decision,
         reasoningLog,
-      }
+      };
 
-      logger.info('Check-in completed', {
+      logger.info("Check-in completed", {
         shouldContinue: result.shouldContinue,
         improvementsCount: improvements.length,
         decision,
-      })
+      });
 
-      return result
+      return result;
     } catch (error: unknown) {
-      logger.error('Check-in failed', {
+      logger.error("Check-in failed", {
         error: error instanceof Error ? String(error) : String(error),
         taskSummary,
-      })
+      });
 
       // Return safe defaults on error
       return {
         shouldContinue: false, // Stop on error
         improvements: [],
         rawResponse: `Error: ${error instanceof Error ? String(error) : String(error)}`,
-        decision: 'no',
+        decision: "no",
         reasoningLog: [
-          'Error occurred during check-in, stopping execution for safety',
+          "Error occurred during check-in, stopping execution for safety",
         ],
-      }
+      };
     }
   }
 
@@ -393,14 +397,14 @@ Remember:
     reasoningLog: string[],
   ): string[] {
     const acceptedImprovements = improvements.filter((_, index) =>
-      reasoningLog[index]?.startsWith('ACCEPTED:'),
-    )
+      reasoningLog[index]?.startsWith("ACCEPTED:"),
+    );
 
     return acceptedImprovements.map(
       (improvement) =>
         `- [ ] ${improvement.suggestion} (${improvement.category}, priority: ${improvement.priority})`,
-    )
+    );
   }
 }
 
-export default OllamaCheckInService
+export default OllamaCheckInService;

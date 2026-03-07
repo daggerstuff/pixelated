@@ -12,42 +12,49 @@ This directory contains comprehensive API tests for the Pixelated Empathy platfo
 ## Test Categories
 
 ### Authentication API
+
 - User login/logout
 - User registration
 - Token validation and refresh
 - Session management
 
 ### User Management API
+
 - Profile retrieval and updates
 - Account deletion
 - User preferences
 - Session management
 
 ### Chat API
+
 - Conversation management
 - Message sending and retrieval
 - Chat history and search
 - Real-time messaging
 
 ### AI Service API
+
 - Text analysis and processing
 - AI response generation
 - Model management
 - Feedback collection
 
 ### Analytics API
+
 - Dashboard metrics
 - Event tracking
 - Report generation
 - Usage analytics
 
 ### File Upload API
+
 - File upload and storage
 - File retrieval and download
 - File deletion and management
 - Metadata handling
 
 ### Error Handling
+
 - Authentication errors (401)
 - Validation errors (400)
 - Not found errors (404)
@@ -55,12 +62,14 @@ This directory contains comprehensive API tests for the Pixelated Empathy platfo
 - Server errors (500)
 
 ### Performance Testing
+
 - Response time validation
 - Concurrent request handling
 - Load testing
 - Rate limit testing
 
 ### Security Testing
+
 - SQL injection prevention
 - XSS attack prevention
 - CSRF protection
@@ -70,6 +79,7 @@ This directory contains comprehensive API tests for the Pixelated Empathy platfo
 ## Running API Tests
 
 ### Prerequisites
+
 ```bash
 # Ensure the API server is running
 npm run dev
@@ -79,11 +89,13 @@ npm install
 ```
 
 ### Run All API Tests
+
 ```bash
 pnpm dlx playwright test tests/api
 ```
 
 ### Run Specific Test Categories
+
 ```bash
 # Authentication tests only
 pnpm dlx playwright test tests/api --grep "Authentication API"
@@ -96,6 +108,7 @@ pnpm dlx playwright test tests/api --grep "Security"
 ```
 
 ### Run with Different Environments
+
 ```bash
 # Test against staging
 API_BASE_URL=https://staging.pixelatedempathy.com pnpm dlx playwright test tests/api
@@ -118,42 +131,48 @@ The `api.config.json` file contains:
 ## Test Data Management
 
 ### Automatic Cleanup
+
 - Test users are automatically created and cleaned up
 - Test conversations and files are removed after tests
 - No persistent test data remains after test completion
 
 ### Test User Creation
+
 ```typescript
 // Create a test user for testing
 const token = await apiUtils.createTestUser({
-  email: 'custom@test.com',
-  password: 'customPassword123',
-  name: 'Custom Test User'
+  email: "custom@test.com",
+  password: "customPassword123",
+  name: "Custom Test User",
 });
 ```
 
 ### Test Data Generation
+
 ```typescript
 // Generate test data
-const userData = APITestUtils.generateTestData('user');
-const messageData = APITestUtils.generateTestData('message');
-const fileData = APITestUtils.generateTestData('file');
+const userData = APITestUtils.generateTestData("user");
+const messageData = APITestUtils.generateTestData("message");
+const fileData = APITestUtils.generateTestData("file");
 ```
 
 ## Performance Monitoring
 
 ### Response Time Tracking
+
 ```typescript
-const { result, responseTime } = await APITestUtils.measureResponseTime(
-  () => request.get('/api/user/profile')
+const { result, responseTime } = await APITestUtils.measureResponseTime(() =>
+  request.get("/api/user/profile"),
 );
 expect(responseTime).toBeLessThan(1000); // Should respond within 1 second
 ```
 
 ### Concurrent Request Testing
+
 ```typescript
-const requests = Array.from({ length: 10 }, () => 
-  () => request.get('/api/user/profile')
+const requests = Array.from(
+  { length: 10 },
+  () => () => request.get("/api/user/profile"),
 );
 const results = await APITestUtils.batchRequests(requests, 5);
 ```
@@ -161,41 +180,45 @@ const results = await APITestUtils.batchRequests(requests, 5);
 ## Security Validation
 
 ### XSS Prevention Testing
+
 ```typescript
-await request.post('/api/chat/messages', {
+await request.post("/api/chat/messages", {
   data: {
     content: '<script>alert("xss")</script>',
-    conversationId: 'test_conv'
-  }
+    conversationId: "test_conv",
+  },
 });
 // Verify script is escaped, not executed
 ```
 
 ### SQL Injection Prevention
+
 ```typescript
-await request.post('/api/auth/login', {
+await request.post("/api/auth/login", {
   data: {
     email: "admin'; DROP TABLE users; --",
-    password: 'password'
-  }
+    password: "password",
+  },
 });
 // Should return validation error, not execute SQL
 ```
 
 ### Rate Limiting Validation
+
 ```typescript
 // Make rapid requests to trigger rate limiting
 const promises = Array.from({ length: 100 }, () =>
-  request.get('/api/user/profile')
+  request.get("/api/user/profile"),
 );
 const responses = await Promise.all(promises);
-const rateLimited = responses.filter(r => r.status() === 429);
+const rateLimited = responses.filter((r) => r.status() === 429);
 expect(rateLimited.length).toBeGreaterThan(0);
 ```
 
 ## Error Handling
 
 ### Expected Error Responses
+
 All API endpoints are tested for proper error handling:
 
 - **400 Bad Request**: Invalid input data
@@ -206,6 +229,7 @@ All API endpoints are tested for proper error handling:
 - **500 Internal Server Error**: Server-side errors
 
 ### Error Response Format
+
 ```json
 {
   "error": "Error message",
@@ -220,17 +244,21 @@ All API endpoints are tested for proper error handling:
 ## Reporting
 
 ### HTML Reports
+
 ```bash
 pnpm dlx playwright test tests/api --reporter=html
 ```
 
 ### JSON Reports
+
 ```bash
 pnpm dlx playwright test tests/api --reporter=json
 ```
 
 ### Custom Reporting
+
 The test suite generates detailed reports including:
+
 - Response time metrics
 - Error rate analysis
 - Security test results
@@ -240,24 +268,28 @@ The test suite generates detailed reports including:
 ## Best Practices
 
 ### Test Organization
+
 - Group related tests in describe blocks
 - Use descriptive test names
 - Include both positive and negative test cases
 - Test edge cases and boundary conditions
 
 ### Data Management
+
 - Always clean up test data
 - Use unique identifiers for test data
 - Avoid dependencies between tests
 - Use factories for test data generation
 
 ### Performance Testing
+
 - Set realistic performance thresholds
 - Test under various load conditions
 - Monitor resource usage
 - Include network latency considerations
 
 ### Security Testing
+
 - Test all input validation
 - Verify authentication and authorization
 - Check for common vulnerabilities
@@ -288,6 +320,7 @@ The test suite generates detailed reports including:
    - Check rate limit configuration
 
 ### Debug Mode
+
 ```bash
 # Run with debug output
 DEBUG=1 pnpm dlx playwright test tests/api

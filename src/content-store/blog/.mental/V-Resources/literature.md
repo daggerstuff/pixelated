@@ -1,7 +1,7 @@
 ---
-title: 'Literature Resources'
-description: 'Comprehensive guide to literature and educational resources'
-author: 'Resource Team'
+title: "Literature Resources"
+description: "Comprehensive guide to literature and educational resources"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

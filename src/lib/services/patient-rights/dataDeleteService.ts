@@ -1,43 +1,43 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import mongoClient from '../../db/mongoClient'
-import type { DataDeletionRequest as DeletionRequest } from './dataDeleteService'
-import { getAuditLogger } from '../../ai/bias-detection/audit'
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import mongoClient from "../../db/mongoClient";
+import type { DataDeletionRequest as DeletionRequest } from "./dataDeleteService";
+import { getAuditLogger } from "../../ai/bias-detection/audit";
 
-const logger = createBuildSafeLogger()
-const auditLogger = getAuditLogger()
+const logger = createBuildSafeLogger();
+const auditLogger = getAuditLogger();
 
 // Types for deletion requests
 export interface DataDeletionRequest {
-  id: string
-  patientId: string
-  patientName: string
-  dataScope: 'all' | 'specific'
-  dataCategories: string[]
-  reason: string
-  additionalDetails?: string
-  status: 'pending' | 'completed' | 'denied' | 'in-progress'
-  dateRequested: string
-  dateProcessed?: string
-  requestedBy: string
-  processedBy?: string
-  processingNotes?: string
+  id: string;
+  patientId: string;
+  patientName: string;
+  dataScope: "all" | "specific";
+  dataCategories: string[];
+  reason: string;
+  additionalDetails?: string;
+  status: "pending" | "completed" | "denied" | "in-progress";
+  dateRequested: string;
+  dateProcessed?: string;
+  requestedBy: string;
+  processedBy?: string;
+  processingNotes?: string;
 }
 
 export interface CreateDataDeletionRequestParams {
-  patientId: string
-  patientName: string
-  dataScope: 'all' | 'specific'
-  dataCategories: string[]
-  reason: string
-  additionalDetails?: string
-  requestedBy: string
+  patientId: string;
+  patientName: string;
+  dataScope: "all" | "specific";
+  dataCategories: string[];
+  reason: string;
+  additionalDetails?: string;
+  requestedBy: string;
 }
 
 export interface UpdateDataDeletionRequestParams {
-  id: string
-  status: 'pending' | 'completed' | 'denied' | 'in-progress'
-  processedBy: string
-  processingNotes?: string
+  id: string;
+  status: "pending" | "completed" | "denied" | "in-progress";
+  processedBy: string;
+  processingNotes?: string;
 }
 
 /**
@@ -47,7 +47,7 @@ export async function createDataDeletionRequest(
   params: CreateDataDeletionRequestParams,
 ): Promise<DataDeletionRequest> {
   try {
-    const requestId = `DEL-${new Date().getFullYear()}-${generateId(4)}`
+    const requestId = `DEL-${new Date().getFullYear()}-${generateId(4)}`;
 
     // Create new deletion request record
     const deletionRequest: DataDeletionRequest = {
@@ -58,23 +58,23 @@ export async function createDataDeletionRequest(
       dataCategories: params.dataCategories,
       reason: params.reason,
       additionalDetails: params.additionalDetails,
-      status: 'pending',
+      status: "pending",
       dateRequested: new Date().toISOString(),
       requestedBy: params.requestedBy,
-    }
+    };
 
     // Insert into database
-    const db = mongoClient.getDb()
-    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
-    await collection.insertOne(deletionRequest)
+    const db = mongoClient.getDb();
+    const collection = db.collection<DeletionRequest>("dataDeletionRequests");
+    await collection.insertOne(deletionRequest);
 
-    return deletionRequest
+    return deletionRequest;
   } catch (error: unknown) {
-    logger.error('Error in createDataDeletionRequest', {
+    logger.error("Error in createDataDeletionRequest", {
       error: error instanceof Error ? String(error) : String(error),
       params,
-    })
-    throw error
+    });
+    throw error;
   }
 }
 
@@ -85,17 +85,17 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const db = mongoClient.getDb()
-    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
-    const request = await collection.findOne({ id })
+    const db = mongoClient.getDb();
+    const collection = db.collection<DeletionRequest>("dataDeletionRequests");
+    const request = await collection.findOne({ id });
 
-    return request as DataDeletionRequest | null
+    return request as DataDeletionRequest | null;
   } catch (error: unknown) {
-    logger.error('Error in getDataDeletionRequest', {
+    logger.error("Error in getDataDeletionRequest", {
       error: error instanceof Error ? String(error) : String(error),
       id,
-    })
-    throw error
+    });
+    throw error;
   }
 }
 
@@ -103,37 +103,37 @@ export async function getDataDeletionRequest(
  * Get all data deletion requests
  */
 export async function getAllDataDeletionRequests(filters?: {
-  status?: 'pending' | 'completed' | 'denied' | 'in-progress'
-  patientId?: string
-  dataScope?: 'all' | 'specific'
+  status?: "pending" | "completed" | "denied" | "in-progress";
+  patientId?: string;
+  dataScope?: "all" | "specific";
 }): Promise<DataDeletionRequest[]> {
-  const query: Partial<DataDeletionRequest> = {}
+  const query: Partial<DataDeletionRequest> = {};
 
   if (filters) {
     // Use bracket notation for index signature properties
-    if (filters['status']) {
-      query.status = filters['status']
+    if (filters["status"]) {
+      query.status = filters["status"];
     }
-    if (filters['patientId']) {
-      query.patientId = filters['patientId']
+    if (filters["patientId"]) {
+      query.patientId = filters["patientId"];
     }
-    if (filters['dataScope']) {
-      query.dataScope = filters['dataScope']
+    if (filters["dataScope"]) {
+      query.dataScope = filters["dataScope"];
     }
   }
 
   try {
-    const db = mongoClient.getDb()
-    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
-    const requests = await collection.find(query).toArray()
+    const db = mongoClient.getDb();
+    const collection = db.collection<DeletionRequest>("dataDeletionRequests");
+    const requests = await collection.find(query).toArray();
 
-    return requests as DataDeletionRequest[]
+    return requests as DataDeletionRequest[];
   } catch (error: unknown) {
-    logger.error('Error in getAllDataDeletionRequests', {
+    logger.error("Error in getAllDataDeletionRequests", {
       error: error instanceof Error ? String(error) : String(error),
       filters,
-    })
-    throw error
+    });
+    throw error;
   }
 }
 
@@ -148,55 +148,55 @@ export async function updateDataDeletionRequest(
       status: params.status,
       processedBy: params.processedBy,
       processingNotes: params.processingNotes,
-    }
+    };
 
     // If status is 'completed' or 'denied', add the processing date
-    if (params.status === 'completed' || params.status === 'denied') {
-      updateData.dateProcessed = new Date().toISOString()
+    if (params.status === "completed" || params.status === "denied") {
+      updateData.dateProcessed = new Date().toISOString();
     }
 
-    const db = mongoClient.getDb()
-    const collection = db.collection<DeletionRequest>('dataDeletionRequests')
+    const db = mongoClient.getDb();
+    const collection = db.collection<DeletionRequest>("dataDeletionRequests");
 
     // Update the request in the database
     const result = await collection.findOneAndUpdate(
       { id: params.id },
       { $set: updateData },
-      { returnDocument: 'after' },
-    )
+      { returnDocument: "after" },
+    );
 
     if (!result) {
-      throw new Error('Failed to update data deletion request')
+      throw new Error("Failed to update data deletion request");
     }
 
     // Get the full request data for audit logging
-    const updatedRequest = result as DataDeletionRequest
+    const updatedRequest = result as DataDeletionRequest;
 
     // Log the action for audit purposes
     auditLogger.logAction(
-      { userId: params.processedBy, role: 'system' as const },
-      'update_deletion_request',
-      'patient_data',
+      { userId: params.processedBy, role: "system" as const },
+      "update_deletion_request",
+      "patient_data",
       {
         requestId: params.id,
         newStatus: params.status,
-        notes: params.processingNotes || 'No notes provided',
+        notes: params.processingNotes || "No notes provided",
       },
-      { ipAddress: '::1', userAgent: 'system' },
-    )
+      { ipAddress: "::1", userAgent: "system" },
+    );
 
     // If the request is completed, actually perform the data deletion
-    if (params.status === 'completed') {
-      await executeDataDeletion(updatedRequest, params.processedBy)
+    if (params.status === "completed") {
+      await executeDataDeletion(updatedRequest, params.processedBy);
     }
 
-    return updatedRequest
+    return updatedRequest;
   } catch (error: unknown) {
-    logger.error('Error in updateDataDeletionRequest', {
+    logger.error("Error in updateDataDeletionRequest", {
       error: error instanceof Error ? String(error) : String(error),
       params,
-    })
-    throw error
+    });
+    throw error;
   }
 }
 
@@ -209,70 +209,73 @@ async function executeDataDeletion(
   processedBy: string,
 ): Promise<void> {
   try {
-    logger.info('Executing data deletion', {
+    logger.info("Executing data deletion", {
       requestId: request.id,
       patientId: request.patientId,
       scope: request.dataScope,
-    })
+    });
 
     // For 'all' scope, delete all patient data
-    if (request.dataScope === 'all') {
+    if (request.dataScope === "all") {
       // Delete from each relevant table
-      await deleteAllPatientData(request.patientId)
+      await deleteAllPatientData(request.patientId);
 
-      logger.info('Completed full patient data deletion', {
+      logger.info("Completed full patient data deletion", {
         requestId: request.id,
         patientId: request.patientId,
-      })
+      });
     }
     // For 'specific' scope, delete only selected categories
     else if (
-      request.dataScope === 'specific' &&
+      request.dataScope === "specific" &&
       request.dataCategories.length > 0
     ) {
-      await deleteSpecificPatientData(request.patientId, request.dataCategories)
+      await deleteSpecificPatientData(
+        request.patientId,
+        request.dataCategories,
+      );
 
-      logger.info('Completed specific patient data deletion', {
+      logger.info("Completed specific patient data deletion", {
         requestId: request.id,
         patientId: request.patientId,
         categories: request.dataCategories,
-      })
+      });
     }
 
     // Log the deletion action for audit purposes
     auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'execute_data_deletion',
-      'patient_data',
+      { userId: processedBy, role: "system" as const },
+      "execute_data_deletion",
+      "patient_data",
       {
         requestId: request.id,
         dataScope: request.dataScope,
         categories: request.dataCategories,
         reason: request.reason,
       },
-      { ipAddress: '::1', userAgent: 'system' },
-    )
+      { ipAddress: "::1", userAgent: "system" },
+    );
   } catch (error: unknown) {
-    logger.error('Error executing data deletion', {
+    logger.error("Error executing data deletion", {
       error: error instanceof Error ? String(error) : String(error),
       requestId: request.id,
       patientId: request.patientId,
-    })
+    });
 
     // We don't throw here to avoid blocking the status update
     // Instead, we log the error and continue
 
     // Log the failure for audit purposes
     auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'data_deletion_error',
-      'patient_data',
+      { userId: processedBy, role: "system" as const },
+      "data_deletion_error",
+      "patient_data",
       {
         requestId: request.id,
         error: error instanceof Error ? String(error) : String(error),
       },
-      { ipAddress: '::1', userAgent: 'system' },
-    )
+      { ipAddress: "::1", userAgent: "system" },
+    );
   }
 }
 
@@ -281,36 +284,36 @@ async function executeDataDeletion(
  */
 async function deleteAllPatientData(patientId: string): Promise<void> {
   const collections = [
-    'patient_profiles',
-    'patient_demographics',
-    'therapy_sessions',
-    'session_notes',
-    'patient_assessments',
-    'assessment_results',
-    'emotion_records',
-    'emotion_tracking_data',
-    'clinical_notes',
-    'therapist_observations',
-    'patient_messages',
-    'communication_logs',
-    'patient_uploads',
-    'media_files',
-  ]
+    "patient_profiles",
+    "patient_demographics",
+    "therapy_sessions",
+    "session_notes",
+    "patient_assessments",
+    "assessment_results",
+    "emotion_records",
+    "emotion_tracking_data",
+    "clinical_notes",
+    "therapist_observations",
+    "patient_messages",
+    "communication_logs",
+    "patient_uploads",
+    "media_files",
+  ];
 
-  const db = mongoClient.getDb()
-  const { client } = db
-  const session = client.startSession()
+  const db = mongoClient.getDb();
+  const { client } = db;
+  const session = client.startSession();
 
   try {
     await session.withTransaction(async () => {
       for (const collectionName of collections) {
         await db
           .collection(collectionName)
-          .deleteMany({ patient_id: patientId }, { session })
+          .deleteMany({ patient_id: patientId }, { session });
       }
-    })
+    });
   } finally {
-    await session.endSession()
+    await session.endSession();
   }
 }
 
@@ -323,39 +326,39 @@ async function deleteSpecificPatientData(
 ): Promise<void> {
   // Map categories to database tables
   const categoryTableMap: Record<string, string[]> = {
-    demographics: ['patient_profiles', 'patient_demographics'],
-    sessions: ['therapy_sessions', 'session_notes'],
-    assessments: ['patient_assessments', 'assessment_results'],
-    emotions: ['emotion_records', 'emotion_tracking_data'],
-    notes: ['clinical_notes', 'therapist_observations'],
-    messages: ['patient_messages', 'communication_logs'],
-    media: ['patient_uploads', 'media_files'],
-  }
+    demographics: ["patient_profiles", "patient_demographics"],
+    sessions: ["therapy_sessions", "session_notes"],
+    assessments: ["patient_assessments", "assessment_results"],
+    emotions: ["emotion_records", "emotion_tracking_data"],
+    notes: ["clinical_notes", "therapist_observations"],
+    messages: ["patient_messages", "communication_logs"],
+    media: ["patient_uploads", "media_files"],
+  };
 
   // Process each requested category
   for (const category of categories) {
-    const tables = categoryTableMap[category]
+    const tables = categoryTableMap[category];
 
     // Skip unknown categories
     if (!tables) {
-      logger.warn(`Unknown data category in deletion request: ${category}`)
-      continue
+      logger.warn(`Unknown data category in deletion request: ${category}`);
+      continue;
     }
 
-    const db = mongoClient.getDb()
+    const db = mongoClient.getDb();
 
     // Delete from each table for this category
     for (const table of tables) {
-      await db.collection(table).deleteMany({ patient_id: patientId })
+      await db.collection(table).deleteMany({ patient_id: patientId });
     }
   }
 }
 
 function generateId(length: number): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-  let result = ''
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return result
+  return result;
 }

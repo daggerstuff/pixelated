@@ -1,12 +1,12 @@
 ---
-title: 'Redis Migration'
-description: 'Guide for migrating Redis data and configurations'
+title: "Redis Migration"
+description: "Guide for migrating Redis data and configurations"
 pubDate: 2025-03-25
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ['redis', 'migration', 'data-transfer']
-author: 'Pixelated Team'
+tags: ["redis", "migration", "data-transfer"]
+author: "Pixelated Team"
 ---
 
 ## Redis Migration Guide
@@ -21,6 +21,7 @@ maintaining system stability.
 ## Migration Steps
 
 1. Update Dependencies
+
    ```bash
    pnpm add ioredis
    ```
@@ -42,15 +43,13 @@ maintaining system stability.
 3. Initialize the Redis Service
 
    ```typescript
-
    const redis = new RedisService({
      url: process.env.REDIS_URL,
      keyPrefix: process.env.REDIS_KEY_PREFIX,
-   })
+   });
 
-   await redis.connect()
+   await redis.connect();
    ```
-
 
 ## Service-Specific Migration Guides
 
@@ -59,6 +58,7 @@ maintaining system stability.
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -105,22 +105,22 @@ maintaining system stability.
 
    ```typescript
    // Before
-   const cacheInvalidation = new CacheInvalidationService()
+   const cacheInvalidation = new CacheInvalidationService();
 
    // After
    const redis = new RedisService({
      url: process.env.REDIS_URL,
-     keyPrefix: 'cache:',
-   })
-   const cacheInvalidation = new CacheInvalidationService(redis)
+     keyPrefix: "cache:",
+   });
+   const cacheInvalidation = new CacheInvalidationService(redis);
    ```
-
 
 ### Analytics Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -168,22 +168,22 @@ maintaining system stability.
 
    ```typescript
    // Before
-   const analytics = new AnalyticsService()
+   const analytics = new AnalyticsService();
 
    // After
    const redis = new RedisService({
      url: process.env.REDIS_URL,
-     keyPrefix: 'analytics:',
-   })
-   const analytics = new AnalyticsService(redis)
+     keyPrefix: "analytics:",
+   });
+   const analytics = new AnalyticsService(redis);
    ```
-
 
 ### Pattern Recognition Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -237,22 +237,22 @@ maintaining system stability.
 
    ```typescript
    // Before
-   const patternRecognition = new PatternRecognitionService()
+   const patternRecognition = new PatternRecognitionService();
 
    // After
    const redis = new RedisService({
      url: process.env.REDIS_URL,
-     keyPrefix: 'patterns:',
-   })
-   const patternRecognition = new PatternRecognitionService(redis)
+     keyPrefix: "patterns:",
+   });
+   const patternRecognition = new PatternRecognitionService(redis);
    ```
-
 
 ### Notification Service
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -306,22 +306,22 @@ maintaining system stability.
 
    ```typescript
    // Before
-   const notification = new NotificationService()
+   const notification = new NotificationService();
 
    // After
    const redis = new RedisService({
      url: process.env.REDIS_URL,
-     keyPrefix: 'notifications:',
-   })
-   const notification = new NotificationService(redis)
+     keyPrefix: "notifications:",
+   });
+   const notification = new NotificationService(redis);
    ```
-
 
 ## Advanced Migration Patterns
 
 1. Update Import Statements
    ```typescript
    // Before
+   ```
 
 // After
 
@@ -375,84 +375,83 @@ maintaining system stability.
 
    ```typescript
    // Before
-   const wsServer = new WebSocketServer()
+   const wsServer = new WebSocketServer();
 
    // After
    const redis = new RedisService({
      url: process.env.REDIS_URL,
-     keyPrefix: 'ws:',
-   })
-   const wsServer = new WebSocketServer(redis)
+     keyPrefix: "ws:",
+   });
+   const wsServer = new WebSocketServer(redis);
    ```
-
 
 ## Testing the Migration
 
 ### Unit Tests
 
 ```typescript
-describe('Service Migration', () => {
-  let redis: RedisService
+describe("Service Migration", () => {
+  let redis: RedisService;
 
   beforeEach(() => {
     redis = new RedisService({
-      url: 'redis://localhost:6379',
-      keyPrefix: 'test:',
-    })
-  })
+      url: "redis://localhost:6379",
+      keyPrefix: "test:",
+    });
+  });
 
   afterEach(async () => {
-    await redis.disconnect()
-  })
+    await redis.disconnect();
+  });
 
-  describe('CacheInvalidationService', () => {
-    it('should work with new Redis service', async () => {
-      const service = new CacheInvalidationService(redis)
-      await service.invalidateKey('test-key')
-      expect(await redis.exists('test-key')).toBe(false)
-    })
-  })
+  describe("CacheInvalidationService", () => {
+    it("should work with new Redis service", async () => {
+      const service = new CacheInvalidationService(redis);
+      await service.invalidateKey("test-key");
+      expect(await redis.exists("test-key")).toBe(false);
+    });
+  });
 
-  describe('AnalyticsService', () => {
-    it('should track events with new Redis service', async () => {
-      const service = new AnalyticsService(redis)
-      await service.trackEvent({ type: 'test', data: {} })
+  describe("AnalyticsService", () => {
+    it("should track events with new Redis service", async () => {
+      const service = new AnalyticsService(redis);
+      await service.trackEvent({ type: "test", data: {} });
       // Verify event storage
-    })
-  })
-})
+    });
+  });
+});
 ```
 
 ### Integration Tests
 
 ```typescript
-describe('Service Integration', () => {
-  let redis: RedisService
-  let analytics: AnalyticsService
-  let patternRecognition: PatternRecognitionService
+describe("Service Integration", () => {
+  let redis: RedisService;
+  let analytics: AnalyticsService;
+  let patternRecognition: PatternRecognitionService;
 
   beforeAll(async () => {
     redis = new RedisService({
       url: process.env.REDIS_URL,
-      keyPrefix: 'integration:',
-    })
-    await redis.connect()
+      keyPrefix: "integration:",
+    });
+    await redis.connect();
 
-    analytics = new AnalyticsService(redis)
-    patternRecognition = new PatternRecognitionService(redis)
-  })
+    analytics = new AnalyticsService(redis);
+    patternRecognition = new PatternRecognitionService(redis);
+  });
 
   afterAll(async () => {
-    await redis.disconnect()
-  })
+    await redis.disconnect();
+  });
 
-  it('should work together with shared Redis service', async () => {
+  it("should work together with shared Redis service", async () => {
     // Test interaction between services
-    await analytics.trackEvent({ type: 'pattern_detected', data: {} })
-    await patternRecognition.processLatestEvents()
+    await analytics.trackEvent({ type: "pattern_detected", data: {} });
+    await patternRecognition.processLatestEvents();
     // Verify results
-  })
-})
+  });
+});
 ```
 
 ## Rollback Procedures
@@ -463,19 +462,19 @@ If issues are encountered during migration:
 
    ```typescript
    class CacheInvalidationService {
-     private readonly redis: RedisService | ReturnType<typeof createClient>
+     private readonly redis: RedisService | ReturnType<typeof createClient>;
 
      constructor(redis?: RedisService) {
-       this.redis = redis || createClient()
+       this.redis = redis || createClient();
      }
 
      async invalidateKey(key: string): Promise<void> {
        if (this.redis instanceof RedisService) {
          // New implementation
-         await this.redis.del(key)
+         await this.redis.del(key);
        } else {
          // Old implementation
-         await this.redis.del(key)
+         await this.redis.del(key);
        }
      }
    }
@@ -484,19 +483,19 @@ If issues are encountered during migration:
 2. Feature Flags
 
    ```typescript
-   const USE_NEW_REDIS = process.env.USE_NEW_REDIS === 'true'
+   const USE_NEW_REDIS = process.env.USE_NEW_REDIS === "true";
 
-   const redis = USE_NEW_REDIS ? new RedisService(config) : createClient()
+   const redis = USE_NEW_REDIS ? new RedisService(config) : createClient();
    ```
 
 3. Gradual Rollout
    ```typescript
    const shouldUseNewRedis = (userId: string): boolean => {
-     const percentage = process.env.NEW_REDIS_ROLLOUT_PERCENTAGE || '0'
-     const hash = createHash('md5').update(userId).digest('hex')
-     const userPercentile = (parseInt(hash.substring(0, 2), 16) / 255) * 100
-     return userPercentile <= parseInt(percentage, 10)
-   }
+     const percentage = process.env.NEW_REDIS_ROLLOUT_PERCENTAGE || "0";
+     const hash = createHash("md5").update(userId).digest("hex");
+     const userPercentile = (parseInt(hash.substring(0, 2), 16) / 255) * 100;
+     return userPercentile <= parseInt(percentage, 10);
+   };
    ```
 
 ## Best Practices
@@ -526,20 +525,20 @@ If issues are encountered during migration:
 1. Error Tracking
 
    ```typescript
-   const errorMetrics = new RedisErrorMetrics(redis)
+   const errorMetrics = new RedisErrorMetrics(redis);
    ```
 
 2. Performance Monitoring
 
    ```typescript
-   const stats = await redis.getPoolStats()
+   const stats = await redis.getPoolStats();
    ```
 
 3. Usage Metrics
    ```typescript
-   logger.info('Redis operation completed', {
-     operation: 'set',
+   logger.info("Redis operation completed", {
+     operation: "set",
      duration: Date.now() - start,
-     service: 'CacheInvalidation',
-   })
+     service: "CacheInvalidation",
+   });
    ```

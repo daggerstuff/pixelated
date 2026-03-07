@@ -1,20 +1,18 @@
 ---
-title: 'Codependency & Complex Trauma'
-description: 'Exploring the intricate connection between codependency and complex trauma, and its impact on relationships and personal growth'
-author: 'Dr. Michael Rivera'
+title: "Codependency & Complex Trauma"
+description: "Exploring the intricate connection between codependency and complex trauma, and its impact on relationships and personal growth"
+author: "Dr. Michael Rivera"
 pubDate: 2024-01-25
 readingTime: 15
-tags: ['codependency', 'complex trauma', 'relationships', 'recovery', 'healing']
-series: 'Healing Journey'
+tags: ["codependency", "complex trauma", "relationships", "recovery", "healing"]
+series: "Healing Journey"
 seriesOrder: 2
 image:
   {
-    url: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Two silhouettes symbolizing relationship dynamics',
+    url: "https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Two silhouettes symbolizing relationship dynamics",
   }
 ---
-
-
 
 # Codependency & Complex Trauma
 

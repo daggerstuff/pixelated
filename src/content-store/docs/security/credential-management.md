@@ -36,6 +36,7 @@ node scripts/clean-credentials.js
 ```
 
 The script:
+
 - Scans for hardcoded credentials and PHI in code files
 - Replaces direct values with environment variable references
 - Provides special handling for documentation files
@@ -44,6 +45,7 @@ The script:
 ### 2. GitLeaks Configuration
 
 The `.gitleaks.toml` file is configured to detect and prevent accidental credential commits. It:
+
 - Scans for various credential patterns
 - Applies appropriate allowlists for test files and example values
 - Functions as a pre-commit check in CI/CD pipelines
@@ -102,6 +104,7 @@ Our GitHub Actions workflows include:
 3. Automated credential cleanup checks
 
 When these scans identify potential issues:
+
 1. Review the generated reports
 2. Run the cleanup script if appropriate
 3. Update allowlists for legitimate false positives
@@ -129,66 +132,76 @@ If you have questions about credential security or encounter issues with the sca
 # Credential Management Report
 
 ## Summary
+
 - Date: 2025-05-05T23:51:07.668Z
 - Environment files checked: 2
 
 ## Environment Variables Status
 
 ### API VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| API_KEY | ✅ | ❌ | ❌ | API key for general authentication |
-| TOGETHER_API_KEY | ✅ | ✅ | ❌ | API key for Together.ai services |
-| ANTHROPIC_API_KEY | ❌ | ❌ | ❌ | API key for Anthropic AI services |
-| OPENAI_API_KEY | ❌ | ❌ | ❌ | API key for OpenAI services |
+
+| Variable          | Development | Production | Test | Description                        |
+| ----------------- | ----------- | ---------- | ---- | ---------------------------------- |
+| API_KEY           | ✅          | ❌         | ❌   | API key for general authentication |
+| TOGETHER_API_KEY  | ✅          | ✅         | ❌   | API key for Together.ai services   |
+| ANTHROPIC_API_KEY | ❌          | ❌         | ❌   | API key for Anthropic AI services  |
+| OPENAI_API_KEY    | ❌          | ❌         | ❌   | API key for OpenAI services        |
 
 ### OAUTH VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| CLIENT_ID | ✅ | ❌ | ❌ | OAuth client ID for authentication |
-| CLIENT_SECRET | ✅ | ❌ | ❌ | OAuth client secret for authentication |
-| OAUTH_REDIRECT_URI | ❌ | ❌ | ❌ | OAuth redirect URI |
+
+| Variable           | Development | Production | Test | Description                            |
+| ------------------ | ----------- | ---------- | ---- | -------------------------------------- |
+| CLIENT_ID          | ✅          | ❌         | ❌   | OAuth client ID for authentication     |
+| CLIENT_SECRET      | ✅          | ❌         | ❌   | OAuth client secret for authentication |
+| OAUTH_REDIRECT_URI | ❌          | ❌         | ❌   | OAuth redirect URI                     |
 
 ### SECURITY VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| ENCRYPTION_KEY | ❌ | ❌ | ❌ | Key for data encryption |
-| CSRF_SECRET | ❌ | ❌ | ❌ | Secret for CSRF protection |
+
+| Variable       | Development | Production | Test | Description                |
+| -------------- | ----------- | ---------- | ---- | -------------------------- |
+| ENCRYPTION_KEY | ❌          | ❌         | ❌   | Key for data encryption    |
+| CSRF_SECRET    | ❌          | ❌         | ❌   | Secret for CSRF protection |
 
 ### PHI VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| PHI_ENCRYPTION_KEY | ❌ | ❌ | ❌ | Key for PHI data encryption |
+
+| Variable           | Development | Production | Test | Description                 |
+| ------------------ | ----------- | ---------- | ---- | --------------------------- |
+| PHI_ENCRYPTION_KEY | ❌          | ❌         | ❌   | Key for PHI data encryption |
 
 ### DATABASE VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| SUPABASE_URL | ✅ | ✅ | ❌ | URL for Supabase connection |
-| SUPABASE_KEY | ❌ | ❌ | ❌ | Supabase service key |
+
+| Variable     | Development | Production | Test | Description                 |
+| ------------ | ----------- | ---------- | ---- | --------------------------- |
+| SUPABASE_URL | ✅          | ✅         | ❌   | URL for Supabase connection |
+| SUPABASE_KEY | ❌          | ❌         | ❌   | Supabase service key        |
 
 ### MONITORING VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| SENTRY_DSN | ✅ | ✅ | ❌ | Sentry monitoring DSN |
+
+| Variable   | Development | Production | Test | Description           |
+| ---------- | ----------- | ---------- | ---- | --------------------- |
+| SENTRY_DSN | ✅          | ✅         | ❌   | Sentry monitoring DSN |
 
 ### EMAIL VARIABLES
-| Variable | Development | Production | Test | Description |
-|----------|-------------|------------|------|-------------|
-| SMTP_HOST | ❌ | ❌ | ❌ | SMTP server host |
-| SMTP_PORT | ❌ | ❌ | ❌ | SMTP server port |
-| SMTP_USER | ❌ | ❌ | ❌ | SMTP authentication username |
-| SMTP_PASSWORD | ❌ | ❌ | ❌ | SMTP authentication password |
-| EMAIL_FROM | ✅ | ✅ | ❌ | Default sender email address |
+
+| Variable      | Development | Production | Test | Description                  |
+| ------------- | ----------- | ---------- | ---- | ---------------------------- |
+| SMTP_HOST     | ❌          | ❌         | ❌   | SMTP server host             |
+| SMTP_PORT     | ❌          | ❌         | ❌   | SMTP server port             |
+| SMTP_USER     | ❌          | ❌         | ❌   | SMTP authentication username |
+| SMTP_PASSWORD | ❌          | ❌         | ❌   | SMTP authentication password |
+| EMAIL_FROM    | ✅          | ✅         | ❌   | Default sender email address |
 
 ## Missing Required Variables
 
 ### DEVELOPMENT
+
 - SMTP_HOST: SMTP server host
 - SMTP_PORT: SMTP server port
 - SMTP_USER: SMTP authentication username
 - SMTP_PASSWORD: SMTP authentication password
 
 ### PRODUCTION
+
 - SMTP_HOST: SMTP server host
 - SMTP_PORT: SMTP server port
 - SMTP_USER: SMTP authentication username

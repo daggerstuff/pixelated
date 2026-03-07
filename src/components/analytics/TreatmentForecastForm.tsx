@@ -1,63 +1,63 @@
-import { useState } from 'react'
-import type { FC } from 'react'
-import { ChartWidget } from '@/components/analytics/ChartWidget'
+import { useState } from "react";
+import type { FC } from "react";
+import { ChartWidget } from "@/components/analytics/ChartWidget";
 
 interface ForecastForm {
-  sessionId: string
-  clientId: string
-  therapistId: string
-  startTime: string
-  status: string
-  securityLevel: string
-  emotionAnalysisEnabled: boolean
-  desiredOutcomes: string
+  sessionId: string;
+  clientId: string;
+  therapistId: string;
+  startTime: string;
+  status: string;
+  securityLevel: string;
+  emotionAnalysisEnabled: boolean;
+  desiredOutcomes: string;
 }
 
 interface ForecastResult {
-  technique: string
-  score: number
-  rationale: string
+  technique: string;
+  score: number;
+  rationale: string;
 }
 
 const initialForm: ForecastForm = {
-  sessionId: '',
-  clientId: '',
-  therapistId: '',
-  startTime: '',
-  status: 'active',
-  securityLevel: 'standard',
+  sessionId: "",
+  clientId: "",
+  therapistId: "",
+  startTime: "",
+  status: "active",
+  securityLevel: "standard",
   emotionAnalysisEnabled: true,
-  desiredOutcomes: '',
-}
+  desiredOutcomes: "",
+};
 
 const TreatmentForecastForm: FC = () => {
-  const [form, setForm] = useState<ForecastForm>(initialForm)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [results, setResults] = useState<ForecastResult[] | null>(null)
+  const [form, setForm] = useState<ForecastForm>(initialForm);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<ForecastResult[] | null>(null);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) {
-    const { name, value, type } = e.target
-    if (type === 'checkbox') {
+    const { name, value, type } = e.target;
+    if (type === "checkbox") {
       setForm((prev) => ({
         ...prev,
         [name]: (e.target as HTMLInputElement).checked,
-      }))
+      }));
     } else {
       setForm((prev) => ({
         ...prev,
         [name]: value,
-      }))
+      }));
     }
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setResults(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResults(null);
     try {
       const payload = {
         session: {
@@ -73,30 +73,30 @@ const TreatmentForecastForm: FC = () => {
         recentEmotionState: null,
         recentInterventions: [],
         desiredOutcomes: form.desiredOutcomes
-          .split(',')
+          .split(",")
           .map((s) => s.trim())
           .filter(Boolean),
-      }
-      const res = await fetch('/api/analytics/treatment-forecast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      };
+      const res = await fetch("/api/analytics/treatment-forecast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
       if (!res.ok || !data.success) {
-        setError(data.error || 'Failed to fetch forecast')
-        setLoading(false)
-        return
+        setError(data.error || "Failed to fetch forecast");
+        setLoading(false);
+        return;
       }
-      setResults(data.data.forecasts)
+      setResults(data.data.forecasts);
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : 'Unknown error',
-      )
+          : "Unknown error",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -207,7 +207,7 @@ const TreatmentForecastForm: FC = () => {
       </div>
       <div>
         <label htmlFor="desiredOutcomes" className="block font-medium">
-          Desired Outcomes{' '}
+          Desired Outcomes{" "}
           <span className="text-xs text-gray-500">(comma-separated)</span>
         </label>
         <input
@@ -225,7 +225,7 @@ const TreatmentForecastForm: FC = () => {
         className="btn btn-primary w-full"
         disabled={loading}
       >
-        {loading ? 'Forecasting...' : 'Get Forecast'}
+        {loading ? "Forecasting..." : "Get Forecast"}
       </button>
       {error && <div className="alert alert-error mt-4">{error}</div>}
       {results && (
@@ -236,7 +236,7 @@ const TreatmentForecastForm: FC = () => {
             chartType="bar"
             labels={results.map((r) => r.technique)}
             series={[
-              { name: 'Predicted Efficacy', data: results.map((r) => r.score) },
+              { name: "Predicted Efficacy", data: results.map((r) => r.score) },
             ]}
             height={300}
           />
@@ -253,7 +253,7 @@ const TreatmentForecastForm: FC = () => {
         </section>
       )}
     </form>
-  )
-}
+  );
+};
 
-export default TreatmentForecastForm
+export default TreatmentForecastForm;

@@ -1,20 +1,18 @@
 ---
-title: 'Symptoms and Manifestations of CPTSD'
-description: 'Understanding the various ways Complex PTSD manifests in daily life and relationships'
-author: 'Dr. James Wilson'
+title: "Symptoms and Manifestations of CPTSD"
+description: "Understanding the various ways Complex PTSD manifests in daily life and relationships"
+author: "Dr. James Wilson"
 pubDate: 2024-02-05
 readingTime: 10
-tags: ['CPTSD', 'trauma', 'mental health', 'symptoms']
-series: 'Complex PTSD'
+tags: ["CPTSD", "trauma", "mental health", "symptoms"]
+series: "Complex PTSD"
 seriesOrder: 2
 image:
   {
-    url: 'https://images.unsplash.com/photo-1559757175-7cb036e0d465?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Abstract representation of complex emotional states',
+    url: "https://images.unsplash.com/photo-1559757175-7cb036e0d465?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Abstract representation of complex emotional states",
   }
 ---
-
-
 
 # Symptoms and Manifestations of CPTSD
 

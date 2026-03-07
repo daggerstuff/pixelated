@@ -1,12 +1,11 @@
-Type declarations (src/types)
-=============================
+# Type declarations (src/types)
 
-Purpose
--------
+## Purpose
+
 This folder contains project-specific TypeScript declaration files. Keep them declaration-only.
 
-Rules
------
+## Rules
+
 - Do NOT put runtime code (imports, function calls, extend(), etc.) in `.d.ts` files.
 - Make `.d.ts` files module-scoped when possible by adding `export {}` at top-level to avoid duplicate global augmentation.
 - Prefer minimal shims (only the symbols required) to avoid conflicts with `lib.dom` and third-party typings.

@@ -1,8 +1,8 @@
 ---
-title: 'Testing Environment Setup Guides'
-description: 'Comprehensive guides for setting up testing environments for Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Testing Environment Setup Guides"
+description: "Comprehensive guides for setting up testing environments for Pixelated"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -91,17 +91,16 @@ Pixelated uses Vitest for unit and integration testing. Here's how to configure 
 2. Create a `vitest.setup.ts` file for global test setup:
 
 ```typescript
-
 // Mock global fetch
-global.fetch = vi.fn()
+global.fetch = vi.fn();
 
 // Mock environment variables
-process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3000/api'
+process.env.NEXT_PUBLIC_API_URL = "http://localhost:3000/api";
 
 // Clean up after each test
 afterEach(() => {
-  vi.clearAllMocks()
-})
+  vi.clearAllMocks();
+});
 ```
 
 ### CI/CD Testing Environment
@@ -152,7 +151,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -184,7 +183,7 @@ For consistent testing across environments, use Docker:
 1. Create a `docker-compose.test.yml` file:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   test:
@@ -210,14 +209,14 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=gradiant_test
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres-test-data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - redis-test-data:/data
 
@@ -304,29 +303,28 @@ mkdir -p src/mocks
 ```typescript
 // src/services/ai.test.ts
 
-
-vi.mock('openai', () => ({
+vi.mock("openai", () => ({
   OpenAI: vi.fn().mockImplementation(() => mockOpenAIClient),
-}))
+}));
 
-describe('AIService', () => {
-  let aiService: AIService
+describe("AIService", () => {
+  let aiService: AIService;
 
   beforeEach(() => {
-    aiService = new AIService()
-  })
+    aiService = new AIService();
+  });
 
-  it('should generate a response', async () => {
-    const response = await aiService.generateResponse('Hello')
+  it("should generate a response", async () => {
+    const response = await aiService.generateResponse("Hello");
 
     expect(mockOpenAIClient.chat.completions.create).toHaveBeenCalledWith({
-      model: 'gpt-4o',
-      messages: [{ role: 'user', content: 'Hello' }],
-    })
+      model: "gpt-4o",
+      messages: [{ role: "user", content: "Hello" }],
+    });
 
-    expect(response).toBe('Hello, how can I help you today?')
-  })
-})
+    expect(response).toBe("Hello, how can I help you today?");
+  });
+});
 ```
 
 ### Database Testing
@@ -392,31 +390,31 @@ const prismaBinary = './node_modules/.bin/prisma'
 ```typescript
 // src/services/user.test.ts
 
-describe('UserService', () => {
-  let userService: UserService
-  let cleanup: () => Promise<void>
+describe("UserService", () => {
+  let userService: UserService;
+  let cleanup: () => Promise<void>;
 
   beforeAll(async () => {
-    const { prisma, cleanup: cleanupFn } = await setupTestDatabase()
-    cleanup = cleanupFn
-    userService = new UserService(prisma)
-  })
+    const { prisma, cleanup: cleanupFn } = await setupTestDatabase();
+    cleanup = cleanupFn;
+    userService = new UserService(prisma);
+  });
 
   afterAll(async () => {
-    await cleanup()
-  })
+    await cleanup();
+  });
 
-  it('should create a user', async () => {
+  it("should create a user", async () => {
     const user = await userService.create({
-      email: 'test@example.com',
-      name: 'Test User',
-    })
+      email: "test@example.com",
+      name: "Test User",
+    });
 
-    expect(user).toHaveProperty('id')
-    expect(user.email).toBe('test@example.com')
-    expect(user.name).toBe('Test User')
-  })
-})
+    expect(user).toHaveProperty("id");
+    expect(user.email).toBe("test@example.com");
+    expect(user.name).toBe("Test User");
+  });
+});
 ```
 
 ### Performance Testing
@@ -434,44 +432,44 @@ mkdir -p tests/performance
 ```typescript
 // tests/performance/api.bench.ts
 
-describe('API Performance', () => {
-  const server = createServer()
-  const baseUrl = 'http://localhost:3000'
+describe("API Performance", () => {
+  const server = createServer();
+  const baseUrl = "http://localhost:3000";
 
   beforeAll(async () => {
-    await server.listen(3000)
-  })
+    await server.listen(3000);
+  });
 
   afterAll(async () => {
-    await server.close()
-  })
+    await server.close();
+  });
 
   bench(
-    'GET /api/health',
+    "GET /api/health",
     async () => {
-      const response = await request(`${baseUrl}/api/health`)
-      return response.statusCode
+      const response = await request(`${baseUrl}/api/health`);
+      return response.statusCode;
     },
     { iterations: 100 },
-  )
+  );
 
   bench(
-    'POST /api/chat',
+    "POST /api/chat",
     async () => {
       const response = await request(`${baseUrl}/api/chat`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: 'Hello, world!',
+          message: "Hello, world!",
         }),
-      })
-      return response.statusCode
+      });
+      return response.statusCode;
     },
     { iterations: 50 },
-  )
-})
+  );
+});
 ```
 
 3. Run performance tests:

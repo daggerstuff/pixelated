@@ -1,12 +1,12 @@
 ---
-title: 'Markdown Syntax'
-description: 'Text, title, and styling in standard markdown'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Markdown Syntax"
+description: "Text, title, and styling in standard markdown"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
-icon: 'text-size'
+icon: "text-size"
 ---
 
 ## Titles
@@ -25,9 +25,7 @@ Best use to subsection headers.
 ### Subtitles
 ```
 
-
 Each **title** and **subtitle** creates an anchor and also shows up on the table of contents on the right.
-
 
 ## Text Formatting
 
@@ -84,6 +82,6 @@ To create a blockquote, add a `>` in front of a paragraph.
 
 Mintlify supports [LaTeX](https://www.latex-project.org) through the Latex component.
 
-
 ```md
+
 ```

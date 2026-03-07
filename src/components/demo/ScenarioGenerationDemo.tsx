@@ -1,92 +1,92 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 interface GeneratedScenario {
   client: {
-    name: string
-    age: string
-    occupation: string
-    presenting: string
-  }
-  background: string
-  symptoms: string[]
-  formulation: string
-  treatment: string[]
+    name: string;
+    age: string;
+    occupation: string;
+    presenting: string;
+  };
+  background: string;
+  symptoms: string[];
+  formulation: string;
+  treatment: string[];
 }
 
 export default function ScenarioGenerationDemo() {
-  const [selectedType, setSelectedType] = useState('anxiety')
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [scenario, setScenario] = useState<GeneratedScenario | null>(null)
+  const [selectedType, setSelectedType] = useState("anxiety");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [scenario, setScenario] = useState<GeneratedScenario | null>(null);
 
   const scenarioTypes = [
-    { id: 'anxiety', label: 'Anxiety Disorder', icon: '😰' },
-    { id: 'depression', label: 'Depression', icon: '😔' },
-    { id: 'trauma', label: 'Trauma/PTSD', icon: '💔' },
-    { id: 'personality', label: 'Personality Disorder', icon: '🎭' },
-  ]
+    { id: "anxiety", label: "Anxiety Disorder", icon: "😰" },
+    { id: "depression", label: "Depression", icon: "😔" },
+    { id: "trauma", label: "Trauma/PTSD", icon: "💔" },
+    { id: "personality", label: "Personality Disorder", icon: "🎭" },
+  ];
 
   const generateScenario = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
 
     // Simulate generation delay
-    await new Promise((resolve) => setTimeout(resolve, 3000))
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const scenarios = {
       anxiety: {
         client: {
-          name: 'Sarah Martinez',
-          age: '28',
-          occupation: 'Marketing Manager',
-          presenting: 'Generalized anxiety with panic attacks',
+          name: "Sarah Martinez",
+          age: "28",
+          occupation: "Marketing Manager",
+          presenting: "Generalized anxiety with panic attacks",
         },
         background:
-          'Recent promotion at work has increased responsibilities and stress. History of perfectionism and people-pleasing behaviors.',
+          "Recent promotion at work has increased responsibilities and stress. History of perfectionism and people-pleasing behaviors.",
         symptoms: [
-          'Persistent worry about work performance',
-          'Physical symptoms: racing heart, sweating',
-          'Avoidance of social situations',
-          'Sleep disturbances',
+          "Persistent worry about work performance",
+          "Physical symptoms: racing heart, sweating",
+          "Avoidance of social situations",
+          "Sleep disturbances",
         ],
         formulation:
-          'GAD with panic disorder, likely triggered by increased work stress and perfectionist tendencies',
+          "GAD with panic disorder, likely triggered by increased work stress and perfectionist tendencies",
         treatment: [
-          'CBT focusing on cognitive restructuring',
-          'Exposure therapy for panic responses',
-          'Stress management techniques',
-          'Mindfulness-based interventions',
+          "CBT focusing on cognitive restructuring",
+          "Exposure therapy for panic responses",
+          "Stress management techniques",
+          "Mindfulness-based interventions",
         ],
       },
       depression: {
         client: {
-          name: 'Michael Chen',
-          age: '35',
-          occupation: 'Software Developer',
-          presenting: 'Major depressive episode',
+          name: "Michael Chen",
+          age: "35",
+          occupation: "Software Developer",
+          presenting: "Major depressive episode",
         },
         background:
-          'Recent divorce and isolation from social support. History of mild depression in college.',
+          "Recent divorce and isolation from social support. History of mild depression in college.",
         symptoms: [
-          'Persistent low mood for 3+ months',
-          'Loss of interest in activities',
-          'Fatigue and low energy',
-          'Feelings of worthlessness',
+          "Persistent low mood for 3+ months",
+          "Loss of interest in activities",
+          "Fatigue and low energy",
+          "Feelings of worthlessness",
         ],
         formulation:
-          'Major Depressive Disorder, single episode, moderate severity, precipitated by major life changes',
+          "Major Depressive Disorder, single episode, moderate severity, precipitated by major life changes",
         treatment: [
-          'Cognitive Behavioral Therapy',
-          'Behavioral activation techniques',
-          'Social support rebuilding',
-          'Consider medication referral',
+          "Cognitive Behavioral Therapy",
+          "Behavioral activation techniques",
+          "Social support rebuilding",
+          "Consider medication referral",
         ],
       },
-    }
+    };
 
     setScenario(
       scenarios[selectedType as keyof typeof scenarios] || scenarios.anxiety,
-    )
-    setIsGenerating(false)
-  }
+    );
+    setIsGenerating(false);
+  };
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6">
@@ -109,8 +109,8 @@ export default function ScenarioGenerationDemo() {
                 onClick={() => setSelectedType(type.id)}
                 className={`p-4 rounded-lg border transition-all ${
                   selectedType === type.id
-                    ? 'bg-blue-600/20 border-blue-400 text-blue-200'
-                    : 'bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700/50'
+                    ? "bg-blue-600/20 border-blue-400 text-blue-200"
+                    : "bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700/50"
                 }`}
               >
                 <div className="text-2xl mb-2">{type.icon}</div>
@@ -128,8 +128,8 @@ export default function ScenarioGenerationDemo() {
             className="px-8 py-3 bg-orange-600 hover:bg-orange-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
           >
             {isGenerating
-              ? 'Generating Scenario...'
-              : 'Generate Clinical Scenario'}
+              ? "Generating Scenario..."
+              : "Generate Clinical Scenario"}
           </button>
         </div>
 
@@ -233,5 +233,5 @@ export default function ScenarioGenerationDemo() {
         )}
       </div>
     </div>
-  )
+  );
 }

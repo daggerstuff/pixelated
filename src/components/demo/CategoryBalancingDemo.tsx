@@ -1,5 +1,5 @@
 export interface CategoryBalancingDemoProps {
-  className?: string
+  className?: string;
 }
 
 export function CategoryBalancingDemo({
@@ -10,7 +10,7 @@ export function CategoryBalancingDemo({
       <h3>Category Balancing Demo</h3>
       <p>Category balancing functionality demo component</p>
     </div>
-  )
+  );
 }
 
-export default CategoryBalancingDemo
+export default CategoryBalancingDemo;

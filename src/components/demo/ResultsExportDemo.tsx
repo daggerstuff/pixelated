@@ -1,5 +1,5 @@
 export interface ResultsExportDemoProps {
-  className?: string
+  className?: string;
 }
 
 export function ResultsExportDemo({ className }: ResultsExportDemoProps) {
@@ -8,7 +8,7 @@ export function ResultsExportDemo({ className }: ResultsExportDemoProps) {
       <h3>Results Export Demo</h3>
       <p>Export functionality demo component</p>
     </div>
-  )
+  );
 }
 
-export default ResultsExportDemo
+export default ResultsExportDemo;

@@ -1,27 +1,27 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('BiasExportAPI')
+const logger = createBuildSafeLogger("BiasExportAPI");
 
 export const GET = async ({
   request,
 }: {
-  request: Request
+  request: Request;
 }): Promise<Response> => {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Parse URL parameters
-    const url = new URL(request.url)
-    const format = url.searchParams.get('format') || 'json'
-    const timeRange = url.searchParams.get('timeRange') || '24h'
-    const includeDetails = url.searchParams.get('includeDetails') === 'true'
+    const url = new URL(request.url);
+    const format = url.searchParams.get("format") || "json";
+    const timeRange = url.searchParams.get("timeRange") || "24h";
+    const includeDetails = url.searchParams.get("includeDetails") === "true";
 
     // Log export request
-    logger.info('Exporting bias detection data', {
+    logger.info("Exporting bias detection data", {
       format,
       timeRange,
       includeDetails,
-    })
+    });
 
     // Return mock export data
     const mockExportData = {
@@ -31,41 +31,41 @@ export const GET = async ({
         timeRange,
         includeDetails,
         recordCount: 150,
-        version: '1.0.0',
+        version: "1.0.0",
       },
       sessions: [
         {
-          sessionId: 'session-123',
-          timestamp: '2024-01-15T09:30:00.000Z',
+          sessionId: "session-123",
+          timestamp: "2024-01-15T09:30:00.000Z",
           biasScore: 0.75,
-          alertLevel: 'high',
+          alertLevel: "high",
           participantDemographics: {
-            gender: 'female',
+            gender: "female",
             age: 28,
-            ethnicity: 'hispanic',
+            ethnicity: "hispanic",
           },
-          scenario: 'therapeutic-session-1',
+          scenario: "therapeutic-session-1",
         },
         {
-          sessionId: 'session-124',
-          timestamp: '2024-01-15T08:45:00.000Z',
+          sessionId: "session-124",
+          timestamp: "2024-01-15T08:45:00.000Z",
           biasScore: 0.45,
-          alertLevel: 'medium',
+          alertLevel: "medium",
           participantDemographics: {
-            gender: 'male',
+            gender: "male",
             age: 35,
-            ethnicity: 'white',
+            ethnicity: "white",
           },
-          scenario: 'therapeutic-session-2',
+          scenario: "therapeutic-session-2",
         },
       ],
       alerts: [
         {
-          id: 'alert-1',
-          sessionId: 'session-123',
-          timestamp: '2024-01-15T09:30:00.000Z',
-          level: 'high',
-          message: 'High bias detected in therapeutic session',
+          id: "alert-1",
+          sessionId: "session-123",
+          timestamp: "2024-01-15T09:30:00.000Z",
+          level: "high",
+          message: "High bias detected in therapeutic session",
           acknowledged: false,
         },
       ],
@@ -75,21 +75,21 @@ export const GET = async ({
         alertsLast24h: 8,
         totalAlerts: 12,
       },
-    }
+    };
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     // Handle different formats
-    if (format === 'csv') {
-      const csvData = convertToCSV(mockExportData)
+    if (format === "csv") {
+      const csvData = convertToCSV(mockExportData);
       return new Response(csvData, {
         status: 200,
         headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition':
+          "Content-Type": "text/csv",
+          "Content-Disposition":
             'attachment; filename="bias-detection-export.csv"',
         },
-      })
+      });
     }
 
     return new Response(
@@ -101,64 +101,64 @@ export const GET = async ({
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Export failed', { error })
+    logger.error("Export failed", { error });
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Export Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Export Failed",
+        message: error instanceof Error ? error.message : "Unknown error",
         processingTime,
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 function convertToCSV(data: Record<string, unknown>): string {
   const sessions =
-    (data.sessions as Array<Record<string, unknown>> | undefined) || []
+    (data.sessions as Array<Record<string, unknown>> | undefined) || [];
   const headers = [
-    'sessionId',
-    'timestamp',
-    'biasScore',
-    'alertLevel',
-    'gender',
-    'age',
-    'ethnicity',
-    'scenario',
-  ]
+    "sessionId",
+    "timestamp",
+    "biasScore",
+    "alertLevel",
+    "gender",
+    "age",
+    "ethnicity",
+    "scenario",
+  ];
 
   const csvRows = [
-    headers.join(','),
+    headers.join(","),
     ...sessions.map((session) => {
       const demographics = session.participantDemographics as
         | Record<string, unknown>
-        | undefined
+        | undefined;
       return [
-        (session.sessionId as string) || '',
-        (session.timestamp as string) || '',
-        String(session.biasScore ?? ''),
-        (session.alertLevel as string) || '',
-        (demographics?.gender as string) || '',
-        String(demographics?.age ?? ''),
-        (demographics?.ethnicity as string) || '',
-        (session.scenario as string) || '',
-      ].join(',')
+        (session.sessionId as string) || "",
+        (session.timestamp as string) || "",
+        String(session.biasScore ?? ""),
+        (session.alertLevel as string) || "",
+        (demographics?.gender as string) || "",
+        String(demographics?.age ?? ""),
+        (demographics?.ethnicity as string) || "",
+        (session.scenario as string) || "",
+      ].join(",");
     }),
-  ]
+  ];
 
-  return csvRows.join('\n')
+  return csvRows.join("\n");
 }

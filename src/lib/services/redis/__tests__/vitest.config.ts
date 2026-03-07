@@ -1,13 +1,13 @@
-import { defineConfig } from 'vitest/config'
-import path from 'path'
+import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
-    include: ['**/*.test.ts', '**/*.perf.test.ts', '**/*.integration.test.ts'],
-    setupFiles: ['./vitest.setup.ts'],
-    globalSetup: './vitest.global.setup.ts',
+    environment: "node",
+    include: ["**/*.test.ts", "**/*.perf.test.ts", "**/*.integration.test.ts"],
+    setupFiles: ["./vitest.setup.ts"],
+    globalSetup: "./vitest.global.setup.ts",
     testTimeout: 30000,
     poolOptions: {
       threads: {
@@ -15,9 +15,9 @@ export default defineConfig({
       },
     },
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'lcov', 'html'],
-      reportsDirectory: './coverage',
+      provider: "v8",
+      reporter: ["text", "lcov", "html"],
+      reportsDirectory: "./coverage",
       thresholds: {
         branches: 80,
         functions: 80,
@@ -28,7 +28,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, '../../../'),
+      "@": path.resolve(__dirname, "../../../"),
     },
   },
-})
+});

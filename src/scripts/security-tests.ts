@@ -12,27 +12,27 @@
  * - Input validation testing
  */
 
-import { spawnSync } from 'node:child_process'
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import process from 'node:process'
+import { spawnSync } from "node:child_process";
+import fs from "node:fs/promises";
+import path from "node:path";
+import process from "node:process";
 
 interface TestResult {
-  name: string
-  passed: boolean
-  details: string[]
-  severity: 'low' | 'medium' | 'high' | 'critical'
+  name: string;
+  passed: boolean;
+  details: string[];
+  severity: "low" | "medium" | "high" | "critical";
 }
 
 interface TestSuite {
-  name: string
-  results: TestResult[]
-  startTime: number
-  endTime: number
-  passed: boolean
+  name: string;
+  results: TestResult[];
+  startTime: number;
+  endTime: number;
+  passed: boolean;
 }
 
-const results: TestSuite[] = []
+const results: TestSuite[] = [];
 
 /**
  * Run a test command and capture its outpu
@@ -42,38 +42,38 @@ async function runTest(
   command: string,
   args: string[],
 ): Promise<TestResult[]> {
-  console.log(`\n🔒 Running ${name}...`)
+  console.log(`\n🔒 Running ${name}...`);
 
   const result = spawnSync(command, args, {
-    stdio: ['inherit', 'pipe', 'pipe'],
-    encoding: 'utf-8',
-  })
+    stdio: ["inherit", "pipe", "pipe"],
+    encoding: "utf-8",
+  });
 
   if (result.status !== 0) {
-    console.error(`❌ ${name} failed with status ${result.status}`)
-    console.error(result?.stderr)
+    console.error(`❌ ${name} failed with status ${result.status}`);
+    console.error(result?.stderr);
     return [
       {
         name,
         passed: false,
         details: [result?.stderr],
-        severity: 'critical',
+        severity: "critical",
       },
-    ]
+    ];
   }
 
   try {
-    return JSON.parse(result?.stdout) as unknown
+    return JSON.parse(result?.stdout) as unknown;
   } catch (error: unknown) {
-    console.error(`Failed to parse test results for ${name}:`, error)
+    console.error(`Failed to parse test results for ${name}:`, error);
     return [
       {
         name,
         passed: false,
-        details: ['Failed to parse test results'],
-        severity: 'critical',
+        details: ["Failed to parse test results"],
+        severity: "critical",
       },
-    ]
+    ];
   }
 }
 
@@ -84,12 +84,12 @@ async function generateReport(suites: TestSuite[]): Promise<string> {
   const totalTests = suites.reduce(
     (sum, suite) => sum + suite.results.length,
     0,
-  )
+  );
   const passedTests = suites.reduce(
     (sum, suite) => sum + suite.results.filter((r) => r.passed).length,
     0,
-  )
-  const failedTests = totalTests - passedTests
+  );
+  const failedTests = totalTests - passedTests;
 
   const html = `
 <!DOCTYPE html>
@@ -195,114 +195,114 @@ async function generateReport(suites: TestSuite[]): Promise<string> {
       ${suite.results
         .map(
           (test) => `
-        <div class="test ${test.passed ? 'passed' : 'failed'}">
+        <div class="test ${test.passed ? "passed" : "failed"}">
           <h3>
-            ${test.passed ? '✅' : '❌'} ${test.name}
+            ${test.passed ? "✅" : "❌"} ${test.name}
             <span class="severity ${test.severity}">${test.severity}</span>
           </h3>
           ${
             test.details.length > 0
-              ? `<div class="details">${test.details.join('\n')}</div>`
-              : ''
+              ? `<div class="details">${test.details.join("\n")}</div>`
+              : ""
           }
         </div>
       `,
         )
-        .join('')}
+        .join("")}
     </div>
   `,
     )
-    .join('')}
+    .join("")}
 </body>
 </html>
-  `
+  `;
 
-  const reportPath = path.join(process.cwd(), 'security-report.html')
-  await fs.writeFile(reportPath, html)
-  return reportPath
+  const reportPath = path.join(process.cwd(), "security-report.html");
+  await fs.writeFile(reportPath, html);
+  return reportPath;
 }
 
 /**
  * Main function
  */
 async function main() {
-  console.log('=== Security Testing Suite ===')
+  console.log("=== Security Testing Suite ===");
 
   // 1. API Endpoint Security Tests
-  const startTime = Date.now()
-  const endpointResults = await runTest('API Endpoint Security Tests', 'pnpm', [
-    'test:security:endpoint',
-  ])
+  const startTime = Date.now();
+  const endpointResults = await runTest("API Endpoint Security Tests", "pnpm", [
+    "test:security:endpoint",
+  ]);
   results.push({
-    name: 'API Endpoint Security',
+    name: "API Endpoint Security",
     results: endpointResults,
     startTime,
     endTime: Date.now(),
     passed: endpointResults.every((r) => r.passed),
-  })
+  });
 
   // 2. Authentication Bypass Tests
-  const authStartTime = Date.now()
-  const authResults = await runTest('Authentication Bypass Tests', 'pnpm', [
-    'test:security:auth',
-  ])
+  const authStartTime = Date.now();
+  const authResults = await runTest("Authentication Bypass Tests", "pnpm", [
+    "test:security:auth",
+  ]);
   results.push({
-    name: 'Authentication Security',
+    name: "Authentication Security",
     results: authResults,
     startTime: authStartTime,
     endTime: Date.now(),
     passed: authResults.every((r) => r.passed),
-  })
+  });
 
   // 3. Web Vulnerability Tests
-  const webStartTime = Date.now()
-  const webResults = await runTest('Web Vulnerability Tests', 'pnpm', [
-    'test:security:web',
-  ])
+  const webStartTime = Date.now();
+  const webResults = await runTest("Web Vulnerability Tests", "pnpm", [
+    "test:security:web",
+  ]);
   results.push({
-    name: 'Web Security',
+    name: "Web Security",
     results: webResults,
     startTime: webStartTime,
     endTime: Date.now(),
     passed: webResults.every((r) => r.passed),
-  })
+  });
 
   // Generate and save report
-  console.log('\n📊 Generating security report...')
-  const reportPath = await generateReport(results)
-  console.log(`📝 Report saved to: ${reportPath}`)
+  console.log("\n📊 Generating security report...");
+  const reportPath = await generateReport(results);
+  console.log(`📝 Report saved to: ${reportPath}`);
 
   // Check if any critical or high severity issues
   const criticalIssues = results.flatMap((suite) =>
     suite.results.filter(
-      (r) => !r.passed && (r.severity === 'critical' || r.severity === 'high'),
+      (r) => !r.passed && (r.severity === "critical" || r.severity === "high"),
     ),
-  )
+  );
 
   if (criticalIssues.length > 0) {
-    console.error('\n🚨 Critical security issues found:')
+    console.error("\n🚨 Critical security issues found:");
     criticalIssues.forEach((issue) => {
-      console.error(`❌ ${issue.name} (${issue.severity})`)
-      console.error(issue.details.join('\n'))
-    })
-    process.exit(1)
+      console.error(`❌ ${issue.name} (${issue.severity})`);
+      console.error(issue.details.join("\n"));
+    });
+    process.exit(1);
   }
 
   // Check overall test status
-  const allPassed = results.every((suite) => suite.passed)
+  const allPassed = results.every((suite) => suite.passed);
   if (!allPassed) {
     console.error(
-      '\n❌ Some security tests failed. Check the report for details.',
-    )
-    process.exit(1)
+      "\n❌ Some security tests failed. Check the report for details.",
+    );
+    process.exit(1);
   }
 
-  console.log('\n✅ All security tests passed!')
-  process.exit(0)
+  console.log("\n✅ All security tests passed!");
+  process.exit(0);
 }
 
 // Execute main function
 main().catch((error: unknown) => {
-  console.error('Unhandled error', String(error))
-  process.exit(1)
-})
+  console.error("Unhandled error", String(error));
+  process.exit(1);
+});

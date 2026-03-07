@@ -27,16 +27,20 @@ Describe the high-level goal of this feature. What problem does it solve? Who be
 ## User Stories
 
 ### Story 1: [Story Name]
+
 As a [role], I want [goal] so that [benefit].
 
 **Acceptance Criteria:**
+
 - [ ] Criterion 1
 - [ ] Criterion 2
 
 ### Story 2: [Story Name]
+
 As a [role], I want [goal] so that [benefit].
 
 **Acceptance Criteria:**
+
 - [ ] Criterion 1
 - [ ] Criterion 2
 
@@ -72,8 +76,10 @@ As a [role], I want [goal] so that [benefit].
 ## Appendix
 
 ### Related Documents
+
 - [Link to design doc]
 - [Link to API spec]
 
 ### Mockups
+
 <!-- Add mockup images here -->

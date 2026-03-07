@@ -1,69 +1,69 @@
-import axios, { AxiosInstance } from 'axios'
-import { Logger } from '../utils/logger'
+import axios, { AxiosInstance } from "axios";
+import { Logger } from "../utils/logger";
 
 export interface YahooFinanceQuote {
-  symbol: string
-  price: number
-  change: number
-  changePercent: number
-  volume: number
-  marketCap: number
-  dayHigh: number
-  dayLow: number
-  fiftyTwoWeekHigh: number
-  fiftyTwoWeekLow: number
-  timestamp: Date
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap: number;
+  dayHigh: number;
+  dayLow: number;
+  fiftyTwoWeekHigh: number;
+  fiftyTwoWeekLow: number;
+  timestamp: Date;
 }
 
 export interface YahooFinanceHistoricalData {
-  date: Date
-  open: number
-  high: number
-  low: number
-  close: number
-  volume: number
-  adjustedClose: number
+  date: Date;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+  adjustedClose: number;
 }
 
 export interface CompanyProfile {
-  symbol: string
-  companyName: string
-  industry: string
-  sector: string
-  marketCap: number
-  employees: number
-  revenue: number
-  profitMargin: number
-  beta: number
-  peRatio: number
-  dividendYield: number
+  symbol: string;
+  companyName: string;
+  industry: string;
+  sector: string;
+  marketCap: number;
+  employees: number;
+  revenue: number;
+  profitMargin: number;
+  beta: number;
+  peRatio: number;
+  dividendYield: number;
 }
 
 export interface MarketSector {
-  sector: string
-  performance: number
-  companies: number
-  marketCap: number
+  sector: string;
+  performance: number;
+  companies: number;
+  marketCap: number;
 }
 
 export class YahooFinanceService {
-  private logger: Logger
-  private client: AxiosInstance
-  private cache: Map<string, { data: any; timestamp: number }> = new Map()
+  private logger: Logger;
+  private client: AxiosInstance;
+  private cache: Map<string, { data: any; timestamp: number }> = new Map();
   private readonly CACHE_TTL =
-    parseInt(process.env['CACHE_TTL_SECONDS'] || '300', 10) * 1000
+    parseInt(process.env["CACHE_TTL_SECONDS"] || "300", 10) * 1000;
 
   constructor() {
-    this.logger = new Logger('YahooFinanceService')
+    this.logger = new Logger("YahooFinanceService");
     this.client = axios.create({
       baseURL:
-        process.env['YAHOO_FINANCE_API_URL'] ||
-        'https://query1.finance.yahoo.com/v8/finance',
+        process.env["YAHOO_FINANCE_API_URL"] ||
+        "https://query1.finance.yahoo.com/v8/finance",
       timeout: 10000,
       headers: {
-        'User-Agent': 'BusinessStrategyCMS/1.0',
+        "User-Agent": "BusinessStrategyCMS/1.0",
       },
-    })
+    });
   }
 
   /**
@@ -71,16 +71,16 @@ export class YahooFinanceService {
    */
   async getQuote(symbol: string): Promise<YahooFinanceQuote | null> {
     try {
-      const cacheKey = `quote_${symbol}`
-      const cached = this.getFromCache(cacheKey)
-      if (cached) return cached
+      const cacheKey = `quote_${symbol}`;
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
 
-      const response = await this.client.get(`/quote/${symbol}`)
-      const result = response.data.quoteResponse?.result?.[0]
+      const response = await this.client.get(`/quote/${symbol}`);
+      const result = response.data.quoteResponse?.result?.[0];
 
       if (!result) {
-        this.logger.warn('No quote data found', { symbol })
-        return null
+        this.logger.warn("No quote data found", { symbol });
+        return null;
       }
 
       const quote: YahooFinanceQuote = {
@@ -95,16 +95,16 @@ export class YahooFinanceService {
         fiftyTwoWeekHigh: result.fiftyTwoWeekHigh,
         fiftyTwoWeekLow: result.fiftyTwoWeekLow,
         timestamp: new Date(),
-      }
+      };
 
-      this.setCache(cacheKey, quote)
-      return quote
+      this.setCache(cacheKey, quote);
+      return quote;
     } catch (error) {
-      this.logger.error('Failed to fetch quote', {
+      this.logger.error("Failed to fetch quote", {
         symbol,
         error: error instanceof Error ? error.message : String(error),
-      })
-      return null
+      });
+      return null;
     }
   }
 
@@ -114,25 +114,25 @@ export class YahooFinanceService {
   async getHistoricalData(
     symbol: string,
     period:
-      | '1d'
-      | '5d'
-      | '1mo'
-      | '3mo'
-      | '6mo'
-      | '1y'
-      | '2y'
-      | '5y'
-      | '10y'
-      | 'ytd'
-      | 'max' = '1y',
+      | "1d"
+      | "5d"
+      | "1mo"
+      | "3mo"
+      | "6mo"
+      | "1y"
+      | "2y"
+      | "5y"
+      | "10y"
+      | "ytd"
+      | "max" = "1y",
   ): Promise<YahooFinanceHistoricalData[]> {
     try {
-      const cacheKey = `historical_${symbol}_${period}`
-      const cached = this.getFromCache(cacheKey)
-      if (cached) return cached
+      const cacheKey = `historical_${symbol}_${period}`;
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
 
-      const interval = period === '1d' ? '1m' : '1d'
-      const range = period
+      const interval = period === "1d" ? "1m" : "1d";
+      const range = period;
 
       const response = await this.client.get(`/chart/${symbol}`, {
         params: {
@@ -140,16 +140,16 @@ export class YahooFinanceService {
           range,
           includeAdjustedClose: true,
         },
-      })
+      });
 
-      const result = response.data.chart?.result?.[0]
+      const result = response.data.chart?.result?.[0];
       if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
-        this.logger.warn('No historical data found', { symbol, period })
-        return []
+        this.logger.warn("No historical data found", { symbol, period });
+        return [];
       }
 
-      const { timestamp, indicators } = result
-      const quote = indicators.quote[0]
+      const { timestamp, indicators } = result;
+      const quote = indicators.quote[0];
 
       const data: YahooFinanceHistoricalData[] = timestamp.map(
         (time: number, index: number) => ({
@@ -164,17 +164,17 @@ export class YahooFinanceService {
             quote.close?.[index] ||
             0,
         }),
-      )
+      );
 
-      this.setCache(cacheKey, data)
-      return data
+      this.setCache(cacheKey, data);
+      return data;
     } catch (error) {
-      this.logger.error('Failed to fetch historical data', {
+      this.logger.error("Failed to fetch historical data", {
         symbol,
         period,
         error: error instanceof Error ? error.message : String(error),
-      })
-      return []
+      });
+      return [];
     }
   }
 
@@ -183,23 +183,23 @@ export class YahooFinanceService {
    */
   async getCompanyProfile(symbol: string): Promise<CompanyProfile | null> {
     try {
-      const cacheKey = `profile_${symbol}`
-      const cached = this.getFromCache(cacheKey)
-      if (cached) return cached
+      const cacheKey = `profile_${symbol}`;
+      const cached = this.getFromCache(cacheKey);
+      if (cached) return cached;
 
-      const response = await this.client.get(`/quote/${symbol}`)
-      const result = response.data.quoteResponse?.result?.[0]
+      const response = await this.client.get(`/quote/${symbol}`);
+      const result = response.data.quoteResponse?.result?.[0];
 
       if (!result) {
-        this.logger.warn('No company data found', { symbol })
-        return null
+        this.logger.warn("No company data found", { symbol });
+        return null;
       }
 
       const profile: CompanyProfile = {
         symbol: result.symbol,
         companyName: result.longName || result.shortName || result.symbol,
-        industry: result.industry || 'Unknown',
-        sector: result.sector || 'Unknown',
+        industry: result.industry || "Unknown",
+        sector: result.sector || "Unknown",
         marketCap: result.marketCap || 0,
         employees: result.fullTimeEmployees || 0,
         revenue: result.revenue || 0,
@@ -207,16 +207,16 @@ export class YahooFinanceService {
         beta: result.beta || 0,
         peRatio: result.trailingPE || 0,
         dividendYield: result.trailingAnnualDividendYield || 0,
-      }
+      };
 
-      this.setCache(cacheKey, profile)
-      return profile
+      this.setCache(cacheKey, profile);
+      return profile;
     } catch (error) {
-      this.logger.error('Failed to fetch company profile', {
+      this.logger.error("Failed to fetch company profile", {
         symbol,
         error: error instanceof Error ? error.message : String(error),
-      })
-      return null
+      });
+      return null;
     }
   }
 
@@ -224,13 +224,13 @@ export class YahooFinanceService {
    * Get market indices
    */
   async getMarketIndices(): Promise<YahooFinanceQuote[]> {
-    const indices = ['^GSPC', '^DJI', '^IXIC', '^RUT', '^VIX']
+    const indices = ["^GSPC", "^DJI", "^IXIC", "^RUT", "^VIX"];
     const results = await Promise.all(
       indices.map((symbol) => this.getQuote(symbol)),
-    )
+    );
     return results.filter(
       (result): result is YahooFinanceQuote => result !== null,
-    )
+    );
   }
 
   /**
@@ -238,19 +238,19 @@ export class YahooFinanceService {
    */
   async getFinancialMetrics(symbols: string[]): Promise<
     {
-      symbol: string
-      marketCap: number
-      revenue: number
-      profitMargin: number
-      peRatio: number
-      dividendYield: number
-      beta: number
+      symbol: string;
+      marketCap: number;
+      revenue: number;
+      profitMargin: number;
+      peRatio: number;
+      dividendYield: number;
+      beta: number;
     }[]
   > {
     const results = await Promise.all(
       symbols.map(async (symbol) => {
-        const profile = await this.getCompanyProfile(symbol)
-        if (!profile) return null
+        const profile = await this.getCompanyProfile(symbol);
+        if (!profile) return null;
 
         return {
           symbol: profile.symbol,
@@ -260,29 +260,29 @@ export class YahooFinanceService {
           peRatio: profile.peRatio,
           dividendYield: profile.dividendYield,
           beta: profile.beta,
-        }
+        };
       }),
-    )
-    return results.filter((result): result is any => result !== null)
+    );
+    return results.filter((result): result is any => result !== null);
   }
 
   private getFromCache(key: string): any {
-    const cached = this.cache.get(key)
+    const cached = this.cache.get(key);
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data
+      return cached.data;
     }
-    return null
+    return null;
   }
 
   private setCache(key: string, data: any): void {
-    this.cache.set(key, { data, timestamp: Date.now() })
+    this.cache.set(key, { data, timestamp: Date.now() });
   }
 
   /**
    * Clear cache for fresh data
    */
   clearCache(): void {
-    this.cache.clear()
+    this.cache.clear();
   }
 
   /**
@@ -292,6 +292,6 @@ export class YahooFinanceService {
     return {
       size: this.cache.size,
       keys: Array.from(this.cache.keys()),
-    }
+    };
   }
 }

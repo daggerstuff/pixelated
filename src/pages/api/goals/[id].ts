@@ -1,98 +1,98 @@
 // import type { APIRoute } from 'astro'
-import type { TherapeuticGoal } from '../../../lib/ai/types/TherapeuticGoals'
-import { goalSchema, goals } from './index' // Reuse schema if possible
+import type { TherapeuticGoal } from "../../../lib/ai/types/TherapeuticGoals";
+import { goalSchema, goals } from "./index"; // Reuse schema if possible
 
 export const GET = async ({ params }: { params: unknown }) => {
-  const { id } = params as { id: string }
-  const goal = goals.find((g: TherapeuticGoal) => g.id === id)
+  const { id } = params as { id: string };
+  const goal = goals.find((g: TherapeuticGoal) => g.id === id);
   if (!goal) {
-    return new Response(JSON.stringify({ error: 'Goal not found' }), {
+    return new Response(JSON.stringify({ error: "Goal not found" }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
   return new Response(JSON.stringify(goal), {
     status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
-}
+    headers: { "Content-Type": "application/json" },
+  });
+};
 
 export const PUT = async ({
   params,
   request,
 }: {
-  params: unknown
-  request: unknown
+  params: unknown;
+  request: unknown;
 }) => {
-  const { id } = params as { id: string }
+  const { id } = params as { id: string };
 
-  if (typeof id !== 'string') {
-    return new Response(JSON.stringify({ error: 'Invalid ID format' }), {
+  if (typeof id !== "string") {
+    return new Response(JSON.stringify({ error: "Invalid ID format" }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  const idx = goals.findIndex((g: TherapeuticGoal) => g.id === id)
+  const idx = goals.findIndex((g: TherapeuticGoal) => g.id === id);
   if (idx === -1) {
-    return new Response(JSON.stringify({ error: 'Goal not found' }), {
+    return new Response(JSON.stringify({ error: "Goal not found" }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
   try {
-    const data = await (request as Request).json()
-    const parsed = goalSchema.safeParse(data)
+    const data = await (request as Request).json();
+    const parsed = goalSchema.safeParse(data);
     if (!parsed.success) {
       return new Response(
         JSON.stringify({
           details: parsed.error.issues,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
-    const existingGoal = goals[idx]
+    const existingGoal = goals[idx];
     if (!existingGoal) {
-      return new Response(JSON.stringify({ error: 'Goal not found' }), {
+      return new Response(JSON.stringify({ error: "Goal not found" }), {
         status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
     const updatedGoal = {
       ...parsed.data,
       id,
       createdAt: existingGoal.createdAt,
       updatedAt: Date.now(),
-    } as TherapeuticGoal
-    goals[idx] = updatedGoal
+    } as TherapeuticGoal;
+    goals[idx] = updatedGoal;
     return new Response(JSON.stringify(updatedGoal), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err: unknown) {
     return new Response(
       JSON.stringify({
-        error: 'Server error',
+        error: "Server error",
         details:
           err instanceof Error
             ? (err as Error)?.message || String(err)
             : String(err),
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
-    )
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
   }
-}
+};
 
 export const DELETE = async ({ params }) => {
-  const { id } = params as { id: string }
-  const idx = goals.findIndex((g: TherapeuticGoal) => g.id === id)
+  const { id } = params as { id: string };
+  const idx = goals.findIndex((g: TherapeuticGoal) => g.id === id);
   if (idx === -1) {
-    return new Response(JSON.stringify({ error: 'Goal not found' }), {
+    return new Response(JSON.stringify({ error: "Goal not found" }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   }
-  goals.splice(idx, 1)
-  return new Response(null, { status: 204 })
-}
+  goals.splice(idx, 1);
+  return new Response(null, { status: 204 });
+};
 
-export const prerender = false
+export const prerender = false;

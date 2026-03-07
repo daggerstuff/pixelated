@@ -7,7 +7,7 @@ import type {
   UnifiedProcessingRequest,
   UnifiedProcessingResponse,
   IUnifiedMetaAlignerAPI,
-} from '../api/unified-api'
+} from "../api/unified-api";
 
 /**
  * Defines the interface for the StreamingHandler.
@@ -23,20 +23,20 @@ export interface IStreamingHandler {
   processStream(
     request: UnifiedProcessingRequest,
     onChunk: (chunk: UnifiedProcessingResponse) => void,
-  ): Promise<void>
+  ): Promise<void>;
 }
 
 /**
  * The StreamingHandler class.
  */
 export class StreamingHandler implements IStreamingHandler {
-  private api: IUnifiedMetaAlignerAPI
-  private buffer: string[] = []
-  private bufferSize: number
+  private api: IUnifiedMetaAlignerAPI;
+  private buffer: string[] = [];
+  private bufferSize: number;
 
   constructor(api: IUnifiedMetaAlignerAPI, bufferSize = 5) {
-    this.api = api
-    this.bufferSize = bufferSize
+    this.api = api;
+    this.bufferSize = bufferSize;
   }
 
   public async processStream(
@@ -47,34 +47,34 @@ export class StreamingHandler implements IStreamingHandler {
     try {
       // In a real-world scenario, you would get a stream from the API.
       // For now, we'll simulate a stream by splitting the response into chunks.
-      const response = await this.api.process(request)
-      const chunks = response.enhancedResponse.split(' ')
+      const response = await this.api.process(request);
+      const chunks = response.enhancedResponse.split(" ");
 
       for (const chunk of chunks) {
-        this.buffer.push(chunk)
+        this.buffer.push(chunk);
         if (this.buffer.length >= this.bufferSize) {
-          const bufferedChunk = this.buffer.join(' ')
-          this.buffer = []
+          const bufferedChunk = this.buffer.join(" ");
+          this.buffer = [];
           const chunkResponse: UnifiedProcessingResponse = {
             ...response,
             enhancedResponse: bufferedChunk,
-          }
-          onChunk(chunkResponse)
+          };
+          onChunk(chunkResponse);
         }
-        await new Promise((resolve) => setTimeout(resolve, 100)) // Simulate network latency
+        await new Promise((resolve) => setTimeout(resolve, 100)); // Simulate network latency
       }
 
       if (this.buffer.length > 0) {
-        const bufferedChunk = this.buffer.join(' ')
-        this.buffer = []
+        const bufferedChunk = this.buffer.join(" ");
+        this.buffer = [];
         const chunkResponse: UnifiedProcessingResponse = {
           ...response,
           enhancedResponse: bufferedChunk,
-        }
-        onChunk(chunkResponse)
+        };
+        onChunk(chunkResponse);
       }
     } catch (error) {
-      onError(error as Error)
+      onError(error as Error);
     }
   }
 }
