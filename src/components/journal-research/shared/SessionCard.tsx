@@ -1,4 +1,4 @@
-import type { Session } from '@/lib/api/journal-research/types'
+import type { Session } from "@/lib/api/journal-research/types";
 import {
   Card,
   CardContent,
@@ -6,40 +6,39 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
-import { ProgressBar } from './ProgressBar'
-import { format } from 'date-fns'
+} from "@/components/ui/card/card";
+import { ProgressBar } from "./ProgressBar";
+import { format } from "date-fns";
 
 export interface SessionCardProps {
-  session: Session
-  onClick?: () => void
-  className?: string
+  session: Session;
+  onClick?: () => void;
+  className?: string;
 }
 
 export function SessionCard({ session, onClick, className }: SessionCardProps) {
-  const progressPercentage =
-    session.progressMetrics?.progress_percentage ?? 0
+  const progressPercentage = session.progressMetrics?.progress_percentage ?? 0;
 
   const phaseColors: Record<string, string> = {
-    discovery: 'bg-blue-500',
-    evaluation: 'bg-yellow-500',
-    acquisition: 'bg-green-500',
-    integration: 'bg-purple-500',
-    reporting: 'bg-gray-500',
-  }
+    discovery: "bg-blue-500",
+    evaluation: "bg-yellow-500",
+    acquisition: "bg-green-500",
+    integration: "bg-purple-500",
+    reporting: "bg-gray-500",
+  };
 
-  const phaseColor = phaseColors[session.currentPhase] ?? 'bg-gray-500'
+  const phaseColor = phaseColors[session.currentPhase] ?? "bg-gray-500";
 
   return (
     <Card
-      className={`cursor-pointer transition-shadow hover:shadow-lg ${className ?? ''}`}
+      className={`cursor-pointer transition-shadow hover:shadow-lg ${className ?? ""}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onClick?.()
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick?.();
         }
       }}
     >
@@ -50,7 +49,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
               {session.sessionId}
             </CardTitle>
             <CardDescription className="mt-1">
-              Started {format(session.startDate, 'MMM d, yyyy')}
+              Started {format(session.startDate, "MMM d, yyyy")}
             </CardDescription>
           </div>
           <div
@@ -89,25 +88,25 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
           {session.progressMetrics && (
             <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
               <div>
-                Identified:{' '}
+                Identified:{" "}
                 <span className="font-medium text-foreground">
                   {session.progressMetrics.sources_identified ?? 0}
                 </span>
               </div>
               <div>
-                Evaluated:{' '}
+                Evaluated:{" "}
                 <span className="font-medium text-foreground">
                   {session.progressMetrics.datasets_evaluated ?? 0}
                 </span>
               </div>
               <div>
-                Acquired:{' '}
+                Acquired:{" "}
                 <span className="font-medium text-foreground">
                   {session.progressMetrics.datasets_acquired ?? 0}
                 </span>
               </div>
               <div>
-                Integrated:{' '}
+                Integrated:{" "}
                 <span className="font-medium text-foreground">
                   {session.progressMetrics.integration_plans_created ?? 0}
                 </span>
@@ -118,8 +117,8 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
       </CardContent>
 
       <CardFooter className="text-xs text-muted-foreground">
-        {session.targetSources.join(', ')}
+        {session.targetSources.join(", ")}
       </CardFooter>
     </Card>
-  )
+  );
 }

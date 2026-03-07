@@ -1,1 +1,1 @@
-export { default as CustomSpotLight } from './CustomSpotLight'
+export { default as CustomSpotLight } from "./CustomSpotLight";

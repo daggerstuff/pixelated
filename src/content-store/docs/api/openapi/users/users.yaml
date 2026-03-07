@@ -1001,15 +1001,15 @@ paths:
               valid_upload:
                 summary: Valid profile picture upload
                 value:
-                  image: '@profile.jpg'
+                  image: "@profile.jpg"
               invalid_format:
                 summary: Invalid file format
                 value:
-                  image: '@document.pdf'
+                  image: "@document.pdf"
               file_too_large:
                 summary: File exceeds size limit
                 value:
-                  image: '@large_image.jpg'
+                  image: "@large_image.jpg"
       responses:
         200:
           description: Profile picture updated successfully

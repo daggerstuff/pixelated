@@ -1,9 +1,9 @@
 ---
-title: 'Text Analysis System Documentation'
-description: 'Text Analysis System Documentation documentation'
+title: "Text Analysis System Documentation"
+description: "Text Analysis System Documentation documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -73,24 +73,23 @@ The Text Analysis System is a core component of Pixelated that provides advanced
 ## Usage
 
 ```typescript
-
 // Initialize services
-const securityAudit = new SecurityAuditService()
-const textAnalysis = new TextAnalysisService(securityAudit)
-await textAnalysis.initialize()
+const securityAudit = new SecurityAuditService();
+const textAnalysis = new TextAnalysisService(securityAudit);
+await textAnalysis.initialize();
 
 // Analyze text
 const result = await textAnalysis.analyzeText(
-  'I feel much better after our CBT session today.',
-  'user123',
-)
+  "I feel much better after our CBT session today.",
+  "user123",
+);
 
 // Access analysis results
-console.log(result.emotions) // Emotional state
-console.log(result.therapyTechniques) // Detected techniques
-console.log(result.crisisIndicators) // Crisis assessment
-console.log(result.semanticAnalysis) // Context and themes
-console.log(result.hipaaCompliance) // PHI detection
+console.log(result.emotions); // Emotional state
+console.log(result.therapyTechniques); // Detected techniques
+console.log(result.crisisIndicators); // Crisis assessment
+console.log(result.semanticAnalysis); // Context and themes
+console.log(result.hipaaCompliance); // PHI detection
 ```
 
 ## Security and Compliance

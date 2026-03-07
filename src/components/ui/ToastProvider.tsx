@@ -1,5 +1,5 @@
 /** @jsxImportSource react */
-import { Toast } from './toast'
+import { Toast } from "./toast";
 
 /**
  * ToastProvider component to provide toast notifications functionality.
@@ -8,8 +8,8 @@ import { Toast } from './toast'
  */
 export default function ToastProvider() {
   // Only render on client side to prevent SSR issues with react-hot-toast
-  if (typeof window === 'undefined') {
-    return null
+  if (typeof window === "undefined") {
+    return null;
   }
 
   return (
@@ -22,18 +22,18 @@ export default function ToastProvider() {
         // Custom styling for different toast types
         success: {
           duration: 3000,
-          className: 'border-l-4 border-green-500',
+          className: "border-l-4 border-green-500",
         },
         error: {
           duration: 5000,
-          className: 'border-l-4 border-red-500',
+          className: "border-l-4 border-red-500",
         },
         loading: {
           duration: Infinity,
-          className: 'border-l-4 border-blue-500',
+          className: "border-l-4 border-blue-500",
         },
       }}
       className="max-w-md"
     />
-  )
+  );
 }

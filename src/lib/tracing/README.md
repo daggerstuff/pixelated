@@ -33,18 +33,18 @@ TRACING_EXPORTER_ENDPOINT=http://localhost:4318
 ### Basic Usage
 
 ```typescript
-import { withSpan, addSpanAttributes } from '@/lib/tracing'
+import { withSpan, addSpanAttributes } from "@/lib/tracing";
 
 // Wrap async operations
-const result = await withSpan('my-operation', async (span) => {
-  span.setAttribute('user.id', userId)
-  return await doSomething()
-})
+const result = await withSpan("my-operation", async (span) => {
+  span.setAttribute("user.id", userId);
+  return await doSomething();
+});
 
 // Add attributes to current span
 addSpanAttributes({
-  'operation.type': 'data-processing',
-})
+  "operation.type": "data-processing",
+});
 ```
 
 ## Architecture

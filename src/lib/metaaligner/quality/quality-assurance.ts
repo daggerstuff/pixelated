@@ -13,5 +13,5 @@ export interface IQualityAssurance {
    * @param response - The response to run the workflow on.
    * @returns A promise that resolves when the workflow is complete.
    */
-  run(response: string): Promise<void>
+  run(response: string): Promise<void>;
 }

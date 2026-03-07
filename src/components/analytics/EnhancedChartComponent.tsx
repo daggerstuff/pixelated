@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,9 +11,9 @@ import {
   Tooltip,
   Legend,
   Filler,
-} from 'chart.js'
-import { Line, Bar, Pie, Scatter } from 'react-chartjs-2'
-import { useChartData } from '@/hooks/useComponentIntegration'
+} from "chart.js";
+import { Line, Bar, Pie, Scatter } from "react-chartjs-2";
+import { useChartData } from "@/hooks/useComponentIntegration";
 
 // Register Chart.js components
 ChartJS.register(
@@ -27,38 +27,38 @@ ChartJS.register(
   Tooltip,
   Legend,
   Filler,
-)
+);
 
 interface EnhancedChartComponentProps {
-  type?: 'line' | 'bar' | 'pie' | 'scatter'
-  title?: string
-  className?: string
+  type?: "line" | "bar" | "pie" | "scatter";
+  title?: string;
+  className?: string;
   data?: {
-    category?: 'progress' | 'emotions' | 'sessions' | 'outcomes'
-    timeRange?: number
-    clientId?: string
-    sessionId?: string
-    dataPoints?: number
-    useBackendData?: boolean
-    autoRefresh?: boolean
-    refreshInterval?: number
-  }
-  options?: any
-  fallbackData?: any
+    category?: "progress" | "emotions" | "sessions" | "outcomes";
+    timeRange?: number;
+    clientId?: string;
+    sessionId?: string;
+    dataPoints?: number;
+    useBackendData?: boolean;
+    autoRefresh?: boolean;
+    refreshInterval?: number;
+  };
+  options?: any;
+  fallbackData?: any;
 }
 
 const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
-  type = 'line',
-  title = 'Analytics Chart',
-  className = '',
+  type = "line",
+  title = "Analytics Chart",
+  className = "",
   data: dataConfig,
   options = {},
   fallbackData,
 }) => {
   const [useBackend, setUseBackend] = useState(
     dataConfig?.useBackendData || false,
-  )
-  const [error, setError] = useState<string | null>(null)
+  );
+  const [error, setError] = useState<string | null>(null);
 
   // Use backend integration hook when enabled
   const {
@@ -68,56 +68,56 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     refresh: refreshBackendData,
   } = useChartData({
     type,
-    category: dataConfig?.category || 'progress',
+    category: dataConfig?.category || "progress",
     timeRange: dataConfig?.timeRange || 30,
     clientId: dataConfig?.clientId,
     sessionId: dataConfig?.sessionId,
     dataPoints: dataConfig?.dataPoints || 50,
     autoRefresh: dataConfig?.autoRefresh || false,
     refreshInterval: dataConfig?.refreshInterval || 60000,
-  })
+  });
 
   // Fallback to default data if backend is not available
   const defaultData = {
     line: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
       datasets: [
         {
-          label: 'Progress Tracking',
+          label: "Progress Tracking",
           data: [65, 59, 80, 81, 56, 55],
-          borderColor: 'rgb(59, 130, 246)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: "rgb(59, 130, 246)",
+          backgroundColor: "rgba(59, 130, 246, 0.1)",
           tension: 0.4,
           fill: true,
         },
       ],
     },
     bar: {
-      labels: ['Anxiety', 'Depression', 'Stress', 'Mood', 'Energy'],
+      labels: ["Anxiety", "Depression", "Stress", "Mood", "Energy"],
       datasets: [
         {
-          label: 'Session Metrics',
+          label: "Session Metrics",
           data: [12, 19, 8, 15, 20],
           backgroundColor: [
-            'rgba(239, 68, 68, 0.8)',
-            'rgba(34, 197, 94, 0.8)',
-            'rgba(251, 191, 36, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(59, 130, 246, 0.8)',
+            "rgba(239, 68, 68, 0.8)",
+            "rgba(34, 197, 94, 0.8)",
+            "rgba(251, 191, 36, 0.8)",
+            "rgba(168, 85, 247, 0.8)",
+            "rgba(59, 130, 246, 0.8)",
           ],
         },
       ],
     },
     pie: {
-      labels: ['Positive', 'Neutral', 'Negative'],
+      labels: ["Positive", "Neutral", "Negative"],
       datasets: [
         {
-          label: 'Emotion Distribution',
+          label: "Emotion Distribution",
           data: [45, 30, 25],
           backgroundColor: [
-            'rgba(34, 197, 94, 0.8)',
-            'rgba(156, 163, 175, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
+            "rgba(34, 197, 94, 0.8)",
+            "rgba(156, 163, 175, 0.8)",
+            "rgba(239, 68, 68, 0.8)",
           ],
         },
       ],
@@ -125,37 +125,37 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     scatter: {
       datasets: [
         {
-          label: 'Correlation Analysis',
+          label: "Correlation Analysis",
           data: Array.from({ length: 30 }, () => ({
             x: Math.random() * 100,
             y: Math.random() * 100,
           })),
-          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          backgroundColor: "rgba(59, 130, 246, 0.6)",
         },
       ],
     },
-  }
+  };
 
   // Determine which data to use
   const chartData =
     useBackend && backendData?.data
       ? backendData.data
-      : fallbackData || defaultData[type] || defaultData.line
+      : fallbackData || defaultData[type] || defaultData.line;
 
   // Handle backend errors gracefully
   useEffect(() => {
     if (backendError && useBackend) {
       console.warn(
-        'Backend chart data unavailable, falling back to demo data:',
+        "Backend chart data unavailable, falling back to demo data:",
         backendError,
-      )
-      setError('Live data temporarily unavailable')
+      );
+      setError("Live data temporarily unavailable");
       // Optionally fall back to demo data
-      setUseBackend(false)
+      setUseBackend(false);
     } else if (error && !backendError && useBackend) {
-      setError(null)
+      setError(null);
     }
-  }, [backendError, useBackend, error])
+  }, [backendError, useBackend, error]);
 
   // Default chart options with therapy-specific styling
   const defaultOptions = {
@@ -163,7 +163,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: "top" as const,
         labels: {
           usePointStyle: true,
           padding: 20,
@@ -177,17 +177,17 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         text: title,
         font: {
           size: 16,
-          weight: 'bold',
+          weight: "bold",
         },
         padding: {
           bottom: 20,
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        titleColor: 'white',
-        bodyColor: 'white',
-        borderColor: 'rgba(59, 130, 246, 0.5)',
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleColor: "white",
+        bodyColor: "white",
+        borderColor: "rgba(59, 130, 246, 0.5)",
         borderWidth: 1,
         cornerRadius: 8,
         displayColors: true,
@@ -196,26 +196,26 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           afterBody: function (_context: any) {
             if (useBackend && backendData?.metadata) {
               return [
-                '',
+                "",
                 `Data Source: ${backendData.metadata.source}`,
                 `Last Updated: ${new Date(backendData.metadata.lastUpdated).toLocaleTimeString()}`,
-              ]
+              ];
             }
-            return []
+            return [];
           },
         },
       },
     },
     scales:
-      type !== 'pie'
+      type !== "pie"
         ? {
             x: {
               grid: {
-                color: 'rgba(156, 163, 175, 0.2)',
+                color: "rgba(156, 163, 175, 0.2)",
                 drawBorder: false,
               },
               ticks: {
-                color: 'rgba(75, 85, 99, 0.8)',
+                color: "rgba(75, 85, 99, 0.8)",
                 font: {
                   size: 11,
                 },
@@ -223,11 +223,11 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
             },
             y: {
               grid: {
-                color: 'rgba(156, 163, 175, 0.2)',
+                color: "rgba(156, 163, 175, 0.2)",
                 drawBorder: false,
               },
               ticks: {
-                color: 'rgba(75, 85, 99, 0.8)',
+                color: "rgba(75, 85, 99, 0.8)",
                 font: {
                   size: 11,
                 },
@@ -238,15 +238,15 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         : {},
     animation: {
       duration: 1000,
-      easing: 'easeInOutQuart',
+      easing: "easeInOutQuart",
     },
     interaction: {
       intersect: false,
-      mode: 'index' as const,
+      mode: "index" as const,
     },
-  }
+  };
 
-  const mergedOptions = { ...defaultOptions, ...options }
+  const mergedOptions = { ...defaultOptions, ...options };
 
   // Loading state
   if (useBackend && backendLoading) {
@@ -257,28 +257,28 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           <span className="text-gray-600">Loading chart data...</span>
           {dataConfig?.autoRefresh && (
             <span className="text-xs text-gray-500 mt-1">
-              Auto-refreshing every{' '}
+              Auto-refreshing every{" "}
               {(dataConfig.refreshInterval || 60000) / 1000}s
             </span>
           )}
         </div>
       </div>
-    )
+    );
   }
 
   const renderChart = () => {
     switch (type) {
-      case 'bar':
-        return <Bar data={chartData} options={mergedOptions} />
-      case 'pie':
-        return <Pie data={chartData} options={mergedOptions} />
-      case 'scatter':
-        return <Scatter data={chartData} options={mergedOptions} />
-      case 'line':
+      case "bar":
+        return <Bar data={chartData} options={mergedOptions} />;
+      case "pie":
+        return <Pie data={chartData} options={mergedOptions} />;
+      case "scatter":
+        return <Scatter data={chartData} options={mergedOptions} />;
+      case "line":
       default:
-        return <Line data={chartData} options={mergedOptions} />
+        return <Line data={chartData} options={mergedOptions} />;
     }
-  }
+  };
 
   return (
     <div className={`relative ${className}`}>
@@ -293,18 +293,18 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
             <div
               className={`w-2 h-2 rounded-full ${
                 useBackend && !backendError
-                  ? 'bg-green-500'
+                  ? "bg-green-500"
                   : error
-                    ? 'bg-red-500'
-                    : 'bg-yellow-500'
+                    ? "bg-red-500"
+                    : "bg-yellow-500"
               }`}
             ></div>
             <span>
               {useBackend && !backendError
-                ? 'Live Data'
+                ? "Live Data"
                 : error
-                  ? 'Demo Data'
-                  : 'Static Data'}
+                  ? "Demo Data"
+                  : "Static Data"}
             </span>
           </div>
 
@@ -366,7 +366,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default EnhancedChartComponent
+export default EnhancedChartComponent;

@@ -26,14 +26,11 @@ We aim to respond within **48 hours**. If we don’t, assume we’re busy patchi
 
 ## Supported Versions
 
-| Version         | Supported?         |
-| :-------------- | :----------------: |
-| `main` (master) | ✅ **Yes**         |
-| `develop`       | ✅ **Yes**         |
-| Anything else   | ❌ **No**          |
-
-
-
+| Version         | Supported? |
+| :-------------- | :--------: |
+| `main` (master) | ✅ **Yes** |
+| `develop`       | ✅ **Yes** |
+| Anything else   | ❌ **No**  |
 
 We only support the branches that matter. If you’re running code from a random fork, may the odds be ever in your favor.
 
@@ -57,6 +54,7 @@ We only support the branches that matter. If you’re running code from a random
 ## Responsible Disclosure
 
 We believe in responsible disclosure. If you report a vulnerability, we’ll:
+
 - Thank you profusely (possibly with memes)
 - Patch the issue ASAP
 - Credit you in our Hall of Fame (unless you prefer anonymity)

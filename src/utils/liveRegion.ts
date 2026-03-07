@@ -10,34 +10,35 @@
 
 // Local fallback if the LiveRegionSystem isn't available
 const createFallbackAnnouncer = (
-  politeness: 'polite' | 'assertive',
+  politeness: "polite" | "assertive",
   clearDelay = 5000,
 ) => {
   return (message: string, customClearDelay?: number) => {
-    const delay = customClearDelay !== undefined ? customClearDelay : clearDelay
+    const delay =
+      customClearDelay !== undefined ? customClearDelay : clearDelay;
 
     // Create a temporary element for the announcement
-    const announcer = document.createElement('div')
-    announcer.className = 'sr-only'
-    announcer.setAttribute('aria-live', politeness)
-    announcer.setAttribute('aria-atomic', 'true')
+    const announcer = document.createElement("div");
+    announcer.className = "sr-only";
+    announcer.setAttribute("aria-live", politeness);
+    announcer.setAttribute("aria-atomic", "true");
 
     // Add to DOM
-    document.body.appendChild(announcer)
+    document.body.appendChild(announcer);
 
     // Set the message (slight delay to ensure screen readers pick it up)
     setTimeout(() => {
-      announcer.textContent = message
-    }, 50)
+      announcer.textContent = message;
+    }, 50);
 
     // Remove after the specified delay
     setTimeout(() => {
       if (document.body.contains(announcer)) {
-        document.body.removeChild(announcer)
+        document.body.removeChild(announcer);
       }
-    }, delay + 100)
-  }
-}
+    }, delay + 100);
+  };
+};
 
 /**
  * Announces a status message (polite)
@@ -49,25 +50,25 @@ const createFallbackAnnouncer = (
  */
 export function announceStatus(message: string, clearDelay?: number): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
-    window.LiveRegionSystem.announceStatus(message, clearDelay)
-    return
+  if (typeof window !== "undefined" && window.LiveRegionSystem) {
+    window.LiveRegionSystem.announceStatus(message, clearDelay);
+    return;
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('status-live-region') as HTMLElement
+  const element = document.getElementById("status-live-region") as HTMLElement;
   if (element) {
-    element.textContent = message
+    element.textContent = message;
     if (clearDelay && clearDelay > 0) {
       setTimeout(() => {
-        element.textContent = ''
-      }, clearDelay)
+        element.textContent = "";
+      }, clearDelay);
     }
-    return
+    return;
   }
 
   // Fall back to creating a temporary announcer
-  createFallbackAnnouncer('polite', 5000)(message, clearDelay)
+  createFallbackAnnouncer("polite", 5000)(message, clearDelay);
 }
 
 /**
@@ -80,25 +81,25 @@ export function announceStatus(message: string, clearDelay?: number): void {
  */
 export function announceAlert(message: string, clearDelay?: number): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
-    window.LiveRegionSystem.announceAlert(message, clearDelay)
-    return
+  if (typeof window !== "undefined" && window.LiveRegionSystem) {
+    window.LiveRegionSystem.announceAlert(message, clearDelay);
+    return;
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('alert-live-region') as HTMLElement
+  const element = document.getElementById("alert-live-region") as HTMLElement;
   if (element) {
-    element.textContent = message
+    element.textContent = message;
     if (clearDelay && clearDelay > 0) {
       setTimeout(() => {
-        element.textContent = ''
-      }, clearDelay)
+        element.textContent = "";
+      }, clearDelay);
     }
-    return
+    return;
   }
 
   // Fall back to creating a temporary announcer
-  createFallbackAnnouncer('assertive', 7000)(message, clearDelay)
+  createFallbackAnnouncer("assertive", 7000)(message, clearDelay);
 }
 
 /**
@@ -111,27 +112,27 @@ export function announceAlert(message: string, clearDelay?: number): void {
  */
 export function log(message: string, clear = false): void {
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
-    window.LiveRegionSystem.log(message, clear)
-    return
+  if (typeof window !== "undefined" && window.LiveRegionSystem) {
+    window.LiveRegionSystem.log(message, clear);
+    return;
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('log-live-region') as HTMLElement
+  const element = document.getElementById("log-live-region") as HTMLElement;
   if (element) {
     if (clear) {
-      element.textContent = message
+      element.textContent = message;
     } else if (element.textContent) {
-      element.textContent += '\n' + message
+      element.textContent += "\n" + message;
     } else {
-      element.textContent = message
+      element.textContent = message;
     }
-    return
+    return;
   }
 
   // For log messages, just use a regular polite announcer
   // Since we can't easily track state without the proper regions
-  createFallbackAnnouncer('polite', 7000)(message)
+  createFallbackAnnouncer("polite", 7000)(message);
 }
 
 /**
@@ -149,38 +150,40 @@ export function announceProgress(
   label: string,
 ): void {
   // Format the announcement
-  const percent = Math.round((Number(value) / Number(max)) * 100)
-  const message = `${label}: ${percent}% (${value} of ${max})`
+  const percent = Math.round((Number(value) / Number(max)) * 100);
+  const message = `${label}: ${percent}% (${value} of ${max})`;
 
   // Try to use the global LiveRegionSystem first
-  if (typeof window !== 'undefined' && window.LiveRegionSystem) {
-    window.LiveRegionSystem.announceProgress(value, max, label)
-    return
+  if (typeof window !== "undefined" && window.LiveRegionSystem) {
+    window.LiveRegionSystem.announceProgress(value, max, label);
+    return;
   }
 
   // Use the ID-based method if elements exist
-  const element = document.getElementById('progress-live-region') as HTMLElement
+  const element = document.getElementById(
+    "progress-live-region",
+  ) as HTMLElement;
   if (element) {
-    element.textContent = message
-    return
+    element.textContent = message;
+    return;
   }
 
   // Fall back to creating a temporary announcer
-  createFallbackAnnouncer('polite', 3000)(message)
+  createFallbackAnnouncer("polite", 3000)(message);
 }
 
 // Type definitions for the global LiveRegionSystem
 declare global {
   interface Window {
     LiveRegionSystem?: {
-      announceStatus: (message: string, clearDelay?: number) => void
-      announceAlert: (message: string, clearDelay?: number) => void
-      log: (message: string, clear?: boolean) => void
+      announceStatus: (message: string, clearDelay?: number) => void;
+      announceAlert: (message: string, clearDelay?: number) => void;
+      log: (message: string, clear?: boolean) => void;
       announceProgress: (
         value: number | string,
         max: number | string,
         label: string,
-      ) => void
-    }
+      ) => void;
+    };
   }
 }

@@ -1,83 +1,83 @@
-import { useState, type FC } from 'react'
-import { Button } from '@/components/ui/button'
+import { useState, type FC } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
-import type { BackupType } from '../../../lib/security/backup/types'
-import { StorageLocation } from '../../../lib/security/backup/backup-types'
-import { Switch } from '@/components/ui/switch'
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import type { BackupType } from "../../../lib/security/backup/types";
+import { StorageLocation } from "../../../lib/security/backup/backup-types";
+import { Switch } from "@/components/ui/switch";
 
 interface BackupTypeConfig {
-  schedule: string
-  retention: number
+  schedule: string;
+  retention: number;
 }
 
 interface StorageLocationConfig {
-  provider: string
-  bucket?: string
-  region?: string
-  [key: string]: string | number | boolean | undefined
+  provider: string;
+  bucket?: string;
+  region?: string;
+  [key: string]: string | number | boolean | undefined;
 }
 
 interface BackupConfig {
-  backupTypes: { [key in BackupType]?: BackupTypeConfig }
+  backupTypes: { [key in BackupType]?: BackupTypeConfig };
 
-  storageLocations: { [key in StorageLocation]?: StorageLocationConfig }
+  storageLocations: { [key in StorageLocation]?: StorageLocationConfig };
 
   encryption: {
-    algorithm: string
-    keyRotationDays: number
-  }
+    algorithm: string;
+    keyRotationDays: number;
+  };
 }
 
 interface BackupConfigurationTabProps {
-  config: BackupConfig
-  onUpdateConfig: (config: BackupConfig) => void
+  config: BackupConfig;
+  onUpdateConfig: (config: BackupConfig) => void;
 }
 
 const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
   config,
   onUpdateConfig,
 }) => {
-  const [formState, setFormState] = useState<BackupConfig>({ ...config })
-  const [isEditing, setIsEditing] = useState(false)
-  const [backupEnabled, setBackupEnabled] = useState(true)
-  const [encryptBackups, setEncryptBackups] = useState(true)
-  const [frequency, setFrequency] = useState('daily')
-  const [retention, setRetention] = useState('30')
-  const [saving, setSaving] = useState(false)
+  const [formState, setFormState] = useState<BackupConfig>({ ...config });
+  const [isEditing, setIsEditing] = useState(false);
+  const [backupEnabled, setBackupEnabled] = useState(true);
+  const [encryptBackups, setEncryptBackups] = useState(true);
+  const [frequency, setFrequency] = useState("daily");
+  const [retention, setRetention] = useState("30");
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (
-    section: 'backupTypes' | 'storageLocations' | 'encryption',
+    section: "backupTypes" | "storageLocations" | "encryption",
     key: string,
     field: string,
     value: string | number,
   ) => {
-    if (section === 'backupTypes') {
+    if (section === "backupTypes") {
       setFormState({
         ...formState,
         backupTypes: {
           ...formState.backupTypes,
           [key]: {
             ...formState.backupTypes[key as BackupType],
-            [field]: field === 'retention' ? Number(value) : value,
+            [field]: field === "retention" ? Number(value) : value,
           },
         },
-      })
-    } else if (section === 'storageLocations') {
+      });
+    } else if (section === "storageLocations") {
       setFormState({
         ...formState,
         storageLocations: {
@@ -87,93 +87,93 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
             [field]: value,
           },
         },
-      })
-    } else if (section === 'encryption') {
+      });
+    } else if (section === "encryption") {
       setFormState({
         ...formState,
         encryption: {
           ...formState.encryption,
-          [field]: field === 'keyRotationDays' ? Number(value) : value,
+          [field]: field === "keyRotationDays" ? Number(value) : value,
         },
-      })
+      });
     }
-  }
+  };
 
   const handleSave = () => {
     // Validate form data
     if (!validateConfig()) {
-      alert('Please fix the validation errors before saving')
-      return
+      alert("Please fix the validation errors before saving");
+      return;
     }
 
-    onUpdateConfig(formState)
-    setIsEditing(false)
-  }
+    onUpdateConfig(formState);
+    setIsEditing(false);
+  };
 
   const validateConfig = (): boolean => {
     // Validate backup types
     for (const type in formState.backupTypes) {
-      const backupConfig = formState.backupTypes[type as BackupType]
+      const backupConfig = formState.backupTypes[type as BackupType];
       if (!backupConfig) {
-        continue
+        continue;
       }
 
       // Validate cron expression (simplified validation)
-      if (!backupConfig.schedule || !backupConfig.schedule.includes('*')) {
-        return false
+      if (!backupConfig.schedule || !backupConfig.schedule.includes("*")) {
+        return false;
       }
 
       // Validate retention period
       if (backupConfig.retention <= 0) {
-        return false
+        return false;
       }
     }
 
     // Validate storage locations
     for (const location in formState.storageLocations) {
       const storageConfig =
-        formState.storageLocations[location as StorageLocation]
+        formState.storageLocations[location as StorageLocation];
       if (!storageConfig) {
-        continue
+        continue;
       }
 
       // Validate provider
       if (!storageConfig.provider) {
-        return false
+        return false;
       }
 
       // Validate bucket for cloud providers
       if (
-        ['aws-s3', 'google-cloud-storage'].includes(storageConfig.provider) &&
+        ["aws-s3", "google-cloud-storage"].includes(storageConfig.provider) &&
         !storageConfig.bucket
       ) {
-        return false
+        return false;
       }
     }
 
     // Validate encryption settings
     if (!formState.encryption.algorithm) {
-      return false
+      return false;
     }
 
     if (formState.encryption.keyRotationDays <= 0) {
-      return false
+      return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const handleCancel = () => {
-    setFormState({ ...config })
-    setIsEditing(false)
-  }
+    setFormState({ ...config });
+    setIsEditing(false);
+  };
 
   const handleSaveConfig = async () => {
-    setSaving(true)
+    setSaving(true);
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setSaving(false)
-  }
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setSaving(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -291,13 +291,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     disabled={!isEditing}
                     value={
                       formState.storageLocations[StorageLocation.PRIMARY]
-                        ?.provider || ''
+                        ?.provider || ""
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.PRIMARY,
-                        'provider',
+                        "provider",
                         value,
                       )
                     }
@@ -322,13 +322,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     id="primary-bucket"
                     value={
                       formState.storageLocations[StorageLocation.PRIMARY]
-                        ?.bucket || ''
+                        ?.bucket || ""
                     }
                     onChange={(e) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.PRIMARY,
-                        'bucket',
+                        "bucket",
                         e.target.value,
                       )
                     }
@@ -341,13 +341,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     id="primary-region"
                     value={
                       formState.storageLocations[StorageLocation.PRIMARY]
-                        ?.region || ''
+                        ?.region || ""
                     }
                     onChange={(e) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.PRIMARY,
-                        'region',
+                        "region",
                         e.target.value,
                       )
                     }
@@ -367,13 +367,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     disabled={!isEditing}
                     value={
                       formState.storageLocations[StorageLocation.SECONDARY]
-                        ?.provider || ''
+                        ?.provider || ""
                     }
                     onValueChange={(value) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.SECONDARY,
-                        'provider',
+                        "provider",
                         value,
                       )
                     }
@@ -400,13 +400,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     id="secondary-bucket"
                     value={
                       formState.storageLocations[StorageLocation.SECONDARY]
-                        ?.bucket || ''
+                        ?.bucket || ""
                     }
                     onChange={(e) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.SECONDARY,
-                        'bucket',
+                        "bucket",
                         e.target.value,
                       )
                     }
@@ -419,13 +419,13 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                     id="secondary-region"
                     value={
                       formState.storageLocations[StorageLocation.SECONDARY]
-                        ?.region || ''
+                        ?.region || ""
                     }
                     onChange={(e) =>
                       handleChange(
-                        'storageLocations',
+                        "storageLocations",
                         StorageLocation.SECONDARY,
-                        'region',
+                        "region",
                         e.target.value,
                       )
                     }
@@ -453,7 +453,7 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                 disabled={!isEditing}
                 value={formState.encryption.algorithm}
                 onValueChange={(value) =>
-                  handleChange('encryption', '', 'algorithm', value)
+                  handleChange("encryption", "", "algorithm", value)
                 }
               >
                 <SelectTrigger>
@@ -478,9 +478,9 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                 value={formState.encryption.keyRotationDays}
                 onChange={(e) =>
                   handleChange(
-                    'encryption',
-                    '',
-                    'keyRotationDays',
+                    "encryption",
+                    "",
+                    "keyRotationDays",
                     e.target.value,
                   )
                 }
@@ -496,11 +496,11 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
 
       <div className="flex justify-end">
         <Button onClick={handleSaveConfig} disabled={saving}>
-          {saving ? 'Saving...' : 'Save Configuration'}
+          {saving ? "Saving..." : "Save Configuration"}
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BackupConfigurationTab
+export default BackupConfigurationTab;

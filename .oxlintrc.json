@@ -40,10 +40,5 @@
     "node": true
   },
   "globals": {},
-  "ignorePatterns": [
-    "dist",
-    "node_modules",
-    "coverage",
-    ".astro"
-  ]
+  "ignorePatterns": ["dist", "node_modules", "coverage", ".astro"]
 }

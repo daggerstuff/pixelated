@@ -1,24 +1,24 @@
-import { useId } from 'react'
-import type { ReactNode } from 'react'
+import { useId } from "react";
+import type { ReactNode } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { RefreshCw } from 'lucide-react'
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshCw } from "lucide-react";
 
 export interface DashboardWidgetProps {
-  title: string
-  description?: string
-  isLoading?: boolean
-  onRefresh?: () => void
-  className?: string
-  children: ReactNode
-  actions?: ReactNode
-  variant?: 'default' | 'compact'
+  title: string;
+  description?: string;
+  isLoading?: boolean;
+  onRefresh?: () => void;
+  className?: string;
+  children: ReactNode;
+  actions?: ReactNode;
+  variant?: "default" | "compact";
 }
 
 export function DashboardWidget({
@@ -26,24 +26,24 @@ export function DashboardWidget({
   description,
   isLoading = false,
   onRefresh,
-  className = '',
+  className = "",
   children,
   actions,
-  variant = 'default',
+  variant = "default",
 }: DashboardWidgetProps) {
-  const titleId = useId()
+  const titleId = useId();
   return (
     <Card
       className={`dashboard-widget ${className}`}
       role="region"
       aria-labelledby={titleId}
     >
-      <CardHeader className={variant === 'compact' ? 'pb-2' : 'pb-4'}>
+      <CardHeader className={variant === "compact" ? "pb-2" : "pb-4"}>
         <div className="flex justify-between items-start">
           <div>
             <CardTitle
               id={titleId}
-              className={variant === 'compact' ? 'text-lg' : 'text-xl'}
+              className={variant === "compact" ? "text-lg" : "text-xl"}
             >
               {title}
             </CardTitle>
@@ -79,5 +79,5 @@ export function DashboardWidget({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

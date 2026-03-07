@@ -5,25 +5,25 @@
  * Extracted from BiasDetectionEngine.ts for better separation of concerns.
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 import {
   ConnectionPool,
   ConnectionPoolConfig,
   PooledConnection,
-} from './connection-pool'
+} from "./connection-pool";
 import type {
   TherapeuticSession,
   PreprocessingLayerResult,
   ModelLevelLayerResult,
   InteractiveLayerResult,
   EvaluationLayerResult,
-} from './types'
+} from "./types";
 import type {
   PythonAnalysisResult,
   PythonHealthResponse,
-} from './bias-detection-interfaces'
+} from "./bias-detection-interfaces";
 
-const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
+const logger = createBuildSafeLogger("PythonBiasDetectionBridge");
 
 /**
  * Production HTTP client for Python Bias Detection Service
@@ -135,8 +135,9 @@ export class PythonBiasDetectionBridge {
     } catch (error: unknown) {
       logger.error("Failed to initialize PythonBiasDetectionBridge", { error });
       throw new Error(
-        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`, { cause: error },
-      )
+        `Python service initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
+        { cause: error },
+      );
     }
   }
 
@@ -267,14 +268,14 @@ export class PythonBiasDetectionBridge {
           // Set up timeout
           timeoutId = setTimeout(() => {
             try {
-              controller.abort()
+              controller.abort();
             } catch {
               /* ignore */
             }
           }, this.timeout);
 
           // Attach the signal to fetch options for this attempt
-          ; (fetchOptions as any).signal = controller.signal
+          (fetchOptions as any).signal = controller.signal;
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -323,8 +324,8 @@ export class PythonBiasDetectionBridge {
         ) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore - runtime check above ensures this exists
-          ; (this.connectionPool as any).releaseConnection(pooledConnection)
-          pooledConnection = null
+          (this.connectionPool as any).releaseConnection(pooledConnection);
+          pooledConnection = null;
         }
         // Clear timeout on error
         if (timeoutId) {
@@ -360,22 +361,22 @@ export class PythonBiasDetectionBridge {
             : {};
         const ling =
           typeof metrics["linguistic_bias"] === "object" &&
-            metrics["linguistic_bias"]
+          metrics["linguistic_bias"]
             ? (metrics["linguistic_bias"] as Record<string, any>)
             : {};
         const sentiment =
           typeof ling["sentiment_analysis"] === "object" &&
-            ling["sentiment_analysis"]
+          ling["sentiment_analysis"]
             ? (ling["sentiment_analysis"] as Record<string, any>)
             : {};
         const rep =
           typeof metrics["representation_analysis"] === "object" &&
-            metrics["representation_analysis"]
+          metrics["representation_analysis"]
             ? (metrics["representation_analysis"] as Record<string, any>)
             : {};
         const dq =
           typeof metrics["data_quality_metrics"] === "object" &&
-            metrics["data_quality_metrics"]
+          metrics["data_quality_metrics"]
             ? (metrics["data_quality_metrics"] as Record<string, any>)
             : {};
         return {
@@ -496,7 +497,7 @@ export class PythonBiasDetectionBridge {
       serviceError:
         error instanceof Error
           ? error.message
-          : error && typeof error === 'object'
+          : error && typeof error === "object"
             ? JSON.stringify(error)
             : error
               ? String(error)

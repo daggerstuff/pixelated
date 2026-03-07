@@ -1,36 +1,36 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from "react";
 
 interface FocusTrapProps {
   /**
    * Whether the focus trap is active
    */
-  active: boolean
+  active: boolean;
 
   /**
    * The content to trap focus within
    */
-  children: React.ReactNode
+  children: React.ReactNode;
 
   /**
    * Element to return focus to when the trap is deactivated
    */
-  returnFocusTo?: HTMLElement | null
+  returnFocusTo?: HTMLElement | null;
 
   /**
    * Whether to initially focus the first focusable element
    * @default true
    */
-  autoFocus?: boolean
+  autoFocus?: boolean;
 
   /**
    * Called when user tries to escape focus trap with Tab or Shift+Tab
    */
-  onEscape?: () => void
+  onEscape?: () => void;
 
   /**
    * Additional classNames for the container
    */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -47,13 +47,13 @@ export function FocusTrap({
   onEscape,
   className,
 }: FocusTrapProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(returnFocusTo || null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(returnFocusTo || null);
 
   // Find all focusable elements within the container
   const getFocusableElements = () => {
     if (!containerRef.current) {
-      return []
+      return [];
     }
 
     // Selector for all focusable elements
@@ -66,7 +66,7 @@ export function FocusTrap({
       'button:not([disabled]):not([tabindex="-1"])',
       '[tabindex]:not([tabindex="-1"])',
       '[contenteditable="true"]:not([tabindex="-1"])',
-    ].join(',')
+    ].join(",");
 
     // Get elements matching selector that are visible (not hidden by CSS)
     return Array.from(
@@ -76,9 +76,9 @@ export function FocusTrap({
         // Check if element is visible
         el.offsetWidth > 0 &&
         el.offsetHeight > 0 &&
-        window.getComputedStyle(el).visibility !== 'hidden',
-    )
-  }
+        window.getComputedStyle(el).visibility !== "hidden",
+    );
+  };
 
   // Save previous active element and set focus when trap is activated
   useEffect(() => {
@@ -88,73 +88,73 @@ export function FocusTrap({
         !previousFocusRef.current &&
         document.activeElement instanceof HTMLElement
       ) {
-        previousFocusRef.current = document.activeElement
+        previousFocusRef.current = document.activeElement;
       }
 
       // Auto-focus the first focusable element when activated
       if (autoFocus) {
         setTimeout(() => {
-          const focusableElements = getFocusableElements()
+          const focusableElements = getFocusableElements();
           if (focusableElements.length > 0 && focusableElements[0]) {
-            focusableElements[0].focus()
+            focusableElements[0].focus();
           } else if (containerRef.current) {
             // If no focusable elements, focus the container itself
-            containerRef.current.setAttribute('tabindex', '-1')
-            containerRef.current?.focus()
+            containerRef.current.setAttribute("tabindex", "-1");
+            containerRef.current?.focus();
           }
-        }, 50) // Small delay to ensure the DOM is ready
+        }, 50); // Small delay to ensure the DOM is ready
       }
     }
-  }, [active, autoFocus])
+  }, [active, autoFocus]);
 
   // Return focus when trap is deactivated
   useEffect(() => {
     return () => {
       if (previousFocusRef.current) {
         setTimeout(() => {
-          previousFocusRef.current?.focus()
-        }, 0)
+          previousFocusRef.current?.focus();
+        }, 0);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Handle tab key to trap focus within the container
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!active || e.key !== 'Tab') {
-      return
+    if (!active || e.key !== "Tab") {
+      return;
     }
 
-    const focusableElements = getFocusableElements()
+    const focusableElements = getFocusableElements();
     if (focusableElements.length === 0) {
-      return
+      return;
     }
 
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-    const { activeElement } = document
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const { activeElement } = document;
 
     // If Shift+Tab and on first element, wrap to last element
     if (e.shiftKey && activeElement === firstElement) {
-      e.preventDefault()
+      e.preventDefault();
       if (lastElement) {
-        lastElement.focus()
+        lastElement.focus();
       }
     }
     // If Tab and on last element, wrap to first element
     else if (!e.shiftKey && activeElement === lastElement) {
-      e.preventDefault()
+      e.preventDefault();
       if (firstElement) {
-        firstElement.focus()
+        firstElement.focus();
       }
       if (onEscape) {
-        onEscape()
+        onEscape();
       }
     }
-  }
+  };
 
   // Don't render anything if not active
   if (!active) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   return (
@@ -168,7 +168,7 @@ export function FocusTrap({
     >
       {children}
     </div>
-  )
+  );
 }
 
-export default FocusTrap
+export default FocusTrap;

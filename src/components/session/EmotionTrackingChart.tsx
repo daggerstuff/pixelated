@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 // Use lazy-loaded chart components to reduce bundle size
 import {
   LineChart,
@@ -9,24 +9,24 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from '@/components/ui/LazyChart'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/LazyChart";
+import { cn } from "@/lib/utils";
 
 // Define types for our component
 
 type EmotionTimelineData = {
-  timestamp: string
-  valence: number
-  arousal: number
-  dominance: number
-  label?: string
-}
+  timestamp: string;
+  valence: number;
+  arousal: number;
+  dominance: number;
+  label?: string;
+};
 
 interface EmotionTrackingChartProps {
-  data?: EmotionTimelineData[]
-  height?: number
-  className?: string
-  isLoading?: boolean
+  data?: EmotionTimelineData[];
+  height?: number;
+  className?: string;
+  isLoading?: boolean;
 }
 
 /**
@@ -41,41 +41,41 @@ export default function EmotionTrackingChart({
   className,
   isLoading = false,
 }: EmotionTrackingChartProps) {
-  const [timeRange, setTimeRange] = useState<'full' | '5min' | '10min'>('full')
+  const [timeRange, setTimeRange] = useState<"full" | "5min" | "10min">("full");
   const [dimensions, setDimensions] = useState<string[]>([
-    'valence',
-    'arousal',
-    'dominance',
-  ])
+    "valence",
+    "arousal",
+    "dominance",
+  ]);
 
   // Process the data based on selected time range
   const processedData = React.useMemo(() => {
     if (data.length === 0) {
-      return []
+      return [];
     }
 
     // Time filtering logic
-    let filteredData = [...data]
-    if (timeRange !== 'full') {
-      const now = new Date()
+    let filteredData = [...data];
+    if (timeRange !== "full") {
+      const now = new Date();
       const cutoffTime = new Date(
-        now.getTime() - (timeRange === '5min' ? 5 : 10) * 60000,
-      )
+        now.getTime() - (timeRange === "5min" ? 5 : 10) * 60000,
+      );
       filteredData = data.filter(
         (item) => new Date(item.timestamp) >= cutoffTime,
-      )
+      );
     }
 
-    return filteredData
-  }, [data, timeRange])
+    return filteredData;
+  }, [data, timeRange]);
 
   const toggleDimension = (dimension: string) => {
     setDimensions((prev) =>
       prev.includes(dimension)
         ? prev.filter((d) => d !== dimension)
         : [...prev, dimension],
-    )
-  }
+    );
+  };
 
   // Loading state
   if (isLoading) {
@@ -86,7 +86,7 @@ export default function EmotionTrackingChart({
           <div className="h-40 bg-gray-200 rounded w-full"></div>
         </div>
       </div>
-    )
+    );
   }
 
   // Empty state
@@ -100,11 +100,11 @@ export default function EmotionTrackingChart({
           Data will appear as the session progresses
         </p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
+    <div className={cn("p-4 bg-white rounded-lg shadow-sm", className)}>
       <div className="mb-4 flex justify-between items-center">
         <h3 className="text-lg font-medium text-gray-900">
           Emotional Dimensions
@@ -115,7 +115,7 @@ export default function EmotionTrackingChart({
             className="text-sm border rounded px-2 py-1"
             value={timeRange}
             onChange={(e) =>
-              setTimeRange(e.target.value as 'full' | '5min' | '10min')
+              setTimeRange(e.target.value as "full" | "5min" | "10min")
             }
             aria-label="Select time range"
           >
@@ -129,35 +129,35 @@ export default function EmotionTrackingChart({
       {/* Dimension toggles */}
       <div className="flex flex-wrap gap-2 mb-4">
         <button
-          onClick={() => toggleDimension('valence')}
+          onClick={() => toggleDimension("valence")}
           className={`text-xs px-3 py-1 rounded-full transition-colors ${
-            dimensions.includes('valence')
-              ? 'bg-blue-100 text-blue-800 border border-blue-300'
-              : 'bg-gray-100 text-gray-600 border border-gray-200'
+            dimensions.includes("valence")
+              ? "bg-blue-100 text-blue-800 border border-blue-300"
+              : "bg-gray-100 text-gray-600 border border-gray-200"
           }`}
-          aria-pressed={dimensions.includes('valence')}
+          aria-pressed={dimensions.includes("valence")}
         >
           Valence (Positive/Negative)
         </button>
         <button
-          onClick={() => toggleDimension('arousal')}
+          onClick={() => toggleDimension("arousal")}
           className={`text-xs px-3 py-1 rounded-full transition-colors ${
-            dimensions.includes('arousal')
-              ? 'bg-red-100 text-red-800 border border-red-300'
-              : 'bg-gray-100 text-gray-600 border border-gray-200'
+            dimensions.includes("arousal")
+              ? "bg-red-100 text-red-800 border border-red-300"
+              : "bg-gray-100 text-gray-600 border border-gray-200"
           }`}
-          aria-pressed={dimensions.includes('arousal')}
+          aria-pressed={dimensions.includes("arousal")}
         >
           Arousal (Calm/Excited)
         </button>
         <button
-          onClick={() => toggleDimension('dominance')}
+          onClick={() => toggleDimension("dominance")}
           className={`text-xs px-3 py-1 rounded-full transition-colors ${
-            dimensions.includes('dominance')
-              ? 'bg-green-100 text-green-800 border border-green-300'
-              : 'bg-gray-100 text-gray-600 border border-gray-200'
+            dimensions.includes("dominance")
+              ? "bg-green-100 text-green-800 border border-green-300"
+              : "bg-gray-100 text-gray-600 border border-gray-200"
           }`}
-          aria-pressed={dimensions.includes('dominance')}
+          aria-pressed={dimensions.includes("dominance")}
         >
           Dominance (Control)
         </button>
@@ -174,8 +174,8 @@ export default function EmotionTrackingChart({
             dataKey="timestamp"
             tickFormatter={(tick) =>
               new Date(tick).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
+                hour: "2-digit",
+                minute: "2-digit",
               })
             }
           />
@@ -184,18 +184,18 @@ export default function EmotionTrackingChart({
           <Tooltip
             formatter={(value, name) => {
               const dimensionLabels: Record<string, string> = {
-                valence: 'Valence (Positive/Negative)',
-                arousal: 'Arousal (Calm/Excited)',
-                dominance: 'Dominance (Control)',
-              }
-              return [`${value}/10`, dimensionLabels[name] || name]
+                valence: "Valence (Positive/Negative)",
+                arousal: "Arousal (Calm/Excited)",
+                dominance: "Dominance (Control)",
+              };
+              return [`${value}/10`, dimensionLabels[name] || name];
             }}
             labelFormatter={(label) => new Date(label).toLocaleTimeString()}
           />
 
           <Legend />
 
-          {dimensions.includes('valence') && (
+          {dimensions.includes("valence") && (
             <Line
               type="monotone"
               dataKey="valence"
@@ -206,7 +206,7 @@ export default function EmotionTrackingChart({
             />
           )}
 
-          {dimensions.includes('arousal') && (
+          {dimensions.includes("arousal") && (
             <Line
               type="monotone"
               dataKey="arousal"
@@ -217,7 +217,7 @@ export default function EmotionTrackingChart({
             />
           )}
 
-          {dimensions.includes('dominance') && (
+          {dimensions.includes("dominance") && (
             <Line
               type="monotone"
               dataKey="dominance"
@@ -245,5 +245,5 @@ export default function EmotionTrackingChart({
         </p>
       </div>
     </div>
-  )
+  );
 }

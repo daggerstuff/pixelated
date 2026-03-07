@@ -1,7 +1,7 @@
 ---
-title: 'Therapist Resources'
-description: 'Comprehensive resource bundle for mental health professionals'
-author: 'Resource Team'
+title: "Therapist Resources"
+description: "Comprehensive resource bundle for mental health professionals"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

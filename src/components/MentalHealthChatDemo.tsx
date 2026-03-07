@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   AlertTriangle,
   Heart,
@@ -11,11 +11,11 @@ import {
   Shield,
   Zap,
   Sparkles,
-} from 'lucide-react'
+} from "lucide-react";
 import MindMirrorDashboard, {
   type MindMirrorAnalysis,
-} from '@/components/ui/MindMirrorDashboard'
-import BrainVisualization from '@/components/ui/BrainVisualization'
+} from "@/components/ui/MindMirrorDashboard";
+import BrainVisualization from "@/components/ui/BrainVisualization";
 // import {
 //   MentalHealthInsights,
 //   MentalHealthHistoryChart,
@@ -25,31 +25,30 @@ import BrainVisualization from '@/components/ui/BrainVisualization'
 import {
   MentalHealthInsights,
   type EnhancedMentalHealthAnalysis,
-} from '@/components/MentalHealthInsights'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
+} from "@/components/MentalHealthInsights";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { createMentalLLaMAFromEnvSafe } from "@/lib/ai/mental-llama/client-adapter";
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
-} from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
-import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
+} from "@/lib/ai/mental-llama/types/mentalLLaMATypes";
+import { ClinicalKnowledgeBase } from "@/lib/ai/mental-llama/ClinicalKnowledgeBase";
 
 // Extended analysis result that might include additional fields
-interface ExtendedMentalHealthAnalysisResult
-  extends MentalHealthAnalysisResult {
-  expertGuidance?: unknown
+interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
+  expertGuidance?: unknown;
   categoryScores?: {
-    depression?: number
-    anxiety?: number
-    stress?: number
-    anger?: number
-    socialIsolation?: number
-    bipolarDisorder?: number
-    ocd?: number
-    eatingDisorder?: number
-    socialAnxiety?: number
-    panicDisorder?: number
-  }
+    depression?: number;
+    anxiety?: number;
+    stress?: number;
+    anger?: number;
+    socialIsolation?: number;
+    bipolarDisorder?: number;
+    ocd?: number;
+    eatingDisorder?: number;
+    socialAnxiety?: number;
+    panicDisorder?: number;
+  };
 }
 
 interface MentalHealthAdapter {
@@ -57,175 +56,175 @@ interface MentalHealthAdapter {
     content: string,
     route: string,
     context: RoutingContext,
-  ): Promise<MentalHealthAnalysisResult>
+  ): Promise<MentalHealthAnalysisResult>;
 }
 
 interface MentalHealthService {
-  adapter: MentalHealthAdapter | null
-  clinicalKnowledge: ClinicalKnowledgeBase
-  isInitialized: boolean
+  adapter: MentalHealthAdapter | null;
+  clinicalKnowledge: ClinicalKnowledgeBase;
+  isInitialized: boolean;
 }
 
-const logger = createBuildSafeLogger('chat-demo')
+const logger = createBuildSafeLogger("chat-demo");
 
 interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: string
-  mentalHealthAnalysis?: MentalHealthAnalysisResult
-  isProcessing?: boolean
-  riskLevel?: 'low' | 'medium' | 'high' | 'critical'
-  needsIntervention?: boolean
-  apiResponse?: unknown // Add type if available
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: string;
+  mentalHealthAnalysis?: MentalHealthAnalysisResult;
+  isProcessing?: boolean;
+  riskLevel?: "low" | "medium" | "high" | "critical";
+  needsIntervention?: boolean;
+  apiResponse?: unknown; // Add type if available
   metadata?: {
-    responseType?: string
-    confidence?: number
-    copingStrategies?: unknown
-    resources?: unknown
-    processingTime?: number
-  }
+    responseType?: string;
+    confidence?: number;
+    copingStrategies?: unknown;
+    resources?: unknown;
+    processingTime?: number;
+  };
 }
 
 // Helper function to map mental health categories to severity levels
 const mapCategoryToSeverity = (
   category?: string,
-): 'low' | 'medium' | 'high' | 'critical' => {
+): "low" | "medium" | "high" | "critical" => {
   if (!category) {
-    return 'low'
+    return "low";
   }
 
-  const lowerCategory = category.toLowerCase()
+  const lowerCategory = category.toLowerCase();
 
   // Map specific mental health categories to severity levels
   switch (lowerCategory) {
-    case 'depression':
-    case 'severe_depression':
-    case 'suicidal_ideation':
-    case 'self_harm':
-      return 'high'
-    case 'anxiety':
-    case 'panic_disorder':
-    case 'severe_anxiety':
-      return 'medium'
-    case 'stress':
-    case 'mild_anxiety':
-    case 'adjustment_disorder':
-      return 'low'
-    case 'crisis':
-    case 'imminent_danger':
-    case 'psychosis':
-      return 'critical'
+    case "depression":
+    case "severe_depression":
+    case "suicidal_ideation":
+    case "self_harm":
+      return "high";
+    case "anxiety":
+    case "panic_disorder":
+    case "severe_anxiety":
+      return "medium";
+    case "stress":
+    case "mild_anxiety":
+    case "adjustment_disorder":
+      return "low";
+    case "crisis":
+    case "imminent_danger":
+    case "psychosis":
+      return "critical";
     default:
-      return 'low'
+      return "low";
   }
-}
+};
 
 // Helper function to convert MentalHealthAnalysisResult to EnhancedMentalHealthAnalysis
 const enhanceAnalysis = (
   analysis?: MentalHealthAnalysisResult,
 ): EnhancedMentalHealthAnalysis | undefined => {
   if (!analysis) {
-    return undefined
+    return undefined;
   }
 
   // Type assertion to extended interface for additional properties
-  const extendedAnalysis = analysis as ExtendedMentalHealthAnalysisResult
+  const extendedAnalysis = analysis as ExtendedMentalHealthAnalysisResult;
 
   // Convert the MentalLLaMA result to the enhanced analysis format
   return {
     timestamp: Date.now(),
     category: mapCategoryToSeverity(analysis.mentalHealthCategory),
-    explanation: analysis.explanation || 'Analysis completed',
+    explanation: analysis.explanation || "Analysis completed",
     expertGuided: !!extendedAnalysis.expertGuidance,
     scores: {
       depression:
         extendedAnalysis.categoryScores?.depression ||
-        (analysis.mentalHealthCategory === 'depression'
+        (analysis.mentalHealthCategory === "depression"
           ? analysis.confidence
           : 0),
       anxiety:
         extendedAnalysis.categoryScores?.anxiety ||
-        (analysis.mentalHealthCategory === 'anxiety' ? analysis.confidence : 0),
+        (analysis.mentalHealthCategory === "anxiety" ? analysis.confidence : 0),
       stress:
         extendedAnalysis.categoryScores?.stress ||
-        (analysis.mentalHealthCategory === 'stress' ? analysis.confidence : 0),
+        (analysis.mentalHealthCategory === "stress" ? analysis.confidence : 0),
       anger:
         extendedAnalysis.categoryScores?.anger ||
-        (analysis.mentalHealthCategory === 'anger' ? analysis.confidence : 0),
+        (analysis.mentalHealthCategory === "anger" ? analysis.confidence : 0),
       socialIsolation:
         extendedAnalysis.categoryScores?.socialIsolation ||
-        (analysis.mentalHealthCategory === 'social_isolation'
+        (analysis.mentalHealthCategory === "social_isolation"
           ? analysis.confidence
           : 0),
       bipolarDisorder:
         extendedAnalysis.categoryScores?.bipolarDisorder ||
-        (analysis.mentalHealthCategory === 'bipolar' ? analysis.confidence : 0),
+        (analysis.mentalHealthCategory === "bipolar" ? analysis.confidence : 0),
       ocd:
         extendedAnalysis.categoryScores?.ocd ||
-        (analysis.mentalHealthCategory === 'ocd' ? analysis.confidence : 0),
+        (analysis.mentalHealthCategory === "ocd" ? analysis.confidence : 0),
       eatingDisorder:
         extendedAnalysis.categoryScores?.eatingDisorder ||
-        (analysis.mentalHealthCategory === 'eating_disorder'
+        (analysis.mentalHealthCategory === "eating_disorder"
           ? analysis.confidence
           : 0),
       socialAnxiety:
         extendedAnalysis.categoryScores?.socialAnxiety ||
-        (analysis.mentalHealthCategory === 'social_anxiety'
+        (analysis.mentalHealthCategory === "social_anxiety"
           ? analysis.confidence
           : 0),
       panicDisorder:
         extendedAnalysis.categoryScores?.panicDisorder ||
-        (analysis.mentalHealthCategory === 'panic_disorder'
+        (analysis.mentalHealthCategory === "panic_disorder"
           ? analysis.confidence
           : 0),
     },
 
-    summary: analysis.explanation || 'Mental health analysis completed',
+    summary: analysis.explanation || "Mental health analysis completed",
     // expertGuidance doesn't exist on MentalHealthAnalysisResult, so we omit expertExplanation
     hasMentalHealthIssue: analysis.hasMentalHealthIssue || false,
     confidence: analysis.confidence || 0,
     supportingEvidence: analysis.supportingEvidence || [],
     riskLevel: analysis.isCrisis
-      ? 'high'
+      ? "high"
       : analysis.confidence > 0.7
-        ? 'medium'
-        : 'low',
-  }
-}
+        ? "medium"
+        : "low",
+  };
+};
 
 // Helper to convert an array of analyses
 const enhanceAnalysisArray = (
   analyses: MentalHealthAnalysisResult[],
 ): EnhancedMentalHealthAnalysis[] => {
-  return analyses.map((analysis) => enhanceAnalysis(analysis)!).filter(Boolean)
-}
+  return analyses.map((analysis) => enhanceAnalysis(analysis)!).filter(Boolean);
+};
 
 /**
  * Production-grade Mental Health Chat Demo Component
  * Showcases real MentalLLaMA integration with clinical-grade analysis
  */
 function generateSecureRandomString(length: number): string {
-  const array = new Uint8Array(length)
-  crypto.getRandomValues(array)
-  return Array.from(array, (byte) => byte.toString(36)).join('')
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => byte.toString(36)).join("");
 }
 
 interface MentalHealthChatDemoProps {
-  showAnalysisPanel?: boolean
-  showSettingsPanel?: boolean
-  initialTab?: string
+  showAnalysisPanel?: boolean;
+  showSettingsPanel?: boolean;
+  initialTab?: string;
 }
 
 export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
   showAnalysisPanel = true,
   showSettingsPanel = true,
-  initialTab = 'analysis',
+  initialTab = "analysis",
 }: MentalHealthChatDemoProps = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: 'welcome_msg',
-      role: 'assistant',
+      id: "welcome_msg",
+      role: "assistant",
       content: `Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to provide thoughtful, evidence-based support.
 
 🧠 **Clinical-Grade Analysis**: Advanced AI analyzes your messages for mental health indicators
@@ -236,13 +235,13 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
 How are you feeling today? I'm here to listen and help.`,
       timestamp: new Date().toISOString(),
     },
-  ])
+  ]);
 
-  const [input, setInput] = useState('')
-  const [processing, setProcessing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [input, setInput] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [mentalHealthService, setMentalHealthService] =
-    useState<MentalHealthService | null>(null)
+    useState<MentalHealthService | null>(null);
   const [settings, setSettings] = useState({
     enableAnalysis: true,
     useExpertGuidance: true,
@@ -252,45 +251,45 @@ How are you feeling today? I'm here to listen and help.`,
     interventionThreshold: 0.7,
     enableMindMirrorUI: true,
     showBrainVisualization: true,
-  })
+  });
   const [currentMindMirrorAnalysis, setCurrentMindMirrorAnalysis] =
-    useState<MindMirrorAnalysis | null>(null)
+    useState<MindMirrorAnalysis | null>(null);
 
   // Convert existing analysis to Mind-Mirror format
   const convertToMindMirrorAnalysis = useCallback(
     (analysis: EnhancedMentalHealthAnalysis): MindMirrorAnalysis => {
       // Map severity levels to archetypes
       const severityToArchetype = {
-        low: 'wise_elder',
-        medium: 'caregiver',
-        high: 'wounded_healer',
-        critical: 'wounded_healer',
-      }
+        low: "wise_elder",
+        medium: "caregiver",
+        high: "wounded_healer",
+        critical: "wounded_healer",
+      };
 
-      const archetype = severityToArchetype[analysis.category] || 'visionary'
+      const archetype = severityToArchetype[analysis.category] || "visionary";
 
       // Determine energy and social connection based on explanation content
-      const explanationLower = (analysis.explanation || '').toLowerCase()
+      const explanationLower = (analysis.explanation || "").toLowerCase();
       const isStressRelated =
-        explanationLower.includes('stress') ||
-        explanationLower.includes('overwhelm')
+        explanationLower.includes("stress") ||
+        explanationLower.includes("overwhelm");
       const isSocialIsolationRelated =
-        explanationLower.includes('isolation') ||
-        explanationLower.includes('lonely') ||
-        explanationLower.includes('social')
+        explanationLower.includes("isolation") ||
+        explanationLower.includes("lonely") ||
+        explanationLower.includes("social");
 
       return {
         archetype: {
           main_archetype: archetype,
           confidence: analysis.confidence || 0,
-          color: '#45B7D1',
-          description: analysis.explanation || 'Analysis completed',
+          color: "#45B7D1",
+          description: analysis.explanation || "Analysis completed",
         },
         mood_vector: {
           emotional_intensity:
-            analysis.riskLevel === 'high'
+            analysis.riskLevel === "high"
               ? 0.8
-              : analysis.riskLevel === 'medium'
+              : analysis.riskLevel === "medium"
                 ? 0.6
                 : 0.4,
           cognitive_clarity: analysis.confidence || 0,
@@ -298,140 +297,140 @@ How are you feeling today? I'm here to listen and help.`,
           social_connection: isSocialIsolationRelated ? 0.2 : 0.7,
           coherence_index: analysis.confidence || 0,
           urgency_score:
-            analysis.riskLevel === 'high'
+            analysis.riskLevel === "high"
               ? 0.9
-              : analysis.riskLevel === 'medium'
+              : analysis.riskLevel === "medium"
                 ? 0.6
                 : 0.3,
         },
         timestamp: analysis.timestamp || Date.now(),
-        session_id: 'chat_session',
+        session_id: "chat_session",
         insights: analysis.supportingEvidence || [],
         recommendations: [
-          'Continue monitoring your mental health patterns',
-          'Consider professional support if symptoms persist',
-          'Practice self-care and stress management techniques',
+          "Continue monitoring your mental health patterns",
+          "Consider professional support if symptoms persist",
+          "Practice self-care and stress management techniques",
         ],
-      }
+      };
     },
     [],
-  )
+  );
 
   const [sessionStats, setSessionStats] = useState({
     totalMessages: 0,
     analysisCount: 0,
     averageConfidence: 0,
-    riskTrend: 'stable' as 'improving' | 'stable' | 'declining' | 'critical',
+    riskTrend: "stable" as "improving" | "stable" | "declining" | "critical",
     interventionsTriggered: 0,
-  })
+  });
 
   // Generate unique session identifiers
   const sessionId = useMemo(() => {
-    const array = new Uint8Array(6)
-    crypto.getRandomValues(array)
-    const randomStr = Array.from(array, (byte) => byte.toString(36)).join('')
-    return `session_${Date.now()}_${randomStr}`
-  }, [])
-  const userId = useMemo(() => `user_${Date.now()}_demo`, [])
-  const timeoutRefs = useRef<number[]>([])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+    const array = new Uint8Array(6);
+    crypto.getRandomValues(array);
+    const randomStr = Array.from(array, (byte) => byte.toString(36)).join("");
+    return `session_${Date.now()}_${randomStr}`;
+  }, []);
+  const userId = useMemo(() => `user_${Date.now()}_demo`, []);
+  const timeoutRefs = useRef<number[]>([]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
-    const timeouts = timeoutRefs.current
+    const timeouts = timeoutRefs.current;
     return () => {
-      timeouts.forEach(clearTimeout)
-    }
-  }, [])
+      timeouts.forEach(clearTimeout);
+    };
+  }, []);
 
   // Initialize production-grade MentalLLaMA service
   useEffect(() => {
     const initializeService = async () => {
       try {
-        logger.info('Initializing production MentalLLaMA service...')
+        logger.info("Initializing production MentalLLaMA service...");
 
         // Initialize the production-grade MentalLLaMA components
-        const { adapter } = await createMentalLLaMAFromEnvSafe()
-        const clinicalKnowledge = new ClinicalKnowledgeBase()
+        const { adapter } = await createMentalLLaMAFromEnvSafe();
+        const clinicalKnowledge = new ClinicalKnowledgeBase();
 
         setMentalHealthService({
           adapter: adapter as MentalHealthAdapter,
           clinicalKnowledge,
           isInitialized: true,
-        })
+        });
 
-        logger.info('Production MentalLLaMA service initialized successfully')
+        logger.info("Production MentalLLaMA service initialized successfully");
       } catch (error: unknown) {
-        logger.error('Failed to initialize MentalLLaMA service', { error })
+        logger.error("Failed to initialize MentalLLaMA service", { error });
 
         // Fallback to demonstration mode with limited functionality
         setMentalHealthService({
           adapter: null,
           clinicalKnowledge: new ClinicalKnowledgeBase(),
           isInitialized: false,
-        })
+        });
       }
-    }
+    };
 
-    initializeService()
-  }, [])
+    initializeService();
+  }, []);
 
   // Get analysis history for visualization
   const getAnalysisHistory = useCallback((): MentalHealthAnalysisResult[] => {
     return messages
       .filter((m) => m.mentalHealthAnalysis)
-      .map((m) => m.mentalHealthAnalysis!)
-  }, [messages])
+      .map((m) => m.mentalHealthAnalysis!);
+  }, [messages]);
 
   // Enhanced analysis for component compatibility
   const enhancedAnalysisHistory = useMemo(() => {
-    const analysisHistory = getAnalysisHistory()
-    return enhanceAnalysisArray(analysisHistory)
-  }, [getAnalysisHistory])
+    const analysisHistory = getAnalysisHistory();
+    return enhanceAnalysisArray(analysisHistory);
+  }, [getAnalysisHistory]);
 
   // Process user message with production-grade analysis
   const handleSendMessage = async () => {
     if (!input.trim() || processing) {
-      return
+      return;
     }
 
-    setProcessing(true)
-    let userMessageId: string | null = null
+    setProcessing(true);
+    let userMessageId: string | null = null;
 
     try {
       // Add user message immediately
       const userMessage: ChatMessage = {
         id: (() => {
-          const array = new Uint8Array(6)
-          crypto.getRandomValues(array)
+          const array = new Uint8Array(6);
+          crypto.getRandomValues(array);
           const randomStr = Array.from(array, (byte) => byte.toString(36)).join(
-            '',
-          )
-          return `user_${Date.now()}_${randomStr}`
+            "",
+          );
+          return `user_${Date.now()}_${randomStr}`;
         })(),
-        role: 'user',
+        role: "user",
         content: input,
         timestamp: new Date().toISOString(),
         isProcessing: true,
-      }
+      };
 
-      userMessageId = userMessage.id
+      userMessageId = userMessage.id;
 
-      setMessages((prev) => [...prev, userMessage])
-      setInput('')
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
 
       // Perform production-grade analysis using our new backend API
       if (settings.enableAnalysis) {
         logger.info(
-          'Performing production-grade mental health analysis via API...',
-        )
+          "Performing production-grade mental health analysis via API...",
+        );
 
         try {
           // Call our new mental health chat API
-          const response = await fetch('/api/mental-health/chat', {
-            method: 'POST',
+          const response = await fetch("/api/mental-health/chat", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               message: userMessage.content,
@@ -445,26 +444,26 @@ How are you feeling today? I'm here to listen and help.`,
                   role: m.role,
                 })),
                 riskLevel:
-                  sessionStats.riskTrend === 'critical'
-                    ? 'high'
-                    : sessionStats.riskTrend === 'declining'
-                      ? 'moderate'
-                      : 'low',
+                  sessionStats.riskTrend === "critical"
+                    ? "high"
+                    : sessionStats.riskTrend === "declining"
+                      ? "moderate"
+                      : "low",
               },
               options: {
                 includeRiskAssessment: true,
                 includeCopingStrategies: true,
                 enableCrisisDetection: true,
-                responseStyle: 'therapeutic',
+                responseStyle: "therapeutic",
               },
             }),
-          })
+          });
 
           if (!response.ok) {
-            throw new Error(`API request failed: ${response.status}`)
+            throw new Error(`API request failed: ${response.status}`);
           }
 
-          const chatResult = await response.json()
+          const chatResult = await response.json();
 
           // Convert API response to our analysis format
           const analysisResult: MentalHealthAnalysisResult = {
@@ -472,12 +471,12 @@ How are you feeling today? I'm here to listen and help.`,
             confidence: chatResult.analysis.concernSeverity / 10, // Convert 1-10 to 0-1
             supportingEvidence: chatResult.analysis.keyTopics,
             isCrisis:
-              chatResult.riskAssessment?.crisisLevel === 'imminent' ||
-              chatResult.riskAssessment?.crisisLevel === 'high',
-            hasMentalHealthIssue: chatResult.analysis.stressLevel !== 'low',
-            explanation: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
+              chatResult.riskAssessment?.crisisLevel === "imminent" ||
+              chatResult.riskAssessment?.crisisLevel === "high",
+            hasMentalHealthIssue: chatResult.analysis.stressLevel !== "low",
+            explanation: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? "positive" : chatResult.analysis.sentimentScore < 0 ? "negative" : "neutral"}`,
             timestamp: new Date().toISOString(),
-          }
+          };
 
           // Update message with analysis results
           setMessages((prev) =>
@@ -488,54 +487,54 @@ How are you feeling today? I'm here to listen and help.`,
                     mentalHealthAnalysis: analysisResult,
                     isProcessing: false,
                     riskLevel:
-                      chatResult.riskAssessment?.crisisLevel === 'imminent'
-                        ? 'critical'
-                        : chatResult.riskAssessment?.crisisLevel === 'high'
-                          ? 'high'
+                      chatResult.riskAssessment?.crisisLevel === "imminent"
+                        ? "critical"
+                        : chatResult.riskAssessment?.crisisLevel === "high"
+                          ? "high"
                           : chatResult.riskAssessment?.crisisLevel ===
-                              'moderate'
-                            ? 'medium'
-                            : 'low',
+                              "moderate"
+                            ? "medium"
+                            : "low",
                     needsIntervention:
                       chatResult.riskAssessment?.immediateAction || false,
                     apiResponse: chatResult, // Store full API response for detailed analysis
                   }
                 : m,
             ),
-          )
+          );
 
           // Convert to Mind-Mirror format if enabled
           if (settings.enableMindMirrorUI) {
             const enhancedAnalysis: EnhancedMentalHealthAnalysis = {
               timestamp: Date.now(),
               category:
-                chatResult.riskAssessment?.crisisLevel === 'imminent'
-                  ? 'critical'
-                  : chatResult.riskAssessment?.crisisLevel === 'high'
-                    ? 'high'
-                    : chatResult.riskAssessment?.crisisLevel === 'moderate'
-                      ? 'medium'
-                      : 'low',
+                chatResult.riskAssessment?.crisisLevel === "imminent"
+                  ? "critical"
+                  : chatResult.riskAssessment?.crisisLevel === "high"
+                    ? "high"
+                    : chatResult.riskAssessment?.crisisLevel === "moderate"
+                      ? "medium"
+                      : "low",
               explanation: analysisResult.explanation,
               expertGuided: true,
               scores: {},
-              summary: `Stress: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : 'negative'}`,
+              summary: `Stress: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? "positive" : "negative"}`,
               hasMentalHealthIssue: analysisResult.hasMentalHealthIssue,
               confidence: analysisResult.confidence,
               supportingEvidence: analysisResult.supportingEvidence || [],
               riskLevel:
-                chatResult.riskAssessment?.crisisLevel === 'imminent'
-                  ? 'high'
-                  : chatResult.riskAssessment?.crisisLevel === 'high'
-                    ? 'high'
-                    : chatResult.riskAssessment?.crisisLevel === 'moderate'
-                      ? 'medium'
-                      : 'low',
-            }
+                chatResult.riskAssessment?.crisisLevel === "imminent"
+                  ? "high"
+                  : chatResult.riskAssessment?.crisisLevel === "high"
+                    ? "high"
+                    : chatResult.riskAssessment?.crisisLevel === "moderate"
+                      ? "medium"
+                      : "low",
+            };
 
             const mindMirrorAnalysis =
-              convertToMindMirrorAnalysis(enhancedAnalysis)
-            setCurrentMindMirrorAnalysis(mindMirrorAnalysis)
+              convertToMindMirrorAnalysis(enhancedAnalysis);
+            setCurrentMindMirrorAnalysis(mindMirrorAnalysis);
           }
 
           // Update session statistics
@@ -548,23 +547,23 @@ How are you feeling today? I'm here to listen and help.`,
                 analysisResult.confidence) /
               (prev.analysisCount + 1),
             riskTrend:
-              chatResult.riskAssessment?.crisisLevel === 'imminent'
-                ? 'critical'
-                : chatResult.riskAssessment?.crisisLevel === 'high'
-                  ? 'declining'
-                  : chatResult.analysis.stressLevel === 'low'
-                    ? 'improving'
-                    : 'stable',
+              chatResult.riskAssessment?.crisisLevel === "imminent"
+                ? "critical"
+                : chatResult.riskAssessment?.crisisLevel === "high"
+                  ? "declining"
+                  : chatResult.analysis.stressLevel === "low"
+                    ? "improving"
+                    : "stable",
             interventionsTriggered: chatResult.riskAssessment?.immediateAction
               ? prev.interventionsTriggered + 1
               : prev.interventionsTriggered,
-          }))
+          }));
 
           // Add assistant response using the API response
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
-              role: 'assistant',
+              role: "assistant",
               content: chatResult.response.message,
               timestamp: new Date().toISOString(),
               // Include API metadata for enhanced display
@@ -575,32 +574,32 @@ How are you feeling today? I'm here to listen and help.`,
                 resources: chatResult.resources,
                 processingTime: chatResult.metadata.processingTime,
               },
-            }
-            setMessages((prev) => [...prev, assistantMessage])
-          }, 1500)
-          timeoutRefs.current.push(timeoutId)
+            };
+            setMessages((prev) => [...prev, assistantMessage]);
+          }, 1500);
+          timeoutRefs.current.push(timeoutId);
         } catch (error: unknown) {
-          logger.error('Failed to call mental health chat API', { error })
+          logger.error("Failed to call mental health chat API", { error });
 
           // Fallback to demo mode on API failure
           setMessages((prev) =>
             prev.map((m) =>
               m.id === userMessage.id ? { ...m, isProcessing: false } : m,
             ),
-          )
+          );
 
           // Generate a basic response for demo purposes
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
-              role: 'assistant',
+              role: "assistant",
               content:
                 "I'm here to listen and support you. Could you tell me more about what's on your mind?",
               timestamp: new Date().toISOString(),
-            }
-            setMessages((prev) => [...prev, assistantMessage])
-          }, 1500)
-          timeoutRefs.current.push(timeoutId)
+            };
+            setMessages((prev) => [...prev, assistantMessage]);
+          }, 1500);
+          timeoutRefs.current.push(timeoutId);
         }
       } else {
         // Analysis disabled - simple response
@@ -608,22 +607,22 @@ How are you feeling today? I'm here to listen and help.`,
           prev.map((m) =>
             m.id === userMessage.id ? { ...m, isProcessing: false } : m,
           ),
-        )
+        );
 
         // Generate a basic response
         const timeoutId = window.setTimeout(() => {
           const assistantMessage: ChatMessage = {
             id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
-            role: 'assistant',
+            role: "assistant",
             content: getDemoResponse(userMessage.content),
             timestamp: new Date().toISOString(),
-          }
-          setMessages((prev) => [...prev, assistantMessage])
-        }, 1000)
-        timeoutRefs.current.push(timeoutId)
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+        }, 1000);
+        timeoutRefs.current.push(timeoutId);
       }
     } catch (error: unknown) {
-      logger.error('Error processing message', { error })
+      logger.error("Error processing message", { error });
 
       // Remove processing state on error
       if (userMessageId) {
@@ -631,19 +630,19 @@ How are you feeling today? I'm here to listen and help.`,
           prev.map((m) =>
             m.id === userMessageId ? { ...m, isProcessing: false } : m,
           ),
-        )
+        );
       }
     } finally {
-      setProcessing(false)
+      setProcessing(false);
     }
-  }
+  };
 
   // Generate therapeutic response based on analysis
   const generateTherapeuticResponse = async (
     analysis: MentalHealthAnalysisResult,
   ): Promise<string> => {
     if (!mentalHealthService?.clinicalKnowledge) {
-      return "I understand. Can you tell me more about what you're experiencing?"
+      return "I understand. Can you tell me more about what you're experiencing?";
     }
 
     try {
@@ -652,7 +651,7 @@ How are you feeling today? I'm here to listen and help.`,
         mentalHealthService.clinicalKnowledge.getInterventionSuggestions(
           analysis.mentalHealthCategory,
           analysis,
-        )
+        );
 
       // Handle crisis situations with immediate priority
       if (analysis.isCrisis) {
@@ -665,13 +664,13 @@ How are you feeling today? I'm here to listen and help.`,
 
 ${analysis.explanation}
 
-I'm here to support you through this. Would you like to talk about what's been making you feel this way?`
+I'm here to support you through this. Would you like to talk about what's been making you feel this way?`;
       }
 
       // Generate contextual response based on analysis
       const urgentInterventions = interventions.filter(
-        (i) => i.urgency === 'urgent' || i.urgency === 'immediate',
-      )
+        (i) => i.urgency === "urgent" || i.urgency === "immediate",
+      );
 
       if (urgentInterventions.length > 0 && urgentInterventions[0]) {
         return `Thank you for sharing that with me. Based on what you've told me, I think it would be helpful to focus on: ${urgentInterventions[0].intervention.toLowerCase()}.
@@ -680,66 +679,66 @@ ${analysis.explanation}
 
 ${urgentInterventions[0].rationale}
 
-How does this resonate with you? What feels most challenging right now?`
+How does this resonate with you? What feels most challenging right now?`;
       }
 
       // Standard supportive response
       return `I hear you, and I appreciate you sharing this with me. ${analysis.explanation}
 
-It sounds like you're dealing with some challenges. What's been the most difficult part of this experience for you?`
+It sounds like you're dealing with some challenges. What's been the most difficult part of this experience for you?`;
     } catch (error: unknown) {
-      logger.error('Error generating therapeutic response', { error })
-      return "I understand you're going through something difficult. Can you help me understand what's been on your mind lately?"
+      logger.error("Error generating therapeutic response", { error });
+      return "I understand you're going through something difficult. Can you help me understand what's been on your mind lately?";
     }
-  }
+  };
 
   // Demo response generator for fallback
   const getDemoResponse = (userMessage: string): string => {
-    const lowerMessage = userMessage.toLowerCase()
+    const lowerMessage = userMessage.toLowerCase();
 
     if (
-      lowerMessage.includes('sad') ||
-      lowerMessage.includes('depressed') ||
-      lowerMessage.includes('down')
+      lowerMessage.includes("sad") ||
+      lowerMessage.includes("depressed") ||
+      lowerMessage.includes("down")
     ) {
-      return "I hear that you're feeling down. That can be really difficult to experience. What's been contributing to these feelings lately?"
+      return "I hear that you're feeling down. That can be really difficult to experience. What's been contributing to these feelings lately?";
     }
 
     if (
-      lowerMessage.includes('anxious') ||
-      lowerMessage.includes('worried') ||
-      lowerMessage.includes('nervous')
+      lowerMessage.includes("anxious") ||
+      lowerMessage.includes("worried") ||
+      lowerMessage.includes("nervous")
     ) {
-      return "It sounds like you're experiencing some anxiety. That's really common, and there are ways to help manage those feelings. What situations tend to make you feel most anxious?"
+      return "It sounds like you're experiencing some anxiety. That's really common, and there are ways to help manage those feelings. What situations tend to make you feel most anxious?";
     }
 
     if (
-      lowerMessage.includes('angry') ||
-      lowerMessage.includes('frustrated') ||
-      lowerMessage.includes('mad')
+      lowerMessage.includes("angry") ||
+      lowerMessage.includes("frustrated") ||
+      lowerMessage.includes("mad")
     ) {
-      return "I can hear the frustration in what you're sharing. Anger often comes up when we're feeling hurt or when our needs aren't being met. What's been triggering these feelings?"
+      return "I can hear the frustration in what you're sharing. Anger often comes up when we're feeling hurt or when our needs aren't being met. What's been triggering these feelings?";
     }
 
-    return "Thank you for sharing that with me. I'm here to listen and support you. Can you tell me more about what's been on your mind?"
-  }
+    return "Thank you for sharing that with me. I'm here to listen and support you. Can you tell me more about what's been on your mind?";
+  };
 
   // Toggle settings with production-grade configuration
   const handleToggleSetting = (setting: keyof typeof settings) => {
     setSettings((prev) => {
-      const newSettings = { ...prev, [setting]: !prev[setting] }
+      const newSettings = { ...prev, [setting]: !prev[setting] };
 
       // Log configuration changes for audit trail
-      logger.info('Mental health chat settings updated', {
+      logger.info("Mental health chat settings updated", {
         setting,
         newValue: newSettings[setting],
         sessionId,
         userId,
-      })
+      });
 
-      return newSettings
-    })
-  }
+      return newSettings;
+    });
+  };
 
   // Request therapeutic intervention
   const handleRequestIntervention = async (
@@ -749,49 +748,49 @@ It sounds like you're dealing with some challenges. What's been the most difficu
       !mentalHealthService?.isInitialized ||
       !messageWithAnalysis.mentalHealthAnalysis
     ) {
-      return
+      return;
     }
 
-    setProcessing(true)
+    setProcessing(true);
 
     try {
-      logger.info('Generating therapeutic intervention', {
+      logger.info("Generating therapeutic intervention", {
         messageId: messageWithAnalysis.id,
         analysisCategory:
           messageWithAnalysis.mentalHealthAnalysis.mentalHealthCategory,
         confidence: messageWithAnalysis.mentalHealthAnalysis.confidence,
-      })
+      });
 
       const intervention = await generateTherapeuticResponse(
         messageWithAnalysis.mentalHealthAnalysis,
-      )
+      );
 
       const assistantMessage: ChatMessage = {
         id: `intervention_${Date.now()}_${generateSecureRandomString(9)}`,
-        role: 'assistant',
+        role: "assistant",
         content: `💡 **Therapeutic Intervention**\n\n${intervention}`,
         timestamp: new Date().toISOString(),
-      }
+      };
 
-      setMessages((prev) => [...prev, assistantMessage])
+      setMessages((prev) => [...prev, assistantMessage]);
 
       // Update intervention statistics
       setSessionStats((prev) => ({
         ...prev,
         interventionsTriggered: prev.interventionsTriggered + 1,
-      }))
+      }));
     } catch (error: unknown) {
-      logger.error('Error generating intervention', { error })
+      logger.error("Error generating intervention", { error });
     } finally {
-      setProcessing(false)
+      setProcessing(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full max-w-7xl mx-auto">
       {/* Main Chat Interface */}
       <div
-        className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
+        className={`flex-1 ${settings.showAnalysisPanel ? "md:max-w-[65%]" : "w-full"}`}
       >
         <Card className="h-[700px] flex flex-col shadow-lg border-0 overflow-hidden">
           <div className="p-4 border-b bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 backdrop-blur-sm">
@@ -806,8 +805,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   </h2>
                   <p className="text-sm text-gray-600">
                     {settings.enableMindMirrorUI
-                      ? 'Enhanced Mind Mirror Analysis'
-                      : 'Production-Grade Mental Health Analysis'}
+                      ? "Enhanced Mind Mirror Analysis"
+                      : "Production-Grade Mental Health Analysis"}
                   </p>
                 </div>
               </div>
@@ -841,15 +840,15 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div className="max-w-[85%] space-y-2">
                     {/* Message Bubble */}
                     <div
                       className={`rounded-2xl px-4 py-3 ${
-                        message.role === 'user'
-                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900 border'
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+                          : "bg-gray-100 text-gray-900 border"
                       }`}
                     >
                       <p className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -875,19 +874,19 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                               <Badge
                                 variant="outline"
                                 className={`text-xs ${
-                                  message.riskLevel === 'critical'
-                                    ? 'border-red-200 text-red-700 bg-red-50'
-                                    : message.riskLevel === 'high'
-                                      ? 'border-orange-200 text-orange-700 bg-orange-50'
-                                      : message.riskLevel === 'medium'
-                                        ? 'border-yellow-200 text-yellow-700 bg-yellow-50'
-                                        : 'border-green-200 text-green-700 bg-green-50'
+                                  message.riskLevel === "critical"
+                                    ? "border-red-200 text-red-700 bg-red-50"
+                                    : message.riskLevel === "high"
+                                      ? "border-orange-200 text-orange-700 bg-orange-50"
+                                      : message.riskLevel === "medium"
+                                        ? "border-yellow-200 text-yellow-700 bg-yellow-50"
+                                        : "border-green-200 text-green-700 bg-green-50"
                                 }`}
                               >
-                                {message.riskLevel === 'critical' && '🚨'}
-                                {message.riskLevel === 'high' && '⚠️'}
-                                {message.riskLevel === 'medium' && '⚠️'}
-                                {message.riskLevel === 'low' && '✓'}{' '}
+                                {message.riskLevel === "critical" && "🚨"}
+                                {message.riskLevel === "high" && "⚠️"}
+                                {message.riskLevel === "medium" && "⚠️"}
+                                {message.riskLevel === "low" && "✓"}{" "}
                                 {message.riskLevel.toUpperCase()}
                               </Badge>
                             )}
@@ -901,7 +900,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           </div>
                         </div>
                         <p className="text-blue-800 text-xs mb-2">
-                          <span className="font-medium">Category:</span>{' '}
+                          <span className="font-medium">Category:</span>{" "}
                           {message.mentalHealthAnalysis.mentalHealthCategory}
                         </p>
                         <p className="text-blue-700 text-xs">
@@ -930,8 +929,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                     <div className="flex items-center text-sm text-gray-600">
                       <div className="animate-spin w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full mr-2"></div>
                       {mentalHealthService?.isInitialized
-                        ? 'Processing with MentalLLaMA...'
-                        : 'Thinking...'}
+                        ? "Processing with MentalLLaMA..."
+                        : "Thinking..."}
                     </div>
                   </div>
                 </div>
@@ -959,14 +958,14 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   placeholder={
                     mentalHealthService?.isInitialized
                       ? "Share what's on your mind... (encrypted & analyzed securely)"
-                      : 'Type your message... (demo mode)'
+                      : "Type your message... (demo mode)"
                   }
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSendMessage()
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
                     }
                   }}
                   disabled={processing}
@@ -980,7 +979,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   {processing ? (
                     <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
                   ) : (
-                    'Send'
+                    "Send"
                   )}
                 </Button>
               </div>
@@ -1026,7 +1025,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
           <Tabs defaultValue={initialTab} className="w-full">
             <TabsList
-              className={`w-full grid ${settings.enableMindMirrorUI ? 'grid-cols-5' : 'grid-cols-4'}`}
+              className={`w-full grid ${settings.enableMindMirrorUI ? "grid-cols-5" : "grid-cols-4"}`}
             >
               {settings.enableMindMirrorUI && (
                 <TabsTrigger value="mindmirror" className="text-xs">
@@ -1074,8 +1073,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                         </span>
                         <Badge variant="outline" className="text-xs">
                           {currentMindMirrorAnalysis.archetype.main_archetype.replace(
-                            '_',
-                            ' ',
+                            "_",
+                            " ",
                           )}
                         </Badge>
                       </div>
@@ -1097,8 +1096,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           variant={
                             currentMindMirrorAnalysis.mood_vector
                               .urgency_score > 0.7
-                              ? 'destructive'
-                              : 'outline'
+                              ? "destructive"
+                              : "outline"
                           }
                         >
                           {Math.round(
@@ -1134,7 +1133,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               {messages
                 .filter(
                   (m) =>
-                    m.role === 'user' &&
+                    m.role === "user" &&
                     m.mentalHealthAnalysis &&
                     !m.isProcessing,
                 )
@@ -1145,7 +1144,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                         Analysis for: &quot;{m.content.substring(0, 40)}
-                        {m.content.length > 40 ? '...' : ''}&quot;
+                        {m.content.length > 40 ? "..." : ""}&quot;
                       </p>
                     </div>
                     <MentalHealthInsights
@@ -1156,7 +1155,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
               {!messages.some(
                 (m) =>
-                  m.role === 'user' &&
+                  m.role === "user" &&
                   m.mentalHealthAnalysis &&
                   !m.isProcessing,
               ) && (
@@ -1255,13 +1254,13 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
                     <div className="bg-gradient-to-r from-green-50 to-blue-50 p-3 rounded-lg">
                       <div className="text-sm font-medium text-gray-900">
-                        Risk Trend:{' '}
+                        Risk Trend:{" "}
                         <span
                           className={`
-                          ${sessionStats.riskTrend === 'critical' ? 'text-red-600' : ''}
-                          ${sessionStats.riskTrend === 'declining' ? 'text-orange-600' : ''}
-                          ${sessionStats.riskTrend === 'stable' ? 'text-blue-600' : ''}
-                          ${sessionStats.riskTrend === 'improving' ? 'text-green-600' : ''}
+                          ${sessionStats.riskTrend === "critical" ? "text-red-600" : ""}
+                          ${sessionStats.riskTrend === "declining" ? "text-orange-600" : ""}
+                          ${sessionStats.riskTrend === "stable" ? "text-blue-600" : ""}
+                          ${sessionStats.riskTrend === "improving" ? "text-green-600" : ""}
                         `}
                         >
                           {sessionStats.riskTrend.charAt(0).toUpperCase() +
@@ -1279,8 +1278,8 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           <AlertTriangle className="w-4 h-4 inline mr-1" />
                           {sessionStats.interventionsTriggered} Intervention
                           {sessionStats.interventionsTriggered > 1
-                            ? 's'
-                            : ''}{' '}
+                            ? "s"
+                            : ""}{" "}
                           Triggered
                         </div>
                         <div className="text-xs text-yellow-700 mt-1">
@@ -1339,7 +1338,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.enableAnalysis}
                             onChange={() =>
-                              handleToggleSetting('enableAnalysis')
+                              handleToggleSetting("enableAnalysis")
                             }
                             className="mt-2"
                           />
@@ -1359,7 +1358,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.useExpertGuidance}
                             onChange={() =>
-                              handleToggleSetting('useExpertGuidance')
+                              handleToggleSetting("useExpertGuidance")
                             }
                             disabled={!settings.enableAnalysis}
                             className="mt-2"
@@ -1378,7 +1377,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.enableCrisisDetection}
                             onChange={() =>
-                              handleToggleSetting('enableCrisisDetection')
+                              handleToggleSetting("enableCrisisDetection")
                             }
                             disabled={!settings.enableAnalysis}
                             className="mt-2"
@@ -1396,7 +1395,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.showAnalysisPanel}
                             onChange={() =>
-                              handleToggleSetting('showAnalysisPanel')
+                              handleToggleSetting("showAnalysisPanel")
                             }
                             className="mt-2"
                           />
@@ -1414,7 +1413,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.enableMindMirrorUI}
                             onChange={() =>
-                              handleToggleSetting('enableMindMirrorUI')
+                              handleToggleSetting("enableMindMirrorUI")
                             }
                             disabled={!settings.showAnalysisPanel}
                             className="mt-2"
@@ -1432,7 +1431,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                             type="checkbox"
                             checked={settings.showBrainVisualization}
                             onChange={() =>
-                              handleToggleSetting('showBrainVisualization')
+                              handleToggleSetting("showBrainVisualization")
                             }
                             disabled={!settings.enableMindMirrorUI}
                             className="mt-2"
@@ -1448,7 +1447,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
                       <div className="space-y-2">
                         <label className="text-xs text-gray-600">
-                          Confidence Threshold:{' '}
+                          Confidence Threshold:{" "}
                           {Math.round(settings.confidenceThreshold * 100)}%
                         </label>
                         <input
@@ -1469,7 +1468,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
                       <div className="space-y-2">
                         <label className="text-xs text-gray-600">
-                          Intervention Threshold:{' '}
+                          Intervention Threshold:{" "}
                           {Math.round(settings.interventionThreshold * 100)}%
                         </label>
                         <input
@@ -1510,7 +1509,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
         </div>
       )}
     </div>
-  )
-})
+  );
+});
 
-export default MentalHealthChatDemo
+export default MentalHealthChatDemo;

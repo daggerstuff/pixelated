@@ -3,23 +3,23 @@
  */
 export interface AuditMetadata {
   /** Reason for the audit event */
-  reason?: string
+  reason?: string;
   /** IP address of the request */
-  ipAddress?: string
+  ipAddress?: string;
   /** User agent of the request */
-  userAgent?: string
+  userAgent?: string;
   /** Required role for access */
-  requiredRole?: string
+  requiredRole?: string;
   /** User's actual role */
-  userRole?: string
+  userRole?: string;
   /** HTTP method of the request */
-  method?: string
+  method?: string;
   /** Request path */
-  path?: string
+  path?: string;
   /** Session ID if applicable */
-  sessionId?: string
+  sessionId?: string;
   /** Any additional metadata */
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 
 /**
@@ -27,70 +27,70 @@ export interface AuditMetadata {
  */
 export interface AuditResource {
   /** Resource identifier */
-  id: string
+  id: string;
   /** Resource type */
-  type: string
+  type: string;
 }
 
 /**
  * Audit log entry in the database
  */
 export interface DbAuditLog {
-  id: string
-  timestamp: Date
-  action: string
-  user_id: string
-  resource_id: string
-  resource_type: string
-  metadata: AuditMetadata
+  id: string;
+  timestamp: Date;
+  action: string;
+  user_id: string;
+  resource_id: string;
+  resource_type: string;
+  metadata: AuditMetadata;
 }
 
 /**
  * Audit log entry as returned by the API
  */
 export interface AuditLogEntry {
-  id: string
-  timestamp: Date
-  action: string
-  userId: string
-  resource: AuditResource
-  metadata: AuditMetadata
+  id: string;
+  timestamp: Date;
+  action: string;
+  userId: string;
+  resource: AuditResource;
+  metadata: AuditMetadata;
 }
 
 export interface AuditLog {
-  id: string
-  timestamp: string
-  userId: string
-  resourceId: string
-  action: 'view' | 'create' | 'update' | 'delete'
-  resourceType: string
-  metadata?: Record<string, unknown>
+  id: string;
+  timestamp: string;
+  userId: string;
+  resourceId: string;
+  action: "view" | "create" | "update" | "delete";
+  resourceType: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AuditMetrics {
   accessByTime: {
-    labels: string[]
-    data: number[]
-  }
+    labels: string[];
+    data: number[];
+  };
   accessByType: {
-    labels: string[]
-    data: number[]
-  }
+    labels: string[];
+    data: number[];
+  };
   unusualAccess: {
-    count: number
+    count: number;
     patterns: {
-      type: string
-      description: string
-      severity: string
-    }[]
-  }
+      type: string;
+      description: string;
+      severity: string;
+    }[];
+  };
 }
 
 export interface AuditLogQuery {
-  startDate?: string
-  endDate?: string
-  userId?: string
-  resourceType?: string
-  action?: string
-  limit?: number
+  startDate?: string;
+  endDate?: string;
+  userId?: string;
+  resourceType?: string;
+  action?: string;
+  limit?: number;
 }

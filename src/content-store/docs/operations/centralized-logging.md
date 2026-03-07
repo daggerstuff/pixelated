@@ -1,12 +1,12 @@
 ---
-title: 'Centralized Logging System'
-description: 'Comprehensive documentation for our ELK-based centralized logging infrastructure'
-pubDate: '2025-01-01'
-author: 'DevOps Team'
+title: "Centralized Logging System"
+description: "Comprehensive documentation for our ELK-based centralized logging infrastructure"
+pubDate: "2025-01-01"
+author: "DevOps Team"
 draft: false
 toc: true
 share: true
-date: '2025-04-12'
+date: "2025-04-12"
 ---
 
 # Centralized Logging System
@@ -79,13 +79,12 @@ ELK_REFRESH_INTERVAL=30s
 The centralized logging system is automatically initialized in `src/middleware.ts`. You can also manually initialize it:
 
 ```typescript
-
 // Initialize all logging services
 loggingServices.initialize({
   elk: {
     enabled: true,
-    url: 'http://elasticsearch:9200',
-    indexPrefix: 'custom-app-logs',
+    url: "http://elasticsearch:9200",
+    indexPrefix: "custom-app-logs",
   },
   retention: {
     defaultRetentionDays: 120,
@@ -95,21 +94,21 @@ loggingServices.initialize({
     },
     archiving: {
       enabled: true,
-      destination: 's3',
+      destination: "s3",
       afterDays: 30,
     },
   },
   visualization: {
-    kibanaUrl: 'http://kibana:5601',
-    spaceId: 'my-app',
+    kibanaUrl: "http://kibana:5601",
+    spaceId: "my-app",
   },
-})
+});
 
 // Set up log interception to capture logs from the standard logger
-loggingServices.setupInterception()
+loggingServices.setupInterception();
 
 // Schedule log retention tasks to run automatically
-const cleanupTask = loggingServices.scheduleRetention()
+const cleanupTask = loggingServices.scheduleRetention();
 ```
 
 ## Usage Examples
@@ -119,27 +118,26 @@ const cleanupTask = loggingServices.scheduleRetention()
 Use the standard logger throughout your application:
 
 ```typescript
-
 // Use the default logger
-logger.info('Application started')
+logger.info("Application started");
 
 // Or create a namespaced logger for a specific component
-const apiLogger = getLogger({ prefix: 'api-service' })
-apiLogger.info('API request received', {
-  method: 'GET',
-  path: '/api/users',
-  ip: '192.168.1.1',
-})
+const apiLogger = getLogger({ prefix: "api-service" });
+apiLogger.info("API request received", {
+  method: "GET",
+  path: "/api/users",
+  ip: "192.168.1.1",
+});
 
 // Log errors with details
 try {
   // Some operation
 } catch (error) {
-  logger.error('Failed to perform operation', {
+  logger.error("Failed to perform operation", {
     error,
-    context: 'user-service',
+    context: "user-service",
     userId: 123,
-  })
+  });
 }
 ```
 
@@ -148,35 +146,38 @@ try {
 Create custom dashboards for specific application components:
 
 ```typescript
-
 // Create a custom dashboard for API monitoring
 async function createApiDashboard() {
   // Define the endpoints to monitor
-  const endpoints = ['/api/v1/users', '/api/v1/products', '/api/v1/orders']
+  const endpoints = ["/api/v1/users", "/api/v1/products", "/api/v1/orders"];
 
   // Define common error types
-  const errorTypes = ['ValidationError', 'AuthenticationError', 'DatabaseError']
+  const errorTypes = [
+    "ValidationError",
+    "AuthenticationError",
+    "DatabaseError",
+  ];
 
   // Create the dashboard
   await logVisualization.createApplicationMonitoringDashboard(
-    'API Service',
+    "API Service",
     endpoints,
     errorTypes,
     {
-      timeRange: { from: 'now-7d', to: 'now' },
-      refreshInterval: '1m',
+      timeRange: { from: "now-7d", to: "now" },
+      refreshInterval: "1m",
     },
-  )
+  );
 
-  console.log('API monitoring dashboard created')
+  console.log("API monitoring dashboard created");
 }
 
 // Generate an embed URL for a dashboard
 function getEmbedUrl(dashboardId) {
   return logVisualization.generateEmbedUrl(dashboardId, {
-    timeRange: { from: 'now-24h', to: 'now' },
+    timeRange: { from: "now-24h", to: "now" },
     darkMode: true,
-  })
+  });
 }
 ```
 
@@ -185,34 +186,33 @@ function getEmbedUrl(dashboardId) {
 Configure and manage log retention policies:
 
 ```typescript
-
 // Set up ILM policies in Elasticsearch
 async function setupRetentionPolicies() {
-  await logRetention.setupILMPolicies()
+  await logRetention.setupILMPolicies();
 
   // Apply policies to index patterns
-  await logRetention.applyPolicyToIndexPattern('app-logs-*', 'app-logs-policy')
-  await logRetention.applyPolicyToIndexPattern('api-logs-*', 'api-logs-policy')
+  await logRetention.applyPolicyToIndexPattern("app-logs-*", "app-logs-policy");
+  await logRetention.applyPolicyToIndexPattern("api-logs-*", "api-logs-policy");
   await logRetention.applyPolicyToIndexPattern(
-    'error-logs-*',
-    'error-logs-policy',
-  )
+    "error-logs-*",
+    "error-logs-policy",
+  );
   await logRetention.applyPolicyToIndexPattern(
-    'security-logs-*',
-    'security-logs-policy',
-  )
+    "security-logs-*",
+    "security-logs-policy",
+  );
   await logRetention.applyPolicyToIndexPattern(
-    'audit-logs-*',
-    'audit-logs-policy',
-  )
+    "audit-logs-*",
+    "audit-logs-policy",
+  );
 
-  console.log('Log retention policies set up successfully')
+  console.log("Log retention policies set up successfully");
 }
 
 // Run manual cleanup (usually scheduled, but can be triggered manually)
 async function cleanupOldLogs() {
-  await logRetention.runManualCleanup()
-  console.log('Manual log cleanup completed')
+  await logRetention.runManualCleanup();
+  console.log("Manual log cleanup completed");
 }
 ```
 
@@ -236,14 +236,14 @@ Always use structured logging with metadata:
 
 ```typescript
 // Good: Structured log with metadata
-logger.info('User logged in', {
+logger.info("User logged in", {
   userId: 123,
-  ip: '192.168.1.1',
-  device: 'mobile',
-})
+  ip: "192.168.1.1",
+  device: "mobile",
+});
 
 // Bad: Unstructured log with string concatenation
-logger.info('User 123 logged in from 192.168.1.1 using mobile')
+logger.info("User 123 logged in from 192.168.1.1 using mobile");
 ```
 
 ### Log Levels
@@ -292,12 +292,12 @@ Use the following tools to debug logging issues:
 
 ```typescript
 // Check ELK connection
-const isConnected = await elkService.testConnection()
-console.log('ELK connection:', isConnected ? 'OK' : 'Failed')
+const isConnected = await elkService.testConnection();
+console.log("ELK connection:", isConnected ? "OK" : "Failed");
 
 // Get index statistics
-const indexStats = await elkService.getIndexStats()
-console.log('Log indices:', indexStats)
+const indexStats = await elkService.getIndexStats();
+console.log("Log indices:", indexStats);
 ```
 
 ## Additional Information

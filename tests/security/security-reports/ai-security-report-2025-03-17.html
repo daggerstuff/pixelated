@@ -7,8 +7,8 @@
     <style>
       body {
         font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
-          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
         line-height: 1.6;
         color: #333;
         max-width: 1200px;
@@ -267,17 +267,17 @@
         High: 3,
         Medium: 0,
         Low: 0,
-      }
+      };
 
-      new Chart(document.getElementById('severityChart'), {
-        type: 'bar',
+      new Chart(document.getElementById("severityChart"), {
+        type: "bar",
         data: {
           labels: Object.keys(severityData),
           datasets: [
             {
-              label: 'Issues by Severity',
+              label: "Issues by Severity",
               data: Object.values(severityData),
-              backgroundColor: ['#e53e3e', '#ed8936', '#ecc94b', '#48bb78'],
+              backgroundColor: ["#e53e3e", "#ed8936", "#ecc94b", "#48bb78"],
             },
           ],
         },
@@ -292,7 +292,7 @@
             },
           },
         },
-      })
+      });
     </script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 ---
-applyTo: 'none'
-description: 'Clean code principles for all languages and frameworks'
+applyTo: "none"
+description: "Clean code principles for all languages and frameworks"
 ---
 
 # Clean Code Guidelines
@@ -18,14 +18,14 @@ description: 'Clean code principles for all languages and frameworks'
 // ❌ Poor naming
 const d = 86400000; // milliseconds in a day
 function f(a, b) {
-	return a + b;
+  return a + b;
 }
 
 // ✅ Clear naming
 const MILLISECONDS_PER_DAY = 86400000;
 
 function calculateSum(firstNumber, secondNumber) {
-	return firstNumber + secondNumber;
+  return firstNumber + secondNumber;
 }
 ```
 
@@ -39,20 +39,24 @@ function calculateSum(firstNumber, secondNumber) {
 ```typescript
 // ❌ Too many responsibilities
 function processUserData(userData) {
-	// validate, transform, save, and notify - too much!
+  // validate, transform, save, and notify - too much!
 }
 
 // ✅ Single responsibility
-function validateUserData(userData) { /* validation logic */
+function validateUserData(userData) {
+  /* validation logic */
 }
 
-function transformUserData(validData) { /* transformation logic */
+function transformUserData(validData) {
+  /* transformation logic */
 }
 
-function saveUserData(transformedData) { /* storage logic */
+function saveUserData(transformedData) {
+  /* storage logic */
 }
 
-function notifyUserProcessed(userId) { /* notification logic */
+function notifyUserProcessed(userId) {
+  /* notification logic */
 }
 ```
 
@@ -72,20 +76,20 @@ function notifyUserProcessed(userId) { /* notification logic */
 ```typescript
 // ❌ Deeply nested conditions
 function getInsuranceAmount(person) {
-	if (person) {
-		if (person.insurance) {
-			if (person.insurance.coverage) {
-				return person.insurance.coverage.amount;
-			}
-		}
-	}
-	return 0;
+  if (person) {
+    if (person.insurance) {
+      if (person.insurance.coverage) {
+        return person.insurance.coverage.amount;
+      }
+    }
+  }
+  return 0;
 }
 
 // ✅ Early returns and optional chaining
 function getInsuranceAmount(person) {
-	if (!person) return 0;
-	return person.insurance?.coverage?.amount || 0;
+  if (!person) return 0;
+  return person.insurance?.coverage?.amount || 0;
 }
 ```
 
@@ -107,13 +111,13 @@ function getInsuranceAmount(person) {
 // ❌ Redundant comment
 // Calculate the sum of two numbers
 function add(a, b) {
-	return a + b;
+  return a + b;
 }
 
 // ✅ Necessary explanation
 function calculateAdjustedPrice(basePrice: number): number {
-	// Apply 15% markup for wholesale orders as per company policy #127
-	return basePrice * 1.15;
+  // Apply 15% markup for wholesale orders as per company policy #127
+  return basePrice * 1.15;
 }
 ```
 
@@ -134,6 +138,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Language-Specific Best Practices
 
 ### TypeScript/JavaScript
+
 - Use **strict type checking** with proper interfaces
 - Leverage **functional programming** concepts (map, filter, reduce)
 - Prefer **async/await** over raw promises
@@ -141,6 +146,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 - Apply **optional chaining** (?.) and **nullish coalescing** (??)
 
 ### Python
+
 - Follow **PEP 8** style guide
 - Use **list/dict comprehensions** for cleaner transformations
 - Leverage **context managers** (with statements)
@@ -158,6 +164,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Code Review Guidelines
 
 ### Review Process
+
 - **Focused Reviews**: Limit scope to 200-400 lines per session
 - **Purpose Over Style**: Review logic and correctness (use linters for style)
 - **Constructive Feedback**: Frame as questions or suggestions
@@ -165,6 +172,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 - **Test Coverage**: Verify appropriate test coverage
 
 ### Review Checklist
+
 1. Does code fulfill requirements?
 2. Is logic correct and edge cases handled?
 3. Is error handling appropriate?
@@ -175,9 +183,9 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Technical Debt Management
 
 - **Categorize Technical Debt**:
-    - **Deliberate**: Strategic decisions to ship faster with known tradeoffs
-    - **Inadvertent**: Suboptimal design discovered only in hindsight
-    - **Bit Rot**: Gradual degradation as environment changes
+  - **Deliberate**: Strategic decisions to ship faster with known tradeoffs
+  - **Inadvertent**: Suboptimal design discovered only in hindsight
+  - **Bit Rot**: Gradual degradation as environment changes
 
 - **Track in Codebase**: Mark technical debt with consistent comments:
 
@@ -186,9 +194,9 @@ function calculateAdjustedPrice(basePrice: number): number {
   ```
 
 - **Establish Repayment Strategy**:
-    - Allocate 10-20% of development time to debt reduction
-    - Fix debt opportunistically when touching related code
-    - Schedule dedicated "cleanup sprints" periodically
+  - Allocate 10-20% of development time to debt reduction
+  - Fix debt opportunistically when touching related code
+  - Schedule dedicated "cleanup sprints" periodically
 
 - **Measure and Monitor**: Track technical debt metrics with static analysis tools
 - **Prevent New Debt**: Enforce standards through code reviews and automation
@@ -196,11 +204,13 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Testing Strategy
 
 ### Test Pyramid Structure
+
 - **Unit Tests** (~70%): Fast, isolated tests for functions/methods
 - **Integration Tests** (~20%): Component interaction testing
 - **E2E Tests** (~10%): Complete user flow validation
 
 ### Test Guidelines
+
 - Follow **Arrange-Act-Assert** pattern
 - Ensure **test isolation** - each test runs independently
 - Use **descriptive test names** that explain the scenario
@@ -208,6 +218,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 - Use test data factories for consistent test setup
 
 ### Coverage Targets
+
 - Critical business logic: 90%+
 - General codebase: 70%+
 - Focus on testing behavior, not implementation details
@@ -215,18 +226,21 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Legacy Code Refactoring
 
 ### Safety-First Approach
+
 - Add characterization tests before refactoring
 - Make small, verifiable changes
 - Follow "Boy Scout Rule": leave code better than found
 - Use "Strangler Pattern" for large-scale refactoring
 
 ### Refactoring Techniques
+
 1. **Extract Method**: Break down large functions
 2. **Extract Class**: Group related functionality
 3. **Rename**: Improve clarity of variables/methods
 4. **Encapsulate**: Reduce global state and dependencies
 
 ### Risk Management
+
 - Schedule refactoring based on risk/reward analysis
 - Update documentation as understanding improves
 - Monitor production impact of changes
@@ -234,6 +248,7 @@ function calculateAdjustedPrice(basePrice: number): number {
 ## Project-Specific Guidelines
 
 ### Pixelated Empathy Codebase
+
 - Prioritize **security** and **privacy** in all implementations
 - Ensure **HIPAA compliance** in data handling
 - Maintain **sub-50ms response times** for AI interactions

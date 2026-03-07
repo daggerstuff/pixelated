@@ -44,12 +44,12 @@ Analyzes text to detect emotions and sentiment.
 }
 ```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `text` | string | Yes | The text to analyze |
-| `userId` | string | No | User identifier for personalization |
-| `includeRiskFactors` | boolean | No | Whether to include risk factors in the analysis |
-| `includeContextualFactors` | boolean | No | Whether to include contextual factors |
+| Parameter                  | Type    | Required | Description                                     |
+| -------------------------- | ------- | -------- | ----------------------------------------------- |
+| `text`                     | string  | Yes      | The text to analyze                             |
+| `userId`                   | string  | No       | User identifier for personalization             |
+| `includeRiskFactors`       | boolean | No       | Whether to include risk factors in the analysis |
+| `includeContextualFactors` | boolean | No       | Whether to include contextual factors           |
 
 ### Response Body
 
@@ -98,11 +98,11 @@ Analyzes audio data to detect emotions from voice patterns.
 
 ### Request Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `audio` | File | Yes | Audio file (WAV or MP3, max 5MB) |
-| `userId` | string | No | User identifier for personalization |
-| `transcript` | string | No | Optional transcript for enhanced accuracy |
+| Parameter    | Type   | Required | Description                               |
+| ------------ | ------ | -------- | ----------------------------------------- |
+| `audio`      | File   | Yes      | Audio file (WAV or MP3, max 5MB)          |
+| `userId`     | string | No       | User identifier for personalization       |
+| `transcript` | string | No       | Optional transcript for enhanced accuracy |
 
 ### Response Body
 
@@ -149,10 +149,10 @@ Gets emotion analyses mapped to the PAD (Pleasure-Arousal-Dominance) model dimen
 
 ### Query Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `sessionId` | string | Yes | The session ID to retrieve data for |
-| `timeframe` | string | No | Timeframe for data (e.g., 'last_hour', 'last_day', 'all') |
+| Parameter   | Type   | Required | Description                                               |
+| ----------- | ------ | -------- | --------------------------------------------------------- |
+| `sessionId` | string | Yes      | The session ID to retrieve data for                       |
+| `timeframe` | string | No       | Timeframe for data (e.g., 'last_hour', 'last_day', 'all') |
 
 ### Response Body
 
@@ -169,7 +169,7 @@ Gets emotion analyses mapped to the PAD (Pleasure-Arousal-Dominance) model dimen
       },
       "emotionCount": 3,
       "primaryEmotion": "excitement"
-    },
+    }
     // ... additional data points
   ]
 }
@@ -200,11 +200,11 @@ Analyzes text in real-time with optimized performance for interactive applicatio
 }
 ```
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `text` | string | Yes | The text to analyze (max 5000 characters) |
-| `userId` | string | No | User identifier for personalization (defaults to 'anonymous') |
-| `context` | object | No | Additional context to improve analysis accuracy |
+| Parameter | Type   | Required | Description                                                   |
+| --------- | ------ | -------- | ------------------------------------------------------------- |
+| `text`    | string | Yes      | The text to analyze (max 5000 characters)                     |
+| `userId`  | string | No       | User identifier for personalization (defaults to 'anonymous') |
+| `context` | object | No       | Additional context to improve analysis accuracy               |
 
 ### Response Body
 
@@ -219,7 +219,7 @@ Analyzes text in real-time with optimized performance for interactive applicatio
     "emotions": [
       {
         "type": "excitement",
-        "confidence": 0.90,
+        "confidence": 0.9,
         "intensity": 0.85
       },
       {
@@ -230,7 +230,7 @@ Analyzes text in real-time with optimized performance for interactive applicatio
     ],
     "dimensions": {
       "valence": 0.87,
-      "arousal": 0.80,
+      "arousal": 0.8,
       "dominance": 0.72
     }
   },
@@ -260,7 +260,7 @@ The real-time analysis endpoint is optimized for:
 **Common Error Codes:**
 
 - `400 Bad Request`: Invalid request parameters
-- `405 Method Not Allowed`: Wrong HTTP method 
+- `405 Method Not Allowed`: Wrong HTTP method
 - `429 Too Many Requests`: Rate limit exceeded
 - `500 Internal Server Error`: Server-side processing error
 
@@ -285,4 +285,4 @@ The Emotion Analysis API uses a combination of models:
 - All API requests should be made over HTTPS
 - API keys should be kept secure and not exposed in client-side code
 - Consider using the server-to-server API for sensitive communications
-- Data is temporarily cached for performance but not permanently stored without consent 
+- Data is temporarily cached for performance but not permanently stored without consent

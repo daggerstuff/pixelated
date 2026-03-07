@@ -1,12 +1,12 @@
 ---
-title: 'Analytics Service'
-description: 'Guide to Pixelated Healths analytics service for data processing and insights'
+title: "Analytics Service"
+description: "Guide to Pixelated Healths analytics service for data processing and insights"
 pubDate: 2025-03-24
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ['analytics', 'services', 'data-processing']
-author: 'Pixelated Team'
+tags: ["analytics", "services", "data-processing"]
+author: "Pixelated Team"
 ---
 
 ## Analytics Service Documentation
@@ -35,12 +35,11 @@ HIPAA compliance.
 ### Initializing the Service
 
 ```typescript
-
 const analyticsService = new AnalyticsService({
   retentionDays: 90, // How long to keep data
   batchSize: 100, // Events to process per batch
   processingInterval: 1000, // Processing interval in ms
-})
+});
 ```
 
 ### Tracking Events
@@ -87,24 +86,24 @@ await analyticsService.trackEvent({
 ```typescript
 // Track API response time
 await analyticsService.trackMetric({
-  name: 'api_response_time',
+  name: "api_response_time",
   value: 150, // milliseconds
   tags: {
-    endpoint: '/api/therapy/session',
-    method: 'POST',
-    status: '200',
+    endpoint: "/api/therapy/session",
+    method: "POST",
+    status: "200",
   },
-})
+});
 
 // Track active users
 await analyticsService.trackMetric({
-  name: 'active_users',
+  name: "active_users",
   value: 1250,
   tags: {
-    type: 'daily',
-    source: 'web',
+    type: "daily",
+    source: "web",
   },
-})
+});
 ```
 
 ### Retrieving Events
@@ -117,14 +116,14 @@ const events = await analyticsService.getEvents({
   endTime: Date.now(),
   limit: 100,
   offset: 0,
-})
+});
 
 // Get therapy sessions
 const sessions = await analyticsService.getEvents({
   type: EventType.THERAPY_SESSION,
   startTime: weekStart,
   endTime: weekEnd,
-})
+});
 ```
 
 ### Retrieving Metrics
@@ -132,45 +131,44 @@ const sessions = await analyticsService.getEvents({
 ```typescript
 // Get API response times
 const responseTimes = await analyticsService.getMetrics({
-  name: 'api_response_time',
+  name: "api_response_time",
   startTime: dayStart,
   endTime: dayEnd,
   tags: {
-    endpoint: '/api/therapy/session',
+    endpoint: "/api/therapy/session",
   },
-})
+});
 
 // Get user metrics
 const userMetrics = await analyticsService.getMetrics({
-  name: 'active_users',
+  name: "active_users",
   tags: {
-    type: 'daily',
+    type: "daily",
   },
-})
+});
 ```
 
 ### WebSocket Integration
 
 ```typescript
-
 // In your client code:
-const ws = new WebSocket('ws://localhost:8083')
+const ws = new WebSocket("ws://localhost:8083");
 
 // Authenticate
 ws.send(
   JSON.stringify({
-    type: 'authenticate',
-    userId: 'user-123',
+    type: "authenticate",
+    userId: "user-123",
   }),
-)
+);
 
 // Listen for events
-ws.on('message', (data) => {
-  const message = JSON.parse(data.toString())
-  if (message.type === 'analytics_event') {
-    console.log('New event:', message.event)
+ws.on("message", (data) => {
+  const message = JSON.parse(data.toString());
+  if (message.type === "analytics_event") {
+    console.log("New event:", message.event);
   }
-})
+});
 ```
 
 ## Configuration
@@ -190,14 +188,14 @@ REDIS_PREFIX=analytics:
 
 ```typescript
 enum EventType {
-  PAGE_VIEW = 'page_view',
-  USER_ACTION = 'user_action',
-  THERAPY_SESSION = 'therapy_session',
-  NOTIFICATION = 'notification',
-  ERROR = 'error',
-  SECURITY = 'security',
-  PERFORMANCE = 'performance',
-  CUSTOM = 'custom',
+  PAGE_VIEW = "page_view",
+  USER_ACTION = "user_action",
+  THERAPY_SESSION = "therapy_session",
+  NOTIFICATION = "notification",
+  ERROR = "error",
+  SECURITY = "security",
+  PERFORMANCE = "performance",
+  CUSTOM = "custom",
 }
 ```
 
@@ -205,10 +203,10 @@ enum EventType {
 
 ```typescript
 enum EventPriority {
-  LOW = 'low',
-  NORMAL = 'normal',
-  HIGH = 'high',
-  CRITICAL = 'critical',
+  LOW = "low",
+  NORMAL = "normal",
+  HIGH = "high",
+  CRITICAL = "critical",
 }
 ```
 
@@ -344,37 +342,37 @@ Common issues and solutions:
 ```typescript
 class AnalyticsService {
   constructor(options?: {
-    retentionDays?: number
-    batchSize?: number
-    processingInterval?: number
-  })
+    retentionDays?: number;
+    batchSize?: number;
+    processingInterval?: number;
+  });
 
   // Event operations
-  async trackEvent(data: EventData): Promise<string>
+  async trackEvent(data: EventData): Promise<string>;
   async getEvents(options: {
-    type: EventType
-    startTime?: number
-    endTime?: number
-    limit?: number
-    offset?: number
-  }): Promise<Event[]>
+    type: EventType;
+    startTime?: number;
+    endTime?: number;
+    limit?: number;
+    offset?: number;
+  }): Promise<Event[]>;
 
   // Metric operations
-  async trackMetric(data: Metric): Promise<void>
+  async trackMetric(data: Metric): Promise<void>;
   async getMetrics(options: {
-    name: string
-    startTime?: number
-    endTime?: number
-    tags?: Record<string, string>
-  }): Promise<Metric[]>
+    name: string;
+    startTime?: number;
+    endTime?: number;
+    tags?: Record<string, string>;
+  }): Promise<Metric[]>;
 
   // WebSocket operations
-  registerClient(userId: string, ws: WebSocket): void
-  unregisterClient(userId: string): void
+  registerClient(userId: string, ws: WebSocket): void;
+  unregisterClient(userId: string): void;
 
   // Maintenance operations
-  async processEvents(): Promise<void>
-  async cleanup(): Promise<void>
+  async processEvents(): Promise<void>;
+  async cleanup(): Promise<void>;
 }
 ```
 

@@ -1,8 +1,8 @@
 ---
-title: 'Development'
-description: 'Preview changes locally to update your docs'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Development"
+description: "Preview changes locally to update your docs"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true

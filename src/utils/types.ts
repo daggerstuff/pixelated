@@ -1,1 +1,1 @@
-export type NavBarLayout = Array<string>
+export type NavBarLayout = Array<string>;

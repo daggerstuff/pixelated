@@ -1,23 +1,23 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 interface FeatureTest {
-  name: string
-  test: () => boolean
+  name: string;
+  test: () => boolean;
 }
 
 export function BrowserCompatibilityTester() {
   const [browserInfo, setBrowserInfo] = useState({
-    userAgent: '',
-    platform: '',
-    language: '',
+    userAgent: "",
+    platform: "",
+    language: "",
     cookiesEnabled: false,
-    vendor: '',
-    screenSize: '',
+    vendor: "",
+    screenSize: "",
     pixelRatio: 0,
     touchPoints: 0,
     hasTouch: false,
-  })
-  const [results, setResults] = useState<Record<string, boolean | string>>({})
+  });
+  const [results, setResults] = useState<Record<string, boolean | string>>({});
 
   useEffect(() => {
     // Collect browser information
@@ -30,102 +30,103 @@ export function BrowserCompatibilityTester() {
       screenSize: `${window.innerWidth}x${window.innerHeight}`,
       pixelRatio: window.devicePixelRatio,
       touchPoints: navigator.maxTouchPoints,
-      hasTouch: 'ontouchstart' in window,
-    })
+      hasTouch: "ontouchstart" in window,
+    });
 
     // Test feature support
     const featureTests: FeatureTest[] = [
       {
-        name: 'ES2024 Features',
+        name: "ES2024 Features",
         test: () => {
           try {
             // Test for specific ES2024 features safely
             return (
-              typeof Promise.withResolvers === 'function' &&
-              'groupBy' in Array.prototype &&
-              typeof Array.prototype.findLast === 'function'
-            )
+              typeof Promise.withResolvers === "function" &&
+              "groupBy" in Array.prototype &&
+              typeof Array.prototype.findLast === "function"
+            );
           } catch {
-            return false
+            return false;
           }
         },
       },
       {
-        name: 'WebCrypto',
+        name: "WebCrypto",
         test: () =>
-          typeof window !== 'undefined' &&
-          'crypto' in window &&
-          'subtle' in window.crypto,
+          typeof window !== "undefined" &&
+          "crypto" in window &&
+          "subtle" in window.crypto,
       },
       {
-        name: 'WebWorkers',
-        test: () => typeof window !== 'undefined' && 'Worker' in window,
+        name: "WebWorkers",
+        test: () => typeof window !== "undefined" && "Worker" in window,
       },
       {
-        name: 'SharedArrayBuffer',
-        test: () => typeof SharedArrayBuffer === 'function',
+        name: "SharedArrayBuffer",
+        test: () => typeof SharedArrayBuffer === "function",
       },
       {
-        name: 'WebAssembly',
-        test: () => typeof WebAssembly === 'object',
+        name: "WebAssembly",
+        test: () => typeof WebAssembly === "object",
       },
       {
-        name: 'CSS Grid',
+        name: "CSS Grid",
         test: () => {
-          if (typeof document === 'undefined') {
-            return false
+          if (typeof document === "undefined") {
+            return false;
           }
-          const el = document.createElement('div')
-          return typeof el.style.grid !== 'undefined'
+          const el = document.createElement("div");
+          return typeof el.style.grid !== "undefined";
         },
       },
       {
-        name: 'Fetch API',
-        test: () => typeof fetch === 'function',
+        name: "Fetch API",
+        test: () => typeof fetch === "function",
       },
       {
-        name: 'LocalStorage',
-        test: () => typeof localStorage !== 'undefined',
+        name: "LocalStorage",
+        test: () => typeof localStorage !== "undefined",
       },
       {
-        name: 'Reduced Motion Support',
+        name: "Reduced Motion Support",
         test: () => {
-          if (typeof window === 'undefined' || !window.matchMedia) {
-            return false
+          if (typeof window === "undefined" || !window.matchMedia) {
+            return false;
           }
-          return !!window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          return !!window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches;
         },
       },
       {
-        name: 'High Contrast Mode',
+        name: "High Contrast Mode",
         test: () => {
-          if (typeof window === 'undefined' || !window.matchMedia) {
-            return false
+          if (typeof window === "undefined" || !window.matchMedia) {
+            return false;
           }
-          return !!window.matchMedia('(forced-colors: active)').matches
+          return !!window.matchMedia("(forced-colors: active)").matches;
         },
       },
-    ]
+    ];
 
-    const testResults: Record<string, boolean | string> = {}
+    const testResults: Record<string, boolean | string> = {};
     featureTests.forEach(({ name, test }) => {
       try {
-        testResults[name] = test()
+        testResults[name] = test();
       } catch {
-        testResults[name] = false
+        testResults[name] = false;
       }
-    })
+    });
 
     // Special handling for accessibility features to show "Active" instead of "Yes"
-    if (testResults['Reduced Motion Support'] === true) {
-      testResults['Reduced Motion Support'] = 'Active'
+    if (testResults["Reduced Motion Support"] === true) {
+      testResults["Reduced Motion Support"] = "Active";
     }
-    if (testResults['High Contrast Mode'] === true) {
-      testResults['High Contrast Mode'] = 'Active'
+    if (testResults["High Contrast Mode"] === true) {
+      testResults["High Contrast Mode"] = "Active";
     }
 
-    setResults(testResults)
-  }, [])
+    setResults(testResults);
+  }, []);
 
   // Helper functions for feature detection
 
@@ -149,8 +150,8 @@ export function BrowserCompatibilityTester() {
             <strong>Vendor:</strong> {browserInfo.vendor}
           </li>
           <li>
-            <strong>Cookies Enabled:</strong>{' '}
-            {browserInfo.cookiesEnabled ? 'Yes' : 'No'}
+            <strong>Cookies Enabled:</strong>{" "}
+            {browserInfo.cookiesEnabled ? "Yes" : "No"}
           </li>
           <li>
             <strong>Screen Size:</strong> {browserInfo.screenSize}
@@ -162,8 +163,8 @@ export function BrowserCompatibilityTester() {
             <strong>Touch Points:</strong> {browserInfo.touchPoints}
           </li>
           <li>
-            <strong>Touch Support:</strong>{' '}
-            {browserInfo.hasTouch ? 'Yes' : 'No'}
+            <strong>Touch Support:</strong>{" "}
+            {browserInfo.hasTouch ? "Yes" : "No"}
           </li>
         </ul>
       </section>
@@ -183,34 +184,34 @@ export function BrowserCompatibilityTester() {
               <tr key={feature}>
                 <td>{feature}</td>
                 <td>
-                  {typeof supported === 'boolean'
+                  {typeof supported === "boolean"
                     ? supported
-                      ? '✅ Yes'
-                      : '❌ No'
-                    : 'Not Supported'}
+                      ? "✅ Yes"
+                      : "❌ No"
+                    : "Not Supported"}
                 </td>
                 <td>
-                  {feature === 'ES2024 Features'
-                    ? 'Used for modern JavaScript features'
-                    : feature === 'WebCrypto'
-                      ? 'Used for secure encryption'
-                      : feature === 'WebWorkers'
-                        ? 'Used for background processing'
-                        : feature === 'SharedArrayBuffer'
-                          ? 'Used for high-performance data sharing'
-                          : feature === 'WebAssembly'
-                            ? 'Used for high-performance code execution'
-                            : feature === 'CSS Grid'
-                              ? 'Used for layout and alignment'
-                              : feature === 'Fetch API'
-                                ? 'Used for asynchronous data fetching'
-                                : feature === 'LocalStorage'
-                                  ? 'Used for client-side storage'
-                                  : feature === 'Reduced Motion Support'
-                                    ? 'Used for reducing motion on devices'
-                                    : feature === 'High Contrast Mode'
-                                      ? 'Used for high contrast mode'
-                                      : ''}
+                  {feature === "ES2024 Features"
+                    ? "Used for modern JavaScript features"
+                    : feature === "WebCrypto"
+                      ? "Used for secure encryption"
+                      : feature === "WebWorkers"
+                        ? "Used for background processing"
+                        : feature === "SharedArrayBuffer"
+                          ? "Used for high-performance data sharing"
+                          : feature === "WebAssembly"
+                            ? "Used for high-performance code execution"
+                            : feature === "CSS Grid"
+                              ? "Used for layout and alignment"
+                              : feature === "Fetch API"
+                                ? "Used for asynchronous data fetching"
+                                : feature === "LocalStorage"
+                                  ? "Used for client-side storage"
+                                  : feature === "Reduced Motion Support"
+                                    ? "Used for reducing motion on devices"
+                                    : feature === "High Contrast Mode"
+                                      ? "Used for high contrast mode"
+                                      : ""}
                 </td>
               </tr>
             ))}
@@ -218,5 +219,5 @@ export function BrowserCompatibilityTester() {
         </table>
       </section>
     </div>
-  )
+  );
 }

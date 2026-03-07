@@ -1,13 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { useReportQuery } from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { Download, FileText } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { useReportQuery } from "@/lib/hooks/journal-research";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { Download, FileText } from "lucide-react";
 
 export interface ReportViewerProps {
-  sessionId: string
-  reportId: string
-  className?: string
+  sessionId: string;
+  reportId: string;
+  className?: string;
 }
 
 export function ReportViewer({
@@ -15,22 +20,22 @@ export function ReportViewer({
   reportId,
   className,
 }: ReportViewerProps) {
-  const { data: report, isLoading } = useReportQuery(sessionId, reportId)
+  const { data: report, isLoading } = useReportQuery(sessionId, reportId);
 
   if (isLoading) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Loading report...</p>
       </div>
-    )
+    );
   }
 
   if (!report) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Report not found</p>
       </div>
-    )
+    );
   }
 
   const renderContent = () => {
@@ -39,30 +44,30 @@ export function ReportViewer({
         <div className="text-center py-8 text-muted-foreground">
           No content available. Report may still be generating.
         </div>
-      )
+      );
     }
 
-    if (report.format === 'json') {
+    if (report.format === "json") {
       return (
         <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
           {JSON.stringify(report.content, null, 2)}
         </pre>
-      )
+      );
     }
 
-    if (report.format === 'markdown') {
+    if (report.format === "markdown") {
       return (
         <div className="prose max-w-none">
           <pre className="whitespace-pre-wrap text-sm">
-            {typeof report.content === 'string'
+            {typeof report.content === "string"
               ? report.content
               : JSON.stringify(report.content, null, 2)}
           </pre>
         </div>
-      )
+      );
     }
 
-    if (report.format === 'pdf') {
+    if (report.format === "pdf") {
       return (
         <div className="text-center py-8">
           <p className="text-muted-foreground mb-4">
@@ -79,24 +84,24 @@ export function ReportViewer({
             </a>
           )}
         </div>
-      )
+      );
     }
 
     return (
       <div className="text-muted-foreground">
         Content format not supported for preview.
       </div>
-    )
-  }
+    );
+  };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Report Viewer</h1>
           <p className="text-muted-foreground mt-1">
-            Generated {format(report.generatedDate, 'PPpp')}
+            Generated {format(report.generatedDate, "PPpp")}
           </p>
         </div>
         <div className="flex gap-2">
@@ -137,7 +142,7 @@ export function ReportViewer({
                 Report Type
               </p>
               <p className="mt-1 capitalize">
-                {report.reportType.replace('_', ' ')}
+                {report.reportType.replace("_", " ")}
               </p>
             </div>
             <div>
@@ -150,7 +155,7 @@ export function ReportViewer({
               <p className="text-sm font-medium text-muted-foreground">
                 Generated Date
               </p>
-              <p className="mt-1">{format(report.generatedDate, 'PPpp')}</p>
+              <p className="mt-1">{format(report.generatedDate, "PPpp")}</p>
             </div>
             {report.filePath && (
               <div>
@@ -175,5 +180,5 @@ export function ReportViewer({
         <CardContent>{renderContent()}</CardContent>
       </Card>
     </div>
-  )
+  );
 }

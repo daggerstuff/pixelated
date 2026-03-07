@@ -10,45 +10,45 @@ import {
   testSentryIntegration,
   captureError,
   captureMessage,
-} from '../../lib/sentry/utils'
+} from "../../lib/sentry/utils";
 
 interface SentryTestProps {
-  className?: string
+  className?: string;
 }
 
-export default function SentryTest({ className = '' }: SentryTestProps) {
+export default function SentryTest({ className = "" }: SentryTestProps) {
   // Only show in development
   if (import.meta.env.PROD) {
-    return null
+    return null;
   }
 
   const handleTestError = () => {
     try {
-      throw new Error('Test error from Sentry Test component')
+      throw new Error("Test error from Sentry Test component");
     } catch (error: unknown) {
       captureError(error as Error, {
         testComponent: {
-          action: 'manual_test_error',
+          action: "manual_test_error",
           timestamp: new Date().toISOString(),
         },
-      })
-      console.log('✅ Test error sent to Sentry!')
+      });
+      console.log("✅ Test error sent to Sentry!");
     }
-  }
+  };
 
   const handleTestMessage = () => {
-    captureMessage('Test message from Sentry Test component', 'info', {
+    captureMessage("Test message from Sentry Test component", "info", {
       testComponent: {
-        action: 'manual_test_message',
+        action: "manual_test_message",
         timestamp: new Date().toISOString(),
       },
-    })
-    console.log('✅ Test message sent to Sentry!')
-  }
+    });
+    console.log("✅ Test message sent to Sentry!");
+  };
 
   const handleFullTest = () => {
-    testSentryIntegration()
-  }
+    testSentryIntegration();
+  };
 
   return (
     <div className={`sentry-test-component ${className}`}>
@@ -77,7 +77,7 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
           </button>
         </div>
         <p className="text-xs text-yellow-700 mt-2">
-          Check your Sentry dashboard at{' '}
+          Check your Sentry dashboard at{" "}
           <a
             href="https://pixelated-empathy-dq.sentry.io/projects/pixel-astro/"
             target="_blank"
@@ -89,5 +89,5 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
         </p>
       </div>
     </div>
-  )
+  );
 }

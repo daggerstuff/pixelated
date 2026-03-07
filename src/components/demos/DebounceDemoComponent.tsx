@@ -1,26 +1,26 @@
-import { useState, useEffect, type FC } from 'react'
-import { useDebounce, useDebouncedCallback } from '@/hooks/useDebounce'
+import { useState, useEffect, type FC } from "react";
+import { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
 
 const DebounceDemoComponent: FC = () => {
   // For useDebounce hook demo
-  const [inputValue1, setInputValue1] = useState('')
-  const debouncedValue = useDebounce(inputValue1, 500)
-  const [debouncedResult1, setDebouncedResult1] = useState('')
+  const [inputValue1, setInputValue1] = useState("");
+  const debouncedValue = useDebounce(inputValue1, 500);
+  const [debouncedResult1, setDebouncedResult1] = useState("");
 
   // For useDebouncedCallback hook demo
-  const [inputValue2, setInputValue2] = useState('')
-  const [debouncedResult2, setDebouncedResult2] = useState('')
+  const [inputValue2, setInputValue2] = useState("");
+  const [debouncedResult2, setDebouncedResult2] = useState("");
 
   // Handler for the useDebouncedCallback demo
   const handleDebouncedChange = useDebouncedCallback((...args: unknown[]) => {
-    const value = args[0] as string
-    setDebouncedResult2(value)
-  }, 500)
+    const value = args[0] as string;
+    setDebouncedResult2(value);
+  }, 500);
 
   // Update the result whenever debouncedValue changes
   useEffect(() => {
-    setDebouncedResult1(debouncedValue)
-  }, [debouncedValue])
+    setDebouncedResult1(debouncedValue);
+  }, [debouncedValue]);
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
@@ -98,9 +98,9 @@ const DebounceDemoComponent: FC = () => {
               type="text"
               value={inputValue2}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const newValue = e.target.value
-                setInputValue2(newValue)
-                handleDebouncedChange(newValue)
+                const newValue = e.target.value;
+                setInputValue2(newValue);
+                handleDebouncedChange(newValue);
               }}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               placeholder="Type something..."
@@ -126,7 +126,7 @@ const DebounceDemoComponent: FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DebounceDemoComponent
+export default DebounceDemoComponent;

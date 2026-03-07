@@ -11,13 +11,13 @@ services:
       - ./docker/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
       - prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=15d'
-      - '--web.enable-lifecycle'
-      - '--web.enable-admin-api'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+      - "--web.enable-admin-api"
     restart: unless-stopped
     networks:
       - pixelated-network
@@ -31,10 +31,10 @@ services:
       - ./docker/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
     command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-      - '--web.listen-address=:9093'
-      - '--cluster.listen-address='
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+      - "--web.listen-address=:9093"
+      - "--cluster.listen-address="
     environment:
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     restart: unless-stopped
@@ -48,7 +48,7 @@ services:
       dockerfile: Dockerfile
     container_name: pixelated-alert-receiver
     ports:
-      - "5001:5001"  # Changed from 9093 to avoid conflict with AlertManager
+      - "5001:5001" # Changed from 9093 to avoid conflict with AlertManager
     environment:
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
     restart: unless-stopped
@@ -83,10 +83,10 @@ services:
       - pixelated-network
 
 volumes:
-   prometheus_data:
-   grafana_data:
-   alertmanager_data:
-   uptime_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
+  uptime_data:
 
 networks:
   pixelated-network:

@@ -2,14 +2,14 @@
  * Local MarkdownHeading type (Astro no longer exports this)
  */
 export type MarkdownHeading = {
-  depth: number
-  slug: string
-  text: string
-}
-import type { HeadingLevel } from '@/types'
+  depth: number;
+  slug: string;
+  text: string;
+};
+import type { HeadingLevel } from "@/types";
 
 export interface TocHeading extends MarkdownHeading {
-  children: TocHeading[]
+  children: TocHeading[];
 }
 
 /**
@@ -17,32 +17,32 @@ export interface TocHeading extends MarkdownHeading {
  * within the tree structure based on its `depth` property.
  */
 function injectChild(items: TocHeading[], item: TocHeading): void {
-  const lastItem = items.at(-1)
+  const lastItem = items.at(-1);
 
   if (!lastItem || lastItem.depth >= item.depth) {
-    items.push(item)
+    items.push(item);
   } else {
-    const depthDiff = item.depth - lastItem.depth
+    const depthDiff = item.depth - lastItem.depth;
 
     if (depthDiff > 1) {
-      let currentDepth = lastItem.depth + 1
-      let currentItems = lastItem.children
+      let currentDepth = lastItem.depth + 1;
+      let currentItems = lastItem.children;
 
       while (currentDepth < item.depth) {
         const fillerItem: TocHeading = {
           depth: currentDepth,
           children: [],
-          slug: '',
-          text: '',
-        }
-        currentItems.push(fillerItem)
-        currentItems = fillerItem.children
-        currentDepth++
+          slug: "",
+          text: "",
+        };
+        currentItems.push(fillerItem);
+        currentItems = fillerItem.children;
+        currentDepth++;
       }
 
-      currentItems.push(item)
+      currentItems.push(item);
     } else {
-      injectChild(lastItem.children, item)
+      injectChild(lastItem.children, item);
     }
   }
 }
@@ -58,17 +58,17 @@ export function generateToc(
 ) {
   if (minHeadingLevel > maxHeadingLevel) {
     throw new Error(
-      '`minHeadingLevel` must be less than or equal to `maxHeadingLevel`',
-    )
+      "`minHeadingLevel` must be less than or equal to `maxHeadingLevel`",
+    );
   }
 
   const bodyHeadings = headings.filter(
     ({ depth }) => depth >= minHeadingLevel && depth <= maxHeadingLevel,
-  )
+  );
 
-  const toc: TocHeading[] = []
+  const toc: TocHeading[] = [];
   for (const heading of bodyHeadings)
-    injectChild(toc, { ...heading, children: [] })
+    injectChild(toc, { ...heading, children: [] });
 
-  return toc
+  return toc;
 }
