@@ -7,6 +7,12 @@ import { useWebSocket } from '@/hooks/useWebSocket'
 import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { cn } from '@/lib/utils'
 import { Bell, Check, X } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface NotificationCenterProps {
   className?: string
@@ -21,12 +27,38 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
     url: 'ws://localhost:8080', // Placeholder URL
     sessionId: 'placeholder-session', // Placeholder session ID
     onMessage: (message) => {
-      // TODO: This is where incoming messages (lastMessage equivalent) would be handled
-      console.log('Received message:', message)
-      // For now, parsing and handling logic from the original useEffect [lastMessage] needs to be adapted here
-      // Example of how you might handle based on your previous logic:
-      // const data = JSON.parse(message.content) as unknown // Assuming message.content is the stringified data
-      // switch (data.type) { ... }
+      try {
+        const payload = JSON.parse(message.content) as {
+          type: string
+          data?: any
+          count?: number
+        }
+
+        switch (payload.type) {
+          case 'notification': {
+            const newNotification = payload.data as NotificationItem
+            setNotifications((prev) => [newNotification, ...prev])
+            if (newNotification.status === NotificationStatus.PENDING) {
+              setUnreadCount((prev) => prev + 1)
+            }
+            break
+          }
+          case 'unreadCount': {
+            if (typeof payload.count === 'number') {
+              setUnreadCount(payload.count)
+            }
+            break
+          }
+          case 'notifications': {
+            if (Array.isArray(payload.data)) {
+              setNotifications(payload.data)
+            }
+            break
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing notification message:', error)
+      }
     },
   })
 
@@ -86,36 +118,53 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   }
 
   return (
-    <div className={cn('relative', className)}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Bell className="h-5 w-5" />
-        {unreadCount > 0 && (
-          <Badge
-            variant="destructive"
-            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-          >
-            {unreadCount}
-          </Badge>
-        )}
-      </Button>
-
-      {isOpen && (
-        <Card className="absolute right-0 top-12 z-50 w-96 shadow-lg">
-          <div className="flex items-center justify-between border-b p-4">
-            <h2 className="text-lg font-semibold">Notifications</h2>
+    <TooltipProvider>
+      <div className={cn('relative', className)}>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsOpen(false)}
+              className="relative"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Notifications"
             >
-              <X className="h-4 w-4" />
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                >
+                  {unreadCount}
+                </Badge>
+              )}
             </Button>
-          </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Notifications</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {isOpen && (
+          <Card className="absolute right-0 top-12 z-50 w-96 shadow-lg">
+            <div className="flex items-center justify-between border-b p-4">
+              <h2 className="text-lg font-semibold">Notifications</h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsOpen(false)}
+                    aria-label="Close notifications"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Close notifications</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
 
           <div className="h-96 overflow-y-auto">
             {notifications.length === 0 ? (
@@ -145,29 +194,46 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
 
                     <div className="flex gap-1">
                       {notification.status === NotificationStatus.PENDING && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleMarkAsRead(notification.id)}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleMarkAsRead(notification.id)}
+                              aria-label="Mark as read"
+                            >
+                              <Check className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Mark as read</p>
+                          </TooltipContent>
+                        </Tooltip>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDismiss(notification.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDismiss(notification.id)}
+                            aria-label="Dismiss notification"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Dismiss notification</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </Card>
-      )}
-    </div>
+          </Card>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
