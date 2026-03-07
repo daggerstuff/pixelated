@@ -1,10 +1,10 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { type DatasetMetadata } from "@/lib/api/research";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { type DatasetMetadata } from '@/lib/api/research';
 
 interface DatasetCardProps {
-  dataset: DatasetMetadata;
-  index?: number;
+    dataset: DatasetMetadata;
+    index?: number;
 }
 
 const DatasetHeader = ({ dataset }: { dataset: DatasetMetadata }) => {

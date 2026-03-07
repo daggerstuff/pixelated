@@ -1,70 +1,70 @@
-import type { ToastOptions } from "react-hot-toast";
-import type { ReactNode } from "react";
-import { toast as hotToast, Toaster } from "react-hot-toast";
-import { cn } from "../../lib/utils";
-import { IconX } from "./icons";
+import type { ToastOptions } from 'react-hot-toast'
+import type { ReactNode } from 'react'
+import { toast as hotToast, Toaster } from 'react-hot-toast'
+import { cn } from '../../lib/utils'
+import { IconX } from './icons'
 
 // Types for toast options
-export interface ToastProps extends Omit<ToastOptions, "icon"> {
-  message: string;
-  icon?: ReactNode;
+export interface ToastProps extends Omit<ToastOptions, 'icon'> {
+  message: string
+  icon?: ReactNode
 }
 
 // Common toast options
 const defaultOptions: Partial<ToastOptions> = {
   duration: 3000,
-  position: "bottom-right",
-};
+  position: 'bottom-right',
+}
 
 // Toast component that provides the Toaster container
 export function Toast({
-  position = "bottom-right",
+  position = 'bottom-right',
   toastOptions,
   className,
 }: {
-  position?: ToastOptions["position"];
-  toastOptions?: Partial<ToastOptions>;
-  className?: string;
+  position?: ToastOptions['position']
+  toastOptions?: Partial<ToastOptions>
+  className?: string
 }) {
   return (
     <Toaster
       position={position}
       toastOptions={{
         className: cn(
-          "bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg rounded-md",
+          'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg rounded-md',
           className,
         ),
         success: {
           className: cn(
-            "bg-white dark:bg-gray-800 border-l-4 border-green-500",
+            'bg-white dark:bg-gray-800 border-l-4 border-green-500',
             className,
           ),
           iconTheme: {
-            primary: "#10B981",
-            secondary: "white",
+            primary: '#10B981',
+            secondary: 'white',
           },
         },
         error: {
           className: cn(
-            "bg-white dark:bg-gray-800 border-l-4 border-red-500",
+            'bg-white dark:bg-gray-800 border-l-4 border-red-500',
             className,
           ),
           iconTheme: {
-            primary: "#EF4444",
-            secondary: "white",
+            primary: '#EF4444',
+            secondary: 'white',
           },
         },
         ...toastOptions,
       }}
     />
-  );
+  )
 }
 
 // Promise toast message types
 interface ToastPromiseMessages<TData> {
-  loading: string;
-  success: string | ((data: TData) => string);
-  error: string | ((err: unknown) => string);
+  loading: string
+  success: string | ((data: TData) => string)
+  error: string | ((err: unknown) => string)
 }
 
 // Utility functions to show different types of toasts
@@ -75,9 +75,9 @@ export const toast = {
       (t) => (
         <div
           className={cn(
-            "flex items-center p-4 bg-white dark:bg-gray-800 rounded-md shadow-md",
-            "max-w-md w-full",
-            t.visible ? "animate-enter" : "animate-leave",
+            'flex items-center p-4 bg-white dark:bg-gray-800 rounded-md shadow-md',
+            'max-w-md w-full',
+            t.visible ? 'animate-enter' : 'animate-leave',
           )}
         >
           {icon && <div className="flex-shrink-0 mr-3">{icon}</div>}
@@ -96,7 +96,7 @@ export const toast = {
         ...defaultOptions,
         ...options,
       },
-    );
+    )
   },
 
   // Success toas
@@ -104,7 +104,7 @@ export const toast = {
     return hotToast.success(message, {
       ...defaultOptions,
       ...options,
-    });
+    })
   },
 
   // Error toas
@@ -112,7 +112,7 @@ export const toast = {
     return hotToast.error(message, {
       ...defaultOptions,
       ...options,
-    });
+    })
   },
 
   // Info toas
@@ -134,7 +134,7 @@ export const toast = {
           />
         </svg>
       ),
-    });
+    })
   },
 
   // Warning toas
@@ -156,7 +156,7 @@ export const toast = {
           />
         </svg>
       ),
-    });
+    })
   },
 
   // Loading toas
@@ -164,7 +164,7 @@ export const toast = {
     return hotToast.loading(message, {
       ...defaultOptions,
       ...options,
-    });
+    })
   },
 
   // Promise toast with proper TypeScript generics
@@ -184,13 +184,13 @@ export const toast = {
         ...defaultOptions,
         ...options,
       },
-    );
+    )
   },
 
   // Dismiss toas
   dismiss: (toastId?: string) => {
-    hotToast.dismiss(toastId);
+    hotToast.dismiss(toastId)
   },
-};
+}
 
-export default Toast;
+export default Toast

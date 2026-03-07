@@ -10,53 +10,53 @@
  * Base error class for all bias detection related errors
  */
 export abstract class BiasDetectionError extends Error {
-  public readonly code: string;
-  public readonly severity: "low" | "medium" | "high" | "critical";
+  public readonly code: string
+  public readonly severity: 'low' | 'medium' | 'high' | 'critical'
   public readonly category:
-    | "configuration"
-    | "validation"
-    | "service"
-    | "data"
-    | "security"
-    | "performance"
-    | "system";
-  public readonly timestamp: Date;
-  public readonly context: Record<string, unknown>;
-  public readonly recoverable: boolean;
-  public readonly userMessage?: string | undefined;
+    | 'configuration'
+    | 'validation'
+    | 'service'
+    | 'data'
+    | 'security'
+    | 'performance'
+    | 'system'
+  public readonly timestamp: Date
+  public readonly context: Record<string, unknown>
+  public readonly recoverable: boolean
+  public readonly userMessage?: string | undefined
 
   constructor(
     message: string,
     code: string,
-    severity: "low" | "medium" | "high" | "critical",
+    severity: 'low' | 'medium' | 'high' | 'critical',
     category:
-      | "configuration"
-      | "validation"
-      | "service"
-      | "data"
-      | "security"
-      | "performance"
-      | "system",
+      | 'configuration'
+      | 'validation'
+      | 'service'
+      | 'data'
+      | 'security'
+      | 'performance'
+      | 'system',
     options: {
-      context?: Record<string, unknown>;
-      recoverable?: boolean;
-      userMessage?: string;
-      cause?: Error | unknown;
+      context?: Record<string, unknown>
+      recoverable?: boolean
+      userMessage?: string
+      cause?: Error | unknown
     } = {},
   ) {
-    super(message, { cause: options.cause });
-    this.name = this.constructor.name;
-    this.code = code;
-    this.severity = severity;
-    this.category = category;
-    this.timestamp = new Date();
-    this.context = options.context || {};
-    this.recoverable = options.recoverable ?? false;
-    this.userMessage = options.userMessage;
+    super(message, { cause: options.cause })
+    this.name = this.constructor.name
+    this.code = code
+    this.severity = severity
+    this.category = category
+    this.timestamp = new Date()
+    this.context = options.context || {}
+    this.recoverable = options.recoverable ?? false
+    this.userMessage = options.userMessage
 
     // Maintain proper stack trace for debugging
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
+      Error.captureStackTrace(this, this.constructor)
     }
   }
 
@@ -64,14 +64,14 @@ export abstract class BiasDetectionError extends Error {
    * Get a user-friendly error message
    */
   public getUserMessage(): string {
-    return this.userMessage || this.getDefaultUserMessage();
+    return this.userMessage || this.getDefaultUserMessage()
   }
 
   /**
    * Get default user message (to be overridden by subclasses)
    */
   protected getDefaultUserMessage(): string {
-    return "An error occurred in the bias detection system. Please contact support.";
+    return 'An error occurred in the bias detection system. Please contact support.'
   }
 
   /**
@@ -89,7 +89,7 @@ export abstract class BiasDetectionError extends Error {
       recoverable: this.recoverable,
       userMessage: this.userMessage,
       stack: this.stack,
-    };
+    }
   }
 
   /**
@@ -102,7 +102,7 @@ export abstract class BiasDetectionError extends Error {
       category: this.category,
       userMessage: this.getUserMessage(),
       recoverable: this.recoverable,
-    };
+    }
   }
 }
 
@@ -113,48 +113,48 @@ export class BiasConfigurationError extends BiasDetectionError {
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      configProperty?: string;
-      configValue?: unknown;
-      userMessage?: string;
-      cause?: Error | unknown;
+      context?: Record<string, unknown>
+      configProperty?: string
+      configValue?: unknown
+      userMessage?: string
+      cause?: Error | unknown
     } = {},
   ) {
-    super(message, "BIAS_CONFIG_ERROR", "high", "configuration", {
+    super(message, 'BIAS_CONFIG_ERROR', 'high', 'configuration', {
       ...options,
       context: {
         ...options.context,
         configProperty: options.configProperty,
         configValue: options.configValue,
       },
-    });
+    })
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Configuration error occurred. Please check your bias detection settings.";
+    return 'Configuration error occurred. Please check your bias detection settings.'
   }
 }
 
 export class BiasConfigurationValidationError extends BiasDetectionError {
-  public readonly configProperty: string;
-  public readonly configValue: unknown;
-  public readonly expectedType: string;
+  public readonly configProperty: string
+  public readonly configValue: unknown
+  public readonly expectedType: string
 
   constructor(
     property: string,
     value: unknown,
     expectedType: string,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
-      cause?: Error | unknown;
+      context?: Record<string, unknown>
+      userMessage?: string
+      cause?: Error | unknown
     } = {},
   ) {
     super(
       `Invalid configuration for property '${property}': expected ${expectedType}, got ${typeof value}`,
-      "BIAS_CONFIG_VALIDATION_ERROR",
-      "high",
-      "configuration",
+      'BIAS_CONFIG_VALIDATION_ERROR',
+      'high',
+      'configuration',
       {
         ...options,
         context: {
@@ -165,18 +165,18 @@ export class BiasConfigurationValidationError extends BiasDetectionError {
           actualType: typeof value,
         },
       },
-    );
-    this.configProperty = property;
-    this.configValue = value;
-    this.expectedType = expectedType;
+    )
+    this.configProperty = property
+    this.configValue = value
+    this.expectedType = expectedType
   }
 }
 
 export class BiasThresholdError extends BiasConfigurationError {
-  public readonly thresholdName: string;
-  public readonly value: number;
-  public readonly min: number;
-  public readonly max: number;
+  public readonly thresholdName: string
+  public readonly value: number
+  public readonly min: number
+  public readonly max: number
 
   constructor(
     thresholdName: string,
@@ -184,8 +184,8 @@ export class BiasThresholdError extends BiasConfigurationError {
     min: number,
     max: number,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
     super(
@@ -201,15 +201,15 @@ export class BiasThresholdError extends BiasConfigurationError {
           actualValue: value,
         },
       },
-    );
-    this.thresholdName = thresholdName;
-    this.value = value;
-    this.min = min;
-    this.max = max;
+    )
+    this.thresholdName = thresholdName
+    this.value = value
+    this.min = min
+    this.max = max
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Bias threshold configuration is invalid. Please use values between 0 and 1.";
+    return 'Bias threshold configuration is invalid. Please use values between 0 and 1.'
   }
 }
 
@@ -220,24 +220,24 @@ export class BiasValidationError extends BiasDetectionError {
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      field?: string;
-      value?: unknown;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      field?: string
+      value?: unknown
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_VALIDATION_ERROR", "medium", "validation", {
+    super(message, 'BIAS_VALIDATION_ERROR', 'medium', 'validation', {
       ...options,
       context: {
         ...options.context,
         field: options.field,
         value: options.value,
       },
-    });
+    })
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Validation error occurred. Please check your input data.";
+    return 'Validation error occurred. Please check your input data.'
   }
 }
 
@@ -245,32 +245,32 @@ export class BiasValidationError extends BiasDetectionError {
  * Session validation errors
  */
 export class BiasSessionValidationError extends BiasDetectionError {
-  public readonly sessionId?: string | undefined;
-  public readonly validationField: string;
+  public readonly sessionId?: string | undefined
+  public readonly validationField: string
 
   constructor(
     sessionId: string | undefined,
     field: string,
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_SESSION_VALIDATION_ERROR", "medium", "validation", {
+    super(message, 'BIAS_SESSION_VALIDATION_ERROR', 'medium', 'validation', {
       ...options,
       context: {
         ...options.context,
         sessionId,
         field,
       },
-    });
-    this.sessionId = sessionId;
-    this.validationField = field;
+    })
+    this.sessionId = sessionId
+    this.validationField = field
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Session data validation failed. Please check the input data format.";
+    return 'Session data validation failed. Please check the input data format.'
   }
 }
 
@@ -278,37 +278,37 @@ export class BiasSessionValidationError extends BiasDetectionError {
  * Service-related errors (Python bridge, API calls)
  */
 export class BiasPythonServiceError extends BiasDetectionError {
-  public readonly serviceUrl?: string | undefined;
-  public readonly httpStatus?: number | undefined;
+  public readonly serviceUrl?: string | undefined
+  public readonly httpStatus?: number | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      serviceUrl?: string;
-      httpStatus?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      serviceUrl?: string
+      httpStatus?: number
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_PYTHON_SERVICE_ERROR", "high", "service", options);
-    this.serviceUrl = options.serviceUrl;
-    this.httpStatus = options.httpStatus;
+    super(message, 'BIAS_PYTHON_SERVICE_ERROR', 'high', 'service', options)
+    this.serviceUrl = options.serviceUrl
+    this.httpStatus = options.httpStatus
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Bias detection service is temporarily unavailable. Please try again later.";
+    return 'Bias detection service is temporarily unavailable. Please try again later.'
   }
 }
 
 export class BiasPythonServiceTimeoutError extends BiasPythonServiceError {
-  public readonly timeout: number;
+  public readonly timeout: number
 
   constructor(
     timeout: number,
     options: {
-      context?: Record<string, unknown>;
-      serviceUrl?: string;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      serviceUrl?: string
+      userMessage?: string
     } = {},
   ) {
     super(`Python service request timed out after ${timeout}ms`, {
@@ -317,8 +317,8 @@ export class BiasPythonServiceTimeoutError extends BiasPythonServiceError {
         ...options.context,
         timeout,
       },
-    });
-    this.timeout = timeout;
+    })
+    this.timeout = timeout
   }
 }
 
@@ -326,9 +326,9 @@ export class BiasPythonServiceUnavailableError extends BiasPythonServiceError {
   constructor(
     serviceUrl: string,
     options: {
-      context?: Record<string, unknown>;
-      httpStatus?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      httpStatus?: number
+      userMessage?: string
     } = {},
   ) {
     super(`Python bias detection service is unavailable at ${serviceUrl}`, {
@@ -338,7 +338,7 @@ export class BiasPythonServiceUnavailableError extends BiasPythonServiceError {
         ...options.context,
         serviceUrl,
       },
-    });
+    })
   }
 }
 
@@ -346,25 +346,25 @@ export class BiasPythonServiceUnavailableError extends BiasPythonServiceError {
  * Data-related errors
  */
 export class BiasDataError extends BiasDetectionError {
-  public readonly dataType?: string | undefined;
-  public readonly dataSize?: number | undefined;
+  public readonly dataType?: string | undefined
+  public readonly dataSize?: number | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      dataType?: string;
-      dataSize?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      dataType?: string
+      dataSize?: number
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_DATA_ERROR", "medium", "data", options);
-    this.dataType = options.dataType;
-    this.dataSize = options.dataSize;
+    super(message, 'BIAS_DATA_ERROR', 'medium', 'data', options)
+    this.dataType = options.dataType
+    this.dataSize = options.dataSize
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Data processing error occurred. Please check your input data.";
+    return 'Data processing error occurred. Please check your input data.'
   }
 }
 
@@ -373,9 +373,9 @@ export class BiasDataCorruptionError extends BiasDataError {
     dataType: string,
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      dataSize?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      dataSize?: number
+      userMessage?: string
     } = {},
   ) {
     super(`Data corruption detected in ${dataType}: ${message}`, {
@@ -386,11 +386,11 @@ export class BiasDataCorruptionError extends BiasDataError {
         dataType,
         corruptionType: message,
       },
-    });
+    })
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Data corruption detected. Please verify your input data and try again.";
+    return 'Data corruption detected. Please verify your input data and try again.'
   }
 }
 
@@ -398,22 +398,22 @@ export class BiasDataCorruptionError extends BiasDataError {
  * Security-related errors
  */
 export class BiasSecurityError extends BiasDetectionError {
-  public readonly securityContext?: string | undefined;
+  public readonly securityContext?: string | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      securityContext?: string;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      securityContext?: string
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_SECURITY_ERROR", "high", "security", options);
-    this.securityContext = options.securityContext;
+    super(message, 'BIAS_SECURITY_ERROR', 'high', 'security', options)
+    this.securityContext = options.securityContext
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Security violation detected. Access denied.";
+    return 'Security violation detected. Access denied.'
   }
 }
 
@@ -421,14 +421,14 @@ export class BiasAuthenticationError extends BiasSecurityError {
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
     super(message, {
       ...options,
-      securityContext: "authentication",
-    });
+      securityContext: 'authentication',
+    })
   }
 }
 
@@ -436,14 +436,14 @@ export class BiasAuthorizationError extends BiasSecurityError {
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
     super(message, {
       ...options,
-      securityContext: "authorization",
-    });
+      securityContext: 'authorization',
+    })
   }
 }
 
@@ -451,28 +451,28 @@ export class BiasAuthorizationError extends BiasSecurityError {
  * Performance-related errors
  */
 export class BiasPerformanceError extends BiasDetectionError {
-  public readonly operation?: string | undefined;
-  public readonly duration?: number | undefined;
-  public readonly threshold?: number | undefined;
+  public readonly operation?: string | undefined
+  public readonly duration?: number | undefined
+  public readonly threshold?: number | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      operation?: string;
-      duration?: number;
-      threshold?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      operation?: string
+      duration?: number
+      threshold?: number
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_PERFORMANCE_ERROR", "medium", "performance", options);
-    this.operation = options.operation;
-    this.duration = options.duration;
-    this.threshold = options.threshold;
+    super(message, 'BIAS_PERFORMANCE_ERROR', 'medium', 'performance', options)
+    this.operation = options.operation
+    this.duration = options.duration
+    this.threshold = options.threshold
   }
 
   protected override getDefaultUserMessage(): string {
-    return "Performance degradation detected. The system may be experiencing high load.";
+    return 'Performance degradation detected. The system may be experiencing high load.'
   }
 }
 
@@ -482,8 +482,8 @@ export class BiasPerformanceTimeoutError extends BiasPerformanceError {
     duration: number,
     threshold: number,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
     super(
@@ -494,13 +494,13 @@ export class BiasPerformanceTimeoutError extends BiasPerformanceError {
         duration,
         threshold,
       } as {
-        context?: Record<string, unknown>;
-        operation: string;
-        duration?: number;
-        threshold?: number;
-        userMessage?: string;
+        context?: Record<string, unknown>
+        operation: string
+        duration?: number
+        threshold?: number
+        userMessage?: string
       },
-    );
+    )
   }
 }
 
@@ -508,11 +508,11 @@ export class BiasResourceExhaustionError extends BiasPerformanceError {
   constructor(
     resource: string,
     options: {
-      context?: Record<string, unknown>;
-      operation: string;
-      duration?: number;
-      threshold?: number;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      operation: string
+      duration?: number
+      threshold?: number
+      userMessage?: string
     },
   ) {
     super(`Resource exhaustion: ${resource}`, {
@@ -523,12 +523,12 @@ export class BiasResourceExhaustionError extends BiasPerformanceError {
       },
       operation: options.operation,
     } as {
-      context?: Record<string, unknown>;
-      operation: string;
-      duration?: number;
-      threshold?: number;
-      userMessage?: string;
-    });
+      context?: Record<string, unknown>
+      operation: string
+      duration?: number
+      threshold?: number
+      userMessage?: string
+    })
   }
 }
 
@@ -536,28 +536,28 @@ export class BiasResourceExhaustionError extends BiasPerformanceError {
  * Model-related errors
  */
 export class BiasModelError extends BiasDetectionError {
-  public readonly modelId?: string | undefined;
-  public readonly confidenceScore?: number | undefined;
-  public readonly biasType?: string | undefined;
+  public readonly modelId?: string | undefined
+  public readonly confidenceScore?: number | undefined
+  public readonly biasType?: string | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      modelId?: string;
-      confidenceScore?: number;
-      biasType?: string;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      modelId?: string
+      confidenceScore?: number
+      biasType?: string
+      userMessage?: string
     } = {},
   ) {
-    super(message, "BIAS_MODEL_ERROR", "high", "system", options);
-    this.modelId = options.modelId;
-    this.confidenceScore = options.confidenceScore;
-    this.biasType = options.biasType;
+    super(message, 'BIAS_MODEL_ERROR', 'high', 'system', options)
+    this.modelId = options.modelId
+    this.confidenceScore = options.confidenceScore
+    this.biasType = options.biasType
   }
 
   protected override getDefaultUserMessage(): string {
-    return "An error occurred within the bias detection model.";
+    return 'An error occurred within the bias detection model.'
   }
 }
 
@@ -565,29 +565,29 @@ export class BiasModelError extends BiasDetectionError {
  * System-related errors
  */
 export class BiasSystemError extends BiasDetectionError {
-  public readonly component?: string | undefined;
+  public readonly component?: string | undefined
 
   constructor(
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      component?: string;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      component?: string
+      userMessage?: string
     } = {},
   ) {
-    const { component, context, ...rest } = options;
-    super(message, "BIAS_SYSTEM_ERROR", "critical", "system", {
+    const { component, context, ...rest } = options
+    super(message, 'BIAS_SYSTEM_ERROR', 'critical', 'system', {
       ...rest,
       context: {
         ...context,
         component,
       },
-    });
-    this.component = component;
+    })
+    this.component = component
   }
 
   protected override getDefaultUserMessage(): string {
-    return "A critical system error occurred in the bias detection engine. Please contact support immediately.";
+    return 'A critical system error occurred in the bias detection engine. Please contact support immediately.'
   }
 }
 
@@ -596,8 +596,8 @@ export class BiasInitializationError extends BiasSystemError {
     component: string,
     message: string,
     options: {
-      context?: Record<string, unknown>;
-      userMessage?: string;
+      context?: Record<string, unknown>
+      userMessage?: string
     } = {},
   ) {
     super(`Failed to initialize ${component}: ${message}`, {
@@ -608,7 +608,7 @@ export class BiasInitializationError extends BiasSystemError {
         component,
         initializationError: message,
       },
-    });
+    })
   }
 }
 
@@ -622,15 +622,15 @@ export class BiasInitializationError extends BiasSystemError {
  */
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) {
-    return String(error);
+    return String(error)
   }
-  if (typeof error === "string") {
-    return error;
+  if (typeof error === 'string') {
+    return error
   }
-  if (error && typeof error === "object" && "message" in error) {
-    return String((error as { message: unknown }).message);
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String((error as { message: unknown }).message)
   }
-  return "Unknown error occurred";
+  return 'Unknown error occurred'
 }
 
 /**
@@ -639,37 +639,37 @@ export function getErrorMessage(error: unknown): string {
 export function createErrorFromUnknown(
   error: unknown,
   context: {
-    operation: string;
+    operation: string
     category?:
-      | "configuration"
-      | "validation"
-      | "service"
-      | "data"
-      | "security"
-      | "performance"
-      | "system";
-    severity?: "low" | "medium" | "high" | "critical";
-    additionalContext?: Record<string, unknown>;
+      | 'configuration'
+      | 'validation'
+      | 'service'
+      | 'data'
+      | 'security'
+      | 'performance'
+      | 'system'
+    severity?: 'low' | 'medium' | 'high' | 'critical'
+    additionalContext?: Record<string, unknown>
   },
 ): BiasDetectionError {
-  const message = getErrorMessage(error);
+  const message = getErrorMessage(error)
 
   const errorOptions: {
-    component: string;
-    context?: Record<string, unknown>;
-    userMessage: string;
+    component: string
+    context?: Record<string, unknown>
+    userMessage: string
   } = {
     component: context.operation,
-    userMessage: "An unexpected error occurred during processing.",
+    userMessage: 'An unexpected error occurred during processing.',
     ...(context.additionalContext !== undefined
       ? { context: context.additionalContext }
       : {}),
-  };
+  }
 
   return new BiasSystemError(
     `Error in ${context.operation}: ${message}`,
     errorOptions,
-  );
+  )
 }
 
 /**
@@ -677,40 +677,40 @@ export function createErrorFromUnknown(
  */
 export function isRetryable(error: unknown): boolean {
   if (error instanceof BiasDetectionError) {
-    return error.recoverable;
+    return error.recoverable
   }
   if (error instanceof Error) {
     // Network errors are typically retryable
     return (
-      String(error).includes("fetch") ||
-      String(error).includes("timeout") ||
-      String(error).includes("network") ||
-      String(error).includes("ECONNRESET") ||
-      String(error).includes("ENOTFOUND")
-    );
+      String(error).includes('fetch') ||
+      String(error).includes('timeout') ||
+      String(error).includes('network') ||
+      String(error).includes('ECONNRESET') ||
+      String(error).includes('ENOTFOUND')
+    )
   }
-  return false;
+  return false
 }
 
 /**
  * Get retry delay based on error type and attempt number
  */
 export function getRetryDelay(error: unknown, attempt: number): number {
-  const baseDelay = 1000; // 1 second
-  const maxDelay = 30000; // 30 seconds
+  const baseDelay = 1000 // 1 second
+  const maxDelay = 30000 // 30 seconds
 
   if (error instanceof BiasPythonServiceTimeoutError) {
     // Exponential backoff for timeout errors
-    return Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
+    return Math.min(baseDelay * Math.pow(2, attempt), maxDelay)
   }
 
   if (error instanceof BiasPythonServiceError) {
     // Linear backoff for service errors
-    return Math.min(baseDelay * (attempt + 1), maxDelay);
+    return Math.min(baseDelay * (attempt + 1), maxDelay)
   }
 
   // Default exponential backoff
-  return Math.min(baseDelay * Math.pow(1.5, attempt), maxDelay);
+  return Math.min(baseDelay * Math.pow(1.5, attempt), maxDelay)
 }
 
 /**
@@ -719,11 +719,11 @@ export function getRetryDelay(error: unknown, attempt: number): number {
 export function shouldAlert(error: unknown): boolean {
   if (error instanceof BiasDetectionError) {
     return (
-      error.severity === "critical" ||
-      (error.severity === "high" && !error.recoverable)
-    );
+      error.severity === 'critical' ||
+      (error.severity === 'high' && !error.recoverable)
+    )
   }
-  return false;
+  return false
 }
 
 /**
@@ -738,39 +738,39 @@ export function getMetrics(error: unknown): Record<string, unknown> {
       errorRecoverable: error.recoverable,
       errorTimestamp: error.timestamp.toISOString(),
       ...error.context,
-    };
+    }
   }
 
   return {
     errorType: error instanceof Error ? error.constructor.name : typeof error,
     errorMessage: getErrorMessage(error),
     errorTimestamp: new Date().toISOString(),
-  };
+  }
 }
 
 /**
  * Error aggregation for monitoring and alerting
  */
 export class BiasErrorAggregator {
-  private errorCounts: Map<string, number> = new Map();
-  private errorSamples: Map<string, BiasDetectionError[]> = new Map();
-  private readonly maxSamplesPerType = 10;
+  private errorCounts: Map<string, number> = new Map()
+  private errorSamples: Map<string, BiasDetectionError[]> = new Map()
+  private readonly maxSamplesPerType = 10
 
   /**
    * Record error occurrence
    */
   recordError(error: unknown): void {
     if (error instanceof BiasDetectionError) {
-      const key = `${error.code}_${error.severity}`;
-      this.errorCounts.set(key, (this.errorCounts.get(key) || 0) + 1);
+      const key = `${error.code}_${error.severity}`
+      this.errorCounts.set(key, (this.errorCounts.get(key) || 0) + 1)
 
       if (!this.errorSamples.has(key)) {
-        this.errorSamples.set(key, []);
+        this.errorSamples.set(key, [])
       }
 
-      const samples = this.errorSamples.get(key)!;
+      const samples = this.errorSamples.get(key)!
       if (samples.length < this.maxSamplesPerType) {
-        samples.push(error);
+        samples.push(error)
       }
     }
   }
@@ -779,28 +779,28 @@ export class BiasErrorAggregator {
    * Get error statistics
    */
   getStatistics(): {
-    totalErrors: number;
-    errorsByType: Record<string, number>;
-    criticalErrors: number;
-    recoverableErrors: number;
-    samples: Record<string, BiasDetectionError[]>;
+    totalErrors: number
+    errorsByType: Record<string, number>
+    criticalErrors: number
+    recoverableErrors: number
+    samples: Record<string, BiasDetectionError[]>
   } {
     const totalErrors = Array.from(this.errorCounts.values()).reduce(
       (sum, count) => sum + count,
       0,
-    );
-    const errorsByType = Object.fromEntries(this.errorCounts);
+    )
+    const errorsByType = Object.fromEntries(this.errorCounts)
 
-    let criticalErrors = 0;
-    let recoverableErrors = 0;
+    let criticalErrors = 0
+    let recoverableErrors = 0
 
     for (const [_key, samples] of Array.from(this.errorSamples)) {
       for (const sample of samples) {
-        if (sample.severity === "critical") {
-          criticalErrors++;
+        if (sample.severity === 'critical') {
+          criticalErrors++
         }
         if (sample.recoverable) {
-          recoverableErrors++;
+          recoverableErrors++
         }
       }
     }
@@ -811,15 +811,15 @@ export class BiasErrorAggregator {
       criticalErrors,
       recoverableErrors,
       samples: Object.fromEntries(this.errorSamples),
-    };
+    }
   }
 
   /**
    * Reset statistics
    */
   reset() {
-    this.errorCounts.clear();
-    this.errorSamples.clear();
+    this.errorCounts.clear()
+    this.errorSamples.clear()
   }
 }
 
@@ -829,39 +829,39 @@ export class BiasErrorAggregator {
 export function isBiasDetectionError(
   error: unknown,
 ): error is BiasDetectionError {
-  return error instanceof BiasDetectionError;
+  return error instanceof BiasDetectionError
 }
 
 export function isBiasConfigurationError(
   error: unknown,
 ): error is BiasConfigurationError {
-  return error instanceof BiasConfigurationError;
+  return error instanceof BiasConfigurationError
 }
 
 export function isBiasValidationError(
   error: unknown,
 ): error is BiasValidationError {
-  return error instanceof BiasValidationError;
+  return error instanceof BiasValidationError
 }
 
 export function isBiasPythonServiceError(
   error: unknown,
 ): error is BiasPythonServiceError {
-  return error instanceof BiasPythonServiceError;
+  return error instanceof BiasPythonServiceError
 }
 
 export function isBiasSecurityError(
   error: unknown,
 ): error is BiasSecurityError {
-  return error instanceof BiasSecurityError;
+  return error instanceof BiasSecurityError
 }
 
 export function isBiasPerformanceError(
   error: unknown,
 ): error is BiasPerformanceError {
-  return error instanceof BiasPerformanceError;
+  return error instanceof BiasPerformanceError
 }
 
 export function isBiasSystemError(error: unknown): error is BiasSystemError {
-  return error instanceof BiasSystemError;
+  return error instanceof BiasSystemError
 }

@@ -3,50 +3,50 @@
  * This prevents "document is not defined" errors during build
  */
 export default function vitePluginFlexsearchSSR() {
-  const virtualModuleId = "virtual:flexsearch-stub";
-  const resolvedVirtualModuleId = "\0" + virtualModuleId;
+  const virtualModuleId = 'virtual:flexsearch-stub'
+  const resolvedVirtualModuleId = '\0' + virtualModuleId
 
   // Check if we're in a server-side environment
-  const isSSR = process.env.SSR === "true" || !globalThis.window;
+  const isSSR = process.env.SSR === 'true' || !globalThis.window
 
   // Specific paths to intercept - being explicit is better than using includes
   const flexsearchPaths = [
-    "flexsearch",
-    "flexsearch/dist/module/document",
-    "flexsearch/dist/module/index",
-    "flexsearch/dist/flexsearch.min.js",
-    "flexsearch/dist/module/lang",
-    "flexsearch/lang",
-  ];
+    'flexsearch',
+    'flexsearch/dist/module/document',
+    'flexsearch/dist/module/index',
+    'flexsearch/dist/flexsearch.min.js',
+    'flexsearch/dist/module/lang',
+    'flexsearch/lang',
+  ]
 
   return {
-    name: "vite-plugin-flexsearch-ssr",
-    enforce: "pre", // Run this plugin before other plugins
+    name: 'vite-plugin-flexsearch-ssr',
+    enforce: 'pre', // Run this plugin before other plugins
 
     resolveId(id, importer, options) {
       // Handle exact path matches
       if (isSSR && flexsearchPaths.includes(id)) {
-        console.log(`[flexsearch-ssr] Intercepting direct import: ${id}`);
-        return resolvedVirtualModuleId;
+        console.log(`[flexsearch-ssr] Intercepting direct import: ${id}`)
+        return resolvedVirtualModuleId
       }
 
       // Check for node_modules paths (handles both ESM and CJS resolution)
-      if (isSSR && id.includes("/node_modules/flexsearch/")) {
-        console.log(`[flexsearch-ssr] Intercepting node_modules import: ${id}`);
-        return resolvedVirtualModuleId;
+      if (isSSR && id.includes('/node_modules/flexsearch/')) {
+        console.log(`[flexsearch-ssr] Intercepting node_modules import: ${id}`)
+        return resolvedVirtualModuleId
       }
 
       // Handle relative imports from flexsearch
       if (
         isSSR &&
         importer &&
-        (importer.includes("flexsearch") ||
-          importer.includes("node_modules/flexsearch"))
+        (importer.includes('flexsearch') ||
+          importer.includes('node_modules/flexsearch'))
       ) {
         console.log(
           `[flexsearch-ssr] Intercepting relative import from flexsearch: ${id} (imported by ${importer})`,
-        );
-        return resolvedVirtualModuleId;
+        )
+        return resolvedVirtualModuleId
       }
 
       // Handle dynamic imports (handles import() patterns)
@@ -54,15 +54,15 @@ export default function vitePluginFlexsearchSSR() {
         isSSR &&
         options &&
         options.dynamicImport &&
-        (id.includes("flexsearch") || id === "flexsearch")
+        (id.includes('flexsearch') || id === 'flexsearch')
       ) {
-        console.log(`[flexsearch-ssr] Intercepting dynamic import: ${id}`);
-        return resolvedVirtualModuleId;
+        console.log(`[flexsearch-ssr] Intercepting dynamic import: ${id}`)
+        return resolvedVirtualModuleId
       }
 
       // Handle the virtual module ID
       if (id === virtualModuleId) {
-        return resolvedVirtualModuleId;
+        return resolvedVirtualModuleId
       }
     },
 
@@ -128,29 +128,29 @@ export default function vitePluginFlexsearchSSR() {
           export const registerEncoder = flexsearchStub.registerEncoder;
           export const registerMatcher = flexsearchStub.registerMatcher;
           export const registerFilter = flexsearchStub.registerFilter;
-        `;
+        `
       }
     },
-  };
+  }
 }
 !(function () {
   try {
     var e =
-        "undefined" != typeof window
+        'undefined' != typeof window
           ? window
-          : "undefined" != typeof global
+          : 'undefined' != typeof global
             ? global
-            : "undefined" != typeof globalThis
+            : 'undefined' != typeof globalThis
               ? globalThis
-              : "undefined" != typeof self
+              : 'undefined' != typeof self
                 ? self
                 : {},
-      n = new e.Error().stack;
+      n = new e.Error().stack
     n &&
       ((e._sentryDebugIds = e._sentryDebugIds || {}),
-      (e._sentryDebugIds[n] = "a0db6a53-f0a3-5748-899c-6016b824b882"));
+      (e._sentryDebugIds[n] = 'a0db6a53-f0a3-5748-899c-6016b824b882'))
   } catch (error) {
     // Intentionally empty - silencing Sentry debug errors
   }
-})();
+})()
 //# debugId=a0db6a53-f0a3-5748-899c-6016b824b882

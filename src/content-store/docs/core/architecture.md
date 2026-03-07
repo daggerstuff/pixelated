@@ -1,8 +1,8 @@
 ---
-title: "Core Architecture"
-description: "Understanding the system architecture and component design"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Core Architecture'
+description: 'Understanding the system architecture and component design'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true

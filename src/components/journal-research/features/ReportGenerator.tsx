@@ -1,56 +1,44 @@
-import { useState } from "react";
-import { format } from "date-fns";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
+import { useState } from 'react'
+import { format } from 'date-fns'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import {
   useGenerateReportMutation,
   useReportListQuery,
-} from "@/lib/hooks/journal-research/useReports";
-import { cn } from "@/lib/utils";
+} from '@/lib/hooks/journal-research/useReports'
+import { cn } from '@/lib/utils'
 
-import { Download, FileText } from "lucide-react";
+import { Download, FileText } from 'lucide-react'
 
 export interface ReportGeneratorProps {
-  sessionId: string | null;
-  className?: string;
+  sessionId: string | null
+  className?: string
 }
 
-export function ReportGenerator({
-  sessionId,
-  className,
-}: ReportGeneratorProps) {
-  const [reportType, setReportType] = useState<
-    "session_report" | "weekly_report" | "summary_report"
-  >("session_report");
-  const [outputFormat, setOutputFormat] = useState<"json" | "markdown" | "pdf">(
-    "json",
-  );
+export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) {
+  const [reportType, setReportType] = useState<'session_report' | 'weekly_report' | 'summary_report'>('session_report')
+  const [outputFormat, setOutputFormat] = useState<'json' | 'markdown' | 'pdf'>('json')
   const [dateRange, setDateRange] = useState<{
-    startDate?: string;
-    endDate?: string;
-  }>({});
-  const generateMutation = useGenerateReportMutation(sessionId);
+    startDate?: string
+    endDate?: string
+  }>({})
+  const generateMutation = useGenerateReportMutation(sessionId)
   const { data: reports, isLoading } = useReportListQuery(sessionId, {
     page: 1,
     pageSize: 10,
-  });
+  })
 
   if (!sessionId) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">
           Please select a session to generate reports
         </p>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Report Generator</h1>
@@ -75,9 +63,9 @@ export function ReportGenerator({
                 onChange={(e) =>
                   setReportType(
                     e.target.value as
-                      | "session_report"
-                      | "weekly_report"
-                      | "summary_report",
+                    | 'session_report'
+                    | 'weekly_report'
+                    | 'summary_report',
                   )
                 }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
@@ -93,7 +81,7 @@ export function ReportGenerator({
               <select
                 value={outputFormat}
                 onChange={(e) =>
-                  setOutputFormat(e.target.value as "json" | "markdown" | "pdf")
+                  setOutputFormat(e.target.value as 'json' | 'markdown' | 'pdf')
                 }
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
@@ -103,43 +91,43 @@ export function ReportGenerator({
               </select>
             </div>
 
-            {(reportType === "weekly_report" ||
-              reportType === "summary_report") && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.startDate ?? ""}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        startDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
+            {(reportType === 'weekly_report' ||
+              reportType === 'summary_report') && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      Start Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.startDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          startDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-medium">
+                      End Date
+                    </label>
+                    <input
+                      type="date"
+                      value={dateRange.endDate ?? ''}
+                      onChange={(e) =>
+                        setDateRange({
+                          ...dateRange,
+                          endDate: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={dateRange.endDate ?? ""}
-                    onChange={(e) =>
-                      setDateRange({
-                        ...dateRange,
-                        endDate: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
             <button
               onClick={() => {
@@ -149,20 +137,20 @@ export function ReportGenerator({
                   dateRange:
                     dateRange.startDate || dateRange.endDate
                       ? {
-                          startDate: dateRange.startDate
-                            ? new Date(dateRange.startDate)
-                            : undefined,
-                          endDate: dateRange.endDate
-                            ? new Date(dateRange.endDate)
-                            : undefined,
-                        }
+                        startDate: dateRange.startDate
+                          ? new Date(dateRange.startDate)
+                          : undefined,
+                        endDate: dateRange.endDate
+                          ? new Date(dateRange.endDate)
+                          : undefined,
+                      }
                       : undefined,
-                });
+                })
               }}
               disabled={generateMutation.isPending}
               className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
             >
-              {generateMutation.isPending ? "Generating..." : "Generate Report"}
+              {generateMutation.isPending ? 'Generating...' : 'Generate Report'}
             </button>
           </div>
         </CardContent>
@@ -194,9 +182,8 @@ export function ReportGenerator({
                     <div>
                       <p className="font-medium">{report.reportId}</p>
                       <p className="text-sm text-muted-foreground">
-                        {report.reportType.replace("_", " ")} •{" "}
-                        {report.format.toUpperCase()} •{" "}
-                        {format(new Date(report.generatedDate), "PPpp")}
+                        {report.reportType.replace('_', ' ')} • {report.format.toUpperCase()} •{' '}
+                        {format(new Date(report.generatedDate), 'PPpp')}
                       </p>
                     </div>
                   </div>
@@ -219,5 +206,5 @@ export function ReportGenerator({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

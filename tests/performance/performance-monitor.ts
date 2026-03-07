@@ -1,14 +1,14 @@
-import type { Page } from "@playwright/test";
+import type { Page } from '@playwright/test'
 
 /**
  * Augment window with performance metrics properties
  */
 declare global {
   interface Window {
-    largestContentfulPaint: number;
-    cumulativeLayoutShift: number;
-    totalBlockingTime: number;
-    firstInputDelay: number;
+    largestContentfulPaint: number
+    cumulativeLayoutShift: number
+    totalBlockingTime: number
+    firstInputDelay: number
   }
 }
 
@@ -102,13 +102,13 @@ export const PERFORMANCE_MONITORING_SCRIPT = `
     console.error('FID observation not supported', e);
   }
 })();
-`;
+`
 
 /**
  * Helper to inject the performance monitoring script into a page
  */
 export async function injectPerformanceMonitoring(page: Page) {
-  await page.addInitScript(PERFORMANCE_MONITORING_SCRIPT);
+  await page.addInitScript(PERFORMANCE_MONITORING_SCRIPT)
 }
 
 /**
@@ -118,16 +118,16 @@ export async function extractPerformanceMetrics(page: Page) {
   return page.evaluate(() => {
     return {
       fcp:
-        performance.getEntriesByName("first-contentful-paint")[0]?.startTime ||
+        performance.getEntriesByName('first-contentful-paint')[0]?.startTime ||
         0,
       lcp: window.largestContentfulPaint || 0,
       cls: window.cumulativeLayoutShift || 0,
       tbt: window.totalBlockingTime || 0,
       fid: window.firstInputDelay || 0,
       // Navigation timing
-      navigationTiming: performance.getEntriesByType("navigation")[0] || {},
+      navigationTiming: performance.getEntriesByType('navigation')[0] || {},
       // Resource timing entries
-      resources: performance.getEntriesByType("resource"),
-    };
-  });
+      resources: performance.getEntriesByType('resource'),
+    }
+  })
 }

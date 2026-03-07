@@ -3,16 +3,16 @@
  * Maps different context types to appropriate objective weights for mental health AI
  */
 
-import { ContextType } from "../core/objectives";
+import { ContextType } from '../core/objectives'
 
 export interface ContextualObjectiveWeights {
-  empathy: number;
-  safety: number;
-  correctness: number;
-  professionalism: number;
-  informativeness: number;
-  bias_detection?: number;
-  cultural_sensitivity?: number;
+  empathy: number
+  safety: number
+  correctness: number
+  professionalism: number
+  informativeness: number
+  bias_detection?: number
+  cultural_sensitivity?: number
 }
 
 /**
@@ -29,7 +29,7 @@ export function getContextualObjectiveWeights(
         professionalism: 0.05,
         correctness: 0.05,
         informativeness: 0.0,
-      };
+      }
 
     case ContextType.SUPPORT:
       return {
@@ -38,7 +38,7 @@ export function getContextualObjectiveWeights(
         professionalism: 0.2,
         correctness: 0.15,
         informativeness: 0.05,
-      };
+      }
 
     case ContextType.INFORMATIONAL:
       return {
@@ -47,7 +47,7 @@ export function getContextualObjectiveWeights(
         professionalism: 0.2,
         empathy: 0.15,
         safety: 0.05,
-      };
+      }
 
     case ContextType.EDUCATIONAL:
       return {
@@ -56,7 +56,7 @@ export function getContextualObjectiveWeights(
         professionalism: 0.15,
         empathy: 0.1,
         safety: 0.05,
-      };
+      }
 
     case ContextType.CLINICAL_ASSESSMENT:
       return {
@@ -65,7 +65,7 @@ export function getContextualObjectiveWeights(
         professionalism: 0.25,
         empathy: 0.08,
         informativeness: 0.02,
-      };
+      }
 
     case ContextType.GENERAL:
     default:
@@ -75,7 +75,7 @@ export function getContextualObjectiveWeights(
         correctness: 0.2,
         professionalism: 0.2,
         informativeness: 0.2,
-      };
+      }
   }
 }
 
@@ -83,5 +83,5 @@ export function getContextualObjectiveWeights(
  * Get default objective weights when no specific context is detected
  */
 export function getDefaultObjectiveWeights(): ContextualObjectiveWeights {
-  return getContextualObjectiveWeights(ContextType.GENERAL);
+  return getContextualObjectiveWeights(ContextType.GENERAL)
 }

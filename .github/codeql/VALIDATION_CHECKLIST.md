@@ -110,7 +110,7 @@ ls -la .github/codeql/custom-queries/
 
 ```javascript
 // Create a test file with SQL injection vulnerability
-const query = `SELECT * FROM users WHERE id = ${userId}`;
+const query = `SELECT * FROM users WHERE id = ${userId}`
 // Expected: CodeQL should flag this as high severity
 ```
 
@@ -118,7 +118,7 @@ const query = `SELECT * FROM users WHERE id = ${userId}`;
 
 ```javascript
 // Create a test file missing FHIR validation
-const patient = await getResource("Patient", id);
+const patient = await getResource('Patient', id)
 // Expected: Custom query should flag unvalidated access
 ```
 
@@ -126,7 +126,7 @@ const patient = await getResource("Patient", id);
 
 ```javascript
 // Create a test file with unencrypted transmission
-fetch("http://api.example.com", { body: sensitiveData });
+fetch('http://api.example.com', { body: sensitiveData })
 // Expected: Custom query should flag unencrypted transmission
 ```
 
@@ -134,7 +134,7 @@ fetch("http://api.example.com", { body: sensitiveData });
 
 ```javascript
 // Create a test file missing audit log
-await updatePatientRecord(id, data);
+await updatePatientRecord(id, data)
 // Expected: Custom query should flag missing audit
 ```
 
@@ -253,7 +253,7 @@ await updatePatientRecord(id, data);
 
 **Validation Status**: [ ] - Complete | [ ] - In Progress | [ ] - Not Started
 
-**Validated By**: **\*\*\*\***\_**\*\*\*\*** **Date**: **\*\*\*\***\_**\*\*\*\***
+**Validated By**: ********\_******** **Date**: ********\_********
 
 **Notes**:
 

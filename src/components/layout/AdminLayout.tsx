@@ -1,10 +1,10 @@
-import type { ReactNode, FC } from "react";
-import React from "react";
+import type { ReactNode, FC } from 'react'
+import React from 'react'
 
 interface AdminLayoutProps {
-  title?: string;
-  description?: string;
-  children: ReactNode;
+  title?: string
+  description?: string
+  children: ReactNode
 }
 
 /**
@@ -13,10 +13,10 @@ interface AdminLayoutProps {
  * by providing a bridge to the Astro AdminLayout component
  */
 const AdminLayout: FC<AdminLayoutProps> = ({
-  title = "Admin Dashboard",
+  title = 'Admin Dashboard',
   children,
 }: AdminLayoutProps) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false)
 
   return (
     <div className="admin-layout">
@@ -28,7 +28,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
         aria-expanded={sidebarOpen}
         type="button"
         onClick={() => setSidebarOpen((v) => !v)}
-        style={{ display: "block" }}
+        style={{ display: 'block' }}
       >
         {/* Hamburger/X icon */}
         <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
@@ -36,8 +36,8 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             fillRule="evenodd"
             d={
               sidebarOpen
-                ? "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                : "M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                ? 'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                : 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
             }
             clipRule="evenodd"
           />
@@ -69,11 +69,11 @@ const AdminLayout: FC<AdminLayoutProps> = ({
         className={`
           sidebar dashboard-sidebar
           fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700
-          ${sidebarOpen ? "translate-x-0 expanded" : "-translate-x-full"}
+          ${sidebarOpen ? 'translate-x-0 expanded' : '-translate-x-full'}
           md:translate-x-0 md:expanded
         `}
         aria-label="Admin sidebar"
-        aria-hidden={sidebarOpen ? "false" : "true"}
+        aria-hidden={sidebarOpen ? 'false' : 'true'}
       >
         <div className="h-full px-3 py-4 overflow-y-auto">
           {/* Logo */}
@@ -170,7 +170,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AdminLayout;
+export default AdminLayout

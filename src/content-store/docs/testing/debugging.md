@@ -1,8 +1,8 @@
 ---
-title: "Debugging Tests"
-description: "Guide to debugging tests in Pixelated"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Debugging Tests'
+description: 'Guide to debugging tests in Pixelated'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
@@ -20,35 +20,35 @@ This guide covers strategies and tools for debugging tests in Pixelated.
 
 ```typescript
 // ❌ Wrong: Race condition
-it("should update user", async () => {
-  service.updateUser(userId, data);
-  const user = await db.getUser(userId);
-  expect(user.name).toBe(data.name);
-});
+it('should update user', async () => {
+  service.updateUser(userId, data)
+  const user = await db.getUser(userId)
+  expect(user.name).toBe(data.name)
+})
 
 // ✅ Correct: Wait for operation
-it("should update user", async () => {
-  await service.updateUser(userId, data);
-  const user = await db.getUser(userId);
-  expect(user.name).toBe(data.name);
-});
+it('should update user', async () => {
+  await service.updateUser(userId, data)
+  const user = await db.getUser(userId)
+  expect(user.name).toBe(data.name)
+})
 ```
 
 2. **Database State**
 
 ```typescript
 // ❌ Wrong: Missing cleanup
-it("should create user", async () => {
-  const user = await createUser();
-  expect(user).toBeDefined();
-});
+it('should create user', async () => {
+  const user = await createUser()
+  expect(user).toBeDefined()
+})
 
 // ✅ Correct: With cleanup
-it("should create user", async () => {
-  const user = await createUser();
-  expect(user).toBeDefined();
-  await cleanupUser(user.id);
-});
+it('should create user', async () => {
+  const user = await createUser()
+  expect(user).toBeDefined()
+  await cleanupUser(user.id)
+})
 ```
 
 3. **Mock Reset**
@@ -98,12 +98,12 @@ npm test -- --inspect-brk
 2. Add breakpoints:
 
 ```typescript
-it("should handle complex flow", async () => {
-  debugger; // Breakpoint
-  const result = await complexOperation();
-  debugger; // Breakpoint
-  expect(result).toBeDefined();
-});
+it('should handle complex flow', async () => {
+  debugger // Breakpoint
+  const result = await complexOperation()
+  debugger // Breakpoint
+  expect(result).toBeDefined()
+})
 ```
 
 3. Use Chrome DevTools (chrome://inspect)
@@ -140,23 +140,23 @@ it("should handle complex flow", async () => {
 
 ```typescript
 beforeAll(() => {
-  db.on("query", (data) => {
-    console.log("Query:", data.sql);
-    console.log("Params:", data.bindings);
-  });
-});
+  db.on('query', (data) => {
+    console.log('Query:', data.sql)
+    console.log('Params:', data.bindings)
+  })
+})
 ```
 
 2. Inspect database state:
 
 ```typescript
-it("should handle transaction", async () => {
+it('should handle transaction', async () => {
   await db.transaction(async (trx) => {
-    await operation(trx);
-    const state = await trx.select().from("table");
-    console.log("DB State:", state);
-  });
-});
+    await operation(trx)
+    const state = await trx.select().from('table')
+    console.log('DB State:', state)
+  })
+})
 ```
 
 ### Network Debugging
@@ -164,32 +164,33 @@ it("should handle transaction", async () => {
 1. Log HTTP requests:
 
 ```typescript
+
 const server = setupServer(
-  rest.post("/api/*", async (req, rest, ctx) => {
-    console.log("Request:", {
+  rest.post('/api/*', async (req, rest, ctx) => {
+    console.log('Request:', {
       url: req.url.toString(),
       body: await req.json(),
       headers: Object.fromEntries(req.headers),
-    });
-    return rest(ctx.json({ success: true }));
+    })
+    return rest(ctx.json({ success: true }))
   }),
-);
+)
 ```
 
 2. Debug WebSocket:
 
 ```typescript
-it("should handle messages", (done) => {
-  const ws = new WebSocket("ws://localhost:3000");
+it('should handle messages', (done) => {
+  const ws = new WebSocket('ws://localhost:3000')
 
-  ws.onopen = () => console.log("Connected");
-  ws.onclose = () => console.log("Disconnected");
-  ws.onerror = (error) => console.error("Error:", error);
+  ws.onopen = () => console.log('Connected')
+  ws.onclose = () => console.log('Disconnected')
+  ws.onerror = (error) => console.error('Error:', error)
   ws.onmessage = (event) => {
-    console.log("Message:", event.data);
-    done();
-  };
-});
+    console.log('Message:', event.data)
+    done()
+  }
+})
 ```
 
 ## Performance Issues
@@ -205,9 +206,9 @@ npm test -- --verbose --timing
 2. Profile specific test:
 
 ```typescript
-console.time("operation");
-await longOperation();
-console.timeEnd("operation");
+console.time('operation')
+await longOperation()
+console.timeEnd('operation')
 ```
 
 ### Memory Leaks
@@ -216,25 +217,25 @@ console.timeEnd("operation");
 
 ```typescript
 beforeEach(() => {
-  const used = process.memoryUsage();
-  console.log("Memory:", {
+  const used = process.memoryUsage()
+  console.log('Memory:', {
     heapTotal: used.heapTotal / 1024 / 1024,
     heapUsed: used.heapUsed / 1024 / 1024,
-  });
-});
+  })
+})
 ```
 
 2. Clean up resources:
 
 ```typescript
-describe("Resource Tests", () => {
-  const resources = [];
+describe('Resource Tests', () => {
+  const resources = []
 
   afterEach(async () => {
-    await Promise.all(resources.map((r) => r.cleanup()));
-    resources.length = 0;
-  });
-});
+    await Promise.all(resources.map((r) => r.cleanup()))
+    resources.length = 0
+  })
+})
 ```
 
 ## Best Practices

@@ -1,12 +1,12 @@
 ---
-title: "Comprehensive Security Measures"
-description: "Detailed documentation of all security measures implemented in the application"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Comprehensive Security Measures'
+description: 'Detailed documentation of all security measures implemented in the application'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
-updated: "2024-06-26"
+updated: '2024-06-26'
 ---
 
 # Comprehensive Security Measures
@@ -96,19 +96,19 @@ Example code for risk assessment:
 // Create risk factors
 const factors: RiskFactor[] = [
   {
-    type: "suicidal_ideation",
+    type: 'suicidal_ideation',
     severity: 0.8,
     confidence: 0.7,
   },
   {
-    type: "social_isolation",
+    type: 'social_isolation',
     severity: 0.6,
     confidence: 0.8,
   },
-];
+]
 
 // Assess risk level
-const assessment = riskLevelAssessment.assessRiskLevel(factors);
+const assessment = riskLevelAssessment.assessRiskLevel(factors)
 ```
 
 #### Weighted Scoring System
@@ -153,9 +153,8 @@ The Risk Alert System manages notifications and human oversight for high-risk si
 
 ### Alert Flow
 
-### Assessment Processing
-
-When a risk assessment is processed, the system checks if alerts should be triggered based on risk level and configuration.
+  ### Assessment Processing
+  When a risk assessment is processed, the system checks if alerts should be triggered based on risk level and configuration.
 
 ### Cooldown Check
 
@@ -176,6 +175,7 @@ High and critical alerts are stored in the database for human review.
 ### Human Review
 
 For high and critical alerts, human reviewers examine the alert and determine appropriate actions.
+
 
 ### Alert Channels
 
@@ -220,6 +220,7 @@ For high and critical alerts, human reviewers examine the alert and determine ap
 
     Webhooks require proper authentication and use HTTPS.
 
+
 ### Human Oversight
 
 For high and critical risk levels, the system ensures human review through:
@@ -255,16 +256,16 @@ The system provides API methods for handling alerts:
 await riskAlertSystem.processAssessment(
   assessment, // Risk assessment result
   userId, // User ID
-  "chat-message", // Source of the assessment
+  'chat-message', // Source of the assessment
   {
     // Additional metadata
-    messageId: "123456",
-    sessionId: "789012",
+    messageId: '123456',
+    sessionId: '789012',
   },
-);
+)
 
 // Retrieve pending alerts for human review
-const pendingAlerts = await riskAlertSystem.getPendingAlertsForReview();
+const pendingAlerts = await riskAlertSystem.getPendingAlertsForReview()
 ```
 
 ## FHE Security Implementation
@@ -362,7 +363,7 @@ The Risk Level Assessment Service can be configured with the following options:
 // Configure the Risk Level Assessment Service
 riskLevelAssessment.configure({
   // Set sensitivity level (low, medium, high)
-  sensitivityLevel: "medium",
+  sensitivityLevel: 'medium',
 
   // Set thresholds for risk levels
   thresholds: {
@@ -374,7 +375,7 @@ riskLevelAssessment.configure({
 
   // Set minimum confidence level for valid factors
   minConfidence: 0.6,
-});
+})
 ```
 
 ### Alert System Configuration
@@ -385,7 +386,7 @@ The Risk Alert System can be configured with the following options:
 // Configure the Risk Alert System
 riskAlertSystem.configure({
   // Enable notification channels
-  enabledChannels: ["dashboard", "email"],
+  enabledChannels: ['dashboard', 'email'],
 
   // Set thresholds for different risk levels
   thresholds: {
@@ -413,13 +414,13 @@ riskAlertSystem.configure({
 
   // Set recipients for notifications
   recipients: {
-    email: ["clinical.team@example.com"],
-    sms: ["+1234567890"],
+    email: ['clinical.team@example.com'],
+    sms: ['+1234567890'],
   },
 
   // Set cooldown period (in milliseconds)
   cooldownPeriod: 1800000, // 30 minutes
-});
+})
 ```
 
 ## Additional Security Measures

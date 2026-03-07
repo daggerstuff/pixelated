@@ -149,7 +149,7 @@ groups:
 
       # Network Alerts
       - alert: HighNetworkTraffic
-        expr: rate(node_network_receive_bytes_total[5m]) > 100000000 # 100MB/s
+        expr: rate(node_network_receive_bytes_total[5m]) > 100000000  # 100MB/s
         for: 10m
         labels:
           severity: warning

@@ -1,9 +1,9 @@
 ---
-title: "Responsive Image Pipeline"
-description: "Responsive Image Pipeline documentation"
+title: 'Responsive Image Pipeline'
+description: 'Responsive Image Pipeline documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -138,32 +138,32 @@ Our image pipeline includes several utility functions for working with images:
 
 ```typescript
 // Calculate aspect ratio
-const aspectRatio = calculateAspectRatio(width, height);
+const aspectRatio = calculateAspectRatio(width, height)
 
 // Calculate height from width while preserving aspect ratio
 const newHeight = calculateHeightFromWidth(
   targetWidth,
   originalWidth,
   originalHeight,
-);
+)
 
 // Calculate width from height while preserving aspect ratio
 const newWidth = calculateWidthFromHeight(
   targetHeight,
   originalWidth,
   originalHeight,
-);
+)
 ```
 
 ### Responsive Breakpoints
 
 ```typescript
 // Generate evenly distributed breakpoints
-const breakpoints = generateBreakpoints(320, 1920, 5);
+const breakpoints = generateBreakpoints(320, 1920, 5)
 // Result: [320, 720, 1120, 1520, 1920]
 
 // Generate a sizes attribute for responsive images
-const sizes = generateSizesAttribute(breakpoints);
+const sizes = generateSizesAttribute(breakpoints)
 // Result: "(max-width: 720px) 320px, (max-width: 1120px) 720px, (max-width: 1520px) 1120px, 1920px"
 ```
 
@@ -171,10 +171,10 @@ const sizes = generateSizesAttribute(breakpoints);
 
 ```typescript
 // Determine best format based on browser support
-const format = getBestImageFormat(request.headers.get("Accept"));
+const format = getBestImageFormat(request.headers.get('Accept'))
 
 // Calculate appropriate quality based on format and connection speed
-const quality = calculateImageQuality("webp", "fast");
+const quality = calculateImageQuality('webp', 'fast')
 ```
 
 ## Using the Image Service
@@ -182,14 +182,15 @@ const quality = calculateImageQuality("webp", "fast");
 For programmatic image optimization, you can use the `ImageService`:
 
 ```typescript
+
 // Optimize a single image
 const optimizedImage = await imageService.optimizeImage({
   src: imagePath,
   width: 800,
   height: 600,
-  format: "webp",
+  format: 'webp',
   quality: 80,
-});
+})
 
 // Generate a set of responsive images
 const responsiveSet = await imageService.generateResponsiveSet(
@@ -199,14 +200,14 @@ const responsiveSet = await imageService.generateResponsiveSet(
     height: 800,
   },
   [320, 640, 768, 1024, 1280],
-);
+)
 
 // Generate a complete picture element configuration
 const pictureConfig = await imageService.generatePictureConfig({
   src: imagePath,
   width: 1200,
   height: 800,
-});
+})
 ```
 
 ## Configuration
@@ -217,16 +218,16 @@ The image pipeline is configured through the `imageConfig` object in `src/config
 // Default settings
 const defaultImageConfig = {
   defaultQuality: 80,
-  defaultFormat: "webp",
+  defaultFormat: 'webp',
   defaultBreakpoints: [320, 640, 768, 1024, 1280, 1536, 1920],
-  allowedDomains: ["images.unsplash.com", "cdn.example.com"],
+  allowedDomains: ['images.unsplash.com', 'cdn.example.com'],
   maxDimension: 2500,
   enableBlurUp: true,
   enableLazyLoading: true,
   cacheDuration: 2592000, // 30 days
   useLQIP: true,
   enableResponsive: true,
-};
+}
 ```
 
 You can override these settings using environment variables:

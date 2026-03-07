@@ -1,38 +1,38 @@
-import React, { useState, useCallback, useMemo } from "react";
-import { InputValidator } from "@/middleware/security";
+import React, { useState, useCallback, useMemo } from 'react'
+import { InputValidator } from '@/middleware/security'
 
 interface BiasAnalysisResult {
-  id: string;
-  overallBiasScore: number;
-  alertLevel: "low" | "medium" | "high" | "critical";
-  confidence: number;
+  id: string
+  overallBiasScore: number
+  alertLevel: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
   layerResults: {
     [layer: string]: {
-      bias_score: number;
-      layer: string;
-      confidence?: number;
-      details?: any;
-    };
-  };
-  recommendations: string[];
+      bias_score: number
+      layer: string
+      confidence?: number
+      details?: any
+    }
+  }
+  recommendations: string[]
   demographics: {
-    gender: string;
-    ethnicity: string;
-    age: string;
-    primaryLanguage: string;
-  };
-  sessionType: string;
-  processingTimeMs: number;
-  createdAt: string;
-  contentHash: string;
+    gender: string
+    ethnicity: string
+    age: string
+    primaryLanguage: string
+  }
+  sessionType: string
+  processingTimeMs: number
+  createdAt: string
+  contentHash: string
 }
 
 interface BiasAnalysisResultsProps {
-  result: BiasAnalysisResult;
-  onExport?: (format: "json" | "csv" | "pdf") => void;
-  onNewAnalysis?: () => void;
-  onViewHistory?: () => void;
-  className?: string;
+  result: BiasAnalysisResult
+  onExport?: (format: 'json' | 'csv' | 'pdf') => void
+  onNewAnalysis?: () => void
+  onViewHistory?: () => void
+  className?: string
 }
 
 export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
@@ -40,56 +40,56 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
   onExport,
   onNewAnalysis,
   onViewHistory,
-  className = "",
+  className = '',
 }) => {
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
-    new Set(["overview"]),
-  );
-  const [selectedLayer, setSelectedLayer] = useState<string | null>(null);
+    new Set(['overview']),
+  )
+  const [selectedLayer, setSelectedLayer] = useState<string | null>(null)
 
   const toggleSection = useCallback((section: string) => {
     setExpandedSections((prev) => {
-      const newSet = new Set(prev);
+      const newSet = new Set(prev)
       if (newSet.has(section)) {
-        newSet.delete(section);
+        newSet.delete(section)
       } else {
-        newSet.add(section);
+        newSet.add(section)
       }
-      return newSet;
-    });
-  }, []);
+      return newSet
+    })
+  }, [])
 
   const getAlertLevelColor = useCallback((level: string) => {
     switch (level) {
-      case "low":
-        return "text-green-600 bg-green-50 border-green-200";
-      case "medium":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "high":
-        return "text-orange-600 bg-orange-50 border-orange-200";
-      case "critical":
-        return "text-red-600 bg-red-50 border-red-200";
+      case 'low':
+        return 'text-green-600 bg-green-50 border-green-200'
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+      case 'high':
+        return 'text-orange-600 bg-orange-50 border-orange-200'
+      case 'critical':
+        return 'text-red-600 bg-red-50 border-red-200'
       default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
+        return 'text-gray-600 bg-gray-50 border-gray-200'
     }
-  }, []);
+  }, [])
 
   const getBiasScoreColor = useCallback((score: number) => {
     if (score < 0.2) {
-      return "text-green-600";
+      return 'text-green-600'
     }
     if (score < 0.4) {
-      return "text-yellow-600";
+      return 'text-yellow-600'
     }
     if (score < 0.6) {
-      return "text-orange-600";
+      return 'text-orange-600'
     }
-    return "text-red-600";
-  }, []);
+    return 'text-red-600'
+  }, [])
 
   const formatBiasScore = useCallback((score: number) => {
-    return `${(score * 100).toFixed(1)}%`;
-  }, []);
+    return `${(score * 100).toFixed(1)}%`
+  }, [])
 
   const layerResults = useMemo(() => {
     return Object.entries(result.layerResults)
@@ -97,21 +97,21 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         name: key,
         ...value,
       }))
-      .sort((a, b) => b.bias_score - a.bias_score);
-  }, [result.layerResults]);
+      .sort((a, b) => b.bias_score - a.bias_score)
+  }, [result.layerResults])
 
   const handleExport = useCallback(
-    (format: "json" | "csv" | "pdf") => {
+    (format: 'json' | 'csv' | 'pdf') => {
       if (onExport) {
-        onExport(format);
+        onExport(format)
       }
     },
     [onExport],
-  );
+  )
 
   const renderBiasScoreBar = useCallback(
     (score: number, label: string) => {
-      const percentage = Math.min(score * 100, 100);
+      const percentage = Math.min(score * 100, 100)
       return (
         <div className="mb-3">
           <div className="flex justify-between items-center mb-1">
@@ -126,21 +126,21 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
             <div
               className={`h-2 rounded-full transition-all duration-300 ${
                 score < 0.2
-                  ? "bg-green-500"
+                  ? 'bg-green-500'
                   : score < 0.4
-                    ? "bg-yellow-500"
+                    ? 'bg-yellow-500'
                     : score < 0.6
-                      ? "bg-orange-500"
-                      : "bg-red-500"
+                      ? 'bg-orange-500'
+                      : 'bg-red-500'
               }`}
               style={{ width: `${percentage}%` }}
             />
           </div>
         </div>
-      );
+      )
     },
     [getBiasScoreColor, formatBiasScore],
-  );
+  )
 
   const renderRecommendations = useCallback(() => {
     if (!result.recommendations || result.recommendations.length === 0) {
@@ -152,7 +152,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
             The analysis indicates low bias levels.
           </p>
         </div>
-      );
+      )
     }
 
     return (
@@ -171,12 +171,12 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
           </div>
         ))}
       </div>
-    );
-  }, [result.recommendations]);
+    )
+  }, [result.recommendations])
 
   const renderLayerDetails = useCallback(
     (layer: any) => {
-      if (!selectedLayer || selectedLayer !== layer.name) return null;
+      if (!selectedLayer || selectedLayer !== layer.name) return null
 
       return (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
@@ -212,10 +212,10 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
             </div>
           )}
         </div>
-      );
+      )
     },
     [selectedLayer, getBiasScoreColor, formatBiasScore],
-  );
+  )
 
   return (
     <div className={`bias-analysis-results ${className}`}>
@@ -227,7 +227,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
               Bias Analysis Results
             </h1>
             <p className="text-sm text-gray-600 mt-1">
-              Analysis completed on{" "}
+              Analysis completed on{' '}
               {new Date(result.createdAt).toLocaleString()}
             </p>
           </div>
@@ -235,19 +235,19 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
             {onExport && (
               <div className="flex gap-2">
                 <button
-                  onClick={() => handleExport("json")}
+                  onClick={() => handleExport('json')}
                   className="btn-secondary text-xs"
                 >
                   Export JSON
                 </button>
                 <button
-                  onClick={() => handleExport("csv")}
+                  onClick={() => handleExport('csv')}
                   className="btn-secondary text-xs"
                 >
                   Export CSV
                 </button>
                 <button
-                  onClick={() => handleExport("pdf")}
+                  onClick={() => handleExport('pdf')}
                   className="btn-secondary text-xs"
                 >
                   Export PDF
@@ -267,7 +267,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         {/* Overview Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("overview")}
+            onClick={() => toggleSection('overview')}
             className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
           >
             <div className="flex items-center justify-between">
@@ -275,14 +275,14 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                 Analysis Overview
               </h2>
               <div
-                className={`transform transition-transform ${expandedSections.has("overview") ? "rotate-180" : ""}`}
+                className={`transform transition-transform ${expandedSections.has('overview') ? 'rotate-180' : ''}`}
               >
                 ▼
               </div>
             </div>
           </button>
 
-          {expandedSections.has("overview") && (
+          {expandedSections.has('overview') && (
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Overall Bias Score */}
@@ -364,7 +364,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         {/* Layer Analysis Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("layers")}
+            onClick={() => toggleSection('layers')}
             className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
           >
             <div className="flex items-center justify-between">
@@ -372,14 +372,14 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                 Layer-by-Layer Analysis
               </h2>
               <div
-                className={`transform transition-transform ${expandedSections.has("layers") ? "rotate-180" : ""}`}
+                className={`transform transition-transform ${expandedSections.has('layers') ? 'rotate-180' : ''}`}
               >
                 ▼
               </div>
             </div>
           </button>
 
-          {expandedSections.has("layers") && (
+          {expandedSections.has('layers') && (
             <div className="p-6">
               <div className="space-y-4">
                 {layerResults.map((layer, _index) => (
@@ -389,7 +389,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                   >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-gray-800 capitalize">
-                        {layer.name.replace(/_/g, " ")}
+                        {layer.name.replace(/_/g, ' ')}
                       </h3>
                       <button
                         onClick={() =>
@@ -400,11 +400,11 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                       >
                         {selectedLayer === layer.name
-                          ? "Hide Details"
-                          : "View Details"}
+                          ? 'Hide Details'
+                          : 'View Details'}
                       </button>
                     </div>
-                    {renderBiasScoreBar(layer.bias_score, "Bias Score")}
+                    {renderBiasScoreBar(layer.bias_score, 'Bias Score')}
                     {renderLayerDetails(layer)}
                   </div>
                 ))}
@@ -416,7 +416,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         {/* Recommendations Section */}
         <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           <button
-            onClick={() => toggleSection("recommendations")}
+            onClick={() => toggleSection('recommendations')}
             className="w-full px-6 py-4 text-left bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors"
           >
             <div className="flex items-center justify-between">
@@ -424,14 +424,14 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
                 Recommendations & Insights
               </h2>
               <div
-                className={`transform transition-transform ${expandedSections.has("recommendations") ? "rotate-180" : ""}`}
+                className={`transform transition-transform ${expandedSections.has('recommendations') ? 'rotate-180' : ''}`}
               >
                 ▼
               </div>
             </div>
           </button>
 
-          {expandedSections.has("recommendations") && (
+          {expandedSections.has('recommendations') && (
             <div className="p-6">{renderRecommendations()}</div>
           )}
         </div>
@@ -451,7 +451,7 @@ export const BiasAnalysisResults: React.FC<BiasAnalysisResultsProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BiasAnalysisResults;
+export default BiasAnalysisResults

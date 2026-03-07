@@ -1,86 +1,86 @@
-import { useState, useEffect, type FC } from "react";
+import { useState, useEffect, type FC } from 'react'
 
 interface DemographicData {
-  category: string;
-  subcategory: string;
-  current: number;
-  target: number;
-  percentage: number;
+  category: string
+  subcategory: string
+  current: number
+  target: number
+  percentage: number
 }
 
 interface DemographicBalancingDisplayProps {
   currentProfile: {
-    age: number;
-    gender: string;
-    occupation: string;
-    background: string;
-  };
-  onBalanceUpdate?: (balanceScore: number) => void;
+    age: number
+    gender: string
+    occupation: string
+    background: string
+  }
+  onBalanceUpdate?: (balanceScore: number) => void
 }
 
 // Simulated demographic targets for training dataset balance
 const demographicTargets = {
   age: {
-    "18-25": 15,
-    "26-35": 25,
-    "36-50": 30,
-    "51-65": 20,
-    "65+": 10,
+    '18-25': 15,
+    '26-35': 25,
+    '36-50': 30,
+    '51-65': 20,
+    '65+': 10,
   },
   gender: {
-    female: 45,
-    male: 40,
-    "non-binary": 10,
-    "prefer not to say": 5,
+    'female': 45,
+    'male': 40,
+    'non-binary': 10,
+    'prefer not to say': 5,
   },
   occupation: {
-    Healthcare: 12,
-    Education: 15,
-    Technology: 18,
-    "Business/Finance": 20,
-    "Service Industry": 15,
-    Student: 10,
-    Retired: 5,
-    Other: 5,
+    'Healthcare': 12,
+    'Education': 15,
+    'Technology': 18,
+    'Business/Finance': 20,
+    'Service Industry': 15,
+    'Student': 10,
+    'Retired': 5,
+    'Other': 5,
   },
   background: {
     Urban: 60,
     Suburban: 25,
     Rural: 15,
   },
-};
+}
 
 // Simulated current dataset statistics - moved outside component to prevent recreation on each render
 const currentStats = {
   age: {
-    "18-25": 12,
-    "26-35": 28,
-    "36-50": 25,
-    "51-65": 22,
-    "65+": 13,
+    '18-25': 12,
+    '26-35': 28,
+    '36-50': 25,
+    '51-65': 22,
+    '65+': 13,
   },
   gender: {
-    female: 52,
-    male: 35,
-    "non-binary": 8,
-    "prefer not to say": 5,
+    'female': 52,
+    'male': 35,
+    'non-binary': 8,
+    'prefer not to say': 5,
   },
   occupation: {
-    Healthcare: 15,
-    Education: 18,
-    Technology: 22,
-    "Business/Finance": 18,
-    "Service Industry": 12,
-    Student: 8,
-    Retired: 4,
-    Other: 3,
+    'Healthcare': 15,
+    'Education': 18,
+    'Technology': 22,
+    'Business/Finance': 18,
+    'Service Industry': 12,
+    'Student': 8,
+    'Retired': 4,
+    'Other': 3,
   },
   background: {
     Urban: 65,
     Suburban: 22,
     Rural: 13,
   },
-};
+}
 
 const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
   currentProfile,
@@ -88,64 +88,64 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
 }) => {
   const [demographicStats, setDemographicStats] = useState<DemographicData[]>(
     [],
-  );
-  const [overallBalance, setOverallBalance] = useState<number>(0);
+  )
+  const [overallBalance, setOverallBalance] = useState<number>(0)
 
   const getAgeCategory = (age: number): string => {
     if (age <= 25) {
-      return "18-25";
+      return '18-25'
     }
     if (age <= 35) {
-      return "26-35";
+      return '26-35'
     }
     if (age <= 50) {
-      return "36-50";
+      return '36-50'
     }
     if (age <= 65) {
-      return "51-65";
+      return '51-65'
     }
-    return "65+";
-  };
+    return '65+'
+  }
 
   const OCCUPATION_CATEGORIES: Record<string, readonly string[]> = {
-    Healthcare: ["doctor", "nurse", "therapist", "medical"],
-    Education: ["teacher", "professor", "education"],
-    Technology: ["engineer", "developer", "tech", "software"],
-    "Business/Finance": ["manager", "analyst", "finance", "business"],
-    "Service Industry": ["service", "retail", "restaurant"],
-    Student: ["student"],
-    Retired: ["retired"],
-  } as const;
+    Healthcare: ['doctor', 'nurse', 'therapist', 'medical'],
+    Education: ['teacher', 'professor', 'education'],
+    Technology: ['engineer', 'developer', 'tech', 'software'],
+    'Business/Finance': ['manager', 'analyst', 'finance', 'business'],
+    'Service Industry': ['service', 'retail', 'restaurant'],
+    Student: ['student'],
+    Retired: ['retired'],
+  } as const
 
   const getOccupationCategory = (occupation: string): string => {
-    const occ = occupation.toLowerCase();
+    const occ = occupation.toLowerCase()
     for (const [category, keywords] of Object.entries(OCCUPATION_CATEGORIES)) {
       if (keywords.some((keyword) => occ.includes(keyword))) {
-        return category;
+        return category
       }
     }
-    return "Other";
-  };
+    return 'Other'
+  }
 
   const getBackgroundCategory = (background: string): string => {
-    const bg = background.toLowerCase();
-    if (bg.includes("urban") || bg.includes("city")) {
-      return "Urban";
+    const bg = background.toLowerCase()
+    if (bg.includes('urban') || bg.includes('city')) {
+      return 'Urban'
     }
-    if (bg.includes("suburban") || bg.includes("suburb")) {
-      return "Suburban";
+    if (bg.includes('suburban') || bg.includes('suburb')) {
+      return 'Suburban'
     }
-    if (bg.includes("rural") || bg.includes("country")) {
-      return "Rural";
+    if (bg.includes('rural') || bg.includes('country')) {
+      return 'Rural'
     }
-    return "Urban"; // Default
-  };
+    return 'Urban' // Default
+  }
 
   useEffect(() => {
     const stats: DemographicData[] = [
       // Age demographics
       ...Object.entries(demographicTargets.age).map(([category, target]) => ({
-        category: "Age",
+        category: 'Age',
         subcategory: category,
         current: currentStats.age[category as keyof typeof currentStats.age],
         target,
@@ -157,7 +157,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       // Gender demographics
       ...Object.entries(demographicTargets.gender).map(
         ([category, target]) => ({
-          category: "Gender",
+          category: 'Gender',
           subcategory: category,
           current:
             currentStats.gender[category as keyof typeof currentStats.gender],
@@ -171,11 +171,11 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       // Occupation demographics
       ...Object.entries(demographicTargets.occupation).map(
         ([category, target]) => ({
-          category: "Occupation",
+          category: 'Occupation',
           subcategory: category,
           current:
             currentStats.occupation[
-              category as keyof typeof currentStats.occupation
+            category as keyof typeof currentStats.occupation
             ],
           target,
           percentage:
@@ -189,11 +189,11 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       // Background demographics
       ...Object.entries(demographicTargets.background).map(
         ([category, target]) => ({
-          category: "Background",
+          category: 'Background',
           subcategory: category,
           current:
             currentStats.background[
-              category as keyof typeof currentStats.background
+            category as keyof typeof currentStats.background
             ],
           target,
           percentage:
@@ -204,40 +204,40 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             100,
         }),
       ),
-    ];
+    ]
 
-    setDemographicStats(stats);
+    setDemographicStats(stats)
 
     // Calculate overall balance score
     const balanceScore =
       stats.reduce((acc, stat) => {
-        const deviation = Math.abs(stat.percentage - 100);
-        return acc + (100 - Math.min(deviation, 100));
-      }, 0) / stats.length;
+        const deviation = Math.abs(stat.percentage - 100)
+        return acc + (100 - Math.min(deviation, 100))
+      }, 0) / stats.length
 
-    setOverallBalance(balanceScore);
-    onBalanceUpdate?.(balanceScore);
-  }, [currentProfile, onBalanceUpdate]);
+    setOverallBalance(balanceScore)
+    onBalanceUpdate?.(balanceScore)
+  }, [currentProfile, onBalanceUpdate])
 
   const getBalanceColor = (percentage: number) => {
     if (percentage >= 90 && percentage <= 110) {
-      return "text-green-600 bg-green-50";
+      return 'text-green-600 bg-green-50'
     }
     if (percentage >= 75 && percentage <= 125) {
-      return "text-yellow-600 bg-yellow-50";
+      return 'text-yellow-600 bg-yellow-50'
     }
-    return "text-red-600 bg-red-50";
-  };
+    return 'text-red-600 bg-red-50'
+  }
 
   const getProgressBarColor = (percentage: number) => {
     if (percentage >= 90 && percentage <= 110) {
-      return "bg-green-500";
+      return 'bg-green-500'
     }
     if (percentage >= 75 && percentage <= 125) {
-      return "bg-yellow-500";
+      return 'bg-yellow-500'
     }
-    return "bg-red-500";
-  };
+    return 'bg-red-500'
+  }
 
   const getCurrentProfileHighlight = (
     category: string,
@@ -248,22 +248,22 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       Gender: currentProfile.gender,
       Occupation: getOccupationCategory(currentProfile.occupation),
       Background: getBackgroundCategory(currentProfile.background),
-    };
+    }
 
-    return categoryMap[category] === subcategory;
-  };
+    return categoryMap[category] === subcategory
+  }
 
   const groupedStats = demographicStats.reduce(
     (acc, stat) => {
-      const { category } = stat;
+      const { category } = stat
       if (!acc[category]) {
-        acc[category] = [];
+        acc[category] = []
       }
-      (acc[category] as DemographicData[]).push(stat);
-      return acc;
+      ; (acc[category] as DemographicData[]).push(stat)
+      return acc
     },
     {} as Record<string, DemographicData[]>,
-  );
+  )
 
   return (
     <div className="p-4 bg-gray-100 rounded-lg">
@@ -276,13 +276,12 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             Overall Balance:
           </span>
           <span
-            className={`text-lg font-bold px-3 py-1 rounded-full ${
-              overallBalance > 85
-                ? "bg-green-100 text-green-800"
+            className={`text-lg font-bold px-3 py-1 rounded-full ${overallBalance > 85
+                ? 'bg-green-100 text-green-800'
                 : overallBalance > 70
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-red-100 text-red-800"
-            }`}
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-red-100 text-red-800'
+              }`}
           >
             {overallBalance.toFixed(1)}%
           </span>
@@ -301,11 +300,11 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
             <strong>Gender:</strong> {currentProfile.gender}
           </div>
           <div>
-            <strong>Occupation Type:</strong>{" "}
+            <strong>Occupation Type:</strong>{' '}
             {getOccupationCategory(currentProfile.occupation)}
           </div>
           <div>
-            <strong>Background:</strong>{" "}
+            <strong>Background:</strong>{' '}
             {getBackgroundCategory(currentProfile.background)}
           </div>
         </div>
@@ -323,18 +322,18 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
                 const isCurrentProfile = getCurrentProfileHighlight(
                   category,
                   stat.subcategory,
-                );
+                )
                 return (
                   <div
                     key={stat.subcategory}
                     className={`
                     flex items-center justify-between p-2 rounded
-                    ${isCurrentProfile ? "bg-blue-100 border border-blue-300" : "bg-gray-50"}
+                    ${isCurrentProfile ? 'bg-blue-100 border border-blue-300' : 'bg-gray-50'}
                   `}
                   >
                     <div className="flex items-center gap-3">
                       <span
-                        className={`text-sm font-medium ${isCurrentProfile ? "text-blue-800" : "text-gray-700"}`}
+                        className={`text-sm font-medium ${isCurrentProfile ? 'text-blue-800' : 'text-gray-700'}`}
                       >
                         {stat.subcategory}
                         {isCurrentProfile && (
@@ -365,7 +364,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -390,7 +389,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
                 <span>
                   <strong>
                     {stat.category} - {stat.subcategory}:
-                  </strong>{" "}
+                  </strong>{' '}
                   {stat.percentage < 75
                     ? `Under-represented (${stat.current}% vs ${stat.target}% target)`
                     : `Over-represented (${stat.current}% vs ${stat.target}% target)`}
@@ -400,10 +399,10 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           {demographicStats.filter(
             (stat) => stat.percentage < 75 || stat.percentage > 125,
           ).length === 0 && (
-            <p className="text-indigo-600">
-              ✓ All demographic categories are well-balanced
-            </p>
-          )}
+              <p className="text-indigo-600">
+                ✓ All demographic categories are well-balanced
+              </p>
+            )}
         </div>
       </div>
 
@@ -428,7 +427,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DemographicBalancingDisplay;
+export default DemographicBalancingDisplay

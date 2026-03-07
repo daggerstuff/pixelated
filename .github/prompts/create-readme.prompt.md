@@ -1,5 +1,5 @@
 ---
-description: "Create a README.md file for the project"
+description: 'Create a README.md file for the project'
 ---
 
 ## Role

@@ -6,4 +6,4 @@ export {
   fetchWithRetry,
   fetchJSONWithRetry,
   type RetryOptions,
-} from "./fetchWithRetry";
+} from './fetchWithRetry'

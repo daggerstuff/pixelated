@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react'
 
 interface SessionMetricsProps {
-  metrics: { label: string; value: number | string }[];
+  metrics: { label: string; value: number | string }[]
 }
 
 export function SessionMetrics({ metrics }: SessionMetricsProps) {
@@ -22,7 +22,7 @@ export function SessionMetrics({ metrics }: SessionMetricsProps) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
-export default SessionMetrics;
+export default SessionMetrics

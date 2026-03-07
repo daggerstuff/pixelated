@@ -1,57 +1,57 @@
-import { useState, useEffect } from "react";
-import { UserMenu } from "../ui/UserMenu";
-import { Navigation } from "./Navigation";
-import SearchBox from "../ui/SearchBox";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react'
+import { UserMenu } from '../ui/UserMenu'
+import { Navigation } from './Navigation'
+import SearchBox from '../ui/SearchBox'
+import { cn } from '@/lib/utils'
 
 export interface HeaderProps {
-  showUserMenu?: boolean;
-  className?: string;
-  position?: "fixed" | "sticky" | "static";
+  showUserMenu?: boolean
+  className?: string
+  position?: 'fixed' | 'sticky' | 'static'
 }
 
 export function Header({
   showUserMenu = true,
   className,
-  position = "fixed",
+  position = 'fixed',
 }: HeaderProps) {
   // Use null as initial state for safe hydration
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean | null>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState<boolean | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean | null>(null)
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean | null>(null)
 
   // Initialize state on client-side only
   useEffect(() => {
-    setMobileMenuOpen(false);
-    setIsSearchOpen(false);
-  }, []);
+    setMobileMenuOpen(false)
+    setIsSearchOpen(false)
+  }, [])
 
   // Handle keyboard shortcut for search (Cmd+K)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setIsSearchOpen((prev) => !prev);
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setIsSearchOpen((prev) => !prev)
       }
-    };
+    }
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Safe check for client-side rendering
-  const isBrowser = typeof window !== "undefined";
+  const isBrowser = typeof window !== 'undefined'
 
   // Only render full interactive content on client-side
   if (!isBrowser || mobileMenuOpen === null || isSearchOpen === null) {
     return (
       <header
         className={cn(
-          "z-30 w-full bg-card border-b border-border",
-          position === "fixed"
-            ? "fixed"
-            : position === "sticky"
-              ? "sticky top-0"
-              : "static",
+          'z-30 w-full bg-card border-b border-border',
+          position === 'fixed'
+            ? 'fixed'
+            : position === 'sticky'
+              ? 'sticky top-0'
+              : 'static',
           className,
         )}
       >
@@ -73,18 +73,18 @@ export function Header({
           </div>
         </div>
       </header>
-    );
+    )
   }
 
   return (
     <header
       className={cn(
-        "z-30 w-full bg-card border-b border-border",
-        position === "fixed"
-          ? "fixed"
-          : position === "sticky"
-            ? "sticky top-0"
-            : "static",
+        'z-30 w-full bg-card border-b border-border',
+        position === 'fixed'
+          ? 'fixed'
+          : position === 'sticky'
+            ? 'sticky top-0'
+            : 'static',
         className,
       )}
     >
@@ -108,8 +108,8 @@ export function Header({
                   fillRule="evenodd"
                   d={
                     mobileMenuOpen
-                      ? "M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      : "M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                      ? 'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                      : 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
                   }
                   clipRule="evenodd"
                 />
@@ -120,7 +120,7 @@ export function Header({
                 src="/favicon.svg"
                 className="h-8 mr-3"
                 alt="Pixelated Empathy Logo"
-              />{" "}
+              />{' '}
               <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap brand-title">
                 Pixelated Empathy
               </span>
@@ -228,7 +228,7 @@ export function Header({
         </div>
       )}
     </header>
-  );
+  )
 }
 
-export default Header;
+export default Header

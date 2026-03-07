@@ -1,13 +1,13 @@
 // Minimal evaluation store for API endpoint
 export async function getEvaluations(sessionId: string) {
   // TODO: Replace with real DB lookup
-  if (sessionId === "test-session") {
-    return [{ sessionId, feedback: "Excellent session." }];
+  if (sessionId === 'test-session') {
+    return [{ sessionId, feedback: 'Excellent session.' }]
   }
-  return [];
+  return []
 }
 
 export async function saveEvaluation(sessionId: string, feedback: string) {
   // TODO: Replace with real DB save
-  return { sessionId, feedback, saved: true };
+  return { sessionId, feedback, saved: true }
 }

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { isFormField } from "./form-validation-types";
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { isFormField } from './form-validation-types'
 import type {
   FormValues,
   ValidationRule,
@@ -8,7 +8,7 @@ import type {
   FormState,
   ValidationResult,
   FormFieldValidationProps,
-} from "./form-validation-types";
+} from './form-validation-types'
 
 /**
  * Enhanced form validation component optimized for mobile devices
@@ -33,271 +33,271 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
     isValid: true,
     isSubmitting: false,
     submitCount: 0,
-  });
+  })
 
-  const [isMobile, setIsMobile] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [isMobile, setIsMobile] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   // Detect mobile device on component mount
   useEffect(() => {
     const checkMobile = () => {
       const isMobileDevice =
-        window.matchMedia("(max-width: 767px)").matches ||
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      setIsMobile(isMobileDevice);
-    };
+        window.matchMedia('(max-width: 767px)').matches ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
 
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Validate a specific field with proper type inference
   const validateField = useCallback(
     <K extends keyof T>(name: K, value: T[K]): string => {
-      const rules = validationRules[name];
+      const rules = validationRules[name]
       if (!rules) {
-        return "";
+        return ''
       }
 
       for (const rule of rules) {
         if (!rule.test(value)) {
-          return rule.message;
+          return rule.message
         }
       }
 
-      return "";
+      return ''
     },
     [validationRules],
-  );
+  )
 
   // Handle input changes with proper type inference
   const handleChange = useCallback(
     (e: Event) => {
-      const { target } = e;
+      const { target } = e
       if (!target || !isFormField(target as Element)) {
-        return;
+        return
       }
 
       const input = target as
         | HTMLInputElement
         | HTMLTextAreaElement
-        | HTMLSelectElement;
-      const name = input.getAttribute("name");
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
       if (!name) {
-        return;
+        return
       }
 
-      const value = input.value as T[keyof T];
+      const value = input.value as T[keyof T]
 
       // Update form state
       setFormState((prev) => ({
         ...prev,
         values: { ...prev.values, [name]: value },
         dirty: { ...prev.dirty, [name]: true },
-      }));
+      }))
 
       if (validateOnChange) {
-        const error = validateField(name as keyof T, value);
+        const error = validateField(name as keyof T, value)
 
         setFormState((prev) => {
-          const newErrors = { ...prev.errors } as Record<string, string>;
+          const newErrors = { ...prev.errors } as Record<string, string>
           if (error) {
-            newErrors[name] = error;
+            newErrors[name] = error
           } else {
-            delete newErrors[name];
+            delete newErrors[name]
           }
 
-          const isValid = Object.keys(newErrors).length === 0;
+          const isValid = Object.keys(newErrors).length === 0
 
           return {
             ...prev,
             errors: newErrors as FormErrors<T>,
             isValid,
-          };
-        });
+          }
+        })
 
         // Update ARIA attributes
-        input.setAttribute("aria-invalid", error ? "true" : "false");
+        input.setAttribute('aria-invalid', error ? 'true' : 'false')
 
         if (onValidationChange) {
           onValidationChange(
             formState.isValid,
             formState.errors as FormErrors<T>,
-          );
+          )
         }
       }
     },
     [validateOnChange, validateField, onValidationChange, formState],
-  );
+  )
 
   // Handle input blur with proper type inference
   const handleBlur = useCallback(
     (e: Event) => {
       if (!validateOnBlur) {
-        return;
+        return
       }
 
-      const { target } = e;
+      const { target } = e
       if (!target || !isFormField(target as Element)) {
-        return;
+        return
       }
 
       const input = target as
         | HTMLInputElement
         | HTMLTextAreaElement
-        | HTMLSelectElement;
-      const name = input.getAttribute("name");
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
       if (!name) {
-        return;
+        return
       }
 
-      const value = input.value as T[keyof T];
+      const value = input.value as T[keyof T]
 
       // Update touched state
       setFormState((prev) => ({
         ...prev,
         touched: { ...prev.touched, [name]: true },
-      }));
+      }))
 
-      const error = validateField(name as keyof T, value);
+      const error = validateField(name as keyof T, value)
 
       setFormState((prev) => {
-        const newErrors = { ...prev.errors } as Record<string, string>;
+        const newErrors = { ...prev.errors } as Record<string, string>
         if (error) {
-          newErrors[name] = error;
+          newErrors[name] = error
         } else {
-          delete newErrors[name];
+          delete newErrors[name]
         }
 
         return {
           ...prev,
           errors: newErrors as FormErrors<T>,
           isValid: Object.keys(newErrors).length === 0,
-        };
-      });
+        }
+      })
 
       // Update ARIA attributes
-      input.setAttribute("aria-invalid", error ? "true" : "false");
+      input.setAttribute('aria-invalid', error ? 'true' : 'false')
     },
     [validateOnBlur, validateField],
-  );
+  )
 
   // Validate entire form with proper type inference
   const validateForm = useCallback((): ValidationResult<T> => {
-    const newErrors: FormErrors<T> = {};
-    let isValid = true;
+    const newErrors: FormErrors<T> = {}
+    let isValid = true
 
     if (!formRef.current) {
-      return { isValid: true, errors: {} };
+      return { isValid: true, errors: {} }
     }
 
-    const form = formRef.current;
-    const inputs = form.querySelectorAll("input, textarea, select");
+    const form = formRef.current
+    const inputs = form.querySelectorAll('input, textarea, select')
 
     inputs.forEach((input) => {
       if (!isFormField(input)) {
-        return;
+        return
       }
 
-      const name = input.getAttribute("name");
+      const name = input.getAttribute('name')
       if (!name || !validationRules[name as keyof T]) {
-        return;
+        return
       }
 
-      const value = input.value as T[keyof T];
-      const error = validateField(name as keyof T, value);
+      const value = input.value as T[keyof T]
+      const error = validateField(name as keyof T, value)
 
       if (error) {
-        newErrors[name as keyof T] = error;
-        isValid = false;
+        newErrors[name as keyof T] = error
+        isValid = false
 
         // Update ARIA attributes
-        input.setAttribute("aria-invalid", "true");
-        const errorId = `${name}-error`;
-        input.setAttribute("aria-describedby", errorId);
+        input.setAttribute('aria-invalid', 'true')
+        const errorId = `${name}-error`
+        input.setAttribute('aria-describedby', errorId)
       } else {
-        input.setAttribute("aria-invalid", "false");
-        input.removeAttribute("aria-describedby");
+        input.setAttribute('aria-invalid', 'false')
+        input.removeAttribute('aria-describedby')
       }
-    });
+    })
 
-    return { isValid, errors: newErrors };
-  }, [validationRules, validateField]);
+    return { isValid, errors: newErrors }
+  }, [validationRules, validateField])
 
   // Handle form submission with proper type inference
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       if (!validateOnSubmit) {
-        return;
+        return
       }
 
       setFormState((prev) => ({
         ...prev,
         isSubmitting: true,
         submitCount: prev.submitCount + 1,
-      }));
+      }))
 
-      const { isValid, errors } = validateForm();
+      const { isValid, errors } = validateForm()
 
       setFormState((prev) => ({
         ...prev,
         isValid,
         errors,
         isSubmitting: false,
-      }));
+      }))
 
       if (!isValid) {
-        e.preventDefault();
+        e.preventDefault()
 
         // Focus first invalid field
         if (focusFirstInvalidField && formRef.current) {
-          const firstErrorName = Object.keys(errors)[0];
+          const firstErrorName = Object.keys(errors)[0]
           if (firstErrorName) {
             const firstErrorField = formRef.current.querySelector(
               `[name="${firstErrorName}"]`,
-            );
+            )
 
-            if (firstErrorField && "scrollIntoView" in firstErrorField) {
+            if (firstErrorField && 'scrollIntoView' in firstErrorField) {
               firstErrorField.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+                behavior: 'smooth',
+                block: 'center',
+              })
 
               setTimeout(() => {
                 if (firstErrorField instanceof HTMLElement) {
-                  firstErrorField.focus();
+                  firstErrorField.focus()
 
                   // Vibrate for haptic feedback on mobile
-                  if (isMobile && "vibrate" in navigator) {
-                    navigator.vibrate([50, 100, 50]);
+                  if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate([50, 100, 50])
                   }
                 }
-              }, 500);
+              }, 500)
             }
           }
         }
 
         // Notify screen readers
         if (isMobile) {
-          const errorCount = Object.keys(errors).length;
+          const errorCount = Object.keys(errors).length
           const errorSummary = document.getElementById(
-            "validation-error-summary",
-          ) as HTMLElement;
+            'validation-error-summary',
+          ) as HTMLElement
           if (errorSummary) {
             errorSummary.textContent = `Form has ${errorCount} ${
-              errorCount === 1 ? "error" : "errors"
-            }. Please correct before submitting.`;
-            errorSummary.setAttribute("role", "alert");
+              errorCount === 1 ? 'error' : 'errors'
+            }. Please correct before submitting.`
+            errorSummary.setAttribute('role', 'alert')
           }
         }
 
         if (onValidationChange) {
-          onValidationChange(false, errors);
+          onValidationChange(false, errors)
         }
       } else if (onValidationChange) {
-        onValidationChange(true, {});
+        onValidationChange(true, {})
       }
     },
     [
@@ -307,82 +307,82 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
       isMobile,
       onValidationChange,
     ],
-  );
+  )
 
   // Set up form with validation attributes and event handlers
   useEffect(() => {
-    const form = formRef.current;
+    const form = formRef.current
     if (!form) {
-      return;
+      return
     }
 
-    const inputs = form.querySelectorAll("input, textarea, select");
+    const inputs = form.querySelectorAll('input, textarea, select')
 
     inputs.forEach((input) => {
       if (!isFormField(input)) {
-        return;
+        return
       }
 
-      const name = input.getAttribute("name");
+      const name = input.getAttribute('name')
       if (!name || !validationRules[name as keyof T]) {
-        return;
+        return
       }
 
       // Add validation attributes
       const validationProps: FormFieldValidationProps = {
         name,
-        "aria-required": true,
-        onChange: handleChange as React.ChangeEventHandler,
-        onBlur: handleBlur as React.FocusEventHandler,
-      };
+        'aria-required': true,
+        'onChange': handleChange as React.ChangeEventHandler,
+        'onBlur': handleBlur as React.FocusEventHandler,
+      }
 
       Object.entries(validationProps).forEach(([key, value]) => {
         if (value !== undefined) {
-          input.setAttribute(key, value.toString());
+          input.setAttribute(key, value.toString())
         }
-      });
+      })
 
       // Enhanced mobile styling
       if (isMobile) {
-        input.classList.add("mobile-input");
+        input.classList.add('mobile-input')
       }
-    });
+    })
 
     // Clean up
     return () => {
       inputs.forEach((input) => {
         if (!isFormField(input)) {
-          return;
+          return
         }
-        input.removeEventListener("change", handleChange);
-        input.removeEventListener("blur", handleBlur);
-      });
-    };
-  }, [validationRules, isMobile, handleChange, handleBlur]);
+        input.removeEventListener('change', handleChange)
+        input.removeEventListener('blur', handleBlur)
+      })
+    }
+  }, [validationRules, isMobile, handleChange, handleBlur])
 
   // Clone and enhance form element
   const enhancedForm = React.Children.map(children, (child) => {
-    if (React.isValidElement(child) && child.type === "form") {
+    if (React.isValidElement(child) && child.type === 'form') {
       const formChild = child as React.ReactElement<
         React.FormHTMLAttributes<HTMLFormElement>
-      >;
+      >
       return React.cloneElement(formChild, {
         ...formChild.props,
         ref: formRef,
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          handleSubmit(e);
+          handleSubmit(e)
           // Call original onSubmit if it exists
           if (formChild.props.onSubmit) {
-            formChild.props.onSubmit(e);
+            formChild.props.onSubmit(e)
           }
         },
         noValidate: true,
       } as React.FormHTMLAttributes<HTMLFormElement> & {
-        ref: React.RefObject<HTMLFormElement>;
-      });
+        ref: React.RefObject<HTMLFormElement>
+      })
     }
-    return child;
-  });
+    return child
+  })
 
   return (
     <>
@@ -405,16 +405,16 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
                 <a
                   href={`#${field}`}
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.preventDefault()
                     const element = document.querySelector(
                       `[name="${field}"]`,
-                    ) as HTMLElement;
+                    ) as HTMLElement
                     if (element instanceof HTMLElement) {
-                      element.focus();
+                      element.focus()
                       element.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
+                        behavior: 'smooth',
+                        block: 'center',
+                      })
                     }
                   }}
                 >
@@ -426,22 +426,22 @@ export function MobileFormValidation<T extends FormValues = FormValues>({
         </div>
       )}
     </>
-  );
+  )
 }
 
 // Helper functions for generic validation rules
 function createRequiredRule<T>(
-  message = "This field is required",
+  message = 'This field is required',
 ): ValidationRule<T> {
   return {
     test: (value: T) => {
-      if (typeof value === "string") {
-        return value.trim() !== "";
+      if (typeof value === 'string') {
+        return value.trim() !== ''
       }
-      return value !== undefined && value !== null;
+      return value !== undefined && value !== null
     },
     message,
-  };
+  }
 }
 
 function createCustomRule<T>(
@@ -451,14 +451,14 @@ function createCustomRule<T>(
   return {
     test,
     message,
-  };
+  }
 }
 
 // Export validation rules with proper typing
 export const ValidationRules = {
   required: createRequiredRule,
   email: (
-    message = "Please enter a valid email address",
+    message = 'Please enter a valid email address',
   ): ValidationRule<string> => ({
     test: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     message,
@@ -479,10 +479,10 @@ export const ValidationRules = {
     test: (value) => {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,
-      ) as HTMLInputElement;
-      return matchField && matchField.value === value;
+      ) as HTMLInputElement
+      return matchField && matchField.value === value
     },
     message,
   }),
   custom: createCustomRule,
-};
+}

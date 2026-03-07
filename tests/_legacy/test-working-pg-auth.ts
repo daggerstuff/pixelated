@@ -38,6 +38,7 @@ async function testWorkingAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Working auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

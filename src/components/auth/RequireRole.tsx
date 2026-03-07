@@ -1,11 +1,12 @@
-import { useSession } from "@/lib/auth-client";
-import type { AuthRole } from "@/config/auth.config";
-import type { UserRole } from "@/types/auth";
+
+import { useSession } from '@/lib/auth-client'
+import type { AuthRole } from '@/config/auth.config'
+import type { UserRole } from '@/types/auth'
 
 interface RequireRoleProps {
-  children: React.ReactNode;
-  role: AuthRole | AuthRole[] | UserRole | UserRole[];
-  fallback?: React.ReactNode;
+  children: React.ReactNode
+  role: AuthRole | AuthRole[] | UserRole | UserRole[]
+  fallback?: React.ReactNode
 }
 
 /**
@@ -23,27 +24,27 @@ export function RequireRole({
   role,
   fallback = null,
 }: RequireRoleProps) {
-  const { data: session } = useSession();
+  const { data: session } = useSession()
 
   // If no session, show fallback
   if (!session?.user) {
-    return <>{fallback}</>;
+    return <>{fallback}</>
   }
 
   // Convert role to array for easier checking
-  const requiredRoles = Array.isArray(role) ? role : [role];
-  const userRole = session.user.role;
+  const requiredRoles = Array.isArray(role) ? role : [role]
+  const userRole = session.user.role
 
   // Check if user has any of the required roles
   const hasRequiredRole = requiredRoles.some(
     (requiredRole) =>
       userRole === requiredRole ||
-      userRole?.toLowerCase() === requiredRole.toLowerCase(),
-  );
+      userRole?.toLowerCase() === requiredRole.toLowerCase()
+  )
 
   if (!hasRequiredRole) {
-    return <>{fallback}</>;
+    return <>{fallback}</>
   }
 
-  return <>{children}</>;
+  return <>{children}</>
 }

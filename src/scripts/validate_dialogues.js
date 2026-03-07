@@ -1,61 +1,61 @@
 #!/usr/bin/env node
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 // Get current file and directory path for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // Configuration
 const DIALOGUES_DIR = path.resolve(
-  "ai",
-  "data",
-  "processed",
-  "generated_dialogues",
-);
-const OUTPUT_REPORT = path.resolve(DIALOGUES_DIR, "validation_report.md");
-const MIN_TURNS = 20; // Minimum number of "Therapist:" and "Client:" exchanges
+  'ai',
+  'data',
+  'processed',
+  'generated_dialogues',
+)
+const OUTPUT_REPORT = path.resolve(DIALOGUES_DIR, 'validation_report.md')
+const MIN_TURNS = 20 // Minimum number of "Therapist:" and "Client:" exchanges
 
 // Secure path validation to prevent directory traversal
 function securePathResolve(basePath, userPath) {
   // Reject absolute paths
   if (path.isAbsolute(userPath)) {
-    throw new Error("Absolute paths are not allowed");
+    throw new Error('Absolute paths are not allowed')
   }
 
   // Reject paths with .. segments (directory traversal)
   if (
-    userPath.includes("..") ||
-    userPath.includes("../") ||
-    userPath.includes("..\\")
+    userPath.includes('..') ||
+    userPath.includes('../') ||
+    userPath.includes('..\\')
   ) {
-    throw new Error("Directory traversal sequences (..) are not allowed");
+    throw new Error('Directory traversal sequences (..) are not allowed')
   }
 
   // Reject paths with unsafe characters
-  const unsafeVisibleChars = /[<>:"|?*]/;
+  const unsafeVisibleChars = /[<>:"|?*]/
   // Check for control characters (0x00-0x1f) by character code
   const hasControlChars = Array.from(userPath).some((char) => {
-    const code = char.charCodeAt(0);
-    return code >= 0 && code <= 31;
-  });
+    const code = char.charCodeAt(0)
+    return code >= 0 && code <= 31
+  })
   if (unsafeVisibleChars.test(userPath) || hasControlChars) {
-    throw new Error("Path contains unsafe characters");
+    throw new Error('Path contains unsafe characters')
   }
 
   // Validate filename pattern (only allow safe characters for dialogue files)
-  const safeFilenamePattern = /^[a-zA-Z0-9._-]+\.txt$/;
+  const safeFilenamePattern = /^[a-zA-Z0-9._-]+\.txt$/
   if (!safeFilenamePattern.test(userPath)) {
     throw new Error(
-      "Filename does not match expected pattern for dialogue files",
-    );
+      'Filename does not match expected pattern for dialogue files',
+    )
   }
 
   // Resolve the path and ensure it stays within the base directory
-  const resolvedPath = path.resolve(basePath, userPath);
-  const resolvedBase = path.resolve(basePath);
+  const resolvedPath = path.resolve(basePath, userPath)
+  const resolvedBase = path.resolve(basePath)
 
   // Verify the resolved path starts with the base path
   if (
@@ -63,125 +63,119 @@ function securePathResolve(basePath, userPath) {
     resolvedPath !== resolvedBase
   ) {
     throw new Error(
-      "Path traversal detected: resolved path escapes base directory",
-    );
+      'Path traversal detected: resolved path escapes base directory',
+    )
   }
 
-  return resolvedPath;
+  return resolvedPath
 }
 
 // Read all dialogue files in the directory
 function readDialogueFiles() {
   if (!fs.existsSync(DIALOGUES_DIR)) {
-    console.error(`Directory not found: ${DIALOGUES_DIR}`);
-    return [];
+    console.error(`Directory not found: ${DIALOGUES_DIR}`)
+    return []
   }
 
   try {
     const files = fs
       .readdirSync(DIALOGUES_DIR)
-      .filter((file) => file.endsWith(".txt") && file.startsWith("edge-"));
+      .filter((file) => file.endsWith('.txt') && file.startsWith('edge-'))
 
-    console.log(`Found ${files.length} dialogue files.`);
-    return files;
+    console.log(`Found ${files.length} dialogue files.`)
+    return files
   } catch (error) {
-    console.error("Error reading dialogue directory:", error.message);
-    return [];
+    console.error('Error reading dialogue directory:', error.message)
+    return []
   }
 }
 
 // Extract prompt ID and scenario type from filename
 function parseFilename(filename) {
-  const parts = filename.replace(".txt", "").split("_");
+  const parts = filename.replace('.txt', '').split('_')
   return {
     promptId: parts[0],
-    scenarioType: parts.slice(1).join("_"),
-  };
+    scenarioType: parts.slice(1).join('_'),
+  }
 }
 
 // Count the number of therapist and client turns
 function countTurns(content) {
-  const therapistMatches = content.match(/Therapist:/g) || [];
-  const clientMatches = content.match(/Client:/g) || [];
+  const therapistMatches = content.match(/Therapist:/g) || []
+  const clientMatches = content.match(/Client:/g) || []
 
   return {
     therapistTurns: therapistMatches.length,
     clientTurns: clientMatches.length,
     totalTurns: therapistMatches.length + clientMatches.length,
-  };
+  }
 }
 
 // Check if the turns alternate properly (Therapist -> Client -> Therapist -> etc.)
 function checkAlternating(content) {
   // Remove any content before the first "Therapist:" or "Client:"
   const startsWithTherapist =
-    content.indexOf("Therapist:") < content.indexOf("Client:") ||
-    content.indexOf("Client:") === -1;
+    content.indexOf('Therapist:') < content.indexOf('Client:') ||
+    content.indexOf('Client:') === -1
   const startsWithClient =
-    content.indexOf("Client:") < content.indexOf("Therapist:") ||
-    content.indexOf("Therapist:") === -1;
+    content.indexOf('Client:') < content.indexOf('Therapist:') ||
+    content.indexOf('Therapist:') === -1
 
   if (!startsWithTherapist && !startsWithClient) {
     return {
       alternates: false,
-      message: "Dialogue does not contain Therapist: or Client: markers",
-    };
+      message: 'Dialogue does not contain Therapist: or Client: markers',
+    }
   }
 
   // Split the content by lines and identify turn boundaries
-  const lines = content.split("\n");
-  const turns = [];
-  let currentSpeaker = null;
-  let currentTurn = [];
+  const lines = content.split('\n')
+  const turns = []
+  let currentSpeaker = null
+  let currentTurn = []
 
   for (const line of lines) {
-    if (line.startsWith("Therapist:")) {
-      if (currentSpeaker === "Therapist") {
+    if (line.startsWith('Therapist:')) {
+      if (currentSpeaker === 'Therapist') {
         // Found another Therapist turn without a Client turn in between
         return {
           alternates: false,
           message:
-            "Found consecutive Therapist turns without Client turns in between",
-        };
+            'Found consecutive Therapist turns without Client turns in between',
+        }
       }
       // Save previous turn if it exists
       if (currentSpeaker !== null) {
-        turns.push({
-          speaker: currentSpeaker,
-          content: currentTurn.join("\n"),
-        });
-        currentTurn = [];
+        turns.push({ speaker: currentSpeaker, content: currentTurn.join('\n') })
+        currentTurn = []
       }
-      currentSpeaker = "Therapist";
-      currentTurn.push(line);
-    } else if (line.startsWith("Client:")) {
-      if (currentSpeaker === "Client") {
+      currentSpeaker = 'Therapist'
+      currentTurn.push(line)
+    } else if (line.startsWith('Client:')) {
+      if (currentSpeaker === 'Client') {
         // Found another Client turn without a Therapist turn in between
         return {
           alternates: false,
           message:
-            "Found consecutive Client turns without Therapist turns in between",
-        };
+            'Found consecutive Client turns without Therapist turns in between',
+        }
       }
       // Save previous turn if it exists
       if (currentSpeaker !== null) {
-        turns.push({
-          speaker: currentSpeaker,
-          content: currentTurn.join("\n"),
-        });
-        currentTurn = [];
+        turns.push({ speaker: currentSpeaker, content: currentTurn.join('\n') })
+        currentTurn = []
       }
-      currentSpeaker = "Client";
-      currentTurn.push(line);
+      currentSpeaker = 'Client'
+      currentTurn.push(line)
     } else if (currentSpeaker !== null) {
       // Continue current turn
-      currentTurn.push(line);
+      currentTurn.push(line)
     }
   }
 
   // Add the last turn
   if (currentSpeaker !== null && currentTurn.length > 0) {
-    turns.push({ speaker: currentSpeaker, content: currentTurn.join("\n") });
+    turns.push({ speaker: currentSpeaker, content: currentTurn.join('\n') })
   }
 
   // Check if there's a reasonable number of turns
@@ -189,13 +183,13 @@ function checkAlternating(content) {
     return {
       alternates: true,
       message: `Turn count is below minimum (${turns.length} < ${MIN_TURNS})`,
-    };
+    }
   }
 
   return {
     alternates: true,
     message: `Dialogue alternates properly with ${turns.length} turns`,
-  };
+  }
 }
 
 // Check for internal monologue, non-verbal cues, and physical symptoms of stress
@@ -214,7 +208,7 @@ function checkNarrativeElements(content) {
     /internal monologue/i,
     /silently questioned/i,
     /mentally noted/i,
-  ];
+  ]
 
   // Non-verbal cues
   const nonVerbalCuePatterns = [
@@ -231,7 +225,7 @@ function checkNarrativeElements(content) {
     /glanced/i,
     /facial expression/i,
     /gesture/i,
-  ];
+  ]
 
   // Physical symptoms
   const physicalSymptomPatterns = [
@@ -246,23 +240,23 @@ function checkNarrativeElements(content) {
     /tension in (his|her|their) (body|shoulders|muscles)/i,
     /felt sick/i,
     /nauseous/i,
-  ];
+  ]
 
   // Count occurrences
   const internalMonologue = internalMonologuePatterns.reduce(
     (count, pattern) => {
-      return count + (content.match(pattern) || []).length;
+      return count + (content.match(pattern) || []).length
     },
     0,
-  );
+  )
 
   const nonVerbalCues = nonVerbalCuePatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length;
-  }, 0);
+    return count + (content.match(pattern) || []).length
+  }, 0)
 
   const physicalSymptoms = physicalSymptomPatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length;
-  }, 0);
+    return count + (content.match(pattern) || []).length
+  }, 0)
 
   return {
     internalMonologue,
@@ -270,7 +264,7 @@ function checkNarrativeElements(content) {
     physicalSymptoms,
     hasRequiredElements:
       internalMonologue > 0 && nonVerbalCues > 0 && physicalSymptoms > 0,
-  };
+  }
 }
 
 // Check for ethical dilemma mentions
@@ -287,16 +281,16 @@ function checkEthicalDilemmas(content) {
     /legally (obligated|required)/i,
     /code of ethics/i,
     /moral (quandary|question|dilemma)/i,
-  ];
+  ]
 
   const ethicalMentions = ethicalDilemmaPatterns.reduce((count, pattern) => {
-    return count + (content.match(pattern) || []).length;
-  }, 0);
+    return count + (content.match(pattern) || []).length
+  }, 0)
 
   return {
     ethicalMentions,
     hasEthicalDilemmas: ethicalMentions > 0,
-  };
+  }
 }
 
 // Check the outcome and tone of the dialogue
@@ -318,19 +312,19 @@ function analyzeOutcome(content, scenarioType) {
     /damaged beyond repair/i,
     /failed/i,
     /disaster/i,
-  ];
+  ]
 
   // Count occurrences
   const troublingOutcomeCount = troublingOutcomePatterns.reduce(
     (count, pattern) => {
-      return count + (content.match(pattern) || []).length;
+      return count + (content.match(pattern) || []).length
     },
     0,
-  );
+  )
 
   // For scenarios that should always fail, ensure they actually do
-  const shouldFail = scenarioType.includes("fail_no_matter_what=true");
-  const lastFewLines = content.split("\n").slice(-15).join("\n").toLowerCase();
+  const shouldFail = scenarioType.includes('fail_no_matter_what=true')
+  const lastFewLines = content.split('\n').slice(-15).join('\n').toLowerCase()
 
   // Check if the ending seems positive (contradicting the "should fail" requirement)
   const positiveResolutionPatterns = [
@@ -344,43 +338,43 @@ function analyzeOutcome(content, scenarioType) {
     /agreed to continue/i,
     /hope/i,
     /healing/i,
-  ];
+  ]
 
   const positiveEnding =
     shouldFail &&
-    positiveResolutionPatterns.some((pattern) => pattern.test(lastFewLines));
+    positiveResolutionPatterns.some((pattern) => pattern.test(lastFewLines))
 
   return {
     troublingOutcomeCount,
     shouldFail,
     positiveEnding,
     appropriateOutcome: !shouldFail || (shouldFail && !positiveEnding),
-  };
+  }
 }
 
 // Validate a single dialogue file
 function validateDialogue(filename) {
-  const filePath = securePathResolve(DIALOGUES_DIR, filename);
-  const { promptId, scenarioType } = parseFilename(filename);
+  const filePath = securePathResolve(DIALOGUES_DIR, filename)
+  const { promptId, scenarioType } = parseFilename(filename)
 
   try {
-    const content = fs.readFileSync(filePath, "utf-8");
+    const content = fs.readFileSync(filePath, 'utf-8')
 
     // Perform validation checks
-    const turnCounts = countTurns(content);
-    const alternatingCheck = checkAlternating(content);
-    const narrativeElements = checkNarrativeElements(content);
-    const ethicalDilemmas = checkEthicalDilemmas(content);
-    const outcomeAnalysis = analyzeOutcome(content, scenarioType);
+    const turnCounts = countTurns(content)
+    const alternatingCheck = checkAlternating(content)
+    const narrativeElements = checkNarrativeElements(content)
+    const ethicalDilemmas = checkEthicalDilemmas(content)
+    const outcomeAnalysis = analyzeOutcome(content, scenarioType)
 
     // Determine overall validation status
-    const enoughTurns = turnCounts.totalTurns >= MIN_TURNS;
+    const enoughTurns = turnCounts.totalTurns >= MIN_TURNS
     const isValid =
       enoughTurns &&
       alternatingCheck.alternates &&
       narrativeElements.hasRequiredElements &&
       ethicalDilemmas.hasEthicalDilemmas &&
-      outcomeAnalysis.appropriateOutcome;
+      outcomeAnalysis.appropriateOutcome
 
     return {
       promptId,
@@ -392,157 +386,155 @@ function validateDialogue(filename) {
       ethicalDilemmas,
       outcomeAnalysis,
       issues: isValid ? [] : [],
-    };
+    }
   } catch (error) {
-    console.error(`Error validating ${filename}:`, error.message);
+    console.error(`Error validating ${filename}:`, error.message)
     return {
       promptId,
       scenarioType,
       isValid: false,
       error: error.message,
       issues: [`Error: ${error.message}`],
-    };
+    }
   }
 }
 
 // Generate a report of validation results
 function generateReport(results) {
-  const validCount = results.filter((r) => r.isValid).length;
-  const invalidCount = results.length - validCount;
+  const validCount = results.filter((r) => r.isValid).length
+  const invalidCount = results.length - validCount
 
-  let report = `# Dialogue Validation Report\n\n`;
-  report += `- Date: ${new Date().toISOString()}\n`;
-  report += `- Total dialogues: ${results.length}\n`;
-  report += `- Valid: ${validCount}\n`;
-  report += `- Invalid: ${invalidCount}\n\n`;
+  let report = `# Dialogue Validation Report\n\n`
+  report += `- Date: ${new Date().toISOString()}\n`
+  report += `- Total dialogues: ${results.length}\n`
+  report += `- Valid: ${validCount}\n`
+  report += `- Invalid: ${invalidCount}\n\n`
 
   // Add summary table
-  report += `## Summary\n\n`;
-  report += `| Prompt ID | Scenario Type | Valid | Therapist Turns | Client Turns | Issues |\n`;
-  report += `|-----------|---------------|-------|------------------|-------------|--------|\n`;
+  report += `## Summary\n\n`
+  report += `| Prompt ID | Scenario Type | Valid | Therapist Turns | Client Turns | Issues |\n`
+  report += `|-----------|---------------|-------|------------------|-------------|--------|\n`
 
   results.forEach((result) => {
     const issues =
-      result.issues && result.issues.length > 0 ? result.issues.join(", ") : "";
+      result.issues && result.issues.length > 0 ? result.issues.join(', ') : ''
 
     const therapistTurns = result.turnCounts
       ? result.turnCounts.therapistTurns
-      : "N/A";
+      : 'N/A'
     const clientTurns = result.turnCounts
       ? result.turnCounts.clientTurns
-      : "N/A";
+      : 'N/A'
 
-    report += `| ${result.promptId} | ${result.scenarioType} | ${result.isValid ? "✅" : "❌"} | ${therapistTurns} | ${clientTurns} | ${issues} |\n`;
-  });
+    report += `| ${result.promptId} | ${result.scenarioType} | ${result.isValid ? '✅' : '❌'} | ${therapistTurns} | ${clientTurns} | ${issues} |\n`
+  })
 
   // Add detailed section for invalid dialogues
-  const invalidDialogues = results.filter((r) => !r.isValid);
+  const invalidDialogues = results.filter((r) => !r.isValid)
   if (invalidDialogues.length > 0) {
-    report += `\n## Invalid Dialogues (${invalidDialogues.length})\n\n`;
+    report += `\n## Invalid Dialogues (${invalidDialogues.length})\n\n`
 
     invalidDialogues.forEach((result) => {
-      report += `### ${result.promptId} (${result.scenarioType})\n\n`;
+      report += `### ${result.promptId} (${result.scenarioType})\n\n`
 
       if (result.error) {
-        report += `- Error: ${result.error}\n`;
+        report += `- Error: ${result.error}\n`
       } else {
         if (result.turnCounts && result.turnCounts.totalTurns < MIN_TURNS) {
-          report += `- Not enough turns: ${result.turnCounts.totalTurns} (minimum required: ${MIN_TURNS})\n`;
+          report += `- Not enough turns: ${result.turnCounts.totalTurns} (minimum required: ${MIN_TURNS})\n`
         }
 
         if (result.alternatingCheck && !result.alternatingCheck.alternates) {
-          report += `- Turns don't alternate properly: ${result.alternatingCheck.message}\n`;
+          report += `- Turns don't alternate properly: ${result.alternatingCheck.message}\n`
         }
 
         if (
           result.narrativeElements &&
           !result.narrativeElements.hasRequiredElements
         ) {
-          report += `- Missing narrative elements:\n`;
-          report += `  - Internal monologue mentions: ${result.narrativeElements.internalMonologue}\n`;
-          report += `  - Non-verbal cue mentions: ${result.narrativeElements.nonVerbalCues}\n`;
-          report += `  - Physical symptom mentions: ${result.narrativeElements.physicalSymptoms}\n`;
+          report += `- Missing narrative elements:\n`
+          report += `  - Internal monologue mentions: ${result.narrativeElements.internalMonologue}\n`
+          report += `  - Non-verbal cue mentions: ${result.narrativeElements.nonVerbalCues}\n`
+          report += `  - Physical symptom mentions: ${result.narrativeElements.physicalSymptoms}\n`
         }
 
         if (
           result.ethicalDilemmas &&
           !result.ethicalDilemmas.hasEthicalDilemmas
         ) {
-          report += `- No ethical dilemma mentions found\n`;
+          report += `- No ethical dilemma mentions found\n`
         }
 
         if (
           result.outcomeAnalysis &&
           !result.outcomeAnalysis.appropriateOutcome
         ) {
-          report += `- Inappropriate outcome: This scenario should fail but has a positive ending\n`;
+          report += `- Inappropriate outcome: This scenario should fail but has a positive ending\n`
         }
       }
 
-      report += "\n";
-    });
+      report += '\n'
+    })
   }
 
-  return report;
+  return report
 }
 
 // Save the report to a file
 function saveReport(report) {
   try {
-    fs.writeFileSync(OUTPUT_REPORT, report);
-    console.log(`Saved validation report to ${OUTPUT_REPORT}`);
-    return true;
+    fs.writeFileSync(OUTPUT_REPORT, report)
+    console.log(`Saved validation report to ${OUTPUT_REPORT}`)
+    return true
   } catch (error) {
-    console.error("Error saving validation report:", error.message);
-    return false;
+    console.error('Error saving validation report:', error.message)
+    return false
   }
 }
 
 // Main function
 async function main() {
-  console.log("Dialogue Validation Tool");
-  console.log("=======================\n");
+  console.log('Dialogue Validation Tool')
+  console.log('=======================\n')
 
   // Read all dialogue files
-  const files = readDialogueFiles();
+  const files = readDialogueFiles()
   if (files.length === 0) {
-    console.error("No dialogue files found to validate.");
-    process.exit(1);
+    console.error('No dialogue files found to validate.')
+    process.exit(1)
   }
 
-  console.log(`Validating ${files.length} dialogue files...\n`);
+  console.log(`Validating ${files.length} dialogue files...\n`)
 
   // Validate each file
-  const results = [];
+  const results = []
   for (let i = 0; i < files.length; i++) {
-    console.log(`[${i + 1}/${files.length}] Validating ${files[i]}...`);
-    const result = validateDialogue(files[i]);
-    results.push(result);
+    console.log(`[${i + 1}/${files.length}] Validating ${files[i]}...`)
+    const result = validateDialogue(files[i])
+    results.push(result)
 
     // Print live validation status
     if (result.isValid) {
-      console.log(`  ✅ Valid`);
+      console.log(`  ✅ Valid`)
     } else {
-      console.log(
-        `  ❌ Invalid: ${result.error || "Failed validation checks"}`,
-      );
+      console.log(`  ❌ Invalid: ${result.error || 'Failed validation checks'}`)
     }
   }
 
   // Generate and save the report
-  const report = generateReport(results);
-  saveReport(report);
+  const report = generateReport(results)
+  saveReport(report)
 
   // Print summary
-  const validCount = results.filter((r) => r.isValid).length;
-  console.log("\nValidation complete!");
-  console.log(`Valid: ${validCount}/${results.length}`);
-  console.log(`Invalid: ${results.length - validCount}/${results.length}`);
-  console.log(`Check ${OUTPUT_REPORT} for the full validation report.`);
+  const validCount = results.filter((r) => r.isValid).length
+  console.log('\nValidation complete!')
+  console.log(`Valid: ${validCount}/${results.length}`)
+  console.log(`Invalid: ${results.length - validCount}/${results.length}`)
+  console.log(`Check ${OUTPUT_REPORT} for the full validation report.`)
 }
 
 // Run the main function
 main().catch((error) => {
-  console.error("Fatal error:", error);
-  process.exit(1);
-});
+  console.error('Fatal error:', error)
+  process.exit(1)
+})

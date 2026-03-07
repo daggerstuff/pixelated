@@ -33,7 +33,6 @@ pnpm merge-datasets:install
 ```
 
 This will:
-
 - Check your Python installation (requires Python 3.8+)
 - Create a virtual environment for isolated dependencies
 - Install necessary packages including `datasets`, `pandas`, `transformers`, `torch`, and other requirements
@@ -48,7 +47,6 @@ pnpm merge-datasets
 ```
 
 This will:
-
 1. Download all the datasets from their sources
 2. Normalize them into a consistent format
 3. Merge them into a single dataset
@@ -56,7 +54,6 @@ This will:
 5. Display statistics about the merged dataset
 
 The merged dataset will be saved in the following formats:
-
 - JSON: `datasets/merged_mental_health_dataset.json`
 - CSV: `datasets/merged_mental_health_dataset.csv`
 
@@ -73,7 +70,6 @@ pnpm prepare-openai
 ```
 
 This will create `datasets/mental_health_openai.jsonl` with the data formatted according to OpenAI's fine-tuning requirements. Each entry includes:
-
 - A system message defining the assistant's role
 - The user's input
 - The expected assistant response
@@ -87,7 +83,6 @@ pnpm prepare-huggingface
 ```
 
 This will create `datasets/mental_health_huggingface` directory containing:
-
 - The dataset in Arrow format
 - A CSV version for inspection: `dataset.csv`
 - Train split (80%): `train` directory
@@ -110,7 +105,6 @@ The system provides comprehensive API endpoints for dataset operations:
 ### Dataset Merging Operations
 
 #### Check Dataset Status
-
 ```
 GET /api/ai/data/merge
 ```
@@ -118,28 +112,23 @@ GET /api/ai/data/merge
 Returns whether the merged dataset exists and its path.
 
 #### Merge Datasets
-
 ```
 POST /api/ai/data/merge
 ```
 
 Parameters:
-
 - `force` (boolean, optional): Whether to recreate the dataset if it already exists.
 
 Headers:
-
 - `Authorization`: Bearer token for authentication
 
 Response:
-
 - Success response with dataset statistics
 - Error response if the operation failed
 
 ### Dataset Preparation Operations
 
 #### Check Preparation Status
-
 ```
 GET /api/ai/data/prepare
 ```
@@ -147,22 +136,18 @@ GET /api/ai/data/prepare
 Returns the status of prepared datasets for different formats.
 
 #### Prepare Datasets
-
 ```
 POST /api/ai/data/prepare
 ```
 
 Parameters:
-
 - `format` (string, optional): Format to prepare ("openai", "huggingface", or "all"). Default is "all".
 - `force` (boolean, optional): Whether to recreate the datasets if they already exist.
 
 Headers:
-
 - `Authorization`: Bearer token for authentication
 
 Response:
-
 - Success response with paths to the prepared datasets
 - Error response if the operation failed
 
@@ -184,37 +169,37 @@ You can also use the dataset tools programmatically in your code:
 import {
   mergeAllDatasets,
   mergedDatasetExists,
-  getMergedDatasetPath,
-} from "./src/lib/ai/data/merge-datasets";
+  getMergedDatasetPath
+} from './src/lib/ai/data/merge-datasets';
 
 import {
   prepareForOpenAI,
   prepareForHuggingFace,
   prepareAllFormats,
-  preparedDatasetsExist,
-} from "./src/lib/ai/data/prepare-fine-tuning";
+  preparedDatasetsExist
+} from './src/lib/ai/data/prepare-fine-tuning';
 
 // Check if datasets already exist
 const datasetExists = mergedDatasetExists();
 const preparedStatus = preparedDatasetsExist();
-console.log("Dataset exists:", datasetExists);
-console.log("Prepared formats:", preparedStatus);
+console.log('Dataset exists:', datasetExists);
+console.log('Prepared formats:', preparedStatus);
 
 // Merge datasets
 const stats = await mergeAllDatasets();
-console.log("Dataset merged:", stats);
+console.log('Dataset merged:', stats);
 
 // Prepare for OpenAI fine-tuning
 const openaiPath = await prepareForOpenAI();
-console.log("OpenAI format path:", openaiPath);
+console.log('OpenAI format path:', openaiPath);
 
 // Prepare for Hugging Face
 const huggingfacePath = await prepareForHuggingFace();
-console.log("Hugging Face format path:", huggingfacePath);
+console.log('Hugging Face format path:', huggingfacePath);
 
 // Or prepare all formats at once
 const allFormats = await prepareAllFormats();
-console.log("All prepared formats:", allFormats);
+console.log('All prepared formats:', allFormats);
 ```
 
 ## Dataset Format
@@ -237,24 +222,19 @@ This consistent format makes it easier to use the data for various AI training p
 ## Format-Specific Details
 
 ### OpenAI Format
-
 The OpenAI format follows the chat completions JSONL format:
 
 ```json
 {
   "messages": [
-    {
-      "role": "system",
-      "content": "You are a helpful mental health assistant."
-    },
-    { "role": "user", "content": "User input here" },
-    { "role": "assistant", "content": "Assistant response here" }
+    {"role": "system", "content": "You are a helpful mental health assistant."},
+    {"role": "user", "content": "User input here"},
+    {"role": "assistant", "content": "Assistant response here"}
   ]
 }
 ```
 
 ### Hugging Face Format
-
 The Hugging Face format is structured as:
 
 ```json
@@ -272,7 +252,6 @@ The Hugging Face format is structured as:
 If you encounter any issues:
 
 1. Check that all Python dependencies are installed correctly:
-
    ```bash
    pnpm merge-datasets:install
    ```

@@ -1,2 +1,2 @@
 // Exports for models module
-export {};
+export {}

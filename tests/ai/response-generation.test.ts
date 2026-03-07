@@ -1,5 +1,5 @@
-import type { AIMessage, AIService } from "@/lib/ai/models/ai-types";
-import { ResponseGenerationService } from "@/lib/ai/services/response-generation";
+import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
+import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
 
 // Mock AI service
 const mockAIService: AIService = {
@@ -9,363 +9,363 @@ const mockAIService: AIService = {
   createChatCompletionWithTracking: vi.fn(),
   generateCompletion: vi.fn(),
   dispose: vi.fn(),
-} as AIService; // Add type assertion to ensure compatibility
+} as AIService // Add type assertion to ensure compatibility
 
-describe("responseGenerationService", () => {
-  let responseService: ResponseGenerationService;
+describe('responseGenerationService', () => {
+  let responseService: ResponseGenerationService
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.resetAllMocks()
     responseService = new ResponseGenerationService({
       aiService: mockAIService,
-      model: "test-model",
-    });
-  });
+      model: 'test-model',
+    })
+  })
 
-  describe("generateResponse", () => {
-    it("should generate a response correctly", async () => {
+  describe('generateResponse', () => {
+    it('should generate a response correctly', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a generated response.",
-              role: "assistant",
+              content: 'This is a generated response.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 100, promptTokens: 70, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
-      const result = await responseService.generateResponse(messages);
+      const result = await responseService.generateResponse(messages)
 
       // Verify the result
       expect(result).toEqual({
-        content: "This is a generated response.",
-        model: "test-model",
+        content: 'This is a generated response.',
+        model: 'test-model',
         usage: { totalTokens: 100, promptTokens: 70, completionTokens: 30 },
-      });
+      })
 
       // Verify the AI service was called (don't check specific parameters as implementation differs)
-      expect(mockAIService.createChatCompletion).toHaveBeenCalled();
-    });
+      expect(mockAIService.createChatCompletion).toHaveBeenCalled()
+    })
 
-    it("should use custom temperature when provided", async () => {
+    it('should use custom temperature when provided', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a generated response.",
-              role: "assistant",
+              content: 'This is a generated response.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 100, promptTokens: 70, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
       await responseService.generateResponse(messages, {
         temperature: 0.2,
-      });
+      })
 
       // Verify the AI service was called with custom temperature
       expect(mockAIService.createChatCompletion).toHaveBeenCalledWith(
         expect.any(Array),
         expect.objectContaining({
-          model: "test-model",
+          model: 'test-model',
           temperature: 0.2,
         }),
-      );
-    });
+      )
+    })
 
-    it("should use custom max tokens when provided", async () => {
+    it('should use custom max tokens when provided', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a generated response.",
-              role: "assistant",
+              content: 'This is a generated response.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 100, promptTokens: 70, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
       await responseService.generateResponse(messages, {
         maxResponseTokens: 500,
-      });
+      })
 
       // Verify the AI service was called with custom max tokens
       expect(mockAIService.createChatCompletion).toHaveBeenCalledWith(
         expect.any(Array),
         expect.objectContaining({
-          model: "test-model",
+          model: 'test-model',
           maxTokens: 500,
         }),
-      );
-    });
+      )
+    })
 
-    it("should use custom system prompt when provided", async () => {
+    it('should use custom system prompt when provided', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a generated response.",
-              role: "assistant",
+              content: 'This is a generated response.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 100, promptTokens: 70, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
-      const customPrompt = "Custom system prompt";
+      const customPrompt = 'Custom system prompt'
       await responseService.generateResponseWithInstructions(
         messages,
         customPrompt,
-      );
+      )
 
       // Just verify the AI service was called
-      expect(mockAIService.createChatCompletion).toHaveBeenCalled();
-    });
+      expect(mockAIService.createChatCompletion).toHaveBeenCalled()
+    })
 
-    it("should handle AI service errors", async () => {
+    it('should handle AI service errors', async () => {
       // Mock the AI service to throw an error
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
-      ).mockRejectedValue(new Error("AI service error"));
+      ).mockRejectedValue(new Error('AI service error'))
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
       await expect(responseService.generateResponse(messages)).rejects.toThrow(
-        "AI service error",
-      );
-    });
+        'AI service error',
+      )
+    })
 
-    it("should handle conversation history correctly", async () => {
+    it('should handle conversation history correctly', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a response to the conversation.",
-              role: "assistant",
+              content: 'This is a response to the conversation.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 150, promptTokens: 120, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
         {
-          role: "assistant",
+          role: 'assistant',
           content: "I'm doing well, thank you! How can I help you today?",
-          name: "assistant",
+          name: 'assistant',
         },
         {
-          role: "user",
-          content: "I have a question about therapy.",
-          name: "user",
+          role: 'user',
+          content: 'I have a question about therapy.',
+          name: 'user',
         },
-      ];
+      ]
 
-      await responseService.generateResponse(messages);
+      await responseService.generateResponse(messages)
 
       // Just verify the AI service was called
-      expect(mockAIService.createChatCompletion).toHaveBeenCalled();
-    });
-  });
+      expect(mockAIService.createChatCompletion).toHaveBeenCalled()
+    })
+  })
 
-  describe("generateResponseWithInstructions", () => {
-    it("should combine instructions with system prompt", async () => {
+  describe('generateResponseWithInstructions', () => {
+    it('should combine instructions with system prompt', async () => {
       // Mock the AI service response
-      (
+      ;(
         mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
       ).mockResolvedValue({
-        id: "test-id",
+        id: 'test-id',
         created: Date.now(),
-        model: "test-model",
+        model: 'test-model',
         choices: [
           {
             message: {
-              content: "This is a response with instructions.",
-              role: "assistant",
+              content: 'This is a response with instructions.',
+              role: 'assistant',
             },
           },
         ],
         usage: { totalTokens: 120, promptTokens: 90, completionTokens: 30 },
-      });
+      })
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
-      const customPrompt = "Custom system prompt";
+      const customPrompt = 'Custom system prompt'
       await responseService.generateResponseWithInstructions(
         messages,
         customPrompt,
-      );
+      )
 
       // Just verify the AI service was called
-      expect(mockAIService.createChatCompletion).toHaveBeenCalled();
-    });
-  });
+      expect(mockAIService.createChatCompletion).toHaveBeenCalled()
+    })
+  })
 
-  describe("generateStreamingResponse", () => {
-    it("should handle streaming responses correctly", async () => {
+  describe('generateStreamingResponse', () => {
+    it('should handle streaming responses correctly', async () => {
       // Create a mock stream with proper Symbol.asyncIterator implementation
       const mockStream = {
         [Symbol.asyncIterator]: () => {
           const chunks = [
-            { choices: [{ delta: { content: "This " } }] },
-            { choices: [{ delta: { content: "is " } }] },
-            { choices: [{ delta: { content: "a " } }] },
-            { choices: [{ delta: { content: "streaming " } }] },
-            { choices: [{ delta: { content: "response." } }] },
-          ];
-          let index = 0;
+            { choices: [{ delta: { content: 'This ' } }] },
+            { choices: [{ delta: { content: 'is ' } }] },
+            { choices: [{ delta: { content: 'a ' } }] },
+            { choices: [{ delta: { content: 'streaming ' } }] },
+            { choices: [{ delta: { content: 'response.' } }] },
+          ]
+          let index = 0
 
           return {
             next: async () => {
               if (index < chunks.length) {
-                return { done: false, value: chunks[index++] };
+                return { done: false, value: chunks[index++] }
               } else {
-                return { done: true, value: undefined };
+                return { done: true, value: undefined }
               }
             },
-          };
+          }
         },
-      };
+      }
 
       // Mock the AI service streaming response
-      (
+      ;(
         mockAIService.createStreamingChatCompletion as ReturnType<typeof vi.fn>
-      ).mockReturnValue(mockStream);
+      ).mockReturnValue(mockStream)
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
       // Create a mock callback
-      const mockCallback = vi.fn();
+      const mockCallback = vi.fn()
 
       await responseService.generateResponse(messages, {
         stream: true,
         onStream: mockCallback,
-      });
+      })
 
       // Just verify the streaming chat completion was called
-      expect(mockAIService.createStreamingChatCompletion).toHaveBeenCalled();
+      expect(mockAIService.createStreamingChatCompletion).toHaveBeenCalled()
 
       // Note: In a real implementation, mockCallback would be called
       // but that depends on how the service handles the stream
-    });
+    })
 
-    it("should handle streaming errors", async () => {
+    it('should handle streaming errors', async () => {
       // Mock the AI service to throw an error
-      (
+      ;(
         mockAIService.createStreamingChatCompletion as ReturnType<typeof vi.fn>
-      ).mockRejectedValue(new Error("Streaming error"));
+      ).mockRejectedValue(new Error('Streaming error'))
 
       const messages: AIMessage[] = [
-        { role: "user", content: "Hello, how are you?", name: "user" },
-      ];
+        { role: 'user', content: 'Hello, how are you?', name: 'user' },
+      ]
 
-      const mockCallback = vi.fn();
+      const mockCallback = vi.fn()
 
       await expect(
         responseService.generateResponse(messages, {
           stream: true,
           onStream: mockCallback,
         }),
-      ).rejects.toThrow("Streaming error");
-    });
-  });
+      ).rejects.toThrow('Streaming error')
+    })
+  })
 
-  describe("constructor", () => {
-    it("should use default model if not provided", () => {
+  describe('constructor', () => {
+    it('should use default model if not provided', () => {
       const service = new ResponseGenerationService({
         aiService: mockAIService,
-      });
+      })
 
       // Access the model directly
       expect((service as unknown as { model: string }).model).toBe(
-        "mistralai/Mixtral-8x7B-Instruct-v0.2",
-      );
-    });
+        'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      )
+    })
 
-    it("should use default temperature if not provided", () => {
+    it('should use default temperature if not provided', () => {
       const service = new ResponseGenerationService({
         aiService: mockAIService,
-        model: "test-model",
-      });
+        model: 'test-model',
+      })
 
-      expect((service as any).temperature).toBe(0.7);
-    });
+      expect((service as any).temperature).toBe(0.7)
+    })
 
-    it("should use default max tokens if not provided", () => {
+    it('should use default max tokens if not provided', () => {
       const service = new ResponseGenerationService({
         aiService: mockAIService,
-        model: "test-model",
-      });
+        model: 'test-model',
+      })
 
-      expect((service as any).maxResponseTokens).toBe(1024);
-    });
+      expect((service as any).maxResponseTokens).toBe(1024)
+    })
 
-    it("should use custom system prompt if provided", () => {
-      const customPrompt = "Custom system prompt";
+    it('should use custom system prompt if provided', () => {
+      const customPrompt = 'Custom system prompt'
       const service = new ResponseGenerationService({
         aiService: mockAIService,
-        model: "test-model",
+        model: 'test-model',
         systemPrompt: customPrompt,
-      });
+      })
 
-      expect((service as any).systemPrompt).toBe(customPrompt);
-    });
-  });
-});
+      expect((service as any).systemPrompt).toBe(customPrompt)
+    })
+  })
+})

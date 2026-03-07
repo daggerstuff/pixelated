@@ -38,6 +38,7 @@ async function testExplicitAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Explicit auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

@@ -1,5 +1,5 @@
 ---
-title: "AI Companions: The Future of Emotional Support"
+title: 'AI Companions: The Future of Emotional Support'
 description: >-
   Exploring how AI companions are revolutionizing emotional support and mental
   wellness through advanced emotional intelligence and personalized interactions

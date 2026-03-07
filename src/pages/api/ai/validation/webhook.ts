@@ -1,104 +1,104 @@
-import { validationRunner } from "@/lib/ai/validation/ContinuousValidationRunner";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { validationRunner } from '@/lib/ai/validation/ContinuousValidationRunner'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
-} from "../../../../lib/audit";
+} from '../../../../lib/audit'
 
 export const POST = async ({
   request,
 }: {
-  request: Request;
+  request: Request
 }): Promise<Response> => {
-  const logger = createBuildSafeLogger("validation-webhook");
+  const logger = createBuildSafeLogger('validation-webhook')
 
   try {
     // Initialize the validation runner if needed
-    await validationRunner.initialize();
+    await validationRunner.initialize()
 
     // Get webhook details from request
-    const payload = await request.json();
-    const event = request.headers.get("x-github-event") || "unknown";
-    const signature = request.headers.get("x-hub-signature-256") || "";
+    const payload = await request.json()
+    const event = request.headers.get('x-github-event') || 'unknown'
+    const signature = request.headers.get('x-hub-signature-256') || ''
 
     // Validate the webhook and handle the event
-    const result = await validationRunner.handleWebhook(payload);
+    const result = await validationRunner.handleWebhook(payload)
 
     // Create audit log
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      "validation-webhook",
-      "system",
-      "validation-api",
+      'validation-webhook',
+      'system',
+      'validation-api',
       {
         event,
         status: result.status,
-        signature: signature ? "present" : "missing",
+        signature: signature ? 'present' : 'missing',
       },
-      result.status === "handled"
+      result.status === 'handled'
         ? AuditEventStatus.SUCCESS
         : AuditEventStatus.FAILURE,
-    );
+    )
 
-    if (result.status === "handled") {
+    if (result.status === 'handled') {
       return new Response(
         JSON.stringify({
           success: true,
-          message: "Webhook processed successfully",
+          message: 'Webhook processed successfully',
           status: result.status,
         }),
         {
           status: 200,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     } else {
       return new Response(
         JSON.stringify({
           success: false,
-          message: "Webhook processing failed",
+          message: 'Webhook processing failed',
           status: result.status,
         }),
         {
           status: 400,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
   } catch (error: unknown) {
     // Log the error
     const errorMessage =
-      error instanceof Error ? String(error) : "Unknown error";
-    logger.error(`Webhook processing error: ${errorMessage}`);
+      error instanceof Error ? String(error) : 'Unknown error'
+    logger.error(`Webhook processing error: ${errorMessage}`)
 
     // Create audit log
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      "validation-webhook",
-      "system",
-      "validation-api",
+      'validation-webhook',
+      'system',
+      'validation-api',
       {
         error: errorMessage,
       },
       AuditEventStatus.FAILURE,
-    );
+    )
 
     return new Response(
       JSON.stringify({
-        error: "Internal Server Error",
+        error: 'Internal Server Error',
         message: `Failed to process webhook: ${errorMessage}`,
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   }
-};
+}

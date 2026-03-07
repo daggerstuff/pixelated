@@ -1,13 +1,11 @@
 // Array.prototype.findLast polyfill
 if (!Array.prototype.findLast) {
-  Array.prototype.findLast = function (callback, thisArg) {
+  Array.prototype.findLast = function(callback, thisArg) {
     if (this == null) {
-      throw new TypeError(
-        "Array.prototype.findLast called on null or undefined",
-      );
+      throw new TypeError('Array.prototype.findLast called on null or undefined');
     }
-    if (typeof callback !== "function") {
-      throw new TypeError("callback must be a function");
+    if (typeof callback !== 'function') {
+      throw new TypeError('callback must be a function');
     }
 
     const array = Object(this);

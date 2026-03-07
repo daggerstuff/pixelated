@@ -4,13 +4,13 @@ module.exports = {
     node: true,
     es2024: true,
   },
-  extends: ["eslint:recommended"],
+  extends: ['eslint:recommended'],
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
   rules: {
-    "no-console": "off",
-    "no-process-exit": "off",
+    'no-console': 'off',
+    'no-process-exit': 'off',
   },
-};
+}

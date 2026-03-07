@@ -1,94 +1,94 @@
-import { getSession } from "../../../lib/auth/session";
-import mongodb from "../../../config/mongodb.config";
-import type { APIContext } from "astro";
+import { getSession } from '../../../lib/auth/session'
+import mongodb from '../../../config/mongodb.config'
+import type { APIContext } from 'astro';
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
   user?: {
-    id: string;
-    email?: string;
-    role?: string;
-    name?: string;
-  };
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
   session?: {
-    sessionId?: string;
-  };
-  expires?: string;
+    sessionId?: string
+  }
+  expires?: string
 }
 
 export const GET = async ({ request }: APIContext) => {
   try {
     // Require authentication and admin role
-    const session: Session | null = await getSession();
-    if (session?.user?.role !== "admin") {
+    const session: Session | null = await getSession()
+    if (session?.user?.role !== 'admin') {
       return new Response(
-        JSON.stringify({ error: "Unauthorized - Admin access required" }),
+        JSON.stringify({ error: 'Unauthorized - Admin access required' }),
         {
           status: 403,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
     // const { user } = session
 
     // Get query parameters
-    const { searchParams } = new URL(request.url);
-    const timeRange = searchParams.get("timeRange") || "24h";
-    const modelType = searchParams.get("modelType") || "all";
+    const { searchParams } = new URL(request.url)
+    const timeRange = searchParams.get('timeRange') || '24h'
+    const modelType = searchParams.get('modelType') || 'all'
 
     // Calculate time bounds
-    const now = new Date();
-    let startTime: Date;
+    const now = new Date()
+    let startTime: Date
     switch (timeRange) {
-      case "1h":
-        startTime = new Date(now.getTime() - 60 * 60 * 1000);
-        break;
-      case "24h":
-        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-        break;
-      case "7d":
-        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case "30d":
-        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
+      case '1h':
+        startTime = new Date(now.getTime() - 60 * 60 * 1000)
+        break
+      case '24h':
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        break
+      case '7d':
+        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        break
+      case '30d':
+        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        break
       default:
-        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000)
     }
 
-    const db = await mongodb.connect();
+    const db = await mongodb.connect()
 
     // Query AI performance metrics from MongoDB
-    const metricsCollection = db.collection("ai_performance_metrics");
+    const metricsCollection = db.collection('ai_performance_metrics')
 
     type RawMetric = {
-      _id?: string;
-      timestamp: Date;
-      model_type: string;
-      request_count: number;
-      success_count: number;
-      cached_count: number;
-      optimized_count: number;
-      total_input_tokens: number;
-      total_output_tokens: number;
-      total_tokens: number;
-      avg_latency: number;
-      max_latency: number;
-      min_latency: number;
-      error_code?: string;
-    };
+      _id?: string
+      timestamp: Date
+      model_type: string
+      request_count: number
+      success_count: number
+      cached_count: number
+      optimized_count: number
+      total_input_tokens: number
+      total_output_tokens: number
+      total_tokens: number
+      avg_latency: number
+      max_latency: number
+      min_latency: number
+      error_code?: string
+    }
 
     const query: Partial<Record<string, unknown>> = {
       timestamp: { $gte: startTime, $lte: now },
-    };
+    }
 
-    if (modelType !== "all") {
-      (query["model_type"] as string | undefined) = modelType;
+    if (modelType !== 'all') {
+      ;(query['model_type'] as string | undefined) = modelType
     }
 
     const results = (await metricsCollection
       .find(query)
-      .toArray()) as unknown as RawMetric[];
+      .toArray()) as unknown as RawMetric[]
 
     // Process and format the results
     const metrics =
@@ -110,17 +110,17 @@ export const GET = async ({ request }: APIContext) => {
         cacheHitRate: Number(row.cached_count) / Number(row.request_count),
         optimizationRate:
           Number(row.optimized_count) / Number(row.request_count),
-      })) ?? [];
+      })) ?? []
 
     // Get model breakdown
     type ModelAgg = {
-      model: string;
-      requestCount: number;
-      totalTokens: number;
-      successCount: number;
-      cachedCount: number;
-      optimizedCount: number;
-    };
+      model: string
+      requestCount: number
+      totalTokens: number
+      successCount: number
+      cachedCount: number
+      optimizedCount: number
+    }
     const modelBreakdown = results.reduce<ModelAgg[]>((acc, row: RawMetric) => {
       const {
         model_type,
@@ -129,16 +129,16 @@ export const GET = async ({ request }: APIContext) => {
         cached_count,
         optimized_count,
         total_tokens,
-      } = row;
+      } = row
 
-      const existingModel = acc.find((item) => item.model === model_type);
+      const existingModel = acc.find((item) => item.model === model_type)
 
       if (existingModel) {
-        existingModel.requestCount += request_count;
-        existingModel.totalTokens += total_tokens;
-        existingModel.successCount += success_count;
-        existingModel.cachedCount += cached_count;
-        existingModel.optimizedCount += optimized_count;
+        existingModel.requestCount += request_count
+        existingModel.totalTokens += total_tokens
+        existingModel.successCount += success_count
+        existingModel.cachedCount += cached_count
+        existingModel.optimizedCount += optimized_count
       } else {
         acc.push({
           model: model_type,
@@ -147,30 +147,30 @@ export const GET = async ({ request }: APIContext) => {
           successCount: success_count,
           cachedCount: cached_count,
           optimizedCount: optimized_count,
-        });
+        })
       }
 
-      return acc;
-    }, []);
+      return acc
+    }, [])
 
     // Get error breakdown
-    type ErrorAgg = { errorCode: string; count: number };
+    type ErrorAgg = { errorCode: string; count: number }
     const errorBreakdown = results.reduce<ErrorAgg[]>((acc, row: RawMetric) => {
-      const error_code = row.error_code ?? "unknown";
+      const error_code = row.error_code ?? 'unknown'
 
-      const existingError = acc.find((item) => item.errorCode === error_code);
+      const existingError = acc.find((item) => item.errorCode === error_code)
 
       if (existingError) {
-        existingError.count += 1;
+        existingError.count += 1
       } else {
         acc.push({
           errorCode: error_code,
           count: 1,
-        });
+        })
       }
 
-      return acc;
-    }, []);
+      return acc
+    }, [])
 
     // Return the metrics
     return new Response(
@@ -195,24 +195,24 @@ export const GET = async ({ request }: APIContext) => {
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   } catch (error: unknown) {
-    console.error("Error fetching AI performance metrics:", error);
+    console.error('Error fetching AI performance metrics:', error)
 
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch AI performance metrics",
+        error: 'Failed to fetch AI performance metrics',
         details: error instanceof Error ? error?.message : String(error),
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   }
-};
+}

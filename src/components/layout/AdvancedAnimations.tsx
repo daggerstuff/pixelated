@@ -1,21 +1,21 @@
-import type { FC, ReactNode, CSSProperties } from "react";
-import React from "react";
+import type { FC, ReactNode, CSSProperties } from 'react'
+import React from 'react'
 
 interface AnimationWrapperProps {
-  children: ReactNode;
+  children: ReactNode
   animation?:
-    | "fadeIn"
-    | "slideUp"
-    | "slideDown"
-    | "slideLeft"
-    | "slideRight"
-    | "scale"
-    | "bounce"
-    | "none";
-  duration?: "fast" | "normal" | "slow" | "custom";
-  delay?: number;
-  className?: string;
-  style?: CSSProperties;
+    | 'fadeIn'
+    | 'slideUp'
+    | 'slideDown'
+    | 'slideLeft'
+    | 'slideRight'
+    | 'scale'
+    | 'bounce'
+    | 'none'
+  duration?: 'fast' | 'normal' | 'slow' | 'custom'
+  delay?: number
+  className?: string
+  style?: CSSProperties
 }
 
 /**
@@ -24,38 +24,38 @@ interface AnimationWrapperProps {
  */
 
 const animationClasses = {
-  fadeIn: "animate-fade-in",
-  slideUp: "animate-slide-up",
-  slideDown: "animate-slide-down",
-  slideLeft: "animate-slide-left",
-  slideRight: "animate-slide-right",
-  scale: "animate-scale-in",
-  bounce: "animate-bounce-in",
-  none: "",
-};
+  fadeIn: 'animate-fade-in',
+  slideUp: 'animate-slide-up',
+  slideDown: 'animate-slide-down',
+  slideLeft: 'animate-slide-left',
+  slideRight: 'animate-slide-right',
+  scale: 'animate-scale-in',
+  bounce: 'animate-bounce-in',
+  none: '',
+}
 
 const durationClasses = {
-  fast: "animation-fast",
-  normal: "animation-normal",
-  slow: "animation-slow",
-  custom: "",
-};
+  fast: 'animation-fast',
+  normal: 'animation-normal',
+  slow: 'animation-slow',
+  custom: '',
+}
 
 export const AnimationWrapper: FC<AnimationWrapperProps> = ({
   children,
-  animation = "none",
-  duration = "normal",
+  animation = 'none',
+  duration = 'normal',
   delay = 0,
-  className = "",
+  className = '',
   style = {},
 }) => {
-  const animationClass = animationClasses[animation];
-  const durationClass = durationClasses[duration];
+  const animationClass = animationClasses[animation]
+  const durationClass = durationClasses[duration]
 
   const combinedStyle: CSSProperties = {
     ...style,
     ...(delay > 0 && { animationDelay: `${delay}ms` }),
-  };
+  }
 
   return (
     <div
@@ -64,8 +64,8 @@ export const AnimationWrapper: FC<AnimationWrapperProps> = ({
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
 // Pre-configured animation components for common use cases
 export const FadeIn: FC<{ children: ReactNode; delay?: number }> = ({
@@ -75,7 +75,7 @@ export const FadeIn: FC<{ children: ReactNode; delay?: number }> = ({
   <AnimationWrapper animation="fadeIn" delay={delay}>
     {children}
   </AnimationWrapper>
-);
+)
 
 export const SlideUp: FC<{ children: ReactNode; delay?: number }> = ({
   children,
@@ -84,7 +84,7 @@ export const SlideUp: FC<{ children: ReactNode; delay?: number }> = ({
   <AnimationWrapper animation="slideUp" delay={delay}>
     {children}
   </AnimationWrapper>
-);
+)
 
 export const SlideDown: FC<{ children: ReactNode; delay?: number }> = ({
   children,
@@ -93,7 +93,7 @@ export const SlideDown: FC<{ children: ReactNode; delay?: number }> = ({
   <AnimationWrapper animation="slideDown" delay={delay}>
     {children}
   </AnimationWrapper>
-);
+)
 
 export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({
   children,
@@ -102,7 +102,7 @@ export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({
   <AnimationWrapper animation="scale" delay={delay}>
     {children}
   </AnimationWrapper>
-);
+)
 
 // Micro-interaction components
 export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
@@ -111,11 +111,11 @@ export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
 }) => (
   <div
     className="transition-transform duration-200 ease-out hover:translate-y-[-4px]"
-    style={{ "--lift": `${lift}px` } as CSSProperties}
+    style={{ '--lift': `${lift}px` } as CSSProperties}
   >
     {children}
   </div>
-);
+)
 
 export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   children,
@@ -124,17 +124,17 @@ export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   <div className="transition-transform duration-75 ease-out active:scale-98">
     {children}
   </div>
-);
+)
 
 export const GlowOnHover: FC<{
-  children: ReactNode;
-  intensity?: "subtle" | "medium" | "strong";
-}> = ({ children, intensity = "medium" }) => {
+  children: ReactNode
+  intensity?: 'subtle' | 'medium' | 'strong'
+}> = ({ children, intensity = 'medium' }) => {
   const intensityClasses = {
-    subtle: "hover:shadow-lg",
-    medium: "hover:shadow-xl hover:shadow-blue-500/25",
-    strong: "hover:shadow-2xl hover:shadow-purple-500/30",
-  };
+    subtle: 'hover:shadow-lg',
+    medium: 'hover:shadow-xl hover:shadow-blue-500/25',
+    strong: 'hover:shadow-2xl hover:shadow-purple-500/30',
+  }
 
   return (
     <div
@@ -142,16 +142,16 @@ export const GlowOnHover: FC<{
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
 // Stagger animation for lists
 export const StaggerContainer: FC<{
-  children: ReactNode;
-  staggerDelay?: number;
-  animation?: "fadeIn" | "slideUp" | "slideLeft";
-}> = ({ children, staggerDelay = 100, animation = "fadeIn" }) => {
-  const childrenArray = React.Children.toArray(children);
+  children: ReactNode
+  staggerDelay?: number
+  animation?: 'fadeIn' | 'slideUp' | 'slideLeft'
+}> = ({ children, staggerDelay = 100, animation = 'fadeIn' }) => {
+  const childrenArray = React.Children.toArray(children)
 
   return (
     <div className="stagger-container">
@@ -165,12 +165,12 @@ export const StaggerContainer: FC<{
         </AnimationWrapper>
       ))}
     </div>
-  );
-};
+  )
+}
 
 // Loading skeleton animations
 export const SkeletonLoader: FC<{ className?: string; lines?: number }> = ({
-  className = "",
+  className = '',
   lines = 1,
 }) => (
   <div className={`space-y-3 ${className}`}>
@@ -182,46 +182,46 @@ export const SkeletonLoader: FC<{ className?: string; lines?: number }> = ({
       />
     ))}
   </div>
-);
+)
 
 // Smooth scroll animation trigger
 export const ScrollReveal: FC<{
-  children: ReactNode;
-  threshold?: number;
-  rootMargin?: string;
-}> = ({ children, threshold = 0.1, rootMargin = "0px 0px -50px 0px" }) => {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const ref = React.useRef<HTMLDivElement>(null);
+  children: ReactNode
+  threshold?: number
+  rootMargin?: string
+}> = ({ children, threshold = 0.1, rootMargin = '0px 0px -50px 0px' }) => {
+  const [isVisible, setIsVisible] = React.useState(false)
+  const ref = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
+          setIsVisible(true)
+          observer.disconnect()
         }
       },
       { threshold, rootMargin },
-    );
+    )
 
     if (ref.current) {
-      observer.observe(ref.current);
+      observer.observe(ref.current)
     }
 
-    return () => observer.disconnect();
-  }, [threshold, rootMargin]);
+    return () => observer.disconnect()
+  }, [threshold, rootMargin])
 
   return (
     <div
       ref={ref}
       className={`transition-all duration-700 ease-out ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
       }`}
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
 // Main animations CSS (to be included in global styles)
 export const animationStyles = `
@@ -359,17 +359,17 @@ export const animationStyles = `
       animation: none;
     }
   }
-`;
+`
 
 // Inject animation styles into the document
-if (typeof document !== "undefined") {
-  const styleId = "advanced-animations-styles";
+if (typeof document !== 'undefined') {
+  const styleId = 'advanced-animations-styles'
   if (!document.getElementById(styleId)) {
-    const styleElement = document.createElement("style");
-    styleElement.id = styleId;
-    styleElement.textContent = animationStyles;
-    document.head.appendChild(styleElement);
+    const styleElement = document.createElement('style')
+    styleElement.id = styleId
+    styleElement.textContent = animationStyles
+    document.head.appendChild(styleElement)
   }
 }
 
-export default AnimationWrapper;
+export default AnimationWrapper

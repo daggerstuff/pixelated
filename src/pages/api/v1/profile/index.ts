@@ -1,13 +1,13 @@
 // API route implementation for user profile endpoints
-import { protectRoute } from "@/lib/auth/serverAuth";
-import type { AuthUser } from "@/lib/auth/types";
-import { auth0UserService } from "@/services/auth0.service";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthUser } from '@/lib/auth/types'
+import { auth0UserService } from '@/services/auth0.service'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-export const prerender = false;
+export const prerender = false
 
 // Initialize services
-const logger = createBuildSafeLogger("profile-api");
+const logger = createBuildSafeLogger('profile-api')
 
 // GET endpoint for profile data
 export const GET = protectRoute({
@@ -16,27 +16,27 @@ export const GET = protectRoute({
 })(async ({
   locals,
 }: {
-  params: Record<string, string | undefined>;
-  request: Request;
-  locals: { user: AuthUser };
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
 }) => {
   try {
-    const { user } = locals;
+    const { user } = locals
 
     // Get user profile from Auth0
-    const userProfile = await auth0UserService.getUserById(user.id);
+    const userProfile = await auth0UserService.getUserById(user.id)
 
     if (!userProfile) {
-      logger.error(`Profile not found for user ${user.id}`);
+      logger.error(`Profile not found for user ${user.id}`)
       return new Response(
         JSON.stringify({
-          error: "Profile not found",
+          error: 'Profile not found',
         }),
         {
           status: 404,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Return sanitized profile data
@@ -44,7 +44,7 @@ export const GET = protectRoute({
       JSON.stringify({
         profile: {
           id: userProfile.id,
-          fullName: userProfile.fullName || userProfile.email.split("@")[0],
+          fullName: userProfile.fullName || userProfile.email.split('@')[0],
           avatarUrl: userProfile.avatarUrl || null,
           email: userProfile.email,
           role: userProfile.role,
@@ -56,22 +56,22 @@ export const GET = protectRoute({
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logger.error("Unexpected error in profile API:", { error });
+    logger.error('Unexpected error in profile API:', { error })
     return new Response(
       JSON.stringify({
-        error: "An unexpected error occurred",
+        error: 'An unexpected error occurred',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-});
+})
 
 // PUT endpoint to update profile data
 export const PUT = protectRoute({
@@ -81,42 +81,42 @@ export const PUT = protectRoute({
   request,
   locals,
 }: {
-  params: Record<string, string | undefined>;
-  request: Request;
-  locals: { user: AuthUser };
+  params: Record<string, string | undefined>
+  request: Request
+  locals: { user: AuthUser }
 }) => {
   try {
-    const { user } = locals;
-    const data = await request.json();
+    const { user } = locals
+    const data = await request.json()
 
     // Validate input data
-    const { fullName, avatarUrl, userMetadata } = data;
-    const updates: Record<string, unknown> = {};
+    const { fullName, avatarUrl, userMetadata } = data
+    const updates: Record<string, unknown> = {}
 
     if (fullName !== undefined) {
-      updates["name"] = fullName;
+      updates['name'] = fullName
     }
     if (avatarUrl !== undefined) {
-      updates["picture"] = avatarUrl;
+      updates['picture'] = avatarUrl
     }
     if (userMetadata !== undefined) {
-      updates["user_metadata"] = userMetadata;
+      updates['user_metadata'] = userMetadata
     }
 
     // Update profile in Auth0
-    const updatedUser = await auth0UserService.updateUser(user.id, updates);
+    const updatedUser = await auth0UserService.updateUser(user.id, updates)
 
     if (!updatedUser) {
-      logger.error(`Error updating profile for user ${user.id}`);
+      logger.error(`Error updating profile for user ${user.id}`)
       return new Response(
         JSON.stringify({
-          error: "Failed to update profile",
+          error: 'Failed to update profile',
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Return updated profile data
@@ -124,7 +124,7 @@ export const PUT = protectRoute({
       JSON.stringify({
         profile: {
           id: updatedUser.id,
-          fullName: updatedUser.fullName || updatedUser.email.split("@")[0],
+          fullName: updatedUser.fullName || updatedUser.email.split('@')[0],
           avatarUrl: updatedUser.avatarUrl || null,
           email: updatedUser.email,
           role: updatedUser.role,
@@ -135,19 +135,19 @@ export const PUT = protectRoute({
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logger.error("Unexpected error updating profile:", { error });
+    logger.error('Unexpected error updating profile:', { error })
     return new Response(
       JSON.stringify({
-        error: "An unexpected error occurred",
+        error: 'An unexpected error occurred',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-});
+})

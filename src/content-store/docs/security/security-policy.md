@@ -15,7 +15,6 @@ toc: true
 If you discover a security vulnerability within this project, please send an email to [SECURITY_EMAIL]. All security vulnerabilities will be promptly addressed.
 
 Please include the following information in your report:
-
 - Type of vulnerability
 - Full path of source file(s) related to the vulnerability
 - Location of the affected source code (tag/branch/commit or direct URL)
@@ -26,7 +25,6 @@ Please include the following information in your report:
 ## Security Measures
 
 ### 1. Access Control
-
 - All repository access must use 2FA (Two-Factor Authentication)
 - SSH keys must be rotated every 90 days
 - Personal Access Tokens (PATs) must:
@@ -40,7 +38,6 @@ Please include the following information in your report:
   - Linear history (no merge commits)
 
 ### 2. Code Security
-
 - All code must pass automated security scanning before merge, including:
   - Static Application Security Testing (SAST)
   - Software Composition Analysis (SCA)
@@ -74,7 +71,6 @@ Please include the following information in your report:
   - Quarterly security posture review
 
 ### 3. HIPAA Compliance
-
 - PHI (Protected Health Information) must never be committed to the repository
 - Test data must be anonymized
 - All deployed instances must use HIPAA-compliant infrastructure
@@ -82,7 +78,6 @@ Please include the following information in your report:
 - Regular HIPAA compliance training required for all contributors
 
 ### 4. Development Practices
-
 - Code review required for all changes
 - Secure coding guidelines must be followed
 - Regular security training for all developers
@@ -90,7 +85,6 @@ Please include the following information in your report:
 - Security incidents documented and reviewed
 
 ### 5. Infrastructure Security
-
 - All deployments must use HTTPS
 - Production credentials never stored in repository
 - Infrastructure as Code (IaC) security scanning enabled
@@ -98,7 +92,6 @@ Please include the following information in your report:
 - Backup procedures documented and tested
 
 ### 6. Incident Response
-
 1. Immediate notification to security team
 2. Assessment of vulnerability impact
 3. Patch development and testing
@@ -106,7 +99,6 @@ Please include the following information in your report:
 5. Post-incident review and documentation
 
 ### 7. Compliance Requirements
-
 - Annual security assessments
 - Regular compliance audits
 - Documentation of all security measures
@@ -114,7 +106,6 @@ Please include the following information in your report:
 - Access review quarterly
 
 ### 8. Data Protection
-
 - No PHI in repositories
 - No credentials in code
 - Data encryption in transit and at rest
@@ -130,7 +121,6 @@ Please include the following information in your report:
 ## Updates
 
 This security policy will be reviewed and updated quarterly or as needed based on:
-
 - New security threats
 - Changes in HIPAA requirements
 - Incident response learnings

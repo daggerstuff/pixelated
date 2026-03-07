@@ -1,24 +1,24 @@
-import * as React from "react";
-import { DashboardWidget } from "./DashboardWidget";
-import { ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
+import * as React from 'react'
+import { DashboardWidget } from './DashboardWidget'
+import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
 
 export interface MetricWidgetProps {
-  title: string;
-  description?: string;
-  metricName: string;
-  value?: number | string;
-  previousValue?: number | string;
-  format?: "number" | "currency" | "percentage" | "duration";
-  prefix?: string;
-  suffix?: string;
-  isLoading?: boolean;
-  variant?: "default" | "compact";
-  className?: string;
-  refreshInterval?: number;
+  title: string
+  description?: string
+  metricName: string
+  value?: number | string
+  previousValue?: number | string
+  format?: 'number' | 'currency' | 'percentage' | 'duration'
+  prefix?: string
+  suffix?: string
+  isLoading?: boolean
+  variant?: 'default' | 'compact'
+  className?: string
+  refreshInterval?: number
   fetchMetric?: (metricName: string) => Promise<{
-    value: number | string;
-    previousValue?: number | string;
-  }>;
+    value: number | string
+    previousValue?: number | string
+  }>
 }
 
 export function MetricWidget({
@@ -27,122 +27,120 @@ export function MetricWidget({
   metricName,
   value,
   previousValue,
-  format = "number",
-  prefix = "",
-  suffix = "",
+  format = 'number',
+  prefix = '',
+  suffix = '',
   isLoading: initialLoading = false,
-  variant = "default",
-  className = "",
+  variant = 'default',
+  className = '',
   refreshInterval,
   fetchMetric,
 }: MetricWidgetProps) {
   const [currentValue, setCurrentValue] = React.useState<
     number | string | undefined
-  >(value);
+  >(value)
   const [prevValue, setPrevValue] = React.useState<number | string | undefined>(
     previousValue,
-  );
-  const [isLoading, setIsLoading] = React.useState(initialLoading || !value);
+  )
+  const [isLoading, setIsLoading] = React.useState(initialLoading || !value)
 
   React.useEffect(() => {
     const loadData = async () => {
       if (fetchMetric) {
         try {
-          setIsLoading(true);
-          const result = await fetchMetric(metricName);
-          setCurrentValue(result.value);
-          setPrevValue(result.previousValue);
+          setIsLoading(true)
+          const result = await fetchMetric(metricName)
+          setCurrentValue(result.value)
+          setPrevValue(result.previousValue)
         } catch (error: unknown) {
-          console.error(`Error fetching metric ${metricName}:`, error);
+          console.error(`Error fetching metric ${metricName}:`, error)
         } finally {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
-    };
+    }
 
-    loadData();
+    loadData()
 
     if (refreshInterval && fetchMetric) {
-      const interval = setInterval(loadData, refreshInterval);
-      return () => clearInterval(interval);
+      const interval = setInterval(loadData, refreshInterval)
+      return () => clearInterval(interval)
     }
 
     // Return undefined for the case where no cleanup is needed
-    return undefined;
-  }, [metricName, fetchMetric, refreshInterval]);
+    return undefined
+  }, [metricName, fetchMetric, refreshInterval])
 
   // Calculate percentage change
   const calculateChange = (): number | null => {
     if (currentValue === undefined || prevValue === undefined) {
-      return null;
+      return null
     }
 
     const current =
-      typeof currentValue === "string"
-        ? parseFloat(currentValue)
-        : currentValue;
+      typeof currentValue === 'string' ? parseFloat(currentValue) : currentValue
     const previous =
-      typeof prevValue === "string" ? parseFloat(prevValue) : prevValue;
+      typeof prevValue === 'string' ? parseFloat(prevValue) : prevValue
 
     if (isNaN(current) || isNaN(previous) || previous === 0) {
-      return null;
+      return null
     }
 
-    return ((current - previous) / previous) * 100;
-  };
+    return ((current - previous) / previous) * 100
+  }
 
-  const percentChange = calculateChange();
+  const percentChange = calculateChange()
 
   const formatValue = (val: number | string | undefined): string => {
     if (val === undefined) {
-      return "N/A";
+      return 'N/A'
     }
 
-    const numValue = typeof val === "string" ? parseFloat(val) : val;
+    const numValue = typeof val === 'string' ? parseFloat(val) : val
 
     if (isNaN(numValue)) {
-      return "N/A";
+      return 'N/A'
     }
 
-    let hours: number, minutes: number, seconds: number;
+    let hours: number, minutes: number, seconds: number
 
     switch (format) {
-      case "currency":
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: "USD",
-        }).format(numValue);
-      case "percentage":
-        return `${numValue.toFixed(1)}%`;
-      case "duration":
+      case 'currency':
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(numValue)
+      case 'percentage':
+        return `${numValue.toFixed(1)}%`
+      case 'duration':
         // Format as mm:ss if under an hour, hh:mm:ss otherwise
-        hours = Math.floor(numValue / 3600);
-        minutes = Math.floor((numValue % 3600) / 60);
-        seconds = Math.floor(numValue % 60);
+        hours = Math.floor(numValue / 3600)
+        minutes = Math.floor((numValue % 3600) / 60)
+        seconds = Math.floor(numValue % 60)
 
         if (hours > 0) {
-          return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+          return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
         }
-        return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+        return `${minutes}:${seconds.toString().padStart(2, '0')}`
       default:
-        return numValue.toLocaleString();
+        return numValue.toLocaleString()
     }
-  };
+  }
 
   const handleRefresh = async () => {
     if (fetchMetric) {
       try {
-        setIsLoading(true);
-        const result = await fetchMetric(metricName);
-        setCurrentValue(result.value);
-        setPrevValue(result.previousValue);
+        setIsLoading(true)
+        const result = await fetchMetric(metricName)
+        setCurrentValue(result.value)
+        setPrevValue(result.previousValue)
       } catch (error: unknown) {
-        console.error(`Error refreshing metric ${metricName}:`, error);
+        console.error(`Error refreshing metric ${metricName}:`, error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
-  };
+  }
 
   return (
     <DashboardWidget
@@ -167,10 +165,10 @@ export function MetricWidget({
             <span
               className={`flex items-center font-medium ${
                 percentChange > 0
-                  ? "text-green-500"
+                  ? 'text-green-500'
                   : percentChange < 0
-                    ? "text-red-500"
-                    : "text-gray-500"
+                    ? 'text-red-500'
+                    : 'text-gray-500'
               }`}
             >
               {percentChange > 0 ? (
@@ -186,5 +184,5 @@ export function MetricWidget({
         )}
       </div>
     </DashboardWidget>
-  );
+  )
 }

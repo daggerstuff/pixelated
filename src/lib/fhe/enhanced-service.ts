@@ -11,20 +11,20 @@ import type {
   FHEServiceOptions,
   FHEConfig,
   EncryptedData,
-} from "./types";
-import { EncryptionMode } from "./types";
-import { MockFHEService } from "./mock/mock-fhe-service";
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
+} from './types'
+import { EncryptionMode } from './types'
+import { MockFHEService } from './mock/mock-fhe-service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("enhanced-fhe");
+const logger = createBuildSafeLogger('enhanced-fhe')
 
 /**
  * Interface for enhanced FHE service that extends the base FHE service
  */
 export interface EnhancedFHEService extends FHEService {
   // Additional methods for enhanced service
-  clearCache(): Promise<void>;
-  getStats(): Record<string, number>;
+  clearCache(): Promise<void>
+  getStats(): Record<string, number>
 }
 
 /**
@@ -37,12 +37,12 @@ export function createEnhancedFHEService(
     mode: EncryptionMode.NONE,
     useMock: true,
     ...config,
-  };
+  }
 
-  logger.info("Creating enhanced FHE service", { mode: options.mode });
+  logger.info('Creating enhanced FHE service', { mode: options.mode })
 
   // Create base service - using mock implementation for now
-  const baseService = new MockFHEService();
+  const baseService = new MockFHEService()
 
   // Stats tracking
   const stats = {
@@ -50,7 +50,7 @@ export function createEnhancedFHEService(
     decryptCount: 0,
     operationCount: 0,
     errorCount: 0,
-  };
+  }
 
   // Create enhanced service with additional capabilities
   const enhancedService: EnhancedFHEService = {
@@ -59,23 +59,23 @@ export function createEnhancedFHEService(
 
     // Enhanced initialize method with logging
     async initialize(options?: unknown): Promise<void | boolean> {
-      logger.info("Initializing enhanced FHE service");
+      logger.info('Initializing enhanced FHE service')
       try {
-        return await baseService.initialize(options);
+        return await baseService.initialize(options)
       } catch (error: unknown) {
-        logger.error("Failed to initialize FHE service", { error });
-        stats.errorCount++;
-        throw error;
+        logger.error('Failed to initialize FHE service', { error })
+        stats.errorCount++
+        throw error
       }
     },
 
     // Pass through with stats tracking
     generateKeys: async (config?: FHEConfig | undefined) => {
       try {
-        return await baseService.generateKeys(config);
+        return await baseService.generateKeys(config)
       } catch (error: unknown) {
-        stats.errorCount++;
-        throw error;
+        stats.errorCount++
+        throw error
       }
     },
 
@@ -90,12 +90,12 @@ export function createEnhancedFHEService(
       options?: unknown,
     ): Promise<EncryptedData<unknown>> {
       try {
-        stats.encryptCount++;
-        return await baseService.encrypt(value, options);
+        stats.encryptCount++
+        return await baseService.encrypt(value, options)
       } catch (error: unknown) {
-        stats.errorCount++;
-        logger.error("Encryption failed", { error });
-        throw error;
+        stats.errorCount++
+        logger.error('Encryption failed', { error })
+        throw error
       }
     },
 
@@ -105,23 +105,23 @@ export function createEnhancedFHEService(
       options?: unknown,
     ): Promise<T> {
       try {
-        stats.decryptCount++;
-        return await baseService.decrypt(encryptedData, options);
+        stats.decryptCount++
+        return await baseService.decrypt(encryptedData, options)
       } catch (error: unknown) {
-        stats.errorCount++;
-        logger.error("Decryption failed", { error });
-        throw error;
+        stats.errorCount++
+        logger.error('Decryption failed', { error })
+        throw error
       }
     },
 
     // Additional methods specific to enhanced service
     clearCache: async (): Promise<void> => {
-      logger.info("Clearing FHE service cache");
-      return Promise.resolve();
+      logger.info('Clearing FHE service cache')
+      return Promise.resolve()
     },
 
     getStats: (): Record<string, number> => ({ ...stats }),
-  };
+  }
 
   // Add operation methods if available on base service
   if (baseService.processEncrypted) {
@@ -131,20 +131,20 @@ export function createEnhancedFHEService(
       params?: Record<string, unknown>,
     ): Promise<unknown> => {
       try {
-        stats.operationCount++;
-        logger.debug("Processing encrypted data", { operation });
+        stats.operationCount++
+        logger.debug('Processing encrypted data', { operation })
         return await baseService.processEncrypted!(
           encryptedData,
           operation,
           params,
-        );
+        )
       } catch (error: unknown) {
-        stats.errorCount++;
-        logger.error("Processing failed", { operation, error });
-        throw error;
+        stats.errorCount++
+        logger.error('Processing failed', { operation, error })
+        throw error
       }
-    };
+    }
   }
 
-  return enhancedService;
+  return enhancedService
 }

@@ -4,48 +4,48 @@
  */
 
 export enum EducationalType {
-  DEFINITION = "definition",
-  EXPLANATION = "explanation",
-  COMPARISON = "comparison",
-  SYMPTOMS = "symptoms",
-  RESEARCH = "research",
+  DEFINITION = 'definition',
+  EXPLANATION = 'explanation',
+  COMPARISON = 'comparison',
+  SYMPTOMS = 'symptoms',
+  RESEARCH = 'research',
 }
 
 export enum TopicArea {
-  DEPRESSION = "depression",
-  ANXIETY = "anxiety",
-  THERAPY = "therapy",
-  MEDICATION = "medication",
-  GENERAL_MENTAL_HEALTH = "general_mental_health",
+  DEPRESSION = 'depression',
+  ANXIETY = 'anxiety',
+  THERAPY = 'therapy',
+  MEDICATION = 'medication',
+  GENERAL_MENTAL_HEALTH = 'general_mental_health',
 }
 
 export enum ResourceType {
-  EDUCATIONAL_VIDEOS = "educational_videos",
-  INFOGRAPHICS = "infographics",
-  SCIENTIFIC_ARTICLES = "scientific_articles",
-  INTERACTIVE_TOOLS = "interactive_tools",
-  BOOKS = "books",
-  PODCASTS = "podcasts",
+  EDUCATIONAL_VIDEOS = 'educational_videos',
+  INFOGRAPHICS = 'infographics',
+  SCIENTIFIC_ARTICLES = 'scientific_articles',
+  INTERACTIVE_TOOLS = 'interactive_tools',
+  BOOKS = 'books',
+  PODCASTS = 'podcasts',
 }
 
 export interface EducationalRecognizerConfig {
-  aiService?: unknown;
-  model?: string;
-  includeResourceRecommendations?: boolean;
-  adaptToUserLevel?: boolean;
-  enableTopicMapping?: boolean;
+  aiService?: unknown
+  model?: string
+  includeResourceRecommendations?: boolean
+  adaptToUserLevel?: boolean
+  enableTopicMapping?: boolean
 }
 
 export interface EducationalContextResult {
-  isEducational: boolean;
-  confidence: number;
-  educationalType: EducationalType;
-  complexity: string;
-  topicArea: TopicArea;
-  learningObjectives: string[];
-  recommendedResources: ResourceType[];
-  priorKnowledgeRequired: string[];
-  metadata: Record<string, unknown>;
+  isEducational: boolean
+  confidence: number
+  educationalType: EducationalType
+  complexity: string
+  topicArea: TopicArea
+  learningObjectives: string[]
+  recommendedResources: ResourceType[]
+  priorKnowledgeRequired: string[]
+  metadata: Record<string, unknown>
 }
 
 // Pattern matching for educational content
@@ -65,58 +65,58 @@ const EDUCATIONAL_PATTERNS = {
   [EducationalType.RESEARCH]: [
     /\b(?:research|latest|studies|study|findings)\b/i,
   ],
-};
+}
 
 // Topic keywords for classification
 const TOPIC_KEYWORDS = {
-  [TopicArea.DEPRESSION]: ["depression", "mood disorder", "depressed"],
-  [TopicArea.ANXIETY]: ["anxiety", "panic", "anxious"],
-  [TopicArea.THERAPY]: ["therapy", "cbt", "dbt", "counseling"],
-  [TopicArea.MEDICATION]: ["medication", "antidepressant", "drug"],
-  [TopicArea.GENERAL_MENTAL_HEALTH]: ["mental health", "ptsd", "bipolar"],
-};
+  [TopicArea.DEPRESSION]: ['depression', 'mood disorder', 'depressed'],
+  [TopicArea.ANXIETY]: ['anxiety', 'panic', 'anxious'],
+  [TopicArea.THERAPY]: ['therapy', 'cbt', 'dbt', 'counseling'],
+  [TopicArea.MEDICATION]: ['medication', 'antidepressant', 'drug'],
+  [TopicArea.GENERAL_MENTAL_HEALTH]: ['mental health', 'ptsd', 'bipolar'],
+}
 
 function matchEducationalType(query: string): {
-  type: EducationalType | null;
-  confidence: number;
+  type: EducationalType | null
+  confidence: number
 } {
-  const lower = query.toLowerCase();
+  const lower = query.toLowerCase()
 
   for (const [type, patterns] of Object.entries(EDUCATIONAL_PATTERNS)) {
     for (const pattern of patterns) {
       if (pattern.test(lower)) {
-        return { type: type as EducationalType, confidence: 0.8 };
+        return { type: type as EducationalType, confidence: 0.8 }
       }
     }
   }
 
-  return { type: null, confidence: 0.1 };
+  return { type: null, confidence: 0.1 }
 }
 
 function matchTopicArea(query: string): TopicArea {
-  const lower = query.toLowerCase();
+  const lower = query.toLowerCase()
 
   for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {
     if (keywords.some((keyword) => lower.includes(keyword))) {
-      return topic as TopicArea;
+      return topic as TopicArea
     }
   }
 
-  return TopicArea.GENERAL_MENTAL_HEALTH;
+  return TopicArea.GENERAL_MENTAL_HEALTH
 }
 
 export class EducationalContextRecognizer {
-  private config: EducationalRecognizerConfig;
+  private config: EducationalRecognizerConfig
 
   constructor(config: EducationalRecognizerConfig = {}) {
     this.config = {
-      model: config.model ?? "gpt-4",
+      model: config.model ?? 'gpt-4',
       includeResourceRecommendations:
         config.includeResourceRecommendations ?? true,
       adaptToUserLevel: config.adaptToUserLevel ?? true,
       enableTopicMapping: config.enableTopicMapping ?? true,
       aiService: config.aiService,
-    };
+    }
   }
 
   async recognizeEducationalContext(
@@ -124,23 +124,23 @@ export class EducationalContextRecognizer {
     userProfile?: Record<string, unknown>,
   ): Promise<EducationalContextResult> {
     // Step 1: Pattern-based recognition
-    const { type, confidence: patternConfidence } = matchEducationalType(query);
+    const { type, confidence: patternConfidence } = matchEducationalType(query)
     const topicArea = this.config.enableTopicMapping
       ? matchTopicArea(query)
-      : TopicArea.GENERAL_MENTAL_HEALTH;
+      : TopicArea.GENERAL_MENTAL_HEALTH
 
     // If no educational pattern found, return non-educational result
     if (!type) {
-      return this.createNonEducationalResult();
+      return this.createNonEducationalResult()
     }
 
     let finalResult: EducationalContextResult = {
       isEducational: true,
       confidence: patternConfidence,
       educationalType: type,
-      complexity: "basic",
+      complexity: 'basic',
       topicArea,
-      learningObjectives: [`Learn about ${topicArea.replace("_", " ")}`],
+      learningObjectives: [`Learn about ${topicArea.replace('_', ' ')}`],
       recommendedResources: this.getDefaultResources(type),
       priorKnowledgeRequired: [],
       metadata: {
@@ -148,7 +148,7 @@ export class EducationalContextRecognizer {
         practicalApplications: [],
         relatedTopics: [],
       },
-    };
+    }
 
     // Step 2: AI enhancement (if available and pattern confidence is high)
     if (this.config.aiService && patternConfidence > 0.7) {
@@ -158,22 +158,22 @@ export class EducationalContextRecognizer {
           userProfile,
           type,
           topicArea,
-        );
+        )
         if (aiResult) {
-          finalResult = this.combineResults(finalResult, aiResult);
+          finalResult = this.combineResults(finalResult, aiResult)
         }
       } catch (error: unknown) {
         // Continue with pattern-based result if AI fails
-        console.warn("AI analysis failed, using pattern-based result:", error);
+        console.warn('AI analysis failed, using pattern-based result:', error)
       }
     }
 
     // Step 3: User profile adaptation
     if (userProfile && this.config.adaptToUserLevel) {
-      finalResult = this.adaptToUserProfile(finalResult, userProfile);
+      finalResult = this.adaptToUserProfile(finalResult, userProfile)
     }
 
-    return finalResult;
+    return finalResult
   }
 
   private createNonEducationalResult(): EducationalContextResult {
@@ -181,7 +181,7 @@ export class EducationalContextRecognizer {
       isEducational: false,
       confidence: 0.1,
       educationalType: EducationalType.DEFINITION,
-      complexity: "basic",
+      complexity: 'basic',
       topicArea: TopicArea.GENERAL_MENTAL_HEALTH,
       learningObjectives: [],
       recommendedResources: [],
@@ -191,7 +191,7 @@ export class EducationalContextRecognizer {
         practicalApplications: [],
         relatedTopics: [],
       },
-    };
+    }
   }
 
   private getDefaultResources(type: EducationalType): ResourceType[] {
@@ -216,9 +216,9 @@ export class EducationalContextRecognizer {
         ResourceType.SCIENTIFIC_ARTICLES,
         ResourceType.BOOKS,
       ],
-    };
+    }
 
-    return resourceMap[type] || [ResourceType.EDUCATIONAL_VIDEOS];
+    return resourceMap[type] || [ResourceType.EDUCATIONAL_VIDEOS]
   }
 
   private async performAIAnalysis(
@@ -228,35 +228,35 @@ export class EducationalContextRecognizer {
     topicArea: TopicArea,
   ): Promise<EducationalContextResult | null> {
     if (!this.config.aiService) {
-      return null;
+      return null
     }
 
     const messages = [
       {
-        role: "system",
+        role: 'system',
         content:
-          "You are an educational context analyzer. Return a JSON object with educational analysis.",
+          'You are an educational context analyzer. Return a JSON object with educational analysis.',
       },
       {
-        role: "user",
+        role: 'user',
         content: `Analyze: "${query}". User: ${JSON.stringify(userProfile || {})}`,
       },
-    ];
+    ]
 
     const response = await this.config.aiService.createChatCompletion(
       messages,
       {
         model: this.config.model,
       },
-    );
+    )
 
-    const content = response?.choices?.[0]?.message?.content;
+    const content = response?.choices?.[0]?.message?.content
     if (!content) {
-      return null;
+      return null
     }
 
     try {
-      const parsed = JSON.parse(content) as unknown;
+      const parsed = JSON.parse(content) as unknown
       return {
         isEducational: Boolean(parsed.isEducational),
         confidence: Math.max(0, Math.min(1, parsed.confidence || 0.8)),
@@ -286,9 +286,9 @@ export class EducationalContextRecognizer {
             ? parsed.metadata.relatedTopics
             : [],
         },
-      };
+      }
     } catch {
-      return null;
+      return null
     }
   }
 
@@ -312,56 +312,56 @@ export class EducationalContextRecognizer {
         ...patternResult.metadata,
         ...aiResult.metadata,
       },
-    };
+    }
   }
 
   private adaptToUserProfile(
     result: EducationalContextResult,
     userProfile: Record<string, unknown>,
   ): EducationalContextResult {
-    const adapted = { ...result };
+    const adapted = { ...result }
 
     // Adapt complexity based on education level
     if (
-      (userProfile as { educationLevel?: string }).educationLevel === "graduate"
+      (userProfile as { educationLevel?: string }).educationLevel === 'graduate'
     ) {
-      adapted.complexity = "advanced";
+      adapted.complexity = 'advanced'
     } else if (
       (userProfile as { educationLevel?: string }).educationLevel ===
-      "high_school"
+      'high_school'
     ) {
       adapted.complexity =
-        result.complexity === "advanced" ? "intermediate" : "basic";
+        result.complexity === 'advanced' ? 'intermediate' : 'basic'
     }
 
     // Adapt resources based on learning style
     if (
       (userProfile as { preferredLearningStyle?: string })
-        .preferredLearningStyle === "visual"
+        .preferredLearningStyle === 'visual'
     ) {
-      const resources = [...adapted.recommendedResources];
+      const resources = [...adapted.recommendedResources]
       if (!resources.includes(ResourceType.INFOGRAPHICS)) {
-        resources.push(ResourceType.INFOGRAPHICS);
+        resources.push(ResourceType.INFOGRAPHICS)
       }
-      adapted.recommendedResources = resources;
+      adapted.recommendedResources = resources
     }
 
-    return adapted;
+    return adapted
   }
 
   private validateComplexity(complexity: string): string {
-    return ["basic", "intermediate", "advanced"].includes(complexity)
+    return ['basic', 'intermediate', 'advanced'].includes(complexity)
       ? complexity
-      : "basic";
+      : 'basic'
   }
 
   private validateResources(resources: unknown): ResourceType[] {
     if (!Array.isArray(resources)) {
-      return [];
+      return []
     }
     return resources
       .filter((r) => Object.values(ResourceType).includes(r))
-      .slice(0, 5); // Limit to 5 resources
+      .slice(0, 5) // Limit to 5 resources
   }
 
   async recognizeBatch(
@@ -369,23 +369,23 @@ export class EducationalContextRecognizer {
   ): Promise<EducationalContextResult[]> {
     return Promise.all(
       queries.map((q) => this.recognizeEducationalContext(q.query)),
-    );
+    )
   }
 
   generateLearningPathway(result: EducationalContextResult): any {
     return {
       currentTopic: `${result.educationalType} - ${result.topicArea}`,
-      nextSteps: ["Learn about symptoms"],
-      estimatedTimeToComplete: "15-30 minutes",
+      nextSteps: ['Learn about symptoms'],
+      estimatedTimeToComplete: '15-30 minutes',
       relatedConcepts: result.metadata.relatedTopics || [],
-    };
+    }
   }
 }
 
 export function createEducationalContextRecognizer(
   config: EducationalRecognizerConfig,
 ): EducationalContextRecognizer {
-  return new EducationalContextRecognizer(config);
+  return new EducationalContextRecognizer(config)
 }
 
 export function getDefaultEducationalRecognizerConfig(
@@ -393,9 +393,9 @@ export function getDefaultEducationalRecognizerConfig(
 ): EducationalRecognizerConfig {
   return {
     aiService,
-    model: "gpt-4",
+    model: 'gpt-4',
     includeResourceRecommendations: true,
     adaptToUserLevel: true,
     enableTopicMapping: true,
-  };
+  }
 }

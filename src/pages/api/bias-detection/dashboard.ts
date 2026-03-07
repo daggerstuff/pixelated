@@ -1,13 +1,13 @@
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("bias-detection-api");
+const logger = createBuildSafeLogger('bias-detection-api')
 
 export const GET = async ({
   request: _request,
 }: {
-  request: Request;
+  request: Request
 }): Promise<Response> => {
-  const startTime = Date.now();
+  const startTime = Date.now()
 
   try {
     // Parse URL parameters
@@ -25,34 +25,34 @@ export const GET = async ({
       },
       alerts: [
         {
-          alertId: "alert-1",
-          timestamp: new Date("2024-01-15T09:30:00Z"),
-          level: "high" as const,
-          type: "high_bias",
-          message: "High bias detected in therapeutic session",
-          sessionId: "session-123",
+          alertId: 'alert-1',
+          timestamp: new Date('2024-01-15T09:30:00Z'),
+          level: 'high' as const,
+          type: 'high_bias',
+          message: 'High bias detected in therapeutic session',
+          sessionId: 'session-123',
           acknowledged: false,
         },
         {
-          alertId: "alert-2",
-          timestamp: new Date("2024-01-15T08:45:00Z"),
-          level: "medium" as const,
-          type: "medium_bias",
-          message: "Medium bias detected in therapeutic session",
-          sessionId: "session-124",
+          alertId: 'alert-2',
+          timestamp: new Date('2024-01-15T08:45:00Z'),
+          level: 'medium' as const,
+          type: 'medium_bias',
+          message: 'Medium bias detected in therapeutic session',
+          sessionId: 'session-124',
           acknowledged: false,
         },
       ],
       trends: [
         {
-          date: new Date("2024-01-14T00:00:00Z"),
+          date: new Date('2024-01-14T00:00:00Z'),
           biasScore: 0.32,
           sessionCount: 25,
           alertCount: 3,
           demographicBreakdown: { age: 0.3, gender: 0.2 },
         },
         {
-          date: new Date("2024-01-15T00:00:00Z"),
+          date: new Date('2024-01-15T00:00:00Z'),
           biasScore: 0.35,
           sessionCount: 28,
           alertCount: 4,
@@ -60,7 +60,7 @@ export const GET = async ({
         },
       ],
       demographics: {
-        age: { "18-24": 20, "25-34": 35, "35-44": 25, "45-54": 15, "55+": 5 },
+        age: { '18-24': 20, '25-34': 35, '35-44': 25, '45-54': 15, '55+': 5 },
         gender: { male: 45, female: 50, other: 5 },
         ethnicity: { white: 20, hispanic: 30, black: 20, asian: 25, other: 5 },
         intersectional: [],
@@ -68,16 +68,16 @@ export const GET = async ({
       },
       recentAnalyses: [
         {
-          sessionId: "session-123",
-          timestamp: new Date("2024-01-15T09:30:00Z"),
+          sessionId: 'session-123',
+          timestamp: new Date('2024-01-15T09:30:00Z'),
           overallBiasScore: 0.75,
-          alertLevel: "high" as const,
+          alertLevel: 'high' as const,
           confidence: 0.85,
           demographics: {
-            age: "25-35",
-            gender: "female",
-            ethnicity: "hispanic",
-            primaryLanguage: "en",
+            age: '25-35',
+            gender: 'female',
+            ethnicity: 'hispanic',
+            primaryLanguage: 'en',
           },
           layerResults: {
             preprocessing: {
@@ -162,7 +162,7 @@ export const GET = async ({
                 patientSafety: 0.9,
               },
               temporalAnalysis: {
-                trendDirection: "worsening" as const,
+                trendDirection: 'worsening' as const,
                 changeRate: 0.05,
                 seasonalPatterns: [],
                 interventionEffectiveness: [],
@@ -174,9 +174,9 @@ export const GET = async ({
         },
       ],
       recommendations: [],
-    };
+    }
 
-    const processingTime = Math.max(Date.now() - startTime, 1); // Ensure > 0
+    const processingTime = Math.max(Date.now() - startTime, 1) // Ensure > 0
 
     return new Response(
       JSON.stringify({
@@ -187,28 +187,28 @@ export const GET = async ({
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   } catch (error: unknown) {
-    logger.error("Error fetching dashboard data:", error);
+    logger.error('Error fetching dashboard data:', error)
 
-    const processingTime = Date.now() - startTime;
+    const processingTime = Date.now() - startTime
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Dashboard Data Retrieval Failed",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Dashboard Data Retrieval Failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
         processingTime,
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   }
-};
+}
