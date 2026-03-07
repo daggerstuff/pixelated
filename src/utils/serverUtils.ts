@@ -6,10 +6,10 @@
 interface AstroGlobal {
   request?: {
     headers?: {
-      get(name: string): string | null;
-      forEach(callback: (value: string, key: string) => void): void;
-    };
-  };
+      get(name: string): string | null
+      forEach(callback: (value: string, key: string) => void): void
+    }
+  }
 }
 
 /**
@@ -23,17 +23,17 @@ interface AstroGlobal {
 export function safelyGetHeader(
   astro: AstroGlobal,
   headerName: string,
-  defaultValue: string = "",
+  defaultValue: string = '',
 ): string {
   // Check if we're in a server context where headers are available
-  const isBuild = import.meta.env.COMMAND === "build";
+  const isBuild = import.meta.env.COMMAND === 'build'
   if (import.meta.env.SSR && astro.request?.headers && !isBuild) {
-    const headerValue = astro.request.headers.get(headerName);
-    return headerValue || defaultValue;
+    const headerValue = astro.request.headers.get(headerName)
+    return headerValue || defaultValue
   }
 
   // In prerendered pages, return the default value
-  return defaultValue;
+  return defaultValue
 }
 
 /**
@@ -43,29 +43,22 @@ export function safelyGetHeader(
  * @returns Object with header values or empty object in prerendered context
  */
 export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
-  console.error(
-    `[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env.COMMAND}`,
-  );
+  console.error(`[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env.COMMAND}`);
   // Only try to access headers in SSR context and not during static build
-  const isBuild = import.meta.env.COMMAND === "build";
-  if (
-    import.meta.env.SSR &&
-    astro.request &&
-    astro.request.headers &&
-    !isBuild
-  ) {
-    const headers: Record<string, string> = {};
+  const isBuild = import.meta.env.COMMAND === 'build'
+  if (import.meta.env.SSR && astro.request && astro.request.headers && !isBuild) {
+    const headers: Record<string, string> = {}
 
     // Convert headers to a plain object
     astro.request.headers.forEach((value: string, key: string) => {
-      headers[key.toLowerCase()] = value;
-    });
+      headers[key.toLowerCase()] = value
+    })
 
-    return headers;
+    return headers
   }
 
   // Return empty object for prerendered pages
-  return {};
+  return {}
 }
 
 /**
@@ -74,7 +67,7 @@ export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
  * @returns boolean indicating if we're in SSR mode
  */
 export function isSSR(): boolean {
-  return import.meta.env.SSR === true;
+  return import.meta.env.SSR === true
 }
 
 /**
@@ -85,13 +78,13 @@ export function isSSR(): boolean {
  */
 export function getClientIP(astro: AstroGlobal): string {
   if (!import.meta.env.SSR) {
-    return "";
+    return ''
   }
 
   return (
-    safelyGetHeader(astro, "x-forwarded-for") ||
-    safelyGetHeader(astro, "x-real-ip") ||
-    safelyGetHeader(astro, "cf-connecting-ip") ||
-    ""
-  );
+    safelyGetHeader(astro, 'x-forwarded-for') ||
+    safelyGetHeader(astro, 'x-real-ip') ||
+    safelyGetHeader(astro, 'cf-connecting-ip') ||
+    ''
+  )
 }

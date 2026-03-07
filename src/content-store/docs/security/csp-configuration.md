@@ -17,22 +17,18 @@ This document describes the Content Security Policy implementation for enhanced 
 ## Security Improvements Made
 
 ### 1. Removed Broad Wildcards
-
 - **Before**: `img-src` included `https:` wildcard allowing any HTTPS image source
 - **After**: Specific trusted domains only for image sources
 - **Before**: `connect-src` used wildcards like `*.supabase.co` and `*.upstash.io`
 - **After**: Specific endpoints documented and reviewed
 
 ### 2. Structured Configuration
-
 - Moved CSP from inline string to structured TypeScript configuration
 - Added environment-specific policies (development vs production)
 - Improved maintainability with categorized domain lists
 
 ### 3. Domain Categorization
-
 The CSP is now organized by purpose:
-
 - **AI/ML APIs**: OpenAI, Together.xyz, Replicate, etc.
 - **Analytics & Monitoring**: Vercel, Google Analytics, Sentry
 - **Authentication**: Google OAuth
@@ -85,7 +81,6 @@ The configuration automatically handles environment differences:
 ## Monitoring CSP Violations
 
 CSP violations can be monitored through:
-
 - Browser developer console
 - Sentry error reporting (if configured)
 - Server logs (when CSP reports are enabled)

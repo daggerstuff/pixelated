@@ -7,7 +7,6 @@ This document outlines the configuration plan for integrating the Playwright MCP
 ## Background
 
 The Playwright MCP server allows Large Language Models (LLMs) to interact with web browsers programmatically, enabling capabilities such as:
-
 - Automated navigation through our application
 - Form filling and interaction with UI elements
 - Screenshot capture for visual verification
@@ -75,24 +74,24 @@ For each critical user flow, we will implement a test following this structure:
 
 ```typescript
 // Example test for authentication flow
-test("Authentication keeps user logged in", async ({ page }) => {
+test('Authentication keeps user logged in', async ({ page }) => {
   // Setup
-  await page.goto("/auth/login");
+  await page.goto('/auth/login');
 
   // Test actions
-  await page.fill('input[name="email"]', "test@example.com");
-  await page.fill('input[name="password"]', "password123");
+  await page.fill('input[name="email"]', 'test@example.com');
+  await page.fill('input[name="password"]', 'password123');
   await page.click('button[type="submit"]');
 
   // Wait for navigation
-  await page.waitForURL("/dashboard");
+  await page.waitForURL('/dashboard');
 
   // Verify persistence
   await page.reload();
 
   // Assertions
-  await expect(page).toHaveURL("/dashboard");
-  await expect(page.locator("h1")).toContainText("Dashboard");
+  await expect(page).toHaveURL('/dashboard');
+  await expect(page.locator('h1')).toContainText('Dashboard');
 });
 ```
 
@@ -103,9 +102,9 @@ name: Playwright MCP Tests
 
 on:
   push:
-    branches: [main, dev]
+    branches: [ main, dev ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   test:
@@ -118,8 +117,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18"
-          cache: "pnpm"
+          node-version: '18'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install

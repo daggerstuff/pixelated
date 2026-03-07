@@ -1,18 +1,19 @@
-import React, { useState, forwardRef } from "react";
-import { usePasswordStrength } from "../../hooks/usePasswordStrength";
-import { Eye, EyeOff } from "lucide-react";
+import React, { useState, forwardRef } from 'react'
+import { usePasswordStrength } from '../../hooks/usePasswordStrength'
+import { Eye, EyeOff } from 'lucide-react'
 
-interface PasswordInputWithStrengthProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  name: string;
-  error?: string;
-  showStrengthMeter?: boolean;
-  showToggleButton?: boolean;
-  showStrengthText?: boolean;
-  helperText?: string;
-  wrapperClassName?: string;
-  inputClassName?: string;
-  required?: boolean;
+interface PasswordInputWithStrengthProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string
+  name: string
+  error?: string
+  showStrengthMeter?: boolean
+  showToggleButton?: boolean
+  showStrengthText?: boolean
+  helperText?: string
+  wrapperClassName?: string
+  inputClassName?: string
+  required?: boolean
 }
 
 /**
@@ -32,83 +33,83 @@ export const PasswordInputWithStrength = forwardRef<
       showToggleButton = true,
       showStrengthText = true,
       helperText,
-      wrapperClassName = "",
-      inputClassName = "",
+      wrapperClassName = '',
+      inputClassName = '',
       required = false,
       onChange,
       onBlur,
-      value = "",
+      value = '',
       ...props
     },
     ref,
   ) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [valueState, setValueState] = useState("");
+    const [isFocused, setIsFocused] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [valueState, setValueState] = useState('')
 
     // Use the controlled value prop if provided, otherwise use internal state
-    const currentValue = typeof value === "string" ? value : valueState;
+    const currentValue = typeof value === 'string' ? value : valueState
 
-    const { strength, feedback, color } = usePasswordStrength(currentValue);
+    const { strength, feedback, color } = usePasswordStrength(currentValue)
 
     // Handle controlled and uncontrolled input cases
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (typeof value !== "string") {
-        setValueState(e.target.value);
+      if (typeof value !== 'string') {
+        setValueState(e.target.value)
       }
 
       if (onChange) {
-        onChange(e);
+        onChange(e)
       }
-    };
+    }
 
     const togglePasswordVisibility = () => {
-      setShowPassword((prev) => !prev);
-    };
+      setShowPassword((prev) => !prev)
+    }
 
     // Add haptic feedback on mobile when typing
     const handleKeyDown = () => {
       if (
-        "vibrate" in navigator &&
+        'vibrate' in navigator &&
         isFocused &&
         currentValue &&
-        strength === "weak"
+        strength === 'weak'
       ) {
-        navigator.vibrate(5); // Very subtle vibration for weak passwords
+        navigator.vibrate(5) // Very subtle vibration for weak passwords
       }
-    };
+    }
 
     const handleFocus = () => {
-      setIsFocused(true);
-    };
+      setIsFocused(true)
+    }
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      setIsFocused(false);
+      setIsFocused(false)
 
       if (onBlur) {
-        onBlur(e);
+        onBlur(e)
       }
-    };
+    }
 
-    const isShowingError = !!error && !isFocused;
+    const isShowingError = !!error && !isFocused
 
     // Determine aria-describedby value
     const getAriaDescribedBy = () => {
       if (isShowingError) {
-        return `${name}-error`;
+        return `${name}-error`
       }
 
-      const ids: string[] = [];
+      const ids: string[] = []
       if (helperText) {
-        ids.push(`${name}-helper`);
+        ids.push(`${name}-helper`)
       }
       // Only reference strength meter if it's actually rendered (requires currentValue)
       if (showStrengthMeter && currentValue) {
-        ids.push(`${name}-strength`);
+        ids.push(`${name}-strength`)
       }
 
-      return ids.length > 0 ? ids.join(" ") : undefined;
-    };
+      return ids.length > 0 ? ids.join(' ') : undefined
+    }
 
     return (
       <div className={`password-input-wrapper ${wrapperClassName}`}>
@@ -123,12 +124,12 @@ export const PasswordInputWithStrength = forwardRef<
               ref={ref}
               id={name}
               name={name}
-              type={showPassword ? "text" : "password"}
+              type={showPassword ? 'text' : 'password'}
               className={`
                 w-full p-3 border rounded
-                ${isShowingError ? "border-red-500 bg-red-50" : "border-gray-300"}
-                ${isFocused ? "ring-2 ring-blue-300 border-blue-300" : ""}
-                ${showToggleButton ? "pr-12" : ""}
+                ${isShowingError ? 'border-red-500 bg-red-50' : 'border-gray-300'}
+                ${isFocused ? 'ring-2 ring-blue-300 border-blue-300' : ''}
+                ${showToggleButton ? 'pr-12' : ''}
                 ${inputClassName}
               `}
               value={currentValue}
@@ -136,7 +137,7 @@ export const PasswordInputWithStrength = forwardRef<
               onFocus={handleFocus}
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              aria-invalid={isShowingError ? "true" : "false"}
+              aria-invalid={isShowingError ? 'true' : 'false'}
               aria-describedby={getAriaDescribedBy()}
               {...props}
             />
@@ -146,8 +147,8 @@ export const PasswordInputWithStrength = forwardRef<
                 type="button"
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded-sm"
                 onClick={togglePasswordVisibility}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                title={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" aria-hidden="true" />
@@ -183,13 +184,13 @@ export const PasswordInputWithStrength = forwardRef<
                 className="password-strength-meter mt-2"
                 role="progressbar"
                 aria-valuenow={
-                  strength === "empty"
+                  strength === 'empty'
                     ? 0
-                    : strength === "weak"
+                    : strength === 'weak'
                       ? 25
-                      : strength === "fair"
+                      : strength === 'fair'
                         ? 50
-                        : strength === "good"
+                        : strength === 'good'
                           ? 75
                           : 100
                 }
@@ -202,15 +203,15 @@ export const PasswordInputWithStrength = forwardRef<
                   style={{
                     backgroundColor: color,
                     width:
-                      strength === "empty"
-                        ? "0%"
-                        : strength === "weak"
-                          ? "25%"
-                          : strength === "fair"
-                            ? "50%"
-                            : strength === "good"
-                              ? "75%"
-                              : "100%",
+                      strength === 'empty'
+                        ? '0%'
+                        : strength === 'weak'
+                          ? '25%'
+                          : strength === 'fair'
+                            ? '50%'
+                            : strength === 'good'
+                              ? '75%'
+                              : '100%',
                   }}
                 ></div>
               </div>
@@ -227,8 +228,8 @@ export const PasswordInputWithStrength = forwardRef<
           )}
         </div>
       </div>
-    );
+    )
   },
-);
+)
 
-PasswordInputWithStrength.displayName = "PasswordInputWithStrength";
+PasswordInputWithStrength.displayName = 'PasswordInputWithStrength'

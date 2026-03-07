@@ -1,47 +1,47 @@
-import React, { useState } from "react";
-import { useMultidimensionalEmotions } from "../../hooks/useMultidimensionalEmotions";
-import MultidimensionalEmotionChart from "../../components/dashboard/MultidimensionalEmotionChart";
+import React, { useState } from 'react'
+import { useMultidimensionalEmotions } from '../../hooks/useMultidimensionalEmotions'
+import MultidimensionalEmotionChart from '../../components/dashboard/MultidimensionalEmotionChart'
 
-type TimeRange = "day" | "week" | "month" | "year";
+type TimeRange = 'day' | 'week' | 'month' | 'year'
 
 const EmotionVisualizationDemo: FC = () => {
-  const [timeRange, setTimeRange] = useState<TimeRange>("week");
-  const [dataPoints, setDataPoints] = useState<number>(100);
+  const [timeRange, setTimeRange] = useState<TimeRange>('week')
+  const [dataPoints, setDataPoints] = useState<number>(100)
   const [selectedEmotionIndex, setSelectedEmotionIndex] = useState<
     number | null
-  >(null);
+  >(null)
 
   // Use a demo clientId for visualization purposes
-  const DEMO_CLIENT_ID = "demo-client";
+  const DEMO_CLIENT_ID = 'demo-client'
   const { data, isLoading, error } = useMultidimensionalEmotions(
     DEMO_CLIENT_ID,
     timeRange,
     dataPoints,
-  );
+  )
 
   const handleTimeRangeChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    setTimeRange(event.target.value as TimeRange);
-  };
+    setTimeRange(event.target.value as TimeRange)
+  }
 
   const handleDataPointsChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setDataPoints(Number(event.target.value));
-  };
+    setDataPoints(Number(event.target.value))
+  }
 
   const handleEmotionSelect = (index: number) => {
-    setSelectedEmotionIndex(index === selectedEmotionIndex ? null : index);
-  };
+    setSelectedEmotionIndex(index === selectedEmotionIndex ? null : index)
+  }
 
   const selectedEmotion =
-    selectedEmotionIndex !== null ? data[selectedEmotionIndex] : null;
+    selectedEmotionIndex !== null ? data[selectedEmotionIndex] : null
 
   // Format timestamp to readable date
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString();
-  };
+    return new Date(timestamp).toLocaleString()
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -124,12 +124,12 @@ const EmotionVisualizationDemo: FC = () => {
                   <strong>Arousal:</strong> {selectedEmotion.arousal.toFixed(2)}
                 </p>
                 <p className="text-sm mb-1">
-                  <strong>Dominance:</strong>{" "}
+                  <strong>Dominance:</strong>{' '}
                   {selectedEmotion.dominance.toFixed(2)}
                 </p>
                 <p className="text-sm">
-                  <strong>Emotion:</strong>{" "}
-                  {selectedEmotion.emotion || "Unknown"}
+                  <strong>Emotion:</strong>{' '}
+                  {selectedEmotion.emotion || 'Unknown'}
                 </p>
               </div>
             )}
@@ -151,10 +151,10 @@ const EmotionVisualizationDemo: FC = () => {
           {/* 3D Visualization */}
           <div className="col-span-1 md:col-span-3 bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
             <div
-              style={{ height: "600px" }}
+              style={{ height: '600px' }}
               aria-busy={isLoading}
               aria-live="polite"
-              aria-describedby={error ? "emotion-error" : undefined}
+              aria-describedby={error ? 'emotion-error' : undefined}
             >
               <MultidimensionalEmotionChart
                 emotionData={data}
@@ -190,14 +190,14 @@ const EmotionVisualizationDemo: FC = () => {
                       key={point.timestamp}
                       onClick={() => handleEmotionSelect(index)}
                       onKeyDown={(e: React.KeyboardEvent) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleEmotionSelect(index);
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleEmotionSelect(index)
                         }
                       }}
                       tabIndex={0}
                       className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700
-                        ${selectedEmotionIndex === index ? "bg-blue-50 dark:bg-blue-900/20" : ""}`}
+                        ${selectedEmotionIndex === index ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
                     >
                       <td className="p-2 border-b">
                         {formatDate(point.timestamp)}
@@ -212,7 +212,7 @@ const EmotionVisualizationDemo: FC = () => {
                         {point.dominance.toFixed(2)}
                       </td>
                       <td className="p-2 border-b">
-                        {point.emotion || "Unknown"}
+                        {point.emotion || 'Unknown'}
                       </td>
                     </tr>
                   ))}
@@ -223,7 +223,7 @@ const EmotionVisualizationDemo: FC = () => {
         </div>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default EmotionVisualizationDemo;
+export default EmotionVisualizationDemo

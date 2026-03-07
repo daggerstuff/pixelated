@@ -25,25 +25,26 @@ The application uses a structured logging system that provides consistent loggin
 ### Using the Logger
 
 ```typescript
-import { getLogger } from "../lib/logging";
+import { getLogger } from '../lib/logging'
 
 // Create a logger, optionally with a specific request ID
-const logger = getLogger();
+const logger = getLogger()
 
 // Basic logging
-logger.info("This is an informational message");
-logger.warn("This is a warning message");
-logger.error("This is an error message");
-logger.debug("This is a debug message");
+logger.info('This is an informational message')
+logger.warn('This is a warning message')
+logger.error('This is an error message')
+logger.debug('This is a debug message')
 
 // Logging with context
-logger.info("User logged in", { userId: "123", ip: "127.0.0.1" });
+logger.info('User logged in', { userId: '123', ip: '127.0.0.1' })
 
 // Logging errors
 try {
   // Some operation that might fail
-} catch (error) {
-  logger.error("Operation failed", error, { operationId: "456" });
+}
+catch (error) {
+  logger.error('Operation failed', error, { operationId: '456' })
 }
 ```
 

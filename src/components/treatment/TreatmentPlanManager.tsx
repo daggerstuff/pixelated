@@ -1,193 +1,193 @@
-import React, { useState, useEffect } from "react";
-import { format, addDays, differenceInDays } from "date-fns";
+import React, { useState, useEffect } from 'react'
+import { format, addDays, differenceInDays } from 'date-fns'
 
 interface TreatmentGoal {
-  id: string;
-  title: string;
-  description: string;
-  targetDate: Date;
-  priority: "low" | "medium" | "high" | "urgent";
-  status: "not-started" | "in-progress" | "completed" | "on-hold";
-  progress: number; // 0-100
-  milestones: Milestone[];
-  category: "behavioral" | "cognitive" | "emotional" | "social" | "physical";
+  id: string
+  title: string
+  description: string
+  targetDate: Date
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'not-started' | 'in-progress' | 'completed' | 'on-hold'
+  progress: number // 0-100
+  milestones: Milestone[]
+  category: 'behavioral' | 'cognitive' | 'emotional' | 'social' | 'physical'
 }
 
 interface Milestone {
-  id: string;
-  title: string;
-  completed: boolean;
-  completedDate?: Date;
-  notes?: string;
+  id: string
+  title: string
+  completed: boolean
+  completedDate?: Date
+  notes?: string
 }
 
 interface TreatmentPlan {
-  id: string;
-  clientName: string;
-  therapistName: string;
-  createdDate: Date;
-  lastModified: Date;
-  duration: number; // weeks
-  goals: TreatmentGoal[];
-  notes: string;
-  status: "active" | "completed" | "paused" | "draft";
+  id: string
+  clientName: string
+  therapistName: string
+  createdDate: Date
+  lastModified: Date
+  duration: number // weeks
+  goals: TreatmentGoal[]
+  notes: string
+  status: 'active' | 'completed' | 'paused' | 'draft'
 }
 
 interface TreatmentPlanManagerProps {
-  plan?: TreatmentPlan;
-  onSave?: (plan: TreatmentPlan) => void;
-  onGoalUpdate?: (goalId: string, updates: Partial<TreatmentGoal>) => void;
-  className?: string;
-  readOnly?: boolean;
+  plan?: TreatmentPlan
+  onSave?: (plan: TreatmentPlan) => void
+  onGoalUpdate?: (goalId: string, updates: Partial<TreatmentGoal>) => void
+  className?: string
+  readOnly?: boolean
 }
 
 const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   plan,
   onSave,
   onGoalUpdate,
-  className = "",
+  className = '',
   readOnly = false,
 }) => {
-  const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(null)
   const [activeTab, setActiveTab] = useState<
-    "overview" | "goals" | "progress" | "notes"
-  >("overview");
-  const [_editingGoal, _setEditingGoal] = useState<string | null>(null);
-  const [newGoal, setNewGoal] = useState<Partial<TreatmentGoal>>({});
-  const [showAddGoal, setShowAddGoal] = useState(false);
+    'overview' | 'goals' | 'progress' | 'notes'
+  >('overview')
+  const [_editingGoal, _setEditingGoal] = useState<string | null>(null)
+  const [newGoal, setNewGoal] = useState<Partial<TreatmentGoal>>({})
+  const [showAddGoal, setShowAddGoal] = useState(false)
 
   // Default sample plan
   const defaultPlan: TreatmentPlan = {
-    id: "plan-1",
-    clientName: "Anonymous Client",
-    therapistName: "Dr. Smith",
+    id: 'plan-1',
+    clientName: 'Anonymous Client',
+    therapistName: 'Dr. Smith',
     createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     lastModified: new Date(),
     duration: 12,
-    status: "active",
+    status: 'active',
     notes:
-      "Initial assessment shows moderate anxiety and depression symptoms. Client is motivated for change.",
+      'Initial assessment shows moderate anxiety and depression symptoms. Client is motivated for change.',
     goals: [
       {
-        id: "goal-1",
-        title: "Reduce Anxiety Symptoms",
+        id: 'goal-1',
+        title: 'Reduce Anxiety Symptoms',
         description:
-          "Learn and practice anxiety management techniques to reduce daily anxiety levels",
+          'Learn and practice anxiety management techniques to reduce daily anxiety levels',
         targetDate: addDays(new Date(), 30),
-        priority: "high",
-        status: "in-progress",
+        priority: 'high',
+        status: 'in-progress',
         progress: 65,
-        category: "emotional",
+        category: 'emotional',
         milestones: [
           {
-            id: "m1",
-            title: "Learn breathing techniques",
+            id: 'm1',
+            title: 'Learn breathing techniques',
             completed: true,
             completedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
           },
           {
-            id: "m2",
-            title: "Practice daily meditation",
+            id: 'm2',
+            title: 'Practice daily meditation',
             completed: true,
             completedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
           },
-          { id: "m3", title: "Identify anxiety triggers", completed: false },
-          { id: "m4", title: "Develop coping strategies", completed: false },
+          { id: 'm3', title: 'Identify anxiety triggers', completed: false },
+          { id: 'm4', title: 'Develop coping strategies', completed: false },
         ],
       },
       {
-        id: "goal-2",
-        title: "Improve Sleep Quality",
+        id: 'goal-2',
+        title: 'Improve Sleep Quality',
         description:
-          "Establish healthy sleep patterns and improve sleep duration and quality",
+          'Establish healthy sleep patterns and improve sleep duration and quality',
         targetDate: addDays(new Date(), 21),
-        priority: "medium",
-        status: "in-progress",
+        priority: 'medium',
+        status: 'in-progress',
         progress: 40,
-        category: "physical",
+        category: 'physical',
         milestones: [
           {
-            id: "m5",
-            title: "Create bedtime routine",
+            id: 'm5',
+            title: 'Create bedtime routine',
             completed: true,
             completedDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
           },
-          { id: "m6", title: "Limit screen time before bed", completed: false },
-          { id: "m7", title: "Track sleep patterns", completed: false },
+          { id: 'm6', title: 'Limit screen time before bed', completed: false },
+          { id: 'm7', title: 'Track sleep patterns', completed: false },
         ],
       },
       {
-        id: "goal-3",
-        title: "Enhance Social Connections",
+        id: 'goal-3',
+        title: 'Enhance Social Connections',
         description:
-          "Build and maintain meaningful relationships and social support networks",
+          'Build and maintain meaningful relationships and social support networks',
         targetDate: addDays(new Date(), 45),
-        priority: "medium",
-        status: "not-started",
+        priority: 'medium',
+        status: 'not-started',
         progress: 0,
-        category: "social",
+        category: 'social',
         milestones: [
-          { id: "m8", title: "Join support group", completed: false },
-          { id: "m9", title: "Reconnect with old friends", completed: false },
-          { id: "m10", title: "Practice social skills", completed: false },
+          { id: 'm8', title: 'Join support group', completed: false },
+          { id: 'm9', title: 'Reconnect with old friends', completed: false },
+          { id: 'm10', title: 'Practice social skills', completed: false },
         ],
       },
     ],
-  };
+  }
 
   useEffect(() => {
-    setCurrentPlan(plan || defaultPlan);
-  }, [plan, defaultPlan]);
+    setCurrentPlan(plan || defaultPlan)
+  }, [plan, defaultPlan])
 
-  const getPriorityColor = (priority: TreatmentGoal["priority"]) => {
+  const getPriorityColor = (priority: TreatmentGoal['priority']) => {
     switch (priority) {
-      case "urgent":
-        return "bg-red-500 text-white";
-      case "high":
-        return "bg-orange-500 text-white";
-      case "medium":
-        return "bg-yellow-500 text-white";
-      case "low":
-        return "bg-green-500 text-white";
+      case 'urgent':
+        return 'bg-red-500 text-white'
+      case 'high':
+        return 'bg-orange-500 text-white'
+      case 'medium':
+        return 'bg-yellow-500 text-white'
+      case 'low':
+        return 'bg-green-500 text-white'
       default:
-        return "bg-gray-500 text-white";
+        return 'bg-gray-500 text-white'
     }
-  };
+  }
 
-  const getStatusColor = (status: TreatmentGoal["status"]) => {
+  const getStatusColor = (status: TreatmentGoal['status']) => {
     switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800";
-      case "on-hold":
-        return "bg-yellow-100 text-yellow-800";
-      case "not-started":
-        return "bg-gray-100 text-gray-800";
+      case 'completed':
+        return 'bg-green-100 text-green-800'
+      case 'in-progress':
+        return 'bg-blue-100 text-blue-800'
+      case 'on-hold':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'not-started':
+        return 'bg-gray-100 text-gray-800'
       default:
-        return "bg-gray-100 text-gray-800";
+        return 'bg-gray-100 text-gray-800'
     }
-  };
+  }
 
-  const getCategoryIcon = (category: TreatmentGoal["category"]) => {
+  const getCategoryIcon = (category: TreatmentGoal['category']) => {
     switch (category) {
-      case "behavioral":
-        return "🎯";
-      case "cognitive":
-        return "🧠";
-      case "emotional":
-        return "❤️";
-      case "social":
-        return "👥";
-      case "physical":
-        return "💪";
+      case 'behavioral':
+        return '🎯'
+      case 'cognitive':
+        return '🧠'
+      case 'emotional':
+        return '❤️'
+      case 'social':
+        return '👥'
+      case 'physical':
+        return '💪'
       default:
-        return "📋";
+        return '📋'
     }
-  };
+  }
 
   const updateGoal = (goalId: string, updates: Partial<TreatmentGoal>) => {
-    if (!currentPlan) return;
+    if (!currentPlan) return
 
     const updatedPlan = {
       ...currentPlan,
@@ -195,18 +195,18 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         goal.id === goalId ? { ...goal, ...updates } : goal,
       ),
       lastModified: new Date(),
-    };
+    }
 
-    setCurrentPlan(updatedPlan);
-    onGoalUpdate?.(goalId, updates);
-    onSave?.(updatedPlan);
-  };
+    setCurrentPlan(updatedPlan)
+    onGoalUpdate?.(goalId, updates)
+    onSave?.(updatedPlan)
+  }
 
   const toggleMilestone = (goalId: string, milestoneId: string) => {
-    if (!currentPlan || readOnly) return;
+    if (!currentPlan || readOnly) return
 
-    const goal = currentPlan.goals.find((g) => g.id === goalId);
-    if (!goal) return;
+    const goal = currentPlan.goals.find((g) => g.id === goalId)
+    if (!goal) return
 
     const updatedMilestones = goal.milestones.map((milestone) =>
       milestone.id === milestoneId
@@ -216,42 +216,42 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             completedDate: !milestone.completed ? new Date() : undefined,
           }
         : milestone,
-    );
+    )
 
-    const completedCount = updatedMilestones.filter((m) => m.completed).length;
+    const completedCount = updatedMilestones.filter((m) => m.completed).length
     const progress = Math.round(
       (completedCount / updatedMilestones.length) * 100,
-    );
+    )
 
-    updateGoal(goalId, { milestones: updatedMilestones, progress });
-  };
+    updateGoal(goalId, { milestones: updatedMilestones, progress })
+  }
 
   const addNewGoal = () => {
-    if (!currentPlan || !newGoal.title) return;
+    if (!currentPlan || !newGoal.title) return
 
     const goal: TreatmentGoal = {
       id: `goal-${Date.now()}`,
-      title: newGoal.title || "",
-      description: newGoal.description || "",
+      title: newGoal.title || '',
+      description: newGoal.description || '',
       targetDate: newGoal.targetDate || addDays(new Date(), 30),
-      priority: newGoal.priority || "medium",
-      status: "not-started",
+      priority: newGoal.priority || 'medium',
+      status: 'not-started',
       progress: 0,
-      category: newGoal.category || "behavioral",
+      category: newGoal.category || 'behavioral',
       milestones: [],
-    };
+    }
 
     const updatedPlan = {
       ...currentPlan,
       goals: [...currentPlan.goals, goal],
       lastModified: new Date(),
-    };
+    }
 
-    setCurrentPlan(updatedPlan);
-    setNewGoal({});
-    setShowAddGoal(false);
-    onSave?.(updatedPlan);
-  };
+    setCurrentPlan(updatedPlan)
+    setNewGoal({})
+    setShowAddGoal(false)
+    onSave?.(updatedPlan)
+  }
 
   if (!currentPlan) {
     return (
@@ -259,13 +259,13 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         <span className="ml-2 text-gray-600">Loading treatment plan...</span>
       </div>
-    );
+    )
   }
 
   const overallProgress = Math.round(
     currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
       currentPlan.goals.length,
-  );
+  )
 
   return (
     <div className={`bg-white rounded-lg shadow-lg p-6 ${className}`}>
@@ -295,14 +295,14 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
 
         {/* Tabs */}
         <div className="flex space-x-4">
-          {(["overview", "goals", "progress", "notes"] as const).map((tab) => (
+          {(['overview', 'goals', 'progress', 'notes'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 border-b-2 transition-colors capitalize ${
                 activeTab === tab
-                  ? "border-blue-500 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
               {tab}
@@ -312,7 +312,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       </div>
 
       {/* Tab Content */}
-      {activeTab === "overview" && (
+      {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-blue-50 p-4 rounded-lg">
@@ -345,36 +345,36 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             <h3 className="text-lg font-semibold mb-3">Goal Categories</h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
               {[
-                "behavioral",
-                "cognitive",
-                "emotional",
-                "social",
-                "physical",
+                'behavioral',
+                'cognitive',
+                'emotional',
+                'social',
+                'physical',
               ].map((category) => {
                 const count = currentPlan.goals.filter(
                   (g) => g.category === category,
-                ).length;
+                ).length
                 return (
                   <div
                     key={category}
                     className="text-center p-3 bg-gray-50 rounded-lg"
                   >
                     <div className="text-2xl mb-1">
-                      {getCategoryIcon(category as TreatmentGoal["category"])}
+                      {getCategoryIcon(category as TreatmentGoal['category'])}
                     </div>
                     <div className="text-sm text-gray-600 capitalize">
                       {category}
                     </div>
                     <div className="font-bold">{count}</div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
         </div>
       )}
 
-      {activeTab === "goals" && (
+      {activeTab === 'goals' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">Treatment Goals</h3>
@@ -394,7 +394,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               <input
                 type="text"
                 placeholder="Goal title"
-                value={newGoal.title || ""}
+                value={newGoal.title || ''}
                 onChange={(e) =>
                   setNewGoal({ ...newGoal, title: e.target.value })
                 }
@@ -402,7 +402,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               />
               <textarea
                 placeholder="Goal description"
-                value={newGoal.description || ""}
+                value={newGoal.description || ''}
                 onChange={(e) =>
                   setNewGoal({ ...newGoal, description: e.target.value })
                 }
@@ -410,11 +410,11 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               />
               <div className="flex gap-4">
                 <select
-                  value={newGoal.priority || "medium"}
+                  value={newGoal.priority || 'medium'}
                   onChange={(e) =>
                     setNewGoal({
                       ...newGoal,
-                      priority: e.target.value as TreatmentGoal["priority"],
+                      priority: e.target.value as TreatmentGoal['priority'],
                     })
                   }
                   className="p-2 border rounded"
@@ -425,11 +425,11 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   <option value="urgent">Urgent</option>
                 </select>
                 <select
-                  value={newGoal.category || "behavioral"}
+                  value={newGoal.category || 'behavioral'}
                   onChange={(e) =>
                     setNewGoal({
                       ...newGoal,
-                      category: e.target.value as TreatmentGoal["category"],
+                      category: e.target.value as TreatmentGoal['category'],
                     })
                   }
                   className="p-2 border rounded"
@@ -444,8 +444,8 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   type="date"
                   value={
                     newGoal.targetDate
-                      ? format(newGoal.targetDate, "yyyy-MM-dd")
-                      : format(addDays(new Date(), 30), "yyyy-MM-dd")
+                      ? format(newGoal.targetDate, 'yyyy-MM-dd')
+                      : format(addDays(new Date(), 30), 'yyyy-MM-dd')
                   }
                   onChange={(e) =>
                     setNewGoal({
@@ -495,12 +495,12 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(goal.status)}`}
                       >
-                        {goal.status.replace("-", " ")}
+                        {goal.status.replace('-', ' ')}
                       </span>
                     </div>
                     <p className="text-gray-600 mb-2">{goal.description}</p>
                     <div className="text-sm text-gray-500">
-                      Target: {format(goal.targetDate, "MMM dd, yyyy")}(
+                      Target: {format(goal.targetDate, 'MMM dd, yyyy')}(
                       {differenceInDays(goal.targetDate, new Date())} days
                       remaining)
                     </div>
@@ -533,15 +533,15 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                       <span
                         className={
                           milestone.completed
-                            ? "line-through text-gray-500"
-                            : ""
+                            ? 'line-through text-gray-500'
+                            : ''
                         }
                       >
                         {milestone.title}
                       </span>
                       {milestone.completed && milestone.completedDate && (
                         <span className="text-xs text-green-600">
-                          ✓ {format(milestone.completedDate, "MMM dd")}
+                          ✓ {format(milestone.completedDate, 'MMM dd')}
                         </span>
                       )}
                     </div>
@@ -553,7 +553,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         </div>
       )}
 
-      {activeTab === "progress" && (
+      {activeTab === 'progress' && (
         <div className="space-y-6">
           <h3 className="text-lg font-semibold">Progress Overview</h3>
           <div className="space-y-4">
@@ -572,7 +572,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   ></div>
                 </div>
                 <div className="text-sm text-gray-600">
-                  {goal.milestones.filter((m) => m.completed).length} of{" "}
+                  {goal.milestones.filter((m) => m.completed).length} of{' '}
                   {goal.milestones.length} milestones completed
                 </div>
               </div>
@@ -581,7 +581,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         </div>
       )}
 
-      {activeTab === "notes" && (
+      {activeTab === 'notes' && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Treatment Notes</h3>
           <textarea
@@ -592,9 +592,9 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   ...currentPlan,
                   notes: e.target.value,
                   lastModified: new Date(),
-                };
-                setCurrentPlan(updatedPlan);
-                onSave?.(updatedPlan);
+                }
+                setCurrentPlan(updatedPlan)
+                onSave?.(updatedPlan)
               }
             }}
             readOnly={readOnly}
@@ -602,13 +602,13 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             placeholder="Add treatment notes, observations, and recommendations..."
           />
           <div className="text-sm text-gray-500">
-            Last modified:{" "}
-            {format(currentPlan.lastModified, "MMM dd, yyyy at h:mm a")}
+            Last modified:{' '}
+            {format(currentPlan.lastModified, 'MMM dd, yyyy at h:mm a')}
           </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TreatmentPlanManager;
+export default TreatmentPlanManager

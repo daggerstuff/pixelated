@@ -1,11 +1,11 @@
-import type { APIRoute, APIContext } from "astro";
-import { z } from "zod";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-import type { TreatmentPlan } from "@/types/treatment";
+import type { APIRoute, APIContext } from 'astro'
+import { z } from 'zod'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { TreatmentPlan } from '@/types/treatment'
 
-export const prerender = false;
+export const prerender = false
 
-const logger = createBuildSafeLogger("treatment-plans");
+const logger = createBuildSafeLogger('treatment-plans')
 
 // Zod schemas for update
 const updateTreatmentObjectiveSchema = z.object({
@@ -13,11 +13,11 @@ const updateTreatmentObjectiveSchema = z.object({
   description: z.string().min(1).optional(),
   targetDate: z.string().optional().nullable(),
   status: z
-    .enum(["Not Started", "In Progress", "Completed", "On Hold", "Cancelled"])
+    .enum(['Not Started', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])
     .optional(),
   interventions: z.array(z.string().min(1)).min(1).optional(),
   progressNotes: z.string().optional().nullable(),
-});
+})
 
 const updateTreatmentGoalSchema = z.object({
   id: z.string().uuid().optional(),
@@ -25,15 +25,15 @@ const updateTreatmentGoalSchema = z.object({
   targetDate: z.string().optional().nullable(),
   status: z
     .enum([
-      "Not Started",
-      "In Progress",
-      "Achieved",
-      "Partially Achieved",
-      "Not Achieved",
+      'Not Started',
+      'In Progress',
+      'Achieved',
+      'Partially Achieved',
+      'Not Achieved',
     ])
     .optional(),
   objectives: z.array(updateTreatmentObjectiveSchema).optional(),
-});
+})
 
 const updateTreatmentPlanClientSchema = z.object({
   title: z.string().min(1).optional(),
@@ -41,30 +41,30 @@ const updateTreatmentPlanClientSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional().nullable(),
   status: z
-    .enum(["Draft", "Active", "Completed", "Discontinued", "Archived"])
+    .enum(['Draft', 'Active', 'Completed', 'Discontinued', 'Archived'])
     .optional(),
   goals: z.array(updateTreatmentGoalSchema).optional(),
   generalNotes: z.string().optional().nullable(),
-});
+})
 
 export const GET: APIRoute = async ({ params, locals }: APIContext) => {
   try {
     // TODO: Replace with actual authentication check
-    const { user } = locals;
+    const { user } = locals
     if (!user) {
-      return new Response(JSON.stringify({ error: "Not authenticated" }), {
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
-      });
+      })
     }
 
-    const { planId } = params;
+    const { planId } = params
     if (!planId) {
-      return new Response(JSON.stringify({ error: "Plan ID is required" }), {
+      return new Response(JSON.stringify({ error: 'Plan ID is required' }), {
         status: 400,
-      });
+      })
     }
 
-    logger.info("Fetching treatment plan", { planId, userId: user.id });
+    logger.info('Fetching treatment plan', { planId, userId: user.id })
 
     // TODO: Replace with actual database implementation
     // For now, return a mock plan to prevent build errors
@@ -72,29 +72,29 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
       id: planId,
       clientId: user.id,
       therapistId: user.id,
-      title: "Mock Treatment Plan",
+      title: 'Mock Treatment Plan',
       diagnosis: null,
       startDate: new Date().toISOString(),
       endDate: null,
-      status: "Draft",
+      status: 'Draft',
       generalNotes: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       goals: [],
-    };
+    }
 
-    return new Response(JSON.stringify(plan), { status: 200 });
+    return new Response(JSON.stringify(plan), { status: 200 })
   } catch (error: unknown) {
-    logger.error(`Error fetching treatment plan:`, error);
+    logger.error(`Error fetching treatment plan:`, error)
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch treatment plan.",
-        details: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to fetch treatment plan.',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
-    );
+    )
   }
-};
+}
 
 export const PUT: APIRoute = async ({
   params,
@@ -103,41 +103,37 @@ export const PUT: APIRoute = async ({
 }: APIContext) => {
   try {
     // TODO: Replace with actual authentication check
-    const { user } = locals;
+    const { user } = locals
     if (!user) {
-      return new Response(JSON.stringify({ error: "Not authenticated" }), {
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
-      });
+      })
     }
 
-    const { planId } = params;
+    const { planId } = params
     if (!planId) {
-      return new Response(JSON.stringify({ error: "Plan ID is required" }), {
+      return new Response(JSON.stringify({ error: 'Plan ID is required' }), {
         status: 400,
-      });
+      })
     }
 
-    const body = await request.json();
+    const body = await request.json()
 
     // Validate the request body
-    const validationResult = updateTreatmentPlanClientSchema.safeParse(body);
+    const validationResult = updateTreatmentPlanClientSchema.safeParse(body)
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: "Invalid request data",
+          error: 'Invalid request data',
           details: validationResult.error.issues,
         }),
         { status: 400 },
-      );
+      )
     }
 
-    const updates = validationResult.data;
+    const updates = validationResult.data
 
-    logger.info("Updating treatment plan", {
-      planId,
-      userId: user.id,
-      updates,
-    });
+    logger.info('Updating treatment plan', { planId, userId: user.id, updates })
 
     // TODO: Replace with actual database implementation
     // For now, return success to prevent build errors
@@ -145,26 +141,26 @@ export const PUT: APIRoute = async ({
       id: planId,
       clientId: user.id,
       therapistId: user.id,
-      title: updates.title || "Updated Treatment Plan",
+      title: updates.title || 'Updated Treatment Plan',
       diagnosis: updates.diagnosis || null,
       startDate: updates.startDate || new Date().toISOString(),
       endDate: updates.endDate || null,
-      status: updates.status || "Draft",
+      status: updates.status || 'Draft',
       generalNotes: updates.generalNotes || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       goals: (updates.goals as any) || [],
-    };
+    }
 
-    return new Response(JSON.stringify(updatedPlan), { status: 200 });
+    return new Response(JSON.stringify(updatedPlan), { status: 200 })
   } catch (error: unknown) {
-    logger.error(`Error updating treatment plan:`, error);
+    logger.error(`Error updating treatment plan:`, error)
     return new Response(
       JSON.stringify({
-        error: "Failed to update treatment plan.",
-        details: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to update treatment plan.',
+        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
-    );
+    )
   }
-};
+}

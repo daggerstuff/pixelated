@@ -3,6 +3,6 @@
  */
 
 export const isBrowser =
-  typeof window !== "undefined" && typeof document !== "undefined";
+  typeof window !== 'undefined' && typeof document !== 'undefined'
 
-export default isBrowser;
+export default isBrowser

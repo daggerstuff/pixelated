@@ -1,9 +1,9 @@
 ---
-title: "Progressive Loading Implementation"
-description: "Progressive Loading Implementation documentation"
+title: 'Progressive Loading Implementation'
+description: 'Progressive Loading Implementation documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -20,22 +20,22 @@ The Progressive Loading system enables efficient loading and rendering of large 
 
 ```typescript
 interface DataChunk<T> {
-  id: string;
-  index: number;
-  data: T[];
+  id: string
+  index: number
+  data: T[]
   metadata: {
-    totalChunks: number;
-    totalItems: number;
-    timestamp: Date;
-    nextChunkId?: string;
-  };
+    totalChunks: number
+    totalItems: number
+    timestamp: Date
+    nextChunkId?: string
+  }
 }
 
 interface ChunkingOptions {
-  chunkSize: number;
-  priorityFields: string[];
-  initialLoadCount: number;
-  preloadStrategy: "adjacent" | "priority" | "temporal";
+  chunkSize: number
+  priorityFields: string[]
+  initialLoadCount: number
+  preloadStrategy: 'adjacent' | 'priority' | 'temporal'
 }
 ```
 
@@ -44,12 +44,12 @@ interface ChunkingOptions {
 ```typescript
 class ProgressiveLoadingManager<T> {
   constructor(options: ChunkingOptions) {
-    this.chunkSize = options.chunkSize;
-    this.priorityFields = options.priorityFields;
-    this.initialLoadCount = options.initialLoadCount;
-    this.preloadStrategy = options.preloadStrategy;
-    this.loadedChunks = new Map();
-    this.pendingChunks = new Set();
+    this.chunkSize = options.chunkSize
+    this.priorityFields = options.priorityFields
+    this.initialLoadCount = options.initialLoadCount
+    this.preloadStrategy = options.preloadStrategy
+    this.loadedChunks = new Map()
+    this.pendingChunks = new Set()
   }
 
   async loadInitialData(sessionId: string): Promise<DataChunk<T>[]> {
@@ -93,10 +93,10 @@ function useProgressiveLoading<T>(
   sessionId: string,
   options: ChunkingOptions,
 ): {
-  data: T[];
-  loading: boolean;
-  loadMore: () => Promise<void>;
-  progress: number;
+  data: T[]
+  loading: boolean
+  loadMore: () => Promise<void>
+  progress: number
 } {
   // Implementation of progressive loading hook
 }
@@ -116,10 +116,10 @@ function useProgressiveLoading<T>(
 
 ```typescript
 interface CacheOptions {
-  maxAge: number;
-  strategy: "LRU" | "priority" | "hybrid";
-  persistenceLevel: "memory" | "localStorage" | "indexedDB";
-  compressionLevel: 0 | 1 | 2 | 3; // 0=none, 3=maximum
+  maxAge: number
+  strategy: 'LRU' | 'priority' | 'hybrid'
+  persistenceLevel: 'memory' | 'localStorage' | 'indexedDB'
+  compressionLevel: 0 | 1 | 2 | 3 // 0=none, 3=maximum
 }
 ```
 
@@ -161,22 +161,22 @@ interface CacheOptions {
 // Client-side implementation
 const sessionViewer = new ProgressiveLoadingManager({
   chunkSize: 50,
-  priorityFields: ["criticalPatterns", "emotionalStates"],
+  priorityFields: ['criticalPatterns', 'emotionalStates'],
   initialLoadCount: 2,
-  preloadStrategy: "adjacent",
-});
+  preloadStrategy: 'adjacent',
+})
 
 // Initial load
-const initialChunks = await sessionViewer.loadInitialData("session-123");
-renderData(initialChunks);
+const initialChunks = await sessionViewer.loadInitialData('session-123')
+renderData(initialChunks)
 
 // Scroll handler
-element.addEventListener("scroll", async (e) => {
+element.addEventListener('scroll', async (e) => {
   if (isNearBottom(e.target)) {
-    const nextChunk = await sessionViewer.loadNextChunk(currentChunkId);
-    appendData(nextChunk);
+    const nextChunk = await sessionViewer.loadNextChunk(currentChunkId)
+    appendData(nextChunk)
   }
-});
+})
 ```
 
 ### Advanced Integration
@@ -188,11 +188,11 @@ function SessionAnalysisViewer({ sessionId }) {
     sessionId,
     {
       chunkSize: 25,
-      priorityFields: ["riskPatterns", "emotionalShifts"],
+      priorityFields: ['riskPatterns', 'emotionalShifts'],
       initialLoadCount: 3,
-      preloadStrategy: "priority",
+      preloadStrategy: 'priority',
     },
-  );
+  )
 
   // Component implementation with IntersectionObserver for detection
 }

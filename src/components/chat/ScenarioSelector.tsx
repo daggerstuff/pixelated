@@ -1,12 +1,12 @@
-import type { Scenario } from "@/types/scenarios";
-import { IconChevronDown, IconUserCircle } from "./icons";
+import type { Scenario } from '@/types/scenarios'
+import { IconChevronDown, IconUserCircle } from './icons'
 
 interface ScenarioSelectorProps {
-  scenarios: Scenario[];
-  selectedScenario: Scenario;
-  showScenarios: boolean;
-  setShowScenarios: (show: boolean) => void;
-  onSelect: (scenario: Scenario) => void;
+  scenarios: Scenario[]
+  selectedScenario: Scenario
+  showScenarios: boolean
+  setShowScenarios: (show: boolean) => void
+  onSelect: (scenario: Scenario) => void
 }
 
 export function ScenarioSelector({
@@ -30,7 +30,7 @@ export function ScenarioSelector({
           </span>
         </span>
         <IconChevronDown
-          className={`h-5 w-5 transition-transform ${showScenarios ? "rotate-180" : ""}`}
+          className={`h-5 w-5 transition-transform ${showScenarios ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -51,5 +51,5 @@ export function ScenarioSelector({
         </div>
       )}
     </div>
-  );
+  )
 }

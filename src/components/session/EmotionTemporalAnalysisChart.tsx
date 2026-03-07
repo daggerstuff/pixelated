@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
   Line,
   XAxis,
@@ -13,38 +13,38 @@ import {
   ZAxis,
   AreaChart,
   Area,
-} from "recharts";
-import type { TemporalEmotionAnalysis } from "../../lib/ai/temporal/EmotionTemporalAnalyzer";
-import { cn } from "@/lib/utils";
+} from 'recharts'
+import type { TemporalEmotionAnalysis } from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
+import { cn } from '@/lib/utils'
 
 type EmotionTemporalAnalysisChartProps = {
-  data: TemporalEmotionAnalysis;
-  className?: string;
-  isLoading?: boolean;
-  height?: number;
-  clientId?: string;
-};
+  data: TemporalEmotionAnalysis
+  className?: string
+  isLoading?: boolean
+  height?: number
+  clientId?: string
+}
 
 // Color map for common emotions
 const emotionColors: Record<string, string> = {
-  happiness: "#4ade80", // green-400
-  joy: "#22c55e", // green-500
-  excitement: "#10b981", // emerald-500
-  contentment: "#60a5fa", // blue-400
-  gratitude: "#3b82f6", // blue-500
-  neutral: "#94a3b8", // slate-400
-  surprise: "#c084fc", // purple-400
-  anxiety: "#f59e0b", // amber-500
-  fear: "#f97316", // orange-500
-  anger: "#ef4444", // red-500
-  sadness: "#6366f1", // indigo-500
-  disgust: "#8b5cf6", // violet-500
-};
+  happiness: '#4ade80', // green-400
+  joy: '#22c55e', // green-500
+  excitement: '#10b981', // emerald-500
+  contentment: '#60a5fa', // blue-400
+  gratitude: '#3b82f6', // blue-500
+  neutral: '#94a3b8', // slate-400
+  surprise: '#c084fc', // purple-400
+  anxiety: '#f59e0b', // amber-500
+  fear: '#f97316', // orange-500
+  anger: '#ef4444', // red-500
+  sadness: '#6366f1', // indigo-500
+  disgust: '#8b5cf6', // violet-500
+}
 
 // Get color for an emotion type, with fallback
 const getEmotionColor = (emotion: string): string => {
-  return emotionColors[emotion.toLowerCase()] || "#94a3b8"; // slate-400 default
-};
+  return emotionColors[emotion.toLowerCase()] || '#94a3b8' // slate-400 default
+}
 
 /**
  * Component for visualizing temporal emotion analysis
@@ -57,40 +57,40 @@ export default function EmotionTemporalAnalysisChart({
   height = 400,
 }: EmotionTemporalAnalysisChartProps) {
   const [viewMode, setViewMode] = useState<
-    "trends" | "critical" | "progression" | "transitions" | "relationships"
-  >("trends");
+    'trends' | 'critical' | 'progression' | 'transitions' | 'relationships'
+  >('trends')
   const [emotionFilters, setEmotionFilters] = useState<Record<string, boolean>>(
     {},
-  );
+  )
 
   // Format data for trend visualization
   const prepareTrendData = () => {
     // Get all emotion types with trendlines
-    const emotionTypes = Object.keys(data.trendlines);
+    const emotionTypes = Object.keys(data.trendlines)
 
     // Initialize emotion filters if not already set
     if (Object.keys(emotionFilters).length === 0 && emotionTypes.length > 0) {
-      const initialFilters: Record<string, boolean> = {};
+      const initialFilters: Record<string, boolean> = {}
       // Show top 5 emotions by default or all if less than 5
       const topEmotions = emotionTypes.slice(
         0,
         Math.min(5, emotionTypes.length),
-      );
+      )
       emotionTypes.forEach((type) => {
-        initialFilters[type] = topEmotions.includes(type);
-      });
-      setEmotionFilters(initialFilters);
+        initialFilters[type] = topEmotions.includes(type)
+      })
+      setEmotionFilters(initialFilters)
     }
 
     // Get filtered emotions
     const filteredEmotions = Object.entries(emotionFilters)
       .filter(([_, isSelected]) => isSelected)
-      .map(([emotion]) => emotion);
+      .map(([emotion]) => emotion)
 
     // Create trendline data with selected emotions
     return filteredEmotions.map((emotion) => {
-      const trendline = data.trendlines[emotion];
-      const volatility = data.volatility[emotion] || 0;
+      const trendline = data.trendlines[emotion]
+      const volatility = data.volatility[emotion] || 0
 
       return {
         name: emotion,
@@ -99,77 +99,77 @@ export default function EmotionTemporalAnalysisChart({
         significance: trendline.significance,
         volatility,
         color: getEmotionColor(emotion),
-      };
-    });
-  };
+      }
+    })
+  }
 
   // Format data for critical points visualization
   const prepareCriticalPointsData = () => {
     return (
-      data?.["criticalPoints"]?.map((point) => ({
-        name: point?.["emotion"],
-        intensity: point?.["intensity"],
-        timestamp: point?.["timestamp"]?.toLocaleString(),
-        sessionId: point?.["sessionId"],
-        color: getEmotionColor(point?.["emotion"]),
+      data?.['criticalPoints']?.map((point) => ({
+        name: point?.['emotion'],
+        intensity: point?.['intensity'],
+        timestamp: point?.['timestamp']?.toLocaleString(),
+        sessionId: point?.['sessionId'],
+        color: getEmotionColor(point?.['emotion']),
       })) || []
-    );
-  };
+    )
+  }
 
   // Format data for progression visualization
   const prepareProgressionData = () => {
     const progression =
-      typeof data === "object" && data !== null && "progression" in data
+      typeof data === 'object' && data !== null && 'progression' in data
         ? (data as { progression?: Record<string, unknown> }).progression
-        : undefined;
+        : undefined
 
     return [
       {
-        name: "Overall Improvement",
-        value: progression?.["overallImprovement"] || 0,
+        name: 'Overall Improvement',
+        value: progression?.['overallImprovement'] || 0,
         fill:
-          (progression?.["overallImprovement"] || 0) >= 0
-            ? "#22c55e"
-            : "#ef4444",
+          (progression?.['overallImprovement'] || 0) >= 0
+            ? '#22c55e'
+            : '#ef4444',
       },
       {
-        name: "Stability Change",
-        value: progression?.["stabilityChange"] || 0,
+        name: 'Stability Change',
+        value: progression?.['stabilityChange'] || 0,
         fill:
-          (progression?.["stabilityChange"] || 0) >= 0 ? "#3b82f6" : "#f97316",
+          (progression?.['stabilityChange'] || 0) >= 0 ? '#3b82f6' : '#f97316',
       },
       {
-        name: "Positive Emotion Change",
-        value: progression?.["positiveEmotionChange"] || 0,
+        name: 'Positive Emotion Change',
+        value: progression?.['positiveEmotionChange'] || 0,
         fill:
-          (progression?.["positiveEmotionChange"] || 0) >= 0
-            ? "#4ade80"
-            : "#f59e0b",
+          (progression?.['positiveEmotionChange'] || 0) >= 0
+            ? '#4ade80'
+            : '#f59e0b',
       },
       {
-        name: "Negative Emotion Change",
-        value: progression?.["negativeEmotionChange"] || 0,
+        name: 'Negative Emotion Change',
+        value: progression?.['negativeEmotionChange'] || 0,
         fill:
-          (progression?.["negativeEmotionChange"] || 0) >= 0
-            ? "#8b5cf6"
-            : "#6366f1",
+          (progression?.['negativeEmotionChange'] || 0) >= 0
+            ? '#8b5cf6'
+            : '#6366f1',
       },
-    ];
-  };
+    ]
+  }
 
   // Format data for transitions visualization
   const prepareTransitionsData = () => {
     // Get top 10 most frequent transitions
-    return data?.["transitions"]?.slice(0, 10)?.map((transition) => ({
-      name: `${transition?.["from"]} → ${transition?.["to"]}`,
-      frequency: transition?.["frequency"],
+    return data?.['transitions']?.slice(0, 10)?.map((transition) => ({
+      name: `${transition?.['from']} → ${transition?.['to']}`,
+      frequency: transition?.['frequency'],
       duration: transition.avgDuration / (1000 * 60), // Convert to minutes
       from: transition.from,
       to: transition.to,
       fromColor: getEmotionColor(transition.from),
       toColor: getEmotionColor(transition.to),
-    }));
-  };
+    }))
+  }
 
   // Format data for relationships visualization
   const prepareRelationshipsData = () => {
@@ -182,9 +182,9 @@ export default function EmotionTemporalAnalysisChart({
         ).dimensionalRelationships
           .map((rel) => {
             if (
-              typeof rel === "object" &&
+              typeof rel === 'object' &&
               rel !== null &&
-              "dimensions" in rel &&
+              'dimensions' in rel &&
               Array.isArray((rel as { dimensions: unknown[] }).dimensions)
             ) {
               return {
@@ -193,23 +193,23 @@ export default function EmotionTemporalAnalysisChart({
                 description: (rel as { description?: string }).description,
                 color:
                   (rel as { correlation?: number }).correlation! >= 0
-                    ? "#22c55e"
-                    : "#ef4444",
-              };
+                    ? '#22c55e'
+                    : '#ef4444',
+              }
             }
-            return null;
+            return null
           })
           .filter(Boolean)
-      : [];
-  };
+      : []
+  }
 
   // Toggle emotion selection in filters
   const toggleEmotionFilter = (emotion: string) => {
     setEmotionFilters((prev) => ({
       ...prev,
       [emotion]: !prev[emotion],
-    }));
-  };
+    }))
+  }
 
   // Loading state
   if (isLoading) {
@@ -220,7 +220,7 @@ export default function EmotionTemporalAnalysisChart({
           <div className="h-40 bg-gray-200 rounded w-full"></div>
         </div>
       </div>
-    );
+    )
   }
 
   // Empty state (no data)
@@ -243,12 +243,12 @@ export default function EmotionTemporalAnalysisChart({
           More data needs to be collected across sessions
         </p>
       </div>
-    );
+    )
   }
 
   // Render the appropriate chart based on view mode
   const renderChart = () => {
-    if (viewMode === "trends") {
+    if (viewMode === 'trends') {
       return (
         <AreaChart
           data={prepareTrendData()}
@@ -259,19 +259,19 @@ export default function EmotionTemporalAnalysisChart({
           <YAxis domain={[-1, 1]} />
           <Tooltip
             formatter={(value, name) => {
-              if (name === "slope") {
+              if (name === 'slope') {
                 return [
-                  `${(value as number).toFixed(2)} (${(value as number) > 0 ? "increasing" : "decreasing"})`,
-                  "Trend",
-                ];
+                  `${(value as number).toFixed(2)} (${(value as number) > 0 ? 'increasing' : 'decreasing'})`,
+                  'Trend',
+                ]
               }
-              if (name === "correlation") {
-                return [(value as number).toFixed(2), "Correlation"];
+              if (name === 'correlation') {
+                return [(value as number).toFixed(2), 'Correlation']
               }
-              if (name === "significance") {
-                return [(value as number).toFixed(2), "Significance"];
+              if (name === 'significance') {
+                return [(value as number).toFixed(2), 'Significance']
               }
-              return [value, name];
+              return [value, name]
             }}
           />
 
@@ -313,10 +313,10 @@ export default function EmotionTemporalAnalysisChart({
             name="Correlation"
           />
         </AreaChart>
-      );
+      )
     }
 
-    if (viewMode === "critical") {
+    if (viewMode === 'critical') {
       return (
         <ScatterChart margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -327,18 +327,18 @@ export default function EmotionTemporalAnalysisChart({
           <ZAxis type="category" dataKey="sessionId" name="Session" />
 
           <Tooltip
-            cursor={{ strokeDasharray: "3 3" }}
+            cursor={{ strokeDasharray: '3 3' }}
             formatter={(value, name, _props) => {
-              if (name === "Intensity") {
-                return [value, name];
+              if (name === 'Intensity') {
+                return [value, name]
               }
-              if (name === "Session") {
-                return [_props.payload.sessionId, "Session"];
+              if (name === 'Session') {
+                return [_props.payload.sessionId, 'Session']
               }
-              if (name === "Timestamp") {
-                return [_props.payload.timestamp, "Timestamp"];
+              if (name === 'Timestamp') {
+                return [_props.payload.timestamp, 'Timestamp']
               }
-              return [value, name];
+              return [value, name]
             }}
           />
 
@@ -352,10 +352,10 @@ export default function EmotionTemporalAnalysisChart({
             />
           ))}
         </ScatterChart>
-      );
+      )
     }
 
-    if (viewMode === "progression") {
+    if (viewMode === 'progression') {
       return (
         <AreaChart
           data={prepareProgressionData()}
@@ -380,10 +380,10 @@ export default function EmotionTemporalAnalysisChart({
             />
           ))}
         </AreaChart>
-      );
+      )
     }
 
-    if (viewMode === "transitions") {
+    if (viewMode === 'transitions') {
       return (
         <AreaChart
           data={prepareTransitionsData()}
@@ -407,13 +407,13 @@ export default function EmotionTemporalAnalysisChart({
 
           <Tooltip
             formatter={(value, name, _props) => {
-              if (name === "frequency") {
-                return [value, "Frequency"];
+              if (name === 'frequency') {
+                return [value, 'Frequency']
               }
-              if (name === "duration") {
-                return [(value as number).toFixed(1), "Avg Duration (min)"];
+              if (name === 'duration') {
+                return [(value as number).toFixed(1), 'Avg Duration (min)']
               }
-              return [value, name];
+              return [value, name]
             }}
           />
 
@@ -438,10 +438,10 @@ export default function EmotionTemporalAnalysisChart({
             name="Avg Duration (min)"
           />
         </AreaChart>
-      );
+      )
     }
 
-    if (viewMode === "relationships") {
+    if (viewMode === 'relationships') {
       return (
         <AreaChart
           data={prepareRelationshipsData()}
@@ -452,10 +452,10 @@ export default function EmotionTemporalAnalysisChart({
           <YAxis domain={[-1, 1]} />
           <Tooltip
             formatter={(value, name) => {
-              if (name === "correlation") {
-                return [(value as number).toFixed(2), "Correlation"];
+              if (name === 'correlation') {
+                return [(value as number).toFixed(2), 'Correlation']
               }
-              return [value, name];
+              return [value, name]
             }}
           />
 
@@ -471,7 +471,7 @@ export default function EmotionTemporalAnalysisChart({
             name="Correlation"
           />
         </AreaChart>
-      );
+      )
     }
 
     // Default fallback - return an empty chart if no condition matches
@@ -482,11 +482,11 @@ export default function EmotionTemporalAnalysisChart({
         <YAxis />
         <Tooltip />
       </AreaChart>
-    );
-  };
+    )
+  }
 
   return (
-    <div className={cn("p-4 bg-white rounded-lg shadow-sm", className)}>
+    <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
       <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
         <h3 className="text-lg font-medium text-gray-900">
           Temporal Emotion Analysis
@@ -494,56 +494,56 @@ export default function EmotionTemporalAnalysisChart({
 
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setViewMode("trends")}
+            onClick={() => setViewMode('trends')}
             className={cn(
-              "px-3 py-1 text-sm rounded-full",
-              viewMode === "trends"
-                ? "bg-purple-100 text-purple-800"
-                : "bg-gray-100 text-gray-600",
+              'px-3 py-1 text-sm rounded-full',
+              viewMode === 'trends'
+                ? 'bg-purple-100 text-purple-800'
+                : 'bg-gray-100 text-gray-600',
             )}
           >
             Trends
           </button>
           <button
-            onClick={() => setViewMode("critical")}
+            onClick={() => setViewMode('critical')}
             className={cn(
-              "px-3 py-1 text-sm rounded-full",
-              viewMode === "critical"
-                ? "bg-orange-100 text-orange-800"
-                : "bg-gray-100 text-gray-600",
+              'px-3 py-1 text-sm rounded-full',
+              viewMode === 'critical'
+                ? 'bg-orange-100 text-orange-800'
+                : 'bg-gray-100 text-gray-600',
             )}
           >
             Critical Points
           </button>
           <button
-            onClick={() => setViewMode("progression")}
+            onClick={() => setViewMode('progression')}
             className={cn(
-              "px-3 py-1 text-sm rounded-full",
-              viewMode === "progression"
-                ? "bg-green-100 text-green-800"
-                : "bg-gray-100 text-gray-600",
+              'px-3 py-1 text-sm rounded-full',
+              viewMode === 'progression'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-600',
             )}
           >
             Progression
           </button>
           <button
-            onClick={() => setViewMode("transitions")}
+            onClick={() => setViewMode('transitions')}
             className={cn(
-              "px-3 py-1 text-sm rounded-full",
-              viewMode === "transitions"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-600",
+              'px-3 py-1 text-sm rounded-full',
+              viewMode === 'transitions'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-gray-100 text-gray-600',
             )}
           >
             Transitions
           </button>
           <button
-            onClick={() => setViewMode("relationships")}
+            onClick={() => setViewMode('relationships')}
             className={cn(
-              "px-3 py-1 text-sm rounded-full",
-              viewMode === "relationships"
-                ? "bg-indigo-100 text-indigo-800"
-                : "bg-gray-100 text-gray-600",
+              'px-3 py-1 text-sm rounded-full',
+              viewMode === 'relationships'
+                ? 'bg-indigo-100 text-indigo-800'
+                : 'bg-gray-100 text-gray-600',
             )}
           >
             Relationships
@@ -552,15 +552,15 @@ export default function EmotionTemporalAnalysisChart({
       </div>
 
       {/* Emotion filters (only show for trend view) */}
-      {viewMode === "trends" && (
+      {viewMode === 'trends' && (
         <div className="mb-4 flex flex-wrap gap-2">
           {Object.entries(emotionFilters).map(([emotion, isSelected]) => (
             <button
               key={emotion}
               onClick={() => toggleEmotionFilter(emotion)}
               className={cn(
-                "px-2 py-1 text-xs rounded-full border",
-                isSelected ? "text-white" : "bg-white text-gray-600",
+                'px-2 py-1 text-xs rounded-full border',
+                isSelected ? 'text-white' : 'bg-white text-gray-600',
               )}
               style={{
                 backgroundColor: isSelected
@@ -575,7 +575,7 @@ export default function EmotionTemporalAnalysisChart({
       )}
 
       {/* Chart based on selected view */}
-      <div style={{ width: "100%", height: `${height}px` }}>
+      <div style={{ width: '100%', height: `${height}px` }}>
         <ResponsiveContainer width="100%" height="100%">
           {renderChart()}
         </ResponsiveContainer>
@@ -583,7 +583,7 @@ export default function EmotionTemporalAnalysisChart({
 
       {/* Summary text based on view */}
       <div className="mt-4 text-sm text-gray-600">
-        {viewMode === "trends" && (
+        {viewMode === 'trends' && (
           <p>
             This chart shows emotional trend patterns over time, helping to
             identify which emotions are increasing or decreasing in intensity
@@ -592,7 +592,7 @@ export default function EmotionTemporalAnalysisChart({
           </p>
         )}
 
-        {viewMode === "critical" && (
+        {viewMode === 'critical' && (
           <p>
             Critical emotional points represent significant moments with high
             emotional intensity. These points often indicate important
@@ -600,7 +600,7 @@ export default function EmotionTemporalAnalysisChart({
           </p>
         )}
 
-        {viewMode === "progression" && (
+        {viewMode === 'progression' && (
           <p>
             The progression chart shows overall emotional improvement metrics.
             Positive values indicate beneficial changes, while negative values
@@ -608,7 +608,7 @@ export default function EmotionTemporalAnalysisChart({
           </p>
         )}
 
-        {viewMode === "transitions" && (
+        {viewMode === 'transitions' && (
           <p>
             This view shows the most common emotional transitions and their
             frequency. Understanding emotional shifts provides insight into
@@ -616,7 +616,7 @@ export default function EmotionTemporalAnalysisChart({
           </p>
         )}
 
-        {viewMode === "relationships" && (
+        {viewMode === 'relationships' && (
           <p>
             Emotional relationships show correlations between different
             emotions. Positive correlations indicate emotions that tend to occur
@@ -626,5 +626,5 @@ export default function EmotionTemporalAnalysisChart({
         )}
       </div>
     </div>
-  );
+  )
 }

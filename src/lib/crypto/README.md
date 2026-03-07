@@ -35,44 +35,44 @@ This is a production-ready cryptography library that uses AWS KMS for key manage
 ### Key Storage
 
 ```typescript
-import { KeyStorage } from "./keyStorage";
+import { KeyStorage } from './keyStorage'
 
 const keyStorage = new KeyStorage({
-  namespace: "myapp",
+  namespace: 'myapp',
   region: process.env.AWS_REGION!,
   kmsKeyId: process.env.AWS_KMS_KEY_ID!,
-  useKms: true,
-});
+  useKms: true
+})
 
 // Generate a new key
-const { keyId, keyData } = await keyStorage.generateKey("data-encryption");
+const { keyId, keyData } = await keyStorage.generateKey('data-encryption')
 
 // Retrieve a key
-const key = await keyStorage.getKey(keyId);
+const key = await keyStorage.getKey(keyId)
 
 // Rotate a key
-const newKey = await keyStorage.rotateKey(keyId);
+const newKey = await keyStorage.rotateKey(keyId)
 ```
 
 ### Encryption
 
 ```typescript
-import { Encryption } from "./encryption";
+import { Encryption } from './encryption'
 
 const encryption = new Encryption({
-  namespace: "myapp",
+  namespace: 'myapp',
   region: process.env.AWS_REGION!,
-  kmsKeyId: process.env.AWS_KMS_KEY_ID!,
-});
+  kmsKeyId: process.env.AWS_KMS_KEY_ID!
+})
 
 // Encrypt data
-const encrypted = await encryption.encrypt("sensitive data", "data-encryption");
+const encrypted = await encryption.encrypt('sensitive data', 'data-encryption')
 
 // Decrypt data
-const decrypted = await encryption.decrypt(encrypted);
+const decrypted = await encryption.decrypt(encrypted)
 
 // Rotate encryption key
-const reEncrypted = await encryption.rotateKey(encrypted);
+const reEncrypted = await encryption.rotateKey(encrypted)
 ```
 
 ### Hashing and Security Functions
@@ -85,22 +85,22 @@ import {
   generateHmac,
   verifyHmac,
   generateCsrfToken,
-  verifyCsrfToken,
-} from "./hash";
+  verifyCsrfToken
+} from './hash'
 
 // Hash a password
-const { hash, salt } = await hashPassword("user-password");
+const { hash, salt } = await hashPassword('user-password')
 
 // Verify a password
-const isValid = await verifyPassword("user-password", hash, salt);
+const isValid = await verifyPassword('user-password', hash, salt)
 
 // Generate and verify HMAC
-const hmac = generateHmac("data", "secret-key");
-const isValidHmac = verifyHmac("data", "secret-key", hmac);
+const hmac = generateHmac('data', 'secret-key')
+const isValidHmac = verifyHmac('data', 'secret-key', hmac)
 
 // CSRF protection
-const csrfToken = generateCsrfToken();
-const isValidToken = verifyCsrfToken(userToken, csrfToken);
+const csrfToken = generateCsrfToken()
+const isValidToken = verifyCsrfToken(userToken, csrfToken)
 ```
 
 ## Security Considerations
@@ -127,7 +127,6 @@ const isValidToken = verifyCsrfToken(userToken, csrfToken);
 ## Error Handling
 
 All functions use proper error handling and will throw descriptive errors when:
-
 - AWS services are unavailable
 - Keys are not found or invalid
 - Decryption fails
@@ -154,7 +153,6 @@ All functions use proper error handling and will throw descriptive errors when:
 ## Development
 
 When developing locally:
-
 1. Use a development KMS key
 2. Set up local DynamoDB for testing
 3. Use proper IAM roles and permissions
@@ -163,13 +161,11 @@ When developing locally:
 ## Testing
 
 Run the test suite:
-
 ```bash
 pnpm test src/lib/crypto
 ```
 
 Tests cover:
-
 - Key generation and rotation
 - Encryption and decryption
 - Password hashing and verification

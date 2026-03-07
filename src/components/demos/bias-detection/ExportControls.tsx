@@ -1,17 +1,17 @@
 // Export controls component for bias detection analysis data
 
-import { useState, type FC } from "react";
+import { useState, type FC } from 'react'
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
   HistoricalComparison,
-} from "../../../lib/types/bias-detection";
+} from '../../../lib/types/bias-detection'
 
 interface ExportControlsProps {
-  analysisResults: BiasAnalysisResults;
-  counterfactualScenarios: CounterfactualScenario[];
-  historicalComparison: HistoricalComparison | null;
-  onExport: () => void;
+  analysisResults: BiasAnalysisResults
+  counterfactualScenarios: CounterfactualScenario[]
+  historicalComparison: HistoricalComparison | null
+  onExport: () => void
 }
 
 export const ExportControls: FC<ExportControlsProps> = ({
@@ -20,92 +20,92 @@ export const ExportControls: FC<ExportControlsProps> = ({
   historicalComparison,
   onExport,
 }) => {
-  const [exportFormat, setExportFormat] = useState<"json" | "csv" | "pdf">(
-    "json",
-  );
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'pdf'>(
+    'json',
+  )
   const [includeComponents, setIncludeComponents] = useState({
     analysis: true,
     counterfactual: true,
     historical: true,
     recommendations: true,
     demographics: true,
-  });
-  const [isExporting, setIsExporting] = useState(false);
+  })
+  const [isExporting, setIsExporting] = useState(false)
 
   // Calculate export size estimate
   const getExportSizeEstimate = () => {
-    let size = 0;
+    let size = 0
     if (includeComponents.analysis) {
-      size += 15; // KB
+      size += 15 // KB
     }
     if (includeComponents.counterfactual) {
-      size += counterfactualScenarios.length * 2;
+      size += counterfactualScenarios.length * 2
     }
     if (includeComponents.historical) {
-      size += 5;
+      size += 5
     }
     if (includeComponents.recommendations) {
-      size += analysisResults.recommendations.length * 0.5;
+      size += analysisResults.recommendations.length * 0.5
     }
     if (includeComponents.demographics) {
-      size += 2;
+      size += 2
     }
-    return Math.max(size, 1);
-  };
+    return Math.max(size, 1)
+  }
 
   // Handle export with different formats
   const handleExport = async () => {
-    setIsExporting(true);
+    setIsExporting(true)
 
     try {
       // Simulate export processing time
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      if (exportFormat === "json") {
-        onExport();
-      } else if (exportFormat === "csv") {
+      if (exportFormat === 'json') {
+        onExport()
+      } else if (exportFormat === 'csv') {
         // Handle CSV export
-        exportAsCSV();
-      } else if (exportFormat === "pdf") {
+        exportAsCSV()
+      } else if (exportFormat === 'pdf') {
         // Handle PDF export
-        exportAsPDF();
+        exportAsPDF()
       }
     } catch (error: unknown) {
-      console.error("Export failed:", error);
+      console.error('Export failed:', error)
     } finally {
-      setIsExporting(false);
+      setIsExporting(false)
     }
-  };
+  }
 
   // Export as CSV
   const exportAsCSV = () => {
-    const csvData: string[] = [];
+    const csvData: string[] = []
 
     // Headers
-    const headers = ["Metric", "Value", "Category"];
-    csvData.push(headers.join(","));
+    const headers = ['Metric', 'Value', 'Category']
+    csvData.push(headers.join(','))
 
     // Analysis data
     if (includeComponents.analysis) {
       csvData.push(
         `Overall Bias Score,${analysisResults.overallBiasScore},Analysis`,
-      );
-      csvData.push(`Alert Level,${analysisResults.alertLevel},Analysis`);
-      csvData.push(`Confidence,${analysisResults.confidence},Analysis`);
+      )
+      csvData.push(`Alert Level,${analysisResults.alertLevel},Analysis`)
+      csvData.push(`Confidence,${analysisResults.confidence},Analysis`)
 
       // Layer results
       csvData.push(
         `Gender Bias,${analysisResults.layerResults.preprocessing.linguisticBias.genderBiasScore},Preprocessing`,
-      );
+      )
       csvData.push(
         `Racial Bias,${analysisResults.layerResults.preprocessing.linguisticBias.racialBiasScore},Preprocessing`,
-      );
+      )
       csvData.push(
         `Age Bias,${analysisResults.layerResults.preprocessing.linguisticBias.ageBiasScore},Preprocessing`,
-      );
+      )
       csvData.push(
         `Cultural Bias,${analysisResults.layerResults.preprocessing.linguisticBias.culturalBiasScore},Preprocessing`,
-      );
+      )
     }
 
     // Counterfactual data
@@ -113,101 +113,101 @@ export const ExportControls: FC<ExportControlsProps> = ({
       counterfactualScenarios.forEach((scenario, index) => {
         csvData.push(
           `Counterfactual ${index + 1},${scenario.biasScoreChange},Counterfactual`,
-        );
+        )
         csvData.push(
           `Likelihood ${index + 1},${scenario.likelihood},Counterfactual`,
-        );
-      });
+        )
+      })
     }
 
     // Historical data
     if (includeComponents.historical && historicalComparison) {
       csvData.push(
         `30-Day Average,${historicalComparison.thirtyDayAverage},Historical`,
-      );
+      )
       csvData.push(
         `Percentile Rank,${historicalComparison.percentileRank},Historical`,
-      );
+      )
       csvData.push(
         `7-Day Trend,${historicalComparison.sevenDayTrend},Historical`,
-      );
+      )
     }
 
     // Create and download CSV
-    const csvContent = csvData.join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bias-analysis-${analysisResults.sessionId}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+    const csvContent = csvData.join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bias-analysis-${analysisResults.sessionId}.csv`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   // Export as PDF (simplified - would need proper PDF library in real implementation)
   const exportAsPDF = () => {
     // This would typically use a library like jsPDF
     // For now, we'll create a formatted text version
-    const pdfContent = generatePDFContent();
-    const blob = new Blob([pdfContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `bias-analysis-report-${analysisResults.sessionId}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+    const pdfContent = generatePDFContent()
+    const blob = new Blob([pdfContent], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bias-analysis-report-${analysisResults.sessionId}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
 
   // Generate PDF content
   const generatePDFContent = () => {
-    let content = `BIAS DETECTION ANALYSIS REPORT\n`;
-    content += `Session ID: ${analysisResults.sessionId}\n`;
-    content += `Generated: ${new Date().toLocaleString()}\n`;
-    content += `\n${"=".repeat(50)}\n\n`;
+    let content = `BIAS DETECTION ANALYSIS REPORT\n`
+    content += `Session ID: ${analysisResults.sessionId}\n`
+    content += `Generated: ${new Date().toLocaleString()}\n`
+    content += `\n${'='.repeat(50)}\n\n`
 
     if (includeComponents.analysis) {
-      content += `ANALYSIS RESULTS\n`;
-      content += `Overall Bias Score: ${(analysisResults.overallBiasScore * 100).toFixed(1)}%\n`;
-      content += `Alert Level: ${analysisResults.alertLevel.toUpperCase()}\n`;
-      content += `Confidence: ${(analysisResults.confidence * 100).toFixed(1)}%\n\n`;
+      content += `ANALYSIS RESULTS\n`
+      content += `Overall Bias Score: ${(analysisResults.overallBiasScore * 100).toFixed(1)}%\n`
+      content += `Alert Level: ${analysisResults.alertLevel.toUpperCase()}\n`
+      content += `Confidence: ${(analysisResults.confidence * 100).toFixed(1)}%\n\n`
 
-      content += `LAYER ANALYSIS\n`;
-      content += `Gender Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.genderBiasScore * 100).toFixed(1)}%\n`;
-      content += `Racial Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.racialBiasScore * 100).toFixed(1)}%\n`;
-      content += `Age Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.ageBiasScore * 100).toFixed(1)}%\n`;
-      content += `Cultural Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.culturalBiasScore * 100).toFixed(1)}%\n\n`;
+      content += `LAYER ANALYSIS\n`
+      content += `Gender Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.genderBiasScore * 100).toFixed(1)}%\n`
+      content += `Racial Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.racialBiasScore * 100).toFixed(1)}%\n`
+      content += `Age Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.ageBiasScore * 100).toFixed(1)}%\n`
+      content += `Cultural Bias: ${(analysisResults.layerResults.preprocessing.linguisticBias.culturalBiasScore * 100).toFixed(1)}%\n\n`
     }
 
     if (includeComponents.recommendations) {
-      content += `RECOMMENDATIONS\n`;
+      content += `RECOMMENDATIONS\n`
       analysisResults.recommendations.forEach((rec, index) => {
-        content += `${index + 1}. ${rec}\n`;
-      });
-      content += `\n`;
+        content += `${index + 1}. ${rec}\n`
+      })
+      content += `\n`
     }
 
     if (includeComponents.counterfactual) {
-      content += `COUNTERFACTUAL SCENARIOS\n`;
+      content += `COUNTERFACTUAL SCENARIOS\n`
       counterfactualScenarios.forEach((scenario, index) => {
-        content += `${index + 1}. ${scenario.change}\n`;
-        content += `   Bias Score Change: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`;
-        content += `   Likelihood: ${scenario.likelihood}\n\n`;
-      });
+        content += `${index + 1}. ${scenario.change}\n`
+        content += `   Bias Score Change: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`
+        content += `   Likelihood: ${scenario.likelihood}\n\n`
+      })
     }
 
     if (includeComponents.historical && historicalComparison) {
-      content += `HISTORICAL COMPARISON\n`;
-      content += `30-Day Average: ${(historicalComparison.thirtyDayAverage * 100).toFixed(1)}%\n`;
-      content += `Percentile Rank: ${historicalComparison.percentileRank}th\n`;
-      content += `7-Day Trend: ${historicalComparison.sevenDayTrend}\n\n`;
+      content += `HISTORICAL COMPARISON\n`
+      content += `30-Day Average: ${(historicalComparison.thirtyDayAverage * 100).toFixed(1)}%\n`
+      content += `Percentile Rank: ${historicalComparison.percentileRank}th\n`
+      content += `7-Day Trend: ${historicalComparison.sevenDayTrend}\n\n`
     }
 
-    return content;
-  };
+    return content
+  }
 
   return (
     <div className="export-controls space-y-6">
@@ -230,27 +230,27 @@ export const ExportControls: FC<ExportControlsProps> = ({
           {/* JSON Format */}
           <div
             className={`border rounded-lg p-4 cursor-pointer transition-all ${
-              exportFormat === "json"
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+              exportFormat === 'json'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => setExportFormat("json")}
+            onClick={() => setExportFormat('json')}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setExportFormat("json");
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setExportFormat('json')
               }
             }}
             tabIndex={0}
             role="radio"
-            aria-checked={exportFormat === "json"}
+            aria-checked={exportFormat === 'json'}
             aria-label="JSON export format"
           >
             <div className="flex items-center mb-2">
               <input
                 type="radio"
-                checked={exportFormat === "json"}
-                onChange={() => setExportFormat("json")}
+                checked={exportFormat === 'json'}
+                onChange={() => setExportFormat('json')}
                 className="mr-2"
               />
               <span className="font-medium text-gray-900">JSON</span>
@@ -266,27 +266,27 @@ export const ExportControls: FC<ExportControlsProps> = ({
           {/* CSV Format */}
           <div
             className={`border rounded-lg p-4 cursor-pointer transition-all ${
-              exportFormat === "csv"
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+              exportFormat === 'csv'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => setExportFormat("csv")}
+            onClick={() => setExportFormat('csv')}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setExportFormat("csv");
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setExportFormat('csv')
               }
             }}
             tabIndex={0}
             role="radio"
-            aria-checked={exportFormat === "csv"}
+            aria-checked={exportFormat === 'csv'}
             aria-label="CSV export format"
           >
             <div className="flex items-center mb-2">
               <input
                 type="radio"
-                checked={exportFormat === "csv"}
-                onChange={() => setExportFormat("csv")}
+                checked={exportFormat === 'csv'}
+                onChange={() => setExportFormat('csv')}
                 className="mr-2"
               />
               <span className="font-medium text-gray-900">CSV</span>
@@ -302,28 +302,28 @@ export const ExportControls: FC<ExportControlsProps> = ({
           {/* PDF Format */}
           <div
             className={`border rounded-lg p-4 cursor-pointer transition-all ${
-              exportFormat === "pdf"
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+              exportFormat === 'pdf'
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
-            onClick={() => setExportFormat("pdf")}
+            onClick={() => setExportFormat('pdf')}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                setExportFormat("pdf");
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                setExportFormat('pdf')
               }
             }}
             tabIndex={0}
             role="radio"
-            aria-checked={exportFormat === "pdf"}
+            aria-checked={exportFormat === 'pdf'}
             aria-label="PDF export format"
           >
             <div className="flex items-center mb-2">
               <input
                 id="pdf-format"
                 type="radio"
-                checked={exportFormat === "pdf"}
-                onChange={() => setExportFormat("pdf")}
+                checked={exportFormat === 'pdf'}
+                onChange={() => setExportFormat('pdf')}
                 className="mr-2"
               />
               <label htmlFor="pdf-format" className="font-medium text-gray-900">
@@ -413,12 +413,12 @@ export const ExportControls: FC<ExportControlsProps> = ({
             />
             <label htmlFor="include-historical" className="flex-1">
               <span
-                className={`font-medium ${historicalComparison ? "text-gray-900" : "text-gray-400"}`}
+                className={`font-medium ${historicalComparison ? 'text-gray-900' : 'text-gray-400'}`}
               >
                 Historical Comparison
               </span>
               <p
-                className={`text-sm ${historicalComparison ? "text-gray-600" : "text-gray-400"}`}
+                className={`text-sm ${historicalComparison ? 'text-gray-600' : 'text-gray-400'}`}
               >
                 Progress tracking and trend analysis data
               </p>
@@ -482,7 +482,7 @@ export const ExportControls: FC<ExportControlsProps> = ({
             <div className="font-medium text-gray-900">Export Summary</div>
             <div className="text-sm text-gray-600">
               Format: {exportFormat.toUpperCase()} • Size: ~
-              {getExportSizeEstimate().toFixed(1)} KB • Components:{" "}
+              {getExportSizeEstimate().toFixed(1)} KB • Components:{' '}
               {Object.values(includeComponents).filter(Boolean).length}/5
             </div>
           </div>
@@ -539,7 +539,7 @@ export const ExportControls: FC<ExportControlsProps> = ({
         </ul>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ExportControls;
+export default ExportControls

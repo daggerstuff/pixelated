@@ -1,5 +1,5 @@
-import type { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
+import type { Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 
 /**
  * Utility functions for end-to-end tests
@@ -14,27 +14,27 @@ import { expect } from "@playwright/test";
  */
 export async function login(
   page: Page,
-  email: string = "test@example.com",
-  password: string = "password123",
+  email: string = 'test@example.com',
+  password: string = 'password123',
   rememberMe: boolean = false,
 ): Promise<void> {
   // Navigate to login page
-  await page.goto("/login");
+  await page.goto('/login')
 
   // Fill login form
-  await page.fill('input[type="email"]', email);
-  await page.fill('input[type="password"]', password);
+  await page.fill('input[type="email"]', email)
+  await page.fill('input[type="password"]', password)
 
   // Toggle remember me if needed
   if (rememberMe) {
-    await page.check('input[type="checkbox"]');
+    await page.check('input[type="checkbox"]')
   }
 
   // Submit the form
-  await page.click('button[type="submit"]');
+  await page.click('button[type="submit"]')
 
   // Wait for navigation to complete
-  await page.waitForNavigation({ waitUntil: "networkidle" });
+  await page.waitForNavigation({ waitUntil: 'networkidle' })
 }
 
 /**
@@ -43,16 +43,16 @@ export async function login(
  */
 export async function logout(page: Page): Promise<void> {
   // Find and click the user menu button
-  await page.click('[data-testid="user-menu-button"]');
+  await page.click('[data-testid="user-menu-button"]')
 
   // Find and click the logout button
-  await page.click('[data-testid="logout-button"]');
+  await page.click('[data-testid="logout-button"]')
 
   // Wait for logout to complete and redirect
-  await page.waitForNavigation({ waitUntil: "networkidle" });
+  await page.waitForNavigation({ waitUntil: 'networkidle' })
 
   // Verify we're logged out (redirected to login or homepage)
-  await expect(page).toHaveURL(/^\/(login|index\.html)?$/);
+  await expect(page).toHaveURL(/^\/(login|index\.html)?$/)
 }
 
 /**
@@ -64,14 +64,14 @@ export async function logout(page: Page): Promise<void> {
  */
 export async function fillRegistrationForm(
   page: Page,
-  email: string = "new-user@example.com",
-  password: string = "SecurePass123!",
-  fullName: string = "Test User",
+  email: string = 'new-user@example.com',
+  password: string = 'SecurePass123!',
+  fullName: string = 'Test User',
 ): Promise<void> {
-  await page.fill('input[name="fullName"]', fullName);
-  await page.fill('input[name="email"]', email);
-  await page.fill('input[name="password"]', password);
-  await page.fill('input[name="confirmPassword"]', password);
+  await page.fill('input[name="fullName"]', fullName)
+  await page.fill('input[name="email"]', email)
+  await page.fill('input[name="password"]', password)
+  await page.fill('input[name="confirmPassword"]', password)
 }
 
 /**
@@ -83,18 +83,18 @@ export async function fillRegistrationForm(
 export async function expectToastNotification(
   page: Page,
   messagePattern: RegExp,
-  type?: "success" | "error",
+  type?: 'success' | 'error',
 ): Promise<void> {
   const toastSelector = type
     ? `.toast-notification.toast-${type}`
-    : ".toast-notification";
+    : '.toast-notification'
 
   // Wait for the toast to appear
-  await page.waitForSelector(toastSelector, { state: "visible" });
+  await page.waitForSelector(toastSelector, { state: 'visible' })
 
   // Verify the message content
-  const toast = page.locator(toastSelector);
-  await expect(toast).toContainText(messagePattern);
+  const toast = page.locator(toastSelector)
+  await expect(toast).toContainText(messagePattern)
 }
 
 /**
@@ -102,7 +102,7 @@ export async function expectToastNotification(
  * @returns A unique email address for testing
  */
 export function generateTestEmail(): string {
-  const timestamp = new Date().getTime();
-  const random = Math.floor(Math.random() * 10000);
-  return `test-${timestamp}-${random}@example.com`;
+  const timestamp = new Date().getTime()
+  const random = Math.floor(Math.random() * 10000)
+  return `test-${timestamp}-${random}@example.com`
 }

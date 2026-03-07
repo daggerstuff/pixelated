@@ -6,9 +6,9 @@
 
 // Use browser-compatible base64 encoding/decoding instead of Node.js Buffer
 
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("default");
+const logger = createBuildSafeLogger('default')
 
 /**
  * Create a signed verification token for data integrity
@@ -18,19 +18,19 @@ const logger = createBuildSafeLogger("default");
  */
 export function createSignedVerificationToken(payload: unknown): string {
   try {
-    const timestamp = Date.now();
+    const timestamp = Date.now()
     const token = {
       ...JSON.parse(JSON.stringify(payload) as unknown),
       iat: timestamp,
       exp: timestamp + 3600000, // 1 hour expiration
-    };
+    }
 
     // Use btoa for browser compatibility instead of Buffer
-    const jsonString = JSON.stringify(token);
-    return btoa(jsonString);
+    const jsonString = JSON.stringify(token)
+    return btoa(jsonString)
   } catch (error: unknown) {
-    logger.error("Failed to create verification token", { error });
-    throw new Error("Verification token creation failed", { cause: error });
+    logger.error('Failed to create verification token', { error })
+    throw new Error('Verification token creation failed', { cause: error })
   }
 }
 
@@ -43,17 +43,17 @@ export function createSignedVerificationToken(payload: unknown): string {
 export function verifyToken(token: string): unknown | null {
   try {
     // Use atob for browser compatibility instead of Buffer
-    const decoded = JSON.parse(atob(token) as unknown);
+    const decoded = JSON.parse(atob(token) as unknown)
 
     // Check expiration
     if (decoded.exp < Date.now()) {
-      logger.warn("Token expired", { token });
-      return null;
+      logger.warn('Token expired', { token })
+      return null
     }
 
-    return decoded;
+    return decoded
   } catch (error: unknown) {
-    logger.error("Error verifying token", { error, token });
-    return null;
+    logger.error('Error verifying token', { error, token })
+    return null
   }
 }

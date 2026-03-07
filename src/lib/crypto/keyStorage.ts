@@ -2,67 +2,67 @@
  * Interface for key storage options
  */
 interface KeyStorageOptions {
-  namespace: string;
-  region: string;
-  kmsKeyId?: string;
-  useKms: boolean;
+  namespace: string
+  region: string
+  kmsKeyId?: string
+  useKms: boolean
 }
 
 /**
  * Interface for stored key data
  */
 interface StoredKeyData {
-  keyId: string;
-  version: number;
-  createdAt: number;
-  expiresAt?: number;
-  algorithm: string;
-  purpose: string;
-  kmsKeyArn?: string;
-  encryptedKey?: string;
+  keyId: string
+  version: number
+  createdAt: number
+  expiresAt?: number
+  algorithm: string
+  purpose: string
+  kmsKeyArn?: string
+  encryptedKey?: string
 }
 
 import {
   KMSClient,
   GenerateDataKeyCommand,
   DecryptCommand,
-} from "@aws-sdk/client-kms";
+} from '@aws-sdk/client-kms'
 
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
 import {
   DynamoDBDocumentClient,
   PutCommand,
   GetCommand,
   QueryCommand,
   DeleteCommand,
-} from "@aws-sdk/lib-dynamodb";
+} from '@aws-sdk/lib-dynamodb'
 
 /**
  * Secure Key Storage Service
  * Manages encryption keys with AWS KMS and DynamoDB for storage
  */
 export class KeyStorage {
-  private namespace: string;
-  private kmsClient: KMSClient;
-  private dynamoClient: DynamoDBDocumentClient;
-  private useKms: boolean;
-  private kmsKeyId?: string;
-  private readonly tableName = "encryption-keys";
+  private namespace: string
+  private kmsClient: KMSClient
+  private dynamoClient: DynamoDBDocumentClient
+  private useKms: boolean
+  private kmsKeyId?: string
+  private readonly tableName = 'encryption-keys'
 
   /**
    * Creates a new KeyStorage instance
    * @param options - Configuration options
    */
   constructor(options: KeyStorageOptions) {
-    this.namespace = options.namespace;
-    this.useKms = options.useKms;
-    this.kmsKeyId = options.kmsKeyId;
+    this.namespace = options.namespace
+    this.useKms = options.useKms
+    this.kmsKeyId = options.kmsKeyId
 
     // Initialize AWS clients
-    const kmsClient = new KMSClient({ region: options.region });
-    const dynamoClient = new DynamoDBClient({ region: options.region });
-    this.kmsClient = kmsClient;
-    this.dynamoClient = DynamoDBDocumentClient.from(dynamoClient);
+    const kmsClient = new KMSClient({ region: options.region })
+    const dynamoClient = new DynamoDBClient({ region: options.region })
+    this.kmsClient = kmsClient
+    this.dynamoClient = DynamoDBDocumentClient.from(dynamoClient)
   }
 
   /**
@@ -71,7 +71,7 @@ export class KeyStorage {
    * @returns Unique key ID
    */
   private generateKeyId(purpose: string): string {
-    return `${this.namespace}:${purpose}:${Date.now()}:${crypto.randomUUID()}`;
+    return `${this.namespace}:${purpose}:${Date.now()}:${crypto.randomUUID()}`
   }
 
   /**
@@ -85,14 +85,14 @@ export class KeyStorage {
       pk: `${this.namespace}#${keyData.purpose}`,
       sk: keyId,
       ttl: keyData.expiresAt ? Math.floor(keyData.expiresAt / 1000) : undefined,
-    };
+    }
 
     await this.dynamoClient.send(
       new PutCommand({
         TableName: this.tableName,
         Item: item,
       }),
-    );
+    )
   }
 
   /**
@@ -108,9 +108,9 @@ export class KeyStorage {
           keyId,
         },
       }),
-    );
+    )
 
-    return (result.Item as StoredKeyData) || null;
+    return (result.Item as StoredKeyData) || null
   }
 
   /**
@@ -122,23 +122,23 @@ export class KeyStorage {
    */
   async generateKey(
     purpose: string,
-    algorithm = "AES_256",
+    algorithm = 'AES_256',
     expiresInDays = 90,
   ): Promise<{ keyId: string; keyData: StoredKeyData }> {
-    const keyId = this.generateKeyId(purpose);
-    const now = Date.now();
+    const keyId = this.generateKeyId(purpose)
+    const now = Date.now()
 
     if (this.useKms) {
       // Generate a data key using KMS
       const dataKeyCommand = new GenerateDataKeyCommand({
         KeyId: this.kmsKeyId,
-        KeySpec: "AES_256",
-      });
+        KeySpec: 'AES_256',
+      })
 
-      const dataKeyResponse = await this.kmsClient.send(dataKeyCommand);
+      const dataKeyResponse = await this.kmsClient.send(dataKeyCommand)
 
       if (!dataKeyResponse.CiphertextBlob || !dataKeyResponse.Plaintext) {
-        throw new Error("Failed to generate data key");
+        throw new Error('Failed to generate data key')
       }
 
       const keyData: StoredKeyData = {
@@ -153,16 +153,16 @@ export class KeyStorage {
         purpose,
         kmsKeyArn: this.kmsKeyId,
         encryptedKey: Buffer.from(dataKeyResponse.CiphertextBlob).toString(
-          "base64",
+          'base64',
         ),
-      };
+      }
 
       // Store the encrypted key
-      await this.storeKey(keyId, keyData);
+      await this.storeKey(keyId, keyData)
 
-      return { keyId, keyData };
+      return { keyId, keyData }
     } else {
-      throw new Error("KMS must be enabled for production use");
+      throw new Error('KMS must be enabled for production use')
     }
   }
 
@@ -174,30 +174,30 @@ export class KeyStorage {
   async rotateKey(
     keyId: string,
   ): Promise<{ keyId: string; keyData: StoredKeyData } | null> {
-    const existingKeyData = await this.getKey(keyId);
+    const existingKeyData = await this.getKey(keyId)
 
     if (!existingKeyData) {
-      return null;
+      return null
     }
 
     // Generate a new key with the same properties
-    const { purpose, algorithm } = existingKeyData;
+    const { purpose, algorithm } = existingKeyData
     const expiresInDays = existingKeyData.expiresAt
       ? Math.floor(
           (existingKeyData.expiresAt - Date.now()) / (24 * 60 * 60 * 1000),
         )
-      : 90;
+      : 90
 
     // Generate a new key
-    const newKey = await this.generateKey(purpose, algorithm, expiresInDays);
+    const newKey = await this.generateKey(purpose, algorithm, expiresInDays)
 
     // Update the version
-    newKey.keyData.version = (existingKeyData.version || 0) + 1;
+    newKey.keyData.version = (existingKeyData.version || 0) + 1
 
     // Store the updated key
-    await this.storeKey(newKey.keyId, newKey.keyData);
+    await this.storeKey(newKey.keyId, newKey.keyData)
 
-    return newKey;
+    return newKey
   }
 
   /**
@@ -209,21 +209,21 @@ export class KeyStorage {
     const queryParams = purpose
       ? {
           TableName: this.tableName,
-          KeyConditionExpression: "pk = :pk",
+          KeyConditionExpression: 'pk = :pk',
           ExpressionAttributeValues: {
-            ":pk": `${this.namespace}#${purpose}`,
+            ':pk': `${this.namespace}#${purpose}`,
           },
         }
       : {
           TableName: this.tableName,
-          KeyConditionExpression: "begins_with(pk, :namespace)",
+          KeyConditionExpression: 'begins_with(pk, :namespace)',
           ExpressionAttributeValues: {
-            ":namespace": this.namespace,
+            ':namespace': this.namespace,
           },
-        };
+        }
 
-    const result = await this.dynamoClient.send(new QueryCommand(queryParams));
-    return (result.Items || []).map((item) => item.keyId);
+    const result = await this.dynamoClient.send(new QueryCommand(queryParams))
+    return (result.Items || []).map((item) => item.keyId)
   }
 
   /**
@@ -240,11 +240,11 @@ export class KeyStorage {
             keyId,
           },
         }),
-      );
-      return true;
+      )
+      return true
     } catch (error: unknown) {
-      console.error("Error deleting key:", error);
-      return false;
+      console.error('Error deleting key:', error)
+      return false
     }
   }
 
@@ -255,17 +255,17 @@ export class KeyStorage {
    */
   async decryptKey(encryptedKey: string): Promise<Buffer> {
     const decryptCommand = new DecryptCommand({
-      CiphertextBlob: Buffer.from(encryptedKey, "base64"),
+      CiphertextBlob: Buffer.from(encryptedKey, 'base64'),
       KeyId: this.kmsKeyId,
-    });
+    })
 
-    const decryptedData = await this.kmsClient.send(decryptCommand);
+    const decryptedData = await this.kmsClient.send(decryptCommand)
 
     if (!decryptedData.Plaintext) {
-      throw new Error("Failed to decrypt key");
+      throw new Error('Failed to decrypt key')
     }
 
-    return Buffer.from(decryptedData.Plaintext);
+    return Buffer.from(decryptedData.Plaintext)
   }
 }
 

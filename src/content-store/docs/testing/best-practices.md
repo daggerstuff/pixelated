@@ -1,8 +1,8 @@
 ---
-title: "Testing Best Practices"
-description: "Comprehensive best practices for testing in the Pixelated platform"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Testing Best Practices'
+description: 'Comprehensive best practices for testing in the Pixelated platform'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
@@ -56,27 +56,28 @@ Aim for a ratio of approximately:
 Follow this structure for unit tests:
 
 ```typescript
-describe("functionToTest", () => {
-  it("should do something specific", () => {
+
+describe('functionToTest', () => {
+  it('should do something specific', () => {
     // Arrange
-    const input = "test input";
+    const input = 'test input'
 
     // Act
-    const result = functionToTest(input);
+    const result = functionToTest(input)
 
     // Assert
-    expect(result).toBe("expected output");
-  });
+    expect(result).toBe('expected output')
+  })
 
-  it("should handle edge cases", () => {
+  it('should handle edge cases', () => {
     // Test edge cases
-  });
+  })
 
-  it("should throw an error for invalid input", () => {
+  it('should throw an error for invalid input', () => {
     // Test error conditions
-    expect(() => functionToTest(null)).toThrow();
-  });
-});
+    expect(() => functionToTest(null)).toThrow()
+  })
+})
 ```
 
 ### 2. Mocking
@@ -90,35 +91,36 @@ describe("functionToTest", () => {
 Example:
 
 ```typescript
+
 // Mock the database module
-vi.mock("./database", () => ({
+vi.mock('./database', () => ({
   Database: {
     query: vi.fn(),
   },
-}));
+}))
 
-describe("UserService", () => {
+describe('UserService', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
-  });
+    vi.resetAllMocks()
+  })
 
-  it("should get user by id", async () => {
+  it('should get user by id', async () => {
     // Arrange
-    const mockUser = { id: "123", name: "Test User" };
-    Database.query.mockResolvedValue([mockUser]);
-    const userService = new UserService();
+    const mockUser = { id: '123', name: 'Test User' }
+    Database.query.mockResolvedValue([mockUser])
+    const userService = new UserService()
 
     // Act
-    const user = await userService.getUserById("123");
+    const user = await userService.getUserById('123')
 
     // Assert
     expect(Database.query).toHaveBeenCalledWith(
-      "SELECT * FROM users WHERE id = ?",
-      ["123"],
-    );
-    expect(user).toEqual(mockUser);
-  });
-});
+      'SELECT * FROM users WHERE id = ?',
+      ['123'],
+    )
+    expect(user).toEqual(mockUser)
+  })
+})
 ```
 
 ### 3. Testing React Components
@@ -173,36 +175,37 @@ describe('Button', () => {
 Example:
 
 ```typescript
-describe("useCounter", () => {
-  it("should initialize with the default value", () => {
+
+describe('useCounter', () => {
+  it('should initialize with the default value', () => {
     // Arrange & Act
-    const { result } = renderHook(() => useCounter());
+    const { result } = renderHook(() => useCounter())
 
     // Assert
-    expect(result.current.count).toBe(0);
-  });
+    expect(result.current.count).toBe(0)
+  })
 
-  it("should initialize with the provided value", () => {
+  it('should initialize with the provided value', () => {
     // Arrange & Act
-    const { result } = renderHook(() => useCounter(10));
+    const { result } = renderHook(() => useCounter(10))
 
     // Assert
-    expect(result.current.count).toBe(10);
-  });
+    expect(result.current.count).toBe(10)
+  })
 
-  it("should increment the counter", () => {
+  it('should increment the counter', () => {
     // Arrange
-    const { result } = renderHook(() => useCounter());
+    const { result } = renderHook(() => useCounter())
 
     // Act
     act(() => {
-      result.current.increment();
-    });
+      result.current.increment()
+    })
 
     // Assert
-    expect(result.current.count).toBe(1);
-  });
-});
+    expect(result.current.count).toBe(1)
+  })
+})
 ```
 
 ## Integration Testing Best Practices
@@ -223,51 +226,52 @@ describe("useCounter", () => {
 Example:
 
 ```typescript
-describe("User API", () => {
-  let server;
-  let baseUrl;
-  let cleanup;
+
+describe('User API', () => {
+  let server
+  let baseUrl
+  let cleanup
 
   beforeAll(async () => {
-    const { cleanup: cleanupDb } = await setupTestDatabase();
-    cleanup = cleanupDb;
+    const { cleanup: cleanupDb } = await setupTestDatabase()
+    cleanup = cleanupDb
 
-    server = createServer();
-    await server.listen(0);
-    const address = server.address();
-    baseUrl = `http://localhost:${address.port}`;
-  });
+    server = createServer()
+    await server.listen(0)
+    const address = server.address()
+    baseUrl = `http://localhost:${address.port}`
+  })
 
   afterAll(async () => {
-    await server.close();
-    await cleanup();
-  });
+    await server.close()
+    await cleanup()
+  })
 
-  it("should create a user", async () => {
+  it('should create a user', async () => {
     // Arrange
     const userData = {
-      name: "Test User",
-      email: "test@example.com",
-    };
+      name: 'Test User',
+      email: 'test@example.com',
+    }
 
     // Act
     const response = await request(`${baseUrl}/api/users`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
-    });
+    })
 
     // Assert
-    expect(response.statusCode).toBe(201);
+    expect(response.statusCode).toBe(201)
 
-    const body = await response.body.json();
-    expect(body).toHaveProperty("id");
-    expect(body.name).toBe(userData.name);
-    expect(body.email).toBe(userData.email);
-  });
-});
+    const body = await response.body.json()
+    expect(body).toHaveProperty('id')
+    expect(body.name).toBe(userData.name)
+    expect(body.email).toBe(userData.email)
+  })
+})
 ```
 
 ### 3. Database Testing
@@ -280,50 +284,51 @@ describe("User API", () => {
 Example:
 
 ```typescript
-describe("UserRepository", () => {
-  let prisma;
-  let userRepository;
-  let cleanup;
+
+describe('UserRepository', () => {
+  let prisma
+  let userRepository
+  let cleanup
 
   beforeAll(async () => {
     const { prisma: prismaClient, cleanup: cleanupDb } =
-      await setupTestDatabase();
-    prisma = prismaClient;
-    cleanup = cleanupDb;
-    userRepository = new UserRepository(prisma);
-  });
+      await setupTestDatabase()
+    prisma = prismaClient
+    cleanup = cleanupDb
+    userRepository = new UserRepository(prisma)
+  })
 
   afterAll(async () => {
-    await cleanup();
-  });
+    await cleanup()
+  })
 
   beforeEach(async () => {
     // Clean up data between tests
-    await prisma.user.deleteMany();
-  });
+    await prisma.user.deleteMany()
+  })
 
-  it("should create a user", async () => {
+  it('should create a user', async () => {
     // Arrange
     const userData = {
-      name: "Test User",
-      email: "test@example.com",
-    };
+      name: 'Test User',
+      email: 'test@example.com',
+    }
 
     // Act
-    const user = await userRepository.create(userData);
+    const user = await userRepository.create(userData)
 
     // Assert
-    expect(user).toHaveProperty("id");
-    expect(user.name).toBe(userData.name);
-    expect(user.email).toBe(userData.email);
+    expect(user).toHaveProperty('id')
+    expect(user.name).toBe(userData.name)
+    expect(user.email).toBe(userData.email)
 
     // Verify in database
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-    });
-    expect(dbUser).toMatchObject(userData);
-  });
-});
+    })
+    expect(dbUser).toMatchObject(userData)
+  })
+})
 ```
 
 ## End-to-End Testing Best Practices
@@ -351,29 +356,30 @@ describe("UserRepository", () => {
 Example:
 
 ```typescript
-test.describe("Authentication", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-  });
 
-  test("should allow a user to sign in", async ({ page }) => {
+test.describe('Authentication', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/')
+  })
+
+  test('should allow a user to sign in', async ({ page }) => {
     // Navigate to login page
-    await page.click("text=Sign In");
+    await page.click('text=Sign In')
 
     // Fill in credentials
-    await page.fill('[data-testid="email-input"]', "test@example.com");
-    await page.fill('[data-testid="password-input"]', "password123");
+    await page.fill('[data-testid="email-input"]', 'test@example.com')
+    await page.fill('[data-testid="password-input"]', 'password123')
 
     // Submit the form
-    await page.click('[data-testid="login-button"]');
+    await page.click('[data-testid="login-button"]')
 
     // Verify successful login
-    await expect(page.locator('[data-testid="user-menu"]')).toBeVisible();
+    await expect(page.locator('[data-testid="user-menu"]')).toBeVisible()
     await expect(page.locator('[data-testid="user-email"]')).toHaveText(
-      "test@example.com",
-    );
-  });
-});
+      'test@example.com',
+    )
+  })
+})
 ```
 
 ## Performance Testing Best Practices
@@ -402,31 +408,32 @@ test.describe("Authentication", () => {
 Example:
 
 ```typescript
-describe("Report Generator Performance", () => {
+
+describe('Report Generator Performance', () => {
   bench(
-    "should generate a small report quickly",
+    'should generate a small report quickly',
     () => {
-      return generateReport({ size: "small", items: 100 });
+      return generateReport({ size: 'small', items: 100 })
     },
     { iterations: 100, time: 1000 },
-  );
+  )
 
   bench(
-    "should generate a medium report efficiently",
+    'should generate a medium report efficiently',
     () => {
-      return generateReport({ size: "medium", items: 1000 });
+      return generateReport({ size: 'medium', items: 1000 })
     },
     { iterations: 50, time: 2000 },
-  );
+  )
 
   bench(
-    "should handle large reports",
+    'should handle large reports',
     () => {
-      return generateReport({ size: "large", items: 10000 });
+      return generateReport({ size: 'large', items: 10000 })
     },
     { iterations: 10, time: 5000 },
-  );
-});
+  )
+})
 ```
 
 ## Security Testing Best Practices

@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
 interface ComparativeProgressControlsProps {
-  metric: string;
-  setMetric: (m: string) => void;
-  cohort: string;
-  setCohort: (c: string) => void;
-  dateRange: { startDate: string; endDate: string };
-  setDateRange: (d: { startDate: string; endDate: string }) => void;
-  isLoading: boolean;
-  availableMetrics: { id: string; label: string }[];
-  availableCohorts: { id: string; label: string }[];
+  metric: string
+  setMetric: (m: string) => void
+  cohort: string
+  setCohort: (c: string) => void
+  dateRange: { startDate: string; endDate: string }
+  setDateRange: (d: { startDate: string; endDate: string }) => void
+  isLoading: boolean
+  availableMetrics: { id: string; label: string }[]
+  availableCohorts: { id: string; label: string }[]
 }
 
 export function ComparativeProgressControls({
@@ -23,40 +23,40 @@ export function ComparativeProgressControls({
   availableMetrics,
   availableCohorts,
 }: ComparativeProgressControlsProps) {
-  const [dateError, setDateError] = useState<string | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null)
 
   const validateDateRange = (startDate: string, endDate: string): boolean => {
     if (!startDate || !endDate) {
-      return true;
+      return true
     }
 
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const start = new Date(startDate)
+    const end = new Date(endDate)
 
-    return start <= end;
-  };
+    return start <= end
+  }
 
   const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newStartDate = e.target.value;
+    const newStartDate = e.target.value
 
     if (validateDateRange(newStartDate, dateRange.endDate)) {
-      setDateRange({ ...dateRange, startDate: newStartDate });
-      setDateError(null);
+      setDateRange({ ...dateRange, startDate: newStartDate })
+      setDateError(null)
     } else {
-      setDateError("Start date cannot be after end date");
+      setDateError('Start date cannot be after end date')
     }
-  };
+  }
 
   const handleEndDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newEndDate = e.target.value;
+    const newEndDate = e.target.value
 
     if (validateDateRange(dateRange.startDate, newEndDate)) {
-      setDateRange({ ...dateRange, endDate: newEndDate });
-      setDateError(null);
+      setDateRange({ ...dateRange, endDate: newEndDate })
+      setDateError(null)
     } else {
-      setDateError("End date cannot be before start date");
+      setDateError('End date cannot be before start date')
     }
-  };
+  }
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-between">
@@ -115,7 +115,7 @@ export function ComparativeProgressControls({
               id="start-date"
               value={dateRange.startDate}
               onChange={handleStartDateChange}
-              className={`w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border ${dateError ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+              className={`w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
               disabled={isLoading}
             />
             <span>to</span>
@@ -124,7 +124,7 @@ export function ComparativeProgressControls({
               id="end-date"
               value={dateRange.endDate}
               onChange={handleEndDateChange}
-              className={`w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border ${dateError ? "border-red-500" : "border-gray-300 dark:border-gray-700"} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
+              className={`w-full sm:w-auto px-3 py-2 bg-white dark:bg-gray-800 border ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500`}
               disabled={isLoading}
             />
           </div>
@@ -134,5 +134,5 @@ export function ComparativeProgressControls({
         </div>
       </div>
     </div>
-  );
+  )
 }

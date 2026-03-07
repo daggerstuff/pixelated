@@ -29,7 +29,7 @@ services:
       - ./models:/app/models
       - ./checkpoints:/app/checkpoints
       - training_cache:/app/cache
-      - /dev/shm:/dev/shm:rw # Shared memory for faster data loading
+      - /dev/shm:/dev/shm:rw  # Shared memory for faster data loading
     # Ports
     ports:
       - "8003:8003"
@@ -85,12 +85,12 @@ services:
     container_name: pixelated-prometheus-training
     restart: unless-stopped
     command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-      - "--web.enable-lifecycle"
-      - "--web.enable-admin-api"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
     volumes:
       - ./monitoring/prometheus/training.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_training_data:/prometheus

@@ -1,7 +1,7 @@
 ---
-title: "Addiction Intervention"
-description: "Guide to effective addiction intervention strategies and approaches"
-author: "Resource Team"
+title: 'Addiction Intervention'
+description: 'Guide to effective addiction intervention strategies and approaches'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

@@ -1,16 +1,16 @@
 type BaseAPIContext = {
-  locals: Record<string, unknown>;
-};
+  locals: Record<string, unknown>
+}
 
-type MiddlewareNext = () => Promise<Response>;
+type MiddlewareNext = () => Promise<Response>
 
 export const securityHeaders = async (
   context: BaseAPIContext,
   next: MiddlewareNext,
 ) => {
-  const response = await next();
+  const response = await next()
 
-  const nonce = context.locals["cspNonce"] as string | undefined;
+  const nonce = context.locals['cspNonce'] as string | undefined
 
   let csp = [
     // Core restrictions
@@ -36,8 +36,8 @@ export const securityHeaders = async (
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
     "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net",
     // Mixed content protections
-    "upgrade-insecure-requests",
-    "block-all-mixed-content",
+    'upgrade-insecure-requests',
+    'block-all-mixed-content',
     // Additional CSP3 hardening (widely supported)
     "script-src-attr 'none'",
     nonce
@@ -48,9 +48,9 @@ export const securityHeaders = async (
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "media-src 'self'",
-  ];
+  ]
 
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     csp = [
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       // In development, we need 'unsafe-inline' and 'unsafe-eval' for Vite/Astro to work.
@@ -63,26 +63,26 @@ export const securityHeaders = async (
       "frame-src 'self' https://giscus.app",
       // Allow ws: and wss: in dev for local websocket debugging
       "connect-src 'self' ws: wss: http://localhost:* https://localhost:*",
-    ];
+    ]
   }
 
-  response.headers.set("Content-Security-Policy", csp.join("; "));
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "SAMEORIGIN");
+  response.headers.set('Content-Security-Policy', csp.join('; '))
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
 
   // Only set HSTS header in production to avoid issues during local development
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === 'production') {
     response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload",
-    );
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload',
+    )
   }
 
   response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=(), payment=()",
-  );
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=()',
+  )
 
-  return response;
-};
+  return response
+}

@@ -3,7 +3,7 @@
  * @description This module provides format validation utilities using Zod schemas.
  */
 
-import { z } from "zod";
+import { z } from 'zod'
 
 /**
  * Validates data against a Zod schema.
@@ -17,14 +17,14 @@ export async function validateData<T extends z.ZodTypeAny>(
   data: unknown,
 ): Promise<z.infer<T>> {
   try {
-    return await schema.parseAsync(data);
+    return await schema.parseAsync(data)
   } catch (error) {
     if (error instanceof z.ZodError) {
       throw new Error(
-        `Validation failed: ${error.issues.map((e) => e.message).join(", ")}`,
+        `Validation failed: ${error.issues.map((e) => e.message).join(', ')}`,
         { cause: error },
-      );
+      )
     }
-    throw error;
+    throw error
   }
 }

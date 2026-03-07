@@ -1,9 +1,9 @@
 ---
-title: "Behavioral Analysis Models in Therapy"
-description: "Behavioral Analysis Models in Therapy documentation"
+title: 'Behavioral Analysis Models in Therapy'
+description: 'Behavioral Analysis Models in Therapy documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -20,26 +20,26 @@ This document outlines the implementation of behavioral analysis models in thera
 
 ```typescript
 interface BehavioralPattern {
-  type: PatternType;
-  confidence: number;
-  indicators: Indicator[];
-  timeframe: TimeRange;
-  context: ContextData;
+  type: PatternType
+  confidence: number
+  indicators: Indicator[]
+  timeframe: TimeRange
+  context: ContextData
 }
 
 interface Indicator {
-  type: string;
-  value: number;
-  source: DataSource;
-  timestamp: Date;
+  type: string
+  value: number
+  source: DataSource
+  timestamp: Date
 }
 
 type PatternType =
-  | "deception"
-  | "emotional_state"
-  | "crisis_risk"
-  | "engagement"
-  | "cognitive_load";
+  | 'deception'
+  | 'emotional_state'
+  | 'crisis_risk'
+  | 'engagement'
+  | 'cognitive_load'
 ```
 
 ### 2. Analysis Models
@@ -127,15 +127,15 @@ type PatternType =
 
 ```typescript
 interface RealTimeAnalysis {
-  sessionId: string;
-  timestamp: Date;
+  sessionId: string
+  timestamp: Date
   analyses: {
-    deception: DeceptionAnalysis;
-    emotional: EmotionalAnalysis;
-    risk: RiskAnalysis;
-    engagement: EngagementAnalysis;
-  };
-  recommendations: Recommendation[];
+    deception: DeceptionAnalysis
+    emotional: EmotionalAnalysis
+    risk: RiskAnalysis
+    engagement: EngagementAnalysis
+  }
+  recommendations: Recommendation[]
 }
 ```
 
@@ -143,11 +143,11 @@ interface RealTimeAnalysis {
 
 ```typescript
 interface HistoricalAnalysis {
-  clientId: exampleId;
-  timeRange: TimeRange;
-  patterns: BehavioralPattern[];
-  trends: Trend[];
-  insights: Insight[];
+  clientId: exampleId
+  timeRange: TimeRange
+  patterns: BehavioralPattern[]
+  trends: Trend[]
+  insights: Insight[]
 }
 ```
 

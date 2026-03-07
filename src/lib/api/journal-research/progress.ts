@@ -1,10 +1,10 @@
-import { journalResearchApiClient } from "./client";
+import { journalResearchApiClient } from './client'
 import {
   Progress,
   ProgressMetrics,
   ProgressMetricsResponseSchema,
   ProgressSchema,
-} from "./types";
+} from './types'
 
 export async function getProgress(sessionId: string): Promise<Progress> {
   return journalResearchApiClient.request<Progress>(
@@ -12,7 +12,7 @@ export async function getProgress(sessionId: string): Promise<Progress> {
     {
       validator: ProgressSchema,
     },
-  );
+  )
 }
 
 export async function getProgressMetrics(
@@ -23,5 +23,5 @@ export async function getProgressMetrics(
     {
       validator: ProgressMetricsResponseSchema,
     },
-  );
+  )
 }

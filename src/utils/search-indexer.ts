@@ -1,20 +1,16 @@
-import fs from "node:fs/promises";
+import fs from 'node:fs/promises'
 
-import {
-  safeJoin,
-  ALLOWED_DIRECTORIES,
-  sanitizeFilename,
-} from "./path-security";
+import { safeJoin, ALLOWED_DIRECTORIES, sanitizeFilename } from './path-security'
 
 interface CollectionEntry {
-  id: string;
-  slug: string;
+  id: string
+  slug: string
   data: {
-    title?: string;
-    tags?: string[];
-    category?: string;
-  };
-  body: string;
+    title?: string
+    tags?: string[]
+    category?: string
+  }
+  body: string
 }
 
 // Mock implementation instead of using astro:content
@@ -22,78 +18,81 @@ async function getCollection(
   collectionName: string,
 ): Promise<CollectionEntry[]> {
   try {
-    const contentDir = safeJoin(ALLOWED_DIRECTORIES.CONTENT, collectionName);
+    const contentDir = safeJoin(
+      ALLOWED_DIRECTORIES.CONTENT,
+      collectionName,
+    )
 
     // Check if directory exists
     try {
-      await fs.access(contentDir);
+      await fs.access(contentDir)
     } catch {
-      console.log(`Collection directory not found: ${contentDir}`);
-      return [];
+      console.log(`Collection directory not found: ${contentDir}`)
+      return []
     }
 
     // Read all files in the directory
-    const files = await fs.readdir(contentDir, { withFileTypes: true });
-    const entries: CollectionEntry[] = [];
+    const files = await fs.readdir(contentDir, { withFileTypes: true })
+    const entries: CollectionEntry[] = []
 
     for (const file of files) {
       if (
         !file.isFile() ||
-        (!file.name.endsWith(".md") && !file.name.endsWith(".mdx"))
+        (!file.name.endsWith('.md') && !file.name.endsWith('.mdx'))
       ) {
-        continue;
+        continue
       }
 
       try {
-        const sanitizedFilename = sanitizeFilename(file.name);
-        const filePath = safeJoin(contentDir, sanitizedFilename);
-        const content = await fs.readFile(filePath, "utf-8");
+        const sanitizedFilename = sanitizeFilename(file.name)
+        const filePath = safeJoin(contentDir, sanitizedFilename)
+        const content = await fs.readFile(filePath, 'utf-8')
 
         // Simple frontmatter extraction
-        const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/);
-        const frontmatter = frontmatterMatch ? frontmatterMatch[1] : "";
+        const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/)
+        const frontmatter = frontmatterMatch ? frontmatterMatch[1] : ''
 
         // Extract title, tags, etc from frontmatter
         const titleMatch = frontmatter
           ? frontmatter.match(/title:\s*["']?(.*?)["']?\n/)
-          : null;
+          : null
         const tagsMatch = frontmatter
           ? frontmatter.match(/tags:\s*\[(.*?)\]/)
-          : null;
+          : null
         const categoryMatch = frontmatter
           ? frontmatter.match(/category:\s*["']?(.*?)["']?\n/)
-          : null;
+          : null
 
         const title =
-          titleMatch?.[1]?.trim() || file.name.replace(/\.(md|mdx)$/, "");
+          titleMatch?.[1]?.trim() || file.name.replace(/\.(md|mdx)$/, '')
         const tags = tagsMatch?.[1]
           ? tagsMatch[1]
-              .split(",")
-              .map((tag) => tag.trim().replace(/["']/g, ""))
-          : [];
-        const category = categoryMatch?.[1]?.trim() || collectionName;
+              .split(',')
+              .map((tag) => tag.trim().replace(/["']/g, ''))
+          : []
+        const category = categoryMatch?.[1]?.trim() || collectionName
 
         // Remove frontmatter and get body content
-        const body = content.replace(/---\n[\s\S]*?\n---/, "").trim();
+        const body = content.replace(/---\n[\s\S]*?\n---/, '').trim()
 
         // Create slug from filename
-        const slug = file.name.replace(/\.(md|mdx)$/, "");
+        const slug = file.name.replace(/\.(md|mdx)$/, '')
 
         entries.push({
           id: slug,
           slug,
           data: { title, tags, category },
           body,
-        });
+        })
       } catch (error: unknown) {
-        console.error(`Error processing file ${file.name}:`, error);
+        console.error(`Error processing file ${file.name}:`, error)
       }
     }
 
-    return entries;
+    return entries
   } catch (error: unknown) {
-    console.error(`Error getting collection ${collectionName}:`, error);
-    return [];
+    console.error(`Error getting collection ${collectionName}:`, error)
+    return []
   }
 }
 
@@ -101,27 +100,27 @@ async function getCollection(
  * Type defining content that can be indexed
  */
 export interface IndexableContent {
-  id: string;
-  slug: string;
-  title: string;
-  content: string;
-  url: string;
-  tags?: string[];
-  category?: string;
-  publishDate?: Date;
-  updatedDate?: Date;
+  id: string
+  slug: string
+  title: string
+  content: string
+  url: string
+  tags?: string[]
+  category?: string
+  publishDate?: Date
+  updatedDate?: Date
 }
 
 /**
  * Search document interface
  */
 export interface SearchDocument {
-  id: string;
-  title: string;
-  content: string;
-  url: string;
-  tags?: string[];
-  category?: string;
+  id: string
+  title: string
+  content: string
+  url: string
+  tags?: string[]
+  category?: string
   // Add other fields if needed
 }
 
@@ -131,62 +130,60 @@ export interface SearchDocument {
  * @returns Array of search documents for client-side indexing
  */
 export async function buildSearchIndex(
-  collections: string[] = ["blog", "docs", "guides"],
+  collections: string[] = ['blog', 'docs', 'guides'],
 ): Promise<SearchDocument[]> {
-  const documents: SearchDocument[] = [];
+  const documents: SearchDocument[] = []
 
   try {
     // Process each content collection
     for (const collectionName of collections) {
       try {
-        const entries = await getCollection(collectionName);
+        const entries = await getCollection(collectionName)
 
         if (!entries || entries.length === 0) {
-          console.log(`No entries found for collection: ${collectionName}`);
-          continue;
+          console.log(`No entries found for collection: ${collectionName}`)
+          continue
         }
 
-        console.log(
-          `Indexing ${entries.length} entries from ${collectionName}`,
-        );
+        console.log(`Indexing ${entries.length} entries from ${collectionName}`)
 
         // Convert entries to search documents
         const docs = entries.map((entry) => {
-          const { id, slug, data, body } = entry;
-          const url = `/${collectionName}/${slug}/`;
+          const { id, slug, data, body } = entry
+          const url = `/${collectionName}/${slug}/`
 
           // Extract metadata from entry
-          const title = data.title || "";
-          const tags = data.tags || [];
-          const category = data.category || collectionName;
+          const title = data.title || ''
+          const tags = data.tags || []
+          const category = data.category || collectionName
 
           // Create unique ID for document
-          const documentId = `${collectionName}_${id}`;
+          const documentId = `${collectionName}_${id}`
 
           return {
             id: documentId,
             title,
-            content: body || "",
+            content: body || '',
             url,
             tags,
             category,
-          };
-        });
+          }
+        })
 
-        documents.push(...docs);
+        documents.push(...docs)
       } catch (error: unknown) {
-        console.error(`Failed to index collection ${collectionName}:`, error);
+        console.error(`Failed to index collection ${collectionName}:`, error)
       }
     }
 
     // Process pages with frontmatter that should be indexed
     // TODO: Add support for indexing static pages
 
-    console.log(`Total indexed documents: ${documents.length}`);
-    return documents;
+    console.log(`Total indexed documents: ${documents.length}`)
+    return documents
   } catch (error: unknown) {
-    console.error("Failed to build search index:", error);
-    return [];
+    console.error('Failed to build search index:', error)
+    return []
   }
 }
 
@@ -198,33 +195,33 @@ export async function buildSearchIndex(
  */
 export function processContent(content: string): string {
   if (!content) {
-    return "";
+    return ''
   }
 
   // Remove frontmatter
-  content = content.replace(/---[\s\S]*?---/, "");
+  content = content.replace(/---[\s\S]*?---/, '')
 
   // Remove HTML tags
-  content = content.replace(/<[^>]*>/g, " ");
+  content = content.replace(/<[^>]*>/g, ' ')
 
   // Remove Markdown syntax
   content = content
-    .replace(/`{3}[\s\S]*?`{3}/g, "") // Code blocks
-    .replace(/`([^`]+)`/g, "$1") // Inline code
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // Links
-    .replace(/!\[([^\]]+)\]\([^)]+\)/g, "$1") // Images
-    .replace(/(?:^|\n)#{1,6}\s+(.*)/g, "$1") // Headings
-    .replace(/\*\*([^*]*)\*\*/g, "$1") // Bold
-    .replace(/\*([^*]*)\*/g, "$1") // Italic
-    .replace(/~~([^~]*)~~/g, "$1") // Strikethrough
-    .replace(/>\s+(.*)/g, "$1") // Blockquotes
-    .replace(/\n\s*[-*+]\s+/g, "\n") // Lists
-    .replace(/\n\s*\d+\.\s+/g, "\n"); // Numbered lists
+    .replace(/`{3}[\s\S]*?`{3}/g, '') // Code blocks
+    .replace(/`([^`]+)`/g, '$1') // Inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+    .replace(/!\[([^\]]+)\]\([^)]+\)/g, '$1') // Images
+    .replace(/(?:^|\n)#{1,6}\s+(.*)/g, '$1') // Headings
+    .replace(/\*\*([^*]*)\*\*/g, '$1') // Bold
+    .replace(/\*([^*]*)\*/g, '$1') // Italic
+    .replace(/~~([^~]*)~~/g, '$1') // Strikethrough
+    .replace(/>\s+(.*)/g, '$1') // Blockquotes
+    .replace(/\n\s*[-*+]\s+/g, '\n') // Lists
+    .replace(/\n\s*\d+\.\s+/g, '\n') // Numbered lists
 
   // Remove extra whitespace
-  content = content.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
+  content = content.replace(/\n+/g, ' ').replace(/\s+/g, ' ').trim()
 
-  return content;
+  return content
 }
 
 /**
@@ -232,10 +229,10 @@ export function processContent(content: string): string {
  * This function is called from the Astro integration
  */
 export async function createSearchIndexFile(): Promise<string> {
-  const documents = await buildSearchIndex();
+  const documents = await buildSearchIndex()
 
   // Create a serialized JSON string of the search documents
-  const indexJson = JSON.stringify(documents);
+  const indexJson = JSON.stringify(documents)
 
   // Create JavaScript that sets the index in a global variable
   return `
@@ -264,5 +261,5 @@ if (document.readyState === 'loading') {
 } else {
   window.initSearch();
 }
-`;
+`
 }

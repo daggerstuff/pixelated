@@ -1,4 +1,4 @@
-import { SITE } from "@/config";
+import { SITE } from '@/config'
 
 /**
  * Formats a given date into a human-readable string.
@@ -8,26 +8,26 @@ export function formatDate(
   showYear = true,
   useUTC = false,
 ): string {
-  const date = typeof d === "string" ? new Date(d) : d;
+  const date = typeof d === 'string' ? new Date(d) : d
   if (Number.isNaN(date.getTime())) {
-    throw new Error("Invalid Date");
+    throw new Error('Invalid Date')
   }
 
   const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-    ...(showYear && { year: "numeric" }),
-    ...(useUTC && { timeZone: "UTC" }),
-  };
+    month: 'short',
+    day: 'numeric',
+    ...(showYear && { year: 'numeric' }),
+    ...(useUTC && { timeZone: 'UTC' }),
+  }
 
-  return date.toLocaleDateString(SITE.lang, options);
+  return date.toLocaleDateString(SITE.lang, options)
 }
 
 /**
  * Gets the year from a given date.
  */
 export function getYear(a: Date | string | number): number {
-  return new Date(a).getFullYear();
+  return new Date(a).getFullYear()
 }
 
 /**
@@ -37,19 +37,19 @@ export function isSameYear(
   a?: Date | string | number,
   b?: Date | string | number,
 ) {
-  return a && b && getYear(a) === getYear(b);
+  return a && b && getYear(a) === getYear(b)
 }
 
 /**
  * Retrieves the current time formatted as a string in 'HH:MM:SS' format.
  */
 export function getCurrentFormattedTime() {
-  const now = new Date();
-  const hours = now.getHours().toString().padStart(2, "0");
-  const minutes = now.getMinutes().toString().padStart(2, "0");
-  const seconds = now.getSeconds().toString().padStart(2, "0");
+  const now = new Date()
+  const hours = now.getHours().toString().padStart(2, '0')
+  const minutes = now.getMinutes().toString().padStart(2, '0')
+  const seconds = now.getSeconds().toString().padStart(2, '0')
 
-  return `${hours}:${minutes}:${seconds}`;
+  return `${hours}:${minutes}:${seconds}`
 }
 
 /**
@@ -58,9 +58,9 @@ export function getCurrentFormattedTime() {
 export function isDiffMonth(currentTime: string, preTime?: string): boolean {
   return preTime
     ? new Date(currentTime).getMonth() !== new Date(preTime!).getMonth()
-    : false;
+    : false
 }
 
 export function isValidDate(date: unknown): date is Date {
-  return date instanceof Date && !Number.isNaN(date.getTime());
+  return date instanceof Date && !Number.isNaN(date.getTime())
 }

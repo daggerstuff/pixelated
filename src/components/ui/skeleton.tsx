@@ -1,25 +1,25 @@
-import React from "react";
-import { cn } from "../../lib/utils";
+import React from 'react'
+import { cn } from '../../lib/utils'
 
 export interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Width of the skeleton */
-  width?: string | number;
+  width?: string | number
   /** Height of the skeleton */
-  height?: string | number;
+  height?: string | number
   /** Number of skeleton items to render */
-  count?: number;
+  count?: number
   /** Whether the skeleton should have a border radius */
-  rounded?: boolean;
+  rounded?: boolean
   /** Whether the skeleton should be circular */
-  circle?: boolean;
+  circle?: boolean
   /** Whether the skeleton should have animation */
-  animate?: boolean;
+  animate?: boolean
   /** Whether the skeleton should have a pulse animation */
-  pulse?: boolean;
+  pulse?: boolean
   /** Whether the skeleton should have a wave animation */
-  wave?: boolean;
+  wave?: boolean
   /** Additional class name */
-  className?: string;
+  className?: string
 }
 
 export function Skeleton({
@@ -34,27 +34,27 @@ export function Skeleton({
   className,
   ...props
 }: SkeletonProps) {
-  const baseClasses = "inline-block bg-gray-200 dark:bg-gray-700";
+  const baseClasses = 'inline-block bg-gray-200 dark:bg-gray-700'
   const animationClasses = animate
     ? pulse
-      ? "animate-pulse"
+      ? 'animate-pulse'
       : wave
-        ? "animate-skeleton-wave"
-        : ""
-    : "";
+        ? 'animate-skeleton-wave'
+        : ''
+    : ''
 
-  const shapeClasses = circle ? "rounded-full" : rounded ? "rounded" : "";
+  const shapeClasses = circle ? 'rounded-full' : rounded ? 'rounded' : ''
 
-  const items = [];
+  const items = []
 
   const style: React.CSSProperties = {
     ...(width !== undefined && {
-      width: typeof width === "number" ? `${width}px` : width,
+      width: typeof width === 'number' ? `${width}px` : width,
     }),
     ...(height !== undefined && {
-      height: typeof height === "number" ? `${height}px` : height,
+      height: typeof height === 'number' ? `${height}px` : height,
     }),
-  };
+  }
 
   for (let i = 0; i < count; i++) {
     items.push(
@@ -64,56 +64,56 @@ export function Skeleton({
         style={style}
         {...props}
       />,
-    );
+    )
 
     // Add line break if multiple items are rendered
     if (i < count - 1) {
-      items.push(<br key={`br-${i}`} />);
+      items.push(<br key={`br-${i}`} />)
     }
   }
 
-  return <>{items}</>;
+  return <>{items}</>
 }
 
 export function SkeletonText({
   lines = 3,
   lineHeight = 16,
-  lastLineWidth = "67%",
+  lastLineWidth = '67%',
   spacing = 8,
   className,
   ...props
 }: SkeletonProps & {
-  /** Number of lines to render */ lines?: number;
-  /** Height of each line */ lineHeight?: number;
+  /** Number of lines to render */ lines?: number
+  /** Height of each line */ lineHeight?: number
   /** Width of the last line (string percentage or pixel value) */ lastLineWidth?:
     | string
-    | number;
-  /** Spacing between lines */ spacing?: number;
+    | number
+  /** Spacing between lines */ spacing?: number
 }) {
   // Convert spacing to proper CSS value
-  const spacingPx = typeof spacing === "number" ? `${spacing}px` : spacing;
+  const spacingPx = typeof spacing === 'number' ? `${spacing}px` : spacing
 
-  const items = [];
+  const items = []
 
   for (let i = 0; i < lines; i++) {
-    const isLastLine = i === lines - 1;
-    const width = isLastLine && lastLineWidth ? lastLineWidth : "100%";
+    const isLastLine = i === lines - 1
+    const width = isLastLine && lastLineWidth ? lastLineWidth : '100%'
 
     items.push(
       <Skeleton
         key={`text-line-${i}`}
         width={width}
-        height={typeof lineHeight === "number" ? `${lineHeight}px` : lineHeight}
-        className={cn("block", className)}
+        height={typeof lineHeight === 'number' ? `${lineHeight}px` : lineHeight}
+        className={cn('block', className)}
         style={{
           marginBottom: isLastLine ? 0 : spacingPx,
         }}
         {...props}
       />,
-    );
+    )
   }
 
-  return <div>{items}</div>;
+  return <div>{items}</div>
 }
 
 export function SkeletonAvatar({
@@ -126,10 +126,10 @@ export function SkeletonAvatar({
       width={size}
       height={size}
       circle
-      className={cn("inline-block", className)}
+      className={cn('inline-block', className)}
       {...props}
     />
-  );
+  )
 }
 
 export function SkeletonButton({
@@ -142,14 +142,14 @@ export function SkeletonButton({
     <Skeleton
       width={width}
       height={height}
-      className={cn("block", className)}
+      className={cn('block', className)}
       {...props}
     />
-  );
+  )
 }
 
 export function SkeletonImage({
-  width = "100%",
+  width = '100%',
   height = 200,
   className,
   ...props
@@ -158,20 +158,20 @@ export function SkeletonImage({
     <Skeleton
       width={width}
       height={height}
-      className={cn("block", className)}
+      className={cn('block', className)}
       {...props}
     />
-  );
+  )
 }
 
 interface SkeletonCardProps {
-  className?: string;
-  rows?: number;
-  rowHeight?: number;
-  rowClassName?: string;
-  circleSize?: number;
-  hasCircle?: boolean;
-  circlePosition?: "left" | "right" | "top";
+  className?: string
+  rows?: number
+  rowHeight?: number
+  rowClassName?: string
+  circleSize?: number
+  hasCircle?: boolean
+  circlePosition?: 'left' | 'right' | 'top'
 }
 
 export function SkeletonCard({
@@ -181,14 +181,14 @@ export function SkeletonCard({
   rowClassName,
   circleSize = 48,
   hasCircle = false,
-  circlePosition = "left",
+  circlePosition = 'left',
 }: SkeletonCardProps) {
   return (
     <div
-      className={cn("flex w-full gap-4", className, {
-        "flex-col": circlePosition === "top",
-        "items-center": circlePosition === "left" || circlePosition === "right",
-        "flex-row-reverse": circlePosition === "right",
+      className={cn('flex w-full gap-4', className, {
+        'flex-col': circlePosition === 'top',
+        'items-center': circlePosition === 'left' || circlePosition === 'right',
+        'flex-row-reverse': circlePosition === 'right',
       })}
     >
       {hasCircle && (
@@ -197,8 +197,8 @@ export function SkeletonCard({
         </div>
       )}
       <div
-        className={cn("w-full space-y-3", {
-          "mt-2": circlePosition === "top" && hasCircle,
+        className={cn('w-full space-y-3', {
+          'mt-2': circlePosition === 'top' && hasCircle,
         })}
       >
         {Array.from({ length: rows }).map((_, i) => (
@@ -206,21 +206,21 @@ export function SkeletonCard({
             key={`card-row-${i}`}
             height={rowHeight}
             className={cn(rowClassName, {
-              "w-3/4": i === rows - 1,
-              "w-full": i !== rows - 1,
+              'w-3/4': i === rows - 1,
+              'w-full': i !== rows - 1,
             })}
           />
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 export function SkeletonChartBar({ className }: SkeletonProps) {
   return (
-    <div className={cn("flex h-40 items-end gap-2", className)}>
+    <div className={cn('flex h-40 items-end gap-2', className)}>
       {Array.from({ length: 7 }).map((_, i) => {
-        const randomHeight = Math.floor(Math.random() * 100) + 20;
+        const randomHeight = Math.floor(Math.random() * 100) + 20
         return (
           <div
             key={`chart-bar-${i}`}
@@ -234,15 +234,15 @@ export function SkeletonChartBar({ className }: SkeletonProps) {
 
             <Skeleton height={4} width={8} />
           </div>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 export function SkeletonChartLine({ className }: SkeletonProps) {
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       <div className="flex justify-between">
         <Skeleton height={5} width={24} />
         <div className="flex space-x-2">
@@ -253,7 +253,7 @@ export function SkeletonChartLine({ className }: SkeletonProps) {
       </div>
       <Skeleton height={40} width="100%" />
     </div>
-  );
+  )
 }
 
 export function SkeletonTable({
@@ -261,12 +261,12 @@ export function SkeletonTable({
   columns = 3,
   className,
 }: {
-  rows?: number;
-  columns?: number;
-  className?: string;
+  rows?: number
+  columns?: number
+  className?: string
 }) {
   return (
-    <div className={cn("space-y-3", className)}>
+    <div className={cn('space-y-3', className)}>
       <div className="flex gap-4">
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={`table-header-${i}`} height={6} className="flex-1" />
@@ -284,12 +284,12 @@ export function SkeletonTable({
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 export function SkeletonProfile({ className }: SkeletonProps) {
   return (
-    <div className={cn("space-y-8", className)}>
+    <div className={cn('space-y-8', className)}>
       <div className="flex flex-col md:flex-row gap-6">
         <div className="flex-shrink-0 flex flex-col items-center">
           <SkeletonAvatar size={96} />
@@ -327,5 +327,5 @@ export function SkeletonProfile({ className }: SkeletonProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

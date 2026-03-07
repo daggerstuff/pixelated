@@ -5,39 +5,24 @@
 
 // JWT Configuration
 export const JWT_CONFIG = {
-  secret:
-    process.env.JWT_SECRET ||
-    import.meta.env.JWT_SECRET ||
-    "fallback-secret-change-in-production",
-  audience:
-    process.env.JWT_AUDIENCE ||
-    import.meta.env.JWT_AUDIENCE ||
-    "pixelated-empathy",
-  issuer:
-    process.env.JWT_ISSUER ||
-    import.meta.env.JWT_ISSUER ||
-    "pixelated-auth-service",
+  secret: process.env.JWT_SECRET || import.meta.env.JWT_SECRET || 'fallback-secret-change-in-production',
+  audience: process.env.JWT_AUDIENCE || import.meta.env.JWT_AUDIENCE || 'pixelated-empathy',
+  issuer: process.env.JWT_ISSUER || import.meta.env.JWT_ISSUER || 'pixelated-auth-service',
   accessTokenExpiry: 24 * 60 * 60, // 24 hours - matching original inline config per PR requirements
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
-  algorithm: "HS256" as const,
-};
+  algorithm: 'HS256' as const,
+}
 
 // Auth0 Configuration
 export const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || "",
-  clientId:
-    process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || "",
-  clientSecret:
-    process.env.AUTH0_CLIENT_SECRET ||
-    import.meta.env.AUTH0_CLIENT_SECRET ||
-    "",
-  audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || "",
+  domain: process.env.AUTH0_DOMAIN || import.meta.env.AUTH0_DOMAIN || '',
+  clientId: process.env.AUTH0_CLIENT_ID || import.meta.env.AUTH0_CLIENT_ID || '',
+  clientSecret: process.env.AUTH0_CLIENT_SECRET || import.meta.env.AUTH0_CLIENT_SECRET || '',
+  audience: process.env.AUTH0_AUDIENCE || import.meta.env.AUTH0_AUDIENCE || '',
   callbackUrl:
-    process.env.AUTH0_CALLBACK_URL ||
-    import.meta.env.AUTH0_CALLBACK_URL ||
-    "http://localhost:4321/api/auth/callback",
-  scope: "openid profile email offline_access",
-};
+    process.env.AUTH0_CALLBACK_URL || import.meta.env.AUTH0_CALLBACK_URL || 'http://localhost:4321/api/auth/callback',
+  scope: 'openid profile email offline_access',
+}
 
 // Password Policy Configuration
 export const PASSWORD_CONFIG = {
@@ -47,12 +32,12 @@ export const PASSWORD_CONFIG = {
   requireUppercase: true,
   requireNumber: true,
   requireSpecial: true,
-};
+}
 
 // Bcrypt Configuration
 export const BCRYPT_CONFIG = {
   rounds: 12,
-};
+}
 
 // Rate Limiting Configuration
 export const RATE_LIMIT_CONFIG = {
@@ -74,33 +59,28 @@ export const RATE_LIMIT_CONFIG = {
     skipSuccessfulRequests: false,
     skipFailedRequests: false,
   },
-};
+}
 
 // Security Configuration
 export const SECURITY_CONFIG = {
   cors: {
-    origin: (process.env.CORS_ORIGIN || import.meta.env.CORS_ORIGIN)?.split(
-      ",",
-    ) || ["http://localhost:4321"],
+    origin: (process.env.CORS_ORIGIN || import.meta.env.CORS_ORIGIN)?.split(',') || ['http://localhost:4321'],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   },
   csrf: {
-    enabled: process.env.NODE_ENV === "production" || import.meta.env.PROD,
-    secret:
-      process.env.CSRF_SECRET ||
-      import.meta.env.CSRF_SECRET ||
-      "fallback-csrf-secret",
+    enabled: process.env.NODE_ENV === 'production' || import.meta.env.PROD,
+    secret: process.env.CSRF_SECRET || import.meta.env.CSRF_SECRET || 'fallback-csrf-secret',
   },
   headers: {
     contentSecurityPolicy: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      fontSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      fontSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'", 'ws:', 'wss:'],
       frameAncestors: ["'none'"],
     },
     hsts: {
@@ -109,27 +89,27 @@ export const SECURITY_CONFIG = {
       preload: true,
     },
   },
-};
+}
 
 // Role-based Access Control Configuration
 export const RBAC_CONFIG = {
-  roles: ["admin", "therapist", "researcher", "patient", "guest"] as const,
+  roles: ['admin', 'therapist', 'researcher', 'patient', 'guest'] as const,
   permissions: {
-    admin: ["*"], // All permissions
+    admin: ['*'], // All permissions
     therapist: [
-      "read:patients",
-      "write:notes",
-      "read:analytics",
-      "read:research_data",
-      "write:interventions",
+      'read:patients',
+      'write:notes',
+      'read:analytics',
+      'read:research_data',
+      'write:interventions',
     ],
     researcher: [
-      "read:analytics",
-      "read:research_data",
-      "write:research_notes",
+      'read:analytics',
+      'read:research_data',
+      'write:research_notes',
     ],
-    patient: ["read:own_data", "write:own_notes", "read:own_analytics"],
-    guest: ["read:public_content"],
+    patient: ['read:own_data', 'write:own_notes', 'read:own_analytics'],
+    guest: ['read:public_content'],
   },
   roleHierarchy: {
     admin: 100,
@@ -138,7 +118,7 @@ export const RBAC_CONFIG = {
     patient: 40,
     guest: 20,
   },
-};
+}
 
 // Token Configuration
 export const TOKEN_CONFIG = {
@@ -152,7 +132,7 @@ export const TOKEN_CONFIG = {
     maxSize: 10000,
     cleanupInterval: 60 * 60 * 1000, // 1 hour
   },
-};
+}
 
 // Performance Configuration
 export const PERFORMANCE_CONFIG = {
@@ -167,7 +147,7 @@ export const PERFORMANCE_CONFIG = {
   rateLimiting: {
     maxResponseTime: 10, // 10ms target
   },
-};
+}
 
 // HIPAA Compliance Configuration
 export const HIPAA_CONFIG = {
@@ -178,7 +158,7 @@ export const HIPAA_CONFIG = {
   },
   encryption: {
     enabled: true,
-    algorithm: "AES-256-GCM",
+    algorithm: 'AES-256-GCM',
     keyRotationInterval: 90 * 24 * 60 * 60 * 1000, // 90 days
   },
   dataRetention: {
@@ -186,7 +166,7 @@ export const HIPAA_CONFIG = {
     sessionData: 24 * 60 * 60 * 1000, // 24 hours
     auditLogs: 7 * 24 * 60 * 60 * 1000, // 7 years
   },
-};
+}
 
 /**
  * Get complete authentication configuration
@@ -203,57 +183,51 @@ export function getAuthConfig() {
     token: TOKEN_CONFIG,
     performance: PERFORMANCE_CONFIG,
     hipaa: HIPAA_CONFIG,
-  };
+  }
 }
 
 /**
  * Validate configuration
  */
 export function validateAuthConfig(): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
+  const errors: string[] = []
 
-  const isProd = process.env.NODE_ENV === "production" || import.meta.env.PROD;
+  const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD;
 
   // Validate JWT secret
   const jwtSecret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET;
   if (!jwtSecret && isProd) {
-    errors.push("JWT_SECRET is required in production");
+    errors.push('JWT_SECRET is required in production')
   }
 
   // Validate Auth0 configuration in production
   if (isProd) {
-    if (!AUTH0_CONFIG.domain) errors.push("AUTH0_DOMAIN is required");
-    if (!AUTH0_CONFIG.clientId) errors.push("AUTH0_CLIENT_ID is required");
-    if (!AUTH0_CONFIG.clientSecret)
-      errors.push("AUTH0_CLIENT_SECRET is required");
+    if (!AUTH0_CONFIG.domain) errors.push('AUTH0_DOMAIN is required')
+    if (!AUTH0_CONFIG.clientId) errors.push('AUTH0_CLIENT_ID is required')
+    if (!AUTH0_CONFIG.clientSecret) errors.push('AUTH0_CLIENT_SECRET is required')
   }
 
   return {
     valid: errors.length === 0,
     errors,
-  };
+  }
 }
 
 /**
  * Environment-specific configuration
  */
 export function getEnvironmentConfig() {
-  const isDevelopment =
-    process.env.NODE_ENV === "development" || import.meta.env.DEV;
-  const isProduction =
-    process.env.NODE_ENV === "production" || import.meta.env.PROD;
-  const isTest = process.env.NODE_ENV === "test";
+  const isDevelopment = process.env.NODE_ENV === 'development' || import.meta.env.DEV
+  const isProduction = process.env.NODE_ENV === 'production' || import.meta.env.PROD
+  const isTest = process.env.NODE_ENV === 'test'
 
   return {
     isDevelopment,
     isProduction,
     isTest,
-    debug:
-      isDevelopment ||
-      process.env.DEBUG === "true" ||
-      import.meta.env.DEBUG === "true",
+    debug: isDevelopment || process.env.DEBUG === 'true' || import.meta.env.DEBUG === 'true',
     strictMode: isProduction,
     enableDetailedErrors: isDevelopment,
     enableStackTraces: isDevelopment || isTest,
-  };
+  }
 }

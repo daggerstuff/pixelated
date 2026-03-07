@@ -1,1 +1,1 @@
-export * from "./jotai-persistence";
+export * from './jotai-persistence'

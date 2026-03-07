@@ -5,9 +5,9 @@
  */
 
 // Trend directions
-export const TREND_INCREASING = "increasing";
-export const TREND_DECREASING = "decreasing";
-export const TREND_STABLE = "stable";
+export const TREND_INCREASING = 'increasing'
+export const TREND_DECREASING = 'decreasing'
+export const TREND_STABLE = 'stable'
 
 /**
  * Analyzes trend directions for risk factors
@@ -17,29 +17,29 @@ export const TREND_STABLE = "stable";
  */
 export async function analyze(
   factors: Array<{ name: string; weight: number; score: number }>,
-): Promise<Array<"increasing" | "decreasing" | "stable">> {
+): Promise<Array<'increasing' | 'decreasing' | 'stable'>> {
   // Mock implementation
   return factors.map((factor) => {
     // Generate a deterministic trend based on factor name and score
     // In a real implementation, this would analyze historical data
-    const hash = hashString(factor.name);
-    const baseValue = (hash % 3) - 1; // -1, 0, or 1
+    const hash = hashString(factor.name)
+    const baseValue = (hash % 3) - 1 // -1, 0, or 1
 
     // Use score to influence the trend
-    const scoreInfluence = factor.score > 0.7 ? 1 : factor.score < 0.3 ? -1 : 0;
+    const scoreInfluence = factor.score > 0.7 ? 1 : factor.score < 0.3 ? -1 : 0
 
     // Combined influence
-    const trendValue = baseValue + scoreInfluence;
+    const trendValue = baseValue + scoreInfluence
 
     // Convert to trend direction
     if (trendValue > 0) {
-      return TREND_INCREASING;
+      return TREND_INCREASING
     }
     if (trendValue < 0) {
-      return TREND_DECREASING;
+      return TREND_DECREASING
     }
-    return TREND_STABLE;
-  });
+    return TREND_STABLE
+  })
 }
 
 /**
@@ -47,13 +47,13 @@ export async function analyze(
  * Used to create deterministic but seemingly random trends
  */
 function hashString(str: string): number {
-  let hash = 0;
+  let hash = 0
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash &= hash; // Convert to 32bit integer
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash &= hash // Convert to 32bit integer
   }
-  return Math.abs(hash);
+  return Math.abs(hash)
 }
 
 /**
@@ -63,10 +63,10 @@ function hashString(str: string): number {
  * @returns Object with detected seasonal patterns
  */
 export function detectSeasonalPatterns(timePoints: number[]): {
-  daily: boolean;
-  weekly: boolean;
-  monthly: boolean;
-  confidence: number;
+  daily: boolean
+  weekly: boolean
+  monthly: boolean
+  confidence: number
 } {
   // Mock implementation
   // In a real implementation, this would use Fourier transform or similar techniques
@@ -75,5 +75,5 @@ export function detectSeasonalPatterns(timePoints: number[]): {
     weekly: timePoints.length > 60,
     monthly: timePoints.length > 180,
     confidence: timePoints.length > 90 ? 0.8 : 0.5,
-  };
+  }
 }

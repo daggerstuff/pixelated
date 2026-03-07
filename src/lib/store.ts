@@ -1,172 +1,172 @@
-import type { AIService } from "./ai/models/ai-types";
-import type { FHEService } from "./fhe";
-import { create } from "zustand";
-import { createMentalHealthChat } from "./chat";
-import { devtools } from "zustand/middleware";
-import { persist, subscribeWithSelector } from "zustand/middleware";
-import { logger } from "./logger";
+import type { AIService } from './ai/models/ai-types'
+import type { FHEService } from './fhe'
+import { create } from 'zustand'
+import { createMentalHealthChat } from './chat'
+import { devtools } from 'zustand/middleware'
+import { persist, subscribeWithSelector } from 'zustand/middleware'
+import { logger } from './logger'
 
 // ============================================================================
 // Enhanced State Types
 // ============================================================================
 
 interface OfflineAction {
-  id: string;
-  type: string;
-  payload: unknown;
-  timestamp: number;
-  retryCount: number;
+  id: string
+  type: string
+  payload: unknown
+  timestamp: number
+  retryCount: number
 }
 
 interface SessionState {
-  lastRoute: string;
-  currentWorkspace: string | null;
-  openTabs: string[];
-  recentItems: string[];
-  searchHistory: string[];
-  lastActivity: number;
+  lastRoute: string
+  currentWorkspace: string | null
+  openTabs: string[]
+  recentItems: string[]
+  searchHistory: string[]
+  lastActivity: number
 }
 
 interface UserPreferences {
-  theme: "light" | "dark" | "system";
-  language: string;
+  theme: 'light' | 'dark' | 'system'
+  language: string
   notifications: {
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
+    email: boolean
+    push: boolean
+    sms: boolean
+  }
   accessibility: {
-    reducedMotion: boolean;
-    highContrast: boolean;
-    fontSize: "small" | "medium" | "large";
-  };
+    reducedMotion: boolean
+    highContrast: boolean
+    fontSize: 'small' | 'medium' | 'large'
+  }
   privacy: {
-    analytics: boolean;
-    crashReporting: boolean;
-    personalization: boolean;
-  };
+    analytics: boolean
+    crashReporting: boolean
+    personalization: boolean
+  }
 }
 
 interface UIState {
-  sidebarOpen: boolean;
-  activeTab: string;
-  layout: "default" | "compact" | "expanded";
-  viewMode: "list" | "grid" | "card";
-  filters: Record<string, unknown>;
-  sortBy: string;
-  sortOrder: "asc" | "desc";
+  sidebarOpen: boolean
+  activeTab: string
+  layout: 'default' | 'compact' | 'expanded'
+  viewMode: 'list' | 'grid' | 'card'
+  filters: Record<string, unknown>
+  sortBy: string
+  sortOrder: 'asc' | 'desc'
 }
 
 interface UsageStats {
-  sessionCount: number;
-  totalTimeSpent: number;
-  featureUsage: Record<string, number>;
-  lastSessionEnd: number | null;
+  sessionCount: number
+  totalTimeSpent: number
+  featureUsage: Record<string, number>
+  lastSessionEnd: number | null
   performanceMetrics: {
-    averageLoadTime: number;
-    errorCount: number;
-    crashCount: number;
-  };
+    averageLoadTime: number
+    errorCount: number
+    crashCount: number
+  }
 }
 
 interface StoreState {
   // Security settings
-  securityLevel: "standard" | "hipaa" | "maximum";
-  encryptionEnabled: boolean;
-  fheInitialized: boolean;
+  securityLevel: 'standard' | 'hipaa' | 'maximum'
+  encryptionEnabled: boolean
+  fheInitialized: boolean
 
   // AI service
-  aiService: AIService;
+  aiService: AIService
 
   // FHE Service
-  fheService: FHEService | null;
+  fheService: FHEService | null
 
   // Mental Health Chat
-  mentalHealthChat: ReturnType<typeof createMentalHealthChat> | null;
-  mentalHealthAnalysisEnabled: boolean;
-  expertGuidanceEnabled: boolean;
+  mentalHealthChat: ReturnType<typeof createMentalHealthChat> | null
+  mentalHealthAnalysisEnabled: boolean
+  expertGuidanceEnabled: boolean
 
   // Enhanced State - User Preferences
-  preferences: UserPreferences;
+  preferences: UserPreferences
 
   // Enhanced State - UI State
-  uiState: UIState;
+  uiState: UIState
 
   // Enhanced State - Session State
-  sessionState: SessionState;
+  sessionState: SessionState
 
   // Enhanced State - Offline Queue
-  offlineQueue: OfflineAction[];
+  offlineQueue: OfflineAction[]
 
   // Enhanced State - Form Drafts
-  formDrafts: Record<string, { data: unknown; timestamp: number }>;
+  formDrafts: Record<string, { data: unknown; timestamp: number }>
 
   // Enhanced State - Usage Analytics
-  usageStats: UsageStats;
+  usageStats: UsageStats
 
   // Original Actions
-  setSecurityLevel: (level: "standard" | "hipaa" | "maximum") => void;
-  setEncryptionEnabled: (enabled: boolean) => void;
-  setFHEInitialized: (initialized: boolean) => void;
-  setAIService: (service: AIService) => void;
+  setSecurityLevel: (level: 'standard' | 'hipaa' | 'maximum') => void
+  setEncryptionEnabled: (enabled: boolean) => void
+  setFHEInitialized: (initialized: boolean) => void
+  setAIService: (service: AIService) => void
   initializeMentalHealthChat: () => ReturnType<
     typeof createMentalHealthChat
-  > | null;
+  > | null
   configureMentalHealthAnalysis: (
     enableAnalysis: boolean,
     useExpertGuidance: boolean,
-  ) => void;
+  ) => void
 
   // Enhanced Actions - User Preferences
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
-  setTheme: (theme: UserPreferences["theme"]) => void;
-  setLanguage: (language: string) => void;
+  updatePreferences: (preferences: Partial<UserPreferences>) => void
+  setTheme: (theme: UserPreferences['theme']) => void
+  setLanguage: (language: string) => void
   updateNotificationSettings: (
-    notifications: Partial<UserPreferences["notifications"]>,
-  ) => void;
+    notifications: Partial<UserPreferences['notifications']>,
+  ) => void
   updateAccessibilitySettings: (
-    accessibility: Partial<UserPreferences["accessibility"]>,
-  ) => void;
-  updatePrivacySettings: (privacy: Partial<UserPreferences["privacy"]>) => void;
+    accessibility: Partial<UserPreferences['accessibility']>,
+  ) => void
+  updatePrivacySettings: (privacy: Partial<UserPreferences['privacy']>) => void
 
   // Enhanced Actions - UI State
-  updateUIState: (uiState: Partial<UIState>) => void;
-  toggleSidebar: () => void;
-  setActiveTab: (tab: string) => void;
-  setLayout: (layout: UIState["layout"]) => void;
-  setViewMode: (viewMode: UIState["viewMode"]) => void;
-  updateFilters: (filters: Record<string, unknown>) => void;
-  setSortBy: (sortBy: string, sortOrder?: UIState["sortOrder"]) => void;
+  updateUIState: (uiState: Partial<UIState>) => void
+  toggleSidebar: () => void
+  setActiveTab: (tab: string) => void
+  setLayout: (layout: UIState['layout']) => void
+  setViewMode: (viewMode: UIState['viewMode']) => void
+  updateFilters: (filters: Record<string, unknown>) => void
+  setSortBy: (sortBy: string, sortOrder?: UIState['sortOrder']) => void
 
   // Enhanced Actions - Session State
-  updateSessionState: (sessionState: Partial<SessionState>) => void;
-  setCurrentRoute: (route: string) => void;
-  setCurrentWorkspace: (workspace: string | null) => void;
-  addOpenTab: (tab: string) => void;
-  removeOpenTab: (tab: string) => void;
-  addRecentItem: (item: string) => void;
-  addSearchHistory: (query: string) => void;
-  updateLastActivity: () => void;
+  updateSessionState: (sessionState: Partial<SessionState>) => void
+  setCurrentRoute: (route: string) => void
+  setCurrentWorkspace: (workspace: string | null) => void
+  addOpenTab: (tab: string) => void
+  removeOpenTab: (tab: string) => void
+  addRecentItem: (item: string) => void
+  addSearchHistory: (query: string) => void
+  updateLastActivity: () => void
 
   // Enhanced Actions - Offline Queue
-  queueOfflineAction: (type: string, payload: unknown) => void;
-  removeOfflineAction: (id: string) => void;
-  clearOfflineQueue: () => void;
+  queueOfflineAction: (type: string, payload: unknown) => void
+  removeOfflineAction: (id: string) => void
+  clearOfflineQueue: () => void
 
   // Enhanced Actions - Form Drafts
-  saveDraft: (formId: string, data: unknown) => void;
-  getDraft: (formId: string) => unknown | null;
-  clearDraft: (formId: string) => void;
-  clearAllDrafts: () => void;
+  saveDraft: (formId: string, data: unknown) => void
+  getDraft: (formId: string) => unknown | null
+  clearDraft: (formId: string) => void
+  clearAllDrafts: () => void
 
   // Enhanced Actions - Usage Analytics
-  trackFeatureUsage: (featureName: string) => void;
-  incrementSessionCount: () => void;
-  recordSessionEnd: () => void;
+  trackFeatureUsage: (featureName: string) => void
+  incrementSessionCount: () => void
+  recordSessionEnd: () => void
   updatePerformanceMetric: (
-    metric: keyof UsageStats["performanceMetrics"],
+    metric: keyof UsageStats['performanceMetrics'],
     value: number,
-  ) => void;
+  ) => void
 }
 
 // ============================================================================
@@ -174,8 +174,8 @@ interface StoreState {
 // ============================================================================
 
 const defaultPreferences: UserPreferences = {
-  theme: "dark",
-  language: "en",
+  theme: 'dark',
+  language: 'en',
   notifications: {
     email: true,
     push: true,
@@ -184,33 +184,33 @@ const defaultPreferences: UserPreferences = {
   accessibility: {
     reducedMotion: false,
     highContrast: false,
-    fontSize: "medium",
+    fontSize: 'medium',
   },
   privacy: {
     analytics: true,
     crashReporting: true,
     personalization: true,
   },
-};
+}
 
 const defaultUIState: UIState = {
   sidebarOpen: true,
-  activeTab: "dashboard",
-  layout: "default",
-  viewMode: "list",
+  activeTab: 'dashboard',
+  layout: 'default',
+  viewMode: 'list',
   filters: {},
-  sortBy: "date",
-  sortOrder: "desc",
-};
+  sortBy: 'date',
+  sortOrder: 'desc',
+}
 
 const defaultSessionState: SessionState = {
-  lastRoute: "/",
+  lastRoute: '/',
   currentWorkspace: null,
   openTabs: [],
   recentItems: [],
   searchHistory: [],
   lastActivity: Date.now(),
-};
+}
 
 const defaultUsageStats: UsageStats = {
   sessionCount: 0,
@@ -222,7 +222,7 @@ const defaultUsageStats: UsageStats = {
     errorCount: 0,
     crashCount: 0,
   },
-};
+}
 
 // ============================================================================
 // Store Implementation
@@ -234,7 +234,7 @@ export const useStore = create<StoreState>()(
       persist(
         (set, get) => ({
           // Original state
-          securityLevel: "hipaa",
+          securityLevel: 'hipaa',
           encryptionEnabled: true,
           fheInitialized: false,
           aiService: null as unknown as AIService,
@@ -266,11 +266,11 @@ export const useStore = create<StoreState>()(
                   enableAnalysis: get().mentalHealthAnalysisEnabled,
                   useExpertGuidance: get().expertGuidanceEnabled,
                 },
-              );
-              set({ mentalHealthChat });
-              return mentalHealthChat;
+              )
+              set({ mentalHealthChat })
+              return mentalHealthChat
             }
-            return null;
+            return null
           },
           configureMentalHealthAnalysis: (
             enableAnalysis: boolean,
@@ -279,14 +279,14 @@ export const useStore = create<StoreState>()(
             set({
               mentalHealthAnalysisEnabled: enableAnalysis,
               expertGuidanceEnabled: useExpertGuidance,
-            });
+            })
 
-            const { mentalHealthChat } = get();
+            const { mentalHealthChat } = get()
             if (mentalHealthChat) {
               mentalHealthChat.configure({
                 enableAnalysis,
                 useExpertGuidance,
-              });
+              })
             }
           },
 
@@ -362,7 +362,7 @@ export const useStore = create<StoreState>()(
                 filters: { ...state.uiState.filters, ...filters },
               },
             })),
-          setSortBy: (sortBy, sortOrder = "desc") =>
+          setSortBy: (sortBy, sortOrder = 'desc') =>
             set((state) => ({
               uiState: { ...state.uiState, sortBy, sortOrder },
             })),
@@ -389,17 +389,17 @@ export const useStore = create<StoreState>()(
             })),
           addOpenTab: (tab) =>
             set((state) => {
-              const openTabs = [...state.sessionState.openTabs];
+              const openTabs = [...state.sessionState.openTabs]
               if (!openTabs.includes(tab)) {
-                openTabs.push(tab);
+                openTabs.push(tab)
                 // Keep only last 10 tabs
                 if (openTabs.length > 10) {
-                  openTabs.shift();
+                  openTabs.shift()
                 }
               }
               return {
                 sessionState: { ...state.sessionState, openTabs },
-              };
+              }
             }),
           removeOpenTab: (tab) =>
             set((state) => ({
@@ -413,28 +413,28 @@ export const useStore = create<StoreState>()(
               const recentItems = [
                 item,
                 ...state.sessionState.recentItems.filter((i) => i !== item),
-              ];
+              ]
               // Keep only last 20 items
               if (recentItems.length > 20) {
-                recentItems.splice(20);
+                recentItems.splice(20)
               }
               return {
                 sessionState: { ...state.sessionState, recentItems },
-              };
+              }
             }),
           addSearchHistory: (query) =>
             set((state) => {
               const searchHistory = [
                 query,
                 ...state.sessionState.searchHistory.filter((q) => q !== query),
-              ];
+              ]
               // Keep only last 50 searches
               if (searchHistory.length > 50) {
-                searchHistory.splice(50);
+                searchHistory.splice(50)
               }
               return {
                 sessionState: { ...state.sessionState, searchHistory },
-              };
+              }
             }),
           updateLastActivity: () =>
             set((state) => ({
@@ -472,13 +472,13 @@ export const useStore = create<StoreState>()(
               },
             })),
           getDraft: (formId) => {
-            const draft = get().formDrafts[formId];
-            return draft?.data || null;
+            const draft = get().formDrafts[formId]
+            return draft?.data || null
           },
           clearDraft: (formId) =>
             set((state) => {
-              const { [formId]: _, ...rest } = state.formDrafts;
-              return { formDrafts: rest };
+              const { [formId]: _, ...rest } = state.formDrafts
+              return { formDrafts: rest }
             }),
           clearAllDrafts: () => set({ formDrafts: {} }),
 
@@ -503,10 +503,10 @@ export const useStore = create<StoreState>()(
             })),
           recordSessionEnd: () =>
             set((state) => {
-              const now = Date.now();
+              const now = Date.now()
               const sessionDuration = state.usageStats.lastSessionEnd
                 ? now - state.usageStats.lastSessionEnd
-                : 0;
+                : 0
 
               return {
                 usageStats: {
@@ -515,7 +515,7 @@ export const useStore = create<StoreState>()(
                   totalTimeSpent:
                     state.usageStats.totalTimeSpent + sessionDuration,
                 },
-              };
+              }
             }),
           updatePerformanceMetric: (metric, value) =>
             set((state) => ({
@@ -529,7 +529,7 @@ export const useStore = create<StoreState>()(
             })),
         }),
         {
-          name: "therapy-state-enhanced",
+          name: 'therapy-state-enhanced',
           partialize: (state) => ({
             // Security settings (persisted)
             securityLevel: state.securityLevel,
@@ -559,7 +559,7 @@ export const useStore = create<StoreState>()(
           migrate: (persistedState: unknown, version: number) => {
             // Handle migration from previous versions
             if (version < 2) {
-              logger.info("Migrating store state to version 2");
+              logger.info('Migrating store state to version 2')
               return {
                 ...(persistedState as Record<string, unknown>),
                 preferences: defaultPreferences,
@@ -567,15 +567,15 @@ export const useStore = create<StoreState>()(
                 sessionState: defaultSessionState,
                 formDrafts: {},
                 usageStats: defaultUsageStats,
-              };
+              }
             }
-            return persistedState;
+            return persistedState
           },
         },
       ),
     ),
   ),
-);
+)
 
 // ============================================================================
 // Store Subscriptions and Side Effects
@@ -585,65 +585,65 @@ export const useStore = create<StoreState>()(
 useStore.subscribe(
   (state) => state.preferences.theme,
   (theme) => {
-    if (typeof window !== "undefined") {
-      const root = document.documentElement;
-      root.classList.remove("light", "dark");
+    if (typeof window !== 'undefined') {
+      const root = document.documentElement
+      root.classList.remove('light', 'dark')
 
-      if (theme === "system") {
+      if (theme === 'system') {
         const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        root.classList.add(prefersDark ? "dark" : "light");
+          '(prefers-color-scheme: dark)',
+        ).matches
+        root.classList.add(prefersDark ? 'dark' : 'light')
       } else {
-        root.classList.add(theme);
+        root.classList.add(theme)
       }
     }
   },
-);
+)
 
 // Subscribe to accessibility changes
 useStore.subscribe(
   (state) => state.preferences.accessibility,
   (accessibility) => {
-    if (typeof window !== "undefined") {
-      const root = document.documentElement;
+    if (typeof window !== 'undefined') {
+      const root = document.documentElement
 
       // Apply reduced motion
       if (accessibility.reducedMotion) {
-        root.style.setProperty("--motion-reduce", "1");
+        root.style.setProperty('--motion-reduce', '1')
       } else {
-        root.style.removeProperty("--motion-reduce");
+        root.style.removeProperty('--motion-reduce')
       }
 
       // Apply high contrast
       if (accessibility.highContrast) {
-        root.classList.add("high-contrast");
+        root.classList.add('high-contrast')
       } else {
-        root.classList.remove("high-contrast");
+        root.classList.remove('high-contrast')
       }
 
       // Apply font size
-      root.classList.remove("font-small", "font-medium", "font-large");
-      root.classList.add(`font-${accessibility.fontSize}`);
+      root.classList.remove('font-small', 'font-medium', 'font-large')
+      root.classList.add(`font-${accessibility.fontSize}`)
     }
   },
-);
+)
 
 // Initialize session on store creation
-if (typeof window !== "undefined") {
+if (typeof window !== 'undefined') {
   // Increment session count on page load
-  useStore.getState().incrementSessionCount();
+  useStore.getState().incrementSessionCount()
 
   // Record session end on page unload
-  window.addEventListener("beforeunload", () => {
-    useStore.getState().recordSessionEnd();
-    useStore.getState().updateLastActivity();
-  });
+  window.addEventListener('beforeunload', () => {
+    useStore.getState().recordSessionEnd()
+    useStore.getState().updateLastActivity()
+  })
 
   // Update activity on user interaction
-  const updateActivity = () => useStore.getState().updateLastActivity();
-  window.addEventListener("mousedown", updateActivity);
-  window.addEventListener("keydown", updateActivity);
-  window.addEventListener("scroll", updateActivity);
-  window.addEventListener("touchstart", updateActivity);
+  const updateActivity = () => useStore.getState().updateLastActivity()
+  window.addEventListener('mousedown', updateActivity)
+  window.addEventListener('keydown', updateActivity)
+  window.addEventListener('scroll', updateActivity)
+  window.addEventListener('touchstart', updateActivity)
 }

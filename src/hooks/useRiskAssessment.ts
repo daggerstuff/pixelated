@@ -1,16 +1,16 @@
-import { useCallback } from "react";
-import { useAIService } from "./useAIService";
-import type { EmotionAnalysis } from "./useEmotionDetection";
+import { useCallback } from 'react'
+import { useAIService } from './useAIService'
+import type { EmotionAnalysis } from './useEmotionDetection'
 
 export type RiskAssessment = {
-  category: "low" | "medium" | "high";
-  factors: string[];
-  requiresExpert: boolean;
-  confidence: number;
-};
+  category: 'low' | 'medium' | 'high'
+  factors: string[]
+  requiresExpert: boolean
+  confidence: number
+}
 
 export const useRiskAssessment = () => {
-  const { getAIResponse } = useAIService();
+  const { getAIResponse } = useAIService()
 
   const assessRisk = useCallback(
     async (
@@ -24,52 +24,47 @@ export const useRiskAssessment = () => {
       - requiresExpert: Boolean indicating if professional intervention is recommended
       - confidence: Number from 0-1 indicating confidence in assessment
 
-      ${emotions ? `Detected emotions: Primary emotion is ${emotions.primaryEmotion} with intensity ${emotions.intensity}. Secondary emotions include: ${emotions.secondaryEmotions.join(", ")}.` : ""}
+      ${emotions ? `Detected emotions: Primary emotion is ${emotions.primaryEmotion} with intensity ${emotions.intensity}. Secondary emotions include: ${emotions.secondaryEmotions.join(', ')}.` : ''}
 
-      Message: "${content}"`;
+      Message: "${content}"`
 
-        const response = await getAIResponse(prompt);
-        let analysisText = "";
+        const response = await getAIResponse(prompt)
+        let analysisText = ''
 
         if (response instanceof ReadableStream) {
-          const reader = response.getReader();
+          const reader = response.getReader()
           while (true) {
-            const { done, value } = await reader.read();
+            const { done, value } = await reader.read()
             if (done) {
-              break;
+              break
             }
-            analysisText += new TextDecoder().decode(value);
+            analysisText += new TextDecoder().decode(value)
           }
         } else {
-          analysisText = response;
+          analysisText = response
         }
-        const parsed = JSON.parse(analysisText) as {
-          category?: string;
-          factors?: string[];
-          requiresExpert?: boolean;
-          confidence?: number;
-        };
+        const parsed = JSON.parse(analysisText) as { category?: string; factors?: string[]; requiresExpert?: boolean; confidence?: number }
 
         return {
-          category: parsed.category || "low",
+          category: parsed.category || 'low',
           factors: parsed.factors || [],
           requiresExpert: parsed.requiresExpert || false,
           confidence: parsed.confidence || 0.5,
-        };
+        }
       } catch (error: unknown) {
-        console.error("Error assessing risk:", error);
+        console.error('Error assessing risk:', error)
         return {
-          category: "low",
+          category: 'low',
           factors: [],
           requiresExpert: false,
           confidence: 0.5,
-        };
+        }
       }
     },
     [getAIResponse],
-  );
+  )
 
-  return { assessRisk };
-};
+  return { assessRisk }
+}
 
-export default useRiskAssessment;
+export default useRiskAssessment

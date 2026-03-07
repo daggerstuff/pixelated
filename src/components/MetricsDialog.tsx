@@ -1,8 +1,8 @@
-import { useAnonymizedMetrics } from "@/simulator";
+import { useAnonymizedMetrics } from '@/simulator'
 
 interface MetricsDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 /**
@@ -10,10 +10,10 @@ interface MetricsDialogProps {
  * Only shows data that has been anonymized and collected with user consent
  */
 export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
-  const metrics = useAnonymizedMetrics();
+  const metrics = useAnonymizedMetrics()
 
   if (!isOpen) {
-    return null;
+    return null
   }
 
   return (
@@ -104,5 +104,5 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

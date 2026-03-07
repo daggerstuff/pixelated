@@ -5,7 +5,7 @@
  * Use this to consistently track request counts, response times, and errors.
  */
 
-import { apiMetrics } from "@/lib/sentry/utils";
+import { apiMetrics } from '@/lib/sentry/utils'
 
 /**
  * Wraps an API route handler with automatic metrics collection
@@ -22,32 +22,31 @@ export function withMetrics<T extends (...args: any[]) => Promise<Response>>(
   handler: T,
 ): T {
   return (async (...args: Parameters<T>) => {
-    const startTime = Date.now();
-    let statusCode = 500;
-    let errorType: string | undefined;
+    const startTime = Date.now()
+    let statusCode = 500
+    let errorType: string | undefined
 
     try {
-      const response = await handler(...args);
-      statusCode = response.status;
+      const response = await handler(...args)
+      statusCode = response.status
 
       // Record metrics
-      const durationMs = Date.now() - startTime;
-      apiMetrics.request(endpoint, "POST", statusCode);
-      apiMetrics.responseTime(endpoint, durationMs, "POST");
+      const durationMs = Date.now() - startTime
+      apiMetrics.request(endpoint, 'POST', statusCode)
+      apiMetrics.responseTime(endpoint, durationMs, 'POST')
 
-      return response;
+      return response
     } catch (error) {
-      errorType =
-        error instanceof Error ? error.constructor.name : "UnknownError";
-      statusCode = 500;
+      errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+      statusCode = 500
 
       // Record error metrics
-      apiMetrics.error(endpoint, errorType);
-      apiMetrics.request(endpoint, "POST", statusCode);
+      apiMetrics.error(endpoint, errorType)
+      apiMetrics.request(endpoint, 'POST', statusCode)
 
-      throw error;
+      throw error
     }
-  }) as T;
+  }) as T
 }
 
 /**
@@ -60,12 +59,12 @@ export function trackApiRequest(
   statusCode: number,
   durationMs: number,
 ): void {
-  apiMetrics.request(endpoint, method, statusCode);
-  apiMetrics.responseTime(endpoint, durationMs, method);
+  apiMetrics.request(endpoint, method, statusCode)
+  apiMetrics.responseTime(endpoint, durationMs, method)
 
   if (statusCode >= 400) {
-    const errorType = statusCode >= 500 ? "ServerError" : "ClientError";
-    apiMetrics.error(endpoint, errorType);
+    const errorType = statusCode >= 500 ? 'ServerError' : 'ClientError'
+    apiMetrics.error(endpoint, errorType)
   }
 }
 
@@ -75,8 +74,8 @@ export function trackApiRequest(
 export function trackApiError(
   endpoint: string,
   errorType: string,
-  method: string = "POST",
+  method: string = 'POST',
 ): void {
-  apiMetrics.error(endpoint, errorType);
-  apiMetrics.request(endpoint, method, 500);
+  apiMetrics.error(endpoint, errorType)
+  apiMetrics.request(endpoint, method, 500)
 }

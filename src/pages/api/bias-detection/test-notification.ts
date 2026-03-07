@@ -1,67 +1,67 @@
-import { BiasDetectionEngine } from "@/lib/ai/bias-detection/BiasDetectionEngine";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-import { isAuthenticated } from "@/lib/auth";
+import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { isAuthenticated } from '@/lib/auth'
 
-const logger = createBuildSafeLogger("bias-detection-api");
-const biasDetectionEngine = new BiasDetectionEngine();
+const logger = createBuildSafeLogger('bias-detection-api')
+const biasDetectionEngine = new BiasDetectionEngine()
 
 export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request);
-    if (!authResult?.["authenticated"]) {
+    const authResult = await isAuthenticated(request)
+    if (!authResult?.['authenticated']) {
       return new Response(
         JSON.stringify({
-          error: "Unauthorized",
-          message: "You must be authenticated to access this endpoint",
+          error: 'Unauthorized',
+          message: 'You must be authenticated to access this endpoint',
         }),
         {
           status: 401,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Check admin permission
-    if (!authResult?.["user"]?.["isAdmin"]) {
+    if (!authResult?.['user']?.['isAdmin']) {
       return new Response(
         JSON.stringify({
-          error: "Forbidden",
-          message: "You do not have permission to send test notifications",
+          error: 'Forbidden',
+          message: 'You do not have permission to send test notifications',
         }),
         {
           status: 403,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Parse request body
-    const body = await request.json();
-    const { notificationType, testData } = body;
+    const body = await request.json()
+    const { notificationType, testData } = body
 
     if (!notificationType || !testData) {
       return new Response(
         JSON.stringify({
-          error: "Bad Request",
-          message: "notificationType and testData are required",
+          error: 'Bad Request',
+          message: 'notificationType and testData are required',
         }),
         {
           status: 400,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         },
-      );
+      )
     }
 
     // Initialize engine if needed
     if (!biasDetectionEngine.getInitializationStatus()) {
-      await biasDetectionEngine.initialize();
+      await biasDetectionEngine.initialize()
     }
 
     // Send test notification
@@ -69,31 +69,31 @@ export const POST = async ({ request }: APIContext) => {
       notificationType,
       testData,
       {
-        userId: authResult?.["user"]?.["id"],
-        email: authResult?.["user"]?.["email"],
+        userId: authResult?.['user']?.['id'],
+        email: authResult?.['user']?.['email'],
       },
-    );
+    )
 
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-    });
+    })
   } catch (error: unknown) {
-    logger.error("Error sending test notification:", error);
+    logger.error('Error sending test notification:', error)
 
     return new Response(
       JSON.stringify({
-        error: "Internal Server Error",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Internal Server Error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       },
-    );
+    )
   }
-};
+}

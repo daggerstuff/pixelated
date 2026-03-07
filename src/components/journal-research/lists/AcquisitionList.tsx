@@ -1,29 +1,22 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react'
 import type {
   Acquisition,
   AcquisitionList as AcquisitionListType,
-} from "@/lib/api/journal-research/types";
-import { Table } from "@/components/ui/table";
-import type {
-  TableColumn,
-  TableState,
-  TableDataSource,
-} from "@/components/ui/table-types";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import {
-  useIntegrateDataset,
-  useTrainingStatus,
-} from "@/lib/hooks/journal-research/useTraining";
-import { Button } from "@/components/ui/button/button";
-import { CheckCircle2, Loader2, Play } from "lucide-react";
+} from '@/lib/api/journal-research/types'
+import { Table } from '@/components/ui/table'
+import type { TableColumn, TableState, TableDataSource } from '@/components/ui/table-types'
+import { format } from 'date-fns'
+import { cn } from '@/lib/utils'
+import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
+import { Button } from '@/components/ui/button/button'
+import { CheckCircle2, Loader2, Play } from 'lucide-react'
 
 export interface AcquisitionListProps {
-  acquisitions: AcquisitionListType;
-  onAcquisitionClick?: (acquisition: Acquisition) => void;
-  isLoading?: boolean;
-  className?: string;
-  sessionId?: string | null;
+  acquisitions: AcquisitionListType
+  onAcquisitionClick?: (acquisition: Acquisition) => void
+  isLoading?: boolean
+  className?: string
+  sessionId?: string | null
 }
 
 export function AcquisitionList({
@@ -33,110 +26,103 @@ export function AcquisitionList({
   className,
   sessionId,
 }: AcquisitionListProps) {
-  const integrateMutation = useIntegrateDataset(sessionId ?? "");
-  const { data: trainingStatus } = useTrainingStatus(
-    sessionId ?? "",
-    !!sessionId,
-  );
+  const integrateMutation = useIntegrateDataset(sessionId ?? '')
+  const { data: trainingStatus } = useTrainingStatus(sessionId ?? '', !!sessionId)
 
   // Create a map of integration statuses
   const integrationStatusMap = useMemo(() => {
-    const map = new Map<string, boolean>();
+    const map = new Map<string, boolean>()
     if (trainingStatus?.datasets) {
       trainingStatus.datasets.forEach((ds) => {
-        map.set(ds.source_id, ds.integrated);
-      });
+        map.set(ds.source_id, ds.integrated)
+      })
     }
-    return map;
-  }, [trainingStatus]);
+    return map
+  }, [trainingStatus])
   const [tableState, setTableState] = useState<TableState>({
     currentPage: acquisitions.page ?? 1,
     pageSize: acquisitions.pageSize ?? 10,
-  });
+  })
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
 
   const filteredAndSortedAcquisitions = useMemo(() => {
-    let filtered = acquisitions.items;
+    let filtered = acquisitions.items
 
     // Apply search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (acq) =>
           acq.acquisitionId.toLowerCase().includes(term) ||
           acq.sourceId.toLowerCase().includes(term) ||
           acq.status.toLowerCase().includes(term),
-      );
+      )
     }
 
     // Apply status filter
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((acq) => acq.status === statusFilter);
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((acq) => acq.status === statusFilter)
     }
 
     // Apply sorting
     if (tableState.sort) {
-      const { sortBy, direction } = tableState.sort;
+      const { sortBy, direction } = tableState.sort
       filtered = [...filtered].sort((a, b) => {
-        let aValue: string | number | Date | null;
-        let bValue: string | number | Date | null;
+        let aValue: string | number | Date | null
+        let bValue: string | number | Date | null
 
         switch (sortBy) {
-          case "status":
-            aValue = a.status;
-            bValue = b.status;
-            break;
-          case "acquiredDate":
-            aValue = a.acquiredDate;
-            bValue = b.acquiredDate;
-            break;
-          case "downloadProgress":
-            aValue = a.downloadProgress ?? 0;
-            bValue = b.downloadProgress ?? 0;
-            break;
-          case "fileSizeMb":
-            aValue = a.fileSizeMb ?? 0;
-            bValue = b.fileSizeMb ?? 0;
-            break;
+          case 'status':
+            aValue = a.status
+            bValue = b.status
+            break
+          case 'acquiredDate':
+            aValue = a.acquiredDate
+            bValue = b.acquiredDate
+            break
+          case 'downloadProgress':
+            aValue = a.downloadProgress ?? 0
+            bValue = b.downloadProgress ?? 0
+            break
+          case 'fileSizeMb':
+            aValue = a.fileSizeMb ?? 0
+            bValue = b.fileSizeMb ?? 0
+            break
           default:
-            return 0;
+            return 0
         }
 
-        if (aValue === null) return 1;
-        if (bValue === null) return -1;
-        if (aValue < bValue) return direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
+        if (aValue === null) return 1
+        if (bValue === null) return -1
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1
+        return 0
+      })
     }
 
-    return filtered;
-  }, [acquisitions.items, searchTerm, statusFilter, tableState.sort]);
+    return filtered
+  }, [acquisitions.items, searchTerm, statusFilter, tableState.sort])
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      completed:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-      "in-progress":
-        "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-      pending:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-      approved:
-        "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-      failed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-    };
+      completed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'in-progress': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      approved: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+    }
     return (
       colors[status.toLowerCase()] ??
-      "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-    );
-  };
+      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    )
+  }
 
   const columns: TableColumn<Acquisition & { id: string }>[] = [
     {
-      id: "acquisitionId",
-      header: "Acquisition ID",
+      id: 'acquisitionId',
+      header: 'Acquisition ID',
       accessor: (row) => (
         <button
           onClick={() => onAcquisitionClick?.(row)}
@@ -148,32 +134,31 @@ export function AcquisitionList({
       sortable: false,
     },
     {
-      id: "sourceId",
-      header: "Source ID",
+      id: 'sourceId',
+      header: 'Source ID',
       accessor: (row) => (
         <span className="font-mono text-sm">{row.sourceId.slice(0, 8)}...</span>
       ),
       hideMobile: true,
     },
     {
-      id: "status",
-      header: "Status",
+      id: 'status',
+      header: 'Status',
       accessor: (row) => (
         <span
           className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${getStatusColor(row.status)}`}
         >
-          {row.status.replace("-", " ")}
+          {row.status.replace('-', ' ')}
         </span>
       ),
       sortable: true,
     },
     {
-      id: "downloadProgress",
-      header: "Progress",
+      id: 'downloadProgress',
+      header: 'Progress',
       accessor: (row) => {
-        const progress = row.downloadProgress ?? 0;
-        if (progress === 0 && row.status !== "in-progress")
-          return <span>-</span>;
+        const progress = row.downloadProgress ?? 0
+        if (progress === 0 && row.status !== 'in-progress') return <span>-</span>
         return (
           <div className="flex items-center gap-2">
             <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
@@ -184,14 +169,14 @@ export function AcquisitionList({
             </div>
             <span className="text-sm">{Math.round(progress)}%</span>
           </div>
-        );
+        )
       },
       sortable: true,
       hideMobile: true,
     },
     {
-      id: "fileSizeMb",
-      header: "Size",
+      id: 'fileSizeMb',
+      header: 'Size',
       accessor: (row) =>
         row.fileSizeMb ? (
           <span className="text-sm">
@@ -203,15 +188,15 @@ export function AcquisitionList({
           <span className="text-muted-foreground">-</span>
         ),
       sortable: true,
-      align: "right",
+      align: 'right',
       hideMobile: true,
     },
     {
-      id: "acquiredDate",
-      header: "Date",
+      id: 'acquiredDate',
+      header: 'Date',
       accessor: (row) =>
         row.acquiredDate ? (
-          format(row.acquiredDate, "MMM d, yyyy")
+          format(row.acquiredDate, 'MMM d, yyyy')
         ) : (
           <span className="text-muted-foreground">-</span>
         ),
@@ -219,11 +204,11 @@ export function AcquisitionList({
       hideMobile: true,
     },
     {
-      id: "trainingIntegration",
-      header: "Training Pipeline",
+      id: 'trainingIntegration',
+      header: 'Training Pipeline',
       accessor: (row) => {
-        const isIntegrated = integrationStatusMap.get(row.sourceId) ?? false;
-        const isIntegrating = integrateMutation.isPending;
+        const isIntegrated = integrationStatusMap.get(row.sourceId) ?? false
+        const isIntegrating = integrateMutation.isPending
 
         if (isIntegrated) {
           return (
@@ -231,7 +216,7 @@ export function AcquisitionList({
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <span className="text-xs text-green-600">Integrated</span>
             </div>
-          );
+          )
         }
 
         if (isIntegrating) {
@@ -240,32 +225,32 @@ export function AcquisitionList({
               <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
               <span className="text-xs text-blue-600">Integrating...</span>
             </div>
-          );
+          )
         }
 
-        if (row.status === "completed" && sessionId) {
+        if (row.status === 'completed' && sessionId) {
           return (
             <Button
               size="sm"
               variant="outline"
               onClick={(e) => {
-                e.stopPropagation();
-                integrateMutation.mutate({ sourceId: row.sourceId });
+                e.stopPropagation()
+                integrateMutation.mutate({ sourceId: row.sourceId })
               }}
               className="h-7 text-xs"
             >
               <Play className="h-3 w-3 mr-1" />
               Integrate
             </Button>
-          );
+          )
         }
 
-        return <span className="text-xs text-muted-foreground">-</span>;
+        return <span className="text-xs text-muted-foreground">-</span>
       },
       sortable: false,
-      align: "center",
+      align: 'center',
     },
-  ];
+  ]
 
   const tableDataSource: TableDataSource<Acquisition & { id: string }> = {
     data: filteredAndSortedAcquisitions.map((acquisition) => ({
@@ -274,12 +259,14 @@ export function AcquisitionList({
     })),
     totalCount: filteredAndSortedAcquisitions.length,
     loading: isLoading,
-  };
+  }
 
-  const statuses = Array.from(new Set(acquisitions.items.map((a) => a.status)));
+  const statuses = Array.from(
+    new Set(acquisitions.items.map((a) => a.status)),
+  )
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-2">
           <input
@@ -297,13 +284,13 @@ export function AcquisitionList({
             <option value="all">All Statuses</option>
             {statuses.map((status) => (
               <option key={status} value={status}>
-                {status.replace("-", " ")}
+                {status.replace('-', ' ')}
               </option>
             ))}
           </select>
         </div>
         <div className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedAcquisitions.length} of {acquisitions.total}{" "}
+          Showing {filteredAndSortedAcquisitions.length} of {acquisitions.total}{' '}
           acquisitions
         </div>
       </div>
@@ -318,5 +305,5 @@ export function AcquisitionList({
         bordered
       />
     </div>
-  );
+  )
 }

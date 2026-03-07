@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { generateConsentForm } from "@/simulator/utils/privacy";
+import { useState } from 'react'
+import { generateConsentForm } from '@/simulator/utils/privacy'
 
 interface ConsentDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConsent: (consent: boolean) => void;
+  isOpen: boolean
+  onClose: () => void
+  onConsent: (consent: boolean) => void
 }
 
 /**
@@ -16,22 +16,22 @@ export function ConsentDialog({
   onClose,
   onConsent,
 }: ConsentDialogProps) {
-  const [checked, setChecked] = useState<boolean>(false);
-  const { consentText, privacyPoints } = generateConsentForm();
+  const [checked, setChecked] = useState<boolean>(false)
+  const { consentText, privacyPoints } = generateConsentForm()
 
   const handleConsentClick = () => {
-    onConsent(true);
-    onClose();
-  };
+    onConsent(true)
+    onClose()
+  }
 
   const handleDeclineClick = () => {
-    onConsent(false);
-    onClose();
-  };
+    onConsent(false)
+    onClose()
+  }
 
   // If dialog is not open, don't render anything
   if (!isOpen) {
-    return null;
+    return null
   }
 
   return (
@@ -143,8 +143,8 @@ export function ConsentDialog({
             disabled={!checked}
             className={`px-4 py-2 text-sm font-medium text-white rounded-md ${
               checked
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-blue-300 cursor-not-allowed"
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-blue-300 cursor-not-allowed'
             }`}
           >
             I Consent
@@ -152,5 +152,5 @@ export function ConsentDialog({
         </div>
       </div>
     </div>
-  );
+  )
 }

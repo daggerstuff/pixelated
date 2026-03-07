@@ -38,6 +38,7 @@ async function testSimpleAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Simple auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

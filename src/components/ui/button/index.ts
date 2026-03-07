@@ -1,11 +1,11 @@
-export { Button, buttonVariants } from "./button";
+export { Button, buttonVariants } from './button'
 
 export type {
   ButtonProps,
   ButtonVariant,
   ButtonSize,
   ButtonBaseProps,
-} from "./button-types";
+} from './button-types'
 
 export {
   BUTTON_VARIANTS,
@@ -14,4 +14,4 @@ export {
   isLoadingButton,
   getAriaProps,
   getButtonClassName,
-} from "./button-types";
+} from './button-types'

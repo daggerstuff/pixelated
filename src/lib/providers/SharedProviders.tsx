@@ -1,32 +1,32 @@
-import type { ReactNode } from "react";
-import React from "react";
-import { AnalyticsProvider } from "./AnalyticsProvider";
+import type { ReactNode } from 'react'
+import React from 'react'
+import { AnalyticsProvider } from './AnalyticsProvider'
 
-import { ErrorBoundary } from "./ErrorBoundary";
-import { NotificationProvider } from "./NotificationProvider";
-import { SecurityProvider } from "./SecurityProvider";
-import { ThemeProvider } from "./ThemeProvider";
+import { ErrorBoundary } from './ErrorBoundary'
+import { NotificationProvider } from './NotificationProvider'
+import { SecurityProvider } from './SecurityProvider'
+import { ThemeProvider } from './ThemeProvider'
 
 interface SharedProvidersProps {
-  children: ReactNode;
+  children: ReactNode
   /**
    * Initial state for providers that support hydration
    */
   initialState?: {
     theme?: {
-      theme?: "light" | "dark";
-      systemPreference?: boolean;
-    };
-  };
+      theme?: 'light' | 'dark'
+      systemPreference?: boolean
+    }
+  }
   /**
    * Configuration options for providers
    */
   config?: {
-    enableAnalytics?: boolean;
-    enableNotifications?: boolean;
-    securityLevel?: "standard" | "hipaa" | "maximum";
-  };
-  onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+    enableAnalytics?: boolean
+    enableNotifications?: boolean
+    securityLevel?: 'standard' | 'hipaa' | 'maximum'
+  }
+  onError?: (error: Error, errorInfo: React.ErrorInfo) => void
 }
 
 /**
@@ -42,8 +42,8 @@ export function SharedProviders({
   const {
     enableAnalytics = true,
     enableNotifications = true,
-    securityLevel = "hipaa",
-  } = config;
+    securityLevel = 'hipaa',
+  } = config
 
   return (
     <ErrorBoundary onError={onError}>
@@ -52,12 +52,14 @@ export function SharedProviders({
           {enableNotifications && (
             <NotificationProvider>{children}</NotificationProvider>
           )}
-          {enableAnalytics && <AnalyticsProvider>{children}</AnalyticsProvider>}
+          {enableAnalytics && (
+            <AnalyticsProvider>{children}</AnalyticsProvider>
+          )}
           {!enableAnalytics && !enableNotifications && children}
         </SecurityProvider>
       </ThemeProvider>
     </ErrorBoundary>
-  );
+  )
 }
 
 /**
@@ -65,13 +67,13 @@ export function SharedProviders({
  */
 export function withSharedProviders<T extends object>(
   Component: React.ComponentType<T>,
-  options: Omit<SharedProvidersProps, "children"> = {},
+  options: Omit<SharedProvidersProps, 'children'> = {},
 ): React.FC<T> {
   return function WithSharedProvidersWrapper(props: T) {
     return (
       <SharedProviders {...options}>
         <Component {...props} />
       </SharedProviders>
-    );
-  };
+    )
+  }
 }

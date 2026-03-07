@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
-import { useDocumentation } from "@/lib/documentation/useDocumentation";
-import type { EHRExportOptions } from "@/lib/documentation/ehrIntegration";
+import { useState, useEffect, useMemo } from 'react'
+import { useDocumentation } from '@/lib/documentation/useDocumentation'
+import type { EHRExportOptions } from '@/lib/documentation/ehrIntegration'
 
 interface ExportToEHRProps {
-  sessionId: string;
-  patientId: string;
-  providerId: string;
-  encounterId?: string;
+  sessionId: string
+  patientId: string
+  providerId: string
+  encounterId?: string
 }
 
 export function ExportToEHR({
@@ -15,22 +15,21 @@ export function ExportToEHR({
   providerId,
   encounterId,
 }: ExportToEHRProps) {
-  const { exportToEHR, isExporting, exportResult } =
-    useDocumentation(sessionId);
-  const [exportFormat, setExportFormat] = useState<"fhir" | "ccda" | "pdf">(
-    "fhir",
-  );
-  const [includeEmotionData, setIncludeEmotionData] = useState(true);
-  const [showSuccessDetails, setShowSuccessDetails] = useState(false);
+  const { exportToEHR, isExporting, exportResult } = useDocumentation(sessionId)
+  const [exportFormat, setExportFormat] = useState<'fhir' | 'ccda' | 'pdf'>(
+    'fhir',
+  )
+  const [includeEmotionData, setIncludeEmotionData] = useState(true)
+  const [showSuccessDetails, setShowSuccessDetails] = useState(false)
 
   // Reset success details when export result changes
   useEffect(() => {
     if (exportResult && exportResult.success) {
-      setShowSuccessDetails(true);
+      setShowSuccessDetails(true)
     } else {
-      setShowSuccessDetails(false);
+      setShowSuccessDetails(false)
     }
-  }, [exportResult]);
+  }, [exportResult])
 
   // Export options memo
   const exportOptions = useMemo<EHRExportOptions>(() => {
@@ -39,16 +38,16 @@ export function ExportToEHR({
       patientId,
       providerId,
       includeEmotionData,
-    };
+    }
     return encounterId !== undefined
       ? { ...baseOptions, encounterId }
-      : baseOptions;
-  }, [exportFormat, patientId, providerId, encounterId, includeEmotionData]);
+      : baseOptions
+  }, [exportFormat, patientId, providerId, encounterId, includeEmotionData])
 
   // Handle export
   const handleExport = async () => {
-    await exportToEHR(exportOptions);
-  };
+    await exportToEHR(exportOptions)
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
@@ -69,7 +68,7 @@ export function ExportToEHR({
             className="w-full rounded-md border border-gray-300 dark:border-gray-600 py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             value={exportFormat}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setExportFormat(e.target.value as "fhir" | "ccda" | "pdf")
+              setExportFormat(e.target.value as 'fhir' | 'ccda' | 'pdf')
             }
             disabled={isExporting}
           >
@@ -82,11 +81,11 @@ export function ExportToEHR({
             <option value="pdf">PDF Document</option>
           </select>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {exportFormat === "fhir"
-              ? "Standard format for exchanging healthcare information electronically."
-              : exportFormat === "ccda"
-                ? "Clinical document standard for patient record exchange."
-                : "Portable document format for easy viewing."}
+            {exportFormat === 'fhir'
+              ? 'Standard format for exchanging healthcare information electronically.'
+              : exportFormat === 'ccda'
+                ? 'Clinical document standard for patient record exchange.'
+                : 'Portable document format for easy viewing.'}
           </p>
         </div>
 
@@ -116,21 +115,21 @@ export function ExportToEHR({
           type="button"
           className={`py-2 px-4 rounded-md text-white font-medium ${
             isExporting
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
           }`}
           onClick={handleExport}
           disabled={isExporting}
         >
-          {isExporting ? "Exporting..." : "Export Documentation"}
+          {isExporting ? 'Exporting...' : 'Export Documentation'}
         </button>
 
         {exportResult && (
           <div
             className={`rounded-md p-4 ${
               exportResult.success
-                ? "bg-green-50 dark:bg-green-900/30"
-                : "bg-red-50 dark:bg-red-900/30"
+                ? 'bg-green-50 dark:bg-green-900/30'
+                : 'bg-red-50 dark:bg-red-900/30'
             }`}
           >
             <div className="flex">
@@ -165,13 +164,13 @@ export function ExportToEHR({
                 <h3
                   className={`text-sm font-medium ${
                     exportResult.success
-                      ? "text-green-800 dark:text-green-200"
-                      : "text-red-800 dark:text-red-200"
+                      ? 'text-green-800 dark:text-green-200'
+                      : 'text-red-800 dark:text-red-200'
                   }`}
                 >
                   {exportResult.success
-                    ? "Documentation exported successfully"
-                    : "Failed to export documentation"}
+                    ? 'Documentation exported successfully'
+                    : 'Failed to export documentation'}
                 </h3>
                 {exportResult.error && (
                   <div className="mt-2 text-sm text-red-700 dark:text-red-300">
@@ -184,15 +183,15 @@ export function ExportToEHR({
                     <p className="text-sm text-green-700 dark:text-green-300">
                       Format: {exportFormat.toUpperCase()}
                     </p>
-                    {typeof exportResult === "object" &&
-                      "documentId" in exportResult &&
+                    {typeof exportResult === 'object' &&
+                      'documentId' in exportResult &&
                       exportResult.documentId && (
                         <p className="text-sm text-green-700 dark:text-green-300">
                           Document ID: {exportResult.documentId as string}
                         </p>
                       )}
-                    {typeof exportResult === "object" &&
-                      "documentUrl" in exportResult &&
+                    {typeof exportResult === 'object' &&
+                      'documentUrl' in exportResult &&
                       exportResult.documentUrl && (
                         <div className="mt-1">
                           <a
@@ -213,5 +212,5 @@ export function ExportToEHR({
         )}
       </div>
     </div>
-  );
+  )
 }

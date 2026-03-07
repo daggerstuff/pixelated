@@ -1,15 +1,10 @@
-import { JournalResearchQueryProvider } from "@/lib/api/journal-research/react-query";
-import { ReportGenerator, ReportViewer } from "../features";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
+import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
+import { ReportGenerator, ReportViewer } from '../features'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 
 export interface ReportsPageProps {
-  sessionId?: string | null;
-  reportId?: string | null;
+  sessionId?: string | null
+  reportId?: string | null
 }
 
 export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
@@ -28,5 +23,5 @@ export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
         <ReportGenerator sessionId={sessionId ?? null} />
       )}
     </JournalResearchQueryProvider>
-  );
+  )
 }
