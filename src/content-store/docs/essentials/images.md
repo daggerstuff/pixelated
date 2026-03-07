@@ -1,14 +1,13 @@
 ---
-title: 'Images and Embeds'
-description: 'Add image, video, and other HTML elements'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Images and Embeds"
+description: "Add image, video, and other HTML elements"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
-icon: 'image'
+icon: "image"
 ---
-
 
 ## Image
 
@@ -27,6 +26,7 @@ Note that the image file size must be less than 5MB. Otherwise, we recommend hos
 To get more customizability with images, you can also use [embeds](/writing-content/embed) to add images
 
 ```html
+
 ```
 
 ## Embeds and HTML elements
@@ -42,14 +42,12 @@ To get more customizability with images, you can also use [embeds](/writing-cont
   style={{ width: '100%', borderRadius: '0.5rem' }}
 ></iframe>
 
-
-
 Mintlify supports [HTML tags in Markdown](https://www.markdownguide.org/basic-syntax/#html). This is helpful if you prefer HTML tags to Markdown syntax, and lets you create documentation with infinite flexibility.
-
 
 ### iFrames
 
 Loads another HTML page within the document. Most commonly used for embedding videos.
 
 ```html
+
 ```

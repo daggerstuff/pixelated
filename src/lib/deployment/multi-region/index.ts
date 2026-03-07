@@ -3,16 +3,16 @@
  * Comprehensive multi-region deployment system for global scale
  */
 
-export { MultiRegionDeploymentManager } from './MultiRegionDeploymentManager'
-export { CloudProviderManager } from './CloudProviderManager'
-export { EdgeComputingManager } from './EdgeComputingManager'
-export { GlobalTrafficRoutingManager } from './GlobalTrafficRoutingManager'
-export { CrossRegionDataSyncManager } from './CrossRegionDataSyncManager'
-export { AutomatedFailoverOrchestrator } from './AutomatedFailoverOrchestrator'
-export { ServiceDiscoveryManager } from './ServiceDiscoveryManager'
-export { ConfigurationManager } from './ConfigurationManager'
-export { HealthMonitor } from './HealthMonitor'
-export { DeploymentOrchestrator } from './DeploymentOrchestrator'
+export { MultiRegionDeploymentManager } from "./MultiRegionDeploymentManager";
+export { CloudProviderManager } from "./CloudProviderManager";
+export { EdgeComputingManager } from "./EdgeComputingManager";
+export { GlobalTrafficRoutingManager } from "./GlobalTrafficRoutingManager";
+export { CrossRegionDataSyncManager } from "./CrossRegionDataSyncManager";
+export { AutomatedFailoverOrchestrator } from "./AutomatedFailoverOrchestrator";
+export { ServiceDiscoveryManager } from "./ServiceDiscoveryManager";
+export { ConfigurationManager } from "./ConfigurationManager";
+export { HealthMonitor } from "./HealthMonitor";
+export { DeploymentOrchestrator } from "./DeploymentOrchestrator";
 
 // Types
 export type {
@@ -20,9 +20,12 @@ export type {
   FailoverEvent,
   CircuitBreakerConfig,
   RegionMetrics,
-} from './AutomatedFailoverOrchestrator'
+} from "./AutomatedFailoverOrchestrator";
 
-export type { SyncStatus, DataDistribution } from './CrossRegionDataSyncManager'
+export type {
+  SyncStatus,
+  DataDistribution,
+} from "./CrossRegionDataSyncManager";
 
 export type {
   ServiceRegistration,
@@ -30,43 +33,43 @@ export type {
   DiscoveryOptions,
   ServiceStats,
   LoadBalancerConfig,
-} from './ServiceDiscoveryManager'
+} from "./ServiceDiscoveryManager";
 
 export type {
   DeploymentConfig,
   DeploymentResult,
   RollbackConfig,
-} from './DeploymentOrchestrator'
+} from "./DeploymentOrchestrator";
 
 export type {
   HealthStatus,
   HealthCheck,
   HealthCheckResult,
-} from './HealthMonitor'
+} from "./HealthMonitor";
 
 export type {
   CloudProvider,
   RegionConfig,
   ResourceConfig,
-} from './CloudProviderManager'
+} from "./CloudProviderManager";
 
 export type {
   EdgeNode,
   EdgeDeployment,
   EdgeConfig,
-} from './EdgeComputingManager'
+} from "./EdgeComputingManager";
 
 export type {
   RoutingRule,
   TrafficPolicy,
   LatencyTarget,
-} from './GlobalTrafficRoutingManager'
+} from "./GlobalTrafficRoutingManager";
 
 export type {
   MultiRegionConfig,
   SyncConfig,
   DatabaseConfig,
-} from './ConfigurationManager'
+} from "./ConfigurationManager";
 
 /**
  * Multi-Region Deployment System
@@ -289,16 +292,16 @@ export type {
  */
 
 // Re-export everything for convenience
-export * from './MultiRegionDeploymentManager'
-export * from './CloudProviderManager'
-export * from './EdgeComputingManager'
-export * from './GlobalTrafficRoutingManager'
-export * from './CrossRegionDataSyncManager'
-export * from './AutomatedFailoverOrchestrator'
-export * from './ServiceDiscoveryManager'
-export * from './ConfigurationManager'
-export * from './HealthMonitor'
-export * from './DeploymentOrchestrator'
+export * from "./MultiRegionDeploymentManager";
+export * from "./CloudProviderManager";
+export * from "./EdgeComputingManager";
+export * from "./GlobalTrafficRoutingManager";
+export * from "./CrossRegionDataSyncManager";
+export * from "./AutomatedFailoverOrchestrator";
+export * from "./ServiceDiscoveryManager";
+export * from "./ConfigurationManager";
+export * from "./HealthMonitor";
+export * from "./DeploymentOrchestrator";
 
 /**
  * Create a fully configured multi-region deployment system
@@ -306,29 +309,29 @@ export * from './DeploymentOrchestrator'
 export async function createMultiRegionSystem(
   configOverrides?: Partial<MultiRegionConfig>,
 ) {
-  const config = new ConfigurationManager()
+  const config = new ConfigurationManager();
 
   if (configOverrides) {
-    await config.updateConfig(configOverrides)
+    await config.updateConfig(configOverrides);
   }
 
-  await config.initialize()
+  await config.initialize();
 
-  const healthMonitor = new HealthMonitor(config)
-  await healthMonitor.initialize()
+  const healthMonitor = new HealthMonitor(config);
+  await healthMonitor.initialize();
 
-  const dataSyncManager = new CrossRegionDataSyncManager(config, healthMonitor)
-  await dataSyncManager.initialize()
+  const dataSyncManager = new CrossRegionDataSyncManager(config, healthMonitor);
+  await dataSyncManager.initialize();
 
-  const serviceDiscovery = new ServiceDiscoveryManager(config, healthMonitor)
-  await serviceDiscovery.initialize()
+  const serviceDiscovery = new ServiceDiscoveryManager(config, healthMonitor);
+  await serviceDiscovery.initialize();
 
   const failoverOrchestrator = new AutomatedFailoverOrchestrator(
     config,
     healthMonitor,
     dataSyncManager,
-  )
-  await failoverOrchestrator.initialize()
+  );
+  await failoverOrchestrator.initialize();
 
   const deploymentManager = new MultiRegionDeploymentManager(
     config,
@@ -336,8 +339,8 @@ export async function createMultiRegionSystem(
     dataSyncManager,
     serviceDiscovery,
     failoverOrchestrator,
-  )
-  await deploymentManager.initialize()
+  );
+  await deploymentManager.initialize();
 
   return {
     config,
@@ -346,7 +349,7 @@ export async function createMultiRegionSystem(
     serviceDiscovery,
     failoverOrchestrator,
     deploymentManager,
-  }
+  };
 }
 
 /**
@@ -364,4 +367,4 @@ export default {
   HealthMonitor,
   DeploymentOrchestrator,
   createMultiRegionSystem,
-}
+};

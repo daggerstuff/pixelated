@@ -52,18 +52,18 @@
   }
 
   /* More visible feedback on error */
-  input[aria-invalid='true'],
-  textarea[aria-invalid='true'],
-  select[aria-invalid='true'] {
+  input[aria-invalid="true"],
+  textarea[aria-invalid="true"],
+  select[aria-invalid="true"] {
     border: 2px solid #e53e3e;
     box-shadow: 0 0 0 1px #e53e3e;
     background-color: #fff5f5;
   }
 
   /* Success state feedback */
-  input[aria-invalid='false'][aria-required='true']:not(:placeholder-shown),
-  textarea[aria-invalid='false'][aria-required='true']:not(:placeholder-shown),
-  select[aria-invalid='false'][aria-required='true']:not([value='']) {
+  input[aria-invalid="false"][aria-required="true"]:not(:placeholder-shown),
+  textarea[aria-invalid="false"][aria-required="true"]:not(:placeholder-shown),
+  select[aria-invalid="false"][aria-required="true"]:not([value=""]) {
     border: 1px solid #38a169;
     background-color: #f0fff4;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2338a169'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
@@ -74,7 +74,7 @@
   }
 
   /* Error message styles */
-  [id$='-error'] {
+  [id$="-error"] {
     color: #e53e3e;
     font-size: 14px;
     margin-top: 4px;
@@ -125,7 +125,7 @@
   }
 
   .error-label::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 100%;
     left: 10px;
@@ -134,9 +134,9 @@
     border-color: #e53e3e transparent transparent transparent;
   }
 
-  input:focus[aria-invalid='true'] + .error-label,
-  textarea:focus[aria-invalid='true'] + .error-label,
-  select:focus[aria-invalid='true'] + .error-label {
+  input:focus[aria-invalid="true"] + .error-label,
+  textarea:focus[aria-invalid="true"] + .error-label,
+  select:focus[aria-invalid="true"] + .error-label {
     opacity: 1;
     transform: translateY(0);
   }
@@ -157,9 +157,9 @@
     }
   }
 
-  input[aria-invalid='true'].shake,
-  textarea[aria-invalid='true'].shake,
-  select[aria-invalid='true'].shake {
+  input[aria-invalid="true"].shake,
+  textarea[aria-invalid="true"].shake,
+  select[aria-invalid="true"].shake {
     animation: shake 0.5s ease-in-out;
   }
 
@@ -227,7 +227,7 @@
   }
 
   /* Improve tap highlight */
-  input[type='submit'],
+  input[type="submit"],
   button {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
@@ -256,7 +256,7 @@
     margin: 16px auto;
   }
 
-  [id$='-error'] {
+  [id$="-error"] {
     font-size: 14px;
   }
 }

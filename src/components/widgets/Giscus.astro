@@ -13,13 +13,13 @@
   const giscusConfig = Array.isArray(FEATURES.giscus) && FEATURES.giscus[1]
   const giscusTemplateScript = document.createElement('script')
 
-  Object.entries(({
-	...giscusConfig,
-	id: 'giscus-script',
-	src: 'https://giscus.app/client.js',
-	crossOrigin: 'anonymous',
-	async: ''
-})).forEach(([key, value]) => {
+  Object.entries({
+    ...giscusConfig,
+    id: 'giscus-script',
+    src: 'https://giscus.app/client.js',
+    crossOrigin: 'anonymous',
+    async: '',
+  }).forEach(([key, value]) => {
     giscusTemplateScript.setAttribute(key, value)
   })
 
@@ -39,13 +39,13 @@
     // Always clone a fresh <script> to ensure it executes again;
     // reused or previously inserted scripts won't run
     const clonedScript = giscusTemplateScript.cloneNode(
-      true
+      true,
     ) as HTMLScriptElement
     clonedScript.setAttribute(
       'data-theme',
       document.documentElement.classList.contains('dark')
         ? giscusThemeDark
-        : giscusThemeLight
+        : giscusThemeLight,
     )
     document.body.appendChild(clonedScript)
   }

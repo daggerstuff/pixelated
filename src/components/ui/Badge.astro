@@ -22,8 +22,7 @@ const badgeVariants = cva(
 )
 
 export interface Props
-  extends HTMLAttributes<'div'>,
-    VariantProps<typeof badgeVariants> {}
+  extends HTMLAttributes<'div'>, VariantProps<typeof badgeVariants> {}
 
 const { class: className, variant, ...rest } = Astro.props
 ---

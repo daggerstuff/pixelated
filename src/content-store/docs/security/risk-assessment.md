@@ -26,12 +26,12 @@ The system consists of three main components:
 
 The system uses four risk levels:
 
-| Level | Description | Typical Response |
-|-------|-------------|------------------|
-| **Low** | Minimal concern, routine monitoring | Passive monitoring only |
-| **Medium** | Moderate concern, requires attention | Dashboard notification |
-| **High** | Significant concern, requires intervention | Dashboard notification + Human review |
-| **Critical** | Severe concern, requires immediate action | Dashboard notification + Human review + Optional escalation |
+| Level        | Description                                | Typical Response                                            |
+| ------------ | ------------------------------------------ | ----------------------------------------------------------- |
+| **Low**      | Minimal concern, routine monitoring        | Passive monitoring only                                     |
+| **Medium**   | Moderate concern, requires attention       | Dashboard notification                                      |
+| **High**     | Significant concern, requires intervention | Dashboard notification + Human review                       |
+| **Critical** | Severe concern, requires immediate action  | Dashboard notification + Human review + Optional escalation |
 
 ## Configuration Options
 
@@ -62,27 +62,30 @@ The `RiskLevelAssessmentService` evaluates various risk factors to determine an 
 
 ```typescript
 // Example usage
-import { riskLevelAssessment, type RiskFactor } from '../../security/risk-level-assessment'
+import {
+  riskLevelAssessment,
+  type RiskFactor,
+} from "../../security/risk-level-assessment";
 
 // Create risk factors
 const factors: RiskFactor[] = [
   {
-    type: 'suicidal_ideation',
+    type: "suicidal_ideation",
     severity: 0.8,
-    confidence: 0.7
+    confidence: 0.7,
   },
   {
-    type: 'social_isolation',
+    type: "social_isolation",
     severity: 0.6,
-    confidence: 0.8
-  }
-]
+    confidence: 0.8,
+  },
+];
 
 // Assess risk level
-const assessment = riskLevelAssessment.assessRiskLevel(factors)
+const assessment = riskLevelAssessment.assessRiskLevel(factors);
 
-console.log(`Risk level: ${assessment.level}`)
-console.log(`Requires intervention: ${assessment.requiresIntervention}`)
+console.log(`Risk level: ${assessment.level}`);
+console.log(`Requires intervention: ${assessment.requiresIntervention}`);
 ```
 
 ### Risk Alert System
@@ -91,19 +94,14 @@ The `RiskAlertSystem` manages notifications and human oversight for high-risk si
 
 ```typescript
 // Example usage
-import { riskAlertSystem } from '../../security/alert-system'
-import { riskLevelAssessment } from '../../security/risk-level-assessment'
+import { riskAlertSystem } from "../../security/alert-system";
+import { riskLevelAssessment } from "../../security/risk-level-assessment";
 
 // Process assessment through alert system
-await riskAlertSystem.processAssessment(
-  assessment,
-  userId,
-  'chat-message',
-  {
-    messageId: '123456',
-    sessionId: '789012'
-  }
-)
+await riskAlertSystem.processAssessment(assessment, userId, "chat-message", {
+  messageId: "123456",
+  sessionId: "789012",
+});
 ```
 
 ### Human Oversight

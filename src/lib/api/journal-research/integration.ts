@@ -1,4 +1,4 @@
-import { journalResearchApiClient } from './client'
+import { journalResearchApiClient } from "./client";
 import {
   IntegrationInitiatePayload,
   IntegrationPlan,
@@ -6,11 +6,11 @@ import {
   IntegrationPlanListSchema,
   IntegrationPlanSchema,
   serializeIntegrationInitiatePayload,
-} from './types'
+} from "./types";
 
 export interface ListIntegrationPlansParams {
-  page?: number
-  pageSize?: number
+  page?: number;
+  pageSize?: number;
 }
 
 export async function initiateIntegration(
@@ -20,18 +20,18 @@ export async function initiateIntegration(
   return journalResearchApiClient.request<IntegrationPlan>(
     `/sessions/${sessionId}/integration`,
     {
-      method: 'POST',
+      method: "POST",
       body: serializeIntegrationInitiatePayload(payload),
       validator: IntegrationPlanSchema,
     },
-  )
+  );
 }
 
 export async function listIntegrationPlans(
   sessionId: string,
   params: ListIntegrationPlansParams = {},
 ): Promise<IntegrationPlanList> {
-  const { page, pageSize } = params
+  const { page, pageSize } = params;
   return journalResearchApiClient.request<IntegrationPlanList>(
     `/sessions/${sessionId}/integration`,
     {
@@ -41,7 +41,7 @@ export async function listIntegrationPlans(
       },
       validator: IntegrationPlanListSchema,
     },
-  )
+  );
 }
 
 export async function getIntegrationPlan(
@@ -53,7 +53,5 @@ export async function getIntegrationPlan(
     {
       validator: IntegrationPlanSchema,
     },
-  )
+  );
 }
-
-

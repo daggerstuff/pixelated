@@ -12,44 +12,54 @@
  */
 
 type SentryShim = {
-  captureException: (error: unknown) => void
-  captureMessage: (message: string) => void
-  setUser: (user: Record<string, unknown>) => void
+  captureException: (error: unknown) => void;
+  captureMessage: (message: string) => void;
+  setUser: (user: Record<string, unknown>) => void;
   addBreadcrumb: (crumb: {
-    message: string
-    category?: string
-    data?: Record<string, unknown>
-    timestamp?: number
-    level?: 'info' | 'error' | 'warning' | 'debug'
-  }) => void
-  withScope: (cb: (scope: {
-    setContext: (key: string, value: Record<string, unknown>) => void
-    setTag: (key: string, value: string) => void
-    setLevel: (level: 'debug' | 'info' | 'warning' | 'error') => void
-  }) => void) => void
+    message: string;
+    category?: string;
+    data?: Record<string, unknown>;
+    timestamp?: number;
+    level?: "info" | "error" | "warning" | "debug";
+  }) => void;
+  withScope: (
+    cb: (scope: {
+      setContext: (key: string, value: Record<string, unknown>) => void;
+      setTag: (key: string, value: string) => void;
+      setLevel: (level: "debug" | "info" | "warning" | "error") => void;
+    }) => void,
+  ) => void;
   metrics: {
-    count: (name: string, value: number, options?: { attributes?: Record<string, unknown> }) => void
-    gauge: (name: string, value: number, options?: { attributes?: Record<string, unknown>; unit?: string }) => void
+    count: (
+      name: string,
+      value: number,
+      options?: { attributes?: Record<string, unknown> },
+    ) => void;
+    gauge: (
+      name: string,
+      value: number,
+      options?: { attributes?: Record<string, unknown>; unit?: string },
+    ) => void;
     distribution: (
       name: string,
       value: number,
       options?: { attributes?: Record<string, unknown>; unit?: string },
-    ) => void
-  }
-}
+    ) => void;
+  };
+};
 
 function getSentry(): SentryShim | null {
   try {
     // Prefer global Sentry if present (initialized via public scripts)
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      return (window as any).Sentry as SentryShim
+    if (typeof window !== "undefined" && (window as any).Sentry) {
+      return (window as any).Sentry as SentryShim;
     }
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry] Failed to access global Sentry object:', error)
+      console.warn("[Sentry] Failed to access global Sentry object:", error);
     }
   }
-  return null
+  return null;
 }
 
 /**
@@ -59,18 +69,18 @@ export function captureError(
   error: Error,
   context?: Record<string, unknown>,
 ): void {
-  const Sentry = getSentry()
-  if (!Sentry) return
+  const Sentry = getSentry();
+  if (!Sentry) return;
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, value as Record<string, unknown>)
-      })
+        scope.setContext(key, value as Record<string, unknown>);
+      });
     }
-    scope.setTag('source', 'manual')
-    scope.setLevel('error')
-    Sentry.captureException(error)
-  })
+    scope.setTag("source", "manual");
+    scope.setLevel("error");
+    Sentry.captureException(error);
+  });
 }
 
 /**
@@ -78,35 +88,35 @@ export function captureError(
  */
 export function captureMessage(
   message: string,
-  level: 'debug' | 'info' | 'warning' | 'error' = 'info',
+  level: "debug" | "info" | "warning" | "error" = "info",
   context?: Record<string, unknown>,
 ): void {
-  const Sentry = getSentry()
-  if (!Sentry) return
+  const Sentry = getSentry();
+  if (!Sentry) return;
   Sentry.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, value as Record<string, unknown>)
-      })
+        scope.setContext(key, value as Record<string, unknown>);
+      });
     }
-    scope.setTag('source', 'manual')
-    scope.setLevel(level)
-    Sentry.captureMessage(message)
-  })
+    scope.setTag("source", "manual");
+    scope.setLevel(level);
+    Sentry.captureMessage(message);
+  });
 }
 
 /**
  * Set user context for Sentry
  */
 export function setUserContext(user: {
-  id?: string
-  email?: string
-  username?: string
-  [key: string]: unknown
+  id?: string;
+  email?: string;
+  username?: string;
+  [key: string]: unknown;
 }) {
-  const Sentry = getSentry()
-  if (!Sentry) return
-  Sentry.setUser(user)
+  const Sentry = getSentry();
+  if (!Sentry) return;
+  Sentry.setUser(user);
 }
 
 /**
@@ -117,15 +127,15 @@ export function addBreadcrumb(
   category: string,
   data?: Record<string, unknown>,
 ) {
-  const Sentry = getSentry()
-  if (!Sentry) return
+  const Sentry = getSentry();
+  if (!Sentry) return;
   Sentry.addBreadcrumb({
     message,
     category,
     ...(data ? { data } : {}),
     timestamp: Date.now() / 1000,
-    level: 'info',
-  })
+    level: "info",
+  });
 }
 
 /**
@@ -141,13 +151,13 @@ export function startTransaction(
   // This function is a no-op for compatibility.
   if (import.meta.env.DEV) {
     console.warn(
-      '[Sentry] startTransaction is not supported in @sentry/astro and will be ignored.',
-    )
+      "[Sentry] startTransaction is not supported in @sentry/astro and will be ignored.",
+    );
   }
   return {
-    setData: () => { },
-    finish: () => { },
-  }
+    setData: () => {},
+    finish: () => {},
+  };
 }
 
 /**
@@ -155,24 +165,24 @@ export function startTransaction(
  */
 export function testSentryIntegration() {
   // Create a test error
-  const testError = new Error('Sentry integration test - this is expected')
+  const testError = new Error("Sentry integration test - this is expected");
 
   // Capture with context
   captureError(testError, {
     test: {
       timestamp: new Date().toISOString(),
-      purpose: 'Integration test',
+      purpose: "Integration test",
       environment: import.meta.env.MODE,
     },
-  })
+  });
 
   // Capture a test message
-  captureMessage('Sentry integration test message', 'info', {
+  captureMessage("Sentry integration test message", "info", {
     test: {
-      type: 'message',
+      type: "message",
       timestamp: new Date().toISOString(),
     },
-  })
+  });
 }
 
 /**
@@ -190,13 +200,13 @@ export const performance = {
   ): { setData: () => void; finish: () => void } => {
     if (import.meta.env.DEV) {
       console.warn(
-        '[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.',
-      )
+        "[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.",
+      );
     }
     return {
-      setData: () => { },
-      finish: () => { },
-    }
+      setData: () => {},
+      finish: () => {},
+    };
   },
 
   /**
@@ -204,19 +214,19 @@ export const performance = {
    */
   measureApiCall: (
     _endpoint: string,
-    _method: string = 'GET',
+    _method: string = "GET",
   ): { setData: () => void; finish: () => void } => {
     if (import.meta.env.DEV) {
       console.warn(
-        '[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.',
-      )
+        "[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.",
+      );
     }
     return {
-      setData: () => { },
-      finish: () => { },
-    }
+      setData: () => {},
+      finish: () => {},
+    };
   },
-}
+};
 
 // ============================================
 // Sentry Metrics API
@@ -227,7 +237,7 @@ export const performance = {
  * Sentry metrics attributes for adding context to metrics
  */
 export interface MetricAttributes {
-  [key: string]: string | number | boolean
+  [key: string]: string | number | boolean;
 }
 
 /**
@@ -255,12 +265,12 @@ export function countMetric(
   attributes?: MetricAttributes,
 ): void {
   try {
-    const Sentry = getSentry()
-    if (!Sentry) return
-    Sentry.metrics.count(name, value, { attributes })
+    const Sentry = getSentry();
+    if (!Sentry) return;
+    Sentry.metrics.count(name, value, { attributes });
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry Metrics] Failed to emit count metric:', error)
+      console.warn("[Sentry Metrics] Failed to emit count metric:", error);
     }
   }
 }
@@ -288,12 +298,12 @@ export function gaugeMetric(
   unit?: string,
 ): void {
   try {
-    const Sentry = getSentry()
-    if (!Sentry) return
-    Sentry.metrics.gauge(name, value, { attributes, unit })
+    const Sentry = getSentry();
+    if (!Sentry) return;
+    Sentry.metrics.gauge(name, value, { attributes, unit });
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
+      console.warn("[Sentry Metrics] Failed to emit gauge metric:", error);
     }
   }
 }
@@ -326,20 +336,23 @@ export function distributionMetric(
   name: string,
   value: number,
   options?: {
-    attributes?: MetricAttributes
-    unit?: string
+    attributes?: MetricAttributes;
+    unit?: string;
   },
 ): void {
   try {
-    const Sentry = getSentry()
-    if (!Sentry) return
+    const Sentry = getSentry();
+    if (!Sentry) return;
     Sentry.metrics.distribution(name, value, {
       attributes: options?.attributes,
       unit: options?.unit,
-    })
+    });
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry Metrics] Failed to emit distribution metric:', error)
+      console.warn(
+        "[Sentry Metrics] Failed to emit distribution metric:",
+        error,
+      );
     }
   }
 }
@@ -356,40 +369,36 @@ export const emotionMetrics = {
    * Track when an emotion analysis is performed
    */
   analysisPerformed(attributes: {
-    model: string
-    sessionType?: string
-    success?: boolean
+    model: string;
+    sessionType?: string;
+    success?: boolean;
   }): void {
-    countMetric('emotion.analysis_performed', 1, {
+    countMetric("emotion.analysis_performed", 1, {
       model: attributes.model,
-      session_type: attributes.sessionType ?? 'unknown',
+      session_type: attributes.sessionType ?? "unknown",
       success: attributes.success ?? true,
-    })
+    });
   },
 
   /**
    * Track emotion analysis latency
    */
   analysisLatency(durationMs: number, model: string): void {
-    distributionMetric('emotion.analysis_latency', durationMs, {
+    distributionMetric("emotion.analysis_latency", durationMs, {
       attributes: { model },
-      unit: 'millisecond',
-    })
+      unit: "millisecond",
+    });
   },
 
   /**
    * Track emotion score distribution
    */
-  scoreDistribution(
-    emotionType: string,
-    score: number,
-    model: string,
-  ): void {
-    distributionMetric('emotion.score', score, {
+  scoreDistribution(emotionType: string, score: number, model: string): void {
+    distributionMetric("emotion.score", score, {
       attributes: { emotion_type: emotionType, model },
-    })
+    });
   },
-}
+};
 
 /**
  * Track bias detection metrics
@@ -399,42 +408,42 @@ export const biasMetrics = {
    * Track when a bias analysis is performed
    */
   analysisPerformed(attributes: {
-    layer: string
-    sessionId?: string
-    success?: boolean
+    layer: string;
+    sessionId?: string;
+    success?: boolean;
   }): void {
-    countMetric('bias.analysis_performed', 1, {
+    countMetric("bias.analysis_performed", 1, {
       layer: attributes.layer,
       success: attributes.success ?? true,
-    })
+    });
   },
 
   /**
    * Track bias analysis latency
    */
   analysisLatency(durationMs: number, layer: string): void {
-    distributionMetric('bias.analysis_latency', durationMs, {
+    distributionMetric("bias.analysis_latency", durationMs, {
       attributes: { layer },
-      unit: 'millisecond',
-    })
+      unit: "millisecond",
+    });
   },
 
   /**
    * Track bias score distribution
    */
   scoreDistribution(biasType: string, score: number): void {
-    distributionMetric('bias.score', score, {
+    distributionMetric("bias.score", score, {
       attributes: { bias_type: biasType },
-    })
+    });
   },
 
   /**
    * Track bias alert levels
    */
-  alertTriggered(level: 'low' | 'warning' | 'high' | 'critical'): void {
-    countMetric('bias.alert_triggered', 1, { alert_level: level })
+  alertTriggered(level: "low" | "warning" | "high" | "critical"): void {
+    countMetric("bias.alert_triggered", 1, { alert_level: level });
   },
-}
+};
 
 /**
  * Track API performance metrics
@@ -444,30 +453,34 @@ export const apiMetrics = {
    * Track API request
    */
   request(endpoint: string, method: string, statusCode?: number): void {
-    countMetric('api.request', 1, {
+    countMetric("api.request", 1, {
       endpoint,
       method,
       status_code: statusCode ?? 0,
-    })
+    });
   },
 
   /**
    * Track API response time
    */
-  responseTime(endpoint: string, durationMs: number, method: string = 'GET'): void {
-    distributionMetric('api.response_time', durationMs, {
+  responseTime(
+    endpoint: string,
+    durationMs: number,
+    method: string = "GET",
+  ): void {
+    distributionMetric("api.response_time", durationMs, {
       attributes: { endpoint, method },
-      unit: 'millisecond',
-    })
+      unit: "millisecond",
+    });
   },
 
   /**
    * Track API errors
    */
   error(endpoint: string, errorType: string): void {
-    countMetric('api.error', 1, { endpoint, error_type: errorType })
+    countMetric("api.error", 1, { endpoint, error_type: errorType });
   },
-}
+};
 
 /**
  * Track therapeutic session metrics
@@ -477,27 +490,27 @@ export const sessionMetrics = {
    * Track session started
    */
   started(sessionType: string): void {
-    countMetric('session.started', 1, { session_type: sessionType })
+    countMetric("session.started", 1, { session_type: sessionType });
   },
 
   /**
    * Track session completed
    */
   completed(sessionType: string, durationMinutes: number): void {
-    countMetric('session.completed', 1, { session_type: sessionType })
-    distributionMetric('session.duration', durationMinutes, {
+    countMetric("session.completed", 1, { session_type: sessionType });
+    distributionMetric("session.duration", durationMinutes, {
       attributes: { session_type: sessionType },
-      unit: 'minute',
-    })
+      unit: "minute",
+    });
   },
 
   /**
    * Track active sessions gauge
    */
   activeSessions(count: number): void {
-    gaugeMetric('session.active_count', count)
+    gaugeMetric("session.active_count", count);
   },
-}
+};
 
 /**
  * Flush all pending metrics to Sentry
@@ -505,13 +518,13 @@ export const sessionMetrics = {
  */
 export async function flushMetrics(): Promise<void> {
   try {
-    const client = getSentry() as any
-    if (client && typeof client.flush === 'function') {
-      await client.flush()
+    const client = getSentry() as any;
+    if (client && typeof client.flush === "function") {
+      await client.flush();
     }
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn('[Sentry Metrics] Failed to flush metrics:', error)
+      console.warn("[Sentry Metrics] Failed to flush metrics:", error);
     }
   }
 }
@@ -520,5 +533,4 @@ export async function flushMetrics(): Promise<void> {
 export {
   captureError as captureException,
   captureMessage as sentryCaptureMessage,
-}
-
+};

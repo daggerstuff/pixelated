@@ -1,88 +1,88 @@
-import nodemailer from 'nodemailer'
-import { productionConfig } from '../config/production.js'
+import nodemailer from "nodemailer";
+import { productionConfig } from "../config/production.js";
 
 export interface EmailTemplate {
-  subject: string
-  html: string
-  text?: string
+  subject: string;
+  html: string;
+  text?: string;
 }
 
 export interface BusinessAlertEmail {
-  userEmail: string
+  userEmail: string;
   alerts: Array<{
-    title: string
-    description: string
-    severity: string
-    timestamp: Date
-  }>
+    title: string;
+    description: string;
+    severity: string;
+    timestamp: Date;
+  }>;
 }
 
 export interface WeeklyDigest {
-  userEmail: string
-  userName: string
+  userEmail: string;
+  userName: string;
   metrics: {
-    newOpportunities: number
-    marketChanges: number
-    competitorUpdates: number
-  }
+    newOpportunities: number;
+    marketChanges: number;
+    competitorUpdates: number;
+  };
   topAlerts: Array<{
-    title: string
-    severity: string
-  }>
+    title: string;
+    severity: string;
+  }>;
 }
 
 export class EmailService {
-  private transporter: nodemailer.Transporter
+  private transporter: nodemailer.Transporter;
 
   constructor() {
-    this.transporter = this.createTransporter()
+    this.transporter = this.createTransporter();
   }
 
   private createTransporter(): nodemailer.Transporter {
-    const config = productionConfig.email
+    const config = productionConfig.email;
 
     switch (config.provider) {
-      case 'sendgrid':
+      case "sendgrid":
         return nodemailer.createTransporter({
-          service: 'SendGrid',
+          service: "SendGrid",
           auth: {
-            user: 'apikey',
+            user: "apikey",
             pass: config.sendgrid.apiKey,
           },
-        })
+        });
 
-      case 'smtp':
+      case "smtp":
         return nodemailer.createTransporter({
           host: config.smtp.host,
           port: config.smtp.port,
           secure: config.smtp.secure,
           auth: config.smtp.auth,
-        })
+        });
 
-      case 'aws':
+      case "aws":
         return nodemailer.createTransporter({
-          host: 'email-smtp.us-east-1.amazonaws.com',
+          host: "email-smtp.us-east-1.amazonaws.com",
           port: 587,
           secure: false,
           auth: {
-            user: process.env.AWS_SES_USER || '',
-            pass: process.env.AWS_SES_PASS || '',
+            user: process.env.AWS_SES_USER || "",
+            pass: process.env.AWS_SES_PASS || "",
           },
-        })
+        });
 
       default:
         return nodemailer.createTransporter({
-          service: 'gmail',
+          service: "gmail",
           auth: {
             user: productionConfig.email.smtp.auth.user,
             pass: productionConfig.email.smtp.auth.pass,
           },
-        })
+        });
     }
   }
 
   async sendBusinessAlert(emailData: BusinessAlertEmail): Promise<void> {
-    const template = this.generateBusinessAlertTemplate(emailData)
+    const template = this.generateBusinessAlertTemplate(emailData);
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -90,11 +90,11 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   async sendWeeklyDigest(digest: WeeklyDigest): Promise<void> {
-    const template = this.generateWeeklyDigestTemplate(digest)
+    const template = this.generateWeeklyDigestTemplate(digest);
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -102,11 +102,11 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   async sendWelcomeEmail(email: string, userName: string): Promise<void> {
-    const template = this.generateWelcomeTemplate(userName)
+    const template = this.generateWelcomeTemplate(userName);
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -114,14 +114,14 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   async sendPasswordResetEmail(
     email: string,
     resetToken: string,
   ): Promise<void> {
-    const template = this.generatePasswordResetTemplate(resetToken)
+    const template = this.generatePasswordResetTemplate(resetToken);
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -129,7 +129,7 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   async sendDocumentSharedEmail(
@@ -142,7 +142,7 @@ export class EmailService {
       documentName,
       sharedBy,
       accessUrl,
-    )
+    );
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -150,7 +150,7 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   async sendCollaborationInvite(
@@ -163,7 +163,7 @@ export class EmailService {
       documentName,
       invitedBy,
       accessUrl,
-    )
+    );
 
     await this.transporter.sendMail({
       from: productionConfig.email.fromEmail,
@@ -171,14 +171,14 @@ export class EmailService {
       subject: template.subject,
       html: template.html,
       text: template.text,
-    })
+    });
   }
 
   private generateBusinessAlertTemplate(
     data: BusinessAlertEmail,
   ): EmailTemplate {
-    const alertCount = data.alerts.length
-    const subject = `🚨 ${alertCount} New Business Alert${alertCount > 1 ? 's' : ''}`
+    const alertCount = data.alerts.length;
+    const subject = `🚨 ${alertCount} New Business Alert${alertCount > 1 ? "s" : ""}`;
 
     const html = `
       <!DOCTYPE html>
@@ -217,7 +217,7 @@ export class EmailService {
               </div>
             `,
               )
-              .join('')}
+              .join("")}
           </div>
           
           <div class="footer">
@@ -227,10 +227,10 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
     const text = `
-      Business Strategy CMS - ${alertCount} New Alert${alertCount > 1 ? 's' : ''}
+      Business Strategy CMS - ${alertCount} New Alert${alertCount > 1 ? "s" : ""}
       
       ${data.alerts
         .map(
@@ -240,14 +240,14 @@ export class EmailService {
         ${alert.timestamp.toLocaleString()}
       `,
         )
-        .join('\n\n')}
-    `
+        .join("\n\n")}
+    `;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 
   private generateWeeklyDigestTemplate(digest: WeeklyDigest): EmailTemplate {
-    const subject = `📊 Weekly Business Intelligence Digest - ${new Date().toLocaleDateString()}`
+    const subject = `📊 Weekly Business Intelligence Digest - ${new Date().toLocaleDateString()}`;
 
     const html = `
       <!DOCTYPE html>
@@ -293,7 +293,7 @@ export class EmailService {
               <p><strong>${alert.title}</strong> (${alert.severity})</p>
             `,
               )
-              .join('')}
+              .join("")}
           </div>
           
           <div class="footer">
@@ -302,7 +302,7 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
     const text = `
       Weekly Business Intelligence Digest
@@ -315,14 +315,14 @@ export class EmailService {
       - Competitor Updates: ${digest.metrics.competitorUpdates}
       
       Top Alerts:
-      ${digest.topAlerts.map((alert) => `- ${alert.title} (${alert.severity})`).join('\n')}
-    `
+      ${digest.topAlerts.map((alert) => `- ${alert.title} (${alert.severity})`).join("\n")}
+    `;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 
   private generateWelcomeTemplate(userName: string): EmailTemplate {
-    const subject = 'Welcome to Pixelated Business Strategy CMS!'
+    const subject = "Welcome to Pixelated Business Strategy CMS!";
 
     const html = `
       <!DOCTYPE html>
@@ -359,16 +359,16 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
-    const text = `Welcome to Pixelated Business Strategy CMS! Start building your business strategy today.`
+    const text = `Welcome to Pixelated Business Strategy CMS! Start building your business strategy today.`;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 
   private generatePasswordResetTemplate(resetToken: string): EmailTemplate {
-    const subject = 'Reset your password'
-    const resetUrl = `https://pixelated.com/reset-password?token=${resetToken}`
+    const subject = "Reset your password";
+    const resetUrl = `https://pixelated.com/reset-password?token=${resetToken}`;
 
     const html = `
       <!DOCTYPE html>
@@ -397,11 +397,11 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
-    const text = `Password reset requested. Visit: ${resetUrl}`
+    const text = `Password reset requested. Visit: ${resetUrl}`;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 
   private generateDocumentSharedTemplate(
@@ -409,7 +409,7 @@ export class EmailService {
     sharedBy: string,
     accessUrl: string,
   ): EmailTemplate {
-    const subject = `📄 Document Shared: ${documentName}`
+    const subject = `📄 Document Shared: ${documentName}`;
 
     const html = `
       <!DOCTYPE html>
@@ -431,11 +431,11 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
-    const text = `${sharedBy} has shared ${documentName} with you. Access: ${accessUrl}`
+    const text = `${sharedBy} has shared ${documentName} with you. Access: ${accessUrl}`;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 
   private generateCollaborationInviteTemplate(
@@ -443,7 +443,7 @@ export class EmailService {
     invitedBy: string,
     accessUrl: string,
   ): EmailTemplate {
-    const subject = `🤝 Collaboration Invitation: ${documentName}`
+    const subject = `🤝 Collaboration Invitation: ${documentName}`;
 
     const html = `
       <!DOCTYPE html>
@@ -465,10 +465,10 @@ export class EmailService {
         </div>
       </body>
       </html>
-    `
+    `;
 
-    const text = `${invitedBy} has invited you to collaborate on ${documentName}. Join: ${accessUrl}`
+    const text = `${invitedBy} has invited you to collaborate on ${documentName}. Join: ${accessUrl}`;
 
-    return { subject, html, text }
+    return { subject, html, text };
   }
 }

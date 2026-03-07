@@ -30,13 +30,13 @@ textarea {
 /* iOS-specific fixes */
 .ios-device {
   /* Fix for iOS text fields with auto-zoom */
-  input[type='text'],
-  input[type='email'],
-  input[type='password'],
-  input[type='number'],
-  input[type='search'],
-  input[type='tel'],
-  input[type='url'],
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
   textarea {
     font-size: 16px !important; /* iOS zooms when font size is less than 16px */
     max-height: 100%; /* Prevent sizing issues */
@@ -170,8 +170,8 @@ html {
   /* Make buttons large enough for touch */
   button,
   .button,
-  [type='button'],
-  [type='submit'] {
+  [type="button"],
+  [type="submit"] {
     min-height: 44px;
     padding: 10px 16px;
   }

@@ -1,43 +1,46 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 export type EvaluationSortField =
-  | 'therapeutic_relevance'
-  | 'data_structure_quality'
-  | 'training_integration'
-  | 'ethical_accessibility'
-  | 'overall_score'
-  | 'evaluation_date'
+  | "therapeutic_relevance"
+  | "data_structure_quality"
+  | "training_integration"
+  | "ethical_accessibility"
+  | "overall_score"
+  | "evaluation_date";
 
 interface EvaluationFilters {
-  priorityTiers: string[]
-  minimumScore: number | null
-  maximumScore: number | null
-  sortBy: EvaluationSortField
-  sortDirection: 'asc' | 'desc'
+  priorityTiers: string[];
+  minimumScore: number | null;
+  maximumScore: number | null;
+  sortBy: EvaluationSortField;
+  sortDirection: "asc" | "desc";
 }
 
 interface EvaluationStoreState {
-  selectedEvaluationId: string | null
-  editingEvaluationId: string | null
-  filters: EvaluationFilters
-  isBulkEditMode: boolean
+  selectedEvaluationId: string | null;
+  editingEvaluationId: string | null;
+  filters: EvaluationFilters;
+  isBulkEditMode: boolean;
 
-  setSelectedEvaluationId: (evaluationId: string | null) => void
-  setEditingEvaluationId: (evaluationId: string | null) => void
-  togglePriorityTier: (priorityTier: string) => void
-  setScoreRange: (min: number | null, max: number | null) => void
-  setSort: (sortBy: EvaluationSortField, sortDirection?: 'asc' | 'desc') => void
-  toggleBulkEditMode: () => void
-  resetFilters: () => void
+  setSelectedEvaluationId: (evaluationId: string | null) => void;
+  setEditingEvaluationId: (evaluationId: string | null) => void;
+  togglePriorityTier: (priorityTier: string) => void;
+  setScoreRange: (min: number | null, max: number | null) => void;
+  setSort: (
+    sortBy: EvaluationSortField,
+    sortDirection?: "asc" | "desc",
+  ) => void;
+  toggleBulkEditMode: () => void;
+  resetFilters: () => void;
 }
 
 const defaultFilters: EvaluationFilters = {
   priorityTiers: [],
   minimumScore: null,
   maximumScore: null,
-  sortBy: 'overall_score',
-  sortDirection: 'desc',
-}
+  sortBy: "overall_score",
+  sortDirection: "desc",
+};
 
 export const useEvaluationStore = create<EvaluationStoreState>((set) => ({
   selectedEvaluationId: null,
@@ -57,14 +60,14 @@ export const useEvaluationStore = create<EvaluationStoreState>((set) => ({
         ? state.filters.priorityTiers.filter(
             (existing) => existing !== priorityTier,
           )
-        : [...state.filters.priorityTiers, priorityTier]
+        : [...state.filters.priorityTiers, priorityTier];
 
       return {
         filters: {
           ...state.filters,
           priorityTiers,
         },
-      }
+      };
     }),
 
   setScoreRange: (min, max) =>
@@ -89,6 +92,4 @@ export const useEvaluationStore = create<EvaluationStoreState>((set) => ({
     set((state) => ({ isBulkEditMode: !state.isBulkEditMode })),
 
   resetFilters: () => set({ filters: defaultFilters }),
-}))
-
-
+}));

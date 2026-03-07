@@ -4,13 +4,13 @@ import {
   CompetitorAnalysis,
   KPIDashboard,
   BusinessAlert,
-} from '../types/business-intelligence'
-import { postgresPool } from '@/config/database'
+} from "../types/business-intelligence";
+import { postgresPool } from "@/config/database";
 import {
   MarketDataModel,
   CompetitorAnalysisModel,
   BusinessMetricsModel,
-} from '@/models'
+} from "@/models";
 
 export class DatabaseService {
   /**
@@ -21,14 +21,14 @@ export class DatabaseService {
       { industry: marketData.industry, timestamp: marketData.timestamp },
       marketData,
       { upsert: true, new: true },
-    )
+    );
   }
 
   /**
    * Store competitor analysis in MongoDB
    */
   async storeCompetitorAnalysis(analysis: CompetitorAnalysis): Promise<void> {
-    // Assuming one analysis per industry per day? Or just strictly structured. 
+    // Assuming one analysis per industry per day? Or just strictly structured.
     // The previous code used ID, but the interface doesn't always have ID for analysis.
     // The schema I created for CompetitorAnalysis uses default ID.
     // Let's assume we create a new record or update based on a key if provided.
@@ -44,7 +44,7 @@ export class DatabaseService {
     // Re-checking types: `export interface CompetitorAnalysis { competitors: number... }` NO ID.
 
     // So for Mongo, I'll just create a new document.
-    await CompetitorAnalysisModel.create(analysis)
+    await CompetitorAnalysisModel.create(analysis);
   }
 
   /**
@@ -53,24 +53,23 @@ export class DatabaseService {
   async getMarketData(industry: string): Promise<MarketData[]> {
     const docs = await MarketDataModel.find({ industry })
       .sort({ timestamp: -1 })
-      .limit(100)
+      .limit(100);
 
-    return docs.map(doc => doc.toObject() as unknown as MarketData)
+    return docs.map((doc) => doc.toObject() as unknown as MarketData);
   }
 
   /**
    * Store business metrics in MongoDB
    */
   async storeBusinessMetrics(metrics: BusinessMetrics): Promise<void> {
-    await BusinessMetricsModel.create(metrics)
+    await BusinessMetricsModel.create(metrics);
   }
 
   /**
    * Get latest business metrics from MongoDB
    */
   async getLatestBusinessMetrics(): Promise<BusinessMetrics> {
-    const doc = await BusinessMetricsModel.findOne()
-      .sort({ createdAt: -1 })
+    const doc = await BusinessMetricsModel.findOne().sort({ createdAt: -1 });
 
     if (!doc) {
       return {
@@ -81,10 +80,10 @@ export class DatabaseService {
         churnRate: 0,
         netPromoterScore: 0,
         marketShare: 0,
-      }
+      };
     }
 
-    return doc.toObject() as unknown as BusinessMetrics
+    return doc.toObject() as unknown as BusinessMetrics;
   }
 
   /**
@@ -101,7 +100,7 @@ export class DatabaseService {
         widgets = EXCLUDED.widgets,
         last_updated = EXCLUDED.last_updated,
         is_shared = EXCLUDED.is_shared
-    `
+    `;
 
     await postgresPool.query(sql, [
       dashboard.id,
@@ -110,27 +109,27 @@ export class DatabaseService {
       JSON.stringify(dashboard.widgets),
       dashboard.lastUpdated,
       dashboard.isShared,
-    ])
+    ]);
   }
 
   /**
    * Get KPI dashboard
    */
   async getKPIDashboard(id: string): Promise<KPIDashboard | null> {
-    const sql = `SELECT * FROM kpi_dashboards WHERE id = $1`
-    const result = await postgresPool.query(sql, [id])
+    const sql = `SELECT * FROM kpi_dashboards WHERE id = $1`;
+    const result = await postgresPool.query(sql, [id]);
 
-    if (result.rows.length === 0) return null
+    if (result.rows.length === 0) return null;
 
-    const row = result.rows[0]
+    const row = result.rows[0];
     return {
       id: row.id,
       name: row.name,
-      metrics: JSON.parse(row.metrics || '{}'),
-      widgets: JSON.parse(row.widgets || '[]'),
+      metrics: JSON.parse(row.metrics || "{}"),
+      widgets: JSON.parse(row.widgets || "[]"),
       lastUpdated: row.last_updated,
       isShared: row.is_shared,
-    }
+    };
   }
 
   /**
@@ -150,7 +149,7 @@ export class DatabaseService {
         conditions = EXCLUDED.conditions,
         recipients = EXCLUDED.recipients,
         is_active = EXCLUDED.is_active
-    `
+    `;
 
     await postgresPool.query(sql, [
       alert.id,
@@ -162,15 +161,15 @@ export class DatabaseService {
       JSON.stringify(alert.recipients),
       alert.isActive,
       alert.createdAt,
-    ])
+    ]);
   }
 
   /**
    * Get active business alerts
    */
   async getActiveBusinessAlerts(): Promise<BusinessAlert[]> {
-    const sql = `SELECT * FROM business_alerts WHERE is_active = true ORDER BY created_at DESC`
-    const result = await postgresPool.query(sql)
+    const sql = `SELECT * FROM business_alerts WHERE is_active = true ORDER BY created_at DESC`;
+    const result = await postgresPool.query(sql);
 
     return result.rows.map((row) => ({
       id: row.id,
@@ -178,11 +177,11 @@ export class DatabaseService {
       title: row.title,
       description: row.description,
       severity: row.severity,
-      conditions: JSON.parse(row.conditions || '[]'),
-      recipients: JSON.parse(row.recipients || '[]'),
+      conditions: JSON.parse(row.conditions || "[]"),
+      recipients: JSON.parse(row.recipients || "[]"),
       isActive: row.is_active,
       createdAt: row.created_at,
-    }))
+    }));
   }
 
   /**
@@ -196,9 +195,9 @@ export class DatabaseService {
     const docs = await MarketDataModel.find({
       industry,
       timestamp: { $gte: startDate, $lte: endDate },
-    }).sort({ timestamp: -1 })
+    }).sort({ timestamp: -1 });
 
-    return docs.map((doc) => doc.toObject() as unknown as MarketData)
+    return docs.map((doc) => doc.toObject() as unknown as MarketData);
   }
 
   /**
@@ -206,21 +205,21 @@ export class DatabaseService {
    */
   async getTrendAnalysis(
     metric: string,
-    period: 'week' | 'month' | 'quarter' | 'year',
+    period: "week" | "month" | "quarter" | "year",
   ): Promise<any[]> {
     const periodMap = {
       week: 7,
       month: 30,
       quarter: 90,
       year: 365,
-    }
+    };
 
-    const days = periodMap[period]
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days)
+    const days = periodMap[period];
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
 
     // Ensure metric is safe to use in projection ($)
-    const metricField = `$${metric}`
+    const metricField = `$${metric}`;
 
     return await BusinessMetricsModel.aggregate([
       {
@@ -231,14 +230,14 @@ export class DatabaseService {
       {
         $group: {
           _id: {
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
           },
           value: { $avg: metricField },
         },
       },
       {
         $project: {
-          date: '$_id',
+          date: "$_id",
           value: 1,
           _id: 0,
         },
@@ -246,20 +245,20 @@ export class DatabaseService {
       {
         $sort: { date: 1 },
       },
-    ])
+    ]);
   }
 
   /**
    * Get dashboard metrics summary via MongoDB Aggregation
    */
   async getDashboardMetrics(): Promise<{
-    totalRevenue: number
-    totalCustomers: number
-    avgCustomerLifetimeValue: number
-    monthlyGrowthRate: number
+    totalRevenue: number;
+    totalCustomers: number;
+    avgCustomerLifetimeValue: number;
+    monthlyGrowthRate: number;
   }> {
-    const startDate = new Date()
-    startDate.setDate(startDate.getDate() - 30)
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
 
     const result = await BusinessMetricsModel.aggregate([
       {
@@ -270,7 +269,7 @@ export class DatabaseService {
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: '$revenue' },
+          totalRevenue: { $sum: "$revenue" },
           // Approximating total customers via average revenue/LTV or just summing count?
           // The SQL used `COUNT(DISTINCT id)` but documents here are metrics snapshots.
           // This seems to imply business metrics are per-customer? No, they are high level.
@@ -290,47 +289,47 @@ export class DatabaseService {
           // I will assume for now we want the AVERAGE over the period or SUM if it represents discrete events.
           // Given fields like "churnRate" and "marketShare", it's definitely a snapshot.
           // So I will calculate average over the period.
-          avgRevenue: { $avg: '$revenue' },
-          avgCLV: { $avg: '$customerLifetimeValue' },
-          avgGrowth: { $avg: '$growthRate' },
+          avgRevenue: { $avg: "$revenue" },
+          avgCLV: { $avg: "$customerLifetimeValue" },
+          avgGrowth: { $avg: "$growthRate" },
         },
       },
-    ])
+    ]);
 
     // Note: The previous SQL implementation might have been assuming something else.
     // Adjusted logic:
-    const data = result[0] || {}
+    const data = result[0] || {};
     return {
       totalRevenue: data.avgRevenue || 0, // Using avg for now as it's likely a run-rate
       totalCustomers: 0, // Not available in this model
       avgCustomerLifetimeValue: data.avgCLV || 0,
       monthlyGrowthRate: data.avgGrowth || 0,
-    }
+    };
   }
 
   /**
    * Get all KPI dashboards (Postgres)
    */
   async getAllKPIDashboards(): Promise<KPIDashboard[]> {
-    const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`
-    const result = await postgresPool.query(sql)
+    const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`;
+    const result = await postgresPool.query(sql);
 
     return result.rows.map((row) => ({
       id: row.id,
       name: row.name,
-      metrics: JSON.parse(row.metrics || '{}'),
-      widgets: JSON.parse(row.widgets || '[]'),
+      metrics: JSON.parse(row.metrics || "{}"),
+      widgets: JSON.parse(row.widgets || "[]"),
       lastUpdated: row.last_updated,
       isShared: row.is_shared,
-    }))
+    }));
   }
 
   /**
    * Delete business alert (Postgres)
    */
   async deleteBusinessAlert(id: string): Promise<void> {
-    const sql = `DELETE FROM business_alerts WHERE id = $1`
-    await postgresPool.query(sql, [id])
+    const sql = `DELETE FROM business_alerts WHERE id = $1`;
+    await postgresPool.query(sql, [id]);
   }
 
   /**
@@ -340,41 +339,41 @@ export class DatabaseService {
     id: string,
     isActive: boolean,
   ): Promise<void> {
-    const sql = `UPDATE business_alerts SET is_active = $1 WHERE id = $2`
-    await postgresPool.query(sql, [isActive, id])
+    const sql = `UPDATE business_alerts SET is_active = $1 WHERE id = $2`;
+    await postgresPool.query(sql, [isActive, id]);
   }
 
   /**
    * Get market data statistics from MongoDB
    */
   async getMarketDataStats(): Promise<{
-    totalIndustries: number
-    avgMarketSize: number
-    avgGrowthRate: number
+    totalIndustries: number;
+    avgMarketSize: number;
+    avgGrowthRate: number;
   }> {
     const result = await MarketDataModel.aggregate([
       {
         $group: {
           _id: null,
-          industries: { $addToSet: '$industry' },
-          avgSize: { $avg: '$marketSize' },
-          avgGrowth: { $avg: '$growthRate' },
+          industries: { $addToSet: "$industry" },
+          avgSize: { $avg: "$marketSize" },
+          avgGrowth: { $avg: "$growthRate" },
         },
       },
       {
         $project: {
-          totalIndustries: { $size: '$industries' },
-          avgMarketSize: '$avgSize',
-          avgGrowthRate: '$avgGrowth',
+          totalIndustries: { $size: "$industries" },
+          avgMarketSize: "$avgSize",
+          avgGrowthRate: "$avgGrowth",
         },
       },
-    ])
+    ]);
 
-    const data = result[0] || {}
+    const data = result[0] || {};
     return {
       totalIndustries: data.totalIndustries || 0,
       avgMarketSize: data.avgMarketSize || 0,
       avgGrowthRate: data.avgGrowthRate || 0,
-    }
+    };
   }
 }

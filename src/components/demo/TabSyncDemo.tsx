@@ -1,21 +1,19 @@
-import type { FC } from 'react'
-import React from 'react'
-import { useSyncedState, useSyncedObject } from '@/hooks/useSyncedState'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn } from '@/components/layout/AdvancedAnimations'
+import type { FC } from "react";
+import React from "react";
+import { useSyncedState, useSyncedObject } from "@/hooks/useSyncedState";
+import { OfflineIndicator } from "@/components/layout/OfflineIndicator";
+import { FadeIn } from "@/components/layout/AdvancedAnimations";
 import {
   ResponsiveContainer,
   ResponsiveText,
-} from '@/components/layout/ResponsiveUtils'
-import tabSyncManager from '@/utils/sync/tabSyncManager'
-
-
+} from "@/components/layout/ResponsiveUtils";
+import tabSyncManager from "@/utils/sync/tabSyncManager";
 
 interface SyncedPreferences {
-  theme: 'light' | 'dark'
-  fontSize: 'small' | 'medium' | 'large'
-  notifications: boolean
-  language: string
+  theme: "light" | "dark";
+  fontSize: "small" | "medium" | "large";
+  notifications: boolean;
+  language: string;
 }
 
 /**
@@ -25,14 +23,14 @@ export const TabSyncDemo: FC = () => {
   // Synced counter state
   const [counter, setCounter, counterLoaded, counterSyncStatus] =
     useSyncedState<number>({
-      key: 'demo_synced_counter',
+      key: "demo_synced_counter",
       defaultValue: 0,
       enableSync: true,
       debounceMs: 500,
       onSync: (value, tabId) => {
-        console.log(`Counter synced from tab ${tabId}:`, value)
+        console.log(`Counter synced from tab ${tabId}:`, value);
       },
-    })
+    });
 
   // Synced preferences object
   const [
@@ -43,79 +41,79 @@ export const TabSyncDemo: FC = () => {
     prefsLoaded,
     prefsSyncStatus,
   ] = useSyncedObject<SyncedPreferences>({
-    key: 'demo_synced_preferences',
+    key: "demo_synced_preferences",
     defaultValue: {
-      theme: 'light',
-      fontSize: 'medium',
+      theme: "light",
+      fontSize: "medium",
       notifications: true,
-      language: 'en',
+      language: "en",
     },
     enableSync: true,
     debounceMs: 300,
-    conflictStrategy: 'merge',
+    conflictStrategy: "merge",
     onSync: (value, tabId) => {
-      console.log(`Preferences synced from tab ${tabId}:`, value)
+      console.log(`Preferences synced from tab ${tabId}:`, value);
     },
-  })
+  });
 
   // Tab sync statistics
   const [syncStats, setSyncStats] = React.useState(() =>
     tabSyncManager.getStats(),
-  )
-  const [activeTabs, setActiveTabs] = React.useState<string[]>([])
+  );
+  const [activeTabs, setActiveTabs] = React.useState<string[]>([]);
 
   // Update sync statistics periodically
   React.useEffect(() => {
     const updateStats = () => {
-      setSyncStats(tabSyncManager.getStats())
-    }
+      setSyncStats(tabSyncManager.getStats());
+    };
 
-    const interval = setInterval(updateStats, 2000)
-    updateStats()
+    const interval = setInterval(updateStats, 2000);
+    updateStats();
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   // Track active tabs
   React.useEffect(() => {
     const handleTabJoin = (data: { tabId: string }) => {
       setActiveTabs((prev) => {
         if (!prev.includes(data.tabId)) {
-          return [...prev, data.tabId]
+          return [...prev, data.tabId];
         }
-        return prev
-      })
-    }
+        return prev;
+      });
+    };
 
     const handleTabLeave = (data: { tabId: string }) => {
-      setActiveTabs((prev) => prev.filter((id) => id !== data.tabId))
-    }
+      setActiveTabs((prev) => prev.filter((id) => id !== data.tabId));
+    };
 
-    tabSyncManager.on('tabJoined', handleTabJoin)
-    tabSyncManager.on('tabLeft', handleTabLeave)
+    tabSyncManager.on("tabJoined", handleTabJoin);
+    tabSyncManager.on("tabLeft", handleTabLeave);
 
     return () => {
-      tabSyncManager.on('tabJoined', handleTabJoin)
-      tabSyncManager.on('tabLeft', handleTabLeave)
-    }
-  }, [])
+      tabSyncManager.on("tabJoined", handleTabJoin);
+      tabSyncManager.on("tabLeft", handleTabLeave);
+    };
+  }, []);
 
-  const incrementCounter = () => setCounter((prev) => prev + 1)
-  const decrementCounter = () => setCounter((prev) => prev - 1)
+  const incrementCounter = () => setCounter((prev) => prev + 1);
+  const decrementCounter = () => setCounter((prev) => prev - 1);
 
-  const resetCounter = () => setCounter(0)
+  const resetCounter = () => setCounter(0);
 
   const resetPreferences = () => {
     setPreferences({
-      theme: 'light',
-      fontSize: 'medium',
+      theme: "light",
+      fontSize: "medium",
       notifications: true,
-      language: 'en',
-    })
-  }
+      language: "en",
+    });
+  };
 
-  const isLoaded = counterLoaded && prefsLoaded
-  const currentTabId = tabSyncManager.getTabId()
+  const isLoaded = counterLoaded && prefsLoaded;
+  const currentTabId = tabSyncManager.getTabId();
 
   return (
     <ResponsiveContainer size="lg">
@@ -138,12 +136,12 @@ export const TabSyncDemo: FC = () => {
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${tabSyncManager.isAvailable() ? 'bg-green-500' : 'bg-red-500'}`}
+                    className={`w-3 h-3 rounded-full ${tabSyncManager.isAvailable() ? "bg-green-500" : "bg-red-500"}`}
                   />
                   <span className="font-medium">Tab Sync</span>
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {tabSyncManager.isAvailable() ? 'Active' : 'Not Available'}
+                  {tabSyncManager.isAvailable() ? "Active" : "Not Available"}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
                   Tab ID: {currentTabId}
@@ -186,16 +184,17 @@ export const TabSyncDemo: FC = () => {
                       {counter}
                     </div>
                     <div className="text-sm text-gray-500 mb-4">
-                      Sync Status:{' '}
+                      Sync Status:{" "}
                       <span
-                        className={`font-medium ${counterSyncStatus === 'synced'
-                          ? 'text-green-600'
-                          : counterSyncStatus === 'syncing'
-                            ? 'text-yellow-600'
-                            : counterSyncStatus === 'conflict'
-                              ? 'text-red-600'
-                              : 'text-gray-600'
-                          }`}
+                        className={`font-medium ${
+                          counterSyncStatus === "synced"
+                            ? "text-green-600"
+                            : counterSyncStatus === "syncing"
+                              ? "text-yellow-600"
+                              : counterSyncStatus === "conflict"
+                                ? "text-red-600"
+                                : "text-gray-600"
+                        }`}
                       >
                         {counterSyncStatus}
                       </span>
@@ -255,8 +254,8 @@ export const TabSyncDemo: FC = () => {
                             value={preferences.theme}
                             onChange={(e) =>
                               updatePreference(
-                                'theme',
-                                e.target.value as 'light' | 'dark',
+                                "theme",
+                                e.target.value as "light" | "dark",
                               )
                             }
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
@@ -278,8 +277,8 @@ export const TabSyncDemo: FC = () => {
                             value={preferences.fontSize}
                             onChange={(e) =>
                               updatePreference(
-                                'fontSize',
-                                e.target.value as 'small' | 'medium' | 'large',
+                                "fontSize",
+                                e.target.value as "small" | "medium" | "large",
                               )
                             }
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
@@ -301,7 +300,7 @@ export const TabSyncDemo: FC = () => {
                             id="language-select"
                             value={preferences.language}
                             onChange={(e) =>
-                              updatePreference('language', e.target.value)
+                              updatePreference("language", e.target.value)
                             }
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
                           >
@@ -323,19 +322,21 @@ export const TabSyncDemo: FC = () => {
                             id="notifications-toggle"
                             onClick={() =>
                               updatePreference(
-                                'notifications',
+                                "notifications",
                                 !preferences.notifications,
                               )
                             }
                             aria-label="Toggle notifications"
-                            className={`relative w-12 h-6 rounded-full transition-colors ${preferences.notifications
-                              ? 'bg-green-500'
-                              : 'bg-gray-300 dark:bg-gray-600'
-                              }`}
+                            className={`relative w-12 h-6 rounded-full transition-colors ${
+                              preferences.notifications
+                                ? "bg-green-500"
+                                : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                           >
                             <div
-                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${preferences.notifications ? 'left-7' : 'left-1'
-                                }`}
+                              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                                preferences.notifications ? "left-7" : "left-1"
+                              }`}
                             />
                           </button>
                         </div>
@@ -347,20 +348,20 @@ export const TabSyncDemo: FC = () => {
 
                       <div className="space-y-3">
                         <div className="text-sm">
-                          <span className="font-medium">Theme:</span>{' '}
+                          <span className="font-medium">Theme:</span>{" "}
                           {preferences.theme}
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium">Font Size:</span>{' '}
+                          <span className="font-medium">Font Size:</span>{" "}
                           {preferences.fontSize}
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium">Language:</span>{' '}
+                          <span className="font-medium">Language:</span>{" "}
                           {preferences.language}
                         </div>
                         <div className="text-sm">
-                          <span className="font-medium">Notifications:</span>{' '}
-                          {preferences.notifications ? 'On' : 'Off'}
+                          <span className="font-medium">Notifications:</span>{" "}
+                          {preferences.notifications ? "On" : "Off"}
                         </div>
                       </div>
 
@@ -369,14 +370,15 @@ export const TabSyncDemo: FC = () => {
                           Sync Status:
                         </div>
                         <div
-                          className={`text-sm font-medium ${prefsSyncStatus === 'synced'
-                            ? 'text-green-600'
-                            : prefsSyncStatus === 'syncing'
-                              ? 'text-yellow-600'
-                              : prefsSyncStatus === 'conflict'
-                                ? 'text-red-600'
-                                : 'text-gray-600'
-                            }`}
+                          className={`text-sm font-medium ${
+                            prefsSyncStatus === "synced"
+                              ? "text-green-600"
+                              : prefsSyncStatus === "syncing"
+                                ? "text-yellow-600"
+                                : prefsSyncStatus === "conflict"
+                                  ? "text-red-600"
+                                  : "text-gray-600"
+                          }`}
                         >
                           {prefsSyncStatus}
                         </div>
@@ -459,7 +461,7 @@ export const TabSyncDemo: FC = () => {
         )}
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
-export default TabSyncDemo
+export default TabSyncDemo;

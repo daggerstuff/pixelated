@@ -1,40 +1,40 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 export type DiscoverySort =
-  | 'publication_date'
-  | 'title'
-  | 'relevance'
-  | 'data_availability'
+  | "publication_date"
+  | "title"
+  | "relevance"
+  | "data_availability";
 
 interface DiscoveryFilters {
-  openAccessOnly: boolean
-  sourceTypes: string[]
-  keywords: string[]
-  sortBy: DiscoverySort
-  sortDirection: 'asc' | 'desc'
+  openAccessOnly: boolean;
+  sourceTypes: string[];
+  keywords: string[];
+  sortBy: DiscoverySort;
+  sortDirection: "asc" | "desc";
 }
 
 interface DiscoveryStoreState {
-  selectedSourceId: string | null
-  filters: DiscoveryFilters
-  highlightSourceId: string | null
+  selectedSourceId: string | null;
+  filters: DiscoveryFilters;
+  highlightSourceId: string | null;
 
-  setSelectedSourceId: (sourceId: string | null) => void
-  setHighlightSourceId: (sourceId: string | null) => void
-  toggleSourceType: (sourceType: string) => void
-  toggleKeyword: (keyword: string) => void
-  toggleOpenAccess: () => void
-  setSort: (sortBy: DiscoverySort, sortDirection?: 'asc' | 'desc') => void
-  resetFilters: () => void
+  setSelectedSourceId: (sourceId: string | null) => void;
+  setHighlightSourceId: (sourceId: string | null) => void;
+  toggleSourceType: (sourceType: string) => void;
+  toggleKeyword: (keyword: string) => void;
+  toggleOpenAccess: () => void;
+  setSort: (sortBy: DiscoverySort, sortDirection?: "asc" | "desc") => void;
+  resetFilters: () => void;
 }
 
 const defaultFilters: DiscoveryFilters = {
   openAccessOnly: false,
   sourceTypes: [],
   keywords: [],
-  sortBy: 'relevance',
-  sortDirection: 'desc',
-}
+  sortBy: "relevance",
+  sortDirection: "desc",
+};
 
 export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
   selectedSourceId: null,
@@ -47,29 +47,31 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
   toggleSourceType: (sourceType) =>
     set((state) => {
       const sourceTypes = state.filters.sourceTypes.includes(sourceType)
-        ? state.filters.sourceTypes.filter((existing) => existing !== sourceType)
-        : [...state.filters.sourceTypes, sourceType]
+        ? state.filters.sourceTypes.filter(
+            (existing) => existing !== sourceType,
+          )
+        : [...state.filters.sourceTypes, sourceType];
 
       return {
         filters: {
           ...state.filters,
           sourceTypes,
         },
-      }
+      };
     }),
 
   toggleKeyword: (keyword) =>
     set((state) => {
       const keywords = state.filters.keywords.includes(keyword)
         ? state.filters.keywords.filter((existing) => existing !== keyword)
-        : [...state.filters.keywords, keyword]
+        : [...state.filters.keywords, keyword];
 
       return {
         filters: {
           ...state.filters,
           keywords,
         },
-      }
+      };
     }),
 
   toggleOpenAccess: () =>
@@ -90,6 +92,4 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
     })),
 
   resetFilters: () => set({ filters: defaultFilters }),
-}))
-
-
+}));

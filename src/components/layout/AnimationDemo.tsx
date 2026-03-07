@@ -1,5 +1,5 @@
-import type { FC } from 'react'
-import React from 'react'
+import type { FC } from "react";
+import React from "react";
 import {
   AnimationWrapper,
   FadeIn,
@@ -11,8 +11,8 @@ import {
   StaggerContainer,
   SkeletonLoader,
   ScrollReveal,
-} from './AdvancedAnimations'
-import { ResponsiveContainer, ResponsiveText } from './ResponsiveUtils'
+} from "./AdvancedAnimations";
+import { ResponsiveContainer, ResponsiveText } from "./ResponsiveUtils";
 
 /**
  * Demonstration component showing advanced animation capabilities
@@ -20,35 +20,35 @@ import { ResponsiveContainer, ResponsiveText } from './ResponsiveUtils'
  */
 
 export const AnimationDemo: FC = () => {
-  const [loaded, setLoaded] = React.useState(false)
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    const timer = setTimeout(() => setLoaded(true), 500)
-    return () => clearTimeout(timer)
-  }, [])
+    const timer = setTimeout(() => setLoaded(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const demoItems = [
     {
-      title: 'Enhanced UX',
-      description: 'Smooth animations create better user experiences',
-      icon: '✨',
+      title: "Enhanced UX",
+      description: "Smooth animations create better user experiences",
+      icon: "✨",
     },
     {
-      title: 'Accessibility',
-      description: 'Respects reduced motion preferences',
-      icon: '♿',
+      title: "Accessibility",
+      description: "Respects reduced motion preferences",
+      icon: "♿",
     },
     {
-      title: 'Performance',
-      description: 'Optimized animations with GPU acceleration',
-      icon: '⚡',
+      title: "Performance",
+      description: "Optimized animations with GPU acceleration",
+      icon: "⚡",
     },
     {
-      title: 'Responsive',
-      description: 'Animations adapt to different screen sizes',
-      icon: '📱',
+      title: "Responsive",
+      description: "Animations adapt to different screen sizes",
+      icon: "📱",
     },
-  ]
+  ];
 
   return (
     <ResponsiveContainer size="lg">
@@ -204,16 +204,16 @@ export const AnimationDemo: FC = () => {
               Toggle Load State
             </button>
 
-            <AnimationWrapper animation={loaded ? 'fadeIn' : 'fadeIn'}>
+            <AnimationWrapper animation={loaded ? "fadeIn" : "fadeIn"}>
               <div className="px-4 py-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                {loaded ? 'Content Loaded!' : 'Loading...'}
+                {loaded ? "Content Loaded!" : "Loading..."}
               </div>
             </AnimationWrapper>
           </div>
         </section>
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
-export default AnimationDemo
+export default AnimationDemo;

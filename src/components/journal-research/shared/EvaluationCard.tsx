@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import { format } from "date-fns";
 import {
   Card,
   CardContent,
@@ -6,13 +6,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
-import type { Evaluation } from '@/lib/api/journal-research/types'
+} from "@/components/ui/card/card";
+import type { Evaluation } from "@/lib/api/journal-research/types";
 
 export interface EvaluationCardProps {
-  evaluation: Evaluation
-  onClick?: () => void
-  className?: string
+  evaluation: Evaluation;
+  onClick?: () => void;
+  className?: string;
 }
 
 export function EvaluationCard({
@@ -21,59 +21,63 @@ export function EvaluationCard({
   className,
 }: EvaluationCardProps) {
   const getScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-600 dark:text-green-400'
-    if (score >= 6) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
-  }
+    if (score >= 8) return "text-green-600 dark:text-green-400";
+    if (score >= 6) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
 
   const getScoreBarColor = (score: number) => {
-    if (score >= 8) return 'bg-green-500 dark:bg-green-300'
-    if (score >= 6) return 'bg-yellow-500 dark:bg-yellow-300'
-    return 'bg-red-500 dark:bg-red-300'
-  }
+    if (score >= 8) return "bg-green-500 dark:bg-green-300";
+    if (score >= 6) return "bg-yellow-500 dark:bg-yellow-300";
+    return "bg-red-500 dark:bg-red-300";
+  };
 
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
-      high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    }
-    return colors[tier.toLowerCase()] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-  }
+      high: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      medium:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      low: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    };
+    return (
+      colors[tier.toLowerCase()] ??
+      "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+    );
+  };
 
   const metrics = [
     {
-      label: 'Therapeutic Relevance',
+      label: "Therapeutic Relevance",
       value: evaluation.therapeuticRelevance,
     },
     {
-      label: 'Data Structure Quality',
+      label: "Data Structure Quality",
       value: evaluation.dataStructureQuality,
     },
     {
-      label: 'Training Integration',
+      label: "Training Integration",
       value: evaluation.trainingIntegration,
     },
     {
-      label: 'Ethical Accessibility',
+      label: "Ethical Accessibility",
       value: evaluation.ethicalAccessibility,
     },
-  ]
+  ];
 
   return (
     <Card
-      className={`transition-shadow hover:shadow-lg ${onClick ? 'cursor-pointer' : ''} ${className ?? ''}`}
+      className={`transition-shadow hover:shadow-lg ${onClick ? "cursor-pointer" : ""} ${className ?? ""}`}
       onClick={onClick}
-      role={onClick ? 'button' : undefined}
+      role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={
         onClick
           ? (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault()
-              onClick()
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
             }
-          }
           : undefined
       }
     >
@@ -111,7 +115,9 @@ export function EvaluationCard({
               <div key={metric.label} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">{metric.label}</span>
-                  <span className={`font-medium ${getScoreColor(metric.value)}`}>
+                  <span
+                    className={`font-medium ${getScoreColor(metric.value)}`}
+                  >
                     {metric.value.toFixed(1)}
                   </span>
                 </div>
@@ -132,10 +138,11 @@ export function EvaluationCard({
       </CardContent>
 
       <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')}</span>
+        <span>
+          Evaluated {format(evaluation.evaluationDate, "MMM d, yyyy")}
+        </span>
         <span>By {evaluation.evaluator}</span>
       </CardFooter>
     </Card>
-  )
+  );
 }
-

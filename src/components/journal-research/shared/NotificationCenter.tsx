@@ -1,118 +1,118 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card'
-import { X, Bell, CheckCircle, AlertCircle, Info, XCircle } from 'lucide-react'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/card/card";
+import { X, Bell, CheckCircle, AlertCircle, Info, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   useNotificationStore,
   useFilteredNotifications,
   type Notification,
-} from '@/lib/stores/journal-research/notificationStore'
+} from "@/lib/stores/journal-research/notificationStore";
 
 export interface NotificationCenterProps {
-  sessionId?: string | null
-  maxVisible?: number
-  className?: string
+  sessionId?: string | null;
+  maxVisible?: number;
+  className?: string;
 }
 
 // Re-export Notification type for convenience
-export type { Notification }
+export type { Notification };
 
 // Export NotificationType as the mapped visual type
-export type NotificationType = 'success' | 'error' | 'warning' | 'info'
+export type NotificationType = "success" | "error" | "warning" | "info";
 
 const typeIcons = {
   success: CheckCircle,
   error: XCircle,
   warning: AlertCircle,
   info: Info,
-}
+};
 
 const typeColors = {
-  success: 'text-green-600 dark:text-green-400',
-  error: 'text-red-600 dark:text-red-400',
-  warning: 'text-yellow-600 dark:text-yellow-400',
-  info: 'text-blue-600 dark:text-blue-400',
-}
+  success: "text-green-600 dark:text-green-400",
+  error: "text-red-600 dark:text-red-400",
+  warning: "text-yellow-600 dark:text-yellow-400",
+  info: "text-blue-600 dark:text-blue-400",
+};
 
 const mapNotificationLevelToType = (
-  level: Notification['level'],
-): 'success' | 'error' | 'warning' | 'info' => {
+  level: Notification["level"],
+): "success" | "error" | "warning" | "info" => {
   switch (level) {
-    case 'success':
-      return 'success'
-    case 'error':
-      return 'error'
-    case 'warning':
-      return 'warning'
-    case 'info':
+    case "success":
+      return "success";
+    case "error":
+      return "error";
+    case "warning":
+      return "warning";
+    case "info":
     default:
-      return 'info'
+      return "info";
   }
-}
+};
 
 export function NotificationCenter({
   sessionId,
   maxVisible = 10,
   className,
 }: NotificationCenterProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const unreadCount = useNotificationStore((state) => state.unreadCount)
-  const markAsRead = useNotificationStore((state) => state.markAsRead)
-  const dismiss = useNotificationStore((state) => state.dismiss)
-  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead)
-  const dismissAll = useNotificationStore((state) => state.dismissAll)
-  const setFilters = useNotificationStore((state) => state.setFilters)
+  const [isOpen, setIsOpen] = useState(false);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const markAsRead = useNotificationStore((state) => state.markAsRead);
+  const dismiss = useNotificationStore((state) => state.dismiss);
+  const markAllAsRead = useNotificationStore((state) => state.markAllAsRead);
+  const dismissAll = useNotificationStore((state) => state.dismissAll);
+  const setFilters = useNotificationStore((state) => state.setFilters);
 
   // Apply session filter if provided
   useEffect(() => {
     if (sessionId) {
-      setFilters({ sessionId })
+      setFilters({ sessionId });
     } else {
-      setFilters({ sessionId: undefined })
+      setFilters({ sessionId: undefined });
     }
-  }, [sessionId, setFilters])
+  }, [sessionId, setFilters]);
 
-  const notifications = useFilteredNotifications()
-  const visibleNotifications = notifications.slice(0, maxVisible)
+  const notifications = useFilteredNotifications();
+  const visibleNotifications = notifications.slice(0, maxVisible);
 
   const handleDismiss = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation()
-    dismiss(id)
-  }
+    e.stopPropagation();
+    dismiss(id);
+  };
 
   const handleClick = (notification: Notification) => {
     if (!notification.read) {
-      markAsRead(notification.id)
+      markAsRead(notification.id);
     }
-  }
+  };
 
   const handleMarkAllAsRead = () => {
-    markAllAsRead()
-  }
+    markAllAsRead();
+  };
 
   const handleDismissAll = () => {
-    dismissAll()
-  }
+    dismissAll();
+  };
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn("relative", className)}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted"
-        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={isOpen}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -141,7 +141,8 @@ export function NotificationCenter({
               </div>
               {unreadCount > 0 && (
                 <CardDescription>
-                  {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+                  {unreadCount} unread notification
+                  {unreadCount !== 1 ? "s" : ""}
                 </CardDescription>
               )}
               {visibleNotifications.length > 0 && (
@@ -178,16 +179,16 @@ export function NotificationCenter({
                   {visibleNotifications.map((notification) => {
                     const notificationType = mapNotificationLevelToType(
                       notification.level,
-                    )
-                    const Icon = typeIcons[notificationType]
+                    );
+                    const Icon = typeIcons[notificationType];
                     return (
                       <div
                         key={notification.id}
                         className={cn(
-                          'border-b p-4 transition-colors cursor-pointer',
+                          "border-b p-4 transition-colors cursor-pointer",
                           {
-                            'bg-muted/50': !notification.read,
-                            'hover:bg-muted/30': true,
+                            "bg-muted/50": !notification.read,
+                            "hover:bg-muted/30": true,
                           },
                         )}
                         onClick={() => handleClick(notification)}
@@ -195,7 +196,7 @@ export function NotificationCenter({
                         <div className="flex items-start gap-3">
                           <Icon
                             className={cn(
-                              'mt-0.5 h-5 w-5 flex-shrink-0',
+                              "mt-0.5 h-5 w-5 flex-shrink-0",
                               typeColors[notificationType],
                             )}
                           />
@@ -203,8 +204,8 @@ export function NotificationCenter({
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex-1">
                                 <p
-                                  className={cn('text-sm font-medium', {
-                                    'font-semibold': !notification.read,
+                                  className={cn("text-sm font-medium", {
+                                    "font-semibold": !notification.read,
                                   })}
                                 >
                                   {notification.title}
@@ -220,7 +221,9 @@ export function NotificationCenter({
                               </div>
                               <button
                                 type="button"
-                                onClick={(e) => handleDismiss(notification.id, e)}
+                                onClick={(e) =>
+                                  handleDismiss(notification.id, e)
+                                }
                                 className="mt-0.5 rounded p-1 text-muted-foreground hover:bg-muted"
                                 aria-label="Dismiss notification"
                               >
@@ -239,7 +242,7 @@ export function NotificationCenter({
                           </div>
                         </div>
                       </div>
-                    )
+                    );
                   })}
                 </div>
               )}
@@ -248,6 +251,5 @@ export function NotificationCenter({
         </>
       )}
     </div>
-  )
+  );
 }
-

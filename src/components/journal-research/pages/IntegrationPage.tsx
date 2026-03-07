@@ -1,8 +1,8 @@
-import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
-import { IntegrationPanel } from '../features/IntegrationPanel'
+import { JournalResearchQueryProvider } from "@/lib/api/journal-research/react-query";
+import { IntegrationPanel } from "../features/IntegrationPanel";
 
 export interface IntegrationPageProps {
-  sessionId?: string | null
+  sessionId?: string | null;
 }
 
 export function IntegrationPage({ sessionId }: IntegrationPageProps) {
@@ -10,6 +10,5 @@ export function IntegrationPage({ sessionId }: IntegrationPageProps) {
     <JournalResearchQueryProvider>
       <IntegrationPanel sessionId={sessionId ?? null} />
     </JournalResearchQueryProvider>
-  )
+  );
 }
-

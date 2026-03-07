@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { getCollection } from 'astro:content'
 
 // export const prerender = true
 
@@ -76,27 +76,27 @@ export async function getStaticPaths() {
 const { page } = Astro.props;
 */
 
-const pageParam = Astro.params.page || "1";
-const currentPage = parseInt(pageParam, 10);
-const pageSize = 20;
+const pageParam = Astro.params.page || '1'
+const currentPage = parseInt(pageParam, 10)
+const pageSize = 20
 
-const posts = await getCollection("blog", (entry: any) => {
-  return import.meta.env.PROD ? !entry.data.draft : true;
-});
+const posts = await getCollection('blog', (entry: any) => {
+  return import.meta.env.PROD ? !entry.data.draft : true
+})
 
 const sortedPosts = posts.sort((postA: any, postB: any) => {
-  return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf();
-});
+  return postB.data.pubDate.valueOf() - postA.data.pubDate.valueOf()
+})
 
-const totalPages = Math.ceil(sortedPosts.length / pageSize);
+const totalPages = Math.ceil(sortedPosts.length / pageSize)
 
 if (currentPage < 1 || currentPage > totalPages) {
-  return Astro.redirect("/404");
+  return Astro.redirect('/404')
 }
 
-const start = (currentPage - 1) * pageSize;
-const end = start + pageSize;
-const pageData = sortedPosts.slice(start, end);
+const start = (currentPage - 1) * pageSize
+const end = start + pageSize
+const pageData = sortedPosts.slice(start, end)
 
 const page = {
   data: pageData,
@@ -110,27 +110,27 @@ const page = {
     next:
       currentPage < totalPages ? `/blog/page/${currentPage + 1}` : undefined,
   },
-};
+}
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
 function getReadingTime(content: string) {
-  const wordsPerMinute = 200;
-  const words = content.split(/\s+/).length;
-  const minutes = Math.ceil(words / wordsPerMinute);
-  return `${minutes} min read`;
+  const wordsPerMinute = 200
+  const words = content.split(/\s+/).length
+  const minutes = Math.ceil(words / wordsPerMinute)
+  return `${minutes} min read`
 }
 
 const title =
-  page.currentPage === 1 ? "All Posts" : `All Posts - Page ${page.currentPage}`;
+  page.currentPage === 1 ? 'All Posts' : `All Posts - Page ${page.currentPage}`
 const description =
-  "All articles about therapy, technology, and digital empathy";
+  'All articles about therapy, technology, and digital empathy'
 ---
 
 <BaseLayout {title} {description}>

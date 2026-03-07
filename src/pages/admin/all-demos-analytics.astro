@@ -593,9 +593,11 @@ const demoPages = [
         const totalSessionsEl = document.getElementById('total-sessions-all')
         if (totalSessionsEl) totalSessionsEl.textContent = String(totalSessions)
         const overallRateEl = document.getElementById('overall-conversion-rate')
-        if (overallRateEl) overallRateEl.textContent = overallRate.toFixed(1) + '%'
+        if (overallRateEl)
+          overallRateEl.textContent = overallRate.toFixed(1) + '%'
         const bestDemoEl = document.getElementById('best-demo')
-        if (bestDemoEl) bestDemoEl.textContent = this.formatDemoName(bestDemo.name)
+        if (bestDemoEl)
+          bestDemoEl.textContent = this.formatDemoName(bestDemo.name)
         const abWinnersEl = document.getElementById('ab-winners')
         if (abWinnersEl) abWinnersEl.textContent = `${significantTests}/4`
       }
@@ -717,7 +719,9 @@ const demoPages = [
           }
         })
 
-        const overallTestStatusEl = document.getElementById('overall-test-status')
+        const overallTestStatusEl = document.getElementById(
+          'overall-test-status',
+        )
         if (overallTestStatusEl) {
           overallTestStatusEl.textContent =
             significantTests > 0
@@ -727,15 +731,25 @@ const demoPages = [
 
         // Update individual winners
         const clinicalWinnerEl = document.getElementById('clinical-winner')
-        if (clinicalWinnerEl) clinicalWinnerEl.textContent = winners['clinical-vault-trainer'] || 'TBD'
+        if (clinicalWinnerEl)
+          clinicalWinnerEl.textContent =
+            winners['clinical-vault-trainer'] || 'TBD'
         const syntheticWinnerEl = document.getElementById('synthetic-winner')
-        if (syntheticWinnerEl) syntheticWinnerEl.textContent = winners['synthetic-training-generator'] || 'TBD'
+        if (syntheticWinnerEl)
+          syntheticWinnerEl.textContent =
+            winners['synthetic-training-generator'] || 'TBD'
         const pipelineWinnerEl = document.getElementById('pipeline-winner')
-        if (pipelineWinnerEl) pipelineWinnerEl.textContent = winners['psychology-pipeline-processor'] || 'TBD'
+        if (pipelineWinnerEl)
+          pipelineWinnerEl.textContent =
+            winners['psychology-pipeline-processor'] || 'TBD'
         const securityWinnerEl = document.getElementById('security-winner')
-        if (securityWinnerEl) securityWinnerEl.textContent = winners['security-bias-detection-engine'] || 'TBD'
+        if (securityWinnerEl)
+          securityWinnerEl.textContent =
+            winners['security-bias-detection-engine'] || 'TBD'
 
-        const overallRecommendationsEl = document.getElementById('overall-recommendations')
+        const overallRecommendationsEl = document.getElementById(
+          'overall-recommendations',
+        )
         if (overallRecommendationsEl) {
           overallRecommendationsEl.textContent =
             significantTests > 2

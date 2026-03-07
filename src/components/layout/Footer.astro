@@ -71,13 +71,12 @@ const defaultSocialLinks: SocialLink[] = [
   },
 ]
 
-const {
-  sections,
-  socialLinks: providedSocialLinks,
-}: Props = Astro.props
+const { sections, socialLinks: providedSocialLinks }: Props = Astro.props
 
 const footerSections =
-  Array.isArray(sections) && sections.length > 0 ? sections : defaultFooterSections
+  Array.isArray(sections) && sections.length > 0
+    ? sections
+    : defaultFooterSections
 
 const candidateSocialLinks =
   Array.isArray(providedSocialLinks) && providedSocialLinks.length > 0
@@ -86,21 +85,20 @@ const candidateSocialLinks =
 
 // Ensure socialLinks is always defined, even if empty
 const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
-  ? candidateSocialLinks.filter(
-      (link): link is SocialLink =>
-        Boolean(
-          link &&
-          typeof link === 'object' &&
-          'name' in link &&
-          'href' in link &&
-          'icon' in link &&
-          typeof link.name === 'string' &&
-          typeof link.href === 'string' &&
-          typeof link.icon === 'string' &&
-          link.name.trim() &&
-          link.href.trim() &&
-          link.icon.trim(),
-        ),
+  ? candidateSocialLinks.filter((link): link is SocialLink =>
+      Boolean(
+        link &&
+        typeof link === 'object' &&
+        'name' in link &&
+        'href' in link &&
+        'icon' in link &&
+        typeof link.name === 'string' &&
+        typeof link.href === 'string' &&
+        typeof link.icon === 'string' &&
+        link.name.trim() &&
+        link.href.trim() &&
+        link.icon.trim(),
+      ),
     )
   : []
 ---
@@ -113,15 +111,33 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
   <div class="footer-container">
     <!-- Footer CTA Section -->
     <div class="footer-cta-section">
-      <h2 class="footer-cta-title">Kick off your 14-day free journey with Pixelated Empathy.</h2>
+      <h2 class="footer-cta-title">
+        Kick off your 14-day free journey with Pixelated Empathy.
+      </h2>
       <div class="footer-cta-buttons">
         <a href="/contact" class="btn-brutalist btn-brutalist--primary">
           Try for free
         </a>
         <a href="/demo-hub" class="btn-brutalist btn-brutalist--secondary">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: var(--space-2);">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            style="margin-right: var(--space-2);"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+            ></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           Watch demo
         </a>
@@ -156,31 +172,33 @@ const socialLinks: SocialLink[] = Array.isArray(candidateSocialLinks)
         </p>
 
         <!-- Social Links - Minimalist Elegance -->
-        {socialLinks && (
-          <nav class="social-nav" aria-label="Social media links">
-            <ul class="social-list">
-              {socialLinks.map((social) => (
-                <li>
-                  <a
-                    href={social.href}
-                    class="social-link"
-                    aria-label={`Follow us on ${social.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <svg
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                      set:html={social.icon}
-                    />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        )}
+        {
+          socialLinks && (
+            <nav class="social-nav" aria-label="Social media links">
+              <ul class="social-list">
+                {socialLinks.map((social) => (
+                  <li>
+                    <a
+                      href={social.href}
+                      class="social-link"
+                      aria-label={`Follow us on ${social.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <svg
+                        width="20"
+                        height="20"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                        set:html={social.icon}
+                      />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
       </div>
 
       <!-- Navigation Sections - Enterprise Brevity -->

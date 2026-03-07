@@ -517,26 +517,16 @@ export const prerender = false
           )
         document
           .getElementById('preset-bias-low')
-          ?.addEventListener('click', () =>
-            this.loadPresetScenario('low-bias'),
-          )
+          ?.addEventListener('click', () => this.loadPresetScenario('low-bias'))
         document
           .getElementById('preset-cultural')
-          ?.addEventListener('click', () =>
-            this.loadPresetScenario('cultural'),
-          )
+          ?.addEventListener('click', () => this.loadPresetScenario('cultural'))
         document
           .getElementById('preset-gender')
-          ?.addEventListener('click', () =>
-            this.loadPresetScenario('gender'),
-          )
+          ?.addEventListener('click', () => this.loadPresetScenario('gender'))
 
-        analyzeBtn?.addEventListener('click', () =>
-          this.runAnalysis(),
-        )
-        clearBtn?.addEventListener('click', () =>
-          this.clearInputs(),
-        )
+        analyzeBtn?.addEventListener('click', () => this.runAnalysis())
+        clearBtn?.addEventListener('click', () => this.clearInputs())
         exportBtn?.addEventListener('click', () => {
           const formatSel = document.getElementById(
             'export-format',

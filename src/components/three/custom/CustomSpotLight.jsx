@@ -1,7 +1,7 @@
 /* eslint-disable */
-import PropTypes from 'prop-types'
+import PropTypes from "prop-types";
 
-import * as React from 'react'
+import * as React from "react";
 import {
   Vector3,
   WebGLRenderTarget,
@@ -10,16 +10,16 @@ import {
   Mesh,
   SpotLight as SpotLightImpl,
   MathUtils,
-} from 'three'
-import { useThree, useFrame } from '@react-three/fiber'
-import { FullScreenQuad } from 'three-stdlib'
+} from "three";
+import { useThree, useFrame } from "@react-three/fiber";
+import { FullScreenQuad } from "three-stdlib";
 
 // Create compatibility shim for removed encoding constants
 
 // Implementation copied from drei's SpotLight but fixed to work with latest three.js
 export default function CustomSpotLight({
   children,
-  color = 'white',
+  color = "white",
   intensity = 1,
   angle = 0.15,
   penumbra = 0,
@@ -31,10 +31,10 @@ export default function CustomSpotLight({
   position = [0, 0, 0],
   ...props
 }) {
-  const { size, camera } = useThree()
-  const groupRef = React.useRef(null)
-  const lightRef = React.useRef(null)
-  const virtualCamRef = React.useRef(null)
+  const { size, camera } = useThree();
+  const groupRef = React.useRef(null);
+  const lightRef = React.useRef(null);
+  const virtualCamRef = React.useRef(null);
 
   const [
     virtualCam,
@@ -45,7 +45,7 @@ export default function CustomSpotLight({
     blurPass,
     quad,
   ] = React.useMemo(() => {
-    const virtualCam = camera.clone()
+    const virtualCam = camera.clone();
     const spotLight = new SpotLightImpl(
       color,
       intensity,
@@ -53,25 +53,25 @@ export default function CustomSpotLight({
       angle,
       penumbra,
       decay,
-    )
-    spotLight.position.set(...position)
+    );
+    spotLight.position.set(...position);
 
     if (shadow) {
-      spotLight.castShadow = true
-      spotLight.shadow.bias = -0.001
-      spotLight.shadow.mapSize.width = 1024
-      spotLight.shadow.mapSize.height = 1024
-      spotLight.shadow.camera.near = 0.5
-      spotLight.shadow.camera.far = distance + 2
-      spotLight.shadow.camera.fov = MathUtils.radToDeg(angle) * 2
+      spotLight.castShadow = true;
+      spotLight.shadow.bias = -0.001;
+      spotLight.shadow.mapSize.width = 1024;
+      spotLight.shadow.mapSize.height = 1024;
+      spotLight.shadow.camera.near = 0.5;
+      spotLight.shadow.camera.far = distance + 2;
+      spotLight.shadow.camera.fov = MathUtils.radToDeg(angle) * 2;
     }
 
-    const targetMesh = new Mesh()
-    targetMesh.visible = false
+    const targetMesh = new Mesh();
+    targetMesh.visible = false;
 
     // If not volumetric, we don't need the rest
     if (!volumetric) {
-      return [virtualCam, spotLight, targetMesh]
+      return [virtualCam, spotLight, targetMesh];
     }
 
     const renderTarget = new WebGLRenderTarget(
@@ -80,14 +80,14 @@ export default function CustomSpotLight({
       {
         format: RGBAFormat,
       },
-    )
+    );
     const renderTargetBlur = new WebGLRenderTarget(
       size.width / 2,
       size.height / 2,
       {
         format: RGBAFormat,
       },
-    )
+    );
 
     // Blur pass
     const blurPass = new ShaderMaterial({
@@ -113,10 +113,10 @@ export default function CustomSpotLight({
           gl_FragColor = color;
         }
       `,
-    })
+    });
 
     // Quad for rendering to screen
-    const quad = new FullScreenQuad(null)
+    const quad = new FullScreenQuad(null);
 
     return [
       virtualCam,
@@ -126,7 +126,7 @@ export default function CustomSpotLight({
       renderTargetBlur,
       blurPass,
       quad,
-    ]
+    ];
   }, [
     camera,
     color,
@@ -140,79 +140,79 @@ export default function CustomSpotLight({
     position,
     size.width,
     size.height,
-  ])
+  ]);
 
   // Update spotlight and references
   React.useEffect(() => {
-    lightRef.current = spotLight
-    virtualCamRef.current = virtualCam
+    lightRef.current = spotLight;
+    virtualCamRef.current = virtualCam;
 
-    const group = groupRef.current
+    const group = groupRef.current;
     if (group) {
-      group.add(spotLight, targetMesh)
+      group.add(spotLight, targetMesh);
 
       return () => {
-        group.remove(spotLight, targetMesh)
-      }
+        group.remove(spotLight, targetMesh);
+      };
     }
-  }, [spotLight, targetMesh, virtualCam])
+  }, [spotLight, targetMesh, virtualCam]);
 
   // Handle resizing
   React.useEffect(() => {
     if (volumetric && renderTarget && renderTargetBlur) {
-      renderTarget.setSize(size.width / 2, size.height / 2)
-      renderTargetBlur.setSize(size.width / 2, size.height / 2)
-      blurPass.uniforms.uResolution.value.set(size.width, size.height, 1)
+      renderTarget.setSize(size.width / 2, size.height / 2);
+      renderTargetBlur.setSize(size.width / 2, size.height / 2);
+      blurPass.uniforms.uResolution.value.set(size.width, size.height, 1);
     }
-  }, [blurPass, renderTarget, renderTargetBlur, size, volumetric])
+  }, [blurPass, renderTarget, renderTargetBlur, size, volumetric]);
 
   // Setup animation loop
   useFrame((state) => {
-    const group = groupRef.current
-    const light = lightRef.current
+    const group = groupRef.current;
+    const light = lightRef.current;
 
     if (group && light) {
       // Update light target
-      light.target.position.set(0, 0, -1).applyMatrix4(group.matrixWorld)
+      light.target.position.set(0, 0, -1).applyMatrix4(group.matrixWorld);
 
       // If volumetric, handle volumetric rendering
       if (volumetric && quad && renderTarget && renderTargetBlur) {
-        const { gl, scene } = state
+        const { gl, scene } = state;
 
         // Setup virtual camera to match the spotlight
-        virtualCam.position.copy(light.position)
-        virtualCam.lookAt(light.target.position)
-        virtualCam.updateMatrixWorld()
+        virtualCam.position.copy(light.position);
+        virtualCam.lookAt(light.target.position);
+        virtualCam.updateMatrixWorld();
 
         // Render the scene from spotlight's perspective
-        const initialBackground = scene.background
-        scene.background = null
+        const initialBackground = scene.background;
+        scene.background = null;
 
         // Store current GL state
-        const initialClearAlpha = gl.getClearAlpha()
-        const initialRenderTarget = gl.getRenderTarget()
+        const initialClearAlpha = gl.getClearAlpha();
+        const initialRenderTarget = gl.getRenderTarget();
 
         // Render light view to target
-        gl.setRenderTarget(renderTarget)
-        gl.setClearAlpha(0)
-        gl.clear()
-        gl.render(scene, virtualCam)
+        gl.setRenderTarget(renderTarget);
+        gl.setClearAlpha(0);
+        gl.clear();
+        gl.render(scene, virtualCam);
 
         // Apply blur if needed
-        blurPass.uniforms.tMap.value = renderTarget.texture
-        quad.material = blurPass
+        blurPass.uniforms.tMap.value = renderTarget.texture;
+        quad.material = blurPass;
 
-        gl.setRenderTarget(renderTargetBlur)
-        gl.clear()
-        quad.render(gl)
+        gl.setRenderTarget(renderTargetBlur);
+        gl.clear();
+        quad.render(gl);
 
         // Restore state
-        gl.setRenderTarget(initialRenderTarget)
-        gl.setClearAlpha(initialClearAlpha)
-        scene.background = initialBackground
+        gl.setRenderTarget(initialRenderTarget);
+        gl.setClearAlpha(initialClearAlpha);
+        scene.background = initialBackground;
       }
     }
-  })
+  });
 
   return (
     <group ref={groupRef} {...props}>
@@ -221,7 +221,7 @@ export default function CustomSpotLight({
       )}
       {children}
     </group>
-  )
+  );
 }
 
 CustomSpotLight.propTypes = {
@@ -236,4 +236,4 @@ CustomSpotLight.propTypes = {
   volumetric: PropTypes.bool,
   debug: PropTypes.bool,
   position: PropTypes.arrayOf(PropTypes.number),
-}
+};

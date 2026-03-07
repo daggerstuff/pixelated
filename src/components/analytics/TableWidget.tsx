@@ -1,72 +1,71 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { DashboardWidget } from './DashboardWidget'
-import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { DashboardWidget } from "./DashboardWidget";
+import type { DashboardWidgetProps as WidgetProps } from "./DashboardWidget";
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
+} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Download, Search, ArrowUp, ArrowDown } from "lucide-react";
 // TableState type is not currently used in this component
 
 // Define a generic type for table row data
 export type TableRowData = Record<string, unknown> & {
-  id?: string | number
-  [key: string]: unknown
-}
+  id?: string | number;
+  [key: string]: unknown;
+};
 
 export interface Column {
-  key: string
-  label: string
-  render?: (value: unknown, row: TableRowData) => React.ReactNode
-  sortable?: boolean
-  filterable?: boolean
+  key: string;
+  label: string;
+  render?: (value: unknown, row: TableRowData) => React.ReactNode;
+  sortable?: boolean;
+  filterable?: boolean;
 }
 
-export interface TableWidgetProps
-  extends Omit<
-    WidgetProps,
-    'children' | 'title' | 'description' | 'isLoading'
-  > {
+export interface TableWidgetProps extends Omit<
+  WidgetProps,
+  "children" | "title" | "description" | "isLoading"
+> {
   /** The title of the table widget */
-  title: string
+  title: string;
 
   /** Optional description for the table */
-  description?: string
+  description?: string;
 
   /** Array of column definitions */
-  columns: Column[]
+  columns: Column[];
 
   /** Array of row data */
-  data: TableRowData[]
+  data: TableRowData[];
 
   /** Whether the table is in a loading state */
-  isLoading?: boolean
+  isLoading?: boolean;
 
   /** Optional class name for the root element */
-  className?: string
+  className?: string;
 
   /** Refresh interval in milliseconds */
-  refreshInterval?: number
+  refreshInterval?: number;
 
   /** Whether to show the search input */
-  enableSearch?: boolean
+  enableSearch?: boolean;
 
   /** Whether to show the export button */
-  enableExport?: boolean
+  enableExport?: boolean;
 
   /** Function to fetch data asynchronously */
-  fetchData?: () => Promise<TableRowData[]>
+  fetchData?: () => Promise<TableRowData[]>;
 
   /** Pagination configuration */
   pagination?: {
-    pageSize: number
-    initialPage?: number
-  }
+    pageSize: number;
+    initialPage?: number;
+  };
 }
 
 export function TableWidget({
@@ -75,7 +74,7 @@ export function TableWidget({
   columns,
   data: initialData,
   isLoading: initialLoading = false,
-  className = '',
+  className = "",
   refreshInterval,
   enableSearch = true,
   enableExport = true,
@@ -83,45 +82,45 @@ export function TableWidget({
   pagination,
   ...props
 }: TableWidgetProps): React.ReactElement {
-  const [data, setData] = useState<TableRowData[]>(initialData)
-  const [isLoading, setIsLoading] = useState(initialLoading)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [data, setData] = useState<TableRowData[]>(initialData);
+  const [isLoading, setIsLoading] = useState(initialLoading);
+  const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
-    key: string
-    direction: 'asc' | 'desc'
-  } | null>(null)
+    key: string;
+    direction: "asc" | "desc";
+  } | null>(null);
   // Handle data fetching if fetchData is provided
   useEffect(() => {
     if (fetchData === undefined) {
-      return
+      return;
     }
 
     const loadData = async () => {
       try {
-        setIsLoading(true)
-        const result = await fetchData()
-        setData(result)
+        setIsLoading(true);
+        const result = await fetchData();
+        setData(result);
       } catch (error: unknown) {
-        console.error('Error fetching table data:', error)
+        console.error("Error fetching table data:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    loadData()
+    loadData();
 
     // Set up refresh interval if provided
-    let intervalId: NodeJS.Timeout | null = null
+    let intervalId: NodeJS.Timeout | null = null;
     if (refreshInterval && refreshInterval > 0) {
-      intervalId = setInterval(loadData, refreshInterval)
+      intervalId = setInterval(loadData, refreshInterval);
     }
 
     return () => {
       if (intervalId) {
-        clearInterval(intervalId)
+        clearInterval(intervalId);
       }
-    }
-  }, [fetchData, refreshInterval, setIsLoading, setData])
+    };
+  }, [fetchData, refreshInterval, setIsLoading, setData]);
 
   // Handle sort
   const handleSort = useCallback((key: string) => {
@@ -130,89 +129,89 @@ export function TableWidget({
       if (prevConfig?.key === key) {
         return {
           key,
-          direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
-        }
+          direction: prevConfig.direction === "asc" ? "desc" : "asc",
+        };
       }
       // Default to ascending for a new key
-      return { key, direction: 'asc' }
-    })
-  }, [])
+      return { key, direction: "asc" };
+    });
+  }, []);
 
   // Apply sorting and filtering
   const filteredAndSortedData = useMemo<TableRowData[]>(() => {
-    let result = [...data]
+    let result = [...data];
 
     // Apply search filter
     if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase()
+      const searchLower = searchTerm.toLowerCase();
       result = result.filter((row) =>
         columns.some((column) => {
-          const value = String(row[column.key] || '').toLowerCase()
-          return value.includes(searchLower)
+          const value = String(row[column.key] || "").toLowerCase();
+          return value.includes(searchLower);
         }),
-      )
+      );
     }
 
     // Apply sorting
     if (sortConfig) {
-      const { key, direction } = sortConfig
+      const { key, direction } = sortConfig;
       result.sort((a, b) => {
-        const aValue = a[key]
-        const bValue = b[key]
+        const aValue = a[key];
+        const bValue = b[key];
 
         if (aValue === bValue) {
-          return 0
+          return 0;
         }
         if (aValue == null) {
-          return direction === 'asc' ? -1 : 1
+          return direction === "asc" ? -1 : 1;
         }
         if (bValue == null) {
-          return direction === 'asc' ? 1 : -1
+          return direction === "asc" ? 1 : -1;
         }
 
-        const comparison = String(aValue).localeCompare(String(bValue))
-        return direction === 'asc' ? comparison : -comparison
-      })
+        const comparison = String(aValue).localeCompare(String(bValue));
+        return direction === "asc" ? comparison : -comparison;
+      });
     }
 
     // Pagination is not currently implemented
     // The pagination object is intentionally unused for now
-    void pagination
+    void pagination;
 
-    return result
-  }, [data, searchTerm, sortConfig, columns, pagination])
+    return result;
+  }, [data, searchTerm, sortConfig, columns, pagination]);
   // Handle export
   const handleExport = useCallback(() => {
     try {
       // Simple CSV export implementation
-      const headers = columns.map((col) => `"${col.label}"`).join(',')
+      const headers = columns.map((col) => `"${col.label}"`).join(",");
       const rows = filteredAndSortedData
         .map((row) =>
           columns
             .map((col) => {
-              const value = row[col.key]
+              const value = row[col.key];
               // Escape quotes and wrap in quotes
-              const escaped = String(value || '').replace(/"/g, '""')
-              return `"${escaped}"`
+              const escaped = String(value || "").replace(/"/g, '""');
+              return `"${escaped}"`;
             })
-            .join(','),
+            .join(","),
         )
-        .join('\n')
+        .join("\n");
 
-      const csvContent = `${headers}\n${rows}`
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-export-${new Date().toISOString().slice(0, 10)}.csv`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      const csvContent = `${headers}\n${rows}`;
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title.toLowerCase().replace(/\s+/g, "-")}-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error: unknown) {
-      console.error('Error exporting data:', error)
+      console.error("Error exporting data:", error);
     }
-  }, [columns, title, filteredAndSortedData])
+  }, [columns, title, filteredAndSortedData]);
 
   return (
     <DashboardWidget
@@ -262,7 +261,7 @@ export function TableWidget({
                         className="flex items-center space-x-1"
                         onClick={() => {
                           if (column.sortable) {
-                            handleSort(column.key)
+                            handleSort(column.key);
                           }
                         }}
                         disabled={!column.sortable}
@@ -270,7 +269,7 @@ export function TableWidget({
                       >
                         <span>{column.label}</span>
                         {sortConfig?.key === column.key &&
-                          (sortConfig.direction === 'asc' ? (
+                          (sortConfig.direction === "asc" ? (
                             <ArrowUp className="h-4 w-4" />
                           ) : (
                             <ArrowDown className="h-4 w-4" />
@@ -300,7 +299,7 @@ export function TableWidget({
                       <TableCell key={`${rowIndex}-${column.key}`}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : String(row[column.key] || '')}
+                          : String(row[column.key] || "")}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -313,5 +312,5 @@ export function TableWidget({
         {/* Pagination would go here */}
       </div>
     </DashboardWidget>
-  )
+  );
 }

@@ -15,7 +15,7 @@ const { left, right, mergeOnMobile } = navBarLayout
 for (const item of new Set(left)) {
   if (new Set(right).has(item)) {
     throw new Error(
-      `Duplicate '${item}' found in both 'UI.navBarLayout.left' and 'UI.navBarLayout.right'.`
+      `Duplicate '${item}' found in both 'UI.navBarLayout.left' and 'UI.navBarLayout.right'.`,
     )
   }
 }
@@ -52,7 +52,7 @@ for (const item of new Set(left)) {
               socialLinks.map((item) => (
                 <NavItem type="social" {item} {mergeOnMobile} />
               ))
-            )
+            ),
           )}
         </div>
       )
@@ -81,7 +81,7 @@ for (const item of new Set(left)) {
               socialLinks.map((item) => (
                 <NavItem type="social" {item} {mergeOnMobile} />
               ))
-            )
+            ),
           )}
         </div>
       )

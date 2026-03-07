@@ -73,7 +73,7 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
         el.setAttribute('aria-hidden', idx === this.#current ? 'false' : 'true')
         el.setAttribute(
           'aria-current',
-          idx === this.#current ? 'true' : 'false'
+          idx === this.#current ? 'true' : 'false',
         )
       }
     }

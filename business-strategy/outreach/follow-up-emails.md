@@ -3,6 +3,7 @@
 ## Follow-up Sequence (3 emails over 7 days)
 
 ### Email 1: Day 2 Follow-up
+
 **Subject**: Quick question about Stanford Psychology training enhancement
 
 Hi [Name],
@@ -14,14 +15,16 @@ Given your department's focus on evidence-based training methods, I thought this
 **Quick question**: Would you have 15 minutes this week to discuss how this could specifically benefit your graduate students?
 
 I can share:
+
 - Detailed implementation timeline
 - Specific ROI calculations for Stanford
 - Research publication opportunities
 - Student feedback from similar programs
 
 **Available times this week:**
+
 - Tuesday 2-4pm PST
-- Wednesday 10am-12pm PST  
+- Wednesday 10am-12pm PST
 - Thursday 1-3pm PST
 
 Looking forward to your thoughts,
@@ -31,6 +34,7 @@ Pixelated Empathy
 ---
 
 ### Email 2: Day 4 Value Add
+
 **Subject**: Stanford Psychology - Diagnostic Accuracy Research Study
 
 Hi [Name],
@@ -38,12 +42,14 @@ Hi [Name],
 I wanted to share some additional context about the diagnostic accuracy research we're conducting with pilot institutions.
 
 **Recent Results from Similar Programs:**
+
 - 78% improvement in diagnostic accuracy
 - 200% faster skill acquisition vs traditional methods
 - 95% student satisfaction scores
 - Zero safety incidents recorded
 
 **Stanford-Specific Benefits:**
+
 - Joint research publication opportunity
 - Enhanced graduate student outcomes
 - Grant funding support applications
@@ -59,6 +65,7 @@ Best regards,
 ---
 
 ### Email 3: Day 7 Urgency
+
 **Subject**: Final 2 pilot slots remaining - Stanford Psychology
 
 Hi [Name],
@@ -70,6 +77,7 @@ I hope you're doing well. I wanted to reach out as we're finalizing our Q1 2026 
 **Quick Decision Needed**: Would you like to secure Stanford's position in our pilot program?
 
 **What's Included:**
+
 - 6-month program with 75 students
 - $12,500 investment (guaranteed ROI)
 - Joint research publication
@@ -89,6 +97,7 @@ Best regards,
 ## Phone Call Script
 
 ### Initial Call Script (10 minutes)
+
 1. **Introduction** (30 seconds)
    - "Hi [Name], this is [Your Name] from Pixelated Empathy..."
    - "I sent you an email about our diagnostic accuracy pilot..."

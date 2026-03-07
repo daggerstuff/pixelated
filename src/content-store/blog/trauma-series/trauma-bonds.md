@@ -1,20 +1,18 @@
 ---
-title: 'Breaking Free from Trauma Bonds'
-description: 'Understand the powerful psychological attachments that form in abusive relationships and learn strategies to recognize and heal from trauma bonds'
-author: 'Dr. Sarah Chen'
+title: "Breaking Free from Trauma Bonds"
+description: "Understand the powerful psychological attachments that form in abusive relationships and learn strategies to recognize and heal from trauma bonds"
+author: "Dr. Sarah Chen"
 pubDate: 2024-03-19
 readingTime: 11
-tags: ['trauma', 'relationships', 'healing', 'abuse', 'recovery']
-series: 'Understanding Trauma'
+tags: ["trauma", "relationships", "healing", "abuse", "recovery"]
+series: "Understanding Trauma"
 seriesOrder: 5
 image:
   {
-    url: 'https://images.unsplash.com/photo-1516410529446-2c777cb7366d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Broken chain symbolizing freedom from trauma bonds',
+    url: "https://images.unsplash.com/photo-1516410529446-2c777cb7366d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Broken chain symbolizing freedom from trauma bonds",
   }
 ---
-
-
 
 # Breaking Free from Trauma Bonds: The Path to Emotional Liberation
 

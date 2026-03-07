@@ -13,6 +13,6 @@
     "tests/test-results/",
     "metrics/",
     "dist/",
-    ".astro/"
+    ".astro/",
   ], // Same as `.prettierignore`
 }

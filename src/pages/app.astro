@@ -32,7 +32,10 @@ if (import.meta.env.SSR) {
       process.on('SIGTERM', handleShutdown)
       process.on('SIGINT', handleShutdown)
     } else {
-      safeLog('info', 'Running in Cloudflare Workers runtime - process handlers not available')
+      safeLog(
+        'info',
+        'Running in Cloudflare Workers runtime - process handlers not available',
+      )
     }
   } catch (error) {
     safeLog(

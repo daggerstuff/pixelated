@@ -1,15 +1,14 @@
-export { DashboardPage } from './DashboardPage'
-export { SessionsListPage } from './SessionsListPage'
-export { SessionDetailPage } from './SessionDetailPage'
-export type { SessionDetailPageProps } from './SessionDetailPage'
-export { DiscoveryPage } from './DiscoveryPage'
-export type { DiscoveryPageProps } from './DiscoveryPage'
-export { EvaluationPage } from './EvaluationPage'
-export type { EvaluationPageProps } from './EvaluationPage'
-export { AcquisitionPage } from './AcquisitionPage'
-export type { AcquisitionPageProps } from './AcquisitionPage'
-export { IntegrationPage } from './IntegrationPage'
-export type { IntegrationPageProps } from './IntegrationPage'
-export { ReportsPage } from './ReportsPage'
-export type { ReportsPageProps } from './ReportsPage'
-
+export { DashboardPage } from "./DashboardPage";
+export { SessionsListPage } from "./SessionsListPage";
+export { SessionDetailPage } from "./SessionDetailPage";
+export type { SessionDetailPageProps } from "./SessionDetailPage";
+export { DiscoveryPage } from "./DiscoveryPage";
+export type { DiscoveryPageProps } from "./DiscoveryPage";
+export { EvaluationPage } from "./EvaluationPage";
+export type { EvaluationPageProps } from "./EvaluationPage";
+export { AcquisitionPage } from "./AcquisitionPage";
+export type { AcquisitionPageProps } from "./AcquisitionPage";
+export { IntegrationPage } from "./IntegrationPage";
+export type { IntegrationPageProps } from "./IntegrationPage";
+export { ReportsPage } from "./ReportsPage";
+export type { ReportsPageProps } from "./ReportsPage";

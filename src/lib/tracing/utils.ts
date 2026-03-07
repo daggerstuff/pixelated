@@ -4,10 +4,10 @@
  * Helper functions for manual instrumentation and span management.
  */
 
-import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import { trace, Span, SpanStatusCode, SpanKind } from "@opentelemetry/api";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
 
-const tracer = trace.getTracer('pixelated-empathy')
+const tracer = trace.getTracer("pixelated-empathy");
 
 /**
  * Create a new span for a given operation
@@ -20,7 +20,7 @@ export function createSpan(
   return tracer.startSpan(name, {
     kind,
     attributes,
-  })
+  });
 }
 
 /**
@@ -33,21 +33,23 @@ export async function withSpan<T>(
 ): Promise<T> {
   const span = tracer.startSpan(name, {
     attributes,
-  })
+  });
 
   try {
-    const result = await fn(span)
-    span.setStatus({ code: SpanStatusCode.OK })
-    return result
+    const result = await fn(span);
+    span.setStatus({ code: SpanStatusCode.OK });
+    return result;
   } catch (error) {
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
-    })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
-    throw error
+    });
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    throw error;
   } finally {
-    span.end()
+    span.end();
   }
 }
 
@@ -61,21 +63,23 @@ export function withSpanSync<T>(
 ): T {
   const span = tracer.startSpan(name, {
     attributes,
-  })
+  });
 
   try {
-    const result = fn(span)
-    span.setStatus({ code: SpanStatusCode.OK })
-    return result
+    const result = fn(span);
+    span.setStatus({ code: SpanStatusCode.OK });
+    return result;
   } catch (error) {
     span.setStatus({
       code: SpanStatusCode.ERROR,
       message: error instanceof Error ? error.message : String(error),
-    })
-    span.recordException(error instanceof Error ? error : new Error(String(error)))
-    throw error
+    });
+    span.recordException(
+      error instanceof Error ? error : new Error(String(error)),
+    );
+    throw error;
   } finally {
-    span.end()
+    span.end();
   }
 }
 
@@ -85,11 +89,11 @@ export function withSpanSync<T>(
 export function addSpanAttributes(
   attributes: Record<string, string | number | boolean>,
 ): void {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
     Object.entries(attributes).forEach(([key, value]) => {
-      activeSpan.setAttribute(key, value)
-    })
+      activeSpan.setAttribute(key, value);
+    });
   }
 }
 
@@ -100,9 +104,9 @@ export function addSpanEvent(
   name: string,
   attributes?: Record<string, string | number | boolean>,
 ): void {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
-    activeSpan.addEvent(name, attributes)
+    activeSpan.addEvent(name, attributes);
   }
 }
 
@@ -110,13 +114,13 @@ export function addSpanEvent(
  * Mark the current span with an error
  */
 export function markSpanError(error: Error): void {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
     activeSpan.setStatus({
       code: SpanStatusCode.ERROR,
       message: error.message,
-    })
-    activeSpan.recordException(error)
+    });
+    activeSpan.recordException(error);
   }
 }
 
@@ -136,14 +140,14 @@ export async function withDatabaseSpan<T>(
         [SemanticAttributes.DB_OPERATION]: operation,
         [SemanticAttributes.DB_SQL_TABLE]: table,
         ...attributes,
-      })
-      return fn()
+      });
+      return fn();
     },
     {
-      [SemanticAttributes.DB_SYSTEM]: 'postgresql',
+      [SemanticAttributes.DB_SYSTEM]: "postgresql",
       ...attributes,
     },
-  )
+  );
 }
 
 /**
@@ -162,15 +166,15 @@ export async function withHttpClientSpan<T>(
         [SemanticAttributes.HTTP_METHOD]: method,
         [SemanticAttributes.HTTP_URL]: url,
         ...attributes,
-      })
-      return fn()
+      });
+      return fn();
     },
     {
       [SemanticAttributes.HTTP_METHOD]: method,
       [SemanticAttributes.HTTP_URL]: url,
       ...attributes,
     },
-  )
+  );
 }
 
 /**
@@ -187,57 +191,57 @@ export async function withAIServiceSpan<T>(
     `ai.${provider}.${operation}`,
     async (span) => {
       span.setAttributes({
-        'ai.provider': provider,
-        'ai.model': model,
-        'ai.operation': operation,
+        "ai.provider": provider,
+        "ai.model": model,
+        "ai.operation": operation,
         ...attributes,
-      })
-      return fn()
+      });
+      return fn();
     },
     {
-      'ai.provider': provider,
-      'ai.model': model,
-      'ai.operation': operation,
+      "ai.provider": provider,
+      "ai.model": model,
+      "ai.operation": operation,
       ...attributes,
     },
-  )
+  );
 }
 
 /**
  * Get the current trace ID
  */
 export function getCurrentTraceId(): string | undefined {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
-    const spanContext = activeSpan.spanContext()
-    return spanContext.traceId
+    const spanContext = activeSpan.spanContext();
+    return spanContext.traceId;
   }
-  return undefined
+  return undefined;
 }
 
 /**
  * Get the current span ID
  */
 export function getCurrentSpanId(): string | undefined {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
-    const spanContext = activeSpan.spanContext()
-    return spanContext.spanId
+    const spanContext = activeSpan.spanContext();
+    return spanContext.spanId;
   }
-  return undefined
+  return undefined;
 }
 
 /**
  * Get trace context for propagation (e.g., in HTTP headers)
  */
 export function getTraceContext(): Record<string, string> {
-  const activeSpan = trace.getActiveSpan()
+  const activeSpan = trace.getActiveSpan();
   if (!activeSpan) {
-    return {}
+    return {};
   }
 
-  const spanContext = activeSpan.spanContext()
+  const spanContext = activeSpan.spanContext();
   return {
-    'traceparent': `00-${spanContext.traceId}-${spanContext.spanId}-${spanContext.traceFlags.toString(16).padStart(2, '0')}`,
-  }
+    traceparent: `00-${spanContext.traceId}-${spanContext.spanId}-${spanContext.traceFlags.toString(16).padStart(2, "0")}`,
+  };
 }

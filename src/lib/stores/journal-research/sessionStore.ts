@@ -1,35 +1,35 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 export type SessionPhase =
-  | 'discovery'
-  | 'evaluation'
-  | 'acquisition'
-  | 'integration'
-  | 'reporting'
-  | 'unknown'
+  | "discovery"
+  | "evaluation"
+  | "acquisition"
+  | "integration"
+  | "reporting"
+  | "unknown";
 
 interface SessionFilters {
-  searchTerm: string
-  phases: SessionPhase[]
+  searchTerm: string;
+  phases: SessionPhase[];
 }
 
 interface SessionStoreState {
-  selectedSessionId: string | null
-  filters: SessionFilters
-  isCreateDrawerOpen: boolean
+  selectedSessionId: string | null;
+  filters: SessionFilters;
+  isCreateDrawerOpen: boolean;
 
-  setSelectedSessionId: (sessionId: string | null) => void
-  togglePhaseFilter: (phase: SessionPhase) => void
-  setSearchTerm: (searchTerm: string) => void
-  resetFilters: () => void
-  openCreateDrawer: () => void
-  closeCreateDrawer: () => void
+  setSelectedSessionId: (sessionId: string | null) => void;
+  togglePhaseFilter: (phase: SessionPhase) => void;
+  setSearchTerm: (searchTerm: string) => void;
+  resetFilters: () => void;
+  openCreateDrawer: () => void;
+  closeCreateDrawer: () => void;
 }
 
 const defaultFilters: SessionFilters = {
-  searchTerm: '',
+  searchTerm: "",
   phases: [],
-}
+};
 
 export const useJournalSessionStore = create<SessionStoreState>((set) => ({
   selectedSessionId: null,
@@ -42,13 +42,13 @@ export const useJournalSessionStore = create<SessionStoreState>((set) => ({
     set((state) => {
       const phases = state.filters.phases.includes(phase)
         ? state.filters.phases.filter((existing) => existing !== phase)
-        : [...state.filters.phases, phase]
+        : [...state.filters.phases, phase];
       return {
         filters: {
           ...state.filters,
           phases,
         },
-      }
+      };
     }),
 
   setSearchTerm: (searchTerm) =>
@@ -63,6 +63,4 @@ export const useJournalSessionStore = create<SessionStoreState>((set) => ({
 
   openCreateDrawer: () => set({ isCreateDrawerOpen: true }),
   closeCreateDrawer: () => set({ isCreateDrawerOpen: false }),
-}))
-
-
+}));

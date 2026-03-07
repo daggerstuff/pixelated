@@ -1,4 +1,4 @@
-import { journalResearchApiClient } from './client'
+import { journalResearchApiClient } from "./client";
 import {
   Acquisition,
   AcquisitionInitiatePayload,
@@ -8,11 +8,11 @@ import {
   AcquisitionUpdatePayload,
   serializeAcquisitionInitiatePayload,
   serializeAcquisitionUpdatePayload,
-} from './types'
+} from "./types";
 
 export interface ListAcquisitionsParams {
-  page?: number
-  pageSize?: number
+  page?: number;
+  pageSize?: number;
 }
 
 export async function initiateAcquisition(
@@ -22,18 +22,18 @@ export async function initiateAcquisition(
   return journalResearchApiClient.request<Acquisition>(
     `/sessions/${sessionId}/acquisition`,
     {
-      method: 'POST',
+      method: "POST",
       body: serializeAcquisitionInitiatePayload(payload),
       validator: AcquisitionSchema,
     },
-  )
+  );
 }
 
 export async function listAcquisitions(
   sessionId: string,
   params: ListAcquisitionsParams = {},
 ): Promise<AcquisitionList> {
-  const { page, pageSize } = params
+  const { page, pageSize } = params;
   return journalResearchApiClient.request<AcquisitionList>(
     `/sessions/${sessionId}/acquisition`,
     {
@@ -43,7 +43,7 @@ export async function listAcquisitions(
       },
       validator: AcquisitionListSchema,
     },
-  )
+  );
 }
 
 export async function getAcquisition(
@@ -55,7 +55,7 @@ export async function getAcquisition(
     {
       validator: AcquisitionSchema,
     },
-  )
+  );
 }
 
 export async function updateAcquisition(
@@ -66,11 +66,9 @@ export async function updateAcquisition(
   return journalResearchApiClient.request<Acquisition>(
     `/sessions/${sessionId}/acquisition/${acquisitionId}`,
     {
-      method: 'PUT',
+      method: "PUT",
       body: serializeAcquisitionUpdatePayload(payload),
       validator: AcquisitionSchema,
     },
-  )
+  );
 }
-
-

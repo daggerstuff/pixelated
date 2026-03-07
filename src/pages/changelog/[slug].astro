@@ -1,12 +1,12 @@
 ---
-import Warning from "@/components/base/Warning.astro";
-import Toc from "@/components/toc/Toc.astro";
-import ShareLink from "@/components/widgets/ShareLink.astro";
-import { FEATURES } from "@/config";
-import type { PostSchema } from "@/lib/schema";
-import BaseLayout from "@/layouts/BaseLayout.astro";
-import { formatDate } from "@/utils/datetime";
-import { getCollection, render } from "astro:content";
+import Warning from '@/components/base/Warning.astro'
+import Toc from '@/components/toc/Toc.astro'
+import ShareLink from '@/components/widgets/ShareLink.astro'
+import { FEATURES } from '@/config'
+import type { PostSchema } from '@/lib/schema'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { formatDate } from '@/utils/datetime'
+import { getCollection, render } from 'astro:content'
 
 // export const prerender = true;
 
@@ -20,33 +20,33 @@ export async function getStaticPaths() {
 }
 */
 
-const { slug } = Astro.params;
-const posts = await getCollection("changelog");
-const post = posts.find((p) => p.slug === slug);
+const { slug } = Astro.params
+const posts = await getCollection('changelog')
+const post = posts.find((p) => p.slug === slug)
 
 if (!post) {
-  return Astro.redirect("/404");
+  return Astro.redirect('/404')
 }
-const { data: frontmatter } = post as { data: PostSchema };
-const { Content, headings } = await render(post);
-const { share, toc } = FEATURES;
+const { data: frontmatter } = post as { data: PostSchema }
+const { Content, headings } = await render(post)
+const { share, toc } = FEATURES
 
 // Build URL for sharing (works with prerendered pages)
-const shareUrl = `https://pixelated.empathy.dev/changelog/${post.slug}`;
+const shareUrl = `https://pixelated.empathy.dev/changelog/${post.slug}`
 
 // Format dates
 const pubDate =
   frontmatter.pubDate instanceof Date
     ? frontmatter.pubDate.toISOString()
-    : undefined;
+    : undefined
 const updatedDate =
   frontmatter.lastModDate instanceof Date
     ? frontmatter.lastModDate.toISOString()
-    : undefined;
+    : undefined
 
 // Warning message for unpublished posts
 const UNPUBLISHED_WARNING = `This article is not yet available.
-Please check back later.`;
+Please check back later.`
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>

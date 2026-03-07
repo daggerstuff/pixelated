@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { debounce } from '@/utils/debounce'
+import { useState, useEffect } from "react";
+import { debounce } from "@/utils/debounce";
 
 /**
  * A hook that debounces a value by delaying updates until after a specified amount of time has passed
@@ -21,21 +21,21 @@ import { debounce } from '@/utils/debounce'
  * ```
  */
 export function useDebounce<T>(value: T, delay: number = 300): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
   useEffect(() => {
     // Update debounced value after delay
     const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
+      setDebouncedValue(value);
+    }, delay);
 
     // Cancel the timeout if value changes or unmounts
     return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
-  return debouncedValue
+  return debouncedValue;
 }
 
 /**
@@ -63,5 +63,5 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => unknown>(
   delay: number = 300,
   immediate: boolean = false,
 ): (...args: Parameters<T>) => void {
-  return debounce(callback, delay, immediate)
+  return debounce(callback, delay, immediate);
 }

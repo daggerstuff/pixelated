@@ -1,30 +1,30 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 interface IntegrationFilters {
-  targetFormats: string[]
-  complexityLevels: string[]
-  maxEffortHours: number | null
+  targetFormats: string[];
+  complexityLevels: string[];
+  maxEffortHours: number | null;
 }
 
 interface IntegrationStoreState {
-  selectedPlanId: string | null
-  filters: IntegrationFilters
-  comparePlanIds: string[]
+  selectedPlanId: string | null;
+  filters: IntegrationFilters;
+  comparePlanIds: string[];
 
-  setSelectedPlanId: (planId: string | null) => void
-  toggleComparePlanId: (planId: string) => void
-  toggleTargetFormat: (format: string) => void
-  toggleComplexityLevel: (complexity: string) => void
-  setMaxEffortHours: (hours: number | null) => void
-  resetFilters: () => void
-  clearCompare: () => void
+  setSelectedPlanId: (planId: string | null) => void;
+  toggleComparePlanId: (planId: string) => void;
+  toggleTargetFormat: (format: string) => void;
+  toggleComplexityLevel: (complexity: string) => void;
+  setMaxEffortHours: (hours: number | null) => void;
+  resetFilters: () => void;
+  clearCompare: () => void;
 }
 
 const defaultFilters: IntegrationFilters = {
   targetFormats: [],
   complexityLevels: [],
   maxEffortHours: null,
-}
+};
 
 export const useIntegrationStore = create<IntegrationStoreState>((set) => ({
   selectedPlanId: null,
@@ -37,23 +37,23 @@ export const useIntegrationStore = create<IntegrationStoreState>((set) => ({
     set((state) => {
       const comparePlanIds = state.comparePlanIds.includes(planId)
         ? state.comparePlanIds.filter((existing) => existing !== planId)
-        : [...state.comparePlanIds, planId]
+        : [...state.comparePlanIds, planId];
 
-      return { comparePlanIds }
+      return { comparePlanIds };
     }),
 
   toggleTargetFormat: (format) =>
     set((state) => {
       const targetFormats = state.filters.targetFormats.includes(format)
         ? state.filters.targetFormats.filter((existing) => existing !== format)
-        : [...state.filters.targetFormats, format]
+        : [...state.filters.targetFormats, format];
 
       return {
         filters: {
           ...state.filters,
           targetFormats,
         },
-      }
+      };
     }),
 
   toggleComplexityLevel: (complexity) =>
@@ -64,14 +64,14 @@ export const useIntegrationStore = create<IntegrationStoreState>((set) => ({
         ? state.filters.complexityLevels.filter(
             (existing) => existing !== complexity,
           )
-        : [...state.filters.complexityLevels, complexity]
+        : [...state.filters.complexityLevels, complexity];
 
       return {
         filters: {
           ...state.filters,
           complexityLevels,
         },
-      }
+      };
     }),
 
   setMaxEffortHours: (hours) =>
@@ -84,6 +84,4 @@ export const useIntegrationStore = create<IntegrationStoreState>((set) => ({
 
   resetFilters: () => set({ filters: defaultFilters }),
   clearCompare: () => set({ comparePlanIds: [] }),
-}))
-
-
+}));

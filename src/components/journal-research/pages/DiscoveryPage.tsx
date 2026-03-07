@@ -1,8 +1,8 @@
-import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
-import { SourceDiscovery } from '../features/SourceDiscovery'
+import { JournalResearchQueryProvider } from "@/lib/api/journal-research/react-query";
+import { SourceDiscovery } from "../features/SourceDiscovery";
 
 export interface DiscoveryPageProps {
-  sessionId?: string | null
+  sessionId?: string | null;
 }
 
 export function DiscoveryPage({ sessionId }: DiscoveryPageProps) {
@@ -10,6 +10,5 @@ export function DiscoveryPage({ sessionId }: DiscoveryPageProps) {
     <JournalResearchQueryProvider>
       <SourceDiscovery sessionId={sessionId ?? null} />
     </JournalResearchQueryProvider>
-  )
+  );
 }
-

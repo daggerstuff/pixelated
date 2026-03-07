@@ -18,7 +18,7 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
 >
   <div class="container mx-auto py-6">
     {
-      perfMode ?
+      perfMode ? (
         <div
           class="flex flex-col gap-6"
           role="region"
@@ -74,7 +74,8 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
             </div>
           </Card>
         </div>
-      : <div class="flex flex-col gap-6">
+      ) : (
+        <div class="flex flex-col gap-6">
           <div class="flex items-center justify-between">
             <div class="relative flex items-center justify-center mb-8">
               <div class="text-center z-10 w-full max-w-2xl mx-auto">
@@ -594,6 +595,7 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
             </div>
           </div>
         </div>
+      )
     }
   </div>
 </DashboardLayout>

@@ -6,85 +6,85 @@
  * indicators, and clinical markers.
  */
 
-import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
+import { getClinicalAnalysisLogger } from "@/lib/logging/standardized-logger";
 import type {
   IModelProvider,
   MentalHealthAnalysisResult,
-} from '../types/mentalLLaMATypes'
-import { parseSemanticEvidenceResponse } from './utils/semanticEvidenceParser'
+} from "../types/mentalLLaMATypes";
+import { parseSemanticEvidenceResponse } from "./utils/semanticEvidenceParser";
 
-const logger = getClinicalAnalysisLogger('general')
+const logger = getClinicalAnalysisLogger("general");
 
 /**
  * Configuration for evidence extraction
  */
 export interface EvidenceExtractionConfig {
-  maxEvidenceItems: number
-  minConfidenceThreshold: number
-  includeContextualEvidence: boolean
-  includeLinguisticPatterns: boolean
-  includeEmotionalMarkers: boolean
-  enableSemanticAnalysis: boolean
-  prioritizeRiskIndicators: boolean
+  maxEvidenceItems: number;
+  minConfidenceThreshold: number;
+  includeContextualEvidence: boolean;
+  includeLinguisticPatterns: boolean;
+  includeEmotionalMarkers: boolean;
+  enableSemanticAnalysis: boolean;
+  prioritizeRiskIndicators: boolean;
 }
 
 /**
  * Detailed evidence item with metadata
  */
 export interface EvidenceItem {
-  text: string
+  text: string;
   type:
-    | 'direct_quote'
-    | 'paraphrase'
-    | 'linguistic_pattern'
-    | 'emotional_marker'
-    | 'contextual_indicator'
-  confidence: number
-  relevance: 'high' | 'medium' | 'low'
-  category: string // e.g., 'crisis_indicator', 'mood_symptom', 'cognitive_pattern'
+    | "direct_quote"
+    | "paraphrase"
+    | "linguistic_pattern"
+    | "emotional_marker"
+    | "contextual_indicator";
+  confidence: number;
+  relevance: "high" | "medium" | "low";
+  category: string; // e.g., 'crisis_indicator', 'mood_symptom', 'cognitive_pattern'
   position?: {
-    start: number
-    end: number
-  }
-  semanticWeight?: number
-  clinicalRelevance?: 'critical' | 'significant' | 'supportive' | 'contextual'
+    start: number;
+    end: number;
+  };
+  semanticWeight?: number;
+  clinicalRelevance?: "critical" | "significant" | "supportive" | "contextual";
   metadata?: {
-    keyword?: string
-    pattern?: string
-    emotionalValence?: 'positive' | 'negative' | 'neutral'
-    intensity?: 'high' | 'medium' | 'low'
-    temporalContext?: 'current' | 'past' | 'future' | 'ongoing'
-    contextualContext?: string // Additional contextual information
-    semanticRationale?: string // Rationale from semantic analysis
-  }
+    keyword?: string;
+    pattern?: string;
+    emotionalValence?: "positive" | "negative" | "neutral";
+    intensity?: "high" | "medium" | "low";
+    temporalContext?: "current" | "past" | "future" | "ongoing";
+    contextualContext?: string; // Additional contextual information
+    semanticRationale?: string; // Rationale from semantic analysis
+  };
 }
 
 /**
  * Evidence extraction result with comprehensive analysis
  */
 export interface EvidenceExtractionResult {
-  evidenceItems: EvidenceItem[]
+  evidenceItems: EvidenceItem[];
   summary: {
-    totalEvidence: number
-    highConfidenceCount: number
-    riskIndicatorCount: number
-    supportiveFactorCount: number
-    overallStrength: 'strong' | 'moderate' | 'weak'
-  }
+    totalEvidence: number;
+    highConfidenceCount: number;
+    riskIndicatorCount: number;
+    supportiveFactorCount: number;
+    overallStrength: "strong" | "moderate" | "weak";
+  };
   categorizedEvidence: {
-    [category: string]: EvidenceItem[]
-  }
+    [category: string]: EvidenceItem[];
+  };
   qualityMetrics: {
-    completeness: number // 0-1 scale
-    specificity: number // 0-1 scale
-    clinicalRelevance: number // 0-1 scale
-  }
+    completeness: number; // 0-1 scale
+    specificity: number; // 0-1 scale
+    clinicalRelevance: number; // 0-1 scale
+  };
   extractionMetadata: {
-    method: 'llm_enhanced' | 'pattern_based' | 'hybrid'
-    processingTime: number
-    tokensUsed?: number
-    errors?: string[]
-  }
+    method: "llm_enhanced" | "pattern_based" | "hybrid";
+    processingTime: number;
+    tokensUsed?: number;
+    errors?: string[];
+  };
 }
 
 /**
@@ -208,7 +208,7 @@ const CLINICAL_EVIDENCE_PATTERNS = {
       },
     ],
   },
-}
+};
 
 /**
  * Emotional and linguistic markers
@@ -216,36 +216,36 @@ const CLINICAL_EVIDENCE_PATTERNS = {
 const EMOTIONAL_MARKERS = {
   negative: {
     high: [
-      'devastating',
-      'terrible',
-      'awful',
-      'horrible',
-      'unbearable',
-      'excruciating',
+      "devastating",
+      "terrible",
+      "awful",
+      "horrible",
+      "unbearable",
+      "excruciating",
     ],
-    medium: ['bad', 'difficult', 'hard', 'tough', 'challenging', 'struggling'],
-    low: ['okay', 'fine', 'alright', 'manageable'],
+    medium: ["bad", "difficult", "hard", "tough", "challenging", "struggling"],
+    low: ["okay", "fine", "alright", "manageable"],
   },
   positive: {
     high: [
-      'amazing',
-      'wonderful',
-      'fantastic',
-      'great',
-      'excellent',
-      'perfect',
+      "amazing",
+      "wonderful",
+      "fantastic",
+      "great",
+      "excellent",
+      "perfect",
     ],
-    medium: ['good', 'nice', 'pleasant', 'positive', 'hopeful'],
-    low: ['okay', 'fine', 'alright', 'decent'],
+    medium: ["good", "nice", "pleasant", "positive", "hopeful"],
+    low: ["okay", "fine", "alright", "decent"],
   },
-}
+};
 
 /**
  * Production-grade Evidence Extractor
  */
 export class EvidenceExtractor {
-  private config: EvidenceExtractionConfig
-  private modelProvider: IModelProvider | undefined
+  private config: EvidenceExtractionConfig;
+  private modelProvider: IModelProvider | undefined;
 
   constructor(
     config: Partial<EvidenceExtractionConfig> = {},
@@ -260,8 +260,8 @@ export class EvidenceExtractor {
       enableSemanticAnalysis: true,
       prioritizeRiskIndicators: true,
       ...config,
-    }
-    this.modelProvider = modelProvider
+    };
+    this.modelProvider = modelProvider;
   }
 
   /**
@@ -272,30 +272,30 @@ export class EvidenceExtractor {
     category: string,
     baseAnalysis?: MentalHealthAnalysisResult,
   ): Promise<EvidenceExtractionResult> {
-    const startTime = Date.now()
-    const evidenceItems: EvidenceItem[] = []
-    const errors: string[] = []
+    const startTime = Date.now();
+    const evidenceItems: EvidenceItem[] = [];
+    const errors: string[] = [];
 
     try {
-      logger.info('Starting evidence extraction', {
+      logger.info("Starting evidence extraction", {
         category,
         textLength: text.length,
         hasBaseAnalysis: !!baseAnalysis,
-      })
+      });
 
       // 1. Pattern-based evidence extraction
-      const patternEvidence = this.extractPatternBasedEvidence(text, category)
-      evidenceItems.push(...patternEvidence)
+      const patternEvidence = this.extractPatternBasedEvidence(text, category);
+      evidenceItems.push(...patternEvidence);
 
       // 2. Linguistic and emotional markers
       if (this.config.includeLinguisticPatterns) {
-        const linguisticEvidence = this.extractLinguisticEvidence(text)
-        evidenceItems.push(...linguisticEvidence)
+        const linguisticEvidence = this.extractLinguisticEvidence(text);
+        evidenceItems.push(...linguisticEvidence);
       }
 
       if (this.config.includeEmotionalMarkers) {
-        const emotionalEvidence = this.extractEmotionalMarkers(text)
-        evidenceItems.push(...emotionalEvidence)
+        const emotionalEvidence = this.extractEmotionalMarkers(text);
+        evidenceItems.push(...emotionalEvidence);
       }
 
       // 3. Contextual evidence
@@ -303,8 +303,8 @@ export class EvidenceExtractor {
         const contextualEvidence = this.extractContextualEvidence(
           text,
           baseAnalysis,
-        )
-        evidenceItems.push(...contextualEvidence)
+        );
+        evidenceItems.push(...contextualEvidence);
       }
 
       // 4. LLM-enhanced evidence extraction (if model provider available)
@@ -314,30 +314,30 @@ export class EvidenceExtractor {
             text,
             category,
             baseAnalysis,
-          )
-          evidenceItems.push(...semanticEvidence)
+          );
+          evidenceItems.push(...semanticEvidence);
         } catch (error: unknown) {
-          logger.error('LLM-enhanced evidence extraction failed', { error })
-          errors.push('Semantic analysis unavailable')
+          logger.error("LLM-enhanced evidence extraction failed", { error });
+          errors.push("Semantic analysis unavailable");
         }
       }
 
       // 5. Filter and rank evidence
-      const filteredEvidence = this.filterAndRankEvidence(evidenceItems)
+      const filteredEvidence = this.filterAndRankEvidence(evidenceItems);
 
       // 6. Categorize evidence
-      const categorizedEvidence = this.categorizeEvidence(filteredEvidence)
+      const categorizedEvidence = this.categorizeEvidence(filteredEvidence);
 
       // 7. Calculate quality metrics
       const qualityMetrics = this.calculateQualityMetrics(
         filteredEvidence,
         text,
-      )
+      );
 
       // 8. Generate summary
-      const summary = this.generateEvidenceSummary(filteredEvidence)
+      const summary = this.generateEvidenceSummary(filteredEvidence);
 
-      const processingTime = Date.now() - startTime
+      const processingTime = Date.now() - startTime;
 
       const result: EvidenceExtractionResult = {
         evidenceItems: filteredEvidence,
@@ -345,21 +345,21 @@ export class EvidenceExtractor {
         categorizedEvidence,
         qualityMetrics,
         extractionMetadata: {
-          method: this.modelProvider ? 'llm_enhanced' : 'pattern_based',
+          method: this.modelProvider ? "llm_enhanced" : "pattern_based",
           processingTime,
           ...(errors.length > 0 && { errors }),
         },
-      }
+      };
 
-      logger.info('Evidence extraction completed', {
+      logger.info("Evidence extraction completed", {
         evidenceCount: filteredEvidence.length,
         processingTime,
         overallStrength: summary.overallStrength,
-      })
+      });
 
-      return result
+      return result;
     } catch (error: unknown) {
-      logger.error('Evidence extraction failed', { error, category })
+      logger.error("Evidence extraction failed", { error, category });
 
       // Return minimal evidence on error
       return {
@@ -369,7 +369,7 @@ export class EvidenceExtractor {
           highConfidenceCount: 0,
           riskIndicatorCount: 0,
           supportiveFactorCount: 0,
-          overallStrength: 'weak',
+          overallStrength: "weak",
         },
         categorizedEvidence: {},
         qualityMetrics: {
@@ -378,13 +378,13 @@ export class EvidenceExtractor {
           clinicalRelevance: 0,
         },
         extractionMetadata: {
-          method: 'pattern_based',
+          method: "pattern_based",
           processingTime: Date.now() - startTime,
           errors: [
-            `Evidence extraction failed: ${error instanceof Error ? String(error) : 'Unknown error'}`,
+            `Evidence extraction failed: ${error instanceof Error ? String(error) : "Unknown error"}`,
           ],
         },
-      }
+      };
     }
   }
 
@@ -395,158 +395,158 @@ export class EvidenceExtractor {
     text: string,
     category: string,
   ): EvidenceItem[] {
-    const evidence: EvidenceItem[] = []
+    const evidence: EvidenceItem[] = [];
     const patterns =
       CLINICAL_EVIDENCE_PATTERNS[
         category as keyof typeof CLINICAL_EVIDENCE_PATTERNS
-      ]
+      ];
 
     if (!patterns) {
-      return evidence
+      return evidence;
     }
 
     Object.entries(patterns).forEach(([subCategory, patternList]) => {
       patternList.forEach(({ pattern, weight }) => {
-        const matches = text.match(pattern)
+        const matches = text.match(pattern);
         if (matches) {
           matches.forEach((match) => {
-            const startIndex = text.indexOf(match)
+            const startIndex = text.indexOf(match);
             evidence.push({
               text: match,
-              type: 'direct_quote',
+              type: "direct_quote",
               confidence: weight,
               relevance:
-                weight > 0.8 ? 'high' : weight > 0.6 ? 'medium' : 'low',
+                weight > 0.8 ? "high" : weight > 0.6 ? "medium" : "low",
               category: `${category}_${subCategory}`,
               position: {
                 start: startIndex,
                 end: startIndex + match.length,
               },
-              clinicalRelevance: weight > 0.8 ? 'significant' : 'supportive',
+              clinicalRelevance: weight > 0.8 ? "significant" : "supportive",
               metadata: {
                 pattern: pattern.source,
                 keyword: match.toLowerCase(),
               },
-            })
-          })
+            });
+          });
         }
-      })
-    })
+      });
+    });
 
-    return evidence
+    return evidence;
   }
 
   /**
    * Extract linguistic patterns and speech markers
    */
   private extractLinguisticEvidence(text: string): EvidenceItem[] {
-    const evidence: EvidenceItem[] = []
+    const evidence: EvidenceItem[] = [];
 
     // Negation patterns that might indicate mental health issues
     const negationPatterns = [
       {
         pattern: /\b(never|nothing|no one|nobody|nowhere)\b/gi,
-        category: 'absolutist_thinking',
+        category: "absolutist_thinking",
       },
       {
         pattern: /\b(can't|won't|don't|isn't|aren't|wasn't|weren't)\b/gi,
-        category: 'negative_capability',
+        category: "negative_capability",
       },
       {
         pattern:
           /\b(always|everything|everyone|everywhere)\s+(is|are|feels?|seems?)\s+\w*(bad|wrong|awful|terrible)\b/gi,
-        category: 'overgeneralization',
+        category: "overgeneralization",
       },
-    ]
+    ];
 
     // Modal verbs indicating uncertainty or distress
     const modalPatterns = [
       {
         pattern: /\b(should|shouldn't|must|mustn't|have to|need to)\b/gi,
-        category: 'pressure_language',
+        category: "pressure_language",
       },
       {
         pattern:
           /\b(might|maybe|perhaps|possibly|probably)\s+\w*(die|hurt|fail|wrong)\b/gi,
-        category: 'uncertainty_with_risk',
+        category: "uncertainty_with_risk",
       },
-    ]
+    ];
 
     // Temporal patterns indicating duration of symptoms
     const temporalPatterns = [
       {
         pattern:
           /\b(for (weeks|months|years)|since|constantly|always|never)\b/gi,
-        category: 'symptom_duration',
+        category: "symptom_duration",
       },
       {
         pattern: /\b(getting worse|deteriorating|declining|spiral(l)?ing)\b/gi,
-        category: 'symptom_progression',
+        category: "symptom_progression",
       },
-    ]
+    ];
 
-    ;[negationPatterns, modalPatterns, temporalPatterns].forEach(
+    [negationPatterns, modalPatterns, temporalPatterns].forEach(
       (patternGroup) => {
         patternGroup.forEach(({ pattern, category }) => {
-          const matches = text.match(pattern)
+          const matches = text.match(pattern);
           if (matches) {
             matches.forEach((match) => {
               evidence.push({
                 text: match,
-                type: 'linguistic_pattern',
+                type: "linguistic_pattern",
                 confidence: 0.6,
-                relevance: 'medium',
+                relevance: "medium",
                 category,
                 metadata: {
                   pattern: pattern.source,
                 },
-              })
-            })
+              });
+            });
           }
-        })
+        });
       },
-    )
+    );
 
-    return evidence
+    return evidence;
   }
 
   /**
    * Extract emotional markers and intensity indicators
    */
   private extractEmotionalMarkers(text: string): EvidenceItem[] {
-    const evidence: EvidenceItem[] = []
+    const evidence: EvidenceItem[] = [];
 
     Object.entries(EMOTIONAL_MARKERS).forEach(([valence, intensityLevels]) => {
       Object.entries(intensityLevels).forEach(([intensity, words]) => {
         words.forEach((word) => {
-          const regex = new RegExp(`\\b${word}\\b`, 'gi')
-          const matches = text.match(regex)
+          const regex = new RegExp(`\\b${word}\\b`, "gi");
+          const matches = text.match(regex);
           if (matches) {
             matches.forEach((match) => {
               evidence.push({
                 text: match,
-                type: 'emotional_marker',
+                type: "emotional_marker",
                 confidence:
-                  intensity === 'high'
+                  intensity === "high"
                     ? 0.8
-                    : intensity === 'medium'
+                    : intensity === "medium"
                       ? 0.6
                       : 0.4,
-                relevance: intensity === 'high' ? 'high' : 'medium',
-                category: 'emotional_expression',
+                relevance: intensity === "high" ? "high" : "medium",
+                category: "emotional_expression",
                 metadata: {
-                  emotionalValence: valence as 'positive' | 'negative',
-                  intensity: intensity as 'high' | 'medium' | 'low',
+                  emotionalValence: valence as "positive" | "negative",
+                  intensity: intensity as "high" | "medium" | "low",
                   keyword: word,
                 },
-              })
-            })
+              });
+            });
           }
-        })
-      })
-    })
+        });
+      });
+    });
 
-    return evidence
+    return evidence;
   }
 
   /**
@@ -556,10 +556,10 @@ export class EvidenceExtractor {
     text: string,
     baseAnalysis?: MentalHealthAnalysisResult,
   ): EvidenceItem[] {
-    const evidence: EvidenceItem[] = []
+    const evidence: EvidenceItem[] = [];
 
     if (!baseAnalysis) {
-      return evidence
+      return evidence;
     }
 
     // If crisis detected, look for additional crisis context
@@ -568,26 +568,26 @@ export class EvidenceExtractor {
         /\b(plan|method|when|where|how)\b/gi,
         /\b(final|last|goodbye|sorry)\b/gi,
         /\b(insurance|will|belongings|pets)\b/gi,
-      ]
+      ];
 
       crisisContextPatterns.forEach((pattern) => {
-        const matches = text.match(pattern)
+        const matches = text.match(pattern);
         if (matches) {
           matches.forEach((match) => {
             evidence.push({
               text: match,
-              type: 'contextual_indicator',
+              type: "contextual_indicator",
               confidence: 0.9,
-              relevance: 'high',
-              category: 'crisis_context',
-              clinicalRelevance: 'critical',
+              relevance: "high",
+              category: "crisis_context",
+              clinicalRelevance: "critical",
               metadata: {
-                contextualContext: 'crisis_amplification',
+                contextualContext: "crisis_amplification",
               },
-            })
-          })
+            });
+          });
         }
-      })
+      });
     }
 
     // Look for supporting/protective factors
@@ -595,28 +595,28 @@ export class EvidenceExtractor {
       /\b(support|help|therapy|treatment|doctor|counselor|family|friends)\b/gi,
       /\b(hope|future|goals|plans|better|improve|recover)\b/gi,
       /\b(grateful|thankful|blessed|lucky|fortunate)\b/gi,
-    ]
+    ];
 
     protectivePatterns.forEach((pattern) => {
-      const matches = text.match(pattern)
+      const matches = text.match(pattern);
       if (matches) {
         matches.forEach((match) => {
           evidence.push({
             text: match,
-            type: 'contextual_indicator',
+            type: "contextual_indicator",
             confidence: 0.7,
-            relevance: 'medium',
-            category: 'protective_factors',
-            clinicalRelevance: 'supportive',
+            relevance: "medium",
+            category: "protective_factors",
+            clinicalRelevance: "supportive",
             metadata: {
-              contextualContext: 'protective_factor',
+              contextualContext: "protective_factor",
             },
-          })
-        })
+          });
+        });
       }
-    })
+    });
 
-    return evidence
+    return evidence;
   }
 
   /**
@@ -628,76 +628,77 @@ export class EvidenceExtractor {
     baseAnalysis?: MentalHealthAnalysisResult,
   ): Promise<EvidenceItem[]> {
     if (!this.modelProvider) {
-      return []
+      return [];
     }
 
     const prompt = this.buildSemanticExtractionPrompt(
       text,
       category,
       baseAnalysis,
-    )
+    );
 
     try {
       const response = await this.modelProvider.invoke(prompt, {
         temperature: 0.2,
         max_tokens: 600,
-      })
+      });
 
       // Parse using utils parser (shared EvidenceItem shape)
-      const parsed = parseSemanticEvidenceResponse(response.content)
+      const parsed = parseSemanticEvidenceResponse(response.content);
 
       // Map shared EvidenceItem -> extractor EvidenceItem
       const mapped: EvidenceItem[] = parsed.map((item) => {
         // clinicalRelevance mapping: prefer categorical where possible
         // If numeric present, bucket into categories; if string provided, preserve it; otherwise default to 'supportive'
-        let clinical: EvidenceItem['clinicalRelevance']
-        if (typeof item.clinicalRelevance === 'number') {
-          const v = item.clinicalRelevance
+        let clinical: EvidenceItem["clinicalRelevance"];
+        if (typeof item.clinicalRelevance === "number") {
+          const v = item.clinicalRelevance;
           if (v >= 0.95) {
-            clinical = 'critical'
+            clinical = "critical";
           } else if (v >= 0.7) {
-            clinical = 'significant'
+            clinical = "significant";
           } else if (v >= 0.4) {
-            clinical = 'supportive'
+            clinical = "supportive";
           } else {
-            clinical = 'contextual'
+            clinical = "contextual";
           }
-        } else if (typeof item.clinicalRelevance === 'string') {
+        } else if (typeof item.clinicalRelevance === "string") {
           // Parser may emit 'supportive' default; preserve valid string
-          clinical = item.clinicalRelevance as EvidenceItem['clinicalRelevance']
+          clinical =
+            item.clinicalRelevance as EvidenceItem["clinicalRelevance"];
         } else {
           // Default when missing
-          clinical = 'supportive'
+          clinical = "supportive";
         }
 
         // severity mapping to relevance/intensity
-        const relevance: EvidenceItem['relevance'] =
-          item.severity === 'high'
-            ? 'high'
-            : item.severity === 'moderate'
-              ? 'medium'
-              : 'low'
+        const relevance: EvidenceItem["relevance"] =
+          item.severity === "high"
+            ? "high"
+            : item.severity === "moderate"
+              ? "medium"
+              : "low";
 
         return {
           text: item.content,
-          type: 'direct_quote',
+          type: "direct_quote",
           confidence: item.confidence ?? 0.5,
           relevance,
           category: item.source || `${category}_semantic`,
           clinicalRelevance: clinical,
           metadata: {
             semanticRationale: (item.context &&
-              (item.context as Record<string, unknown>)[
-                'semanticRationale'
-              ]) as string | undefined,
+              (item.context as Record<string, unknown>)["semanticRationale"]) as
+              | string
+              | undefined,
           },
-        }
-      })
+        };
+      });
 
-      return mapped
+      return mapped;
     } catch (error: unknown) {
-      logger.error('Semantic evidence extraction failed', { error })
-      return []
+      logger.error("Semantic evidence extraction failed", { error });
+      return [];
     }
   }
 
@@ -708,7 +709,7 @@ export class EvidenceExtractor {
     text: string,
     category: string,
     baseAnalysis?: MentalHealthAnalysisResult,
-  ): Array<{ role: 'system' | 'user'; content: string }> {
+  ): Array<{ role: "system" | "user"; content: string }> {
     const systemPrompt = `You are a clinical psychology expert analyzing text for mental health evidence. 
 Extract specific, clinically relevant evidence from the text that supports or contradicts mental health concerns.
 
@@ -737,20 +738,20 @@ Respond in JSON format:
       "category": "symptom_type"
     }
   ]
-}`
+}`;
 
     const userPrompt = `Analyze this text for mental health evidence in the context of ${category}:
 
 "${text}"
 
-${baseAnalysis ? `Previous analysis detected: ${baseAnalysis.mentalHealthCategory} (confidence: ${baseAnalysis.confidence.toFixed(2)})` : ''}
+${baseAnalysis ? `Previous analysis detected: ${baseAnalysis.mentalHealthCategory} (confidence: ${baseAnalysis.confidence.toFixed(2)})` : ""}
 
-Extract evidence that is clinically meaningful and specific to mental health assessment.`
+Extract evidence that is clinically meaningful and specific to mental health assessment.`;
 
     return [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-    ]
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ];
   }
 
   /**
@@ -765,15 +766,15 @@ Extract evidence that is clinically meaningful and specific to mental health ass
           array.findIndex(
             (other) => other.text.toLowerCase() === item.text.toLowerCase(),
           ) === index,
-      )
+      );
 
     // Sort by priority: crisis indicators first, then by confidence
     const sorted = filtered.sort((a, b) => {
       // Prioritize crisis indicators
-      const aCrisis = a.category.includes('crisis') ? 1 : 0
-      const bCrisis = b.category.includes('crisis') ? 1 : 0
+      const aCrisis = a.category.includes("crisis") ? 1 : 0;
+      const bCrisis = b.category.includes("crisis") ? 1 : 0;
       if (aCrisis !== bCrisis) {
-        return bCrisis - aCrisis
+        return bCrisis - aCrisis;
       }
 
       // Then by clinical relevance
@@ -782,37 +783,37 @@ Extract evidence that is clinically meaningful and specific to mental health ass
         significant: 3,
         supportive: 2,
         contextual: 1,
-      }
-      const aRelevance = relevanceOrder[a.clinicalRelevance || 'supportive']
-      const bRelevance = relevanceOrder[b.clinicalRelevance || 'supportive']
+      };
+      const aRelevance = relevanceOrder[a.clinicalRelevance || "supportive"];
+      const bRelevance = relevanceOrder[b.clinicalRelevance || "supportive"];
       if (aRelevance !== bRelevance) {
-        return bRelevance - aRelevance
+        return bRelevance - aRelevance;
       }
 
       // Finally by confidence
-      return b.confidence - a.confidence
-    })
+      return b.confidence - a.confidence;
+    });
 
     // Limit to max items
-    return sorted.slice(0, this.config.maxEvidenceItems)
+    return sorted.slice(0, this.config.maxEvidenceItems);
   }
 
   /**
    * Categorize evidence by type and clinical relevance
    */
   private categorizeEvidence(evidenceItems: EvidenceItem[]): {
-    [category: string]: EvidenceItem[]
+    [category: string]: EvidenceItem[];
   } {
-    const categorized: { [category: string]: EvidenceItem[] } = {}
+    const categorized: { [category: string]: EvidenceItem[] } = {};
 
     evidenceItems.forEach((item) => {
       if (!categorized[item.category]) {
-        categorized[item.category] = []
+        categorized[item.category] = [];
       }
-      categorized[item.category]!.push(item)
-    })
+      categorized[item.category]!.push(item);
+    });
 
-    return categorized
+    return categorized;
   }
 
   /**
@@ -822,29 +823,29 @@ Extract evidence that is clinically meaningful and specific to mental health ass
     evidenceItems: EvidenceItem[],
     originalText: string,
   ): {
-    completeness: number
-    specificity: number
-    clinicalRelevance: number
+    completeness: number;
+    specificity: number;
+    clinicalRelevance: number;
   } {
     if (evidenceItems.length === 0) {
-      return { completeness: 0, specificity: 0, clinicalRelevance: 0 }
+      return { completeness: 0, specificity: 0, clinicalRelevance: 0 };
     }
 
     // Completeness: coverage of original text
     const evidenceTextLength = evidenceItems.reduce(
       (sum, item) => sum + item.text.length,
       0,
-    )
+    );
     const completeness = Math.min(
       evidenceTextLength / (originalText.length * 0.3),
       1,
-    ) // Target 30% coverage
+    ); // Target 30% coverage
 
     // Specificity: proportion of high-confidence, specific evidence
     const specificEvidence = evidenceItems.filter(
-      (item) => item.confidence > 0.7 && item.type === 'direct_quote',
-    )
-    const specificity = specificEvidence.length / evidenceItems.length
+      (item) => item.confidence > 0.7 && item.type === "direct_quote",
+    );
+    const specificity = specificEvidence.length / evidenceItems.length;
 
     // Clinical relevance: weighted by clinical importance
     const relevanceWeights = {
@@ -852,53 +853,53 @@ Extract evidence that is clinically meaningful and specific to mental health ass
       significant: 0.8,
       supportive: 0.6,
       contextual: 0.4,
-    }
+    };
     const totalRelevance = evidenceItems.reduce(
       (sum, item) =>
-        sum + (relevanceWeights[item.clinicalRelevance || 'supportive'] || 0.4),
+        sum + (relevanceWeights[item.clinicalRelevance || "supportive"] || 0.4),
       0,
-    )
-    const clinicalRelevance = totalRelevance / evidenceItems.length
+    );
+    const clinicalRelevance = totalRelevance / evidenceItems.length;
 
     return {
       completeness: Math.round(completeness * 100) / 100,
       specificity: Math.round(specificity * 100) / 100,
       clinicalRelevance: Math.round(clinicalRelevance * 100) / 100,
-    }
+    };
   }
 
   /**
    * Generate evidence summary
    */
   private generateEvidenceSummary(evidenceItems: EvidenceItem[]): {
-    totalEvidence: number
-    highConfidenceCount: number
-    riskIndicatorCount: number
-    supportiveFactorCount: number
-    overallStrength: 'strong' | 'moderate' | 'weak'
+    totalEvidence: number;
+    highConfidenceCount: number;
+    riskIndicatorCount: number;
+    supportiveFactorCount: number;
+    overallStrength: "strong" | "moderate" | "weak";
   } {
-    const totalEvidence = evidenceItems.length
+    const totalEvidence = evidenceItems.length;
     const highConfidenceCount = evidenceItems.filter(
       (item) => item.confidence > 0.7,
-    ).length
+    ).length;
     const riskIndicatorCount = evidenceItems.filter(
       (item) =>
-        item.category.includes('crisis') ||
-        item.category.includes('risk') ||
-        item.clinicalRelevance === 'critical',
-    ).length
+        item.category.includes("crisis") ||
+        item.category.includes("risk") ||
+        item.clinicalRelevance === "critical",
+    ).length;
     const supportiveFactorCount = evidenceItems.filter(
       (item) =>
-        item.category.includes('protective') ||
-        item.metadata?.emotionalValence === 'positive',
-    ).length
+        item.category.includes("protective") ||
+        item.metadata?.emotionalValence === "positive",
+    ).length;
 
     // Determine overall strength
-    let overallStrength: 'strong' | 'moderate' | 'weak' = 'weak'
+    let overallStrength: "strong" | "moderate" | "weak" = "weak";
     if (highConfidenceCount >= 3 && totalEvidence >= 5) {
-      overallStrength = 'strong'
+      overallStrength = "strong";
     } else if (highConfidenceCount >= 1 && totalEvidence >= 2) {
-      overallStrength = 'moderate'
+      overallStrength = "moderate";
     }
 
     return {
@@ -907,7 +908,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
       riskIndicatorCount,
       supportiveFactorCount,
       overallStrength,
-    }
+    };
   }
 
   /**
@@ -918,7 +919,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
       .filter((item) => item.confidence > 0.5) // Only include medium+ confidence
       .sort((a, b) => b.confidence - a.confidence) // Sort by confidence
       .map((item) => item.text)
-      .slice(0, 10) // Limit for readability
+      .slice(0, 10); // Limit for readability
   }
 
   /**
@@ -928,7 +929,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
     evidenceResult: EvidenceExtractionResult,
     category: string,
   ): EvidenceItem[] {
-    return evidenceResult.categorizedEvidence[category] || []
+    return evidenceResult.categorizedEvidence[category] || [];
   }
 
   /**
@@ -939,9 +940,9 @@ Extract evidence that is clinically meaningful and specific to mental health ass
   ): EvidenceItem[] {
     return evidenceResult.evidenceItems.filter(
       (item) =>
-        item.clinicalRelevance === 'critical' ||
+        item.clinicalRelevance === "critical" ||
         item.confidence > 0.8 ||
-        item.category.includes('crisis'),
-    )
+        item.category.includes("crisis"),
+    );
   }
 }

@@ -1,8 +1,8 @@
-import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
-import { EvaluationPanel } from '../features/EvaluationPanel'
+import { JournalResearchQueryProvider } from "@/lib/api/journal-research/react-query";
+import { EvaluationPanel } from "../features/EvaluationPanel";
 
 export interface EvaluationPageProps {
-  sessionId?: string | null
+  sessionId?: string | null;
 }
 
 export function EvaluationPage({ sessionId }: EvaluationPageProps) {
@@ -10,6 +10,5 @@ export function EvaluationPage({ sessionId }: EvaluationPageProps) {
     <JournalResearchQueryProvider>
       <EvaluationPanel sessionId={sessionId ?? null} />
     </JournalResearchQueryProvider>
-  )
+  );
 }
-

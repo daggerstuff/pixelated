@@ -7,31 +7,34 @@
  * or falls back to a local implementation.
  */
 
-import type { APIContext, APIRoute } from 'astro'
-import { getSession } from '@/lib/auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { APIContext, APIRoute } from "astro";
+import { getSession } from "@/lib/auth/session";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 import {
   createEmbeddingAgentClient,
   EmbeddingAgentError,
   EmbeddingRequestSchema,
-} from '@/lib/ai/embedding-agent'
-import type { EmbeddingRequest, EmbeddingResponse } from '@/lib/ai/embedding-agent'
+} from "@/lib/ai/embedding-agent";
+import type {
+  EmbeddingRequest,
+  EmbeddingResponse,
+} from "@/lib/ai/embedding-agent";
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
   user?: {
-    id: string
-    email?: string
-    role?: string
-    name?: string
-  }
+    id: string;
+    email?: string;
+    role?: string;
+    name?: string;
+  };
   session?: {
-    sessionId?: string
-  }
-  expires?: string
+    sessionId?: string;
+  };
+  expires?: string;
 }
 
-const logger = createBuildSafeLogger('embeddings-embed')
+const logger = createBuildSafeLogger("embeddings-embed");
 
 /**
  * GET handler - returns information about the embed endpoint.
@@ -39,229 +42,229 @@ const logger = createBuildSafeLogger('embeddings-embed')
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     // Verify session for security
-    const session: Session | null = await getSession()
+    const session: Session | null = await getSession();
     if (!session?.user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     return new Response(
       JSON.stringify({
-        name: 'Text Embedding API',
-        description: 'Endpoint for generating text embeddings',
-        methods: ['POST'],
-        version: '1.0.0',
-        status: 'active',
-        authentication: 'required',
+        name: "Text Embedding API",
+        description: "Endpoint for generating text embeddings",
+        methods: ["POST"],
+        version: "1.0.0",
+        status: "active",
+        authentication: "required",
         supportedModels: [
-          'all-MiniLM-L6-v2',
-          'all-MiniLM-L12-v2',
-          'all-mpnet-base-v2',
-          'BAAI/bge-small-en-v1.5',
-          'BAAI/bge-base-en-v1.5',
-          'emilyalsentzer/Bio_ClinicalBERT',
+          "all-MiniLM-L6-v2",
+          "all-MiniLM-L12-v2",
+          "all-mpnet-base-v2",
+          "BAAI/bge-small-en-v1.5",
+          "BAAI/bge-base-en-v1.5",
+          "emilyalsentzer/Bio_ClinicalBERT",
         ],
         parameters: {
-          required: ['text'],
-          optional: ['knowledgeType', 'metadata', 'model'],
+          required: ["text"],
+          optional: ["knowledgeType", "metadata", "model"],
         },
         features: [
-          'Single text embedding',
-          'Multiple embedding models',
-          'Caching support',
-          'Clinical knowledge optimization',
+          "Single text embedding",
+          "Multiple embedding models",
+          "Caching support",
+          "Clinical knowledge optimization",
         ],
-        defaultModel: 'all-MiniLM-L6-v2',
+        defaultModel: "all-MiniLM-L6-v2",
         defaultDimension: 384,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   } catch (error) {
-    logger.error('Embed API info error:', error)
+    logger.error("Embed API info error:", error);
     return new Response(
       JSON.stringify({
-        error: 'Failed to get endpoint information',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to get endpoint information",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * POST handler - generates embedding for provided text.
  */
 export const POST: APIRoute = async ({ request }: APIContext) => {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Verify session
-    const session: Session | null = await getSession()
+    const session: Session | null = await getSession();
     if (!session?.user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Parse and validate request body
-    let body: unknown
+    let body: unknown;
     try {
-      body = await request.json()
+      body = await request.json();
     } catch {
       return new Response(
         JSON.stringify({
-          error: 'Invalid JSON',
-          message: 'Request body must be valid JSON',
+          error: "Invalid JSON",
+          message: "Request body must be valid JSON",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     // Validate request schema
-    const validation = EmbeddingRequestSchema.safeParse(body)
+    const validation = EmbeddingRequestSchema.safeParse(body);
     if (!validation.success) {
       return new Response(
         JSON.stringify({
-          error: 'Validation error',
-          message: 'Invalid request format',
+          error: "Validation error",
+          message: "Invalid request format",
           details: validation.error.flatten(),
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    const embeddingRequest: EmbeddingRequest = validation.data
+    const embeddingRequest: EmbeddingRequest = validation.data;
 
     // Try to use the Python embedding agent service
-    const agentUrl = import.meta.env['EMBEDDING_AGENT_URL'] || 'http://localhost:8001'
-    const client = createEmbeddingAgentClient(agentUrl)
+    const agentUrl =
+      import.meta.env["EMBEDDING_AGENT_URL"] || "http://localhost:8001";
+    const client = createEmbeddingAgentClient(agentUrl);
 
     try {
-      const response = await client.embedText(embeddingRequest)
+      const response = await client.embedText(embeddingRequest);
 
-      logger.info('Generated embedding', {
+      logger.info("Generated embedding", {
         userId: session.user.id,
         textLength: embeddingRequest.text.length,
         model: response.modelUsed,
         dimension: response.dimension,
         cached: response.cached,
         processingTimeMs: response.processingTimeMs,
-      })
+      });
 
       return new Response(JSON.stringify(response), {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time-Ms': String(Date.now() - startTime),
-          'X-Model-Used': response.modelUsed,
-          'X-Cached': String(response.cached),
+          "Content-Type": "application/json",
+          "X-Processing-Time-Ms": String(Date.now() - startTime),
+          "X-Model-Used": response.modelUsed,
+          "X-Cached": String(response.cached),
         },
-      })
+      });
     } catch (error) {
       // If the agent service is unavailable, fall back to local mock
       if (error instanceof EmbeddingAgentError && error.statusCode === 0) {
-        logger.warn('Embedding agent unavailable, using mock implementation')
-        const mockResponse = generateMockEmbedding(embeddingRequest.text)
+        logger.warn("Embedding agent unavailable, using mock implementation");
+        const mockResponse = generateMockEmbedding(embeddingRequest.text);
 
         return new Response(JSON.stringify(mockResponse), {
           status: 200,
           headers: {
-            'Content-Type': 'application/json',
-            'X-Processing-Time-Ms': String(Date.now() - startTime),
-            'X-Model-Used': 'mock',
-            'X-Cached': 'false',
+            "Content-Type": "application/json",
+            "X-Processing-Time-Ms": String(Date.now() - startTime),
+            "X-Model-Used": "mock",
+            "X-Cached": "false",
           },
-        })
+        });
       }
-      throw error
+      throw error;
     }
   } catch (error) {
-    logger.error('Embed endpoint error:', error)
+    logger.error("Embed endpoint error:", error);
 
     if (error instanceof EmbeddingAgentError) {
       return new Response(
         JSON.stringify({
-          error: 'Embedding service error',
+          error: "Embedding service error",
           message: error.message,
           statusCode: error.statusCode,
         }),
         {
           status: error.statusCode || 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * Generate a mock embedding for testing when the agent is unavailable.
  */
 function generateMockEmbedding(text: string): EmbeddingResponse {
   // Generate deterministic hash-based mock embedding
-  const hash = simpleHash(text)
-  const dimension = 384
-  const embedding: number[] = []
+  const hash = simpleHash(text);
+  const dimension = 384;
+  const embedding: number[] = [];
 
   // Create pseudo-random but deterministic embedding
-  let seed = hash
+  let seed = hash;
   for (let i = 0; i < dimension; i++) {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff
-    embedding.push((seed / 0x7fffffff) * 2 - 1)
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    embedding.push((seed / 0x7fffffff) * 2 - 1);
   }
 
   // Normalize
-  const norm = Math.sqrt(embedding.reduce((sum, x) => sum + x * x, 0))
-  const normalizedEmbedding = embedding.map((x) => x / norm)
+  const norm = Math.sqrt(embedding.reduce((sum, x) => sum + x * x, 0));
+  const normalizedEmbedding = embedding.map((x) => x / norm);
 
   return {
     embedding: normalizedEmbedding,
     embeddingId: `mock_${hash.toString(16)}`,
-    modelUsed: 'mock-embedding-v1',
+    modelUsed: "mock-embedding-v1",
     dimension,
     textHash: hash.toString(16),
     cached: false,
     processingTimeMs: 5,
     createdAt: new Date().toISOString(),
-  }
+  };
 }
 
 /**
  * Simple hash function for text.
  */
 function simpleHash(str: string): number {
-  let hash = 0
+  let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32-bit integer
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
   }
-  return Math.abs(hash)
+  return Math.abs(hash);
 }
-

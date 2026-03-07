@@ -4,20 +4,20 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../ui/card'
-import { Badge } from '../ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import type { UnusualPattern } from '../../lib/audit/analysis'
+} from "../ui/card";
+import { Badge } from "../ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { UnusualPattern } from "../../lib/audit/analysis";
 
 interface UnusualPatternsProps {
-  patterns: UnusualPattern[]
+  patterns: UnusualPattern[];
 }
 
 const severityColors = {
-  low: 'bg-yellow-100 text-yellow-800',
-  medium: 'bg-orange-100 text-orange-800',
-  high: 'bg-red-100 text-red-800',
-}
+  low: "bg-yellow-100 text-yellow-800",
+  medium: "bg-orange-100 text-orange-800",
+  high: "bg-red-100 text-red-800",
+};
 
 export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
   if (!patterns.length) {
@@ -28,7 +28,7 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
           <CardDescription>No unusual patterns detected</CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
@@ -36,7 +36,7 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
       <CardHeader>
         <CardTitle>Unusual Patterns</CardTitle>
         <CardDescription>
-          {patterns.length} pattern{patterns.length !== 1 ? 's' : ''} detected
+          {patterns.length} pattern{patterns.length !== 1 ? "s" : ""} detected
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -49,7 +49,7 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
               >
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-lg font-semibold capitalize">
-                    {pattern.type.replace('_', ' ')}
+                    {pattern.type.replace("_", " ")}
                   </h3>
                   <Badge
                     variant="outline"
@@ -70,5 +70,5 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
         </ScrollArea>
       </CardContent>
     </Card>
-  )
+  );
 }

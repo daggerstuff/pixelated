@@ -1,10 +1,10 @@
-import { useState } from 'react'
-import type { FC } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState } from "react";
+import type { FC } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Upload,
   CheckCircle,
@@ -15,175 +15,175 @@ import {
   FileText,
   Brain,
   Zap,
-} from 'lucide-react'
+} from "lucide-react";
 
 interface DemoStep {
-  id: string
-  title: string
-  description: string
-  status: 'pending' | 'processing' | 'completed'
-  progress: number
+  id: string;
+  title: string;
+  description: string;
+  status: "pending" | "processing" | "completed";
+  progress: number;
 }
 
 const ClientFacingDemo: FC = () => {
   // Enable all tabs in test/CI mode for testing purposes
   // Tests can enable all tabs by adding ?test=true to the URL
   const isTestMode =
-    typeof window !== 'undefined' &&
-    (window.location.search.includes('test=true') ||
-      window.location.search.includes('enable-all-tabs=true'))
+    typeof window !== "undefined" &&
+    (window.location.search.includes("test=true") ||
+      window.location.search.includes("enable-all-tabs=true"));
 
-  const [currentStep, setCurrentStep] = useState(0)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [, setDemoData] = useState({
     uploadedFiles: 0,
     validationScore: 0,
     balanceScore: 0,
     exportReady: false,
-  })
+  });
 
   const demoSteps: DemoStep[] = [
     {
-      id: 'upload',
-      title: 'Upload Psychology Content',
-      description: 'Upload case studies, therapy notes, or training materials',
-      status: 'completed',
+      id: "upload",
+      title: "Upload Psychology Content",
+      description: "Upload case studies, therapy notes, or training materials",
+      status: "completed",
       progress: 100,
     },
     {
-      id: 'validate',
-      title: 'AI-Powered Validation',
+      id: "validate",
+      title: "AI-Powered Validation",
       description:
-        'Validate content for clinical accuracy and ethical compliance',
-      status: currentStep >= 1 ? 'completed' : 'pending',
+        "Validate content for clinical accuracy and ethical compliance",
+      status: currentStep >= 1 ? "completed" : "pending",
       progress: currentStep >= 1 ? 100 : 0,
     },
     {
-      id: 'balance',
-      title: 'Category Balancing',
+      id: "balance",
+      title: "Category Balancing",
       description:
-        'Ensure balanced representation across psychology categories',
-      status: currentStep >= 2 ? 'completed' : 'pending',
+        "Ensure balanced representation across psychology categories",
+      status: currentStep >= 2 ? "completed" : "pending",
       progress: currentStep >= 2 ? 100 : 0,
     },
     {
-      id: 'export',
-      title: 'Export Results',
-      description: 'Generate training-ready datasets and quality reports',
-      status: currentStep >= 3 ? 'completed' : 'pending',
+      id: "export",
+      title: "Export Results",
+      description: "Generate training-ready datasets and quality reports",
+      status: currentStep >= 3 ? "completed" : "pending",
       progress: currentStep >= 3 ? 100 : 0,
     },
-  ]
+  ];
 
   const sampleFiles = [
     {
-      name: 'anxiety-case-studies.json',
-      size: '2.4 MB',
-      type: 'JSON',
-      status: 'processed',
+      name: "anxiety-case-studies.json",
+      size: "2.4 MB",
+      type: "JSON",
+      status: "processed",
     },
     {
-      name: 'therapy-session-notes.csv',
-      size: '1.8 MB',
-      type: 'CSV',
-      status: 'processed',
+      name: "therapy-session-notes.csv",
+      size: "1.8 MB",
+      type: "CSV",
+      status: "processed",
     },
     {
-      name: 'clinical-assessments.txt',
-      size: '956 KB',
-      type: 'TXT',
-      status: 'processed',
+      name: "clinical-assessments.txt",
+      size: "956 KB",
+      type: "TXT",
+      status: "processed",
     },
-  ]
+  ];
 
   const validationResults = [
     {
-      category: 'Clinical Accuracy',
+      category: "Clinical Accuracy",
       score: 94,
-      status: 'excellent',
-      color: 'text-green-400',
+      status: "excellent",
+      color: "text-green-400",
     },
     {
-      category: 'Ethical Compliance',
+      category: "Ethical Compliance",
       score: 98,
-      status: 'excellent',
-      color: 'text-green-400',
+      status: "excellent",
+      color: "text-green-400",
     },
     {
-      category: 'Content Quality',
+      category: "Content Quality",
       score: 91,
-      status: 'good',
-      color: 'text-blue-400',
+      status: "good",
+      color: "text-blue-400",
     },
     {
-      category: 'Format Consistency',
+      category: "Format Consistency",
       score: 88,
-      status: 'good',
-      color: 'text-blue-400',
+      status: "good",
+      color: "text-blue-400",
     },
-  ]
+  ];
 
   const categoryBalance = [
     {
-      name: 'Anxiety Disorders',
+      name: "Anxiety Disorders",
       percentage: 30,
       target: 30,
-      color: 'bg-purple-500',
+      color: "bg-purple-500",
     },
     {
-      name: 'Mood Disorders',
+      name: "Mood Disorders",
       percentage: 25,
       target: 25,
-      color: 'bg-blue-500',
+      color: "bg-blue-500",
     },
     {
-      name: 'Trauma & PTSD',
+      name: "Trauma & PTSD",
       percentage: 20,
       target: 20,
-      color: 'bg-green-500',
+      color: "bg-green-500",
     },
     {
-      name: 'Personality Disorders',
+      name: "Personality Disorders",
       percentage: 15,
       target: 15,
-      color: 'bg-yellow-500',
+      color: "bg-yellow-500",
     },
-    { name: 'Substance Use', percentage: 10, target: 10, color: 'bg-red-500' },
-  ]
+    { name: "Substance Use", percentage: 10, target: 10, color: "bg-red-500" },
+  ];
 
   const runDemo = async () => {
-    setIsProcessing(true)
+    setIsProcessing(true);
 
     // Simulate processing steps
     for (let i = 0; i <= 3; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      setCurrentStep(i)
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setCurrentStep(i);
 
       // Update demo data
       if (i === 0) {
-        setDemoData((prev) => ({ ...prev, uploadedFiles: 3 }))
+        setDemoData((prev) => ({ ...prev, uploadedFiles: 3 }));
       } else if (i === 1) {
-        setDemoData((prev) => ({ ...prev, validationScore: 93 }))
+        setDemoData((prev) => ({ ...prev, validationScore: 93 }));
       } else if (i === 2) {
-        setDemoData((prev) => ({ ...prev, balanceScore: 94 }))
+        setDemoData((prev) => ({ ...prev, balanceScore: 94 }));
       } else if (i === 3) {
-        setDemoData((prev) => ({ ...prev, exportReady: true }))
+        setDemoData((prev) => ({ ...prev, exportReady: true }));
       }
     }
 
-    setIsProcessing(false)
-  }
+    setIsProcessing(false);
+  };
 
   const resetDemo = () => {
-    setCurrentStep(0)
-    setIsProcessing(false)
+    setCurrentStep(0);
+    setIsProcessing(false);
     setDemoData({
       uploadedFiles: 0,
       validationScore: 0,
       balanceScore: 0,
       exportReady: false,
-    })
-  }
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -232,14 +232,14 @@ const ClientFacingDemo: FC = () => {
             <div key={step.id} className="flex flex-col items-center flex-1">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-                  step.status === 'completed'
-                    ? 'bg-green-600'
-                    : step.status === 'processing'
-                      ? 'bg-blue-600'
-                      : 'bg-gray-600'
+                  step.status === "completed"
+                    ? "bg-green-600"
+                    : step.status === "processing"
+                      ? "bg-blue-600"
+                      : "bg-gray-600"
                 }`}
               >
-                {step.status === 'completed' ? (
+                {step.status === "completed" ? (
                   <CheckCircle className="w-6 h-6 text-white" />
                 ) : (
                   <span className="text-white font-bold">{index + 1}</span>
@@ -260,16 +260,16 @@ const ClientFacingDemo: FC = () => {
       </div>
 
       {/* Demo Content */}
-      <Tabs value={demoSteps[currentStep]?.id || 'upload'} className="w-full">
+      <Tabs value={demoSteps[currentStep]?.id || "upload"} className="w-full">
         <TabsList className="grid w-full grid-cols-4 bg-slate-800">
           {demoSteps.map((step, index) => {
             // Map step IDs to test IDs expected by tests
             const testIdMap: Record<string, string> = {
-              upload: 'data-ingestion-tab',
-              validate: 'validation-tab',
-              balance: 'category-balancing-tab',
-              export: 'export-tab',
-            }
+              upload: "data-ingestion-tab",
+              validate: "validation-tab",
+              balance: "category-balancing-tab",
+              export: "export-tab",
+            };
             return (
               <TabsTrigger
                 key={step.id}
@@ -280,7 +280,7 @@ const ClientFacingDemo: FC = () => {
               >
                 {step.title}
               </TabsTrigger>
-            )
+            );
           })}
         </TabsList>
 
@@ -504,15 +504,15 @@ const ClientFacingDemo: FC = () => {
                           <span className="text-xs text-gray-400">
                             {Math.abs(category.percentage - category.target) ===
                             0
-                              ? 'Perfect'
+                              ? "Perfect"
                               : Math.abs(
                                     category.percentage - category.target,
                                   ) <= 2
-                                ? 'Excellent'
-                                : 'Good'}
+                                ? "Excellent"
+                                : "Good"}
                           </span>
                           <span className="text-xs text-gray-400">
-                            {category.percentage >= category.target ? '+' : ''}
+                            {category.percentage >= category.target ? "+" : ""}
                             {category.percentage - category.target}%
                           </span>
                         </div>
@@ -665,7 +665,7 @@ const ClientFacingDemo: FC = () => {
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
-export default ClientFacingDemo
+export default ClientFacingDemo;

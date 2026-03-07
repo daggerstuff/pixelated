@@ -1,6 +1,6 @@
 ---
-import BlogPostLayout from "@/layouts/BlogPostLayout.astro";
-import { getCollection, render } from "astro:content";
+import BlogPostLayout from '@/layouts/BlogPostLayout.astro'
+import { getCollection, render } from 'astro:content'
 
 // export const prerender = true;
 
@@ -20,16 +20,16 @@ interface Props {
 }
 */
 
-const { slug } = Astro.params;
-const docs = await getCollection("docs");
+const { slug } = Astro.params
+const docs = await getCollection('docs')
 const entry = docs.find(
-  (doc) => !doc.data.draft && (doc.data.slug || doc.slug) === slug
-);
+  (doc) => !doc.data.draft && (doc.data.slug || doc.slug) === slug,
+)
 
 if (!entry) {
-  return Astro.redirect("/404");
+  return Astro.redirect('/404')
 }
-const { Content } = await render(entry);
+const { Content } = await render(entry)
 ---
 
 <BlogPostLayout {entry} basePath="docs">

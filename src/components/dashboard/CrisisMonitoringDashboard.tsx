@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import Alert from '@/components/ui/alert'
+import React, { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Alert from "@/components/ui/alert";
 import {
   AlertTriangle,
   Clock,
@@ -16,74 +16,73 @@ import {
   Phone,
   Eye,
   BarChart3,
-} from 'lucide-react'
-import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
-
+} from "lucide-react";
+import type { CrisisPrediction } from "@/lib/ai/services/PredictiveCrisisModelingService";
 
 export interface PatientRiskData {
-  id: string
-  name: string
-  currentRisk: 'minimal' | 'low' | 'moderate' | 'high' | 'imminent'
-  prediction: CrisisPrediction
-  lastAssessment: string
-  lastContact: string
-  escalationStatus?: 'active' | 'resolved' | 'monitoring'
-  therapistId: string
-  alerts: AlertItem[]
+  id: string;
+  name: string;
+  currentRisk: "minimal" | "low" | "moderate" | "high" | "imminent";
+  prediction: CrisisPrediction;
+  lastAssessment: string;
+  lastContact: string;
+  escalationStatus?: "active" | "resolved" | "monitoring";
+  therapistId: string;
+  alerts: AlertItem[];
 }
 
 export interface AlertItem {
-  id: string
-  type: 'prediction' | 'escalation' | 'missed_session' | 'manual' | 'system'
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  message: string
-  timestamp: string
-  acknowledged: boolean
-  actions: string[]
+  id: string;
+  type: "prediction" | "escalation" | "missed_session" | "manual" | "system";
+  severity: "low" | "medium" | "high" | "critical";
+  message: string;
+  timestamp: string;
+  acknowledged: boolean;
+  actions: string[];
 }
 
 export interface DashboardMetrics {
-  totalPatients: number
-  highRiskPatients: number
-  activeEscalations: number
-  todayAssessments: number
-  averageResponseTime: string
-  escalationRate: number
-  falsePositiveRate: number
+  totalPatients: number;
+  highRiskPatients: number;
+  activeEscalations: number;
+  todayAssessments: number;
+  averageResponseTime: string;
+  escalationRate: number;
+  falsePositiveRate: number;
 }
 
 export interface CrisisMonitoringDashboardProps {
-  therapistId?: string
-  refreshInterval?: number
-  showEmergencyControls?: boolean
+  therapistId?: string;
+  refreshInterval?: number;
+  showEmergencyControls?: boolean;
 }
 
 export const CrisisMonitoringDashboard: React.FC<
   CrisisMonitoringDashboardProps
 > = ({
-  therapistId = 'current_therapist',
+  therapistId = "current_therapist",
   refreshInterval = 30000, // 30 seconds
   showEmergencyControls = true,
 }) => {
-  const [patients, setPatients] = useState<PatientRiskData[]>([])
-  const [alerts, setAlerts] = useState<AlertItem[]>([])
+  const [patients, setPatients] = useState<PatientRiskData[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalPatients: 0,
     highRiskPatients: 0,
     activeEscalations: 0,
     todayAssessments: 0,
-    averageResponseTime: '0m',
+    averageResponseTime: "0m",
     escalationRate: 0,
     falsePositiveRate: 0,
-  })
-  const [activeTab, setActiveTab] = useState('overview')
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
-  const [loading, setLoading] = useState(false)
+  });
+  const [activeTab, setActiveTab] = useState("overview");
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [loading, setLoading] = useState(false);
 
   // Fetch dashboard data
   const fetchDashboardData = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       // Simulated API calls - replace with actual endpoints
       const [patientsResponse, alertsResponse, metricsResponse] =
@@ -91,75 +90,75 @@ export const CrisisMonitoringDashboard: React.FC<
           fetchPatientRiskData(therapistId),
           fetchAlerts(therapistId),
           fetchMetrics(therapistId),
-        ])
+        ]);
 
-      setPatients(patientsResponse)
-      setAlerts(alertsResponse)
-      setMetrics(metricsResponse)
-      setLastUpdated(new Date())
+      setPatients(patientsResponse);
+      setAlerts(alertsResponse);
+      setMetrics(metricsResponse);
+      setLastUpdated(new Date());
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      console.error("Error fetching dashboard data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [therapistId])
+  }, [therapistId]);
 
   // Auto-refresh effect
   useEffect(() => {
-    fetchDashboardData()
+    fetchDashboardData();
 
     if (autoRefresh) {
-      const interval = setInterval(fetchDashboardData, refreshInterval)
-      return () => clearInterval(interval)
+      const interval = setInterval(fetchDashboardData, refreshInterval);
+      return () => clearInterval(interval);
     }
-  }, [fetchDashboardData, autoRefresh, refreshInterval])
+  }, [fetchDashboardData, autoRefresh, refreshInterval]);
 
   // Get risk color for styling
   const getRiskColor = (risk: string): string => {
     const colors = {
-      minimal: 'text-green-600 bg-green-50',
-      low: 'text-blue-600 bg-blue-50',
-      moderate: 'text-yellow-600 bg-yellow-50',
-      high: 'text-orange-600 bg-orange-50',
-      imminent: 'text-red-600 bg-red-50',
-    }
-    return colors[risk as keyof typeof colors] || colors.minimal
-  }
+      minimal: "text-green-600 bg-green-50",
+      low: "text-blue-600 bg-blue-50",
+      moderate: "text-yellow-600 bg-yellow-50",
+      high: "text-orange-600 bg-orange-50",
+      imminent: "text-red-600 bg-red-50",
+    };
+    return colors[risk as keyof typeof colors] || colors.minimal;
+  };
 
   // Get severity color for alerts
   const getSeverityColor = (severity: string): string => {
     const colors = {
-      low: 'border-blue-200 bg-blue-50',
-      medium: 'border-yellow-200 bg-yellow-50',
-      high: 'border-orange-200 bg-orange-50',
-      critical: 'border-red-200 bg-red-50',
-    }
-    return colors[severity as keyof typeof colors] || colors.low
-  }
+      low: "border-blue-200 bg-blue-50",
+      medium: "border-yellow-200 bg-yellow-50",
+      high: "border-orange-200 bg-orange-50",
+      critical: "border-red-200 bg-red-50",
+    };
+    return colors[severity as keyof typeof colors] || colors.low;
+  };
 
   // Handle alert acknowledgment
   const acknowledgeAlert = async (alertId: string) => {
     try {
-      await acknowledgeAlertAPI(alertId)
+      await acknowledgeAlertAPI(alertId);
       setAlerts((prev) =>
         prev.map((alert) =>
           alert.id === alertId ? { ...alert, acknowledged: true } : alert,
         ),
-      )
+      );
     } catch (error) {
-      console.error('Error acknowledging alert:', error)
+      console.error("Error acknowledging alert:", error);
     }
-  }
+  };
 
   // Trigger manual escalation
   const triggerManualEscalation = async (patientId: string) => {
     try {
-      await triggerEscalationAPI(patientId, 'manual')
-      await fetchDashboardData() // Refresh data
+      await triggerEscalationAPI(patientId, "manual");
+      await fetchDashboardData(); // Refresh data
     } catch (error) {
-      console.error('Error triggering escalation:', error)
+      console.error("Error triggering escalation:", error);
     }
-  }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -176,11 +175,11 @@ export const CrisisMonitoringDashboard: React.FC<
 
         <div className="flex items-center space-x-4">
           <Button
-            variant={autoRefresh ? 'default' : 'outline'}
+            variant={autoRefresh ? "default" : "outline"}
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
             <Activity className="h-4 w-4 mr-2" />
-            Auto-refresh {autoRefresh ? 'ON' : 'OFF'}
+            Auto-refresh {autoRefresh ? "ON" : "OFF"}
           </Button>
 
           <Button onClick={fetchDashboardData} disabled={loading}>
@@ -228,7 +227,7 @@ export const CrisisMonitoringDashboard: React.FC<
             <div className="text-xs text-gray-500 mt-1">
               {metrics.totalPatients > 0
                 ? `${Math.round((metrics.highRiskPatients / metrics.totalPatients) * 100)}% of total`
-                : '0% of total'}
+                : "0% of total"}
             </div>
           </CardContent>
         </Card>
@@ -286,7 +285,7 @@ export const CrisisMonitoringDashboard: React.FC<
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
           {/* Critical Alerts Section */}
-          {alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
+          {alerts.filter((a) => a.severity === "critical" && !a.acknowledged)
             .length > 0 && (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
@@ -294,7 +293,7 @@ export const CrisisMonitoringDashboard: React.FC<
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
                 <div className="mt-2 space-y-1">
                   {alerts
-                    .filter((a) => a.severity === 'critical' && !a.acknowledged)
+                    .filter((a) => a.severity === "critical" && !a.acknowledged)
                     .slice(0, 3)
                     .map((alert) => (
                       <div key={alert.id} className="text-sm">
@@ -319,7 +318,7 @@ export const CrisisMonitoringDashboard: React.FC<
                 {patients
                   .filter(
                     (p) =>
-                      p.currentRisk === 'high' || p.currentRisk === 'imminent',
+                      p.currentRisk === "high" || p.currentRisk === "imminent",
                   )
                   .slice(0, 5)
                   .map((patient) => (
@@ -330,15 +329,15 @@ export const CrisisMonitoringDashboard: React.FC<
                       <div className="flex items-center space-x-3">
                         <div
                           className={`w-3 h-3 rounded-full ${
-                            patient.currentRisk === 'imminent'
-                              ? 'bg-red-500'
-                              : 'bg-orange-500'
+                            patient.currentRisk === "imminent"
+                              ? "bg-red-500"
+                              : "bg-orange-500"
                           }`}
                         />
                         <div>
                           <div className="font-medium">{patient.name}</div>
                           <div className="text-sm text-gray-500">
-                            Last contact:{' '}
+                            Last contact:{" "}
                             {new Date(patient.lastContact).toLocaleDateString()}
                           </div>
                         </div>
@@ -365,7 +364,7 @@ export const CrisisMonitoringDashboard: React.FC<
 
                 {patients.filter(
                   (p) =>
-                    p.currentRisk === 'high' || p.currentRisk === 'imminent',
+                    p.currentRisk === "high" || p.currentRisk === "imminent",
                 ).length === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <CheckCircle className="h-12 w-12 mx-auto mb-2 text-green-500" />
@@ -412,9 +411,9 @@ export const CrisisMonitoringDashboard: React.FC<
                     <div className="flex items-center space-x-2 mb-2">
                       <Badge
                         variant={
-                          alert.severity === 'critical'
-                            ? 'destructive'
-                            : 'secondary'
+                          alert.severity === "critical"
+                            ? "destructive"
+                            : "secondary"
                         }
                       >
                         {alert.severity.toUpperCase()}
@@ -483,15 +482,15 @@ export const CrisisMonitoringDashboard: React.FC<
                     <div className="flex items-center space-x-4">
                       <div
                         className={`w-4 h-4 rounded-full ${
-                          patient.currentRisk === 'imminent'
-                            ? 'bg-red-500'
-                            : patient.currentRisk === 'high'
-                              ? 'bg-orange-500'
-                              : patient.currentRisk === 'moderate'
-                                ? 'bg-yellow-500'
-                                : patient.currentRisk === 'low'
-                                  ? 'bg-blue-500'
-                                  : 'bg-green-500'
+                          patient.currentRisk === "imminent"
+                            ? "bg-red-500"
+                            : patient.currentRisk === "high"
+                              ? "bg-orange-500"
+                              : patient.currentRisk === "moderate"
+                                ? "bg-yellow-500"
+                                : patient.currentRisk === "low"
+                                  ? "bg-blue-500"
+                                  : "bg-green-500"
                         }`}
                       />
 
@@ -511,7 +510,7 @@ export const CrisisMonitoringDashboard: React.FC<
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
                         <div className="text-sm text-gray-500 mt-1">
-                          Confidence:{' '}
+                          Confidence:{" "}
                           {Math.round(patient.prediction.confidence * 100)}%
                         </div>
                       </div>
@@ -535,11 +534,11 @@ export const CrisisMonitoringDashboard: React.FC<
                       {patient.escalationStatus && (
                         <Badge
                           variant={
-                            patient.escalationStatus === 'active'
-                              ? 'destructive'
-                              : patient.escalationStatus === 'monitoring'
-                                ? 'secondary'
-                                : 'outline'
+                            patient.escalationStatus === "active"
+                              ? "destructive"
+                              : patient.escalationStatus === "monitoring"
+                                ? "secondary"
+                                : "outline"
                           }
                         >
                           {patient.escalationStatus}
@@ -551,11 +550,11 @@ export const CrisisMonitoringDashboard: React.FC<
                   {patient.prediction.primaryRiskFactors.length > 0 && (
                     <div className="mt-3 pt-3 border-t">
                       <div className="text-sm text-gray-600">
-                        <strong>Primary risk factors:</strong>{' '}
-                        {patient.prediction.primaryRiskFactors.join(', ')}
+                        <strong>Primary risk factors:</strong>{" "}
+                        {patient.prediction.primaryRiskFactors.join(", ")}
                       </div>
                       <div className="text-sm text-gray-600 mt-1">
-                        <strong>Intervention window:</strong>{' '}
+                        <strong>Intervention window:</strong>{" "}
                         {patient.prediction.interventionWindow.optimal}
                       </div>
                     </div>
@@ -610,15 +609,15 @@ export const CrisisMonitoringDashboard: React.FC<
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
+                  {["imminent", "high", "moderate", "low", "minimal"].map(
                     (risk) => {
                       const count = patients.filter(
                         (p) => p.currentRisk === risk,
-                      ).length
+                      ).length;
                       const percentage =
                         patients.length > 0
                           ? (count / patients.length) * 100
-                          : 0
+                          : 0;
 
                       return (
                         <div
@@ -637,7 +636,7 @@ export const CrisisMonitoringDashboard: React.FC<
                             </div>
                           </div>
                         </div>
-                      )
+                      );
                     },
                   )}
                 </div>
@@ -647,8 +646,8 @@ export const CrisisMonitoringDashboard: React.FC<
         </TabsContent>
       </Tabs>
     </div>
-  )
-}
+  );
+};
 
 // Simulated API functions - replace with actual implementations
 async function fetchPatientRiskData(
@@ -657,45 +656,45 @@ async function fetchPatientRiskData(
   // Simulated data
   return [
     {
-      id: 'patient_001',
-      name: 'Jane Doe',
-      currentRisk: 'high',
+      id: "patient_001",
+      name: "Jane Doe",
+      currentRisk: "high",
       prediction: {
-        riskLevel: 'high',
-        timeframe: 'within_day',
+        riskLevel: "high",
+        timeframe: "within_day",
         confidence: 0.89,
-        primaryRiskFactors: ['Social isolation', 'Recent trauma disclosure'],
-        protectiveFactors: ['Strong therapeutic alliance'],
+        primaryRiskFactors: ["Social isolation", "Recent trauma disclosure"],
+        protectiveFactors: ["Strong therapeutic alliance"],
         interventionWindow: {
-          optimal: 'Within 24 hours',
-          critical: 'Within 72 hours',
+          optimal: "Within 24 hours",
+          critical: "Within 72 hours",
         },
-        escalationTriggers: ['Immediate clinical review required'],
+        escalationTriggers: ["Immediate clinical review required"],
       },
-      lastAssessment: '2025-10-29T10:30:00Z',
-      lastContact: '2025-10-28T14:20:00Z',
-      escalationStatus: 'monitoring',
+      lastAssessment: "2025-10-29T10:30:00Z",
+      lastContact: "2025-10-28T14:20:00Z",
+      escalationStatus: "monitoring",
       therapistId,
       alerts: [],
     },
-  ]
+  ];
 }
 
 async function fetchAlerts(_therapistId: string): Promise<AlertItem[]> {
   return [
     {
-      id: 'alert_001',
-      type: 'prediction',
-      severity: 'high',
-      message: 'Patient Jane Doe showing elevated crisis risk indicators',
-      timestamp: '2025-10-29T11:15:00Z',
+      id: "alert_001",
+      type: "prediction",
+      severity: "high",
+      message: "Patient Jane Doe showing elevated crisis risk indicators",
+      timestamp: "2025-10-29T11:15:00Z",
       acknowledged: false,
       actions: [
-        'Schedule urgent session',
-        'Contact emergency contact if no response',
+        "Schedule urgent session",
+        "Contact emergency contact if no response",
       ],
     },
-  ]
+  ];
 }
 
 async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
@@ -704,15 +703,15 @@ async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
     highRiskPatients: 3,
     activeEscalations: 1,
     todayAssessments: 12,
-    averageResponseTime: '2.3m',
+    averageResponseTime: "2.3m",
     escalationRate: 8.5,
     falsePositiveRate: 4.2,
-  }
+  };
 }
 
 async function acknowledgeAlertAPI(alertId: string): Promise<void> {
   // API call to acknowledge alert
-  console.log('Acknowledging alert:', alertId)
+  console.log("Acknowledging alert:", alertId);
 }
 
 async function triggerEscalationAPI(
@@ -720,7 +719,7 @@ async function triggerEscalationAPI(
   type: string,
 ): Promise<void> {
   // API call to trigger escalation
-  console.log('Triggering escalation for patient:', patientId, 'type:', type)
+  console.log("Triggering escalation for patient:", patientId, "type:", type);
 }
 
-export default CrisisMonitoringDashboard
+export default CrisisMonitoringDashboard;

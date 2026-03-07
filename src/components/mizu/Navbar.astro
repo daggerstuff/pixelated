@@ -1,13 +1,13 @@
 ---
-import { AuthButtons } from "@/components/auth/AuthButtons";
+import { AuthButtons } from '@/components/auth/AuthButtons'
 
 const links = [
-  { text: "Home", href: "/", isAnchor: false },
-  { text: "Features", href: "/features", isAnchor: false },
-  { text: "About", href: "/about", isAnchor: false },
-  { text: "Team", href: "/team", isAnchor: false },
-  { text: "Contact", href: "/contact", isAnchor: false },
-];
+  { text: 'Home', href: '/', isAnchor: false },
+  { text: 'Features', href: '/features', isAnchor: false },
+  { text: 'About', href: '/about', isAnchor: false },
+  { text: 'Team', href: '/team', isAnchor: false },
+  { text: 'Contact', href: '/contact', isAnchor: false },
+]
 ---
 
 <header
@@ -106,15 +106,15 @@ const links = [
 </header>
 
 <script>
-  const mobileMenuButton = document.getElementById("mobile-menu-button");
-  const mobileMenu = document.getElementById("mobile-menu");
+  const mobileMenuButton = document.getElementById('mobile-menu-button')
+  const mobileMenu = document.getElementById('mobile-menu')
 
   if (mobileMenuButton && mobileMenu) {
-    mobileMenuButton.addEventListener("click", () => {
+    mobileMenuButton.addEventListener('click', () => {
       const isExpanded =
-        mobileMenuButton.getAttribute("aria-expanded") === "true";
-      mobileMenuButton.setAttribute("aria-expanded", String(!isExpanded));
-      mobileMenu.classList.toggle("hidden");
-    });
+        mobileMenuButton.getAttribute('aria-expanded') === 'true'
+      mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded))
+      mobileMenu.classList.toggle('hidden')
+    })
   }
 </script>

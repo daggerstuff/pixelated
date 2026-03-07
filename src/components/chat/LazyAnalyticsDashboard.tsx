@@ -1,15 +1,15 @@
-import { Suspense, lazy } from 'react'
-import type { SecurityLevel } from '../../hooks/useSecurity'
-import type { Message } from '../../types/chat'
+import { Suspense, lazy } from "react";
+import type { SecurityLevel } from "../../hooks/useSecurity";
+import type { Message } from "../../types/chat";
 
 // Lazy load the heavy analytics dashboard
-const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
+const AnalyticsDashboardReact = lazy(() => import("./AnalyticsDashboardReact"));
 
 interface LazyAnalyticsDashboardProps {
-  messages: Message[]
-  securityLevel: SecurityLevel
-  encryptionEnabled: boolean
-  scenario: string
+  messages: Message[];
+  securityLevel: SecurityLevel;
+  encryptionEnabled: boolean;
+  scenario: string;
 }
 
 function AnalyticsLoadingFallback() {
@@ -42,7 +42,7 @@ function AnalyticsLoadingFallback() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function LazyAnalyticsDashboard(
@@ -52,5 +52,5 @@ export default function LazyAnalyticsDashboard(
     <Suspense fallback={<AnalyticsLoadingFallback />}>
       <AnalyticsDashboardReact {...props} />
     </Suspense>
-  )
+  );
 }

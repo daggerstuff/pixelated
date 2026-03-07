@@ -9,35 +9,35 @@
  * Supported embedding models.
  */
 export type EmbeddingModel =
-  | 'all-MiniLM-L6-v2'
-  | 'all-MiniLM-L12-v2'
-  | 'all-mpnet-base-v2'
-  | 'BAAI/bge-small-en-v1.5'
-  | 'BAAI/bge-base-en-v1.5'
-  | 'emilyalsentzer/Bio_ClinicalBERT'
+  | "all-MiniLM-L6-v2"
+  | "all-MiniLM-L12-v2"
+  | "all-mpnet-base-v2"
+  | "BAAI/bge-small-en-v1.5"
+  | "BAAI/bge-base-en-v1.5"
+  | "emilyalsentzer/Bio_ClinicalBERT";
 
 /**
  * Types of clinical/psychological knowledge.
  */
 export type KnowledgeType =
-  | 'dsm5'
-  | 'pdm2'
-  | 'clinical'
-  | 'therapeutic_technique'
-  | 'therapeutic_conversation'
-  | 'general'
+  | "dsm5"
+  | "pdm2"
+  | "clinical"
+  | "therapeutic_technique"
+  | "therapeutic_conversation"
+  | "general";
 
 /**
  * Configuration for the embedding agent.
  */
 export interface EmbeddingAgentConfig {
-  modelName: EmbeddingModel
-  embeddingDimension: number
-  batchSize: number
-  maxTextLength: number
-  normalizeEmbeddings: boolean
-  cacheEmbeddings: boolean
-  useGpu: boolean
+  modelName: EmbeddingModel;
+  embeddingDimension: number;
+  batchSize: number;
+  maxTextLength: number;
+  normalizeEmbeddings: boolean;
+  cacheEmbeddings: boolean;
+  useGpu: boolean;
 }
 
 /**
@@ -45,13 +45,13 @@ export interface EmbeddingAgentConfig {
  */
 export interface EmbeddingRequest {
   /** Text to embed (1-10000 characters) */
-  text: string
+  text: string;
   /** Type of knowledge for categorization */
-  knowledgeType?: KnowledgeType
+  knowledgeType?: KnowledgeType;
   /** Additional metadata to associate with the embedding */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
   /** Override the default embedding model */
-  model?: EmbeddingModel
+  model?: EmbeddingModel;
 }
 
 /**
@@ -59,21 +59,21 @@ export interface EmbeddingRequest {
  */
 export interface EmbeddingResponse {
   /** The embedding vector */
-  embedding: number[]
+  embedding: number[];
   /** Unique identifier for this embedding */
-  embeddingId: string
+  embeddingId: string;
   /** The model used to generate the embedding */
-  modelUsed: string
+  modelUsed: string;
   /** Dimension of the embedding vector */
-  dimension: number
+  dimension: number;
   /** Hash of the input text for caching */
-  textHash: string
+  textHash: string;
   /** Whether the embedding was retrieved from cache */
-  cached: boolean
+  cached: boolean;
   /** Time taken to generate the embedding in milliseconds */
-  processingTimeMs: number
+  processingTimeMs: number;
   /** Timestamp of embedding creation */
-  createdAt: string
+  createdAt: string;
 }
 
 /**
@@ -81,13 +81,13 @@ export interface EmbeddingResponse {
  */
 export interface BatchEmbeddingRequest {
   /** List of texts to embed (1-100 items) */
-  texts: string[]
+  texts: string[];
   /** Knowledge types for each text */
-  knowledgeTypes?: KnowledgeType[]
+  knowledgeTypes?: KnowledgeType[];
   /** Metadata for each text */
-  metadataList?: Record<string, unknown>[]
+  metadataList?: Record<string, unknown>[];
   /** Override the default embedding model */
-  model?: EmbeddingModel
+  model?: EmbeddingModel;
 }
 
 /**
@@ -95,15 +95,15 @@ export interface BatchEmbeddingRequest {
  */
 export interface BatchEmbeddingItem {
   /** Index in the original request */
-  index: number
+  index: number;
   /** The embedding vector */
-  embedding: number[]
+  embedding: number[];
   /** Unique identifier */
-  embeddingId: string
+  embeddingId: string;
   /** Hash of the input text */
-  textHash: string
+  textHash: string;
   /** Whether from cache */
-  cached: boolean
+  cached: boolean;
 }
 
 /**
@@ -111,21 +111,21 @@ export interface BatchEmbeddingItem {
  */
 export interface BatchEmbeddingResponse {
   /** List of embedding results */
-  embeddings: BatchEmbeddingItem[]
+  embeddings: BatchEmbeddingItem[];
   /** Total number of embeddings */
-  totalCount: number
+  totalCount: number;
   /** Number of embeddings retrieved from cache */
-  cachedCount: number
+  cachedCount: number;
   /** Number of newly generated embeddings */
-  generatedCount: number
+  generatedCount: number;
   /** The model used */
-  modelUsed: string
+  modelUsed: string;
   /** Embedding dimension */
-  dimension: number
+  dimension: number;
   /** Total processing time in milliseconds */
-  processingTimeMs: number
+  processingTimeMs: number;
   /** Timestamp */
-  createdAt: string
+  createdAt: string;
 }
 
 /**
@@ -133,17 +133,17 @@ export interface BatchEmbeddingResponse {
  */
 export interface SimilaritySearchRequest {
   /** Query text to search for similar items */
-  query: string
+  query: string;
   /** Pre-computed query embedding (optional) */
-  queryEmbedding?: number[]
+  queryEmbedding?: number[];
   /** Number of similar items to return (1-100) */
-  topK?: number
+  topK?: number;
   /** Filter by knowledge types */
-  knowledgeTypes?: KnowledgeType[]
+  knowledgeTypes?: KnowledgeType[];
   /** Minimum similarity threshold (0-1) */
-  minSimilarity?: number
+  minSimilarity?: number;
   /** Whether to include metadata in results */
-  includeMetadata?: boolean
+  includeMetadata?: boolean;
 }
 
 /**
@@ -151,17 +151,17 @@ export interface SimilaritySearchRequest {
  */
 export interface SimilarityMatch {
   /** ID of the matching item */
-  itemId: string
+  itemId: string;
   /** Content of the matching item */
-  content: string
+  content: string;
   /** Cosine similarity score (0-1) */
-  similarityScore: number
+  similarityScore: number;
   /** Type of the matching knowledge */
-  knowledgeType: KnowledgeType
+  knowledgeType: KnowledgeType;
   /** Source of the knowledge item */
-  source: string
+  source: string;
   /** Additional metadata */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -169,15 +169,15 @@ export interface SimilarityMatch {
  */
 export interface SimilaritySearchResponse {
   /** List of similar items */
-  matches: SimilarityMatch[]
+  matches: SimilarityMatch[];
   /** ID of the query embedding used */
-  queryEmbeddingId: string
+  queryEmbeddingId: string;
   /** Total number of items searched */
-  totalSearched: number
+  totalSearched: number;
   /** Search processing time in milliseconds */
-  processingTimeMs: number
+  processingTimeMs: number;
   /** Embedding model used */
-  modelUsed: string
+  modelUsed: string;
 }
 
 /**
@@ -185,29 +185,29 @@ export interface SimilaritySearchResponse {
  */
 export interface EmbeddingAgentStatus {
   /** Current agent status */
-  status: 'healthy' | 'degraded' | 'unhealthy'
+  status: "healthy" | "degraded" | "unhealthy";
   /** Whether the embedding model is loaded */
-  modelLoaded: boolean
+  modelLoaded: boolean;
   /** Name of the loaded model */
-  modelName: string
+  modelName: string;
   /** Dimension of embeddings */
-  embeddingDimension: number
+  embeddingDimension: number;
   /** Number of cached embeddings */
-  cacheSize: number
+  cacheSize: number;
   /** Number of indexed knowledge items */
-  knowledgeItemsCount: number
+  knowledgeItemsCount: number;
   /** Whether GPU is available */
-  gpuAvailable: boolean
+  gpuAvailable: boolean;
   /** GPU memory used in MB */
-  gpuMemoryUsedMb?: number
+  gpuMemoryUsedMb?: number;
   /** Agent uptime in seconds */
-  uptimeSeconds: number
+  uptimeSeconds: number;
   /** Total requests processed */
-  requestsProcessed: number
+  requestsProcessed: number;
   /** Average response time in milliseconds */
-  averageResponseTimeMs: number
+  averageResponseTimeMs: number;
   /** Timestamp of last request */
-  lastRequestAt?: string
+  lastRequestAt?: string;
 }
 
 /**
@@ -215,15 +215,15 @@ export interface EmbeddingAgentStatus {
  */
 export interface HealthCheckResponse {
   /** Health status */
-  status: 'healthy' | 'degraded' | 'unhealthy'
+  status: "healthy" | "degraded" | "unhealthy";
   /** API version */
-  version: string
+  version: string;
   /** Whether model is loaded */
-  modelLoaded: boolean
+  modelLoaded: boolean;
   /** Whether cache is available */
-  cacheAvailable: boolean
+  cacheAvailable: boolean;
   /** Timestamp */
-  timestamp: string
+  timestamp: string;
 }
 
 /**
@@ -231,15 +231,15 @@ export interface HealthCheckResponse {
  */
 export interface EmbeddingErrorResponse {
   /** Error type */
-  error: string
+  error: string;
   /** Error message */
-  message: string
+  message: string;
   /** Additional error details */
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>;
   /** Timestamp */
-  timestamp: string
+  timestamp: string;
   /** Request ID for tracking */
-  requestId?: string
+  requestId?: string;
 }
 
 /**
@@ -247,13 +247,13 @@ export interface EmbeddingErrorResponse {
  */
 export interface EmbeddingModelInfo {
   /** Model identifier */
-  id: EmbeddingModel
+  id: EmbeddingModel;
   /** Model name */
-  name: string
+  name: string;
   /** Embedding dimension */
-  dimension: number
+  dimension: number;
   /** Model description */
-  description: string
+  description: string;
 }
 
 /**
@@ -261,9 +261,9 @@ export interface EmbeddingModelInfo {
  */
 export interface CacheStats {
   /** Number of cached embeddings */
-  cacheSize: number
+  cacheSize: number;
   /** Whether caching is enabled */
-  cacheEnabled: boolean
+  cacheEnabled: boolean;
 }
 
 /**
@@ -271,11 +271,11 @@ export interface CacheStats {
  */
 export interface KnowledgeLoadResult {
   /** Whether loading succeeded */
-  success: boolean
+  success: boolean;
   /** Number of knowledge items loaded */
-  itemsLoaded: number
+  itemsLoaded: number;
   /** Status message */
-  message: string
+  message: string;
 }
 
 /**
@@ -283,10 +283,9 @@ export interface KnowledgeLoadResult {
  */
 export interface CacheClearResult {
   /** Whether clearing succeeded */
-  success: boolean
+  success: boolean;
   /** Number of cached items removed */
-  itemsCleared: number
+  itemsCleared: number;
   /** Status message */
-  message: string
+  message: string;
 }
-

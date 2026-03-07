@@ -18,13 +18,13 @@
     "directory": "packages/integrations/react"
   },
   "files": [
-    "dist",
-    "client.js",
     "client-v17.js",
+    "client.js",
     "context.js",
+    "dist",
     "jsx-runtime.js",
-    "server.js",
     "server-v17.js",
+    "server.js",
     "static-html.js",
     "vnode-children.js"
   ],

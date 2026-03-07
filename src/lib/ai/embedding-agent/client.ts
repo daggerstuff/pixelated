@@ -143,17 +143,17 @@ export class EmbeddingAgentClient {
     const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
     try {
-      const response = await fetch(url, {
+      const options: RequestInit = {
         method,
         headers,
-        body:
-          method === "GET"
-            ? undefined
-            : body
-              ? JSON.stringify(toSnakeCase(body))
-              : undefined,
         signal: controller.signal,
-      });
+      };
+
+      if (method !== "GET" && body) {
+        options.body = JSON.stringify(toSnakeCase(body));
+      }
+
+      const response = await fetch(url, options);
 
       clearTimeout(timeoutId);
 

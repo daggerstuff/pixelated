@@ -1,15 +1,15 @@
-import React from 'react'
+import React from "react";
 
 interface EvaluationFeedbackPanelProps {
-  feedback: string
-  onSubmit: (feedback: string) => void
+  feedback: string;
+  onSubmit: (feedback: string) => void;
 }
 
 export function EvaluationFeedbackPanel({
   feedback,
   onSubmit,
 }: EvaluationFeedbackPanelProps) {
-  const [value, setValue] = React.useState(feedback || '')
+  const [value, setValue] = React.useState(feedback || "");
 
   return (
     <section
@@ -19,8 +19,8 @@ export function EvaluationFeedbackPanel({
       <h3>Session Feedback</h3>
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          onSubmit(value)
+          e.preventDefault();
+          onSubmit(value);
         }}
       >
         <label htmlFor="feedback-input">Feedback</label>
@@ -34,5 +34,5 @@ export function EvaluationFeedbackPanel({
         <button type="submit">Submit Feedback</button>
       </form>
     </section>
-  )
+  );
 }

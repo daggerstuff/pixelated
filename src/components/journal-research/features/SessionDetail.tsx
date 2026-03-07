@@ -1,56 +1,64 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { SessionCard } from '../shared/SessionCard'
-import { SessionForm } from '../forms/SessionForm'
-import { ProgressCharts } from '../charts/ProgressCharts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { SessionCard } from "../shared/SessionCard";
+import { SessionForm } from "../forms/SessionForm";
+import { ProgressCharts } from "../charts/ProgressCharts";
 import {
   useSessionQuery,
   useUpdateSessionMutation,
   useDeleteSessionMutation,
-} from '@/lib/hooks/journal-research'
-import { useProgressQuery, useProgressMetricsQuery } from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { useState } from 'react'
+} from "@/lib/hooks/journal-research";
+import {
+  useProgressQuery,
+  useProgressMetricsQuery,
+} from "@/lib/hooks/journal-research";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { useState } from "react";
 
 export interface SessionDetailProps {
-  sessionId: string
-  className?: string
+  sessionId: string;
+  className?: string;
 }
 
 export function SessionDetail({ sessionId, className }: SessionDetailProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const { data: session, isLoading } = useSessionQuery(sessionId)
-  const { data: progress } = useProgressQuery(sessionId)
+  const [isEditing, setIsEditing] = useState(false);
+  const { data: session, isLoading } = useSessionQuery(sessionId);
+  const { data: progress } = useProgressQuery(sessionId);
   const { data: metrics } = useProgressMetricsQuery(sessionId, {
     refetchInterval: 5000,
-  })
-  const updateMutation = useUpdateSessionMutation()
-  const deleteMutation = useDeleteSessionMutation()
+  });
+  const updateMutation = useUpdateSessionMutation();
+  const deleteMutation = useDeleteSessionMutation();
 
   if (isLoading) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Loading session...</p>
       </div>
-    )
+    );
   }
 
   if (!session) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Session not found</p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{session.sessionId}</h1>
           <p className="text-muted-foreground mt-1">
-            Started {format(session.startDate, 'MMM d, yyyy')} • Current phase:{' '}
+            Started {format(session.startDate, "MMM d, yyyy")} • Current phase:{" "}
             <span className="capitalize">{session.currentPhase}</span>
           </p>
         </div>
@@ -59,7 +67,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
             onClick={() => setIsEditing(!isEditing)}
             className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
           >
-            {isEditing ? 'Cancel' : 'Edit'}
+            {isEditing ? "Cancel" : "Edit"}
           </button>
           <button
             onClick={() => {
@@ -68,7 +76,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                   `Are you sure you want to delete session ${session.sessionId}?`,
                 )
               ) {
-                deleteMutation.mutate(session.sessionId)
+                deleteMutation.mutate(session.sessionId);
               }
             }}
             className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
@@ -95,10 +103,10 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                   { sessionId: session.sessionId, payload },
                   {
                     onSuccess: () => {
-                      setIsEditing(false)
+                      setIsEditing(false);
                     },
                   },
-                )
+                );
               }}
             />
           </CardContent>
@@ -112,7 +120,10 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
             <CardTitle>Progress Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <ProgressCharts progress={progress} metrics={metrics ?? undefined} />
+            <ProgressCharts
+              progress={progress}
+              metrics={metrics ?? undefined}
+            />
           </CardContent>
         </Card>
       )}
@@ -134,7 +145,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
               <p className="text-sm font-medium text-muted-foreground">
                 Start Date
               </p>
-              <p className="mt-1">{format(session.startDate, 'PPpp')}</p>
+              <p className="mt-1">{format(session.startDate, "PPpp")}</p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
@@ -146,19 +157,21 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
               <p className="text-sm font-medium text-muted-foreground">
                 Target Sources
               </p>
-              <p className="mt-1">{session.targetSources.join(', ')}</p>
+              <p className="mt-1">{session.targetSources.join(", ")}</p>
             </div>
             <div className="md:col-span-2">
               <p className="text-sm font-medium text-muted-foreground">
                 Search Keywords
               </p>
               <div className="mt-1 space-y-1">
-                {Object.entries(session.searchKeywords).map(([category, keywords]) => (
-                  <div key={category}>
-                    <span className="font-medium">{category}:</span>{' '}
-                    {keywords.join(', ')}
-                  </div>
-                ))}
+                {Object.entries(session.searchKeywords).map(
+                  ([category, keywords]) => (
+                    <div key={category}>
+                      <span className="font-medium">{category}:</span>{" "}
+                      {keywords.join(", ")}
+                    </div>
+                  ),
+                )}
               </div>
             </div>
             {session.progressMetrics && (
@@ -206,6 +219,5 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
-

@@ -1,13 +1,13 @@
 ---
-title: 'Tutorial'
-description: 'Quick start guide for the Pixelated Empathy platform'
+title: "Tutorial"
+description: "Quick start guide for the Pixelated Empathy platform"
 pubDate: 2025-01-01
 author: Pixelated Empathy Team
-category: 'Tutorial'
-tags: ['guide', 'setup', 'introduction']
+category: "Tutorial"
+tags: ["guide", "setup", "introduction"]
 order: 1
 draft: false
-slug: 'getting-started'
+slug: "getting-started"
 ---
 
 # Tutorial with Pixelated Empathy
@@ -106,4 +106,4 @@ If you need help:
 
 - Check the [FAQ](/docs/faq)
 - Browse the [API documentation](/api-docs)
-- Contact support at support@pixelatedempathy.com 
+- Contact support at support@pixelatedempathy.com

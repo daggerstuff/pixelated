@@ -9,4 +9,4 @@ export {
   mockFHEService,
   MockFHEService,
   MockFHEScheme,
-} from './mock-fhe-service'
+} from "./mock-fhe-service";

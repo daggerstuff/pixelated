@@ -1,8 +1,8 @@
 ---
-title: 'Test Execution'
-description: 'Guide to running and managing tests in Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Test Execution"
+description: "Guide to running and managing tests in Pixelated"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -143,7 +143,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Install dependencies
         run: npm ci

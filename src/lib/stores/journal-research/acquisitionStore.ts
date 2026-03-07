@@ -1,34 +1,34 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 export type AcquisitionStatus =
-  | 'pending'
-  | 'approved'
-  | 'in-progress'
-  | 'completed'
-  | 'failed'
+  | "pending"
+  | "approved"
+  | "in-progress"
+  | "completed"
+  | "failed";
 
 interface AcquisitionFilters {
-  statuses: AcquisitionStatus[]
-  showDownloadFailuresOnly: boolean
+  statuses: AcquisitionStatus[];
+  showDownloadFailuresOnly: boolean;
 }
 
 interface AcquisitionStoreState {
-  selectedAcquisitionId: string | null
-  filters: AcquisitionFilters
-  expandedRowIds: string[]
+  selectedAcquisitionId: string | null;
+  filters: AcquisitionFilters;
+  expandedRowIds: string[];
 
-  setSelectedAcquisitionId: (acquisitionId: string | null) => void
-  toggleStatusFilter: (status: AcquisitionStatus) => void
-  toggleShowDownloadFailuresOnly: () => void
-  expandRow: (acquisitionId: string) => void
-  collapseRow: (acquisitionId: string) => void
-  resetFilters: () => void
+  setSelectedAcquisitionId: (acquisitionId: string | null) => void;
+  toggleStatusFilter: (status: AcquisitionStatus) => void;
+  toggleShowDownloadFailuresOnly: () => void;
+  expandRow: (acquisitionId: string) => void;
+  collapseRow: (acquisitionId: string) => void;
+  resetFilters: () => void;
 }
 
 const defaultFilters: AcquisitionFilters = {
   statuses: [],
   showDownloadFailuresOnly: false,
-}
+};
 
 export const useAcquisitionStore = create<AcquisitionStoreState>((set) => ({
   selectedAcquisitionId: null,
@@ -42,14 +42,14 @@ export const useAcquisitionStore = create<AcquisitionStoreState>((set) => ({
     set((state) => {
       const statuses = state.filters.statuses.includes(status)
         ? state.filters.statuses.filter((existing) => existing !== status)
-        : [...state.filters.statuses, status]
+        : [...state.filters.statuses, status];
 
       return {
         filters: {
           ...state.filters,
           statuses,
         },
-      }
+      };
     }),
 
   toggleShowDownloadFailuresOnly: () =>
@@ -63,11 +63,11 @@ export const useAcquisitionStore = create<AcquisitionStoreState>((set) => ({
   expandRow: (acquisitionId) =>
     set((state) => {
       if (state.expandedRowIds.includes(acquisitionId)) {
-        return state
+        return state;
       }
       return {
         expandedRowIds: [...state.expandedRowIds, acquisitionId],
-      }
+      };
     }),
 
   collapseRow: (acquisitionId) =>
@@ -78,6 +78,4 @@ export const useAcquisitionStore = create<AcquisitionStoreState>((set) => ({
     })),
 
   resetFilters: () => set({ filters: defaultFilters }),
-}))
-
-
+}));

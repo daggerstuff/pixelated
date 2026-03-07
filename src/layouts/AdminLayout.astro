@@ -90,7 +90,7 @@ const {
                 href="/admin/dashboard"
                 class:list={[
                   'nav-link-refined flex items-center px-6 py-3',
-                  { 'nav-link-refined--active': activeItem === 'dashboard' }
+                  { 'nav-link-refined--active': activeItem === 'dashboard' },
                 ]}
                 style={`display: flex; ${activeItem === 'dashboard' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
@@ -114,7 +114,7 @@ const {
                 href="/admin/users"
                 class:list={[
                   'nav-link-refined flex items-center px-6 py-3',
-                  { 'nav-link-refined--active': activeItem === 'users' }
+                  { 'nav-link-refined--active': activeItem === 'users' },
                 ]}
                 style={`display: flex; ${activeItem === 'users' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
@@ -160,7 +160,9 @@ const {
                 href="/admin/bias-detection"
                 class:list={[
                   'nav-link-refined flex items-center px-6 py-3',
-                  { 'nav-link-refined--active': activeItem === 'bias-detection' }
+                  {
+                    'nav-link-refined--active': activeItem === 'bias-detection',
+                  },
                 ]}
                 style={`display: flex; ${activeItem === 'bias-detection' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
@@ -185,7 +187,7 @@ const {
                 href="/admin/security"
                 class:list={[
                   'nav-link-refined flex items-center px-6 py-3',
-                  { 'nav-link-refined--active': activeItem === 'security' }
+                  { 'nav-link-refined--active': activeItem === 'security' },
                 ]}
                 style={`display: flex; ${activeItem === 'security' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >
@@ -210,7 +212,7 @@ const {
                 href="/admin/settings"
                 class:list={[
                   'nav-link-refined flex items-center px-6 py-3',
-                  { 'nav-link-refined--active': activeItem === 'settings' }
+                  { 'nav-link-refined--active': activeItem === 'settings' },
                 ]}
                 style={`display: flex; ${activeItem === 'settings' ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);' : ''}`}
               >

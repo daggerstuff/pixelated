@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Badge } from '@/components/ui/badge'
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Search,
   BookOpen,
@@ -11,46 +11,46 @@ import {
   Users,
   Target,
   ChevronRight,
-} from 'lucide-react'
+} from "lucide-react";
 
 interface Framework {
-  id: string
-  name: string
-  category: string
-  description: string
-  techniques: string[]
-  conditions: string[]
-  evidenceLevel: string
-  keyPrinciples: string[]
-  developers?: string[]
-  yearDeveloped?: number
-  applications: string[]
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  techniques: string[];
+  conditions: string[];
+  evidenceLevel: string;
+  keyPrinciples: string[];
+  developers?: string[];
+  yearDeveloped?: number;
+  applications: string[];
 }
 
 interface FrameworksResponse {
-  frameworks: Framework[]
-  categories: string[]
-  totalCount: number
+  frameworks: Framework[];
+  categories: string[];
+  totalCount: number;
   metadata: {
-    processingTime: number
-    evidenceBasedOnly: boolean
-  }
+    processingTime: number;
+    evidenceBasedOnly: boolean;
+  };
 }
 
 export default function PsychologyFrameworksDemo() {
-  const [frameworks, setFrameworks] = useState<Framework[]>([])
-  const [filteredFrameworks, setFilteredFrameworks] = useState<Framework[]>([])
-  const [categories, setCategories] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
+  const [frameworks, setFrameworks] = useState<Framework[]>([]);
+  const [filteredFrameworks, setFilteredFrameworks] = useState<Framework[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedFramework, setSelectedFramework] = useState<Framework | null>(
     null,
-  )
-  const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [selectedCondition, setSelectedCondition] = useState<string>('all')
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCondition, setSelectedCondition] = useState<string>("all");
 
   const filterFrameworks = useCallback(() => {
-    let filtered = frameworks
+    let filtered = frameworks;
 
     // Filter by search term
     if (searchTerm.trim()) {
@@ -64,195 +64,195 @@ export default function PsychologyFrameworksDemo() {
           fw.conditions.some((c) =>
             c.toLowerCase().includes(searchTerm.toLowerCase()),
           ),
-      )
+      );
     }
 
     // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter((fw) => fw.category === selectedCategory)
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter((fw) => fw.category === selectedCategory);
     }
 
     // Filter by condition
-    if (selectedCondition !== 'all') {
+    if (selectedCondition !== "all") {
       filtered = filtered.filter((fw) =>
         fw.conditions.some((c) =>
           c.toLowerCase().includes(selectedCondition.toLowerCase()),
         ),
-      )
+      );
     }
 
-    setFilteredFrameworks(filtered)
-  }, [frameworks, searchTerm, selectedCategory, selectedCondition])
+    setFilteredFrameworks(filtered);
+  }, [frameworks, searchTerm, selectedCategory, selectedCondition]);
 
   // Load frameworks on component mount
   useEffect(() => {
-    loadFrameworks()
-  }, [])
+    loadFrameworks();
+  }, []);
 
   // Filter frameworks when search/filter criteria change
   useEffect(() => {
-    filterFrameworks()
-  }, [filterFrameworks])
+    filterFrameworks();
+  }, [filterFrameworks]);
 
   const loadFrameworks = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch('/api/psychology/frameworks', {
-        method: 'GET',
+      const response = await fetch("/api/psychology/frameworks", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`)
+        throw new Error(`API request failed: ${response.status}`);
       }
 
-      const result: FrameworksResponse = await response.json()
+      const result: FrameworksResponse = await response.json();
 
-      setFrameworks(result.frameworks)
-      setCategories(result.categories)
+      setFrameworks(result.frameworks);
+      setCategories(result.categories);
 
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
-        setSelectedFramework(result.frameworks[0] || null)
+        setSelectedFramework(result.frameworks[0] || null);
       }
     } catch (error: unknown) {
-      console.error('Failed to load frameworks:', error)
+      console.error("Failed to load frameworks:", error);
 
       // Fallback to demo data
       const demoFrameworks: Framework[] = [
         {
-          id: 'cbt',
-          name: 'Cognitive Behavioral Therapy (CBT)',
-          category: 'Cognitive-Behavioral',
+          id: "cbt",
+          name: "Cognitive Behavioral Therapy (CBT)",
+          category: "Cognitive-Behavioral",
           description:
-            'Evidence-based therapeutic approach focusing on identifying and changing negative thought patterns and behaviors.',
+            "Evidence-based therapeutic approach focusing on identifying and changing negative thought patterns and behaviors.",
           techniques: [
-            'Cognitive Restructuring',
-            'Behavioral Activation',
-            'Exposure Therapy',
-            'Thought Records',
+            "Cognitive Restructuring",
+            "Behavioral Activation",
+            "Exposure Therapy",
+            "Thought Records",
           ],
-          conditions: ['Depression', 'Anxiety Disorders', 'PTSD', 'OCD'],
-          evidenceLevel: 'Strong',
+          conditions: ["Depression", "Anxiety Disorders", "PTSD", "OCD"],
+          evidenceLevel: "Strong",
           keyPrinciples: [
-            'Thoughts, feelings, and behaviors are interconnected',
-            'Focus on present-moment problems',
-            'Active, collaborative approach',
-            'Skills-based intervention',
+            "Thoughts, feelings, and behaviors are interconnected",
+            "Focus on present-moment problems",
+            "Active, collaborative approach",
+            "Skills-based intervention",
           ],
-          developers: ['Aaron Beck', 'Albert Ellis'],
+          developers: ["Aaron Beck", "Albert Ellis"],
           yearDeveloped: 1960,
           applications: [
-            'Individual Therapy',
-            'Group Therapy',
-            'Self-Help',
-            'Digital Interventions',
+            "Individual Therapy",
+            "Group Therapy",
+            "Self-Help",
+            "Digital Interventions",
           ],
         },
         {
-          id: 'dbt',
-          name: 'Dialectical Behavior Therapy (DBT)',
-          category: 'Mindfulness-Based',
+          id: "dbt",
+          name: "Dialectical Behavior Therapy (DBT)",
+          category: "Mindfulness-Based",
           description:
-            'Comprehensive treatment approach combining CBT techniques with mindfulness and distress tolerance skills.',
+            "Comprehensive treatment approach combining CBT techniques with mindfulness and distress tolerance skills.",
           techniques: [
-            'Mindfulness',
-            'Distress Tolerance',
-            'Emotion Regulation',
-            'Interpersonal Effectiveness',
+            "Mindfulness",
+            "Distress Tolerance",
+            "Emotion Regulation",
+            "Interpersonal Effectiveness",
           ],
           conditions: [
-            'Borderline Personality Disorder',
-            'Suicidal Ideation',
-            'Self-Harm',
-            'Emotional Dysregulation',
+            "Borderline Personality Disorder",
+            "Suicidal Ideation",
+            "Self-Harm",
+            "Emotional Dysregulation",
           ],
-          evidenceLevel: 'Strong',
+          evidenceLevel: "Strong",
           keyPrinciples: [
-            'Dialectical thinking',
-            'Mindfulness as core skill',
-            'Distress tolerance',
-            'Validation and change balance',
+            "Dialectical thinking",
+            "Mindfulness as core skill",
+            "Distress tolerance",
+            "Validation and change balance",
           ],
-          developers: ['Marsha Linehan'],
+          developers: ["Marsha Linehan"],
           yearDeveloped: 1980,
           applications: [
-            'Individual Therapy',
-            'Group Skills Training',
-            'Intensive Outpatient',
-            'Residential Treatment',
+            "Individual Therapy",
+            "Group Skills Training",
+            "Intensive Outpatient",
+            "Residential Treatment",
           ],
         },
         {
-          id: 'act',
-          name: 'Acceptance and Commitment Therapy (ACT)',
-          category: 'Mindfulness-Based',
+          id: "act",
+          name: "Acceptance and Commitment Therapy (ACT)",
+          category: "Mindfulness-Based",
           description:
-            'Behavioral approach using mindfulness and acceptance strategies to increase psychological flexibility.',
+            "Behavioral approach using mindfulness and acceptance strategies to increase psychological flexibility.",
           techniques: [
-            'Values Clarification',
-            'Mindfulness Exercises',
-            'Defusion Techniques',
-            'Committed Action',
+            "Values Clarification",
+            "Mindfulness Exercises",
+            "Defusion Techniques",
+            "Committed Action",
           ],
           conditions: [
-            'Chronic Pain',
-            'Anxiety',
-            'Depression',
-            'Substance Use',
+            "Chronic Pain",
+            "Anxiety",
+            "Depression",
+            "Substance Use",
           ],
-          evidenceLevel: 'Moderate',
+          evidenceLevel: "Moderate",
           keyPrinciples: [
-            'Psychological flexibility',
-            'Values-based living',
-            'Acceptance over control',
-            'Present-moment awareness',
+            "Psychological flexibility",
+            "Values-based living",
+            "Acceptance over control",
+            "Present-moment awareness",
           ],
-          developers: ['Steven Hayes'],
+          developers: ["Steven Hayes"],
           yearDeveloped: 1990,
           applications: [
-            'Individual Therapy',
-            'Group Therapy',
-            'Workplace Interventions',
-            'Health Psychology',
+            "Individual Therapy",
+            "Group Therapy",
+            "Workplace Interventions",
+            "Health Psychology",
           ],
         },
-      ]
+      ];
 
-      setFrameworks(demoFrameworks)
+      setFrameworks(demoFrameworks);
       setCategories([
-        'Cognitive-Behavioral',
-        'Mindfulness-Based',
-        'Psychodynamic',
-        'Humanistic',
-      ])
+        "Cognitive-Behavioral",
+        "Mindfulness-Based",
+        "Psychodynamic",
+        "Humanistic",
+      ]);
       if (demoFrameworks.length > 0) {
-        setSelectedFramework(demoFrameworks[0] || null)
+        setSelectedFramework(demoFrameworks[0] || null);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getUniqueConditions = () => {
-    const allConditions = frameworks.flatMap((fw) => fw.conditions)
-    return Array.from(new Set(allConditions)).sort()
-  }
+    const allConditions = frameworks.flatMap((fw) => fw.conditions);
+    return Array.from(new Set(allConditions)).sort();
+  };
 
   const getEvidenceBadgeColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case 'strong':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'moderate':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'emerging':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+      case "strong":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "moderate":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "emerging":
+        return "bg-blue-100 text-blue-800 border-blue-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
@@ -314,7 +314,7 @@ export default function PsychologyFrameworksDemo() {
           </div>
 
           <div className="mt-4 text-sm text-gray-600">
-            Showing {filteredFrameworks.length} of {frameworks.length}{' '}
+            Showing {filteredFrameworks.length} of {frameworks.length}{" "}
             frameworks
           </div>
         </CardContent>
@@ -340,8 +340,8 @@ export default function PsychologyFrameworksDemo() {
                   key={framework.id}
                   className={`cursor-pointer transition-all hover:shadow-md ${
                     selectedFramework?.id === framework.id
-                      ? 'ring-2 ring-blue-500 bg-blue-50'
-                      : 'hover:bg-gray-50'
+                      ? "ring-2 ring-blue-500 bg-blue-50"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={() => setSelectedFramework(framework)}
                 >
@@ -508,7 +508,7 @@ export default function PsychologyFrameworksDemo() {
                             Developers
                           </h4>
                           <p className="text-gray-700">
-                            {selectedFramework.developers.join(', ')}
+                            {selectedFramework.developers.join(", ")}
                           </p>
                         </div>
                       )}
@@ -573,9 +573,9 @@ export default function PsychologyFrameworksDemo() {
             <Button
               variant="outline"
               onClick={() => {
-                setSearchTerm('')
-                setSelectedCategory('all')
-                setSelectedCondition('all')
+                setSearchTerm("");
+                setSelectedCategory("all");
+                setSelectedCondition("all");
               }}
               className="flex items-center gap-2"
             >
@@ -585,5 +585,5 @@ export default function PsychologyFrameworksDemo() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

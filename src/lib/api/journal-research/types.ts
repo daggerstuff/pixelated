@@ -1,9 +1,9 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 const isoDateSchema = z
   .string()
   .datetime()
-  .transform((value) => new Date(value))
+  .transform((value) => new Date(value));
 
 const optionalIsoDateSchema = z
   .string()
@@ -11,13 +11,13 @@ const optionalIsoDateSchema = z
   .transform((value) => new Date(value))
   .optional()
   .nullable()
-  .transform((value) => (value || null))
+  .transform((value) => value || null);
 
-export const SearchKeywordMapSchema = z.record(z.string(), z.array(z.string()))
-export type SearchKeywordMap = z.infer<typeof SearchKeywordMapSchema>
+export const SearchKeywordMapSchema = z.record(z.string(), z.array(z.string()));
+export type SearchKeywordMap = z.infer<typeof SearchKeywordMapSchema>;
 
-export const WeeklyTargetsSchema = z.record(z.string(), z.number())
-export type WeeklyTargets = z.infer<typeof WeeklyTargetsSchema>
+export const WeeklyTargetsSchema = z.record(z.string(), z.number());
+export type WeeklyTargets = z.infer<typeof WeeklyTargetsSchema>;
 
 export const ProgressMetricsSchema = z
   .object({
@@ -33,9 +33,9 @@ export const ProgressMetricsSchema = z
     datasetsAcquired: data.datasets_acquired,
     integrationPlansCreated: data.integration_plans_created,
     lastUpdated: data.last_updated,
-  }))
+  }));
 
-export type ProgressMetrics = z.infer<typeof ProgressMetricsSchema>
+export type ProgressMetrics = z.infer<typeof ProgressMetricsSchema>;
 
 export const SessionSchema = z
   .object({
@@ -55,9 +55,9 @@ export const SessionSchema = z
     weeklyTargets: data.weekly_targets,
     currentPhase: data.current_phase,
     progressMetrics: data.progress_metrics,
-  }))
+  }));
 
-export type Session = z.infer<typeof SessionSchema>
+export type Session = z.infer<typeof SessionSchema>;
 
 export const SourceSchema = z
   .object({
@@ -89,9 +89,9 @@ export const SourceSchema = z
     dataAvailability: data.data_availability,
     discoveryDate: data.discovery_date,
     discoveryMethod: data.discovery_method,
-  }))
+  }));
 
-export type Source = z.infer<typeof SourceSchema>
+export type Source = z.infer<typeof SourceSchema>;
 
 export const DiscoveryResponseSchema = z
   .object({
@@ -105,9 +105,9 @@ export const DiscoveryResponseSchema = z
     sources: data.sources,
     totalSources: data.total_sources,
     discoveryStatus: data.discovery_status,
-  }))
+  }));
 
-export type DiscoveryResponse = z.infer<typeof DiscoveryResponseSchema>
+export type DiscoveryResponse = z.infer<typeof DiscoveryResponseSchema>;
 
 export const EvaluationSchema = z
   .object({
@@ -133,9 +133,9 @@ export const EvaluationSchema = z
     priorityTier: data.priority_tier,
     evaluationDate: data.evaluation_date,
     evaluator: data.evaluator,
-  }))
+  }));
 
-export type Evaluation = z.infer<typeof EvaluationSchema>
+export type Evaluation = z.infer<typeof EvaluationSchema>;
 
 export const AcquisitionSchema = z
   .object({
@@ -155,9 +155,9 @@ export const AcquisitionSchema = z
     filePath: data.file_path ?? null,
     fileSizeMb: data.file_size ?? null,
     acquiredDate: data.acquired_date,
-  }))
+  }));
 
-export type Acquisition = z.infer<typeof AcquisitionSchema>
+export type Acquisition = z.infer<typeof AcquisitionSchema>;
 
 export const IntegrationPlanSchema = z
   .object({
@@ -179,9 +179,9 @@ export const IntegrationPlanSchema = z
     estimatedEffortHours: data.estimated_effort_hours,
     schemaMapping: data.schema_mapping,
     createdDate: data.created_date,
-  }))
+  }));
 
-export type IntegrationPlan = z.infer<typeof IntegrationPlanSchema>
+export type IntegrationPlan = z.infer<typeof IntegrationPlanSchema>;
 
 export const ProgressSchema = z
   .object({
@@ -197,11 +197,11 @@ export const ProgressSchema = z
     progressMetrics: data.progress_metrics,
     weeklyTargets: data.weekly_targets,
     progressPercentage: data.progress_percentage,
-  }))
+  }));
 
-export type Progress = z.infer<typeof ProgressSchema>
+export type Progress = z.infer<typeof ProgressSchema>;
 
-export const ProgressMetricsResponseSchema = ProgressMetricsSchema
+export const ProgressMetricsResponseSchema = ProgressMetricsSchema;
 
 export const ReportSchema = z
   .object({
@@ -221,23 +221,23 @@ export const ReportSchema = z
     generatedDate: data.generated_date,
     content: data.content ?? null,
     filePath: data.file_path ?? null,
-  }))
+  }));
 
-export type Report = z.infer<typeof ReportSchema>
+export type Report = z.infer<typeof ReportSchema>;
 
 const PaginationEnvelopeSchema = z.object({
   total: z.number(),
   page: z.number(),
   page_size: z.number(),
   total_pages: z.number(),
-})
+});
 
 export interface Paginated<T> {
-  items: T[]
-  total: number
-  page: number
-  pageSize: number
-  totalPages: number
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 const createPaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
@@ -251,62 +251,63 @@ const createPaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
     page: data.page,
     pageSize: data.page_size,
     totalPages: data.total_pages,
-  }))
+  }));
 
-export const SessionListSchema = createPaginatedSchema(SessionSchema)
-export type SessionList = z.infer<typeof SessionListSchema>
+export const SessionListSchema = createPaginatedSchema(SessionSchema);
+export type SessionList = z.infer<typeof SessionListSchema>;
 
-export const SourceListSchema = createPaginatedSchema(SourceSchema)
-export type SourceList = z.infer<typeof SourceListSchema>
+export const SourceListSchema = createPaginatedSchema(SourceSchema);
+export type SourceList = z.infer<typeof SourceListSchema>;
 
-export const EvaluationListSchema = createPaginatedSchema(EvaluationSchema)
-export type EvaluationList = z.infer<typeof EvaluationListSchema>
+export const EvaluationListSchema = createPaginatedSchema(EvaluationSchema);
+export type EvaluationList = z.infer<typeof EvaluationListSchema>;
 
-export const AcquisitionListSchema = createPaginatedSchema(AcquisitionSchema)
-export type AcquisitionList = z.infer<typeof AcquisitionListSchema>
+export const AcquisitionListSchema = createPaginatedSchema(AcquisitionSchema);
+export type AcquisitionList = z.infer<typeof AcquisitionListSchema>;
 
-export const IntegrationPlanListSchema =
-  createPaginatedSchema(IntegrationPlanSchema)
-export type IntegrationPlanList = z.infer<typeof IntegrationPlanListSchema>
+export const IntegrationPlanListSchema = createPaginatedSchema(
+  IntegrationPlanSchema,
+);
+export type IntegrationPlanList = z.infer<typeof IntegrationPlanListSchema>;
 
-export const ReportListSchema = createPaginatedSchema(ReportSchema)
-export type ReportList = z.infer<typeof ReportListSchema>
+export const ReportListSchema = createPaginatedSchema(ReportSchema);
+export type ReportList = z.infer<typeof ReportListSchema>;
 
 // Request payload schemas
 export const CreateSessionPayloadSchema = z.object({
   sessionId: z.string().optional(),
-  targetSources: z.array(z.string()).default(['pubmed', 'doaj']),
+  targetSources: z.array(z.string()).default(["pubmed", "doaj"]),
   searchKeywords: SearchKeywordMapSchema.default({}),
   weeklyTargets: WeeklyTargetsSchema.default({}),
-})
+});
 
-export type CreateSessionPayload = z.input<typeof CreateSessionPayloadSchema>
+export type CreateSessionPayload = z.input<typeof CreateSessionPayloadSchema>;
 
 export const UpdateSessionPayloadSchema = z.object({
   targetSources: z.array(z.string()).optional(),
   searchKeywords: SearchKeywordMapSchema.optional(),
   weeklyTargets: WeeklyTargetsSchema.optional(),
   currentPhase: z.string().optional(),
-})
+});
 
-export type UpdateSessionPayload = z.input<typeof UpdateSessionPayloadSchema>
+export type UpdateSessionPayload = z.input<typeof UpdateSessionPayloadSchema>;
 
 export const DiscoveryInitiatePayloadSchema = z.object({
   keywords: z.array(z.string()).default([]),
-  sources: z.array(z.string()).default(['pubmed', 'doaj']),
-})
+  sources: z.array(z.string()).default(["pubmed", "doaj"]),
+});
 
 export type DiscoveryInitiatePayload = z.input<
   typeof DiscoveryInitiatePayloadSchema
->
+>;
 
 export const EvaluationInitiatePayloadSchema = z.object({
   sourceIds: z.array(z.string()).optional(),
-})
+});
 
 export type EvaluationInitiatePayload = z.input<
   typeof EvaluationInitiatePayloadSchema
->
+>;
 
 export const EvaluationUpdatePayloadSchema = z.object({
   therapeuticRelevance: z.number().min(1).max(10).optional(),
@@ -314,159 +315,155 @@ export const EvaluationUpdatePayloadSchema = z.object({
   trainingIntegration: z.number().min(1).max(10).optional(),
   ethicalAccessibility: z.number().min(1).max(10).optional(),
   priorityTier: z.string().optional(),
-})
+});
 
 export type EvaluationUpdatePayload = z.input<
   typeof EvaluationUpdatePayloadSchema
->
+>;
 
 export const AcquisitionInitiatePayloadSchema = z.object({
   sourceIds: z.array(z.string()).optional(),
-})
+});
 
 export type AcquisitionInitiatePayload = z.input<
   typeof AcquisitionInitiatePayloadSchema
->
+>;
 
 export const AcquisitionUpdatePayloadSchema = z.object({
-  status: z.enum(['pending', 'approved', 'in-progress', 'completed', 'failed']),
-})
+  status: z.enum(["pending", "approved", "in-progress", "completed", "failed"]),
+});
 
 export type AcquisitionUpdatePayload = z.input<
   typeof AcquisitionUpdatePayloadSchema
->
+>;
 
 export const IntegrationInitiatePayloadSchema = z.object({
   sourceIds: z.array(z.string()).optional(),
-  targetFormat: z.string().default('chatml'),
-})
+  targetFormat: z.string().default("chatml"),
+});
 
 export type IntegrationInitiatePayload = z.input<
   typeof IntegrationInitiatePayloadSchema
->
+>;
 
 export const ReportGeneratePayloadSchema = z.object({
   reportType: z
-    .enum(['session_report', 'weekly_report', 'summary_report'])
-    .default('session_report'),
-  format: z.enum(['json', 'markdown', 'pdf']).default('json'),
+    .enum(["session_report", "weekly_report", "summary_report"])
+    .default("session_report"),
+  format: z.enum(["json", "markdown", "pdf"]).default("json"),
   dateRange: z
     .object({
       startDate: z.union([z.date(), z.string().datetime()]).optional(),
       endDate: z.union([z.date(), z.string().datetime()]).optional(),
     })
     .optional(),
-})
+});
 
-export type ReportGeneratePayload = z.input<
-  typeof ReportGeneratePayloadSchema
->
+export type ReportGeneratePayload = z.input<typeof ReportGeneratePayloadSchema>;
 
 // Serialization helpers
 export const serializeCreateSessionPayload = (
   payload: CreateSessionPayload,
 ) => {
-  const parsed = CreateSessionPayloadSchema.parse(payload)
+  const parsed = CreateSessionPayloadSchema.parse(payload);
   return {
     session_id: parsed.sessionId,
     target_sources: parsed.targetSources,
     search_keywords: parsed.searchKeywords,
     weekly_targets: parsed.weeklyTargets,
-  }
-}
+  };
+};
 
 export const serializeUpdateSessionPayload = (
   payload: UpdateSessionPayload,
 ) => {
-  const parsed = UpdateSessionPayloadSchema.parse(payload)
+  const parsed = UpdateSessionPayloadSchema.parse(payload);
   return {
     target_sources: parsed.targetSources,
     search_keywords: parsed.searchKeywords,
     weekly_targets: parsed.weeklyTargets,
     current_phase: parsed.currentPhase,
-  }
-}
+  };
+};
 
 export const serializeDiscoveryInitiatePayload = (
   payload: DiscoveryInitiatePayload,
 ) => {
-  const parsed = DiscoveryInitiatePayloadSchema.parse(payload)
+  const parsed = DiscoveryInitiatePayloadSchema.parse(payload);
   return {
     keywords: parsed.keywords,
     sources: parsed.sources,
-  }
-}
+  };
+};
 
 export const serializeEvaluationInitiatePayload = (
   payload: EvaluationInitiatePayload,
 ) => {
-  const parsed = EvaluationInitiatePayloadSchema.parse(payload)
+  const parsed = EvaluationInitiatePayloadSchema.parse(payload);
   return {
     source_ids: parsed.sourceIds,
-  }
-}
+  };
+};
 
 export const serializeEvaluationUpdatePayload = (
   payload: EvaluationUpdatePayload,
 ) => {
-  const parsed = EvaluationUpdatePayloadSchema.parse(payload)
+  const parsed = EvaluationUpdatePayloadSchema.parse(payload);
   return {
     therapeutic_relevance: parsed.therapeuticRelevance,
     data_structure_quality: parsed.dataStructureQuality,
     training_integration: parsed.trainingIntegration,
     ethical_accessibility: parsed.ethicalAccessibility,
     priority_tier: parsed.priorityTier,
-  }
-}
+  };
+};
 
 export const serializeAcquisitionInitiatePayload = (
   payload: AcquisitionInitiatePayload,
 ) => {
-  const parsed = AcquisitionInitiatePayloadSchema.parse(payload)
+  const parsed = AcquisitionInitiatePayloadSchema.parse(payload);
   return {
     source_ids: parsed.sourceIds,
-  }
-}
+  };
+};
 
 export const serializeAcquisitionUpdatePayload = (
   payload: AcquisitionUpdatePayload,
 ) => {
-  const parsed = AcquisitionUpdatePayloadSchema.parse(payload)
+  const parsed = AcquisitionUpdatePayloadSchema.parse(payload);
   return {
     status: parsed.status,
-  }
-}
+  };
+};
 
 export const serializeIntegrationInitiatePayload = (
   payload: IntegrationInitiatePayload,
 ) => {
-  const parsed = IntegrationInitiatePayloadSchema.parse(payload)
+  const parsed = IntegrationInitiatePayloadSchema.parse(payload);
   return {
     source_ids: parsed.sourceIds,
     target_format: parsed.targetFormat,
-  }
-}
+  };
+};
 
 export const serializeReportGeneratePayload = (
   payload: ReportGeneratePayload,
 ) => {
-  const parsed = ReportGeneratePayloadSchema.parse(payload)
+  const parsed = ReportGeneratePayloadSchema.parse(payload);
   return {
     report_type: parsed.reportType,
     format: parsed.format,
     date_range: parsed.dateRange
       ? {
-        start_date:
-          parsed.dateRange.startDate instanceof Date
-            ? parsed.dateRange.startDate.toISOString()
-            : parsed.dateRange.startDate,
-        end_date:
-          parsed.dateRange.endDate instanceof Date
-            ? parsed.dateRange.endDate.toISOString()
-            : parsed.dateRange.endDate,
-      }
+          start_date:
+            parsed.dateRange.startDate instanceof Date
+              ? parsed.dateRange.startDate.toISOString()
+              : parsed.dateRange.startDate,
+          end_date:
+            parsed.dateRange.endDate instanceof Date
+              ? parsed.dateRange.endDate.toISOString()
+              : parsed.dateRange.endDate,
+        }
       : undefined,
-  }
-}
-
-
+  };
+};

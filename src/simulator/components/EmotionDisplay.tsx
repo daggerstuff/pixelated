@@ -1,13 +1,13 @@
-import { useSimulatorContext } from '../context/SimulatorContext'
+import { useSimulatorContext } from "../context/SimulatorContext";
 
 interface ProgressBarProps {
-  label: string
-  value: number
-  color: string
+  label: string;
+  value: number;
+  color: string;
 }
 
 const ProgressBar = ({ label, value, color }: ProgressBarProps) => {
-  const percentage = Math.round(value * 100)
+  const percentage = Math.round(value * 100);
 
   return (
     <div className="mb-4">
@@ -23,22 +23,22 @@ const ProgressBar = ({ label, value, color }: ProgressBarProps) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const EmotionDisplay = () => {
-  const { state } = useSimulatorContext()
-  const { emotionState } = state
+  const { state } = useSimulatorContext();
+  const { emotionState } = state;
 
   if (!emotionState) {
     return (
       <div className="p-4 bg-gray-50 rounded-lg">
         <p className="text-gray-500 text-center">No emotion data available</p>
       </div>
-    )
+    );
   }
 
-  const { valence, energy, dominance } = emotionState
+  const { valence, energy, dominance } = emotionState;
 
   return (
     <div className="p-4 bg-white rounded-lg shadow">
@@ -62,5 +62,5 @@ export const EmotionDisplay = () => {
         color="bg-purple-600"
       />
     </div>
-  )
-}
+  );
+};

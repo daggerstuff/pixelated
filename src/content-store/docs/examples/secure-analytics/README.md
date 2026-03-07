@@ -38,16 +38,20 @@ sudo apt-get install automake build-essential clang cmake git \
 ### 1. Initialize the Environment
 
 ```typescript
-import { JIFFAdapter, JIFFAdapterConfig, MPCProtocol } from '@gradiant/mp-spdz-bindings'
+import {
+  JIFFAdapter,
+  JIFFAdapterConfig,
+  MPCProtocol,
+} from "@gradiant/mp-spdz-bindings";
 
 const config: JIFFAdapterConfig = {
   partyId: 0, // Change for each party
   numParties: 3,
   threshold: 1,
-  protocol: MPCProtocol.SEMI2K // Use SEMI2K for better performance
-}
+  protocol: MPCProtocol.SEMI2K, // Use SEMI2K for better performance
+};
 
-const adapter = new JIFFAdapter(config)
+const adapter = new JIFFAdapter(config);
 ```
 
 ### 2. Secure Mean Calculation
@@ -55,30 +59,28 @@ const adapter = new JIFFAdapter(config)
 ```typescript
 async function calculateSecureMean(values: number[]): Promise<number> {
   // Share all values
-  const shares = await Promise.all(
-    values.map(value => adapter.share(value))
-  )
+  const shares = await Promise.all(values.map((value) => adapter.share(value)));
 
   // Sum the shares
-  let sum = shares[0]
+  let sum = shares[0];
   for (let i = 1; i < shares.length; i++) {
-    sum = await adapter.add(sum, shares[i])
+    sum = await adapter.add(sum, shares[i]);
   }
 
   // Create share for length
-  const length = await adapter.share(BigInt(values.length))
+  const length = await adapter.share(BigInt(values.length));
 
   // Divide sum by length
-  const mean = await adapter.multiply(sum, length)
+  const mean = await adapter.multiply(sum, length);
 
   // Open the result
-  return Number(await adapter.open(mean))
+  return Number(await adapter.open(mean));
 }
 
 // Example usage
-const values = [1, 2, 3, 4, 5]
-const mean = await calculateSecureMean(values)
-console.log('Secure mean:', mean)
+const values = [1, 2, 3, 4, 5];
+const mean = await calculateSecureMean(values);
+console.log("Secure mean:", mean);
 ```
 
 ### 3. Secure Standard Deviation
@@ -86,40 +88,38 @@ console.log('Secure mean:', mean)
 ```typescript
 async function calculateSecureStdDev(values: number[]): Promise<number> {
   // Calculate mean first
-  const mean = await calculateSecureMean(values)
-  const meanShare = await adapter.share(mean)
+  const mean = await calculateSecureMean(values);
+  const meanShare = await adapter.share(mean);
 
   // Share all values
-  const shares = await Promise.all(
-    values.map(value => adapter.share(value))
-  )
+  const shares = await Promise.all(values.map((value) => adapter.share(value)));
 
   // Calculate squared differences
   const squaredDiffs = await Promise.all(
     shares.map(async (share) => {
-      const diff = await adapter.subtract(share, meanShare)
-      return adapter.multiply(diff, diff)
-    })
-  )
+      const diff = await adapter.subtract(share, meanShare);
+      return adapter.multiply(diff, diff);
+    }),
+  );
 
   // Sum squared differences
-  let sum = squaredDiffs[0]
+  let sum = squaredDiffs[0];
   for (let i = 1; i < squaredDiffs.length; i++) {
-    sum = await adapter.add(sum, squaredDiffs[i])
+    sum = await adapter.add(sum, squaredDiffs[i]);
   }
 
   // Divide by length
-  const length = await adapter.share(BigInt(values.length))
-  const variance = await adapter.multiply(sum, length)
+  const length = await adapter.share(BigInt(values.length));
+  const variance = await adapter.multiply(sum, length);
 
   // Open the result and calculate square root
-  const varianceValue = Number(await adapter.open(variance))
-  return Math.sqrt(varianceValue)
+  const varianceValue = Number(await adapter.open(variance));
+  return Math.sqrt(varianceValue);
 }
 
 // Example usage
-const stdDev = await calculateSecureStdDev(values)
-console.log('Secure standard deviation:', stdDev)
+const stdDev = await calculateSecureStdDev(values);
+console.log("Secure standard deviation:", stdDev);
 ```
 
 ### 4. Secure Correlation Coefficient
@@ -127,54 +127,54 @@ console.log('Secure standard deviation:', stdDev)
 ```typescript
 async function calculateSecureCorrelation(
   x: number[],
-  y: number[]
+  y: number[],
 ): Promise<number> {
   if (x.length !== y.length) {
-    throw new Error('Arrays must have same length')
+    throw new Error("Arrays must have same length");
   }
 
   // Share all values
-  const xShares = await Promise.all(x.map(value => adapter.share(value)))
-  const yShares = await Promise.all(y.map(value => adapter.share(value)))
+  const xShares = await Promise.all(x.map((value) => adapter.share(value)));
+  const yShares = await Promise.all(y.map((value) => adapter.share(value)));
 
   // Calculate means
-  const xMean = await calculateSecureMean(x)
-  const yMean = await calculateSecureMean(y)
-  const xMeanShare = await adapter.share(xMean)
-  const yMeanShare = await adapter.share(yMean)
+  const xMean = await calculateSecureMean(x);
+  const yMean = await calculateSecureMean(y);
+  const xMeanShare = await adapter.share(xMean);
+  const yMeanShare = await adapter.share(yMean);
 
   // Calculate covariance numerator
   const covProducts = await Promise.all(
     xShares.map(async (xShare, i) => {
-      const xDiff = await adapter.subtract(xShare, xMeanShare)
-      const yDiff = await adapter.subtract(yShares[i], yMeanShare)
-      return adapter.multiply(xDiff, yDiff)
-    })
-  )
+      const xDiff = await adapter.subtract(xShare, xMeanShare);
+      const yDiff = await adapter.subtract(yShares[i], yMeanShare);
+      return adapter.multiply(xDiff, yDiff);
+    }),
+  );
 
   // Sum products
-  let covSum = covProducts[0]
+  let covSum = covProducts[0];
   for (let i = 1; i < covProducts.length; i++) {
-    covSum = await adapter.add(covSum, covProducts[i])
+    covSum = await adapter.add(covSum, covProducts[i]);
   }
 
   // Calculate standard deviations
-  const xStdDev = await calculateSecureStdDev(x)
-  const yStdDev = await calculateSecureStdDev(y)
+  const xStdDev = await calculateSecureStdDev(x);
+  const yStdDev = await calculateSecureStdDev(y);
 
   // Calculate correlation coefficient
-  const denominator = await adapter.share(BigInt(xStdDev * yStdDev))
-  const correlation = await adapter.multiply(covSum, denominator)
+  const denominator = await adapter.share(BigInt(xStdDev * yStdDev));
+  const correlation = await adapter.multiply(covSum, denominator);
 
   // Open the result
-  return Number(await adapter.open(correlation))
+  return Number(await adapter.open(correlation));
 }
 
 // Example usage
-const x = [1, 2, 3, 4, 5]
-const y = [2, 4, 6, 8, 10]
-const correlation = await calculateSecureCorrelation(x, y)
-console.log('Secure correlation:', correlation)
+const x = [1, 2, 3, 4, 5];
+const y = [2, 4, 6, 8, 10];
+const correlation = await calculateSecureCorrelation(x, y);
+console.log("Secure correlation:", correlation);
 ```
 
 ### 5. Secure Linear Regression
@@ -182,63 +182,63 @@ console.log('Secure correlation:', correlation)
 ```typescript
 async function calculateSecureLinearRegression(
   x: number[],
-  y: number[]
-): Promise<{ slope: number, intercept: number }> {
+  y: number[],
+): Promise<{ slope: number; intercept: number }> {
   if (x.length !== y.length) {
-    throw new Error('Arrays must have same length')
+    throw new Error("Arrays must have same length");
   }
 
   // Share all values
-  const xShares = await Promise.all(x.map(value => adapter.share(value)))
-  const yShares = await Promise.all(y.map(value => adapter.share(value)))
+  const xShares = await Promise.all(x.map((value) => adapter.share(value)));
+  const yShares = await Promise.all(y.map((value) => adapter.share(value)));
 
   // Calculate means
-  const xMean = await calculateSecureMean(x)
-  const yMean = await calculateSecureMean(y)
-  const xMeanShare = await adapter.share(xMean)
-  const yMeanShare = await adapter.share(yMean)
+  const xMean = await calculateSecureMean(x);
+  const yMean = await calculateSecureMean(y);
+  const xMeanShare = await adapter.share(xMean);
+  const yMeanShare = await adapter.share(yMean);
 
   // Calculate slope numerator and denominator
   const numeratorProducts = await Promise.all(
     xShares.map(async (xShare, i) => {
-      const xDiff = await adapter.subtract(xShare, xMeanShare)
-      const yDiff = await adapter.subtract(yShares[i], yMeanShare)
-      return adapter.multiply(xDiff, yDiff)
-    })
-  )
+      const xDiff = await adapter.subtract(xShare, xMeanShare);
+      const yDiff = await adapter.subtract(yShares[i], yMeanShare);
+      return adapter.multiply(xDiff, yDiff);
+    }),
+  );
 
   const denominatorProducts = await Promise.all(
     xShares.map(async (xShare) => {
-      const xDiff = await adapter.subtract(xShare, xMeanShare)
-      return adapter.multiply(xDiff, xDiff)
-    })
-  )
+      const xDiff = await adapter.subtract(xShare, xMeanShare);
+      return adapter.multiply(xDiff, xDiff);
+    }),
+  );
 
   // Sum products
-  let numeratorSum = numeratorProducts[0]
-  let denominatorSum = denominatorProducts[0]
+  let numeratorSum = numeratorProducts[0];
+  let denominatorSum = denominatorProducts[0];
   for (let i = 1; i < numeratorProducts.length; i++) {
-    numeratorSum = await adapter.add(numeratorSum, numeratorProducts[i])
-    denominatorSum = await adapter.add(denominatorSum, denominatorProducts[i])
+    numeratorSum = await adapter.add(numeratorSum, numeratorProducts[i]);
+    denominatorSum = await adapter.add(denominatorSum, denominatorProducts[i]);
   }
 
   // Calculate slope
-  const slope = await adapter.multiply(numeratorSum, denominatorSum)
-  const slopeValue = Number(await adapter.open(slope))
+  const slope = await adapter.multiply(numeratorSum, denominatorSum);
+  const slopeValue = Number(await adapter.open(slope));
 
   // Calculate intercept
   const interceptShare = await adapter.subtract(
     yMeanShare,
-    await adapter.multiply(xMeanShare, await adapter.share(slopeValue))
-  )
-  const interceptValue = Number(await adapter.open(interceptShare))
+    await adapter.multiply(xMeanShare, await adapter.share(slopeValue)),
+  );
+  const interceptValue = Number(await adapter.open(interceptShare));
 
-  return { slope: slopeValue, intercept: interceptValue }
+  return { slope: slopeValue, intercept: interceptValue };
 }
 
 // Example usage
-const regression = await calculateSecureLinearRegression(x, y)
-console.log('Secure linear regression:', regression)
+const regression = await calculateSecureLinearRegression(x, y);
+console.log("Secure linear regression:", regression);
 ```
 
 ## Performance Considerations
@@ -276,30 +276,30 @@ console.log('Secure linear regression:', regression)
 ## Testing
 
 ```typescript
-describe('Secure Analytics', () => {
-  let adapter: JIFFAdapter
+describe("Secure Analytics", () => {
+  let adapter: JIFFAdapter;
 
   beforeEach(() => {
     adapter = new JIFFAdapter({
       partyId: 0,
       numParties: 3,
-      protocol: MPCProtocol.SEMI2K
-    })
-  })
+      protocol: MPCProtocol.SEMI2K,
+    });
+  });
 
-  it('should calculate mean securely', async () => {
-    const values = [1, 2, 3, 4, 5]
-    const mean = await calculateSecureMean(values)
-    expect(mean).toBe(3)
-  })
+  it("should calculate mean securely", async () => {
+    const values = [1, 2, 3, 4, 5];
+    const mean = await calculateSecureMean(values);
+    expect(mean).toBe(3);
+  });
 
-  it('should calculate correlation securely', async () => {
-    const x = [1, 2, 3, 4, 5]
-    const y = [2, 4, 6, 8, 10]
-    const correlation = await calculateSecureCorrelation(x, y)
-    expect(correlation).toBeCloseTo(1.0)
-  })
-})
+  it("should calculate correlation securely", async () => {
+    const x = [1, 2, 3, 4, 5];
+    const y = [2, 4, 6, 8, 10];
+    const correlation = await calculateSecureCorrelation(x, y);
+    expect(correlation).toBeCloseTo(1.0);
+  });
+});
 ```
 
 ## Further Resources
