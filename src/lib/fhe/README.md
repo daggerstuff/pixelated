@@ -47,69 +47,69 @@ The module supports different encryption modes:
 ### Initialize the FHE Service
 
 ```typescript
-import { EncryptionMode, fheService } from '@/lib/fhe'
+import { EncryptionMode, fheService } from "@/lib/fhe";
 
 // Initialize with default settings
-await fheService.initialize()
+await fheService.initialize();
 
 // Or with custom settings
 await fheService.initialize({
   mode: EncryptionMode.FHE,
   keySize: 2048,
-  securityLevel: 'high',
-  enableDebug: true
-})
+  securityLevel: "high",
+  enableDebug: true,
+});
 ```
 
 ### Encrypt a Message
 
 ```typescript
-const plaintext = 'Client message with sensitive information'
-const encrypted = await fheService.encrypt(plaintext)
+const plaintext = "Client message with sensitive information";
+const encrypted = await fheService.encrypt(plaintext);
 ```
 
 ### Decrypt a Message
 
 ```typescript
-const decrypted = await fheService.decrypt(encrypted)
-console.log(decrypted) // "Client message with sensitive information"
+const decrypted = await fheService.decrypt(encrypted);
+console.log(decrypted); // "Client message with sensitive information"
 ```
 
 ### Process Encrypted Data
 
 ```typescript
-import { FHEOperation } from '@/lib/fhe'
+import { FHEOperation } from "@/lib/fhe";
 
 // Analyze sentiment without decryption
 const sentimentResult = await fheService.processEncrypted(
   encrypted,
-  FHEOperation.SENTIMENT
-)
+  FHEOperation.SENTIMENT,
+);
 
 // The result is still encrypted
-const sentiment = await fheService.decrypt(sentimentResult)
-console.log(sentiment) // "positive", "negative", or "neutral"
+const sentiment = await fheService.decrypt(sentimentResult);
+console.log(sentiment); // "positive", "negative", or "neutral"
 ```
 
 ### Generate Analytics on Encrypted Conversations
 
 ```typescript
-import { AnalyticsType, fheAnalytics } from '@/lib/fhe/analytics'
+import { AnalyticsType, fheAnalytics } from "@/lib/fhe/analytics";
 
 // Initialize analytics service
-await fheAnalytics.initialize()
+await fheAnalytics.initialize();
 
 // Analyze sentiment trends in encrypted messages
-const sentimentTrend = await fheAnalytics.analyzeSentimentTrend(messages)
+const sentimentTrend = await fheAnalytics.analyzeSentimentTrend(messages);
 
 // Create a full analytics dashboard
-const dashboard = await fheAnalytics.createAnalyticsDashboard(messages)
+const dashboard = await fheAnalytics.createAnalyticsDashboard(messages);
 ```
 
 ### Export Public Key for External Use
 
 ```typescript
-const publicKey = fheService.exportPublicKey()
+const publicKey = fheService.exportPublicKey();
 // Share this key with external systems that need to encrypt data
 // that your system will process homomorphically
 ```

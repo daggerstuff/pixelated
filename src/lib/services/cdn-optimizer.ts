@@ -3,74 +3,74 @@
  * Global content delivery optimization with edge caching and asset management
  */
 
-import { getLogger } from '@/lib/logging'
-import { createHash } from 'crypto'
+import { getLogger } from "@/lib/logging";
+import { createHash } from "crypto";
 
-const logger = getLogger('cdn-optimizer')
+const logger = getLogger("cdn-optimizer");
 
 // CDN configuration
 interface CDNConfig {
-  provider: 'cloudflare' | 'aws' | 'azure' | 'custom'
-  baseUrl: string
-  apiKey?: string
-  zoneId?: string
+  provider: "cloudflare" | "aws" | "azure" | "custom";
+  baseUrl: string;
+  apiKey?: string;
+  zoneId?: string;
 
   // Edge caching settings
   edgeCache: {
-    enabled: boolean
-    defaultTTL: number
-    maxTTL: number
-    staleWhileRevalidate: number
-  }
+    enabled: boolean;
+    defaultTTL: number;
+    maxTTL: number;
+    staleWhileRevalidate: number;
+  };
 
   // Asset optimization
   assets: {
-    enableCompression: boolean
-    enableWebP: boolean
-    enableAVIF: boolean
-    imageQuality: number
-  }
+    enableCompression: boolean;
+    enableWebP: boolean;
+    enableAVIF: boolean;
+    imageQuality: number;
+  };
 
   // Geographic optimization
   geo: {
-    enableGeoRouting: boolean
-    preferredRegions: string[]
-    failoverRegions: string[]
-  }
+    enableGeoRouting: boolean;
+    preferredRegions: string[];
+    failoverRegions: string[];
+  };
 }
 
 // Asset metadata
 interface AssetMetadata {
-  url: string
-  originalSize: number
-  optimizedSize?: number
-  format: string
-  width?: number
-  height?: number
-  hash: string
-  cdnUrl?: string
-  cacheHeaders: Record<string, string>
+  url: string;
+  originalSize: number;
+  optimizedSize?: number;
+  format: string;
+  width?: number;
+  height?: number;
+  hash: string;
+  cdnUrl?: string;
+  cacheHeaders: Record<string, string>;
 }
 
 // CDN response
 interface CDNResponse {
-  success: boolean
-  url?: string
-  error?: string
-  metadata?: AssetMetadata
+  success: boolean;
+  url?: string;
+  error?: string;
+  metadata?: AssetMetadata;
 }
 
 /**
  * CDN and edge caching service
  */
 export class CDNEdgeOptimizer {
-  private config: CDNConfig
-  private assetCache: Map<string, AssetMetadata> = new Map()
+  private config: CDNConfig;
+  private assetCache: Map<string, AssetMetadata> = new Map();
 
   constructor(config: Partial<CDNConfig> = {}) {
     this.config = {
-      provider: 'cloudflare',
-      baseUrl: process.env.CDN_BASE_URL || 'https://cdn.pixelatedempathy.com',
+      provider: "cloudflare",
+      baseUrl: process.env.CDN_BASE_URL || "https://cdn.pixelatedempathy.com",
       edgeCache: {
         enabled: true,
         defaultTTL: 3600, // 1 hour
@@ -85,17 +85,17 @@ export class CDNEdgeOptimizer {
       },
       geo: {
         enableGeoRouting: false,
-        preferredRegions: ['us-east-1', 'eu-west-1'],
-        failoverRegions: ['us-west-1', 'ap-southeast-1'],
+        preferredRegions: ["us-east-1", "eu-west-1"],
+        failoverRegions: ["us-west-1", "ap-southeast-1"],
       },
       ...config,
-    }
+    };
 
-    logger.info('CDN optimizer initialized', {
+    logger.info("CDN optimizer initialized", {
       provider: this.config.provider,
       baseUrl: this.config.baseUrl,
       edgeCacheEnabled: this.config.edgeCache.enabled,
-    })
+    });
   }
 
   /**
@@ -104,50 +104,50 @@ export class CDNEdgeOptimizer {
   optimizeAssetUrl(
     assetPath: string,
     options: {
-      format?: string
-      width?: number
-      height?: number
-      quality?: number
-      webp?: boolean
-      avif?: boolean
+      format?: string;
+      width?: number;
+      height?: number;
+      quality?: number;
+      webp?: boolean;
+      avif?: boolean;
     } = {},
   ): string {
     try {
       // Generate asset hash for cache busting
-      const assetHash = this.generateAssetHash(assetPath, options)
+      const assetHash = this.generateAssetHash(assetPath, options);
 
       // Build optimized URL
-      let optimizedUrl = `${this.config.baseUrl}${assetPath}`
+      let optimizedUrl = `${this.config.baseUrl}${assetPath}`;
 
       // Add query parameters for optimization
-      const params = new URLSearchParams()
+      const params = new URLSearchParams();
 
-      if (options.format) params.append('format', options.format)
-      if (options.width) params.append('w', options.width.toString())
-      if (options.height) params.append('h', options.height.toString())
-      if (options.quality) params.append('q', options.quality.toString())
+      if (options.format) params.append("format", options.format);
+      if (options.width) params.append("w", options.width.toString());
+      if (options.height) params.append("h", options.height.toString());
+      if (options.quality) params.append("q", options.quality.toString());
       if (options.webp && this.config.assets.enableWebP)
-        params.append('webp', 'true')
+        params.append("webp", "true");
       if (options.avif && this.config.assets.enableAVIF)
-        params.append('avif', 'true')
+        params.append("avif", "true");
 
       // Add cache busting
-      params.append('v', assetHash)
+      params.append("v", assetHash);
 
       if (params.toString()) {
-        optimizedUrl += '?' + params.toString()
+        optimizedUrl += "?" + params.toString();
       }
 
-      logger.debug('Asset URL optimized', {
+      logger.debug("Asset URL optimized", {
         original: assetPath,
         optimized: optimizedUrl,
         options,
-      })
+      });
 
-      return optimizedUrl
+      return optimizedUrl;
     } catch (error) {
-      logger.error('Failed to optimize asset URL', { assetPath, error })
-      return assetPath // Fallback to original
+      logger.error("Failed to optimize asset URL", { assetPath, error });
+      return assetPath; // Fallback to original
     }
   }
 
@@ -161,10 +161,10 @@ export class CDNEdgeOptimizer {
     const hashInput = JSON.stringify({
       path: assetPath,
       options,
-      version: '1.0',
-    })
+      version: "1.0",
+    });
 
-    return createHash('md5').update(hashInput).digest('hex').substring(0, 8)
+    return createHash("md5").update(hashInput).digest("hex").substring(0, 8);
   }
 
   /**
@@ -173,23 +173,23 @@ export class CDNEdgeOptimizer {
   async optimizeImage(
     imagePath: string,
     options: {
-      width?: number
-      height?: number
-      quality?: number
-      format?: 'webp' | 'avif' | 'jpeg' | 'png'
+      width?: number;
+      height?: number;
+      quality?: number;
+      format?: "webp" | "avif" | "jpeg" | "png";
     } = {},
   ): Promise<CDNResponse> {
     try {
       // Check cache first
-      const cacheKey = this.generateAssetHash(imagePath, options)
-      const cached = this.assetCache.get(cacheKey)
+      const cacheKey = this.generateAssetHash(imagePath, options);
+      const cached = this.assetCache.get(cacheKey);
 
       if (cached) {
         return {
           success: true,
           url: cached.cdnUrl,
           metadata: cached,
-        }
+        };
       }
 
       // Build optimization URL
@@ -198,9 +198,9 @@ export class CDNEdgeOptimizer {
         width: options.width,
         height: options.height,
         quality: options.quality || this.config.assets.imageQuality,
-        webp: options.format === 'webp',
-        avif: options.format === 'avif',
-      })
+        webp: options.format === "webp",
+        avif: options.format === "avif",
+      });
 
       // In a real implementation, this would:
       // 1. Upload to CDN if not exists
@@ -211,37 +211,37 @@ export class CDNEdgeOptimizer {
       const metadata: AssetMetadata = {
         url: imagePath,
         originalSize: 0, // Would be populated from actual file
-        format: options.format || 'jpeg',
+        format: options.format || "jpeg",
         hash: cacheKey,
         cdnUrl: optimizedUrl,
         cacheHeaders: this.generateCacheHeaders(),
-      }
+      };
 
       // Cache the result
-      this.assetCache.set(cacheKey, metadata)
+      this.assetCache.set(cacheKey, metadata);
 
-      logger.info('Image optimized for CDN', {
+      logger.info("Image optimized for CDN", {
         original: imagePath,
         optimized: optimizedUrl,
         format: options.format,
-      })
+      });
 
       return {
         success: true,
         url: optimizedUrl,
         metadata,
-      }
+      };
     } catch (error) {
-      logger.error('Image optimization failed', {
+      logger.error("Image optimization failed", {
         imagePath,
         options,
         error: error instanceof Error ? error.message : String(error),
-      })
+      });
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Optimization failed',
-      }
+        error: error instanceof Error ? error.message : "Optimization failed",
+      };
     }
   }
 
@@ -250,18 +250,18 @@ export class CDNEdgeOptimizer {
    */
   private generateCacheHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
-      'Cache-Control': `public, max-age=${this.config.edgeCache.defaultTTL}, stale-while-revalidate=${this.config.edgeCache.staleWhileRevalidate}`,
-      'CDN-Cache-Control': `max-age=${this.config.edgeCache.maxTTL}`,
-      'Vercel-CDN-Cache-Control': `max-age=${this.config.edgeCache.defaultTTL}`,
-      'Netlify-CDN-Cache-Control': `max-age=${this.config.edgeCache.defaultTTL}`,
-    }
+      "Cache-Control": `public, max-age=${this.config.edgeCache.defaultTTL}, stale-while-revalidate=${this.config.edgeCache.staleWhileRevalidate}`,
+      "CDN-Cache-Control": `max-age=${this.config.edgeCache.maxTTL}`,
+      "Vercel-CDN-Cache-Control": `max-age=${this.config.edgeCache.defaultTTL}`,
+      "Netlify-CDN-Cache-Control": `max-age=${this.config.edgeCache.defaultTTL}`,
+    };
 
     if (this.config.assets.enableCompression) {
-      headers['Content-Encoding'] = 'gzip, br'
-      headers['Vary'] = 'Accept-Encoding'
+      headers["Content-Encoding"] = "gzip, br";
+      headers["Vary"] = "Accept-Encoding";
     }
 
-    return headers
+    return headers;
   }
 
   /**
@@ -269,47 +269,47 @@ export class CDNEdgeOptimizer {
    */
   async optimizeAssets(
     assets: Array<{
-      path: string
+      path: string;
       options?: {
-        width?: number
-        height?: number
-        quality?: number
-        format?: string
-      }
+        width?: number;
+        height?: number;
+        quality?: number;
+        format?: string;
+      };
     }>,
   ): Promise<CDNResponse[]> {
-    const results: CDNResponse[] = []
+    const results: CDNResponse[] = [];
 
-    logger.info('Starting batch asset optimization', {
+    logger.info("Starting batch asset optimization", {
       count: assets.length,
-    })
+    });
 
     // Process in batches to avoid overwhelming CDN
-    const batchSize = 10
+    const batchSize = 10;
     for (let i = 0; i < assets.length; i += batchSize) {
-      const batch = assets.slice(i, i + batchSize)
+      const batch = assets.slice(i, i + batchSize);
 
       const batchPromises = batch.map((asset) =>
         this.optimizeImage(asset.path, asset.options),
-      )
+      );
 
-      const batchResults = await Promise.all(batchPromises)
-      results.push(...batchResults)
+      const batchResults = await Promise.all(batchPromises);
+      results.push(...batchResults);
 
       // Small delay between batches
       if (i + batchSize < assets.length) {
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
     }
 
-    const successCount = results.filter((r) => r.success).length
-    logger.info('Batch asset optimization completed', {
+    const successCount = results.filter((r) => r.success).length;
+    logger.info("Batch asset optimization completed", {
       total: assets.length,
       successful: successCount,
       failed: assets.length - successCount,
-    })
+    });
 
-    return results
+    return results;
   }
 
   /**
@@ -319,19 +319,19 @@ export class CDNEdgeOptimizer {
     imagePath: string,
     alt: string,
     options: {
-      sizes?: string
-      breakpoints?: number[]
-      formats?: string[]
+      sizes?: string;
+      breakpoints?: number[];
+      formats?: string[];
     } = {},
   ): string {
-    const breakpoints = options.breakpoints || [640, 1024, 1280, 1920]
-    const formats = options.formats || ['avif', 'webp', 'jpeg']
+    const breakpoints = options.breakpoints || [640, 1024, 1280, 1920];
+    const formats = options.formats || ["avif", "webp", "jpeg"];
     const sizes =
       options.sizes ||
-      '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+      "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
 
-    let html = `<!-- Responsive image: ${alt} -->\n`
-    html += `<picture>\n`
+    let html = `<!-- Responsive image: ${alt} -->\n`;
+    html += `<picture>\n`;
 
     // Generate sources for each format
     formats.forEach((format) => {
@@ -340,21 +340,21 @@ export class CDNEdgeOptimizer {
           const url = this.optimizeAssetUrl(imagePath, {
             width: bp,
             format: format as any,
-            quality: format === 'avif' ? 80 : 85,
-          })
-          return `${url} ${bp}w`
+            quality: format === "avif" ? 80 : 85,
+          });
+          return `${url} ${bp}w`;
         })
-        .join(', ')
+        .join(", ");
 
-      html += `  <source type="image/${format}" srcset="${srcset}" sizes="${sizes}">\n`
-    })
+      html += `  <source type="image/${format}" srcset="${srcset}" sizes="${sizes}">\n`;
+    });
 
     // Fallback img tag
-    const fallbackUrl = this.optimizeAssetUrl(imagePath, { quality: 85 })
-    html += `  <img src="${fallbackUrl}" alt="${alt}" loading="lazy" sizes="${sizes}">\n`
-    html += `</picture>`
+    const fallbackUrl = this.optimizeAssetUrl(imagePath, { quality: 85 });
+    html += `  <img src="${fallbackUrl}" alt="${alt}" loading="lazy" sizes="${sizes}">\n`;
+    html += `</picture>`;
 
-    return html
+    return html;
   }
 
   /**
@@ -363,10 +363,10 @@ export class CDNEdgeOptimizer {
   generatePrefetchTags(criticalAssets: string[]): string {
     return criticalAssets
       .map((asset) => {
-        const optimizedUrl = this.optimizeAssetUrl(asset)
-        return `  <link rel="preload" href="${optimizedUrl}" as="image" fetchpriority="high">`
+        const optimizedUrl = this.optimizeAssetUrl(asset);
+        return `  <link rel="preload" href="${optimizedUrl}" as="image" fetchpriority="high">`;
       })
-      .join('\n')
+      .join("\n");
   }
 
   /**
@@ -375,19 +375,19 @@ export class CDNEdgeOptimizer {
   async invalidateCDNCache(patterns: string[]): Promise<boolean> {
     try {
       // This would integrate with actual CDN APIs (Cloudflare, AWS CloudFront, etc.)
-      logger.info('CDN cache invalidation requested', { patterns })
+      logger.info("CDN cache invalidation requested", { patterns });
 
       // Placeholder implementation
       // Real implementation would call CDN API to purge cache
 
-      return true
+      return true;
     } catch (error) {
-      logger.error('CDN cache invalidation failed', {
+      logger.error("CDN cache invalidation failed", {
         patterns,
         error: error instanceof Error ? error.message : String(error),
-      })
+      });
 
-      return false
+      return false;
     }
   }
 
@@ -395,10 +395,10 @@ export class CDNEdgeOptimizer {
    * Get CDN performance metrics
    */
   async getCDNMetrics(): Promise<{
-    cacheHitRate: number
-    bandwidthSaved: number
-    requestsServed: number
-    avgResponseTime: number
+    cacheHitRate: number;
+    bandwidthSaved: number;
+    requestsServed: number;
+    avgResponseTime: number;
   }> {
     try {
       // This would integrate with CDN analytics APIs
@@ -409,15 +409,15 @@ export class CDNEdgeOptimizer {
         bandwidthSaved: 0, // Bytes saved through caching
         requestsServed: 0, // Total requests served by CDN
         avgResponseTime: 50, // Average response time in ms
-      }
+      };
     } catch (error) {
-      logger.error('Failed to get CDN metrics', { error })
+      logger.error("Failed to get CDN metrics", { error });
       return {
         cacheHitRate: 0,
         bandwidthSaved: 0,
         requestsServed: 0,
         avgResponseTime: 0,
-      }
+      };
     }
   }
 
@@ -425,11 +425,11 @@ export class CDNEdgeOptimizer {
    * Optimize static assets for global delivery
    */
   async optimizeStaticAssets(): Promise<{
-    optimized: number
-    totalSize: number
-    savings: number
+    optimized: number;
+    totalSize: number;
+    savings: number;
   }> {
-    logger.info('Starting static asset optimization for CDN')
+    logger.info("Starting static asset optimization for CDN");
 
     // This would scan public directory and optimize all static assets
     // For now, return placeholder results
@@ -438,11 +438,11 @@ export class CDNEdgeOptimizer {
       optimized: 0,
       totalSize: 0,
       savings: 0,
-    }
+    };
 
-    logger.info('Static asset optimization completed', result)
+    logger.info("Static asset optimization completed", result);
 
-    return result
+    return result;
   }
 }
 
@@ -450,10 +450,10 @@ export class CDNEdgeOptimizer {
  * CDN utilities and helpers
  */
 export class CDNUtility {
-  private optimizer: CDNEdgeOptimizer
+  private optimizer: CDNEdgeOptimizer;
 
   constructor(optimizer: CDNEdgeOptimizer) {
-    this.optimizer = optimizer
+    this.optimizer = optimizer;
   }
 
   /**
@@ -461,16 +461,16 @@ export class CDNUtility {
    */
   generateAssetManifest(assets: string[]): string {
     const manifest = {
-      version: '1.0',
+      version: "1.0",
       timestamp: new Date().toISOString(),
       assets: assets.map((asset) => ({
         original: asset,
         cdn: this.optimizer.optimizeAssetUrl(asset),
-        hash: this.optimizer['generateAssetHash'](asset, {}),
+        hash: this.optimizer["generateAssetHash"](asset, {}),
       })),
-    }
+    };
 
-    return JSON.stringify(manifest, null, 2)
+    return JSON.stringify(manifest, null, 2);
   }
 
   /**
@@ -480,7 +480,7 @@ export class CDNUtility {
     return `
       // CDN-optimized service worker cache configuration
       const CACHE_NAME = 'pixelated-v1'
-      const CDN_BASE_URL = '${this.optimizer['config'].baseUrl}'
+      const CDN_BASE_URL = '${this.optimizer["config"].baseUrl}'
 
       // Assets to cache for offline functionality
       const CACHE_ASSETS = [
@@ -516,23 +516,23 @@ export class CDNUtility {
             })
         )
       })
-    `
+    `;
   }
 
   /**
    * Generate CDN configuration for different environments
    */
-  generateCDNConfig(env: 'development' | 'staging' | 'production'): object {
+  generateCDNConfig(env: "development" | "staging" | "production"): object {
     const baseConfig = {
-      provider: this.optimizer['config'].provider,
-      baseUrl: this.optimizer['config'].baseUrl,
-      edgeCache: this.optimizer['config'].edgeCache,
-      assets: this.optimizer['config'].assets,
-    }
+      provider: this.optimizer["config"].provider,
+      baseUrl: this.optimizer["config"].baseUrl,
+      edgeCache: this.optimizer["config"].edgeCache,
+      assets: this.optimizer["config"].assets,
+    };
 
     // Environment-specific overrides
     switch (env) {
-      case 'development':
+      case "development":
         return {
           ...baseConfig,
           edgeCache: {
@@ -543,37 +543,37 @@ export class CDNUtility {
             ...baseConfig.assets,
             enableCompression: false,
           },
-        }
+        };
 
-      case 'staging':
+      case "staging":
         return {
           ...baseConfig,
           edgeCache: {
             ...baseConfig.edgeCache,
             defaultTTL: 1800, // 30 minutes for staging
           },
-        }
+        };
 
-      case 'production':
-        return baseConfig
+      case "production":
+        return baseConfig;
 
       default:
-        return baseConfig
+        return baseConfig;
     }
   }
 }
 
 // Global CDN optimizer instance
-let cdnOptimizer: CDNEdgeOptimizer | null = null
+let cdnOptimizer: CDNEdgeOptimizer | null = null;
 
 /**
  * Get global CDN optimizer instance
  */
 export function getCDNOptimizer(): CDNEdgeOptimizer {
   if (!cdnOptimizer) {
-    cdnOptimizer = new CDNEdgeOptimizer()
+    cdnOptimizer = new CDNEdgeOptimizer();
   }
-  return cdnOptimizer
+  return cdnOptimizer;
 }
 
 /**
@@ -582,8 +582,8 @@ export function getCDNOptimizer(): CDNEdgeOptimizer {
 export function initializeCDNOptimizer(
   config?: Partial<CDNConfig>,
 ): CDNEdgeOptimizer {
-  cdnOptimizer = new CDNEdgeOptimizer(config)
-  return cdnOptimizer
+  cdnOptimizer = new CDNEdgeOptimizer(config);
+  return cdnOptimizer;
 }
 
 /**
@@ -594,30 +594,30 @@ export const cdnUtils = {
    * Optimize image URL for global delivery
    */
   optimizeImageUrl: (imagePath: string, options?: any) => {
-    return getCDNOptimizer().optimizeAssetUrl(imagePath, options)
+    return getCDNOptimizer().optimizeAssetUrl(imagePath, options);
   },
 
   /**
    * Generate responsive image markup
    */
   generateResponsiveImage: (imagePath: string, alt: string, options?: any) => {
-    return getCDNOptimizer().generateResponsiveImage(imagePath, alt, options)
+    return getCDNOptimizer().generateResponsiveImage(imagePath, alt, options);
   },
 
   /**
    * Invalidate CDN cache for specific patterns
    */
   invalidateCache: (patterns: string[]) => {
-    return getCDNOptimizer().invalidateCDNCache(patterns)
+    return getCDNOptimizer().invalidateCDNCache(patterns);
   },
 
   /**
    * Get CDN performance metrics
    */
   getMetrics: () => {
-    return getCDNOptimizer().getCDNMetrics()
+    return getCDNOptimizer().getCDNMetrics();
   },
-}
+};
 
 /**
  * Asset optimization helper functions
@@ -627,74 +627,76 @@ export const assetOptimizer = {
    * Optimize static assets for production
    */
   optimizeForProduction: async () => {
-    const optimizer = getCDNOptimizer()
-    return optimizer.optimizeStaticAssets()
+    const optimizer = getCDNOptimizer();
+    return optimizer.optimizeStaticAssets();
   },
 
   /**
    * Generate asset manifest
    */
   generateManifest: (assets: string[]) => {
-    const utility = new CDNUtility(getCDNOptimizer())
-    return utility.generateAssetManifest(assets)
+    const utility = new CDNUtility(getCDNOptimizer());
+    return utility.generateAssetManifest(assets);
   },
 
   /**
    * Generate service worker with CDN caching
    */
   generateServiceWorker: () => {
-    const utility = new CDNUtility(getCDNOptimizer())
-    return utility.generateServiceWorkerCache()
+    const utility = new CDNUtility(getCDNOptimizer());
+    return utility.generateServiceWorkerCache();
   },
-}
+};
 
 /**
  * Performance monitoring for CDN
  */
 export async function monitorCDNPerformance(): Promise<{
-  status: 'healthy' | 'degraded' | 'unhealthy'
-  metrics: any
-  recommendations: string[]
+  status: "healthy" | "degraded" | "unhealthy";
+  metrics: any;
+  recommendations: string[];
 }> {
   try {
-    const metrics = await getCDNOptimizer().getCDNMetrics()
-    const recommendations: string[] = []
+    const metrics = await getCDNOptimizer().getCDNMetrics();
+    const recommendations: string[] = [];
 
-    let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
+    let status: "healthy" | "degraded" | "unhealthy" = "healthy";
 
     // Analyze metrics and generate recommendations
     if (metrics.cacheHitRate < 0.8) {
-      status = 'degraded'
-      recommendations.push('Low cache hit rate - consider increasing cache TTL')
+      status = "degraded";
+      recommendations.push(
+        "Low cache hit rate - consider increasing cache TTL",
+      );
     }
 
     if (metrics.avgResponseTime > 200) {
-      status = 'degraded'
-      recommendations.push('High response time - check CDN configuration')
+      status = "degraded";
+      recommendations.push("High response time - check CDN configuration");
     }
 
     if (metrics.cacheHitRate < 0.6) {
-      status = 'unhealthy'
+      status = "unhealthy";
     }
 
-    logger.info('CDN performance monitoring', {
+    logger.info("CDN performance monitoring", {
       status,
       metrics,
       recommendationCount: recommendations.length,
-    })
+    });
 
     return {
       status,
       metrics,
       recommendations,
-    }
+    };
   } catch (error) {
-    logger.error('CDN performance monitoring failed', { error })
+    logger.error("CDN performance monitoring failed", { error });
 
     return {
-      status: 'unhealthy',
+      status: "unhealthy",
       metrics: {},
-      recommendations: ['CDN monitoring unavailable'],
-    }
+      recommendations: ["CDN monitoring unavailable"],
+    };
   }
 }

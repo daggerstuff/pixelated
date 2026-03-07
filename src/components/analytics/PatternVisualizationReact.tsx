@@ -1,34 +1,34 @@
-import type { FC } from 'react'
+import type { FC } from "react";
 import type {
   TrendPattern,
   CrossSessionPattern,
   RiskCorrelation,
-} from '@/lib/fhe/pattern-recognition'
+} from "@/lib/fhe/pattern-recognition";
 
 export interface PatternVisualizationProps {
-  trends?: TrendPattern[]
-  crossSessionPatterns?: CrossSessionPattern[]
-  riskCorrelations?: RiskCorrelation[]
-  className?: string
-  showControls?: boolean
+  trends?: TrendPattern[];
+  crossSessionPatterns?: CrossSessionPattern[];
+  riskCorrelations?: RiskCorrelation[];
+  className?: string;
+  showControls?: boolean;
   onPatternSelect?: (
     pattern: TrendPattern | CrossSessionPattern | RiskCorrelation,
-  ) => void
+  ) => void;
 }
 
 export const PatternVisualization: FC<PatternVisualizationProps> = ({
   trends = [],
   crossSessionPatterns = [],
   riskCorrelations = [],
-  className = '',
+  className = "",
   showControls = true,
   onPatternSelect,
 }) => {
   const handleSelect = (
     pattern: TrendPattern | CrossSessionPattern | RiskCorrelation,
   ) => {
-    onPatternSelect?.(pattern)
-  }
+    onPatternSelect?.(pattern);
+  };
 
   return (
     <div className={`pattern-visualization ${className}`}>
@@ -45,15 +45,15 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                   onClick={() => handleSelect(trend)}
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelect(trend)
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleSelect(trend);
                     }
                   }}
                   aria-label={`Select trend pattern: ${trend.description}`}
                 >
                   <div className="font-medium">{trend.description}</div>
                   <div className="text-xs text-gray-500">
-                    {trend.indicators.join(', ')}
+                    {trend.indicators.join(", ")}
                   </div>
                 </button>
               ))}
@@ -75,8 +75,8 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                   onClick={() => handleSelect(pattern)}
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelect(pattern)
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleSelect(pattern);
                     }
                   }}
                   aria-label={`Select cross-session pattern: ${pattern.description}`}
@@ -84,7 +84,8 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                   <div className="font-medium">{pattern.description}</div>
                   <div className="text-xs text-gray-500">
                     Sessions: {pattern.sessions.length}
-                    {pattern.timeSpanDays && `, Span: ${pattern.timeSpanDays} days`}
+                    {pattern.timeSpanDays &&
+                      `, Span: ${pattern.timeSpanDays} days`}
                   </div>
                 </button>
               ))}
@@ -108,8 +109,8 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
                   onClick={() => handleSelect(correlation)}
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleSelect(correlation)
+                    if (e.key === "Enter" || e.key === " ") {
+                      handleSelect(correlation);
                     }
                   }}
                   aria-label={`Select risk correlation: ${correlation.description || correlation.riskFactor}`}
@@ -137,7 +138,7 @@ export const PatternVisualization: FC<PatternVisualizationProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default PatternVisualization
+export default PatternVisualization;

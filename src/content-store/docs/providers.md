@@ -1,12 +1,12 @@
 ---
-title: 'Provider System'
-description: 'Comprehensive guide to Pixelated Healths provider system for managing global state and functionality'
+title: "Provider System"
+description: "Comprehensive guide to Pixelated Healths provider system for managing global state and functionality"
 pubDate: 2025-03-24
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ['providers', 'state-management', 'architecture']
-author: 'Pixelated Team'
+tags: ["providers", "state-management", "architecture"]
+author: "Pixelated Team"
 ---
 
 # Provider System
@@ -21,7 +21,6 @@ The `SharedProviders` component is the root provider that composes all other pro
 - Theme management with ThemeProvider
 - Security settings with SecurityProvider
 
-
 ### Usage
 
 ```tsx
@@ -35,11 +34,9 @@ function App() {
 You can also use the HOC pattern:
 
 ```tsx
-
 function YourComponent() {
-  return <div>Your component content</div>
+  return <div>Your component content</div>;
 }
-
 ```
 
 ## ThemeProvider
@@ -141,15 +138,15 @@ All providers and their hooks are fully typed. Example type definitions:
 
 ```tsx
 interface ThemeState {
-  colorScheme: 'light' | 'dark' | 'system'
-  contrastMode: 'standard' | 'high'
-  motionPreference: 'reduced' | 'full'
+  colorScheme: "light" | "dark" | "system";
+  contrastMode: "standard" | "high";
+  motionPreference: "reduced" | "full";
 }
 
 interface SecurityState {
-  securityLevel: 'standard' | 'hipaa' | 'maximum'
-  isKeyRotationNeeded: boolean
-  lastKeyRotation: Date
+  securityLevel: "standard" | "hipaa" | "maximum";
+  isKeyRotationNeeded: boolean;
+  lastKeyRotation: Date;
 }
 ```
 

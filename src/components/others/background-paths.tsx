@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { Button } from '~/components/ui/button'
+import { motion } from "framer-motion";
+import { Button } from "~/components/ui/button";
 
 function FloatingPaths({ position }: { position: number }) {
   const paths = Array.from({ length: 36 }, (_, i) => ({
@@ -13,7 +13,7 @@ function FloatingPaths({ position }: { position: number }) {
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
     color: `rgba(15,23,42,${0.1 + i * 0.03})`,
     width: 0.5 + i * 0.03,
-  }))
+  }));
 
   return (
     <div className="absolute inset-0 pointer-events-none">
@@ -39,21 +39,21 @@ function FloatingPaths({ position }: { position: number }) {
             transition={{
               duration: 20 + Math.random() * 10,
               repeat: Number.POSITIVE_INFINITY,
-              ease: 'linear',
+              ease: "linear",
             }}
           />
         ))}
       </svg>
     </div>
-  )
+  );
 }
 
 export default function BackgroundPaths({
-  title = 'Background Paths',
+  title = "Background Paths",
 }: {
-  title?: string
+  title?: string;
 }) {
-  const words = title.split(' ')
+  const words = title.split(" ");
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center overflow-x-hidden bg-white dark:bg-neutral-950">
@@ -64,7 +64,7 @@ export default function BackgroundPaths({
 
       <div
         className="relative z-10 container mx-auto px-4 md:px-6 text-center max-w-full sm:max-w-4xl"
-        style={{ maxWidth: '100vw', paddingLeft: '8px', paddingRight: '8px' }}
+        style={{ maxWidth: "100vw", paddingLeft: "8px", paddingRight: "8px" }}
       >
         <motion.div
           initial={{ opacity: 0 }}
@@ -78,14 +78,14 @@ export default function BackgroundPaths({
                 key={`word-${word}-${wordIndex}`}
                 className="inline-block mr-4 last:mr-0"
               >
-                {word.split('').map((letter, letterIndex) => (
+                {word.split("").map((letter, letterIndex) => (
                   <motion.span
                     key={`${word}-${letter}-${wordIndex}-${letterIndex}`}
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{
                       delay: wordIndex * 0.1 + letterIndex * 0.03,
-                      type: 'spring',
+                      type: "spring",
                       stiffness: 150,
                       damping: 25,
                     }}
@@ -127,5 +127,5 @@ export default function BackgroundPaths({
         </motion.div>
       </div>
     </div>
-  )
+  );
 }

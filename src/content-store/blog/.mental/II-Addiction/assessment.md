@@ -1,7 +1,7 @@
 ---
-title: 'Addiction Assessment'
-description: 'Comprehensive guide to addiction assessment tools and methods'
-author: 'Dr. Robert Williams'
+title: "Addiction Assessment"
+description: "Comprehensive guide to addiction assessment tools and methods"
+author: "Dr. Robert Williams"
 pubDate: 2024-02-26
 ---
 

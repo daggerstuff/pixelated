@@ -7,52 +7,52 @@ import type {
   UserProfile,
   CollaborationSession,
   Notification,
-} from '@/types/collaboration'
+} from "@/types/collaboration";
 
 export interface CollaborationConfig {
-  maxParticipants: number
-  enableRealTimeSync: boolean
-  encryptionRequired: boolean
-  auditAllActions: boolean
-  allowedRoles: string[]
-  sessionTimeout: number // minutes
+  maxParticipants: number;
+  enableRealTimeSync: boolean;
+  encryptionRequired: boolean;
+  auditAllActions: boolean;
+  allowedRoles: string[];
+  sessionTimeout: number; // minutes
 }
 
 export interface CollaborationInvite {
-  id: string
-  sessionId: string
-  invitedBy: string
-  invitedUser: string
-  role: 'viewer' | 'editor' | 'admin'
-  permissions: string[]
-  expiresAt: Date
-  accepted: boolean
-  acceptedAt?: Date
+  id: string;
+  sessionId: string;
+  invitedBy: string;
+  invitedUser: string;
+  role: "viewer" | "editor" | "admin";
+  permissions: string[];
+  expiresAt: Date;
+  accepted: boolean;
+  acceptedAt?: Date;
 }
 
 export interface SecureMessage {
-  id: string
-  sessionId: string
-  senderId: string
-  content: string
-  timestamp: Date
-  encrypted: boolean
-  signature?: string
-  readBy: string[]
-  edited: boolean
-  editedAt?: Date
+  id: string;
+  sessionId: string;
+  senderId: string;
+  content: string;
+  timestamp: Date;
+  encrypted: boolean;
+  signature?: string;
+  readBy: string[];
+  edited: boolean;
+  editedAt?: Date;
 }
 
 /**
  * Advanced Collaboration Manager
  */
 class CollaborationManager {
-  private config: CollaborationConfig
-  private activeSessions = new Map<string, CollaborationSession>()
-  private userSessions = new Map<string, Set<string>>() // userId -> sessionIds
-  private invitations = new Map<string, CollaborationInvite>()
-  private messages = new Map<string, SecureMessage[]>()
-  private notifications = new Map<string, Notification[]>()
+  private config: CollaborationConfig;
+  private activeSessions = new Map<string, CollaborationSession>();
+  private userSessions = new Map<string, Set<string>>(); // userId -> sessionIds
+  private invitations = new Map<string, CollaborationInvite>();
+  private messages = new Map<string, SecureMessage[]>();
+  private notifications = new Map<string, Notification[]>();
 
   constructor() {
     this.config = {
@@ -60,9 +60,9 @@ class CollaborationManager {
       enableRealTimeSync: true,
       encryptionRequired: true,
       auditAllActions: true,
-      allowedRoles: ['therapist', 'supervisor', 'admin', 'researcher'],
+      allowedRoles: ["therapist", "supervisor", "admin", "researcher"],
       sessionTimeout: 120, // 2 hours
-    }
+    };
   }
 
   /**
@@ -72,17 +72,17 @@ class CollaborationManager {
     creator: UserProfile,
     sessionData: Omit<
       CollaborationSession,
-      'id' | 'createdAt' | 'participants' | 'status'
+      "id" | "createdAt" | "participants" | "status"
     >,
   ): Promise<CollaborationSession> {
-    const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
     const session: CollaborationSession = {
       id: sessionId,
       ...sessionData,
       createdAt: new Date(),
       participants: [creator.id],
-      status: 'active',
+      status: "active",
       settings: {
         allowChat: true,
         allowScreenShare: true,
@@ -90,27 +90,27 @@ class CollaborationManager {
         requireApproval: false,
         ...sessionData.settings,
       },
-    }
+    };
 
-    this.activeSessions.set(sessionId, session)
-    this.addUserToSession(creator.id, sessionId)
+    this.activeSessions.set(sessionId, session);
+    this.addUserToSession(creator.id, sessionId);
 
     // Create initial message
     const welcomeMessage: SecureMessage = {
       id: `msg_${Date.now()}`,
       sessionId,
-      senderId: 'system',
+      senderId: "system",
       content: `Collaboration session created by ${creator.name}`,
       timestamp: new Date(),
       encrypted: false,
       readBy: [creator.id],
-    }
+    };
 
-    this.addMessage(sessionId, welcomeMessage)
+    this.addMessage(sessionId, welcomeMessage);
 
-    console.log(`Created collaboration session: ${sessionId}`)
+    console.log(`Created collaboration session: ${sessionId}`);
 
-    return session
+    return session;
   }
 
   /**
@@ -120,20 +120,20 @@ class CollaborationManager {
     sessionId: string,
     invitedBy: string,
     invitedUser: string,
-    role: 'viewer' | 'editor' | 'admin' = 'viewer',
+    role: "viewer" | "editor" | "admin" = "viewer",
   ): Promise<CollaborationInvite> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
     if (session.participants.length >= this.config.maxParticipants) {
       throw new Error(
         `Session full (max ${this.config.maxParticipants} participants)`,
-      )
+      );
     }
 
-    const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
     const invitation: CollaborationInvite = {
       id: inviteId,
@@ -144,34 +144,34 @@ class CollaborationManager {
       permissions: this.getRolePermissions(role),
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       accepted: false,
-    }
+    };
 
-    this.invitations.set(inviteId, invitation)
+    this.invitations.set(inviteId, invitation);
 
     // Send notification to invited user
     await this.sendNotification(invitedUser, {
       id: `notif_${Date.now()}`,
-      type: 'collaboration_invite',
-      title: 'Collaboration Session Invitation',
+      type: "collaboration_invite",
+      title: "Collaboration Session Invitation",
       message: `You have been invited to join a collaboration session by ${invitedBy}`,
       data: { sessionId, inviteId },
       createdAt: new Date(),
       read: false,
-    })
+    });
 
-    console.log(`Invitation sent: ${invitedUser} to session ${sessionId}`)
+    console.log(`Invitation sent: ${invitedUser} to session ${sessionId}`);
 
-    return invitation
+    return invitation;
   }
 
   private getRolePermissions(role: string): string[] {
     const permissions: Record<string, string[]> = {
-      viewer: ['read', 'comment'],
-      editor: ['read', 'write', 'comment', 'upload'],
-      admin: ['read', 'write', 'comment', 'upload', 'manage_users', 'delete'],
-    }
+      viewer: ["read", "comment"],
+      editor: ["read", "write", "comment", "upload"],
+      admin: ["read", "write", "comment", "upload", "manage_users", "delete"],
+    };
 
-    return permissions[role] || permissions.viewer
+    return permissions[role] || permissions.viewer;
   }
 
   /**
@@ -181,55 +181,55 @@ class CollaborationManager {
     inviteId: string,
     userId: string,
   ): Promise<{
-    success: boolean
-    session?: CollaborationSession
-    error?: string
+    success: boolean;
+    session?: CollaborationSession;
+    error?: string;
   }> {
-    const invitation = this.invitations.get(inviteId)
+    const invitation = this.invitations.get(inviteId);
     if (!invitation) {
-      return { success: false, error: 'Invitation not found' }
+      return { success: false, error: "Invitation not found" };
     }
 
     if (invitation.invitedUser !== userId) {
-      return { success: false, error: 'Invitation not for this user' }
+      return { success: false, error: "Invitation not for this user" };
     }
 
     if (invitation.expiresAt < new Date()) {
-      return { success: false, error: 'Invitation expired' }
+      return { success: false, error: "Invitation expired" };
     }
 
-    const session = this.activeSessions.get(invitation.sessionId)
+    const session = this.activeSessions.get(invitation.sessionId);
     if (!session) {
-      return { success: false, error: 'Session no longer exists' }
+      return { success: false, error: "Session no longer exists" };
     }
 
     // Add user to session
-    session.participants.push(userId)
-    this.addUserToSession(userId, invitation.sessionId)
-    invitation.accepted = true
-    invitation.acceptedAt = new Date()
+    session.participants.push(userId);
+    this.addUserToSession(userId, invitation.sessionId);
+    invitation.accepted = true;
+    invitation.acceptedAt = new Date();
 
     // Send notification to session creator
     await this.sendNotification(invitation.invitedBy, {
       id: `notif_${Date.now()}`,
-      type: 'collaboration_accepted',
-      title: 'Invitation Accepted',
+      type: "collaboration_accepted",
+      title: "Invitation Accepted",
       message: `${userId} has accepted your collaboration invitation`,
       data: { sessionId: invitation.sessionId },
       createdAt: new Date(),
       read: false,
-    })
+    });
 
-    console.log(`User ${userId} joined session ${invitation.sessionId}`)
+    console.log(`User ${userId} joined session ${invitation.sessionId}`);
 
-    return { success: true, session }
+    return { success: true, session };
   }
 
   private addUserToSession(userId: string, sessionId: string): void {
     if (!this.userSessions.has(userId)) {
-      this.userSessions.set(userId, new Set())
+      this.userSessions.set(userId, new Set());
     }
-    this.userSessions.get(userId)!.add(sessionId)
+    this.userSessions.get(userId)!.add(sessionId);
   }
 
   /**
@@ -240,26 +240,26 @@ class CollaborationManager {
     senderId: string,
     content: string,
     options: {
-      encrypt?: boolean
-      priority?: 'low' | 'normal' | 'high'
+      encrypt?: boolean;
+      priority?: "low" | "normal" | "high";
     } = {},
   ): Promise<SecureMessage> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
     if (!session.participants.includes(senderId)) {
-      throw new Error('User not participant in session')
+      throw new Error("User not participant in session");
     }
 
-    const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
-    let processedContent = content
+    let processedContent = content;
 
     // Encrypt message if required
     if (options.encrypt || this.config.encryptionRequired) {
-      processedContent = await this.encryptMessage(content, sessionId)
+      processedContent = await this.encryptMessage(content, sessionId);
     }
 
     const message: SecureMessage = {
@@ -270,14 +270,14 @@ class CollaborationManager {
       timestamp: new Date(),
       encrypted: options.encrypt || this.config.encryptionRequired,
       readBy: [senderId],
-    }
+    };
 
-    this.addMessage(sessionId, message)
+    this.addMessage(sessionId, message);
 
     // Broadcast to all participants (in real implementation, use WebSocket)
-    await this.broadcastMessage(session, message)
+    await this.broadcastMessage(session, message);
 
-    return message
+    return message;
   }
 
   private async encryptMessage(
@@ -285,20 +285,20 @@ class CollaborationManager {
     sessionId: string,
   ): Promise<string> {
     // Use session-specific encryption key
-    const _sessionKey = await this.getSessionEncryptionKey(sessionId)
-    return `encrypted_${btoa(content)}` // Mock encryption
+    const _sessionKey = await this.getSessionEncryptionKey(sessionId);
+    return `encrypted_${btoa(content)}`; // Mock encryption
   }
 
   private async getSessionEncryptionKey(sessionId: string): Promise<string> {
     // Generate or retrieve session encryption key
-    return `session_key_${sessionId}`
+    return `session_key_${sessionId}`;
   }
 
   private addMessage(sessionId: string, message: SecureMessage): void {
     if (!this.messages.has(sessionId)) {
-      this.messages.set(sessionId, [])
+      this.messages.set(sessionId, []);
     }
-    this.messages.get(sessionId)!.push(message)
+    this.messages.get(sessionId)!.push(message);
   }
 
   private async broadcastMessage(
@@ -306,85 +306,85 @@ class CollaborationManager {
     message: SecureMessage,
   ): Promise<void> {
     // In real implementation, broadcast via WebSocket to all participants
-    console.log(`Broadcasting message ${message.id} to session ${session.id}`)
+    console.log(`Broadcasting message ${message.id} to session ${session.id}`);
   }
 
   /**
    * Leave collaboration session
    */
   async leaveSession(sessionId: string, userId: string): Promise<boolean> {
-    const session = this.activeSessions.get(sessionId)
-    if (!session) return false
+    const session = this.activeSessions.get(sessionId);
+    if (!session) return false;
 
     // Remove user from participants
-    session.participants = session.participants.filter((id) => id !== userId)
+    session.participants = session.participants.filter((id) => id !== userId);
 
     // Remove from user sessions
-    const userSessionSet = this.userSessions.get(userId)
+    const userSessionSet = this.userSessions.get(userId);
     if (userSessionSet) {
-      userSessionSet.delete(sessionId)
+      userSessionSet.delete(sessionId);
       if (userSessionSet.size === 0) {
-        this.userSessions.delete(userId)
+        this.userSessions.delete(userId);
       }
     }
 
     // If no participants left, end session
     if (session.participants.length === 0) {
-      await this.endSession(sessionId)
+      await this.endSession(sessionId);
     } else {
       // Notify remaining participants
       await this.sendMessage(
         sessionId,
-        'system',
+        "system",
         `${userId} has left the session`,
-      )
+      );
     }
 
-    return true
+    return true;
   }
 
   /**
    * End collaboration session
    */
   async endSession(sessionId: string): Promise<{
-    session: CollaborationSession
-    duration: number
-    messageCount: number
-    participantCount: number
+    session: CollaborationSession;
+    duration: number;
+    messageCount: number;
+    participantCount: number;
   }> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
-    session.status = 'ended'
-    const duration = Date.now() - session.createdAt.getTime()
-    const messageCount = this.messages.get(sessionId)?.length || 0
-    const participantCount = session.participants.length
+    session.status = "ended";
+    const duration = Date.now() - session.createdAt.getTime();
+    const messageCount = this.messages.get(sessionId)?.length || 0;
+    const participantCount = session.participants.length;
 
     // Archive session data
-    await this.archiveSession(session)
+    await this.archiveSession(session);
 
     // Clean up
-    this.activeSessions.delete(sessionId)
-    this.messages.delete(sessionId)
+    this.activeSessions.delete(sessionId);
+    this.messages.delete(sessionId);
 
     // Remove all users from this session
     this.userSessions.forEach((sessionSet, userId) => {
-      sessionSet.delete(sessionId)
+      sessionSet.delete(sessionId);
       if (sessionSet.size === 0) {
-        this.userSessions.delete(userId)
+        this.userSessions.delete(userId);
       }
-    })
+    });
 
-    console.log(`Ended collaboration session: ${sessionId}`)
+    console.log(`Ended collaboration session: ${sessionId}`);
 
     return {
       session,
       duration,
       messageCount,
       participantCount,
-    }
+    };
   }
 
   private async archiveSession(session: CollaborationSession): Promise<void> {
@@ -393,9 +393,9 @@ class CollaborationManager {
       session,
       messages: this.messages.get(session.id) || [],
       archivedAt: new Date(),
-    }
+    };
 
-    console.log('Session archived:', archiveData)
+    console.log("Session archived:", archiveData);
   }
 
   /**
@@ -406,26 +406,26 @@ class CollaborationManager {
     userId: string,
     limit: number = 50,
   ): Promise<SecureMessage[]> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
     if (!session.participants.includes(userId)) {
-      throw new Error('User not authorized to view messages')
+      throw new Error("User not authorized to view messages");
     }
 
-    const sessionMessages = this.messages.get(sessionId) || []
-    const recentMessages = sessionMessages.slice(-limit)
+    const sessionMessages = this.messages.get(sessionId) || [];
+    const recentMessages = sessionMessages.slice(-limit);
 
     // Mark messages as read
     recentMessages.forEach((message) => {
       if (!message.readBy.includes(userId)) {
-        message.readBy.push(userId)
+        message.readBy.push(userId);
       }
-    })
+    });
 
-    return recentMessages
+    return recentMessages;
   }
 
   /**
@@ -436,13 +436,13 @@ class CollaborationManager {
     notification: Notification,
   ): Promise<void> {
     if (!this.notifications.has(userId)) {
-      this.notifications.set(userId, [])
+      this.notifications.set(userId, []);
     }
 
-    this.notifications.get(userId)!.push(notification)
+    this.notifications.get(userId)!.push(notification);
 
     // In real implementation, send push notification or email
-    console.log(`Notification sent to ${userId}:`, notification.title)
+    console.log(`Notification sent to ${userId}:`, notification.title);
   }
 
   /**
@@ -452,42 +452,42 @@ class CollaborationManager {
     userId: string,
     unreadOnly: boolean = false,
   ): Notification[] {
-    const userNotifications = this.notifications.get(userId) || []
+    const userNotifications = this.notifications.get(userId) || [];
 
     if (unreadOnly) {
-      return userNotifications.filter((n) => !n.read)
+      return userNotifications.filter((n) => !n.read);
     }
 
-    return userNotifications
+    return userNotifications;
   }
 
   /**
    * Mark notifications as read
    */
   markNotificationsRead(userId: string, notificationIds?: string[]): number {
-    const userNotifications = this.notifications.get(userId) || []
-    let markedCount = 0
+    const userNotifications = this.notifications.get(userId) || [];
+    let markedCount = 0;
 
     userNotifications.forEach((notification) => {
       if (!notificationIds || notificationIds.includes(notification.id)) {
         if (!notification.read) {
-          notification.read = true
-          markedCount++
+          notification.read = true;
+          markedCount++;
         }
       }
-    })
+    });
 
-    return markedCount
+    return markedCount;
   }
 
   /**
    * Get active sessions for user
    */
   getUserSessions(userId: string): CollaborationSession[] {
-    const userSessionIds = this.userSessions.get(userId) || new Set()
+    const userSessionIds = this.userSessions.get(userId) || new Set();
     return Array.from(userSessionIds)
       .map((sessionId) => this.activeSessions.get(sessionId))
-      .filter((session) => session !== undefined) as CollaborationSession[]
+      .filter((session) => session !== undefined) as CollaborationSession[];
   }
 
   /**
@@ -496,78 +496,78 @@ class CollaborationManager {
   async updateSessionSettings(
     sessionId: string,
     userId: string,
-    settings: Partial<CollaborationSession['settings']>,
+    settings: Partial<CollaborationSession["settings"]>,
   ): Promise<CollaborationSession> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
     // Check if user has admin permissions
-    const userRole = this.getUserRoleInSession(sessionId, userId)
-    if (userRole !== 'admin') {
-      throw new Error('Admin permissions required to update session settings')
+    const userRole = this.getUserRoleInSession(sessionId, userId);
+    if (userRole !== "admin") {
+      throw new Error("Admin permissions required to update session settings");
     }
 
-    session.settings = { ...session.settings, ...settings }
-    session.updatedAt = new Date()
+    session.settings = { ...session.settings, ...settings };
+    session.updatedAt = new Date();
 
     // Notify all participants of settings change
     await this.sendMessage(
       sessionId,
-      'system',
+      "system",
       `Session settings updated by ${userId}`,
-    )
+    );
 
-    return session
+    return session;
   }
 
   private getUserRoleInSession(_sessionId: string, _userId: string): string {
     // In real implementation, check against session role assignments
-    return 'viewer' // Mock default role
+    return "viewer"; // Mock default role
   }
 
   /**
    * Get collaboration analytics
    */
   getCollaborationAnalytics(): {
-    activeSessions: number
-    totalParticipants: number
-    averageSessionDuration: number
-    messageCount: number
-    topCollaborators: string[]
+    activeSessions: number;
+    totalParticipants: number;
+    averageSessionDuration: number;
+    messageCount: number;
+    topCollaborators: string[];
   } {
-    const sessions = Array.from(this.activeSessions.values())
+    const sessions = Array.from(this.activeSessions.values());
 
-    const activeSessions = sessions.length
+    const activeSessions = sessions.length;
     const totalParticipants = sessions.reduce(
       (sum, session) => sum + session.participants.length,
       0,
-    )
+    );
 
     // Calculate average session duration
     const totalDuration = sessions.reduce((sum, session) => {
-      return sum + (Date.now() - session.createdAt.getTime())
-    }, 0)
+      return sum + (Date.now() - session.createdAt.getTime());
+    }, 0);
     const averageSessionDuration =
-      activeSessions > 0 ? totalDuration / activeSessions : 0
+      activeSessions > 0 ? totalDuration / activeSessions : 0;
 
     // Count total messages
     const messageCount = Array.from(this.messages.values()).reduce(
       (sum, messages) => sum + messages.length,
       0,
-    )
+    );
 
     // Find top collaborators (users in most sessions)
-    const userSessionCounts = new Map<string, number>()
+    const userSessionCounts = new Map<string, number>();
     this.userSessions.forEach((sessionSet, userId) => {
-      userSessionCounts.set(userId, sessionSet.size)
-    })
+      userSessionCounts.set(userId, sessionSet.size);
+    });
 
     const topCollaborators = Array.from(userSessionCounts.entries())
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
-      .map(([userId]) => userId)
+      .map(([userId]) => userId);
 
     return {
       activeSessions,
@@ -575,7 +575,7 @@ class CollaborationManager {
       averageSessionDuration,
       messageCount,
       topCollaborators,
-    }
+    };
   }
 
   /**
@@ -583,40 +583,40 @@ class CollaborationManager {
    */
   async exportSessionData(
     sessionId: string,
-    format: 'json' | 'csv',
+    format: "json" | "csv",
   ): Promise<{
-    data: any
-    format: string
-    exportedAt: Date
-    includesPII: boolean
+    data: any;
+    format: string;
+    exportedAt: Date;
+    includesPII: boolean;
   }> {
-    const session = this.activeSessions.get(sessionId)
+    const session = this.activeSessions.get(sessionId);
     if (!session) {
-      throw new Error(`Session not found: ${sessionId}`)
+      throw new Error(`Session not found: ${sessionId}`);
     }
 
-    const sessionMessages = this.messages.get(sessionId) || []
-    const includesPII = sessionMessages.some((msg) => !msg.encrypted)
+    const sessionMessages = this.messages.get(sessionId) || [];
+    const includesPII = sessionMessages.some((msg) => !msg.encrypted);
 
-    let exportData: any
+    let exportData: any;
 
-    if (format === 'json') {
+    if (format === "json") {
       exportData = {
         session,
         messages: sessionMessages,
         participants: session.participants,
-      }
+      };
     } else {
       // CSV format for messages
-      const headers = ['Timestamp', 'Sender', 'Content', 'Encrypted']
+      const headers = ["Timestamp", "Sender", "Content", "Encrypted"];
       const rows = sessionMessages.map((msg) => [
         msg.timestamp.toISOString(),
         msg.senderId,
-        msg.encrypted ? '[ENCRYPTED]' : msg.content,
-        msg.encrypted ? 'Yes' : 'No',
-      ])
+        msg.encrypted ? "[ENCRYPTED]" : msg.content,
+        msg.encrypted ? "Yes" : "No",
+      ]);
 
-      exportData = [headers, ...rows].map((row) => row.join(',')).join('\n')
+      exportData = [headers, ...rows].map((row) => row.join(",")).join("\n");
     }
 
     return {
@@ -624,13 +624,13 @@ class CollaborationManager {
       format,
       exportedAt: new Date(),
       includesPII,
-    }
+    };
   }
 }
 
 // Export singleton instance
-export const collaborationManager = new CollaborationManager()
+export const collaborationManager = new CollaborationManager();
 
 // Export class for custom instances
-export { CollaborationManager }
-export default collaborationManager
+export { CollaborationManager };
+export default collaborationManager;

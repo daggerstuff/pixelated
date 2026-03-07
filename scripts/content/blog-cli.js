@@ -8,52 +8,52 @@
  */
 
 // Import dependencies
-import { createInterface } from 'readline'
-import { spawnSync } from 'child_process'
-import { fileURLToPath } from 'url'
+import { createInterface } from "readline";
+import { spawnSync } from "child_process";
+import { fileURLToPath } from "url";
 
 // ANSI colors for pretty output
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  dim: '\x1b[2m',
-  green: '\x1b[32m',
-  blue: '\x1b[34m',
-  yellow: '\x1b[33m',
-  red: '\x1b[31m',
-  purple: '\x1b[35m',
-  cyan: '\x1b[36m',
-}
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  green: "\x1b[32m",
+  blue: "\x1b[34m",
+  yellow: "\x1b[33m",
+  red: "\x1b[31m",
+  purple: "\x1b[35m",
+  cyan: "\x1b[36m",
+};
 
 // Create readline interface
 const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
-})
+});
 
 // Helper functions
 /**
  * Clear the console
  */
 function clear() {
-  console.clear()
+  console.clear();
 }
 
 /**
  * Display the application header
  */
 function showHeader() {
-  clear()
+  clear();
   console.log(
     `${colors.blue}===============================================${colors.reset}`,
-  )
+  );
   console.log(
     `${colors.cyan}${colors.bright}          📝  BLOG HELPER CLI  📝          ${colors.reset}`,
-  )
+  );
   console.log(
     `${colors.blue}===============================================${colors.reset}`,
-  )
-  console.log('')
+  );
+  console.log("");
 }
 
 /**
@@ -61,7 +61,7 @@ function showHeader() {
  * @param {string} message - The success message to display
  */
 function success(message) {
-  console.log(`${colors.green}✓ ${message}${colors.reset}`)
+  console.log(`${colors.green}✓ ${message}${colors.reset}`);
 }
 
 /**
@@ -69,7 +69,7 @@ function success(message) {
  * @param {string} message - The info message to display
  */
 function info(message) {
-  console.log(`${colors.blue}ℹ ${message}${colors.reset}`)
+  console.log(`${colors.blue}ℹ ${message}${colors.reset}`);
 }
 
 /**
@@ -77,7 +77,7 @@ function info(message) {
  * @param {string} message - The warning message to display
  */
 function warning(message) {
-  console.log(`${colors.yellow}⚠ ${message}${colors.reset}`)
+  console.log(`${colors.yellow}⚠ ${message}${colors.reset}`);
 }
 
 /**
@@ -85,7 +85,7 @@ function warning(message) {
  * @param {string} message - The error message to display
  */
 function error(message) {
-  console.log(`${colors.red}✗ ${message}${colors.reset}`)
+  console.log(`${colors.red}✗ ${message}${colors.reset}`);
 }
 
 // Run blog publisher command safely
@@ -95,13 +95,13 @@ function error(message) {
  * @returns {string[]} Array of parsed arguments
  */
 function parseArgs(command) {
-  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
-  const args = []
-  let m
+  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g;
+  const args = [];
+  let m;
   while ((m = re.exec(command)) !== null) {
-    args.push(m[1] ?? m[2] ?? m[0])
+    args.push(m[1] ?? m[2] ?? m[0]);
   }
-  return args
+  return args;
 }
 
 /**
@@ -110,22 +110,22 @@ function parseArgs(command) {
  * @returns {boolean} True if the token is safe, false otherwise
  */
 function isSafeToken(token) {
-  if (typeof token !== 'string' || token.length === 0) {
-    return false
+  if (typeof token !== "string" || token.length === 0) {
+    return false;
   }
   // disallow shell metacharacters and control/newline characters
-  return !/[;&|$`<>\\\n\r]/.test(token)
+  return !/[;&|$`<>\\\n\r]/.test(token);
 }
 
 const ALLOWED_TOP_LEVEL = new Set([
-  'status',
-  'series',
-  'upcoming',
-  'overdue',
-  'report',
-  'generate',
-  'publish',
-])
+  "status",
+  "series",
+  "upcoming",
+  "overdue",
+  "report",
+  "generate",
+  "publish",
+]);
 
 /**
  * Run a blog publisher command safely
@@ -134,51 +134,51 @@ const ALLOWED_TOP_LEVEL = new Set([
  */
 function runCommand(command) {
   try {
-    if (typeof command !== 'string' || command.trim().length === 0) {
-      return { success: false, error: 'Command must be a non-empty string' }
+    if (typeof command !== "string" || command.trim().length === 0) {
+      return { success: false, error: "Command must be a non-empty string" };
     }
 
-    const tokens = parseArgs(command)
+    const tokens = parseArgs(command);
     if (tokens.length === 0) {
-      return { success: false, error: 'Empty command' }
+      return { success: false, error: "Empty command" };
     }
 
-    const top = tokens[0]
+    const top = tokens[0];
     if (!ALLOWED_TOP_LEVEL.has(top)) {
-      return { success: false, error: `Disallowed command: ${top}` }
+      return { success: false, error: `Disallowed command: ${top}` };
     }
 
     // validate tokens
     for (const t of tokens) {
       if (!isSafeToken(t)) {
-        return { success: false, error: 'Invalid characters in arguments' }
+        return { success: false, error: "Invalid characters in arguments" };
       }
     }
 
-    const args = ['run', 'blog-publisher', '--', ...tokens]
-    const proc = spawnSync('pnpm', args, {
-      encoding: 'utf8',
-      stdio: 'pipe',
+    const args = ["run", "blog-publisher", "--", ...tokens];
+    const proc = spawnSync("pnpm", args, {
+      encoding: "utf8",
+      stdio: "pipe",
       shell: false,
-    })
+    });
 
     if (proc.error) {
-      return { success: false, error: proc.error.message }
+      return { success: false, error: proc.error.message };
     }
 
     if (proc.status === 0) {
-      return { success: true, output: (proc.stdout || '').toString().trim() }
+      return { success: true, output: (proc.stdout || "").toString().trim() };
     }
 
     return {
       success: false,
-      error: (proc.stderr || proc.error || 'Unknown error').toString(),
-      output: (proc.stdout || '').toString().trim(),
-    }
+      error: (proc.stderr || proc.error || "Unknown error").toString(),
+      output: (proc.stdout || "").toString().trim(),
+    };
   } catch (err) {
     // Handle unknown errors with proper typing
-    const errorMessage = err instanceof Error ? err.message : String(err)
-    return { success: false, error: errorMessage }
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -186,31 +186,33 @@ function runCommand(command) {
  * Show available commands
  */
 function showCommands() {
-  console.log(`${colors.cyan}Available commands:${colors.reset}`)
+  console.log(`${colors.cyan}Available commands:${colors.reset}`);
   console.log(
     `  ${colors.yellow}status${colors.reset}    - Show overall blog post status`,
-  )
+  );
   console.log(
     `  ${colors.yellow}series${colors.reset}    - List all blog series and their posts`,
-  )
+  );
   console.log(
     `  ${colors.yellow}upcoming${colors.reset}  - Show upcoming scheduled publications`,
-  )
-  console.log(`  ${colors.yellow}overdue${colors.reset}   - Show overdue posts`)
+  );
+  console.log(
+    `  ${colors.yellow}overdue${colors.reset}   - Show overdue posts`,
+  );
   console.log(
     `  ${colors.yellow}generate${colors.reset}  - Create a new blog post`,
-  )
+  );
   console.log(
     `  ${colors.yellow}publish${colors.reset}   - Publish a draft post`,
-  )
+  );
   console.log(
     `  ${colors.yellow}report${colors.reset}    - Generate a comprehensive report`,
-  )
+  );
   console.log(
     `  ${colors.yellow}help${colors.reset}      - Show this help message`,
-  )
-  console.log(`  ${colors.yellow}exit${colors.reset}      - Exit the CLI`)
-  console.log('')
+  );
+  console.log(`  ${colors.yellow}exit${colors.reset}      - Exit the CLI`);
+  console.log("");
 }
 
 /**
@@ -220,54 +222,54 @@ function mainPrompt() {
   rl.question(
     `${colors.bright}${colors.purple}blog>${colors.reset} `,
     (input) => {
-      const args = input.trim().split(' ')
-      const command = args[0].toLowerCase()
-      const restArgs = args.slice(1).join(' ')
+      const args = input.trim().split(" ");
+      const command = args[0].toLowerCase();
+      const restArgs = args.slice(1).join(" ");
 
       switch (command) {
-        case 'help':
-          showCommands()
-          mainPrompt()
-          break
+        case "help":
+          showCommands();
+          mainPrompt();
+          break;
 
-        case 'exit':
-        case 'quit':
-          console.log(`${colors.blue}Goodbye! 👋${colors.reset}`)
-          rl.close()
-          break
+        case "exit":
+        case "quit":
+          console.log(`${colors.blue}Goodbye! 👋${colors.reset}`);
+          rl.close();
+          break;
 
-        case 'clear':
-          showHeader()
-          mainPrompt()
-          break
+        case "clear":
+          showHeader();
+          mainPrompt();
+          break;
 
-        case 'status':
-        case 'series':
-        case 'upcoming':
-        case 'overdue':
-        case 'report':
-          const result = runCommand(command)
+        case "status":
+        case "series":
+        case "upcoming":
+        case "overdue":
+        case "report":
+          const result = runCommand(command);
           if (result.success) {
-            console.log(result.output)
+            console.log(result.output);
           } else {
-            error(`Command failed: ${result.error}`)
+            error(`Command failed: ${result.error}`);
             if (result.output) {
-              console.log(result.output)
+              console.log(result.output);
             }
           }
-          mainPrompt()
-          break
+          mainPrompt();
+          break;
 
-        case 'generate':
+        case "generate":
           if (!restArgs) {
             // Interactive generate
             rl.question(
               `${colors.yellow}Enter post title:${colors.reset} `,
               (title) => {
                 if (!title.trim()) {
-                  error('Post title is required')
-                  mainPrompt()
-                  return
+                  error("Post title is required");
+                  mainPrompt();
+                  return;
                 }
 
                 rl.question(
@@ -275,109 +277,109 @@ function mainPrompt() {
                   (series) => {
                     const seriesArg = series.trim()
                       ? `"${series.trim()}"`
-                      : '""'
+                      : '""';
                     const result = runCommand(
                       `generate ${seriesArg} "${title.trim()}"`,
-                    )
+                    );
 
                     if (result.success) {
-                      console.log(result.output)
-                      success('Post created successfully')
+                      console.log(result.output);
+                      success("Post created successfully");
                     } else {
-                      error(`Failed to create post: ${result.error}`)
+                      error(`Failed to create post: ${result.error}`);
                       if (result.output) {
-                        console.log(result.output)
+                        console.log(result.output);
                       }
                     }
 
-                    mainPrompt()
+                    mainPrompt();
                   },
-                )
+                );
               },
-            )
+            );
           } else {
             // Direct generate with args
-            const result = runCommand(`generate ${restArgs}`)
+            const result = runCommand(`generate ${restArgs}`);
             if (result.success) {
-              console.log(result.output)
-              success('Post created successfully')
+              console.log(result.output);
+              success("Post created successfully");
             } else {
-              error(`Failed to create post: ${result.error}`)
+              error(`Failed to create post: ${result.error}`);
               if (result.output) {
-                console.log(result.output)
+                console.log(result.output);
               }
             }
-            mainPrompt()
+            mainPrompt();
           }
-          break
+          break;
 
-        case 'publish':
+        case "publish":
           if (!restArgs) {
-            error('Please specify a file path to publish')
-            info('Usage: publish <file-path>')
+            error("Please specify a file path to publish");
+            info("Usage: publish <file-path>");
           } else {
-            const result = runCommand(`publish ${restArgs}`)
+            const result = runCommand(`publish ${restArgs}`);
             if (result.success) {
-              console.log(result.output)
-              success('Post published successfully')
+              console.log(result.output);
+              success("Post published successfully");
             } else {
-              error(`Failed to publish post: ${result.error}`)
+              error(`Failed to publish post: ${result.error}`);
               if (result.output) {
-                console.log(result.output)
+                console.log(result.output);
               }
             }
           }
-          mainPrompt()
-          break
+          mainPrompt();
+          break;
 
-        case '':
-          mainPrompt()
-          break
+        case "":
+          mainPrompt();
+          break;
 
         default:
-          error(`Unknown command: ${command}`)
-          info('Type "help" to see available commands')
-          mainPrompt()
-          break
+          error(`Unknown command: ${command}`);
+          info('Type "help" to see available commands');
+          mainPrompt();
+          break;
       }
     },
-  )
+  );
 }
 
 /**
  * Start the CLI application
  */
 async function start() {
-  showHeader()
-  console.log(`${colors.cyan}Welcome to the Blog CLI!${colors.reset}`)
+  showHeader();
+  console.log(`${colors.cyan}Welcome to the Blog CLI!${colors.reset}`);
   console.log(
     `${colors.dim}Type 'help' to see available commands or 'exit' to quit${colors.reset}`,
-  )
-  console.log('')
+  );
+  console.log("");
 
   // Check if the blog publisher is available
-  const testResult = runCommand('status')
+  const testResult = runCommand("status");
   if (!testResult.success) {
-    error('Failed to access the blog publisher')
-    warning('The publishing system may not be properly installed')
-    info('You can still try using commands, but they may not work correctly')
-    console.log('')
+    error("Failed to access the blog publisher");
+    warning("The publishing system may not be properly installed");
+    info("You can still try using commands, but they may not work correctly");
+    console.log("");
   }
 
-  mainPrompt()
+  mainPrompt();
 }
 
 /**
  * Handle clean exit
  */
-rl.on('close', () => {
-  process.exit(0)
-})
+rl.on("close", () => {
+  process.exit(0);
+});
 
 // Start the CLI only when executed directly (prevents side-effects on import)
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  start()
+  start();
 }
 
 // Export helpers for testing
-export { parseArgs, isSafeToken, runCommand, start }
+export { parseArgs, isSafeToken, runCommand, start };

@@ -1,8 +1,8 @@
 ---
-title: 'Testing Overview'
-description: 'Comprehensive guide to Pixelated testing infrastructure and practices'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Testing Overview"
+description: "Comprehensive guide to Pixelated testing infrastructure and practices"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true

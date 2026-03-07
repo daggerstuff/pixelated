@@ -1,7 +1,7 @@
 ---
-title: 'Patient Resources'
-description: 'Comprehensive resource bundle for individuals in recovery'
-author: 'Resource Team'
+title: "Patient Resources"
+description: "Comprehensive resource bundle for individuals in recovery"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

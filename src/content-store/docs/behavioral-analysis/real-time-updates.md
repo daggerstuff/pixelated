@@ -1,9 +1,9 @@
 ---
-title: 'Real-Time Updates System'
-description: 'Real-Time Updates System documentation'
+title: "Real-Time Updates System"
+description: "Real-Time Updates System documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -20,33 +20,33 @@ The Real-Time Updates System enables live synchronization of behavioral analysis
 
 ```typescript
 interface EventMessage {
-  id: string
-  type: EventType
-  payload: any
+  id: string;
+  type: EventType;
+  payload: any;
   metadata: {
-    timestamp: Date
-    source: EventSource
-    correlationId?: string
-    sessionId?: string
-    userId?: string
-  }
+    timestamp: Date;
+    source: EventSource;
+    correlationId?: string;
+    sessionId?: string;
+    userId?: string;
+  };
 }
 
 type EventType =
-  | 'emotion.detected'
-  | 'pattern.identified'
-  | 'analysis.updated'
-  | 'recommendation.generated'
-  | 'risk.flagged'
-  | 'session.milestone'
-  | 'annotation.added'
+  | "emotion.detected"
+  | "pattern.identified"
+  | "analysis.updated"
+  | "recommendation.generated"
+  | "risk.flagged"
+  | "session.milestone"
+  | "annotation.added";
 
 type EventSource =
-  | 'emotion-analyzer'
-  | 'pattern-detector'
-  | 'recommendation-engine'
-  | 'therapist-interface'
-  | 'client-interface'
+  | "emotion-analyzer"
+  | "pattern-detector"
+  | "recommendation-engine"
+  | "therapist-interface"
+  | "client-interface";
 ```
 
 ### 2. Real-Time Communication Layer
@@ -54,10 +54,10 @@ type EventSource =
 ```typescript
 class RealTimeUpdateService {
   constructor(options: {
-    reconnectStrategy: ReconnectStrategy
-    messageBuffer: number
-    priorityChannels: string[]
-    securityLevel: SecurityLevel
+    reconnectStrategy: ReconnectStrategy;
+    messageBuffer: number;
+    priorityChannels: string[];
+    securityLevel: SecurityLevel;
   }) {
     // Service initialization
   }
@@ -107,15 +107,15 @@ class RealTimeUpdateService {
 function useRealTimeUpdates(
   channels: string[],
   options?: {
-    bufferSize?: number
-    debounceMs?: number
-    processImmediately?: string[]
+    bufferSize?: number;
+    debounceMs?: number;
+    processImmediately?: string[];
   },
 ): {
-  events: EventMessage[]
-  lastEvent: EventMessage | null
-  connected: boolean
-  reconnecting: boolean
+  events: EventMessage[];
+  lastEvent: EventMessage | null;
+  connected: boolean;
+  reconnecting: boolean;
 } {
   // Implementation of real-time updates consumer
 }
@@ -137,10 +137,10 @@ function useRealTimeUpdates(
 // Server-side implementation example
 class RealTimeUpdateServer {
   constructor(options: {
-    maxConnections: number
-    authenticationStrategy: AuthStrategy
-    channelConfiguration: ChannelConfig[]
-    loadBalancing: LoadBalancingStrategy
+    maxConnections: number;
+    authenticationStrategy: AuthStrategy;
+    channelConfiguration: ChannelConfig[];
+    loadBalancing: LoadBalancingStrategy;
   }) {
     // Server initialization
   }
@@ -149,11 +149,11 @@ class RealTimeUpdateServer {
 }
 
 interface ChannelConfig {
-  name: string
-  authRequired: boolean
-  rateLimits: RateLimitConfig
-  persistence: PersistenceConfig
-  accessControl: AccessControlConfig
+  name: string;
+  authRequired: boolean;
+  rateLimits: RateLimitConfig;
+  persistence: PersistenceConfig;
+  accessControl: AccessControlConfig;
 }
 ```
 
@@ -210,29 +210,29 @@ interface ChannelConfig {
 ```typescript
 // Vanilla JavaScript example
 const realTimeClient = new RealTimeClient({
-  endpoint: 'wss://updates.example.com/ws',
+  endpoint: "wss://updates.example.com/ws",
   reconnectStrategy: {
     initialDelayMs: 100,
     maxDelayMs: 5000,
     factor: 1.5,
   },
-})
+});
 
 realTimeClient
   .connect(authToken)
-  .then(() => console.log('Connected to real-time updates'))
-  .catch((err) => console.error('Connection failed:', err))
+  .then(() => console.log("Connected to real-time updates"))
+  .catch((err) => console.error("Connection failed:", err));
 
 const subscription = realTimeClient.subscribe(
-  ['emotion.detected', 'pattern.identified'],
+  ["emotion.detected", "pattern.identified"],
   (event) => {
-    console.log('Received event:', event)
-    updateUI(event)
+    console.log("Received event:", event);
+    updateUI(event);
   },
-)
+);
 
 // Later cleanup
-subscription.unsubscribe()
+subscription.unsubscribe();
 ```
 
 ### React Component Integration

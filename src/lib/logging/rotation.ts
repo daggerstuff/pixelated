@@ -1,50 +1,54 @@
-import { exec } from 'node:child_process'
-import fs from 'node:fs/promises'
-import path from 'node:path'
-import { promisify } from 'node:util'
-import { safeJoin, ALLOWED_DIRECTORIES, validatePath } from '../../utils/path-security'
+import { exec } from "node:child_process";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { promisify } from "node:util";
+import {
+  safeJoin,
+  ALLOWED_DIRECTORIES,
+  validatePath,
+} from "../../utils/path-security";
 
-const execAsync = promisify(exec)
+const execAsync = promisify(exec);
 
 /**
  * Log rotation configuration
  */
 export interface LogRotationConfig {
   // Directory where logs are stored
-  logDir: string
+  logDir: string;
 
   // Maximum file size in bytes before rotation (default: 10MB)
-  maxSize?: number
+  maxSize?: number;
 
   // Maximum number of rotated files to keep (default: 5)
-  maxFiles?: number
+  maxFiles?: number;
 
   // Whether to compress rotated logs (default: true)
-  compress?: boolean
+  compress?: boolean;
 
   // Rotation frequency - daily, hourly, etc. (default: daily)
-  frequency?: 'hourly' | 'daily' | 'weekly'
+  frequency?: "hourly" | "daily" | "weekly";
 }
 
 /**
  * Default configuration
  */
 const defaultConfig: LogRotationConfig = {
-  logDir: safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'logs'),
+  logDir: safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "logs"),
   maxSize: 10 * 1024 * 1024, // 10MB
   maxFiles: 5,
   compress: true,
-  frequency: 'daily',
-}
+  frequency: "daily",
+};
 
 /**
  * Log rotation service
  */
 export class LogRotationService {
-  private config: LogRotationConfig
+  private config: LogRotationConfig;
 
   constructor(config: Partial<LogRotationConfig> = {}) {
-    this.config = { ...defaultConfig, ...config }
+    this.config = { ...defaultConfig, ...config };
   }
 
   /**
@@ -52,53 +56,53 @@ export class LogRotationService {
    */
   async ensureLogDir(): Promise<void> {
     try {
-      await fs.mkdir(this.config.logDir, { recursive: true })
+      await fs.mkdir(this.config.logDir, { recursive: true });
     } catch (error: unknown) {
-      console.error('Failed to create log directory:', error)
+      console.error("Failed to create log directory:", error);
     }
   }
 
   /**
    * Get current log filename based on frequency
    */
-  getLogFilename(prefix = 'app'): string {
-    const date = new Date()
-    let dateStr: string
+  getLogFilename(prefix = "app"): string {
+    const date = new Date();
+    let dateStr: string;
 
     switch (this.config.frequency) {
-      case 'hourly':
-        dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${String(date.getHours()).padStart(2, '0')}`
-        break
-      case 'weekly': {
-        const startOfWeek = new Date(date)
-        startOfWeek.setDate(date.getDate() - date.getDay())
-        dateStr = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, '0')}-${String(startOfWeek.getDate()).padStart(2, '0')}`
-        break
+      case "hourly":
+        dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}-${String(date.getHours()).padStart(2, "0")}`;
+        break;
+      case "weekly": {
+        const startOfWeek = new Date(date);
+        startOfWeek.setDate(date.getDate() - date.getDay());
+        dateStr = `${startOfWeek.getFullYear()}-${String(startOfWeek.getMonth() + 1).padStart(2, "0")}-${String(startOfWeek.getDate()).padStart(2, "0")}`;
+        break;
       }
-      case 'daily':
+      case "daily":
       default:
-        dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+        dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
     }
 
-    const filename = `${prefix}-${dateStr}.log`
-    return validatePath(filename, this.config.logDir)
+    const filename = `${prefix}-${dateStr}.log`;
+    return validatePath(filename, this.config.logDir);
   }
 
   /**
    * Write a log entry to the appropriate file
    */
-  async writeLog(entry: string, prefix = 'app'): Promise<void> {
-    await this.ensureLogDir()
-    const filename = this.getLogFilename(prefix)
+  async writeLog(entry: string, prefix = "app"): Promise<void> {
+    await this.ensureLogDir();
+    const filename = this.getLogFilename(prefix);
 
     try {
       // Append to log file
-      await fs.appendFile(filename, `${entry}\n`)
+      await fs.appendFile(filename, `${entry}\n`);
 
       // Check file size and rotate if needed
-      await this.checkAndRotate(filename)
+      await this.checkAndRotate(filename);
     } catch (error: unknown) {
-      console.error('Failed to write log:', error)
+      console.error("Failed to write log:", error);
     }
   }
 
@@ -107,10 +111,10 @@ export class LogRotationService {
    */
   async checkAndRotate(filename: string): Promise<void> {
     try {
-      const stats = await fs.stat(filename)
+      const stats = await fs.stat(filename);
 
       if (stats.size >= (this.config.maxSize ?? defaultConfig.maxSize!)) {
-        await this.rotateLog(filename)
+        await this.rotateLog(filename);
       }
     } catch {
       // File might not exist yet, ignore
@@ -125,22 +129,22 @@ export class LogRotationService {
       // Generate rotated filename with timestamp
       const timestamp = new Date()
         .toISOString()
-        .replace(/:/g, '-')
-        .replace(/\..+/, '')
-      const rotatedFilename = `${filename}.${timestamp}`
+        .replace(/:/g, "-")
+        .replace(/\..+/, "");
+      const rotatedFilename = `${filename}.${timestamp}`;
 
       // Rename current log file
-      await fs.rename(filename, rotatedFilename)
+      await fs.rename(filename, rotatedFilename);
 
       // Compress if configured
       if (this.config.compress) {
-        await this.compressLog(rotatedFilename)
+        await this.compressLog(rotatedFilename);
       }
 
       // Cleanup old logs
-      await this.cleanupOldLogs(filename)
+      await this.cleanupOldLogs(filename);
     } catch (error: unknown) {
-      console.error('Failed to rotate log:', error)
+      console.error("Failed to rotate log:", error);
     }
   }
 
@@ -150,9 +154,9 @@ export class LogRotationService {
   async compressLog(filename: string): Promise<void> {
     try {
       // Use gzip to compress the file
-      await execAsync(`gzip -9 ${filename}`)
+      await execAsync(`gzip -9 ${filename}`);
     } catch (error: unknown) {
-      console.error('Failed to compress log:', error)
+      console.error("Failed to compress log:", error);
     }
   }
 
@@ -161,41 +165,41 @@ export class LogRotationService {
    */
   async cleanupOldLogs(baseFilename: string): Promise<void> {
     try {
-      const dirname = path.dirname(baseFilename)
-      const baseFile = path.basename(baseFilename)
-      const prefix = baseFile.split('.')[0]
+      const dirname = path.dirname(baseFilename);
+      const baseFile = path.basename(baseFilename);
+      const prefix = baseFile.split(".")[0];
 
       // Get all rotated log files
-      const files = await fs.readdir(dirname)
+      const files = await fs.readdir(dirname);
       const rotatedFiles = files
         .filter(
           (file) => prefix && file.startsWith(prefix) && file !== baseFile,
         )
         .map((file) => {
-          const filePath = validatePath(file, dirname)
-          return { name: file, path: filePath }
-        })
+          const filePath = validatePath(file, dirname);
+          return { name: file, path: filePath };
+        });
 
       // Sort by modification time (newest first)
       const filesWithStats = await Promise.all(
         rotatedFiles.map(async (file) => {
-          const stats = await fs.stat(file.path)
-          return { ...file, mtime: stats.mtime }
+          const stats = await fs.stat(file.path);
+          return { ...file, mtime: stats.mtime };
         }),
-      )
+      );
 
-      filesWithStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
+      filesWithStats.sort((a, b) => b.mtime.getTime() - a.mtime.getTime());
 
       // Delete excess files
-      const maxFiles = this.config.maxFiles ?? defaultConfig.maxFiles!
+      const maxFiles = this.config.maxFiles ?? defaultConfig.maxFiles!;
       if (filesWithStats.length >= maxFiles) {
-        const filesToDelete = filesWithStats.slice(maxFiles - 1)
+        const filesToDelete = filesWithStats.slice(maxFiles - 1);
         for (const file of filesToDelete) {
-          await fs.unlink(file.path)
+          await fs.unlink(file.path);
         }
       }
     } catch (error: unknown) {
-      console.error('Failed to clean up old logs:', error)
+      console.error("Failed to clean up old logs:", error);
     }
   }
 
@@ -204,66 +208,66 @@ export class LogRotationService {
    */
   async aggregateLogs(
     output: string,
-    pattern = '*',
+    pattern = "*",
     startDate?: Date,
     endDate?: Date,
   ): Promise<void> {
     try {
-      await this.ensureLogDir()
-      const { logDir } = this.config
+      await this.ensureLogDir();
+      const { logDir } = this.config;
 
       // Get all log files
-      const files = await fs.readdir(logDir)
+      const files = await fs.readdir(logDir);
 
       // Filter by pattern
       const filteredFiles = files.filter((file) => {
-        if (!file.endsWith('.log') && !file.endsWith('.log.gz')) {
-          return false
+        if (!file.endsWith(".log") && !file.endsWith(".log.gz")) {
+          return false;
         }
 
-        if (pattern !== '*' && !file.includes(pattern)) {
-          return false
+        if (pattern !== "*" && !file.includes(pattern)) {
+          return false;
         }
 
         // Extract date from filename
-        const dateMatch = file.match(/\d{4}-\d{2}-\d{2}/)
+        const dateMatch = file.match(/\d{4}-\d{2}-\d{2}/);
         if (!dateMatch) {
-          return true
+          return true;
         }
 
-        const fileDate = new Date(dateMatch[0])
+        const fileDate = new Date(dateMatch[0]);
 
         if (startDate && fileDate < startDate) {
-          return false
+          return false;
         }
         if (endDate && fileDate > endDate) {
-          return false
+          return false;
         }
 
-        return true
-      })
+        return true;
+      });
 
       // Sort by date
-      filteredFiles.sort()
+      filteredFiles.sort();
 
       // Create output file
-      await fs.writeFile(output, '')
+      await fs.writeFile(output, "");
 
       // Aggregate log content
       for (const file of filteredFiles) {
-        const filePath = validatePath(file, logDir)
+        const filePath = validatePath(file, logDir);
 
         // Handle compressed files
-        if (file.endsWith('.gz')) {
-          const { stdout } = await execAsync(`gunzip -c ${filePath}`)
-          await fs.appendFile(output, stdout)
+        if (file.endsWith(".gz")) {
+          const { stdout } = await execAsync(`gunzip -c ${filePath}`);
+          await fs.appendFile(output, stdout);
         } else {
-          const content = await fs.readFile(filePath, 'utf8')
-          await fs.appendFile(output, content)
+          const content = await fs.readFile(filePath, "utf8");
+          await fs.appendFile(output, content);
         }
       }
     } catch (error: unknown) {
-      console.error('Failed to aggregate logs:', error)
+      console.error("Failed to aggregate logs:", error);
     }
   }
 }

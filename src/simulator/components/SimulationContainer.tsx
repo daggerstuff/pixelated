@@ -1,8 +1,13 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
-import type { SimulationContainerProps, TherapeuticTechnique, RealTimeFeedback, Scenario } from '../types'
-import { useSimulator } from '../context/SimulatorContext'
-import { checkBrowserCompatibility } from '../utils/privacy'
-import SimulationControls from './SimulationControls'
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import type {
+  SimulationContainerProps,
+  TherapeuticTechnique,
+  RealTimeFeedback,
+  Scenario,
+} from "../types";
+import { useSimulator } from "../context/SimulatorContext";
+import { checkBrowserCompatibility } from "../utils/privacy";
+import SimulationControls from "./SimulationControls";
 
 /**
  * Main container for the therapeutic simulation
@@ -10,64 +15,64 @@ import SimulationControls from './SimulationControls'
  */
 export function SimulationContainer({
   scenarioId,
-  className = '',
+  className = "",
   onBackToScenarios,
 }: SimulationContainerProps) {
-  const [userResponse, setUserResponse] = useState<string>('')
-  const [isCompatible, setIsCompatible] = useState<boolean>(true)
-  const [compatibilityError, setCompatibilityError] = useState<string[]>([])
-  const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true)
+  const [userResponse, setUserResponse] = useState<string>("");
+  const [isCompatible, setIsCompatible] = useState<boolean>(true);
+  const [compatibilityError, setCompatibilityError] = useState<string[]>([]);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true);
   const [showTechniqueHighlights, setShowTechniqueHighlights] =
-    useState<boolean>(true)
+    useState<boolean>(true);
   const [detectedTechniques, setDetectedTechniques] = useState<
     TherapeuticTechnique[]
-  >([])
+  >([]);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const responseInputRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const responseInputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { state } = useSimulator()
+  const { state } = useSimulator();
   const typedState = state as {
-    currentScenario?: Scenario
-    isProcessing?: boolean
-    realtimeFeedback?: RealTimeFeedback[]
-    startSimulation?: (id: string) => Promise<void>
-    endSimulation?: () => Promise<void>
-    transcribedText?: string
-    isConnected?: boolean
-  }
+    currentScenario?: Scenario;
+    isProcessing?: boolean;
+    realtimeFeedback?: RealTimeFeedback[];
+    startSimulation?: (id: string) => Promise<void>;
+    endSimulation?: () => Promise<void>;
+    transcribedText?: string;
+    isConnected?: boolean;
+  };
 
-  const currentScenario = typedState?.currentScenario
-  const isProcessing = typedState?.isProcessing ?? false
-  const realtimeFeedback = typedState?.realtimeFeedback ?? []
-  const startSimulation = typedState?.startSimulation
-  const endSimulation = typedState?.endSimulation
-  const transcribedText = typedState?.transcribedText ?? ''
-  const isConnected = typedState?.isConnected ?? false
+  const currentScenario = typedState?.currentScenario;
+  const isProcessing = typedState?.isProcessing ?? false;
+  const realtimeFeedback = typedState?.realtimeFeedback ?? [];
+  const startSimulation = typedState?.startSimulation;
+  const endSimulation = typedState?.endSimulation;
+  const transcribedText = typedState?.transcribedText ?? "";
+  const isConnected = typedState?.isConnected ?? false;
 
   // Conversation history for the current session
   const [conversation, setConversation] = useState<
     Array<{
-      type: 'scenario' | 'user' | 'feedback'
-      content: string
-      timestamp: number
-      techniques?: TherapeuticTechnique[]
+      type: "scenario" | "user" | "feedback";
+      content: string;
+      timestamp: number;
+      techniques?: TherapeuticTechnique[];
     }>
-  >([])
+  >([]);
 
   // Check browser compatibility on mount
   useEffect(() => {
-    const { compatible, missingFeatures } = checkBrowserCompatibility()
-    setIsCompatible(compatible)
-    setCompatibilityError(missingFeatures)
-  }, [])
+    const { compatible, missingFeatures } = checkBrowserCompatibility();
+    setIsCompatible(compatible);
+    setCompatibilityError(missingFeatures);
+  }, []);
 
   // Start simulation when scenarioId changes
   useEffect(() => {
     if (scenarioId) {
       // Reset conversation
-      setConversation([])
-      setUserResponse('')
+      setConversation([]);
+      setUserResponse("");
 
       // Start new simulation
       if (startSimulation) {
@@ -75,12 +80,12 @@ export function SimulationContainer({
           .then(() => {
             // Focus on response input after simulation starts
             if (responseInputRef.current) {
-              responseInputRef.current.focus()
+              responseInputRef.current.focus();
             }
           })
           .catch((error) => {
-            console.error('Failed to start simulation:', error)
-          })
+            console.error("Failed to start simulation:", error);
+          });
       }
     }
 
@@ -88,51 +93,51 @@ export function SimulationContainer({
     return () => {
       if (endSimulation) {
         endSimulation().catch((err) =>
-          console.error('Error ending simulation:', err),
-        )
+          console.error("Error ending simulation:", err),
+        );
       }
-    }
-  }, [scenarioId, startSimulation, endSimulation])
+    };
+  }, [scenarioId, startSimulation, endSimulation]);
 
   // Add scenario information to conversation when scenario changes
   useEffect(() => {
     if (currentScenario) {
       setConversation((prev) => {
         // Check if we already have the scenario information
-        if (prev.some((item) => item.type === 'scenario')) {
-          return prev
+        if (prev.some((item) => item.type === "scenario")) {
+          return prev;
         }
 
         // Add scenario information
         return [
           {
-            type: 'scenario',
-            content: `${currentScenario?.['contextDescription'] || ''} ${currentScenario?.['clientBackground'] || ''}`,
+            type: "scenario",
+            content: `${currentScenario?.["contextDescription"] || ""} ${currentScenario?.["clientBackground"] || ""}`,
             timestamp: Date.now(),
           },
-        ]
-      })
+        ];
+      });
     }
-  }, [currentScenario])
+  }, [currentScenario]);
 
   // Auto-scroll to bottom of conversation when new messages arrive
   useEffect(() => {
     if (autoScrollEnabled && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [conversation, autoScrollEnabled])
+  }, [conversation, autoScrollEnabled]);
 
   // Update user response when transcription changes
   useEffect(() => {
     if (transcribedText) {
-      setUserResponse(transcribedText)
+      setUserResponse(transcribedText);
     }
-  }, [transcribedText])
+  }, [transcribedText]);
 
   // Add feedback to conversation when it arrives
   useEffect(() => {
     if (realtimeFeedback && realtimeFeedback.length > 0) {
-      const latestFeedback: RealTimeFeedback = realtimeFeedback[0]
+      const latestFeedback: RealTimeFeedback = realtimeFeedback[0];
 
       // Add feedback to conversation if it has content
       if (latestFeedback.content || latestFeedback.suggestion) {
@@ -141,25 +146,25 @@ export function SimulationContainer({
           if (
             prev.some(
               (item) =>
-                item.type === 'feedback' &&
+                item.type === "feedback" &&
                 item.timestamp === latestFeedback.timestamp,
             )
           ) {
-            return prev
+            return prev;
           }
 
           return [
             ...prev,
             {
-              type: 'feedback',
+              type: "feedback",
               content:
                 latestFeedback.content ||
                 latestFeedback.suggestion ||
-                'No feedback available',
+                "No feedback available",
               timestamp: latestFeedback.timestamp,
             },
-          ]
-        })
+          ];
+        });
       }
 
       // Update detected techniques if available
@@ -168,49 +173,49 @@ export function SimulationContainer({
           prev.includes(latestFeedback.suggestedTechnique!)
             ? prev
             : [...prev, latestFeedback.suggestedTechnique!],
-        )
+        );
       }
     }
-  }, [realtimeFeedback])
+  }, [realtimeFeedback]);
 
   // Handle form submission
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-      e.preventDefault()
+      e.preventDefault();
 
       if (!userResponse.trim() || isProcessing || !currentScenario) {
-        return
+        return;
       }
 
       // Add user response to conversation
       setConversation((prev) => [
         ...prev,
         {
-          type: 'user',
+          type: "user",
           content: userResponse,
           timestamp: Date.now(),
           techniques: detectedTechniques,
         },
-      ])
+      ]);
 
       // Clear input
-      setUserResponse('')
+      setUserResponse("");
     },
     [userResponse, isProcessing, currentScenario, detectedTechniques],
-  )
+  );
 
   // Handle text area growing as content is added
   const handleTextAreaChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const { target } = e
-      setUserResponse(target.value)
+      const { target } = e;
+      setUserResponse(target.value);
 
       // Auto-resize the textarea
-      target.style.height = 'inherit'
-      target.style.height = `${target.scrollHeight}px`
+      target.style.height = "inherit";
+      target.style.height = `${target.scrollHeight}px`;
     },
     [],
-  )
+  );
 
   // Main render
   return (
@@ -235,7 +240,11 @@ export function SimulationContainer({
       )}
 
       <div className="simulation-header">
-        <h2>{(currentScenario && 'title' in currentScenario ? currentScenario.title : null) || 'Therapeutic Simulation'}</h2>
+        <h2>
+          {(currentScenario && "title" in currentScenario
+            ? currentScenario.title
+            : null) || "Therapeutic Simulation"}
+        </h2>
         {onBackToScenarios && (
           <button onClick={onBackToScenarios} className="back-button">
             ← Back to Scenarios
@@ -254,11 +263,11 @@ export function SimulationContainer({
           >
             <div className="message-header">
               <span className="message-type">
-                {item.type === 'scenario'
-                  ? 'Scenario'
-                  : item.type === 'user'
-                    ? 'Therapist'
-                    : 'Client'}
+                {item.type === "scenario"
+                  ? "Scenario"
+                  : item.type === "user"
+                    ? "Therapist"
+                    : "Client"}
               </span>
               <span className="message-time">
                 {new Date(item.timestamp).toLocaleTimeString()}
@@ -266,7 +275,7 @@ export function SimulationContainer({
             </div>
             <div className="message-content">
               {item.content}
-              {item.type === 'user' &&
+              {item.type === "user" &&
                 showTechniqueHighlights &&
                 item.techniques &&
                 item.techniques.length > 0 && (
@@ -277,7 +286,7 @@ export function SimulationContainer({
                         className="technique-tag"
                         title={getTechniqueDescription(technique)}
                       >
-                        {technique.replace(/_/g, ' ')}
+                        {technique.replace(/_/g, " ")}
                       </span>
                     ))}
                   </div>
@@ -306,7 +315,7 @@ export function SimulationContainer({
               disabled={isProcessing || !userResponse.trim() || !isConnected}
               className="send-button"
             >
-              {isProcessing ? 'Processing...' : 'Send Response'}
+              {isProcessing ? "Processing..." : "Send Response"}
             </button>
           </div>
         </div>
@@ -336,16 +345,16 @@ export function SimulationContainer({
 
       <style>{/* Existing styles... */}</style>
     </div>
-  )
+  );
 }
 
 // Helper function to provide descriptions of techniques
 function getTechniqueDescription(technique: TherapeuticTechnique): string {
   const descriptions: Record<string, string> = {
     active_listening:
-      'Giving full attention to the client and demonstrating attentive listening through verbal and non-verbal cues',
+      "Giving full attention to the client and demonstrating attentive listening through verbal and non-verbal cues",
     reflective_statements:
-      'Paraphrasing and reflecting back what the client has said to demonstrate understanding',
+      "Paraphrasing and reflecting back what the client has said to demonstrate understanding",
     open_ended_questions:
       "Questions that cannot be answered with a simple 'yes' or 'no', encouraging elaboration",
     validation:
@@ -353,16 +362,16 @@ function getTechniqueDescription(technique: TherapeuticTechnique): string {
     motivational_interviewing:
       "Collaborative conversation style for strengthening a person's motivation and commitment to change",
     cognitive_restructuring:
-      'Identifying and challenging negative or distorted thinking patterns',
+      "Identifying and challenging negative or distorted thinking patterns",
     goal_setting:
-      'Collaborative development of specific, measurable, achievable, relevant, and time-bound goals',
+      "Collaborative development of specific, measurable, achievable, relevant, and time-bound goals",
     mindfulness:
-      'Guiding awareness to the present moment with acceptance and without judgment',
+      "Guiding awareness to the present moment with acceptance and without judgment",
     behavioral_activation:
-      'Encouraging engagement in rewarding activities to improve mood and build positive experiences',
+      "Encouraging engagement in rewarding activities to improve mood and build positive experiences",
     grounding_techniques:
-      'Methods to help bring a person back to the present moment during distress or flashbacks',
-  }
+      "Methods to help bring a person back to the present moment during distress or flashbacks",
+  };
 
-  return descriptions[technique] || technique.replace(/_/g, ' ')
+  return descriptions[technique] || technique.replace(/_/g, " ");
 }

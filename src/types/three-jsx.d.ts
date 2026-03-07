@@ -4,15 +4,15 @@
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      group: any
-      mesh: any
-      meshBasicMaterial: any
-      perspectiveCamera: any
-      ambientLight: any
-      directionalLight: any
+      group: any;
+      mesh: any;
+      meshBasicMaterial: any;
+      perspectiveCamera: any;
+      ambientLight: any;
+      directionalLight: any;
     }
   }
 }
-export {}
+export {};
 
 // types module (standardized)

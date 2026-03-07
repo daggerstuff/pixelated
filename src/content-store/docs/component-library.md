@@ -232,7 +232,7 @@ Container component with a clean, bordered appearance.
 **Props:**
 
 ```typescript
-interface Props extends HTMLAttributes<'div'> {
+interface Props extends HTMLAttributes<"div"> {
   class?: string;
 }
 ```
@@ -282,7 +282,7 @@ Feedback component for displaying notifications.
 
 ```typescript
 interface Props {
-  variant?: 'info' | 'success' | 'warning' | 'error';
+  variant?: "info" | "success" | "warning" | "error";
   title?: string;
   description?: string;
   icon?: string;
@@ -324,10 +324,16 @@ A versatile button component that supports different variants and sizes.
 **Props:**
 
 ```typescript
-interface Props extends HTMLAttributes<'button'> {
+interface Props extends HTMLAttributes<"button"> {
   href?: string;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-  size?: 'default' | 'sm' | 'lg' | 'icon';
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
+  size?: "default" | "sm" | "lg" | "icon";
   loading?: boolean;
   loadingText?: string;
 }
@@ -567,13 +573,13 @@ interface LoginFormProps {
 **Usage:**
 
 ```tsx
-import { LoginForm } from '@/components/auth/LoginForm';
+import { LoginForm } from "@/components/auth/LoginForm";
 
 <LoginForm
   redirectTo="/dashboard"
   showSignup={true}
   showResetPassword={true}
-/>
+/>;
 ```
 
 **Features:**
@@ -605,9 +611,9 @@ interface ResetPasswordFormProps {
 **Usage:**
 
 ```tsx
-import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm';
+import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 
-<ResetPasswordForm redirectTo="/login" />
+<ResetPasswordForm redirectTo="/login" />;
 ```
 
 **Features:**
@@ -637,12 +643,12 @@ interface PasswordResetRequestFormProps {
 **Usage:**
 
 ```tsx
-import { PasswordResetRequestForm } from '@/components/auth/PasswordResetRequestForm';
+import { PasswordResetRequestForm } from "@/components/auth/PasswordResetRequestForm";
 
 <PasswordResetRequestForm
   redirectTo="/login"
-  onSuccess={() => console.log('Reset email sent')}
-/>
+  onSuccess={() => console.log("Reset email sent")}
+/>;
 ```
 
 **Features:**
@@ -670,9 +676,9 @@ interface RegisterFormProps {
 **Usage:**
 
 ```tsx
-import { RegisterForm } from '@/components/auth/RegisterForm';
+import { RegisterForm } from "@/components/auth/RegisterForm";
 
-<RegisterForm redirectTo="/dashboard" />
+<RegisterForm redirectTo="/dashboard" />;
 ```
 
 **Features:**
@@ -738,7 +744,7 @@ An Astro component that creates smooth transitions between pages using Astro's V
 
 ```typescript
 interface Props {
-  mode?: 'default' | 'fade' | 'slide' | 'slide-up' | 'slide-down' | 'zoom';
+  mode?: "default" | "fade" | "slide" | "slide-up" | "slide-down" | "zoom";
   duration?: number;
 }
 ```

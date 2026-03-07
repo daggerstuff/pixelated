@@ -3,36 +3,36 @@
  */
 
 export function readFile() {
-  return Promise.resolve('')
+  return Promise.resolve("");
 }
 
 export function readFileSync() {
-  return ''
+  return "";
 }
 
 export function writeFile() {
-  return Promise.resolve()
+  return Promise.resolve();
 }
 
 export function writeFileSync() {}
 
 export function existsSync() {
-  return false
+  return false;
 }
 
 export function createReadStream() {
-  throw new Error('Not implemented')
+  throw new Error("Not implemented");
 }
 
 export function readdir() {
-  return Promise.resolve([])
+  return Promise.resolve([]);
 }
 
 export const promises = {
-  readFile: () => Promise.resolve(''),
+  readFile: () => Promise.resolve(""),
   writeFile: () => Promise.resolve(),
   readdir: () => Promise.resolve([]),
-}
+};
 
 export default {
   readFile,
@@ -43,4 +43,4 @@ export default {
   createReadStream,
   readdir,
   promises,
-}
+};

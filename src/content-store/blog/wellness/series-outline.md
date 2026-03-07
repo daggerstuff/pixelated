@@ -1,7 +1,7 @@
 ---
-title: 'Everyday Joy: Simple Practices for Mental Wellness'
-description: 'A heartwarming exploration of practical, accessible approaches to nurturing mental health and finding joy in daily life'
-author: 'Wellness Team'
+title: "Everyday Joy: Simple Practices for Mental Wellness"
+description: "A heartwarming exploration of practical, accessible approaches to nurturing mental health and finding joy in daily life"
+author: "Wellness Team"
 pubDate: 2024-04-19
 draft: false
 ---
@@ -11,13 +11,13 @@ draft: false
 ## Series Blueprint 📋
 
 ```yaml
-title: 'Everyday Joy: Simple Practices for Mental Wellness'
-description: 'Discovering accessible ways to enhance mental wellbeing through daily practices and mindful living'
-timeframe: 'May-June 2024'
+title: "Everyday Joy: Simple Practices for Mental Wellness"
+description: "Discovering accessible ways to enhance mental wellbeing through daily practices and mindful living"
+timeframe: "May-June 2024"
 articles: 5
-frequency: 'Bi-weekly (between Neuroplasticity series)'
-audience: 'General public, wellness enthusiasts, mental health advocates'
-impact_goal: 'Empower individuals with practical tools for mental wellness'
+frequency: "Bi-weekly (between Neuroplasticity series)"
+audience: "General public, wellness enthusiasts, mental health advocates"
+impact_goal: "Empower individuals with practical tools for mental wellness"
 ```
 
 ## 🎯 Series Vision

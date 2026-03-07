@@ -1,26 +1,34 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   EvaluationUpdatePayloadSchema,
   type EvaluationUpdatePayload,
   type Evaluation,
-} from '@/lib/api/journal-research/types'
+} from "@/lib/api/journal-research/types";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button/button'
-import { cn } from '@/lib/utils'
-import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button/button";
+import { cn } from "@/lib/utils";
+import { getFieldErrors } from "@/lib/error";
+import {
+  ErrorMessage,
+  FieldError,
+} from "@/components/journal-research/shared/ErrorMessage";
 
 export interface EvaluationFormProps {
-  evaluation?: Evaluation
-  onSubmit: (data: EvaluationUpdatePayload) => void | Promise<void>
-  onCancel?: () => void
-  isLoading?: boolean
-  className?: string
+  evaluation?: Evaluation;
+  onSubmit: (data: EvaluationUpdatePayload) => void | Promise<void>;
+  onCancel?: () => void;
+  isLoading?: boolean;
+  className?: string;
 }
 
-const priorityTiers = ['high', 'medium', 'low']
+const priorityTiers = ["high", "medium", "low"];
 
 export function EvaluationForm({
   evaluation,
@@ -35,11 +43,11 @@ export function EvaluationForm({
     trainingIntegration: evaluation?.trainingIntegration,
     ethicalAccessibility: evaluation?.ethicalAccessibility,
     priorityTier: evaluation?.priorityTier,
-  })
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [touched, setTouched] = useState<Record<string, boolean>>({})
-  const [submitError, setSubmitError] = useState<unknown>(null)
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitError, setSubmitError] = useState<unknown>(null);
 
   useEffect(() => {
     if (evaluation) {
@@ -49,65 +57,67 @@ export function EvaluationForm({
         trainingIntegration: evaluation.trainingIntegration,
         ethicalAccessibility: evaluation.ethicalAccessibility,
         priorityTier: evaluation.priorityTier,
-      })
+      });
     }
-  }, [evaluation])
+  }, [evaluation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrors({})
-    setSubmitError(null)
+    e.preventDefault();
+    setErrors({});
+    setSubmitError(null);
 
     try {
-      const validated = EvaluationUpdatePayloadSchema.parse(formData)
-      await onSubmit(validated)
+      const validated = EvaluationUpdatePayloadSchema.parse(formData);
+      await onSubmit(validated);
     } catch (error) {
-
-      const fieldErrs = getFieldErrors(error) ?? {}
+      const fieldErrs = getFieldErrors(error) ?? {};
 
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
-        setErrors(fieldErrs)
+        setErrors(fieldErrs);
       } else {
-        setSubmitError(error)
+        setSubmitError(error);
       }
     }
-  }
+  };
 
-  const handleScoreChange = (field: keyof EvaluationUpdatePayload, value: string) => {
-    const numValue = parseFloat(value)
+  const handleScoreChange = (
+    field: keyof EvaluationUpdatePayload,
+    value: string,
+  ) => {
+    const numValue = parseFloat(value);
     if (!isNaN(numValue) && numValue >= 1 && numValue <= 10) {
-      setFormData({ ...formData, [field]: numValue })
+      setFormData({ ...formData, [field]: numValue });
     }
-  }
+  };
 
   const metrics = [
     {
-      key: 'therapeuticRelevance' as const,
-      label: 'Therapeutic Relevance',
-      description: 'How relevant is this dataset for therapeutic applications?',
+      key: "therapeuticRelevance" as const,
+      label: "Therapeutic Relevance",
+      description: "How relevant is this dataset for therapeutic applications?",
     },
     {
-      key: 'dataStructureQuality' as const,
-      label: 'Data Structure Quality',
-      description: 'How well-structured and usable is the data?',
+      key: "dataStructureQuality" as const,
+      label: "Data Structure Quality",
+      description: "How well-structured and usable is the data?",
     },
     {
-      key: 'trainingIntegration' as const,
-      label: 'Training Integration',
-      description: 'How easily can this be integrated into training?',
+      key: "trainingIntegration" as const,
+      label: "Training Integration",
+      description: "How easily can this be integrated into training?",
     },
     {
-      key: 'ethicalAccessibility' as const,
-      label: 'Ethical Accessibility',
-      description: 'How accessible is this data ethically and legally?',
+      key: "ethicalAccessibility" as const,
+      label: "Ethical Accessibility",
+      description: "How accessible is this data ethically and legally?",
     },
-  ]
+  ];
 
   return (
-    <Card className={cn('w-full', className)}>
+    <Card className={cn("w-full", className)}>
       <CardHeader>
         <CardTitle>
-          {evaluation ? 'Update Evaluation' : 'Create Evaluation'}
+          {evaluation ? "Update Evaluation" : "Create Evaluation"}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -128,28 +138,32 @@ export function EvaluationForm({
                     min="1"
                     max="10"
                     step="0.1"
-                    value={formData[metric.key]?.toString() ?? ''}
+                    value={formData[metric.key]?.toString() ?? ""}
                     onChange={(e) => {
-                      handleScoreChange(metric.key, e.target.value)
+                      handleScoreChange(metric.key, e.target.value);
                       if (touched[metric.key]) {
                         setErrors((prev) => {
-                          const next = { ...prev }
-                          delete next[metric.key]
-                          return next
-                        })
+                          const next = { ...prev };
+                          delete next[metric.key];
+                          return next;
+                        });
                       }
                     }}
                     onBlur={() => {
-                      setTouched((prev) => ({ ...prev, [metric.key]: true }))
+                      setTouched((prev) => ({ ...prev, [metric.key]: true }));
                     }}
                     className={cn(
-                      'w-20 rounded-md border bg-background px-2 py-1 text-right text-sm',
+                      "w-20 rounded-md border bg-background px-2 py-1 text-right text-sm",
                       errors[metric.key] && touched[metric.key]
-                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                        : 'border-input',
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                        : "border-input",
                     )}
                     aria-invalid={!!errors[metric.key] && touched[metric.key]}
-                    aria-describedby={errors[metric.key] && touched[metric.key] ? `${metric.key}-error` : undefined}
+                    aria-describedby={
+                      errors[metric.key] && touched[metric.key]
+                        ? `${metric.key}-error`
+                        : undefined
+                    }
                   />
                   <span className="text-sm text-muted-foreground">/ 10</span>
                 </div>
@@ -161,21 +175,27 @@ export function EvaluationForm({
                 step="0.1"
                 value={formData[metric.key] ?? 5}
                 onChange={(e) => {
-                  handleScoreChange(metric.key, e.target.value)
+                  handleScoreChange(metric.key, e.target.value);
                   if (touched[metric.key]) {
                     setErrors((prev) => {
-                      const next = { ...prev }
-                      delete next[metric.key]
-                      return next
-                    })
+                      const next = { ...prev };
+                      delete next[metric.key];
+                      return next;
+                    });
                   }
                 }}
                 onBlur={() => {
-                  setTouched((prev) => ({ ...prev, [metric.key]: true }))
+                  setTouched((prev) => ({ ...prev, [metric.key]: true }));
                 }}
                 className="w-full"
               />
-              <FieldError error={errors[metric.key] && touched[metric.key] ? errors[metric.key] : undefined} />
+              <FieldError
+                error={
+                  errors[metric.key] && touched[metric.key]
+                    ? errors[metric.key]
+                    : undefined
+                }
+              />
             </div>
           ))}
 
@@ -183,7 +203,7 @@ export function EvaluationForm({
             <Label htmlFor="priorityTier">Priority Tier</Label>
             <select
               id="priorityTier"
-              value={formData.priorityTier ?? ''}
+              value={formData.priorityTier ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, priorityTier: e.target.value })
               }
@@ -209,14 +229,14 @@ export function EvaluationForm({
             )}
             <Button type="submit" disabled={isLoading}>
               {isLoading
-                ? 'Saving...'
+                ? "Saving..."
                 : evaluation
-                  ? 'Update Evaluation'
-                  : 'Create Evaluation'}
+                  ? "Update Evaluation"
+                  : "Create Evaluation"}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

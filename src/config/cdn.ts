@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const cdnConfigSchema = z.object({
   // Base CDN URL
@@ -52,17 +52,17 @@ export const cdnConfigSchema = z.object({
     // X-Content-Type-Options
     nosniff: z.boolean(),
     // X-Frame-Options
-    frameOptions: z.enum(['DENY', 'SAMEORIGIN']),
+    frameOptions: z.enum(["DENY", "SAMEORIGIN"]),
     // Referrer Policy
     referrerPolicy: z.enum([
-      'no-referrer',
-      'no-referrer-when-downgrade',
-      'origin',
-      'origin-when-cross-origin',
-      'same-origin',
-      'strict-origin',
-      'strict-origin-when-cross-origin',
-      'unsafe-url',
+      "no-referrer",
+      "no-referrer-when-downgrade",
+      "origin",
+      "origin-when-cross-origin",
+      "same-origin",
+      "strict-origin",
+      "strict-origin-when-cross-origin",
+      "unsafe-url",
     ]),
   }),
 
@@ -80,29 +80,29 @@ export const cdnConfigSchema = z.object({
     imageOptimization: z.object({
       isEnabled: z.boolean(),
       quality: z.number().min(1).max(100),
-      formats: z.array(z.enum(['webp', 'avif'])),
+      formats: z.array(z.enum(["webp", "avif"])),
     }),
   }),
-})
+});
 
-export type CdnConfig = z.infer<typeof cdnConfigSchema>
+export type CdnConfig = z.infer<typeof cdnConfigSchema>;
 
 export const defaultCdnConfig: CdnConfig = {
-  baseUrl: 'https://cdn.pixelatedempathy.com',
+  baseUrl: "https://cdn.pixelatedempathy.com",
   edgeLocations: [
     {
-      region: 'us-east-1',
-      url: 'https://us-east-1.cdn.pixelatedempathy.com',
+      region: "us-east-1",
+      url: "https://us-east-1.cdn.pixelatedempathy.com",
       isEnabled: true,
     },
     {
-      region: 'eu-west-1',
-      url: 'https://eu-west-1.cdn.pixelatedempathy.com',
+      region: "eu-west-1",
+      url: "https://eu-west-1.cdn.pixelatedempathy.com",
       isEnabled: true,
     },
     {
-      region: 'ap-southeast-1',
-      url: 'https://ap-southeast-1.cdn.pixelatedempathy.com',
+      region: "ap-southeast-1",
+      url: "https://ap-southeast-1.cdn.pixelatedempathy.com",
       isEnabled: true,
     },
   ],
@@ -110,36 +110,36 @@ export const defaultCdnConfig: CdnConfig = {
     defaultTtl: 86400, // 24 hours
     rules: [
       {
-        pattern: '*.js',
+        pattern: "*.js",
         ttl: 604800, // 1 week
         isEnabled: true,
       },
       {
-        pattern: '*.css',
+        pattern: "*.css",
         ttl: 604800, // 1 week
         isEnabled: true,
       },
       {
-        pattern: '*.png|*.jpg|*.webp|*.avif',
+        pattern: "*.png|*.jpg|*.webp|*.avif",
         ttl: 2592000, // 30 days
         isEnabled: true,
       },
       {
-        pattern: '*.html',
+        pattern: "*.html",
         ttl: 3600, // 1 hour
         isEnabled: true,
       },
     ],
     invalidation: {
       useSoftInvalidation: true,
-      patterns: ['/*'],
+      patterns: ["/*"],
     },
     warmup: {
       isEnabled: true,
       urls: [
-        'https://cdn.pixelatedempathy.com/index.html',
-        'https://cdn.pixelatedempathy.com/main.js',
-        'https://cdn.pixelatedempathy.com/styles.css',
+        "https://cdn.pixelatedempathy.com/index.html",
+        "https://cdn.pixelatedempathy.com/main.js",
+        "https://cdn.pixelatedempathy.com/styles.css",
       ],
     },
   },
@@ -148,8 +148,8 @@ export const defaultCdnConfig: CdnConfig = {
       "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.pixelatedempathy.com; style-src 'self' 'unsafe-inline' https://cdn.pixelatedempathy.com; img-src 'self' data: blob: https://cdn.pixelatedempathy.com https://images.unsplash.com https://plus.unsplash.com; font-src 'self' https://cdn.pixelatedempathy.com; connect-src 'self' https://api.pixelatedempathy.com;",
     hstsMaxAge: 31536000, // 1 year
     nosniff: true,
-    frameOptions: 'DENY',
-    referrerPolicy: 'strict-origin-when-cross-origin',
+    frameOptions: "DENY",
+    referrerPolicy: "strict-origin-when-cross-origin",
   },
   performance: {
     brotli: true,
@@ -159,7 +159,7 @@ export const defaultCdnConfig: CdnConfig = {
     imageOptimization: {
       isEnabled: true,
       quality: 85,
-      formats: ['webp', 'avif'],
+      formats: ["webp", "avif"],
     },
   },
-}
+};

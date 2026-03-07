@@ -1,5 +1,5 @@
-import { createAuditLog, AuditEventType } from '../../audit'
-import { initializeAICollections } from './schema'
+import { createAuditLog, AuditEventType } from "../../audit";
+import { initializeAICollections } from "./schema";
 
 /**
  * Initialize the AI database tables
@@ -7,40 +7,40 @@ import { initializeAICollections } from './schema'
  */
 export async function initializeAIDatabase() {
   try {
-    console.log('Initializing AI database tables...')
+    console.log("Initializing AI database tables...");
 
     // Initialize tables
-    await initializeAICollections()
+    await initializeAICollections();
 
     // Log successful initialization
     await createAuditLog(
       AuditEventType.SYSTEM,
-      'system.ai.database.initialize',
-      'system',
-      'ai',
+      "system.ai.database.initialize",
+      "system",
+      "ai",
       { timestamp: new Date().toISOString() },
-    )
+    );
 
-    console.log('AI database tables initialized successfully')
-    return true
+    console.log("AI database tables initialized successfully");
+    return true;
   } catch (error: unknown) {
     console.error(
-      'Failed to initialize AI database:',
+      "Failed to initialize AI database:",
       error instanceof Error ? error : new Error(String(error)),
-    )
+    );
 
     // Log initialization failure
     await createAuditLog(
       AuditEventType.SYSTEM,
-      'system.ai.database.initialize.error',
-      'system',
-      'ai',
+      "system.ai.database.initialize.error",
+      "system",
+      "ai",
       {
         error: error instanceof Error ? error?.message : String(error),
         timestamp: new Date().toISOString(),
       },
-    )
+    );
 
-    throw error instanceof Error ? error : new Error(String(error))
+    throw error instanceof Error ? error : new Error(String(error));
   }
 }

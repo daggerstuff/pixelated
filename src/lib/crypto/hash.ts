@@ -1,7 +1,7 @@
-import { createHash, randomBytes, scrypt, timingSafeEqual } from 'crypto'
-import { promisify } from 'util'
+import { createHash, randomBytes, scrypt, timingSafeEqual } from "crypto";
+import { promisify } from "util";
 
-const scryptAsync = promisify<string, Buffer, number, Buffer>(scrypt)
+const scryptAsync = promisify<string, Buffer, number, Buffer>(scrypt);
 
 /**
  * Generates a SHA-256 hash of the input string
@@ -9,7 +9,7 @@ const scryptAsync = promisify<string, Buffer, number, Buffer>(scrypt)
  * @returns The hex string of the hash
  */
 export function sha256(input: string): string {
-  return createHash('sha256').update(input).digest('hex')
+  return createHash("sha256").update(input).digest("hex");
 }
 
 /**
@@ -18,7 +18,7 @@ export function sha256(input: string): string {
  * @returns The random string as hex
  */
 export function generateRandomString(length: number): string {
-  return randomBytes(length).toString('hex')
+  return randomBytes(length).toString("hex");
 }
 
 /**
@@ -29,13 +29,13 @@ export function generateRandomString(length: number): string {
 export async function hashPassword(
   password: string,
 ): Promise<{ hash: string; salt: string }> {
-  const salt = randomBytes(32)
-  const derivedKey = await scryptAsync(password, salt, 64)
+  const salt = randomBytes(32);
+  const derivedKey = await scryptAsync(password, salt, 64);
 
   return {
-    hash: derivedKey.toString('hex'),
-    salt: salt.toString('hex'),
-  }
+    hash: derivedKey.toString("hex"),
+    salt: salt.toString("hex"),
+  };
 }
 
 /**
@@ -50,10 +50,10 @@ export async function verifyPassword(
   hash: string,
   salt: string,
 ): Promise<boolean> {
-  const hashBuffer = Buffer.from(hash, 'hex')
-  const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 64)
+  const hashBuffer = Buffer.from(hash, "hex");
+  const derivedKey = await scryptAsync(password, Buffer.from(salt, "hex"), 64);
 
-  return timingSafeEqual(hashBuffer, derivedKey)
+  return timingSafeEqual(hashBuffer, derivedKey);
 }
 
 /**
@@ -63,7 +63,7 @@ export async function verifyPassword(
  * @returns HMAC as hex string
  */
 export function generateHmac(data: string, key: string): string {
-  return createHash('sha256').update(key).update(data).digest('hex')
+  return createHash("sha256").update(key).update(data).digest("hex");
 }
 
 /**
@@ -74,11 +74,11 @@ export function generateHmac(data: string, key: string): string {
  * @returns True if HMAC is valid
  */
 export function verifyHmac(data: string, key: string, hmac: string): boolean {
-  const calculatedHmac = generateHmac(data, key)
+  const calculatedHmac = generateHmac(data, key);
   return timingSafeEqual(
-    Buffer.from(calculatedHmac, 'hex'),
-    Buffer.from(hmac, 'hex'),
-  )
+    Buffer.from(calculatedHmac, "hex"),
+    Buffer.from(hmac, "hex"),
+  );
 }
 
 /**
@@ -86,7 +86,7 @@ export function verifyHmac(data: string, key: string, hmac: string): boolean {
  * @returns CSRF token
  */
 export function generateCsrfToken(): string {
-  return randomBytes(32).toString('hex')
+  return randomBytes(32).toString("hex");
 }
 
 /**
@@ -97,9 +97,9 @@ export function generateCsrfToken(): string {
  */
 export function verifyCsrfToken(token1: string, token2: string): boolean {
   try {
-    return timingSafeEqual(Buffer.from(token1), Buffer.from(token2))
+    return timingSafeEqual(Buffer.from(token1), Buffer.from(token2));
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -118,23 +118,23 @@ export function verifyCsrfToken(token1: string, token2: string): boolean {
 export async function generateHash(data: string): Promise<string> {
   try {
     // Convert string to buffer
-    const encoder = new TextEncoder()
-    const dataBuffer = encoder.encode(data)
+    const encoder = new TextEncoder();
+    const dataBuffer = encoder.encode(data);
 
     // Generate SHA-256 hash
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+    const hashBuffer = await crypto.subtle.digest("SHA-256", dataBuffer);
 
     // Convert to hex string
     return Array.from(new Uint8Array(hashBuffer))
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('')
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   } catch (error: unknown) {
     // Fallback to simple hash if crypto not available
     console.warn(
-      'Web Crypto API not available, using fallback hash method',
+      "Web Crypto API not available, using fallback hash method",
       error,
-    )
-    return fallbackHash(data)
+    );
+    return fallbackHash(data);
   }
 }
 
@@ -143,22 +143,22 @@ export async function generateHash(data: string): Promise<string> {
  * Not cryptographically secure, but better than nothing for rate limiting
  */
 function fallbackHash(str: string): string {
-  let hash = 0
+  let hash = 0;
 
   if (str.length === 0) {
-    return hash.toString(16)
+    return hash.toString(16);
   }
 
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash &= hash // Convert to 32bit integer
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash &= hash; // Convert to 32bit integer
   }
 
   // Add timestamp to make it harder to reverse
-  const timestamp = Date.now().toString(36)
+  const timestamp = Date.now().toString(36);
 
-  return hash.toString(16) + timestamp
+  return hash.toString(16) + timestamp;
 }
 
 // Example PHI audit logging - uncomment and customize as needed

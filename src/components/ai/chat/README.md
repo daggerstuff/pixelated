@@ -5,9 +5,11 @@ This directory contains a comprehensive suite of enhanced React hooks for AI-pow
 ## Available Hooks
 
 ### 1. `useResponseGeneration`
+
 Hook for generating AI responses with therapeutic capabilities.
 
 **Key Features:**
+
 - Streaming and non-streaming response generation
 - Therapeutic response mode with intervention detection
 - Batch response generation
@@ -17,9 +19,11 @@ Hook for generating AI responses with therapeutic capabilities.
 - Response insights and confidence scoring
 
 ### 2. `useChatCompletion`
+
 Enhanced hook for managing complete chat conversations.
 
 **Key Features:**
+
 - Full conversation management
 - Message editing, deletion, and resending
 - Auto-save and persistence
@@ -31,9 +35,11 @@ Enhanced hook for managing complete chat conversations.
 - Real-time typing indicators
 
 ### 3. `useSentimentAnalysis`
+
 Hook for analyzing the emotional tone of messages.
 
 **Key Features:**
+
 - Single and batch sentiment analysis
 - Streaming analysis for real-time feedback
 - Confidence scoring and emotion detection
@@ -43,9 +49,11 @@ Hook for analyzing the emotional tone of messages.
 - Error handling and retry logic
 
 ### 4. `useCrisisDetection`
+
 Hook for detecting crisis situations and mental health emergencies.
 
 **Key Features:**
+
 - Real-time crisis detection
 - Batch analysis capabilities
 - Alert system with severity levels
@@ -60,30 +68,35 @@ Hook for detecting crisis situations and mental health emergencies.
 All hooks share these advanced capabilities:
 
 ### 🔄 Streaming Support
+
 - Real-time data processing
 - Progress tracking
 - Cancellation support
 - Chunk-by-chunk handling
 
 ### 📊 Analytics & Insights
+
 - Performance metrics
 - Usage statistics
 - Confidence scoring
 - Historical data tracking
 
 ### 🚨 Error Handling
+
 - Retry logic with exponential backoff
 - Graceful degradation
 - Detailed error reporting
 - Recovery mechanisms
 
 ### ⏱️ Progress Tracking
+
 - Real-time progress indicators
 - Estimated completion times
 - Loading states
 - Performance monitoring
 
 ### 🎛️ Advanced Configuration
+
 - Customizable parameters
 - Model selection
 - Temperature control
@@ -92,6 +105,7 @@ All hooks share these advanced capabilities:
 ## Usage Examples
 
 ### Basic Chat Completion
+
 ```typescript
 import { useChatCompletion } from './useChatCompletion'
 
@@ -123,6 +137,7 @@ function ChatApp() {
 ```
 
 ### Streaming Response Generation
+
 ```typescript
 import { useResponseGeneration } from './useResponseGeneration'
 
@@ -161,6 +176,7 @@ function TherapyBot() {
 ```
 
 ### Sentiment Analysis with Analytics
+
 ```typescript
 import { useSentimentAnalysis } from './useSentimentAnalysis'
 
@@ -199,6 +215,7 @@ function SentimentMonitor() {
 ```
 
 ### Crisis Detection with Alerts
+
 ```typescript
 import { useCrisisDetection } from './useCrisisDetection'
 
@@ -250,6 +267,7 @@ function CrisisMonitor() {
 ## Configuration Options
 
 ### Common Options (Available in all hooks)
+
 - `maxRetries` - Number of retry attempts for failed requests
 - `timeout` - Request timeout in milliseconds
 - `onError` - Error handling callback
@@ -258,11 +276,13 @@ function CrisisMonitor() {
 - `model` - AI model selection
 
 ### Specialized Options
+
 Each hook also supports specific configuration options tailored to its functionality.
 
 ## Error Handling
 
 All hooks implement robust error handling:
+
 - Automatic retry with exponential backoff
 - Network error detection
 - Rate limit handling
@@ -289,6 +309,7 @@ All hooks implement robust error handling:
 ## Type Safety
 
 All hooks are fully typed with TypeScript, providing:
+
 - Complete type inference
 - Runtime type checking
 - IDE autocomplete support

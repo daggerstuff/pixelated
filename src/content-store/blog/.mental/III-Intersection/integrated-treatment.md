@@ -1,7 +1,7 @@
 ---
-title: 'Integrated Treatment for CPTSD and Addiction'
-description: 'Guide to integrated treatment approaches for concurrent CPTSD and addiction'
-author: 'Resource Team'
+title: "Integrated Treatment for CPTSD and Addiction"
+description: "Guide to integrated treatment approaches for concurrent CPTSD and addiction"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

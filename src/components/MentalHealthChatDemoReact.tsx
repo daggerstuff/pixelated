@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
-import { MentalHealthHistoryChart } from '@/components/MentalHealthHistoryChart'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { MentalHealthAnalysis } from '@/lib/chat'
-import { createMentalHealthChat } from '@/lib/chat'
+import { MentalHealthHistoryChart } from "@/components/MentalHealthHistoryChart";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import type { MentalHealthAnalysis } from "@/lib/chat";
+import { createMentalHealthChat } from "@/lib/chat";
 
-const logger = createBuildSafeLogger('MentalHealthChatDemo')
+const logger = createBuildSafeLogger("MentalHealthChatDemo");
 
 // Mock implementation for demo
 const mockFHEService = {
@@ -20,74 +20,76 @@ const mockFHEService = {
   encryptText: async (text: string) => text,
   decryptText: async (text: string) => text,
   generateHash: async (data: string) => `hash_${data.substring(0, 10)}`,
-}
+};
 
 interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: number
-  mentalHealthAnalysis?: MentalHealthAnalysis
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: number;
+  mentalHealthAnalysis?: MentalHealthAnalysis;
 }
 
 // Enhanced mental health analysis for UI display
-interface EnhancedMentalHealthAnalysis
-  extends Omit<MentalHealthAnalysis, 'scores' | 'summary' | 'riskLevel'> {
-  riskLevel?: 'low' | 'medium' | 'high'
-  summary?: string
+interface EnhancedMentalHealthAnalysis extends Omit<
+  MentalHealthAnalysis,
+  "scores" | "summary" | "riskLevel"
+> {
+  riskLevel?: "low" | "medium" | "high";
+  summary?: string;
   scores?: {
-    depression: number
-    anxiety: number
-    stress: number
-    anger: number
-    socialIsolation: number
-    bipolarDisorder?: number
-    ocd?: number
-    eatingDisorder?: number
-    socialAnxiety?: number
-    panicDisorder?: number
-    [key: string]: number | undefined
-  }
-  expertExplanation?: string
+    depression: number;
+    anxiety: number;
+    stress: number;
+    anger: number;
+    socialIsolation: number;
+    bipolarDisorder?: number;
+    ocd?: number;
+    eatingDisorder?: number;
+    socialAnxiety?: number;
+    panicDisorder?: number;
+    [key: string]: number | undefined;
+  };
+  expertExplanation?: string;
 }
 
 interface MentalHealthChatDemoReactProps {
-  'initialTab'?: string
-  'showSettingsPanel'?: boolean
-  'showAnalysisPanel'?: boolean
-  'client:load'?: boolean
-  'client:visible'?: boolean
-  'client:idle'?: boolean
-  'client:only'?: boolean | string
+  initialTab?: string;
+  showSettingsPanel?: boolean;
+  showAnalysisPanel?: boolean;
+  "client:load"?: boolean;
+  "client:visible"?: boolean;
+  "client:idle"?: boolean;
+  "client:only"?: boolean | string;
 }
 
 /**
  * React component for the MentalLLaMA chat integration
  */
 export default function MentalHealthChatDemoReact({
-  initialTab = 'chat',
+  initialTab = "chat",
   showSettingsPanel = true,
   showAnalysisPanel = true,
 }: MentalHealthChatDemoReactProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
-      id: '1',
-      role: 'assistant',
+      id: "1",
+      role: "assistant",
       content: "Hello! I'm here to chat. How are you feeling today?",
       timestamp: Date.now(),
     },
-  ])
-  const [input, setInput] = useState('')
-  const [processing, setProcessing] = useState(false)
+  ]);
+  const [input, setInput] = useState("");
+  const [processing, setProcessing] = useState(false);
   const [mentalHealthChat, setMentalHealthChat] = useState<ReturnType<
     typeof createMentalHealthChat
-  > | null>(null)
+  > | null>(null);
   const [settings, setSettings] = useState({
     enableAnalysis: true,
     useExpertGuidance: true,
     showAnalysisPanel: showAnalysisPanel,
-  })
-  const [activeTab, setActiveTab] = useState(initialTab)
+  });
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Initialize the MentalHealthChat service
   useEffect(() => {
@@ -96,77 +98,77 @@ export default function MentalHealthChatDemoReact({
       useExpertGuidance: settings.useExpertGuidance,
       triggerInterventionThreshold: 0.7,
       analysisMinimumLength: 15,
-    })
+    });
 
-    setMentalHealthChat(chat)
+    setMentalHealthChat(chat);
 
     return () => {
       // Clean up if needed
-    }
-  }, [settings.enableAnalysis, settings.useExpertGuidance])
+    };
+  }, [settings.enableAnalysis, settings.useExpertGuidance]);
 
   // Get all analyses from the message history
   const getAnalysisHistory = (): EnhancedMentalHealthAnalysis[] => {
     return messages
       .filter((m) => m.mentalHealthAnalysis)
       .map((m) => {
-        const analysis = m.mentalHealthAnalysis!
+        const analysis = m.mentalHealthAnalysis!;
         // Convert to EnhancedMentalHealthAnalysis
         // Type guard for scores property
         interface AnalysisWithScores {
-          scores?: Record<string, number | undefined>
+          scores?: Record<string, number | undefined>;
         }
         const hasScores = (obj: unknown): obj is AnalysisWithScores =>
-          typeof obj === 'object' && obj !== null && 'scores' in obj
+          typeof obj === "object" && obj !== null && "scores" in obj;
 
         return {
           ...analysis,
-          riskLevel: analysis.category === 'high' ? 'high' : 'low',
-          summary: analysis.explanation || '',
+          riskLevel: analysis.category === "high" ? "high" : "low",
+          summary: analysis.explanation || "",
           scores: {
             depression: 0,
             anxiety: 0,
             stress: 0,
             anger: 0,
             socialIsolation: 0,
-            ...(hasScores(analysis) && typeof analysis.scores === 'object'
+            ...(hasScores(analysis) && typeof analysis.scores === "object"
               ? analysis.scores
               : {}),
           },
           expertExplanation: analysis.expertGuided
             ? analysis.explanation
             : undefined,
-        } as EnhancedMentalHealthAnalysis
-      })
-  }
+        } as EnhancedMentalHealthAnalysis;
+      });
+  };
 
   // Process a new user message
   const handleSendMessage = async () => {
     if (!input.trim() || !mentalHealthChat) {
-      return
+      return;
     }
 
-    setProcessing(true)
+    setProcessing(true);
 
     try {
       // Add user message
       const userMessage: ChatMessage = {
         id: `user_${Date.now()}`,
-        role: 'user',
+        role: "user",
         content: input,
         timestamp: Date.now(),
-      }
+      };
 
-      setMessages((prev) => [...prev, userMessage])
-      setInput('')
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
 
       // Process message with MentalHealthChat
       const processedMessage = await mentalHealthChat.processMessage({
         id: userMessage.id,
-        senderId: 'user',
+        senderId: "user",
         content: userMessage.content,
         timestamp: userMessage.timestamp,
-      })
+      });
 
       // Update user message with analysis
       if (processedMessage.mentalHealthAnalysis) {
@@ -181,60 +183,60 @@ export default function MentalHealthChatDemoReact({
                   }
                 : m,
           ),
-        )
+        );
       }
 
       // Generate assistant response
-      let responseContent = 'I understand. Can you tell me more about that?'
+      let responseContent = "I understand. Can you tell me more about that?";
 
       // If intervention is needed, generate therapeutic response
-      const needsIntervention = await mentalHealthChat.needsIntervention()
+      const needsIntervention = await mentalHealthChat.needsIntervention();
       if (needsIntervention) {
-        responseContent = await mentalHealthChat.generateIntervention()
+        responseContent = await mentalHealthChat.generateIntervention();
       }
 
       // Add assistant response
       setTimeout(() => {
         const assistantMessage: ChatMessage = {
           id: `assistant_${Date.now()}`,
-          role: 'assistant',
+          role: "assistant",
           content: responseContent,
           timestamp: Date.now(),
-        }
+        };
 
-        setMessages((prev) => [...prev, assistantMessage])
-        setProcessing(false)
-      }, 1000)
+        setMessages((prev) => [...prev, assistantMessage]);
+        setProcessing(false);
+      }, 1000);
     } catch (error: unknown) {
-      logger.error('Error processing message', { error })
-      setProcessing(false)
+      logger.error("Error processing message", { error });
+      setProcessing(false);
     }
-  }
+  };
 
   // Toggle settings
   const handleToggleSetting = (setting: keyof typeof settings) => {
     setSettings((prev) => {
-      const newSettings = { ...prev, [setting]: !prev[setting] }
+      const newSettings = { ...prev, [setting]: !prev[setting] };
 
       // Update the MentalHealthChat service if needed
       if (
         mentalHealthChat &&
-        (setting === 'enableAnalysis' || setting === 'useExpertGuidance')
+        (setting === "enableAnalysis" || setting === "useExpertGuidance")
       ) {
         mentalHealthChat.configure({
           enableAnalysis: newSettings.enableAnalysis,
           useExpertGuidance: newSettings.useExpertGuidance,
-        })
+        });
       }
 
-      return newSettings
-    })
-  }
+      return newSettings;
+    });
+  };
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
       <div
-        className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
+        className={`flex-1 ${settings.showAnalysisPanel ? "md:max-w-[65%]" : "w-full"}`}
       >
         <Card className="h-[600px] flex flex-col">
           <CardContent className="flex-1 flex flex-col p-4">
@@ -243,14 +245,14 @@ export default function MentalHealthChatDemoReact({
                 <div
                   key={message.id}
                   className={`flex ${
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
                   <div
                     className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                      message.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
                     }`}
                   >
                     <p>{message.content}</p>
@@ -271,9 +273,9 @@ export default function MentalHealthChatDemoReact({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault()
-                    handleSendMessage()
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
                   }
                 }}
                 disabled={processing}
@@ -383,7 +385,7 @@ export default function MentalHealthChatDemoReact({
                             id="enable-analysis"
                             checked={settings.enableAnalysis}
                             onCheckedChange={() =>
-                              handleToggleSetting('enableAnalysis')
+                              handleToggleSetting("enableAnalysis")
                             }
                           />
                         </div>
@@ -403,7 +405,7 @@ export default function MentalHealthChatDemoReact({
                             id="expert-guidance"
                             checked={settings.useExpertGuidance}
                             onCheckedChange={() =>
-                              handleToggleSetting('useExpertGuidance')
+                              handleToggleSetting("useExpertGuidance")
                             }
                           />
                         </div>
@@ -423,7 +425,7 @@ export default function MentalHealthChatDemoReact({
                             id="show-analysis"
                             checked={settings.showAnalysisPanel}
                             onCheckedChange={() =>
-                              handleToggleSetting('showAnalysisPanel')
+                              handleToggleSetting("showAnalysisPanel")
                             }
                           />
                         </div>
@@ -437,5 +439,5 @@ export default function MentalHealthChatDemoReact({
         </div>
       )}
     </div>
-  )
+  );
 }

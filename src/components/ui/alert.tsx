@@ -1,30 +1,30 @@
-import * as React from 'react'
-import { cn } from '@/lib/utils'
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 export interface AlertProps {
-  variant?: 'default' | 'error' | 'warning' | 'success' | 'info'
-  title?: string
-  description?: React.ReactNode
-  icon?: React.ReactNode
-  className?: string
-  children?: React.ReactNode
+  variant?: "default" | "error" | "warning" | "success" | "info";
+  title?: string;
+  description?: React.ReactNode;
+  icon?: React.ReactNode;
+  className?: string;
+  children?: React.ReactNode;
 }
 
 const variantStyles = {
-  default: 'border-border bg-background text-foreground',
+  default: "border-border bg-background text-foreground",
   error:
-    'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
+    "border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300",
   warning:
-    'border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300',
+    "border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300",
   success:
-    'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300',
-  info: 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
-}
+    "border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300",
+  info: "border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300",
+};
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
   (
     {
-      variant = 'default',
+      variant = "default",
       title,
       description,
       icon,
@@ -39,7 +39,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         ref={ref}
         role="alert"
         className={cn(
-          'relative w-full rounded-lg border px-4 py-3 text-sm',
+          "relative w-full rounded-lg border px-4 py-3 text-sm",
           variantStyles[variant],
           className,
         )}
@@ -60,25 +60,21 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
           </div>
         </div>
       </div>
-    )
+    );
   },
-)
+);
 
-Alert.displayName = 'Alert'
+Alert.displayName = "Alert";
 
 export const AlertDescription = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   return (
-    <div
-      ref={ref}
-      className={cn('text-sm opacity-90', className)}
-      {...props}
-    />
-  )
-})
+    <div ref={ref} className={cn("text-sm opacity-90", className)} {...props} />
+  );
+});
 
-AlertDescription.displayName = 'AlertDescription'
+AlertDescription.displayName = "AlertDescription";
 
-export default Alert
+export default Alert;

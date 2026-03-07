@@ -1,29 +1,29 @@
-import twilio, { type Twilio } from 'twilio'
-import { config } from '@/config/env.config'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import twilio, { type Twilio } from "twilio";
+import { config } from "@/config/env.config";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('smsUtils')
+const logger = createBuildSafeLogger("smsUtils");
 
-let twilioClient: ReturnType<typeof twilio> | null = null
+let twilioClient: ReturnType<typeof twilio> | null = null;
 
 /**
  * Initialize Twilio client with credentials
  */
 export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
-  const accountSid = config.twilio.accountSid()
-  const authToken = config.twilio.authToken()
+  const accountSid = config.twilio.accountSid();
+  const authToken = config.twilio.authToken();
 
   if (!accountSid || !authToken) {
-    logger.warn('Twilio credentials not configured')
-    return null
+    logger.warn("Twilio credentials not configured");
+    return null;
   }
 
   try {
-    twilioClient = twilio(accountSid, authToken)
-    return twilioClient
+    twilioClient = twilio(accountSid, authToken);
+    return twilioClient;
   } catch (error: unknown) {
-    logger.error('Failed to initialize Twilio client:', error)
-    return null
+    logger.error("Failed to initialize Twilio client:", error);
+    return null;
   }
 }
 
@@ -32,23 +32,23 @@ export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
  */
 export function getTwilioClient(): Twilio | null {
   if (!twilioClient) {
-    return initializeTwilioClient()
+    return initializeTwilioClient();
   }
-  return twilioClient
+  return twilioClient;
 }
 
 /**
  * Send an SMS message using Twilio
  */
 export async function sendSMS(to: string, body: string): Promise<boolean> {
-  const client = getTwilioClient()
+  const client = getTwilioClient();
   if (!client) {
-    throw new Error('Twilio client not initialized')
+    throw new Error("Twilio client not initialized");
   }
 
-  const from = config.twilio.phoneNumber()
+  const from = config.twilio.phoneNumber();
   if (!from) {
-    throw new Error('Twilio phone number not configured')
+    throw new Error("Twilio phone number not configured");
   }
 
   try {
@@ -56,18 +56,18 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
       body,
       to,
       from,
-    })
+    });
 
-    logger.info('SMS sent successfully', {
+    logger.info("SMS sent successfully", {
       messageId: message.sid,
       to,
       status: message.status,
-    })
+    });
 
-    return true
+    return true;
   } catch (error: unknown) {
-    logger.error('Failed to send SMS:', error)
-    throw error
+    logger.error("Failed to send SMS:", error);
+    throw error;
   }
 }
 
@@ -77,6 +77,6 @@ export async function sendSMS(to: string, body: string): Promise<boolean> {
  */
 export function isValidPhoneNumber(phone: string): boolean {
   // Basic regex for E.164 format (+1234567890)
-  const phoneRegex = /^\+[1-9]\d{1,14}$/
-  return phoneRegex.test(phone)
+  const phoneRegex = /^\+[1-9]\d{1,14}$/;
+  return phoneRegex.test(phone);
 }

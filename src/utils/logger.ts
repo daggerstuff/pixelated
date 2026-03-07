@@ -11,75 +11,75 @@ export enum LogLevel {
 }
 
 export interface LogOptions {
-  level?: LogLevel
-  timestamp?: boolean
-  context?: string
-  environment?: 'client' | 'server'
+  level?: LogLevel;
+  timestamp?: boolean;
+  context?: string;
+  environment?: "client" | "server";
 }
 
 // Default options
 const DEFAULT_OPTIONS: LogOptions = {
   level: LogLevel.INFO,
   timestamp: true,
-  context: 'app',
-  environment: typeof window !== 'undefined' ? 'client' : 'server',
-}
+  context: "app",
+  environment: typeof window !== "undefined" ? "client" : "server",
+};
 
 // Current log level - can be set dynamically
 let currentLogLevel =
-  typeof process !== 'undefined' && process.env['NODE_ENV'] === 'production'
+  typeof process !== "undefined" && process.env["NODE_ENV"] === "production"
     ? LogLevel.ERROR
-    : LogLevel.DEBUG
+    : LogLevel.DEBUG;
 
 /**
  * Creates a logger with the given context
  */
 export function createLogger(options: LogOptions = {}): {
-  debug: (message: string, ...args: unknown[]) => void
-  info: (message: string, ...args: unknown[]) => void
-  warn: (message: string, ...args: unknown[]) => void
-  error: (message: string | Error, ...args: unknown[]) => void
-  setLevel: (level: LogLevel) => void
-  getLevel: () => LogLevel
+  debug: (message: string, ...args: unknown[]) => void;
+  info: (message: string, ...args: unknown[]) => void;
+  warn: (message: string, ...args: unknown[]) => void;
+  error: (message: string | Error, ...args: unknown[]) => void;
+  setLevel: (level: LogLevel) => void;
+  getLevel: () => LogLevel;
 } {
-  const opts = { ...DEFAULT_OPTIONS, ...options }
+  const opts = { ...DEFAULT_OPTIONS, ...options };
 
   return {
     debug: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.DEBUG) {
-        logMessage(LogLevel.DEBUG, opts, message, ...args)
+        logMessage(LogLevel.DEBUG, opts, message, ...args);
       }
     },
 
     info: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.INFO) {
-        logMessage(LogLevel.INFO, opts, message, ...args)
+        logMessage(LogLevel.INFO, opts, message, ...args);
       }
     },
 
     warn: (message: string, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.WARN) {
-        logMessage(LogLevel.WARN, opts, message, ...args)
+        logMessage(LogLevel.WARN, opts, message, ...args);
       }
     },
 
     error: (message: string | Error, ...args: unknown[]) => {
       if (currentLogLevel <= LogLevel.ERROR) {
         if (message instanceof Error) {
-          logMessage(LogLevel.ERROR, opts, message.message, ...args)
-          console.error(message.stack)
+          logMessage(LogLevel.ERROR, opts, message.message, ...args);
+          console.error(message.stack);
         } else {
-          logMessage(LogLevel.ERROR, opts, message, ...args)
+          logMessage(LogLevel.ERROR, opts, message, ...args);
         }
       }
     },
 
     setLevel: (level: LogLevel) => {
-      currentLogLevel = level
+      currentLogLevel = level;
     },
 
     getLevel: () => currentLogLevel,
-  }
+  };
 }
 
 /**
@@ -91,36 +91,36 @@ function logMessage(
   message: string,
   ...args: unknown[]
 ) {
-  const timestamp = options.timestamp ? `[${new Date().toISOString()}]` : ''
-  const levelStr = LogLevel[level].padEnd(5)
-  const context = options.context ? `[${options.context}]` : ''
+  const timestamp = options.timestamp ? `[${new Date().toISOString()}]` : "";
+  const levelStr = LogLevel[level].padEnd(5);
+  const context = options.context ? `[${options.context}]` : "";
 
-  const prefix = `${timestamp} ${levelStr} ${context}:`
+  const prefix = `${timestamp} ${levelStr} ${context}:`;
 
   switch (level) {
     case LogLevel.DEBUG:
-      console.debug(prefix, message, ...args)
-      break
+      console.debug(prefix, message, ...args);
+      break;
     case LogLevel.INFO:
-      console.info(prefix, message, ...args)
-      break
+      console.info(prefix, message, ...args);
+      break;
     case LogLevel.WARN:
-      console.warn(prefix, message, ...args)
-      break
+      console.warn(prefix, message, ...args);
+      break;
     case LogLevel.ERROR:
-      console.error(prefix, message, ...args)
-      break
+      console.error(prefix, message, ...args);
+      break;
   }
 }
 
 // Default logger instance
-export const logger = createLogger()
+export const logger = createLogger();
 
 // Export a function to set the global log level
 export function setLogLevel(level: LogLevel): void {
-  currentLogLevel = level
-  logger.setLevel(level)
+  currentLogLevel = level;
+  logger.setLevel(level);
 }
 
 // Export log levels for easy access
-export const LogLevels = LogLevel
+export const LogLevels = LogLevel;

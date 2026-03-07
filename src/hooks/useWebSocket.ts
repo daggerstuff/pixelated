@@ -1,34 +1,34 @@
-import type { ChatMessage } from '@/types/chat'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ChatMessage } from "@/types/chat";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface WebSocketHookOptions {
-  url: string
-  sessionId: string
-  onMessage?: (message: ChatMessage) => void
-  onStatusChange?: (status: string) => void
-  onError?: (error: Error) => void
-  encrypted?: boolean
+  url: string;
+  sessionId: string;
+  onMessage?: (message: ChatMessage) => void;
+  onStatusChange?: (status: string) => void;
+  onError?: (error: Error) => void;
+  encrypted?: boolean;
 }
 
 type WebSocketMessage =
   | {
-    type: 'message'
-    data: ChatMessage
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: "message";
+      data: ChatMessage;
+      sessionId?: string;
+      encrypted?: boolean;
+    }
   | {
-    type: 'status'
-    data: { status: string }
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: "status";
+      data: { status: string };
+      sessionId?: string;
+      encrypted?: boolean;
+    }
   | {
-    type: 'error'
-    data: { message?: string }
-    sessionId?: string
-    encrypted?: boolean
-  }
+      type: "error";
+      data: { message?: string };
+      sessionId?: string;
+      encrypted?: boolean;
+    };
 
 export function useWebSocket({
   url,
@@ -38,139 +38,141 @@ export function useWebSocket({
   onError,
   encrypted = false,
 }: WebSocketHookOptions) {
-  const [isConnected, setIsConnected] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const wsRef = useRef<WebSocket | null>(null)
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const connect = useCallback(() => {
     try {
-      const ws = new WebSocket(url)
-      wsRef.current = ws
+      const ws = new WebSocket(url);
+      wsRef.current = ws;
 
       ws.onopen = () => {
-        setIsConnected(true)
-        setError(null)
+        setIsConnected(true);
+        setError(null);
 
         // Send initial status message
         ws.send(
           JSON.stringify({
-            type: 'status',
-            data: { status: 'connected' },
+            type: "status",
+            data: { status: "connected" },
             sessionId,
             encrypted,
           }),
-        )
-      }
+        );
+      };
 
       ws.onclose = () => {
-        setIsConnected(false)
+        setIsConnected(false);
         // Attempt to reconnect after a delay
-        setTimeout(connect, 3000)
-      }
+        setTimeout(connect, 3000);
+      };
 
       ws.onerror = () => {
-        const wsError = new Error('WebSocket error')
-        setError(wsError)
+        const wsError = new Error("WebSocket error");
+        setError(wsError);
         if (onError) {
-          onError(wsError)
+          onError(wsError);
         }
-      }
+      };
 
       ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(event.data) as unknown as WebSocketMessage
-          let wsError: Error
+          const message: WebSocketMessage = JSON.parse(
+            event.data,
+          ) as unknown as WebSocketMessage;
+          let wsError: Error;
 
           switch (message.type) {
-            case 'message':
+            case "message":
               if (onMessage && message.data) {
-                onMessage(message.data as ChatMessage)
+                onMessage(message.data as ChatMessage);
               }
-              break
-            case 'status':
+              break;
+            case "status":
               if (
                 message.sessionId === sessionId &&
                 onStatusChange &&
                 message.data?.status
               ) {
-                onStatusChange(message.data.status)
+                onStatusChange(message.data.status);
               }
-              break
-            case 'error':
-              wsError = new Error(message.data?.message || 'Unknown error')
-              setError(wsError)
+              break;
+            case "error":
+              wsError = new Error(message.data?.message || "Unknown error");
+              setError(wsError);
               if (onError) {
-                onError(wsError)
+                onError(wsError);
               }
-              break
+              break;
           }
         } catch (error: unknown) {
-          console.error('Error parsing WebSocket message:', error)
+          console.error("Error parsing WebSocket message:", error);
           if (onError) {
-            onError(error as Error)
+            onError(error as Error);
           }
         }
-      }
+      };
     } catch (error: unknown) {
-      setError(error as Error)
+      setError(error as Error);
       if (onError) {
-        onError(error as Error)
+        onError(error as Error);
       }
     }
-  }, [url, sessionId, onMessage, onStatusChange, onError, encrypted])
+  }, [url, sessionId, onMessage, onStatusChange, onError, encrypted]);
 
   useEffect(() => {
-    connect()
+    connect();
 
     return () => {
       if (wsRef.current) {
-        wsRef.current.close()
+        wsRef.current.close();
       }
-    }
-  }, [connect])
+    };
+  }, [connect]);
 
   const sendMessage = useCallback(
     (message: ChatMessage) => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(
           JSON.stringify({
-            type: 'message',
+            type: "message",
             data: message,
             sessionId,
             encrypted,
           }),
-        )
+        );
       } else {
-        const error = new Error('WebSocket is not connected')
-        setError(error)
+        const error = new Error("WebSocket is not connected");
+        setError(error);
         if (onError) {
-          onError(error)
+          onError(error);
         }
       }
     },
     [sessionId, encrypted, onError],
-  )
+  );
 
   const sendStatus = useCallback(
     (status: string) => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
         wsRef.current.send(
           JSON.stringify({
-            type: 'status',
+            type: "status",
             data: { status },
             sessionId,
             encrypted,
           }),
-        )
+        );
       }
     },
     [sessionId, encrypted],
-  )
+  );
 
   return {
     isConnected,
     error,
     sendMessage,
     sendStatus,
-  }
+  };
 }

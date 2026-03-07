@@ -1,32 +1,32 @@
-import type { FC } from 'react'
+import type { FC } from "react";
 
 interface EmotionProgressData {
-  date: string
-  overallProgress: number
-  valenceScore: number
-  arousalStability: number
-  dominanceGains: number
-  riskFactors: number
-  goalProgress: number
+  date: string;
+  overallProgress: number;
+  valenceScore: number;
+  arousalStability: number;
+  dominanceGains: number;
+  riskFactors: number;
+  goalProgress: number;
 }
 
 interface EmotionProgressDashboardProps {
-  data?: EmotionProgressData[]
-  isLoading?: boolean
-  error?: Error | null
-  timeRange?: 'week' | 'month' | 'quarter' | 'year'
+  data?: EmotionProgressData[];
+  isLoading?: boolean;
+  error?: Error | null;
+  timeRange?: "week" | "month" | "quarter" | "year";
 }
 
 const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
   data = [],
   isLoading = false,
   error = null,
-  timeRange = 'month',
+  timeRange = "month",
 }) => {
   // Mock data for demo purposes
   const mockData: EmotionProgressData[] = [
     {
-      date: '2024-01-01',
+      date: "2024-01-01",
       overallProgress: 65,
       valenceScore: 72,
       arousalStability: 68,
@@ -35,7 +35,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
       goalProgress: 70,
     },
     {
-      date: '2024-01-08',
+      date: "2024-01-08",
       overallProgress: 72,
       valenceScore: 75,
       arousalStability: 74,
@@ -44,7 +44,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
       goalProgress: 78,
     },
     {
-      date: '2024-01-15',
+      date: "2024-01-15",
       overallProgress: 78,
       valenceScore: 80,
       arousalStability: 76,
@@ -53,7 +53,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
       goalProgress: 82,
     },
     {
-      date: '2024-01-22',
+      date: "2024-01-22",
       overallProgress: 85,
       valenceScore: 82,
       arousalStability: 84,
@@ -61,29 +61,29 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
       riskFactors: 15,
       goalProgress: 88,
     },
-  ]
+  ];
 
-  const displayData = data.length > 0 ? data : mockData
+  const displayData = data.length > 0 ? data : mockData;
 
   const getProgressColor = (score: number) => {
     if (score >= 80) {
-      return 'text-green-600 bg-green-100'
+      return "text-green-600 bg-green-100";
     } else if (score >= 60) {
-      return 'text-yellow-600 bg-yellow-100'
+      return "text-yellow-600 bg-yellow-100";
     } else {
-      return 'text-red-600 bg-red-100'
+      return "text-red-600 bg-red-100";
     }
-  }
+  };
 
   const getRiskColor = (risk: number) => {
     if (risk <= 20) {
-      return 'text-green-600 bg-green-100'
+      return "text-green-600 bg-green-100";
     } else if (risk <= 40) {
-      return 'text-yellow-600 bg-yellow-100'
+      return "text-yellow-600 bg-yellow-100";
     } else {
-      return 'text-red-600 bg-red-100'
+      return "text-red-600 bg-red-100";
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -101,7 +101,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           <div className="h-64 bg-gray-200 rounded"></div>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -114,10 +114,10 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           <p className="text-red-600">{String(error)}</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const latestData = displayData[displayData.length - 1]
+  const latestData = displayData[displayData.length - 1];
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
@@ -146,10 +146,10 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
               className={`px-3 py-1 rounded-full text-sm font-medium ${getProgressColor(latestData?.overallProgress || 0)}`}
             >
               {(latestData?.overallProgress || 0) >= 80
-                ? 'Excellent'
+                ? "Excellent"
                 : (latestData?.overallProgress || 0) >= 60
-                  ? 'Good'
-                  : 'Needs Attention'}
+                  ? "Good"
+                  : "Needs Attention"}
             </div>
           </div>
         </div>
@@ -186,10 +186,10 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
               className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(latestData?.riskFactors || 0)}`}
             >
               {(latestData?.riskFactors || 0) <= 20
-                ? 'Low Risk'
+                ? "Low Risk"
                 : (latestData?.riskFactors || 0) <= 40
-                  ? 'Moderate'
-                  : 'High Risk'}
+                  ? "Moderate"
+                  : "High Risk"}
             </div>
           </div>
         </div>
@@ -244,10 +244,10 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
             </div>
             <p className="text-gray-600">
               {(latestData?.goalProgress || 0) >= 80
-                ? 'Exceeding expectations!'
+                ? "Exceeding expectations!"
                 : (latestData?.goalProgress || 0) >= 60
-                  ? 'Great progress!'
-                  : 'Keep working toward your goals'}
+                  ? "Great progress!"
+                  : "Keep working toward your goals"}
             </p>
           </div>
         </div>
@@ -337,7 +337,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EmotionProgressDashboard
+export default EmotionProgressDashboard;

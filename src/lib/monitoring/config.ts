@@ -1,36 +1,36 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('default')
+const logger = createBuildSafeLogger("default");
 
 export interface MonitoringConfig {
   grafana: {
-    url: string
-    apiKey: string
-    orgId: string
-    enableRUM: boolean
-    rumApplicationName: string
-    rumSamplingRate: number
-  }
+    url: string;
+    apiKey: string;
+    orgId: string;
+    enableRUM: boolean;
+    rumApplicationName: string;
+    rumSamplingRate: number;
+  };
   metrics: {
-    enablePerformanceMetrics: boolean
-    slowRequestThreshold: number
-    errorRateThreshold: number
-    resourceUtilizationThreshold: number
-  }
+    enablePerformanceMetrics: boolean;
+    slowRequestThreshold: number;
+    errorRateThreshold: number;
+    resourceUtilizationThreshold: number;
+  };
   alerts: {
-    enableAlerts: boolean
-    slackWebhookUrl?: string
-    emailRecipients?: string[]
-  }
+    enableAlerts: boolean;
+    slackWebhookUrl?: string;
+    emailRecipients?: string[];
+  };
 }
 
 const defaultConfig: MonitoringConfig = {
   grafana: {
-    url: 'https://grafana.example.com',
-    apiKey: '',
-    orgId: '',
+    url: "https://grafana.example.com",
+    apiKey: "",
+    orgId: "",
     enableRUM: true,
-    rumApplicationName: 'astro-app',
+    rumApplicationName: "astro-app",
     rumSamplingRate: 0.5, // 50% sampling
   },
   metrics: {
@@ -44,7 +44,7 @@ const defaultConfig: MonitoringConfig = {
     slackWebhookUrl: undefined,
     emailRecipients: [],
   },
-}
+};
 
 export function getMonitoringConfig(): MonitoringConfig {
   try {
@@ -55,11 +55,11 @@ export function getMonitoringConfig(): MonitoringConfig {
         apiKey: process.env.GRAFANA_API_KEY || defaultConfig.grafana.apiKey,
         orgId: process.env.GRAFANA_ORG_ID || defaultConfig.grafana.orgId,
       },
-    }
+    };
   } catch (error: unknown) {
-    logger.error('Failed to load monitoring configuration', {
+    logger.error("Failed to load monitoring configuration", {
       error: error instanceof Error ? String(error) : String(error),
-    })
-    return defaultConfig
+    });
+    return defaultConfig;
   }
 }

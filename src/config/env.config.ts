@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 /**
  * Environment variable schema with validation
@@ -6,17 +6,17 @@ import { z } from 'zod'
 const envSchema = z.object({
   // Node environment
   NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
+    .enum(["development", "production", "test"])
+    .default("development"),
 
   // Server configuration
   PORT: z.string().transform(Number).default(3000),
   LOG_LEVEL: z
-    .enum(['error', 'warn', 'info', 'verbose', 'debug'])
-    .default('info'),
+    .enum(["error", "warn", "info", "verbose", "debug"])
+    .default("info"),
   ENABLE_RATE_LIMITING: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
 
   // Analytics worker configuration
@@ -45,7 +45,7 @@ const envSchema = z.object({
 
   // Authentication - JWT based
   JWT_SECRET: z.string().optional(),
-  JWT_EXPIRES_IN: z.string().default('24h'), // Per original PR requirements
+  JWT_EXPIRES_IN: z.string().default("24h"), // Per original PR requirements
 
   // APIs
   OPENAI_API_KEY: z.string().optional(),
@@ -87,17 +87,14 @@ const envSchema = z.object({
   // Security
   SECURITY_ENABLE_BRUTE_FORCE_PROTECTION: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
   SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default(5),
-  SECURITY_ACCOUNT_LOCKOUT_DURATION: z
-    .string()
-    .transform(Number)
-    .default(1800),
+  SECURITY_ACCOUNT_LOCKOUT_DURATION: z.string().transform(Number).default(1800),
   SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default(100),
   SECURITY_ENABLE_ALERTS: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
 
   // Rate limiting
@@ -107,20 +104,20 @@ const envSchema = z.object({
   // Logging
   LOG_CONSOLE: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
   LOG_AUDIT: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
 
   // Security Implementation
   ENABLE_AUDIT_LOGGING: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .default(true),
   AUDIT_LOG_RETENTION_DAYS: z.string().transform(Number).default(2555),
-  ENCRYPTION_ALGORITHM: z.enum(['aes-256-gcm']).default('aes-256-gcm'),
+  ENCRYPTION_ALGORITHM: z.enum(["aes-256-gcm"]).default("aes-256-gcm"),
   ENCRYPTION_KEY: z.string().min(32).optional(),
 
   // Client-side variables (exposed to the browser)
@@ -130,18 +127,19 @@ const envSchema = z.object({
     .string()
     .refine(
       (val) => {
-        if (!val) return true // Optional, so empty is valid
+        if (!val) return true; // Optional, so empty is valid
         try {
-          const url = new URL(val)
+          const url = new URL(val);
           // Accept ws://, wss://, http://, and https:// schemes
-          return ['ws:', 'wss:', 'http:', 'https:'].includes(url.protocol)
+          return ["ws:", "wss:", "http:", "https:"].includes(url.protocol);
         } catch {
-          return false
+          return false;
         }
       },
       {
-        message: 'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
-      }
+        message:
+          "PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL",
+      },
     )
     .optional(),
 
@@ -162,13 +160,13 @@ const envSchema = z.object({
   MENTALLAMA_API_KEY: z.string().optional(),
   MENTALLAMA_ENDPOINT_URL_7B: z.string().url().optional(),
   MENTALLAMA_ENDPOINT_URL_13B: z.string().url().optional(),
-  MENTALLAMA_DEFAULT_MODEL_TIER: z.enum(['7B', '13B']).optional(),
+  MENTALLAMA_DEFAULT_MODEL_TIER: z.enum(["7B", "13B"]).optional(),
   MENTALLAMA_ENABLE_PYTHON_BRIDGE: z
     .string()
-    .transform((val: string) => val === 'true')
+    .transform((val: string) => val === "true")
     .optional(),
   MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
-})
+});
 
 /**
  * Cache the validated environment variables
@@ -178,28 +176,28 @@ const envSchema = z.object({
 
 function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
   const secretKeys = [
-    'MONGODB_PASSWORD',
-    'MONGODB_URI',
-    'JWT_SECRET',
-    'OPENAI_API_KEY',
-    'TOGETHER_API_KEY',
-    'GOOGLE_API_KEY',
-    'REPLICATE_API_TOKEN',
-    'AXIOM_TOKEN',
-    'VITE_LITLYX_API_KEY',
-    'RESEND_API_KEY',
-    'TWILIO_AUTH_TOKEN',
-    'SENTRY_DSN',
-    'SENTRY_DSN',
-    'SLACK_WEBHOOK_URL',
-    'ENCRYPTION_KEY',
-  ]
+    "MONGODB_PASSWORD",
+    "MONGODB_URI",
+    "JWT_SECRET",
+    "OPENAI_API_KEY",
+    "TOGETHER_API_KEY",
+    "GOOGLE_API_KEY",
+    "REPLICATE_API_TOKEN",
+    "AXIOM_TOKEN",
+    "VITE_LITLYX_API_KEY",
+    "RESEND_API_KEY",
+    "TWILIO_AUTH_TOKEN",
+    "SENTRY_DSN",
+    "SENTRY_DSN",
+    "SLACK_WEBHOOK_URL",
+    "ENCRYPTION_KEY",
+  ];
   return Object.fromEntries(
     Object.entries(env).map(([k, v]) => [
       k,
-      secretKeys.includes(k) && v ? '[hidden]' : v,
+      secretKeys.includes(k) && v ? "[hidden]" : v,
     ]),
-  )
+  );
 }
 /**
  * Get the validated environment variables
@@ -207,26 +205,26 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
  */
 export function getEnv(): z.infer<typeof envSchema> {
   // Type-safe environment source handling
-  let envSource: Record<string, unknown>
+  let envSource: Record<string, unknown>;
 
-  if (typeof process !== 'undefined') {
-    envSource = process.env as Record<string, unknown>
+  if (typeof process !== "undefined") {
+    envSource = process.env as Record<string, unknown>;
   } else {
     // For browser/Vite environments, we'll work with an empty object
     // since client-side env vars should be prefixed with VITE_
-    envSource = {}
+    envSource = {};
   }
 
   // Log all env variables (masking secrets)
   // Only log in CI or production to avoid local noise
-  if (envSource['CI'] || envSource['NODE_ENV'] === 'production') {
+  if (envSource["CI"] || envSource["NODE_ENV"] === "production") {
     console.log(
-      '[env.config] Environment variables at build:',
+      "[env.config] Environment variables at build:",
       maskEnv(envSource),
-    )
+    );
   }
 
-  return envSchema.parse(envSource)
+  return envSchema.parse(envSource);
 }
 
 /**
@@ -234,27 +232,27 @@ export function getEnv(): z.infer<typeof envSchema> {
  * Note: Lazy evaluation to avoid initialization issues during build
  */
 export const env = (() => {
-  let cachedEnvInstance: z.infer<typeof envSchema> | null = null
+  let cachedEnvInstance: z.infer<typeof envSchema> | null = null;
   return () => {
     if (!cachedEnvInstance) {
-      cachedEnvInstance = getEnv()
+      cachedEnvInstance = getEnv();
     }
-    return cachedEnvInstance
-  }
-})()
+    return cachedEnvInstance;
+  };
+})();
 
 /**
  * Type definition for environment variables
  */
-export type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof envSchema>;
 
 /**
  * Environment configuration object
  */
 export const config = {
-  isDevelopment: (): boolean => env().NODE_ENV === 'development',
-  isProduction: (): boolean => env().NODE_ENV === 'production',
-  isTest: (): boolean => env().NODE_ENV === 'test',
+  isDevelopment: (): boolean => env().NODE_ENV === "development",
+  isProduction: (): boolean => env().NODE_ENV === "production",
+  isTest: (): boolean => env().NODE_ENV === "test",
 
   server: {
     port: (): number => env().PORT,
@@ -398,13 +396,13 @@ export const config = {
     apiKey: (): string | undefined => env().MENTALLAMA_API_KEY,
     endpointUrl7B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_7B,
     endpointUrl13B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_13B,
-    defaultModelTier: (): '7B' | '13B' | undefined =>
+    defaultModelTier: (): "7B" | "13B" | undefined =>
       env().MENTALLAMA_DEFAULT_MODEL_TIER,
     enablePythonBridge: (): boolean | undefined =>
       env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
     pythonBridgeScriptPath: (): string | undefined =>
       env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
   },
-}
+};
 
-export default config
+export default config;

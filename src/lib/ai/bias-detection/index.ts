@@ -5,13 +5,13 @@
  */
 
 // Main engine
-export { BiasDetectionEngine } from './BiasDetectionEngine'
+export { BiasDetectionEngine } from "./BiasDetectionEngine";
 
 // Core modules
-export { PythonBiasDetectionBridge } from './python-bridge'
-export { BiasMetricsCollector } from './metrics-collector'
+export { PythonBiasDetectionBridge } from "./python-bridge";
+export { BiasMetricsCollector } from "./metrics-collector";
 // Bias Detection Alert System
-export { BiasAlertSystem } from './alerts-system'
+export { BiasAlertSystem } from "./alerts-system";
 
 // Type exports - explicitly handle duplicates
 export type {
@@ -31,7 +31,7 @@ export type {
   BiasAlert,
   BiasDashboardSummary,
   ModelPerformanceMetrics,
-} from './types'
+} from "./types";
 
 // Re-export interfaces (avoiding PerformanceMetrics duplicate)
 export type {
@@ -56,19 +56,18 @@ export type {
   AlertStatistics,
   FallbackAnalysisResult,
   SystemPerformanceMetrics,
-} from './bias-detection-interfaces'
-
+} from "./bias-detection-interfaces";
 
 // Utilities
-export * from './utils'
+export * from "./utils";
 
 // Services
-export { getAuditLogger } from './audit'
-export { getCacheManager } from './cache'
-export { performanceMonitor } from './performance-monitor'
+export { getAuditLogger } from "./audit";
+export { getCacheManager } from "./cache";
+export { performanceMonitor } from "./performance-monitor";
 
 // Serverless helpers
-export * from './serverless-handlers'
+export * from "./serverless-handlers";
 
 // Default export
-export { BiasDetectionEngine as default } from './BiasDetectionEngine'
+export { BiasDetectionEngine as default } from "./BiasDetectionEngine";

@@ -1,12 +1,12 @@
 // Main bias detection demo component with comprehensive analysis interface
 
-import { useState, useCallback, type FC } from 'react'
-import { BiasAnalysisDisplay } from './BiasAnalysisDisplay'
-import { PresetScenarioSelector } from './PresetScenarioSelector'
-import { CounterfactualAnalysis } from './CounterfactualAnalysis'
-import { HistoricalProgressTracker } from './HistoricalProgressTracker'
-import { SessionInputForm } from './SessionInputForm'
-import { ExportControls } from './ExportControls'
+import { useState, useCallback, type FC } from "react";
+import { BiasAnalysisDisplay } from "./BiasAnalysisDisplay";
+import { PresetScenarioSelector } from "./PresetScenarioSelector";
+import { CounterfactualAnalysis } from "./CounterfactualAnalysis";
+import { HistoricalProgressTracker } from "./HistoricalProgressTracker";
+import { SessionInputForm } from "./SessionInputForm";
+import { ExportControls } from "./ExportControls";
 import {
   PRESET_SCENARIOS,
   calculateBiasFactors,
@@ -15,57 +15,57 @@ import {
   generateRecommendations,
   createExportData,
   generateSessionId,
-} from '../../../lib/utils/demo-helpers'
+} from "../../../lib/utils/demo-helpers";
 import type {
   SessionData,
   BiasAnalysisResults,
   PresetScenario,
   CounterfactualScenario,
   HistoricalComparison,
-} from '../../../lib/types/bias-detection'
+} from "../../../lib/types/bias-detection";
 
 interface BiasDetectionDemoProps {
-  className?: string
-  onAnalysisComplete?: (results: BiasAnalysisResults) => void
-  enableExport?: boolean
-  showHistoricalData?: boolean
+  className?: string;
+  onAnalysisComplete?: (results: BiasAnalysisResults) => void;
+  enableExport?: boolean;
+  showHistoricalData?: boolean;
 }
 
 export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
-  className = '',
+  className = "",
   onAnalysisComplete,
   enableExport = true,
   showHistoricalData = true,
 }) => {
   // Core state
-  const [sessionData, setSessionData] = useState<SessionData | null>(null)
+  const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [analysisResults, setAnalysisResults] =
-    useState<BiasAnalysisResults | null>(null)
+    useState<BiasAnalysisResults | null>(null);
   const [counterfactualScenarios, setCounterfactualScenarios] = useState<
     CounterfactualScenario[]
-  >([])
+  >([]);
   const [historicalComparison, setHistoricalComparison] =
-    useState<HistoricalComparison | null>(null)
+    useState<HistoricalComparison | null>(null);
 
   // UI state
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetScenario | null>(
     null,
-  )
+  );
   const [activeTab, setActiveTab] = useState<
-    'analysis' | 'counterfactual' | 'historical' | 'export'
-  >('analysis')
-  const [error, setError] = useState<string | null>(null)
+    "analysis" | "counterfactual" | "historical" | "export"
+  >("analysis");
+  const [error, setError] = useState<string | null>(null);
 
   // Analysis function
   const performBiasAnalysis = useCallback(
     async (data: SessionData) => {
-      setIsAnalyzing(true)
-      setError(null)
+      setIsAnalyzing(true);
+      setError(null);
 
       try {
         // Calculate bias factors
-        const biasFactors = calculateBiasFactors(data)
+        const biasFactors = calculateBiasFactors(data);
 
         // Create comprehensive analysis results
         const results: BiasAnalysisResults = {
@@ -74,12 +74,12 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
           overallBiasScore: biasFactors.overall,
           alertLevel:
             biasFactors.overall >= 0.8
-              ? 'critical'
+              ? "critical"
               : biasFactors.overall >= 0.6
-                ? 'high'
+                ? "high"
                 : biasFactors.overall >= 0.4
-                  ? 'medium'
-                  : 'low',
+                  ? "medium"
+                  : "low",
           confidence: 0.85 + Math.random() * 0.1, // Simulated confidence
           layerResults: {
             preprocessing: {
@@ -93,7 +93,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
               representationAnalysis: {
                 diversityIndex: 1 - biasFactors.overall,
                 underrepresentedGroups:
-                  biasFactors.age > 0.5 ? ['elderly'] : [],
+                  biasFactors.age > 0.5 ? ["elderly"] : [],
               },
             },
             modelLevel: {
@@ -129,56 +129,56 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
             data.demographics,
           ),
           demographics: data.demographics,
-        }
+        };
 
         // Generate counterfactual scenarios
-        const scenarios = generateCounterfactualScenarios(biasFactors)
+        const scenarios = generateCounterfactualScenarios(biasFactors);
 
         // Generate historical comparison if enabled
-        let historical: HistoricalComparison | null = null
+        let historical: HistoricalComparison | null = null;
         if (showHistoricalData) {
-          historical = generateHistoricalComparison(biasFactors.overall)
+          historical = generateHistoricalComparison(biasFactors.overall);
         }
 
         // Update state
-        setAnalysisResults(results)
-        setCounterfactualScenarios(scenarios)
-        setHistoricalComparison(historical)
+        setAnalysisResults(results);
+        setCounterfactualScenarios(scenarios);
+        setHistoricalComparison(historical);
 
         // Notify parent component
-        onAnalysisComplete?.(results)
+        onAnalysisComplete?.(results);
       } catch (err: unknown) {
         setError(
           err instanceof Error
             ? (err as Error)?.message || String(err)
-            : 'Analysis failed',
-        )
+            : "Analysis failed",
+        );
       } finally {
-        setIsAnalyzing(false)
+        setIsAnalyzing(false);
       }
     },
     [onAnalysisComplete, showHistoricalData],
-  )
+  );
 
   // Handle session data submission
   const handleSessionSubmit = useCallback(
-    (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => {
+    (data: Omit<SessionData, "sessionId" | "timestamp">) => {
       const sessionData: SessionData = {
         ...data,
         sessionId: generateSessionId(),
         timestamp: new Date(),
-      }
+      };
 
-      setSessionData(sessionData)
-      performBiasAnalysis(sessionData)
+      setSessionData(sessionData);
+      performBiasAnalysis(sessionData);
     },
     [performBiasAnalysis],
-  )
+  );
 
   // Handle preset scenario selection
   const handlePresetSelect = useCallback(
     (preset: PresetScenario) => {
-      setSelectedPreset(preset)
+      setSelectedPreset(preset);
 
       const sessionData: SessionData = {
         sessionId: generateSessionId(),
@@ -186,18 +186,18 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         demographics: preset.demographics,
         content: preset.content,
         timestamp: new Date(),
-      }
+      };
 
-      setSessionData(sessionData)
-      performBiasAnalysis(sessionData)
+      setSessionData(sessionData);
+      performBiasAnalysis(sessionData);
     },
     [performBiasAnalysis],
-  )
+  );
 
   // Handle export
   const handleExport = useCallback(() => {
     if (!analysisResults || !counterfactualScenarios) {
-      return
+      return;
     }
 
     const exportData = createExportData(
@@ -205,46 +205,46 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
       counterfactualScenarios,
       historicalComparison || {
         thirtyDayAverage: 0,
-        sevenDayTrend: 'stable' as const,
+        sevenDayTrend: "stable" as const,
         percentileRank: 50,
         comparisonToAverage: 0,
-        trendDirection: 'neutral',
+        trendDirection: "neutral",
       },
-    )
+    );
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json',
-    })
+      type: "application/json",
+    });
 
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `bias-analysis-${analysisResults.sessionId}.json`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }, [analysisResults, counterfactualScenarios, historicalComparison])
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bias-analysis-${analysisResults.sessionId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [analysisResults, counterfactualScenarios, historicalComparison]);
 
   // Tab navigation
   const tabs = [
     {
-      id: 'analysis' as const,
-      label: 'Bias Analysis',
+      id: "analysis" as const,
+      label: "Bias Analysis",
       disabled: !analysisResults,
     },
     {
-      id: 'counterfactual' as const,
-      label: 'Counterfactual Analysis',
+      id: "counterfactual" as const,
+      label: "Counterfactual Analysis",
       disabled: !counterfactualScenarios.length,
     },
     {
-      id: 'historical' as const,
-      label: 'Historical Progress',
+      id: "historical" as const,
+      label: "Historical Progress",
       disabled: !historicalComparison,
     },
-    { id: 'export' as const, label: 'Export Data', disabled: !analysisResults },
-  ]
+    { id: "export" as const, label: "Export Data", disabled: !analysisResults },
+  ];
 
   return (
     <div className={`bias-detection-demo ${className}`}>
@@ -347,10 +347,10 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
                   disabled={tab.disabled}
                   className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
+                      ? "border-blue-500 text-blue-600"
                       : tab.disabled
-                        ? 'border-transparent text-gray-400 cursor-not-allowed'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        ? "border-transparent text-gray-400 cursor-not-allowed"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
                   {tab.label}
@@ -361,14 +361,14 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'analysis' && (
+            {activeTab === "analysis" && (
               <BiasAnalysisDisplay
                 results={analysisResults}
                 sessionData={sessionData}
               />
             )}
 
-            {activeTab === 'counterfactual' &&
+            {activeTab === "counterfactual" &&
               counterfactualScenarios.length > 0 && (
                 <CounterfactualAnalysis
                   scenarios={counterfactualScenarios}
@@ -376,14 +376,14 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
                 />
               )}
 
-            {activeTab === 'historical' && historicalComparison && (
+            {activeTab === "historical" && historicalComparison && (
               <HistoricalProgressTracker
                 comparison={historicalComparison}
                 currentScore={analysisResults.overallBiasScore}
               />
             )}
 
-            {activeTab === 'export' && enableExport && (
+            {activeTab === "export" && enableExport && (
               <ExportControls
                 analysisResults={analysisResults}
                 counterfactualScenarios={counterfactualScenarios}
@@ -395,7 +395,7 @@ export const BiasDetectionDemo: FC<BiasDetectionDemoProps> = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BiasDetectionDemo
+export default BiasDetectionDemo;
