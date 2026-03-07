@@ -72,9 +72,6 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         limit: 20,
         offset: 0,
       }), // Stringify custom payload
-      // type: 'get_notifications',
-      // limit: 20,
-      // offset: 0,
     })
   }, [sendMessage])
 
@@ -83,8 +80,6 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
       id: `mark-read-${notificationId}`,
       role: 'system',
       content: JSON.stringify({ type: 'mark_read', notificationId }),
-      // type: 'mark_read',
-      // notificationId,
     })
 
     setNotifications((prev: NotificationItem[]) =>
@@ -102,8 +97,6 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
       id: `dismiss-${notificationId}`,
       role: 'system',
       content: JSON.stringify({ type: 'dismiss', notificationId }),
-      // type: 'dismiss',
-      // notificationId,
     })
 
     setNotifications((prev: NotificationItem[]) =>
