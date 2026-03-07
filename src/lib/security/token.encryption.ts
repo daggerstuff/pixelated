@@ -3,38 +3,38 @@ import {
   createDecipheriv,
   randomBytes,
   scrypt,
-} from "node:crypto";
-import { promisify } from "node:util";
-import { SecurityError } from "./errors/security.error";
+} from 'node:crypto'
+import { promisify } from 'node:util'
+import { SecurityError } from './errors/security.error'
 
-const scryptAsync = promisify(scrypt);
+const scryptAsync = promisify(scrypt)
 
 export interface TokenEncryptionConfig {
-  algorithm: string;
-  keyLength: number;
-  ivLength: number;
-  salt: string;
+  algorithm: string
+  keyLength: number
+  ivLength: number
+  salt: string
 }
 
 export class TokenEncryptionService {
-  private readonly config: TokenEncryptionConfig;
-  private readonly logger: Console;
-  private encryptionKey: Buffer | null = null;
+  private readonly config: TokenEncryptionConfig
+  private readonly logger: Console
+  private encryptionKey: Buffer | null = null
 
   constructor(
     config: TokenEncryptionConfig = {
-      algorithm: "aes-256-gcm",
+      algorithm: 'aes-256-gcm',
       keyLength: 32,
       ivLength: 16,
-      salt: process.env["TOKEN_ENCRYPTION_SALT"] || "",
+      salt: process.env['TOKEN_ENCRYPTION_SALT'] || '',
     },
     logger: Console = console,
   ) {
-    this.config = config;
-    this.logger = logger;
+    this.config = config
+    this.logger = logger
 
     if (!this.config.salt) {
-      throw new SecurityError("Token encryption salt is required");
+      throw new SecurityError('Token encryption salt is required')
     }
   }
 
@@ -44,14 +44,11 @@ export class TokenEncryptionService {
         password,
         this.config.salt,
         this.config.keyLength,
-      )) as Buffer;
-      this.logger.info("Token encryption service initialized successfully");
+      )) as Buffer
+      this.logger.info('Token encryption service initialized successfully')
     } catch (error: unknown) {
-      this.logger.error(
-        "Failed to initialize token encryption service:",
-        error,
-      );
-      throw new SecurityError("Failed to initialize token encryption service");
+      this.logger.error('Failed to initialize token encryption service:', error)
+      throw new SecurityError('Failed to initialize token encryption service')
     }
   }
 
@@ -59,73 +56,73 @@ export class TokenEncryptionService {
     token: string,
   ): Promise<{ encryptedToken: string; iv: string }> {
     if (!this.encryptionKey) {
-      throw new SecurityError("Token encryption service not initialized");
+      throw new SecurityError('Token encryption service not initialized')
     }
 
     try {
-      const iv = randomBytes(this.config.ivLength);
+      const iv = randomBytes(this.config.ivLength)
       const cipher = createCipheriv(
         this.config.algorithm,
         this.encryptionKey,
         iv,
-      );
+      )
 
       const encryptedToken = Buffer.concat([
-        cipher.update(token, "utf8"),
+        cipher.update(token, 'utf8'),
         cipher.final(),
-      ]);
+      ])
 
       const authTag = (
         cipher as unknown as { getAuthTag(): Buffer }
-      ).getAuthTag();
+      ).getAuthTag()
 
       return {
         encryptedToken: Buffer.concat([encryptedToken, authTag]).toString(
-          "base64",
+          'base64',
         ),
-        iv: iv.toString("base64"),
-      };
+        iv: iv.toString('base64'),
+      }
     } catch (error: unknown) {
-      this.logger.error("Failed to encrypt token:", error);
-      throw new SecurityError("Failed to encrypt token");
+      this.logger.error('Failed to encrypt token:', error)
+      throw new SecurityError('Failed to encrypt token')
     }
   }
 
   async decryptToken(encryptedToken: string, iv: string): Promise<string> {
     if (!this.encryptionKey) {
-      throw new SecurityError("Token encryption service not initialized");
+      throw new SecurityError('Token encryption service not initialized')
     }
 
     try {
       const decipher = createDecipheriv(
         this.config.algorithm,
         this.encryptionKey,
-        Buffer.from(iv, "base64"),
-      );
+        Buffer.from(iv, 'base64'),
+      )
 
-      const encryptedData = Buffer.from(encryptedToken, "base64");
-      const authTag = encryptedData.slice(-16);
-      const encryptedContent = encryptedData.slice(0, -16);
+      const encryptedData = Buffer.from(encryptedToken, 'base64')
+      const authTag = encryptedData.slice(-16)
+      const encryptedContent = encryptedData.slice(0, -16)
 
-      (decipher as unknown as { setAuthTag(tag: Buffer): void }).setAuthTag(
+      ;(decipher as unknown as { setAuthTag(tag: Buffer): void }).setAuthTag(
         authTag,
-      );
+      )
 
       const decryptedToken = Buffer.concat([
         decipher.update(encryptedContent),
         decipher.final(),
-      ]);
+      ])
 
-      return decryptedToken.toString("utf8");
+      return decryptedToken.toString('utf8')
     } catch (error: unknown) {
-      this.logger.error("Failed to decrypt token:", error);
-      throw new SecurityError("Failed to decrypt token");
+      this.logger.error('Failed to decrypt token:', error)
+      throw new SecurityError('Failed to decrypt token')
     }
   }
 
   async rotateKey(newPassword: string): Promise<void> {
     if (!this.encryptionKey) {
-      throw new SecurityError("Token encryption service not initialized");
+      throw new SecurityError('Token encryption service not initialized')
     }
 
     try {
@@ -133,19 +130,19 @@ export class TokenEncryptionService {
         newPassword,
         this.config.salt,
         this.config.keyLength,
-      );
+      )
 
-      this.encryptionKey = Buffer.from(newKey as Buffer);
+      this.encryptionKey = Buffer.from(newKey as Buffer)
 
-      this.logger.info("Encryption key rotated successfully");
+      this.logger.info('Encryption key rotated successfully')
     } catch (error: unknown) {
-      this.logger.error("Failed to rotate encryption key:", error);
-      throw new SecurityError("Failed to rotate encryption key");
+      this.logger.error('Failed to rotate encryption key:', error)
+      throw new SecurityError('Failed to rotate encryption key')
     }
   }
 
   cleanup() {
-    this.encryptionKey = null;
-    this.logger.info("Token encryption service cleaned up");
+    this.encryptionKey = null
+    this.logger.info('Token encryption service cleaned up')
   }
 }

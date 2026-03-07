@@ -3,134 +3,133 @@
  * Provides real-time user profiling, anomaly detection, and behavioral pattern analysis
  */
 
-import { Redis } from "ioredis";
-import { MongoClient } from "mongodb";
-import * as tf from "@tensorflow/tfjs";
-import * as crypto from "crypto";
-import { EventEmitter } from "events";
+import { Redis } from 'ioredis'
+import { MongoClient } from 'mongodb'
+import * as tf from '@tensorflow/tfjs'
+import * as crypto from 'crypto'
+import { EventEmitter } from 'events'
 
 export interface SecurityEvent {
-  eventId: string;
-  userId: string;
-  timestamp: Date;
-  eventType: string;
-  sourceIp: string;
-  userAgent: string;
-  requestMethod: string;
-  endpoint: string;
-  responseCode: number;
-  responseTime: number;
-  payloadSize: number;
-  sessionId: string;
-  riskScore?: number;
-  metadata?: Record<string, unknown>;
+  eventId: string
+  userId: string
+  timestamp: Date
+  eventType: string
+  sourceIp: string
+  userAgent: string
+  requestMethod: string
+  endpoint: string
+  responseCode: number
+  responseTime: number
+  payloadSize: number
+  sessionId: string
+  riskScore?: number
+  metadata?: Record<string, unknown>
 }
 
 export interface BehaviorProfile {
-  userId: string;
-  profileId: string;
-  behavioralPatterns: BehavioralPattern[];
-  riskIndicators: RiskIndicator[];
-  baselineMetrics: BaselineMetrics;
-  anomalyThresholds: AnomalyThresholds;
-  lastUpdated: Date;
-  confidenceScore: number;
+  userId: string
+  profileId: string
+  behavioralPatterns: BehavioralPattern[]
+  riskIndicators: RiskIndicator[]
+  baselineMetrics: BaselineMetrics
+  anomalyThresholds: AnomalyThresholds
+  lastUpdated: Date
+  confidenceScore: number
 }
 
 export interface BehavioralPattern {
-  patternId: string;
-  patternType: "temporal" | "spatial" | "sequential" | "frequency";
-  patternData: unknown;
-  confidence: number;
-  frequency: number;
-  lastObserved: Date;
-  stability: number;
+  patternId: string
+  patternType: 'temporal' | 'spatial' | 'sequential' | 'frequency'
+  patternData: unknown
+  confidence: number
+  frequency: number
+  lastObserved: Date
+  stability: number
 }
 
 export interface Anomaly {
-  anomalyId: string;
-  userId: string;
-  patternId: string;
-  anomalyType: "deviation" | "novelty" | "outlier";
-  severity: "low" | "medium" | "high" | "critical";
-  deviationScore: number;
-  confidence: number;
-  context: unknown;
-  timestamp: Date;
+  anomalyId: string
+  userId: string
+  patternId: string
+  anomalyType: 'deviation' | 'novelty' | 'outlier'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  deviationScore: number
+  confidence: number
+  context: unknown
+  timestamp: Date
 }
 
 export interface RiskScore {
-  userId: string;
-  score: number;
-  confidence: number;
-  contributingFactors: RiskFactor[];
-  trend: "increasing" | "decreasing" | "stable";
-  timestamp: Date;
+  userId: string
+  score: number
+  confidence: number
+  contributingFactors: RiskFactor[]
+  trend: 'increasing' | 'decreasing' | 'stable'
+  timestamp: Date
 }
 
 export interface BehavioralAnalysisService {
   createBehaviorProfile(
     userId: string,
     events: SecurityEvent[],
-  ): Promise<BehaviorProfile>;
+  ): Promise<BehaviorProfile>
   detectAnomalies(
     profile: BehaviorProfile,
     currentEvents: SecurityEvent[],
-  ): Promise<Anomaly[]>;
+  ): Promise<Anomaly[]>
   calculateBehavioralRisk(
     profile: BehaviorProfile,
     events: SecurityEvent[],
-  ): Promise<RiskScore>;
+  ): Promise<RiskScore>
   mineBehavioralPatterns(
     sequences: BehavioralSequence[],
-  ): Promise<BehavioralPattern[]>;
-  analyzeBehaviorGraph(events: SecurityEvent[]): Promise<BehaviorGraph>;
+  ): Promise<BehavioralPattern[]>
+  analyzeBehaviorGraph(events: SecurityEvent[]): Promise<BehaviorGraph>
   analyzeWithPrivacy(
     events: SecurityEvent[],
-  ): Promise<PrivateBehavioralAnalysis>;
+  ): Promise<PrivateBehavioralAnalysis>
 }
 
 export class AdvancedBehavioralAnalysisService
   extends EventEmitter
-  implements BehavioralAnalysisService
-{
-  private redis: Redis;
-  private mongoClient: MongoClient;
-  private anomalyDetector: AnomalyDetector;
-  private patternMiner: PatternMiner;
-  private riskCalculator: RiskCalculator;
-  private privacyPreserver: PrivacyPreserver;
-  private graphAnalyzer: GraphAnalyzer;
+  implements BehavioralAnalysisService {
+  private redis: Redis
+  private mongoClient: MongoClient
+  private anomalyDetector: AnomalyDetector
+  private patternMiner: PatternMiner
+  private riskCalculator: RiskCalculator
+  private privacyPreserver: PrivacyPreserver
+  private graphAnalyzer: GraphAnalyzer
 
   constructor(
     private config: {
-      redisUrl: string;
-      mongoUrl: string;
-      modelPath: string;
-      privacyConfig: PrivacyConfig;
-      anomalyThresholds: AnomalyThresholds;
+      redisUrl: string
+      mongoUrl: string
+      modelPath: string
+      privacyConfig: PrivacyConfig
+      anomalyThresholds: AnomalyThresholds
     },
   ) {
-    super();
+    super()
     this.initializeServices().catch((error) => {
-      this.emit("error", error);
-    });
+      this.emit('error', error)
+    })
   }
 
   private async initializeServices(): Promise<void> {
-    this.redis = new Redis(this.config.redisUrl);
-    this.mongoClient = new MongoClient(this.config.mongoUrl);
+    this.redis = new Redis(this.config.redisUrl)
+    this.mongoClient = new MongoClient(this.config.mongoUrl)
 
-    this.anomalyDetector = new MLAnomalyDetector(this.config.modelPath);
-    this.patternMiner = new SequentialPatternMiner();
-    this.riskCalculator = new MultiFactorRiskCalculator();
+    this.anomalyDetector = new MLAnomalyDetector(this.config.modelPath)
+    this.patternMiner = new SequentialPatternMiner()
+    this.riskCalculator = new MultiFactorRiskCalculator()
     this.privacyPreserver = new DifferentialPrivacyPreserver(
       this.config.privacyConfig,
-    );
-    this.graphAnalyzer = new BehavioralGraphAnalyzer();
+    )
+    this.graphAnalyzer = new BehavioralGraphAnalyzer()
 
-    await this.mongoClient.connect();
-    this.emit("services_initialized");
+    await this.mongoClient.connect()
+    this.emit('services_initialized')
   }
 
   async createBehaviorProfile(
@@ -139,26 +138,26 @@ export class AdvancedBehavioralAnalysisService
   ): Promise<BehaviorProfile> {
     try {
       if (!userId || !events || events.length === 0) {
-        throw new Error("Invalid input: userId and events are required");
+        throw new Error('Invalid input: userId and events are required')
       }
 
-      const features = await this.extractBehavioralFeatures(events);
+      const features = await this.extractBehavioralFeatures(events)
 
       const patterns = await this.mineBehavioralPatterns(
         this.convertEventsToSequences(events),
-      );
+      )
 
-      const baselineMetrics = await this.calculateBaselineMetrics(features);
+      const baselineMetrics = await this.calculateBaselineMetrics(features)
 
       const riskIndicators = await this.identifyRiskIndicators(
         features,
         patterns,
-      );
+      )
 
       const confidenceScore = this.calculateProfileConfidence(
         features,
         patterns,
-      );
+      )
 
       const profile: BehaviorProfile = {
         userId,
@@ -169,15 +168,15 @@ export class AdvancedBehavioralAnalysisService
         anomalyThresholds: this.config.anomalyThresholds,
         lastUpdated: new Date(),
         confidenceScore,
-      };
+      }
 
-      await this.storeBehaviorProfile(profile);
+      await this.storeBehaviorProfile(profile)
 
-      this.emit("profile_created", { userId, profileId: profile.profileId });
-      return profile;
+      this.emit('profile_created', { userId, profileId: profile.profileId })
+      return profile
     } catch (error) {
-      this.emit("profile_creation_error", { userId, error });
-      throw error;
+      this.emit('profile_creation_error', { userId, error })
+      throw error
     }
   }
 
@@ -186,54 +185,54 @@ export class AdvancedBehavioralAnalysisService
     currentEvents: SecurityEvent[],
   ): Promise<Anomaly[]> {
     try {
-      const anomalies: Anomaly[] = [];
+      const anomalies: Anomaly[] = []
 
       const currentFeatures =
-        await this.extractBehavioralFeatures(currentEvents);
+        await this.extractBehavioralFeatures(currentEvents)
 
       const temporalAnomalies = await this.detectTemporalAnomalies(
         profile,
         currentEvents,
-      );
-      anomalies.push(...temporalAnomalies);
+      )
+      anomalies.push(...temporalAnomalies)
 
       const spatialAnomalies = await this.detectSpatialAnomalies(
         profile,
         currentEvents,
-      );
-      anomalies.push(...spatialAnomalies);
+      )
+      anomalies.push(...spatialAnomalies)
 
       const sequentialAnomalies = await this.detectSequentialAnomalies(
         profile,
         currentEvents,
-      );
-      anomalies.push(...sequentialAnomalies);
+      )
+      anomalies.push(...sequentialAnomalies)
 
       const frequencyAnomalies = await this.detectFrequencyAnomalies(
         profile,
         currentEvents,
-      );
-      anomalies.push(...frequencyAnomalies);
+      )
+      anomalies.push(...frequencyAnomalies)
 
       const mlAnomalies = await this.anomalyDetector.detectAnomalies(
         profile,
         currentFeatures,
-      );
-      anomalies.push(...mlAnomalies);
+      )
+      anomalies.push(...mlAnomalies)
 
-      const filteredAnomalies = this.filterAndRankAnomalies(anomalies);
+      const filteredAnomalies = this.filterAndRankAnomalies(anomalies)
 
-      await this.storeAnomalies(filteredAnomalies);
+      await this.storeAnomalies(filteredAnomalies)
 
-      this.emit("anomalies_detected", {
+      this.emit('anomalies_detected', {
         userId: profile.userId,
         anomalyCount: filteredAnomalies.length,
-      });
+      })
 
-      return filteredAnomalies;
+      return filteredAnomalies
     } catch (error) {
-      this.emit("anomaly_detection_error", { userId: profile.userId, error });
-      throw error;
+      this.emit('anomaly_detection_error', { userId: profile.userId, error })
+      throw error
     }
   }
 
@@ -242,32 +241,31 @@ export class AdvancedBehavioralAnalysisService
     events: SecurityEvent[],
   ): Promise<RiskScore> {
     try {
-      const riskFactors = await this.extractRiskFactors(profile, events);
+      const riskFactors = await this.extractRiskFactors(profile, events)
 
       const behavioralRisk = await this.calculateBehavioralRiskComponent(
         profile,
         events,
-      );
+      )
       const anomalyRisk = await this.calculateAnomalyRiskComponent(
         profile,
         events,
-      );
-      const contextualRisk =
-        await this.calculateContextualRiskComponent(events);
+      )
+      const contextualRisk = await this.calculateContextualRiskComponent(events)
       const historicalRisk = await this.calculateHistoricalRiskComponent(
         profile.userId,
-      );
+      )
 
       const totalRisk = this.combineRiskComponents([
-        { type: "behavioral", score: behavioralRisk, weight: 0.3 },
-        { type: "anomaly", score: anomalyRisk, weight: 0.4 },
-        { type: "contextual", score: contextualRisk, weight: 0.2 },
-        { type: "historical", score: historicalRisk, weight: 0.1 },
-      ]);
+        { type: 'behavioral', score: behavioralRisk, weight: 0.3 },
+        { type: 'anomaly', score: anomalyRisk, weight: 0.4 },
+        { type: 'contextual', score: contextualRisk, weight: 0.2 },
+        { type: 'historical', score: historicalRisk, weight: 0.1 },
+      ])
 
-      const confidence = this.calculateRiskConfidence(riskFactors);
+      const confidence = this.calculateRiskConfidence(riskFactors)
 
-      const trend = await this.calculateRiskTrend(profile.userId, totalRisk);
+      const trend = await this.calculateRiskTrend(profile.userId, totalRisk)
 
       const riskScore: RiskScore = {
         userId: profile.userId,
@@ -276,18 +274,18 @@ export class AdvancedBehavioralAnalysisService
         contributingFactors: riskFactors,
         trend,
         timestamp: new Date(),
-      };
+      }
 
-      await this.storeRiskScore(riskScore);
+      await this.storeRiskScore(riskScore)
 
-      this.emit("risk_calculated", {
+      this.emit('risk_calculated', {
         userId: profile.userId,
         riskScore: totalRisk,
-      });
-      return riskScore;
+      })
+      return riskScore
     } catch (error) {
-      this.emit("risk_calculation_error", { userId: profile.userId, error });
-      throw error;
+      this.emit('risk_calculation_error', { userId: profile.userId, error })
+      throw error
     }
   }
 
@@ -295,36 +293,36 @@ export class AdvancedBehavioralAnalysisService
     sequences: BehavioralSequence[],
   ): Promise<BehavioralPattern[]> {
     try {
-      const patterns = await this.patternMiner.minePatterns(sequences);
+      const patterns = await this.patternMiner.minePatterns(sequences)
 
       const significantPatterns = patterns.filter(
         (pattern) => pattern.confidence > 0.7 && pattern.frequency > 0.1,
-      );
+      )
 
       const classifiedPatterns =
-        await this.classifyPatterns(significantPatterns);
+        await this.classifyPatterns(significantPatterns)
 
       const stablePatterns =
-        await this.calculatePatternStability(classifiedPatterns);
+        await this.calculatePatternStability(classifiedPatterns)
 
-      this.emit("patterns_mined", { patternCount: stablePatterns.length });
-      return stablePatterns;
+      this.emit('patterns_mined', { patternCount: stablePatterns.length })
+      return stablePatterns
     } catch (error) {
-      this.emit("pattern_mining_error", { error });
-      throw error;
+      this.emit('pattern_mining_error', { error })
+      throw error
     }
   }
 
   async analyzeBehaviorGraph(events: SecurityEvent[]): Promise<BehaviorGraph> {
     try {
-      const graph = await this.graphAnalyzer.buildGraph(events);
+      const graph = await this.graphAnalyzer.buildGraph(events)
 
-      const centrality = await this.graphAnalyzer.calculateCentrality(graph);
-      const communities = await this.graphAnalyzer.detectCommunities(graph);
-      const anomalies = await this.graphAnalyzer.detectGraphAnomalies(graph);
+      const centrality = await this.graphAnalyzer.calculateCentrality(graph)
+      const communities = await this.graphAnalyzer.detectCommunities(graph)
+      const anomalies = await this.graphAnalyzer.detectGraphAnomalies(graph)
 
       const clusters =
-        await this.graphAnalyzer.identifyBehavioralClusters(graph);
+        await this.graphAnalyzer.identifyBehavioralClusters(graph)
 
       const behaviorGraph: BehaviorGraph = {
         graphId: this.generateGraphId(),
@@ -337,13 +335,13 @@ export class AdvancedBehavioralAnalysisService
           anomalyScore: anomalies.anomalyScore,
         },
         timestamp: new Date(),
-      };
+      }
 
-      this.emit("behavior_graph_analyzed", { graphId: behaviorGraph.graphId });
-      return behaviorGraph;
+      this.emit('behavior_graph_analyzed', { graphId: behaviorGraph.graphId })
+      return behaviorGraph
     } catch (error) {
-      this.emit("graph_analysis_error", { error });
-      throw error;
+      this.emit('graph_analysis_error', { error })
+      throw error
     }
   }
 
@@ -351,14 +349,14 @@ export class AdvancedBehavioralAnalysisService
     events: SecurityEvent[],
   ): Promise<PrivateBehavioralAnalysis> {
     try {
-      const privateEvents = await this.privacyPreserver.applyPrivacy(events);
+      const privateEvents = await this.privacyPreserver.applyPrivacy(events)
 
-      const features = await this.extractBehavioralFeatures(privateEvents);
+      const features = await this.extractBehavioralFeatures(privateEvents)
       const patterns = await this.mineBehavioralPatterns(
         this.convertEventsToSequences(privateEvents),
-      );
+      )
 
-      const privacyBudget = this.privacyPreserver.getPrivacyBudget();
+      const privacyBudget = this.privacyPreserver.getPrivacyBudget()
 
       const privateAnalysis: PrivateBehavioralAnalysis = {
         analysisId: this.generateAnalysisId(),
@@ -368,15 +366,15 @@ export class AdvancedBehavioralAnalysisService
         privacyBudgetRemaining: privacyBudget.remaining,
         epsilon: privacyBudget.epsilon,
         timestamp: new Date(),
-      };
+      }
 
-      this.emit("private_analysis_completed", {
+      this.emit('private_analysis_completed', {
         analysisId: privateAnalysis.analysisId,
-      });
-      return privateAnalysis;
+      })
+      return privateAnalysis
     } catch (error) {
-      this.emit("private_analysis_error", { error });
-      throw error;
+      this.emit('private_analysis_error', { error })
+      throw error
     }
   }
 
@@ -389,16 +387,16 @@ export class AdvancedBehavioralAnalysisService
       sequential: await this.extractSequentialFeatures(events),
       frequency: await this.extractFrequencyFeatures(events),
       contextual: await this.extractContextualFeatures(events),
-    };
+    }
 
-    return features;
+    return features
   }
 
   private async extractTemporalFeatures(
     events: SecurityEvent[],
   ): Promise<TemporalFeatures> {
-    const timestamps = events.map((e) => e.timestamp.getTime());
-    const intervals = this.calculateTimeIntervals(timestamps);
+    const timestamps = events.map((e) => e.timestamp.getTime())
+    const intervals = this.calculateTimeIntervals(timestamps)
 
     return {
       avgSessionDuration: this.calculateAverageSessionDuration(events),
@@ -407,29 +405,29 @@ export class AdvancedBehavioralAnalysisService
       activityFrequency: this.calculateActivityFrequency(events),
       sessionRegularity: this.calculateSessionRegularity(intervals),
       responseTimePattern: this.calculateResponseTimePattern(events),
-    };
+    }
   }
 
   private async extractSpatialFeatures(
     events: SecurityEvent[],
   ): Promise<SpatialFeatures> {
-    const ipAddresses = events.map((e) => e.sourceIp);
-    const locations = await this.geolocateIPs(ipAddresses);
+    const ipAddresses = events.map((e) => e.sourceIp)
+    const locations = await this.geolocateIPs(ipAddresses)
 
     return {
       ipDiversity: this.calculateIPDiversity(ipAddresses),
       geographicSpread: this.calculateGeographicSpread(locations),
       mobilityPattern: this.calculateMobilityPattern(locations),
       networkCharacteristics: this.analyzeNetworkCharacteristics(events),
-    };
+    }
   }
 
   private async detectTemporalAnomalies(
     profile: BehaviorProfile,
     events: SecurityEvent[],
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = [];
-    const temporalFeatures = await this.extractTemporalFeatures(events);
+    const anomalies: Anomaly[] = []
+    const temporalFeatures = await this.extractTemporalFeatures(events)
 
     if (
       temporalFeatures.timeOfDayPreference >
@@ -438,128 +436,120 @@ export class AdvancedBehavioralAnalysisService
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
-        patternId: "temporal_timing",
-        anomalyType: "deviation",
-        severity: "medium",
+        patternId: 'temporal_timing',
+        anomalyType: 'deviation',
+        severity: 'medium',
         deviationScore: temporalFeatures.timeOfDayPreference,
         confidence: 0.8,
         context: {
-          feature: "timeOfDayPreference",
+          feature: 'timeOfDayPreference',
           value: temporalFeatures.timeOfDayPreference,
         },
         timestamp: new Date(),
-      });
+      })
     }
 
-    return anomalies;
+    return anomalies
   }
 
   private calculateTimeIntervals(timestamps: number[]): number[] {
-    if (timestamps.length < 2) return [];
-    const sorted = [...timestamps].sort((a, b) => a - b);
-    const intervals: number[] = [];
+    if (timestamps.length < 2) return []
+    const sorted = [...timestamps].sort((a, b) => a - b)
+    const intervals: number[] = []
     for (let i = 1; i < sorted.length; i++) {
-      intervals.push(sorted[i] - sorted[i - 1]);
+      intervals.push(sorted[i] - sorted[i - 1])
     }
-    return intervals;
+    return intervals
   }
 
   private calculateAverageSessionDuration(events: SecurityEvent[]): number {
-    if (events.length === 0) return 0;
+    if (events.length === 0) return 0
     // Simplified: max time - min time
-    const timestamps = events.map((e) => e.timestamp.getTime());
-    return Math.max(...timestamps) - Math.min(...timestamps);
+    const timestamps = events.map(e => e.timestamp.getTime())
+    return Math.max(...timestamps) - Math.min(...timestamps)
   }
 
   private calculateTimeOfDayPreference(events: SecurityEvent[]): number {
-    if (events.length === 0) return 0;
+    if (events.length === 0) return 0
     // Return avg hour (0-24) / 24
-    const hours = events.map((e) => e.timestamp.getHours());
-    const avg = hours.reduce((a, b) => a + b, 0) / hours.length;
-    return avg / 24;
+    const hours = events.map(e => e.timestamp.getHours())
+    const avg = hours.reduce((a, b) => a + b, 0) / hours.length
+    return avg / 24
   }
 
   private calculateDayOfWeekPattern(_events: SecurityEvent[]): number[] {
-    return [0, 0, 0, 0, 0, 0, 0]; // Placeholder for 7 days
+    return [0, 0, 0, 0, 0, 0, 0] // Placeholder for 7 days
   }
 
   private calculateActivityFrequency(events: SecurityEvent[]): number {
-    return events.length;
+    return events.length
   }
 
   private calculateSessionRegularity(intervals: number[]): number {
-    if (intervals.length === 0) return 1;
+    if (intervals.length === 0) return 1
     // Variance of intervals?
-    return 0.8; // Placeholder
+    return 0.8 // Placeholder
   }
 
   private calculateResponseTimePattern(_events: SecurityEvent[]): number[] {
-    return []; // Placeholder
+    return [] // Placeholder
   }
 
   private async geolocateIPs(ips: string[]): Promise<unknown[]> {
-    return ips.map((_ip) => ({ lat: 0, lon: 0 }));
+    return ips.map(_ip => ({ lat: 0, lon: 0 }))
   }
 
   private calculateIPDiversity(ips: string[]): number {
-    return new Set(ips).size;
+    return new Set(ips).size
   }
 
   private calculateGeographicSpread(_locations: unknown[]): number {
-    return 0.1;
+    return 0.1
   }
 
   private calculateMobilityPattern(_locations: unknown[]): number {
-    return 0.1;
+    return 0.1
   }
 
-  private analyzeNetworkCharacteristics(
-    _events: SecurityEvent[],
-  ): NetworkCharacteristics {
+  private analyzeNetworkCharacteristics(_events: SecurityEvent[]): NetworkCharacteristics {
     return {
-      connectionType: "unknown",
+      connectionType: 'unknown',
       bandwidthEstimate: 0,
       latency: 0,
-    };
+    }
   }
 
-  private async extractSequentialFeatures(
-    _events: SecurityEvent[],
-  ): Promise<SequentialFeatures> {
+  private async extractSequentialFeatures(_events: SecurityEvent[]): Promise<SequentialFeatures> {
     return {
       actionSequences: [],
       transitionProbabilities: {},
       sequenceEntropy: 0,
       markovChain: null,
-    };
+    }
   }
 
-  private async extractFrequencyFeatures(
-    events: SecurityEvent[],
-  ): Promise<FrequencyFeatures> {
+  private async extractFrequencyFeatures(events: SecurityEvent[]): Promise<FrequencyFeatures> {
     return {
       eventFrequency: events.length,
       endpointFrequency: {},
       methodFrequency: {},
       responseCodeFrequency: {},
-    };
+    }
   }
 
-  private async extractContextualFeatures(
-    _events: SecurityEvent[],
-  ): Promise<ContextualFeatures> {
+  private async extractContextualFeatures(_events: SecurityEvent[]): Promise<ContextualFeatures> {
     return {
       deviceCharacteristics: {
-        deviceType: "unknown",
-        os: "unknown",
-        browser: "unknown",
-        screenResolution: "unknown",
+        deviceType: 'unknown',
+        os: 'unknown',
+        browser: 'unknown',
+        screenResolution: 'unknown',
       },
       networkContext: {
-        asn: "unknown",
-        isp: "unknown",
-        country: "unknown",
-        timezone: "unknown",
+        asn: 'unknown',
+        isp: 'unknown',
+        country: 'unknown',
+        timezone: 'unknown',
       },
       temporalContext: {
         localTime: new Date().toISOString(),
@@ -567,25 +557,27 @@ export class AdvancedBehavioralAnalysisService
         weekend: false,
         holiday: false,
       },
-    };
+    }
   }
 
+
+
   private removeDuplicateAnomalies(anomalies: Anomaly[]): Anomaly[] {
-    const seen = new Set();
-    return anomalies.filter((a) => {
-      const key = `${a.patternId}-${a.anomalyType}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    const seen = new Set()
+    return anomalies.filter(a => {
+      const key = `${a.patternId}-${a.anomalyType}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
   }
 
   private async detectSpatialAnomalies(
     profile: BehaviorProfile,
     events: SecurityEvent[],
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = [];
-    const spatialFeatures = await this.extractSpatialFeatures(events);
+    const anomalies: Anomaly[] = []
+    const spatialFeatures = await this.extractSpatialFeatures(events)
 
     if (
       spatialFeatures.geographicSpread >
@@ -594,64 +586,51 @@ export class AdvancedBehavioralAnalysisService
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
-        patternId: "spatial_location",
-        anomalyType: "novelty",
-        severity: "high",
+        patternId: 'spatial_location',
+        anomalyType: 'novelty',
+        severity: 'high',
         deviationScore: spatialFeatures.geographicSpread,
         confidence: 0.9,
         context: {
-          feature: "geographicSpread",
+          feature: 'geographicSpread',
           value: spatialFeatures.geographicSpread,
         },
         timestamp: new Date(),
-      });
+      })
     }
 
-    return anomalies;
+    return anomalies
   }
 
   private async classifyPatterns(
     patterns: BehavioralPattern[],
   ): Promise<BehavioralPattern[]> {
-    return patterns.map((p) => ({ ...p }));
+    return patterns.map((p) => ({ ...p }))
   }
-  private async calculatePatternStability(
-    patterns: BehavioralPattern[],
-  ): Promise<BehavioralPattern[]> {
-    return patterns.map((p) => ({ ...p, stability: 0.9 }));
+  private async calculatePatternStability(patterns: BehavioralPattern[]): Promise<BehavioralPattern[]> {
+    return patterns.map(p => ({ ...p, stability: 0.9 }))
   }
 
-  private async detectSequentialAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
-    return [];
+  private async detectSequentialAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
+    return []
   }
 
-  private async calculateBaselineMetrics(
-    _features: BehavioralFeatures,
-  ): Promise<BaselineMetrics> {
+  private async calculateBaselineMetrics(_features: BehavioralFeatures): Promise<BaselineMetrics> {
     return {
       timeOfDayThreshold: 0.5,
       geographicThreshold: 0.5,
       frequencyThreshold: 0.5,
       sequentialThreshold: 0.5,
-      deviceDiversityThreshold: 0.5,
-    };
+      deviceDiversityThreshold: 0.5
+    }
   }
 
-  private async detectFrequencyAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
-    return [];
+  private async detectFrequencyAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
+    return []
   }
 
-  private calculateProfileConfidence(
-    _features: BehavioralFeatures,
-    _patterns: BehavioralPattern[],
-  ): number {
-    return 0.8;
+  private calculateProfileConfidence(_features: BehavioralFeatures, _patterns: BehavioralPattern[]): number {
+    return 0.8
   }
 
   private async identifyRiskIndicators(
@@ -659,164 +638,144 @@ export class AdvancedBehavioralAnalysisService
     _patternsOrCurrent: BehavioralPattern[] | SecurityEvent[],
     _anomalies?: Anomaly[],
   ): Promise<RiskIndicator[]> {
-    return [];
+    return []
   }
 
-  private async detectContextualAnomalies(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<Anomaly[]> {
-    return [];
+  private async detectContextualAnomalies(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<Anomaly[]> {
+    return []
   }
 
-  private async extractRiskFactors(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<RiskFactor[]> {
-    return [];
+  private async extractRiskFactors(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<RiskFactor[]> {
+    return []
   }
 
-  private async calculateBehavioralRiskComponent(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<number> {
-    return 0.5;
+  private async calculateBehavioralRiskComponent(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<number> {
+    return 0.5
   }
 
-  private async calculateAnomalyRiskComponent(
-    _profile: BehaviorProfile,
-    _events: SecurityEvent[],
-  ): Promise<number> {
-    return 0.5;
+  private async calculateAnomalyRiskComponent(_profile: BehaviorProfile, _events: SecurityEvent[]): Promise<number> {
+    return 0.5
   }
 
-  private async calculateContextualRiskComponent(
-    _events: SecurityEvent[],
-  ): Promise<number> {
-    return 0.5;
+  private async calculateContextualRiskComponent(_events: SecurityEvent[]): Promise<number> {
+    return 0.5
   }
 
-  private async calculateHistoricalRiskComponent(
-    _userId: string,
-  ): Promise<number> {
-    return 0.5;
+  private async calculateHistoricalRiskComponent(_userId: string): Promise<number> {
+    return 0.5
   }
 
   private calculateRiskConfidence(_riskFactors: RiskFactor[]): number {
-    return 0.8;
+    return 0.8
   }
 
-  private async calculateRiskTrend(
-    _userId: string,
-    _currentRisk: number,
-  ): Promise<"increasing" | "decreasing" | "stable"> {
-    return "stable";
+  private async calculateRiskTrend(_userId: string, _currentRisk: number): Promise<'increasing' | 'decreasing' | 'stable'> {
+    return 'stable'
   }
 
   private filterAndRankAnomalies(anomalies: Anomaly[]): Anomaly[] {
-    const uniqueAnomalies = this.removeDuplicateAnomalies(anomalies);
+    const uniqueAnomalies = this.removeDuplicateAnomalies(anomalies)
 
     const rankedAnomalies = uniqueAnomalies.sort((a, b) => {
-      const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-      const severityDiff =
-        severityOrder[b.severity] - severityOrder[a.severity];
+      const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+      const severityDiff = severityOrder[b.severity] - severityOrder[a.severity]
       if (severityDiff !== 0) {
-        return severityDiff;
+        return severityDiff
       }
-      return b.confidence - a.confidence;
-    });
+      return b.confidence - a.confidence
+    })
 
-    return rankedAnomalies.slice(0, 10);
+    return rankedAnomalies.slice(0, 10)
   }
 
   private combineRiskComponents(components: RiskComponent[]): number {
     return components.reduce((total, component) => {
-      return total + component.score * component.weight;
-    }, 0);
+      return total + component.score * component.weight
+    }, 0)
   }
 
   private async storeBehaviorProfile(profile: BehaviorProfile): Promise<void> {
-    const db = this.mongoClient.db("threat_detection");
-    const collection = db.collection("behavior_profiles");
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('behavior_profiles')
 
     await collection.replaceOne({ userId: profile.userId }, profile, {
       upsert: true,
-    });
+    })
 
     await this.redis.setex(
       `behavior_profile:${profile.userId}`,
       3600,
       JSON.stringify(profile),
-    );
+    )
   }
 
   private async storeAnomalies(anomalies: Anomaly[]): Promise<void> {
     if (anomalies.length === 0) {
-      return;
+      return
     }
 
-    const db = this.mongoClient.db("threat_detection");
-    const collection = db.collection("anomalies");
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('anomalies')
 
-    await collection.insertMany(anomalies);
+    await collection.insertMany(anomalies)
 
-    const recentAnomalies = anomalies.slice(0, 5);
+    const recentAnomalies = anomalies.slice(0, 5)
     await this.redis.setex(
       `anomalies:${anomalies[0].userId}`,
       1800, // 30 minutes TTL
       JSON.stringify(recentAnomalies),
-    );
+    )
   }
 
   private async storeRiskScore(riskScore: RiskScore): Promise<void> {
-    const db = this.mongoClient.db("threat_detection");
-    const collection = db.collection("risk_scores");
+    const db = this.mongoClient.db('threat_detection')
+    const collection = db.collection('risk_scores')
 
-    await collection.insertOne(riskScore);
+    await collection.insertOne(riskScore)
 
     await this.redis.setex(
       `current_risk:${riskScore.userId}`,
       900,
       JSON.stringify(riskScore),
-    );
+    )
   }
 
   private generateProfileId(userId: string): string {
-    return `profile_${userId}_${Date.now()}`;
+    return `profile_${userId}_${Date.now()}`
   }
 
   private generateAnomalyId(): string {
-    return this._secureId("anomaly_");
+    return this._secureId('anomaly_')
   }
 
   private generateAnalysisId(): string {
-    return this._secureId("analysis_");
+    return this._secureId('analysis_')
   }
 
   private generateGraphId(): string {
-    return this._secureId("graph_");
+    return this._secureId('graph_')
   }
 
   // Use crypto.randomUUID when available, else crypto.randomBytes fallback
-  private _secureId(prefix = ""): string {
+  private _secureId(prefix = ''): string {
     try {
-      const c: unknown = crypto;
-      const asObj = c as Record<string, unknown> | undefined;
+      const c: unknown = crypto
+      const asObj = c as Record<string, unknown> | undefined
       // Node & modern runtimes
-      if (asObj && typeof asObj["randomUUID"] === "function") {
-        const fn = asObj["randomUUID"] as () => string;
-        return `${prefix}${fn()}`;
+      if (asObj && typeof asObj['randomUUID'] === 'function') {
+        const fn = asObj['randomUUID'] as () => string
+        return `${prefix}${fn()}`
       }
-      if (asObj && typeof asObj["randomBytes"] === "function") {
-        const fn = asObj["randomBytes"] as (size: number) => Buffer;
-        return `${prefix}${fn(16).toString("hex")}`;
+      if (asObj && typeof asObj['randomBytes'] === 'function') {
+        const fn = asObj['randomBytes'] as (size: number) => Buffer
+        return `${prefix}${fn(16).toString('hex')}`
       }
     } catch {
       // ignore and fallback
     }
 
     // Last-resort fallback (not cryptographically secure)
-    return `${prefix}${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+    return `${prefix}${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
   private convertEventsToSequences(
@@ -832,7 +791,7 @@ export class AdvancedBehavioralAnalysisService
         userAgent: event.userAgent,
         endpoint: event.endpoint,
       },
-    }));
+    }))
   }
 
   private minMaxNormalize(
@@ -840,15 +799,15 @@ export class AdvancedBehavioralAnalysisService
     min?: number,
     max?: number,
   ): number[] {
-    const dataMin = min || Math.min(...data);
-    const dataMax = max || Math.max(...data);
-    const range = dataMax - dataMin;
+    const dataMin = min || Math.min(...data)
+    const dataMax = max || Math.max(...data)
+    const range = dataMax - dataMin
 
     if (range === 0) {
-      return data.map(() => 0.5);
+      return data.map(() => 0.5)
     }
 
-    return data.map((value) => (value - dataMin) / range);
+    return data.map((value) => (value - dataMin) / range)
   }
 
   private zScoreNormalize(
@@ -857,255 +816,258 @@ export class AdvancedBehavioralAnalysisService
     std?: number,
   ): number[] {
     const dataMean =
-      mean || data.reduce((sum, val) => sum + val, 0) / data.length;
+      mean || data.reduce((sum, val) => sum + val, 0) / data.length
     const dataStd =
       std ||
       Math.sqrt(
         data.reduce((sum, val) => sum + Math.pow(val - dataMean, 2), 0) /
-          data.length,
-      );
+        data.length,
+      )
 
     if (dataStd === 0) {
-      return data.map(() => 0);
+      return data.map(() => 0)
     }
 
-    return data.map((value) => (value - dataMean) / dataStd);
+    return data.map((value) => (value - dataMean) / dataStd)
   }
 
   async shutdown(): Promise<void> {
-    await this.redis.quit();
-    await this.mongoClient.close();
-    this.emit("shutdown");
+    await this.redis.quit()
+    await this.mongoClient.close()
+    this.emit('shutdown')
   }
 }
 
 interface BehavioralFeatures {
-  temporal: TemporalFeatures;
-  spatial: SpatialFeatures;
-  sequential: SequentialFeatures;
-  frequency: FrequencyFeatures;
-  contextual: ContextualFeatures;
+  temporal: TemporalFeatures
+  spatial: SpatialFeatures
+  sequential: SequentialFeatures
+  frequency: FrequencyFeatures
+  contextual: ContextualFeatures
 }
 
 interface TemporalFeatures {
-  avgSessionDuration: number;
-  timeOfDayPreference: number;
-  dayOfWeekPattern: number[];
-  activityFrequency: number;
-  sessionRegularity: number;
-  responseTimePattern: number[];
+  avgSessionDuration: number
+  timeOfDayPreference: number
+  dayOfWeekPattern: number[]
+  activityFrequency: number
+  sessionRegularity: number
+  responseTimePattern: number[]
 }
 
 interface SpatialFeatures {
-  ipDiversity: number;
-  geographicSpread: number;
-  mobilityPattern: number;
-  networkCharacteristics: NetworkCharacteristics;
+  ipDiversity: number
+  geographicSpread: number
+  mobilityPattern: number
+  networkCharacteristics: NetworkCharacteristics
 }
 
 interface SequentialFeatures {
-  actionSequences: string[][];
-  transitionProbabilities: Record<string, number>;
-  sequenceEntropy: number;
-  markovChain: unknown;
+  actionSequences: string[][]
+  transitionProbabilities: Record<string, number>
+  sequenceEntropy: number
+  markovChain: unknown
 }
 
 interface FrequencyFeatures {
-  eventFrequency: number;
-  endpointFrequency: Record<string, number>;
-  methodFrequency: Record<string, number>;
-  responseCodeFrequency: Record<string, number>;
+  eventFrequency: number
+  endpointFrequency: Record<string, number>
+  methodFrequency: Record<string, number>
+  responseCodeFrequency: Record<string, number>
 }
 
 interface ContextualFeatures {
-  deviceCharacteristics: DeviceCharacteristics;
-  networkContext: NetworkContext;
-  temporalContext: TemporalContext;
+  deviceCharacteristics: DeviceCharacteristics
+  networkContext: NetworkContext
+  temporalContext: TemporalContext
 }
 
 interface NetworkCharacteristics {
-  connectionType: string;
-  bandwidthEstimate: number;
-  latency: number;
+  connectionType: string
+  bandwidthEstimate: number
+  latency: number
 }
 
 interface DeviceCharacteristics {
-  deviceType: string;
-  os: string;
-  browser: string;
-  screenResolution: string;
+  deviceType: string
+  os: string
+  browser: string
+  screenResolution: string
 }
 
 interface NetworkContext {
-  asn: string;
-  isp: string;
-  country: string;
-  timezone: string;
+  asn: string
+  isp: string
+  country: string
+  timezone: string
 }
 
 interface TemporalContext {
-  localTime: string;
-  businessHours: boolean;
-  weekend: boolean;
-  holiday: boolean;
+  localTime: string
+  businessHours: boolean
+  weekend: boolean
+  holiday: boolean
 }
 
 interface BehavioralSequence {
-  sequenceId: string;
-  userId: string;
-  timestamp: Date;
-  actions: string[];
-  context: unknown;
+  sequenceId: string
+  userId: string
+  timestamp: Date
+  actions: string[]
+  context: unknown
 }
 
 interface BehaviorGraph {
-  graphId: string;
-  nodes: GraphNode[];
-  edges: GraphEdge[];
-  properties: GraphProperties;
-  timestamp: Date;
+  graphId: string
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  properties: GraphProperties
+  timestamp: Date
 }
 
 interface GraphNode {
-  nodeId: string;
-  nodeType: string;
-  properties: Record<string, unknown>;
-  centrality?: number;
+  nodeId: string
+  nodeType: string
+  properties: Record<string, unknown>
+  centrality?: number
 }
 
 interface GraphEdge {
-  edgeId: string;
-  sourceId: string;
-  targetId: string;
-  edgeType: string;
-  weight: number;
-  properties: Record<string, unknown>;
+  edgeId: string
+  sourceId: string
+  targetId: string
+  edgeType: string
+  weight: number
+  properties: Record<string, unknown>
 }
 
 interface GraphProperties {
-  centrality: Record<string, number>;
-  communities: string[][];
-  clusters: Cluster[];
-  anomalyScore: number;
+  centrality: Record<string, number>
+  communities: string[][]
+  clusters: Cluster[]
+  anomalyScore: number
 }
 
 interface Cluster {
-  clusterId: string;
-  nodes: string[];
-  cohesion: number;
-  separation: number;
+  clusterId: string
+  nodes: string[]
+  cohesion: number
+  separation: number
 }
 
 interface PrivateBehavioralAnalysis {
-  analysisId: string;
-  privatizedFeatures: BehavioralFeatures;
-  behavioralPatterns: BehavioralPattern[];
-  privacyBudgetUsed: number;
-  privacyBudgetRemaining: number;
-  epsilon: number;
-  timestamp: Date;
+  analysisId: string
+  privatizedFeatures: BehavioralFeatures
+  behavioralPatterns: BehavioralPattern[]
+  privacyBudgetUsed: number
+  privacyBudgetRemaining: number
+  epsilon: number
+  timestamp: Date
 }
 
 interface PrivacyConfig {
-  epsilon: number;
-  delta: number;
-  sensitivity: number;
-  mechanism: "laplace" | "gaussian";
+  epsilon: number
+  delta: number
+  sensitivity: number
+  mechanism: 'laplace' | 'gaussian'
 }
 
 interface AnomalyThresholds {
-  temporal: number;
-  spatial: number;
-  sequential: number;
-  frequency: number;
+  temporal: number
+  spatial: number
+  sequential: number
+  frequency: number
 }
 
 interface RiskFactor {
-  type: string;
-  score: number;
-  weight: number;
-  description: string;
-  evidence: unknown[];
+  type: string
+  score: number
+  weight: number
+  description: string
+  evidence: unknown[]
 }
 
 export interface RiskIndicator {
-  type: string;
-  severity: "low" | "medium" | "high" | "critical";
-  description: string;
-  timestamp: Date;
-  metadata?: Record<string, unknown>;
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  timestamp: Date
+  metadata?: Record<string, unknown>
 }
 
 interface RiskComponent {
-  type: string;
-  score: number;
-  weight: number;
+  type: string
+  score: number
+  weight: number
 }
 
 interface BaselineMetrics {
-  timeOfDayThreshold: number;
-  geographicThreshold: number;
-  frequencyThreshold: number;
-  sequentialThreshold: number;
-  deviceDiversityThreshold: number;
+  timeOfDayThreshold: number
+  geographicThreshold: number
+  frequencyThreshold: number
+  sequentialThreshold: number
+  deviceDiversityThreshold: number
 }
 
 abstract class AnomalyDetector {
   abstract detectAnomalies(
     profile: BehaviorProfile,
     features: BehavioralFeatures,
-  ): Promise<Anomaly[]>;
+  ): Promise<Anomaly[]>
 }
 
 abstract class PatternMiner {
   abstract minePatterns(
     sequences: BehavioralSequence[],
-  ): Promise<BehavioralPattern[]>;
+  ): Promise<BehavioralPattern[]>
 }
 
 abstract class RiskCalculator {
   abstract calculateRisk(
     profile: BehaviorProfile,
     events: SecurityEvent[],
-  ): Promise<number>;
+  ): Promise<number>
 }
 
 abstract class PrivacyPreserver {
-  abstract applyPrivacy(events: SecurityEvent[]): Promise<SecurityEvent[]>;
+  abstract applyPrivacy(events: SecurityEvent[]): Promise<SecurityEvent[]>
   abstract getPrivacyBudget(): {
-    used: number;
-    remaining: number;
-    epsilon: number;
-  };
+    used: number
+    remaining: number
+    epsilon: number
+  }
 }
 
 abstract class GraphAnalyzer {
-  abstract buildGraph(events: SecurityEvent[]): Promise<BehaviorGraph>;
+  abstract buildGraph(events: SecurityEvent[]): Promise<BehaviorGraph>
   abstract calculateCentrality(
     graph: BehaviorGraph,
-  ): Promise<Record<string, number>>;
-  abstract detectCommunities(graph: BehaviorGraph): Promise<string[][]>;
+  ): Promise<Record<string, number>>
+  abstract detectCommunities(graph: BehaviorGraph): Promise<string[][]>
   abstract detectGraphAnomalies(
     graph: BehaviorGraph,
-  ): Promise<{ anomalyScore: number }>;
-  abstract identifyBehavioralClusters(graph: BehaviorGraph): Promise<Cluster[]>;
+  ): Promise<{ anomalyScore: number }>
+  abstract identifyBehavioralClusters(graph: BehaviorGraph): Promise<Cluster[]>
 }
 
 // Placeholder class for IsolationForest to resolve type errors
 class IsolationForest {
-  constructor(_nTrees: number, _sampleSize: number) {}
+  constructor(
+    _nTrees: number,
+    _sampleSize: number,
+  ) { }
 
   predict(data: number[][]): number[] {
-    return data.map(() => 0.0);
+    return data.map(() => 0.0)
   }
 }
 
 class MLAnomalyDetector extends AnomalyDetector {
-  private model: tf.Sequential | null = null;
-  private isolationForest: IsolationForest | null = null;
+  private model: tf.Sequential | null = null
+  private isolationForest: IsolationForest | null = null
 
   constructor(private modelPath: string) {
-    super();
+    super()
   }
 
   async detectAnomalies(
@@ -1113,67 +1075,67 @@ class MLAnomalyDetector extends AnomalyDetector {
     features: BehavioralFeatures,
   ): Promise<Anomaly[]> {
     try {
-      const anomalies: Anomaly[] = [];
+      const anomalies: Anomaly[] = []
 
-      await this.initializeModels();
+      await this.initializeModels()
 
-      const featureVector = this.featuresToVector(features);
+      const featureVector = this.featuresToVector(features)
 
-      const mlAnomalies = await this.detectMLAnomalies(profile, featureVector);
-      anomalies.push(...mlAnomalies);
+      const mlAnomalies = await this.detectMLAnomalies(profile, featureVector)
+      anomalies.push(...mlAnomalies)
 
       const statisticalAnomalies = await this.detectStatisticalAnomalies(
         profile,
         features,
-      );
-      anomalies.push(...statisticalAnomalies);
+      )
+      anomalies.push(...statisticalAnomalies)
 
       const temporalAnomalies = await this.detectTemporalAnomalies(
         profile,
         features,
-      );
-      anomalies.push(...temporalAnomalies);
+      )
+      anomalies.push(...temporalAnomalies)
 
-      return this.filterAndRankAnomalies(anomalies);
+      return this.filterAndRankAnomalies(anomalies)
     } catch (error) {
-      console.error("Error in ML anomaly detection:", error);
-      return [];
+      console.error('Error in ML anomaly detection:', error)
+      return []
     }
   }
 
   private async initializeModels(): Promise<void> {
     if (this.model && this.isolationForest) {
-      return;
+      return
     }
 
-    this.model = tf.sequential();
+    this.model = tf.sequential()
     this.model.add(
       tf.layers.dense({
         units: 32,
-        activation: "relu",
+        activation: 'relu',
         inputShape: [10], // Assuming 10 features
       }),
-    );
-    this.model.add(tf.layers.dropout({ rate: 0.2 }));
+    )
+    this.model.add(tf.layers.dropout({ rate: 0.2 }))
     this.model.add(
       tf.layers.dense({
         units: 16,
-        activation: "relu",
+        activation: 'relu',
       }),
-    );
+    )
     this.model.add(
       tf.layers.dense({
         units: 10,
-        activation: "linear",
+        activation: 'linear',
       }),
-    );
+    )
 
     this.model.compile({
       optimizer: tf.train.adam(0.001),
-      loss: "meanSquaredError",
-    });
+      loss: 'meanSquaredError',
+    })
 
-    this.isolationForest = new IsolationForest(100, 256);
+    this.isolationForest = new IsolationForest(100, 256)
   }
 
   private featuresToVector(features: BehavioralFeatures): number[] {
@@ -1186,9 +1148,9 @@ class MLAnomalyDetector extends AnomalyDetector {
       features.spatial.geographicSpread,
       features.sequential.sequenceEntropy,
       features.frequency.eventFrequency / 100, // Normalize
-      features.frequency.endpointFrequency["/api/sensitive"] || 0,
-      features.contextual.deviceCharacteristics.deviceType === "mobile" ? 1 : 0,
-    ];
+      features.frequency.endpointFrequency['/api/sensitive'] || 0,
+      features.contextual.deviceCharacteristics.deviceType === 'mobile' ? 1 : 0,
+    ]
   }
 
   private async detectMLAnomalies(
@@ -1196,163 +1158,163 @@ class MLAnomalyDetector extends AnomalyDetector {
     featureVector: number[],
   ): Promise<Anomaly[]> {
     if (!this.model || !this.isolationForest) {
-      return [];
+      return []
     }
 
-    const anomalies: Anomaly[] = [];
+    const anomalies: Anomaly[] = []
 
     try {
       // run tensor operations inside tf.tidy to ensure tensors are disposed
       const { reconstructionError, anomalyScore } = tf.tidy(() => {
-        const inputTensor = tf.tensor2d([featureVector]);
-        const reconstruction = this.model.predict(inputTensor) as tf.Tensor;
+        const inputTensor = tf.tensor2d([featureVector])
+        const reconstruction = this.model.predict(inputTensor) as tf.Tensor
         const error = tf
           .mean(tf.abs(tf.sub(inputTensor, reconstruction)))
-          .dataSync()[0];
+          .dataSync()[0]
 
-        const score = this.isolationForest.predict([featureVector])[0];
-        return { reconstructionError: error, anomalyScore: score };
-      });
+        const score = this.isolationForest.predict([featureVector])[0]
+        return { reconstructionError: error, anomalyScore: score }
+      })
 
       const reconstructionThreshold =
-        profile.baselineMetrics.sequentialThreshold || 0.1;
+        profile.baselineMetrics.sequentialThreshold || 0.1
 
       if (reconstructionError > reconstructionThreshold) {
         anomalies.push({
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
-          patternId: "ml_reconstruction_error",
-          anomalyType: "novelty",
+          patternId: 'ml_reconstruction_error',
+          anomalyType: 'novelty',
           severity:
             reconstructionError > reconstructionThreshold * 2
-              ? "high"
-              : "medium",
+              ? 'high'
+              : 'medium',
           deviationScore: reconstructionError,
           confidence: 0.85,
           context: {
-            type: "autoencoder",
+            type: 'autoencoder',
             error: reconstructionError,
             threshold: reconstructionThreshold,
           },
           timestamp: new Date(),
-        });
+        })
       }
 
-      const isolationThreshold = 0.6; // Configurable threshold
+      const isolationThreshold = 0.6 // Configurable threshold
 
       if (anomalyScore > isolationThreshold) {
         anomalies.push({
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
-          patternId: "ml_isolation_forest",
-          anomalyType: "outlier",
-          severity: anomalyScore > 0.8 ? "critical" : "high",
+          patternId: 'ml_isolation_forest',
+          anomalyType: 'outlier',
+          severity: anomalyScore > 0.8 ? 'critical' : 'high',
           deviationScore: anomalyScore,
           confidence: 0.9,
           context: {
-            type: "isolation_forest",
+            type: 'isolation_forest',
             score: anomalyScore,
             threshold: isolationThreshold,
           },
           timestamp: new Date(),
-        });
+        })
       }
     } catch (error) {
-      console.error("Error in ML anomaly detection:", error);
+      console.error('Error in ML anomaly detection:', error)
     }
 
-    return anomalies;
+    return anomalies
   }
 
   private async detectStatisticalAnomalies(
     profile: BehaviorProfile,
     features: BehavioralFeatures,
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = [];
+    const anomalies: Anomaly[] = []
 
     const numericalFeatures = [
       features.temporal.activityFrequency,
       features.spatial.geographicSpread,
       features.sequential.sequenceEntropy,
-    ];
+    ]
 
     const baselineValues = [
       profile.baselineMetrics.frequencyThreshold,
       profile.baselineMetrics.geographicThreshold,
       profile.baselineMetrics.sequentialThreshold,
-    ];
+    ]
 
     numericalFeatures.forEach((value, index) => {
-      const baseline = baselineValues[index];
+      const baseline = baselineValues[index]
       if (baseline && value > baseline * 2) {
         // 2 standard deviations
         anomalies.push({
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
           patternId: `statistical_${index}`,
-          anomalyType: "deviation",
-          severity: value > baseline * 3 ? "critical" : "high",
+          anomalyType: 'deviation',
+          severity: value > baseline * 3 ? 'critical' : 'high',
           deviationScore: value / baseline,
           confidence: 0.75,
           context: {
-            type: "statistical",
-            feature: ["activity", "geographic", "entropy"][index],
+            type: 'statistical',
+            feature: ['activity', 'geographic', 'entropy'][index],
             value,
             baseline,
           },
           timestamp: new Date(),
-        });
+        })
       }
-    });
+    })
 
-    return anomalies;
+    return anomalies
   }
 
   private async detectTemporalAnomalies(
     profile: BehaviorProfile,
     features: BehavioralFeatures,
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = [];
+    const anomalies: Anomaly[] = []
 
     // Detect unusually strong time-of-day preferences
-    const timePref = features.temporal.timeOfDayPreference;
+    const timePref = features.temporal.timeOfDayPreference
     const baselineTimeThreshold =
-      profile.baselineMetrics.timeOfDayThreshold ?? 0.5;
+      profile.baselineMetrics.timeOfDayThreshold ?? 0.5
 
     if (timePref > 0.8) {
       // Very strong preference for a particular time-of-day
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
-        patternId: "temporal_unusual_time",
-        anomalyType: "novelty",
-        severity: timePref > 0.9 ? "high" : "medium",
+        patternId: 'temporal_unusual_time',
+        anomalyType: 'novelty',
+        severity: timePref > 0.9 ? 'high' : 'medium',
         deviationScore: timePref,
         confidence: 0.8,
         context: {
-          type: "temporal",
+          type: 'temporal',
           timeOfDayPreference: timePref,
           baselineThreshold: baselineTimeThreshold,
         },
         timestamp: new Date(),
-      });
+      })
     } else if (timePref > baselineTimeThreshold) {
       // Mild deviation from baseline time-of-day behavior
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
-        patternId: "temporal_time_deviation",
-        anomalyType: "deviation",
-        severity: "low",
+        patternId: 'temporal_time_deviation',
+        anomalyType: 'deviation',
+        severity: 'low',
         deviationScore: timePref / baselineTimeThreshold,
         confidence: 0.65,
         context: {
-          type: "temporal",
+          type: 'temporal',
           timeOfDayPreference: timePref,
           baselineThreshold: baselineTimeThreshold,
         },
         timestamp: new Date(),
-      });
+      })
     }
 
     if (features.temporal.sessionRegularity < 0.3) {
@@ -1360,78 +1322,78 @@ class MLAnomalyDetector extends AnomalyDetector {
       anomalies.push({
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
-        patternId: "temporal_irregular_sessions",
-        anomalyType: "deviation",
-        severity: "low",
+        patternId: 'temporal_irregular_sessions',
+        anomalyType: 'deviation',
+        severity: 'low',
         deviationScore: 1 - features.temporal.sessionRegularity,
         confidence: 0.7,
         context: {
-          type: "temporal",
+          type: 'temporal',
           sessionRegularity: features.temporal.sessionRegularity,
         },
         timestamp: new Date(),
-      });
+      })
     }
 
-    return anomalies;
+    return anomalies
   }
 
   private filterAndRankAnomalies(anomalies: Anomaly[]): Anomaly[] {
     return anomalies
       .filter((anomaly) => anomaly.confidence > 0.6)
       .sort((a, b) => {
-        const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+        const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
         const severityDiff =
-          severityOrder[b.severity] - severityOrder[a.severity];
+          severityOrder[b.severity] - severityOrder[a.severity]
         if (severityDiff !== 0) {
-          return severityDiff;
+          return severityDiff
         }
-        return b.confidence - a.confidence;
+        return b.confidence - a.confidence
       })
-      .slice(0, 20);
+      .slice(0, 20)
   }
 
   private generateProfileId(userId: string): string {
-    return `profile_${userId}_${Date.now()}`;
+    return `profile_${userId}_${Date.now()}`
   }
 
   private generateAnomalyId(): string {
-    return `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   private generateAnalysisId(): string {
-    return `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `analysis_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 
   private generateGraphId(): string {
-    return `graph_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return `graph_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
   }
 }
 
 class SequentialPatternMiner extends PatternMiner {
-  private minSupport: number = 0.1;
-  private maxPatternLength: number = 10;
-  private minPatternLength: number = 2;
+  private minSupport: number = 0.1
+  private maxPatternLength: number = 10
+  private minPatternLength: number = 2
 
   async minePatterns(
     sequences: BehavioralSequence[],
   ): Promise<BehavioralPattern[]> {
     try {
-      const processedSequences = this.preprocessSequences(sequences);
+      const processedSequences = this.preprocessSequences(sequences)
 
       const frequentPatterns =
-        await this.mineFrequentPatterns(processedSequences);
+        await this.mineFrequentPatterns(processedSequences)
 
       const significantPatterns =
-        this.filterSignificantPatterns(frequentPatterns);
+        this.filterSignificantPatterns(frequentPatterns)
 
       return await this.calculatePatternStatistics(
         significantPatterns,
         processedSequences,
-      );
+      )
     } catch (error) {
-      console.error("Error in sequential pattern mining:", error);
-      return [];
+      console.error('Error in sequential pattern mining:', error)
+      return []
     }
   }
 
@@ -1440,44 +1402,41 @@ class SequentialPatternMiner extends PatternMiner {
       .filter((seq) => seq.actions.length >= this.minPatternLength)
       .map((seq) =>
         seq.actions.filter((action) => action && action.trim().length > 0),
-      );
+      )
   }
 
   private async mineFrequentPatterns(
     sequences: string[][],
   ): Promise<FrequentPattern[]> {
-    const patterns: FrequentPattern[] = [];
+    const patterns: FrequentPattern[] = []
 
-    const prefixSpanPatterns = await this.prefixSpan(
-      sequences,
-      this.minSupport,
-    );
-    patterns.push(...prefixSpanPatterns);
+    const prefixSpanPatterns = await this.prefixSpan(sequences, this.minSupport)
+    patterns.push(...prefixSpanPatterns)
 
-    const spadePatterns = await this.spade(sequences, this.minSupport);
-    patterns.push(...spadePatterns);
+    const spadePatterns = await this.spade(sequences, this.minSupport)
+    patterns.push(...spadePatterns)
 
-    return patterns;
+    return patterns
   }
 
   private async prefixSpan(
     sequences: string[][],
     minSupport: number,
   ): Promise<FrequentPattern[]> {
-    const patterns: FrequentPattern[] = [];
-    const frequentItems = this.findFrequentItems(sequences, minSupport);
+    const patterns: FrequentPattern[] = []
+    const frequentItems = this.findFrequentItems(sequences, minSupport)
 
     for (const item of frequentItems) {
-      const projectedDB = this.projectDatabase(sequences, [item]);
+      const projectedDB = this.projectDatabase(sequences, [item])
       const pattern = await this.prefixSpanGrowth(
         projectedDB,
         [item],
         minSupport,
-      );
-      patterns.push(...pattern);
+      )
+      patterns.push(...pattern)
     }
 
-    return patterns;
+    return patterns
   }
 
   private async prefixSpanGrowth(
@@ -1485,17 +1444,17 @@ class SequentialPatternMiner extends PatternMiner {
     prefix: string[],
     minSupport: number,
   ): Promise<FrequentPattern[]> {
-    const patterns: FrequentPattern[] = [];
+    const patterns: FrequentPattern[] = []
 
     if (prefix.length >= this.maxPatternLength) {
-      return patterns;
+      return patterns
     }
 
-    const frequentItems = this.findFrequentItems(projectedDB, minSupport);
+    const frequentItems = this.findFrequentItems(projectedDB, minSupport)
 
     for (const item of frequentItems) {
-      const newPrefix = [...prefix, item];
-      const support = this.calculateSupport(projectedDB, newPrefix);
+      const newPrefix = [...prefix, item]
+      const support = this.calculateSupport(projectedDB, newPrefix)
 
       if (support >= minSupport) {
         patterns.push({
@@ -1503,168 +1462,168 @@ class SequentialPatternMiner extends PatternMiner {
           support,
           confidence: support,
           frequency: support,
-          type: "sequential",
-        });
+          type: 'sequential',
+        })
 
-        const newProjectedDB = this.projectDatabase(projectedDB, newPrefix);
+        const newProjectedDB = this.projectDatabase(projectedDB, newPrefix)
         const subPatterns = await this.prefixSpanGrowth(
           newProjectedDB,
           newPrefix,
           minSupport,
-        );
-        patterns.push(...subPatterns);
+        )
+        patterns.push(...subPatterns)
       }
     }
 
-    return patterns;
+    return patterns
   }
 
   private async spade(
     sequences: string[][],
     minSupport: number,
   ): Promise<FrequentPattern[]> {
-    const patterns: FrequentPattern[] = [];
+    const patterns: FrequentPattern[] = []
 
-    const idLists = this.buildIdLists(sequences);
+    const idLists = this.buildIdLists(sequences)
     const frequentSequences = this.enumerateFrequentSequences(
       idLists,
       minSupport,
-    );
+    )
 
     for (const seq of frequentSequences) {
-      const support = this.calculateSequenceSupport(seq, sequences);
+      const support = this.calculateSequenceSupport(seq, sequences)
       if (support >= minSupport) {
         patterns.push({
           pattern: seq,
           support,
           confidence: support,
           frequency: support,
-          type: "sequential",
-        });
+          type: 'sequential',
+        })
       }
     }
 
-    return patterns;
+    return patterns
   }
 
   private findFrequentItems(
     sequences: string[][],
     minSupport: number,
   ): string[] {
-    const itemCounts: Record<string, number> = {};
+    const itemCounts: Record<string, number> = {}
 
     for (const sequence of sequences) {
-      const uniqueItems = Array.from(new Set(sequence));
+      const uniqueItems = Array.from(new Set(sequence))
       for (const item of uniqueItems) {
-        itemCounts[item] = (itemCounts[item] || 0) + 1;
+        itemCounts[item] = (itemCounts[item] || 0) + 1
       }
     }
 
-    const totalSequences = sequences.length;
-    const minCount = Math.ceil(totalSequences * minSupport);
+    const totalSequences = sequences.length
+    const minCount = Math.ceil(totalSequences * minSupport)
 
     return Object.entries(itemCounts)
       .filter(([_, count]) => count >= minCount)
-      .map(([item, _]) => item);
+      .map(([item, _]) => item)
   }
 
   private projectDatabase(sequences: string[][], prefix: string[]): string[][] {
-    const projectedDB: string[][] = [];
+    const projectedDB: string[][] = []
 
     for (const sequence of sequences) {
-      const projectedSequence: string[] = [];
+      const projectedSequence: string[] = []
 
       for (let i = 0; i < sequence.length; i++) {
         if (sequence[i] === prefix[prefix.length - 1]) {
           // Found the last item of prefix, add remaining sequence
-          const remainingSequence = sequence.slice(i + 1);
+          const remainingSequence = sequence.slice(i + 1)
           if (remainingSequence.length > 0) {
-            projectedSequence.push(...remainingSequence);
+            projectedSequence.push(...remainingSequence)
           }
-          break;
+          break
         }
       }
 
       if (projectedSequence.length > 0) {
-        projectedDB.push(projectedSequence);
+        projectedDB.push(projectedSequence)
       }
     }
 
-    return projectedDB;
+    return projectedDB
   }
 
   private buildIdLists(sequences: string[][]): Record<string, number[][]> {
-    const idLists: Record<string, number[][]> = {};
+    const idLists: Record<string, number[][]> = {}
 
     sequences.forEach((sequence, seqIndex) => {
       sequence.forEach((item, itemIndex) => {
         if (!idLists[item]) {
-          idLists[item] = [];
+          idLists[item] = []
         }
-        idLists[item].push([seqIndex, itemIndex]);
-      });
-    });
+        idLists[item].push([seqIndex, itemIndex])
+      })
+    })
 
-    return idLists;
+    return idLists
   }
 
   private enumerateFrequentSequences(
     idLists: Record<string, number[][]>,
     minSupport: number,
   ): string[][] {
-    const frequentSequences: string[][] = [];
+    const frequentSequences: string[][] = []
 
     for (const item of Object.keys(idLists)) {
       if (idLists[item].length >= minSupport) {
-        frequentSequences.push([item]);
+        frequentSequences.push([item])
       }
     }
 
-    let k = 2;
+    let k = 2
     while (true) {
-      const candidates = this.generateCandidates(frequentSequences, k);
-      const frequentKSequences: string[][] = [];
+      const candidates = this.generateCandidates(frequentSequences, k)
+      const frequentKSequences: string[][] = []
 
       for (const candidate of candidates) {
         if (this.isFrequentSequence(candidate, idLists, minSupport)) {
-          frequentKSequences.push(candidate);
+          frequentKSequences.push(candidate)
         }
       }
 
       if (frequentKSequences.length === 0) {
-        break;
+        break
       }
 
-      frequentSequences.push(...frequentKSequences);
-      k++;
+      frequentSequences.push(...frequentKSequences)
+      k++
     }
 
-    return frequentSequences;
+    return frequentSequences
   }
 
   private generateCandidates(
     frequentSequences: string[][],
     k: number,
   ): string[][] {
-    const candidates: string[][] = [];
+    const candidates: string[][] = []
 
     for (let i = 0; i < frequentSequences.length; i++) {
       for (let j = i + 1; j < frequentSequences.length; j++) {
-        const seq1 = frequentSequences[i];
-        const seq2 = frequentSequences[j];
+        const seq1 = frequentSequences[i]
+        const seq2 = frequentSequences[j]
 
         if (
           seq1.length === k - 1 &&
           seq2.length === k - 1 &&
           seq1.slice(0, -1).every((item, idx) => item === seq2[idx])
         ) {
-          const candidate = [...seq1, seq2[seq2.length - 1]];
-          candidates.push(candidate);
+          const candidate = [...seq1, seq2[seq2.length - 1]]
+          candidates.push(candidate)
         }
       }
     }
 
-    return candidates;
+    return candidates
   }
 
   private isFrequentSequence(
@@ -1676,63 +1635,63 @@ class SequentialPatternMiner extends PatternMiner {
     // would join idLists for the full sequence. Here we compute support from
     // the idLists passed in: count unique sequence IDs from the last item's
     // idList. For single-item sequences this yields the correct support.
-    const lastItem = sequence[sequence.length - 1];
-    const idList = idLists[lastItem];
+    const lastItem = sequence[sequence.length - 1]
+    const idList = idLists[lastItem]
     if (!idList) {
-      return false;
+      return false
     }
-    const uniqueSequenceIds = new Set(idList.map((entry) => entry[0]));
-    const support = uniqueSequenceIds.size;
-    return support >= minSupport;
+    const uniqueSequenceIds = new Set(idList.map((entry) => entry[0]))
+    const support = uniqueSequenceIds.size
+    return support >= minSupport
   }
 
   private calculateSequenceSupport(
     sequence: string[],
     sequences: string[][],
   ): number {
-    let count = 0;
+    let count = 0
 
     for (const seq of sequences) {
       if (this.containsSequence(seq, sequence)) {
-        count++;
+        count++
       }
     }
 
-    return count;
+    return count
   }
 
   private containsSequence(sequence: string[], pattern: string[]): boolean {
     if (pattern.length === 0) {
-      return true;
+      return true
     }
     if (pattern.length > sequence.length) {
-      return false;
+      return false
     }
 
     for (let i = 0; i <= sequence.length - pattern.length; i++) {
-      let match = true;
+      let match = true
       for (let j = 0; j < pattern.length; j++) {
         if (sequence[i + j] !== pattern[j]) {
-          match = false;
-          break;
+          match = false
+          break
         }
       }
       if (match) {
-        return true;
+        return true
       }
     }
 
-    return false;
+    return false
   }
 
   private calculateSupport(sequences: string[][], pattern: string[]): number {
-    let count = 0;
+    let count = 0
     for (const sequence of sequences) {
       if (this.containsSequence(sequence, pattern)) {
-        count++;
+        count++
       }
     }
-    return count;
+    return count
   }
 
   private filterSignificantPatterns(
@@ -1743,65 +1702,65 @@ class SequentialPatternMiner extends PatternMiner {
         pattern.pattern.length >= this.minPatternLength &&
         pattern.support >= this.minSupport &&
         pattern.confidence > 0.5,
-    );
+    )
   }
 
   private async calculatePatternStatistics(
     patterns: FrequentPattern[],
     sequences: string[][],
   ): Promise<BehavioralPattern[]> {
-    const behavioralPatterns: BehavioralPattern[] = [];
+    const behavioralPatterns: BehavioralPattern[] = []
 
     for (const freqPattern of patterns) {
       const stability = await this.calculatePatternStability(
         freqPattern,
         sequences,
-      );
-      const { confidence } = freqPattern;
-      const frequency = freqPattern.support;
+      )
+      const { confidence } = freqPattern
+      const frequency = freqPattern.support
 
       behavioralPatterns.push({
         patternId: this.generatePatternId(freqPattern.pattern),
-        patternType: "sequential",
+        patternType: 'sequential',
         patternData: {
           sequence: freqPattern.pattern,
           support: freqPattern.support,
-          type: "sequential",
+          type: 'sequential',
         },
         confidence,
         frequency,
         lastObserved: new Date(),
         stability,
-      });
+      })
     }
 
-    return behavioralPatterns;
+    return behavioralPatterns
   }
 
   private async calculatePatternStability(
     pattern: FrequentPattern,
     sequences: string[][],
   ): Promise<number> {
-    let totalOccurrences = 0;
-    let consistentOccurrences = 0;
+    let totalOccurrences = 0
+    let consistentOccurrences = 0
 
     for (const sequence of sequences) {
       const occurrences = this.countPatternOccurrences(
         sequence,
         pattern.pattern,
-      );
-      totalOccurrences += occurrences;
+      )
+      totalOccurrences += occurrences
 
       if (occurrences > 0) {
-        consistentOccurrences++;
+        consistentOccurrences++
       }
     }
 
     if (totalOccurrences === 0) {
-      return 0;
+      return 0
     }
 
-    return consistentOccurrences / sequences.length;
+    return consistentOccurrences / sequences.length
   }
 
   private countPatternOccurrences(
@@ -1809,41 +1768,41 @@ class SequentialPatternMiner extends PatternMiner {
     pattern: string[],
   ): number {
     if (pattern.length === 0) {
-      return 0;
+      return 0
     }
     if (pattern.length > sequence.length) {
-      return 0;
+      return 0
     }
 
-    let count = 0;
+    let count = 0
     for (let i = 0; i <= sequence.length - pattern.length; i++) {
-      let match = true;
+      let match = true
       for (let j = 0; j < pattern.length; j++) {
         if (sequence[i + j] !== pattern[j]) {
-          match = false;
-          break;
+          match = false
+          break
         }
       }
       if (match) {
-        count++;
-        i += pattern.length - 1;
+        count++
+        i += pattern.length - 1
       }
     }
 
-    return count;
+    return count
   }
 
   private generatePatternId(pattern: string[]): string {
-    return `pattern_${pattern.join("_")}_${Date.now()}`;
+    return `pattern_${pattern.join('_')}_${Date.now()}`
   }
 }
 
 interface FrequentPattern {
-  pattern: string[];
-  support: number;
-  confidence: number;
-  frequency: number;
-  type: string;
+  pattern: string[]
+  support: number
+  confidence: number
+  frequency: number
+  type: string
 }
 
 class MultiFactorRiskCalculator extends RiskCalculator {
@@ -1851,28 +1810,28 @@ class MultiFactorRiskCalculator extends RiskCalculator {
     _profile: BehaviorProfile,
     _events: SecurityEvent[],
   ): Promise<number> {
-    return 0.5;
+    return 0.5
   }
 }
 
 class DifferentialPrivacyPreserver extends PrivacyPreserver {
   constructor(private config: PrivacyConfig) {
-    super();
+    super()
   }
 
   async applyPrivacy(events: SecurityEvent[]): Promise<SecurityEvent[]> {
-    return events;
+    return events
   }
 
   getPrivacyBudget(): { used: number; remaining: number; epsilon: number } {
-    return { used: 0.1, remaining: 0.9, epsilon: this.config.epsilon };
+    return { used: 0.1, remaining: 0.9, epsilon: this.config.epsilon }
   }
 }
 
 class BehavioralGraphAnalyzer extends GraphAnalyzer {
   async buildGraph(_events: SecurityEvent[]): Promise<BehaviorGraph> {
     return {
-      graphId: "graph_123",
+      graphId: 'graph_123',
       nodes: [],
       edges: [],
       properties: {
@@ -1882,26 +1841,26 @@ class BehavioralGraphAnalyzer extends GraphAnalyzer {
         anomalyScore: 0,
       },
       timestamp: new Date(),
-    };
+    }
   }
 
   async calculateCentrality(
     _graph: BehaviorGraph,
   ): Promise<Record<string, number>> {
-    return {};
+    return {}
   }
 
   async detectCommunities(_graph: BehaviorGraph): Promise<string[][]> {
-    return [];
+    return []
   }
 
   async detectGraphAnomalies(
     _graph: BehaviorGraph,
   ): Promise<{ anomalyScore: number }> {
-    return { anomalyScore: 0 };
+    return { anomalyScore: 0 }
   }
 
   async identifyBehavioralClusters(_graph: BehaviorGraph): Promise<Cluster[]> {
-    return [];
+    return []
   }
 }

@@ -60,10 +60,10 @@ Choose the appropriate protocol based on your security and performance requireme
 ## Performance Comparison
 
 | Protocol | Security Model | Preprocessing | Online Phase | Memory Usage |
-| -------- | -------------- | ------------- | ------------ | ------------ |
-| MASCOT   | Malicious      | Slow          | Moderate     | High         |
-| SPDZ2k   | Malicious      | Moderate      | Fast         | Moderate     |
-| Semi2k   | Semi-honest    | Fast          | Very Fast    | Low          |
+|----------|---------------|---------------|--------------|--------------|
+| MASCOT   | Malicious     | Slow          | Moderate     | High         |
+| SPDZ2k   | Malicious     | Moderate      | Fast         | Moderate     |
+| Semi2k   | Semi-honest   | Fast          | Very Fast    | Low          |
 
 ## Security Considerations
 

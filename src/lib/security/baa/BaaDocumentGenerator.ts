@@ -1,5 +1,5 @@
-import type { BaaTemplate, BaaDocument, BusinessAssociate } from "./types";
-import { generateId } from "../../utils/ids";
+import type { BaaTemplate, BaaDocument, BusinessAssociate } from './types'
+import { generateId } from '../../utils/ids'
 
 /**
  * Service for generating BAA documents from templates
@@ -17,14 +17,14 @@ export class BaaDocumentGenerator {
     expirationDate?: Date,
   ): BaaDocument {
     // Check if all required placeholders have values
-    this.validatePlaceholderValues(template, placeholderValues);
+    this.validatePlaceholderValues(template, placeholderValues)
 
     // Create a new BAA document
     const document: BaaDocument = {
       id: generateId(),
       templateId: template.id,
       businessAssociateId: businessAssociate.id,
-      name: `BAA - ${businessAssociate.name} - ${new Date().toISOString().split("T")[0]}`,
+      name: `BAA - ${businessAssociate.name} - ${new Date().toISOString().split('T')[0]}`,
       effectiveDate,
       expirationDate,
       status: BaaStatus.DRAFT,
@@ -39,19 +39,19 @@ export class BaaDocumentGenerator {
       auditTrail: [
         {
           id: generateId(),
-          documentId: "", // Will be set below
-          eventType: "created",
+          documentId: '', // Will be set below
+          eventType: 'created',
           timestamp: new Date(),
           userId: createdBy,
           details: `Document created from template "${template.name}"`,
         },
       ],
-    };
+    }
 
     // Set the documentId in auditTrail
-    document.auditTrail[0].documentId = document.id;
+    document.auditTrail[0].documentId = document.id
 
-    return document;
+    return document
   }
 
   /**
@@ -104,29 +104,29 @@ export class BaaDocumentGenerator {
       </head>
       <body>
         <h1>BUSINESS ASSOCIATE AGREEMENT</h1>
-    `;
+    `
 
     // Add sections
     template.sections
       .filter((section) => document.includedSectionIds.includes(section.id))
       .sort((a, b) => a.order - b.order)
       .forEach((section) => {
-        let sectionContent = section.content;
+        let sectionContent = section.content
 
         // Replace placeholders in the section content
         Object.entries(document.filledPlaceholders).forEach(([key, value]) => {
-          const placeholder = `{{${key}}}`;
+          const placeholder = `{{${key}}}`
           sectionContent = sectionContent.replace(
-            new RegExp(placeholder, "g"),
+            new RegExp(placeholder, 'g'),
             value,
-          );
-        });
+          )
+        })
 
         html += `
           <h2>${section.title}</h2>
           <div>${this.convertMarkdownToHtml(sectionContent)}</div>
-        `;
-      });
+        `
+      })
 
     // Add signature blocks
     html += `
@@ -150,9 +150,9 @@ export class BaaDocumentGenerator {
         </div>
       </body>
       </html>
-    `;
+    `
 
-    return html;
+    return html
   }
 
   /**
@@ -160,23 +160,23 @@ export class BaaDocumentGenerator {
    * Note: This is a basic implementation supporting only basic formatting
    */
   private convertMarkdownToHtml(markdown: string): string {
-    let html = markdown;
+    let html = markdown
 
     // Convert line breaks to <br> tags
-    html = html.replace(/\n\n/g, "</p><p>");
+    html = html.replace(/\n\n/g, '</p><p>')
 
     // Convert bold text
-    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
 
     // Convert italic text
-    html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
 
     // Wrap in paragraph tags if not already wrapped
-    if (!html.startsWith("<p>")) {
-      html = `<p>${html}</p>`;
+    if (!html.startsWith('<p>')) {
+      html = `<p>${html}</p>`
     }
 
-    return html;
+    return html
   }
 
   /**
@@ -188,12 +188,12 @@ export class BaaDocumentGenerator {
   ): void {
     const missingPlaceholders = template.placeholders
       .filter((p) => p.required && !placeholderValues[p.key])
-      .map((p) => p.key);
+      .map((p) => p.key)
 
     if (missingPlaceholders.length > 0) {
       throw new Error(
-        `Missing required placeholder values: ${missingPlaceholders.join(", ")}`,
-      );
+        `Missing required placeholder values: ${missingPlaceholders.join(', ')}`,
+      )
     }
   }
 
@@ -211,25 +211,25 @@ export class BaaDocumentGenerator {
         .filter((section) => document.includedSectionIds.includes(section.id))
         .sort((a, b) => a.order - b.order)
         .map((section) => {
-          let { content } = section;
+          let { content } = section
 
           // Replace placeholders in the content
           Object.entries(document.filledPlaceholders).forEach(
             ([key, value]) => {
-              const placeholder = `{{${key}}}`;
-              content = content.replace(new RegExp(placeholder, "g"), value);
+              const placeholder = `{{${key}}}`
+              content = content.replace(new RegExp(placeholder, 'g'), value)
             },
-          );
+          )
 
           return {
             id: section.id,
             title: section.title,
             content,
             order: section.order,
-          };
+          }
         }),
-    };
+    }
 
-    return JSON.stringify(exportData, null, 2);
+    return JSON.stringify(exportData, null, 2)
   }
 }

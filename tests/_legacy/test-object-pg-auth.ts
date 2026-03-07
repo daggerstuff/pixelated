@@ -38,6 +38,7 @@ async function testObjectAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Object auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

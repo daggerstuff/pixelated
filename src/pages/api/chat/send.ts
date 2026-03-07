@@ -1,20 +1,20 @@
-import type { APIContext } from "astro";
-import { v4 as uuidv4 } from "uuid";
+import type { APIContext } from 'astro'
+import { v4 as uuidv4 } from 'uuid'
 // Import the FHE chat library
-import { fheChat } from "../../../lib/chat/fheChat";
+import { fheChat } from '../../../lib/chat/fheChat'
 
 // Define the request interface for the message sending API
 interface ChatMessageRequest {
-  conversationId: string;
-  userId: string;
-  message: string;
-  isEncrypted?: boolean;
-  requireSenderVerification?: boolean;
+  conversationId: string
+  userId: string
+  message: string
+  isEncrypted?: boolean
+  requireSenderVerification?: boolean
 }
 
 // Define the message sending handler with FHE secure processing
 export const POST = async ({ request }: APIContext) => {
-  const body = (await request.json()) as ChatMessageRequest;
+  const body = (await request.json()) as ChatMessageRequest
 
   // ... existing message validation logic
 
@@ -26,17 +26,17 @@ export const POST = async ({ request }: APIContext) => {
     content: body.message,
     timestamp: Date.now(),
     metadata: {
-      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-      userAgent: request.headers.get("user-agent") || "unknown",
+      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+      userAgent: request.headers.get('user-agent') || 'unknown',
     },
-  };
+  }
 
   // Process the message with FHE
-  const secureMessage = await fheChat.processMessage(messageData);
+  const secureMessage = await fheChat.processMessage(messageData)
 
   // For sensitive conversations, encrypt the message using FHE
   if (body.isEncrypted) {
-    await fheChat.encryptMessage(messageData);
+    await fheChat.encryptMessage(messageData)
     // ... store encrypted message ...
   } else {
     // ... store message with security signature ...
@@ -44,8 +44,8 @@ export const POST = async ({ request }: APIContext) => {
 
   // Verify the sender is authorized (for AI messages or restricted conversations)
   if (body.requireSenderVerification) {
-    const authorizedSenders = await getAuthorizedSenders(body.conversationId);
-    await fheChat.verifySender(body.userId, authorizedSenders);
+    const authorizedSenders = await getAuthorizedSenders(body.conversationId)
+    await fheChat.verifySender(body.userId, authorizedSenders)
   }
 
   // ... existing message processing logic
@@ -60,12 +60,12 @@ export const POST = async ({ request }: APIContext) => {
     {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         // ... other headers ...
       },
     },
-  );
-};
+  )
+}
 
 // Helper function to get authorized senders for a conversation
 async function getAuthorizedSenders(
@@ -73,5 +73,5 @@ async function getAuthorizedSenders(
 ): Promise<string[]> {
   // In a real implementation, this would fetch the authorized senders from the database
   // For now, return a mock lis
-  return ["user-1", "user-2", "ai-assistant"];
+  return ['user-1', 'user-2', 'ai-assistant']
 }

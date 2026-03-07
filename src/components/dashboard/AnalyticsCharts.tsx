@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from "react";
-import type { FC } from "react";
-import { useAnalyticsDashboard } from "@/hooks/useAnalyticsDashboard";
+import { useState, useCallback, useMemo } from 'react'
+import type { FC } from 'react'
+import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
 import type {
   SessionData,
   SkillProgressData,
@@ -8,7 +8,7 @@ import type {
   AnalyticsError,
   TimeRange,
   AnalyticsFilters,
-} from "@/types/analytics";
+} from '@/types/analytics'
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
@@ -20,12 +20,12 @@ const LoadingSkeleton: FC = () => (
       <div className="h-3 bg-gray-200 rounded w-4/6"></div>
     </div>
   </div>
-);
+)
 
 // Error boundary component
 interface ErrorDisplayProps {
-  error: AnalyticsError;
-  onRetry: () => void;
+  error: AnalyticsError
+  onRetry: () => void
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
@@ -45,21 +45,21 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
       </button>
     </div>
   </div>
-);
+)
 
 // Time range selector component
 interface TimeRangeSelectorProps {
-  value: TimeRange;
-  onChange: (range: TimeRange) => void;
+  value: TimeRange
+  onChange: (range: TimeRange) => void
 }
 
 const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
   const options: { value: TimeRange; label: string }[] = [
-    { value: "7d", label: "Last 7 days" },
-    { value: "30d", label: "Last 30 days" },
-    { value: "90d", label: "Last 90 days" },
-    { value: "1y", label: "Last year" },
-  ];
+    { value: '7d', label: 'Last 7 days' },
+    { value: '30d', label: 'Last 30 days' },
+    { value: '90d', label: 'Last 90 days' },
+    { value: '1y', label: 'Last year' },
+  ]
 
   return (
     <div className="flex space-x-2">
@@ -69,30 +69,30 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
           onClick={() => onChange(option.value)}
           className={`px-3 py-1 text-sm rounded transition-colors ${
             value === option.value
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
           {option.label}
         </button>
       ))}
     </div>
-  );
-};
+  )
+}
 
 // Session activity chart component
 interface SessionChartProps {
-  data: SessionData[];
-  isLoading: boolean;
+  data: SessionData[]
+  isLoading: boolean
 }
 
 const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   const maxSessions = useMemo(() => {
-    return Math.max(...data.map((d) => d.sessions), 1);
-  }, [data]);
+    return Math.max(...data.map((d) => d.sessions), 1)
+  }, [data])
 
   if (isLoading) {
-    return <LoadingSkeleton />;
+    return <LoadingSkeleton />
   }
 
   return (
@@ -105,13 +105,13 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
               className="bg-blue-500 w-full rounded-t transition-all duration-300 hover:bg-blue-600"
               style={{
                 height: `${(day.sessions / maxSessions) * 100}%`,
-                minHeight: "4px",
+                minHeight: '4px',
               }}
               title={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
             />
             <span className="text-xs mt-2 text-gray-600">
-              {new Date(day.date).toLocaleDateString("en-US", {
-                weekday: "short",
+              {new Date(day.date).toLocaleDateString('en-US', {
+                weekday: 'short',
               })}
             </span>
             <span className="text-xs text-gray-500">{day.sessions}</span>
@@ -119,41 +119,41 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Skill progress component
 interface SkillProgressProps {
-  data: SkillProgressData[];
-  isLoading: boolean;
+  data: SkillProgressData[]
+  isLoading: boolean
 }
 
 const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   if (isLoading) {
-    return <LoadingSkeleton />;
+    return <LoadingSkeleton />
   }
 
-  const getTrendIcon = (trend: "up" | "down" | "stable") => {
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case "up":
-        return "↗";
-      case "down":
-        return "↘";
-      case "stable":
-        return "→";
+      case 'up':
+        return '↗'
+      case 'down':
+        return '↘'
+      case 'stable':
+        return '→'
     }
-  };
+  }
 
-  const getTrendColor = (trend: "up" | "down" | "stable") => {
+  const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
-      case "up":
-        return "text-green-600";
-      case "down":
-        return "text-red-600";
-      case "stable":
-        return "text-gray-600";
+      case 'up':
+        return 'text-green-600'
+      case 'down':
+        return 'text-red-600'
+      case 'stable':
+        return 'text-gray-600'
     }
-  };
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow">
@@ -180,13 +180,13 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Summary stats component
 interface SummaryStatsProps {
-  data: MetricSummary[];
-  isLoading: boolean;
+  data: MetricSummary[]
+  isLoading: boolean
 }
 
 const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
@@ -199,25 +199,25 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
           </div>
         ))}
       </div>
-    );
+    )
   }
 
   const getColorClasses = (color?: string) => {
     switch (color) {
-      case "blue":
-        return "text-blue-600";
-      case "green":
-        return "text-green-600";
-      case "purple":
-        return "text-purple-600";
-      case "orange":
-        return "text-orange-600";
-      case "red":
-        return "text-red-600";
+      case 'blue':
+        return 'text-blue-600'
+      case 'green':
+        return 'text-green-600'
+      case 'purple':
+        return 'text-purple-600'
+      case 'orange':
+        return 'text-orange-600'
+      case 'red':
+        return 'text-red-600'
       default:
-        return "text-gray-600";
+        return 'text-gray-600'
     }
-  };
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -227,7 +227,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
           className="bg-white p-4 rounded-lg shadow text-center"
         >
           <div className={`text-2xl font-bold ${getColorClasses(stat.color)}`}>
-            {typeof stat.value === "number"
+            {typeof stat.value === 'number'
               ? stat.value.toLocaleString()
               : stat.value}
           </div>
@@ -236,18 +236,18 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
             <div className="text-xs text-gray-500 mt-1">
               <span
                 className={
-                  stat.trend.direction === "up"
-                    ? "text-green-600"
-                    : stat.trend.direction === "down"
-                      ? "text-red-600"
-                      : "text-gray-600"
+                  stat.trend.direction === 'up'
+                    ? 'text-green-600'
+                    : stat.trend.direction === 'down'
+                      ? 'text-red-600'
+                      : 'text-gray-600'
                 }
               >
-                {stat.trend.direction === "up"
-                  ? "↗"
-                  : stat.trend.direction === "down"
-                    ? "↘"
-                    : "→"}{" "}
+                {stat.trend.direction === 'up'
+                  ? '↗'
+                  : stat.trend.direction === 'down'
+                    ? '↘'
+                    : '→'}{' '}
                 {stat.trend.value}%
               </span>
               <span className="ml-1">{stat.trend.period}</span>
@@ -256,32 +256,32 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 // Main analytics charts component
 export const AnalyticsCharts: FC = () => {
   // State for filters
   const [filters, setFilters] = useState<AnalyticsFilters>({
-    timeRange: "7d",
-    userSegment: "all",
-  });
+    timeRange: '7d',
+    userSegment: 'all',
+  })
 
   // Use production-grade analytics hook
   const { data, isLoading, error, refetch } = useAnalyticsDashboard(filters, {
     refreshInterval: 300000, // 5 minutes
     enableAutoRefresh: true,
-  });
+  })
 
   // Handle retry
   const handleRetry = useCallback(() => {
-    refetch();
-  }, [refetch]);
+    refetch()
+  }, [refetch])
 
   // Handle time range change
   const handleTimeRangeChange = useCallback((timeRange: TimeRange) => {
-    setFilters((prev) => ({ ...prev, timeRange }));
-  }, []);
+    setFilters((prev) => ({ ...prev, timeRange }))
+  }, [])
 
   // Render error state
   if (error && !isLoading) {
@@ -296,7 +296,7 @@ export const AnalyticsCharts: FC = () => {
         </div>
         <ErrorDisplay error={error} onRetry={handleRetry} />
       </div>
-    );
+    )
   }
 
   return (
@@ -326,5 +326,5 @@ export const AnalyticsCharts: FC = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,8 +1,8 @@
-import { ObjectId } from "mongodb";
-import { todoDAO } from "../../services/mongodb.dao";
-import { verifyAuthToken } from "../../utils/auth";
+import { ObjectId } from 'mongodb'
+import { todoDAO } from '../../services/mongodb.dao'
+import { verifyAuthToken } from '../../utils/auth'
 
-export const prerender = false;
+export const prerender = false
 
 /**
  * Todos API endpoint
@@ -12,19 +12,19 @@ export const prerender = false;
  */
 export const GET = async ({ request }) => {
   try {
-    const authHeader = request.headers.get("Authorization");
+    const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
       return new Response(
-        JSON.stringify({ error: "Authorization header required" }),
+        JSON.stringify({ error: 'Authorization header required' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
-    const { userId } = await verifyAuthToken(authHeader);
-    const todos = await todoDAO.findAll(userId);
+    const { userId } = await verifyAuthToken(authHeader)
+    const todos = await todoDAO.findAll(userId)
 
     return new Response(
       JSON.stringify({
@@ -33,47 +33,47 @@ export const GET = async ({ request }) => {
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logError("GET /api/todos", error);
+    logError('GET /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Failed to fetch todos",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to fetch todos',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-};
+}
 
 export const POST = async ({ request }) => {
   try {
-    const authHeader = request.headers.get("Authorization");
+    const authHeader = request.headers.get('Authorization')
     if (!authHeader) {
       return new Response(
-        JSON.stringify({ error: "Authorization header required" }),
+        JSON.stringify({ error: 'Authorization header required' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
-    const { userId } = await verifyAuthToken(authHeader);
-    const body = await request.json();
-    const { name, description } = body;
+    const { userId } = await verifyAuthToken(authHeader)
+    const body = await request.json()
+    const { name, description } = body
 
     if (!name) {
-      return new Response(JSON.stringify({ error: "Name is required" }), {
+      return new Response(JSON.stringify({ error: 'Name is required' }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     const todo = await todoDAO.create({
@@ -81,7 +81,7 @@ export const POST = async ({ request }) => {
       name,
       description,
       completed: false,
-    });
+    })
 
     return new Response(
       JSON.stringify({
@@ -90,24 +90,24 @@ export const POST = async ({ request }) => {
       }),
       {
         status: 201,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logError("POST /api/todos", error);
+    logError('POST /api/todos', error)
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Failed to create todo",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to create todo',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-};
+}
 
 // Provide minimal structured error logging to aid debugging in CI and local
 // development. For production-grade logging, route these through the
@@ -118,7 +118,7 @@ function logError(context: string, err: unknown) {
   console.error(
     `[todos.api] ${context} -`,
     err instanceof Error ? err.stack || err.message : String(err),
-  );
+  )
 }
 
 // Rate limiting should be implemented at the edge or via middleware (API gateway,

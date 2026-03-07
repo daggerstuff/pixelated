@@ -14,14 +14,14 @@
  */
 
 // Export the ConsentService
-export { ConsentService, consentService } from "./ConsentService";
+export { ConsentService, consentService } from './ConsentService'
 
 // Export all types
-export * from "./types";
+export * from './types'
 
 // Export React components
-export { ResearchConsentForm } from "../../../components/consent/ResearchConsentForm";
+export { ResearchConsentForm } from '../../../components/consent/ResearchConsentForm'
 
 // Export default consentService instance for easier imports
-import { consentService } from "./ConsentService";
-export default consentService;
+import { consentService } from './ConsentService'
+export default consentService

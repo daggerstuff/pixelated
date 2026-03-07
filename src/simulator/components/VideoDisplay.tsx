@@ -1,38 +1,38 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { UserSession } from "../types";
-import { toast } from "sonner";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-import { signalingService } from "../../lib/services/WebRTCSignalingService";
-import type { SignalingMessage } from "../../lib/services/WebRTCSignalingService";
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import type { UserSession } from '../types'
+import { toast } from 'sonner'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { signalingService } from '../../lib/services/WebRTCSignalingService'
+import type { SignalingMessage } from '../../lib/services/WebRTCSignalingService'
 
-const logger = createBuildSafeLogger("VideoDisplay");
+const logger = createBuildSafeLogger('VideoDisplay')
 
 interface VideoDisplayProps {
-  isConnected: boolean;
-  connectionStatus: UserSession["connectionStatus"];
-  className?: string;
-  sessionId: string;
-  userId: string;
-  onConnectionStateChange?: (state: RTCPeerConnectionState) => void;
+  isConnected: boolean
+  connectionStatus: UserSession['connectionStatus']
+  className?: string
+  sessionId: string
+  userId: string
+  onConnectionStateChange?: (state: RTCPeerConnectionState) => void
 }
 
 interface IceServer {
-  urls: string[];
-  username?: string;
-  credential?: string;
+  urls: string[]
+  username?: string
+  credential?: string
 }
 
 const ICE_SERVERS: IceServer[] = [
   {
     urls: [
-      process.env.TURN_SERVER_URL || "turn:turn.pixelatedempathy.com:3478",
+      process.env.TURN_SERVER_URL || 'turn:turn.pixelatedempathy.com:3478',
     ],
 
     username: process.env.TURN_SERVER_USERNAME,
     credential: process.env.TURN_SERVER_PASSWORD,
   },
-  { urls: ["stun:stun.l.google.com:19302"] },
-];
+  { urls: ['stun:stun.l.google.com:19302'] },
+]
 
 /**
  * Production-grade video chat component for therapeutic interactions
@@ -41,26 +41,26 @@ const ICE_SERVERS: IceServer[] = [
 const VideoDisplay: React.FC<VideoDisplayProps> = ({
   isConnected,
   connectionStatus,
-  className = "",
+  className = '',
   sessionId,
   userId,
   onConnectionStateChange,
 }) => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  const localStreamRef = useRef<MediaStream | null>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null)
+  const remoteVideoRef = useRef<HTMLVideoElement>(null)
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null)
+  const localStreamRef = useRef<MediaStream | null>(null)
 
-  const [isReconnecting, setIsReconnecting] = useState(false);
-  const [hasPermissionError, setHasPermissionError] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false)
+  const [hasPermissionError, setHasPermissionError] = useState(false)
 
   // Initialize WebRTC peer connection
   const initializePeerConnection = useCallback(() => {
     try {
       const peerConnection = new RTCPeerConnection({
         iceServers: ICE_SERVERS,
-        iceTransportPolicy: "relay", // Force usage of TURN server for privacy
-      });
+        iceTransportPolicy: 'relay', // Force usage of TURN server for privacy
+      })
 
       // Handle ICE candidate events
       peerConnection.onicecandidate = async (event) => {
@@ -70,46 +70,43 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
               sessionId,
               userId,
               event.candidate.toJSON(),
-            );
+            )
           } catch (error: unknown) {
-            logger.error("Failed to send ICE candidate", { error, sessionId });
+            logger.error('Failed to send ICE candidate', { error, sessionId })
           }
         }
-      };
+      }
 
       // Handle connection state changes
       peerConnection.onconnectionstatechange = () => {
-        logger.info("Connection state changed", {
+        logger.info('Connection state changed', {
           state: peerConnection.connectionState,
           sessionId,
-        });
+        })
 
-        onConnectionStateChange?.(peerConnection.connectionState);
+        onConnectionStateChange?.(peerConnection.connectionState)
 
-        if (peerConnection.connectionState === "failed") {
-          handleConnectionFailure();
+        if (peerConnection.connectionState === 'failed') {
+          handleConnectionFailure()
         }
-      };
+      }
 
       // Handle remote stream
       peerConnection.ontrack = (event) => {
         if (remoteVideoRef.current && event.streams[0]) {
-          remoteVideoRef.current.srcObject = event.streams[0];
-          logger.info("Received remote stream", { sessionId });
+          remoteVideoRef.current.srcObject = event.streams[0]
+          logger.info('Received remote stream', { sessionId })
         }
-      };
+      }
 
-      peerConnectionRef.current = peerConnection;
-      return peerConnection;
+      peerConnectionRef.current = peerConnection
+      return peerConnection
     } catch (error: unknown) {
-      logger.error("Failed to initialize peer connection", {
-        error,
-        sessionId,
-      });
-      toast.error("Failed to establish video connection");
-      return null;
+      logger.error('Failed to initialize peer connection', { error, sessionId })
+      toast.error('Failed to establish video connection')
+      return null
     }
-  }, [sessionId, userId, onConnectionStateChange, handleConnectionFailure]);
+  }, [sessionId, userId, onConnectionStateChange, handleConnectionFailure])
 
   // Handle media stream setup
   const setupMediaStream = useCallback(async () => {
@@ -121,159 +118,159 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
           frameRate: { ideal: 30 },
         },
         audio: true,
-      });
+      })
 
       if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
+        localVideoRef.current.srcObject = stream
       }
 
       // Add tracks to peer connection
-      const peerConnection = peerConnectionRef.current;
+      const peerConnection = peerConnectionRef.current
       if (peerConnection) {
         stream.getTracks().forEach((track) => {
-          peerConnection.addTrack(track, stream);
-        });
+          peerConnection.addTrack(track, stream)
+        })
       }
 
-      localStreamRef.current = stream;
-      setHasPermissionError(false);
+      localStreamRef.current = stream
+      setHasPermissionError(false)
 
-      logger.info("Local media stream initialized", { sessionId });
+      logger.info('Local media stream initialized', { sessionId })
     } catch (error: unknown) {
-      logger.error("Failed to get user media", { error, sessionId });
-      setHasPermissionError(true);
-      toast.error("Unable to access camera or microphone");
+      logger.error('Failed to get user media', { error, sessionId })
+      setHasPermissionError(true)
+      toast.error('Unable to access camera or microphone')
     }
-  }, [sessionId]);
+  }, [sessionId])
 
   // Handle connection failures and reconnection
   const handleConnectionFailure = useCallback(async () => {
-    logger.warn("Connection failed, attempting reconnection", { sessionId });
-    setIsReconnecting(true);
+    logger.warn('Connection failed, attempting reconnection', { sessionId })
+    setIsReconnecting(true)
 
     try {
       // Clean up existing connection
       if (peerConnectionRef.current) {
-        peerConnectionRef.current.close();
+        peerConnectionRef.current.close()
       }
 
       // Reinitialize connection
-      const newPeerConnection = initializePeerConnection();
+      const newPeerConnection = initializePeerConnection()
       if (newPeerConnection) {
-        await setupMediaStream();
-        await createAndSendOffer();
+        await setupMediaStream()
+        await createAndSendOffer()
       }
     } catch (error: unknown) {
-      logger.error("Reconnection failed", { error, sessionId });
-      toast.error("Failed to reconnect video call");
+      logger.error('Reconnection failed', { error, sessionId })
+      toast.error('Failed to reconnect video call')
     } finally {
-      setIsReconnecting(false);
+      setIsReconnecting(false)
     }
   }, [
     sessionId,
     initializePeerConnection,
     setupMediaStream,
     createAndSendOffer,
-  ]);
+  ])
 
   // Create and send an offer to the peer
   const createAndSendOffer = useCallback(async () => {
-    const peerConnection = peerConnectionRef.current;
+    const peerConnection = peerConnectionRef.current
     if (!peerConnection) {
-      return;
+      return
     }
 
     try {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      await signalingService.sendOffer(sessionId, userId, offer);
+      const offer = await peerConnection.createOffer()
+      await peerConnection.setLocalDescription(offer)
+      await signalingService.sendOffer(sessionId, userId, offer)
     } catch (error: unknown) {
-      logger.error("Failed to create and send offer", { error, sessionId });
-      toast.error("Failed to establish connection");
+      logger.error('Failed to create and send offer', { error, sessionId })
+      toast.error('Failed to establish connection')
     }
-  }, [sessionId, userId]);
+  }, [sessionId, userId])
 
   // Handle incoming signaling messages
   const handleSignalingMessage = useCallback(
     async (message: SignalingMessage) => {
-      const peerConnection = peerConnectionRef.current;
+      const peerConnection = peerConnectionRef.current
       if (!peerConnection) {
-        return;
+        return
       }
 
       try {
         switch (message.type) {
-          case "offer":
+          case 'offer':
             if (message.data) {
               await peerConnection.setRemoteDescription(
                 new RTCSessionDescription(
                   message.data as RTCSessionDescriptionInit,
                 ),
-              );
-              const answer = await peerConnection.createAnswer();
-              await peerConnection.setLocalDescription(answer);
-              await signalingService.sendAnswer(sessionId, userId, answer);
+              )
+              const answer = await peerConnection.createAnswer()
+              await peerConnection.setLocalDescription(answer)
+              await signalingService.sendAnswer(sessionId, userId, answer)
             }
-            break;
+            break
 
-          case "answer":
+          case 'answer':
             if (message.data) {
               await peerConnection.setRemoteDescription(
                 new RTCSessionDescription(
                   message.data as RTCSessionDescriptionInit,
                 ),
-              );
+              )
             }
-            break;
+            break
 
-          case "ice-candidate":
+          case 'ice-candidate':
             if (message.data) {
               await peerConnection.addIceCandidate(
                 new RTCIceCandidate(message.data as RTCIceCandidateInit),
-              );
+              )
             }
-            break;
+            break
         }
       } catch (error: unknown) {
-        logger.error("Error handling signaling message", {
+        logger.error('Error handling signaling message', {
           error,
           sessionId,
           messageType: message.type,
-        });
+        })
       }
     },
     [sessionId, userId],
-  );
+  )
 
   // Initialize connection when component mounts or when connection status changes
   useEffect(() => {
-    if (isConnected && connectionStatus === "connected") {
+    if (isConnected && connectionStatus === 'connected') {
       const initialize = async () => {
-        const peerConnection = initializePeerConnection();
+        const peerConnection = initializePeerConnection()
         if (peerConnection) {
-          await setupMediaStream();
-          await createAndSendOffer();
+          await setupMediaStream()
+          await createAndSendOffer()
         }
-      };
-      initialize();
+      }
+      initialize()
 
       // Register signaling message handler
       const cleanup = signalingService.onMessage(
         sessionId,
         handleSignalingMessage,
-      );
+      )
 
       return () => {
-        cleanup();
+        cleanup()
         if (localStreamRef.current) {
-          localStreamRef.current.getTracks().forEach((track) => track.stop());
+          localStreamRef.current.getTracks().forEach((track) => track.stop())
         }
         if (peerConnectionRef.current) {
-          peerConnectionRef.current.close();
+          peerConnectionRef.current.close()
         }
-      };
+      }
     }
-    return undefined;
+    return undefined
   }, [
     isConnected,
     connectionStatus,
@@ -282,32 +279,32 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     setupMediaStream,
     createAndSendOffer,
     initializePeerConnection,
-  ]);
+  ])
 
   // Status message based on connection state
   const getStatusMessage = () => {
     if (hasPermissionError) {
-      return "Camera/Microphone access denied";
+      return 'Camera/Microphone access denied'
     }
     if (isReconnecting) {
-      return "Reconnecting...";
+      return 'Reconnecting...'
     }
     switch (connectionStatus) {
-      case "connecting":
-        return "Establishing secure connection...";
-      case "connected":
-        return "Secure connection established";
-      case "disconnected":
-        return "Connection ended";
+      case 'connecting':
+        return 'Establishing secure connection...'
+      case 'connected':
+        return 'Secure connection established'
+      case 'disconnected':
+        return 'Connection ended'
       default:
-        return "Ready to start secure session";
+        return 'Ready to start secure session'
     }
-  };
+  }
 
   return (
     <div
       className={`video-display relative rounded-lg overflow-hidden bg-gray-800 ${className}`}
-      style={{ aspectRatio: "16/9" }}
+      style={{ aspectRatio: '16/9' }}
       role="region"
       aria-label="Video chat interface"
     >
@@ -315,7 +312,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       <video
         ref={remoteVideoRef}
         className={`absolute inset-0 w-full h-full object-cover ${
-          isConnected && !hasPermissionError ? "opacity-100" : "opacity-0"
+          isConnected && !hasPermissionError ? 'opacity-100' : 'opacity-0'
         }`}
         autoPlay
         playsInline
@@ -329,7 +326,7 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className={`h-16 w-16 mb-3 ${
-              hasPermissionError ? "text-red-500" : "text-gray-500"
+              hasPermissionError ? 'text-red-500' : 'text-gray-500'
             }`}
             fill="none"
             viewBox="0 0 24 24"
@@ -353,13 +350,13 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
           </svg>
           <p className="text-lg font-medium text-gray-300">
             {hasPermissionError
-              ? "Camera Access Required"
-              : "Practice Simulation"}
+              ? 'Camera Access Required'
+              : 'Practice Simulation'}
           </p>
           <p className="text-sm text-gray-400 mt-1">
             {hasPermissionError
-              ? "Please allow access to your camera and microphone"
-              : "Click Start to begin a therapeutic interaction"}
+              ? 'Please allow access to your camera and microphone'
+              : 'Click Start to begin a therapeutic interaction'}
           </p>
         </div>
       )}
@@ -367,21 +364,21 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
       {/* Connection status indicator */}
       <div
         className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-xs font-medium flex items-center ${
-          connectionStatus === "connected"
-            ? "bg-green-100 text-green-800"
-            : connectionStatus === "connecting" || isReconnecting
-              ? "bg-yellow-100 text-yellow-800 animate-pulse"
-              : "bg-gray-100 text-gray-800"
+          connectionStatus === 'connected'
+            ? 'bg-green-100 text-green-800'
+            : connectionStatus === 'connecting' || isReconnecting
+              ? 'bg-yellow-100 text-yellow-800 animate-pulse'
+              : 'bg-gray-100 text-gray-800'
         }`}
         role="status"
       >
         <span
           className={`w-2 h-2 rounded-full mr-1.5 ${
-            connectionStatus === "connected"
-              ? "bg-green-500"
-              : connectionStatus === "connecting" || isReconnecting
-                ? "bg-yellow-500"
-                : "bg-gray-500"
+            connectionStatus === 'connected'
+              ? 'bg-green-500'
+              : connectionStatus === 'connecting' || isReconnecting
+                ? 'bg-yellow-500'
+                : 'bg-gray-500'
           }`}
         />
 
@@ -427,10 +424,10 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
         End-to-End Encrypted
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default VideoDisplay;
+export default VideoDisplay
 
 // Example PHI audit logging - uncomment and customize as needed
 // logger.info('Accessing PHI data', {

@@ -2,7 +2,7 @@
  * Email template utilities
  */
 
-import { logger } from "./logger";
+import { logger } from './logger'
 
 /**
  * Preview an email template with the given data
@@ -17,30 +17,30 @@ export async function previewTemplate(
     string | { platform: string; url: string | undefined }[] | undefined
   > = {},
 ): Promise<string> {
-  logger.info("Previewing email template", {
-    context: "Template",
+  logger.info('Previewing email template', {
+    context: 'Template',
     data: {
       templateName,
       data,
     },
-  });
+  })
 
   try {
     // Implementation would typically load the template and render it with the data
-    const renderedHtml = `<html><body><h1>Template: ${templateName}</h1><pre>${JSON.stringify(data, null, 2)}</pre></body></html>`;
+    const renderedHtml = `<html><body><h1>Template: ${templateName}</h1><pre>${JSON.stringify(data, null, 2)}</pre></body></html>`
 
-    logger.debug("Template rendered successfully", {
-      context: "Template",
+    logger.debug('Template rendered successfully', {
+      context: 'Template',
       data: { templateName },
-    });
+    })
 
-    return renderedHtml;
+    return renderedHtml
   } catch (error: unknown) {
-    logger.error("Failed to render template", error as Error, {
-      context: "Template",
+    logger.error('Failed to render template', error as Error, {
+      context: 'Template',
       data: { templateName },
-    });
-    throw error;
+    })
+    throw error
   }
 }
 
@@ -50,5 +50,5 @@ export async function previewTemplate(
  */
 export async function listTemplates(): Promise<string[]> {
   // Implementation would typically scan a directory for templates
-  return ["welcome", "password-reset"];
+  return ['welcome', 'password-reset']
 }

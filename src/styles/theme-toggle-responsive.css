@@ -5,7 +5,7 @@
    ================================================ */
 
 /* Import responsive design system */
-@import url("./responsive-design-system.css");
+@import url('./responsive-design-system.css');
 
 /* Base mobile-first styles */
 .theme-toggle-unified {
@@ -82,7 +82,7 @@
 
   /* Enhanced touch targets for mobile */
   .theme-toggle-unified::before {
-    content: "";
+    content: '';
     position: absolute;
     top: -8px;
     left: -8px;
@@ -241,7 +241,7 @@
   }
 
   .theme-toggle-unified::before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;

@@ -1,11 +1,11 @@
-import React from "react";
-import { toast } from "react-hot-toast";
-import { useOffline } from "../../hooks/useOffline";
+import React from 'react'
+import { toast } from 'react-hot-toast'
+import { useOffline } from '../../hooks/useOffline'
 
 interface OfflineIndicatorProps {
-  className?: string;
-  showToast?: boolean;
-  showIndicator?: boolean;
+  className?: string
+  showToast?: boolean
+  showIndicator?: boolean
 }
 
 /**
@@ -15,34 +15,34 @@ interface OfflineIndicatorProps {
  * to retry the connection or switch to offline mode.
  */
 export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
-  className = "",
+  className = '',
   showToast = true,
   showIndicator = true,
 }) => {
   const { isOffline, connectionInfo } = useOffline({
     onOffline: () => {
       if (showToast) {
-        toast.error("You are offline. Some features may be limited.", {
+        toast.error('You are offline. Some features may be limited.', {
           duration: 4000,
-          position: "bottom-right",
-          id: "offline-notification",
-        });
+          position: 'bottom-right',
+          id: 'offline-notification',
+        })
       }
     },
     onOnline: () => {
       if (showToast) {
-        toast.success("You are back online!", {
+        toast.success('You are back online!', {
           duration: 2000,
-          position: "bottom-right",
-          id: "online-notification",
-        });
+          position: 'bottom-right',
+          id: 'online-notification',
+        })
       }
     },
-  });
+  })
 
   // If we're online or not showing the indicator, return null
   if (!isOffline || !showIndicator) {
-    return null;
+    return null
   }
 
   return (
@@ -54,7 +54,7 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
       p-4
       transform transition-all duration-300 ease-in-ou
       ${className}
-      ${isOffline ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"}
+      ${isOffline ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
     `}
     >
       <div className="flex items-center space-x-3">
@@ -107,5 +107,5 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
         </a>
       </div>
     </div>
-  );
-};
+  )
+}

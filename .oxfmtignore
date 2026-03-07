@@ -1,8 +1,0 @@
-helm/
-infrastructure/helm/
-k8s/
-docker-compose.yaml
-.agent/
-.agents/
-helm/templates/training-deployment.yaml
-docker/journal-research-mcp-server/docker-compose.yml

@@ -1,138 +1,138 @@
-import React, { useState, useEffect } from "react";
-import { authClient } from "@/lib/auth-client";
-import { AccessibilityAnnouncer } from "../ui/AccessibilityAnnouncer";
+import React, { useState, useEffect } from 'react'
+import { authClient } from '@/lib/auth-client'
+import { AccessibilityAnnouncer } from '../ui/AccessibilityAnnouncer'
 import {
   MobileFormValidation,
   ValidationRules,
-} from "../ui/MobileFormValidation";
-import { PasswordInputWithStrength } from "../ui/PasswordInputWithStrength";
+} from '../ui/MobileFormValidation'
+import { PasswordInputWithStrength } from '../ui/PasswordInputWithStrength'
 
 interface RegisterFormProps {
-  redirectTo?: string;
-  showLogin?: boolean;
+  redirectTo?: string
+  showLogin?: boolean
 }
 
 export function RegisterForm({
   redirectTo,
   showLogin = true,
 }: RegisterFormProps) {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [fullName, setFullName] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSuccessful, setIsSuccessful] = useState<boolean>(false);
-  const [acceptTerms, setAcceptTerms] = useState<boolean>(false);
-  const [announcement, setAnnouncement] = useState<string>("");
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [formIsValid, setFormIsValid] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>('')
+  const [password, setPassword] = useState<string>('')
+  const [fullName, setFullName] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSuccessful, setIsSuccessful] = useState<boolean>(false)
+  const [acceptTerms, setAcceptTerms] = useState<boolean>(false)
+  const [announcement, setAnnouncement] = useState<string>('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [formIsValid, setFormIsValid] = useState<boolean>(false)
 
   // Define validation rules
   const validationRules = {
     fullName: [
-      ValidationRules.required("Full name is required"),
-      ValidationRules.minLength(2, "Name must be at least 2 characters"),
+      ValidationRules.required('Full name is required'),
+      ValidationRules.minLength(2, 'Name must be at least 2 characters'),
     ],
 
     email: [
-      ValidationRules.required("Email is required"),
-      ValidationRules.email("Please enter a valid email address"),
+      ValidationRules.required('Email is required'),
+      ValidationRules.email('Please enter a valid email address'),
     ],
 
     password: [
-      ValidationRules.required("Password is required"),
-      ValidationRules.minLength(8, "Password must be at least 8 characters"),
+      ValidationRules.required('Password is required'),
+      ValidationRules.minLength(8, 'Password must be at least 8 characters'),
     ],
 
     terms: [
       {
-        test: (value: string) => value === "true",
-        message: "You must accept the Terms of Service and Privacy Policy",
+        test: (value: string) => value === 'true',
+        message: 'You must accept the Terms of Service and Privacy Policy',
       },
     ],
-  };
+  }
 
   // Handle validation changes from the MobileFormValidation component
   const handleValidationChange = (
     isValid: boolean,
     errors: Record<string, string>,
   ) => {
-    setFormIsValid(isValid);
-    setFieldErrors(errors);
-  };
+    setFormIsValid(isValid)
+    setFieldErrors(errors)
+  }
 
   // Announce loading states and errors to screen readers
   useEffect(() => {
     if (isLoading) {
-      setAnnouncement("Creating your account, please wait...");
+      setAnnouncement('Creating your account, please wait...')
     } else if (errorMessage) {
-      setAnnouncement(`Error: ${errorMessage}`);
+      setAnnouncement(`Error: ${errorMessage}`)
     } else if (isSuccessful) {
       setAnnouncement(
-        "Registration successful! Please check your email to verify your account.",
-      );
+        'Registration successful! Please check your email to verify your account.',
+      )
     }
-  }, [isLoading, errorMessage, isSuccessful]);
+  }, [isLoading, errorMessage, isSuccessful])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     // The MobileFormValidation component will handle form validation
     // If the form reaches this point and is invalid, validation errors will be displayed
 
     if (!formIsValid) {
       // Form validation will be shown by the MobileFormValidation component
-      return;
+      return
     }
 
-    setIsLoading(true);
-    setErrorMessage(null);
+    setIsLoading(true)
+    setErrorMessage(null)
 
     try {
       const response = await authClient.signUp.email({
         email,
         password,
         name: fullName,
-      });
+      })
 
       if (response.error) {
         setErrorMessage(
-          typeof response.error === "string"
+          typeof response.error === 'string'
             ? response.error
-            : "Registration failed",
-        );
-        return;
+            : 'Registration failed',
+        )
+        return
       }
 
       if (response.data?.user) {
-        setIsSuccessful(true);
+        setIsSuccessful(true)
       }
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? String(error) : "An unexpected error occurred";
-      setErrorMessage(errorMessage);
-      console.error("Registration error:", error);
+        error instanceof Error ? String(error) : 'An unexpected error occurred'
+      setErrorMessage(errorMessage)
+      console.error('Registration error:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleGoogleSignIn = async () => {
     try {
-      setIsLoading(true);
-      setErrorMessage("");
-      setAnnouncement("Initiating Google sign in...");
+      setIsLoading(true)
+      setErrorMessage('')
+      setAnnouncement('Initiating Google sign in...')
 
       await authClient.signIn.social({
-        provider: "google",
-        callbackURL: redirectTo || "/dashboard",
-      });
+        provider: 'google',
+        callbackURL: redirectTo || '/dashboard',
+      })
       // OAuth redirects automatically, so no need to handle redirect here
     } catch (error: unknown) {
-      setErrorMessage((error as Error).message);
-      setIsLoading(false);
+      setErrorMessage((error as Error).message)
+      setIsLoading(false)
     }
-  };
+  }
 
   if (isSuccessful) {
     return (
@@ -143,7 +143,7 @@ export function RegisterForm({
           it within a few minutes, check your spam folder.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -189,7 +189,7 @@ export function RegisterForm({
               disabled={isLoading}
               placeholder="John Doe"
               aria-required="true"
-              aria-invalid={fieldErrors["fullName"] ? "true" : "false"}
+              aria-invalid={fieldErrors['fullName'] ? 'true' : 'false'}
               className="mobile-input"
               autoComplete="name"
             />
@@ -212,7 +212,7 @@ export function RegisterForm({
               disabled={isLoading}
               placeholder="your@email.com"
               aria-required="true"
-              aria-invalid={fieldErrors["email"] ? "true" : "false"}
+              aria-invalid={fieldErrors['email'] ? 'true' : 'false'}
               className="mobile-input"
               autoComplete="email"
             />
@@ -231,8 +231,8 @@ export function RegisterForm({
               autoComplete="new-password"
               showStrengthMeter={true}
               showStrengthText={true}
-              {...(fieldErrors["password"] && {
-                error: fieldErrors["password"],
+              {...(fieldErrors['password'] && {
+                error: fieldErrors['password'],
               })}
               helperText="Password must be at least 8 characters"
             />
@@ -251,12 +251,12 @@ export function RegisterForm({
                 required
                 disabled={isLoading}
                 aria-required="true"
-                aria-invalid={fieldErrors["terms"] ? "true" : "false"}
+                aria-invalid={fieldErrors['terms'] ? 'true' : 'false'}
                 value={acceptTerms.toString()}
               />
 
               <label htmlFor="terms">
-                I agree to the{" "}
+                I agree to the{' '}
                 <a
                   href="/terms"
                   target="_blank"
@@ -264,8 +264,8 @@ export function RegisterForm({
                   aria-label="Terms of Service (opens in new tab)"
                 >
                   Terms of Service
-                </a>{" "}
-                and{" "}
+                </a>{' '}
+                and{' '}
                 <a
                   href="/privacy"
                   target="_blank"
@@ -284,7 +284,7 @@ export function RegisterForm({
             disabled={isLoading}
             aria-busy={isLoading}
           >
-            {isLoading ? "Creating Account..." : "Create Account"}
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
       </MobileFormValidation>
@@ -323,12 +323,12 @@ export function RegisterForm({
 
       {showLogin && (
         <div className="auth-alternate-action">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <a href="/login" className="auth-link">
             Log in
           </a>
         </div>
       )}
     </div>
-  );
+  )
 }

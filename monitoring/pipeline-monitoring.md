@@ -62,7 +62,6 @@ monitoring:
 ### GitLab Notifications
 
 1. **Pipeline Failure Alerts**
-
    ```yaml
    # In .gitlab-ci.yml
    notify-failure:
@@ -356,21 +355,18 @@ cache-metrics:
 ## Maintenance Tasks
 
 ### Weekly Tasks
-
 - [ ] Review pipeline performance metrics
 - [ ] Check security scan results
 - [ ] Update dependencies if needed
 - [ ] Clean up old artifacts and images
 
 ### Monthly Tasks
-
 - [ ] Analyze pipeline trends
 - [ ] Review and update alerting rules
 - [ ] Optimize resource usage
 - [ ] Update monitoring dashboards
 
 ### Quarterly Tasks
-
 - [ ] Security audit of pipeline configuration
 - [ ] Performance optimization review
 - [ ] Update monitoring and alerting strategy

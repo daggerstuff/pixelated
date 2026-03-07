@@ -67,7 +67,6 @@ Production-quality implementation of Quality Scoring v1 for the Dataset Expansio
 ### 5. Documentation ✅
 
 **Files**:
-
 - `README.md` - Complete usage documentation
 - `IMPLEMENTATION_SUMMARY.md` - This file
 - `config.example.json` - Example configuration
@@ -132,7 +131,6 @@ python scripts/quality_scoring/run_stub.py \
 ## Signal Descriptions
 
 ### Empathy [0,1]
-
 - **Purpose**: Measure empathetic communication
 - **Method**: Pattern matching using `EmpathyMentalHealthValidator` indicators
 - **Key Patterns**:
@@ -143,21 +141,18 @@ python scripts/quality_scoring/run_stub.py \
 - **Penalties**: Dismissive language ("just get over it", "it's not that bad")
 
 ### Fidelity [0,1]
-
 - **Purpose**: Clinical authenticity and evidence-based practice
 - **Method**: Pattern-based detection of pseudo-clinical claims
 - **Red Flags**: "guaranteed cure", "miracle treatment", "100% effective"
 - **Rewards**: Evidence-based language, appropriate therapeutic terms
 
 ### Domain [0,1]
-
 - **Purpose**: Therapeutic/mental health relevance
 - **Method**: Multi-category keyword matching
 - **Categories**: Emotions, therapeutic terms, mental health topics, techniques
 - **Scoring**: Higher scores for diverse category presence
 
 ### Harm [0,1] (higher = worse)
-
 - **Purpose**: Safety and harmfulness detection
 - **Method**: Pattern-based detection using safety validators
 - **Patterns**: Self-harm, violence, crisis content, harmful dismissive language
@@ -174,13 +169,11 @@ The system uses a three-tier decision system:
 3. **Accept**: `composite >= accept_min` AND `harm <= harm_max`
 
 **Default Thresholds**:
-
 - `harm_max`: 0.05 (reject if harm > 0.05)
 - `accept_min`: 0.60 (accept if composite >= 0.60)
 - `curate_min`: 0.45 (curate if composite >= 0.45)
 
 **Default Weights**:
-
 - `empathy`: 0.25
 - `fidelity`: 0.25
 - `domain`: 0.25
@@ -226,7 +219,7 @@ Configuration is done via JSON file with weights and thresholds:
   },
   "thresholds": {
     "harm_max": 0.05,
-    "accept_min": 0.6,
+    "accept_min": 0.60,
     "curate_min": 0.45
   }
 }
@@ -237,14 +230,12 @@ Configuration is done via JSON file with weights and thresholds:
 ## Testing
 
 The system has been tested with:
-
 - ✅ Basic signal computation
 - ✅ Production/fallback logic
 - ✅ JSONL file processing
 - ✅ Decision logic with various thresholds
 
 **Test Results**:
-
 - Empathy detection: Working with fallback heuristics
 - Fidelity scoring: Correctly identifies pseudo-clinical claims
 - Domain relevance: Properly scores therapeutic content

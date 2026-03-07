@@ -1,61 +1,61 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { fetchJSONWithRetry } from "@/lib/net/index";
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { fetchJSONWithRetry } from '@/lib/net/index'
 
 export interface EmotionData {
-  timestamp: number;
-  valence: number; // Pleasure dimension (0-1)
-  arousal: number; // Arousal dimension (0-1)
-  dominance: number; // Dominance dimension (0-1)
-  emotion?: string; // Named emotion (optional)
+  timestamp: number
+  valence: number // Pleasure dimension (0-1)
+  arousal: number // Arousal dimension (0-1)
+  dominance: number // Dominance dimension (0-1)
+  emotion?: string // Named emotion (optional)
 }
 
-type TimeRange = "day" | "week" | "month" | "year";
+type TimeRange = 'day' | 'week' | 'month' | 'year'
 
 interface UseMultidimensionalEmotionsReturn {
-  data: EmotionData[];
-  isLoading: boolean;
-  error: Error | null;
-  refresh: () => void;
-  isCached: boolean; // Added to indicate if data was loaded from cache
+  data: EmotionData[]
+  isLoading: boolean
+  error: Error | null
+  refresh: () => void
+  isCached: boolean // Added to indicate if data was loaded from cache
 }
 
 interface EmotionApiResponse {
   data: {
-    timestamp: number;
+    timestamp: number
     dimensions: {
-      valence: number;
-      arousal: number;
-      dominance: number;
-    };
-    mappedEmotion?: string;
-  }[];
+      valence: number
+      arousal: number
+      dominance: number
+    }
+    mappedEmotion?: string
+  }[]
   meta: {
-    totalCount: number;
-    pageCount: number;
-    hasMore: boolean;
-  };
+    totalCount: number
+    pageCount: number
+    hasMore: boolean
+  }
 }
 
 interface CacheEntry {
-  data: EmotionData[];
-  timestamp: number;
-  size: number; // Approximate memory size in bytes
-  lastAccessed: number; // Last access timestamp
-  priority: number; // Priority level for cache retention policy
+  data: EmotionData[]
+  timestamp: number
+  size: number // Approximate memory size in bytes
+  lastAccessed: number // Last access timestamp
+  priority: number // Priority level for cache retention policy
 }
 
 // Improved cache implementation
 class EmotionDataCache {
-  private cache = new Map<string, CacheEntry>();
-  private maxEntries = 20; // Maximum number of cache entries
-  private maxMemory = 10 * 1024 * 1024; // Max cache size (10MB)
-  private currentMemory = 0;
-  private ttl = 5 * 60 * 1000; // Default TTL: 5 minutes
-  private cleanupInterval: NodeJS.Timeout | null = null;
+  private cache = new Map<string, CacheEntry>()
+  private maxEntries = 20 // Maximum number of cache entries
+  private maxMemory = 10 * 1024 * 1024 // Max cache size (10MB)
+  private currentMemory = 0
+  private ttl = 5 * 60 * 1000 // Default TTL: 5 minutes
+  private cleanupInterval: NodeJS.Timeout | null = null
 
   constructor() {
     // Set up periodic cache cleanup
-    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
+    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000)
   }
 
   // Calculate approximate size of emotion data in bytes
@@ -63,51 +63,51 @@ class EmotionDataCache {
     // Each emotion data point has 4 numbers (timestamp, valence, arousal, dominance)
     // Each number is approximately 8 bytes + possible emotion string (est. 20 bytes)
     // Plus overhead for object structure
-    const bytesPerEntry = 4 * 8 + (data[0]?.emotion ? 20 : 0) + 16;
-    return data.length * bytesPerEntry;
+    const bytesPerEntry = 4 * 8 + (data[0]?.emotion ? 20 : 0) + 16
+    return data.length * bytesPerEntry
   }
 
   // Get data from cache
   get(key: string): EmotionData[] | null {
-    const entry = this.cache.get(key);
+    const entry = this.cache.get(key)
 
     if (!entry) {
-      return null;
+      return null
     }
 
     // Check if entry has expired
-    const now = Date.now();
+    const now = Date.now()
     if (now - entry.timestamp > this.ttl) {
-      this.delete(key);
-      return null;
+      this.delete(key)
+      return null
     }
 
     // Update last accessed time and increase priority
-    entry.lastAccessed = now;
-    entry.priority += 1;
+    entry.lastAccessed = now
+    entry.priority += 1
 
-    return entry.data;
+    return entry.data
   }
 
   // Set data in cache
   set(key: string, data: EmotionData[], priority = 1): void {
     // Calculate size of the new data
-    const size = this.calculateSize(data);
+    const size = this.calculateSize(data)
 
     // If the new data is too large for our cache, don't cache it
     if (size > this.maxMemory * 0.5) {
-      console.warn(`Data too large for cache: ${size} bytes`);
-      return;
+      console.warn(`Data too large for cache: ${size} bytes`)
+      return
     }
 
     // If adding this would exceed our memory limit, make room
     if (this.currentMemory + size > this.maxMemory) {
-      this.evict(size);
+      this.evict(size)
     }
 
     // If we have too many entries, remove the least valuable one
     if (this.cache.size >= this.maxEntries) {
-      this.evictLeastValuable();
+      this.evictLeastValuable()
     }
 
     // Add the new entry
@@ -117,32 +117,32 @@ class EmotionDataCache {
       size,
       lastAccessed: Date.now(),
       priority,
-    });
+    })
 
-    this.currentMemory += size;
+    this.currentMemory += size
   }
 
   // Delete a specific entry
   delete(key: string): void {
-    const entry = this.cache.get(key);
+    const entry = this.cache.get(key)
     if (entry) {
-      this.currentMemory -= entry.size;
-      this.cache.delete(key);
+      this.currentMemory -= entry.size
+      this.cache.delete(key)
     }
   }
 
   // Clear all entries
   clear() {
-    this.cache.clear();
-    this.currentMemory = 0;
+    this.cache.clear()
+    this.currentMemory = 0
   }
 
   // Clean up expired entries
   cleanup() {
-    const now = Date.now();
+    const now = Date.now()
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.ttl) {
-        this.delete(key);
+        this.delete(key)
       }
     }
   }
@@ -152,87 +152,87 @@ class EmotionDataCache {
     // Sort entries by priority and last accessed time
     const entries = Array.from(this.cache.entries()).sort((a, b) => {
       // First by priority (lowest first)
-      const priorityDiff = a[1].priority - b[1].priority;
+      const priorityDiff = a[1].priority - b[1].priority
       if (priorityDiff !== 0) {
-        return priorityDiff;
+        return priorityDiff
       }
 
       // Then by last accessed (oldest first)
-      return a[1].lastAccessed - b[1].lastAccessed;
-    });
+      return a[1].lastAccessed - b[1].lastAccessed
+    })
 
     // Remove entries until we have enough space
-    let freedSpace = 0;
+    let freedSpace = 0
     for (const [key, entry] of entries) {
-      this.delete(key);
-      freedSpace += entry.size;
+      this.delete(key)
+      freedSpace += entry.size
 
       if (freedSpace >= requiredSpace) {
-        break;
+        break
       }
     }
   }
 
   // Remove the least valuable entry based on priority and access time
   private evictLeastValuable() {
-    let leastValuableKey: string | null = null;
-    let lowestValue = Infinity;
+    let leastValuableKey: string | null = null
+    let lowestValue = Infinity
 
     for (const [key, entry] of this.cache.entries()) {
       // Calculate value based on priority and recency
       const recencyFactor = Math.max(
         1,
         (Date.now() - entry.lastAccessed) / 1000,
-      );
-      const value = entry.priority / recencyFactor;
+      )
+      const value = entry.priority / recencyFactor
 
       if (value < lowestValue) {
-        lowestValue = value;
-        leastValuableKey = key;
+        lowestValue = value
+        leastValuableKey = key
       }
     }
 
     if (leastValuableKey) {
-      this.delete(leastValuableKey);
+      this.delete(leastValuableKey)
     }
   }
 
   // Clean up when the object is garbage collected
   destroy() {
     if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
+      clearInterval(this.cleanupInterval)
+      this.cleanupInterval = null
     }
   }
 
   // Set custom TTL for specific client data
   setTTL(_clientId: string, ttl: number): void {
     // In a more advanced implementation, we could have client-specific TTLs
-    this.ttl = ttl;
+    this.ttl = ttl
   }
 
   // Get cache statistics for monitoring
   getStats(): {
-    entries: number;
-    memoryUsed: number;
-    memoryLimit: number;
+    entries: number
+    memoryUsed: number
+    memoryLimit: number
   } {
     return {
       entries: this.cache.size,
       memoryUsed: this.currentMemory,
       memoryLimit: this.maxMemory,
-    };
+    }
   }
 }
 
 // Singleton cache instance
-const emotionCache = new EmotionDataCache();
+const emotionCache = new EmotionDataCache()
 
 // Clean up cache when window is unloaded
-if (typeof window !== "undefined") {
-  window.addEventListener("beforeunload", () => {
-    emotionCache.destroy();
-  });
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    emotionCache.destroy()
+  })
 }
 
 /**
@@ -245,17 +245,17 @@ if (typeof window !== "undefined") {
  */
 export function useMultidimensionalEmotions(
   clientId: string,
-  timeRange: TimeRange = "week",
+  timeRange: TimeRange = 'week',
   dataPoints: number = 100,
 ): UseMultidimensionalEmotionsReturn {
-  const [data, setData] = useState<EmotionData[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [isCached, setIsCached] = useState<boolean>(false);
+  const [data, setData] = useState<EmotionData[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<Error | null>(null)
+  const [isCached, setIsCached] = useState<boolean>(false)
 
   // Use refs to track the current request and prevent race conditions
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const isMountedRef = useRef(true);
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const isMountedRef = useRef(true)
 
   // Helper to convert time range to milliseconds
   const getTimeRangeInMs = (range: TimeRange): number => {
@@ -264,60 +264,60 @@ export function useMultidimensionalEmotions(
       week: 7 * 24 * 60 * 60 * 1000,
       month: 30 * 24 * 60 * 60 * 1000,
       year: 365 * 24 * 60 * 60 * 1000,
-    };
-    return timeRanges[range];
-  };
+    }
+    return timeRanges[range]
+  }
 
   // Create a fetch function that we can call from outside the effect
   const fetchEmotionData = useCallback(
     async (ignoreCache = false) => {
       if (!clientId) {
-        setError(new Error("Client ID is required"));
-        setIsLoading(false);
-        return;
+        setError(new Error('Client ID is required'))
+        setIsLoading(false)
+        return
       }
 
       // Cancel any existing requests
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        abortControllerRef.current.abort()
       }
 
       // Create new abort controller for this request
-      abortControllerRef.current = new AbortController();
+      abortControllerRef.current = new AbortController()
 
-      setIsLoading(true);
-      setError(null);
-      setIsCached(false);
+      setIsLoading(true)
+      setError(null)
+      setIsCached(false)
 
       // Calculate cache key
-      const cacheKey = `emotions_${clientId}_${timeRange}_${dataPoints}`;
+      const cacheKey = `emotions_${clientId}_${timeRange}_${dataPoints}`
 
       // Check cache first unless explicitly told to ignore it
       if (!ignoreCache) {
-        const cachedData = emotionCache.get(cacheKey);
+        const cachedData = emotionCache.get(cacheKey)
         if (cachedData) {
-          setData(cachedData);
-          setIsLoading(false);
-          setIsCached(true);
-          return;
+          setData(cachedData)
+          setIsLoading(false)
+          setIsCached(true)
+          return
         }
       }
 
       try {
         // Progressive loading implementation
         // 1. First, display a lower resolution version from cache if available
-        const lowResKey = `emotions_${clientId}_${timeRange}_${Math.floor(dataPoints / 4)}`;
-        const lowResData = emotionCache.get(lowResKey);
+        const lowResKey = `emotions_${clientId}_${timeRange}_${Math.floor(dataPoints / 4)}`
+        const lowResData = emotionCache.get(lowResKey)
 
         if (lowResData && !ignoreCache) {
           // Show low-resolution data while loading full data
-          setData(lowResData);
-          setIsCached(true);
+          setData(lowResData)
+          setIsCached(true)
           // Continue loading but don't set isLoading to false yet
         }
 
-        const startDate = new Date(Date.now() - getTimeRangeInMs(timeRange));
-        const endDate = new Date();
+        const startDate = new Date(Date.now() - getTimeRangeInMs(timeRange))
+        const endDate = new Date()
 
         // Build query parameters
         const params = new URLSearchParams({
@@ -325,15 +325,15 @@ export function useMultidimensionalEmotions(
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
           limit: dataPoints.toString(),
-        });
+        })
 
         // Fetch data from API with pagination support
         const result = await fetchJSONWithRetry<EmotionApiResponse>(
           `/api/emotions/dimensional?${params}`,
           {
             headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer demo-token",
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer demo-token',
             },
             // pass external abort controller; helper composes signals and adds per-attempt timeout
             signal: abortControllerRef.current.signal,
@@ -344,7 +344,7 @@ export function useMultidimensionalEmotions(
             minDelay: 300,
             maxDelay: 1500,
           },
-        );
+        )
 
         // Transform API response to our format
         const emotionData: EmotionData[] = result.data.map((item) => ({
@@ -353,42 +353,42 @@ export function useMultidimensionalEmotions(
           arousal: item.dimensions.arousal,
           dominance: item.dimensions.dominance,
           emotion: item.mappedEmotion,
-        }));
+        }))
 
         // Sort by timestamp (oldest first)
-        emotionData.sort((a, b) => a.timestamp - b.timestamp);
+        emotionData.sort((a, b) => a.timestamp - b.timestamp)
 
         // Only update state if the component is still mounted
         if (isMountedRef.current) {
-          setData(emotionData);
-          setIsCached(false);
+          setData(emotionData)
+          setIsCached(false)
 
           // Cache the results with different priorities based on time range
-          let priority = 1;
+          let priority = 1
           switch (timeRange) {
-            case "day":
-              priority = 4; // Most recent data, highest priority
-              break;
-            case "week":
-              priority = 3;
-              break;
-            case "month":
-              priority = 2;
-              break;
-            case "year":
-              priority = 1; // Oldest data, lowest priority
-              break;
+            case 'day':
+              priority = 4 // Most recent data, highest priority
+              break
+            case 'week':
+              priority = 3
+              break
+            case 'month':
+              priority = 2
+              break
+            case 'year':
+              priority = 1 // Oldest data, lowest priority
+              break
           }
 
-          emotionCache.set(cacheKey, emotionData, priority);
+          emotionCache.set(cacheKey, emotionData, priority)
 
           // Also cache smaller versions for progressive loading
           if (dataPoints > 20) {
             const sampledData = sampleData(
               emotionData,
               Math.floor(dataPoints / 4),
-            );
-            emotionCache.set(lowResKey, sampledData, priority - 1);
+            )
+            emotionCache.set(lowResKey, sampledData, priority - 1)
           }
         }
       } catch (err: unknown) {
@@ -396,85 +396,85 @@ export function useMultidimensionalEmotions(
         if (
           isMountedRef.current &&
           !(
-            err instanceof DOMException && (err as Error)?.name === "AbortError"
+            err instanceof DOMException && (err as Error)?.name === 'AbortError'
           )
         ) {
-          console.error("Error fetching emotion data:", err);
-          setError(err instanceof Error ? err : new Error(String(err)));
-          setIsCached(false);
+          console.error('Error fetching emotion data:', err)
+          setError(err instanceof Error ? err : new Error(String(err)))
+          setIsCached(false)
         }
       } finally {
         // Only update state if the component is still mounted
         if (isMountedRef.current) {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
     },
     [clientId, timeRange, dataPoints],
-  );
+  )
 
   useEffect(() => {
     // Initialize mounted ref
-    isMountedRef.current = true;
+    isMountedRef.current = true
 
     // Set appropriate TTL based on time range
     // Recent data changes more frequently than historical data
     switch (timeRange) {
-      case "day":
-        emotionCache.setTTL(clientId, 2 * 60 * 1000); // 2 minutes
-        break;
-      case "week":
-        emotionCache.setTTL(clientId, 5 * 60 * 1000); // 5 minutes
-        break;
-      case "month":
-        emotionCache.setTTL(clientId, 15 * 60 * 1000); // 15 minutes
-        break;
-      case "year":
-        emotionCache.setTTL(clientId, 60 * 60 * 1000); // 1 hour
-        break;
+      case 'day':
+        emotionCache.setTTL(clientId, 2 * 60 * 1000) // 2 minutes
+        break
+      case 'week':
+        emotionCache.setTTL(clientId, 5 * 60 * 1000) // 5 minutes
+        break
+      case 'month':
+        emotionCache.setTTL(clientId, 15 * 60 * 1000) // 15 minutes
+        break
+      case 'year':
+        emotionCache.setTTL(clientId, 60 * 60 * 1000) // 1 hour
+        break
     }
 
     // Fetch data
-    fetchEmotionData();
+    fetchEmotionData()
 
     // Clean up function
     return () => {
-      isMountedRef.current = false;
+      isMountedRef.current = false
 
       // Cancel any pending requests when the component unmounts
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+        abortControllerRef.current.abort()
       }
-    };
-  }, [fetchEmotionData, timeRange, clientId]);
+    }
+  }, [fetchEmotionData, timeRange, clientId])
 
   // Create a refresh function to manually refetch data
   const refresh = useCallback(() => {
     // Force refetch bypassing cache
-    fetchEmotionData(true);
-  }, [fetchEmotionData]);
+    fetchEmotionData(true)
+  }, [fetchEmotionData])
 
-  return { data, isLoading, error, refresh, isCached };
+  return { data, isLoading, error, refresh, isCached }
 }
 
 // Helper to sample data for lower resolution preview
 function sampleData(data: EmotionData[], targetCount: number): EmotionData[] {
   if (data.length <= targetCount) {
-    return data;
+    return data
   }
 
-  const result: EmotionData[] = [];
-  const stride = data.length / targetCount;
+  const result: EmotionData[] = []
+  const stride = data.length / targetCount
 
   for (let i = 0; i < targetCount; i++) {
-    const index = Math.min(Math.floor(i * stride), data.length - 1);
-    const entry = data[index];
+    const index = Math.min(Math.floor(i * stride), data.length - 1)
+    const entry = data[index]
     if (entry) {
-      result.push(entry);
+      result.push(entry)
     }
   }
 
-  return result;
+  return result
 }
 
-export default useMultidimensionalEmotions;
+export default useMultidimensionalEmotions

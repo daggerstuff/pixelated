@@ -1,75 +1,75 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type EmotionProbabilities = Record<string, number>;
+export type EmotionProbabilities = Record<string, number>
 
 export interface AudioEmotion {
-  valence: number;
-  arousal: number;
-  dominance?: number;
-  primary_emotion?: string;
-  confidence?: number;
-  emotion_probabilities?: EmotionProbabilities;
+    valence: number
+    arousal: number
+    dominance?: number
+    primary_emotion?: string
+    confidence?: number
+    emotion_probabilities?: EmotionProbabilities
 }
 
 export interface TextEmotion {
-  eq_scores: number[];
-  overall_eq: number;
-  confidence?: number;
+    eq_scores: number[]
+    overall_eq: number
+    confidence?: number
 }
 
 export interface FusedEmotion {
-  eq_scores: number[];
-  overall_eq: number;
-  valence?: number;
-  arousal?: number;
-  dominance?: number;
-  conflict_score?: number;
-  confidence?: number;
-  text_contribution?: number;
-  audio_contribution?: number;
+    eq_scores: number[]
+    overall_eq: number
+    valence?: number
+    arousal?: number
+    dominance?: number
+    conflict_score?: number
+    confidence?: number
+    text_contribution?: number
+    audio_contribution?: number
 }
 
 export interface MultimodalInferenceResponse {
-  response?: string;
-  transcription?: string;
-  text_emotion?: TextEmotion;
-  audio_emotion?: AudioEmotion;
-  fused_emotion?: FusedEmotion;
-  conflict_detected?: boolean;
-  latency_ms?: number;
-  audio_url?: string;
-  warning?: string;
+    response?: string
+    transcription?: string
+    text_emotion?: TextEmotion
+    audio_emotion?: AudioEmotion
+    fused_emotion?: FusedEmotion
+    conflict_detected?: boolean
+    latency_ms?: number
+    audio_url?: string
+    warning?: string
 }
 
 export interface UseMultimodalPixelOptions {
-  endpoint?: string;
-  textOnlyEndpoint?: string;
-  defaultContextType?: string;
-  streamUrl?: string;
+    endpoint?: string
+    textOnlyEndpoint?: string
+    defaultContextType?: string
+    streamUrl?: string
 }
 
 export interface UseMultimodalPixelState {
-  loading: boolean;
-  error: string | null;
-  lastResponse: MultimodalInferenceResponse | null;
-  transcription: string | null;
-  textEmotion: TextEmotion | null;
-  audioEmotion: AudioEmotion | null;
-  fusedEmotion: FusedEmotion | null;
-  conflictDetected: boolean;
-  latencyMs: number | null;
+    loading: boolean
+    error: string | null
+    lastResponse: MultimodalInferenceResponse | null
+    transcription: string | null
+    textEmotion: TextEmotion | null
+    audioEmotion: AudioEmotion | null
+    fusedEmotion: FusedEmotion | null
+    conflictDetected: boolean
+    latencyMs: number | null
 
-  // Streaming
-  streaming: boolean;
-  streamStatus: string | null;
-  streamError: string | null;
+    // Streaming
+    streaming: boolean
+    streamStatus: string | null
+    streamError: string | null
 }
 
 export interface MultimodalInferArgs {
-  text: string;
-  audioBlob?: Blob | null;
-  sessionId?: string;
-  contextType?: string;
+    text: string
+    audioBlob?: Blob | null
+    sessionId?: string
+    contextType?: string
 }
 
 export interface MultimodalStreamConfig {
@@ -451,18 +451,18 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const { result } = reader;
-      if (typeof result === "string") {
-        const base64 = result.split(",")[1] || "";
-        resolve(base64);
-      } else {
-        reject(new Error("Failed to convert blob to base64"));
-      }
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(blob);
-  });
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onloadend = () => {
+            const { result } = reader
+            if (typeof result === 'string') {
+                const base64 = result.split(',')[1] || ''
+                resolve(base64)
+            } else {
+                reject(new Error('Failed to convert blob to base64'))
+            }
+        }
+        reader.onerror = () => reject(reader.error)
+        reader.readAsDataURL(blob)
+    })
 }

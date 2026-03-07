@@ -3,11 +3,7 @@
  */
 
 import { z } from "zod";
-import {
-  createErrorContext,
-  normalizeError,
-  ValidationError,
-} from "@/lib/error";
+import { createErrorContext, normalizeError, ValidationError } from "@/lib/error";
 
 /**
  * Validate API request body with Zod schema
@@ -42,10 +38,7 @@ export async function validateApiRequest<T extends z.ZodType>(
       );
     }
 
-    throw normalizeError(
-      error,
-      createErrorContext({ action: "api_validation" }),
-    );
+    throw normalizeError(error, createErrorContext({ action: "api_validation" }));
   }
 }
 
@@ -71,9 +64,7 @@ export async function validateApiResponse<T extends z.ZodType>(
         "Response validation failed",
         fieldErrors,
         createErrorContext({
-          action: context?.endpoint
-            ? `RESPONSE ${context.endpoint}`
-            : "api_response",
+          action: context?.endpoint ? `RESPONSE ${context.endpoint}` : "api_response",
           metadata: {
             endpoint: context?.endpoint,
           },
@@ -81,10 +72,7 @@ export async function validateApiResponse<T extends z.ZodType>(
       );
     }
 
-    throw normalizeError(
-      error,
-      createErrorContext({ action: "api_response_validation" }),
-    );
+    throw normalizeError(error, createErrorContext({ action: "api_response_validation" }));
   }
 }
 
@@ -101,8 +89,7 @@ export function validateQueryParams<T extends z.ZodType>(
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined) {
         // Handle array values
-        normalized[key] =
-          Array.isArray(value) && value.length === 1 ? value[0] : value;
+        normalized[key] = Array.isArray(value) && value.length === 1 ? value[0] : value;
       }
     });
 
@@ -124,9 +111,6 @@ export function validateQueryParams<T extends z.ZodType>(
       );
     }
 
-    throw normalizeError(
-      error,
-      createErrorContext({ action: "query_validation" }),
-    );
+    throw normalizeError(error, createErrorContext({ action: "query_validation" }));
   }
 }

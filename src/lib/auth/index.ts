@@ -3,50 +3,49 @@
  * Provides complete authentication system with Auth0 integration
  */
 
-import type { AstroCookies } from "astro";
-import { authConfig } from "../../config/auth.config";
-import { validateToken } from "./auth0-jwt-service";
-import { extractTokenFromRequest } from "./auth0-middleware";
-import { getSession } from "./session";
+import type { AstroCookies } from 'astro'
+import { authConfig } from '../../config/auth.config'
+import { validateToken } from './auth0-jwt-service'
+import { extractTokenFromRequest } from './auth0-middleware'
+import { getSession } from './session'
 
 // Re-export session for compatibility
-export { getSession } from "./session";
-export type { SessionData } from "./session";
+export { getSession } from './session'
+export type { SessionData } from './session'
 
 /**
  * Get the current user from the request or cookies
  */
 export async function getCurrentUser(
-  context: Request | AstroCookies,
+  context: Request | AstroCookies
 ): Promise<{ id: string; role: string } | null> {
-  let token: string | null = null;
+  let token: string | null = null
 
-  if ("headers" in context) {
+  if ('headers' in context) {
     // It's a Request object
-    token = extractTokenFromRequest(context as Request);
+    token = extractTokenFromRequest(context as Request)
   } else {
     // It's AstroCookies
     // Check for Auth0 token first, then fallback to configured name
-    token =
-      (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
-      (context as AstroCookies).get("auth_token")?.value ||
-      null;
+    token = (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ||
+      (context as AstroCookies).get('auth_token')?.value ||
+      null
   }
 
   if (!token) {
-    return null;
+    return null
   }
 
   try {
-    const result = await validateToken(token, "access");
+    const result = await validateToken(token, 'access')
     if (result.valid && result.userId) {
-      return { id: result.userId, role: result.role || "guest" };
+      return { id: result.userId, role: result.role || 'guest' }
     }
   } catch {
     // Token validation failed
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -56,21 +55,19 @@ export async function hasRole(
   context: AstroCookies | Request,
   role: string,
 ): Promise<boolean> {
-  const user = await getCurrentUser(context);
+  const user = await getCurrentUser(context)
   if (!user) {
-    return false;
+    return false
   }
-  return user.role === role;
+  return user.role === role
 }
 
 /**
  * Check if the current user is authenticated
  */
-export async function isAuthenticated(
-  context: AstroCookies | Request,
-): Promise<boolean> {
-  const user = await getCurrentUser(context);
-  return !!user;
+export async function isAuthenticated(context: AstroCookies | Request): Promise<boolean> {
+  const user = await getCurrentUser(context)
+  return !!user
 }
 
 /**
@@ -80,27 +77,27 @@ export async function requirePageAuth(
   context: { request: Request },
   role?: string,
 ): Promise<Response | null> {
-  const user = await getCurrentUser(context.request);
+  const user = await getCurrentUser(context.request)
 
   if (!user) {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/login" },
-    });
+      headers: { Location: '/login' }
+    })
   }
 
   if (role && user.role !== role) {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/access-denied" },
-    });
+      headers: { Location: '/access-denied' }
+    })
   }
 
-  return null;
+  return null
 }
 
 // Export authentication types and middleware
-export * from "./types";
+export * from './types'
 
 // Export server-side auth functionality
 export {
@@ -111,7 +108,7 @@ export {
   cleanupExpiredTokens,
   measureTokenOperation,
   AuthenticationError,
-} from "./auth0-jwt-service";
+} from './auth0-jwt-service'
 
 export type {
   TokenPair,
@@ -119,7 +116,7 @@ export type {
   ClientInfo,
   UserRole,
   TokenType,
-} from "./auth0-jwt-service";
+} from './auth0-jwt-service'
 
 // Auth0/Legacy Bridge exports removed
 
@@ -132,7 +129,7 @@ export {
   getClientInfo,
   csrfProtection,
   securityHeaders,
-} from "./auth0-middleware";
+} from './auth0-middleware'
 
 /**
  * Initialize authentication system
@@ -140,15 +137,13 @@ export {
 export async function initializeAuthSystem(): Promise<void> {
   try {
     // Start token cleanup scheduler
-    const { startTokenCleanupScheduler } = await import("./auth0-jwt-service");
-    startTokenCleanupScheduler();
+    const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
+    startTokenCleanupScheduler()
 
-    console.log(
-      "✅ Authentication system initialized successfully (Auth0-native)",
-    );
+    console.log('✅ Authentication system initialized successfully (Auth0-native)')
   } catch (error) {
-    console.error("❌ Failed to initialize authentication system:", error);
-    throw error;
+    console.error('❌ Failed to initialize authentication system:', error)
+    throw error
   }
 }
 
@@ -159,6 +154,6 @@ export const auth = {
   getCurrentUser,
   isAuthenticated,
   hasRole,
-};
+}
 
-export const requireAuth = requirePageAuth;
+export const requireAuth = requirePageAuth

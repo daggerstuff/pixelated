@@ -1,32 +1,32 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react'
 
 interface MobileDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
+  isOpen: boolean
+  onClose: () => void
+  children: React.ReactNode
 }
 
 export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
       }
-    };
+    }
 
     if (isOpen) {
-      document.body.style.overflow = "hidden";
-      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = 'hidden'
+      document.addEventListener('keydown', handleEscape)
     }
 
     return () => {
-      document.body.style.overflow = "";
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen, onClose]);
+      document.body.style.overflow = ''
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen, onClose])
 
   if (!isOpen) {
-    return null;
+    return null
   }
 
   return (
@@ -36,8 +36,8 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
         className="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 lg:hidden border-0"
         onClick={onClose}
         onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            onClose();
+          if (e.key === 'Escape') {
+            onClose()
           }
         }}
         aria-label="Close menu"
@@ -62,5 +62,5 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
         </div>
       </div>
     </>
-  );
+  )
 }

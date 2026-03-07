@@ -8,14 +8,14 @@ import type {
   LLMOutput,
   UnifiedContext,
   UnifiedProcessingRequest,
-} from "./unified-api";
-import type { LLMResponse as MentalLLaMAResponse } from "../../ai/mental-llama/types/mentalLLaMATypes";
+} from './unified-api'
+import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes'
 
 /**
  * Represents the supported LLM providers.
  * This enum is used to identify the source of the LLM output.
  */
-export type LLMProvider = "MentalLLaMA" | "OpenAI" | "Anthropic" | "Gemini";
+export type LLMProvider = 'MentalLLaMA' | 'OpenAI' | 'Anthropic' | 'Gemini'
 
 /**
  * The LLM adapter class.
@@ -38,22 +38,22 @@ export class LLMAdapter {
     context: UnifiedContext,
   ): UnifiedProcessingRequest {
     switch (provider) {
-      case "MentalLLaMA":
+      case 'MentalLLaMA':
         return this.transformMentalLLaMA(
           rawOutput as MentalLLaMAResponse,
           context,
-        );
-      case "OpenAI":
+        )
+      case 'OpenAI':
         // Placeholder for OpenAI adapter
-        throw new Error("OpenAI adapter not implemented yet.");
-      case "Anthropic":
+        throw new Error('OpenAI adapter not implemented yet.')
+      case 'Anthropic':
         // Placeholder for Anthropic adapter
-        throw new Error("Anthropic adapter not implemented yet.");
-      case "Gemini":
+        throw new Error('Anthropic adapter not implemented yet.')
+      case 'Gemini':
         // Placeholder for Gemini adapter
-        throw new Error("Gemini adapter not implemented yet.");
+        throw new Error('Gemini adapter not implemented yet.')
       default:
-        throw new Error(`Unsupported LLM provider: ${provider}`);
+        throw new Error(`Unsupported LLM provider: ${provider}`)
     }
   }
 
@@ -77,11 +77,11 @@ export class LLMAdapter {
         tokenUsage: rawOutput.tokenUsage,
         model: rawOutput.model,
       },
-    };
+    }
 
     return {
       llmOutput,
       context,
-    };
+    }
   }
 }

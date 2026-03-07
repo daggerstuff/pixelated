@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
-import { AnalyticsService } from "@/lib/analytics";
+import { useState, useEffect } from 'react'
+import { AnalyticsService } from '@/lib/analytics'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "../ui/slider";
-import { Button } from "@/components/ui/button";
-import { Lock, Trash, RefreshCw } from "lucide-react";
+} from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
+import { Slider } from '../ui/slider'
+import { Button } from '@/components/ui/button'
+import { Lock, Trash, RefreshCw } from 'lucide-react'
 
 interface PrivacySettings {
-  enabled: boolean;
-  differentialPrivacy: boolean;
-  privacyBudget: number;
-  anonymize: boolean;
+  enabled: boolean
+  differentialPrivacy: boolean
+  privacyBudget: number
+  anonymize: boolean
 }
 
 export function PrivacyDashboard() {
@@ -25,25 +25,25 @@ export function PrivacyDashboard() {
     differentialPrivacy: true,
     privacyBudget: 1.0,
     anonymize: true,
-  });
-  const [eventCount, setEventCount] = useState(0);
-  const [lastSync, setLastSync] = useState<Date | null>(null);
+  })
+  const [eventCount, setEventCount] = useState(0)
+  const [lastSync, setLastSync] = useState<Date | null>(null)
 
-  const analytics = AnalyticsService.getInstance();
+  const analytics = AnalyticsService.getInstance()
 
   useEffect(() => {
     // Load initial settings
-    const events = analytics.getEvents();
-    setEventCount(events.length);
-    setLastSync(new Date());
-  }, [analytics]);
+    const events = analytics.getEvents()
+    setEventCount(events.length)
+    setLastSync(new Date())
+  }, [analytics])
 
   const handleSettingChange = (
     key: keyof PrivacySettings,
     value: boolean | number,
   ) => {
-    const newSettings = { ...settings, [key]: value };
-    setSettings(newSettings);
+    const newSettings = { ...settings, [key]: value }
+    setSettings(newSettings)
 
     // Update analytics service config
     analytics.updateConfig({
@@ -51,20 +51,20 @@ export function PrivacyDashboard() {
       differentialPrivacyEnabled: newSettings.differentialPrivacy,
       privacyBudget: newSettings.privacyBudget,
       anonymize: newSettings.anonymize,
-    });
-  };
+    })
+  }
 
   const handleClearData = async () => {
-    analytics.clearEvents();
-    setEventCount(0);
-    setLastSync(new Date());
-  };
+    analytics.clearEvents()
+    setEventCount(0)
+    setLastSync(new Date())
+  }
 
   const handleRefresh = async () => {
-    const events = analytics.getEvents();
-    setEventCount(events.length);
-    setLastSync(new Date());
-  };
+    const events = analytics.getEvents()
+    setEventCount(events.length)
+    setLastSync(new Date())
+  }
 
   return (
     <div className="space-y-4">
@@ -89,7 +89,7 @@ export function PrivacyDashboard() {
             <Switch
               checked={settings.enabled}
               onCheckedChange={(checked: boolean) =>
-                handleSettingChange("enabled", checked)
+                handleSettingChange('enabled', checked)
               }
             />
           </div>
@@ -104,7 +104,7 @@ export function PrivacyDashboard() {
             <Switch
               checked={settings.differentialPrivacy}
               onCheckedChange={(checked: boolean) =>
-                handleSettingChange("differentialPrivacy", checked)
+                handleSettingChange('differentialPrivacy', checked)
               }
             />
           </div>
@@ -123,7 +123,7 @@ export function PrivacyDashboard() {
               step={0.1}
               onValueChange={(values: number[]) =>
                 handleSettingChange(
-                  "privacyBudget",
+                  'privacyBudget',
                   values[0] ?? settings.privacyBudget,
                 )
               }
@@ -145,7 +145,7 @@ export function PrivacyDashboard() {
             <Switch
               checked={settings.anonymize}
               onCheckedChange={(checked: boolean) =>
-                handleSettingChange("anonymize", checked)
+                handleSettingChange('anonymize', checked)
               }
             />
           </div>
@@ -168,7 +168,7 @@ export function PrivacyDashboard() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">Last Updated</span>
               <span className="font-medium">
-                {lastSync?.toLocaleTimeString() ?? "Never"}
+                {lastSync?.toLocaleTimeString() ?? 'Never'}
               </span>
             </div>
             <div className="flex gap-2">
@@ -195,5 +195,5 @@ export function PrivacyDashboard() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

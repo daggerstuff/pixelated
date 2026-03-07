@@ -1,11 +1,10 @@
-import React from "react";
-import { useSimulator } from "../context/SimulatorContext";
-import type { SpeechPattern } from "../types";
+import React from 'react'
+import { useSimulator } from '../context/SimulatorContext'
+import type { SpeechPattern } from '../types'
 
 export const SpeechPatternDisplay: React.FC = () => {
-  const { state } = useSimulator();
-  const speechPatterns: SpeechPattern[] =
-    (state as { speechPatterns?: SpeechPattern[] })?.speechPatterns ?? [];
+  const { state } = useSimulator()
+  const speechPatterns: SpeechPattern[] = (state as { speechPatterns?: SpeechPattern[] })?.speechPatterns ?? []
 
   if (!speechPatterns || speechPatterns.length === 0) {
     return (
@@ -15,7 +14,7 @@ export const SpeechPatternDisplay: React.FC = () => {
           No speech patterns detected yet.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -23,10 +22,7 @@ export const SpeechPatternDisplay: React.FC = () => {
       <h2 className="text-lg font-semibold mb-4">Speech Patterns</h2>
       <div className="space-y-3">
         {speechPatterns.map((pattern: SpeechPattern) => (
-          <div
-            key={pattern.pattern}
-            className="flex justify-between items-center"
-          >
+          <div key={pattern.pattern} className="flex justify-between items-center">
             <span className="text-sm">{pattern.pattern}</span>
             <span className="text-sm font-medium">
               {(pattern.confidence * 100).toFixed(1)}%
@@ -35,5 +31,5 @@ export const SpeechPatternDisplay: React.FC = () => {
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

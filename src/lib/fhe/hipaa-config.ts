@@ -32,88 +32,88 @@ export const HIPAA_SECURITY_CONFIG = {
 
   // Risk Levels
   RISK_LEVELS: {
-    LOW: "low",
-    MEDIUM: "medium",
-    HIGH: "high",
-    CRITICAL: "critical",
+    LOW: 'low',
+    MEDIUM: 'medium',
+    HIGH: 'high',
+    CRITICAL: 'critical',
   } as const,
 
   // Key Status
   KEY_STATUS: {
-    ACTIVE: "active",
-    DEPRECATED: "deprecated",
-    COMPROMISED: "compromised",
-    DESTROYED: "destroyed",
+    ACTIVE: 'active',
+    DEPRECATED: 'deprecated',
+    COMPROMISED: 'compromised',
+    DESTROYED: 'destroyed',
   } as const,
 
   // Migration Settings
   KEY_MIGRATION_GRACE_PERIOD_MS: 24 * 60 * 60 * 1000, // 24 hours
 
   // CloudWatch Metrics
-  CLOUDWATCH_NAMESPACE: "HIPAA/FHE/KeyRotation",
+  CLOUDWATCH_NAMESPACE: 'HIPAA/FHE/KeyRotation',
 
   // Environment Variables Required
   REQUIRED_ENV_VARS: [
-    "HIPAA_MASTER_SECRET",
-    "KEY_ROTATION_LAMBDA_ARN",
-    "AWS_REGION",
+    'HIPAA_MASTER_SECRET',
+    'KEY_ROTATION_LAMBDA_ARN',
+    'AWS_REGION',
   ] as const,
-} as const;
+} as const
 
 /**
  * Validate HIPAA++ environment configuration
  */
 export function validateHIPAAEnvironment(): {
-  valid: boolean;
-  missing: string[];
+  valid: boolean
+  missing: string[]
 } {
-  const missing: string[] = [];
+  const missing: string[] = []
 
   for (const envVar of HIPAA_SECURITY_CONFIG.REQUIRED_ENV_VARS) {
     if (!process.env[envVar]) {
-      missing.push(envVar);
+      missing.push(envVar)
     }
   }
 
   return {
     valid: missing.length === 0,
     missing,
-  };
+  }
 }
 
 /**
  * Get HIPAA++ compliant storage prefix
  */
 export function getHIPAAStoragePrefix(): string {
-  const environment = process.env["NODE_ENV"] || "development";
-  const region = process.env["AWS_REGION"] || "us-east-1";
-  return `hipaa-fhe-${environment}-${region}-`;
+  const environment = process.env['NODE_ENV'] || 'development'
+  const region = process.env['AWS_REGION'] || 'us-east-1'
+  return `hipaa-fhe-${environment}-${region}-`
 }
 
 /**
  * Security event severity mapping
  */
 export const SECURITY_EVENT_SEVERITY = {
-  service_initialized: "low",
-  key_rotation_started: "medium",
-  key_rotation_completed: "low",
-  key_rotation_failed: "critical",
-  key_deprecated: "medium",
-  key_destroyed: "medium",
-  key_compromise_reported: "critical",
-  emergency_rotation_triggered: "critical",
-  suspicious_activity_detected: "critical",
-  key_age_violation: "high",
-  lock_acquisition_failed: "high",
-  aws_clients_init_failed: "critical",
-  missing_lambda_arn: "critical",
-  key_storage_failed: "critical",
-  service_disposal_started: "medium",
-  service_disposed: "low",
-} as const;
+  service_initialized: 'low',
+  key_rotation_started: 'medium',
+  key_rotation_completed: 'low',
+  key_rotation_failed: 'critical',
+  key_deprecated: 'medium',
+  key_destroyed: 'medium',
+  key_compromise_reported: 'critical',
+  emergency_rotation_triggered: 'critical',
+  suspicious_activity_detected: 'critical',
+  key_age_violation: 'high',
+  lock_acquisition_failed: 'high',
+  aws_clients_init_failed: 'critical',
+  missing_lambda_arn: 'critical',
+  key_storage_failed: 'critical',
+  service_disposal_started: 'medium',
+  service_disposed: 'low',
+} as const
 
-export type SecurityEventType = keyof typeof SECURITY_EVENT_SEVERITY;
+export type SecurityEventType = keyof typeof SECURITY_EVENT_SEVERITY
 export type RiskLevel =
-  (typeof HIPAA_SECURITY_CONFIG.RISK_LEVELS)[keyof typeof HIPAA_SECURITY_CONFIG.RISK_LEVELS];
+  (typeof HIPAA_SECURITY_CONFIG.RISK_LEVELS)[keyof typeof HIPAA_SECURITY_CONFIG.RISK_LEVELS]
 export type KeyStatus =
-  (typeof HIPAA_SECURITY_CONFIG.KEY_STATUS)[keyof typeof HIPAA_SECURITY_CONFIG.KEY_STATUS];
+  (typeof HIPAA_SECURITY_CONFIG.KEY_STATUS)[keyof typeof HIPAA_SECURITY_CONFIG.KEY_STATUS]

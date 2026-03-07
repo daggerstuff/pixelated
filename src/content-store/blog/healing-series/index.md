@@ -1,9 +1,10 @@
 ---
-title: "Healing Journey Series"
-description: "Exploring the path to recovery and personal growth through understanding and self-discovery"
-author: "Pixelated Empathy Team"
+title: 'Healing Journey Series'
+description: 'Exploring the path to recovery and personal growth through understanding and self-discovery'
+author: 'Pixelated Empathy Team'
 pubDate: 2024-03-15
 ---
+
 
 ## Healing Journey Series
 
@@ -14,34 +15,34 @@ This series focuses on the transformative journey of healing from trauma and add
 ### [Understanding Emotional Unavailability](/blog/healing-series/emotional-unavailability)
 
 <ArticleCard
-title="Understanding Emotional Unavailability"
-description="Explore the roots of emotional unavailability and its connection to trauma, with practical steps toward emotional connection."
-author="Dr. Rachel Kim"
-date="2024-02-19"
-readingTime="11 min"
-tags={['emotional health', 'relationships', 'trauma', 'healing']}
+  title="Understanding Emotional Unavailability"
+  description="Explore the roots of emotional unavailability and its connection to trauma, with practical steps toward emotional connection."
+  author="Dr. Rachel Kim"
+  date="2024-02-19"
+  readingTime="11 min"
+  tags={['emotional health', 'relationships', 'trauma', 'healing']}
 />
 
 ### [Codependency and Complex Trauma](/blog/healing-series/codependency-and-trauma)
 
 <ArticleCard
-title="Codependency and Complex Trauma"
-description="A deep dive into the intersection of codependency and complex trauma, offering insights for recovery and growth."
-author="Dr. David Thompson"
-date="2024-02-20"
-readingTime="16 min"
-tags={['codependency', 'trauma', 'recovery', 'relationships']}
+  title="Codependency and Complex Trauma"
+  description="A deep dive into the intersection of codependency and complex trauma, offering insights for recovery and growth."
+  author="Dr. David Thompson"
+  date="2024-02-20"
+  readingTime="16 min"
+  tags={['codependency', 'trauma', 'recovery', 'relationships']}
 />
 
 ### [The Dance of Wounded Souls](/blog/healing-series/dance-of-wounded-souls)
 
 <ArticleCard
-title="The Dance of Wounded Souls"
-description="Understanding the intricate patterns of trauma recovery and the journey toward wholeness and authentic connection."
-author="Dr. Lisa Anderson"
-date="2024-02-21"
-readingTime="14 min"
-tags={['healing', 'trauma', 'spirituality', 'growth']}
+  title="The Dance of Wounded Souls"
+  description="Understanding the intricate patterns of trauma recovery and the journey toward wholeness and authentic connection."
+  author="Dr. Lisa Anderson"
+  date="2024-02-21"
+  readingTime="14 min"
+  tags={['healing', 'trauma', 'spirituality', 'growth']}
 />
 
 ## Series Overview

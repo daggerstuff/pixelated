@@ -146,7 +146,7 @@ interface User {
   name: string;
   email: string;
   avatarUrl?: string;
-  role: "user" | "admin";
+  role: 'user' | 'admin';
   createdAt: string;
 }
 ```
@@ -172,7 +172,7 @@ interface SecurityEvent {
   id: string;
   timestamp: number;
   type: string;
-  severity: "critical" | "high" | "medium" | "low";
+  severity: 'critical' | 'high' | 'medium' | 'low';
   userId?: string;
   ip?: string;
   metadata?: {
@@ -206,16 +206,16 @@ Many endpoints that return lists support pagination through query parameters:
 
 ```typescript
 interface PaginationInfo {
-  page: number; // Current page number
-  limit: number; // Items per page
-  total: number; // Total number of items
-  hasNext: boolean; // Whether there are more pages
-  hasPrev: boolean; // Whether there are previous pages
+  page: number;  // Current page number
+  limit: number;  // Items per page
+  total: number;  // Total number of items
+  hasNext: boolean;  // Whether there are more pages
+  hasPrev: boolean;  // Whether there are previous pages
 }
 
 interface PaginatedResponse<T> {
-  data: T[]; // Current page of results
-  pagination: PaginationInfo; // Pagination metadata
+  data: T[];  // Current page of results
+  pagination: PaginationInfo;  // Pagination metadata
 }
 ```
 
@@ -223,22 +223,16 @@ Example usage:
 
 ```typescript
 // First page
-const response = await fetch(
-  "/api/messages?conversationId=123&page=1&limit=20",
-  {
-    headers: { Authorization: `Bearer ${token}` },
-  },
-);
+const response = await fetch('/api/messages?conversationId=123&page=1&limit=20', {
+  headers: { Authorization: `Bearer ${token}` }
+});
 const firstPage = await response.json();
 
 // Next page
 if (firstPage.pagination.hasNext) {
-  const nextResponse = await fetch(
-    "/api/messages?conversationId=123&page=2&limit=20",
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    },
-  );
+  const nextResponse = await fetch('/api/messages?conversationId=123&page=2&limit=20', {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   const secondPage = await nextResponse.json();
 }
 ```
@@ -249,9 +243,9 @@ API errors follow a standard format:
 
 ```typescript
 interface ApiError {
-  code: string; // Error code (e.g., "not_found", "unauthorized")
-  message: string; // Human-readable error message
-  details?: any; // Additional error details
+  code: string;  // Error code (e.g., "not_found", "unauthorized")
+  message: string;  // Human-readable error message
+  details?: any;  // Additional error details
 }
 ```
 
@@ -270,7 +264,7 @@ Common error codes:
 React components can use fetch or custom hooks to interact with the API:
 
 ```jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 function MessagesComponent({ conversationId }) {
   const [messages, setMessages] = useState([]);
@@ -279,18 +273,13 @@ function MessagesComponent({ conversationId }) {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch(
-          `/api/messages?conversationId=${conversationId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          },
-        );
+        const response = await fetch(`/api/messages?conversationId=${conversationId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
         const data = await response.json();
         setMessages(data.messages);
       } catch (error) {
-        console.error("Failed to fetch messages:", error);
+        console.error('Failed to fetch messages:', error);
       } finally {
         setLoading(false);
       }
@@ -301,17 +290,17 @@ function MessagesComponent({ conversationId }) {
 
   const handleSend = async (content) => {
     try {
-      await fetch("/api/messages", {
-        method: "POST",
+      await fetch('/api/messages', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({ content, recipientId: "user123" }),
+        body: JSON.stringify({ content, recipientId: 'user123' })
       });
       // Refresh messages
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error('Failed to send message:', error);
     }
   };
 
@@ -319,10 +308,10 @@ function MessagesComponent({ conversationId }) {
 
   return (
     <div>
-      {messages.map((message) => (
+      {messages.map(message => (
         <div key={message.id}>{message.content}</div>
       ))}
-      <button onClick={() => handleSend("Hello!")}>Send</button>
+      <button onClick={() => handleSend('Hello!')}>Send</button>
     </div>
   );
 }

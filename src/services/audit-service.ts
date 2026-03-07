@@ -1,13 +1,13 @@
 export interface AuditEventData {
-  userId: string;
-  action: string;
-  resource: string;
-  metadata?: Record<string, unknown>;
+  userId: string
+  action: string
+  resource: string
+  metadata?: Record<string, unknown>
 }
 
 export interface AuditEvent extends AuditEventData {
-  id: string;
-  timestamp: string;
+  id: string
+  timestamp: string
 }
 
 export class AuditService {
@@ -16,10 +16,10 @@ export class AuditService {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
       ...eventData,
-    };
+    }
 
-    await this.storeEvent(newEvent);
-    return newEvent;
+    await this.storeEvent(newEvent)
+    return newEvent
   }
 
   private async storeEvent(_event: AuditEvent): Promise<void> {

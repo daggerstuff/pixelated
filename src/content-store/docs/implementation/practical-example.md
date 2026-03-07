@@ -1,9 +1,9 @@
 ---
-title: "Practical Implementation Example"
-description: "Practical Implementation Example documentation"
+title: 'Practical Implementation Example'
+description: 'Practical Implementation Example documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -274,13 +274,13 @@ async def test_therapy_session():
 
 ```yaml
 # docker-compose.yml
-version: "3.8"
+version: '3.8'
 
 services:
   therapy_system:
     build: .
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - MODEL_PATH=/models

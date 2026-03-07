@@ -38,8 +38,7 @@ export class PatientResponseService {
     consistencyService: BeliefConsistencyService,
     emotionSynthesizer?: EmotionSynthesizer, // Optional with fallback
   ) {
-    this.emotionSynthesizer =
-      emotionSynthesizer || EmotionSynthesizer.getInstance();
+    this.emotionSynthesizer = emotionSynthesizer || EmotionSynthesizer.getInstance();
   }
 }
 ```
@@ -55,7 +54,7 @@ export function createPatientResponseService(options?: {
   return new PatientResponseService(
     profileService,
     consistencyService,
-    options?.emotionSynthesizer || EmotionSynthesizer.getInstance(),
+    options?.emotionSynthesizer || EmotionSynthesizer.getInstance()
   );
 }
 
@@ -64,7 +63,7 @@ export function createTestPatientResponseService(): PatientResponseService {
   return new PatientResponseService(
     mockProfileService,
     mockConsistencyService,
-    EmotionSynthesizer.createTestInstance(), // Isolated instance
+    EmotionSynthesizer.createTestInstance() // Isolated instance
   );
 }
 ```
@@ -79,12 +78,12 @@ export function createTestPatientResponseService(): PatientResponseService {
 
 ```typescript
 // Test example
-describe("PatientResponseService", () => {
+describe('PatientResponseService', () => {
   beforeEach(() => {
     EmotionSynthesizer.resetInstance(); // Clean state
   });
 
-  it("should synthesize emotions correctly", () => {
+  it('should synthesize emotions correctly', () => {
     const service = createTestPatientResponseService();
     // Test with isolated dependencies
   });
@@ -120,7 +119,7 @@ const service = createPatientResponseService();
 // Custom configuration
 const customSynthesizer = EmotionSynthesizer.getInstance();
 const service = createPatientResponseService({
-  emotionSynthesizer: customSynthesizer,
+  emotionSynthesizer: customSynthesizer
 });
 ```
 
@@ -133,7 +132,7 @@ const service = createTestPatientResponseService();
 // With mocks
 const mockSynthesizer = createMockEmotionSynthesizer();
 const service = createTestPatientResponseService({
-  emotionSynthesizer: mockSynthesizer,
+  emotionSynthesizer: mockSynthesizer
 });
 ```
 
@@ -145,7 +144,7 @@ const service = createPatientResponseService();
 // Use emotional synthesis in response generation
 const emotionalContext = await service.synthesizeEmotionalContext(
   responseContext,
-  "sadness",
+  'sadness'
 );
 
 // Get current emotional state

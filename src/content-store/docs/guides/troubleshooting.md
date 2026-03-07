@@ -56,12 +56,14 @@ toc: true
 #### Resolution 1
 
 1. Container Issues
+
    - Check container health command
    - Verify environment variables
    - Review resource limits
    - Check container registry access
 
 2. Network Issues
+
    - Verify security group rules
    - Check subnet configurations
    - Test load balancer health checks
@@ -121,12 +123,14 @@ toc: true
 #### Resolution 2
 
 1. Resource Optimization
+
    - Adjust container resources
    - Scale service capacity
    - Optimize database queries
    - Enable caching
 
 2. Performance Tuning
+
    - Review application settings
    - Optimize database indexes
    - Adjust connection pools
@@ -173,12 +177,14 @@ toc: true
 #### Resolution 3
 
 1. Metric Collection
+
    - Restart CloudWatch agent
    - Update agent configuration
    - Check IAM permissions
    - Verify metric namespaces
 
 2. Log Aggregation
+
    - Check Firehose delivery
    - Verify Lambda processor
    - Update retention policies
@@ -371,12 +377,14 @@ toc: true
 ### 1. Escalation Levels
 
 1. Level 1: DevOps Team
+
    - Initial investigation
    - Basic troubleshooting
    - Quick fixes
    - Monitoring alerts
 
 2. Level 2: Platform Team
+
    - Infrastructure issues
    - Performance problems
    - Security incidents
@@ -391,12 +399,14 @@ toc: true
 ### 2. Escalation Process
 
 1. Initial Response
+
    - Document issue details
    - Collect relevant logs
    - Identify impact
    - Start investigation
 
 2. Escalation Criteria
+
    - Issue duration > 30 minutes
    - Multiple services affected
    - Data loss potential
@@ -411,12 +421,14 @@ toc: true
 ### 3. Contact Information
 
 1. DevOps Team
+
    - Slack: #devops-support
    - Email: [devops@example.com](mailto:devops@example.com)
    - Phone: 1-800-xxx-xxxx
    - On-call: PagerDuty
 
 2. Platform Team
+
    - Slack: #platform-support
    - Email: [platform@example.com](mailto:platform@example.com)
    - Phone: 1-800-xxx-xxxx

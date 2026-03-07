@@ -1,40 +1,40 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { format } from "date-fns";
+} from '@/components/ui/select'
+import { format } from 'date-fns'
 
 export interface FilterOptions {
   // Trend filters
-  startDate?: Date | null;
-  endDate?: Date | null;
-  minSignificance?: number;
+  startDate?: Date | null
+  endDate?: Date | null
+  minSignificance?: number
 
   // Pattern filters
-  patternType?: string;
-  minFrequency?: number;
+  patternType?: string
+  minFrequency?: number
 
   // Risk filters
-  minConfidence?: number;
-  riskFactor?: string;
-  minSeverity?: number;
+  minConfidence?: number
+  riskFactor?: string
+  minSeverity?: number
 }
 
 interface FilterControlsProps {
-  options: FilterOptions;
-  onChange: (options: FilterOptions) => void;
-  onApply: () => void;
-  onReset: () => void;
-  activeTab: "trends" | "patterns" | "risks";
-  patternTypes?: string[];
-  riskFactors?: string[];
+  options: FilterOptions
+  onChange: (options: FilterOptions) => void
+  onApply: () => void
+  onReset: () => void
+  activeTab: 'trends' | 'patterns' | 'risks'
+  patternTypes?: string[]
+  riskFactors?: string[]
 }
 
 export function FilterControls({
@@ -46,27 +46,27 @@ export function FilterControls({
   patternTypes = [],
   riskFactors = [],
 }: FilterControlsProps) {
-  const [dateError, setDateError] = useState<string | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null)
 
   const handleChange = (key: keyof FilterOptions, value: unknown) => {
-    const newOptions = { ...options, [key]: value };
+    const newOptions = { ...options, [key]: value }
     if (
-      (key === "startDate" &&
+      (key === 'startDate' &&
         newOptions.endDate &&
         value &&
         value > newOptions.endDate) ||
-      (key === "endDate" &&
+      (key === 'endDate' &&
         newOptions.startDate &&
         value &&
         value < newOptions.startDate)
     ) {
-      setDateError("End date cannot be earlier than start date.");
-      return;
+      setDateError('End date cannot be earlier than start date.')
+      return
     } else {
-      setDateError(null);
+      setDateError(null)
     }
-    onChange(newOptions);
-  };
+    onChange(newOptions)
+  }
 
   return (
     <div className="filter-controls space-y-4 p-4 border rounded-md bg-gray-50 dark:bg-gray-900 mb-4">
@@ -82,7 +82,7 @@ export function FilterControls({
         </div>
       </div>
 
-      {activeTab === "trends" && (
+      {activeTab === 'trends' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="startDate">Start Date</Label>
@@ -90,11 +90,11 @@ export function FilterControls({
               id="startDate"
               type="date"
               value={
-                options.startDate ? format(options.startDate, "yyyy-MM-dd") : ""
+                options.startDate ? format(options.startDate, 'yyyy-MM-dd') : ''
               }
               onChange={(e) => {
-                const date = e.target.value ? new Date(e.target.value) : null;
-                handleChange("startDate", date);
+                const date = e.target.value ? new Date(e.target.value) : null
+                handleChange('startDate', date)
               }}
             />
           </div>
@@ -105,11 +105,11 @@ export function FilterControls({
               id="endDate"
               type="date"
               value={
-                options.endDate ? format(options.endDate, "yyyy-MM-dd") : ""
+                options.endDate ? format(options.endDate, 'yyyy-MM-dd') : ''
               }
               onChange={(e) => {
-                const date = e.target.value ? new Date(e.target.value) : null;
-                handleChange("endDate", date);
+                const date = e.target.value ? new Date(e.target.value) : null
+                handleChange('endDate', date)
               }}
             />
           </div>
@@ -120,13 +120,13 @@ export function FilterControls({
         <div className="text-red-500 text-xs mb-2">{dateError}</div>
       )}
 
-      {activeTab === "patterns" && (
+      {activeTab === 'patterns' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="patternType">Pattern Type</Label>
             <Select
-              value={options.patternType || ""}
-              onValueChange={(value) => handleChange("patternType", value)}
+              value={options.patternType || ''}
+              onValueChange={(value) => handleChange('patternType', value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -148,10 +148,10 @@ export function FilterControls({
               id="minFrequency"
               type="number"
               min={0}
-              value={options.minFrequency || ""}
+              value={options.minFrequency || ''}
               onChange={(e) =>
                 handleChange(
-                  "minFrequency",
+                  'minFrequency',
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
@@ -161,7 +161,7 @@ export function FilterControls({
         </div>
       )}
 
-      {activeTab === "risks" && (
+      {activeTab === 'risks' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="minConfidence">Min Confidence</Label>
@@ -171,10 +171,10 @@ export function FilterControls({
               min={0}
               max={1}
               step={0.1}
-              value={options.minConfidence || ""}
+              value={options.minConfidence || ''}
               onChange={(e) =>
                 handleChange(
-                  "minConfidence",
+                  'minConfidence',
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
@@ -185,8 +185,8 @@ export function FilterControls({
           <div className="space-y-2">
             <Label htmlFor="riskFactor">Risk Factor</Label>
             <Select
-              value={options.riskFactor || ""}
-              onValueChange={(value) => handleChange("riskFactor", value)}
+              value={options.riskFactor || ''}
+              onValueChange={(value) => handleChange('riskFactor', value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -204,5 +204,5 @@ export function FilterControls({
         </div>
       )}
     </div>
-  );
+  )
 }

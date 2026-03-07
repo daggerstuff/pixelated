@@ -3,7 +3,6 @@
 ## ✅ What Was Configured
 
 ### 1. Enhanced Workflow (`.github/workflows/codeql.yml`)
-
 - **Autobuild Integration**: Replaced manual builds with `autobuild` action for better analysis
 - **Extended Queries**: Added `security-extended` query pack for comprehensive security analysis
 - **ML-Powered Analysis**: Enabled ML-powered alerts for JavaScript/TypeScript
@@ -13,7 +12,6 @@
 - **Database Export**: Upload CodeQL database on failure for advanced debugging
 
 ### 2. Improved Configuration (`.github/codeql/codeql-config.yml`)
-
 - **Expanded Path Analysis**: Now analyzes `src`, `ai`, and `scripts` directories
 - **Comprehensive Exclusions**: Properly excludes tests, generated code, dependencies, and cache
 - **Query Filters**: Focus on security `problem` and `path-problem` queries
@@ -21,13 +19,11 @@
 - **Multiple Query Packs**: Uses both `security-extended` and `security-and-quality` packs
 
 ### 3. Custom Query Pack (`.github/codeql/custom-queries/qlpack.yml`)
-
 - Defined healthcare-specific query pack
 - Created reusable HIPAA compliance suite
 - Properly structured for CodeQL discovery
 
 ### 4. Documentation
-
 - **README.md**: Comprehensive guide covering:
   - Configuration overview
   - Custom queries explanation
@@ -45,7 +41,6 @@
 ## 🎯 Key Features
 
 ### Healthcare-Specific Security
-
 - ✅ FHIR resource validation checks
 - ✅ EHR data encryption verification
 - ✅ HIPAA audit logging validation
@@ -53,7 +48,6 @@
 - ✅ PHI transmission security
 
 ### Security Coverage
-
 - ✅ SQL injection detection
 - ✅ XSS vulnerability scanning
 - ✅ Authentication bypass detection
@@ -62,7 +56,6 @@
 - ✅ Taint tracking
 
 ### Analysis Quality
-
 - ✅ Autobuild for accurate analysis
 - ✅ ML-powered JavaScript/TypeScript alerts
 - ✅ Extended security query pack
@@ -72,18 +65,15 @@
 ## 📊 Coverage
 
 ### Languages Analyzed
-
 - JavaScript/TypeScript (frontend + Node.js)
 - Python (AI/ML services)
 
 ### Paths Analyzed
-
 - `src/` - Frontend Astro/React application
 - `ai/` - Python AI/ML services
 - `scripts/` - Build and deployment scripts
 
 ### Paths Excluded
-
 - `node_modules/`, `dist/`, `build/`, `.next/`, `.astro/`
 - Test files: `test/`, `tests/`, `__tests__/`, `*.test.*`, `*.spec.*`
 - Python: `.venv/`, `__pycache__/`, `*.pyc`
@@ -99,24 +89,22 @@
 
 Custom queries map to HIPAA Security Rule requirements:
 
-| Requirement           | Section        | Check                      |
-| --------------------- | -------------- | -------------------------- |
-| Access Control        | §164.312(a)(1) | Authentication validation  |
-| Audit Controls        | §164.312(b)    | Audit logging enforcement  |
-| Integrity             | §164.312(c)(1) | Version checks, validation |
-| Transmission Security | §164.312(e)(1) | Encryption verification    |
+| Requirement | Section | Check |
+|-------------|---------|-------|
+| Access Control | §164.312(a)(1) | Authentication validation |
+| Audit Controls | §164.312(b) | Audit logging enforcement |
+| Integrity | §164.312(c)(1) | Version checks, validation |
+| Transmission Security | §164.312(e)(1) | Encryption verification |
 
 ## 📈 Expected Results
 
 ### Alert Categories
-
 - **Security vulnerabilities**: High-priority fixes required
 - **Code quality issues**: Best practice violations
 - **HIPAA compliance**: Healthcare-specific security checks
 - **Data flow issues**: Sensitive data handling
 
 ### Performance
-
 - **Run time**: 5-20 minutes (depending on code size)
 - **Memory**: Up to 16GB allocated
 - **Timeout**: 360 minutes maximum
@@ -125,21 +113,18 @@ Custom queries map to HIPAA Security Rule requirements:
 ## 🚀 Next Steps
 
 ### Immediate Actions
-
 1. Review existing security alerts in GitHub Security tab
 2. Address any high/critical findings before deployment
 3. Train team on using CodeQL alerts
 4. Set up notifications for security findings
 
 ### Ongoing Maintenance
-
 1. **Weekly**: Review new alerts from scheduled scans
 2. **Monthly**: Analyze alert trends and patterns
 3. **Quarterly**: Update custom queries for new patterns
 4. **Annually**: Full security audit and compliance review
 
 ### Optional Enhancements
-
 1. Enable `fail-on: high` to block PRs with critical issues (currently commented)
 2. Add more custom queries for project-specific patterns
 3. Integrate with external SIEM or security tools
@@ -156,25 +141,20 @@ Custom queries map to HIPAA Security Rule requirements:
 ## 🔧 Customization
 
 ### To Add New Custom Queries
-
 1. Create `.ql` file in `custom-queries/`
 2. Add proper metadata (severity, tags, etc.)
 3. Reference in `codeql-config.yml`
 4. Update `qlpack.yml` if needed
 
 ### To Exclude Additional Paths
-
 Add to `paths-ignore` in `codeql-config.yml`:
-
 ```yaml
 paths-ignore:
-  - "**/your-excluded-path"
+  - '**/your-excluded-path'
 ```
 
 ### To Adjust Query Filters
-
 Modify `query-filters` in `codeql-config.yml`:
-
 ```yaml
 query-filters:
   - include:

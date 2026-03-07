@@ -3,90 +3,90 @@
  * Handles sensitive configuration data with encryption and secure storage
  */
 
-import * as fs from "fs";
-import { getLogger } from "@/lib/logging";
+import * as fs from 'fs'
+import { getLogger } from '@/lib/logging'
 
-const logger = getLogger("secrets-manager");
+const logger = getLogger('secrets-manager')
 
 // Security configuration
 const SECURITY_CONFIG = {
   ENCRYPTION: {
-    ALGORITHM: "aes-256-gcm",
+    ALGORITHM: 'aes-256-gcm',
     KEY_LENGTH: 32,
     IV_LENGTH: 16,
     TAG_LENGTH: 16,
   },
   STORAGE: {
-    SECRETS_DIR: process.env.SECRETS_DIR || "./config/secrets",
+    SECRETS_DIR: process.env.SECRETS_DIR || './config/secrets',
     PERMISSIONS: 0o600, // Read/write for owner only
   },
   VALIDATION: {
     REQUIRED_SECRETS: [
-      "DB_PASSWORD",
-      "JWT_SECRET",
-      "REDIS_PASSWORD",
-      "ENCRYPTION_KEY",
+      'DB_PASSWORD',
+      'JWT_SECRET',
+      'REDIS_PASSWORD',
+      'ENCRYPTION_KEY',
     ],
   },
-};
+}
 
 export interface SecretConfig {
-  name: string;
-  value: string;
-  encrypted?: boolean;
-  rotationDate?: Date;
-  expiresAt?: Date;
+  name: string
+  value: string
+  encrypted?: boolean
+  rotationDate?: Date
+  expiresAt?: Date
 }
 
 function generateRandomBytes(length: number): Uint8Array {
-  const bytes = new Uint8Array(length);
+  const bytes = new Uint8Array(length)
   // Prefer Web Crypto when available (browsers, modern Node)
   if (
-    typeof globalThis !== "undefined" &&
+    typeof globalThis !== 'undefined' &&
     (globalThis as any).crypto?.getRandomValues
   ) {
-    (globalThis as any).crypto.getRandomValues(bytes);
-    return bytes;
+    ;(globalThis as any).crypto.getRandomValues(bytes)
+    return bytes
   }
   // Fallback to Math.random (not cryptographically secure, but avoids bundling node:crypto in client)
-  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256);
-  return bytes;
+  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256)
+  return bytes
 }
 
 export class SecretsManager {
-  private static instance: SecretsManager;
-  private secrets: Map<string, SecretConfig> = new Map();
-  private encryptionKey: Uint8Array;
+  private static instance: SecretsManager
+  private secrets: Map<string, SecretConfig> = new Map()
+  private encryptionKey: Uint8Array
 
   private constructor() {
-    this.encryptionKey = this.loadEncryptionKey();
-    this.loadSecrets();
-    this.validateRequiredSecrets();
+    this.encryptionKey = this.loadEncryptionKey()
+    this.loadSecrets()
+    this.validateRequiredSecrets()
   }
 
   static getInstance(): SecretsManager {
     if (!SecretsManager.instance) {
-      SecretsManager.instance = new SecretsManager();
+      SecretsManager.instance = new SecretsManager()
     }
-    return SecretsManager.instance;
+    return SecretsManager.instance
   }
 
   /**
    * Load encryption key from secure storage
    */
   private loadEncryptionKey(): Uint8Array {
-    const keyPath = `${SECURITY_CONFIG.STORAGE.SECRETS_DIR}/.master-key`;
+    const keyPath = `${SECURITY_CONFIG.STORAGE.SECRETS_DIR}/.master-key`
 
     if (fs.existsSync(keyPath)) {
       // Load existing master key
-      return new Uint8Array(fs.readFileSync(keyPath));
+      return new Uint8Array(fs.readFileSync(keyPath))
     } else {
       // Generate new master key (should be done during setup)
-      const key = generateRandomBytes(SECURITY_CONFIG.ENCRYPTION.KEY_LENGTH);
+      const key = generateRandomBytes(SECURITY_CONFIG.ENCRYPTION.KEY_LENGTH)
       logger.warn(
-        "Generated new master key - this should be stored securely outside the application",
-      );
-      return key;
+        'Generated new master key - this should be stored securely outside the application',
+      )
+      return key
     }
   }
 
@@ -96,21 +96,19 @@ export class SecretsManager {
   private loadSecrets(): void {
     try {
       // Load from environment variables (for development)
-      this.loadFromEnvironment();
+      this.loadFromEnvironment()
 
       // Load from secure files (for production)
-      this.loadFromSecureFiles();
+      this.loadFromSecureFiles()
 
-      logger.info("Secrets loaded successfully", {
+      logger.info('Secrets loaded successfully', {
         count: this.secrets.size,
         encrypted: Array.from(this.secrets.values()).filter((s) => s.encrypted)
           .length,
-      });
+      })
     } catch (error) {
-      logger.error("Failed to load secrets", { error });
-      throw new Error("Secrets manager initialization failed", {
-        cause: error,
-      });
+      logger.error('Failed to load secrets', { error })
+      throw new Error('Secrets manager initialization failed', { cause: error })
     }
   }
 
@@ -129,7 +127,7 @@ export class SecretsManager {
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
       SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL,
-    };
+    }
 
     Object.entries(envSecrets).forEach(([key, value]) => {
       if (value && this.isValidSecret(value)) {
@@ -137,61 +135,61 @@ export class SecretsManager {
           name: key,
           value: value,
           encrypted: false,
-        });
+        })
       }
-    });
+    })
   }
 
   /**
    * Load secrets from secure files (production)
    */
   private loadFromSecureFiles(): void {
-    const secretsDir = SECURITY_CONFIG.STORAGE.SECRETS_DIR;
+    const secretsDir = SECURITY_CONFIG.STORAGE.SECRETS_DIR
 
     if (!fs.existsSync(secretsDir)) {
-      logger.warn("Secrets directory not found", { path: secretsDir });
-      return;
+      logger.warn('Secrets directory not found', { path: secretsDir })
+      return
     }
 
     // Load individual secret files
     const secretFiles = [
-      "db-password",
-      "jwt-secret",
-      "redis-password",
-      "encryption-key",
-      "resend-api-key",
-      "aws-access-key",
-      "aws-secret-key",
-      "openai-api-key",
-      "sentry-token",
-      "slack-webhook",
-    ];
+      'db-password',
+      'jwt-secret',
+      'redis-password',
+      'encryption-key',
+      'resend-api-key',
+      'aws-access-key',
+      'aws-secret-key',
+      'openai-api-key',
+      'sentry-token',
+      'slack-webhook',
+    ]
 
     secretFiles.forEach((filename) => {
-      const filePath = `${secretsDir}/${filename}`;
+      const filePath = `${secretsDir}/${filename}`
       if (fs.existsSync(filePath)) {
         try {
-          const value = fs.readFileSync(filePath, "utf-8").trim();
+          const value = fs.readFileSync(filePath, 'utf-8').trim()
           if (this.isValidSecret(value)) {
-            const key = this.filenameToKey(filename);
+            const key = this.filenameToKey(filename)
             this.secrets.set(key, {
               name: key,
               value: value,
               encrypted: false,
-            });
+            })
           }
         } catch (error) {
-          logger.error(`Failed to load secret file: ${filename}`, { error });
+          logger.error(`Failed to load secret file: ${filename}`, { error })
         }
       }
-    });
+    })
   }
 
   /**
    * Validate secret value
    */
   private isValidSecret(value: string): boolean {
-    if (!value || value.length < 8) return false;
+    if (!value || value.length < 8) return false
 
     // Check for common insecure patterns
     const insecurePatterns = [
@@ -202,9 +200,9 @@ export class SecretsManager {
       /123456/i,
       /password/i,
       /admin/i,
-    ];
+    ]
 
-    return !insecurePatterns.some((pattern) => pattern.test(value));
+    return !insecurePatterns.some((pattern) => pattern.test(value))
   }
 
   /**
@@ -212,19 +210,19 @@ export class SecretsManager {
    */
   private filenameToKey(filename: string): string {
     const mapping: Record<string, string> = {
-      "db-password": "DB_PASSWORD",
-      "jwt-secret": "JWT_SECRET",
-      "redis-password": "REDIS_PASSWORD",
-      "encryption-key": "ENCRYPTION_KEY",
-      "resend-api-key": "RESEND_API_KEY",
-      "aws-access-key": "AWS_ACCESS_KEY_ID",
-      "aws-secret-key": "AWS_SECRET_ACCESS_KEY",
-      "openai-api-key": "OPENAI_API_KEY",
-      "sentry-token": "SENTRY_AUTH_TOKEN",
-      "slack-webhook": "SLACK_WEBHOOK_URL",
-    };
+      'db-password': 'DB_PASSWORD',
+      'jwt-secret': 'JWT_SECRET',
+      'redis-password': 'REDIS_PASSWORD',
+      'encryption-key': 'ENCRYPTION_KEY',
+      'resend-api-key': 'RESEND_API_KEY',
+      'aws-access-key': 'AWS_ACCESS_KEY_ID',
+      'aws-secret-key': 'AWS_SECRET_ACCESS_KEY',
+      'openai-api-key': 'OPENAI_API_KEY',
+      'sentry-token': 'SENTRY_AUTH_TOKEN',
+      'slack-webhook': 'SLACK_WEBHOOK_URL',
+    }
 
-    return mapping[filename] || filename.toUpperCase().replace(/-/g, "_");
+    return mapping[filename] || filename.toUpperCase().replace(/-/g, '_')
   }
 
   /**
@@ -233,11 +231,11 @@ export class SecretsManager {
   private validateRequiredSecrets(): void {
     const missing = SECURITY_CONFIG.VALIDATION.REQUIRED_SECRETS.filter(
       (key) => !this.secrets.has(key),
-    );
+    )
 
     if (missing.length > 0) {
-      logger.error("Missing required secrets", { missing });
-      throw new Error(`Missing required secrets: ${missing.join(", ")}`);
+      logger.error('Missing required secrets', { missing })
+      throw new Error(`Missing required secrets: ${missing.join(', ')}`)
     }
   }
 
@@ -245,37 +243,37 @@ export class SecretsManager {
    * Get secret value
    */
   getSecret(key: string): string {
-    const secret = this.secrets.get(key);
+    const secret = this.secrets.get(key)
     if (!secret) {
-      logger.error("Secret not found", { key });
-      throw new Error(`Secret ${key} not found`);
+      logger.error('Secret not found', { key })
+      throw new Error(`Secret ${key} not found`)
     }
 
     // Log access for audit purposes (without exposing value)
-    logger.info("Secret accessed", { key, encrypted: secret.encrypted });
+    logger.info('Secret accessed', { key, encrypted: secret.encrypted })
 
-    return secret.value;
+    return secret.value
   }
 
   /**
    * Get secret with validation
    */
   getSecretSafe(key: string, validator?: (value: string) => boolean): string {
-    const value = this.getSecret(key);
+    const value = this.getSecret(key)
 
     if (validator && !validator(value)) {
-      logger.error("Secret validation failed", { key });
-      throw new Error(`Secret ${key} failed validation`);
+      logger.error('Secret validation failed', { key })
+      throw new Error(`Secret ${key} failed validation`)
     }
 
-    return value;
+    return value
   }
 
   /**
    * Check if secret exists
    */
   hasSecret(key: string): boolean {
-    return this.secrets.has(key);
+    return this.secrets.has(key)
   }
 
   /**
@@ -283,13 +281,13 @@ export class SecretsManager {
    */
   getDatabaseConfig() {
     return {
-      host: process.env.DB_HOST || "localhost",
-      port: parseInt(process.env.DB_PORT || "5432"),
-      database: process.env.DB_NAME || "pixelated",
-      user: process.env.DB_USER || "postgres",
-      password: this.getSecret("DB_PASSWORD"),
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432'),
+      database: process.env.DB_NAME || 'pixelated',
+      user: process.env.DB_USER || 'postgres',
+      password: this.getSecret('DB_PASSWORD'),
       ssl:
-        process.env.NODE_ENV === "production"
+        process.env.NODE_ENV === 'production'
           ? {
               rejectUnauthorized: true,
               ca: process.env.DB_SSL_CA,
@@ -297,7 +295,7 @@ export class SecretsManager {
               key: process.env.DB_SSL_KEY,
             }
           : false,
-    };
+    }
   }
 
   /**
@@ -305,11 +303,11 @@ export class SecretsManager {
    */
   getJWTConfig() {
     return {
-      secret: this.getSecret("JWT_SECRET"),
-      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
-      issuer: process.env.JWT_ISSUER || "pixelated-empathy",
-      audience: process.env.JWT_AUDIENCE || "pixelated-users",
-    };
+      secret: this.getSecret('JWT_SECRET'),
+      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      issuer: process.env.JWT_ISSUER || 'pixelated-empathy',
+      audience: process.env.JWT_AUDIENCE || 'pixelated-users',
+    }
   }
 
   /**
@@ -318,11 +316,11 @@ export class SecretsManager {
   getRedisConfig() {
     return {
       url: process.env.REDIS_URL,
-      password: this.getSecret("REDIS_PASSWORD"),
-      host: process.env.REDIS_HOST || "localhost",
-      port: parseInt(process.env.REDIS_PORT || "6379"),
-      db: parseInt(process.env.REDIS_DB || "0"),
-    };
+      password: this.getSecret('REDIS_PASSWORD'),
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      db: parseInt(process.env.REDIS_DB || '0'),
+    }
   }
 
   /**
@@ -330,34 +328,34 @@ export class SecretsManager {
    */
   async rotateSecret(key: string, newValue: string): Promise<void> {
     if (!this.isValidSecret(newValue)) {
-      throw new Error("Invalid secret value");
+      throw new Error('Invalid secret value')
     }
 
-    const oldSecret = this.secrets.get(key);
+    const oldSecret = this.secrets.get(key)
     this.secrets.set(key, {
       name: key,
       value: newValue,
       encrypted: false,
       rotationDate: new Date(),
-    });
+    })
 
-    logger.info("Secret rotated", { key, hadPreviousValue: !!oldSecret });
+    logger.info('Secret rotated', { key, hadPreviousValue: !!oldSecret })
   }
 
   /**
    * Get audit log of secret access
    */
   getAuditLog(): Array<{
-    key: string;
-    timestamp: Date;
-    encrypted: boolean;
+    key: string
+    timestamp: Date
+    encrypted: boolean
   }> {
     // This would typically come from a proper audit system
     return Array.from(this.secrets.entries()).map(([key, secret]) => ({
       key,
       timestamp: new Date(),
       encrypted: secret.encrypted || false,
-    }));
+    }))
   }
 
   /**
@@ -365,38 +363,38 @@ export class SecretsManager {
    */
   cleanup(): void {
     // Clear secrets from memory
-    this.secrets.clear();
+    this.secrets.clear()
 
     // Clear encryption key
-    this.encryptionKey.fill(0);
+    this.encryptionKey.fill(0)
 
-    logger.info("Secrets manager cleaned up");
+    logger.info('Secrets manager cleaned up')
   }
 }
 
 // Singleton instance
-let secretsManager: SecretsManager | null = null;
+let secretsManager: SecretsManager | null = null
 
 export function getSecretsManager(): SecretsManager {
   if (!secretsManager) {
-    secretsManager = SecretsManager.getInstance();
+    secretsManager = SecretsManager.getInstance()
   }
-  return secretsManager;
+  return secretsManager
 }
 
 export function createSecretsManager(): SecretsManager {
-  return SecretsManager.getInstance();
+  return SecretsManager.getInstance()
 }
 
 // Cleanup on process termination
-process.on("SIGINT", () => {
+process.on('SIGINT', () => {
   if (secretsManager) {
-    secretsManager.cleanup();
+    secretsManager.cleanup()
   }
-});
+})
 
-process.on("SIGTERM", () => {
+process.on('SIGTERM', () => {
   if (secretsManager) {
-    secretsManager.cleanup();
+    secretsManager.cleanup()
   }
-});
+})

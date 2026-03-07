@@ -1,191 +1,191 @@
-import { Router } from "express";
-import { authenticateToken } from "@/middleware/auth";
-import { MarketDataService } from "@/services/marketDataService";
-import { logger } from "@/utils/logger";
-import type { AuthenticatedRequest } from "@/middleware/auth";
+import { Router } from 'express'
+import { authenticateToken } from '@/middleware/auth'
+import { MarketDataService } from '@/services/marketDataService'
+import { logger } from '@/utils/logger'
+import type { AuthenticatedRequest } from '@/middleware/auth'
 
-const router = Router();
+const router = Router()
 
 // All market data endpoints require authentication
-router.use(authenticateToken);
+router.use(authenticateToken)
 
 // Initialize market data service
-const marketDataService = new MarketDataService();
+const marketDataService = new MarketDataService()
 
 /**
  * GET /api/market/quote/:symbol
  * Get comprehensive market data for a symbol
  */
-router.get("/quote/:symbol", async (req: AuthenticatedRequest, res) => {
+router.get('/quote/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params;
+    const { symbol } = req.params
 
     if (!symbol) {
       return res.status(400).json({
         success: false,
-        error: { message: "Symbol is required" },
-      });
+        error: { message: 'Symbol is required' },
+      })
     }
 
-    const data = await marketDataService.getComprehensiveMarketData(symbol);
+    const data = await marketDataService.getComprehensiveMarketData(symbol)
 
     if (!data) {
       return res.status(404).json({
         success: false,
-        error: { message: "Symbol not found" },
-      });
+        error: { message: 'Symbol not found' },
+      })
     }
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Quote error:", error);
+    logger.error('Quote error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get quote" },
-    });
+      error: { message: 'Failed to get quote' },
+    })
   }
-});
+})
 
 /**
  * POST /api/market/bulk
  * Get comprehensive market data for multiple symbols
  */
-router.post("/bulk", async (req: AuthenticatedRequest, res) => {
+router.post('/bulk', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbols } = req.body;
+    const { symbols } = req.body
 
     if (!Array.isArray(symbols) || symbols.length === 0) {
       return res.status(400).json({
         success: false,
-        error: { message: "Symbols array is required" },
-      });
+        error: { message: 'Symbols array is required' },
+      })
     }
 
-    const data = await marketDataService.getBulkMarketData(symbols);
+    const data = await marketDataService.getBulkMarketData(symbols)
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Bulk data error:", error);
+    logger.error('Bulk data error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get bulk market data" },
-    });
+      error: { message: 'Failed to get bulk market data' },
+    })
   }
-});
+})
 
 /**
  * GET /api/market/technical/:symbol
  * Get technical analysis for a symbol
  */
-router.get("/technical/:symbol", async (req: AuthenticatedRequest, res) => {
+router.get('/technical/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params;
+    const { symbol } = req.params
 
     if (!symbol) {
       return res.status(400).json({
         success: false,
-        error: { message: "Symbol is required" },
-      });
+        error: { message: 'Symbol is required' },
+      })
     }
 
-    const data = await marketDataService.getTechnicalAnalysis(symbol);
+    const data = await marketDataService.getTechnicalAnalysis(symbol)
 
     if (!data) {
       return res.status(404).json({
         success: false,
-        error: { message: "Technical analysis not available" },
-      });
+        error: { message: 'Technical analysis not available' },
+      })
     }
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Technical analysis error:", error);
+    logger.error('Technical analysis error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get technical analysis" },
-    });
+      error: { message: 'Failed to get technical analysis' },
+    })
   }
-});
+})
 
 /**
  * GET /api/market/sectors
  * Get sector performance analysis
  */
-router.get("/sectors", async (_req: AuthenticatedRequest, res) => {
+router.get('/sectors', async (_req: AuthenticatedRequest, res) => {
   try {
-    const data = await marketDataService.getSectorPerformance();
+    const data = await marketDataService.getSectorPerformance()
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Sectors error:", error);
+    logger.error('Sectors error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get sector data" },
-    });
+      error: { message: 'Failed to get sector data' },
+    })
   }
-});
+})
 
 /**
  * GET /api/market/economic
  * Get economic indicators
  */
-router.get("/economic", async (_req: AuthenticatedRequest, res) => {
+router.get('/economic', async (_req: AuthenticatedRequest, res) => {
   try {
-    const data = await marketDataService.getEconomicIndicators();
+    const data = await marketDataService.getEconomicIndicators()
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Economic indicators error:", error);
+    logger.error('Economic indicators error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get economic indicators" },
-    });
+      error: { message: 'Failed to get economic indicators' },
+    })
   }
-});
+})
 
 /**
  * GET /api/market/sentiment/:symbol
  * Get market sentiment analysis
  */
-router.get("/sentiment/:symbol", async (req: AuthenticatedRequest, res) => {
+router.get('/sentiment/:symbol', async (req: AuthenticatedRequest, res) => {
   try {
-    const { symbol } = req.params;
+    const { symbol } = req.params
 
     if (!symbol) {
       return res.status(400).json({
         success: false,
-        error: { message: "Symbol is required" },
-      });
+        error: { message: 'Symbol is required' },
+      })
     }
 
-    const data = await marketDataService.getMarketSentiment(symbol);
+    const data = await marketDataService.getMarketSentiment(symbol)
 
     return res.json({
       success: true,
       data,
-    });
+    })
   } catch (error) {
-    logger.error("Sentiment error:", error);
+    logger.error('Sentiment error:', error)
     return res.status(500).json({
       success: false,
-      error: { message: "Failed to get market sentiment" },
-    });
+      error: { message: 'Failed to get market sentiment' },
+    })
   }
-});
+})
 
-export { router as marketRouter };
+export { router as marketRouter }

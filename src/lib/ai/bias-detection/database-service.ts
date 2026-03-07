@@ -5,7 +5,7 @@
  * Handles all CRUD operations with proper error handling and HIPAA compliance.
  */
 
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type {
   BiasAnalysisResult,
   BiasAlert,
@@ -14,11 +14,11 @@ import type {
   BiasTrendData,
   DemographicBreakdown,
   DashboardRecommendation,
-} from "./types";
-import mongodb from "../../../config/mongodb.config";
-import { ObjectId } from "mongodb";
+} from './types'
+import mongodb from '../../../config/mongodb.config'
+import { ObjectId } from 'mongodb'
 
-const logger = createBuildSafeLogger("BiasDetectionDatabase");
+const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
 export class BiasDetectionDatabaseService {
   /**
@@ -28,25 +28,23 @@ export class BiasDetectionDatabaseService {
     try {
       // Check if mongodb client is available
       if (!mongodb) {
-        throw new Error("MongoDB client not initialized");
+        throw new Error('MongoDB client not initialized')
       }
 
-      const db = await mongodb.connect();
+      const db = await mongodb.connect()
 
       // Validate the connection by attempting a simple operation
-      await db.admin().ping();
+      await db.admin().ping()
 
-      return db;
+      return db
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error("Database connection failed", {
+        error instanceof Error ? error.message : String(error)
+      logger.error('Database connection failed', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
-      });
-      throw new Error(`Database connection failed: ${errorMessage}`, {
-        cause: error,
-      });
+      })
+      throw new Error(`Database connection failed: ${errorMessage}`, { cause: error })
     }
   }
 
@@ -58,8 +56,8 @@ export class BiasDetectionDatabaseService {
     processingTimeMs?: number,
   ): Promise<void> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_analyses");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_analyses')
 
       const document = {
         _id: new ObjectId(),
@@ -67,21 +65,21 @@ export class BiasDetectionDatabaseService {
         processingTimeMs,
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
+      }
 
-      await collection.insertOne(document);
+      await collection.insertOne(document)
 
-      logger.debug("Analysis result stored successfully", {
+      logger.debug('Analysis result stored successfully', {
         sessionId: result.sessionId,
         analysisId: document._id,
         processingTimeMs,
-      });
+      })
     } catch (error: unknown) {
-      logger.error("Failed to store analysis result", {
+      logger.error('Failed to store analysis result', {
         error: error instanceof Error ? String(error) : String(error),
         sessionId: result.sessionId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -90,8 +88,8 @@ export class BiasDetectionDatabaseService {
    */
   async storeAlert(alert: BiasAlert, _analysisId?: string): Promise<void> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_alerts");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_alerts')
 
       const document = {
         _id: new ObjectId(),
@@ -100,21 +98,21 @@ export class BiasDetectionDatabaseService {
         resolvedAt: alert.resolvedAt || null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      };
+      }
 
-      await collection.insertOne(document);
+      await collection.insertOne(document)
 
-      logger.debug("Alert stored successfully", {
+      logger.debug('Alert stored successfully', {
         alertId: alert.alertId,
         level: alert.level,
         acknowledged: alert.acknowledged,
-      });
+      })
     } catch (error: unknown) {
-      logger.error("Failed to store alert", {
+      logger.error('Failed to store alert', {
         error: error instanceof Error ? String(error) : String(error),
         alertId: alert.alertId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -122,39 +120,39 @@ export class BiasDetectionDatabaseService {
    * Get dashboard data from database
    */
   async getDashboardData(options?: {
-    timeRange?: string;
-    includeDetails?: boolean;
+    timeRange?: string
+    includeDetails?: boolean
   }): Promise<BiasDashboardData> {
     try {
-      const timeRange = options?.timeRange || "24h";
-      const hoursBack = this.parseTimeRange(timeRange);
-      const cutoffTime = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
+      const timeRange = options?.timeRange || '24h'
+      const hoursBack = this.parseTimeRange(timeRange)
+      const cutoffTime = new Date(Date.now() - hoursBack * 60 * 60 * 1000)
 
       // Get summary statistics
-      const summary = await this.getSummaryStats(cutoffTime);
+      const summary = await this.getSummaryStats(cutoffTime)
 
       // Get recent alerts
-      const alerts = await this.getRecentAlerts(cutoffTime);
+      const alerts = await this.getRecentAlerts(cutoffTime)
 
       // Get trend data
-      const rawTrends = await this.getTrendData(timeRange);
+      const rawTrends = await this.getTrendData(timeRange)
       const trends = rawTrends.map((t) => ({
         date: t.date,
         biasScore: t.biasScore,
         sessionCount: t.sessionCount,
         alertCount: t.alertCount,
-      }));
+      }))
 
       // Get demographic breakdown
-      const demographics = await this.getDemographicBreakdown(cutoffTime);
+      const demographics = await this.getDemographicBreakdown(cutoffTime)
 
       // Get recent analyses if details requested
       const recentAnalyses = options?.includeDetails
         ? await this.getRecentAnalyses(cutoffTime, 10)
-        : [];
+        : []
 
       // Generate recommendations based on data
-      const recommendations = this.getRecommendations(summary, alerts);
+      const recommendations = this.getRecommendations(summary, alerts)
 
       return {
         summary,
@@ -163,62 +161,68 @@ export class BiasDetectionDatabaseService {
         demographics,
         recentAnalyses,
         recommendations,
-      };
+      }
     } catch (error: unknown) {
-      logger.error("Failed to get dashboard data", {
+      logger.error('Failed to get dashboard data', {
         error: error instanceof Error ? String(error) : String(error),
         timeRange: options?.timeRange,
-      });
+      })
       throw error;
     }
   }
+
+
+
+
+
+
 
   /**
    * Get summary statistics
    */
   private async getSummaryStats(cutoffTime: Date): Promise<BiasSummaryStats> {
     try {
-      const db = await this.getDatabase();
+      const db = await this.getDatabase()
 
       // Get total sessions in the time range
       const totalSessions = await db
-        .collection("bias_analyses")
-        .countDocuments({ createdAt: { $gte: cutoffTime } });
+        .collection('bias_analyses')
+        .countDocuments({ createdAt: { $gte: cutoffTime } })
 
       // Get average bias score
       const avgResult = (await db
-        .collection("bias_analyses")
+        .collection('bias_analyses')
         .aggregate([
           { $match: { createdAt: { $gte: cutoffTime } } },
-          { $group: { _id: null, avgScore: { $avg: "$overallBiasScore" } } },
+          { $group: { _id: null, avgScore: { $avg: '$overallBiasScore' } } },
         ])
-        .toArray()) as Array<{ avgScore: number }>;
+        .toArray()) as Array<{ avgScore: number }>
 
       const averageBiasScore =
         avgResult.length > 0 && avgResult[0]?.avgScore != null
           ? avgResult[0].avgScore
-          : 0;
+          : 0
 
       // Get alerts in the last 24 hours
-      const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000)
       const alertsLast24h = await db
-        .collection("bias_alerts")
-        .countDocuments({ createdAt: { $gte: last24h } });
+        .collection('bias_alerts')
+        .countDocuments({ createdAt: { $gte: last24h } })
 
       // Get critical alerts
-      const criticalIssues = await db.collection("bias_alerts").countDocuments({
-        level: "critical",
+      const criticalIssues = await db.collection('bias_alerts').countDocuments({
+        level: 'critical',
         createdAt: { $gte: cutoffTime },
-      });
+      })
 
       // Calculate improvement rate (simplified)
-      const improvementRate = Math.max(0, Math.min(1, 1 - averageBiasScore));
+      const improvementRate = Math.max(0, Math.min(1, 1 - averageBiasScore))
 
       // Calculate compliance score based on alerts and bias scores
       const complianceScore = Math.max(
         0,
         Math.min(100, 100 - averageBiasScore * 50 - criticalIssues * 5),
-      );
+      )
 
       return {
         totalSessions,
@@ -228,7 +232,7 @@ export class BiasDetectionDatabaseService {
         improvementRate,
         complianceScore,
         activeAlerts: criticalIssues, // Fallback
-        trendDirection: "stable" as const, // Fallback
+        trendDirection: 'stable' as const, // Fallback
         alertsLayerBreakdown: {}, // Fallback
         alerts: {
           low: 0,
@@ -236,12 +240,12 @@ export class BiasDetectionDatabaseService {
           high: 0,
           critical: criticalIssues,
         },
-      };
+      }
     } catch (error: unknown) {
-      logger.error("Failed to get summary stats", {
+      logger.error('Failed to get summary stats', {
         error: error instanceof Error ? String(error) : String(error),
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -253,31 +257,31 @@ export class BiasDetectionDatabaseService {
     limit: number = 50,
   ): Promise<BiasAlert[]> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_alerts");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_alerts')
 
       const alerts = await collection
         .find({ createdAt: { $gte: cutoffTime } })
         .sort({ createdAt: -1 })
         .limit(limit)
-        .toArray();
+        .toArray()
 
       return alerts.map((alert) => ({
-        alertId: alert["alertId"],
-        timestamp: alert["timestamp"],
-        level: alert["level"],
-        type: alert["type"],
-        message: alert["message"],
-        sessionId: alert["sessionId"],
-        biasScore: alert["biasScore"] || 0,
-        acknowledged: alert["acknowledged"] || false,
-        resolvedAt: alert["resolvedAt"] || undefined,
-      }));
+        alertId: alert['alertId'],
+        timestamp: alert['timestamp'],
+        level: alert['level'],
+        type: alert['type'],
+        message: alert['message'],
+        sessionId: alert['sessionId'],
+        biasScore: alert['biasScore'] || 0,
+        acknowledged: alert['acknowledged'] || false,
+        resolvedAt: alert['resolvedAt'] || undefined,
+      }))
     } catch (error: unknown) {
-      logger.error("Failed to get recent alerts", {
+      logger.error('Failed to get recent alerts', {
         error: error instanceof Error ? String(error) : String(error),
-      });
-      return [];
+      })
+      return []
     }
   }
 
@@ -286,22 +290,22 @@ export class BiasDetectionDatabaseService {
    */
   private async getTrendData(timeRange: string): Promise<BiasTrendData[]> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_analyses");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_analyses')
 
-      const hoursBack = this.parseTimeRange(timeRange);
-      const points = Math.min(24, hoursBack); // Max 24 data points
-      const intervalHours = Math.max(1, Math.floor(hoursBack / points));
+      const hoursBack = this.parseTimeRange(timeRange)
+      const points = Math.min(24, hoursBack) // Max 24 data points
+      const intervalHours = Math.max(1, Math.floor(hoursBack / points))
 
-      const trends: BiasTrendData[] = [];
+      const trends: BiasTrendData[] = []
 
       for (let i = points - 1; i >= 0; i--) {
         const endTime = new Date(
           Date.now() - i * intervalHours * 60 * 60 * 1000,
-        );
+        )
         const startTime = new Date(
           endTime.getTime() - intervalHours * 60 * 60 * 1000,
-        );
+        )
 
         // Get analyses for this time period
         const analyses = await collection
@@ -311,33 +315,33 @@ export class BiasDetectionDatabaseService {
               $lt: endTime,
             },
           })
-          .toArray();
+          .toArray()
 
-        const alertCount = await db.collection("bias_alerts").countDocuments({
+        const alertCount = await db.collection('bias_alerts').countDocuments({
           createdAt: {
             $gte: startTime,
             $lt: endTime,
           },
-        });
+        })
 
         // Calculate average bias score for this period
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
-                (sum, analysis) => sum + analysis["overallBiasScore"],
-                0,
-              ) / analyses.length
-            : 0;
+              (sum, analysis) => sum + analysis['overallBiasScore'],
+              0,
+            ) / analyses.length
+            : 0
 
         // Get demographic breakdown for this period
-        const demographicBreakdown: Record<string, number> = {};
+        const demographicBreakdown: Record<string, number> = {}
         analyses.forEach((analysis) => {
-          const demo = analysis["demographics"];
+          const demo = analysis['demographics']
           if (demo) {
             // (Previously unused) key could be used for grouping if needed
             // No-op: placeholder for future demographic aggregation
           }
-        });
+        })
 
         trends.push({
           date: endTime.toISOString(),
@@ -345,16 +349,16 @@ export class BiasDetectionDatabaseService {
           sessionCount: analyses.length,
           alertCount,
           demographicBreakdown,
-        });
+        })
       }
 
-      return trends;
+      return trends
     } catch (error: unknown) {
-      logger.error("Failed to get trend data", {
+      logger.error('Failed to get trend data', {
         error: error instanceof Error ? String(error) : String(error),
         timeRange,
-      });
-      return [];
+      })
+      return []
     }
   }
 
@@ -365,12 +369,12 @@ export class BiasDetectionDatabaseService {
     cutoffTime: Date,
   ): Promise<DemographicBreakdown> {
     try {
-      const db = await this.getDatabase();
+      const db = await this.getDatabase()
 
       const analyses = await db
-        .collection("bias_analyses")
+        .collection('bias_analyses')
         .find({ createdAt: { $gte: cutoffTime } })
-        .toArray();
+        .toArray()
 
       // Temporary storage for aggregation
       // dimension -> value -> { count, totalBias }
@@ -382,94 +386,95 @@ export class BiasDetectionDatabaseService {
         gender: {},
         ethnicity: {},
         intersectional: {},
-      };
+      }
 
       analyses.forEach((analysis) => {
-        const demo = analysis["demographics"];
-        const biasScore = analysis["overallBiasScore"] || 0;
+        const demo = analysis['demographics']
+        const biasScore = analysis['overallBiasScore'] || 0
 
         if (demo) {
           // Helper to update aggregation
           const update = (dimension: string, value: string) => {
-            if (!aggregation[dimension]) aggregation[dimension] = {};
+            if (!aggregation[dimension]) aggregation[dimension] = {}
             if (!aggregation[dimension][value]) {
-              aggregation[dimension][value] = { count: 0, totalBias: 0 };
+              aggregation[dimension][value] = { count: 0, totalBias: 0 }
             }
-            aggregation[dimension][value].count++;
-            aggregation[dimension][value].totalBias += biasScore;
-          };
+            aggregation[dimension][value].count++
+            aggregation[dimension][value].totalBias += biasScore
+          }
 
           // Individual dimensions
-          if (demo.age) update("age", demo.age);
-          if (demo.gender) update("gender", demo.gender);
-          if (demo.ethnicity) update("ethnicity", demo.ethnicity);
+          if (demo.age) update('age', demo.age)
+          if (demo.gender) update('gender', demo.gender)
+          if (demo.ethnicity) update('ethnicity', demo.ethnicity)
 
           // Intersectional dimension
           if (demo.age && demo.gender && demo.ethnicity) {
             const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
               .sort()
-              .join("|");
-            update("intersectional", intersectionKey);
+              .join('|')
+            update('intersectional', intersectionKey)
           }
         }
-      });
+      })
 
       // Convert to final format { count, averageBias }
-      const result: DemographicBreakdown = {};
+      const result: DemographicBreakdown = {}
 
       Object.entries(aggregation).forEach(([dimension, values]) => {
-        result[dimension] = {};
+        result[dimension] = {}
         Object.entries(values).forEach(([value, stats]) => {
           result[dimension][value] = {
             count: stats.count,
             averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
-          };
-        });
-      });
+          }
+        })
+      })
 
-      return result;
+      return result
     } catch (error: unknown) {
-      logger.error("Failed to get demographic breakdown", {
+      logger.error('Failed to get demographic breakdown', {
         error: error instanceof Error ? String(error) : String(error),
-      });
+      })
       // Return empty structure on error
-      return {};
+      return {}
     }
   }
+
 
   /**
    * Get recent analyses
    */
   private async getRecentAnalyses(
     cutoffTime: Date,
-    limit: number,
+    limit: number
   ): Promise<BiasAnalysisResult[]> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_analyses");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_analyses')
 
       const analyses = await collection
         .find({ createdAt: { $gte: cutoffTime } })
         .sort({ createdAt: -1 })
         .limit(limit)
-        .toArray();
+        .toArray()
 
       return analyses.map((analysis) => ({
-        sessionId: analysis["sessionId"],
-        timestamp: analysis["timestamp"],
-        overallBiasScore: analysis["overallBiasScore"],
-        layerResults: analysis["layerResults"],
-        demographics: analysis["demographics"],
-        recommendations: analysis["recommendations"] || [],
-        alertLevel: analysis["alertLevel"],
-        explanation: analysis["explanation"],
-        confidence: analysis["confidence"],
-      }));
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] || [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }))
     } catch (error: unknown) {
-      logger.error("Failed to get recent analyses", {
+      logger.error('Failed to get recent analyses', {
         error: error instanceof Error ? String(error) : String(error),
-      });
-      return [];
+      })
+      return []
     }
   }
 
@@ -480,43 +485,43 @@ export class BiasDetectionDatabaseService {
     summary: BiasSummaryStats,
     _alerts: BiasAlert[],
   ): DashboardRecommendation[] {
-    const recommendations: DashboardRecommendation[] = [];
+    const recommendations: DashboardRecommendation[] = []
 
     if (summary.criticalIssues > 0) {
       recommendations.push({
-        id: "critical-alerts",
-        priority: "critical" as const,
-        title: "Critical Bias Alerts Detected",
+        id: 'critical-alerts',
+        priority: 'critical' as const,
+        title: 'Critical Bias Alerts Detected',
         description: `${summary.criticalIssues} critical bias issues require immediate attention`,
-        action: "Review and address critical alerts immediately",
-        impact: "High - Prevents potential harm and compliance violations",
-      });
+        action: 'Review and address critical alerts immediately',
+        impact: 'High - Prevents potential harm and compliance violations',
+      })
     }
 
     if (summary.averageBiasScore > 0.6) {
       recommendations.push({
-        id: "high-bias-score",
-        priority: "high" as const,
-        title: "High Average Bias Score",
+        id: 'high-bias-score',
+        priority: 'high' as const,
+        title: 'High Average Bias Score',
         description: `Average bias score of ${summary.averageBiasScore.toFixed(3)} exceeds recommended threshold`,
-        action: "Review training data and model parameters",
-        impact: "Medium - Improves overall system fairness",
-      });
+        action: 'Review training data and model parameters',
+        impact: 'Medium - Improves overall system fairness',
+      })
     }
 
     if (summary.improvementRate < 0.05) {
       recommendations.push({
-        id: "stagnant-improvement",
-        priority: "medium" as const,
-        title: "Limited Bias Reduction Progress",
+        id: 'stagnant-improvement',
+        priority: 'medium' as const,
+        title: 'Limited Bias Reduction Progress',
         description:
-          "Bias scores have not improved significantly in recent period",
-        action: "Implement additional bias mitigation strategies",
-        impact: "Medium - Ensures continuous improvement",
-      });
+          'Bias scores have not improved significantly in recent period',
+        action: 'Implement additional bias mitigation strategies',
+        impact: 'Medium - Ensures continuous improvement',
+      })
     }
 
-    return recommendations;
+    return recommendations
   }
 
   /**
@@ -524,18 +529,18 @@ export class BiasDetectionDatabaseService {
    */
   private parseTimeRange(timeRange: string): number {
     switch (timeRange) {
-      case "1h":
-        return 1;
-      case "6h":
-        return 6;
-      case "24h":
-        return 24;
-      case "7d":
-        return 24 * 7;
-      case "30d":
-        return 24 * 30;
+      case '1h':
+        return 1
+      case '6h':
+        return 6
+      case '24h':
+        return 24
+      case '7d':
+        return 24 * 7
+      case '30d':
+        return 24 * 30
       default:
-        return 24;
+        return 24
     }
   }
 
@@ -546,32 +551,32 @@ export class BiasDetectionDatabaseService {
     sessionId: string,
   ): Promise<BiasAnalysisResult | null> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("bias_analyses");
+      const db = await this.getDatabase()
+      const collection = db.collection('bias_analyses')
 
-      const analysis = await collection.findOne({ sessionId });
+      const analysis = await collection.findOne({ sessionId })
 
       if (!analysis) {
-        return null;
+        return null
       }
 
       return {
-        sessionId: analysis["sessionId"],
-        timestamp: analysis["timestamp"],
-        overallBiasScore: analysis["overallBiasScore"],
-        layerResults: analysis["layerResults"],
-        demographics: analysis["demographics"],
-        recommendations: analysis["recommendations"] || [],
-        alertLevel: analysis["alertLevel"],
-        explanation: analysis["explanation"],
-        confidence: analysis["confidence"],
-      };
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] || [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }
     } catch (error: unknown) {
-      logger.error("Failed to get session analysis", {
+      logger.error('Failed to get session analysis', {
         error: error instanceof Error ? String(error) : String(error),
         sessionId,
-      });
-      return null;
+      })
+      return null
     }
   }
 
@@ -579,38 +584,38 @@ export class BiasDetectionDatabaseService {
    * Record system metrics
    */
   async recordSystemMetrics(metrics: {
-    responseTimeMs: number;
-    memoryUsageMb: number;
-    cpuUsagePercent: number;
-    activeConnections: number;
-    cacheHitRate: number;
-    pythonServiceStatus: "up" | "down" | "degraded";
-    databaseStatus: "up" | "down" | "degraded";
-    overallHealth: "healthy" | "degraded" | "critical";
-    errorCount: number;
-    errorRate: number;
+    responseTimeMs: number
+    memoryUsageMb: number
+    cpuUsagePercent: number
+    activeConnections: number
+    cacheHitRate: number
+    pythonServiceStatus: 'up' | 'down' | 'degraded'
+    databaseStatus: 'up' | 'down' | 'degraded'
+    overallHealth: 'healthy' | 'degraded' | 'critical'
+    errorCount: number
+    errorRate: number
   }): Promise<void> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("system_metrics");
+      const db = await this.getDatabase()
+      const collection = db.collection('system_metrics')
 
       const document = {
         _id: new ObjectId(),
         ...metrics,
         timestamp: new Date(),
         createdAt: new Date(),
-      };
+      }
 
-      await collection.insertOne(document);
+      await collection.insertOne(document)
 
-      logger.debug("System metrics recorded successfully", {
+      logger.debug('System metrics recorded successfully', {
         overallHealth: metrics.overallHealth,
         responseTimeMs: metrics.responseTimeMs,
-      });
+      })
     } catch (error: unknown) {
-      logger.error("Failed to record system metrics", {
+      logger.error('Failed to record system metrics', {
         error: error instanceof Error ? String(error) : String(error),
-      });
+      })
       // Don't throw - system metrics recording should not break the main flow
     }
   }
@@ -619,19 +624,19 @@ export class BiasDetectionDatabaseService {
    * Record audit log entry
    */
   async recordAuditLog(entry: {
-    sessionId?: string;
-    userId?: string;
-    action: string;
-    resource?: string;
-    details?: unknown;
-    ipAddress?: string;
-    userAgent?: string;
-    dataAccessed?: string[];
-    retentionPeriodDays?: number;
+    sessionId?: string
+    userId?: string
+    action: string
+    resource?: string
+    details?: unknown
+    ipAddress?: string
+    userAgent?: string
+    dataAccessed?: string[]
+    retentionPeriodDays?: number
   }): Promise<void> {
     try {
-      const db = await this.getDatabase();
-      const collection = db.collection("audit_logs");
+      const db = await this.getDatabase()
+      const collection = db.collection('audit_logs')
 
       const document = {
         _id: new ObjectId(),
@@ -640,27 +645,27 @@ export class BiasDetectionDatabaseService {
         createdAt: new Date(),
         retentionExpiry: entry.retentionPeriodDays
           ? new Date(
-              Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
-            )
+            Date.now() + entry.retentionPeriodDays * 24 * 60 * 60 * 1000,
+          )
           : null,
-      };
+      }
 
-      await collection.insertOne(document);
+      await collection.insertOne(document)
 
-      logger.debug("Audit log entry recorded successfully", {
+      logger.debug('Audit log entry recorded successfully', {
         action: entry.action,
         userId: entry.userId,
         sessionId: entry.sessionId,
-      });
+      })
     } catch (error: unknown) {
-      logger.error("Failed to record audit log", {
+      logger.error('Failed to record audit log', {
         error: error instanceof Error ? String(error) : String(error),
         action: entry.action,
-      });
+      })
       // Don't throw - audit logging should not break the main flow
     }
   }
 }
 
 // Singleton instance
-export const biasDetectionDb = new BiasDetectionDatabaseService();
+export const biasDetectionDb = new BiasDetectionDatabaseService()

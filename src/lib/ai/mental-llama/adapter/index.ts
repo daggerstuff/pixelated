@@ -1,2 +1,2 @@
 // Exports for adapter module
-export {};
+export {}

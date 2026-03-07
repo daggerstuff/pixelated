@@ -1,9 +1,9 @@
 ---
-title: "AI System Security Best Practices"
-description: "AI System Security Best Practices documentation"
+title: 'AI System Security Best Practices'
+description: 'AI System Security Best Practices documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "security"]
+author: 'Pixelated Team'
+tags: ['documentation', 'security']
 draft: false
 toc: true
 ---

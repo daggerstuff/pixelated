@@ -1,9 +1,9 @@
 ---
-title: "Session Data Caching"
-description: "Session Data Caching documentation"
+title: 'Session Data Caching'
+description: 'Session Data Caching documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -20,21 +20,21 @@ The Session Data Caching system optimizes the delivery, storage, and retrieval o
 
 ```typescript
 interface CachingLayer {
-  name: CacheLayerType;
-  priority: number;
-  capacity: number;
-  ttl: number;
-  securityLevel: SecurityLevel;
-  compressionEnabled: boolean;
-  encryptionEnabled: boolean;
+  name: CacheLayerType
+  priority: number
+  capacity: number
+  ttl: number
+  securityLevel: SecurityLevel
+  compressionEnabled: boolean
+  encryptionEnabled: boolean
 }
 
 type CacheLayerType =
-  | "memory"
-  | "localStorage"
-  | "indexedDB"
-  | "serviceWorker"
-  | "server";
+  | 'memory'
+  | 'localStorage'
+  | 'indexedDB'
+  | 'serviceWorker'
+  | 'server'
 ```
 
 ### 2. Cache Management Service
@@ -42,11 +42,11 @@ type CacheLayerType =
 ```typescript
 class SessionDataCacheManager {
   constructor(options: {
-    layers: CachingLayer[];
-    defaultTTL: number;
-    securityConfig: SecurityConfig;
-    compressionLevel: CompressionLevel;
-    evictionPolicy: EvictionPolicy;
+    layers: CachingLayer[]
+    defaultTTL: number
+    securityConfig: SecurityConfig
+    compressionLevel: CompressionLevel
+    evictionPolicy: EvictionPolicy
   }) {
     // Initialize cache manager with configured layers
   }
@@ -75,23 +75,23 @@ class SessionDataCacheManager {
 
 ```typescript
 function generateCacheKey(params: {
-  sessionId: string;
-  dataType: string;
-  timeRange?: [Date, Date];
-  filters?: Record<string, any>;
-  version?: string;
+  sessionId: string
+  dataType: string
+  timeRange?: [Date, Date]
+  filters?: Record<string, any>
+  version?: string
 }): string {
   // Generate deterministic cache key from parameters
-  const baseKey = `session:${params.sessionId}:${params.dataType}`;
+  const baseKey = `session:${params.sessionId}:${params.dataType}`
   const filterString = params.filters
     ? `:${JSON.stringify(params.filters)}`
-    : "";
+    : ''
   const timeString = params.timeRange
     ? `:${params.timeRange[0].getTime()}-${params.timeRange[1].getTime()}`
-    : "";
-  const versionString = params.version ? `:v${params.version}` : "";
+    : ''
+  const versionString = params.version ? `:v${params.version}` : ''
 
-  return `${baseKey}${filterString}${timeString}${versionString}`;
+  return `${baseKey}${filterString}${timeString}${versionString}`
 }
 ```
 
@@ -119,18 +119,18 @@ function generateCacheKey(params: {
 
 ```typescript
 interface SecurityConfig {
-  encryptionEnabled: boolean;
-  encryptionKey?: CryptoKey;
-  sensitiveFields: string[];
-  anonymizationRules: AnonymizationRule[];
-  allowedOrigins: string[];
-  requireAuth: boolean;
+  encryptionEnabled: boolean
+  encryptionKey?: CryptoKey
+  sensitiveFields: string[]
+  anonymizationRules: AnonymizationRule[]
+  allowedOrigins: string[]
+  requireAuth: boolean
 }
 
 interface AnonymizationRule {
-  field: string;
-  strategy: "redact" | "hash" | "truncate" | "replace";
-  replacementValue?: string;
+  field: string
+  strategy: 'redact' | 'hash' | 'truncate' | 'replace'
+  replacementValue?: string
 }
 ```
 
@@ -152,10 +152,10 @@ interface AnonymizationRule {
 
 ```typescript
 interface CompressionOptions {
-  level: CompressionLevel;
-  algorithm: "gzip" | "brotli" | "deflate";
-  threshold: number; // Minimum size in bytes for compression
-  excludedFields: string[]; // Fields to exclude from compression
+  level: CompressionLevel
+  algorithm: 'gzip' | 'brotli' | 'deflate'
+  threshold: number // Minimum size in bytes for compression
+  excludedFields: string[] // Fields to exclude from compression
 }
 
 enum CompressionLevel {
@@ -205,22 +205,22 @@ class CacheIntegratedRealTimeSystem {
     private cacheManager: SessionDataCacheManager,
     private realTimeService: RealTimeUpdateService,
   ) {
-    this.setupListeners();
+    this.setupListeners()
   }
 
   private setupListeners(): void {
-    this.realTimeService.subscribe(["session.data.updated"], (event) => {
+    this.realTimeService.subscribe(['session.data.updated'], (event) => {
       // Update cache on real-time events
-      this.updateCacheFromEvent(event);
-    });
+      this.updateCacheFromEvent(event)
+    })
   }
 
   private async updateCacheFromEvent(event: EventMessage): Promise<void> {
-    const { sessionId, dataType } = event.payload;
-    const cacheKey = generateCacheKey({ sessionId, dataType });
+    const { sessionId, dataType } = event.payload
+    const cacheKey = generateCacheKey({ sessionId, dataType })
 
     // Invalidate existing cache or update with new data
-    await this.cacheManager.store(cacheKey, event.payload.data);
+    await this.cacheManager.store(cacheKey, event.payload.data)
   }
 }
 ```
@@ -248,20 +248,20 @@ class CacheIntegratedRealTimeSystem {
 const cacheManager = new SessionDataCacheManager({
   layers: [
     {
-      name: "memory",
+      name: 'memory',
       priority: 1,
       capacity: 50,
       ttl: 300000,
-      securityLevel: "medium",
+      securityLevel: 'medium',
       compressionEnabled: false,
       encryptionEnabled: false,
     },
     {
-      name: "indexedDB",
+      name: 'indexedDB',
       priority: 2,
       capacity: 200,
       ttl: 3600000,
-      securityLevel: "high",
+      securityLevel: 'high',
       compressionEnabled: true,
       encryptionEnabled: true,
     },
@@ -269,29 +269,29 @@ const cacheManager = new SessionDataCacheManager({
   defaultTTL: 600000, // 10 minutes
   securityConfig: {
     encryptionEnabled: true,
-    sensitiveFields: ["diagnoses", "medications", "personalIdentifiers"],
+    sensitiveFields: ['diagnoses', 'medications', 'personalIdentifiers'],
     anonymizationRules: [
-      { field: "clientName", strategy: "hash" },
-      { field: "phoneNumber", strategy: "redact" },
+      { field: 'clientName', strategy: 'hash' },
+      { field: 'phoneNumber', strategy: 'redact' },
     ],
-    allowedOrigins: ["https://app.example.com"],
+    allowedOrigins: ['https://app.example.com'],
     requireAuth: true,
   },
   compressionLevel: CompressionLevel.MEDIUM,
-  evictionPolicy: "lru",
-});
+  evictionPolicy: 'lru',
+})
 
 // Store session data
 await cacheManager.store(
-  generateCacheKey({ sessionId: "session-123", dataType: "emotionalAnalysis" }),
+  generateCacheKey({ sessionId: 'session-123', dataType: 'emotionalAnalysis' }),
   analysisResults,
-  { ttl: 900000, priority: "high" },
-);
+  { ttl: 900000, priority: 'high' },
+)
 
 // Retrieve session data
 const cachedResults = await cacheManager.retrieve(
-  generateCacheKey({ sessionId: "session-123", dataType: "emotionalAnalysis" }),
-);
+  generateCacheKey({ sessionId: 'session-123', dataType: 'emotionalAnalysis' }),
+)
 ```
 
 ### 2. React Integration
@@ -299,63 +299,63 @@ const cachedResults = await cacheManager.retrieve(
 ```tsx
 // React hook for cached session data
 function useCachedSessionData(sessionId, dataType, options = {}) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
-    let isMounted = true;
-    const cacheKey = generateCacheKey({ sessionId, dataType });
+    let isMounted = true
+    const cacheKey = generateCacheKey({ sessionId, dataType })
 
     async function fetchData() {
       try {
-        setLoading(true);
+        setLoading(true)
         // Try to get from cache first
-        let result = await cacheManager.retrieve(cacheKey);
+        let result = await cacheManager.retrieve(cacheKey)
 
         // If not in cache, fetch from API and cache it
         if (!result) {
-          result = await fetchFromApi(sessionId, dataType);
-          await cacheManager.store(cacheKey, result, options);
+          result = await fetchFromApi(sessionId, dataType)
+          await cacheManager.store(cacheKey, result, options)
         }
 
         if (isMounted) {
-          setData(result);
-          setError(null);
+          setData(result)
+          setError(null)
         }
       } catch (err) {
         if (isMounted) {
-          setError(err);
+          setError(err)
         }
       } finally {
         if (isMounted) {
-          setLoading(false);
+          setLoading(false)
         }
       }
     }
 
-    fetchData();
+    fetchData()
 
     return () => {
-      isMounted = false;
-    };
-  }, [sessionId, dataType]);
+      isMounted = false
+    }
+  }, [sessionId, dataType])
 
-  return { data, loading, error };
+  return { data, loading, error }
 }
 
 // Component using cached data
 function SessionAnalytics({ sessionId }) {
   const { data, loading, error } = useCachedSessionData(
     sessionId,
-    "emotionalAnalysis",
-    { ttl: 300000, priority: "high" },
-  );
+    'emotionalAnalysis',
+    { ttl: 300000, priority: 'high' },
+  )
 
-  if (loading) return <LoadingIndicator />;
-  if (error) return <ErrorDisplay error={error} />;
+  if (loading) return <LoadingIndicator />
+  if (error) return <ErrorDisplay error={error} />
 
-  return <AnalyticsDisplay data={data} />;
+  return <AnalyticsDisplay data={data} />
 }
 ```
 

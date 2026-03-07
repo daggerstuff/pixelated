@@ -1,48 +1,41 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
-import { ProgressCharts } from "../charts/ProgressCharts";
-import { ProgressBar } from "../shared/ProgressBar";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import { ProgressCharts } from '../charts/ProgressCharts'
+import { ProgressBar } from '../shared/ProgressBar'
 import {
   useProgressQuery,
   useProgressMetricsQuery,
-} from "@/lib/hooks/journal-research";
-import { cn } from "@/lib/utils";
-import { useMemo } from "react";
+} from '@/lib/hooks/journal-research'
+import { cn } from '@/lib/utils'
+import { useMemo } from 'react'
 
 export interface ProgressTrackerProps {
-  sessionId: string | null;
-  className?: string;
+  sessionId: string | null
+  className?: string
 }
 
-export function ProgressTracker({
-  sessionId,
-  className,
-}: ProgressTrackerProps) {
-  const { data: progress, isLoading: progressLoading } =
-    useProgressQuery(sessionId);
+export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) {
+  const { data: progress, isLoading: progressLoading } = useProgressQuery(
+    sessionId,
+  )
   const { data: metrics, isLoading: metricsLoading } = useProgressMetricsQuery(
     sessionId,
     {
       refetchInterval: 5000,
     },
-  );
+  )
 
-  const isLoading = progressLoading || metricsLoading;
+  const isLoading = progressLoading || metricsLoading
 
   const progressAgainstTargets = useMemo(() => {
-    if (!progress || !metrics) return null;
+    if (!progress || !metrics) return null
 
-    const targets = progress.weeklyTargets;
+    const targets = progress.weeklyTargets
     const currentMetrics = {
       sourcesIdentified: metrics.sourcesIdentified,
       datasetsEvaluated: metrics.datasetsEvaluated,
       datasetsAcquired: metrics.datasetsAcquired,
       integrationPlansCreated: metrics.integrationPlansCreated,
-    };
+    }
 
     return {
       sourcesIdentified: {
@@ -52,8 +45,7 @@ export function ProgressTracker({
           targets.sources_identified > 0
             ? Math.min(
                 100,
-                (currentMetrics.sourcesIdentified /
-                  targets.sources_identified) *
+                (currentMetrics.sourcesIdentified / targets.sources_identified) *
                   100,
               )
             : 0,
@@ -65,8 +57,7 @@ export function ProgressTracker({
           targets.datasets_evaluated > 0
             ? Math.min(
                 100,
-                (currentMetrics.datasetsEvaluated /
-                  targets.datasets_evaluated) *
+                (currentMetrics.datasetsEvaluated / targets.datasets_evaluated) *
                   100,
               )
             : 0,
@@ -96,37 +87,37 @@ export function ProgressTracker({
               )
             : 0,
       },
-    };
-  }, [progress, metrics]);
+    }
+  }, [progress, metrics])
 
   if (!sessionId) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">
           Please select a session to track progress
         </p>
       </div>
-    );
+    )
   }
 
   if (isLoading) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">Loading progress...</p>
       </div>
-    );
+    )
   }
 
   if (!progress) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">No progress data available</p>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Progress Tracker</h1>
@@ -187,7 +178,7 @@ export function ProgressTracker({
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-medium">Sources Identified</span>
                   <span className="text-muted-foreground">
-                    {progressAgainstTargets.sourcesIdentified.current} /{" "}
+                    {progressAgainstTargets.sourcesIdentified.current} /{' '}
                     {progressAgainstTargets.sourcesIdentified.target}
                   </span>
                 </div>
@@ -199,7 +190,7 @@ export function ProgressTracker({
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-medium">Datasets Evaluated</span>
                   <span className="text-muted-foreground">
-                    {progressAgainstTargets.datasetsEvaluated.current} /{" "}
+                    {progressAgainstTargets.datasetsEvaluated.current} /{' '}
                     {progressAgainstTargets.datasetsEvaluated.target}
                   </span>
                 </div>
@@ -211,7 +202,7 @@ export function ProgressTracker({
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-medium">Datasets Acquired</span>
                   <span className="text-muted-foreground">
-                    {progressAgainstTargets.datasetsAcquired.current} /{" "}
+                    {progressAgainstTargets.datasetsAcquired.current} /{' '}
                     {progressAgainstTargets.datasetsAcquired.target}
                   </span>
                 </div>
@@ -223,7 +214,7 @@ export function ProgressTracker({
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-medium">Integration Plans Created</span>
                   <span className="text-muted-foreground">
-                    {progressAgainstTargets.integrationPlansCreated.current} /{" "}
+                    {progressAgainstTargets.integrationPlansCreated.current} /{' '}
                     {progressAgainstTargets.integrationPlansCreated.target}
                   </span>
                 </div>
@@ -288,5 +279,5 @@ export function ProgressTracker({
         </Card>
       )}
     </div>
-  );
+  )
 }

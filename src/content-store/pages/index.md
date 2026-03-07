@@ -1,6 +1,6 @@
 ---
 title: Pixelated Empathy
-date: "2025-01-29"
+date: '2025-01-29'
 ---
 
 # Welcome to Pixelated Empathy

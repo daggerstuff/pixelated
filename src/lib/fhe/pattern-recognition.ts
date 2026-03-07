@@ -9,81 +9,81 @@
  * Trend pattern detected over time
  */
 export interface TrendPattern {
-  id: string;
-  type: string;
-  startDate: Date;
-  endDate: Date;
-  confidence: number;
-  indicators: string[];
-  description: string;
-  significance?: number;
-  emotionTypes?: string[];
+  id: string
+  type: string
+  startDate: Date
+  endDate: Date
+  confidence: number
+  indicators: string[]
+  description: string
+  significance?: number
+  emotionTypes?: string[]
 }
 
 /**
  * Pattern detected across multiple sessions
  */
 export interface CrossSessionPattern {
-  id: string;
-  type: string;
-  confidence: number;
-  sessions: string[];
-  description: string;
-  significance?: number;
-  strength?: number;
-  categories?: string[];
+  id: string
+  type: string
+  confidence: number
+  sessions: string[]
+  description: string
+  significance?: number
+  strength?: number
+  categories?: string[]
 }
 
 /**
  * Risk factor correlation
  */
 export interface RiskCorrelation {
-  id: string;
-  riskFactor: string;
+  id: string
+  riskFactor: string
   correlatedFactors: {
-    factor: string;
-    strength: number;
-  }[];
-  confidence: number;
-  significance: string;
-  severityScore: number;
-  description?: string;
+    factor: string
+    strength: number
+  }[]
+  confidence: number
+  significance: string
+  severityScore: number
+  description?: string
 }
 
 /**
  * Encrypted pattern data
  */
 export interface EncryptedPattern {
-  id: string;
-  encryptedData: string;
+  id: string
+  encryptedData: string
   metadata: {
-    timestamp: number;
-    patternType: string;
-  };
+    timestamp: number
+    patternType: string
+  }
 }
 
 /**
  * Encrypted analysis data
  */
 export interface EncryptedAnalysis {
-  id: string;
-  encryptedData: string;
+  id: string
+  encryptedData: string
   metadata: {
-    timestamp: number;
-    analysisType: string;
-  };
+    timestamp: number
+    analysisType: string
+  }
 }
 
 /**
  * Encrypted correlation data
  */
 export interface EncryptedCorrelation {
-  id: string;
-  encryptedData: string;
+  id: string
+  encryptedData: string
   metadata: {
-    timestamp: number;
-    correlationType: string;
-  };
+    timestamp: number
+    correlationType: string
+  }
 }
 
 /**
@@ -93,33 +93,33 @@ export interface PatternRecognitionOps {
   processPatterns(
     dataPoints: unknown[],
     options: {
-      windowSize: number;
-      minPoints: number;
-      threshold: number;
+      windowSize: number
+      minPoints: number
+      threshold: number
     },
-  ): Promise<EncryptedPattern[]>;
+  ): Promise<EncryptedPattern[]>
 
   decryptPatterns(
     encryptedPatterns: EncryptedPattern[],
-  ): Promise<TrendPattern[]>;
+  ): Promise<TrendPattern[]>
 
   analyzeCrossSessions(
     sessions: unknown[],
     confidenceThreshold: number,
-  ): Promise<EncryptedAnalysis>;
+  ): Promise<EncryptedAnalysis>
 
   decryptCrossSessionAnalysis(
     encryptedAnalysis: EncryptedAnalysis,
-  ): Promise<CrossSessionPattern[]>;
+  ): Promise<CrossSessionPattern[]>
 
   processRiskCorrelations(
     analyses: unknown[],
     riskFactorWeights: Record<string, number>,
-  ): Promise<EncryptedCorrelation[]>;
+  ): Promise<EncryptedCorrelation[]>
 
   decryptRiskCorrelations(
     encryptedCorrelations: EncryptedCorrelation[],
-  ): Promise<RiskCorrelation[]>;
+  ): Promise<RiskCorrelation[]>
 }
 
 // Example PHI audit logging - uncomment and customize as needed

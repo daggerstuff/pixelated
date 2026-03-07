@@ -7,8 +7,8 @@ import type {
   BackupStatus,
   RecoveryTestStatus,
   VerificationMethod,
-} from "./backup-types";
-import { BackupType } from "./backup-types";
+} from './backup-types'
+import { BackupType } from './backup-types'
 
 // Only export types needed by this file, not re-export from backup-types.ts
 // to avoid duplicate exports
@@ -17,81 +17,81 @@ import { BackupType } from "./backup-types";
  * Interface for backup metadata
  */
 export interface BackupMetadata {
-  id: string;
-  type: BackupType;
-  timestamp: string;
-  size: number;
-  contentHash: string;
-  encryptionVersion: string;
-  location: string;
-  path: string;
-  status: BackupStatus;
-  retentionDays: number;
-  iv: string;
-  containsSensitiveData?: boolean;
-  verificationStatus?: string;
-  verificationDate?: string;
+  id: string
+  type: BackupType
+  timestamp: string
+  size: number
+  contentHash: string
+  encryptionVersion: string
+  location: string
+  path: string
+  status: BackupStatus
+  retentionDays: number
+  iv: string
+  containsSensitiveData?: boolean
+  verificationStatus?: string
+  verificationDate?: string
 }
 
 /**
  * Interface for backup reports
  */
 export interface BackupReport {
-  id: string;
-  generatedAt: string;
+  id: string
+  generatedAt: string
   reportPeriod: {
-    start: string;
-    end: string;
-  };
+    start: string
+    end: string
+  }
   summary: {
-    totalBackups: number;
-    successfulBackups: number;
-    failedBackups: number;
-    averageBackupSize: number;
-    totalStorageUsed: number;
-    backupsByType: Record<string, number>;
-  };
+    totalBackups: number
+    successfulBackups: number
+    failedBackups: number
+    averageBackupSize: number
+    totalStorageUsed: number
+    backupsByType: Record<string, number>
+  }
   verificationSummary: {
-    totalVerifications: number;
-    successfulVerifications: number;
-    failedVerifications: number;
-  };
+    totalVerifications: number
+    successfulVerifications: number
+    failedVerifications: number
+  }
   recoveryTestSummary: {
-    totalTests: number;
-    successfulTests: number;
-    failedTests: number;
-    averageRecoveryTime: number;
-  };
+    totalTests: number
+    successfulTests: number
+    failedTests: number
+    averageRecoveryTime: number
+  }
   retentionSummary: {
-    backupsExpired: number;
-    backupsDeleted: number;
-    storageReclaimed: number;
-  };
+    backupsExpired: number
+    backupsDeleted: number
+    storageReclaimed: number
+  }
   complianceStatus: {
-    compliant: boolean;
+    compliant: boolean
     issues: Array<{
-      issueType: string;
-      description: string;
-      severity: "low" | "medium" | "high" | "critical";
-      remediation: string;
-    }>;
-  };
+      issueType: string
+      description: string
+      severity: 'low' | 'medium' | 'high' | 'critical'
+      remediation: string
+    }>
+  }
 }
 
 /**
  * Interface for storage provider configuration
  */
 export interface StorageProviderConfig {
-  type: string;
+  type: string
   credentials?: {
-    [key: string]: string;
-  };
-  region?: string;
-  bucket?: string;
-  container?: string;
-  endpoint?: string;
-  path?: string;
-  options?: Record<string, unknown>;
+    [key: string]: string
+  }
+  region?: string
+  bucket?: string
+  container?: string
+  endpoint?: string
+  path?: string
+  options?: Record<string, unknown>
 }
 
 /**
@@ -101,76 +101,76 @@ export interface StorageProvider {
   /**
    * Initialize the storage provider
    */
-  initialize(): Promise<void>;
+  initialize(): Promise<void>
 
   /**
    * List files matching a pattern
    */
-  listFiles(pattern?: string): Promise<string[]>;
+  listFiles(pattern?: string): Promise<string[]>
 
   /**
    * Store a file
    */
-  storeFile(key: string, data: Uint8Array): Promise<void>;
+  storeFile(key: string, data: Uint8Array): Promise<void>
 
   /**
    * Get a file
    */
-  getFile(key: string): Promise<Uint8Array>;
+  getFile(key: string): Promise<Uint8Array>
 
   /**
    * Delete a file
    */
-  deleteFile(key: string): Promise<void>;
+  deleteFile(key: string): Promise<void>
 }
 
 /**
  * Recovery testing configuration
  */
 export interface RecoveryTestConfig {
-  enabled?: boolean;
-  schedule: string; // Cron expression for automatic testing
+  enabled?: boolean
+  schedule: string // Cron expression for automatic testing
   environment: {
-    type: "docker" | "vm" | "kubernetes" | "sandbox";
-    config: Record<string, unknown>;
-  };
+    type: 'docker' | 'vm' | 'kubernetes' | 'sandbox'
+    config: Record<string, unknown>
+  }
   testCases: Array<{
-    name: string;
-    description: string;
-    backupType: string;
+    name: string
+    description: string
+    backupType: string
     dataVerification: Array<{
-      type: VerificationMethod;
-      target: string;
-      expected?: string | number | boolean;
-      query?: string;
-      threshold?: number;
-    }>;
-  }>;
-  notifyOnFailure: boolean;
-  generateReport: boolean;
+      type: VerificationMethod
+      target: string
+      expected?: string | number | boolean
+      query?: string
+      threshold?: number
+    }>
+  }>
+  notifyOnFailure: boolean
+  generateReport: boolean
 }
 
 /**
  * Recovery test result
  */
 export interface RecoveryTestResult {
-  id: string;
-  testDate: string;
-  backupId: string;
-  environment: string;
-  status: RecoveryTestStatus;
-  timeTaken: number; // milliseconds
+  id: string
+  testDate: string
+  backupId: string
+  environment: string
+  status: RecoveryTestStatus
+  timeTaken: number // milliseconds
   verificationResults: Array<{
-    testCase: string;
-    passed: boolean;
-    details: Record<string, unknown>;
-  }>;
+    testCase: string
+    passed: boolean
+    details: Record<string, unknown>
+  }>
   issues?: Array<{
-    type: string;
-    description: string;
-    severity: "low" | "medium" | "high" | "critical";
-  }>;
-  report?: string; // URL or path to detailed report
+    type: string
+    description: string
+    severity: 'low' | 'medium' | 'high' | 'critical'
+  }>
+  report?: string // URL or path to detailed report
 }
 
-export { BackupType };
+export { BackupType }

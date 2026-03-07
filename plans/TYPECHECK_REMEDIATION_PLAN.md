@@ -85,7 +85,7 @@ Astro's type interfaces properly.
 
 ```typescript
 // market-research.ts - Type 'boolean' is not assignable to type 'string'
-throw new ValidationError("title is required", { title: !title });
+throw new ValidationError('title is required', { title: !title })
 // title is boolean, but ValidationError expects string
 ```
 
@@ -373,15 +373,15 @@ Files using getSession() now define a local Session interface:
 ```typescript
 interface Session {
   user?: {
-    id: string;
-    email?: string;
-    role?: string;
-    name?: string;
-  };
+    id: string
+    email?: string
+    role?: string
+    name?: string
+  }
   session?: {
-    sessionId?: string;
-  };
-  expires?: string;
+    sessionId?: string
+  }
+  expires?: string
 }
 ```
 
@@ -462,6 +462,8 @@ interface Session {
 - [x] `src/hooks/usePipelineWebSocket.ts` - Fixed deprecated .substr() -> .substring()
 - [x] `src/utils/sync/tabSyncManager.ts` - Fixed deprecated .substr() -> .substring()
 
+
+
 ### Completed (Phase 7: Zod v4 Compatibility)
 
 - [x] Multiple files - Fixed ZodError.errors -> ZodError.issues for Zod v4 compatibility:
@@ -494,11 +496,11 @@ interface Session {
 
 ### Error Count Progress
 
-| Date       | Errors | Notes                        |
-| ---------- | ------ | ---------------------------- |
-| Initial    | 3,689  | Starting point               |
-| 2026-02-26 | ~3,300 | Phase 1-6 fixes              |
-| Current    | ~3,303 | After Zod v4, modules, fixes |
+| Date | Errors | Notes |
+|------|--------|-------|
+| Initial | 3,689 | Starting point |
+| 2026-02-26 | ~3,300 | Phase 1-6 fixes |
+| Current | ~3,303 | After Zod v4, modules, fixes |
 
 ### Session Progress (2026-02-28)
 
@@ -516,7 +518,7 @@ interface Session {
 #### Key Patterns Discovered
 
 - **renderAstro** expects Component parameter to accept `Record<string, unknown>`
-  not strict generic Props type - Astro components don't have strict prop typing at runtime
+      not strict generic Props type - Astro components don't have strict prop typing at runtime
 - **Visitor** type from unist-util-visit can be used for callback parameter typing
 - **Unused variables** should be declared with `let` instead of `const` if assigned later,
-  or prefix with `_` to indicate intentional placeholder
+      or prefix with `_` to indicate intentional placeholder

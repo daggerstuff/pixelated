@@ -1,8 +1,8 @@
 ---
-title: "Thread Analytics Optimizations"
-description: "Comprehensive optimizations for the thread analytics system including materialized views, caching strategies, and performance improvements"
+title: 'Thread Analytics Optimizations'
+description: 'Comprehensive optimizations for the thread analytics system including materialized views, caching strategies, and performance improvements'
 pubDate: 2024-12-01
-author: "System Documentation"
+author: 'System Documentation'
 toc: true
 draft: false
 ---
@@ -87,7 +87,7 @@ The system implements a multi-level caching strategy:
 1. Metrics Cache (60s TTL):
 
    ```typescript
-   await this.cacheService.set(`thread:metrics:${threadId}`, metrics, 60);
+   await this.cacheService.set(`thread:metrics:${threadId}`, metrics, 60)
    ```
 
 2. Performance Cache (30s TTL):
@@ -97,7 +97,7 @@ The system implements a multi-level caching strategy:
      `thread:performance:${threadId}`,
      performance,
      30,
-   );
+   )
    ```
 
 3. Report Cache (5m TTL):
@@ -106,7 +106,7 @@ The system implements a multi-level caching strategy:
      `thread:report:${threadId}:${startDate.getTime()}:${endDate.getTime()}`,
      report,
      300,
-   );
+   )
    ```
 
 Cache invalidation is handled automatically through TTL and triggered by data updates.
@@ -230,15 +230,15 @@ The optimizations are thoroughly tested:
 1. Unit Tests:
 
    ```typescript
-   describe("ThreadAnalyticsService", () => {
-     it("returns cached metrics when available", async () => {
+   describe('ThreadAnalyticsService', () => {
+     it('returns cached metrics when available', async () => {
        // ... test cache hits
-     });
+     })
 
-     it("fetches from materialized view on cache miss", async () => {
+     it('fetches from materialized view on cache miss', async () => {
        // ... test materialized view access
-     });
-   });
+     })
+   })
    ```
 
 2. SQL Tests:

@@ -1,7 +1,7 @@
 ---
-title: "Editorial Roadmap 2025"
-description: "Strategic content planning and editorial calendar for cutting-edge trauma research and clinical applications"
-author: "Research & Editorial Team"
+title: 'Editorial Roadmap 2025'
+description: 'Strategic content planning and editorial calendar for cutting-edge trauma research and clinical applications'
+author: 'Research & Editorial Team'
 pubDate: 2025-04-12
 ---
 
@@ -10,10 +10,10 @@ pubDate: 2025-04-12
 ## 🎯 Current Focus
 
 ```yaml
-quarter: "Q2 2025"
-theme: "Neuroplasticity & Trauma Revolution"
-approach: "Evidence-based innovation in trauma treatment"
-impact_goal: "Transform clinical practice through cutting-edge research"
+quarter: 'Q2 2025'
+theme: 'Neuroplasticity & Trauma Revolution'
+approach: 'Evidence-based innovation in trauma treatment'
+impact_goal: 'Transform clinical practice through cutting-edge research'
 ```
 
 ## 📚 Active Series

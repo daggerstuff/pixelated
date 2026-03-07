@@ -93,17 +93,17 @@ If the target environment is protected by Cloudflare Zero Trust Access, the pipe
 
 We've established the following performance budgets:
 
-| Metric   | Target (Good) | Maximum (Acceptable) |
-| -------- | ------------- | -------------------- |
-| TTFB     | < 300ms       | < 600ms              |
-| FCP      | < 1.8s        | < 3s                 |
-| LCP      | < 2.5s        | < 4s                 |
-| CLS      | < 0.1         | < 0.25               |
-| TBT      | < 200ms       | < 600ms              |
-| FID      | < 100ms       | < 300ms              |
-| JS Size  | < 500KB       | < 1MB                |
-| CSS Size | < 100KB       | < 200KB              |
-| Requests | < 50          | < 80                 |
+| Metric | Target (Good) | Maximum (Acceptable) |
+|--------|---------------|----------------------|
+| TTFB   | < 300ms       | < 600ms              |
+| FCP    | < 1.8s        | < 3s                 |
+| LCP    | < 2.5s        | < 4s                 |
+| CLS    | < 0.1         | < 0.25               |
+| TBT    | < 200ms       | < 600ms              |
+| FID    | < 100ms       | < 300ms              |
+| JS Size| < 500KB       | < 1MB                |
+| CSS Size| < 100KB      | < 200KB              |
+| Requests| < 50         | < 80                 |
 
 ## Common Performance Optimizations
 

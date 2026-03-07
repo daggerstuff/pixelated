@@ -47,7 +47,6 @@ The tests use a dedicated configuration file at `tests/e2e-config.ts`, which ext
 These tests cover the following critical user journeys:
 
 ### Authentication Journey
-
 - Registration of new users
 - Login with correct and incorrect credentials
 - Password reset flow
@@ -55,7 +54,6 @@ These tests cover the following critical user journeys:
 - CSRF protection
 
 ### Dashboard Journey
-
 - Dashboard access and component loading
 - Sidebar navigation between sections
 - Data visualization interaction
@@ -63,7 +61,6 @@ These tests cover the following critical user journeys:
 - Mobile responsiveness
 
 ### User Experience
-
 - Page transitions between routes
 - Toast notifications for user feedback
 - Loading states during async operations

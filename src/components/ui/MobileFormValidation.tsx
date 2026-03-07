@@ -1,26 +1,26 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 
 interface ValidationRule {
-  test: (value: string) => boolean;
-  message: string;
+  test: (value: string) => boolean
+  message: string
 }
 
 interface ValidationConfig {
-  [key: string]: ValidationRule[];
+  [key: string]: ValidationRule[]
 }
 
 interface MobileFormValidationProps {
-  children: React.ReactNode;
+  children: React.ReactNode
   onValidationChange?: (
     isValid: boolean,
     errors: Record<string, string>,
-  ) => void;
-  validationRules: ValidationConfig;
-  validateOnChange?: boolean;
-  validateOnBlur?: boolean;
-  validateOnSubmit?: boolean;
-  focusFirstInvalidField?: boolean;
-  showErrorSummary?: boolean;
+  ) => void
+  validationRules: ValidationConfig
+  validateOnChange?: boolean
+  validateOnBlur?: boolean
+  validateOnSubmit?: boolean
+  focusFirstInvalidField?: boolean
+  showErrorSummary?: boolean
 }
 
 /**
@@ -37,45 +37,45 @@ export function MobileFormValidation({
   focusFirstInvalidField = true,
   showErrorSummary = false,
 }: MobileFormValidationProps) {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [, setTouchedFields] = useState<Set<string>>(new Set());
-  const [submitted, setSubmitted] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [, setTouchedFields] = useState<Set<string>>(new Set())
+  const [submitted, setSubmitted] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
 
   // Detect mobile device on component mount
   useEffect(() => {
     const checkMobile = () => {
       const isMobileDevice =
-        window.matchMedia("(max-width: 767px)").matches ||
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      setIsMobile(isMobileDevice);
-    };
+        window.matchMedia('(max-width: 767px)').matches ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+      setIsMobile(isMobileDevice)
+    }
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
 
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   // Validate a specific field
   const validateField = useCallback(
     (name: string, value: string): string => {
-      const rules = validationRules[name];
+      const rules = validationRules[name]
       if (!rules) {
-        return "";
+        return ''
       }
 
       for (const rule of rules) {
         if (!rule.test(value)) {
-          return rule.message;
+          return rule.message
         }
       }
 
-      return "";
+      return ''
     },
     [validationRules],
-  );
+  )
 
   // Handle input changes
   const handleChange = useCallback(
@@ -83,155 +83,155 @@ export function MobileFormValidation({
       const input = e.target as
         | HTMLInputElement
         | HTMLTextAreaElement
-        | HTMLSelectElement;
-      const name = input.getAttribute("name");
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
       if (!name) {
-        return;
+        return
       }
 
       // Mark field as touched
       setTouchedFields((prev) => {
-        const newSet = new Set(prev);
-        newSet.add(name);
-        return newSet;
-      });
+        const newSet = new Set(prev)
+        newSet.add(name)
+        return newSet
+      })
 
       if (validateOnChange) {
-        const { value } = input;
-        const error = validateField(name, value);
+        const { value } = input
+        const error = validateField(name, value)
 
-        let newErrors: Record<string, string> = {};
+        let newErrors: Record<string, string> = {}
         setErrors((prev) => {
-          newErrors = { ...prev };
+          newErrors = { ...prev }
           if (error) {
-            newErrors[name] = error;
+            newErrors[name] = error
           } else {
-            delete newErrors[name];
+            delete newErrors[name]
           }
-          return newErrors;
-        });
+          return newErrors
+        })
 
         // Update ARIA attributes
-        input.setAttribute("aria-invalid", error ? "true" : "false");
+        input.setAttribute('aria-invalid', error ? 'true' : 'false')
 
         if (onValidationChange) {
-          onValidationChange(Object.keys(newErrors).length === 0, newErrors);
+          onValidationChange(Object.keys(newErrors).length === 0, newErrors)
         }
       }
     },
     [validateOnChange, validateField, onValidationChange],
-  );
+  )
 
   // Handle input blur
   const handleBlur = useCallback(
     (e: Event) => {
       if (!validateOnBlur) {
-        return;
+        return
       }
 
       const input = e.target as
         | HTMLInputElement
         | HTMLTextAreaElement
-        | HTMLSelectElement;
-      const name = input.getAttribute("name");
+        | HTMLSelectElement
+      const name = input.getAttribute('name')
       if (!name) {
-        return;
+        return
       }
 
-      const { value } = input;
-      const error = validateField(name, value);
+      const { value } = input
+      const error = validateField(name, value)
 
       setErrors((prev) => {
-        const newErrors = { ...prev };
+        const newErrors = { ...prev }
         if (error) {
-          newErrors[name] = error;
+          newErrors[name] = error
         } else {
-          delete newErrors[name];
+          delete newErrors[name]
         }
-        return newErrors;
-      });
+        return newErrors
+      })
 
       // Update ARIA attributes
-      input.setAttribute("aria-invalid", error ? "true" : "false");
+      input.setAttribute('aria-invalid', error ? 'true' : 'false')
     },
     [validateOnBlur, validateField],
-  );
+  )
 
   // Find and enhance all form inputs with validation attributes
   useEffect(() => {
-    const form = formRef.current;
+    const form = formRef.current
     if (!form) {
-      return;
+      return
     }
 
-    const inputs = form.querySelectorAll("input, textarea, select");
+    const inputs = form.querySelectorAll('input, textarea, select')
 
     inputs.forEach((input) => {
-      const name = input.getAttribute("name");
+      const name = input.getAttribute('name')
       if (!name || !validationRules[name]) {
-        return;
+        return
       }
 
       // Add event listeners for input validation
-      input.addEventListener("change", handleChange);
-      input.addEventListener("blur", handleBlur);
+      input.addEventListener('change', handleChange)
+      input.addEventListener('blur', handleBlur)
 
       // Add ARIA attributes
-      input.setAttribute("aria-required", "true");
+      input.setAttribute('aria-required', 'true')
 
       // Enhanced feedback for mobile
       if (isMobile) {
         // Make touch targets easier
-        input.classList.add("mobile-input");
+        input.classList.add('mobile-input')
       }
-    });
+    })
 
     // Clean up event listeners
     return () => {
       inputs.forEach((input) => {
-        input.removeEventListener("change", handleChange);
-        input.removeEventListener("blur", handleBlur);
-      });
-    };
-  }, [validationRules, isMobile, handleChange, handleBlur, formRef]);
+        input.removeEventListener('change', handleChange)
+        input.removeEventListener('blur', handleBlur)
+      })
+    }
+  }, [validationRules, isMobile, handleChange, handleBlur, formRef])
 
   // Validate all fields in the form
   const validateForm = (): Record<string, string> => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
 
     if (!formRef.current) {
-      return newErrors;
+      return newErrors
     }
 
-    const form = formRef.current;
-    const inputs = form.querySelectorAll("input, textarea, select");
+    const form = formRef.current
+    const inputs = form.querySelectorAll('input, textarea, select')
 
     inputs.forEach((input) => {
-      const name = input.getAttribute("name");
+      const name = input.getAttribute('name')
       if (!name || !validationRules[name]) {
-        return;
+        return
       }
 
       const { value } = input as
         | HTMLInputElement
         | HTMLTextAreaElement
-        | HTMLSelectElement;
-      const error = validateField(name, value);
+        | HTMLSelectElement
+      const error = validateField(name, value)
 
       if (error) {
-        newErrors[name] = error;
+        newErrors[name] = error
 
         // Update ARIA attributes
-        input.setAttribute("aria-invalid", "true");
-        const errorId = `${name}-error`;
-        input.setAttribute("aria-describedby", errorId);
+        input.setAttribute('aria-invalid', 'true')
+        const errorId = `${name}-error`
+        input.setAttribute('aria-describedby', errorId)
       } else {
-        input.setAttribute("aria-invalid", "false");
+        input.setAttribute('aria-invalid', 'false')
       }
-    });
+    })
 
-    return newErrors;
-  };
+    return newErrors
+  }
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -239,103 +239,103 @@ export function MobileFormValidation({
       // Mark all fields as touched
       if (formRef.current) {
         const inputs = formRef.current.querySelectorAll(
-          "input, textarea, select",
-        );
-        const fieldNames = new Set<string>();
+          'input, textarea, select',
+        )
+        const fieldNames = new Set<string>()
         inputs.forEach((input) => {
-          const name = input.getAttribute("name");
+          const name = input.getAttribute('name')
           if (name) {
-            fieldNames.add(name);
+            fieldNames.add(name)
           }
-        });
-        setTouchedFields(fieldNames);
+        })
+        setTouchedFields(fieldNames)
       }
 
       // Validate all fields
-      const newErrors = validateForm();
-      setErrors(newErrors);
-      setSubmitted(true);
+      const newErrors = validateForm()
+      setErrors(newErrors)
+      setSubmitted(true)
 
       // If there are errors, prevent form submission
       if (Object.keys(newErrors).length > 0) {
-        e.preventDefault();
+        e.preventDefault()
 
         // Focus first invalid field
         if (focusFirstInvalidField && formRef.current) {
-          const firstErrorName = Object.keys(newErrors)[0];
+          const firstErrorName = Object.keys(newErrors)[0]
           if (firstErrorName) {
             const firstErrorField = formRef.current.querySelector(
               `[name="${firstErrorName}"]`,
-            );
-            if (firstErrorField && "scrollIntoView" in firstErrorField) {
+            )
+            if (firstErrorField && 'scrollIntoView' in firstErrorField) {
               // Smooth scroll to the field
               firstErrorField.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+                behavior: 'smooth',
+                block: 'center',
+              })
 
               // Wait for scroll to complete before focusing
               setTimeout(() => {
                 if (firstErrorField instanceof HTMLElement) {
-                  firstErrorField.focus();
+                  firstErrorField.focus()
 
                   // Vibrate for haptic feedback on mobile
-                  if (isMobile && "vibrate" in navigator) {
-                    navigator.vibrate([50, 100, 50]);
+                  if (isMobile && 'vibrate' in navigator) {
+                    navigator.vibrate([50, 100, 50])
                   }
                 }
-              }, 500);
+              }, 500)
             }
           }
         }
 
         // Notify screen readers about validation errors
         if (isMobile) {
-          const errorCount = Object.keys(newErrors).length;
+          const errorCount = Object.keys(newErrors).length
           const errorSummary = document.getElementById(
-            "validation-error-summary",
-          );
+            'validation-error-summary',
+          )
           if (errorSummary) {
-            errorSummary.textContent = `Form has ${errorCount} ${errorCount === 1 ? "error" : "errors"}. Please correct before submitting.`;
-            errorSummary.setAttribute("role", "alert");
+            errorSummary.textContent = `Form has ${errorCount} ${errorCount === 1 ? 'error' : 'errors'}. Please correct before submitting.`
+            errorSummary.setAttribute('role', 'alert')
           }
         }
 
         if (onValidationChange) {
-          onValidationChange(false, newErrors);
+          onValidationChange(false, newErrors)
         }
       } else if (onValidationChange) {
-        onValidationChange(true, {});
+        onValidationChange(true, {})
       }
     }
-  };
+  }
 
   // Clone the form element and inject our handlers
   const enhancedForm = React.Children.map(children, (child) => {
-    if (React.isValidElement(child) && child.type === "form") {
+    if (React.isValidElement(child) && child.type === 'form') {
       const specificChild = child as React.ReactElement<
         React.FormHTMLAttributes<HTMLFormElement>
-      >;
+      >
       // Set up form props with the right type
       const formProps: React.FormHTMLAttributes<HTMLFormElement> & {
-        ref: React.RefObject<HTMLFormElement | null>;
+        ref: React.RefObject<HTMLFormElement | null>
       } = {
         ...specificChild.props,
         ref: formRef,
         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
-          handleSubmit(e);
+          handleSubmit(e)
           // Call the original onSubmit if it exists
           if (specificChild.props.onSubmit) {
-            specificChild.props.onSubmit(e);
+            specificChild.props.onSubmit(e)
           }
         },
         noValidate: true, // Disable browser validation in favor of our custom validation
-      };
+      }
 
-      return React.cloneElement(specificChild, formProps);
+      return React.cloneElement(specificChild, formProps)
     }
-    return child;
-  });
+    return child
+  })
 
   return (
     <>
@@ -358,16 +358,16 @@ export function MobileFormValidation({
                 <a
                   href={`#${field}`}
                   onClick={(e) => {
-                    e.preventDefault();
+                    e.preventDefault()
                     const element = document.querySelector(
                       `[name="${field}"]`,
-                    ) as HTMLElement;
+                    ) as HTMLElement
                     if (element instanceof HTMLElement) {
-                      element.focus();
+                      element.focus()
                       element.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
+                        behavior: 'smooth',
+                        block: 'center',
+                      })
                     }
                   }}
                 >
@@ -379,16 +379,16 @@ export function MobileFormValidation({
         </div>
       )}
     </>
-  );
+  )
 }
 
 // Commonly used validation rules
 export const ValidationRules = {
-  required: (message = "This field is required"): ValidationRule => ({
-    test: (value) => value.trim() !== "",
+  required: (message = 'This field is required'): ValidationRule => ({
+    test: (value) => value.trim() !== '',
     message,
   }),
-  email: (message = "Please enter a valid email address"): ValidationRule => ({
+  email: (message = 'Please enter a valid email address'): ValidationRule => ({
     test: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
     message,
   }),
@@ -408,9 +408,9 @@ export const ValidationRules = {
     test: (value) => {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,
-      ) as HTMLInputElement;
-      return matchField && matchField.value === value;
+      ) as HTMLInputElement
+      return matchField && matchField.value === value
     },
     message,
   }),
-};
+}
