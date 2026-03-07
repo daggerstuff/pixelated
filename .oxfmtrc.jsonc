@@ -2,5 +2,17 @@
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
   // Use 80 if migrating from Prettier; 100 is the Oxfmt default!
   "printWidth": 80,
-  "ignorePatterns": [], // Same as `.prettierignore`
+  "ignorePatterns": [
+    "ai/infra/cloud/helm/",
+    "helm/",
+    "ai/infra/monitoring/",
+    "docker/",
+    "ai/training/",
+    "ai/training/configs/",
+    "ai/infra/config/",
+    "tests/test-results/",
+    "metrics/",
+    "dist/",
+    ".astro/"
+  ]
 }
