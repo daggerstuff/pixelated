@@ -107,6 +107,7 @@ opencode.json
 /npm-debug.log*
 /playwright-report-browser-compat
 /playwright-report/
+config/playwright-report/
 /playwright/.cache/
 /pnpm-debug.log*
 /secret-scan-report.md
@@ -115,6 +116,7 @@ opencode.json
 /security-reports/
 /stats.html
 /test-results/
+config/test-results/
 /yarn-debug.log*
 /yarn-error.log*
 MANIFEST
