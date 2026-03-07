@@ -16,7 +16,7 @@ import type {
   AIStreamChunk,
   TherapeuticResponse,
 } from "@/lib/ai/types";
-import { ResponseGenerationService } from "@/lib/ai/response-generation/service";
+import { ResponseGenerationService } from "@/lib/ai/services/response-generation";
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
