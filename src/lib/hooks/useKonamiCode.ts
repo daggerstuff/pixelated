@@ -1,44 +1,44 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from 'react'
 
 const konamiCode = [
-  "ArrowUp",
-  "ArrowUp",
-  "ArrowDown",
-  "ArrowDown",
-  "ArrowLeft",
-  "ArrowRight",
-  "ArrowLeft",
-  "ArrowRight",
-  "b",
-  "a",
-];
+  'ArrowUp',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'ArrowLeft',
+  'ArrowRight',
+  'b',
+  'a',
+]
 
 export const useKonamiCode = (callback: () => void) => {
-  const [keys, setKeys] = useState<string[]>([]);
+  const [keys, setKeys] = useState<string[]>([])
 
   const handler = useCallback(
     ({ key }: KeyboardEvent) => {
-      if (key === "Escape") {
-        setKeys([]);
-        return;
+      if (key === 'Escape') {
+        setKeys([])
+        return
       }
 
-      const newKeys = [...keys, key];
+      const newKeys = [...keys, key]
 
-      if (newKeys.join("").includes(konamiCode.join(""))) {
-        callback();
-        setKeys([]);
+      if (newKeys.join('').includes(konamiCode.join(''))) {
+        callback()
+        setKeys([])
       } else {
-        setKeys(newKeys);
+        setKeys(newKeys)
       }
     },
     [keys, callback],
-  );
+  )
 
   useEffect(() => {
-    window.addEventListener("keydown", handler);
+    window.addEventListener('keydown', handler)
     return () => {
-      window.removeEventListener("keydown", handler);
-    };
-  }, [handler]);
-};
+      window.removeEventListener('keydown', handler)
+    }
+  }, [handler])
+}

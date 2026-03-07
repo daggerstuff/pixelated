@@ -25,7 +25,9 @@ looks like:
       "name": "nvidia",
       "api_base_url": "https://integrate.api.nvidia.com/v1/chat/completions",
       "api_key": "nvapi-...",
-      "models": ["moonshotai/kimi-k2.5"]
+      "models": [
+        "moonshotai/kimi-k2.5"
+      ]
     }
   ]
 }

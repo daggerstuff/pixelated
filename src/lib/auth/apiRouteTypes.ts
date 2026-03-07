@@ -1,5 +1,5 @@
-import type { AuthRole } from "../../config/auth.config.ts";
-import type { AuthUser } from "./types.js";
+import type { AuthRole } from '../../config/auth.config.ts'
+import type { AuthUser } from './types.js'
 
 /**
  * ASTRO 5.x TYPE INHERITANCE BUG WORKAROUND
@@ -27,17 +27,17 @@ export interface BaseAPIContext<
     string | undefined
   >,
 > {
-  request: Request;
-  url: URL;
-  params: Params;
-  props: Props;
-  redirect(path: string, status?: number): Response;
-  locals: Record<string, unknown>;
+  request: Request
+  url: URL
+  params: Params
+  props: Props
+  redirect(path: string, status?: number): Response
+  locals: Record<string, unknown>
   cookies: {
-    get(name: string): { value: string } | undefined;
-    set(name: string, value: string, options?: Record<string, unknown>): void;
-    delete(name: string, options?: Record<string, unknown>): void;
-  };
+    get(name: string): { value: string } | undefined
+    set(name: string, value: string, options?: Record<string, unknown>): void
+    delete(name: string, options?: Record<string, unknown>): void
+  }
 }
 
 /**
@@ -56,12 +56,12 @@ export interface AuthAPIContext<
     string | undefined
   >,
 > extends BaseAPIContext<Props, Params> {
-  locals: BaseAPIContext<Props, Params>["locals"] & {
-    user: AuthUser;
-  };
+  locals: BaseAPIContext<Props, Params>['locals'] & {
+    user: AuthUser
+  }
   // CRITICAL: DO NOT REMOVE - Works around Astro 5.x type inheritance bug
   // Without this, TypeScript cannot see 'request' property from broken APIContext inheritance
-  request: Request;
+  request: Request
 }
 
 /**
@@ -74,15 +74,15 @@ export type ProtectedAPIRoute<
     string,
     string | undefined
   >,
-> = (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>;
+> = (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
 
 /**
  * Options for protecting an API route
  */
 export interface ProtectRouteOptions {
-  requiredRole?: AuthRole;
-  validateIPMatch?: boolean;
-  validateUserAgent?: boolean;
+  requiredRole?: AuthRole
+  validateIPMatch?: boolean
+  validateUserAgent?: boolean
 }
 
 /**
@@ -95,7 +95,7 @@ export type APIContextConverter<
     string,
     string | undefined
   >,
-> = (context: BaseAPIContext<Props, Params>) => AuthAPIContext<Props, Params>;
+> = (context: BaseAPIContext<Props, Params>) => AuthAPIContext<Props, Params>
 
 /**
  * Higher-order function to apply protection to an API route
@@ -113,4 +113,4 @@ export type ProtectRouteFunction = <
   handler: (
     context: AuthAPIContext<Props, Params>,
   ) => Response | Promise<Response>,
-) => (context: BaseAPIContext<Props, Params>) => Response | Promise<Response>;
+) => (context: BaseAPIContext<Props, Params>) => Response | Promise<Response>

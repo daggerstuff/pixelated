@@ -11,7 +11,6 @@ toc: true
 # Deployment Guide
 
 ## Table of Contents
-
 1. [Prerequisites](#prerequisites)
 2. [Initial Setup](#initial-setup)
 3. [Deployment Process](#deployment-process)
@@ -37,20 +36,17 @@ Before starting a deployment, ensure you have:
 ## Initial Setup
 
 1. Clone the repository:
-
    ```bash
    git clone https://github.com/your-org/your-repo.git
    cd your-repo
    ```
 
 2. Initialize Terraform:
-
    ```bash
    terraform init
    ```
 
 3. Verify the infrastructure plan:
-
    ```bash
    terraform plan
    ```
@@ -65,7 +61,6 @@ Before starting a deployment, ensure you have:
 ### 1. Prepare for Deployment
 
 1. Tag your release:
-
    ```bash
    git tag -a v1.0.0 -m "Release version 1.0.0"
    git push origin v1.0.0
@@ -79,7 +74,6 @@ Before starting a deployment, ensure you have:
 ### 2. Blue-Green Deployment
 
 1. Create a new deployment:
-
    ```bash
    aws deploy create-deployment \
      --application-name your-app \
@@ -96,7 +90,6 @@ Before starting a deployment, ensure you have:
 ### 3. Traffic Shifting
 
 The deployment process automatically:
-
 1. Creates a new (green) environment
 2. Routes 10% of traffic to green environment
 3. Monitors for errors and performance
@@ -108,7 +101,6 @@ The deployment process automatically:
 ### 1. Initiate Canary
 
 1. Start with 10% traffic:
-
    ```bash
    aws elbv2 modify-listener \
      --listener-arn $LISTENER_ARN \
@@ -123,7 +115,6 @@ The deployment process automatically:
 ### 2. Validation
 
 The canary analysis Lambda function automatically:
-
 1. Collects metrics for 10 minutes
 2. Compares against thresholds
 3. Makes promotion/rollback decision
@@ -133,7 +124,6 @@ The canary analysis Lambda function automatically:
 ### 1. Automatic Rollback
 
 Automatic rollback is triggered when:
-
 - Error rate exceeds 1%
 - P95 latency exceeds 1000ms
 - Health check failures occur
@@ -143,7 +133,6 @@ Automatic rollback is triggered when:
 To manually rollback:
 
 1. Stop the deployment:
-
    ```bash
    aws deploy stop-deployment \
      --deployment-id deployment-id
@@ -162,7 +151,6 @@ To manually rollback:
 ### 1. CloudWatch Dashboards
 
 Access the deployment dashboard:
-
 1. Open AWS Console
 2. Navigate to CloudWatch
 3. Open "your-app-deployment" dashboard
@@ -170,7 +158,6 @@ Access the deployment dashboard:
 ### 2. Key Metrics
 
 Monitor these metrics during deployment:
-
 - HTTP 5xx errors
 - Response latency
 - CPU/Memory utilization
@@ -179,7 +166,6 @@ Monitor these metrics during deployment:
 ### 3. Logs
 
 View deployment logs:
-
 1. Open CloudWatch Logs
 2. Check log groups:
    - /aws/codedeploy/your-app
@@ -207,14 +193,12 @@ View deployment logs:
 ### Debug Steps
 
 1. Check deployment status:
-
    ```bash
    aws deploy get-deployment \
      --deployment-id deployment-id
    ```
 
 2. Review deployment events:
-
    ```bash
    aws deploy list-deployment-events \
      --deployment-id deployment-id
@@ -230,7 +214,6 @@ View deployment logs:
 ### Support
 
 For additional support:
-
 1. Check deployment logs
 2. Review CloudWatch metrics
 3. Contact DevOps team

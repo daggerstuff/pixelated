@@ -12,12 +12,12 @@ This document outlines common TypeScript errors found in the project and how the
 
 ```typescript
 // Error:
-const user = await getUser();
-console.log(user.name); // Error: 'user' is not defined
+const user = await getUser()
+console.log(user.name) // Error: 'user' is not defined
 
 // Fixed:
-const user = await getUser();
-console.log(user.name); // Correctly using user
+const user = await getUser()
+console.log(user.name) // Correctly using user
 ```
 
 ### 2. Missing Properties in AIMessage Interface
@@ -29,16 +29,16 @@ console.log(user.name); // Correctly using user
 ```typescript
 // Error:
 const message: AIMessage = {
-  role: "user",
-  content: "Hello",
-}; // Error: Property 'name' is missing
+  role: 'user',
+  content: 'Hello',
+} // Error: Property 'name' is missing
 
 // Fixed:
 const message: AIMessage = {
-  role: "user",
-  content: "Hello",
-  name: "", // Added required property
-};
+  role: 'user',
+  content: 'Hello',
+  name: '', // Added required property
+}
 ```
 
 ### 3. Nullable Property Access
@@ -49,10 +49,10 @@ const message: AIMessage = {
 
 ```typescript
 // Error:
-const name = error.message; // Error if error is null or undefined
+const name = error.message // Error if error is null or undefined
 
 // Fixed:
-const name = error?.message; // Safely accesses message if error exists
+const name = error?.message // Safely accesses message if error exists
 ```
 
 ## Using the TypeScript Error Fixer
@@ -108,10 +108,10 @@ Some TypeScript errors require manual intervention because they involve complex 
 
 ```typescript
 // Error:
-const id = someFunction(); // Type 'unknown' is not assignable to type 'string'
+const id = someFunction() // Type 'unknown' is not assignable to type 'string'
 
 // Fixed using type assertion:
-const id = someFunction() as string;
+const id = someFunction() as string
 ```
 
 ### 2. Properly Typing React Components
@@ -124,8 +124,8 @@ function MyComponent(props) {
 
 // Fixed:
 interface MyComponentProps {
-  name: string;
-  age?: number;
+  name: string
+  age?: number
 }
 
 function MyComponent(props: MyComponentProps) {
@@ -138,15 +138,15 @@ function MyComponent(props: MyComponentProps) {
 ```typescript
 // Error:
 function processData(data: any) {
-  return data.value; // Unsafe property access
+  return data.value // Unsafe property access
 }
 
 // Fixed with type guard:
 function processData(data: unknown) {
-  if (data && typeof data === "object" && "value" in data) {
-    return data.value;
+  if (data && typeof data === 'object' && 'value' in data) {
+    return data.value
   }
-  return undefined;
+  return undefined
 }
 ```
 

@@ -1,7 +1,7 @@
 ---
-title: "Addiction Overview"
-description: "Understanding addiction and its impact on mental health"
-author: "Resource Team"
+title: 'Addiction Overview'
+description: 'Understanding addiction and its impact on mental health'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

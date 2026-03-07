@@ -4,4 +4,4 @@ export {
   AccordionItem,
   AccordionTrigger,
   AccordionContent,
-} from "./accordion";
+} from './accordion'

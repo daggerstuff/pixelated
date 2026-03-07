@@ -1,10 +1,10 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 // Production configuration schema
 export const ProductionConfigSchema = z.object({
   // Router configuration
   router: z.object({
-    defaultTargetAnalyzer: z.string().default("general_mental_health"),
+    defaultTargetAnalyzer: z.string().default('general_mental_health'),
     defaultConfidence: z.number().min(0).max(1).default(0.1),
     maxRetries: z.number().min(1).max(10).default(3),
     llmTimeoutMs: z.number().min(1000).max(300000).default(45000),
@@ -65,14 +65,14 @@ export const ProductionConfigSchema = z.object({
       .default(60000),
     enableDetailedLogging: z.boolean().default(false), // Only enable in staging
   }),
-});
+})
 
-export type ProductionConfig = z.infer<typeof ProductionConfigSchema>;
+export type ProductionConfig = z.infer<typeof ProductionConfigSchema>
 
 // Default production configuration
 export const DEFAULT_PRODUCTION_CONFIG: ProductionConfig = {
   router: {
-    defaultTargetAnalyzer: "general_mental_health",
+    defaultTargetAnalyzer: 'general_mental_health',
     defaultConfidence: 0.1,
     maxRetries: 3,
     llmTimeoutMs: 45000,
@@ -114,6 +114,6 @@ export const DEFAULT_PRODUCTION_CONFIG: ProductionConfig = {
     enablePerformanceTracking: true,
     metricsCollectionIntervalMs: 60000,
     enableDetailedLogging:
-      typeof process !== "undefined" && process.env.NODE_ENV !== "production",
+      typeof process !== 'undefined' && process.env.NODE_ENV !== 'production',
   },
-};
+}

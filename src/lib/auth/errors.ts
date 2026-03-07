@@ -11,9 +11,9 @@ export class AuthenticationError extends Error {
     message: string,
     public code?: string,
   ) {
-    super(message);
-    this.name = "AuthenticationError";
-    Error.captureStackTrace(this, AuthenticationError);
+    super(message)
+    this.name = 'AuthenticationError'
+    Error.captureStackTrace(this, AuthenticationError)
   }
 }
 
@@ -25,8 +25,8 @@ export class TokenValidationError extends AuthenticationError {
     message: string,
     public reason: TokenValidationReason,
   ) {
-    super(message, "TOKEN_VALIDATION_FAILED");
-    this.name = "TokenValidationError";
+    super(message, 'TOKEN_VALIDATION_FAILED')
+    this.name = 'TokenValidationError'
   }
 }
 
@@ -34,9 +34,9 @@ export class TokenValidationError extends AuthenticationError {
  * Token expiration error
  */
 export class TokenExpiredError extends TokenValidationError {
-  constructor(message: string = "Token has expired") {
-    super(message, "EXPIRED");
-    this.name = "TokenExpiredError";
+  constructor(message: string = 'Token has expired') {
+    super(message, 'EXPIRED')
+    this.name = 'TokenExpiredError'
   }
 }
 
@@ -44,9 +44,9 @@ export class TokenExpiredError extends TokenValidationError {
  * Token revocation error
  */
 export class TokenRevokedError extends TokenValidationError {
-  constructor(message: string = "Token has been revoked") {
-    super(message, "REVOKED");
-    this.name = "TokenRevokedError";
+  constructor(message: string = 'Token has been revoked') {
+    super(message, 'REVOKED')
+    this.name = 'TokenRevokedError'
   }
 }
 
@@ -54,9 +54,9 @@ export class TokenRevokedError extends TokenValidationError {
  * Invalid token format or signature error
  */
 export class InvalidTokenError extends TokenValidationError {
-  constructor(message: string = "Invalid token format or signature") {
-    super(message, "INVALID_FORMAT");
-    this.name = "InvalidTokenError";
+  constructor(message: string = 'Invalid token format or signature') {
+    super(message, 'INVALID_FORMAT')
+    this.name = 'InvalidTokenError'
   }
 }
 
@@ -67,9 +67,9 @@ export class TokenTypeMismatchError extends TokenValidationError {
   constructor(expected: string, actual: string) {
     super(
       `Invalid token type: expected ${expected}, got ${actual}`,
-      "TYPE_MISMATCH",
-    );
-    this.name = "TokenTypeMismatchError";
+      'TYPE_MISMATCH',
+    )
+    this.name = 'TokenTypeMismatchError'
   }
 }
 
@@ -78,8 +78,8 @@ export class TokenTypeMismatchError extends TokenValidationError {
  */
 export class SessionContextError extends TokenValidationError {
   constructor(message: string) {
-    super(message, "SESSION_CONTEXT_INVALID");
-    this.name = "SessionContextError";
+    super(message, 'SESSION_CONTEXT_INVALID')
+    this.name = 'SessionContextError'
   }
 }
 
@@ -87,9 +87,9 @@ export class SessionContextError extends TokenValidationError {
  * Replay attack detection error
  */
 export class ReplayAttackError extends TokenValidationError {
-  constructor(message: string = "Potential replay attack detected") {
-    super(message, "REPLAY_ATTACK");
-    this.name = "ReplayAttackError";
+  constructor(message: string = 'Potential replay attack detected') {
+    super(message, 'REPLAY_ATTACK')
+    this.name = 'ReplayAttackError'
   }
 }
 
@@ -98,8 +98,8 @@ export class ReplayAttackError extends TokenValidationError {
  */
 export class ConfigurationError extends AuthenticationError {
   constructor(message: string) {
-    super(message, "CONFIGURATION_ERROR");
-    this.name = "ConfigurationError";
+    super(message, 'CONFIGURATION_ERROR')
+    this.name = 'ConfigurationError'
   }
 }
 
@@ -108,13 +108,13 @@ export class ConfigurationError extends AuthenticationError {
  */
 export class RateLimitError extends AuthenticationError {
   constructor(
-    message: string = "Rate limit exceeded",
+    message: string = 'Rate limit exceeded',
     public retryAfter?: number,
     public limit?: number,
     public window?: number,
   ) {
-    super(message, "RATE_LIMIT_EXCEEDED");
-    this.name = "RateLimitError";
+    super(message, 'RATE_LIMIT_EXCEEDED')
+    this.name = 'RateLimitError'
   }
 }
 
@@ -123,13 +123,13 @@ export class RateLimitError extends AuthenticationError {
  */
 export class PermissionDeniedError extends AuthenticationError {
   constructor(
-    message: string = "Insufficient permissions",
+    message: string = 'Insufficient permissions',
     public requiredRole?: string,
     public userRole?: string,
     public requiredPermission?: string,
   ) {
-    super(message, "PERMISSION_DENIED");
-    this.name = "PermissionDeniedError";
+    super(message, 'PERMISSION_DENIED')
+    this.name = 'PermissionDeniedError'
   }
 }
 
@@ -142,8 +142,8 @@ export class AccountSecurityError extends AuthenticationError {
     public reason: AccountSecurityReason,
     public userId?: string,
   ) {
-    super(message, "ACCOUNT_SECURITY_VIOLATION");
-    this.name = "AccountSecurityError";
+    super(message, 'ACCOUNT_SECURITY_VIOLATION')
+    this.name = 'AccountSecurityError'
   }
 }
 
@@ -151,28 +151,28 @@ export class AccountSecurityError extends AuthenticationError {
  * Token validation failure reasons
  */
 export enum TokenValidationReason {
-  EXPIRED = "EXPIRED",
-  REVOKED = "REVOKED",
-  INVALID_FORMAT = "INVALID_FORMAT",
-  TYPE_MISMATCH = "TYPE_MISMATCH",
-  SESSION_CONTEXT_INVALID = "SESSION_CONTEXT_INVALID",
-  REPLAY_ATTACK = "REPLAY_ATTACK",
-  METADATA_NOT_FOUND = "METADATA_NOT_FOUND",
-  SIGNATURE_INVALID = "SIGNATURE_INVALID",
-  AUDIENCE_INVALID = "AUDIENCE_INVALID",
-  ISSUER_INVALID = "ISSUER_INVALID",
+  EXPIRED = 'EXPIRED',
+  REVOKED = 'REVOKED',
+  INVALID_FORMAT = 'INVALID_FORMAT',
+  TYPE_MISMATCH = 'TYPE_MISMATCH',
+  SESSION_CONTEXT_INVALID = 'SESSION_CONTEXT_INVALID',
+  REPLAY_ATTACK = 'REPLAY_ATTACK',
+  METADATA_NOT_FOUND = 'METADATA_NOT_FOUND',
+  SIGNATURE_INVALID = 'SIGNATURE_INVALID',
+  AUDIENCE_INVALID = 'AUDIENCE_INVALID',
+  ISSUER_INVALID = 'ISSUER_INVALID',
 }
 
 /**
  * Account security violation reasons
  */
 export enum AccountSecurityReason {
-  ACCOUNT_LOCKED = "ACCOUNT_LOCKED",
-  ACCOUNT_SUSPENDED = "ACCOUNT_SUSPENDED",
-  MFA_REQUIRED = "MFA_REQUIRED",
-  PASSWORD_EXPIRED = "PASSWORD_EXPIRED",
-  TOO_MANY_FAILED_ATTEMPTS = "TOO_MANY_FAILED_ATTEMPTS",
-  SUSPICIOUS_ACTIVITY = "SUSPICIOUS_ACTIVITY",
+  ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
+  ACCOUNT_SUSPENDED = 'ACCOUNT_SUSPENDED',
+  MFA_REQUIRED = 'MFA_REQUIRED',
+  PASSWORD_EXPIRED = 'PASSWORD_EXPIRED',
+  TOO_MANY_FAILED_ATTEMPTS = 'TOO_MANY_FAILED_ATTEMPTS',
+  SUSPICIOUS_ACTIVITY = 'SUSPICIOUS_ACTIVITY',
 }
 
 /**
@@ -183,27 +183,27 @@ export class ErrorResponseFormatter {
    * Format authentication error for API response
    */
   static formatAuthenticationError(error: AuthenticationError): {
-    error: string;
-    message: string;
-    code?: string;
-    details?: Record<string, unknown>;
+    error: string
+    message: string
+    code?: string
+    details?: Record<string, unknown>
   } {
     const response: {
-      error: string;
-      message: string;
-      code?: string;
-      details?: Record<string, unknown>;
+      error: string
+      message: string
+      code?: string
+      details?: Record<string, unknown>
     } = {
       error: error.name,
       message: error.message,
       code: error.code,
-    };
+    }
 
     // Add specific details based on error type
     if (error instanceof TokenValidationError) {
       response.details = {
         reason: error.reason,
-      };
+      }
     }
 
     if (error instanceof RateLimitError) {
@@ -211,7 +211,7 @@ export class ErrorResponseFormatter {
         retryAfter: error.retryAfter,
         limit: error.limit,
         window: error.window,
-      };
+      }
     }
 
     if (error instanceof PermissionDeniedError) {
@@ -219,17 +219,17 @@ export class ErrorResponseFormatter {
         requiredRole: error.requiredRole,
         userRole: error.userRole,
         requiredPermission: error.requiredPermission,
-      };
+      }
     }
 
     if (error instanceof AccountSecurityError) {
       response.details = {
         reason: error.reason,
         userId: error.userId,
-      };
+      }
     }
 
-    return response;
+    return response
   }
 
   /**
@@ -239,14 +239,14 @@ export class ErrorResponseFormatter {
     error: AuthenticationError,
     statusCode: number = 401,
   ): {
-    statusCode: number;
+    statusCode: number
     body: {
-      error: string;
-      message: string;
-      code?: string;
-      details?: Record<string, unknown>;
-      timestamp: string;
-    };
+      error: string
+      message: string
+      code?: string
+      details?: Record<string, unknown>
+      timestamp: string
+    }
   } {
     return {
       statusCode,
@@ -254,7 +254,7 @@ export class ErrorResponseFormatter {
         ...this.formatAuthenticationError(error),
         timestamp: new Date().toISOString(),
       },
-    };
+    }
   }
 }
 
@@ -266,43 +266,43 @@ export class AuthenticationErrorHandler {
    * Handle authentication error and return appropriate response
    */
   static handleError(error: unknown): {
-    statusCode: number;
-    body: Record<string, unknown>;
+    statusCode: number
+    body: Record<string, unknown>
   } {
     if (error instanceof AuthenticationError) {
       if (error instanceof TokenExpiredError) {
-        return ErrorResponseFormatter.createHTTPErrorResponse(error, 401);
+        return ErrorResponseFormatter.createHTTPErrorResponse(error, 401)
       }
 
       if (error instanceof TokenRevokedError) {
-        return ErrorResponseFormatter.createHTTPErrorResponse(error, 401);
+        return ErrorResponseFormatter.createHTTPErrorResponse(error, 401)
       }
 
       if (error instanceof RateLimitError) {
-        return ErrorResponseFormatter.createHTTPErrorResponse(error, 429);
+        return ErrorResponseFormatter.createHTTPErrorResponse(error, 429)
       }
 
       if (error instanceof PermissionDeniedError) {
-        return ErrorResponseFormatter.createHTTPErrorResponse(error, 403);
+        return ErrorResponseFormatter.createHTTPErrorResponse(error, 403)
       }
 
       if (error instanceof AccountSecurityError) {
-        return ErrorResponseFormatter.createHTTPErrorResponse(error, 403);
+        return ErrorResponseFormatter.createHTTPErrorResponse(error, 403)
       }
 
       // Default authentication error
-      return ErrorResponseFormatter.createHTTPErrorResponse(error, 401);
+      return ErrorResponseFormatter.createHTTPErrorResponse(error, 401)
     }
 
     // Unknown error
     return {
       statusCode: 500,
       body: {
-        error: "InternalServerError",
-        message: "An unexpected error occurred",
+        error: 'InternalServerError',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       },
-    };
+    }
   }
 }
 
@@ -316,12 +316,12 @@ export class AuthenticationErrorLogger {
   static logError(
     error: AuthenticationError,
     context: {
-      userId?: string;
-      ipAddress?: string;
-      userAgent?: string;
-      endpoint?: string;
-      method?: string;
-      requestId?: string;
+      userId?: string
+      ipAddress?: string
+      userAgent?: string
+      endpoint?: string
+      method?: string
+      requestId?: string
     } = {},
   ): void {
     const logData = {
@@ -330,21 +330,21 @@ export class AuthenticationErrorLogger {
       code: error.code,
       context,
       timestamp: new Date().toISOString(),
-    };
+    }
 
     // Log with appropriate level based on error type
     if (
       error instanceof TokenExpiredError ||
       error instanceof TokenRevokedError
     ) {
-      console.warn("Authentication warning:", logData);
+      console.warn('Authentication warning:', logData)
     } else if (
       error instanceof RateLimitError ||
       error instanceof PermissionDeniedError
     ) {
-      console.warn("Security warning:", logData);
+      console.warn('Security warning:', logData)
     } else {
-      console.error("Authentication error:", logData);
+      console.error('Authentication error:', logData)
     }
   }
 
@@ -356,11 +356,11 @@ export class AuthenticationErrorLogger {
     userId: string,
     details: Record<string, unknown> = {},
   ): void {
-    console.info("Security event:", {
+    console.info('Security event:', {
       event,
       userId,
       details,
       timestamp: new Date().toISOString(),
-    });
+    })
   }
 }

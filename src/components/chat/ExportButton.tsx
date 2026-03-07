@@ -5,16 +5,16 @@ import {
   File as IconFile,
   FileType as IconFilePdf,
   Lock as IconLock,
-} from "lucide-react";
-import { useState } from "react";
+} from 'lucide-react'
+import { useState } from 'react'
 
 interface ExportButtonProps {
-  sessionId: string;
-  onExportStart?: () => void;
-  onExportComplete?: (result: unknown) => void;
-  onExportError?: (error: Error) => void;
-  disabled?: boolean;
-  securityLevel?: "standard" | "hipaa" | "maximum";
+  sessionId: string
+  onExportStart?: () => void
+  onExportComplete?: (result: unknown) => void
+  onExportError?: (error: Error) => void
+  disabled?: boolean
+  securityLevel?: 'standard' | 'hipaa' | 'maximum'
 }
 
 export default function ExportButton({
@@ -23,96 +23,94 @@ export default function ExportButton({
   onExportComplete,
   onExportError,
   disabled = false,
-  securityLevel = "hipaa",
+  securityLevel = 'hipaa',
 }: ExportButtonProps) {
-  const [isExporting, setIsExporting] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
-  const [exportFormat, setExportFormat] = useState("json");
-  const [exportError, setExportError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
+  const [exportFormat, setExportFormat] = useState('json')
+  const [exportError, setExportError] = useState<string | null>(null)
 
   // Map security level to encryption mode
   const getEncryptionMode = () => {
     switch (securityLevel) {
-      case "standard":
-        return "standard";
-      case "maximum":
-        return "fhe";
-      case "hipaa":
+      case 'standard':
+        return 'standard'
+      case 'maximum':
+        return 'fhe'
+      case 'hipaa':
       default:
-        return "hipaa";
+        return 'hipaa'
     }
-  };
+  }
 
   const handleExport = async (format: string) => {
     if (disabled || isExporting || !sessionId) {
-      return;
+      return
     }
 
     try {
-      setIsExporting(true);
-      setExportError(null);
-      setExportFormat(format);
-      setShowOptions(false);
+      setIsExporting(true)
+      setExportError(null)
+      setExportFormat(format)
+      setShowOptions(false)
 
       if (onExportStart) {
-        onExportStart();
+        onExportStart()
       }
 
       // Call export API
-      const response = await fetch("/api/export/conversation", {
-        method: "POST",
+      const response = await fetch('/api/export/conversation', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           sessionId,
           format,
           encryptionMode: getEncryptionMode(),
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Export failed");
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Export failed')
       }
 
-      const result = await response.json();
+      const result = await response.json()
 
       // Start download
-      window.location.href = result.downloadUrl;
+      window.location.href = result.downloadUrl
 
       if (onExportComplete) {
-        onExportComplete(result);
+        onExportComplete(result)
       }
     } catch (error: unknown) {
-      console.error("Export error:", error);
+      console.error('Export error:', error)
       setExportError(
         error instanceof Error
           ? String(error)
-          : "Failed to export conversation",
-      );
+          : 'Failed to export conversation',
+      )
 
       if (onExportError) {
-        onExportError(
-          error instanceof Error ? error : new Error(String(error)),
-        );
+        onExportError(error instanceof Error ? error : new Error(String(error)))
       }
     } finally {
-      setIsExporting(false);
+      setIsExporting(false)
     }
-  };
+  }
 
   const renderFormatIcon = (format: string) => {
     switch (format) {
-      case "pdf":
-        return <IconFilePdf className="w-4 h-4 mr-2" />;
-      case "encrypted_archive":
-        return <IconArchive className="w-4 h-4 mr-2" />;
-      case "json":
+      case 'pdf':
+        return <IconFilePdf className="w-4 h-4 mr-2" />
+      case 'encrypted_archive':
+        return <IconArchive className="w-4 h-4 mr-2" />
+      case 'json':
       default:
-        return <IconFile className="w-4 h-4 mr-2" />;
+        return <IconFile className="w-4 h-4 mr-2" />
     }
-  };
+  }
 
   return (
     <div className="relative">
@@ -123,8 +121,8 @@ export default function ExportButton({
           className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-l-md
             ${
               disabled || isExporting
-                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                : "bg-purple-600 hover:bg-purple-700 text-white"
+                ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
           aria-label="Export conversation"
         >
@@ -137,8 +135,8 @@ export default function ExportButton({
           className={`inline-flex items-center px-2 py-2 rounded-r-md border-l border-purple-700
             ${
               disabled || isExporting
-                ? "bg-gray-400 text-gray-700 cursor-not-allowed"
-                : "bg-purple-600 hover:bg-purple-700 text-white"
+                ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
           onClick={() => setShowOptions(!showOptions)}
           disabled={disabled || isExporting}
@@ -153,10 +151,10 @@ export default function ExportButton({
           <div className="py-1" role="menu" aria-orientation="vertical">
             <button
               className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
-              onClick={() => handleExport("json")}
+              onClick={() => handleExport('json')}
               role="menuitem"
             >
-              {renderFormatIcon("json")}
+              {renderFormatIcon('json')}
               <span>JSON (.json)</span>
               <IconLock
                 className="w-3 h-3 ml-auto text-green-400"
@@ -166,10 +164,10 @@ export default function ExportButton({
 
             <button
               className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
-              onClick={() => handleExport("pdf")}
+              onClick={() => handleExport('pdf')}
               role="menuitem"
             >
-              {renderFormatIcon("pdf")}
+              {renderFormatIcon('pdf')}
               <span>PDF Document (.pdf)</span>
               <IconLock
                 className="w-3 h-3 ml-auto text-green-400"
@@ -179,10 +177,10 @@ export default function ExportButton({
 
             <button
               className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
-              onClick={() => handleExport("encrypted_archive")}
+              onClick={() => handleExport('encrypted_archive')}
               role="menuitem"
             >
-              {renderFormatIcon("encrypted_archive")}
+              {renderFormatIcon('encrypted_archive')}
               <span>Secure Archive (.secz)</span>
               <IconLock
                 className="w-3 h-3 ml-auto text-green-400"
@@ -197,5 +195,5 @@ export default function ExportButton({
         <div className="mt-2 text-sm text-red-500">{exportError}</div>
       )}
     </div>
-  );
+  )
 }

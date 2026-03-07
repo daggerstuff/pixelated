@@ -1,18 +1,18 @@
 /* Font loading fix */
 @font-face {
-  font-family: "Inter";
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("/fonts/inter-regular.woff2") format("woff2");
+  src: url('/fonts/inter-regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: "Inter";
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("/fonts/inter-bold.woff2") format("woff2");
+  src: url('/fonts/inter-bold.woff2') format('woff2');
 }
 
 /* Font fixes and overrides */
@@ -20,8 +20,8 @@
 /* Apply a pixelated/monospace style without relying on missing fonts */
 .font-cute {
   font-family:
-    "DM Mono", "Courier New", "SFMono-Regular", Menlo, Monaco, Consolas,
-    "Liberation Mono", monospace !important;
+    'DM Mono', 'Courier New', 'SFMono-Regular', Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace !important;
   font-weight: 500 !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;

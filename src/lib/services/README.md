@@ -19,34 +19,31 @@ The Cache Service provides a robust multi-layered caching solution designed to o
 #### Basic Cache Operations
 
 ```typescript
-import { getCacheService } from "../services/cacheService";
+import { getCacheService } from '../services/cacheService';
 
 // Get cache service
 const cacheService = getCacheService();
 
 // Set a value
-await cacheService.set("key", "value", 300); // 300s TTL
+await cacheService.set('key', 'value', 300); // 300s TTL
 
 // Get a value
-const value = await cacheService.get<string>("key");
+const value = await cacheService.get<string>('key');
 
 // Delete a value
-await cacheService.delete("key");
+await cacheService.delete('key');
 
 // Clear by prefix
-await cacheService.clearByPrefix("user:123:");
+await cacheService.clearByPrefix('user:123:');
 ```
 
 #### Higher-Order Caching Function
 
 ```typescript
-import { withCache } from "../services/cacheService";
+import { withCache } from '../services/cacheService';
 
 // Original function
-const expensiveOperation = async (
-  id: string,
-  options: any,
-): Promise<Result> => {
+const expensiveOperation = async (id: string, options: any): Promise<Result> => {
   // ... expensive computation or API call
   return result;
 };
@@ -54,12 +51,12 @@ const expensiveOperation = async (
 // Create cached version
 const cachedOperation = withCache(
   expensiveOperation,
-  "prefix:operation",
-  60, // 1 minute TTL
+  'prefix:operation',
+  60 // 1 minute TTL
 );
 
 // Use cached version - automatically handles caching
-const result = await cachedOperation("123", { filters: true });
+const result = await cachedOperation('123', { filters: true });
 ```
 
 ### Cache Keys

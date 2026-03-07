@@ -1,11 +1,11 @@
 interface BreadcrumbItem {
-  name: string;
-  href: string;
-  current?: boolean;
+  name: string
+  href: string
+  current?: boolean
 }
 
 export interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItem[]
 }
 
 export function Breadcrumb({ items }: BreadcrumbProps) {
@@ -30,7 +30,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         {items.map((item, index) => (
           <li
             key={item.href || `breadcrumb-${index}`}
-            aria-current={item.current ? "page" : undefined}
+            aria-current={item.current ? 'page' : undefined}
           >
             <div className="flex items-center">
               <svg
@@ -48,8 +48,8 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
                 href={item.href}
                 className={`ml-1 text-sm font-medium md:ml-2 ${
                   item.current
-                    ? "text-gray-500 dark:text-gray-400"
-                    : "text-purple-600 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400"
+                    ? 'text-gray-500 dark:text-gray-400'
+                    : 'text-purple-600 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400'
                 }`}
               >
                 {item.name}
@@ -59,5 +59,5 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         ))}
       </ol>
     </nav>
-  );
+  )
 }

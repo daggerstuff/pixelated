@@ -1,7 +1,7 @@
 ---
-title: "CPTSD Overview"
-description: "Understanding Complex Post-Traumatic Stress Disorder"
-author: "Dr. Emily Johnson"
+title: 'CPTSD Overview'
+description: 'Understanding Complex Post-Traumatic Stress Disorder'
+author: 'Dr. Emily Johnson'
 pubDate: 2024-02-25
 ---
 

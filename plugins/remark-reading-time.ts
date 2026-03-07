@@ -1,7 +1,7 @@
-import { toString } from "mdast-util-to-string";
-import getReadingTime from "reading-time";
-import type { Root } from "mdast";
-import type { VFile } from "vfile";
+import { toString } from 'mdast-util-to-string'
+import getReadingTime from 'reading-time'
+import type { Root } from 'mdast'
+import type { VFile } from 'vfile'
 
 /**
  * Used to add a reading time property to the frontmatter of your Markdown or MDX files.
@@ -11,20 +11,20 @@ import type { VFile } from "vfile";
 function remarkReadingTime() {
   //
   return (tree: Root, file: VFile) => {
-    const frontmatter = file.data.astro?.frontmatter;
+    const frontmatter = file.data.astro?.frontmatter
     if (
       !frontmatter ||
-      frontmatter["minutesRead"] ||
-      frontmatter["minutesRead"] === 0
+      frontmatter['minutesRead'] ||
+      frontmatter['minutesRead'] === 0
     ) {
-      return;
+      return
     }
 
-    const textOnPage = toString(tree);
-    const readingTime = getReadingTime(textOnPage);
+    const textOnPage = toString(tree)
+    const readingTime = getReadingTime(textOnPage)
 
-    frontmatter["minutesRead"] = Math.max(1, Math.round(readingTime.minutes));
-  };
+    frontmatter['minutesRead'] = Math.max(1, Math.round(readingTime.minutes))
+  }
 }
 
-export default remarkReadingTime;
+export default remarkReadingTime

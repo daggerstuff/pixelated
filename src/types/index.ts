@@ -2,17 +2,17 @@
  * Enhanced type definitions for the application with strict typing
  */
 
-import type { StrictRequired, Brand } from "./utility";
+import type { StrictRequired, Brand } from './utility'
 
 // ============================================================================
 // BRANDED TYPES FOR TYPE SAFETY
 // ============================================================================
 
 /** Branded string types for enhanced type safety */
-export type UserId = Brand<string, "UserId">;
-export type SessionId = Brand<string, "SessionId">;
-export type ComponentId = Brand<string, "ComponentId">;
-export type RouteSlug = Brand<string, "RouteSlug">;
+export type UserId = Brand<string, 'UserId'>
+export type SessionId = Brand<string, 'SessionId'>
+export type ComponentId = Brand<string, 'ComponentId'>
+export type RouteSlug = Brand<string, 'RouteSlug'>
 
 // ============================================================================
 // LAYOUT TYPES
@@ -20,35 +20,35 @@ export type RouteSlug = Brand<string, "RouteSlug">;
 
 /** Background types for the layout with strict enum */
 export type BgType =
-  | "default"
-  | "plum"
-  | "gradient"
-  | "pulse"
-  | "light"
-  | "dark"
-  | "stars"
-  | "dot"
-  | "rose"
-  | "particle"
-  | "animated";
+  | 'default'
+  | 'plum'
+  | 'gradient'
+  | 'pulse'
+  | 'light'
+  | 'dark'
+  | 'stars'
+  | 'dot'
+  | 'rose'
+  | 'particle'
+  | 'animated'
 
 /** Strict validation for background types */
 export const isBgType = (value: string): value is BgType => {
   const validTypes: readonly BgType[] = [
-    "default",
-    "plum",
-    "gradient",
-    "pulse",
-    "light",
-    "dark",
-    "stars",
-    "dot",
-    "rose",
-    "particle",
-    "animated",
-  ] as const;
-  return validTypes.includes(value as BgType);
-};
+    'default',
+    'plum',
+    'gradient',
+    'pulse',
+    'light',
+    'dark',
+    'stars',
+    'dot',
+    'rose',
+    'particle',
+    'animated',
+  ] as const
+  return validTypes.includes(value as BgType)
+}
 
 // ============================================================================
 // NAVIGATION TYPES
@@ -56,30 +56,30 @@ export const isBgType = (value: string): value is BgType => {
 
 /** Enhanced navigation bar layout with strict typing */
 export type NavBarLayout = StrictRequired<{
-  left: readonly NavItem[];
-  right: readonly NavItem[];
-  mergeOnMobile: boolean;
-}>;
+  left: readonly NavItem[]
+  right: readonly NavItem[]
+  mergeOnMobile: boolean
+}>
 
 /** Strict navigation item definition */
 export type NavItem = {
-  name: string;
-  link: string;
-  icon: string | null;
-  desc: string | null;
-  isExternal: boolean;
-  ariaLabel: string;
-};
+  name: string
+  link: string
+  icon: string | null
+  desc: string | null
+  isExternal: boolean
+  ariaLabel: string
+}
 
 /** Navigation item creation helper with defaults */
 export type NavItemInput = {
-  name: string;
-  link: string;
-  icon?: string;
-  desc?: string;
-  isExternal?: boolean;
-  ariaLabel?: string;
-};
+  name: string
+  link: string
+  icon?: string
+  desc?: string
+  isExternal?: boolean
+  ariaLabel?: string
+}
 
 /** Helper function to create properly typed navigation items */
 export const createNavItem = (input: NavItemInput): NavItem => ({
@@ -89,7 +89,7 @@ export const createNavItem = (input: NavItemInput): NavItem => ({
   desc: input.desc || null,
   isExternal: input.isExternal ?? false,
   ariaLabel: input.ariaLabel ?? input.name,
-});
+})
 
 // ============================================================================
 // COMPONENT PROPS TYPES
@@ -97,38 +97,38 @@ export const createNavItem = (input: NavItemInput): NavItem => ({
 
 /** Base props that all components should accept */
 export type BaseComponentProps = {
-  readonly id?: ComponentId;
-  readonly className?: string;
-  readonly "data-testid"?: string;
-  readonly "aria-label"?: string;
-};
+  readonly 'id'?: ComponentId
+  readonly 'className'?: string
+  readonly 'data-testid'?: string
+  readonly 'aria-label'?: string
+}
 
 /** Props for components that can be disabled */
 export type DisableableProps = {
-  readonly disabled?: boolean;
-  readonly "aria-disabled"?: boolean;
-};
+  readonly 'disabled'?: boolean
+  readonly 'aria-disabled'?: boolean
+}
 
 /** Props for components with loading states */
 export type LoadingProps = {
-  readonly loading?: boolean;
-  readonly "aria-busy"?: boolean;
-};
+  readonly 'loading'?: boolean
+  readonly 'aria-busy'?: boolean
+}
 
 /** Combined interactive component props */
 export type InteractiveComponentProps = BaseComponentProps &
   DisableableProps &
-  LoadingProps;
+  LoadingProps
 
 // ============================================================================
 // RESPONSIVE DESIGN TYPES
 // ============================================================================
 
 /** Strict breakpoint definitions */
-export type Breakpoint = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
 /** Responsive value type for properties that can vary by breakpoint */
-export type ResponsiveValue<T> = T | Partial<Record<Breakpoint, T>>;
+export type ResponsiveValue<T> = T | Partial<Record<Breakpoint, T>>
 
 /** Helper to create responsive values */
 export const createResponsiveValue = <T>(
@@ -136,10 +136,10 @@ export const createResponsiveValue = <T>(
   breakpointValues?: Partial<Record<Breakpoint, T>>,
 ): ResponsiveValue<T> => {
   if (!breakpointValues) {
-    return defaultValue;
+    return defaultValue
   }
-  return { ...breakpointValues };
-};
+  return { ...breakpointValues }
+}
 
 // ============================================================================
 // ACCESSIBILITY TYPES
@@ -147,81 +147,81 @@ export const createResponsiveValue = <T>(
 
 /** ARIA role definitions with strict typing */
 export type AriaRole =
-  | "button"
-  | "link"
-  | "menu"
-  | "menuitem"
-  | "menubar"
-  | "navigation"
-  | "main"
-  | "banner"
-  | "contentinfo"
-  | "complementary"
-  | "search"
-  | "form"
-  | "dialog"
-  | "alert"
-  | "alertdialog"
-  | "status"
-  | "log";
+  | 'button'
+  | 'link'
+  | 'menu'
+  | 'menuitem'
+  | 'menubar'
+  | 'navigation'
+  | 'main'
+  | 'banner'
+  | 'contentinfo'
+  | 'complementary'
+  | 'search'
+  | 'form'
+  | 'dialog'
+  | 'alert'
+  | 'alertdialog'
+  | 'status'
+  | 'log'
 
 /** Accessibility props for interactive elements */
 export type AccessibilityProps = {
-  readonly role?: AriaRole;
-  readonly "aria-label"?: string;
-  readonly "aria-labelledby"?: string;
-  readonly "aria-describedby"?: string;
-  readonly "aria-expanded"?: boolean;
-  readonly "aria-haspopup"?:
+  readonly 'role'?: AriaRole
+  readonly 'aria-label'?: string
+  readonly 'aria-labelledby'?: string
+  readonly 'aria-describedby'?: string
+  readonly 'aria-expanded'?: boolean
+  readonly 'aria-haspopup'?:
     | boolean
-    | "menu"
-    | "listbox"
-    | "tree"
-    | "grid"
-    | "dialog";
-  readonly "aria-hidden"?: boolean;
-  readonly tabIndex?: number;
-};
+    | 'menu'
+    | 'listbox'
+    | 'tree'
+    | 'grid'
+    | 'dialog'
+  readonly 'aria-hidden'?: boolean
+  readonly 'tabIndex'?: number
+}
 
 // ============================================================================
 // THEME TYPES
 // ============================================================================
 
 /** Strict theme mode definition */
-export type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = 'light' | 'dark' | 'system'
 
 /** Color scheme with strict typing */
-export type ColorScheme = "light" | "dark";
+export type ColorScheme = 'light' | 'dark'
 
 /** Theme configuration */
 export type ThemeConfig = StrictRequired<{
-  mode: ThemeMode;
-  colorScheme: ColorScheme;
-  highContrast: boolean;
-  reducedMotion: boolean;
-}>;
+  mode: ThemeMode
+  colorScheme: ColorScheme
+  highContrast: boolean
+  reducedMotion: boolean
+}>
 
 // ============================================================================
 // TYPE COMPATIBILITY & LEGACY SUPPORT
 // ============================================================================
 
 /** For backward compatibility - will be deprecated */
-export type InternalNav = NavItem;
-export type SocialLink = NavItem;
+export type InternalNav = NavItem
+export type SocialLink = NavItem
 
 // ============================================================================
 // RE-EXPORTS
 // ============================================================================
 
 // Enhanced utility types
-export * from "./utility";
+export * from './utility'
 
 // Domain-specific types
-export * from "./auth";
-export * from "./chat";
-export * from "./user";
-export * from "./analytics";
-export * from "./treatment";
+export * from './auth'
+export * from './chat'
+export * from './user'
+export * from './analytics'
+export * from './treatment'
 
 // ============================================================================
 // TYPE GUARDS
@@ -229,27 +229,27 @@ export * from "./treatment";
 
 /** Type guard for navigation items */
 export const isNavItem = (value: unknown): value is NavItem => {
-  if (typeof value !== "object" || value === null) {
-    return false;
+  if (typeof value !== 'object' || value === null) {
+    return false
   }
-  const item = value as Record<string, unknown>;
+  const item = value as Record<string, unknown>
 
   return (
-    typeof item["name"] === "string" &&
-    typeof item["link"] === "string" &&
-    (item["icon"] === null || typeof item["icon"] === "string") &&
-    (item["desc"] === null || typeof item["desc"] === "string") &&
-    typeof item["isExternal"] === "boolean" &&
-    typeof item["ariaLabel"] === "string"
-  );
-};
+    typeof item['name'] === 'string' &&
+    typeof item['link'] === 'string' &&
+    (item['icon'] === null || typeof item['icon'] === 'string') &&
+    (item['desc'] === null || typeof item['desc'] === 'string') &&
+    typeof item['isExternal'] === 'boolean' &&
+    typeof item['ariaLabel'] === 'string'
+  )
+}
 
 /** Type guard for theme mode */
 export const isThemeMode = (value: string): value is ThemeMode => {
-  return ["light", "dark", "system"].includes(value);
-};
+  return ['light', 'dark', 'system'].includes(value)
+}
 
 /** Type guard for breakpoint */
 export const isBreakpoint = (value: string): value is Breakpoint => {
-  return ["xs", "sm", "md", "lg", "xl", "2xl"].includes(value);
-};
+  return ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].includes(value)
+}

@@ -1,51 +1,51 @@
-import { createBuildSafeLogger } from "./logging/build-safe-logger";
+import { createBuildSafeLogger } from './logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("EmailService");
+const logger = createBuildSafeLogger('EmailService')
 
 export interface EmailConfig {
-  provider: "smtp" | "sendgrid" | "aws-ses" | "resend";
-  apiKey?: string;
-  smtpHost?: string;
-  smtpPort?: number;
-  smtpUser?: string;
-  smtpPassword?: string;
-  fromEmail: string;
-  fromName: string;
+  provider: 'smtp' | 'sendgrid' | 'aws-ses' | 'resend'
+  apiKey?: string
+  smtpHost?: string
+  smtpPort?: number
+  smtpUser?: string
+  smtpPassword?: string
+  fromEmail: string
+  fromName: string
 }
 
 export interface EmailMessage {
-  to: string | string[];
-  cc?: string | string[];
-  bcc?: string | string[];
-  subject: string;
-  htmlContent?: string;
-  textContent?: string;
-  attachments?: EmailAttachment[];
+  to: string | string[]
+  cc?: string | string[]
+  bcc?: string | string[]
+  subject: string
+  htmlContent?: string
+  textContent?: string
+  attachments?: EmailAttachment[]
 }
 
 export interface EmailAttachment {
-  filename: string;
-  content: string | Buffer;
-  contentType: string;
-  encoding?: "base64" | "binary";
+  filename: string
+  content: string | Buffer
+  contentType: string
+  encoding?: 'base64' | 'binary'
 }
 
 export interface EmailResult {
-  success: boolean;
-  messageId?: string;
-  error?: string;
-  provider: string;
+  success: boolean
+  messageId?: string
+  error?: string
+  provider: string
 }
 
 /**
  * Email Service for sending notifications and communications
  */
 export class EmailService {
-  private config: EmailConfig;
+  private config: EmailConfig
 
   constructor(config: EmailConfig) {
-    this.config = config;
-    logger.info("EmailService initialized", { provider: config.provider });
+    this.config = config
+    logger.info('EmailService initialized', { provider: config.provider })
   }
 
   /**
@@ -53,41 +53,41 @@ export class EmailService {
    */
   async sendEmail(message: EmailMessage): Promise<EmailResult> {
     try {
-      logger.debug("Sending email", {
+      logger.debug('Sending email', {
         to: message.to,
         subject: message.subject,
         provider: this.config.provider,
-      });
+      })
 
       // In production, this would integrate with actual email providers
       // For now, we'll simulate sending
-      await this.simulateEmailSend(message);
+      await this.simulateEmailSend(message)
 
-      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-      logger.info("Email sent successfully", {
+      logger.info('Email sent successfully', {
         messageId,
         to: message.to,
         provider: this.config.provider,
-      });
+      })
 
       return {
         success: true,
         messageId,
         provider: this.config.provider,
-      };
+      }
     } catch (error: unknown) {
-      logger.error("Failed to send email", {
+      logger.error('Failed to send email', {
         error,
         to: message.to,
         subject: message.subject,
-      });
+      })
 
       return {
         success: false,
         error: `Email send failed: ${error}`,
         provider: this.config.provider,
-      };
+      }
     }
   }
 
@@ -97,14 +97,14 @@ export class EmailService {
   async sendBreachNotification(
     recipients: string[],
     breachDetails: {
-      type: string;
-      severity: "low" | "medium" | "high" | "critical";
-      affectedUsers: number;
-      detectedAt: Date;
-      description: string;
+      type: string
+      severity: 'low' | 'medium' | 'high' | 'critical'
+      affectedUsers: number
+      detectedAt: Date
+      description: string
     },
   ): Promise<EmailResult> {
-    const subject = `SECURITY ALERT: ${breachDetails.type} Detected`;
+    const subject = `SECURITY ALERT: ${breachDetails.type} Detected`
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -157,14 +157,14 @@ export class EmailService {
           </p>
         </div>
       </div>
-    `;
+    `
 
     return this.sendEmail({
       to: recipients,
       subject,
       htmlContent,
       textContent: this.stripHtml(htmlContent),
-    });
+    })
   }
 
   /**
@@ -173,12 +173,12 @@ export class EmailService {
   async sendPatientDeletionConfirmation(
     patientEmail: string,
     deletionDetails: {
-      requestId: string;
-      scheduledDate: Date;
-      dataTypes: string[];
+      requestId: string
+      scheduledDate: Date
+      dataTypes: string[]
     },
   ): Promise<EmailResult> {
-    const subject = "Data Deletion Request Confirmation";
+    const subject = 'Data Deletion Request Confirmation'
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -205,7 +205,7 @@ export class EmailService {
 
           <h3>Data Types to be Deleted</h3>
           <ul>
-            ${deletionDetails.dataTypes.map((type) => `<li>${type}</li>`).join("")}
+            ${deletionDetails.dataTypes.map((type) => `<li>${type}</li>`).join('')}
           </ul>
 
           <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
@@ -217,87 +217,87 @@ export class EmailService {
           <p>Best regards,<br>Pixelated Mental Health Platform Team</p>
         </div>
       </div>
-    `;
+    `
 
     return this.sendEmail({
       to: patientEmail,
       subject,
       htmlContent,
       textContent: this.stripHtml(htmlContent),
-    });
+    })
   }
 
   private async simulateEmailSend(message: EmailMessage): Promise<void> {
     // Simulate network delay
     await new Promise((resolve) =>
       setTimeout(resolve, 100 + Math.random() * 200),
-    );
+    )
 
     // Log the message being sent (in dev mode)
-    logger.debug("Simulating email send", {
+    logger.debug('Simulating email send', {
       to: message.to,
       subject: message.subject,
-    });
+    })
 
     // Simulate occasional failures (5% failure rate)
     if (Math.random() < 0.05) {
-      throw new Error("Simulated email provider error");
+      throw new Error('Simulated email provider error')
     }
   }
 
   private getSeverityColor(severity: string): string {
     switch (severity) {
-      case "critical":
-        return "#dc3545";
-      case "high":
-        return "#fd7e14";
-      case "medium":
-        return "#ffc107";
-      case "low":
-        return "#28a745";
+      case 'critical':
+        return '#dc3545'
+      case 'high':
+        return '#fd7e14'
+      case 'medium':
+        return '#ffc107'
+      case 'low':
+        return '#28a745'
       default:
-        return "#6c757d";
+        return '#6c757d'
     }
   }
 
   private stripHtml(html: string): string {
     return html
-      .replace(/<[^>]*>/g, "")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&amp;/g, "&")
-      .trim();
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .trim()
   }
 
   /**
    * Upsert an email template
    */
   async upsertTemplate(template: {
-    alias: string;
-    subject: string;
-    htmlBody: string;
-    from: string;
+    alias: string
+    subject: string
+    htmlBody: string
+    from: string
   }): Promise<void> {
     // In a real implementation, this would store the template in a database
     // For now, we'll just log it
-    logger.info("Email template upserted", { alias: template.alias });
+    logger.info('Email template upserted', { alias: template.alias })
   }
 
   /**
    * Queue an email for sending
    */
   async queueEmail(email: {
-    to: string;
-    templateAlias: string;
-    templateModel: Record<string, unknown>;
+    to: string
+    templateAlias: string
+    templateModel: Record<string, unknown>
   }): Promise<void> {
     // In a real implementation, this would queue the email for processing
     // For now, we'll simulate sending it immediately
-    logger.info("Email queued", {
+    logger.info('Email queued', {
       to: email.to,
       templateAlias: email.templateAlias,
-    });
+    })
 
     // Simulate immediate sending
     await this.sendEmail({
@@ -305,17 +305,17 @@ export class EmailService {
       subject: `Template: ${email.templateAlias}`,
       htmlContent: `<p>Template: ${email.templateAlias}</p><pre>${JSON.stringify(email.templateModel, null, 2)}</pre>`,
       textContent: `Template: ${email.templateAlias}\n${JSON.stringify(email.templateModel, null, 2)}`,
-    });
+    })
   }
 
   async startProcessing(interval: number): Promise<void> {
-    logger.info("Email processing started", { interval });
+    logger.info('Email processing started', { interval })
     // In a real implementation, this would start a loop to process the email queue
   }
 }
 
 // Default email service instance
-let emailServiceInstance: EmailService | null = null;
+let emailServiceInstance: EmailService | null = null
 
 /**
  * Get the default email service instance
@@ -323,20 +323,20 @@ let emailServiceInstance: EmailService | null = null;
 export function getEmailService(): EmailService {
   if (!emailServiceInstance) {
     const config: EmailConfig = {
-      provider: "smtp",
-      fromEmail: process.env["FROM_EMAIL"] || "noreply@pixelated.health",
-      fromName: process.env["FROM_NAME"] || "Pixelated Mental Health Platform",
-      smtpHost: process.env["SMTP_HOST"],
-      smtpPort: Number.parseInt(process.env["SMTP_PORT"] || "587"),
-      smtpUser: process.env["SMTP_USER"],
-      smtpPassword: process.env["SMTP_PASSWORD"],
-      apiKey: process.env["EMAIL_API_KEY"],
-    };
+      provider: 'smtp',
+      fromEmail: process.env['FROM_EMAIL'] || 'noreply@pixelated.health',
+      fromName: process.env['FROM_NAME'] || 'Pixelated Mental Health Platform',
+      smtpHost: process.env['SMTP_HOST'],
+      smtpPort: Number.parseInt(process.env['SMTP_PORT'] || '587'),
+      smtpUser: process.env['SMTP_USER'],
+      smtpPassword: process.env['SMTP_PASSWORD'],
+      apiKey: process.env['EMAIL_API_KEY'],
+    }
 
-    emailServiceInstance = new EmailService(config);
+    emailServiceInstance = new EmailService(config)
   }
 
-  return emailServiceInstance;
+  return emailServiceInstance
 }
 
 /**
@@ -344,10 +344,10 @@ export function getEmailService(): EmailService {
  */
 export async function sendBreachNotification(
   recipients: string[],
-  breachDetails: Parameters<EmailService["sendBreachNotification"]>[1],
+  breachDetails: Parameters<EmailService['sendBreachNotification']>[1],
 ): Promise<EmailResult> {
-  const emailService = getEmailService();
-  return emailService.sendBreachNotification(recipients, breachDetails);
+  const emailService = getEmailService()
+  return emailService.sendBreachNotification(recipients, breachDetails)
 }
 
 /**
@@ -356,20 +356,20 @@ export async function sendBreachNotification(
 export async function sendPatientDeletionConfirmation(
   patientEmail: string,
   deletionDetails: Parameters<
-    EmailService["sendPatientDeletionConfirmation"]
+    EmailService['sendPatientDeletionConfirmation']
   >[1],
 ): Promise<EmailResult> {
-  const emailService = getEmailService();
+  const emailService = getEmailService()
   return emailService.sendPatientDeletionConfirmation(
     patientEmail,
     deletionDetails,
-  );
+  )
 }
 
 /**
  * Send a generic email using the default email service
  */
 export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
-  const emailService = getEmailService();
-  return emailService.sendEmail(message);
+  const emailService = getEmailService()
+  return emailService.sendEmail(message)
 }

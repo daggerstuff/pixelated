@@ -1,3 +1,4 @@
+
 services:
   # Triton Inference Server with Pixel model
   triton-inference-server:
@@ -21,9 +22,9 @@ services:
 
     # Port mappings
     ports:
-      - "8000:8000" # HTTP
-      - "8001:8001" # gRPC
-      - "8002:8002" # Metrics
+      - "8000:8000"  # HTTP
+      - "8001:8001"  # gRPC
+      - "8002:8002"  # Metrics
 
     # Volume mounts
     volumes:
@@ -49,7 +50,7 @@ services:
               count: 1
               capabilities: [gpu]
         limits:
-          cpus: "4"
+          cpus: '4'
           memory: 16G
 
     # Health check

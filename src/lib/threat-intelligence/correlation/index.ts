@@ -5,5 +5,5 @@
  * and identifying correlations between threats.
  */
 
-export { ThreatCorrelationEngine } from "./ThreatCorrelationEngine";
-export { ThreatCorrelationEngineCore } from "./ThreatCorrelationEngine";
+export { ThreatCorrelationEngine } from './ThreatCorrelationEngine'
+export { ThreatCorrelationEngineCore } from './ThreatCorrelationEngine'

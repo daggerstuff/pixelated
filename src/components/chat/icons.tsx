@@ -1,10 +1,10 @@
 interface IconProps {
-  className?: string;
-  size?: number;
-  strokeWidth?: number;
+  className?: string
+  size?: number
+  strokeWidth?: number
 }
 
-export function IconSend({ className = "h-6 w-6" }: IconProps) {
+export function IconSend({ className = 'h-6 w-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -18,10 +18,10 @@ export function IconSend({ className = "h-6 w-6" }: IconProps) {
     >
       <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
     </svg>
-  );
+  )
 }
 
-export function IconLock({ className = "h-6 w-6" }: IconProps) {
+export function IconLock({ className = 'h-6 w-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -37,10 +37,10 @@ export function IconLock({ className = "h-6 w-6" }: IconProps) {
 
       <path d="M7 11V7a5 5 0 0110 0v4" />
     </svg>
-  );
+  )
 }
 
-export function IconShieldLock({ className = "h-6 w-6" }: IconProps) {
+export function IconShieldLock({ className = 'h-6 w-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -57,10 +57,10 @@ export function IconShieldLock({ className = "h-6 w-6" }: IconProps) {
       <path d="M8 11h8" />
       <path d="M12 15V7" />
     </svg>
-  );
+  )
 }
 
-export function IconUserCircle({ className = "h-6 w-6" }: IconProps) {
+export function IconUserCircle({ className = 'h-6 w-6' }: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@ export function IconUserCircle({ className = "h-6 w-6" }: IconProps) {
       <path d="M12 13a3 3 0 100-6 3 3 0 000 6z" />
       <path d="M6.168 18.849A4 4 0 0112 16h0a4 4 0 015.832 2.849" />
     </svg>
-  );
+  )
 }
 
 export function IconChevronDown(props: IconProps) {
@@ -96,7 +96,7 @@ export function IconChevronDown(props: IconProps) {
     >
       <path d="m6 9 6 6 6-6" />
     </svg>
-  );
+  )
 }
 
 export function IconMaximize(props: IconProps) {
@@ -115,7 +115,7 @@ export function IconMaximize(props: IconProps) {
     >
       <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
     </svg>
-  );
+  )
 }
 
 export function IconMinimize(props: IconProps) {
@@ -134,7 +134,7 @@ export function IconMinimize(props: IconProps) {
     >
       <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
     </svg>
-  );
+  )
 }
 
 export function IconMessage(props: IconProps) {
@@ -153,7 +153,7 @@ export function IconMessage(props: IconProps) {
     >
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
-  );
+  )
 }
 
 export function IconX(props: IconProps) {
@@ -173,7 +173,7 @@ export function IconX(props: IconProps) {
       <line x1="18" y1="6" x2="6" y2="18" />
       <line x1="6" y1="6" x2="18" y2="18" />
     </svg>
-  );
+  )
 }
 
 export function IconBrain(props: IconProps) {
@@ -194,7 +194,7 @@ export function IconBrain(props: IconProps) {
 
       <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54Z" />
     </svg>
-  );
+  )
 }
 
 export function IconUser(props: IconProps) {
@@ -214,13 +214,13 @@ export function IconUser(props: IconProps) {
       <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
-  );
+  )
 }
 
 export const IconMental = ({
-  className = "h-6 w-6",
+  className = 'h-6 w-6',
 }: {
-  className?: string;
+  className?: string
 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -238,12 +238,12 @@ export const IconMental = ({
     <path d="M16 2a4 4 0 0 1 4 4v3a2 2 0 0 1-2 2" />
     <circle cx="12" cy="10" r="2" />
   </svg>
-);
+)
 
 export const IconSettings = ({
-  className = "h-6 w-6",
+  className = 'h-6 w-6',
 }: {
-  className?: string;
+  className?: string
 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -259,4 +259,4 @@ export const IconSettings = ({
 
     <circle cx="12" cy="12" r="3" />
   </svg>
-);
+)

@@ -1,7 +1,7 @@
-import type { APIContext, MiddlewareHandler, MiddlewareNext } from "astro";
+import type { APIContext, MiddlewareHandler, MiddlewareNext } from 'astro'
 
 export interface ExtendedMiddleware extends MiddlewareHandler {
-  (context: APIContext, next: MiddlewareNext): Promise<Response | undefined>;
+  (context: APIContext, next: MiddlewareNext): Promise<Response | undefined>
 }
 
 /**
@@ -13,4 +13,4 @@ export const middlewareSequence = sequence(
   csrfMiddleware,
   securityHeadersMiddleware,
   contentTypeMiddleware,
-);
+)

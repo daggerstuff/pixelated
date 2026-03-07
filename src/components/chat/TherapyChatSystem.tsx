@@ -1,71 +1,71 @@
-import type { Message } from "@/types/chat";
-import type { Scenario } from "@/types/scenarios";
-import { clientScenarios } from "@/data/scenarios";
-import { useStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
-import { useEffect, useState, lazy, Suspense, useCallback } from "react";
+import type { Message } from '@/types/chat'
+import type { Scenario } from '@/types/scenarios'
+import { clientScenarios } from '@/data/scenarios'
+import { useStore } from '@/lib/store'
+import { cn } from '@/lib/utils'
+import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
 // Import this component dynamically for code splitting
-const LazyAnalyticsDashboard = lazy(() => import("./LazyAnalyticsDashboard"));
-import { ChatContainer } from "./ChatContainer";
-import { MentalHealthInsights } from "@/components/MentalHealthInsights";
+const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
+import { ChatContainer } from './ChatContainer'
+import { MentalHealthInsights } from '@/components/MentalHealthInsights'
 import {
   IconChevronDown,
   IconMaximize,
   IconMinimize,
   IconMental,
-} from "./icons";
-import { BarChart as IconChart } from "lucide-react";
+} from './icons'
+import { BarChart as IconChart } from 'lucide-react'
 // Removed unused import: SecurityBadge
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { useAIService } from "@/hooks/useAIService";
-import { useMentalHealthAnalysis } from "@/hooks/useMentalHealthAnalysis";
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import { useAIService } from '@/hooks/useAIService'
+import { useMentalHealthAnalysis } from '@/hooks/useMentalHealthAnalysis'
 import {
   useEmotionDetection,
   type EmotionAnalysis,
-} from "@/hooks/useEmotionDetection";
-import { useRiskAssessment } from "@/hooks/useRiskAssessment";
-import { CognitiveModelSelector } from "./CognitiveModelSelector";
-import { usePatientModel } from "@/hooks/usePatientModel";
-import { loadSampleModels } from "@/lib/utils/load-sample-models";
+} from '@/hooks/useEmotionDetection'
+import { useRiskAssessment } from '@/hooks/useRiskAssessment'
+import { CognitiveModelSelector } from './CognitiveModelSelector'
+import { usePatientModel } from '@/hooks/usePatientModel'
+import { loadSampleModels } from '@/lib/utils/load-sample-models'
 // Import SupervisorFeedback component
-import { SupervisorFeedback } from "@/components/feedback/SupervisorFeedback";
+import { SupervisorFeedback } from '@/components/feedback/SupervisorFeedback'
 
 // Extended Message type with mental health analysis
 interface ExtendedMessage extends Message {
-  mentalHealthAnalysis?: MentalHealthChatAnalysis;
+  mentalHealthAnalysis?: MentalHealthChatAnalysis
 }
 
 // Add the systemMessage property to Scenario for the current code
 interface EnhancedScenario extends Scenario {
-  systemMessage: string;
+  systemMessage: string
 }
 
 // Define MentalHealthChatAnalysis interface if not already defined elsewhere
 interface MentalHealthChatAnalysis {
-  category: "low" | "medium" | "high" | "critical";
-  hasMentalHealthIssue: boolean;
-  confidence: number;
-  explanation: string;
-  supportingEvidence: string[];
-  timestamp: number;
-  expertGuided: boolean;
-  emotions: string[];
-  riskFactors: string[];
+  category: 'low' | 'medium' | 'high' | 'critical'
+  hasMentalHealthIssue: boolean
+  confidence: number
+  explanation: string
+  supportingEvidence: string[]
+  timestamp: number
+  expertGuided: boolean
+  emotions: string[]
+  riskFactors: string[]
 }
 
 // Define InterventionConfig interface if not already defined elsewhere
 interface InterventionConfig {
-  scores: unknown;
-  type: "immediate" | "preventive" | "supportive";
-  requiresExpert: boolean;
-  emotions: EmotionAnalysis;
-  riskFactors: string[];
+  scores: unknown
+  type: 'immediate' | 'preventive' | 'supportive'
+  requiresExpert: boolean
+  emotions: EmotionAnalysis
+  riskFactors: string[]
 }
 
 // Define TherapeuticInterventions interface if not already defined elsewhere
 interface TherapeuticInterventions {
-  generateIntervention: (config: InterventionConfig) => Promise<string>;
+  generateIntervention: (config: InterventionConfig) => Promise<string>
 }
 
 // Define useTherapeuticInterventions hook
@@ -73,10 +73,10 @@ const useTherapeuticInterventions = (): TherapeuticInterventions => {
   return {
     generateIntervention: async (_config: InterventionConfig) => {
       // Simplified implementation
-      return "Consider using validation and reflection techniques to address the client's concerns.";
+      return "Consider using validation and reflection techniques to address the client's concerns."
     },
-  };
-};
+  }
+}
 
 // Loading fallback component
 const LoadingAnalytics = () => (
@@ -87,51 +87,51 @@ const LoadingAnalytics = () => (
       <div className="h-40 bg-green-700/10 rounded"></div>
     </div>
   </div>
-);
+)
 
 // Replace export default function with function for consistency
 function ProfessionalTherapistWorkspace() {
   // State
-  const [messages, setMessages] = useState<ExtendedMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [showScenarios, setShowScenarios] = useState(false);
+  const [messages, setMessages] = useState<ExtendedMessage[]>([])
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [showScenarios, setShowScenarios] = useState(false)
   const [selectedScenario, setSelectedScenario] = useState<EnhancedScenario>(
     () => {
-      const defaultScenario = clientScenarios[0];
+      const defaultScenario = clientScenarios[0]
       if (!defaultScenario) {
         // Fallback scenario if clientScenarios is empty
         return {
-          id: "default",
-          name: "General Therapy Session",
-          description: "A general therapy session with a client",
-          tags: ["general"],
-          difficulty: "beginner" as const,
-          category: "other" as const,
+          id: 'default',
+          name: 'General Therapy Session',
+          description: 'A general therapy session with a client',
+          tags: ['general'],
+          difficulty: 'beginner' as const,
+          category: 'other' as const,
           systemMessage:
-            "You are a professional CBT therapist helping a client.",
-        };
+            'You are a professional CBT therapist helping a client.',
+        }
       }
       return {
-        id: defaultScenario.id || "default",
+        id: defaultScenario.id || 'default',
         name: defaultScenario.name,
         description: defaultScenario.description,
         tags: defaultScenario.tags,
         difficulty: defaultScenario.difficulty,
         category: defaultScenario.category,
-        systemMessage: "You are a professional CBT therapist helping a client.",
-      };
+        systemMessage: 'You are a professional CBT therapist helping a client.',
+      }
     },
-  );
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showMentalHealthPanel, setShowMentalHealthPanel] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  )
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [showMentalHealthPanel, setShowMentalHealthPanel] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showPatientModelSelector, setShowPatientModelSelector] =
-    useState(false);
-  const [usePatientSimulation, setUsePatientSimulation] = useState(false);
+    useState(false)
+  const [usePatientSimulation, setUsePatientSimulation] = useState(false)
   // Add SupervisorFeedback state
-  const [showSupervisorFeedback, setShowSupervisorFeedback] = useState(false);
+  const [showSupervisorFeedback, setShowSupervisorFeedback] = useState(false)
 
   const {
     isLoading: isPatientModelLoading,
@@ -141,67 +141,67 @@ function ProfessionalTherapistWorkspace() {
     selectModel,
     updateStyleConfig,
     generatePatientResponse,
-  } = usePatientModel();
+  } = usePatientModel()
 
-  const { getAIResponse } = useAIService();
-  const { analyzeMessage } = useMentalHealthAnalysis();
-  const { generateIntervention } = useTherapeuticInterventions();
-  const { detectEmotions } = useEmotionDetection();
-  const { assessRisk } = useRiskAssessment();
-  const storeState = useStore();
+  const { getAIResponse } = useAIService()
+  const { analyzeMessage } = useMentalHealthAnalysis()
+  const { generateIntervention } = useTherapeuticInterventions()
+  const { detectEmotions } = useEmotionDetection()
+  const { assessRisk } = useRiskAssessment()
+  const storeState = useStore()
 
   // Initialize mental health chat if not already initialized
   useEffect(() => {
     if (!storeState.mentalHealthChat && storeState.fheService) {
-      storeState.initializeMentalHealthChat();
+      storeState.initializeMentalHealthChat()
     }
-  }, [storeState, storeState.fheService, storeState.mentalHealthChat]);
+  }, [storeState, storeState.fheService, storeState.mentalHealthChat])
 
   // Initialize sample cognitive models
   useEffect(() => {
     // Load sample models if patient simulation is enabled
     if (usePatientSimulation) {
       loadSampleModels().catch((err) => {
-        console.error("Failed to load sample models:", err);
-      });
+        console.error('Failed to load sample models:', err)
+      })
     }
-  }, [usePatientSimulation]);
+  }, [usePatientSimulation])
 
   // Handle scenario change - update to add systemMessage
   const changeScenario = (scenario: Scenario) => {
     setSelectedScenario({
       ...scenario,
       systemMessage: `You are a professional CBT therapist helping a client with ${scenario.name}. ${scenario.description}`,
-    });
-    setShowScenarios(false);
+    })
+    setShowScenarios(false)
     // Add system message for new scenario
     setMessages([
       {
-        role: "system",
+        role: 'system',
         content: `New client case selected: ${scenario.name}. ${scenario.description}`,
-        name: "",
+        name: '',
       } as ExtendedMessage,
-    ]);
-  };
+    ])
+  }
 
   // Handle message submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+    e.preventDefault()
+    setError(null)
 
     if (!input.trim() || isLoading) {
-      return;
+      return
     }
 
     const userMessage: ExtendedMessage = {
-      role: "user",
+      role: 'user',
       content: input,
-      name: "",
-    } as ExtendedMessage;
+      name: '',
+    } as ExtendedMessage
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
+    setMessages((prev) => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
 
     try {
       // Process the message with mental health analysis if available
@@ -210,13 +210,13 @@ function ProfessionalTherapistWorkspace() {
         storeState.mentalHealthAnalysisEnabled
       ) {
         // Detect emotions
-        const emotions = await detectEmotions(input);
+        const emotions = await detectEmotions(input)
 
         // Analyze message for mental health indicators
-        const analysis = await analyzeMessage(input);
+        const analysis = await analyzeMessage(input)
 
         // Assess risk factors
-        const riskAssessment = await assessRisk(input, emotions);
+        const riskAssessment = await assessRisk(input, emotions)
 
         // Combine into mental health analysis
         const mentalHealthAnalysis: MentalHealthChatAnalysis = {
@@ -225,19 +225,19 @@ function ProfessionalTherapistWorkspace() {
           confidence: analysis.confidence,
           explanation: String(
             analysis.scores &&
-              typeof analysis.scores === "object" &&
+              typeof analysis.scores === 'object' &&
               analysis.scores !== null &&
-              "explanation" in analysis.scores
-              ? analysis.scores["explanation"]
-              : "No additional explanation available",
+              'explanation' in analysis.scores
+              ? analysis.scores['explanation']
+              : 'No additional explanation available',
           ),
           supportingEvidence:
             analysis.scores &&
-            typeof analysis.scores === "object" &&
+            typeof analysis.scores === 'object' &&
             analysis.scores !== null &&
-            "supportingEvidence" in analysis.scores &&
-            Array.isArray(analysis.scores["supportingEvidence"])
-              ? (analysis.scores["supportingEvidence"] as string[])
+            'supportingEvidence' in analysis.scores &&
+            Array.isArray(analysis.scores['supportingEvidence'])
+              ? (analysis.scores['supportingEvidence'] as string[])
               : [],
           timestamp: Date.now(),
           expertGuided: riskAssessment.requiresExpert,
@@ -245,185 +245,185 @@ function ProfessionalTherapistWorkspace() {
             ? [emotions.primaryEmotion, ...emotions.secondaryEmotions]
             : [],
           riskFactors: riskAssessment.factors,
-        };
+        }
 
         // Update user message with analysis
-        userMessage.mentalHealthAnalysis = mentalHealthAnalysis;
+        userMessage.mentalHealthAnalysis = mentalHealthAnalysis
 
         // Check if intervention is needed
         const interventionConfig: InterventionConfig = {
           scores: analysis.scores,
           type:
-            riskAssessment.category === "high"
-              ? "immediate"
-              : riskAssessment.category === "medium"
-                ? "preventive"
-                : "supportive",
+            riskAssessment.category === 'high'
+              ? 'immediate'
+              : riskAssessment.category === 'medium'
+                ? 'preventive'
+                : 'supportive',
           requiresExpert: riskAssessment.requiresExpert,
           emotions,
           riskFactors: riskAssessment.factors,
-        };
+        }
 
-        const intervention = await generateIntervention(interventionConfig);
+        const intervention = await generateIntervention(interventionConfig)
 
         // If intervention is immediate, add a system message
-        if (interventionConfig.type === "immediate") {
+        if (interventionConfig.type === 'immediate') {
           setMessages((prev) => [
             ...prev,
             {
-              role: "system",
+              role: 'system',
               content: `🚨 High Risk Alert: This client may require immediate professional intervention. ${intervention}`,
-              name: "",
+              name: '',
             } as ExtendedMessage,
-          ]);
+          ])
         }
       }
 
       // Check if we should use the patient simulation
-      let aiResponse: string | undefined;
+      let aiResponse: string | undefined
       if (usePatientSimulation && currentModelId) {
         // Generate response using the cognitive model
-        const patientPrompt = await handlePatientSimulationResponse(input);
+        const patientPrompt = await handlePatientSimulationResponse(input)
 
         if (patientPrompt) {
           // Use the generated prompt to get response from AI
-          aiResponse = await getAIResponse(patientPrompt);
+          aiResponse = await getAIResponse(patientPrompt)
         } else {
           // Fallback to normal response if patient simulation fails
           aiResponse = await getAIResponse(
             JSON.stringify([...messages, userMessage]),
-          );
+          )
         }
       } else {
         // Use regular AI response
         aiResponse = await getAIResponse(
           JSON.stringify([...messages, userMessage]),
-        );
+        )
       }
 
       // Add AI response to messages
       setMessages((prev) => [
         ...prev,
         {
-          role: "assistant",
+          role: 'assistant',
           content: aiResponse,
-          name: "",
+          name: '',
         } as ExtendedMessage,
-      ]);
+      ])
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : "An error occurred while processing your message",
-      );
-      console.error("Chat error:", err);
+          : 'An error occurred while processing your message',
+      )
+      console.error('Chat error:', err)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Get the most recent message with mental health analysis
   const getLatestMentalHealthAnalysis = ():
     | MentalHealthChatAnalysis
     | undefined => {
-    const messagesWithAnalysis = messages.filter((m) => m.mentalHealthAnalysis);
+    const messagesWithAnalysis = messages.filter((m) => m.mentalHealthAnalysis)
     if (messagesWithAnalysis.length === 0) {
-      return undefined;
+      return undefined
     }
-    const lastMessage = messagesWithAnalysis[messagesWithAnalysis.length - 1];
-    return lastMessage?.mentalHealthAnalysis;
-  };
+    const lastMessage = messagesWithAnalysis[messagesWithAnalysis.length - 1]
+    return lastMessage?.mentalHealthAnalysis
+  }
 
   // Toggle mental health analysis settings
   const toggleMentalHealthAnalysis = () => {
     storeState.configureMentalHealthAnalysis(
       !storeState.mentalHealthAnalysisEnabled,
       storeState.expertGuidanceEnabled,
-    );
-  };
+    )
+  }
 
   // Toggle expert guidance
   const toggleExpertGuidance = () => {
     storeState.configureMentalHealthAnalysis(
       storeState.mentalHealthAnalysisEnabled,
       !storeState.expertGuidanceEnabled,
-    );
-  };
+    )
+  }
 
   // Generate patient response using cognitive model
   const handlePatientSimulationResponse = async (therapistMessage: string) => {
     if (!usePatientSimulation || !currentModelId || !currentModel) {
-      return null;
+      return null
     }
 
     try {
       // Convert messages to the format expected by generatePatientResponse
       const conversationMessages = messages.map((msg) => ({
-        role: msg.role === "assistant" ? "patient" : "therapist",
+        role: msg.role === 'assistant' ? 'patient' : 'therapist',
         content: msg.content,
-      }));
+      }))
 
       // Add the new therapist message
       conversationMessages.push({
-        role: "therapist",
+        role: 'therapist',
         content: therapistMessage,
-      });
+      })
 
       // Extract therapeutic focus from the context if available
       const currentFocus = messages
         .filter(
-          (msg) => msg.role === "system" && msg.content.includes("focus:"),
+          (msg) => msg.role === 'system' && msg.content.includes('focus:'),
         )
-        .map((msg) => msg.content.replace("Current focus:", "").trim())
+        .map((msg) => msg.content.replace('Current focus:', '').trim())
         .filter(
           (focus): focus is string =>
-            typeof focus === "string" && focus.length > 0,
-        );
+            typeof focus === 'string' && focus.length > 0,
+        )
 
       // Generate response
       const { prompt } = await generatePatientResponse(
         conversationMessages,
         currentFocus.length > 0 ? currentFocus : undefined,
         1, // Session number (could be tracked in state in a more advanced implementation)
-      );
+      )
 
       // At this point we'd send the prompt to the LLM service
       // but for now, we'll use the regular AI service
-      return prompt;
+      return prompt
     } catch (err: unknown) {
-      console.error("Error generating patient response:", err);
-      return null;
+      console.error('Error generating patient response:', err)
+      return null
     }
-  };
+  }
 
   // Get therapist responses for supervisor feedback
   const getTherapistResponses = useCallback(() => {
     return messages
-      .filter((msg) => msg.role === "user")
-      .map((msg) => msg.content);
-  }, [messages]);
+      .filter((msg) => msg.role === 'user')
+      .map((msg) => msg.content)
+  }, [messages])
 
   // Generate session transcript for supervisor feedback
   const getSessionTranscript = useCallback(() => {
     return messages
-      .filter((msg) => msg.role !== "system")
+      .filter((msg) => msg.role !== 'system')
       .map(
         (msg) =>
-          `${msg.role === "user" ? "Therapist" : "Client"}: ${msg.content}`,
+          `${msg.role === 'user' ? 'Therapist' : 'Client'}: ${msg.content}`,
       )
-      .join("\n");
-  }, [messages]);
+      .join('\n')
+  }, [messages])
 
   // Toggle supervisor feedback panel
   const toggleSupervisorFeedback = () => {
-    setShowSupervisorFeedback(!showSupervisorFeedback);
-  };
+    setShowSupervisorFeedback(!showSupervisorFeedback)
+  }
 
   return (
     <div
       className={cn(
-        "flex flex-col",
-        isExpanded ? "fixed inset-0 z-10 bg-black p-4" : "",
+        'flex flex-col',
+        isExpanded ? 'fixed inset-0 z-10 bg-black p-4' : '',
       )}
     >
       {/* Header toolbar */}
@@ -435,23 +435,23 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setShowPatientModelSelector(true)}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-sm",
+              'rounded-lg px-3 py-1.5 text-sm',
               usePatientSimulation
-                ? "bg-green-800/70 text-green-200"
-                : "bg-green-900/30 text-green-400",
+                ? 'bg-green-800/70 text-green-200'
+                : 'bg-green-900/30 text-green-400',
             )}
           >
             {usePatientSimulation
-              ? `Patient Model: ${currentModel?.name || "Default"}`
-              : "Enable Patient Simulation"}
+              ? `Patient Model: ${currentModel?.name || 'Default'}`
+              : 'Enable Patient Simulation'}
           </button>
           <button
             onClick={() => setShowAnalytics(!showAnalytics)}
             className={cn(
-              "rounded-lg p-1.5",
+              'rounded-lg p-1.5',
               showAnalytics
-                ? "bg-green-800/70 text-green-200"
-                : "bg-green-900/30 text-green-400",
+                ? 'bg-green-800/70 text-green-200'
+                : 'bg-green-900/30 text-green-400',
             )}
             aria-label="Toggle analytics dashboard"
           >
@@ -460,10 +460,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setShowMentalHealthPanel(!showMentalHealthPanel)}
             className={cn(
-              "rounded-lg p-1.5",
+              'rounded-lg p-1.5',
               showMentalHealthPanel
-                ? "bg-green-800/70 text-green-200"
-                : "bg-green-900/30 text-green-400",
+                ? 'bg-green-800/70 text-green-200'
+                : 'bg-green-900/30 text-green-400',
             )}
             aria-label="Toggle mental health insights"
           >
@@ -472,10 +472,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={toggleSupervisorFeedback}
             className={cn(
-              "rounded-lg px-3 py-1.5 text-sm",
+              'rounded-lg px-3 py-1.5 text-sm',
               showSupervisorFeedback
-                ? "bg-green-800/70 text-green-200"
-                : "bg-green-900/30 text-green-400",
+                ? 'bg-green-800/70 text-green-200'
+                : 'bg-green-900/30 text-green-400',
             )}
           >
             Supervisor Feedback
@@ -483,7 +483,7 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="rounded-lg bg-green-900/30 p-1.5 text-green-400"
-            aria-label={isExpanded ? "Minimize" : "Maximize"}
+            aria-label={isExpanded ? 'Minimize' : 'Maximize'}
           >
             {isExpanded ? (
               <IconMinimize className="h-5 w-5" />
@@ -503,7 +503,7 @@ function ProfessionalTherapistWorkspace() {
             aria-pressed={showScenarios}
             onClick={() => setShowScenarios(!showScenarios)}
           >
-            {" "}
+            {' '}
             <div className="relative mb-4 flex items-center justify-between">
               <span>Client Case: {selectedScenario.name}</span>
               <IconChevronDown className="h-4 w-4" />
@@ -549,10 +549,10 @@ function ProfessionalTherapistWorkspace() {
                   <button
                     key={scenario.id}
                     className={cn(
-                      "rounded px-3 py-2 text-left text-sm transition-colors",
+                      'rounded px-3 py-2 text-left text-sm transition-colors',
                       selectedScenario.id === scenario.id
-                        ? "bg-green-700/30 text-green-300"
-                        : "text-gray-300 hover:bg-green-700/20",
+                        ? 'bg-green-700/30 text-green-300'
+                        : 'text-gray-300 hover:bg-green-700/20',
                     )}
                     onClick={() => changeScenario(scenario)}
                   >
@@ -580,8 +580,8 @@ function ProfessionalTherapistWorkspace() {
           <ChatContainer
             messages={messages}
             onSendMessage={(msg) => {
-              setInput(msg);
-              handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+              setInput(msg)
+              handleSubmit({ preventDefault: () => {} } as React.FormEvent)
             }}
             isLoading={isLoading}
             {...(error ? { error } : {})}
@@ -604,7 +604,7 @@ function ProfessionalTherapistWorkspace() {
                 }
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 border border-gray-300 bg-white hover:bg-gray-100 h-8 py-2 px-3"
               >
-                {showPatientModelSelector ? "Hide" : "Select"} Patient Model
+                {showPatientModelSelector ? 'Hide' : 'Select'} Patient Model
               </button>
             )}
           </div>
@@ -626,7 +626,7 @@ function ProfessionalTherapistWorkspace() {
               )}
               {currentModel && (
                 <div className="text-gray-700 text-sm mb-2">
-                  Using patient model: <strong>{currentModel.name}</strong> -{" "}
+                  Using patient model: <strong>{currentModel.name}</strong> -{' '}
                   {currentModel.diagnosisInfo?.primaryDiagnosis}
                 </div>
               )}
@@ -653,10 +653,10 @@ function ProfessionalTherapistWorkspace() {
               <MentalHealthInsights
                 analysis={{
                   ...(getLatestMentalHealthAnalysis() || {
-                    category: "low" as const,
+                    category: 'low' as const,
                     hasMentalHealthIssue: true,
                     confidence: 0,
-                    explanation: "No data available",
+                    explanation: 'No data available',
                     supportingEvidence: [],
                     timestamp: Date.now(),
                     expertGuided: false,
@@ -664,14 +664,14 @@ function ProfessionalTherapistWorkspace() {
                     riskFactors: [],
                   }),
                   riskLevel:
-                    getLatestMentalHealthAnalysis()?.category === "critical"
-                      ? "high"
+                    getLatestMentalHealthAnalysis()?.category === 'critical'
+                      ? 'high'
                       : (getLatestMentalHealthAnalysis()?.category as
-                          | "low"
-                          | "medium"
-                          | "high"
-                          | undefined) || "low",
-                  summary: "Analysis summary not available",
+                          | 'low'
+                          | 'medium'
+                          | 'high'
+                          | undefined) || 'low',
+                  summary: 'Analysis summary not available',
                   scores: {},
                 }}
               />
@@ -685,7 +685,7 @@ function ProfessionalTherapistWorkspace() {
             <SupervisorFeedback
               sessionTranscript={getSessionTranscript()}
               patientModel={{
-                id: currentModel?.id || "default-model",
+                id: currentModel?.id || 'default-model',
                 name: currentModel?.name || selectedScenario.name,
                 presentingIssues: currentModel?.presentingIssues || [
                   selectedScenario.description,
@@ -739,11 +739,11 @@ function ProfessionalTherapistWorkspace() {
                 onClick={() => setUsePatientSimulation(!usePatientSimulation)}
                 className={`rounded-md px-4 py-2 ${
                   usePatientSimulation
-                    ? "bg-red-500 text-white"
-                    : "bg-green-500 text-white"
+                    ? 'bg-red-500 text-white'
+                    : 'bg-green-500 text-white'
                 }`}
               >
-                {usePatientSimulation ? "Disable" : "Enable"} Simulation
+                {usePatientSimulation ? 'Disable' : 'Enable'} Simulation
               </button>
             </div>
             {isPatientModelLoading && (
@@ -758,7 +758,7 @@ function ProfessionalTherapistWorkspace() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default ProfessionalTherapistWorkspace;
+export default ProfessionalTherapistWorkspace

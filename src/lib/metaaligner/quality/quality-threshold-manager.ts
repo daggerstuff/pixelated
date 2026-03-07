@@ -13,5 +13,5 @@ export interface IQualityThresholdManager {
    * @param metrics - The metrics to check.
    * @returns A boolean indicating whether the metrics meet the thresholds.
    */
-  meetsThresholds(metrics: Record<string, number>): boolean;
+  meetsThresholds(metrics: Record<string, number>): boolean
 }

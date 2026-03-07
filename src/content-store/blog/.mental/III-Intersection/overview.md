@@ -1,7 +1,7 @@
 ---
-title: "CPTSD and Addiction Intersection"
-description: "Understanding the complex relationship between CPTSD and addiction"
-author: "Resource Team"
+title: 'CPTSD and Addiction Intersection'
+description: 'Understanding the complex relationship between CPTSD and addiction'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

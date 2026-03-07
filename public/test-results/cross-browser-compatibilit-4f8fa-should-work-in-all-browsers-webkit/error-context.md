@@ -24,27 +24,27 @@ Call log:
 ```yaml
 - heading "404" [level=1]
 - paragraph:
-    - strong: File not found
+  - strong: File not found
 - paragraph: The site configured at this address does not contain the requested file.
 - paragraph:
-    - text: If this is your site, make sure that the filename case matches the URL as well as any file permissions. For root URLs (like
-    - code: http://example.com/
-    - text: ) you must provide an
-    - code: index.html
-    - text: file.
+  - text: If this is your site, make sure that the filename case matches the URL as well as any file permissions. For root URLs (like
+  - code: http://example.com/
+  - text: ) you must provide an
+  - code: index.html
+  - text: file.
 - paragraph:
-    - link "Read the full documentation":
-        - /url: https://help.github.com/pages/
-    - text: for more information about using
-    - strong: GitHub Pages
-    - text: .
+  - link "Read the full documentation":
+    - /url: https://help.github.com/pages/
+  - text: for more information about using
+  - strong: GitHub Pages
+  - text: .
 - link "GitHub Status":
-    - /url: https://githubstatus.com
+  - /url: https://githubstatus.com
 - text: —
 - link "@githubstatus":
-    - /url: https://twitter.com/githubstatus
+  - /url: https://twitter.com/githubstatus
 - link:
-    - /url: /
+  - /url: /
 ```
 
 # Test source

@@ -1,16 +1,16 @@
-import type { BgType } from "../../src/types";
-import { html } from "satori-html";
-import backgroundBase64 from "./base64";
+import type { BgType } from '../../src/types'
+import { html } from 'satori-html'
+import backgroundBase64 from './base64'
 
 export function ogImageMarkup(
   authorOrBrand: string,
   title: string,
   bgType: BgType,
 ) {
-  if (!["plum", "dot", "rose", "particle"].includes(bgType)) {
+  if (!['plum', 'dot', 'rose', 'particle'].includes(bgType)) {
     throw new Error(
       "The value of 'bgType' must be one of the following: 'plum', 'dot', 'rose', 'particle'.",
-    );
+    )
   }
 
   return html`<div
@@ -61,5 +61,5 @@ export function ogImageMarkup(
         <div tw="text-white text-3.1rem leading-relaxed mr-18">${title}</div>
       </div>
     </div>
-  </div>`;
+  </div>`
 }

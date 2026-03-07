@@ -1,94 +1,85 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
   DiscoveryInitiatePayloadSchema,
   type DiscoveryInitiatePayload,
-} from "@/lib/api/journal-research/types";
+} from '@/lib/api/journal-research/types'
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button/button";
-import { cn } from "@/lib/utils";
-import { getFieldErrors } from "@/lib/error";
-import {
-  ErrorMessage,
-  FieldError,
-} from "@/components/journal-research/shared/ErrorMessage";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button/button'
+import { cn } from '@/lib/utils'
+import { getFieldErrors } from '@/lib/error'
+import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
 
 export interface DiscoveryFormProps {
-  onSubmit: (data: DiscoveryInitiatePayload) => void | Promise<void>;
-  onCancel?: () => void;
-  isLoading?: boolean;
-  className?: string;
-  defaultSources?: string[];
-  defaultKeywords?: string[];
+  onSubmit: (data: DiscoveryInitiatePayload) => void | Promise<void>
+  onCancel?: () => void
+  isLoading?: boolean
+  className?: string
+  defaultSources?: string[]
+  defaultKeywords?: string[]
 }
 
-const availableSources = ["pubmed", "doaj", "arxiv", "ieee", "acm"];
+const availableSources = ['pubmed', 'doaj', 'arxiv', 'ieee', 'acm']
 
 export function DiscoveryForm({
   onSubmit,
   onCancel,
   isLoading = false,
   className,
-  defaultSources = ["pubmed", "doaj"],
+  defaultSources = ['pubmed', 'doaj'],
   defaultKeywords = [],
 }: DiscoveryFormProps) {
-  const [sources, setSources] = useState<string[]>(defaultSources);
-  const [keywords, setKeywords] = useState<string[]>(defaultKeywords);
-  const [keywordInput, setKeywordInput] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submitError, setSubmitError] = useState<unknown>(null);
+  const [sources, setSources] = useState<string[]>(defaultSources)
+  const [keywords, setKeywords] = useState<string[]>(defaultKeywords)
+  const [keywordInput, setKeywordInput] = useState('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitError, setSubmitError] = useState<unknown>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-    setSubmitError(null);
+    e.preventDefault()
+    setErrors({})
+    setSubmitError(null)
 
     try {
       const payload: DiscoveryInitiatePayload = {
         keywords,
         sources,
-      };
-      const validated = DiscoveryInitiatePayloadSchema.parse(payload);
-      await onSubmit(validated);
+      }
+      const validated = DiscoveryInitiatePayloadSchema.parse(payload)
+      await onSubmit(validated)
     } catch (error) {
-      const fieldErrs = getFieldErrors(error) ?? {};
+
+      const fieldErrs = getFieldErrors(error) ?? {}
 
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
-        setErrors(fieldErrs);
+        setErrors(fieldErrs)
       } else {
-        setSubmitError(error);
+        setSubmitError(error)
       }
     }
-  };
+  }
 
   const handleSourceToggle = (source: string) => {
     setSources((prev) =>
-      prev.includes(source)
-        ? prev.filter((s) => s !== source)
-        : [...prev, source],
-    );
-  };
+      prev.includes(source) ? prev.filter((s) => s !== source) : [...prev, source],
+    )
+  }
 
   const handleAddKeyword = () => {
-    if (!keywordInput.trim()) return;
+    if (!keywordInput.trim()) return
     if (!keywords.includes(keywordInput.trim())) {
-      setKeywords((prev) => [...prev, keywordInput.trim()]);
-      setKeywordInput("");
+      setKeywords((prev) => [...prev, keywordInput.trim()])
+      setKeywordInput('')
     }
-  };
+  }
 
   const handleRemoveKeyword = (keyword: string) => {
-    setKeywords((prev) => prev.filter((k) => k !== keyword));
-  };
+    setKeywords((prev) => prev.filter((k) => k !== keyword))
+  }
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader>
         <CardTitle>Initiate Discovery</CardTitle>
       </CardHeader>
@@ -129,9 +120,9 @@ export function DiscoveryForm({
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddKeyword();
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddKeyword()
                   }
                 }}
                 placeholder="Enter keyword"
@@ -178,11 +169,11 @@ export function DiscoveryForm({
               </Button>
             )}
             <Button type="submit" disabled={isLoading || sources.length === 0}>
-              {isLoading ? "Starting Discovery..." : "Start Discovery"}
+              {isLoading ? 'Starting Discovery...' : 'Start Discovery'}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  );
+  )
 }

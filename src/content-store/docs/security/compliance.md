@@ -1,8 +1,8 @@
 ---
-title: "Compliance & Standards"
-description: "Learn about Pixelated Healths compliance framework and security standards"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Compliance & Standards'
+description: 'Learn about Pixelated Healths compliance framework and security standards'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
@@ -16,14 +16,11 @@ focus on HIPAA compliance and data protection regulations.
 ## Compliance Framework
 
     Healthcare data protection
-
-<Card
-title="Security Standards"
-icon="shield-check"
-href="#security-standards"
-
->
-
+  <Card
+    title="Security Standards"
+    icon="shield-check"
+    href="#security-standards"
+  >
     Industry certifications
     Privacy regulations
     Security controls
@@ -31,6 +28,7 @@ href="#security-standards"
 ## HIPAA Compliance
 
 ### Core Requirements
+
 
 - Privacy Rule compliance
 - Security Rule implementation
@@ -64,7 +62,7 @@ Pixelated implements comprehensive automated tools for HIPAA compliance verifica
 
 ### Implementation 1
 
-`````typescript Audit Logging
+```typescript Audit Logging
 
 const logger = new HIPAALogger({
 retentionPeriod: '6y',
@@ -96,43 +94,44 @@ const canAccess = await accessControl.checkAccess({
   resourceId: 'record_456',
   action: 'view'
 });
-`````
+````
+
 
 ### FHE Integration for HIPAA Compliance
 
-Fully Homomorphic Encryption enhances HIPAA compliance by enabling secure
-computation on encrypted data
+  Fully Homomorphic Encryption enhances HIPAA compliance by enabling secure
+  computation on encrypted data
 
 ```typescript
+
 // Initialize FHE service
 const fheService = new FHEService({
-  scheme: "BFV",
+  scheme: 'BFV',
   securityLevel: 128,
   polyModulusDegree: 4096,
-});
+})
 
 // Process PHI while it remains encrypted
 async function processEncryptedPatientData(encryptedData) {
   // Perform operations on encrypted data without decryption
-  const result = await fheService.processEncrypted(encryptedData);
+  const result = await fheService.processEncrypted(encryptedData)
 
   // Data remains protected throughout processing
-  return result;
+  return result
 }
 ```
 
 ### Compliance Verification Process
 
-### Automated Scanning Run automated compliance checks (daily in CI/CD)
-
-Manual Review Quarterly review of all PHI handling systems ### Documentation
-Update compliance documentation ### Training Staff training and certification
-
-### Third-Party Audit Annual external compliance audit
+  ### Automated Scanning Run automated compliance checks (daily in CI/CD) ###
+  Manual Review Quarterly review of all PHI handling systems ### Documentation
+  Update compliance documentation ### Training Staff training and certification
+  ### Third-Party Audit Annual external compliance audit
 
 ## Security Standards
 
 ### Certifications
+
 
 | Standard      | Status    | Last Audit | Next Audit |
 | ------------- | --------- | ---------- | ---------- |
@@ -154,6 +153,7 @@ Update compliance documentation ### Training Staff training and certification
 
 ### Privacy Regulations
 
+
 - HIPAA (United States)
 - GDPR (European Union)
 - CCPA (California)
@@ -163,25 +163,25 @@ Update compliance documentation ### Training Staff training and certification
 
 ```typescript
 const privacyManager = new PrivacyManager({
-  regulations: ["HIPAA", "GDPR", "CCPA"],
+  regulations: ['HIPAA', 'GDPR', 'CCPA'],
   dataRetention: {
-    medical: "6y",
-    audit: "6y",
-    backups: "7y",
+    medical: '6y',
+    audit: '6y',
+    backups: '7y',
   },
   dataSubjectRights: {
     access: true,
     deletion: true,
     portability: true,
   },
-});
+})
 
 // Handle data subject request
 const response = await privacyManager.handleRequest({
-  type: "access",
-  subjectId: "user_123",
-  scope: ["medical_records", "audit_logs"],
-});
+  type: 'access',
+  subjectId: 'user_123',
+  scope: ['medical_records', 'audit_logs'],
+})
 ```
 
 ## Risk Management
@@ -198,7 +198,7 @@ graph TD
 
 ### Implementation 3
 
-`````typescript Risk Assessment
+```typescript Risk Assessment
 const riskManager = new RiskManager({
   assessmentFrequency: 'quarterly',
   automatedScanning: true,
@@ -225,11 +225,13 @@ const status = await controlMonitor.checkControls({
   controlSet: 'encryption',
   metrics: ['effectiveness', 'coverage']
 });
-`````
+````
+
 
 ## Audit Management
 
 ### Audit Process
+
 
 1. Event Collection
 2. Secure Storage
@@ -241,58 +243,58 @@ const status = await controlMonitor.checkControls({
 
 ```typescript
 const auditManager = new AuditManager({
-  storageProvider: "encrypted_s3",
-  retentionPeriod: "6y",
+  storageProvider: 'encrypted_s3',
+  retentionPeriod: '6y',
   realTimeAnalysis: true,
-});
+})
 
 // Record audit event
 await auditManager.recordEvent({
-  eventType: "data_access",
-  userId: "user_123",
-  resourceId: "record_456",
-  action: "view",
+  eventType: 'data_access',
+  userId: 'user_123',
+  resourceId: 'record_456',
+  action: 'view',
   timestamp: new Date(),
   metadata: {
-    ip: "192.168.1.1",
-    userAgent: "Mozilla/5.0...",
-    reason: "treatment",
+    ip: '192.168.1.1',
+    userAgent: 'Mozilla/5.0...',
+    reason: 'treatment',
   },
-});
+})
 
 // Generate compliance report
 const report = await auditManager.generateReport({
-  period: "last_quarter",
-  type: "hipaa_compliance",
-  format: "pdf",
-});
+  period: 'last_quarter',
+  type: 'hipaa_compliance',
+  format: 'pdf',
+})
 ```
 
 ## Incident Response
 
 ### Response Protocol
 
-### Detection Identify and classify the incident ### Containment Limit the
 
-impact and spread ### Eradication Remove the threat ### Recovery Restore
-normal operations ### Lessons Learned Document and improve
+  ### Detection Identify and classify the incident ### Containment Limit the
+  impact and spread ### Eradication Remove the threat ### Recovery Restore
+  normal operations ### Lessons Learned Document and improve
 
 ### Implementation 5
 
 ```typescript
 const incidentManager = new IncidentManager({
-  notificationChannels: ["email", "slack", "sms"],
+  notificationChannels: ['email', 'slack', 'sms'],
   automatedResponse: true,
   forensicsEnabled: true,
-});
+})
 
 // Handle security incident
 await incidentManager.handleIncident({
-  type: "unauthorized_access",
-  severity: "high",
-  affectedSystems: ["auth_service"],
+  type: 'unauthorized_access',
+  severity: 'high',
+  affectedSystems: ['auth_service'],
   timestamp: new Date(),
-});
+})
 ```
 
 ## Best Practices
@@ -306,12 +308,10 @@ await incidentManager.handleIncident({
 
 Need help with compliance? Contact our compliance team:
 
-<Card
-title="Compliance Support"
-icon="balance-scale"
-href="mailto:compliance@gradiant.dev"
-
->
-
+  <Card
+    title="Compliance Support"
+    icon="balance-scale"
+    href="mailto:compliance@gradiant.dev"
+  >
     Contact compliance team
     View compliance guides

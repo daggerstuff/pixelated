@@ -1,13 +1,13 @@
-import { Request, Response, NextFunction } from "express";
-import { AuthService } from "@/services/authService";
-import { UserRole } from "@/types/user";
+import { Request, Response, NextFunction } from 'express'
+import { AuthService } from '@/services/authService'
+import { UserRole } from '@/types/user'
 
 export interface AuthenticatedRequest extends Request {
   user?: {
-    userId: string;
-    email: string;
-    role: UserRole;
-  };
+    userId: string
+    email: string
+    role: UserRole
+  }
 }
 
 export const authenticateToken = async (
@@ -15,36 +15,36 @@ export const authenticateToken = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
+  const authHeader = req.headers['authorization']
+  const token = authHeader && authHeader.split(' ')[1]
 
   if (!token) {
     res.status(401).json({
       success: false,
-      error: { message: "Access token required" },
-    });
-    return;
+      error: { message: 'Access token required' },
+    })
+    return
   }
 
   try {
-    const payload = await AuthService.verifyToken(token);
+    const payload = await AuthService.verifyToken(token)
     if (!payload) {
       res.status(401).json({
         success: false,
-        error: { message: "Invalid or expired token" },
-      });
-      return;
+        error: { message: 'Invalid or expired token' },
+      })
+      return
     }
 
-    req.user = payload;
-    next();
+    req.user = payload
+    next()
   } catch {
     res.status(401).json({
       success: false,
-      error: { message: "Invalid token" },
-    });
+      error: { message: 'Invalid token' },
+    })
   }
-};
+}
 
 export const requireRole = (roles: UserRole[]) => {
   return (
@@ -55,36 +55,36 @@ export const requireRole = (roles: UserRole[]) => {
     if (!req.user) {
       res.status(401).json({
         success: false,
-        error: { message: "Authentication required" },
-      });
-      return;
+        error: { message: 'Authentication required' },
+      })
+      return
     }
 
     if (!roles.includes(req.user.role)) {
       res.status(403).json({
         success: false,
-        error: { message: "Insufficient permissions" },
-      });
-      return;
+        error: { message: 'Insufficient permissions' },
+      })
+      return
     }
 
-    next();
-  };
-};
+    next()
+  }
+}
 
-export const requireAdmin = requireRole([UserRole.ADMINISTRATOR]);
+export const requireAdmin = requireRole([UserRole.ADMINISTRATOR])
 export const requireEditor = requireRole([
   UserRole.ADMINISTRATOR,
   UserRole.EDITOR,
-]);
+])
 export const requireCreator = requireRole([
   UserRole.ADMINISTRATOR,
   UserRole.EDITOR,
   UserRole.CONTENT_CREATOR,
-]);
+])
 export const requireViewer = requireRole([
   UserRole.ADMINISTRATOR,
   UserRole.EDITOR,
   UserRole.CONTENT_CREATOR,
   UserRole.VIEWER,
-]);
+])

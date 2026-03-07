@@ -1,14 +1,14 @@
-import { useState } from "react";
-import { useResponseGeneration } from "./useResponseGeneration";
+import { useState } from 'react'
+import { useResponseGeneration } from './useResponseGeneration'
 
 /**
  * Example component demonstrating useResponseGeneration hook
  */
 export function ResponseGenerationExample() {
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState('')
   const [responseType, setResponseType] = useState<
-    "general" | "therapeutic" | "creative" | "analytical"
-  >("general");
+    'general' | 'therapeutic' | 'creative' | 'analytical'
+  >('general')
 
   const {
     response,
@@ -24,59 +24,59 @@ export function ResponseGenerationExample() {
     stopGeneration,
     reset,
   } = useResponseGeneration({
-    model: "gpt-4o",
+    model: 'gpt-4o',
     temperature: 0.7,
     maxTokens: 1024,
     responseType,
     streamingEnabled: true,
     onProgress: (chunk, accumulated) => {
-      console.log("Streaming chunk:", chunk);
-      console.log("Accumulated response length:", accumulated.length);
+      console.log('Streaming chunk:', chunk)
+      console.log('Accumulated response length:', accumulated.length)
     },
     onComplete: (finalResponse) => {
       console.log(
-        "Response completed:",
-        finalResponse.substring(0, 100) + "...",
-      );
+        'Response completed:',
+        finalResponse.substring(0, 100) + '...',
+      )
     },
     onTherapeuticInsights: (insights) => {
-      console.log("Therapeutic insights:", insights);
+      console.log('Therapeutic insights:', insights)
     },
     onError: (error) => {
-      console.error("Response generation error:", error);
+      console.error('Response generation error:', error)
     },
-  });
+  })
 
   const handleGenerateResponse = async () => {
     if (!prompt.trim()) {
-      return;
+      return
     }
 
-    if (responseType === "therapeutic") {
+    if (responseType === 'therapeutic') {
       await generateTherapeuticResponse(prompt, {
-        sessionId: "demo-session",
-        userId: "demo-user",
-        context: "example-usage",
-      });
+        sessionId: 'demo-session',
+        userId: 'demo-user',
+        context: 'example-usage',
+      })
     } else {
-      await generateResponse(prompt);
+      await generateResponse(prompt)
     }
-  };
+  }
 
   const handleStreamingResponse = async () => {
     if (!prompt.trim()) {
-      return;
+      return
     }
 
-    const generator = generateStreamingResponse(prompt);
+    const generator = generateStreamingResponse(prompt)
 
     // Example of consuming the streaming response
     for await (const chunk of generator) {
       // Each chunk is automatically handled by the hook
       // You can add custom logic here if needed
-      console.log("Received chunk:", chunk);
+      console.log('Received chunk:', chunk)
     }
-  };
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -133,7 +133,7 @@ export function ResponseGenerationExample() {
           disabled={isLoading || !prompt.trim()}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Generating..." : "Generate Response"}
+          {isLoading ? 'Generating...' : 'Generate Response'}
         </button>
 
         <button
@@ -141,7 +141,7 @@ export function ResponseGenerationExample() {
           disabled={isLoading || !prompt.trim()}
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isStreaming ? "Streaming..." : "Stream Response"}
+          {isStreaming ? 'Streaming...' : 'Stream Response'}
         </button>
 
         <button
@@ -177,7 +177,7 @@ export function ResponseGenerationExample() {
             style={{ width: `${progress}%` }}
           />
           <div className="text-xs text-gray-600 mt-1">
-            {isStreaming ? "Streaming" : "Loading"}: {Math.round(progress)}%
+            {isStreaming ? 'Streaming' : 'Loading'}: {Math.round(progress)}%
           </div>
         </div>
       )}
@@ -211,7 +211,7 @@ export function ResponseGenerationExample() {
           </h3>
           <div className="space-y-2 text-sm text-blue-800">
             <div>
-              <strong>Confidence:</strong>{" "}
+              <strong>Confidence:</strong>{' '}
               {Math.round(therapeuticInsights.confidence * 100)}%
             </div>
             {therapeuticInsights.intervention && (
@@ -222,13 +222,13 @@ export function ResponseGenerationExample() {
             {therapeuticInsights.techniques &&
               therapeuticInsights.techniques.length > 0 && (
                 <div>
-                  <strong>Techniques:</strong>{" "}
-                  {therapeuticInsights.techniques.join(", ")}
+                  <strong>Techniques:</strong>{' '}
+                  {therapeuticInsights.techniques.join(', ')}
                 </div>
               )}
             {therapeuticInsights.usage && (
               <div>
-                <strong>Token Usage:</strong>{" "}
+                <strong>Token Usage:</strong>{' '}
                 {therapeuticInsights.usage.totalTokens} tokens
               </div>
             )}
@@ -267,7 +267,7 @@ export function ResponseGenerationExample() {
         </ul>
       </div>
     </div>
-  );
+  )
 }
 
-export default ResponseGenerationExample;
+export default ResponseGenerationExample

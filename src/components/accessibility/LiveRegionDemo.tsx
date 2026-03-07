@@ -1,22 +1,22 @@
-import { useState } from "react";
+import { useState } from 'react'
 import {
   LiveRegionProvider,
   useLiveRegion,
   useStatusAnnouncer,
-} from "./LiveRegionContext";
+} from './LiveRegionContext'
 
 // Demo component that shows using the individual hooks
 function StatusButton() {
-  const announceStatus = useStatusAnnouncer();
-  const [count, setCount] = useState(0);
+  const announceStatus = useStatusAnnouncer()
+  const [count, setCount] = useState(0)
 
   const handleClick = () => {
-    const newCount = count + 1;
-    setCount(newCount);
+    const newCount = count + 1
+    setCount(newCount)
     announceStatus(
-      `Button clicked ${newCount} ${newCount === 1 ? "time" : "times"}`,
-    );
-  };
+      `Button clicked ${newCount} ${newCount === 1 ? 'time' : 'times'}`,
+    )
+  }
 
   return (
     <button
@@ -25,21 +25,21 @@ function StatusButton() {
     >
       Status Hook: Click Me ({count})
     </button>
-  );
+  )
 }
 
 // Demo component that shows using the combined hook
 function AlertButton() {
-  const { announceAlert } = useLiveRegion();
-  const [severity, setSeverity] = useState("low");
+  const { announceAlert } = useLiveRegion()
+  const [severity, setSeverity] = useState('low')
 
   const handleClick = () => {
     // Rotate through severity levels
     const nextSeverity =
-      severity === "low" ? "medium" : severity === "medium" ? "high" : "low";
-    setSeverity(nextSeverity);
-    announceAlert(`Alert severity changed to ${nextSeverity}`);
-  };
+      severity === 'low' ? 'medium' : severity === 'medium' ? 'high' : 'low'
+    setSeverity(nextSeverity)
+    announceAlert(`Alert severity changed to ${nextSeverity}`)
+  }
 
   return (
     <button
@@ -48,7 +48,7 @@ function AlertButton() {
     >
       Alert Hook: Severity ({severity})
     </button>
-  );
+  )
 }
 
 // Main demo wrapper
@@ -66,7 +66,7 @@ export function LiveRegionDemoReact() {
         </div>
       </div>
     </LiveRegionProvider>
-  );
+  )
 }
 
-export default LiveRegionDemoReact;
+export default LiveRegionDemoReact

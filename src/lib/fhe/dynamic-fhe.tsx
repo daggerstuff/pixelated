@@ -5,27 +5,27 @@
  * and address chunk size warnings.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 
 // Dynamic import for the main FHE module
 export const loadFHEModule = async () => {
-  return import("./index");
-};
+  return import('./index')
+}
 
 // Dynamic import for FHE encryption functionality
 export const loadFHEEncryption = async () => {
-  return import("./encryption");
-};
+  return import('./encryption')
+}
 
 // Dynamic import for FHE key management
 export const loadFHEKeyManager = async () => {
-  return import("./key-manager");
-};
+  return import('./key-manager')
+}
 
 // Dynamic import for FHE operations
 export const loadFHEOperations = async () => {
-  return import("./operations");
-};
+  return import('./operations')
+}
 
 // Utility function to load all FHE modules when needed
 export const loadAllFHEModules = async () => {
@@ -34,15 +34,15 @@ export const loadAllFHEModules = async () => {
     loadFHEEncryption(),
     loadFHEKeyManager(),
     loadFHEOperations(),
-  ]);
+  ])
 
   return {
     main,
     encryption,
     keyManager,
     operations,
-  };
-};
+  }
+}
 
 /**
  * React hook for using FHE functionality with dynamic loading
@@ -64,36 +64,36 @@ export const loadAllFHEModules = async () => {
  * ```
  */
 export const useFHE = () => {
-  const [fhe, setFHE] = useState<null | typeof import("./index")>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [fhe, setFHE] = useState<null | typeof import('./index')>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const loadFHE = async () => {
       try {
-        const module = await loadFHEModule();
+        const module = await loadFHEModule()
         if (isMounted) {
-          setFHE(module);
-          setLoading(false);
+          setFHE(module)
+          setLoading(false)
         }
       } catch (err: unknown) {
         if (isMounted) {
           setError(
-            err instanceof Error ? err : new Error("Failed to load FHE module"),
-          );
-          setLoading(false);
+            err instanceof Error ? err : new Error('Failed to load FHE module'),
+          )
+          setLoading(false)
         }
       }
-    };
+    }
 
-    loadFHE();
+    loadFHE()
 
     return () => {
-      isMounted = false;
-    };
-  }, []);
+      isMounted = false
+    }
+  }, [])
 
-  return { fhe, loading, error };
-};
+  return { fhe, loading, error }
+}

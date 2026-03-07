@@ -1,18 +1,18 @@
-import type { FC } from "react";
-import React from "react";
-import { useOfflineDetection } from "@/hooks/useOfflineDetection";
-import offlineManager from "@/utils/offline/offlineManager";
-import { AnimationWrapper } from "./AdvancedAnimations";
+import type { FC } from 'react'
+import React from 'react'
+import { useOfflineDetection } from '@/hooks/useOfflineDetection'
+import offlineManager from '@/utils/offline/offlineManager'
+import { AnimationWrapper } from './AdvancedAnimations'
 
 interface OfflineIndicatorProps {
-  showDetails?: boolean;
+  showDetails?: boolean
   position?:
-    | "top-left"
-    | "top-right"
-    | "bottom-left"
-    | "bottom-right"
-    | "inline";
-  className?: string;
+    | 'top-left'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-right'
+    | 'inline'
+  className?: string
 }
 
 /**
@@ -21,71 +21,71 @@ interface OfflineIndicatorProps {
  */
 export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
   showDetails = false,
-  position = "top-right",
-  className = "",
+  position = 'top-right',
+  className = '',
 }) => {
-  const networkState = useOfflineDetection();
+  const networkState = useOfflineDetection()
   const [queueStats, setQueueStats] = React.useState(
     () => offlineManager.getStatus().queueStats,
-  );
-  const [isVisible, setIsVisible] = React.useState(false);
+  )
+  const [isVisible, setIsVisible] = React.useState(false)
 
   // Update queue stats periodically
   React.useEffect(() => {
     const updateStats = () => {
-      setQueueStats(offlineManager.getStatus().queueStats);
-    };
+      setQueueStats(offlineManager.getStatus().queueStats)
+    }
 
-    const interval = setInterval(updateStats, 2000);
-    updateStats(); // Initial update
+    const interval = setInterval(updateStats, 2000)
+    updateStats() // Initial update
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   // Auto-show when offline or when there are pending requests
   React.useEffect(() => {
-    setIsVisible(networkState.isOffline || queueStats.total > 0);
-  }, [networkState.isOffline, queueStats.total]);
+    setIsVisible(networkState.isOffline || queueStats.total > 0)
+  }, [networkState.isOffline, queueStats.total])
 
   // Listen to offline manager events
   React.useEffect(() => {
-    const unsubscribeOnline = offlineManager.on("online", () => {
-      setTimeout(() => setIsVisible(false), 3000); // Hide after 3 seconds online
-    });
+    const unsubscribeOnline = offlineManager.on('online', () => {
+      setTimeout(() => setIsVisible(false), 3000) // Hide after 3 seconds online
+    })
 
-    const unsubscribeOffline = offlineManager.on("offline", () => {
-      setIsVisible(true);
-    });
+    const unsubscribeOffline = offlineManager.on('offline', () => {
+      setIsVisible(true)
+    })
 
     return () => {
-      unsubscribeOnline();
-      unsubscribeOffline();
-    };
-  }, []);
+      unsubscribeOnline()
+      unsubscribeOffline()
+    }
+  }, [])
 
-  if (!isVisible) return null;
+  if (!isVisible) return null
 
   const positionClasses = {
-    "top-left": "fixed top-4 left-4 z-50",
-    "top-right": "fixed top-4 right-4 z-50",
-    "bottom-left": "fixed bottom-4 left-4 z-50",
-    "bottom-right": "fixed bottom-4 right-4 z-50",
-    inline: "inline-flex",
-  };
+    'top-left': 'fixed top-4 left-4 z-50',
+    'top-right': 'fixed top-4 right-4 z-50',
+    'bottom-left': 'fixed bottom-4 left-4 z-50',
+    'bottom-right': 'fixed bottom-4 right-4 z-50',
+    'inline': 'inline-flex',
+  }
 
   const getStatusColor = () => {
-    if (networkState.isOffline) return "bg-red-500";
-    if (networkState.isSlowConnection) return "bg-yellow-500";
-    if (queueStats.total > 0) return "bg-blue-500";
-    return "bg-green-500";
-  };
+    if (networkState.isOffline) return 'bg-red-500'
+    if (networkState.isSlowConnection) return 'bg-yellow-500'
+    if (queueStats.total > 0) return 'bg-blue-500'
+    return 'bg-green-500'
+  }
 
   const getStatusText = () => {
-    if (networkState.isOffline) return "Offline";
-    if (networkState.isSlowConnection) return "Slow Connection";
-    if (queueStats.total > 0) return `${queueStats.total} pending`;
-    return "Online";
-  };
+    if (networkState.isOffline) return 'Offline'
+    if (networkState.isSlowConnection) return 'Slow Connection'
+    if (queueStats.total > 0) return `${queueStats.total} pending`
+    return 'Online'
+  }
 
   const getStatusIcon = () => {
     if (networkState.isOffline) {
@@ -97,7 +97,7 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
             clipRule="evenodd"
           />
         </svg>
-      );
+      )
     }
 
     if (networkState.isSlowConnection) {
@@ -109,7 +109,7 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
             clipRule="evenodd"
           />
         </svg>
-      );
+      )
     }
 
     if (queueStats.total > 0) {
@@ -125,7 +125,7 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
             clipRule="evenodd"
           />
         </svg>
-      );
+      )
     }
 
     return (
@@ -136,8 +136,8 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
           clipRule="evenodd"
         />
       </svg>
-    );
-  };
+    )
+  }
 
   return (
     <AnimationWrapper
@@ -157,13 +157,13 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
         {showDetails && (networkState.isOffline || queueStats.total > 0) && (
           <span className="text-xs opacity-75">
             {networkState.isOffline
-              ? "• No connection"
+              ? '• No connection'
               : `• ${queueStats.total} queued`}
           </span>
         )}
       </div>
     </AnimationWrapper>
-  );
-};
+  )
+}
 
-export default OfflineIndicator;
+export default OfflineIndicator

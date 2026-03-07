@@ -6,56 +6,56 @@
  * or integrated with other web frameworks.
  */
 
-import { Request, Response, NextFunction } from "express";
-import { RateLimitingBridge } from "./rate-limiting-bridge";
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
-import type { RateLimitResult } from "../../rate-limiting/types";
-import type { ThreatResponse } from "../response-orchestration";
+import { Request, Response, NextFunction } from 'express'
+import { RateLimitingBridge } from './rate-limiting-bridge'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { RateLimitResult } from '../../rate-limiting/types'
+import type { ThreatResponse } from '../response-orchestration'
 
-const logger = createBuildSafeLogger("api-middleware");
+const logger = createBuildSafeLogger('api-middleware')
 
 export interface ApiMiddlewareConfig {
   /** Enable threat detection integration */
-  enabled: boolean;
+  enabled: boolean
   /** Rate limiting bridge instance */
-  bridge: RateLimitingBridge;
+  bridge: RateLimitingBridge
   /** Custom identifier extraction function */
-  getIdentifier?: (req: Request) => string;
+  getIdentifier?: (req: Request) => string
   /** Custom context extraction function */
-  getContext?: (req: Request) => ThreatDetectionContext;
+  getContext?: (req: Request) => ThreatDetectionContext
   /** Response handler for rate limited requests */
   rateLimitHandler?: (
     req: Request,
     res: Response,
     result: RateLimitCheckResult,
-  ) => void;
+  ) => void
   /** Skip middleware for certain paths */
-  skipPaths?: string[];
+  skipPaths?: string[]
   /** Enable logging */
-  enableLogging?: boolean;
+  enableLogging?: boolean
 }
 
 /**
  * Context gathered from an incoming request for threat detection and rate limiting
  */
 export interface ThreatDetectionContext {
-  ip?: string;
-  method?: string;
-  path?: string;
-  userAgent?: string | undefined;
-  timestamp?: string;
-  userId?: string;
-  userRole?: string;
-  sessionId?: string;
-  headers?: Record<string, string>;
-  body?: Record<string, unknown>;
-  [key: string]: unknown;
+  ip?: string
+  method?: string
+  path?: string
+  userAgent?: string | undefined
+  timestamp?: string
+  userId?: string
+  userRole?: string
+  sessionId?: string
+  headers?: Record<string, string>
+  body?: Record<string, unknown>
+  [key: string]: unknown
 }
 
 export interface RateLimitCheckResult {
-  rateLimitResult: RateLimitResult;
-  threatResponse?: ThreatResponse;
-  shouldBlock: boolean;
+  rateLimitResult: RateLimitResult
+  threatResponse?: ThreatResponse
+  shouldBlock: boolean
 }
 
 // Augment Express Request to carry threat detection info
@@ -63,31 +63,31 @@ declare global {
   namespace Express {
     interface Request {
       threatDetection?: {
-        result: RateLimitCheckResult;
-        threatResponse?: ThreatResponse;
-      };
+        result: RateLimitCheckResult
+        threatResponse?: ThreatResponse
+      }
       user?: {
-        id: string;
-        role?: string;
-        [key: string]: any;
-      };
+        id: string
+        role?: string
+        [key: string]: any
+      }
       session?: {
-        id: string;
-        [key: string]: any;
-      };
+        id: string
+        [key: string]: any
+      }
     }
   }
 }
 
 export class ThreatDetectionMiddleware {
-  private config: ApiMiddlewareConfig;
+  private config: ApiMiddlewareConfig
 
   constructor(config: ApiMiddlewareConfig) {
     this.config = {
       enableLogging: true,
-      skipPaths: ["/health", "/status", "/metrics"],
+      skipPaths: ['/health', '/status', '/metrics'],
       ...config,
-    };
+    }
   }
 
   /**
@@ -98,67 +98,66 @@ export class ThreatDetectionMiddleware {
       // NOTE: Using 'any' cast for config to access 'enabled' if it exists on ApiMiddlewareConfig but not typed in ThreatDetectionMiddlewareConfig
       // or if types are mismatched.
       if ((this.config as any).enabled === false) {
-        return next();
+        return next()
       }
 
       try {
         // Skip middleware for certain paths
         if (this.shouldSkip(req.path)) {
-          return next();
+          return next()
         }
 
         // Get identifier and context
-        const identifier = this.getIdentifier(req);
-        const context = this.getContext(req);
+        const identifier = this.getIdentifier(req)
+        const context = this.getContext(req)
 
         // Check rate limit with threat detection
-        const result =
-          (await this.config.bridge.checkRateLimitWithThreatDetection(
-            identifier,
-            context,
-          )) as unknown as RateLimitCheckResult;
+        const result = (await this.config.bridge.checkRateLimitWithThreatDetection(
+          identifier,
+          context,
+        )) as unknown as RateLimitCheckResult
 
         // Log the check if enabled
         if (this.config.enableLogging) {
-          logger.info("Rate limit and threat detection check", {
+          logger.info('Rate limit and threat detection check', {
             path: req.path,
             method: req.method,
             identifier,
             allowed: result.rateLimitResult.allowed,
             shouldBlock: result.shouldBlock,
             threatDetected: !!result.threatResponse,
-          });
+          })
         }
 
         // If request should be blocked
         if (result.shouldBlock) {
           if (this.config.rateLimitHandler) {
-            return this.config.rateLimitHandler(req, res, result);
+            return this.config.rateLimitHandler(req, res, result)
           }
 
           // Default rate limit response
-          return this.defaultRateLimitHandler(req, res, result);
+          return this.defaultRateLimitHandler(req, res, result)
         }
 
         // Add threat detection context to request (typed via declaration merging above)
         req.threatDetection = {
           result,
           threatResponse: result.threatResponse,
-        };
+        }
 
         // Continue to next middleware
-        next();
+        next()
       } catch (error: unknown) {
-        logger.error("Threat detection middleware error:", {
+        logger.error('Threat detection middleware error:', {
           error,
           path: req.path,
-        });
-        console.error("Threat detection middleware error:", error);
+        })
+        console.error('Threat detection middleware error:', error)
 
         // Fail open - allow request if middleware fails
-        next();
+        next()
       }
-    };
+    }
   }
 
   /**
@@ -169,7 +168,7 @@ export class ThreatDetectionMiddleware {
       this.config.skipPaths?.some(
         (skipPath) => path.startsWith(skipPath) || path === skipPath,
       ) || false
-    );
+    )
   }
 
   /**
@@ -177,23 +176,23 @@ export class ThreatDetectionMiddleware {
    */
   private getIdentifier(req: Request): string {
     if (this.config.getIdentifier) {
-      return this.config.getIdentifier(req);
+      return this.config.getIdentifier(req)
     }
 
     // Default identifier extraction
     if (req.user?.id) {
-      return `user:${req.user.id}`;
+      return `user:${req.user.id}`
     }
 
     if (req.session?.id) {
-      return `session:${req.session.id}`;
+      return `session:${req.session.id}`
     }
 
     if (req.ip) {
-      return `ip:${req.ip}`;
+      return `ip:${req.ip}`
     }
 
-    return "unknown";
+    return 'unknown'
   }
 
   /**
@@ -204,49 +203,49 @@ export class ThreatDetectionMiddleware {
       ip: req.ip,
       method: req.method,
       path: req.path,
-      userAgent: req.get("User-Agent"),
+      userAgent: req.get('User-Agent'),
       timestamp: new Date().toISOString(),
-    };
+    }
 
     // Add user context if available
     if (req.user) {
-      context.userId = req.user.id;
-      context.userRole = req.user.role;
+      context.userId = req.user.id
+      context.userRole = req.user.role
     }
 
     // Add session context if available
     if (req.session) {
-      context.sessionId = req.session.id;
+      context.sessionId = req.session.id
     }
 
     // Add request headers (filtered)
-    const sensitiveHeaders = ["authorization", "cookie", "set-cookie"];
+    const sensitiveHeaders = ['authorization', 'cookie', 'set-cookie']
     context.headers = Object.fromEntries(
       Object.entries(req.headers)
         .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(",") : value || "",
+          Array.isArray(value) ? value.join(',') : (value || ''),
         ]),
-    );
+    )
 
     // Add request body for certain methods (filtered)
-    if (["POST", "PUT", "PATCH"].includes(req.method) && req.body) {
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && req.body) {
       // Filter sensitive fields
-      const sensitiveFields = ["password", "token", "secret", "key"];
+      const sensitiveFields = ['password', 'token', 'secret', 'key']
       context.body = Object.fromEntries(
         Object.entries(req.body).filter(
           ([key]) => !sensitiveFields.includes(key.toLowerCase()),
         ),
-      );
+      )
     }
 
     // Add custom context if provided
     if (this.config.getContext) {
-      Object.assign(context, this.config.getContext(req));
+      Object.assign(context, this.config.getContext(req))
     }
 
-    return context;
+    return context
   }
 
   /**
@@ -257,24 +256,24 @@ export class ThreatDetectionMiddleware {
     res: Response,
     result: RateLimitCheckResult,
   ): void {
-    const { rateLimitResult, threatResponse } = result;
+    const { rateLimitResult, threatResponse } = result
 
     res.set({
-      "X-RateLimit-Limit": rateLimitResult.limit.toString(),
-      "X-RateLimit-Remaining": rateLimitResult.remaining.toString(),
-      "X-RateLimit-Reset": rateLimitResult.resetTime.toISOString(),
-      "X-RateLimit-Retry-After": rateLimitResult.retryAfter?.toString() || "0",
-      "X-Threat-Detected": threatResponse ? "true" : "false",
-    });
+      'X-RateLimit-Limit': rateLimitResult.limit.toString(),
+      'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+      'X-RateLimit-Reset': rateLimitResult.resetTime.toISOString(),
+      'X-RateLimit-Retry-After': rateLimitResult.retryAfter?.toString() || '0',
+      'X-Threat-Detected': threatResponse ? 'true' : 'false',
+    })
 
     if (threatResponse) {
-      res.set("X-Threat-Response-Id", threatResponse.responseId);
-      res.set("X-Threat-Severity", threatResponse.severity);
+      res.set('X-Threat-Response-Id', threatResponse.responseId)
+      res.set('X-Threat-Severity', threatResponse.severity)
     }
 
     res.status(429).json({
-      error: "Too Many Requests",
-      message: "Rate limit exceeded",
+      error: 'Too Many Requests',
+      message: 'Rate limit exceeded',
       retryAfter: rateLimitResult.retryAfter,
       limit: rateLimitResult.limit,
       remaining: rateLimitResult.remaining,
@@ -287,35 +286,35 @@ export class ThreatDetectionMiddleware {
           actions: threatResponse.actions.length,
         },
       }),
-    });
+    })
   }
 
   /**
    * Get middleware health status
    */
   async getHealthStatus(): Promise<{
-    healthy: boolean;
-    bridgeHealthy: boolean;
-    enabled: boolean;
-    recentRequests: number;
+    healthy: boolean
+    bridgeHealthy: boolean
+    enabled: boolean
+    recentRequests: number
   }> {
     try {
-      const bridgeStatus = await this.config.bridge.getStatus();
+      const bridgeStatus = await this.config.bridge.getStatus()
 
       return {
         healthy: bridgeStatus.healthy,
         bridgeHealthy: bridgeStatus.healthy,
         enabled: this.config.enabled,
         recentRequests: bridgeStatus.recentIntegrations,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to get middleware health status:", { error });
+      logger.error('Failed to get middleware health status:', { error })
       return {
         healthy: false,
         bridgeHealthy: false,
         enabled: this.config.enabled,
         recentRequests: 0,
-      };
+      }
     }
   }
 }
@@ -331,9 +330,9 @@ export function createThreatDetectionMiddleware(
     enabled: true,
     bridge,
     ...customConfig,
-  };
+  }
 
-  return new ThreatDetectionMiddleware(config);
+  return new ThreatDetectionMiddleware(config)
 }
 
 /**
@@ -343,9 +342,9 @@ export function threatDetection(
   bridge: RateLimitingBridge,
   config?: Partial<ApiMiddlewareConfig>,
 ): RequestHandler {
-  const middleware = createThreatDetectionMiddleware(bridge, config);
-  return middleware.middleware();
+  const middleware = createThreatDetectionMiddleware(bridge, config)
+  return middleware.middleware()
 }
 
 // Type alias for Express RequestHandler
-type RequestHandler = (req: Request, res: Response, next: NextFunction) => void;
+type RequestHandler = (req: Request, res: Response, next: NextFunction) => void

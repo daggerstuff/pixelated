@@ -1,11 +1,11 @@
-import type { Database } from "../../types/supabase";
-import { createAuditLog } from "../audit";
-import { mongoClient } from "./mongoClient";
-import { updateConversation } from "./conversations";
+import type { Database } from '../../types/supabase'
+import { createAuditLog } from '../audit'
+import { mongoClient } from './mongoClient'
+import { updateConversation } from './conversations'
 
-export type Message = Database["public"]["Tables"]["messages"]["Row"];
-export type NewMessage = Database["public"]["Tables"]["messages"]["Insert"];
-export type UpdateMessage = Database["public"]["Tables"]["messages"]["Update"];
+export type Message = Database['public']['Tables']['messages']['Row']
+export type NewMessage = Database['public']['Tables']['messages']['Insert']
+export type UpdateMessage = Database['public']['Tables']['messages']['Update']
 
 /**
  * Get messages for a conversation
@@ -18,23 +18,23 @@ export async function getMessages(
 ): Promise<Message[]> {
   // First verify the user has access to this conversation
   const conversation = await mongoClient.db
-    .collection("conversations")
-    .findOne({ _id: conversationId, user_id: userId });
+    .collection('conversations')
+    .findOne({ _id: conversationId, user_id: userId })
 
   if (!conversation) {
-    throw new Error("Unauthorized access to conversation");
+    throw new Error('Unauthorized access to conversation')
   }
 
   // Then get the messages
   const messages = await mongoClient.db
-    .collection("messages")
+    .collection('messages')
     .find({ conversation_id: conversationId })
     .sort({ created_at: -1 })
     .skip(offset)
     .limit(limit)
-    .toArray();
+    .toArray()
 
-  return messages as Message[];
+  return messages as Message[]
 }
 
 /**
@@ -47,41 +47,41 @@ export async function createMessage(
 ): Promise<Message> {
   // First verify the user has access to this conversation
   const conversation = await mongoClient.db
-    .collection("conversations")
-    .findOne({ _id: message.conversation_id, user_id: userId });
+    .collection('conversations')
+    .findOne({ _id: message.conversation_id, user_id: userId })
 
   if (!conversation) {
-    throw new Error("Unauthorized access to conversation");
+    throw new Error('Unauthorized access to conversation')
   }
 
   // Create the message
-  const result = await mongoClient.db.collection("messages").insertOne(message);
+  const result = await mongoClient.db.collection('messages').insertOne(message)
   const newMessage = {
     ...message,
     _id: result.insertedId,
-  };
+  }
 
   // Update the conversation's last_message_at timestamp
   await updateConversation(message.conversation_id, userId, {
     last_message_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  });
+  })
 
   // Log the event for HIPAA compliance
   await createAuditLog({
     userId,
-    action: "message_created",
-    resource: "messages",
+    action: 'message_created',
+    resource: 'messages',
     metadata: {
       messageId: newMessage._id.toHexString(),
       conversationId: message.conversation_id,
       role: message.role,
-      ipAddress: request?.headers.get("x-forwarded-for"),
-      userAgent: request?.headers.get("user-agent"),
+      ipAddress: request?.headers.get('x-forwarded-for'),
+      userAgent: request?.headers.get('user-agent'),
     },
-  });
+  })
 
-  return newMessage as Message;
+  return newMessage as Message
 }
 
 /**
@@ -96,41 +96,41 @@ export async function updateMessage(
 ): Promise<Message> {
   // First verify the user has access to this conversation
   const conversation = await mongoClient.db
-    .collection("conversations")
-    .findOne({ _id: conversationId, user_id: userId });
+    .collection('conversations')
+    .findOne({ _id: conversationId, user_id: userId })
 
   if (!conversation) {
-    throw new Error("Unauthorized access to conversation");
+    throw new Error('Unauthorized access to conversation')
   }
 
   // Update the message
   const result = await mongoClient.db
-    .collection("messages")
+    .collection('messages')
     .findOneAndUpdate(
       { _id: id, conversation_id: conversationId },
       { $set: updates },
-      { returnDocument: "after" },
-    );
+      { returnDocument: 'after' },
+    )
 
   if (!result.value) {
-    throw new Error("Failed to update message");
+    throw new Error('Failed to update message')
   }
 
   // Log the event for HIPAA compliance
   await createAuditLog({
     userId,
-    action: "message_updated",
-    resource: "messages",
+    action: 'message_updated',
+    resource: 'messages',
     metadata: {
       messageId: id,
       conversationId,
       updates,
-      ipAddress: request?.headers.get("x-forwarded-for"),
-      userAgent: request?.headers.get("user-agent"),
+      ipAddress: request?.headers.get('x-forwarded-for'),
+      userAgent: request?.headers.get('user-agent'),
     },
-  });
+  })
 
-  return result.value as Message;
+  return result.value as Message
 }
 
 /**
@@ -150,9 +150,9 @@ export async function flagMessage(
       flagged_by: userId,
       reason,
     },
-  };
+  }
 
-  return updateMessage(id, conversationId, userId, updates, request);
+  return updateMessage(id, conversationId, userId, updates, request)
 }
 
 /**
@@ -160,21 +160,21 @@ export async function flagMessage(
  */
 export async function adminGetFlaggedMessages(): Promise<Message[]> {
   const messages = await mongoClient.db
-    .collection("messages")
+    .collection('messages')
     .aggregate([
       { $match: { is_flagged: true } },
       {
         $lookup: {
-          from: "conversations",
-          localField: "conversation_id",
-          foreignField: "_id",
-          as: "conversations",
+          from: 'conversations',
+          localField: 'conversation_id',
+          foreignField: '_id',
+          as: 'conversations',
         },
       },
-      { $unwind: "$conversations" },
+      { $unwind: '$conversations' },
       { $sort: { created_at: -1 } },
     ])
-    .toArray();
+    .toArray()
 
-  return messages as Message[];
+  return messages as Message[]
 }

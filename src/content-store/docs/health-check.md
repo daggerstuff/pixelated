@@ -94,7 +94,7 @@ Edit the cron schedule in `.github/workflows/health-check.yml`:
 ```yaml
 on:
   schedule:
-    - cron: "*/15 * * * *" # Current: Every 15 minutes
+    - cron: '*/15 * * * *'  # Current: Every 15 minutes
 ```
 
 Common cron schedules:

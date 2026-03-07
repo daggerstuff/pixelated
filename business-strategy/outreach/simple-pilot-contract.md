@@ -8,7 +8,6 @@
 **Duration:** January 1 - June 30, 2026
 
 **Terms:**
-
 - Company provides AI training platform + support
 - Institution provides participants + assessments
 - Success = 75%+ diagnostic accuracy improvement
@@ -17,10 +16,10 @@
 
 **Payment:** 50% on signing, 50% at midpoint
 
-**Institution:** \***\*\*\*\*\***\_\***\*\*\*\*\*** **Date:** \***\*\_\*\***
-**Contact:** \***\*\*\*\*\***\_\_\_\_\***\*\*\*\*\*** **Title:** \***\*\_\_\*\***
+**Institution:** _____________________ **Date:** _________
+**Contact:** ________________________ **Title:** __________
 
-**Pixelated:** \***\*\*\*\*\***\_\_\***\*\*\*\*\*** **Date:** \***\*\_\*\***
-**Contact:** \***\*\*\*\*\***\_\_\_\_\***\*\*\*\*\*** **Title:** \***\*\_\_\*\***
+**Pixelated:** ______________________ **Date:** _________
+**Contact:** ________________________ **Title:** __________
 
 **Email confirmation of this agreement is legally binding.**
