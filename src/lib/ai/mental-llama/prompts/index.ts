@@ -1,2 +1,2 @@
 // Exports for prompts module
-export {};
+export {}

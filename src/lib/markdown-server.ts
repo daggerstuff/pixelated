@@ -3,16 +3,16 @@
  * using the full remark/rehype pipeline.
  */
 
-import { remark } from "remark";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import rehypeStringify from "rehype-stringify";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
-import rehypeSanitize from "rehype-sanitize";
-import rehypeExternalLinks from "rehype-external-links";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import { remark } from 'remark'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import rehypeSanitize from 'rehype-sanitize'
+import rehypeExternalLinks from 'rehype-external-links'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 
 /**
  * Parse and render Markdown to HTML using the full remark/rehype pipeline.
@@ -22,7 +22,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings";
  */
 export async function renderMarkdown(content: string): Promise<string> {
   if (!content) {
-    return "";
+    return ''
   }
 
   const result = await remark()
@@ -33,16 +33,16 @@ export async function renderMarkdown(content: string): Promise<string> {
     .use(rehypeSanitize)
     .use(rehypeKatex)
     .use(rehypeExternalLinks, {
-      target: "_blank",
-      rel: ["nofollow", "noopener"],
+      target: '_blank',
+      rel: ['nofollow', 'noopener'],
     })
     .use(rehypeAutolinkHeadings)
     .use(rehypeStringify)
-    .process(content);
+    .process(content)
 
-  return String(result);
+  return String(result)
 }
 
 export default {
   renderMarkdown,
-};
+}

@@ -1,17 +1,17 @@
-import React from "@/lib/esm-compat/react";
-import { useAnonymizedMetrics } from "./hooks";
+import React from '@/lib/esm-compat/react'
+import { useAnonymizedMetrics } from './hooks'
 
 // Simple simulator components
 export function SimulatorProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+  return <>{children}</>
 }
 
 export function SimulationContainer({
   scenarioId,
-  className = "",
+  className = '',
 }: {
-  scenarioId: string;
-  className?: string;
+  scenarioId: string
+  className?: string
 }) {
   return (
     <div className={className}>
@@ -27,25 +27,25 @@ export function SimulationContainer({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function ScenarioSelector({
   onSelect,
-  className = "",
+  className = '',
 }: {
-  onSelect: (scenarioId: string) => void;
-  className?: string;
+  onSelect: (scenarioId: string) => void
+  className?: string
 }) {
   const scenarios = [
     {
-      id: "depression",
-      name: "Depression Assessment",
-      difficulty: "Intermediate",
+      id: 'depression',
+      name: 'Depression Assessment',
+      difficulty: 'Intermediate',
     },
-    { id: "anxiety", name: "Anxiety Management", difficulty: "Beginner" },
-    { id: "trauma", name: "Trauma-Informed Care", difficulty: "Advanced" },
-  ];
+    { id: 'anxiety', name: 'Anxiety Management', difficulty: 'Beginner' },
+    { id: 'trauma', name: 'Trauma-Informed Care', difficulty: 'Advanced' },
+  ]
 
   return (
     <div className={className}>
@@ -63,8 +63,8 @@ export function ScenarioSelector({
             <button
               className="text-sm text-blue-600 hover:text-blue-800"
               onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                onSelect(scenario.id);
+                e.stopPropagation()
+                onSelect(scenario.id)
               }}
             >
               Start Scenario →
@@ -73,8 +73,8 @@ export function ScenarioSelector({
         ))}
       </div>
     </div>
-  );
+  )
 }
 
 // Re-export the hook from the hooks directory
-export { useAnonymizedMetrics } from "./hooks";
+export { useAnonymizedMetrics } from './hooks'

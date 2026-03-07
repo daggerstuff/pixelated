@@ -1,16 +1,16 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import storageManager from "@/utils/storage/storageManager";
-import tabSyncManager from "@/utils/sync/tabSyncManager";
-import type { StorageConfig } from "@/utils/storage/storageManager";
+import { useState, useEffect, useCallback, useRef } from 'react'
+import storageManager from '@/utils/storage/storageManager'
+import tabSyncManager from '@/utils/sync/tabSyncManager'
+import type { StorageConfig } from '@/utils/storage/storageManager'
 
 export interface UseSyncedStateOptions<T> extends Partial<StorageConfig> {
-  key: string;
-  defaultValue: T;
-  debounceMs?: number;
-  enableSync?: boolean;
-  conflictStrategy?: "local" | "remote" | "merge" | "manual";
-  onSync?: (value: T, sourceTabId: string) => void;
-  onConflict?: (localValue: T, remoteValue: T) => T;
+  key: string
+  defaultValue: T
+  debounceMs?: number
+  enableSync?: boolean
+  conflictStrategy?: 'local' | 'remote' | 'merge' | 'manual'
+  onSync?: (value: T, sourceTabId: string) => void
+  onConflict?: (localValue: T, remoteValue: T) => T
 }
 
 /**
@@ -22,88 +22,88 @@ export function useSyncedState<T>({
   defaultValue,
   debounceMs = 300,
   enableSync = true,
-  conflictStrategy = "remote",
+  conflictStrategy = 'remote',
   onSync,
   onConflict,
   ...storageOptions
 }: UseSyncedStateOptions<T>) {
-  const [state, setState] = useState<T>(defaultValue);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [state, setState] = useState<T>(defaultValue)
+  const [isLoaded, setIsLoaded] = useState(false)
   const [syncStatus, setSyncStatus] = useState<
-    "synced" | "syncing" | "conflict" | "offline"
-  >("synced");
-  const debounceRef = useRef<NodeJS.Timeout>();
-  const lastSyncValueRef = useRef<T>(defaultValue);
-  const ignoreNextRemoteUpdate = useRef(false);
+    'synced' | 'syncing' | 'conflict' | 'offline'
+  >('synced')
+  const debounceRef = useRef<NodeJS.Timeout>()
+  const lastSyncValueRef = useRef<T>(defaultValue)
+  const ignoreNextRemoteUpdate = useRef(false)
 
   // Load initial value from storage
   useEffect(() => {
     const storedValue = storageManager.get(key, {
       defaultValue,
       ...storageOptions,
-    });
+    })
 
-    setState(storedValue);
-    lastSyncValueRef.current = storedValue;
-    setIsLoaded(true);
-  }, [key, defaultValue, storageOptions]);
+    setState(storedValue)
+    lastSyncValueRef.current = storedValue
+    setIsLoaded(true)
+  }, [key, defaultValue, storageOptions])
 
   // Set up tab synchronization listeners
   useEffect(() => {
-    if (!enableSync || !tabSyncManager.isAvailable()) return;
+    if (!enableSync || !tabSyncManager.isAvailable()) return
 
     const unsubscribeStateReceived = tabSyncManager.on(
-      "stateReceived",
+      'stateReceived',
       (data: any) => {
-        if (data.key !== key) return;
+        if (data.key !== key) return
 
         // Avoid infinite loops by ignoring our own updates
         if (ignoreNextRemoteUpdate.current) {
-          ignoreNextRemoteUpdate.current = false;
-          return;
+          ignoreNextRemoteUpdate.current = false
+          return
         }
 
         // Handle conflicts
         if (state !== defaultValue && data.value !== state) {
-          let finalValue = data.value;
+          let finalValue = data.value
 
           switch (conflictStrategy) {
-            case "local":
-              finalValue = state;
-              break;
-            case "merge":
+            case 'local':
+              finalValue = state
+              break
+            case 'merge':
               try {
-                finalValue = mergeValues(state, data.value);
+                finalValue = mergeValues(state, data.value)
               } catch {
-                finalValue = data.value;
+                finalValue = data.value
               }
-              break;
-            case "manual":
+              break
+            case 'manual':
               finalValue = onConflict
                 ? onConflict(state, data.value)
-                : data.value;
-              break;
-            case "remote":
+                : data.value
+              break
+            case 'remote':
             default:
-              finalValue = data.value;
-              break;
+              finalValue = data.value
+              break
           }
 
-          setState(finalValue);
-          lastSyncValueRef.current = finalValue;
-          setSyncStatus("synced");
+          setState(finalValue)
+          lastSyncValueRef.current = finalValue
+          setSyncStatus('synced')
 
-          onSync?.(finalValue, data.tabId);
+          onSync?.(finalValue, data.tabId)
         } else {
-          setState(data.value);
-          lastSyncValueRef.current = data.value;
-          setSyncStatus("synced");
-          onSync?.(data.value, data.tabId);
+          setState(data.value)
+          lastSyncValueRef.current = data.value
+          setSyncStatus('synced')
+          onSync?.(data.value, data.tabId)
         }
       },
-    );
+    )
 
-    return unsubscribeStateReceived;
+    return unsubscribeStateReceived
   }, [
     key,
     enableSync,
@@ -112,70 +112,70 @@ export function useSyncedState<T>({
     conflictStrategy,
     onSync,
     onConflict,
-  ]);
+  ])
 
   // Debounced save to storage and sync across tabs
   const saveToStorageAndSync = useCallback(
     (value: T) => {
       if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+        clearTimeout(debounceRef.current)
       }
 
       debounceRef.current = setTimeout(() => {
         // Save to local storage
-        const success = storageManager.set(key, value, storageOptions);
+        const success = storageManager.set(key, value, storageOptions)
         if (success) {
-          lastSyncValueRef.current = value;
+          lastSyncValueRef.current = value
 
           // Sync across tabs if enabled
           if (enableSync && tabSyncManager.isAvailable()) {
-            setSyncStatus("syncing");
-            const synced = tabSyncManager.syncState(key, value);
+            setSyncStatus('syncing')
+            const synced = tabSyncManager.syncState(key, value)
             if (synced) {
-              setSyncStatus("synced");
+              setSyncStatus('synced')
             } else {
-              setSyncStatus("offline");
+              setSyncStatus('offline')
             }
           }
         }
-      }, debounceMs);
+      }, debounceMs)
     },
     [key, debounceMs, enableSync, storageOptions],
-  );
+  )
 
   // Enhanced setState that also persists and syncs
   const setSyncedState = useCallback(
     (value: T | ((prev: T) => T)) => {
       setState((prev) => {
         const newValue =
-          typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
+          typeof value === 'function' ? (value as (prev: T) => T)(prev) : value
 
         // Only save and sync if value actually changed
         if (newValue !== lastSyncValueRef.current) {
-          saveToStorageAndSync(newValue);
+          saveToStorageAndSync(newValue)
 
           // Mark that we should ignore the next remote update (our own)
           if (enableSync) {
-            ignoreNextRemoteUpdate.current = true;
+            ignoreNextRemoteUpdate.current = true
           }
         }
 
-        return newValue;
-      });
+        return newValue
+      })
     },
     [saveToStorageAndSync, enableSync],
-  );
+  )
 
   // Cleanup debounce timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+        clearTimeout(debounceRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
-  return [state, setSyncedState, isLoaded, syncStatus] as const;
+  return [state, setSyncedState, isLoaded, syncStatus] as const
 }
 
 /**
@@ -186,12 +186,12 @@ export function useSyncedObject<T extends Record<string, any>>({
   defaultValue,
   debounceMs = 300,
   enableSync = true,
-  conflictStrategy = "remote",
+  conflictStrategy = 'remote',
   onSync,
   onConflict,
   ...storageOptions
-}: Omit<UseSyncedStateOptions<T>, "defaultValue"> & {
-  defaultValue: T;
+}: Omit<UseSyncedStateOptions<T>, 'defaultValue'> & {
+  defaultValue: T
 }) {
   const [state, setState, isLoaded, syncStatus] = useSyncedState({
     key,
@@ -202,31 +202,31 @@ export function useSyncedObject<T extends Record<string, any>>({
     onSync,
     onConflict,
     ...storageOptions,
-  });
+  })
 
   const updateField = useCallback(
     <K extends keyof T>(field: K, value: T[K] | ((prev: T[K]) => T[K])) => {
       setState((prev) => ({
         ...prev,
         [field]:
-          typeof value === "function"
+          typeof value === 'function'
             ? (value as (prev: T[K]) => T[K])(prev[field])
             : value,
-      }));
+      }))
     },
     [setState],
-  );
+  )
 
   const removeField = useCallback(
     (field: keyof T) => {
       setState((prev) => {
-        const newState = { ...prev };
-        delete newState[field];
-        return newState;
-      });
+        const newState = { ...prev }
+        delete newState[field]
+        return newState
+      })
     },
     [setState],
-  );
+  )
 
   return [
     state,
@@ -235,43 +235,43 @@ export function useSyncedObject<T extends Record<string, any>>({
     removeField,
     isLoaded,
     syncStatus,
-  ] as const;
+  ] as const
 }
 
 /**
  * Simple value merging strategy
  */
 function mergeValues<T>(local: T, remote: T): T {
-  if (typeof local !== "object" || typeof remote !== "object") {
-    return remote;
+  if (typeof local !== 'object' || typeof remote !== 'object') {
+    return remote
   }
 
   if (Array.isArray(local) && Array.isArray(remote)) {
-    return [...new Set([...local, ...remote])] as T;
+    return [...new Set([...local, ...remote])] as T
   }
 
   if (
     local &&
     remote &&
-    typeof local === "object" &&
-    typeof remote === "object"
+    typeof local === 'object' &&
+    typeof remote === 'object'
   ) {
-    const merged = { ...local } as Record<string, any>;
+    const merged = { ...local } as Record<string, any>
     for (const [key, value] of Object.entries(remote)) {
       if (
         merged[key] &&
-        typeof merged[key] === "object" &&
-        typeof value === "object"
+        typeof merged[key] === 'object' &&
+        typeof value === 'object'
       ) {
-        merged[key] = mergeValues(merged[key], value);
+        merged[key] = mergeValues(merged[key], value)
       } else {
-        merged[key] = value;
+        merged[key] = value
       }
     }
-    return merged as T;
+    return merged as T
   }
 
-  return remote;
+  return remote
 }
 
-export default useSyncedState;
+export default useSyncedState

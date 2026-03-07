@@ -1,8 +1,8 @@
 ---
-title: "Building AI Models for Emotion Detection in Mental Health"
-date: "2025-01-28"
+title: 'Building AI Models for Emotion Detection in Mental Health'
+date: '2025-01-28'
 duration: 8min
-description: "Deep dive into the technical challenges and solutions for detecting emotions from text in mental health contexts"
+description: 'Deep dive into the technical challenges and solutions for detecting emotions from text in mental health contexts'
 ---
 
 [[toc]]
@@ -42,7 +42,6 @@ text3 = "Everything feels meaningless"  # Existential despair
 ### 2. Cultural and Individual Variations
 
 Emotional expression varies significantly across:
-
 - **Cultural backgrounds**
 - **Age groups**
 - **Communication styles**
@@ -51,7 +50,6 @@ Emotional expression varies significantly across:
 ### 3. Privacy and Sensitivity
 
 Mental health data requires special handling:
-
 - **HIPAA compliance** for healthcare contexts
 - **Anonymization** techniques
 - **Consent management**
@@ -350,4 +348,4 @@ As we continue to develop these technologies, we remain committed to transparenc
 
 ---
 
-_Want to contribute to our emotion detection research? Check out our [open-source models](https://github.com/vivirox/pixelated) or [reach out](mailto:research@pixelatedempathy.com) to discuss collaboration opportunities._
+*Want to contribute to our emotion detection research? Check out our [open-source models](https://github.com/vivirox/pixelated) or [reach out](mailto:research@pixelatedempathy.com) to discuss collaboration opportunities.*

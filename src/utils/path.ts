@@ -1,18 +1,18 @@
-import { base } from "astro:config/server";
+import { base } from 'astro:config/server'
 
 /**
  * Joins the provided path segments with the base path,
  * ensuring that multiple slashes are replaced with a single slash.
  */
 export function withBasePath(...paths: string[]): string {
-  return [base, ...paths].join("/").replace(/\/+/g, "/");
+  return [base, ...paths].join('/').replace(/\/+/g, '/')
 }
 
 /**
  * Ensures that a given pathname ends with a trailing slash.
  */
 export function ensureTrailingSlash(pathname: string): string {
-  return pathname.endsWith("/") ? pathname : pathname + "/";
+  return pathname.endsWith('/') ? pathname : pathname + '/'
 }
 
 /**
@@ -20,5 +20,5 @@ export function ensureTrailingSlash(pathname: string): string {
  * and joining with the base path.
  */
 export function resolvePath(pathname: string): string {
-  return withBasePath(ensureTrailingSlash(pathname));
+  return withBasePath(ensureTrailingSlash(pathname))
 }

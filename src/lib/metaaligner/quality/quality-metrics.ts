@@ -13,7 +13,7 @@ export interface IQualityMetrics {
    * @param response - The response to calculate metrics for.
    * @returns A promise that resolves to the quality metrics.
    */
-  calculate(response: string): Promise<Record<string, number>>;
+  calculate(response: string): Promise<Record<string, number>>
 }
 
 /**
@@ -27,6 +27,6 @@ export class QualityMetrics implements IQualityMetrics {
       fluency: 0,
       coherence: 0,
       relevance: 0,
-    };
+    }
   }
 }

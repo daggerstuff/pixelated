@@ -1,13 +1,13 @@
 ---
-title: "Tutorial"
-description: "Quick start guide for the Pixelated Empathy platform"
+title: 'Tutorial'
+description: 'Quick start guide for the Pixelated Empathy platform'
 pubDate: 2025-01-01
 author: Pixelated Empathy Team
-category: "Tutorial"
-tags: ["guide", "setup", "introduction"]
+category: 'Tutorial'
+tags: ['guide', 'setup', 'introduction']
 order: 1
 draft: false
-slug: "getting-started"
+slug: 'getting-started'
 ---
 
 # Tutorial with Pixelated Empathy

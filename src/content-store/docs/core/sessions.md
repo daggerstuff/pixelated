@@ -1,8 +1,8 @@
 ---
-title: "Session Management"
-description: "Real-time session handling and WebSocket communication"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Session Management'
+description: 'Real-time session handling and WebSocket communication'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
@@ -26,34 +26,34 @@ The session management system handles real-time communication between clients an
 ### Connection Setup
 
 ```typescript
-const socket = new WebSocket("wss://api.gemcity.xyz/ws", {
+const socket = new WebSocket('wss://api.gemcity.xyz/ws', {
   headers: {
     Authorization: `Bearer ${token}`,
   },
-});
+})
 
 socket.onopen = () => {
-  console.log("Connected to session");
-};
+  console.log('Connected to session')
+}
 
 socket.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  handleMessage(message);
-};
+  const message = JSON.parse(event.data)
+  handleMessage(message)
+}
 ```
 
 ### Message Types
 
 ```typescript
 interface Message {
-  type: "text" | "system" | "ai" | "action";
-  content: string;
+  type: 'text' | 'system' | 'ai' | 'action'
+  content: string
   metadata?: {
-    sentiment?: number;
-    topics?: string[];
-    suggestions?: string[];
-  };
-  timestamp: string;
+    sentiment?: number
+    topics?: string[]
+    suggestions?: string[]
+  }
+  timestamp: string
 }
 ```
 
@@ -63,36 +63,36 @@ interface Message {
 // Send heartbeat every 30 seconds
 setInterval(() => {
   if (socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify({ type: "ping" }));
+    socket.send(JSON.stringify({ type: 'ping' }))
   }
-}, 30000);
+}, 30000)
 
 // Handle heartbeat response
 socket.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-  if (message.type === "pong") {
-    updateLastHeartbeat();
+  const message = JSON.parse(event.data)
+  if (message.type === 'pong') {
+    updateLastHeartbeat()
   }
-};
+}
 ```
 
 ## Session Data Model
 
 ```typescript
 interface Session {
-  id: string;
-  clientId: exampleId;
-  mode: "chat" | "voice" | "video";
-  status: "active" | "completed" | "cancelled";
-  startTime: string;
-  endTime?: string;
+  id: string
+  clientId: exampleId
+  mode: 'chat' | 'voice' | 'video'
+  status: 'active' | 'completed' | 'cancelled'
+  startTime: string
+  endTime?: string
   metrics?: {
-    duration: number;
-    messageCount: number;
-    responseTime: number;
-  };
-  created_at: string;
-  updated_at: string;
+    duration: number
+    messageCount: number
+    responseTime: number
+  }
+  created_at: string
+  updated_at: string
 }
 ```
 
@@ -102,40 +102,40 @@ interface Session {
 
 ```typescript
 interface SessionContext {
-  messages: Message[];
-  participants: Participant[];
-  status: SessionStatus;
-  metrics: SessionMetrics;
+  messages: Message[]
+  participants: Participant[]
+  status: SessionStatus
+  metrics: SessionMetrics
 }
 
 const SessionContext = createContext<{
-  session: SessionContext;
-  sendMessage: (content: string) => void;
-  updateStatus: (status: SessionStatus) => void;
-}>();
+  session: SessionContext
+  sendMessage: (content: string) => void
+  updateStatus: (status: SessionStatus) => void
+}>()
 ```
 
 ### Message Queue
 
 ```typescript
 class MessageQueue {
-  private queue: Message[] = [];
-  private processing = false;
+  private queue: Message[] = []
+  private processing = false
 
   async add(message: Message) {
-    this.queue.push(message);
+    this.queue.push(message)
     if (!this.processing) {
-      this.process();
+      this.process()
     }
   }
 
   private async process() {
-    this.processing = true;
+    this.processing = true
     while (this.queue.length > 0) {
-      const message = this.queue.shift();
-      await this.sendMessage(message);
+      const message = this.queue.shift()
+      await this.sendMessage(message)
     }
-    this.processing = false;
+    this.processing = false
   }
 }
 ```
@@ -150,9 +150,9 @@ class MessageQueue {
 
 ```typescript
 interface SentimentAnalysis {
-  score: number; // -1 to 1
-  labels: string[];
-  confidence: number;
+  score: number // -1 to 1
+  labels: string[]
+  confidence: number
 }
 ```
 
@@ -160,9 +160,9 @@ interface SentimentAnalysis {
 
 ```typescript
 interface TopicAnalysis {
-  topics: string[];
-  relevance: number[];
-  context: string;
+  topics: string[]
+  relevance: number[]
+  context: string
 }
 ```
 
@@ -170,9 +170,9 @@ interface TopicAnalysis {
 
 ```typescript
 interface CrisisDetection {
-  risk_level: "none" | "low" | "medium" | "high";
-  triggers: string[];
-  recommended_action: string;
+  risk_level: 'none' | 'low' | 'medium' | 'high'
+  triggers: string[]
+  recommended_action: string
 }
 ```
 
@@ -182,22 +182,22 @@ interface CrisisDetection {
 
 ```typescript
 class ConnectionManager {
-  private retryCount = 0;
-  private maxRetries = 5;
-  private backoffMs = 1000;
+  private retryCount = 0
+  private maxRetries = 5
+  private backoffMs = 1000
 
   async reconnect() {
     while (this.retryCount < this.maxRetries) {
       try {
-        await this.connect();
-        this.retryCount = 0;
-        return;
+        await this.connect()
+        this.retryCount = 0
+        return
       } catch (error) {
-        this.retryCount++;
-        await this.wait(this.backoffMs * Math.pow(2, this.retryCount));
+        this.retryCount++
+        await this.wait(this.backoffMs * Math.pow(2, this.retryCount))
       }
     }
-    throw new Error("Connection failed");
+    throw new Error('Connection failed')
   }
 }
 ```
@@ -206,9 +206,9 @@ class ConnectionManager {
 
 ```typescript
 interface RetryOptions {
-  maxRetries: number;
-  backoffMs: number;
-  exponential: boolean;
+  maxRetries: number
+  backoffMs: number
+  exponential: boolean
 }
 
 async function sendWithRetry(
@@ -219,20 +219,20 @@ async function sendWithRetry(
     exponential: true,
   },
 ) {
-  let retries = 0;
+  let retries = 0
   while (retries < options.maxRetries) {
     try {
-      await sendMessage(message);
-      return;
+      await sendMessage(message)
+      return
     } catch (error) {
-      retries++;
+      retries++
       const delay = options.exponential
         ? options.backoffMs * Math.pow(2, retries)
-        : options.backoffMs;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+        : options.backoffMs
+      await new Promise((resolve) => setTimeout(resolve, delay))
     }
   }
-  throw new Error("Failed to send message after retries");
+  throw new Error('Failed to send message after retries')
 }
 ```
 
@@ -242,25 +242,25 @@ async function sendWithRetry(
 
 ```typescript
 class MessageBatcher {
-  private batch: Message[] = [];
-  private batchSize = 10;
-  private flushInterval = 1000;
+  private batch: Message[] = []
+  private batchSize = 10
+  private flushInterval = 1000
 
   constructor() {
-    setInterval(() => this.flush(), this.flushInterval);
+    setInterval(() => this.flush(), this.flushInterval)
   }
 
   add(message: Message) {
-    this.batch.push(message);
+    this.batch.push(message)
     if (this.batch.length >= this.batchSize) {
-      this.flush();
+      this.flush()
     }
   }
 
   private async flush() {
-    if (this.batch.length === 0) return;
-    const messages = this.batch.splice(0);
-    await this.sendBatch(messages);
+    if (this.batch.length === 0) return
+    const messages = this.batch.splice(0)
+    await this.sendBatch(messages)
   }
 }
 ```
@@ -269,21 +269,21 @@ class MessageBatcher {
 
 ```typescript
 class ConnectionPool {
-  private connections: Map<string, WebSocket> = new Map();
-  private maxConnections = 100;
+  private connections: Map<string, WebSocket> = new Map()
+  private maxConnections = 100
 
   getConnection(sessionId: string): WebSocket {
     if (this.connections.has(sessionId)) {
-      return this.connections.get(sessionId)!;
+      return this.connections.get(sessionId)!
     }
 
     if (this.connections.size >= this.maxConnections) {
-      this.evictOldest();
+      this.evictOldest()
     }
 
-    const connection = this.createConnection(sessionId);
-    this.connections.set(sessionId, connection);
-    return connection;
+    const connection = this.createConnection(sessionId)
+    this.connections.set(sessionId, connection)
+    return connection
   }
 }
 ```
@@ -294,17 +294,17 @@ class ConnectionPool {
 
 ```typescript
 interface SessionAuth {
-  token: string;
-  sessionId: string;
-  clientId: string;
-  permissions: string[];
+  token: string
+  sessionId: string
+  clientId: string
+  permissions: string[]
 }
 
 function validateSession(auth: SessionAuth): boolean {
   // Validate JWT token
   // Check session permissions
   // Verify client authorization
-  return true;
+  return true
 }
 ```
 
@@ -312,24 +312,24 @@ function validateSession(auth: SessionAuth): boolean {
 
 ```typescript
 class RateLimit {
-  private requests: Map<string, number[]> = new Map();
-  private maxRequests = 100;
-  private windowMs = 60000;
+  private requests: Map<string, number[]> = new Map()
+  private maxRequests = 100
+  private windowMs = 60000
 
   isAllowed(clientId: string): boolean {
-    const now = Date.now();
-    const window = now - this.windowMs;
+    const now = Date.now()
+    const window = now - this.windowMs
 
-    let requests = this.requests.get(clientId) || [];
-    requests = requests.filter((time) => time > window);
+    let requests = this.requests.get(clientId) || []
+    requests = requests.filter((time) => time > window)
 
     if (requests.length >= this.maxRequests) {
-      return false;
+      return false
     }
 
-    requests.push(now);
-    this.requests.set(clientId, requests);
-    return true;
+    requests.push(now)
+    this.requests.set(clientId, requests)
+    return true
   }
 }
 ```
@@ -340,11 +340,11 @@ class RateLimit {
 
 ```typescript
 interface SessionMetrics {
-  activeConnections: number;
-  messagesPerSecond: number;
-  averageResponseTime: number;
-  errorRate: number;
-  connectionErrors: number;
+  activeConnections: number
+  messagesPerSecond: number
+  averageResponseTime: number
+  errorRate: number
+  connectionErrors: number
 }
 
 class MetricsCollector {
@@ -355,7 +355,7 @@ class MetricsCollector {
       averageResponseTime: this.getAverageResponseTime(),
       errorRate: this.getErrorRate(),
       connectionErrors: this.getConnectionErrors(),
-    };
+    }
   }
 }
 ```
@@ -364,14 +364,14 @@ class MetricsCollector {
 
 ```typescript
 interface HealthStatus {
-  status: "healthy" | "degraded" | "unhealthy";
+  status: 'healthy' | 'degraded' | 'unhealthy'
   checks: {
-    websocket: boolean;
-    database: boolean;
-    ai_service: boolean;
-    redis: boolean;
-  };
-  timestamp: string;
+    websocket: boolean
+    database: boolean
+    ai_service: boolean
+    redis: boolean
+  }
+  timestamp: string
 }
 
 async function healthCheck(): Promise<HealthStatus> {
@@ -380,28 +380,28 @@ async function healthCheck(): Promise<HealthStatus> {
     checkDatabaseHealth(),
     checkAIServiceHealth(),
     checkRedisHealth(),
-  ]);
+  ])
 
   const results = {
-    websocket: checks[0].status === "fulfilled",
-    database: checks[1].status === "fulfilled",
-    ai_service: checks[2].status === "fulfilled",
-    redis: checks[3].status === "fulfilled",
-  };
+    websocket: checks[0].status === 'fulfilled',
+    database: checks[1].status === 'fulfilled',
+    ai_service: checks[2].status === 'fulfilled',
+    redis: checks[3].status === 'fulfilled',
+  }
 
-  const failedChecks = Object.values(results).filter((check) => !check).length;
+  const failedChecks = Object.values(results).filter((check) => !check).length
   const status =
     failedChecks === 0
-      ? "healthy"
+      ? 'healthy'
       : failedChecks <= 1
-        ? "degraded"
-        : "unhealthy";
+        ? 'degraded'
+        : 'unhealthy'
 
   return {
     status,
     checks: results,
     timestamp: new Date().toISOString(),
-  };
+  }
 }
 ```
 

@@ -21,7 +21,7 @@
   }
 
   /* Fix for Safari input styling */
-  input[type="search"] {
+  input[type='search'] {
     -webkit-appearance: none;
   }
 }

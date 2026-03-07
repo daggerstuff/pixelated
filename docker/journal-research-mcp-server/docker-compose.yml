@@ -1,3 +1,4 @@
+
 services:
   journal-research-mcp-server:
     build:
@@ -50,13 +51,7 @@ services:
     networks:
       - journal-research-network
     healthcheck:
-      test:
-        [
-          "CMD",
-          "python",
-          "-c",
-          "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, 'handle_request') else 1); except Exception: import sys; sys.exit(1)",
-        ]
+      test: ["CMD", "python", "-c", "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, \'handle_request\') else 1); except Exception: import sys; sys.exit(1)"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -65,10 +60,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.0"
+          cpus: '2.0'
           memory: 2G
         reservations:
-          cpus: "0.5"
+          cpus: '0.5'
           memory: 512M
 
 volumes:

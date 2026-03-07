@@ -8,11 +8,11 @@ declare global {
       [elemName: string]: React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLElement>,
         HTMLElement
-      >;
+      >
     }
 
     interface HTMLAttributes extends React.HTMLAttributes<HTMLElement> {
-      class?: string;
+      class?: string
     }
 
     // Keep declaration-only and avoid redeclaring DOM Element/ElementClass.
@@ -20,6 +20,6 @@ declare global {
 }
 
 // Minimal Astro JSX shims used only for build-time JSX parsing.
-export {};
+export {}
 
 // types module (standardized)

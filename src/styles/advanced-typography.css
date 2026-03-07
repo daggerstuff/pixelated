@@ -1,21 +1,17 @@
 /* Advanced Typography System - Sophisticated Mental Health Design */
 
 /* Import Variable Fonts for Maximum Flexibility */
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 
 :root {
   /* Advanced Font Stack - Context-Aware Typography */
-  --font-display:
-    "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-body:
-    "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", "Monaco", "Inconsolata", monospace;
-  --font-numeric:
-    "SF Pro Display", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-therapeutic:
-    "Inter Variable", system-ui, sans-serif; /* Softer for therapeutic content */
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  --font-numeric: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-therapeutic: 'Inter Variable', system-ui, sans-serif; /* Softer for therapeutic content */
 
   /* Fluid Type Scale - Responsive & Sophisticated */
   --text-scale-ratio: 1.25; /* Perfect fourth - pleasing to the eye */
@@ -33,19 +29,19 @@
   --text-6xl: clamp(3.583rem, 3.463rem + 0.6vw, 3.882rem);
 
   /* Advanced Letter Spacing - Optical Corrections */
-  --letter-tight: -0.025em; /* For large headings */
-  --letter-normal: 0em; /* Body text */
-  --letter-wide: 0.025em; /* Small text for legibility */
-  --letter-wider: 0.05em; /* Labels and captions */
-  --letter-widest: 0.1em; /* Buttons and tags */
+  --letter-tight: -0.025em;   /* For large headings */
+  --letter-normal: 0em;       /* Body text */
+  --letter-wide: 0.025em;     /* Small text for legibility */
+  --letter-wider: 0.05em;     /* Labels and captions */
+  --letter-widest: 0.1em;     /* Buttons and tags */
 
   /* Sophisticated Line Heights - Reading Optimization */
-  --leading-none: 1; /* Tight headers */
-  --leading-tight: 1.25; /* Display text */
-  --leading-snug: 1.375; /* Headings */
-  --leading-normal: 1.5; /* Body text - optimal reading */
-  --leading-relaxed: 1.625; /* Therapeutic content */
-  --leading-loose: 2; /* Spacious content */
+  --leading-none: 1;          /* Tight headers */
+  --leading-tight: 1.25;      /* Display text */
+  --leading-snug: 1.375;      /* Headings */
+  --leading-normal: 1.5;      /* Body text - optimal reading */
+  --leading-relaxed: 1.625;   /* Therapeutic content */
+  --leading-loose: 2;         /* Spacious content */
 
   /* Contextual Font Weights - Semantic Meaning */
   --weight-hairline: 100;
@@ -59,14 +55,14 @@
   --weight-black: 900;
 
   /* Advanced Color Palette - Sophisticated Therapeutic Colors */
-  --text-primary: #f8fafc; /* Pure white - highest contrast */
-  --text-secondary: #e2e8f0; /* Soft white - secondary content */
-  --text-tertiary: #cbd5e1; /* Muted - supporting text */
-  --text-quaternary: #94a3b8; /* Subtle - captions and labels */
-  --text-therapeutic: #a7f3d0; /* Gentle green - therapeutic content */
-  --text-empathic: #bfdbfe; /* Soft blue - empathic communication */
-  --text-focus: #fbbf24; /* Warm amber - attention without anxiety */
-  --text-crisis: #fb7185; /* Gentle pink-red - urgent but not harsh */
+  --text-primary: #f8fafc;        /* Pure white - highest contrast */
+  --text-secondary: #e2e8f0;      /* Soft white - secondary content */
+  --text-tertiary: #cbd5e1;       /* Muted - supporting text */
+  --text-quaternary: #94a3b8;     /* Subtle - captions and labels */
+  --text-therapeutic: #a7f3d0;    /* Gentle green - therapeutic content */
+  --text-empathic: #bfdbfe;       /* Soft blue - empathic communication */
+  --text-focus: #fbbf24;          /* Warm amber - attention without anxiety */
+  --text-crisis: #fb7185;         /* Gentle pink-red - urgent but not harsh */
 
   /* Contextual Text Colors */
   --text-body-primary: var(--text-secondary);
@@ -89,11 +85,7 @@ html {
   /* Better font feature settings */
   font-variant-ligatures: common-ligatures;
   font-variant-numeric: oldstyle-nums proportional-nums;
-  font-feature-settings:
-    "liga" 1,
-    "kern" 1,
-    "onum" 1,
-    "pnum" 1;
+  font-feature-settings: "liga" 1, "kern" 1, "onum" 1, "pnum" 1;
 }
 
 body {
@@ -117,11 +109,7 @@ body {
   color: var(--text-heading-primary);
 
   /* Advanced text effects */
-  background: linear-gradient(
-    135deg,
-    var(--text-primary),
-    var(--text-therapeutic)
-  );
+  background: linear-gradient(135deg, var(--text-primary), var(--text-therapeutic));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -304,22 +292,14 @@ body {
 
 /* Advanced Utility Classes */
 .text-gradient {
-  background: linear-gradient(
-    135deg,
-    var(--text-primary),
-    var(--text-therapeutic)
-  );
+  background: linear-gradient(135deg, var(--text-primary), var(--text-therapeutic));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .text-gradient-blue {
-  background: linear-gradient(
-    135deg,
-    var(--text-empathic),
-    var(--text-primary)
-  );
+  background: linear-gradient(135deg, var(--text-empathic), var(--text-primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -404,7 +384,7 @@ body {
 /* Print Styles - Professional Output */
 @media print {
   body {
-    font-family: "Times New Roman", serif;
+    font-family: 'Times New Roman', serif;
     font-size: 12pt;
     line-height: 1.5;
     color: #000000;

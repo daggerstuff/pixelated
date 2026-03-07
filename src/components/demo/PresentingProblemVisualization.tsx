@@ -1,9 +1,9 @@
-import React, { FC } from "react";
-import type { PresentingProblemEvent } from "../../lib/types/psychology-pipeline";
+import React, { FC } from 'react'
+import type { PresentingProblemEvent } from '../../lib/types/psychology-pipeline'
 
 interface PresentingProblemVisualizationProps {
-  events: PresentingProblemEvent[];
-  presentingProblem: string;
+  events: PresentingProblemEvent[]
+  presentingProblem: string
 }
 
 const PresentingProblemVisualization: FC<
@@ -13,40 +13,40 @@ const PresentingProblemVisualization: FC<
   const sortedEvents = [...events].sort((a, b) => {
     // Simple sorting by extracting numbers from time strings
     const getTimeValue = (timeStr: string) => {
-      const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i);
+      const match = timeStr.match(/(\d+)\s*(month|week|day|year)/i)
       if (!match) {
-        return 0;
+        return 0
       }
-      const num = parseInt(match[1], 10);
-      const unit = match[2].toLowerCase();
+      const num = parseInt(match[1], 10)
+      const unit = match[2].toLowerCase()
 
       switch (unit) {
-        case "year":
-          return num * 365;
-        case "month":
-          return num * 30;
-        case "week":
-          return num * 7;
-        case "day":
-          return num;
+        case 'year':
+          return num * 365
+        case 'month':
+          return num * 30
+        case 'week':
+          return num * 7
+        case 'day':
+          return num
         default:
-          return num;
+          return num
       }
-    };
+    }
 
-    return getTimeValue(b.time) - getTimeValue(a.time); // Reverse chronological
-  });
+    return getTimeValue(b.time) - getTimeValue(a.time) // Reverse chronological
+  })
 
   const getSeverityColor = (index: number, total: number) => {
-    const intensity = (index + 1) / total;
+    const intensity = (index + 1) / total
     if (intensity <= 0.33) {
-      return "bg-yellow-200 border-yellow-400";
+      return 'bg-yellow-200 border-yellow-400'
     }
     if (intensity <= 0.66) {
-      return "bg-orange-200 border-orange-400";
+      return 'bg-orange-200 border-orange-400'
     }
-    return "bg-red-200 border-red-400";
-  };
+    return 'bg-red-200 border-red-400'
+  }
 
   return (
     <div className="presenting-problem-visualization bg-white rounded-lg p-6 border shadow-sm">
@@ -137,20 +137,20 @@ const PresentingProblemVisualization: FC<
             </h6>
             <div className="text-xs text-indigo-700 space-y-1">
               <p>
-                • <strong>Duration:</strong> Problem has been developing over{" "}
+                • <strong>Duration:</strong> Problem has been developing over{' '}
                 {sortedEvents.length} documented stages
               </p>
               <p>
-                • <strong>Pattern:</strong>{" "}
+                • <strong>Pattern:</strong>{' '}
                 {sortedEvents.length > 2
-                  ? "Progressive escalation with identifiable triggers"
-                  : "Recent onset with clear precipitating factors"}
+                  ? 'Progressive escalation with identifiable triggers'
+                  : 'Recent onset with clear precipitating factors'}
               </p>
               <p>
-                • <strong>Intervention Window:</strong>{" "}
+                • <strong>Intervention Window:</strong>{' '}
                 {sortedEvents.length <= 2
-                  ? "Early intervention opportunity"
-                  : "Established pattern requiring comprehensive treatment"}
+                  ? 'Early intervention opportunity'
+                  : 'Established pattern requiring comprehensive treatment'}
               </p>
             </div>
           </div>
@@ -181,7 +181,7 @@ const PresentingProblemVisualization: FC<
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default PresentingProblemVisualization;
+export default PresentingProblemVisualization

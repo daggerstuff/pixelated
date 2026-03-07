@@ -1,12 +1,12 @@
 ---
-title: "Accessibility Developer Guide"
-description: "Best practices and standards for implementing accessible components"
-pubDate: "2025-01-01"
-author: "Accessibility Team"
+title: 'Accessibility Developer Guide'
+description: 'Best practices and standards for implementing accessible components'
+pubDate: '2025-01-01'
+author: 'Accessibility Team'
 draft: false
 toc: true
 share: true
-date: "2025-04-12"
+date: '2025-04-12'
 ---
 
 # Accessibility Developer Guide
@@ -104,7 +104,6 @@ describe('YourComponent accessibility', () => {
    - Use `<fieldset>` and `<legend>` for related form fields
 
    ```astro
-
    ```
 
 ### Navigation
@@ -113,14 +112,12 @@ describe('YourComponent accessibility', () => {
    - Provide a skip link at the top of each page
 
    ```astro
-
    ```
 
 2. **ARIA Landmarks**
    - Use proper landmarks to structure your page
 
    ```astro
-
    ```
 
 3. **Navigation State**
@@ -317,7 +314,6 @@ Astro's `client:load` directive can impact accessibility. Consider these tips:
    - Always include a secondary indicator (icon, text, pattern)
 
    ```astro
-
    ```
 
 3. **Focus Indicators**

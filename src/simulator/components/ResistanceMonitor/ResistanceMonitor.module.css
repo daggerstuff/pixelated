@@ -17,7 +17,7 @@
     0 4px 32px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   color: #e2e8f0;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   position: relative;
   transition:
     border-color 0.4s,
@@ -288,7 +288,7 @@
   transition: background 0.25s;
 }
 
-.emotionChip[aria-selected="true"] {
+.emotionChip[aria-selected='true'] {
   background: rgba(99, 102, 241, 0.2);
   border: 1px solid rgba(99, 102, 241, 0.4);
 }

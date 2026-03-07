@@ -12,14 +12,14 @@ declare global {
      * @param message - message body displayed in the alert
      */
     showDLPAlert?: (
-      type: "success" | "error" | "warning",
+      type: 'success' | 'error' | 'warning',
       message: string,
-    ) => void;
+    ) => void
   }
 }
 
 // No exports from this module file - keep as an ambient declaration file
-export {};
+export {}
 
 // types module
 

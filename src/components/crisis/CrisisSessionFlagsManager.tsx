@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
-import type { FC } from "react";
+import { useState, useEffect, useCallback } from 'react'
+import type { FC } from 'react'
 import type {
   CrisisSessionFlag,
   UserSessionStatus,
-} from "../../lib/ai/crisis/types";
+} from '../../lib/ai/crisis/types'
 
 interface CrisisSessionFlagsManagerProps {
-  userId?: string;
-  showPendingOnly?: boolean;
-  allowManagement?: boolean;
+  userId?: string
+  showPendingOnly?: boolean
+  allowManagement?: boolean
 }
 
 export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
@@ -16,50 +16,50 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
   showPendingOnly = false,
   allowManagement = false,
 }) => {
-  const [flags, setFlags] = useState<CrisisSessionFlag[]>([]);
-  const [userStatus, setUserStatus] = useState<UserSessionStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [flags, setFlags] = useState<CrisisSessionFlag[]>([])
+  const [userStatus, setUserStatus] = useState<UserSessionStatus | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedFlag, setSelectedFlag] = useState<CrisisSessionFlag | null>(
     null,
-  );
-  const [updating, setUpdating] = useState<string | null>(null);
+  )
+  const [updating, setUpdating] = useState<string | null>(null)
 
   const loadFlags = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setLoading(true)
+      setError(null)
 
-      const params = new URLSearchParams();
+      const params = new URLSearchParams()
       if (userId) {
-        params.append("userId", userId);
+        params.append('userId', userId)
       }
       if (showPendingOnly) {
-        params.append("pending", "true");
+        params.append('pending', 'true')
       }
 
-      const response = await fetch(`/api/crisis/session-flags?${params}`);
+      const response = await fetch(`/api/crisis/session-flags?${params}`)
       if (!response.ok) {
-        throw new Error(`Failed to load flags: ${response.statusText}`);
+        throw new Error(`Failed to load flags: ${response.statusText}`)
       }
 
-      const data = await response.json();
-      setFlags(data.flags || []);
-      setUserStatus(data.status || null);
+      const data = await response.json()
+      setFlags(data.flags || [])
+      setUserStatus(data.status || null)
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : "Failed to load crisis flags",
-      );
+          : 'Failed to load crisis flags',
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [userId, showPendingOnly]);
+  }, [userId, showPendingOnly])
 
   useEffect(() => {
-    loadFlags();
-  }, [loadFlags]);
+    loadFlags()
+  }, [loadFlags])
 
   const updateFlagStatus = async (
     flagId: string,
@@ -68,13 +68,13 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     assignedTo?: string,
   ) => {
     try {
-      setUpdating(flagId);
-      setError(null);
+      setUpdating(flagId)
+      setError(null)
 
-      const response = await fetch("/api/crisis/session-flags", {
-        method: "PUT",
+      const response = await fetch('/api/crisis/session-flags', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           flagId,
@@ -82,64 +82,64 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
           reviewerNotes: notes,
           assignedTo,
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Failed to update flag: ${response.statusText}`);
+        throw new Error(`Failed to update flag: ${response.statusText}`)
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       // Update the flag in the list
       setFlags((prev) =>
         prev.map((flag) => (flag.id === flagId ? data.flag : flag)),
-      );
+      )
 
-      setSelectedFlag(null);
+      setSelectedFlag(null)
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : "Failed to update flag",
-      );
+          : 'Failed to update flag',
+      )
     } finally {
-      setUpdating(null);
+      setUpdating(null)
     }
-  };
+  }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "critical":
-        return "text-red-600 bg-red-50";
-      case "high":
-        return "text-orange-600 bg-orange-50";
-      case "medium":
-        return "text-yellow-600 bg-yellow-50";
-      case "low":
-        return "text-green-600 bg-green-50";
+      case 'critical':
+        return 'text-red-600 bg-red-50'
+      case 'high':
+        return 'text-orange-600 bg-orange-50'
+      case 'medium':
+        return 'text-yellow-600 bg-yellow-50'
+      case 'low':
+        return 'text-green-600 bg-green-50'
       default:
-        return "text-gray-600 bg-gray-50";
+        return 'text-gray-600 bg-gray-50'
     }
-  };
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
-        return "text-red-600 bg-red-50";
-      case "under_review":
-        return "text-blue-600 bg-blue-50";
-      case "reviewed":
-        return "text-green-600 bg-green-50";
-      case "resolved":
-        return "text-green-700 bg-green-100";
-      case "escalated":
-        return "text-purple-600 bg-purple-50";
-      case "dismissed":
-        return "text-gray-600 bg-gray-50";
+      case 'pending':
+        return 'text-red-600 bg-red-50'
+      case 'under_review':
+        return 'text-blue-600 bg-blue-50'
+      case 'reviewed':
+        return 'text-green-600 bg-green-50'
+      case 'resolved':
+        return 'text-green-700 bg-green-100'
+      case 'escalated':
+        return 'text-purple-600 bg-purple-50'
+      case 'dismissed':
+        return 'text-gray-600 bg-gray-50'
       default:
-        return "text-gray-600 bg-gray-50";
+        return 'text-gray-600 bg-gray-50'
     }
-  };
+  }
 
   if (loading) {
     return (
@@ -147,7 +147,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         <span className="ml-2">Loading crisis flags...</span>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -181,7 +181,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -213,7 +213,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
             </div>
             <div className="text-center">
               <div
-                className={`text-2xl font-bold ${getSeverityColor(userStatus.currentRiskLevel).split(" ")[0]}`}
+                className={`text-2xl font-bold ${getSeverityColor(userStatus.currentRiskLevel).split(' ')[0]}`}
               >
                 {userStatus.currentRiskLevel.toUpperCase()}
               </div>
@@ -227,7 +227,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Crisis Session Flags {showPendingOnly && "(Pending Review)"}
+            Crisis Session Flags {showPendingOnly && '(Pending Review)'}
           </h3>
         </div>
 
@@ -250,7 +250,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(flag.status)}`}
                       >
-                        {flag.status.replace("_", " ").toUpperCase()}
+                        {flag.status.replace('_', ' ').toUpperCase()}
                       </span>
                       <span className="text-xs text-gray-500">
                         Confidence: {(flag.confidence * 100).toFixed(1)}%
@@ -267,7 +267,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                         Flagged: {new Date(flag.flaggedAt).toLocaleString()}
                       </div>
                       {flag.detectedRisks.length > 0 && (
-                        <div>Risks: {flag.detectedRisks.join(", ")}</div>
+                        <div>Risks: {flag.detectedRisks.join(', ')}</div>
                       )}
                       {flag.textSample && (
                         <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
@@ -284,22 +284,22 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
                     {flag.resolutionNotes && (
                       <div className="mt-2 p-2 bg-green-50 rounded text-sm">
-                        <strong>Resolution Notes:</strong>{" "}
+                        <strong>Resolution Notes:</strong>{' '}
                         {flag.resolutionNotes}
                       </div>
                     )}
                   </div>
 
                   {allowManagement &&
-                    flag.status !== "resolved" &&
-                    flag.status !== "dismissed" && (
+                    flag.status !== 'resolved' &&
+                    flag.status !== 'dismissed' && (
                       <div className="ml-4 flex-shrink-0">
                         <button
                           onClick={() => setSelectedFlag(flag)}
                           disabled={updating === flag.id}
                           className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
                         >
-                          {updating === flag.id ? "Updating..." : "Manage"}
+                          {updating === flag.id ? 'Updating...' : 'Manage'}
                         </button>
                       </div>
                     )}
@@ -330,11 +330,11 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                     aria-label="Update Status"
                   >
                     {[
-                      "under_review",
-                      "reviewed",
-                      "resolved",
-                      "escalated",
-                      "dismissed",
+                      'under_review',
+                      'reviewed',
+                      'resolved',
+                      'escalated',
+                      'dismissed',
                     ].map((status) => (
                       <button
                         key={status}
@@ -344,7 +344,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                         disabled={updating === selectedFlag.id}
                         className="w-full text-left px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
                       >
-                        {status.replace("_", " ").toUpperCase()}
+                        {status.replace('_', ' ').toUpperCase()}
                       </button>
                     ))}
                   </div>
@@ -364,5 +364,5 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,8 +1,8 @@
-import type { ChatMessageWithFHE } from "../../lib/chat/fheChat";
+import type { ChatMessageWithFHE } from '../../lib/chat/fheChat'
 
 interface FHEChatStatusProps {
-  message: ChatMessageWithFHE;
-  className?: string;
+  message: ChatMessageWithFHE
+  className?: string
 }
 
 /**
@@ -10,11 +10,11 @@ interface FHEChatStatusProps {
  */
 export default function FHEChatStatus({
   message,
-  className = "",
+  className = '',
 }: FHEChatStatusProps) {
   // Default to secure if no status is available
-  const isEncrypted = message.fheStatus?.encrypted ?? true;
-  const isVerified = message.fheStatus?.verified ?? true;
+  const isEncrypted = message.fheStatus?.encrypted ?? true
+  const isVerified = message.fheStatus?.verified ?? true
 
   return (
     <div className={`fhe-status flex items-center gap-1 ${className}`}>
@@ -42,10 +42,10 @@ export default function FHEChatStatus({
         </span>
       )}
     </div>
-  );
+  )
 }
 
-function LockIcon({ className = "" }) {
+function LockIcon({ className = '' }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -59,10 +59,10 @@ function LockIcon({ className = "" }) {
         clipRule="evenodd"
       />
     </svg>
-  );
+  )
 }
 
-function UnlockIcon({ className = "" }) {
+function UnlockIcon({ className = '' }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -72,10 +72,10 @@ function UnlockIcon({ className = "" }) {
     >
       <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
     </svg>
-  );
+  )
 }
 
-function CheckIcon({ className = "" }) {
+function CheckIcon({ className = '' }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -89,10 +89,10 @@ function CheckIcon({ className = "" }) {
         clipRule="evenodd"
       />
     </svg>
-  );
+  )
 }
 
-function AlertIcon({ className = "" }) {
+function AlertIcon({ className = '' }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -106,5 +106,5 @@ function AlertIcon({ className = "" }) {
         clipRule="evenodd"
       />
     </svg>
-  );
+  )
 }

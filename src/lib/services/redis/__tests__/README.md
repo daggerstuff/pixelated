@@ -48,7 +48,6 @@ pnpm test:safe
 ```
 
 This script:
-
 1. Verifies Redis is running
 2. Creates necessary test mocks
 3. Sets appropriate environment variables
@@ -61,7 +60,6 @@ This script:
 **Problem**: `RedisServiceError: Failed to connect to Redis`
 
 **Solutions**:
-
 - Ensure Redis is running locally with `redis-cli ping`
 - Set `SKIP_REDIS_TESTS=true` to skip Redis perf tests
 - Use the mock Redis implementation by running in development mode
@@ -72,7 +70,6 @@ This script:
 **Problem**: `TypeError: expect(...).toBe is not a function`
 
 **Solution**:
-
 - These errors typically occur when test matchers aren't properly available
 - Make sure custom matchers have been correctly defined and extended
 - Reset mocks between tests with `vi.resetAllMocks()`
@@ -82,7 +79,6 @@ This script:
 **Problem**: `Error: Redis is already connecting/connected`
 
 **Solutions**:
-
 - Ensure `disconnect()` is called in test teardown
 - Use `beforeEach`/`afterEach` to properly setup/teardown Redis
 - Reduce test concurrency with `--poolOptions.threads.maxThreads=3`

@@ -3,7 +3,7 @@
  * This file provides basic mock responses for API calls
  */
 
-import { vi } from "vitest";
+import { vi } from 'vitest'
 
 const mockDashboardData = {
   summary: {
@@ -14,17 +14,17 @@ const mockDashboardData = {
   },
   charts: {
     userGrowth: [
-      { month: "Jan", users: 100 },
-      { month: "Feb", users: 150 },
-      { month: "Mar", users: 200 },
+      { month: 'Jan', users: 100 },
+      { month: 'Feb', users: 150 },
+      { month: 'Mar', users: 200 },
     ],
   },
-};
+}
 
 // Simple mock handlers
 export const handlers = [
   // Mock API responses can be added here if needed
-];
+]
 
 // Mock HTTP response helper
 export const HttpResponse = {
@@ -38,7 +38,7 @@ export const HttpResponse = {
     status: 200,
     text: () => Promise.resolve(text),
   }),
-};
+}
 
 // Mock http helper
 export const http = {
@@ -46,6 +46,6 @@ export const http = {
   post: vi.fn(),
   put: vi.fn(),
   delete: vi.fn(),
-};
+}
 
-export { mockDashboardData };
+export { mockDashboardData }

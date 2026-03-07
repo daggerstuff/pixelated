@@ -1,9 +1,9 @@
 ---
-title: "Integration Guide: Therapy Analysis System"
-description: "Integration Guide: Therapy Analysis System documentation"
+title: 'Integration Guide: Therapy Analysis System'
+description: 'Integration Guide: Therapy Analysis System documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -18,26 +18,26 @@ This guide demonstrates how to integrate the Advanced Detection Systems, Mistral
 
 ```typescript
 interface TherapyAnalysisSystem {
-  detectionSystem: DetectionSystem;
-  ragSystem: RAGSystem;
-  behavioralAnalysis: BehavioralAnalyzer;
+  detectionSystem: DetectionSystem
+  ragSystem: RAGSystem
+  behavioralAnalysis: BehavioralAnalyzer
 
   // Integration components
-  sessionManager: SessionManager;
-  alertSystem: AlertSystem;
-  dataStore: DataStore;
+  sessionManager: SessionManager
+  alertSystem: AlertSystem
+  dataStore: DataStore
 }
 
 interface SessionManager {
-  startSession(clientId: exampleId): Promise<Session>;
-  processInput(sessionId: string, input: UserInput): Promise<Analysis>;
-  endSession(sessionId: string): Promise<SessionSummary>;
+  startSession(clientId: exampleId): Promise<Session>
+  processInput(sessionId: string, input: UserInput): Promise<Analysis>
+  endSession(sessionId: string): Promise<SessionSummary>
 }
 
 interface AlertSystem {
-  checkThresholds(analysis: Analysis): Promise<Alert[]>;
-  notifyStakeholders(alerts: Alert[]): Promise<void>;
-  logAlerts(alerts: Alert[]): Promise<void>;
+  checkThresholds(analysis: Analysis): Promise<Alert[]>
+  notifyStakeholders(alerts: Alert[]): Promise<void>
+  logAlerts(alerts: Alert[]): Promise<void>
 }
 ```
 
@@ -143,25 +143,25 @@ class CrisisDetector:
 ```typescript
 interface DataFlow {
   input: {
-    text: string;
-    voice?: AudioData;
-    behavioral: BehavioralMetrics;
-    context: SessionContext;
-  };
+    text: string
+    voice?: AudioData
+    behavioral: BehavioralMetrics
+    context: SessionContext
+  }
 
   processing: {
-    textAnalysis: TextAnalysisResult;
-    voiceAnalysis?: VoiceAnalysisResult;
-    behavioralAnalysis: BehavioralAnalysisResult;
-    ragContext: RetrievedContext;
-  };
+    textAnalysis: TextAnalysisResult
+    voiceAnalysis?: VoiceAnalysisResult
+    behavioralAnalysis: BehavioralAnalysisResult
+    ragContext: RetrievedContext
+  }
 
   output: {
-    response: string;
-    insights: TherapeuticInsights;
-    recommendations: Recommendation[];
-    alerts: Alert[];
-  };
+    response: string
+    insights: TherapeuticInsights
+    recommendations: Recommendation[]
+    alerts: Alert[]
+  }
 }
 ```
 
@@ -169,17 +169,17 @@ interface DataFlow {
 
 ```typescript
 interface EventSystem {
-  subscribe(event: TherapyEvent, handler: EventHandler): void;
-  publish(event: TherapyEvent, data: EventData): void;
-  unsubscribe(event: TherapyEvent, handler: EventHandler): void;
+  subscribe(event: TherapyEvent, handler: EventHandler): void
+  publish(event: TherapyEvent, data: EventData): void
+  unsubscribe(event: TherapyEvent, handler: EventHandler): void
 }
 
 type TherapyEvent =
-  | "crisis_detected"
-  | "pattern_identified"
-  | "risk_level_changed"
-  | "intervention_needed"
-  | "session_milestone";
+  | 'crisis_detected'
+  | 'pattern_identified'
+  | 'risk_level_changed'
+  | 'intervention_needed'
+  | 'session_milestone'
 ```
 
 ## Deployment Strategy
@@ -192,19 +192,19 @@ type TherapyEvent =
        image: therapy-detection:latest
        resources:
          gpu: 1
-         memory: "8Gi"
+         memory: '8Gi'
 
      rag_system:
        image: therapy-rag:latest
        resources:
          gpu: 1
-         memory: "16Gi"
+         memory: '16Gi'
 
      behavioral_analysis:
        image: therapy-behavior:latest
        resources:
-         cpu: "4"
-         memory: "8Gi"
+         cpu: '4'
+         memory: '8Gi'
    ```
 
 2. Scaling Configuration

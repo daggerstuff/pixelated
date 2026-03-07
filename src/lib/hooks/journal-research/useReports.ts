@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   generateReport,
   getReport,
@@ -6,16 +6,16 @@ import {
   type Report,
   type ReportGeneratePayload,
   type ReportList,
-} from "@/lib/api/journal-research";
+} from '@/lib/api/journal-research'
 import {
   journalResearchMutationKeys,
   journalResearchQueryKeys,
-} from "@/lib/api/journal-research/react-query";
+} from '@/lib/api/journal-research/react-query'
 
 interface UseReportListOptions {
-  page?: number;
-  pageSize?: number;
-  enabled?: boolean;
+  page?: number
+  pageSize?: number
+  enabled?: boolean
 }
 
 export const useReportListQuery = (
@@ -23,42 +23,42 @@ export const useReportListQuery = (
   { page = 1, pageSize = 25, enabled = true }: UseReportListOptions = {},
 ) =>
   useQuery({
-    queryKey: journalResearchQueryKeys.reports.list(sessionId ?? "unknown", {
+    queryKey: journalResearchQueryKeys.reports.list(sessionId ?? 'unknown', {
       page,
       pageSize,
     }),
-    queryFn: () => listReports(sessionId ?? "", { page, pageSize }),
+    queryFn: () => listReports(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data: ReportList) => data,
-  });
+  })
 
 export const useReportQuery = (
   sessionId: string | null,
   reportId: string | null,
   options: { enabled?: boolean } = {},
 ) => {
-  const { enabled = true } = options;
+  const { enabled = true } = options
   return useQuery({
     queryKey: journalResearchQueryKeys.reports.detail(
-      sessionId ?? "unknown",
-      reportId ?? "unknown",
+      sessionId ?? 'unknown',
+      reportId ?? 'unknown',
     ),
-    queryFn: () => getReport(sessionId ?? "", reportId ?? ""),
+    queryFn: () => getReport(sessionId ?? '', reportId ?? ''),
     enabled: Boolean(sessionId && reportId) && enabled,
-  });
-};
+  })
+}
 
 export const useGenerateReportMutation = (sessionId: string | null) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation({
     mutationKey: journalResearchMutationKeys.reports.generate(),
     mutationFn: (payload: ReportGeneratePayload) =>
-      generateReport(sessionId ?? "", payload),
+      generateReport(sessionId ?? '', payload),
     onSuccess: (result: Report) => {
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.reports.list(result.sessionId, {}),
         exact: false,
-      });
+      })
     },
-  });
-};
+  })
+}

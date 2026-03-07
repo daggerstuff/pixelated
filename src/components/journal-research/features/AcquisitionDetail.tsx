@@ -1,34 +1,18 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
 import {
   useAcquisitionQuery,
   useAcquisitionUpdateMutation,
-} from "@/lib/hooks/journal-research";
-import {
-  useIntegrateDataset,
-  useTrainingStatus,
-} from "@/lib/hooks/journal-research/useTraining";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import {
-  Download,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Play,
-  CheckCircle2,
-  Loader2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button/button";
+} from '@/lib/hooks/journal-research'
+import { useIntegrateDataset, useTrainingStatus } from '@/lib/hooks/journal-research/useTraining'
+import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
+import { Download, CheckCircle, XCircle, Clock, Play, CheckCircle2, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button/button'
 
 export interface AcquisitionDetailProps {
-  sessionId: string;
-  acquisitionId: string;
-  className?: string;
+  sessionId: string
+  acquisitionId: string
+  className?: string
 }
 
 export function AcquisitionDetail({
@@ -39,58 +23,54 @@ export function AcquisitionDetail({
   const { data: acquisition, isLoading } = useAcquisitionQuery(
     sessionId,
     acquisitionId,
-  );
-  const updateMutation = useAcquisitionUpdateMutation(sessionId);
-  const integrateMutation = useIntegrateDataset(sessionId);
-  const { data: trainingStatus } = useTrainingStatus(sessionId, true);
+  )
+  const updateMutation = useAcquisitionUpdateMutation(sessionId)
+  const integrateMutation = useIntegrateDataset(sessionId)
+  const { data: trainingStatus } = useTrainingStatus(sessionId, true)
 
   // Check if this acquisition is integrated
-  const isIntegrated =
-    trainingStatus?.datasets?.find(
-      (ds) => ds.source_id === acquisition?.sourceId,
-    )?.integrated ?? false;
+  const isIntegrated = trainingStatus?.datasets?.find(
+    (ds) => ds.source_id === acquisition?.sourceId
+  )?.integrated ?? false
 
   if (isLoading) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">Loading acquisition...</p>
       </div>
-    );
+    )
   }
 
   if (!acquisition) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">Acquisition not found</p>
       </div>
-    );
+    )
   }
 
   const statusIcons = {
     pending: Clock,
     approved: CheckCircle,
-    "in-progress": Download,
+    'in-progress': Download,
     completed: CheckCircle,
     failed: XCircle,
-  };
+  }
 
-  const StatusIcon =
-    statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock;
+  const StatusIcon = statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock
 
   const statusColors = {
-    pending: "text-yellow-600",
-    approved: "text-blue-600",
-    "in-progress": "text-blue-600",
-    completed: "text-green-600",
-    failed: "text-red-600",
-  };
+    pending: 'text-yellow-600',
+    approved: 'text-blue-600',
+    'in-progress': 'text-blue-600',
+    completed: 'text-green-600',
+    failed: 'text-red-600',
+  }
 
-  const statusColor =
-    statusColors[acquisition.status as keyof typeof statusColors] ??
-    "text-gray-600";
+  const statusColor = statusColors[acquisition.status as keyof typeof statusColors] ?? 'text-gray-600'
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -98,17 +78,17 @@ export function AcquisitionDetail({
           <p className="text-muted-foreground mt-1">
             <span className="capitalize">{acquisition.status}</span>
             {acquisition.acquiredDate &&
-              ` • Acquired ${format(acquisition.acquiredDate, "MMM d, yyyy")}`}
+              ` • Acquired ${format(acquisition.acquiredDate, 'MMM d, yyyy')}`}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <StatusIcon className={cn("h-5 w-5", statusColor)} />
+            <StatusIcon className={cn('h-5 w-5', statusColor)} />
             <span className="capitalize font-medium">{acquisition.status}</span>
           </div>
 
           {/* Training Pipeline Integration */}
-          {acquisition.status === "completed" && (
+          {acquisition.status === 'completed' && (
             <div className="flex items-center gap-2">
               {isIntegrated ? (
                 <div className="flex items-center gap-2 rounded-md bg-green-50 dark:bg-green-900/20 px-3 py-1.5">
@@ -122,9 +102,7 @@ export function AcquisitionDetail({
                   size="sm"
                   onClick={() => {
                     if (acquisition.sourceId) {
-                      integrateMutation.mutate({
-                        sourceId: acquisition.sourceId,
-                      });
+                      integrateMutation.mutate({ sourceId: acquisition.sourceId })
                     }
                   }}
                   disabled={integrateMutation.isPending}
@@ -178,7 +156,7 @@ export function AcquisitionDetail({
                   Acquired Date
                 </p>
                 <p className="mt-1">
-                  {format(acquisition.acquiredDate, "PPpp")}
+                  {format(acquisition.acquiredDate, 'PPpp')}
                 </p>
               </div>
             )}
@@ -227,14 +205,14 @@ export function AcquisitionDetail({
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {acquisition.status === "pending" && (
+            {acquisition.status === 'pending' && (
               <>
                 <button
                   onClick={() => {
                     updateMutation.mutate({
                       acquisitionId: acquisition.acquisitionId,
-                      payload: { status: "approved" },
-                    });
+                      payload: { status: 'approved' },
+                    })
                   }}
                   className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
@@ -244,8 +222,8 @@ export function AcquisitionDetail({
                   onClick={() => {
                     updateMutation.mutate({
                       acquisitionId: acquisition.acquisitionId,
-                      payload: { status: "failed" },
-                    });
+                      payload: { status: 'failed' },
+                    })
                   }}
                   className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground hover:bg-destructive/90"
                 >
@@ -253,26 +231,26 @@ export function AcquisitionDetail({
                 </button>
               </>
             )}
-            {acquisition.status === "approved" && (
+            {acquisition.status === 'approved' && (
               <button
                 onClick={() => {
                   updateMutation.mutate({
                     acquisitionId: acquisition.acquisitionId,
-                    payload: { status: "in-progress" },
-                  });
+                    payload: { status: 'in-progress' },
+                  })
                 }}
                 className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Start Download
               </button>
             )}
-            {acquisition.status === "in-progress" && (
+            {acquisition.status === 'in-progress' && (
               <button
                 onClick={() => {
                   updateMutation.mutate({
                     acquisitionId: acquisition.acquisitionId,
-                    payload: { status: "completed" },
-                  });
+                    payload: { status: 'completed' },
+                  })
                 }}
                 className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
               >
@@ -283,5 +261,5 @@ export function AcquisitionDetail({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

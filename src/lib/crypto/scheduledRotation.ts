@@ -1,14 +1,14 @@
-import { KeyStorage } from "./keyStorage";
+import { KeyStorage } from './keyStorage'
 
 /**
  * Options for scheduled key rotation
  */
 interface ScheduledRotationOptions {
-  checkIntervalMs?: number;
-  namespace?: string;
-  useSecureStorage?: boolean;
-  onRotation?: (keyId: string, newKeyId: string) => void;
-  onError?: (error: Error) => void;
+  checkIntervalMs?: number
+  namespace?: string
+  useSecureStorage?: boolean
+  onRotation?: (keyId: string, newKeyId: string) => void
+  onError?: (error: Error) => void
 }
 
 /**
@@ -16,11 +16,11 @@ interface ScheduledRotationOptions {
  * Automatically rotates keys based on expiration
  */
 export class ScheduledKeyRotation {
-  private keyStorage: KeyStorage;
-  private checkInterval: number;
-  private intervalId: NodeJS.Timeout | null = null;
-  private onRotation?: (keyId: string, newKeyId: string) => void;
-  private onError?: (error: Error) => void;
+  private keyStorage: KeyStorage
+  private checkInterval: number
+  private intervalId: NodeJS.Timeout | null = null
+  private onRotation?: (keyId: string, newKeyId: string) => void
+  private onError?: (error: Error) => void
 
   /**
    * Creates a new ScheduledKeyRotation instance
@@ -28,15 +28,15 @@ export class ScheduledKeyRotation {
    */
   constructor(options: ScheduledRotationOptions = {}) {
     this.keyStorage = new KeyStorage({
-      namespace: options.namespace || "app",
-      region: "us-east-1",
+      namespace: options.namespace || 'app',
+      region: 'us-east-1',
       useKms: false,
-    });
+    })
 
     // Default check interval: 1 hour
-    this.checkInterval = options.checkIntervalMs || 60 * 60 * 1000;
-    this.onRotation = options.onRotation;
-    this.onError = options.onError;
+    this.checkInterval = options.checkIntervalMs || 60 * 60 * 1000
+    this.onRotation = options.onRotation
+    this.onError = options.onError
   }
 
   /**
@@ -44,28 +44,28 @@ export class ScheduledKeyRotation {
    */
   start() {
     if (this.intervalId) {
-      return; // Already started
+      return // Already started
     }
 
     // Perform initial check
     this.checkAndRotateKeys().catch((error) => {
       if (this.onError) {
-        this.onError(error);
+        this.onError(error)
       } else {
-        console.error("Error during key rotation:", error);
+        console.error('Error during key rotation:', error)
       }
-    });
+    })
 
     // Schedule regular checks
     this.intervalId = setInterval(() => {
       this.checkAndRotateKeys().catch((error) => {
         if (this.onError) {
-          this.onError(error);
+          this.onError(error)
         } else {
-          console.error("Error during key rotation:", error);
+          console.error('Error during key rotation:', error)
         }
-      });
-    }, this.checkInterval);
+      })
+    }, this.checkInterval)
   }
 
   /**
@@ -73,8 +73,8 @@ export class ScheduledKeyRotation {
    */
   stop() {
     if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
+      clearInterval(this.intervalId)
+      this.intervalId = null
     }
   }
 
@@ -83,39 +83,37 @@ export class ScheduledKeyRotation {
    */
   private shouldRotateKey(keyData: { expiresAt?: number }): boolean {
     if (!keyData.expiresAt) {
-      return false;
+      return false
     }
-    const now = Date.now();
-    const isExpired = keyData.expiresAt <= now;
+    const now = Date.now()
+    const isExpired = keyData.expiresAt <= now
     const expiresWithin24Hours =
-      keyData.expiresAt > now && keyData.expiresAt <= now + 24 * 60 * 60 * 1000;
-    return isExpired || expiresWithin24Hours;
+      keyData.expiresAt > now &&
+      keyData.expiresAt <= now + 24 * 60 * 60 * 1000
+    return isExpired || expiresWithin24Hours
   }
 
   /**
    * Rotate a single key and handle notifications
    */
-  private async rotateKeyWithNotification(
-    keyId: string,
-  ): Promise<string | null> {
+  private async rotateKeyWithNotification(keyId: string): Promise<string | null> {
     try {
-      const rotatedKey = await this.keyStorage.rotateKey(keyId);
+      const rotatedKey = await this.keyStorage.rotateKey(keyId)
       if (!rotatedKey) {
-        return null;
+        return null
       }
       if (this.onRotation) {
-        this.onRotation(keyId, rotatedKey.keyId);
+        this.onRotation(keyId, rotatedKey.keyId)
       }
-      return rotatedKey.keyId;
+      return rotatedKey.keyId
     } catch (error: unknown) {
-      const errorObj =
-        error instanceof Error ? error : new Error(String(error));
+      const errorObj = error instanceof Error ? error : new Error(String(error))
       if (this.onError) {
-        this.onError(errorObj);
+        this.onError(errorObj)
       } else {
-        console.error(`Error rotating key ${keyId}:`, error);
+        console.error(`Error rotating key ${keyId}:`, error)
       }
-      return null;
+      return null
     }
   }
 
@@ -124,23 +122,23 @@ export class ScheduledKeyRotation {
    * @returns Array of rotated key IDs
    */
   async checkAndRotateKeys(): Promise<string[]> {
-    const rotatedKeys: string[] = [];
-    const allKeys = await this.keyStorage.listKeys();
+    const rotatedKeys: string[] = []
+    const allKeys = await this.keyStorage.listKeys()
 
     for (const keyId of allKeys) {
-      const keyData = await this.keyStorage.getKey(keyId);
+      const keyData = await this.keyStorage.getKey(keyId)
       if (!keyData) {
-        continue;
+        continue
       }
       if (this.shouldRotateKey(keyData)) {
-        const rotatedKeyId = await this.rotateKeyWithNotification(keyId);
+        const rotatedKeyId = await this.rotateKeyWithNotification(keyId)
         if (rotatedKeyId) {
-          rotatedKeys.push(rotatedKeyId);
+          rotatedKeys.push(rotatedKeyId)
         }
       }
     }
 
-    return rotatedKeys;
+    return rotatedKeys
   }
 
   /**
@@ -150,26 +148,26 @@ export class ScheduledKeyRotation {
    */
   async forceRotateKey(keyId: string): Promise<string | null> {
     try {
-      const rotatedKey = await this.keyStorage.rotateKey(keyId);
+      const rotatedKey = await this.keyStorage.rotateKey(keyId)
 
       if (rotatedKey) {
         // Notify about rotation
         if (this.onRotation) {
-          this.onRotation(keyId, rotatedKey.keyId);
+          this.onRotation(keyId, rotatedKey.keyId)
         }
 
-        return rotatedKey.keyId;
+        return rotatedKey.keyId
       }
 
-      return null;
+      return null
     } catch (error: unknown) {
       if (this.onError) {
-        this.onError(error instanceof Error ? error : new Error(String(error)));
+        this.onError(error instanceof Error ? error : new Error(String(error)))
       } else {
-        console.error(`Error rotating key ${keyId}:`, error);
+        console.error(`Error rotating key ${keyId}:`, error)
       }
 
-      return null;
+      return null
     }
   }
 }

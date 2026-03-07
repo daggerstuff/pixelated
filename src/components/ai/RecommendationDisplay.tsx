@@ -1,42 +1,42 @@
-import type { FC } from "react";
-import type { TreatmentRecommendation } from "../../lib/ai/services/RecommendationService";
+import type { FC } from 'react'
+import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 
 interface RecommendationDisplayProps {
-  recommendations: TreatmentRecommendation[];
+  recommendations: TreatmentRecommendation[]
 }
 
 // Define more specific types for treatment and personalization
 interface TreatmentDetails {
-  approach?: string;
-  techniques?: string[];
-  duration?: string;
-  frequency?: string;
+  approach?: string
+  techniques?: string[]
+  duration?: string
+  frequency?: string
 }
 
 interface PersonalizationDetails {
-  factors?: string[];
-  adaptations?: string;
+  factors?: string[]
+  adaptations?: string
 }
 
 // Extended TreatmentRecommendation with additional properties used in the component
 interface ExtendedTreatmentRecommendation extends TreatmentRecommendation {
-  efficacy?: number;
-  indications?: string[];
-  treatment?: string | TreatmentDetails;
-  evidence?: string[];
-  personalization?: string | PersonalizationDetails;
+  efficacy?: number
+  indications?: string[]
+  treatment?: string | TreatmentDetails
+  evidence?: string[]
+  personalization?: string | PersonalizationDetails
   alternatives?: Array<{
-    name: string;
-    description?: string;
-    efficacy?: number;
-  }>;
+    name: string
+    description?: string
+    efficacy?: number
+  }>
   mediaRecommendations?: Array<{
-    title: string;
-    type: string;
-    description?: string;
-    url?: string;
-  }>;
-  timestamp?: string;
+    title: string
+    type: string
+    description?: string
+    url?: string
+  }>
+  timestamp?: string
 }
 
 const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
@@ -47,68 +47,68 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
       <div className="text-center py-8 text-gray-500">
         No recommendations available
       </div>
-    );
+    )
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
+      case 'high':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'low':
+        return 'bg-green-100 text-green-800 border-green-200'
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   const getEfficacyColor = (efficacy: number) => {
     if (efficacy >= 0.8) {
-      return "text-green-600";
+      return 'text-green-600'
     } else if (efficacy >= 0.6) {
-      return "text-yellow-600";
+      return 'text-yellow-600'
     } else {
-      return "text-red-600";
+      return 'text-red-600'
     }
-  };
+  }
 
   // Helper function to check if an object has the structure of TreatmentDetails
   const isTreatmentDetails = (
     treatment: unknown,
   ): treatment is TreatmentDetails => {
-    if (!treatment || typeof treatment !== "object") {
-      return false;
+    if (!treatment || typeof treatment !== 'object') {
+      return false
     }
-    const t = treatment as Record<string, unknown>;
+    const t = treatment as Record<string, unknown>
     return (
-      ("approach" in t &&
-        (typeof t["approach"] === "string" || t["approach"] === undefined)) ||
-      ("techniques" in t &&
-        (Array.isArray(t["techniques"]) || t["techniques"] === undefined)) ||
-      ("duration" in t &&
-        (typeof t["duration"] === "string" || t["duration"] === undefined)) ||
-      ("frequency" in t &&
-        (typeof t["frequency"] === "string" || t["frequency"] === undefined))
-    );
-  };
+      ('approach' in t &&
+        (typeof t['approach'] === 'string' || t['approach'] === undefined)) ||
+      ('techniques' in t &&
+        (Array.isArray(t['techniques']) || t['techniques'] === undefined)) ||
+      ('duration' in t &&
+        (typeof t['duration'] === 'string' || t['duration'] === undefined)) ||
+      ('frequency' in t &&
+        (typeof t['frequency'] === 'string' || t['frequency'] === undefined))
+    )
+  }
 
   // Helper function to check if an object has the structure of PersonalizationDetails
   const isPersonalizationDetails = (
     personalization: unknown,
   ): personalization is PersonalizationDetails => {
-    if (!personalization || typeof personalization !== "object") {
-      return false;
+    if (!personalization || typeof personalization !== 'object') {
+      return false
     }
-    const p = personalization as Record<string, unknown>;
+    const p = personalization as Record<string, unknown>
     return (
-      ("factors" in p &&
-        (Array.isArray(p["factors"]) || p["factors"] === undefined)) ||
-      ("adaptations" in p &&
-        (typeof p["adaptations"] === "string" ||
-          p["adaptations"] === undefined))
-    );
-  };
+      ('factors' in p &&
+        (Array.isArray(p['factors']) || p['factors'] === undefined)) ||
+      ('adaptations' in p &&
+        (typeof p['adaptations'] === 'string' ||
+          p['adaptations'] === undefined))
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -118,13 +118,13 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
 
       {recommendations.map((baseRec) => {
         // Cast to extended type to handle additional properties
-        const rec = baseRec as ExtendedTreatmentRecommendation;
+        const rec = baseRec as ExtendedTreatmentRecommendation
 
         return (
           <div
             key={
               rec.id ||
-              `rec-${rec.title || "untitled"}-${rec.metadata?.generatedAt || Date.now()}`
+              `rec-${rec.title || 'untitled'}-${rec.metadata?.generatedAt || Date.now()}`
             }
             className="bg-white rounded-lg shadow-md border border-gray-200 p-6"
           >
@@ -132,7 +132,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {rec.title || "Treatment Recommendation"}
+                  {rec.title || 'Treatment Recommendation'}
                 </h3>
                 {rec.description && (
                   <p className="text-gray-600 mb-3">{rec.description}</p>
@@ -142,10 +142,10 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-medium border ${getPriorityColor(rec.priority)}`}
                 >
-                  {rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}{" "}
+                  {rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}{' '}
                   Priority
                 </span>
-                {typeof rec.efficacy === "number" && (
+                {typeof rec.efficacy === 'number' && (
                   <span
                     className={`text-sm font-medium ${getEfficacyColor(rec.efficacy)}`}
                   >
@@ -181,35 +181,35 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                   Treatment Details:
                 </h4>
                 <div className="bg-gray-50 rounded p-3">
-                  {typeof rec.treatment === "string" ? (
+                  {typeof rec.treatment === 'string' ? (
                     <p className="text-gray-800">{rec.treatment}</p>
                   ) : isTreatmentDetails(rec.treatment) ? (
                     <div className="space-y-2">
-                      {rec.treatment["approach"] && (
+                      {rec.treatment['approach'] && (
                         <div>
                           <span className="font-medium">Approach: </span>
-                          <span>{rec.treatment["approach"]}</span>
+                          <span>{rec.treatment['approach']}</span>
                         </div>
                       )}
-                      {rec.treatment["techniques"] &&
-                        rec.treatment["techniques"].length > 0 && (
+                      {rec.treatment['techniques'] &&
+                        rec.treatment['techniques'].length > 0 && (
                           <div>
                             <span className="font-medium">Techniques: </span>
                             <span>
-                              {rec.treatment["techniques"].join(", ")}
+                              {rec.treatment['techniques'].join(', ')}
                             </span>
                           </div>
                         )}
-                      {rec.treatment["duration"] && (
+                      {rec.treatment['duration'] && (
                         <div>
                           <span className="font-medium">Duration: </span>
-                          <span>{rec.treatment["duration"]}</span>
+                          <span>{rec.treatment['duration']}</span>
                         </div>
                       )}
-                      {rec.treatment["frequency"] && (
+                      {rec.treatment['frequency'] && (
                         <div>
                           <span className="font-medium">Frequency: </span>
-                          <span>{rec.treatment["frequency"]}</span>
+                          <span>{rec.treatment['frequency']}</span>
                         </div>
                       )}
                     </div>
@@ -253,25 +253,25 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                   Personalization Notes:
                 </h4>
                 <div className="bg-blue-50 rounded p-3">
-                  {typeof rec.personalization === "string" ? (
+                  {typeof rec.personalization === 'string' ? (
                     <p className="text-blue-800 text-sm">
                       {rec.personalization}
                     </p>
                   ) : isPersonalizationDetails(rec.personalization) ? (
                     <div className="space-y-1 text-sm text-blue-800">
-                      {rec.personalization["factors"] &&
-                        rec.personalization["factors"].length > 0 && (
+                      {rec.personalization['factors'] &&
+                        rec.personalization['factors'].length > 0 && (
                           <div>
                             <span className="font-medium">Factors: </span>
                             <span>
-                              {rec.personalization["factors"].join(", ")}
+                              {rec.personalization['factors'].join(', ')}
                             </span>
                           </div>
                         )}
-                      {rec.personalization["adaptations"] && (
+                      {rec.personalization['adaptations'] && (
                         <div>
                           <span className="font-medium">Adaptations: </span>
-                          <span>{rec.personalization["adaptations"]}</span>
+                          <span>{rec.personalization['adaptations']}</span>
                         </div>
                       )}
                     </div>
@@ -304,7 +304,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
                           {alt.description}
                         </div>
                       )}
-                      {typeof alt.efficacy === "number" && (
+                      {typeof alt.efficacy === 'number' && (
                         <div
                           className={`mt-1 ${getEfficacyColor(alt.efficacy)}`}
                         >
@@ -364,10 +364,10 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({
               </div>
             )}
           </div>
-        );
+        )
       })}
     </div>
-  );
-};
+  )
+}
 
-export default RecommendationDisplay;
+export default RecommendationDisplay

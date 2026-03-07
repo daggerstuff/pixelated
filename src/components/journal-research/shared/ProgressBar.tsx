@@ -1,20 +1,20 @@
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils'
 
 export interface ProgressBarProps {
-  value: number;
-  max?: number;
-  label?: string;
-  showValue?: boolean;
-  className?: string;
-  variant?: "default" | "success" | "warning" | "error";
+  value: number
+  max?: number
+  label?: string
+  showValue?: boolean
+  className?: string
+  variant?: 'default' | 'success' | 'warning' | 'error'
 }
 
 const variantStyles = {
-  default: "bg-primary",
-  success: "bg-green-500",
-  warning: "bg-yellow-500",
-  error: "bg-red-500",
-};
+  default: 'bg-primary',
+  success: 'bg-green-500',
+  warning: 'bg-yellow-500',
+  error: 'bg-red-500',
+}
 
 export function ProgressBar({
   value,
@@ -22,13 +22,13 @@ export function ProgressBar({
   label,
   showValue = false,
   className,
-  variant = "default",
+  variant = 'default',
 }: ProgressBarProps) {
-  const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
-  const id = `progress-${Math.random().toString(36).substr(2, 9)}`;
+  const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
+  const id = `progress-${Math.random().toString(36).substr(2, 9)}`
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn('w-full', className)}>
       {label && (
         <div className="mb-2 flex items-center justify-between text-sm">
           <label htmlFor={id} className="text-muted-foreground">
@@ -45,12 +45,12 @@ export function ProgressBar({
         aria-valuenow={value}
         aria-valuemin={0}
         aria-valuemax={max}
-        aria-label={label ?? "Progress"}
+        aria-label={label ?? 'Progress'}
         id={id}
       >
         <div
           className={cn(
-            "h-full transition-all duration-300 ease-out",
+            'h-full transition-all duration-300 ease-out',
             variantStyles[variant],
           )}
           style={{ width: `${percentage}%` }}
@@ -62,5 +62,5 @@ export function ProgressBar({
         </div>
       )}
     </div>
-  );
+  )
 }

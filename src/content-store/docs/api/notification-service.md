@@ -47,21 +47,21 @@ The `NotificationService` is a singleton class that handles notifications for ca
 
 ```typescript
 interface NotificationConfig {
-  enabled: boolean;
+  enabled: boolean
   channels: {
     email?: {
-      enabled: boolean;
-      recipients: string[];
-    };
+      enabled: boolean
+      recipients: string[]
+    }
     slack?: {
-      enabled: boolean;
-      channel: string;
-    };
-  };
+      enabled: boolean
+      channel: string
+    }
+  }
   throttle: {
-    maxNotifications: number;
-    windowMs: number;
-  };
+    maxNotifications: number
+    windowMs: number
+  }
 }
 ```
 
@@ -76,7 +76,7 @@ Returns the singleton instance of the NotificationService.
 **Example**:
 
 ```typescript
-const notificationService = NotificationService.getInstance();
+const notificationService = NotificationService.getInstance()
 ```
 
 #### `notify(alert: CacheAlert)`
@@ -93,12 +93,12 @@ Sends notifications for a cache alert through configured channels.
 
 ```typescript
 const alert = {
-  type: "memory_usage",
+  type: 'memory_usage',
   value: 85,
   threshold: 80,
-};
+}
 
-await notificationService.notify(alert);
+await notificationService.notify(alert)
 ```
 
 #### `clearNotificationHistory()`
@@ -110,7 +110,7 @@ Clears the notification history, resetting throttling counters.
 **Example**:
 
 ```typescript
-await notificationService.clearNotificationHistory();
+await notificationService.clearNotificationHistory()
 ```
 
 ### Base Service Private Methods
@@ -130,53 +130,53 @@ multiple notification channels with advanced features.
 ### Automated Service Interfaces 2
 
 ```typescript
-type NotificationChannel = "email" | "slack" | "sms" | "webhook";
-type NotificationSeverity = "low" | "medium" | "high" | "critical";
+type NotificationChannel = 'email' | 'slack' | 'sms' | 'webhook'
+type NotificationSeverity = 'low' | 'medium' | 'high' | 'critical'
 
 interface NotificationTemplate {
-  subject: string;
-  body: string;
-  channels: NotificationChannel[];
+  subject: string
+  body: string
+  channels: NotificationChannel[]
 }
 
 interface NotificationConfig {
-  enabled: boolean;
+  enabled: boolean
   channels: {
     email?: {
-      enabled: boolean;
-      recipients: string[];
-      templates?: Record<string, string>;
-    };
+      enabled: boolean
+      recipients: string[]
+      templates?: Record<string, string>
+    }
     slack?: {
-      enabled: boolean;
-      channel: string;
-      templates?: Record<string, string>;
-    };
+      enabled: boolean
+      channel: string
+      templates?: Record<string, string>
+    }
     sms?: {
-      enabled: boolean;
-      numbers: string[];
-      templates?: Record<string, string>;
-    };
+      enabled: boolean
+      numbers: string[]
+      templates?: Record<string, string>
+    }
     webhook?: {
-      enabled: boolean;
-      url: string;
-      headers?: Record<string, string>;
-    };
-  };
+      enabled: boolean
+      url: string
+      headers?: Record<string, string>
+    }
+  }
   throttling: {
-    maxPerMinute: number;
-    maxPerHour: number;
-    cooldownPeriod: number;
-  };
+    maxPerMinute: number
+    maxPerHour: number
+    cooldownPeriod: number
+  }
 }
 
 interface Notification {
-  id: string;
-  type: string;
-  severity: NotificationSeverity;
-  message: string;
-  metadata?: Record<string, any>;
-  timestamp: Date;
+  id: string
+  type: string
+  severity: NotificationSeverity
+  message: string
+  metadata?: Record<string, any>
+  timestamp: Date
 }
 ```
 
@@ -191,7 +191,7 @@ Returns the singleton instance of the AutomatedNotificationService.
 **Example**:
 
 ```typescript
-const notificationService = AutomatedNotificationService.getInstance();
+const notificationService = AutomatedNotificationService.getInstance()
 ```
 
 #### `notify(notification: Notification)`
@@ -208,15 +208,15 @@ Sends a notification through configured channels based on severity and type.
 
 ```typescript
 const notification = {
-  id: "notif-123",
-  type: "system_alert",
-  severity: "high",
-  message: "Database connection issues detected",
-  metadata: { connectionAttempts: 5, lastError: "Connection timeout" },
+  id: 'notif-123',
+  type: 'system_alert',
+  severity: 'high',
+  message: 'Database connection issues detected',
+  metadata: { connectionAttempts: 5, lastError: 'Connection timeout' },
   timestamp: new Date(),
-};
+}
 
-await notificationService.notify(notification);
+await notificationService.notify(notification)
 ```
 
 ### Automated Service Events
@@ -229,15 +229,15 @@ The AutomatedNotificationService emits the following events:
 **Example**:
 
 ```typescript
-const notificationService = AutomatedNotificationService.getInstance();
+const notificationService = AutomatedNotificationService.getInstance()
 
-notificationService.on("notification:sent", (notification) => {
-  console.log(`Notification ${notification.id} sent successfully`);
-});
+notificationService.on('notification:sent', (notification) => {
+  console.log(`Notification ${notification.id} sent successfully`)
+})
 
-notificationService.on("notification:error", ({ notification, error }) => {
-  console.error(`Error sending notification ${notification.id}:`, error);
-});
+notificationService.on('notification:error', ({ notification, error }) => {
+  console.error(`Error sending notification ${notification.id}:`, error)
+})
 ```
 
 ## Security NotificationService
@@ -248,32 +248,32 @@ notifications with advanced error handling, circuit breaking, and performance mo
 ### Security Service Interfaces 2
 
 ```typescript
-type NotificationChannelType = "email" | "sms" | "slack" | "webhook";
+type NotificationChannelType = 'email' | 'sms' | 'slack' | 'webhook'
 
 interface NotificationChannel {
-  readonly type: NotificationChannelType;
-  readonly target: string;
-  readonly enabled: boolean;
+  readonly type: NotificationChannelType
+  readonly target: string
+  readonly enabled: boolean
   readonly retryConfig?: Readonly<{
-    maxRetries: number;
-    initialDelay: number;
-    maxDelay: number;
-    backoffFactor: number;
-  }>;
+    maxRetries: number
+    initialDelay: number
+    maxDelay: number
+    backoffFactor: number
+  }>
 }
 
 interface NotificationTemplate {
-  readonly subject: string;
-  readonly body: string;
-  readonly severity: IncidentSeverity;
-  readonly type: IncidentType;
-  readonly variables?: readonly string[];
+  readonly subject: string
+  readonly body: string
+  readonly severity: IncidentSeverity
+  readonly type: IncidentType
+  readonly variables?: readonly string[]
 }
 
 interface NotificationMessage {
-  readonly subject: string;
-  readonly body: string;
-  readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly subject: string
+  readonly body: string
+  readonly metadata?: Readonly<Record<string, unknown>>
 }
 ```
 
@@ -293,19 +293,19 @@ Sends notifications for a security incident through configured channels.
 
 ```typescript
 const incident = {
-  id: "incident-123",
+  id: 'incident-123',
   type: IncidentType.UNAUTHORIZED_ACCESS,
   severity: IncidentSeverity.HIGH,
-  source: "login-service",
+  source: 'login-service',
   timestamp: new Date(),
   details: {
-    ipAddress: "192.168.1.1",
-    userId: "user-123",
+    ipAddress: '192.168.1.1',
+    userId: 'user-123',
     attempts: 5,
   },
-};
+}
 
-await notificationService.notifyIncident(incident);
+await notificationService.notifyIncident(incident)
 ```
 
 #### `addNotificationChannel(severity: IncidentSeverity, channel: NotificationChannel)`
@@ -323,8 +323,8 @@ Adds a notification channel for a specific severity level.
 
 ```typescript
 const channel = {
-  type: "email",
-  target: "security@example.com",
+  type: 'email',
+  target: 'security@example.com',
   enabled: true,
   retryConfig: {
     maxRetries: 3,
@@ -332,12 +332,12 @@ const channel = {
     maxDelay: 5000,
     backoffFactor: 2,
   },
-};
+}
 
 await notificationService.addNotificationChannel(
   IncidentSeverity.HIGH,
   channel,
-);
+)
 ```
 
 #### `removeNotificationChannel(severity: IncidentSeverity, channelType: string, target: string)`
@@ -357,9 +357,9 @@ Removes a notification channel for a specific severity level.
 ```typescript
 await notificationService.removeNotificationChannel(
   IncidentSeverity.HIGH,
-  "email",
-  "security@example.com",
-);
+  'email',
+  'security@example.com',
+)
 ```
 
 #### `addTemplate(key: string, template: NotificationTemplate)`
@@ -377,14 +377,14 @@ Adds a notification template for a specific incident type.
 
 ```typescript
 const template = {
-  subject: "Security Alert: Unauthorized Access",
-  body: "An unauthorized access attempt was detected from IP: {{ipAddress}}",
+  subject: 'Security Alert: Unauthorized Access',
+  body: 'An unauthorized access attempt was detected from IP: {{ipAddress}}',
   severity: IncidentSeverity.HIGH,
   type: IncidentType.UNAUTHORIZED_ACCESS,
-  variables: ["ipAddress"],
-};
+  variables: ['ipAddress'],
+}
 
-await notificationService.addTemplate("unauthorized_access", template);
+await notificationService.addTemplate('unauthorized_access', template)
 ```
 
 #### `getMetrics()`
@@ -396,8 +396,8 @@ Returns metrics for all notification channels.
 **Example**:
 
 ```typescript
-const metrics = notificationService.getMetrics();
-console.log("Email channel metrics:", metrics.email);
+const metrics = notificationService.getMetrics()
+console.log('Email channel metrics:', metrics.email)
 ```
 
 #### `getChannelMetrics(channelType: string)`
@@ -413,8 +413,8 @@ Returns metrics for a specific notification channel.
 **Example**:
 
 ```typescript
-const emailMetrics = notificationService.getChannelMetrics("email");
-console.log("Email success rate:", 1 - emailMetrics.failureRate);
+const emailMetrics = notificationService.getChannelMetrics('email')
+console.log('Email success rate:', 1 - emailMetrics.failureRate)
 ```
 
 ## Common Interfaces
@@ -423,9 +423,9 @@ console.log("Email success rate:", 1 - emailMetrics.failureRate);
 
 ```typescript
 interface CacheAlert {
-  type: string;
-  value: number;
-  threshold: number;
+  type: string
+  value: number
+  threshold: number
 }
 ```
 
@@ -433,26 +433,26 @@ interface CacheAlert {
 
 ```typescript
 interface ChannelMetrics {
-  totalRequests: number;
-  successfulRequests: number;
-  failedRequests: number;
-  lastSuccessTime: number;
-  lastFailureTime: number;
-  lastReset: number;
-  totalSuccessDuration: number;
-  totalFailureDuration: number;
-  averageSuccessDuration: number;
-  averageFailureDuration: number;
-  averageResponseTime: number;
-  failureRate: number;
-  isOpen: boolean;
-  consecutiveFailures: number;
-  consecutiveSuccesses: number;
+  totalRequests: number
+  successfulRequests: number
+  failedRequests: number
+  lastSuccessTime: number
+  lastFailureTime: number
+  lastReset: number
+  totalSuccessDuration: number
+  totalFailureDuration: number
+  averageSuccessDuration: number
+  averageFailureDuration: number
+  averageResponseTime: number
+  failureRate: number
+  isOpen: boolean
+  consecutiveFailures: number
+  consecutiveSuccesses: number
   lastError?: {
-    message: string;
-    category: string;
-    timestamp: number;
-  };
+    message: string
+    category: string
+    timestamp: number
+  }
 }
 ```
 
@@ -504,34 +504,34 @@ The notification services implement various error handling strategies:
 ### Basic Cache Alert Notification
 
 ```typescript
-import { CacheMonitoringService } from "@/services/CacheMonitoringService";
-import { NotificationService } from "@/services/NotificationService";
+import { CacheMonitoringService } from '@/services/CacheMonitoringService'
+import { NotificationService } from '@/services/NotificationService'
 
 // Set up cache monitoring with notification
-const cacheMonitoring = new CacheMonitoringService();
-const notificationService = NotificationService.getInstance();
+const cacheMonitoring = new CacheMonitoringService()
+const notificationService = NotificationService.getInstance()
 
 // Configure alert handler
-cacheMonitoring.on("alert", async (alert) => {
-  await notificationService.notify(alert);
-});
+cacheMonitoring.on('alert', async (alert) => {
+  await notificationService.notify(alert)
+})
 
 // Start monitoring
-cacheMonitoring.startMonitoring();
+cacheMonitoring.startMonitoring()
 ```
 
 ### Automated Notification for System Events
 
 ```typescript
-import { AutomatedNotificationService } from "@/services/AutomatedNotificationService";
-import { SystemMonitoringService } from "@/services/SystemMonitoringService";
+import { AutomatedNotificationService } from '@/services/AutomatedNotificationService'
+import { SystemMonitoringService } from '@/services/SystemMonitoringService'
 
 // Set up system monitoring with notification
-const systemMonitoring = new SystemMonitoringService();
-const notificationService = AutomatedNotificationService.getInstance();
+const systemMonitoring = new SystemMonitoringService()
+const notificationService = AutomatedNotificationService.getInstance()
 
 // Configure event handler
-systemMonitoring.on("event", async (event) => {
+systemMonitoring.on('event', async (event) => {
   const notification = {
     id: `event-${event.id}`,
     type: event.type,
@@ -539,53 +539,53 @@ systemMonitoring.on("event", async (event) => {
     message: event.message,
     metadata: event.details,
     timestamp: new Date(),
-  };
+  }
 
-  await notificationService.notify(notification);
-});
+  await notificationService.notify(notification)
+})
 
 // Helper function to map event levels to notification severities
-function mapSeverity(level: string): "low" | "medium" | "high" | "critical" {
+function mapSeverity(level: string): 'low' | 'medium' | 'high' | 'critical' {
   switch (level) {
-    case "debug":
-      return "low";
-    case "info":
-      return "low";
-    case "warn":
-      return "medium";
-    case "error":
-      return "high";
-    case "fatal":
-      return "critical";
+    case 'debug':
+      return 'low'
+    case 'info':
+      return 'low'
+    case 'warn':
+      return 'medium'
+    case 'error':
+      return 'high'
+    case 'fatal':
+      return 'critical'
     default:
-      return "medium";
+      return 'medium'
   }
 }
 
 // Start monitoring
-systemMonitoring.startMonitoring();
+systemMonitoring.startMonitoring()
 ```
 
 ### Security Incident Notification
 
 ```typescript
-import { NotificationService } from "@/security/NotificationService";
+import { NotificationService } from '@/security/NotificationService'
 import {
   IncidentSeverity,
   IncidentType,
   SecurityIncidentService,
-} from "@/security/SecurityIncidentService";
-import { SecurityAuditService } from "@/services/SecurityAuditService";
+} from '@/security/SecurityIncidentService'
+import { SecurityAuditService } from '@/services/SecurityAuditService'
 
 // Initialize services
-const auditService = new SecurityAuditService();
-const notificationService = new NotificationService(auditService);
-const incidentService = new SecurityIncidentService();
+const auditService = new SecurityAuditService()
+const notificationService = new NotificationService(auditService)
+const incidentService = new SecurityIncidentService()
 
 // Configure incident handler
-incidentService.on("incident", async (incident) => {
-  await notificationService.notifyIncident(incident);
-});
+incidentService.on('incident', async (incident) => {
+  await notificationService.notifyIncident(incident)
+})
 
 // Create and report an incident
 async function reportUnauthorizedAccess(
@@ -597,15 +597,15 @@ async function reportUnauthorizedAccess(
     id: `incident-${Date.now()}`,
     type: IncidentType.UNAUTHORIZED_ACCESS,
     severity: attempts > 5 ? IncidentSeverity.HIGH : IncidentSeverity.MEDIUM,
-    source: "auth-service",
+    source: 'auth-service',
     timestamp: new Date(),
     details: {
       ipAddress,
       userId,
       attempts,
     },
-  };
+  }
 
-  await incidentService.reportIncident(incident);
+  await incidentService.reportIncident(incident)
 }
 ```

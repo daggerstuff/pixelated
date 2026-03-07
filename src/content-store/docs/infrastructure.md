@@ -1,12 +1,12 @@
 ---
-title: "Core Infrastructure"
-description: "Documentation of Pixelated Healths core infrastructure components, security, and configuration"
+title: 'Core Infrastructure'
+description: 'Documentation of Pixelated Healths core infrastructure components, security, and configuration'
 pubDate: 2025-03-24
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ["infrastructure", "security", "configuration", "deployment"]
-author: "Pixelated Team"
+tags: ['infrastructure', 'security', 'configuration', 'deployment']
+author: 'Pixelated Team'
 ---
 
 ## Core Infrastructure Documentation
@@ -92,17 +92,17 @@ This document outlines the key components, configurations, and best practices im
 
 ```typescript
 interface EnvironmentConfig {
-  NODE_ENV: "development" | "staging" | "production";
-  DATABASE_URL: string;
-  REDIS_URL: string;
-  API_KEY: string;
-  ENCRYPTION_KEY: string;
-  JWT_SECRET: string;
-  CORS_ORIGINS: string[];
+  NODE_ENV: 'development' | 'staging' | 'production'
+  DATABASE_URL: string
+  REDIS_URL: string
+  API_KEY: string
+  ENCRYPTION_KEY: string
+  JWT_SECRET: string
+  CORS_ORIGINS: string[]
   RATE_LIMIT: {
-    window: number;
-    max: number;
-  };
+    window: number
+    max: number
+  }
 }
 ```
 
@@ -110,13 +110,13 @@ interface EnvironmentConfig {
 
 ```typescript
 const securityHeaders = {
-  "Content-Security-Policy": "default-src 'self'",
-  "X-Frame-Options": "DENY",
-  "X-Content-Type-Options": "nosniff",
-  "Referrer-Policy": "strict-origin-when-cross-origin",
-  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-};
+  'Content-Security-Policy': "default-src 'self'",
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+}
 ```
 
 ## Deployment Configuration
@@ -162,12 +162,12 @@ const securityHeaders = {
 ```typescript
 interface ErrorResponse {
   error: {
-    code: string;
-    message: string;
-    details?: unknown;
-  };
-  requestId: string;
-  timestamp: string;
+    code: string
+    message: string
+    details?: unknown
+  }
+  requestId: string
+  timestamp: string
 }
 ```
 

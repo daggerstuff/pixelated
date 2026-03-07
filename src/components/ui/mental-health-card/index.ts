@@ -1,1 +1,1 @@
-export { MentalHealthCard } from "./MentalHealthCard";
+export { MentalHealthCard } from './MentalHealthCard'

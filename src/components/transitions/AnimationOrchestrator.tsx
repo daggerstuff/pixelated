@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   AnimatePresence,
   motion,
   useAnimation,
   type Variants,
-} from "framer-motion";
+} from 'framer-motion'
 import {
   animationPresets,
   getReducedMotionVariant,
@@ -12,50 +12,50 @@ import {
   type SequenceType,
   TIMING,
   EASING,
-} from "../../lib/animations/sequences";
+} from '../../lib/animations/sequences'
 
 export interface AnimationOrchestratorProps {
-  children: React.ReactNode;
-  sequence?: AnimationPreset | Variants;
-  orchestrationType?: SequenceType;
-  triggerOnMount?: boolean;
-  triggerOnViewport?: boolean;
-  viewportThreshold?: number;
-  staggerChildren?: boolean;
-  staggerDelay?: number;
-  enableReducedMotion?: boolean;
-  onAnimationStart?: () => void;
-  onAnimationComplete?: () => void;
-  className?: string;
-  style?: React.CSSProperties;
-  as?: keyof JSX.IntrinsicElements;
-  viewport?: boolean;
-  once?: boolean;
+  children: React.ReactNode
+  sequence?: AnimationPreset | Variants
+  orchestrationType?: SequenceType
+  triggerOnMount?: boolean
+  triggerOnViewport?: boolean
+  viewportThreshold?: number
+  staggerChildren?: boolean
+  staggerDelay?: number
+  enableReducedMotion?: boolean
+  onAnimationStart?: () => void
+  onAnimationComplete?: () => void
+  className?: string
+  style?: React.CSSProperties
+  as?: keyof JSX.IntrinsicElements
+  viewport?: boolean
+  once?: boolean
 }
 
 // Hook for reduced motion detection
 function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
 
     const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
-    };
+      setPrefersReducedMotion(event.matches)
+    }
 
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
 
-  return prefersReducedMotion;
+  return prefersReducedMotion
 }
 
 // Main AnimationOrchestrator component
 export function AnimationOrchestrator({
   children,
-  sequence = "fadeIn",
+  sequence = 'fadeIn',
   triggerOnMount = true,
   triggerOnViewport = false,
   viewportThreshold = 0.1,
@@ -64,84 +64,84 @@ export function AnimationOrchestrator({
   enableReducedMotion = true,
   onAnimationStart,
   onAnimationComplete,
-  className = "",
+  className = '',
   style = {},
-  as = "div",
+  as = 'div',
   once = true,
 }: AnimationOrchestratorProps) {
-  const controls = useAnimation();
-  const prefersReducedMotion = useReducedMotion();
-  const [isVisible, setIsVisible] = useState(!triggerOnViewport);
+  const controls = useAnimation()
+  const prefersReducedMotion = useReducedMotion()
+  const [isVisible, setIsVisible] = useState(!triggerOnViewport)
 
   // Get the animation variants
   const variants = useMemo(() => {
-    let baseVariants: Variants;
+    let baseVariants: Variants
 
-    if (typeof sequence === "string") {
-      baseVariants = animationPresets[sequence] || animationPresets.fadeIn;
+    if (typeof sequence === 'string') {
+      baseVariants = animationPresets[sequence] || animationPresets.fadeIn
     } else {
-      baseVariants = sequence;
+      baseVariants = sequence
     }
 
     // Apply reduced motion if enabled and user prefers it
     if (enableReducedMotion && prefersReducedMotion) {
-      return getReducedMotionVariant(baseVariants);
+      return getReducedMotionVariant(baseVariants)
     }
 
     // Add stagger configuration if enabled
     if (
       staggerChildren &&
-      baseVariants["animate"] &&
-      typeof baseVariants["animate"] === "object"
+      baseVariants['animate'] &&
+      typeof baseVariants['animate'] === 'object'
     ) {
       return {
         ...baseVariants,
         animate: {
-          ...baseVariants["animate"],
+          ...baseVariants['animate'],
           transition: {
-            ...(baseVariants["animate"] as Record<string, unknown>)[
-              "transition"
+            ...(baseVariants['animate'] as Record<string, unknown>)[
+              'transition'
             ],
             staggerChildren: staggerDelay,
           },
         },
-      };
+      }
     }
 
-    return baseVariants;
+    return baseVariants
   }, [
     sequence,
     enableReducedMotion,
     prefersReducedMotion,
     staggerChildren,
     staggerDelay,
-  ]);
+  ])
 
   // Handle viewport trigger
   const handleViewportEnter = useCallback(() => {
     if (triggerOnViewport && !isVisible) {
-      setIsVisible(true);
-      controls.start("animate");
-      onAnimationStart?.();
+      setIsVisible(true)
+      controls.start('animate')
+      onAnimationStart?.()
     }
-  }, [triggerOnViewport, isVisible, controls, onAnimationStart]);
+  }, [triggerOnViewport, isVisible, controls, onAnimationStart])
 
   // Handle mount trigger
   useEffect(() => {
     if (triggerOnMount && !triggerOnViewport) {
-      controls.start("animate");
-      onAnimationStart?.();
+      controls.start('animate')
+      onAnimationStart?.()
     }
-  }, [triggerOnMount, triggerOnViewport, controls, onAnimationStart]);
+  }, [triggerOnMount, triggerOnViewport, controls, onAnimationStart])
 
   // Handle animation complete
   const handleAnimationComplete = useCallback(() => {
-    onAnimationComplete?.();
-  }, [onAnimationComplete]);
+    onAnimationComplete?.()
+  }, [onAnimationComplete])
 
   const Component = motion[as] as React.ComponentType<
     React.ComponentProps<typeof motion.div>
-  >;
+  >
 
   return (
     <Component
@@ -157,7 +157,7 @@ export function AnimationOrchestrator({
         triggerOnViewport
           ? {
               once,
-              margin: "0px 0px -10% 0px",
+              margin: '0px 0px -10% 0px',
               amount: viewportThreshold,
             }
           : undefined
@@ -165,17 +165,17 @@ export function AnimationOrchestrator({
     >
       {children}
     </Component>
-  );
+  )
 }
 
 // Specialized components for common use cases
 
 export function PageTransition({
   children,
-  sequence = "fadeIn",
-  className = "",
+  sequence = 'fadeIn',
+  className = '',
   ...props
-}: Omit<AnimationOrchestratorProps, "orchestrationType">) {
+}: Omit<AnimationOrchestratorProps, 'orchestrationType'>) {
   return (
     <AnimationOrchestrator
       sequence={sequence}
@@ -185,18 +185,18 @@ export function PageTransition({
     >
       {children}
     </AnimationOrchestrator>
-  );
+  )
 }
 
 export function ListAnimation({
   children,
-  sequence = "stagger",
+  sequence = 'stagger',
   staggerChildren = true,
   staggerDelay = 0.1,
   triggerOnViewport = true,
-  className = "",
+  className = '',
   ...props
-}: Omit<AnimationOrchestratorProps, "orchestrationType">) {
+}: Omit<AnimationOrchestratorProps, 'orchestrationType'>) {
   return (
     <AnimationOrchestrator
       sequence={sequence}
@@ -209,16 +209,16 @@ export function ListAnimation({
     >
       {children}
     </AnimationOrchestrator>
-  );
+  )
 }
 
 export function ModalAnimation({
   children,
-  sequence = "modal",
+  sequence = 'modal',
   triggerOnMount = true,
-  className = "",
+  className = '',
   ...props
-}: Omit<AnimationOrchestratorProps, "orchestrationType">) {
+}: Omit<AnimationOrchestratorProps, 'orchestrationType'>) {
   return (
     <AnimationOrchestrator
       sequence={sequence}
@@ -229,16 +229,16 @@ export function ModalAnimation({
     >
       {children}
     </AnimationOrchestrator>
-  );
+  )
 }
 
 export function InteractiveAnimation({
   children,
-  sequence = "button",
+  sequence = 'button',
   triggerOnMount = false,
-  className = "",
+  className = '',
   ...props
-}: Omit<AnimationOrchestratorProps, "orchestrationType">) {
+}: Omit<AnimationOrchestratorProps, 'orchestrationType'>) {
   return (
     <AnimationOrchestrator
       sequence={sequence}
@@ -249,24 +249,24 @@ export function InteractiveAnimation({
     >
       {children}
     </AnimationOrchestrator>
-  );
+  )
 }
 
 // Advanced sequence builder for complex animations
 interface SequenceStep {
-  delay?: number;
-  duration?: number;
-  ease?: keyof typeof EASING | number[];
-  variants: Variants;
+  delay?: number
+  duration?: number
+  ease?: keyof typeof EASING | number[]
+  variants: Variants
 }
 
 interface AdvancedSequenceProps {
-  children: React.ReactNode;
-  steps: SequenceStep[];
-  autoPlay?: boolean;
-  loop?: boolean;
-  className?: string;
-  onSequenceComplete?: () => void;
+  children: React.ReactNode
+  steps: SequenceStep[]
+  autoPlay?: boolean
+  loop?: boolean
+  className?: string
+  onSequenceComplete?: () => void
 }
 
 export function AdvancedSequence({
@@ -274,94 +274,94 @@ export function AdvancedSequence({
   steps,
   autoPlay = true,
   loop = false,
-  className = "",
+  className = '',
   onSequenceComplete,
 }: AdvancedSequenceProps) {
-  const controls = useAnimation();
-  const [currentStep, setCurrentStep] = useState(0);
+  const controls = useAnimation()
+  const [currentStep, setCurrentStep] = useState(0)
 
   // Execute sequence
   const executeSequence = useCallback(async () => {
     for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
-      setCurrentStep(i);
+      const step = steps[i]
+      setCurrentStep(i)
 
       await controls.start({
-        ...step.variants["animate"],
+        ...step.variants['animate'],
         transition: {
           duration: step.duration || TIMING.normal,
-          ease: typeof step.ease === "string" ? EASING[step.ease] : step.ease,
+          ease: typeof step.ease === 'string' ? EASING[step.ease] : step.ease,
           delay: step.delay || 0,
         },
-      });
+      })
     }
 
-    onSequenceComplete?.();
+    onSequenceComplete?.()
 
     if (loop) {
-      setCurrentStep(0);
-      await controls.start(steps[0].variants["initial"] || {});
-      executeSequence();
+      setCurrentStep(0)
+      await controls.start(steps[0].variants['initial'] || {})
+      executeSequence()
     }
-  }, [steps, controls, loop, onSequenceComplete]);
+  }, [steps, controls, loop, onSequenceComplete])
 
   useEffect(() => {
     if (autoPlay && steps.length > 0) {
-      executeSequence();
+      executeSequence()
     }
-  }, [autoPlay, executeSequence, steps.length]);
+  }, [autoPlay, executeSequence, steps.length])
 
-  const currentVariants = steps[currentStep]?.variants || {};
+  const currentVariants = steps[currentStep]?.variants || {}
 
   return (
     <motion.div
       className={className}
-      initial={currentVariants["initial"] || {}}
+      initial={currentVariants['initial'] || {}}
       animate={controls}
     >
       {children}
     </motion.div>
-  );
+  )
 }
 
 // Choreographed animation for multiple elements
 interface ChoreographyItem {
-  id: string;
-  element: React.ReactNode;
-  variants: Variants;
-  delay?: number;
+  id: string
+  element: React.ReactNode
+  variants: Variants
+  delay?: number
 }
 
 interface ChoreographyProps {
-  items: ChoreographyItem[];
-  masterSequence?: Variants;
-  className?: string;
-  onChoreographyComplete?: () => void;
+  items: ChoreographyItem[]
+  masterSequence?: Variants
+  className?: string
+  onChoreographyComplete?: () => void
 }
 
 export function Choreography({
   items,
   masterSequence,
-  className = "",
+  className = '',
   onChoreographyComplete,
 }: ChoreographyProps) {
-  const masterControls = useAnimation();
+  const masterControls = useAnimation()
 
   useEffect(() => {
     const runChoreography = async () => {
       if (masterSequence) {
-        await masterControls.start(masterSequence["animate"] || {});
+        await masterControls.start(masterSequence['animate'] || {})
       }
-      onChoreographyComplete?.();
-    };
+      onChoreographyComplete?.()
+    }
 
-    runChoreography();
-  }, [masterControls, masterSequence, onChoreographyComplete]);
+    runChoreography()
+  }, [masterControls, masterSequence, onChoreographyComplete])
 
   return (
     <motion.div
       className={className}
-      initial={masterSequence?.["initial"] || {}}
+      initial={masterSequence?.['initial'] || {}}
       animate={masterControls}
     >
       <AnimatePresence>
@@ -379,9 +379,9 @@ export function Choreography({
         ))}
       </AnimatePresence>
     </motion.div>
-  );
+  )
 }
 
 // Export utilities
-export { useReducedMotion };
-export default AnimationOrchestrator;
+export { useReducedMotion }
+export default AnimationOrchestrator

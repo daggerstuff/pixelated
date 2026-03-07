@@ -1,2 +1,2 @@
 // Exports for utils module
-export {};
+export {}

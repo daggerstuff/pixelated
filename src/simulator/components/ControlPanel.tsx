@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react'
 
 interface ControlPanelProps {
-  isConnected: boolean;
-  isProcessing: boolean;
-  onStart: () => void;
-  onEnd: () => void;
-  className?: string;
+  isConnected: boolean
+  isProcessing: boolean
+  onStart: () => void
+  onEnd: () => void
+  className?: string
 }
 
 /**
@@ -16,7 +16,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   isProcessing,
   onStart,
   onEnd,
-  className = "",
+  className = '',
 }) => {
   return (
     <div
@@ -28,19 +28,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           <span
             className={`w-2.5 h-2.5 rounded-full mr-2 ${
               isConnected
-                ? "bg-green-500"
+                ? 'bg-green-500'
                 : isProcessing
-                  ? "bg-yellow-500 animate-pulse"
-                  : "bg-gray-400"
+                  ? 'bg-yellow-500 animate-pulse'
+                  : 'bg-gray-400'
             }`}
           />
 
           <span className="font-medium">
             {isConnected
-              ? "Simulation in progress"
+              ? 'Simulation in progress'
               : isProcessing
-                ? "Connecting..."
-                : "Ready"}
+                ? 'Connecting...'
+                : 'Ready'}
           </span>
         </div>
       </div>
@@ -53,8 +53,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             disabled={isProcessing}
             className={`px-4 py-2 rounded-md text-sm font-medium flex items-center ${
               isProcessing
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : "bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500'
             }`}
           >
             {isProcessing ? (
@@ -142,7 +142,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ControlPanel;
+export default ControlPanel

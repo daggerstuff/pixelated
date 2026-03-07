@@ -7,36 +7,36 @@
  * It uses interfaces defined in ./types.ts and implementations from ./seal-types.ts.
  */
 
-import { EncryptionMode, FHEOperation } from "./types";
-import type { HomomorphicOperationResult } from "./types";
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
-import type { SealOperations } from "./seal-operations";
-import { SealSchemeType } from "./seal-types";
-import type { SealContextOptions } from "./seal-types";
+import { EncryptionMode, FHEOperation } from './types'
+import type { HomomorphicOperationResult } from './types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import type { SealOperations } from './seal-operations'
+import { SealSchemeType } from './seal-types'
+import type { SealContextOptions } from './seal-types'
 
 // Get logger
-const logger = createBuildSafeLogger("homomorphic-ops");
+const logger = createBuildSafeLogger('homomorphic-ops')
 
 // Environment detection
-const isServer = typeof window === "undefined";
+const isServer = typeof window === 'undefined'
 
 /**
  * Custom error class for homomorphic operation errors
  * Extends the base Error class for FHE-specific error handling
  */
 export class FHEOperationError extends Error {
-  public readonly operation: FHEOperation | string;
-  public readonly code: string;
+  public readonly operation: FHEOperation | string
+  public readonly code: string
 
   constructor(
     message: string,
     operation: FHEOperation | string,
-    code = "OPERATION_ERROR",
+    code = 'OPERATION_ERROR',
   ) {
-    super(message);
-    this.name = "FHEOperationError";
-    this.operation = operation;
-    this.code = code;
+    super(message)
+    this.name = 'FHEOperationError'
+    this.operation = operation
+    this.code = code
   }
 }
 
@@ -45,40 +45,40 @@ export class FHEOperationError extends Error {
  */
 const SENTIMENT_WORDS = {
   positive: [
-    "good",
-    "great",
-    "excellent",
-    "wonderful",
-    "amazing",
-    "happy",
-    "joy",
-    "loved",
-    "best",
-    "better",
+    'good',
+    'great',
+    'excellent',
+    'wonderful',
+    'amazing',
+    'happy',
+    'joy',
+    'loved',
+    'best',
+    'better',
   ],
   negative: [
-    "bad",
-    "terrible",
-    "awful",
-    "horrible",
-    "sad",
-    "angry",
-    "hate",
-    "worst",
-    "poor",
-    "disappointing",
+    'bad',
+    'terrible',
+    'awful',
+    'horrible',
+    'sad',
+    'angry',
+    'hate',
+    'worst',
+    'poor',
+    'disappointing',
   ],
   neutral: [
-    "maybe",
-    "possibly",
-    "perhaps",
-    "okay",
-    "fine",
-    "average",
-    "neutral",
-    "unclear",
+    'maybe',
+    'possibly',
+    'perhaps',
+    'okay',
+    'fine',
+    'average',
+    'neutral',
+    'unclear',
   ],
-};
+}
 
 /**
  * Class for performing homomorphic operations on encrypted data
@@ -87,19 +87,19 @@ const SENTIMENT_WORDS = {
  * homomorphic operations on encrypted data.
  */
 export class HomomorphicOperations {
-  private static instance: HomomorphicOperations;
-  private initialized = false;
-  private sealOps: SealOperations | null = null;
-  private enableClientSideProcessing = true;
-  private enableServerSideProcessing = true;
+  private static instance: HomomorphicOperations
+  private initialized = false
+  private sealOps: SealOperations | null = null
+  private enableClientSideProcessing = true
+  private enableServerSideProcessing = true
 
   /**
    * Private constructor for singleton pattern
    */
   private constructor() {
     logger.info(
-      `Homomorphic Operations initialized in ${isServer ? "server" : "client"} environment`,
-    );
+      `Homomorphic Operations initialized in ${isServer ? 'server' : 'client'} environment`,
+    )
   }
 
   /**
@@ -107,9 +107,9 @@ export class HomomorphicOperations {
    */
   public static getInstance(): HomomorphicOperations {
     if (!HomomorphicOperations.instance) {
-      HomomorphicOperations.instance = new HomomorphicOperations();
+      HomomorphicOperations.instance = new HomomorphicOperations()
     }
-    return HomomorphicOperations.instance;
+    return HomomorphicOperations.instance
   }
 
   /**
@@ -118,17 +118,17 @@ export class HomomorphicOperations {
    * based on the SealContextOptions interface from ./seal-types.ts
    */
   public async initialize(options?: {
-    enableClientSide?: boolean;
-    enableServerSide?: boolean;
+    enableClientSide?: boolean
+    enableServerSide?: boolean
   }): Promise<void> {
     if (this.initialized) {
-      return;
+      return
     }
 
     try {
       // Set processing options
-      this.enableClientSideProcessing = options?.enableClientSide ?? true;
-      this.enableServerSideProcessing = options?.enableServerSide ?? true;
+      this.enableClientSideProcessing = options?.enableClientSide ?? true
+      this.enableServerSideProcessing = options?.enableServerSide ?? true
 
       // Create SEAL context options
       const contextOptions: SealContextOptions = {
@@ -138,47 +138,47 @@ export class HomomorphicOperations {
           coeffModulusBits: [60, 40, 40, 40, 60],
           plainModulus: 1032193,
         },
-      };
+      }
 
       // In client environment, initialize SEAL operations if client-side processing is enabled
       if (!isServer && this.enableClientSideProcessing) {
-        const { SealService } = await import("./seal-service");
-        const { SealOperations } = await import("./seal-operations");
+        const { SealService } = await import('./seal-service')
+        const { SealOperations } = await import('./seal-operations')
 
-        const sealService = SealService.getInstance();
-        await sealService.initialize(contextOptions);
+        const sealService = SealService.getInstance()
+        await sealService.initialize(contextOptions)
 
         if (!sealService.hasKeys()) {
-          await sealService.generateKeys();
+          await sealService.generateKeys()
         }
 
-        this.sealOps = new SealOperations(sealService);
+        this.sealOps = new SealOperations(sealService)
       }
 
       // In server environment, initialize SEAL operations if server-side processing is enabled
       if (isServer && this.enableServerSideProcessing) {
-        const { SealService } = await import("./seal-service");
-        const { SealOperations } = await import("./seal-operations");
+        const { SealService } = await import('./seal-service')
+        const { SealOperations } = await import('./seal-operations')
 
-        const sealService = SealService.getInstance();
-        await sealService.initialize(contextOptions);
+        const sealService = SealService.getInstance()
+        await sealService.initialize(contextOptions)
 
         if (!sealService.hasKeys()) {
-          await sealService.generateKeys();
+          await sealService.generateKeys()
         }
 
-        this.sealOps = new SealOperations(sealService);
+        this.sealOps = new SealOperations(sealService)
       }
 
-      this.initialized = true;
-      logger.info("Homomorphic operations initialized successfully");
+      this.initialized = true
+      logger.info('Homomorphic operations initialized successfully')
     } catch (error: unknown) {
-      logger.error("Failed to initialize homomorphic operations", { error });
+      logger.error('Failed to initialize homomorphic operations', { error })
       throw new FHEOperationError(
-        "Homomorphic operations initialization error",
-        "initialize",
-        "INITIALIZATION_ERROR",
-      );
+        'Homomorphic operations initialization error',
+        'initialize',
+        'INITIALIZATION_ERROR',
+      )
     }
   }
 
@@ -196,39 +196,39 @@ export class HomomorphicOperations {
     params?: Record<string, unknown>,
   ): Promise<HomomorphicOperationResult> {
     if (!this.initialized) {
-      await this.initialize();
+      await this.initialize()
     }
 
     try {
-      logger.info(`Processing encrypted data with operation: ${operation}`);
+      logger.info(`Processing encrypted data with operation: ${operation}`)
 
       // If we're not in FHE mode or the operation is not supported, fall back to simulation
       if (encryptionMode !== EncryptionMode.FHE || !this.sealOps) {
-        return this.simulateOperation(encryptedData, operation, params);
+        return this.simulateOperation(encryptedData, operation, params)
       }
 
-      let result: string;
-      let sentimentResult;
-      let categoryResult;
-      let opResult;
+      let result: string
+      let sentimentResult
+      let categoryResult
+      let opResult
       const metadata: Record<string, unknown> = {
         operationType: operation,
         timestamp: Date.now(),
-      };
+      }
 
       try {
         // Parse the encrypted data
-        let parsedData;
+        let parsedData
         try {
-          parsedData = JSON.parse(encryptedData) as unknown;
+          parsedData = JSON.parse(encryptedData) as unknown
         } catch {
           // If not JSON, use as is
-          parsedData = { serializedCiphertext: encryptedData };
+          parsedData = { serializedCiphertext: encryptedData }
         }
 
         // Extract the serialized ciphertext
         const serializedCiphertext =
-          parsedData.serializedCiphertext || encryptedData;
+          parsedData.serializedCiphertext || encryptedData
 
         // Perform the operation using SEAL
         switch (operation) {
@@ -238,15 +238,15 @@ export class HomomorphicOperations {
             sentimentResult = await this.sealOps.polynomial(
               serializedCiphertext,
               [0.5, 0.2, 0.1, 0.05], // Simple polynomial coefficients for demo purposes
-            );
+            )
 
             result = JSON.stringify({
               serializedCiphertext: sentimentResult.result,
-              operation: "sentiment",
+              operation: 'sentiment',
               timestamp: Date.now(),
-            });
-            metadata.confidence = 0.85;
-            break;
+            })
+            metadata.confidence = 0.85
+            break
 
           case FHEOperation.CATEGORIZE:
             // For categorization, we compute dot products with category vectors
@@ -254,14 +254,14 @@ export class HomomorphicOperations {
             categoryResult = await this.simulateCategorization(
               serializedCiphertext,
               params,
-            );
+            )
             result = JSON.stringify({
               serializedCiphertext: categoryResult,
-              operation: "categorize",
+              operation: 'categorize',
               timestamp: Date.now(),
-            });
-            metadata.categories = params?.categories || {};
-            break;
+            })
+            metadata.categories = params?.categories || {}
+            break
 
           case FHEOperation.Addition:
           case FHEOperation.Subtraction:
@@ -275,18 +275,18 @@ export class HomomorphicOperations {
               operation,
               serializedCiphertext,
               params,
-            );
+            )
 
             result = JSON.stringify({
               serializedCiphertext: opResult.result,
               operation,
               timestamp: Date.now(),
-            });
-            break;
+            })
+            break
 
           default:
             // Fall back to simulation for unsupported operations
-            return this.simulateOperation(encryptedData, operation, params);
+            return this.simulateOperation(encryptedData, operation, params)
         }
 
         return {
@@ -295,19 +295,19 @@ export class HomomorphicOperations {
           operationType: String(operation),
           timestamp: Date.now(),
           metadata,
-        };
+        }
       } catch (error: unknown) {
-        logger.error(`Error in SEAL operation ${operation}`, { error });
+        logger.error(`Error in SEAL operation ${operation}`, { error })
         throw new FHEOperationError(
           `SEAL operation error: ${error instanceof Error ? String(error) : String(error)}`,
           operation,
-        );
+        )
       }
     } catch (error: unknown) {
       logger.error(
         `Failed to process encrypted data with operation ${operation}`,
         { error },
-      );
+      )
       return {
         success: false,
         error: error instanceof Error ? String(error) : String(error),
@@ -319,7 +319,7 @@ export class HomomorphicOperations {
           timestamp: Date.now(),
           error: true,
         },
-      };
+      }
     }
   }
 
@@ -335,68 +335,68 @@ export class HomomorphicOperations {
     params?: Record<string, unknown>,
   ): Promise<{ result: string; success: boolean }> {
     if (!this.sealOps) {
-      throw new Error("SEAL operations not initialized");
+      throw new Error('SEAL operations not initialized')
     }
 
-    let addend;
-    let addResult;
-    let subtrahend;
-    let subResult;
-    let multiplier;
-    let multResult;
-    let negResult;
-    let coefficients;
-    let polyResult;
-    let steps;
-    let rotResult;
+    let addend
+    let addResult
+    let subtrahend
+    let subResult
+    let multiplier
+    let multResult
+    let negResult
+    let coefficients
+    let polyResult
+    let steps
+    let rotResult
 
     switch (operation) {
       case FHEOperation.Addition:
         // Add a constant or another ciphertext
-        addend = (params?.["addend"] as number[]) || [1];
-        addResult = await this.sealOps.add(serializedCiphertext, addend);
-        return { result: addResult["result"], success: addResult["success"] };
+        addend = (params?.['addend'] as number[]) || [1]
+        addResult = await this.sealOps.add(serializedCiphertext, addend)
+        return { result: addResult['result'], success: addResult['success'] }
 
       case FHEOperation.Subtraction:
         // Subtract a constant or another ciphertext
-        subtrahend = (params?.["subtrahend"] as number[]) || [1];
+        subtrahend = (params?.['subtrahend'] as number[]) || [1]
         subResult = await this.sealOps.subtract(
           serializedCiphertext,
           subtrahend,
-        );
-        return { result: subResult["result"], success: subResult["success"] };
+        )
+        return { result: subResult['result'], success: subResult['success'] }
 
       case FHEOperation.Multiplication:
         // Multiply by a constant or another ciphertext
-        multiplier = (params?.["multiplier"] as number[]) || [2];
+        multiplier = (params?.['multiplier'] as number[]) || [2]
         multResult = await this.sealOps.multiply(
           serializedCiphertext,
           multiplier,
-        );
-        return { result: multResult["result"], success: multResult["success"] };
+        )
+        return { result: multResult['result'], success: multResult['success'] }
 
       case FHEOperation.Negation:
         // Negate the value
-        negResult = await this.sealOps.negate(serializedCiphertext);
-        return { result: negResult["result"], success: negResult["success"] };
+        negResult = await this.sealOps.negate(serializedCiphertext)
+        return { result: negResult['result'], success: negResult['success'] }
 
       case FHEOperation.Polynomial:
         // Apply a polynomial function
-        coefficients = (params?.["coefficients"] as number[]) || [0, 1];
+        coefficients = (params?.['coefficients'] as number[]) || [0, 1]
         polyResult = await this.sealOps.polynomial(
           serializedCiphertext,
           coefficients,
-        );
-        return { result: polyResult["result"], success: polyResult["success"] };
+        )
+        return { result: polyResult['result'], success: polyResult['success'] }
 
       case FHEOperation.Rotation:
         // Rotate elements in a vector
-        steps = (params?.["steps"] as number) || 1;
-        rotResult = await this.sealOps.rotate(serializedCiphertext, steps);
-        return { result: rotResult["result"], success: rotResult["success"] };
+        steps = (params?.['steps'] as number) || 1
+        rotResult = await this.sealOps.rotate(serializedCiphertext, steps)
+        return { result: rotResult['result'], success: rotResult['success'] }
 
       default:
-        throw new Error(`Unsupported SEAL operation: ${operation}`);
+        throw new Error(`Unsupported SEAL operation: ${operation}`)
     }
   }
 
@@ -411,98 +411,98 @@ export class HomomorphicOperations {
     operation: FHEOperation,
     params?: Record<string, unknown>,
   ): Promise<HomomorphicOperationResult> {
-    logger.info(`Simulating operation ${operation} on encrypted data`);
+    logger.info(`Simulating operation ${operation} on encrypted data`)
 
-    let result: string;
-    let tokens;
+    let result: string
+    let tokens
     const metadata: Record<string, unknown> = {
       operationType: operation,
       timestamp: Date.now(),
       simulated: true,
-    };
+    }
 
     // For simulation, we'll decode the encryptedData in a way that would
     // be possible in a real FHE implementation
-    let decodedData: string;
+    let decodedData: string
 
     try {
       // This is just for simulation
-      if (encryptedData.startsWith("eyJ")) {
+      if (encryptedData.startsWith('eyJ')) {
         // Base64 JSON format
-        const decoded = atob(encryptedData);
-        const parsed = JSON.parse(decoded) as unknown;
+        const decoded = atob(encryptedData)
+        const parsed = JSON.parse(decoded) as unknown
 
-        if (parsed.data && typeof parsed.data === "string") {
-          decodedData = parsed.data;
+        if (parsed.data && typeof parsed.data === 'string') {
+          decodedData = parsed.data
         } else {
-          decodedData = "Unknown encoded format";
+          decodedData = 'Unknown encoded format'
         }
       } else {
         // Assume plaintext for simulation
-        decodedData = encryptedData;
+        decodedData = encryptedData
       }
     } catch {
       // If we can't decode, just use the raw value for simulation
-      decodedData = encryptedData;
+      decodedData = encryptedData
     }
 
     // Perform the operation (simulated)
     switch (operation) {
       case FHEOperation.SENTIMENT:
-        result = await this.analyzeSentiment(decodedData);
-        metadata.confidence = 0.85;
-        break;
+        result = await this.analyzeSentiment(decodedData)
+        metadata.confidence = 0.85
+        break
 
       case FHEOperation.CATEGORIZE:
         result = await this.categorizeText(
           decodedData,
-          params?.["categories"] as Record<string, string[]> | undefined,
-        );
-        metadata.categories = params?.["categories"] || {};
-        break;
+          params?.['categories'] as Record<string, string[]> | undefined,
+        )
+        metadata.categories = params?.['categories'] || {}
+        break
 
       case FHEOperation.SUMMARIZE:
         result = await this.summarizeText(
           decodedData,
-          params?.["maxLength"] as number | undefined,
-        );
-        metadata.maxLength = params?.["maxLength"] || 100;
-        break;
+          params?.['maxLength'] as number | undefined,
+        )
+        metadata.maxLength = params?.['maxLength'] || 100
+        break
 
       case FHEOperation.TOKENIZE:
-        tokens = await this.tokenizeText(decodedData);
-        result = JSON.stringify(tokens);
-        metadata.tokenCount = tokens.length;
-        break;
+        tokens = await this.tokenizeText(decodedData)
+        result = JSON.stringify(tokens)
+        metadata.tokenCount = tokens.length
+        break
 
       case FHEOperation.FILTER:
         result = await this.filterText(
           decodedData,
-          params?.["filterTerms"] as string[] | undefined,
-        );
-        metadata.filtered = true;
-        break;
+          params?.['filterTerms'] as string[] | undefined,
+        )
+        metadata.filtered = true
+        break
 
       case FHEOperation.CUSTOM:
         result = await this.performCustomOperation(
           decodedData,
-          params?.["operation"] as string,
+          params?.['operation'] as string,
           params,
-        );
-        metadata.custom = params?.["operation"] || "unknown";
-        break;
+        )
+        metadata.custom = params?.['operation'] || 'unknown'
+        break
 
       default:
-        result = `Unsupported operation: ${operation}`;
-        metadata.supported = false;
-        break;
+        result = `Unsupported operation: ${operation}`
+        metadata.supported = false
+        break
     }
 
     // Simulate re-encryption
     const simulatedEncrypted = JSON.stringify({
       data: result,
       metadata,
-    });
+    })
 
     return {
       success: true,
@@ -510,7 +510,7 @@ export class HomomorphicOperations {
       operationType: String(operation),
       timestamp: Date.now(),
       metadata,
-    };
+    }
   }
 
   /**
@@ -523,7 +523,7 @@ export class HomomorphicOperations {
   ): Promise<string> {
     // In a real implementation, we would compute dot products with category vectors
     // using homomorphic operations. For now, we return a placeholder result.
-    return `simulated_categorization_result_${Date.now()}`;
+    return `simulated_categorization_result_${Date.now()}`
   }
 
   /**
@@ -532,32 +532,32 @@ export class HomomorphicOperations {
   private async analyzeSentiment(text: string): Promise<string> {
     // This would be a real sentiment analysis algorithm in a production implementation
     // For simulation, we'll do a simple word count
-    text = text.toLowerCase();
+    text = text.toLowerCase()
 
-    let positiveCount = 0;
-    let negativeCount = 0;
-    let neutralCount = 0;
+    let positiveCount = 0
+    let negativeCount = 0
+    let neutralCount = 0
 
-    const words = text.split(/\s+/);
+    const words = text.split(/\s+/)
 
     for (const word of words) {
       if (SENTIMENT_WORDS.positive.includes(word)) {
-        positiveCount++;
+        positiveCount++
       }
       if (SENTIMENT_WORDS.negative.includes(word)) {
-        negativeCount++;
+        negativeCount++
       }
       if (SENTIMENT_WORDS.neutral.includes(word)) {
-        neutralCount++;
+        neutralCount++
       }
     }
 
     if (positiveCount > negativeCount && positiveCount > neutralCount) {
-      return "positive";
+      return 'positive'
     } else if (negativeCount > positiveCount && negativeCount > neutralCount) {
-      return "negative";
+      return 'negative'
     } else {
-      return "neutral";
+      return 'neutral'
     }
   }
 
@@ -570,42 +570,42 @@ export class HomomorphicOperations {
   ): Promise<string> {
     // If no categories provided, use some defaults
     const defaultCategories: Record<string, string[]> = {
-      health: ["health", "medical", "doctor", "hospital", "symptom"],
-      finance: ["money", "finance", "bank", "invest", "budget"],
-      technology: ["computer", "software", "hardware", "tech", "digital"],
-      education: ["learn", "school", "study", "education", "student"],
-    };
+      health: ['health', 'medical', 'doctor', 'hospital', 'symptom'],
+      finance: ['money', 'finance', 'bank', 'invest', 'budget'],
+      technology: ['computer', 'software', 'hardware', 'tech', 'digital'],
+      education: ['learn', 'school', 'study', 'education', 'student'],
+    }
 
-    const categoriesToUse = categories || defaultCategories;
-    text = text.toLowerCase();
+    const categoriesToUse = categories || defaultCategories
+    text = text.toLowerCase()
 
     // Count matches for each category
-    const categoryScores: Record<string, number> = {};
+    const categoryScores: Record<string, number> = {}
 
     for (const [category, keywords] of Object.entries(categoriesToUse)) {
-      categoryScores[category] = 0;
+      categoryScores[category] = 0
 
       for (const keyword of keywords) {
-        const regex = new RegExp(`\\b${keyword}\\b`, "gi");
-        const matches = text.match(regex);
+        const regex = new RegExp(`\\b${keyword}\\b`, 'gi')
+        const matches = text.match(regex)
         if (matches) {
-          categoryScores[category] += matches.length;
+          categoryScores[category] += matches.length
         }
       }
     }
 
     // Find category with highest score
-    let maxScore = 0;
-    let maxCategory = "unknown";
+    let maxScore = 0
+    let maxCategory = 'unknown'
 
     for (const [category, score] of Object.entries(categoryScores)) {
       if (score > maxScore) {
-        maxScore = score;
-        maxCategory = category;
+        maxScore = score
+        maxCategory = category
       }
     }
 
-    return maxCategory;
+    return maxCategory
   }
 
   /**
@@ -615,39 +615,39 @@ export class HomomorphicOperations {
     text: string,
     maxLength?: number,
   ): Promise<string> {
-    const max = maxLength || 100;
+    const max = maxLength || 100
 
     if (text.length <= max) {
-      return text;
+      return text
     }
 
     // Simple extractive summarization by taking the first few sentences
-    const sentences = text.split(/[.!?]+/);
-    let summary = "";
-    let currentLength = 0;
+    const sentences = text.split(/[.!?]+/)
+    let summary = ''
+    let currentLength = 0
 
     for (const sentence of sentences) {
-      const trimmedSentence = sentence.trim();
+      const trimmedSentence = sentence.trim()
       if (!trimmedSentence) {
-        continue;
+        continue
       }
 
       if (currentLength + trimmedSentence.length <= max) {
-        summary += trimmedSentence + ". ";
-        currentLength += trimmedSentence.length + 2;
+        summary += trimmedSentence + '. '
+        currentLength += trimmedSentence.length + 2
       } else {
-        break;
+        break
       }
     }
 
-    return summary.trim();
+    return summary.trim()
   }
 
   /**
    * Tokenize text into words (for simulation only)
    */
   private async tokenizeText(text: string): Promise<string[]> {
-    return text.toLowerCase().split(/\W+/).filter(Boolean);
+    return text.toLowerCase().split(/\W+/).filter(Boolean)
   }
 
   /**
@@ -658,17 +658,17 @@ export class HomomorphicOperations {
     filterTerms?: string[],
   ): Promise<string> {
     if (!filterTerms || filterTerms.length === 0) {
-      return text;
+      return text
     }
 
-    let filteredText = text;
+    let filteredText = text
 
     for (const term of filterTerms) {
-      const regex = new RegExp(`\\b${term}\\b`, "gi");
-      filteredText = filteredText.replace(regex, "[FILTERED]");
+      const regex = new RegExp(`\\b${term}\\b`, 'gi')
+      filteredText = filteredText.replace(regex, '[FILTERED]')
     }
 
-    return filteredText;
+    return filteredText
   }
 
   /**
@@ -680,47 +680,47 @@ export class HomomorphicOperations {
     _params?: Record<string, unknown>,
   ): Promise<string> {
     switch (operation) {
-      case "count_words":
-        return String(text.split(/\s+/).filter(Boolean).length);
+      case 'count_words':
+        return String(text.split(/\s+/).filter(Boolean).length)
 
-      case "count_characters":
-        return String(text.length);
+      case 'count_characters':
+        return String(text.length)
 
-      case "reverse":
-        return text.split("").reverse().join("");
+      case 'reverse':
+        return text.split('').reverse().join('')
 
-      case "to_uppercase":
-        return text.toUpperCase();
+      case 'to_uppercase':
+        return text.toUpperCase()
 
-      case "to_lowercase":
-        return text.toLowerCase();
+      case 'to_lowercase':
+        return text.toLowerCase()
 
-      case "remove_punctuation":
-        return text.replace(/[^\w\s]/g, "");
+      case 'remove_punctuation':
+        return text.replace(/[^\w\s]/g, '')
 
-      case "count_sentences":
-        return String(text.split(/[.!?]+/).filter(Boolean).length);
+      case 'count_sentences':
+        return String(text.split(/[.!?]+/).filter(Boolean).length)
 
-      case "reading_level": {
+      case 'reading_level': {
         // Simplified Flesch-Kincaid Grade Level calculation
-        const wordCount = text.split(/\s+/).filter(Boolean).length;
-        const sentenceCount = text.split(/[.!?]+/).filter(Boolean).length;
-        const syllableCount = this.estimateSyllables(text);
+        const wordCount = text.split(/\s+/).filter(Boolean).length
+        const sentenceCount = text.split(/[.!?]+/).filter(Boolean).length
+        const syllableCount = this.estimateSyllables(text)
 
         if (wordCount === 0 || sentenceCount === 0) {
-          return "Unknown";
+          return 'Unknown'
         }
 
         const score =
           0.39 * (wordCount / sentenceCount) +
           11.8 * (syllableCount / wordCount) -
-          15.59;
+          15.59
 
-        return score.toFixed(1);
+        return score.toFixed(1)
       }
 
       default:
-        return `Unknown operation: ${operation}`;
+        return `Unknown operation: ${operation}`
     }
   }
 
@@ -731,27 +731,27 @@ export class HomomorphicOperations {
     // This is a very simplified syllable counter
     // In a real implementation, this would be more sophisticated
 
-    const words = text.toLowerCase().split(/\s+/).filter(Boolean);
-    let syllableCount = 0;
+    const words = text.toLowerCase().split(/\s+/).filter(Boolean)
+    let syllableCount = 0
 
     for (const word of words) {
       // Count vowel groups as syllables
-      const vowelGroups = word.match(/[aeiouy]+/g);
+      const vowelGroups = word.match(/[aeiouy]+/g)
       if (vowelGroups) {
-        syllableCount += vowelGroups.length;
+        syllableCount += vowelGroups.length
       } else {
-        syllableCount += 1; // Assume at least one syllable
+        syllableCount += 1 // Assume at least one syllable
       }
 
       // Subtract for silent 'e' at the end
-      if (word.length > 2 && word.endsWith("e")) {
-        syllableCount -= 1;
+      if (word.length > 2 && word.endsWith('e')) {
+        syllableCount -= 1
       }
     }
 
-    return syllableCount;
+    return syllableCount
   }
 }
 
 // Export default instance
-export default HomomorphicOperations.getInstance();
+export default HomomorphicOperations.getInstance()

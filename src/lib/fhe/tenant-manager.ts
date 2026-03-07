@@ -1,57 +1,54 @@
-import { TenantConfig } from "./types";
+import { TenantConfig } from './types'
 
 class TenantManager {
-  private tenants: Map<string, TenantConfig> = new Map();
-  private operationCounts: Map<string, number> = new Map();
+  private tenants: Map<string, TenantConfig> = new Map()
+  private operationCounts: Map<string, number> = new Map()
 
   async initialize(): Promise<void> {
-    this.tenants.clear();
-    this.operationCounts.clear();
+    this.tenants.clear()
+    this.operationCounts.clear()
   }
 
   async registerTenant(config: TenantConfig): Promise<void> {
-    this.tenants.set(config.tenantId, config);
-    this.operationCounts.set(config.tenantId, 0);
+    this.tenants.set(config.tenantId, config)
+    this.operationCounts.set(config.tenantId, 0)
   }
 
   async removeTenant(tenantId: string): Promise<void> {
-    this.tenants.delete(tenantId);
-    this.operationCounts.delete(tenantId);
+    this.tenants.delete(tenantId)
+    this.operationCounts.delete(tenantId)
   }
 
   getTenant(tenantId: string): TenantConfig | undefined {
-    return this.tenants.get(tenantId);
+    return this.tenants.get(tenantId)
   }
 
   getAllTenants(): TenantConfig[] {
-    return Array.from(this.tenants.values());
+    return Array.from(this.tenants.values())
   }
 
   trackOperation(tenantId: string): boolean {
-    const tenant = this.getTenant(tenantId);
-    if (!tenant) return false;
+    const tenant = this.getTenant(tenantId)
+    if (!tenant) return false
 
-    const currentCount = this.operationCounts.get(tenantId) || 0;
-    const limit = tenant.resourceLimits?.maxOperationsPerMinute;
+    const currentCount = this.operationCounts.get(tenantId) || 0
+    const limit = tenant.resourceLimits?.maxOperationsPerMinute
 
     if (limit !== undefined && currentCount >= limit) {
-      return false;
+      return false
     }
 
-    this.operationCounts.set(tenantId, currentCount + 1);
-    return true;
+    this.operationCounts.set(tenantId, currentCount + 1)
+    return true
   }
 
-  applyTenantConfig<T extends object>(
-    baseConfig: T,
-    tenantId: string,
-  ): T & { tenantConfig?: TenantConfig } {
-    const tenant = this.getTenant(tenantId);
+  applyTenantConfig<T extends object>(baseConfig: T, tenantId: string): T & { tenantConfig?: TenantConfig } {
+    const tenant = this.getTenant(tenantId)
     if (!tenant) {
-      return baseConfig;
+      return baseConfig
     }
 
-    const { customConfig, resourceLimits } = tenant;
+    const { customConfig, resourceLimits } = tenant
 
     // Create a new config merging base, custom, and resource limits
     // We prioritize tenant specific overrides
@@ -59,28 +56,23 @@ class TenantManager {
       ...baseConfig,
       ...customConfig,
       // Apply resource limits if they map to config properties
-      ...(resourceLimits?.maxKeySize
-        ? { keySize: resourceLimits.maxKeySize }
-        : {}),
-      tenantConfig: tenant,
-    };
+      ...(resourceLimits?.maxKeySize ? { keySize: resourceLimits.maxKeySize } : {}),
+      tenantConfig: tenant
+    }
 
-    return newConfig;
+    return newConfig
   }
 
   getTenantKeyPrefix(tenantId: string, basePrefix: string): string {
-    return `${basePrefix}_tenant_${tenantId}_`;
+    return `${basePrefix}_tenant_${tenantId}_`
   }
 
-  enhanceOperationParams<T extends object>(
-    params: T,
-    tenantId: string,
-  ): T & { tenantId: string } {
+  enhanceOperationParams<T extends object>(params: T, tenantId: string): T & { tenantId: string } {
     return {
       ...params,
-      tenantId,
-    };
+      tenantId
+    }
   }
 }
 
-export const tenantManager = new TenantManager();
+export const tenantManager = new TenantManager()

@@ -34,7 +34,7 @@
 
   /* Card backgrounds */
   .card,
-  [class*="card"],
+  [class*='card'],
   .border {
     background: rgba(16, 185, 129, 0.05) !important;
     border-color: rgba(16, 185, 129, 0.2) !important;
@@ -61,7 +61,7 @@
 
   /* Badge backgrounds */
   .badge,
-  [class*="badge"] {
+  [class*='badge'] {
     background: rgba(16, 185, 129, 0.15) !important;
     border-color: rgba(16, 185, 129, 0.3) !important;
   }
@@ -104,7 +104,7 @@
 
   /* Enhance card visibility */
   .card,
-  [class*="card"] {
+  [class*='card'] {
     background: rgba(16, 185, 129, 0.08) !important;
     border: 1px solid rgba(16, 185, 129, 0.25) !important;
   }

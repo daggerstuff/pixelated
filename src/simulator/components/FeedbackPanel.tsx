@@ -1,73 +1,73 @@
-import React from "react";
-import { useSimulator } from "../context/SimulatorContext";
-import type { RealTimeFeedback } from "../types";
-import { FeedbackType } from "../types";
+import React from 'react'
+import { useSimulator } from '../context/SimulatorContext'
+import type { RealTimeFeedback } from '../types'
+import { FeedbackType } from '../types'
 
 interface FeedbackPanelProps {
-  className?: string;
+  className?: string
 }
 
 // Map of feedback types to user-friendly names
 const feedbackTypeLabels: Record<FeedbackType, string> = {
-  [FeedbackType.COMMUNICATION_STYLE]: "Communication Style",
-  [FeedbackType.TECHNIQUE_APPLICATION]: "Technique Application",
-  [FeedbackType.EMPATHETIC_RESPONSE]: "Empathetic Response",
-  [FeedbackType.THERAPEUTIC_ALLIANCE]: "Therapeutic Alliance",
-  [FeedbackType.QUESTION_FORMULATION]: "Question Formulation",
-  [FeedbackType.ACTIVE_LISTENING]: "Active Listening",
-  [FeedbackType.FRAMEWORK_ADHERENCE]: "Framework Adherence",
-  [FeedbackType.INTERVENTION_TIMING]: "Intervention Timing",
-  [FeedbackType.POSITIVE]: "Positive Feedback",
-  [FeedbackType.DEVELOPMENTAL]: "Developmental Feedback",
-  [FeedbackType.TECHNIQUE_SUGGESTION]: "Technique Suggestion",
-  [FeedbackType.ALTERNATIVE_APPROACH]: "Alternative Approach",
-};
+  [FeedbackType.COMMUNICATION_STYLE]: 'Communication Style',
+  [FeedbackType.TECHNIQUE_APPLICATION]: 'Technique Application',
+  [FeedbackType.EMPATHETIC_RESPONSE]: 'Empathetic Response',
+  [FeedbackType.THERAPEUTIC_ALLIANCE]: 'Therapeutic Alliance',
+  [FeedbackType.QUESTION_FORMULATION]: 'Question Formulation',
+  [FeedbackType.ACTIVE_LISTENING]: 'Active Listening',
+  [FeedbackType.FRAMEWORK_ADHERENCE]: 'Framework Adherence',
+  [FeedbackType.INTERVENTION_TIMING]: 'Intervention Timing',
+  [FeedbackType.POSITIVE]: 'Positive Feedback',
+  [FeedbackType.DEVELOPMENTAL]: 'Developmental Feedback',
+  [FeedbackType.TECHNIQUE_SUGGESTION]: 'Technique Suggestion',
+  [FeedbackType.ALTERNATIVE_APPROACH]: 'Alternative Approach',
+}
 
 // Map of feedback types to colors
 const feedbackTypeColors: Record<FeedbackType, string> = {
-  [FeedbackType.COMMUNICATION_STYLE]: "bg-blue-100 text-blue-800",
-  [FeedbackType.TECHNIQUE_APPLICATION]: "bg-green-100 text-green-800",
-  [FeedbackType.EMPATHETIC_RESPONSE]: "bg-purple-100 text-purple-800",
-  [FeedbackType.THERAPEUTIC_ALLIANCE]: "bg-yellow-100 text-yellow-800",
-  [FeedbackType.QUESTION_FORMULATION]: "bg-indigo-100 text-indigo-800",
-  [FeedbackType.ACTIVE_LISTENING]: "bg-pink-100 text-pink-800",
-  [FeedbackType.FRAMEWORK_ADHERENCE]: "bg-teal-100 text-teal-800",
-  [FeedbackType.INTERVENTION_TIMING]: "bg-orange-100 text-orange-800",
-  [FeedbackType.POSITIVE]: "bg-green-100 text-green-800",
-  [FeedbackType.DEVELOPMENTAL]: "bg-blue-100 text-blue-800",
-  [FeedbackType.TECHNIQUE_SUGGESTION]: "bg-indigo-100 text-indigo-800",
-  [FeedbackType.ALTERNATIVE_APPROACH]: "bg-teal-100 text-teal-800",
-};
+  [FeedbackType.COMMUNICATION_STYLE]: 'bg-blue-100 text-blue-800',
+  [FeedbackType.TECHNIQUE_APPLICATION]: 'bg-green-100 text-green-800',
+  [FeedbackType.EMPATHETIC_RESPONSE]: 'bg-purple-100 text-purple-800',
+  [FeedbackType.THERAPEUTIC_ALLIANCE]: 'bg-yellow-100 text-yellow-800',
+  [FeedbackType.QUESTION_FORMULATION]: 'bg-indigo-100 text-indigo-800',
+  [FeedbackType.ACTIVE_LISTENING]: 'bg-pink-100 text-pink-800',
+  [FeedbackType.FRAMEWORK_ADHERENCE]: 'bg-teal-100 text-teal-800',
+  [FeedbackType.INTERVENTION_TIMING]: 'bg-orange-100 text-orange-800',
+  [FeedbackType.POSITIVE]: 'bg-green-100 text-green-800',
+  [FeedbackType.DEVELOPMENTAL]: 'bg-blue-100 text-blue-800',
+  [FeedbackType.TECHNIQUE_SUGGESTION]: 'bg-indigo-100 text-indigo-800',
+  [FeedbackType.ALTERNATIVE_APPROACH]: 'bg-teal-100 text-teal-800',
+}
 
 // Map of priorities to colors
 const priorityColors: Record<string, string> = {
-  low: "bg-gray-100",
-  medium: "bg-yellow-100",
-  high: "bg-red-100",
-};
+  low: 'bg-gray-100',
+  medium: 'bg-yellow-100',
+  high: 'bg-red-100',
+}
 
 // Helper function to get border color based on feedback type
 const getBorderColor = (type: FeedbackType): string => {
   switch (type) {
     case FeedbackType.EMPATHETIC_RESPONSE:
-      return "border-l-purple";
+      return 'border-l-purple'
     case FeedbackType.TECHNIQUE_APPLICATION:
-      return "border-l-green";
+      return 'border-l-green'
     default:
-      return "border-l-blue";
+      return 'border-l-blue'
   }
-};
+}
 
 /**
  * Component for displaying real-time feedback during a simulation
  */
-const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = "" }) => {
-  const { realtimeFeedback, clearFeedback, isConnected } = useSimulator();
+const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = '' }) => {
+  const { realtimeFeedback, clearFeedback, isConnected } = useSimulator()
 
   // Handle clearing feedback
   const handleClearFeedback = () => {
-    clearFeedback();
-  };
+    clearFeedback()
+  }
 
   return (
     <div
@@ -128,8 +128,8 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = "" }) => {
               </span>
               <span className="text-xs text-gray-400">
                 {new Date(feedback.timestamp).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
+                  hour: '2-digit',
+                  minute: '2-digit',
                 })}
               </span>
             </div>
@@ -167,7 +167,7 @@ const FeedbackPanel: React.FC<FeedbackPanelProps> = ({ className = "" }) => {
         Feedback is generated in real-time and is not recorded
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FeedbackPanel;
+export default FeedbackPanel
