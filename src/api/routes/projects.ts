@@ -2,6 +2,7 @@
 import express, { Router, Request, Response } from 'express'
 import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import { authMiddleware } from '../middleware/auth'
+import { ensureString } from '../../utils/security'
 import {
     createProject,
     getProject,
@@ -49,8 +50,8 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const result = await listProjects(user.id, {
         page: page ? parseInt(page as string) : 1,
         limit: limit ? parseInt(limit as string) : 50,
-        category: category as string,
-        status: status as string
+        category: ensureString(category),
+        status: ensureString(status)
     })
 
     res.json({

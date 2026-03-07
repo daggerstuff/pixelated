@@ -2,6 +2,7 @@
 import express, { Router, Request, Response } from 'express'
 import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import { authMiddleware } from '../middleware/auth'
+import { ensureString } from '../../utils/security'
 import {
     listSalesOpportunities,
     createSalesOpportunity,
@@ -25,7 +26,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     const result = await listSalesOpportunities(user.id, {
         page: page ? parseInt(page as string) : 1,
         limit: limit ? parseInt(limit as string) : 50,
-        stage: stage as string,
+        stage: ensureString(stage),
         status: undefined
     })
 

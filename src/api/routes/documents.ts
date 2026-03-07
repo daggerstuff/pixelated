@@ -8,30 +8,15 @@ import { asyncHandler, NotFoundError, ValidationError } from '../middleware/erro
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import { getPostgresPool } from '../../lib/database/connection'
 import * as documentService from '../services/document-service'
+import { ensureString as sanitizeInput } from '../../utils/security'
 
 // Temporary placeholder middleware - auth handled at Astro layer
 const requirePermission = (_permission: string) => (_req: Request, _res: Response, next: () => void) => next()
 const requireRole = (_roles: string[]) => (_req: Request, _res: Response, next: () => void) => next()
 
 
-// Helper to ensure param is a string (Express types params as string | string[])
-const ensureString = (param: unknown): string => {
-    if (Array.isArray(param)) {
-        return ensureString(param[0])
-    }
-    if (typeof param === 'string') {
-        return param
-    }
-    if (param && typeof param === 'object') {
-        // Handle ParsedQs or other objects
-        const values = Object.values(param)
-        if (values.length > 0) {
-            const firstValue = values[0]
-            return typeof firstValue === 'string' ? firstValue : String(firstValue ?? '')
-        }
-    }
-    return param !== undefined && param !== null ? String(param) : ''
-}
+// Helper to ensure param is a string (legacy/compatibility wrap)
+const ensureString = (param: unknown): string => sanitizeInput(param) || ''
 const router: Router = express.Router()
 
 // ============================================================================
@@ -95,9 +80,9 @@ router.get(
             ]
         }
 
-        if (status) filter.status = status
-        if (type) filter.type = type
-        if (category) filter.category = category
+        if (status) filter.status = ensureString(status)
+        if (type) filter.type = ensureString(type)
+        if (category) filter.category = ensureString(category)
 
         if (search) {
             filter.$text = { $search: search }
