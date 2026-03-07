@@ -18,6 +18,4 @@ extractor: javascript
 suites:
   - name: hipaa-compliance
     description: HIPAA compliance security checks
-    queries:
-      - fhir-security.ql
-      - ehr-security.ql
+    queries: .
