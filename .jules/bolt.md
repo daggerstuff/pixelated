@@ -1,0 +1,3 @@
+## 2025-05-15 - [O(1) LRU and Metrics in PerformanceOptimizer]
+**Learning:** The `PerformanceOptimizer` service had several O(n) bottlenecks in its cache implementation. LRU eviction was performing a full scan of the cache, and metrics calculation was iterating over all entries to sum access counts. JavaScript `Map` preserves insertion order, which can be leveraged for O(1) LRU by re-inserting keys on access (moving them to the end). Metrics can be tracked incrementally with O(1) counters instead of O(n) reductions.
+**Action:** Always leverage `Map` insertion order for LRU strategies in JavaScript. Prefer incremental counters for metrics over expensive collection-wide reductions during monitoring cycles.

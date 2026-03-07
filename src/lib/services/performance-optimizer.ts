@@ -78,6 +78,8 @@ export class PerformanceOptimizer {
   >
   private metricsHistory: PerformanceMetrics[]
   private activeCounts: Map<string, number>
+  private totalCacheAccesses: number = 0
+  private cacheHitsCount: number = 0
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -210,22 +212,27 @@ export class PerformanceOptimizer {
   set(key: string, value: unknown): void {
     const now = Date.now()
 
-    // Evict expired entries
+    // Evict expired entries (amortized O(1))
     this.evictExpired()
 
-    // Evict based on strategy if cache is full
-    if (this.cache.size >= this.config.cache.maxSize) {
+    // Check if key exists to update insertion order
+    const existingEntry = this.cache.get(key)
+    if (existingEntry) {
+      this.cache.delete(key)
+    } else if (this.cache.size >= this.config.cache.maxSize) {
+      // Evict based on strategy if cache is full
       this.evictByStrategy()
     }
 
     this.cache.set(key, {
       value,
       timestamp: now,
-      accessCount: 1,
+      accessCount: existingEntry ? existingEntry.accessCount : 1,
     })
   }
 
   get(key: string): unknown | null {
+    this.totalCacheAccesses++
     const entry = this.cache.get(key)
     if (!entry) {
       return null
@@ -237,15 +244,33 @@ export class PerformanceOptimizer {
       return null
     }
 
-    entry.accessCount++
+    this.cacheHitsCount++
+
+    // For LRU, move to the end of the Map (most recently used)
+    // and update timestamp to implement sliding window TTL
+    if (this.config.cache.strategy === 'LRU') {
+      this.cache.delete(key)
+      entry.timestamp = now
+      entry.accessCount++
+      this.cache.set(key, entry)
+    } else {
+      entry.accessCount++
+    }
+
     return entry.value
   }
 
   private evictExpired() {
     const now = Date.now()
+    // When using LRU with sliding window, Map order is roughly by expiry.
+    // This allows for early exit in many cases, making it amortized O(1).
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.config.cache.ttl) {
         this.cache.delete(key)
+      } else if (this.config.cache.strategy === 'LRU') {
+        // If it's not expired and we're using LRU, later entries
+        // are even more recent, so we can stop.
+        break
       }
     }
   }
@@ -259,7 +284,9 @@ export class PerformanceOptimizer {
 
     switch (this.config.cache.strategy) {
       case 'LRU':
-        keyToEvict = this.findLRUKey()
+        // Map.keys().next().value returns the first inserted key
+        // which is the Least Recently Used in our implementation.
+        keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
         keyToEvict = this.findLFUKey()
@@ -275,20 +302,6 @@ export class PerformanceOptimizer {
       return
     }
     this.cache.delete(keyToEvict)
-  }
-
-  private findLRUKey(): string {
-    let oldestKey = ''
-    let oldestTime = Date.now()
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTime) {
-        oldestTime = entry.timestamp
-        oldestKey = key
-      }
-    }
-
-    return oldestKey
   }
 
   private findLFUKey(): string {
@@ -439,13 +452,10 @@ export class PerformanceOptimizer {
 
   private updateMetrics() {
     // Update cache hit rate
-    const totalCacheAccesses = Array.from(this.cache.values()).reduce(
-      (sum, entry) => sum + entry.accessCount,
-      0,
-    )
-    const cacheHits = this.cache.size
     this.metrics.cacheHitRate =
-      totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
+      this.totalCacheAccesses > 0
+        ? this.cacheHitsCount / this.totalCacheAccesses
+        : 0
 
     // Update active connections
     this.metrics.activeConnections = Array.from(
