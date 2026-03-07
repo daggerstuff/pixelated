@@ -19,12 +19,10 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
 ### Site Down / Inaccessible
 
 1. **Check Monitoring Alerts**
-
    - Review Slack alerts for specific error details
    - Check GitHub Actions monitoring workflow results
 
 2. **Verify Deployment Status**
-
    - Check AWS CloudFormation stack status
    - Verify DNS resolution is working properly
 
@@ -39,7 +37,6 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
 ### Database Issues
 
 1. **Check Database Connection**
-
    - Verify MongoDB Atlas status at [MongoDB Status](https://status.cloud.mongodb.com/)
    - Run health check against the API endpoint manually:
      ```bash
@@ -47,7 +44,6 @@ This document outlines the disaster recovery procedures for the Pixelated Astro 
      ```
 
 2. **Database Recovery Steps**
-
    - If database corruption is suspected, restore from the latest backup:
 
      ```bash
@@ -190,25 +186,21 @@ If GitHub Actions is unavailable:
 ### Response Procedures
 
 1. **Identification**
-
    - Determine severity level
    - Document initial findings
    - Notify appropriate team members
 
 2. **Containment**
-
    - Implement immediate mitigation (e.g., rollback)
    - Isolate affected components
    - Prevent further damage
 
 3. **Eradication**
-
    - Identify and fix the root cause
    - Deploy and test fixes
    - Verify security of all components
 
 4. **Recovery**
-
    - Restore service to normal operation
    - Verify data integrity
    - Monitor for any recurring issues

@@ -1,19 +1,19 @@
-import React from 'react'
-import type { AIMessage } from '../../lib/ai'
-import type { CrisisDetectionResult } from '../../lib/ai/crisis/types'
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { authClient } from '@/lib/auth-client'
+import React from "react";
+import type { AIMessage } from "../../lib/ai";
+import type { CrisisDetectionResult } from "../../lib/ai/crisis/types";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { authClient } from "@/lib/auth-client";
 import {
   ChatContainer,
   useChatCompletion,
   useCrisisDetection,
   useSentimentAnalysis,
-} from '../ai'
+} from "../ai";
 
 interface ChatDemoProps {
-  className?: string
-  onCrisisAlert?: (crisis: CrisisDetectionResult) => void
-  maxMessages?: number
+  className?: string;
+  onCrisisAlert?: (crisis: CrisisDetectionResult) => void;
+  maxMessages?: number;
 }
 
 /**
@@ -21,51 +21,51 @@ interface ChatDemoProps {
  * Features: Authentication, rate limiting, crisis management, error boundaries
  */
 export function ChatDemo({
-  className = '',
+  className = "",
   onCrisisAlert,
   maxMessages = 50,
 }: ChatDemoProps) {
-  const { data: session } = authClient.useSession()
-  const isAuthenticated = !!session?.user
-  const [showAnalysis, setShowAnalysis] = useState(false)
-  const [messageCount, setMessageCount] = useState(0)
-  const [rateLimitExceeded, setRateLimitExceeded] = useState(false)
-  const [crisisAlertShown, setCrisisAlertShown] = useState(false)
-  const lastMessageTime = useRef<number>(0)
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session?.user;
+  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [messageCount, setMessageCount] = useState(0);
+  const [rateLimitExceeded, setRateLimitExceeded] = useState(false);
+  const [crisisAlertShown, setCrisisAlertShown] = useState(false);
+  const lastMessageTime = useRef<number>(0);
 
   // Rate limiting: max 1 message per 2 seconds
-  const RATE_LIMIT_MS = 2000
-  const MAX_MESSAGES_PER_HOUR = 30
+  const RATE_LIMIT_MS = 2000;
+  const MAX_MESSAGES_PER_HOUR = 30;
 
   // Initial system message
   const initialMessages: AIMessage[] = [
     {
-      role: 'system',
+      role: "system",
       content:
-        'You are a professional mental health training assistant. Provide supportive, evidence-based responses while maintaining appropriate boundaries.',
-      name: '',
+        "You are a professional mental health training assistant. Provide supportive, evidence-based responses while maintaining appropriate boundaries.",
+      name: "",
     },
-  ]
+  ];
 
   // Chat completion hook with enhanced error handling
   const { messages, isLoading, error, sendMessage, retryLastMessage } =
     useChatCompletion({
       initialMessages,
-      model: 'gpt-4o',
+      model: "gpt-4o",
       temperature: 0.7,
       maxTokens: 1024,
       onError: (error) => {
-        console.error('Chat error:', error)
+        console.error("Chat error:", error);
         // Log to monitoring service in production
       },
-    })
+    });
 
   // Sentiment analysis hook
   const {
     analyzeText: analyzeSentiment,
     result: sentimentResult,
     isLoading: sentimentLoading,
-  } = useSentimentAnalysis()
+  } = useSentimentAnalysis();
 
   // Crisis detection with proper alert handling
   const {
@@ -73,64 +73,64 @@ export function ChatDemo({
     result: crisisResult,
     isLoading: crisisLoading,
   } = useCrisisDetection({
-    sensitivityLevel: 'medium',
+    sensitivityLevel: "medium",
     onCrisisDetected: useCallback(
       (result: CrisisDetectionResult) => {
-        if (result.isCrisis && result.riskLevel === 'critical') {
-          setCrisisAlertShown(true)
-          onCrisisAlert?.(result)
+        if (result.isCrisis && result.riskLevel === "critical") {
+          setCrisisAlertShown(true);
+          onCrisisAlert?.(result);
           // In production: trigger emergency protocols
         }
       },
       [onCrisisAlert],
     ),
-  })
+  });
 
   // Rate limiting check
   const checkRateLimit = useCallback(() => {
-    const now = Date.now()
+    const now = Date.now();
     if (now - lastMessageTime.current < RATE_LIMIT_MS) {
-      setRateLimitExceeded(true)
-      setTimeout(() => setRateLimitExceeded(false), RATE_LIMIT_MS)
-      return false
+      setRateLimitExceeded(true);
+      setTimeout(() => setRateLimitExceeded(false), RATE_LIMIT_MS);
+      return false;
     }
     if (messageCount >= MAX_MESSAGES_PER_HOUR) {
-      return false
+      return false;
     }
-    return true
-  }, [messageCount])
+    return true;
+  }, [messageCount]);
 
   // Enhanced message handler with validation and rate limiting
   const handleSendMessage = useCallback(
     async (message: string) => {
       if (!isAuthenticated) {
-        throw new Error('Authentication required')
+        throw new Error("Authentication required");
       }
 
       if (!checkRateLimit()) {
-        return
+        return;
       }
 
       // Input validation
       if (!message.trim() || message.length > 2000) {
-        throw new Error('Invalid message length')
+        throw new Error("Invalid message length");
       }
 
       try {
-        lastMessageTime.current = Date.now()
-        setMessageCount((prev) => prev + 1)
+        lastMessageTime.current = Date.now();
+        setMessageCount((prev) => prev + 1);
 
         // Send message to AI
-        await sendMessage(message)
+        await sendMessage(message);
 
         // Run analysis in parallel
         await Promise.allSettled([
           analyzeSentiment(message),
           detectCrisis(message),
-        ])
+        ]);
       } catch (error: unknown) {
-        console.error('Message handling error:', error)
-        throw error
+        console.error("Message handling error:", error);
+        throw error;
       }
     },
     [
@@ -140,15 +140,15 @@ export function ChatDemo({
       analyzeSentiment,
       detectCrisis,
     ],
-  )
+  );
 
   // Reset rate limiting hourly
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageCount(0)
-    }, 3600000) // 1 hour
-    return () => clearInterval(interval)
-  }, [])
+      setMessageCount(0);
+    }, 3600000); // 1 hour
+    return () => clearInterval(interval);
+  }, []);
 
   // Authentication guard
   if (!isAuthenticated) {
@@ -165,7 +165,7 @@ export function ChatDemo({
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -195,7 +195,7 @@ export function ChatDemo({
                   Crisis Detected
                 </h3>
                 <p className="text-sm text-red-700">
-                  Risk Level: {crisisResult.riskLevel} | Confidence:{' '}
+                  Risk Level: {crisisResult.riskLevel} | Confidence:{" "}
                   {(crisisResult.confidence * 100).toFixed(0)}%
                 </p>
               </div>
@@ -229,18 +229,18 @@ export function ChatDemo({
       <div className="flex-1 min-h-0">
         <ChatContainer
           messages={messages
-            .filter((m) => m.role !== 'system' && m.content !== undefined)
+            .filter((m) => m.role !== "system" && m.content !== undefined)
             .slice(-maxMessages) // Limit message history
             .map((m) => ({
-              role: m.role as 'user' | 'assistant' | 'system',
-              content: m.content || '',
-              name: m.name || '',
+              role: m.role as "user" | "assistant" | "system",
+              content: m.content || "",
+              name: m.name || "",
             }))}
           onSendMessage={handleSendMessage}
           isLoading={isLoading}
           error={error?.toString()}
           inputPlaceholder={
-            rateLimitExceeded ? 'Please wait...' : 'Type a message...'
+            rateLimitExceeded ? "Please wait..." : "Type a message..."
           }
           onRetry={retryLastMessage}
           disabled={rateLimitExceeded || messageCount >= MAX_MESSAGES_PER_HOUR}
@@ -256,7 +256,7 @@ export function ChatDemo({
               className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <svg
-                className={`mr-2 h-4 w-4 transform transition-transform ${showAnalysis ? 'rotate-180' : ''}`}
+                className={`mr-2 h-4 w-4 transform transition-transform ${showAnalysis ? "rotate-180" : ""}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -268,7 +268,7 @@ export function ChatDemo({
                   d="M19 9l-7 7-7-7"
                 />
               </svg>
-              {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
+              {showAnalysis ? "Hide Analysis" : "Show Analysis"}
             </button>
             <div className="text-xs text-gray-500">
               Messages: {messageCount}/{MAX_MESSAGES_PER_HOUR}
@@ -349,9 +349,9 @@ export function ChatDemo({
                         Crisis Detected:
                       </span>
                       <span
-                        className={`text-sm font-medium ${crisisResult.isCrisis ? 'text-red-600' : 'text-green-600'}`}
+                        className={`text-sm font-medium ${crisisResult.isCrisis ? "text-red-600" : "text-green-600"}`}
                       >
-                        {crisisResult.isCrisis ? 'Yes' : 'No'}
+                        {crisisResult.isCrisis ? "Yes" : "No"}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -371,14 +371,15 @@ export function ChatDemo({
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Risk Level:</span>
                       <span
-                        className={`text-sm font-medium ${crisisResult.riskLevel === 'critical'
-                            ? 'text-red-600'
-                            : crisisResult.riskLevel === 'high'
-                              ? 'text-orange-600'
-                              : crisisResult.riskLevel === 'medium'
-                                ? 'text-yellow-600'
-                                : 'text-green-600'
-                          }`}
+                        className={`text-sm font-medium ${
+                          crisisResult.riskLevel === "critical"
+                            ? "text-red-600"
+                            : crisisResult.riskLevel === "high"
+                              ? "text-orange-600"
+                              : crisisResult.riskLevel === "medium"
+                                ? "text-yellow-600"
+                                : "text-green-600"
+                        }`}
                       >
                         {crisisResult.riskLevel}
                       </span>
@@ -411,7 +412,7 @@ export function ChatDemo({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Error Boundary Component
@@ -420,19 +421,19 @@ export class ChatDemoErrorBoundary extends React.Component<
   { hasError: boolean; error?: Error }
 > {
   constructor(props: {
-    children: React.ReactNode
-    fallback?: React.ReactNode
+    children: React.ReactNode;
+    fallback?: React.ReactNode;
   }) {
-    super(props)
-    this.state = { hasError: false }
+    super(props);
+    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ChatDemo Error:', error, errorInfo)
+    console.error("ChatDemo Error:", error, errorInfo);
     // Log to monitoring service in production
   }
 
@@ -459,9 +460,9 @@ export class ChatDemoErrorBoundary extends React.Component<
             </div>
           </div>
         )
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

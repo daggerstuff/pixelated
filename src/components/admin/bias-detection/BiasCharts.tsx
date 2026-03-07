@@ -18,16 +18,16 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from 'recharts'
+} from "recharts";
 
 interface BiasChartsProps {
-  biasData: Array<{ name: string; value: number }>
-  demographicData: Array<{ name: string; value: number }>
-  timeSeriesData: Array<{ date: string; bias: number; accuracy: number }>
-  radarData: Array<{ subject: string; A: number; B: number; fullMark: number }>
+  biasData: Array<{ name: string; value: number }>;
+  demographicData: Array<{ name: string; value: number }>;
+  timeSeriesData: Array<{ date: string; bias: number; accuracy: number }>;
+  radarData: Array<{ subject: string; A: number; B: number; fullMark: number }>;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 export function BiasCharts({
   biasData,
@@ -120,5 +120,5 @@ export function BiasCharts({
         </ResponsiveContainer>
       </div>
     </>
-  )
+  );
 }

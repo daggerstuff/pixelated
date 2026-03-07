@@ -5,7 +5,7 @@
 export function open() {}
 export function close() {}
 export function url() {
-  return null
+  return null;
 }
 export function waitForDebugger() {}
 
@@ -13,7 +13,7 @@ export const console = {
   markTimeline() {},
   timeline() {},
   timelineEnd() {},
-}
+};
 
 export class Session {
   connect() {}
@@ -29,4 +29,4 @@ export default {
   waitForDebugger,
   console,
   Session,
-}
+};

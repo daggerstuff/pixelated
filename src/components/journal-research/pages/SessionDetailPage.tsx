@@ -1,8 +1,8 @@
-import { JournalResearchQueryProvider } from '@/lib/api/journal-research/react-query'
-import { SessionDetail } from '../features/SessionDetail'
+import { JournalResearchQueryProvider } from "@/lib/api/journal-research/react-query";
+import { SessionDetail } from "../features/SessionDetail";
 
 export interface SessionDetailPageProps {
-  sessionId: string
+  sessionId: string;
 }
 
 export function SessionDetailPage({ sessionId }: SessionDetailPageProps) {
@@ -10,5 +10,5 @@ export function SessionDetailPage({ sessionId }: SessionDetailPageProps) {
     <JournalResearchQueryProvider>
       <SessionDetail sessionId={sessionId} />
     </JournalResearchQueryProvider>
-  )
+  );
 }

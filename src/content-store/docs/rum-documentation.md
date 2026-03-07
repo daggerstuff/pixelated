@@ -71,11 +71,11 @@ RUM configuration is defined in `src/lib/monitoring/config.ts`. The key settings
 ```typescript
 const defaultConfig: MonitoringConfig = {
   grafana: {
-    url: process.env.GRAFANA_URL || 'https://grafana.pixelatedempathy.com',
-    apiKey: process.env.GRAFANA_API_KEY || '',
-    orgId: process.env.GRAFANA_ORG_ID || '',
+    url: process.env.GRAFANA_URL || "https://grafana.pixelatedempathy.com",
+    apiKey: process.env.GRAFANA_API_KEY || "",
+    orgId: process.env.GRAFANA_ORG_ID || "",
     enableRUM: true,
-    rumApplicationName: 'gradiant-astro',
+    rumApplicationName: "gradiant-astro",
     rumSamplingRate: 1.0, // 100% sampling in production
   },
   metrics: {
@@ -87,9 +87,9 @@ const defaultConfig: MonitoringConfig = {
   alerts: {
     enableAlerts: true,
     slackWebhookUrl: process.env.SLACK_WEBHOOK,
-    emailRecipients: process.env.MONITORING_EMAIL_RECIPIENTS?.split(','),
+    emailRecipients: process.env.MONITORING_EMAIL_RECIPIENTS?.split(","),
   },
-}
+};
 ```
 
 ### Environment Variables
@@ -127,12 +127,17 @@ The dashboard automatically refreshes every 30 seconds. You can manually refresh
 To access RUM data in React components, use the provided hooks:
 
 ```tsx
-import { useMonitoring, useRUMData } from '../lib/monitoring/hooks';
+import { useMonitoring, useRUMData } from "../lib/monitoring/hooks";
 
 function MyComponent() {
   // Get monitoring utilities
-  const { trackEvent, trackError, trackMetric,
-          trackUserInteraction, trackPageView } = useMonitoring();
+  const {
+    trackEvent,
+    trackError,
+    trackMetric,
+    trackUserInteraction,
+    trackPageView,
+  } = useMonitoring();
 
   // Access RUM data
   const {
@@ -141,12 +146,12 @@ function MyComponent() {
     visualStability,
     isLoading,
     lastUpdated,
-    refreshData
+    refreshData,
   } = useRUMData();
 
   // Track custom event
   const handleClick = () => {
-    trackUserInteraction('button', 'click', { buttonId: 'my-button' });
+    trackUserInteraction("button", "click", { buttonId: "my-button" });
     // Your component logic here
   };
 
@@ -173,17 +178,17 @@ function MyComponent() {
 
 We've established the following performance budgets:
 
-| Metric | Target (Good) | Maximum (Acceptable) |
-|--------|---------------|----------------------|
-| TTFB   | < 300ms       | < 600ms              |
-| FCP    | < 1.8s        | < 3s                 |
-| LCP    | < 2.5s        | < 4s                 |
-| CLS    | < 0.1         | < 0.25               |
-| TBT    | < 200ms       | < 600ms              |
-| FID    | < 100ms       | < 300ms              |
-| JS Size| < 500KB       | < 1MB                |
-| CSS Size| < 100KB      | < 200KB              |
-| Requests| < 50         | < 80                 |
+| Metric   | Target (Good) | Maximum (Acceptable) |
+| -------- | ------------- | -------------------- |
+| TTFB     | < 300ms       | < 600ms              |
+| FCP      | < 1.8s        | < 3s                 |
+| LCP      | < 2.5s        | < 4s                 |
+| CLS      | < 0.1         | < 0.25               |
+| TBT      | < 200ms       | < 600ms              |
+| FID      | < 100ms       | < 300ms              |
+| JS Size  | < 500KB       | < 1MB                |
+| CSS Size | < 100KB       | < 200KB              |
+| Requests | < 50          | < 80                 |
 
 ## Troubleshooting
 
@@ -210,7 +215,7 @@ To enable debug mode for more detailed logging:
 
 ```typescript
 // In your development environment
-window.localStorage.setItem('rum-debug', 'true');
+window.localStorage.setItem("rum-debug", "true");
 ```
 
 ## Future Enhancements

@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute, APIContext } from "astro";
 /**
  * Bias Detection Engine - Metrics API Endpoint
  *
@@ -6,30 +6,30 @@ import type { APIRoute, APIContext } from 'astro'
  * for the bias detection engine.
  */
 
-export const prerender = false
+export const prerender = false;
 
-import { z } from 'zod'
+import { z } from "zod";
 
 // Schema for validating query parameters
 const metricsQuerySchema = z.object({
   timeRange: z.coerce.number().min(60000).max(86400000).optional(),
-  format: z.enum(['json', 'prometheus']).optional().default('json'),
+  format: z.enum(["json", "prometheus"]).optional().default("json"),
   metrics: z.string().optional(),
-  aggregation: z.enum(['raw', 'summary']).optional().default('summary'),
-})
+  aggregation: z.enum(["raw", "summary"]).optional().default("summary"),
+});
 
-type MetricsQuery = z.infer<typeof metricsQuerySchema>
+type MetricsQuery = z.infer<typeof metricsQuerySchema>;
 
 // Astro API route export - simplified version
 export const GET: APIRoute = async ({ url }: APIContext) => {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Only allow GET requests
-    const queryParams = Object.fromEntries(url.searchParams.entries())
+    const queryParams = Object.fromEntries(url.searchParams.entries());
 
     // Validate query parameters
-    const queryResult = metricsQuerySchema.safeParse(queryParams)
+    const queryResult = metricsQuerySchema.safeParse(queryParams);
     if (!queryResult.success) {
       return new Response(
         JSON.stringify({
@@ -37,12 +37,12 @@ export const GET: APIRoute = async ({ url }: APIContext) => {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
-    const query: MetricsQuery = queryResult.data
+    const query: MetricsQuery = queryResult.data;
 
     // Mock metrics data - replace with actual bias detection metrics
     const mockMetrics = {
@@ -56,13 +56,13 @@ export const GET: APIRoute = async ({ url }: APIContext) => {
       },
       meta: {
         totalMetrics: 4,
-        metricsTypes: ['requests', 'response_time', 'bias_runs', 'alerts'],
+        metricsTypes: ["requests", "response_time", "bias_runs", "alerts"],
         requestDuration: Date.now() - startTime,
       },
-    }
+    };
 
     // Handle Prometheus format
-    if (query.format === 'prometheus') {
+    if (query.format === "prometheus") {
       const prometheusData = `# HELP bias_detection_requests_total Total number of bias detection requests
 # TYPE bias_detection_requests_total counter
 bias_detection_requests_total ${mockMetrics.summary.totalRequests}
@@ -78,34 +78,34 @@ bias_detection_runs_total ${mockMetrics.summary.biasDetectionRuns}
 # HELP bias_detection_alerts_total Total alerts triggered
 # TYPE bias_detection_alerts_total counter
 bias_detection_alerts_total ${mockMetrics.summary.alertsTriggered}
-`
+`;
       return new Response(prometheusData, {
         status: 200,
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-      })
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
     }
 
     // JSON response
     return new Response(JSON.stringify(mockMetrics, null, 2), {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
+        "Content-Type": "application/json",
+        "Cache-Control": "no-cache",
       },
-    })
+    });
   } catch (error: unknown) {
-    console.error('Metrics endpoint error:', error)
+    console.error("Metrics endpoint error:", error);
 
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Internal server error",
+        message: error instanceof Error ? String(error) : "Unknown error",
         timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};

@@ -258,7 +258,7 @@ spec:
       # Security context at pod level
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65534  # nobody user (node-exporter default)
+        runAsUser: 65534 # nobody user (node-exporter default)
         runAsGroup: 65534
         fsGroup: 65534
         seccompProfile:

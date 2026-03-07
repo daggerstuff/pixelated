@@ -1,17 +1,19 @@
 ---
-applyTo: 'ai/**/*.py,**/*model*.py,**/*inference*.py,**/*training*.py'
-description: 'Python LLM development guidelines for model, inference, and training files'
+applyTo: "ai/**/*.py,**/*model*.py,**/*inference*.py,**/*training*.py"
+description: "Python LLM development guidelines for model, inference, and training files"
 ---
 
 # Python AI/ML Development Guidelines
 
 ## Environment & Setup
+
 - Always activate Python environment: `source .venv/bin/activate` from project root
 - Use `uv` package manager for Python dependencies
 - Python 3.11+ required for optimal performance
 - Ensure CUDA availability for GPU operations
 
 ## Core Principles for Pixelated Empathy
+
 - **Safety First**: All AI models must integrate bias detection and safety validation
 - **Performance**: <50ms response time requirement for therapeutic conversations
 - **Privacy**: Implement FHE-compatible architectures for zero-knowledge processing
@@ -20,6 +22,7 @@ description: 'Python LLM development guidelines for model, inference, and traini
 - **HIPAA Compliance**: All data handling must meet healthcare privacy standards
 
 ## Project Structure
+
 - `ai/models/` - Model definitions and architectures
 - `ai/inference/` - Real-time inference services
 - `ai/training/` - Training pipelines and scripts
@@ -27,6 +30,7 @@ description: 'Python LLM development guidelines for model, inference, and traini
 - `ai/api/` - Flask/FastAPI services for model endpoints
 
 ## Therapeutic AI Architecture Pattern
+
 ```python
 class TherapeuticAIModel(nn.Module):
     """Base class for therapeutic conversation models"""
@@ -53,6 +57,7 @@ class TherapeuticAIModel(nn.Module):
 ```
 
 ## Performance Optimization
+
 - **Response Time Target**: <50ms for conversational AI
 - **Memory Management**: Use `torch.cuda.amp` for mixed precision
 - **Model Efficiency**: Implement gradient checkpointing for large models
@@ -86,6 +91,7 @@ def generate_therapeutic_response(model, input_text, max_length=512):
 ```
 
 ## Bias Detection Integration
+
 - **Real-time Monitoring**: Integrate `BiasDetectionEngine` in all model outputs
 - **Threshold Management**: Configure bias thresholds per therapeutic scenario
 - **Audit Logging**: Log all bias detection results for compliance
@@ -118,6 +124,7 @@ class BiasDetectionPipeline:
 ```
 
 ## Therapeutic Model Fine-tuning
+
 - **PEFT Methods**: Use LoRA/QLoRA for efficient therapeutic domain adaptation
 - **Safety-First Training**: Include safety validation in training loop
 - **Scenario-Specific**: Fine-tune for crisis intervention, trauma therapy, etc.
@@ -148,6 +155,7 @@ class TherapeuticTrainer:
 ```
 
 ## Privacy & Security Implementation
+
 - **FHE Integration**: Implement fully homomorphic encryption for sensitive data
 - **Zero-Knowledge Architecture**: Process therapeutic data without exposure
 - **HIPAA Compliance**: Encrypt all PHI at rest and in transit
@@ -179,6 +187,7 @@ class FHETherapeuticModel:
 ```
 
 ## Therapeutic AI Evaluation
+
 - **Clinical Validity**: Validate responses against therapeutic best practices
 - **Bias Metrics**: Measure fairness across demographic groups
 - **Safety Scores**: Assess potential harm in therapeutic contexts
@@ -209,12 +218,14 @@ class TherapeuticEvaluator:
 ```
 
 ## Common Issues & Solutions
+
 - **High Latency**: Check model size, use quantization, optimize inference pipeline
 - **Bias Detection Failures**: Retrain bias detection models, adjust thresholds
 - **Privacy Violations**: Audit data flows, strengthen encryption, review logging
 - **Safety Concerns**: Enhance safety validation, update training data filters
 
 ## Development Workflow
+
 1. **Environment**: Activate `.venv`, ensure CUDA availability
 2. **Safety First**: Implement bias detection and safety validation before model logic
 3. **Modular Design**: Separate models, inference, training, and safety components
@@ -224,6 +235,7 @@ class TherapeuticEvaluator:
 7. **Deployment**: Use Docker containers with proper security configurations
 
 ## Code Quality Standards
+
 - **Type Hints**: Use comprehensive type annotations for all functions
 - **Error Handling**: Implement robust error handling for therapeutic contexts
 - **Logging**: Use structured logging with audit trail capabilities
@@ -231,6 +243,7 @@ class TherapeuticEvaluator:
 - **Documentation**: Document all therapeutic AI components thoroughly
 
 ## Integration Points
+
 - **Frontend**: Expose models via Flask/FastAPI endpoints in `ai/api/`
 - **Database**: Store model outputs and bias scores in PostgreSQL
 - **Monitoring**: Integrate with Prometheus for performance metrics
@@ -238,6 +251,7 @@ class TherapeuticEvaluator:
 - **Compliance**: Log all operations for HIPAA audit requirements
 
 ## Performance Targets
+
 - **Response Time**: <50ms for conversational interactions
 - **Throughput**: Support 100+ concurrent therapeutic sessions
 - **Accuracy**: >95% clinical appropriateness score

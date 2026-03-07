@@ -3,24 +3,24 @@
  */
 
 interface CacheOptions {
-  ttl: number // Time to live in seconds
-  maxSize?: number // Maximum number of items to store
+  ttl: number; // Time to live in seconds
+  maxSize?: number; // Maximum number of items to store
 }
 
 interface CacheEntry<T> {
-  value: T
-  expires: number
+  value: T;
+  expires: number;
 }
 
 export class Cache {
-  private store: Map<string, CacheEntry<unknown>>
-  private readonly ttl: number
-  private readonly maxSize: number
+  private store: Map<string, CacheEntry<unknown>>;
+  private readonly ttl: number;
+  private readonly maxSize: number;
 
   constructor(options: CacheOptions) {
-    this.store = new Map()
-    this.ttl = options.ttl * 1000 // Convert to milliseconds
-    this.maxSize = options.maxSize || 1000
+    this.store = new Map();
+    this.ttl = options.ttl * 1000; // Convert to milliseconds
+    this.maxSize = options.maxSize || 1000;
   }
 
   /**
@@ -29,19 +29,19 @@ export class Cache {
    * @returns The cached value or undefined if not found/expired
    */
   async get<T>(key: string): Promise<T | undefined> {
-    const entry = this.store.get(key) as CacheEntry<T> | undefined
+    const entry = this.store.get(key) as CacheEntry<T> | undefined;
 
     if (!entry) {
-      return undefined
+      return undefined;
     }
 
     // Check if entry has expired
     if (Date.now() > entry.expires) {
-      this.store.delete(key)
-      return undefined
+      this.store.delete(key);
+      return undefined;
     }
 
-    return entry.value
+    return entry.value;
   }
 
   /**
@@ -53,14 +53,14 @@ export class Cache {
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     // Enforce max size limit
     if (this.store.size >= this.maxSize) {
-      const oldestKey = this.store.keys().next().value
-      this.store.delete(oldestKey)
+      const oldestKey = this.store.keys().next().value;
+      this.store.delete(oldestKey);
     }
 
     this.store.set(key, {
       value,
       expires: Date.now() + (ttl ? ttl * 1000 : this.ttl),
-    })
+    });
   }
 
   /**
@@ -68,20 +68,20 @@ export class Cache {
    * @param key Cache key
    */
   async delete(key: string): Promise<void> {
-    this.store.delete(key)
+    this.store.delete(key);
   }
 
   /**
    * Clear all entries from the cache
    */
   async clear(): Promise<void> {
-    this.store.clear()
+    this.store.clear();
   }
 
   /**
    * Get the number of entries in the cache
    */
   get size(): number {
-    return this.store.size
+    return this.store.size;
   }
 }

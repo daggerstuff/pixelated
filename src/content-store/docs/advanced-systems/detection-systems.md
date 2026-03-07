@@ -1,9 +1,9 @@
 ---
-title: 'Advanced Detection Systems in Therapy'
-description: 'Advanced Detection Systems in Therapy documentation'
+title: "Advanced Detection Systems in Therapy"
+description: "Advanced Detection Systems in Therapy documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -49,43 +49,43 @@ Advanced detection systems in therapy combine multiple modalities of analysis to
 ```typescript
 interface DetectionSystem {
   textAnalysis: {
-    sentiment: number
-    topics: string[]
-    entities: Entity[]
-    temporalPatterns: Pattern[]
-  }
+    sentiment: number;
+    topics: string[];
+    entities: Entity[];
+    temporalPatterns: Pattern[];
+  };
 
   voiceAnalysis: {
-    frequencyChanges: FrequencyData[]
-    stressIndicators: StressMarker[]
-    emotionalState: EmotionalState
-  }
+    frequencyChanges: FrequencyData[];
+    stressIndicators: StressMarker[];
+    emotionalState: EmotionalState;
+  };
 
   behavioralAnalysis: {
-    responsePatterns: Pattern[]
-    consistencyScore: number
-    engagementMetrics: Metrics
-  }
+    responsePatterns: Pattern[];
+    consistencyScore: number;
+    engagementMetrics: Metrics;
+  };
 
   contextualAnalysis: {
-    situationAssessment: Assessment
-    historicalContext: HistoricalData
-    environmentalFactors: Factor[]
-  }
+    situationAssessment: Assessment;
+    historicalContext: HistoricalData;
+    environmentalFactors: Factor[];
+  };
 }
 
 interface Pattern {
-  type: string
-  confidence: number
-  timeframe: TimeRange
-  indicators: string[]
+  type: string;
+  confidence: number;
+  timeframe: TimeRange;
+  indicators: string[];
 }
 
 interface Assessment {
-  riskLevel: 'low' | 'medium' | 'high' | 'critical'
-  confidenceScore: number
-  factors: Factor[]
-  recommendations: string[]
+  riskLevel: "low" | "medium" | "high" | "critical";
+  confidenceScore: number;
+  factors: Factor[];
+  recommendations: string[];
 }
 ```
 

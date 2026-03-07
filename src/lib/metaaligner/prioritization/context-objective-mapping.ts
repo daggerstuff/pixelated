@@ -1,24 +1,24 @@
 // Context-to-Objective Mapping System for MetaAligner
 // Maps detected context types to prioritized objectives for multi-objective alignment.
 
-import { ContextType } from '../core/objectives'
+import { ContextType } from "../core/objectives";
 
 /**
  * Core alignment objectives as string enums for clarity.
  */
 export enum ObjectiveKey {
-  Correctness = 'correctness',
-  Informativeness = 'informativeness',
-  Professionalism = 'professionalism',
-  Empathy = 'empathy',
-  Safety = 'safety',
-  Support = 'support',
+  Correctness = "correctness",
+  Informativeness = "informativeness",
+  Professionalism = "professionalism",
+  Empathy = "empathy",
+  Safety = "safety",
+  Support = "support",
 }
 
 export interface ObjectivePriority {
-  key: ObjectiveKey
-  priority: number // 1 = highest, larger = lower priority
-  weight: number // 0..1 normalized for weighting algorithms
+  key: ObjectiveKey;
+  priority: number; // 1 = highest, larger = lower priority
+  weight: number; // 0..1 normalized for weighting algorithms
 }
 
 /**
@@ -61,7 +61,7 @@ const contextObjectiveMap: Record<ContextType, ObjectivePriority[]> = {
     { key: ObjectiveKey.Professionalism, priority: 2, weight: 0.7 },
     { key: ObjectiveKey.Empathy, priority: 3, weight: 0.6 },
   ],
-}
+};
 
 /**
  * Returns prioritized objectives for the given context type.
@@ -72,5 +72,5 @@ export function getPrioritizedObjectivesForContext(
 ): ObjectivePriority[] {
   return (
     contextObjectiveMap[context] ?? contextObjectiveMap[ContextType.GENERAL]
-  )
+  );
 }

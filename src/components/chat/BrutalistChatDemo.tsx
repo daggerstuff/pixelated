@@ -1,120 +1,120 @@
-import React, { useState } from 'react'
-import type { FC } from 'react'
-import { createPersonaMessage, getPersonaContext } from './PersonaService'
-import type { PersonaServiceConfig } from './PersonaService'
-import { ChatShell } from './ChatShell'
+import React, { useState } from "react";
+import type { FC } from "react";
+import { createPersonaMessage, getPersonaContext } from "./PersonaService";
+import type { PersonaServiceConfig } from "./PersonaService";
+import { ChatShell } from "./ChatShell";
 
 export interface ChatMessage {
-  id: string
-  role: 'user' | 'bot' | 'system'
-  content: string
-  timestamp: Date
+  id: string;
+  role: "user" | "bot" | "system";
+  content: string;
+  timestamp: Date;
   personaContext?: {
-    scenario: string
-    tone: string
-    traits: string[]
-  }
+    scenario: string;
+    tone: string;
+    traits: string[];
+  };
   metadata?: {
-    biasDetected?: boolean
-    confidenceScore?: number
-    suggestions?: string[]
-  }
+    biasDetected?: boolean;
+    confidenceScore?: number;
+    suggestions?: string[];
+  };
 }
 
 const BrutalistChatDemo: FC = () => {
   // Use PersonaService for persona context
-  const personaConfig: PersonaServiceConfig = { mode: 'deterministic' } // Future: set based on UI or API
-  getPersonaContext(personaConfig)
+  const personaConfig: PersonaServiceConfig = { mode: "deterministic" }; // Future: set based on UI or API
+  getPersonaContext(personaConfig);
   const [messages, setMessages] = useState<ChatMessage[]>([
     createPersonaMessage({
-      baseId: '1',
-      role: 'system',
+      baseId: "1",
+      role: "system",
       content:
-        'THERAPY TRAINING SESSION INITIALIZED. You are the therapist. Client persona: Sarah, 28, presenting with anxiety and relationship concerns.',
+        "THERAPY TRAINING SESSION INITIALIZED. You are the therapist. Client persona: Sarah, 28, presenting with anxiety and relationship concerns.",
       timestamp: new Date(),
       config: personaConfig,
     }),
     createPersonaMessage({
-      baseId: '2',
-      role: 'bot',
+      baseId: "2",
+      role: "bot",
       content:
         "I don't know why I'm here. My boyfriend says I need therapy but I think he's the problem.",
       timestamp: new Date(),
       config: personaConfig,
     }),
-  ])
+  ]);
 
-  const [inputValue, setInputValue] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
-  const [sessionActive, setSessionActive] = useState(true)
+  const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [sessionActive, setSessionActive] = useState(true);
 
   // Scroll management will be handled by ChatShell render prop
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || !sessionActive) {
-      return
+      return;
     }
 
     const userMessage = createPersonaMessage({
       content: inputValue,
-      role: 'user',
+      role: "user",
       config: personaConfig,
       metadata: {
         biasDetected: Math.random() > 0.8, // Bias detection for therapist responses
         confidenceScore: Math.floor(Math.random() * 30) + 70,
         suggestions: [
-          'Consider exploring both perspectives',
-          'Validate client emotions',
-          'Avoid taking sides',
+          "Consider exploring both perspectives",
+          "Validate client emotions",
+          "Avoid taking sides",
         ],
       },
-    })
+    });
 
-    setMessages((prev) => [...prev, userMessage])
-    setInputValue('')
-    setIsTyping(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInputValue("");
+    setIsTyping(true);
 
     // Simulate persona-based response (to be enhanced with a real PersonaService later)
     setTimeout(() => {
       const responses = [
         "That sounds really difficult. Can you tell me more about what's been happening in your relationship?",
         "I hear that you're feeling frustrated. What would you like to see change?",
-        'It sounds like there might be different perspectives here. How do you think your boyfriend sees the situation?',
+        "It sounds like there might be different perspectives here. How do you think your boyfriend sees the situation?",
         "He just doesn't listen to me anymore. Every time I try to talk about something important, he gets defensive.",
         "I feel like I'm walking on eggshells around him. I can't say anything without it turning into an argument.",
         "Maybe you're right... but it's hard to see past all the hurt and frustration right now.",
-      ]
+      ];
 
       const botMessage = createPersonaMessage({
         content: responses[Math.floor(Math.random() * responses.length)]!,
-        role: 'bot',
+        role: "bot",
         config: personaConfig,
         metadata: {
           confidenceScore: Math.floor(Math.random() * 20) + 80, // Client confidence in sharing
         },
-      })
+      });
 
-      setMessages((prev) => [...prev, botMessage])
-      setIsTyping(false)
-    }, 1500)
-  }
+      setMessages((prev) => [...prev, botMessage]);
+      setIsTyping(false);
+    }, 1500);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
   const endSession = () => {
-    setSessionActive(false)
+    setSessionActive(false);
     const systemMessage = createPersonaMessage({
-      content: 'SESSION ENDED. Performance analysis available in dashboard.',
-      role: 'system',
+      content: "SESSION ENDED. Performance analysis available in dashboard.",
+      role: "system",
       config: personaConfig,
-    })
-    setMessages((prev) => [...prev, systemMessage])
-  }
+    });
+    setMessages((prev) => [...prev, systemMessage]);
+  };
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -175,14 +175,14 @@ const BrutalistChatDemo: FC = () => {
                 <div key={message.id} className="space-y-2">
                   <div
                     className={`max-w-[85%] ${
-                      message.role === 'user'
-                        ? 'ml-auto'
-                        : message.role === 'system'
-                          ? 'mx-auto'
-                          : 'mr-auto'
+                      message.role === "user"
+                        ? "ml-auto"
+                        : message.role === "system"
+                          ? "mx-auto"
+                          : "mr-auto"
                     }`}
                   >
-                    {message.role === 'system' ? (
+                    {message.role === "system" ? (
                       <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
                         <div className="text-sm text-amber-800 font-medium">
                           {message.content}
@@ -191,13 +191,13 @@ const BrutalistChatDemo: FC = () => {
                     ) : (
                       <>
                         <div className="text-xs text-slate-500 mb-1 font-medium">
-                          {message.role === 'user' ? 'THERAPIST' : 'CLIENT'}
+                          {message.role === "user" ? "THERAPIST" : "CLIENT"}
                         </div>
                         <div
                           className={`rounded-2xl px-4 py-3 ${
-                            message.role === 'user'
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white border border-slate-200 text-slate-800 shadow-sm'
+                            message.role === "user"
+                              ? "bg-blue-500 text-white"
+                              : "bg-white border border-slate-200 text-slate-800 shadow-sm"
                           }`}
                         >
                           {message.content}
@@ -208,7 +208,7 @@ const BrutalistChatDemo: FC = () => {
 
                   {/* Bias Detection Alert - Refined */}
                   {message.metadata?.biasDetected &&
-                    message.role === 'user' && (
+                    message.role === "user" && (
                       <div className="max-w-[85%] ml-auto">
                         <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
                           <div className="flex items-center gap-2 mb-2 text-amber-800">
@@ -237,22 +237,22 @@ const BrutalistChatDemo: FC = () => {
                   {message.metadata?.confidenceScore && (
                     <div
                       className={`text-xs text-slate-500 flex items-center gap-2 ${
-                        message.role === 'user'
-                          ? 'justify-end'
-                          : 'justify-start'
+                        message.role === "user"
+                          ? "justify-end"
+                          : "justify-start"
                       }`}
                     >
                       <span>
-                        {message.role === 'user'
-                          ? 'Therapeutic Confidence:'
-                          : 'Client Openness:'}
+                        {message.role === "user"
+                          ? "Therapeutic Confidence:"
+                          : "Client Openness:"}
                       </span>
                       <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full ${
-                            message.role === 'user'
-                              ? 'bg-blue-400'
-                              : 'bg-green-400'
+                            message.role === "user"
+                              ? "bg-blue-400"
+                              : "bg-green-400"
                           }`}
                           style={{
                             width: `${message.metadata.confidenceScore}%`,
@@ -280,11 +280,11 @@ const BrutalistChatDemo: FC = () => {
                         <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"></div>
                         <div
                           className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"
-                          style={{ animationDelay: '0.2s' }}
+                          style={{ animationDelay: "0.2s" }}
                         ></div>
                         <div
                           className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-pulse"
-                          style={{ animationDelay: '0.4s' }}
+                          style={{ animationDelay: "0.4s" }}
                         ></div>
                       </div>
                     </div>
@@ -306,8 +306,8 @@ const BrutalistChatDemo: FC = () => {
               onKeyDown={handleKeyDown}
               placeholder={
                 sessionActive
-                  ? 'Type your therapeutic response...'
-                  : 'Session ended'
+                  ? "Type your therapeutic response..."
+                  : "Session ended"
               }
               className="flex-1 resize-none border border-slate-300 rounded-lg px-3 py-2 text-slate-800 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               rows={2}
@@ -343,7 +343,7 @@ const BrutalistChatDemo: FC = () => {
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-center">
           <div className="text-lg font-semibold text-slate-800">
-            {messages.filter((m) => m.role === 'user').length}
+            {messages.filter((m) => m.role === "user").length}
           </div>
           <div className="text-xs text-slate-600">Responses</div>
         </div>
@@ -358,14 +358,14 @@ const BrutalistChatDemo: FC = () => {
             {(() => {
               const messagesWithConfidence = messages.filter(
                 (m) => m.metadata?.confidenceScore,
-              )
+              );
               const totalConfidence = messagesWithConfidence.reduce(
                 (acc, m) => acc + (m.metadata?.confidenceScore || 0),
                 0,
-              )
+              );
               return messagesWithConfidence.length > 0
                 ? Math.round(totalConfidence / messagesWithConfidence.length)
-                : 0
+                : 0;
             })()}
             %
           </div>
@@ -382,7 +382,7 @@ const BrutalistChatDemo: FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BrutalistChatDemo
+export default BrutalistChatDemo;

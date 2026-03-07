@@ -1,339 +1,327 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactNode } from 'react'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactNode } from "react";
 import {
-    useEvaluationListQuery,
-    useEvaluationQuery,
-    useEvaluationInitiateMutation,
-    useEvaluationUpdateMutation,
-    useEvaluationSelection,
-} from '../useEvaluation'
-import * as api from '@/lib/api/journal-research'
-import { useEvaluationStore } from '@/lib/stores/journal-research'
+  useEvaluationListQuery,
+  useEvaluationQuery,
+  useEvaluationInitiateMutation,
+  useEvaluationUpdateMutation,
+  useEvaluationSelection,
+} from "../useEvaluation";
+import * as api from "@/lib/api/journal-research";
+import { useEvaluationStore } from "@/lib/stores/journal-research";
 
 // Mock API functions
-vi.mock('@/lib/api/journal-research', () => ({
-    listEvaluations: vi.fn(),
-    getEvaluation: vi.fn(),
-    initiateEvaluation: vi.fn(),
-    updateEvaluation: vi.fn(),
-}))
+vi.mock("@/lib/api/journal-research", () => ({
+  listEvaluations: vi.fn(),
+  getEvaluation: vi.fn(),
+  initiateEvaluation: vi.fn(),
+  updateEvaluation: vi.fn(),
+}));
 
 // Mock store
-vi.mock('@/lib/stores/journal-research', () => ({
-    useEvaluationStore: vi.fn(),
-}))
+vi.mock("@/lib/stores/journal-research", () => ({
+  useEvaluationStore: vi.fn(),
+}));
 
 const mockEvaluation = {
-    evaluationId: 'eval-1',
-    sessionId: 'session-1',
-    sourceId: 'source-1',
-    priorityTier: 'high' as const,
-    overallScore: 0.85,
-    therapeuticRelevance: 0.9,
-    dataStructureQuality: 0.8,
-    trainingIntegration: 0.85,
-    ethicalAccessibility: 0.8,
-    evaluationDate: '2024-01-01T00:00:00Z',
-    notes: 'Test evaluation',
-}
+  evaluationId: "eval-1",
+  sessionId: "session-1",
+  sourceId: "source-1",
+  priorityTier: "high" as const,
+  overallScore: 0.85,
+  therapeuticRelevance: 0.9,
+  dataStructureQuality: 0.8,
+  trainingIntegration: 0.85,
+  ethicalAccessibility: 0.8,
+  evaluationDate: "2024-01-01T00:00:00Z",
+  notes: "Test evaluation",
+};
 
 const mockEvaluationList = {
-    items: [mockEvaluation],
-    total: 1,
-    page: 1,
-    pageSize: 25,
-    totalPages: 1,
-}
+  items: [mockEvaluation],
+  total: 1,
+  page: 1,
+  pageSize: 25,
+  totalPages: 1,
+};
 
 const createWrapper = () => {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: { retry: false },
-            mutations: { retry: false },
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+};
+
+describe("useEvaluation hooks", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    useEvaluationStore.mockReturnValue({
+      filters: {
+        priorityTiers: [],
+        minimumScore: null,
+        maximumScore: null,
+        sortBy: "overall_score",
+        sortDirection: "desc",
+      },
+      selectedEvaluationId: null,
+      setSelectedEvaluationId: vi.fn(),
+      editingEvaluationId: null,
+      setEditingEvaluationId: vi.fn(),
+      isBulkEditMode: false,
+      toggleBulkEditMode: vi.fn(),
+    });
+  });
+
+  describe("useEvaluationListQuery", () => {
+    it("fetches evaluation list successfully", async () => {
+      vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList);
+
+      const { result } = renderHook(() => useEvaluationListQuery("session-1"), {
+        wrapper: createWrapper(),
+      });
+
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
+
+      expect(result.current.data).toBeDefined();
+      expect(api.listEvaluations).toHaveBeenCalledWith("session-1", {
+        page: 1,
+        pageSize: 25,
+      });
+    });
+
+    it("applies filters from store", async () => {
+      vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList);
+      useEvaluationStore.mockReturnValue({
+        filters: {
+          priorityTiers: ["high"],
+          minimumScore: 0.8,
+          maximumScore: 0.9,
+          sortBy: "therapeutic_relevance",
+          sortDirection: "asc",
         },
-    })
+      });
 
-    return ({ children }: { children: ReactNode }) => (
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    )
-}
+      const { result } = renderHook(() => useEvaluationListQuery("session-1"), {
+        wrapper: createWrapper(),
+      });
 
-describe('useEvaluation hooks', () => {
-    beforeEach(() => {
-        vi.clearAllMocks()
-        useEvaluationStore.mockReturnValue({
-            filters: {
-                priorityTiers: [],
-                minimumScore: null,
-                maximumScore: null,
-                sortBy: 'overall_score',
-                sortDirection: 'desc',
-            },
-            selectedEvaluationId: null,
-            setSelectedEvaluationId: vi.fn(),
-            editingEvaluationId: null,
-            setEditingEvaluationId: vi.fn(),
-            isBulkEditMode: false,
-            toggleBulkEditMode: vi.fn(),
-        })
-    })
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
 
-    describe('useEvaluationListQuery', () => {
-        it('fetches evaluation list successfully', async () => {
-            vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList)
+      expect(result.current.data).toBeDefined();
+    });
 
-            const { result } = renderHook(
-                () => useEvaluationListQuery('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+    it("does not fetch when sessionId is null", () => {
+      const { result } = renderHook(() => useEvaluationListQuery(null), {
+        wrapper: createWrapper(),
+      });
 
-            await waitFor(() => {
-                expect(result.current.isSuccess).toBe(true)
-            })
+      expect(result.current.isLoading).toBe(false);
+      expect(api.listEvaluations).not.toHaveBeenCalled();
+    });
 
-            expect(result.current.data).toBeDefined()
-            expect(api.listEvaluations).toHaveBeenCalledWith('session-1', {
-                page: 1,
-                pageSize: 25,
-            })
-        })
+    it("handles error state", async () => {
+      const error = new Error("Failed to fetch evaluations");
+      vi.mocked(api.listEvaluations).mockRejectedValue(error);
 
-        it('applies filters from store', async () => {
-            vi.mocked(api.listEvaluations).mockResolvedValue(mockEvaluationList)
-            useEvaluationStore.mockReturnValue({
-                filters: {
-                    priorityTiers: ['high'],
-                    minimumScore: 0.8,
-                    maximumScore: 0.9,
-                    sortBy: 'therapeutic_relevance',
-                    sortDirection: 'asc',
-                },
-            })
+      const { result } = renderHook(() => useEvaluationListQuery("session-1"), {
+        wrapper: createWrapper(),
+      });
 
-            const { result } = renderHook(
-                () => useEvaluationListQuery('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
 
-            await waitFor(() => {
-                expect(result.current.isSuccess).toBe(true)
-            })
+      expect(result.current.error).toEqual(error);
+    });
+  });
 
-            expect(result.current.data).toBeDefined()
-        })
+  describe("useEvaluationQuery", () => {
+    it("fetches evaluation successfully", async () => {
+      vi.mocked(api.getEvaluation).mockResolvedValue(mockEvaluation);
 
-        it('does not fetch when sessionId is null', () => {
-            const { result } = renderHook(() => useEvaluationListQuery(null), {
-                wrapper: createWrapper(),
-            })
+      const { result } = renderHook(
+        () => useEvaluationQuery("session-1", "eval-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-            expect(result.current.isLoading).toBe(false)
-            expect(api.listEvaluations).not.toHaveBeenCalled()
-        })
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
 
-        it('handles error state', async () => {
-            const error = new Error('Failed to fetch evaluations')
-            vi.mocked(api.listEvaluations).mockRejectedValue(error)
+      expect(result.current.data).toEqual(mockEvaluation);
+      expect(api.getEvaluation).toHaveBeenCalledWith("session-1", "eval-1");
+    });
 
-            const { result } = renderHook(
-                () => useEvaluationListQuery('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+    it("does not fetch when sessionId or evaluationId is null", () => {
+      const { result } = renderHook(() => useEvaluationQuery(null, "eval-1"), {
+        wrapper: createWrapper(),
+      });
 
-            await waitFor(() => {
-                expect(result.current.isError).toBe(true)
-            })
+      expect(result.current.isLoading).toBe(false);
+      expect(api.getEvaluation).not.toHaveBeenCalled();
+    });
 
-            expect(result.current.error).toEqual(error)
-        })
-    })
+    it("handles error state", async () => {
+      const error = new Error("Failed to fetch evaluation");
+      vi.mocked(api.getEvaluation).mockRejectedValue(error);
 
-    describe('useEvaluationQuery', () => {
-        it('fetches evaluation successfully', async () => {
-            vi.mocked(api.getEvaluation).mockResolvedValue(mockEvaluation)
+      const { result } = renderHook(
+        () => useEvaluationQuery("session-1", "eval-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-            const { result } = renderHook(
-                () => useEvaluationQuery('session-1', 'eval-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
 
-            await waitFor(() => {
-                expect(result.current.isSuccess).toBe(true)
-            })
+      expect(result.current.error).toEqual(error);
+    });
+  });
 
-            expect(result.current.data).toEqual(mockEvaluation)
-            expect(api.getEvaluation).toHaveBeenCalledWith('session-1', 'eval-1')
-        })
+  describe("useEvaluationInitiateMutation", () => {
+    it("initiates evaluation successfully", async () => {
+      vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation);
+      const setSelectedEvaluationId = vi.fn();
 
-        it('does not fetch when sessionId or evaluationId is null', () => {
-            const { result } = renderHook(
-                () => useEvaluationQuery(null, 'eval-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      vi.spyOn(useEvaluationStore, "getState").mockReturnValue({
+        setSelectedEvaluationId,
+      } as any);
 
-            expect(result.current.isLoading).toBe(false)
-            expect(api.getEvaluation).not.toHaveBeenCalled()
-        })
+      const { result } = renderHook(
+        () => useEvaluationInitiateMutation("session-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-        it('handles error state', async () => {
-            const error = new Error('Failed to fetch evaluation')
-            vi.mocked(api.getEvaluation).mockRejectedValue(error)
+      const payload = {
+        sourceIds: ["source-1"],
+        evaluationCriteria: {},
+      };
 
-            const { result } = renderHook(
-                () => useEvaluationQuery('session-1', 'eval-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      result.current.mutate(payload);
 
-            await waitFor(() => {
-                expect(result.current.isError).toBe(true)
-            })
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
 
-            expect(result.current.error).toEqual(error)
-        })
-    })
+      expect(api.initiateEvaluation).toHaveBeenCalledWith("session-1", payload);
+      expect(setSelectedEvaluationId).toHaveBeenCalledWith("eval-1");
+    });
 
-    describe('useEvaluationInitiateMutation', () => {
-        it('initiates evaluation successfully', async () => {
-            vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation)
-            const setSelectedEvaluationId = vi.fn()
+    it("handles error state", async () => {
+      const error = new Error("Failed to initiate evaluation");
+      vi.mocked(api.initiateEvaluation).mockRejectedValue(error);
 
-            vi.spyOn(useEvaluationStore, 'getState').mockReturnValue({
-                setSelectedEvaluationId,
-            } as any)
+      const { result } = renderHook(
+        () => useEvaluationInitiateMutation("session-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-            const { result } = renderHook(
-                () => useEvaluationInitiateMutation('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      result.current.mutate({
+        sourceIds: ["source-1"],
+        evaluationCriteria: {},
+      });
 
-            const payload = {
-                sourceIds: ['source-1'],
-                evaluationCriteria: {},
-            }
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
 
-            result.current.mutate(payload)
+      expect(result.current.error).toEqual(error);
+    });
+  });
 
-            await waitFor(() => {
-                expect(result.current.isSuccess).toBe(true)
-            })
+  describe("useEvaluationUpdateMutation", () => {
+    it("updates evaluation successfully", async () => {
+      const updatedEvaluation = { ...mockEvaluation, notes: "Updated notes" };
+      vi.mocked(api.updateEvaluation).mockResolvedValue(updatedEvaluation);
 
-            expect(api.initiateEvaluation).toHaveBeenCalledWith('session-1', payload)
-            expect(setSelectedEvaluationId).toHaveBeenCalledWith('eval-1')
-        })
+      const { result } = renderHook(
+        () => useEvaluationUpdateMutation("session-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-        it('handles error state', async () => {
-            const error = new Error('Failed to initiate evaluation')
-            vi.mocked(api.initiateEvaluation).mockRejectedValue(error)
+      const payload = {
+        notes: "Updated notes",
+      };
 
-            const { result } = renderHook(
-                () => useEvaluationInitiateMutation('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      result.current.mutate({ evaluationId: "eval-1", payload });
 
-            result.current.mutate({
-                sourceIds: ['source-1'],
-                evaluationCriteria: {},
-            })
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true);
+      });
 
-            await waitFor(() => {
-                expect(result.current.isError).toBe(true)
-            })
+      expect(api.updateEvaluation).toHaveBeenCalledWith(
+        "session-1",
+        "eval-1",
+        payload,
+      );
+    });
 
-            expect(result.current.error).toEqual(error)
-        })
-    })
+    it("handles error state", async () => {
+      const error = new Error("Failed to update evaluation");
+      vi.mocked(api.updateEvaluation).mockRejectedValue(error);
 
-    describe('useEvaluationUpdateMutation', () => {
-        it('updates evaluation successfully', async () => {
-            const updatedEvaluation = { ...mockEvaluation, notes: 'Updated notes' }
-            vi.mocked(api.updateEvaluation).mockResolvedValue(updatedEvaluation)
+      const { result } = renderHook(
+        () => useEvaluationUpdateMutation("session-1"),
+        {
+          wrapper: createWrapper(),
+        },
+      );
 
-            const { result } = renderHook(
-                () => useEvaluationUpdateMutation('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
+      result.current.mutate({
+        evaluationId: "eval-1",
+        payload: { notes: "Updated" },
+      });
 
-            const payload = {
-                notes: 'Updated notes',
-            }
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true);
+      });
 
-            result.current.mutate({ evaluationId: 'eval-1', payload })
+      expect(result.current.error).toEqual(error);
+    });
+  });
 
-            await waitFor(() => {
-                expect(result.current.isSuccess).toBe(true)
-            })
+  describe("useEvaluationSelection", () => {
+    it("returns selection state from store", () => {
+      const mockState = {
+        selectedEvaluationId: "eval-1",
+        setSelectedEvaluationId: vi.fn(),
+        editingEvaluationId: "eval-2",
+        setEditingEvaluationId: vi.fn(),
+        isBulkEditMode: true,
+        toggleBulkEditMode: vi.fn(),
+      };
 
-            expect(api.updateEvaluation).toHaveBeenCalledWith(
-                'session-1',
-                'eval-1',
-                payload,
-            )
-        })
+      useEvaluationStore.mockReturnValue(mockState);
 
-        it('handles error state', async () => {
-            const error = new Error('Failed to update evaluation')
-            vi.mocked(api.updateEvaluation).mockRejectedValue(error)
+      const { result } = renderHook(() => useEvaluationSelection());
 
-            const { result } = renderHook(
-                () => useEvaluationUpdateMutation('session-1'),
-                {
-                    wrapper: createWrapper(),
-                },
-            )
-
-            result.current.mutate({
-                evaluationId: 'eval-1',
-                payload: { notes: 'Updated' },
-            })
-
-            await waitFor(() => {
-                expect(result.current.isError).toBe(true)
-            })
-
-            expect(result.current.error).toEqual(error)
-        })
-    })
-
-    describe('useEvaluationSelection', () => {
-        it('returns selection state from store', () => {
-            const mockState = {
-                selectedEvaluationId: 'eval-1',
-                setSelectedEvaluationId: vi.fn(),
-                editingEvaluationId: 'eval-2',
-                setEditingEvaluationId: vi.fn(),
-                isBulkEditMode: true,
-                toggleBulkEditMode: vi.fn(),
-            }
-
-            useEvaluationStore.mockReturnValue(mockState)
-
-            const { result } = renderHook(() => useEvaluationSelection())
-
-            expect(result.current.selectedEvaluationId).toBe('eval-1')
-            expect(result.current.editingEvaluationId).toBe('eval-2')
-            expect(result.current.isBulkEditMode).toBe(true)
-            expect(typeof result.current.setSelectedEvaluationId).toBe('function')
-            expect(typeof result.current.toggleBulkEditMode).toBe('function')
-        })
-    })
-})
+      expect(result.current.selectedEvaluationId).toBe("eval-1");
+      expect(result.current.editingEvaluationId).toBe("eval-2");
+      expect(result.current.isBulkEditMode).toBe(true);
+      expect(typeof result.current.setSelectedEvaluationId).toBe("function");
+      expect(typeof result.current.toggleBulkEditMode).toBe("function");
+    });
+  });
+});

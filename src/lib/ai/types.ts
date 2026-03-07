@@ -1,5 +1,5 @@
 export interface AIMessage {
-  role: string
-  content: string
-  name: string
+  role: string;
+  content: string;
+  name: string;
 }

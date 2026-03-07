@@ -1,20 +1,20 @@
 // Custom session input form for bias detection analysis
 
-import React, { useState, useEffect } from 'react'
-import { RealTimeBiasIndicator } from './RealTimeBiasIndicator'
+import React, { useState, useEffect } from "react";
+import { RealTimeBiasIndicator } from "./RealTimeBiasIndicator";
 import type {
   SessionData,
   Demographics,
-} from '../../../lib/types/bias-detection'
+} from "../../../lib/types/bias-detection";
 
 interface SessionInputFormProps {
-  onSubmit: (data: Omit<SessionData, 'sessionId' | 'timestamp'>) => void
-  disabled?: boolean
+  onSubmit: (data: Omit<SessionData, "sessionId" | "timestamp">) => void;
+  disabled?: boolean;
   initialData?: {
-    scenario?: string
-    demographics: Demographics
-    content: string
-  }
+    scenario?: string;
+    demographics: Demographics;
+    content: string;
+  };
 }
 
 export const SessionInputForm: FC<SessionInputFormProps> = ({
@@ -23,73 +23,73 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
   initialData,
 }) => {
   const [formData, setFormData] = useState({
-    scenario: initialData?.scenario || '',
+    scenario: initialData?.scenario || "",
     demographics: {
-      age: initialData?.demographics.age || '26-35',
-      gender: initialData?.demographics.gender || 'female',
-      ethnicity: initialData?.demographics.ethnicity || 'white',
-      primaryLanguage: initialData?.demographics.primaryLanguage || 'en',
+      age: initialData?.demographics.age || "26-35",
+      gender: initialData?.demographics.gender || "female",
+      ethnicity: initialData?.demographics.ethnicity || "white",
+      primaryLanguage: initialData?.demographics.primaryLanguage || "en",
     },
-    content: initialData?.content || '',
-  })
+    content: initialData?.content || "",
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Update form when initialData changes
   useEffect(() => {
     if (initialData) {
       setFormData({
-        scenario: initialData.scenario || '',
+        scenario: initialData.scenario || "",
         demographics: initialData.demographics,
         content: initialData.content,
-      })
+      });
     }
-  }, [initialData])
+  }, [initialData]);
 
   // Validation
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
-    if (!formData['content'].trim()) {
-      newErrors['content'] = 'Content is required'
-    } else if (formData['content'].trim().length < 10) {
-      newErrors['content'] = 'Content must be at least 10 characters'
+    if (!formData["content"].trim()) {
+      newErrors["content"] = "Content is required";
+    } else if (formData["content"].trim().length < 10) {
+      newErrors["content"] = "Content must be at least 10 characters";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
     onSubmit({
-      scenario: formData.scenario || '',
+      scenario: formData.scenario || "",
       demographics: formData.demographics,
-      content: formData['content'].trim(),
-    })
-  }
+      content: formData["content"].trim(),
+    });
+  };
 
   // Handle input changes
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
+    }));
 
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
-        [field]: '',
-      }))
+        [field]: "",
+      }));
     }
-  }
+  };
 
   const handleDemographicChange = (
     field: keyof Demographics,
@@ -101,8 +101,8 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         ...prev.demographics,
         [field]: value,
       },
-    }))
-  }
+    }));
+  };
 
   return (
     <form onSubmit={handleSubmit} className="session-input-form space-y-4">
@@ -118,7 +118,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           id="scenario"
           type="text"
           value={formData.scenario}
-          onChange={(e) => handleInputChange('scenario', e.target.value)}
+          onChange={(e) => handleInputChange("scenario", e.target.value)}
           disabled={disabled}
           placeholder="e.g., anxiety-treatment, depression-session"
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -141,7 +141,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
             <select
               id="age-group"
               value={formData.demographics.age}
-              onChange={(e) => handleDemographicChange('age', e.target.value)}
+              onChange={(e) => handleDemographicChange("age", e.target.value)}
               disabled={disabled}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
@@ -166,7 +166,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
               id="gender"
               value={formData.demographics.gender}
               onChange={(e) =>
-                handleDemographicChange('gender', e.target.value)
+                handleDemographicChange("gender", e.target.value)
               }
               disabled={disabled}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -191,7 +191,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
               id="ethnicity"
               value={formData.demographics.ethnicity}
               onChange={(e) =>
-                handleDemographicChange('ethnicity', e.target.value)
+                handleDemographicChange("ethnicity", e.target.value)
               }
               disabled={disabled}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -219,7 +219,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
               id="primary-language"
               value={formData.demographics.primaryLanguage}
               onChange={(e) =>
-                handleDemographicChange('primaryLanguage', e.target.value)
+                handleDemographicChange("primaryLanguage", e.target.value)
               }
               disabled={disabled}
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
@@ -253,16 +253,16 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           <textarea
             id="therapeutic-content"
             value={formData.content}
-            onChange={(e) => handleInputChange('content', e.target.value)}
+            onChange={(e) => handleInputChange("content", e.target.value)}
             disabled={disabled}
             rows={6}
             placeholder="Enter the therapeutic conversation content to analyze for bias patterns..."
             className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors ${
-              errors['content'] ? 'border-red-300' : 'border-gray-300'
+              errors["content"] ? "border-red-300" : "border-gray-300"
             }`}
           />
-          {errors['content'] && (
-            <p className="mt-1 text-sm text-red-600">{errors['content']}</p>
+          {errors["content"] && (
+            <p className="mt-1 text-sm text-red-600">{errors["content"]}</p>
           )}
           <div className="flex justify-between items-center mt-1">
             <p className="text-sm text-gray-500">
@@ -308,7 +308,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           disabled={disabled || !formData.content.trim()}
           className="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
         >
-          {disabled ? 'Analyzing...' : 'Analyze for Bias'}
+          {disabled ? "Analyzing..." : "Analyze for Bias"}
         </button>
       </div>
 
@@ -341,7 +341,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         </div>
       )}
     </form>
-  )
-}
+  );
+};
 
-export default SessionInputForm
+export default SessionInputForm;

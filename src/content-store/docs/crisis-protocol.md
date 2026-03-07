@@ -114,25 +114,25 @@ VAPID_SUBJECT=mailto:admin@yourdomain.com
 ### Basic Implementation
 
 ```typescript
-import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
+import { createMentalLLaMAFromEnv } from "@/lib/ai/mental-llama";
 
 // Create adapter with crisis protocol enabled
-const { adapter } = await createMentalLLaMAFromEnv()
+const { adapter } = await createMentalLLaMAFromEnv();
 
 // Analyze text with automatic crisis detection
 const result = await adapter.analyzeMentalHealth(
   "I've been thinking about ending it all",
-  ['auto_route'], // Enable automatic routing with crisis detection
+  ["auto_route"], // Enable automatic routing with crisis detection
   {
-    userId: 'user123',
-    sessionId: 'session456',
-    sessionType: 'therapy_session'
-  }
-)
+    userId: "user123",
+    sessionId: "session456",
+    sessionType: "therapy_session",
+  },
+);
 
 // Check for crisis detection
-if (result.mentalHealthCategory === 'crisis') {
-  console.log('Crisis detected - alerts have been sent')
+if (result.mentalHealthCategory === "crisis") {
+  console.log("Crisis detected - alerts have been sent");
   // Additional crisis response logic here
 }
 ```
@@ -140,11 +140,13 @@ if (result.mentalHealthCategory === 'crisis') {
 ### Custom Crisis Notifier
 
 ```typescript
-import { SlackNotificationService } from '@/lib/services/notification/SlackNotificationService'
-import { MentalLLaMAAdapter } from '@/lib/ai/mental-llama/MentalLLaMAAdapter'
+import { SlackNotificationService } from "@/lib/services/notification/SlackNotificationService";
+import { MentalLLaMAAdapter } from "@/lib/ai/mental-llama/MentalLLaMAAdapter";
 
 // Create custom crisis notifier
-const crisisNotifier = new SlackNotificationService('https://hooks.slack.com/services/...')
+const crisisNotifier = new SlackNotificationService(
+  "https://hooks.slack.com/services/...",
+);
 
 // Create adapter with custom notifier
 const adapter = new MentalLLaMAAdapter(
@@ -154,8 +156,8 @@ const adapter = new MentalLLaMAAdapter(
   apiKey,
   modelProvider,
   pythonBridge,
-  crisisNotifier
-)
+  crisisNotifier,
+);
 ```
 
 ## Crisis Alert Format
@@ -201,13 +203,13 @@ If Slack notifications fail, the system falls back to email notifications sent t
 
 ```typescript
 // Test crisis detection with sample text
-const testText = "I don't want to live anymore"
-const result = await adapter.analyzeMentalHealth(testText, ['auto_route'], {
-  userId: 'test-user',
-  sessionId: 'test-session'
-})
+const testText = "I don't want to live anymore";
+const result = await adapter.analyzeMentalHealth(testText, ["auto_route"], {
+  userId: "test-user",
+  sessionId: "test-session",
+});
 
-console.log('Crisis detected:', result.mentalHealthCategory === 'crisis')
+console.log("Crisis detected:", result.mentalHealthCategory === "crisis");
 ```
 
 ### Integration Testing
@@ -229,6 +231,7 @@ console.log('Crisis detected:', result.mentalHealthCategory === 'crisis')
 ### Logging
 
 Crisis events are logged with:
+
 - Timestamp
 - User/Session identifiers
 - Text sample
@@ -300,5 +303,5 @@ node -e "console.log(require('./src/config/env.config.ts').config.notifications.
 
 ---
 
-*Last Updated: 2025-01-17*
-*Version: 1.0.0*
+_Last Updated: 2025-01-17_
+_Version: 1.0.0_

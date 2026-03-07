@@ -2,20 +2,20 @@
  * Real environment variable utilities for browser and Node.js environments.
  */
 
-type EnvSource = Record<string, string | undefined>
+type EnvSource = Record<string, string | undefined>;
 
 // Prefer import.meta.env for Vite/ESM, fallback to process.env for Node
 function getEnvSource(): EnvSource {
   if (
-    typeof import.meta !== 'undefined' &&
-    typeof import.meta.env === 'object'
+    typeof import.meta !== "undefined" &&
+    typeof import.meta.env === "object"
   ) {
-    return import.meta.env as EnvSource
+    return import.meta.env as EnvSource;
   }
-  if (typeof process !== 'undefined' && typeof process.env === 'object') {
-    return process.env as EnvSource
+  if (typeof process !== "undefined" && typeof process.env === "object") {
+    return process.env as EnvSource;
   }
-  return {}
+  return {};
 }
 
 /**
@@ -24,15 +24,15 @@ function getEnvSource(): EnvSource {
  * @param defaultValue Value to return if key is not set.
  */
 export function getEnv(key: string, defaultValue?: string): string | undefined {
-  const source = getEnvSource()
-  const val = source[key]
-  if (val !== undefined && val !== null && val !== '') {
-    return val
+  const source = getEnvSource();
+  const val = source[key];
+  if (val !== undefined && val !== null && val !== "") {
+    return val;
   }
   if (defaultValue !== undefined) {
-    return defaultValue
+    return defaultValue;
   }
-  return undefined
+  return undefined;
 }
 
 /**
@@ -41,12 +41,12 @@ export function getEnv(key: string, defaultValue?: string): string | undefined {
  * @param key The environment variable key.
  */
 export function isEnvTrue(key: string): boolean {
-  const val = getEnv(key)
+  const val = getEnv(key);
   if (!val) {
-    return false
+    return false;
   }
-  const normalized = val.toString().trim().toLowerCase()
-  return ['1', 'true', 'yes', 'on'].includes(normalized)
+  const normalized = val.toString().trim().toLowerCase();
+  return ["1", "true", "yes", "on"].includes(normalized);
 }
 
 /**
@@ -56,7 +56,7 @@ export const env = new Proxy(
   {},
   {
     get(_target, prop: string): void {
-      return getEnv(prop) ?? ''
+      return getEnv(prop) ?? "";
     },
   },
-)
+);

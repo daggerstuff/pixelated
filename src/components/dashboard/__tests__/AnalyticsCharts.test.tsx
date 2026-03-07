@@ -1,20 +1,20 @@
-import { render, screen } from '@testing-library/react'
-import { AnalyticsCharts } from '../AnalyticsCharts'
+import { render, screen } from "@testing-library/react";
+import { AnalyticsCharts } from "../AnalyticsCharts";
 
-vi.mock('@/hooks/useAnalyticsDashboard', () => ({
+vi.mock("@/hooks/useAnalyticsDashboard", () => ({
   useAnalyticsDashboard: vi.fn(() => ({
     data: {
       summaryStats: [],
       sessionMetrics: [],
-      skillProgress: []
+      skillProgress: [],
     },
     isLoading: false,
     error: null,
-    refetch: vi.fn()
-  }))
-}))
+    refetch: vi.fn(),
+  })),
+}));
 
-describe('AnalyticsCharts', () => {
+describe("AnalyticsCharts", () => {
   beforeEach(() => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -22,17 +22,17 @@ describe('AnalyticsCharts', () => {
       json: async () => ({
         sessionMetrics: {},
         skillProgress: {},
-        summaryStats: {}
+        summaryStats: {},
       }),
-    })
-  })
+    });
+  });
 
   afterEach(() => {
-    vi.restoreAllMocks()
-  })
+    vi.restoreAllMocks();
+  });
 
-  it('renders analytics charts heading', async () => {
-    render(<AnalyticsCharts />)
-    expect(await screen.findByText(/Analytics Overview/i)).toBeInTheDocument()
-  })
-})
+  it("renders analytics charts heading", async () => {
+    render(<AnalyticsCharts />);
+    expect(await screen.findByText(/Analytics Overview/i)).toBeInTheDocument();
+  });
+});

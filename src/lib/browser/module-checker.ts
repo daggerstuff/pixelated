@@ -12,7 +12,7 @@
  * Check if we're in a browser environment
  */
 export const isBrowser =
-  typeof window !== 'undefined' && typeof document !== 'undefined'
+  typeof window !== "undefined" && typeof document !== "undefined";
 
 /**
  * Check if a specific Node.js module is available
@@ -23,15 +23,15 @@ export const isBrowser =
 export async function isModuleAvailable(moduleName: string): Promise<boolean> {
   if (isBrowser) {
     // Browser environment - Node.js modules are never available
-    return false
+    return false;
   }
 
   try {
     // In Node.js, attempt to dynamically import the module
-    await import(moduleName)
-    return true
+    await import(moduleName);
+    return true;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -46,16 +46,16 @@ export async function safeImport<T = unknown>(
 ): Promise<T | null> {
   if (isBrowser) {
     // Browser environment - return null for Node.js modules
-    return null
+    return null;
   }
 
   try {
     // In Node.js, attempt to dynamically import the module
-    const module = await import(moduleName)
-    return module.default || module
+    const module = await import(moduleName);
+    return module.default || module;
   } catch (error: unknown) {
-    console.warn(`Module ${moduleName} is not available:`, error)
-    return null
+    console.warn(`Module ${moduleName} is not available:`, error);
+    return null;
   }
 }
 
@@ -63,20 +63,20 @@ export async function safeImport<T = unknown>(
  * Common Node.js modules that might be used in the application
  */
 export const NodeModules = {
-  fs: 'fs/promises',
-  fsSync: 'fs',
-  path: 'path',
-  crypto: 'crypto',
-  http: 'http',
-  https: 'https',
-  zlib: 'zlib',
-  util: 'util',
-  os: 'os',
-  stream: 'stream',
-  child_process: 'child_process',
-  buffer: 'buffer',
-  events: 'events',
-}
+  fs: "fs/promises",
+  fsSync: "fs",
+  path: "path",
+  crypto: "crypto",
+  http: "http",
+  https: "https",
+  zlib: "zlib",
+  util: "util",
+  os: "os",
+  stream: "stream",
+  child_process: "child_process",
+  buffer: "buffer",
+  events: "events",
+};
 
 /**
  * Import common Node.js modules safely all at once
@@ -86,18 +86,18 @@ export const NodeModules = {
 export async function importCommonModules() {
   if (isBrowser) {
     // In browser, return empty objects for all modules
-    return Object.fromEntries(Object.keys(NodeModules).map((key) => [key, {}]))
+    return Object.fromEntries(Object.keys(NodeModules).map((key) => [key, {}]));
   }
 
-  const modules: Record<string, unknown> = {}
+  const modules: Record<string, unknown> = {};
 
   // Import each module in parallel
   const imports = Object.entries(NodeModules).map(async ([key, name]) => {
-    modules[key] = await safeImport(name)
-  })
+    modules[key] = await safeImport(name);
+  });
 
-  await Promise.all(imports)
-  return modules
+  await Promise.all(imports);
+  return modules;
 }
 
 export default {
@@ -106,4 +106,4 @@ export default {
   safeImport,
   NodeModules,
   importCommonModules,
-}
+};

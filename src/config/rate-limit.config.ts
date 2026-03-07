@@ -1,16 +1,16 @@
-import config from './env.config'
+import config from "./env.config";
 
 /**
  * Rate limiting configuration interface
  */
 export interface RateLimitOptions {
-  maxRequests: number
-  windowMs: number
-  enabled: boolean
-  message: string
-  statusCode: number
-  headers: boolean
-  skipTrustedIPs?: string[]
+  maxRequests: number;
+  windowMs: number;
+  enabled: boolean;
+  message: string;
+  statusCode: number;
+  headers: boolean;
+  skipTrustedIPs?: string[];
 }
 
 /**
@@ -39,7 +39,7 @@ export const rateLimitConfig = {
     /**
      * Message to return when rate limit is exceeded
      */
-    message: 'Too many requests, please try again later.',
+    message: "Too many requests, please try again later.",
 
     /**
      * HTTP status code to return when rate limit is exceeded
@@ -54,7 +54,7 @@ export const rateLimitConfig = {
     /**
      * Skip rate limiting for trusted IPs (e.g., internal services)
      */
-    skipTrustedIPs: ['127.0.0.1', '::1'],
+    skipTrustedIPs: ["127.0.0.1", "::1"],
   } as RateLimitOptions,
 
   /**
@@ -66,7 +66,7 @@ export const rateLimitConfig = {
      */
     maxRequests: 20,
     windowMs: 60 * 1000, // 1 minute
-    message: 'Too many authentication attempts, please try again later.',
+    message: "Too many authentication attempts, please try again later.",
   },
 
   /**
@@ -78,7 +78,7 @@ export const rateLimitConfig = {
      */
     maxRequests: 300,
     windowMs: 5 * 60 * 1000, // 5 minutes
-    message: 'API rate limit exceeded, please slow down your requests.',
+    message: "API rate limit exceeded, please slow down your requests.",
   },
 
   /**
@@ -90,7 +90,7 @@ export const rateLimitConfig = {
      */
     maxRequests: 10,
     windowMs: 60 * 60 * 1000, // 1 hour
-    message: 'Too many sensitive operations attempted. Please try again later.',
+    message: "Too many sensitive operations attempted. Please try again later.",
   },
 
   /**
@@ -98,23 +98,23 @@ export const rateLimitConfig = {
    * Merges default config with endpoint-specific overrides
    */
   getConfig: (
-    type: 'default' | 'auth' | 'api' | 'sensitive',
+    type: "default" | "auth" | "api" | "sensitive",
   ): RateLimitOptions => {
     if (!rateLimitConfig.default.enabled) {
-      return { ...rateLimitConfig.default, enabled: false }
+      return { ...rateLimitConfig.default, enabled: false };
     }
 
-    const baseConfig = rateLimitConfig.default
+    const baseConfig = rateLimitConfig.default;
 
-    if (type === 'default') {
-      return baseConfig
+    if (type === "default") {
+      return baseConfig;
     }
 
     return {
       ...baseConfig,
       ...rateLimitConfig[type],
-    }
+    };
   },
-}
+};
 
-export default rateLimitConfig
+export default rateLimitConfig;

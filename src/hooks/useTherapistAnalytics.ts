@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createBuildSafeLogger } from "../lib/logging/build-safe-logger";
 // design tokens mapping is handled externally for chart color literals
 // Runtime import (class/value) for AnalyticsError - used for instantiation and instanceof checks
-import { AnalyticsError as AnalyticsErrorClass } from '@/types/analytics'
+import { AnalyticsError as AnalyticsErrorClass } from "@/types/analytics";
 // Type-only imports
 import type {
   TherapistAnalyticsChartData,
@@ -11,65 +11,67 @@ import type {
   TherapistSkillProgressData,
   TherapistMetricSummary,
   AnalyticsError as AnalyticsErrorType,
-} from '@/types/analytics'
-import type { TherapistSession } from '@/types/dashboard'
+} from "@/types/analytics";
+import type { TherapistSession } from "@/types/dashboard";
 
-const _rawLogger = createBuildSafeLogger('use-therapist-analytics')
+const _rawLogger = createBuildSafeLogger("use-therapist-analytics");
 const normalizeLogger = (raw: unknown) => {
   const safeFn = (fn: unknown, fallback: (...args: unknown[]) => void) =>
-    typeof fn === 'function' ? (fn as (...args: unknown[]) => unknown) : fallback
+    typeof fn === "function"
+      ? (fn as (...args: unknown[]) => unknown)
+      : fallback;
 
   // If the module mock returned a bare function (e.g. vi.fn()), call it for all
   // log levels but still provide the standard method names.
-  if (typeof raw === 'function') {
-    const fn = raw as (...args: unknown[]) => unknown
+  if (typeof raw === "function") {
+    const fn = raw as (...args: unknown[]) => unknown;
     return {
       info: (...args: unknown[]) => {
         try {
-          fn(...args)
+          fn(...args);
         } catch {
           /* swallow */
         }
       },
       warn: (...args: unknown[]) => {
         try {
-          fn(...args)
+          fn(...args);
         } catch {
           /* swallow */
         }
       },
       error: (...args: unknown[]) => {
         try {
-          fn(...args)
+          fn(...args);
         } catch {
           /* swallow */
         }
       },
       debug: (...args: unknown[]) => {
         try {
-          fn(...args)
+          fn(...args);
         } catch {
           /* swallow */
         }
       },
       child: (/* name: string */) => normalizeLogger(raw),
-    }
+    };
   }
 
   // If it's an object, pick methods or fall back to console
-  if (typeof raw === 'object' && raw !== null) {
-    const obj = raw as Record<string, any>
+  if (typeof raw === "object" && raw !== null) {
+    const obj = raw as Record<string, any>;
     return {
-      info: safeFn(obj['info'], console.info.bind(console)),
-      warn: safeFn(obj['warn'], console.warn.bind(console)),
-      error: safeFn(obj['error'], console.error.bind(console)),
+      info: safeFn(obj["info"], console.info.bind(console)),
+      warn: safeFn(obj["warn"], console.warn.bind(console)),
+      error: safeFn(obj["error"], console.error.bind(console)),
       debug: safeFn(
-        obj['debug'],
+        obj["debug"],
         console.debug ? console.debug.bind(console) : console.log.bind(console),
       ),
       child: (name?: string) =>
-        normalizeLogger(obj['child'] ? obj['child'](name) : obj),
-    }
+        normalizeLogger(obj["child"] ? obj["child"](name) : obj),
+    };
   }
 
   // Fallback to console
@@ -81,17 +83,17 @@ const normalizeLogger = (raw: unknown) => {
       ? console.debug.bind(console)
       : console.log.bind(console),
     child: () => normalizeLogger(console),
-  }
-}
+  };
+};
 
-const logger = normalizeLogger(_rawLogger)
+const logger = normalizeLogger(_rawLogger);
 
 interface UseTherapistAnalyticsResult {
-  data: TherapistAnalyticsChartData | null
-  isLoading: boolean
-  error: AnalyticsErrorType | null
-  refetch: () => Promise<void>
-  clearError: () => void
+  data: TherapistAnalyticsChartData | null;
+  isLoading: boolean;
+  error: AnalyticsErrorType | null;
+  refetch: () => Promise<void>;
+  clearError: () => void;
 }
 
 /**
@@ -102,12 +104,14 @@ export function useTherapistAnalytics(
   sessions: TherapistSession[],
 ): UseTherapistAnalyticsResult {
   // State management
-  const [data, setData] = useState<TherapistAnalyticsChartData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<AnalyticsErrorType | null>(null)
+  const [data, setData] = useState<TherapistAnalyticsChartData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<AnalyticsErrorType | null>(null);
 
   // Refs for cleanup and refresh loop
-  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
 
   /**
    * Transform session data for therapist analytics
@@ -115,7 +119,7 @@ export function useTherapistAnalytics(
   const transformSessionData = useCallback(
     (sessions: TherapistSession[]): TherapistSessionData[] => {
       // Apply incoming filters (lightweight - detailed filtering delegated to helper)
-      const filtered = applyAnalyticsFilters(sessions, _filters)
+      const filtered = applyAnalyticsFilters(sessions, _filters);
 
       return filtered.map((session) => ({
         date: session.startTime,
@@ -127,10 +131,10 @@ export function useTherapistAnalytics(
         milestonesAchieved:
           session.progressMetrics?.milestonesReached?.length ?? 0,
         averageResponseTime: session.progressMetrics?.responseTime ?? 0,
-      }))
+      }));
     },
     [_filters],
-  )
+  );
 
   /**
    * Transform skill progress data for therapist analytics
@@ -141,61 +145,61 @@ export function useTherapistAnalytics(
       const sorted = [...sessions].sort(
         (a, b) =>
           new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
-      )
+      );
       // Build per-skill score history
       const perSkill: Record<string, { scores: number[]; sessions: number }> =
-        {}
+        {};
       sorted.forEach((session) => {
-        const scores = session.progressMetrics?.skillScores
+        const scores = session.progressMetrics?.skillScores;
         if (!scores) {
-          return
+          return;
         }
         Object.entries(scores).forEach(([skill, score]) => {
           if (!perSkill[skill]) {
-            perSkill[skill] = { scores: [], sessions: 0 }
+            perSkill[skill] = { scores: [], sessions: 0 };
           }
-          perSkill[skill].scores.push(score)
-          perSkill[skill].sessions += 1
-        })
-      })
+          perSkill[skill].scores.push(score);
+          perSkill[skill].sessions += 1;
+        });
+      });
       return Object.entries(perSkill).map(([skill, agg]) => {
-        const count = agg.scores.length
+        const count = agg.scores.length;
         const avg = Math.round(
           agg.scores.reduce((a, b) => a + b, 0) / (count || 1),
-        )
-        const last = count > 0 ? agg.scores[count - 1] : undefined
-        const prev = count > 1 ? agg.scores[count - 2] : undefined
-        const first = count > 0 ? agg.scores[0] : undefined
+        );
+        const last = count > 0 ? agg.scores[count - 1] : undefined;
+        const prev = count > 1 ? agg.scores[count - 2] : undefined;
+        const first = count > 0 ? agg.scores[0] : undefined;
 
-        let trend: 'up' | 'down' | 'stable' = 'stable'
-        if (typeof last === 'number' && typeof prev === 'number') {
+        let trend: "up" | "down" | "stable" = "stable";
+        if (typeof last === "number" && typeof prev === "number") {
           if (last > prev) {
-            trend = 'up'
+            trend = "up";
           } else if (last < prev) {
-            trend = 'down'
+            trend = "down";
           } else {
-            trend = 'stable'
+            trend = "stable";
           }
         }
 
         const averageImprovement =
-          typeof last === 'number' && typeof first === 'number' && count > 1
+          typeof last === "number" && typeof first === "number" && count > 1
             ? last - first
-            : 0
+            : 0;
 
         return {
           skill,
-          skillId: skill.toLowerCase().replace(/\s+/g, '-'),
+          skillId: skill.toLowerCase().replace(/\s+/g, "-"),
           score: avg,
           trend,
-          category: 'therapeutic',
+          category: "therapeutic",
           sessionsPracticed: agg.sessions,
           averageImprovement,
-        }
-      })
+        };
+      });
     },
     [],
-  )
+  );
 
   /**
    * Lightweight filter applier - keeps hook decoupled from filter shape.
@@ -206,115 +210,115 @@ export function useTherapistAnalytics(
     filters: AnalyticsFilters,
   ) => {
     // Clone input
-    let out = [...allSessions]
+    let out = [...allSessions];
 
     // Time range filter - quick heuristic
     if (filters?.timeRange) {
-      const now = Date.now()
+      const now = Date.now();
       const cutoff = ((): number => {
         switch (filters.timeRange) {
-          case '7d':
-            return now - 7 * 24 * 60 * 60 * 1000
-          case '30d':
-            return now - 30 * 24 * 60 * 60 * 1000
-          case '90d':
-            return now - 90 * 24 * 60 * 60 * 1000
-          case '1y':
-            return now - 365 * 24 * 60 * 60 * 1000
+          case "7d":
+            return now - 7 * 24 * 60 * 60 * 1000;
+          case "30d":
+            return now - 30 * 24 * 60 * 60 * 1000;
+          case "90d":
+            return now - 90 * 24 * 60 * 60 * 1000;
+          case "1y":
+            return now - 365 * 24 * 60 * 60 * 1000;
           default:
-            return 0
+            return 0;
         }
-      })()
+      })();
       out = out.filter((s) => {
-        const t = new Date(s.startTime).getTime()
-        return t >= cutoff
-      })
+        const t = new Date(s.startTime).getTime();
+        return t >= cutoff;
+      });
     }
 
     // skillCategory placeholder - if provided, filter sessions practicing skills in that category.
-    if (filters?.skillCategory && filters.skillCategory !== 'all') {
+    if (filters?.skillCategory && filters.skillCategory !== "all") {
       out = out.filter((s) => {
-        const scores = s.progressMetrics?.skillScores ?? {}
+        const scores = s.progressMetrics?.skillScores ?? {};
         return Object.keys(scores).some((sk) =>
           sk.toLowerCase().includes(filters.skillCategory!),
-        )
-      })
+        );
+      });
     }
 
-    return out
-  }
+    return out;
+  };
 
   /**
    * Transform summary stats for therapist analytics
    */
   const transformSummaryStats = useCallback(
     (sessions: TherapistSession[]): TherapistMetricSummary[] => {
-      const totalSessions = sessions.length
+      const totalSessions = sessions.length;
       const completedSessions = sessions.filter(
-        (s) => s.status === 'completed',
-      ).length
+        (s) => s.status === "completed",
+      ).length;
       const avgProgress =
         sessions.length > 0
           ? Math.round(
-            sessions.reduce((sum, s) => sum + s.progress, 0) /
-            sessions.length,
-          )
-          : 0
+              sessions.reduce((sum, s) => sum + s.progress, 0) /
+                sessions.length,
+            )
+          : 0;
 
       const avgDuration =
         sessions.length > 0
           ? Math.round(
-            sessions.reduce((sum, s) => {
-              const start = new Date(s.startTime)
-              const end = s.endTime ? new Date(s.endTime) : new Date()
-              return sum + (end.getTime() - start.getTime()) / 1000
-            }, 0) / sessions.length,
-          )
-          : 0
+              sessions.reduce((sum, s) => {
+                const start = new Date(s.startTime);
+                const end = s.endTime ? new Date(s.endTime) : new Date();
+                return sum + (end.getTime() - start.getTime()) / 1000;
+              }, 0) / sessions.length,
+            )
+          : 0;
 
       return [
         {
           value: totalSessions,
-          label: 'Total Sessions',
-          therapistId: sessions[0]?.therapistId ?? 'unknown',
+          label: "Total Sessions",
+          therapistId: sessions[0]?.therapistId ?? "unknown",
           trend:
             totalSessions > 0
-              ? { value: totalSessions, direction: 'up', period: 'all time' }
+              ? { value: totalSessions, direction: "up", period: "all time" }
               : undefined,
           // Use semantic chart color token mapping; legacy hook consumers expect
           // one of the defined literal names. Map to semantic literal.
-          color: 'blue',
+          color: "blue",
         },
         {
           value: avgProgress,
-          label: 'Avg Progress',
-          therapistId: sessions[0]?.therapistId ?? 'unknown',
+          label: "Avg Progress",
+          therapistId: sessions[0]?.therapistId ?? "unknown",
           trend:
             avgProgress > 50
-              ? { value: avgProgress - 50, direction: 'up', period: 'recent' }
+              ? { value: avgProgress - 50, direction: "up", period: "recent" }
               : undefined,
-          color: 'green',
+          color: "green",
         },
         {
           value: completedSessions,
-          label: 'Completed',
-          therapistId: sessions[0]?.therapistId ?? 'unknown',
+          label: "Completed",
+          therapistId: sessions[0]?.therapistId ?? "unknown",
           trend:
             completedSessions > 0
-              ? { value: completedSessions, direction: 'up', period: 'recent' }
+              ? { value: completedSessions, direction: "up", period: "recent" }
               : undefined,
-          color: 'purple',
+          color: "purple",
         },
         {
           value: avgDuration,
-          label: 'Avg Duration (s)',
-          therapistId: sessions[0]?.therapistId ?? 'unknown',
-          color: 'orange',
+          label: "Avg Duration (s)",
+          therapistId: sessions[0]?.therapistId ?? "unknown",
+          color: "orange",
         },
-      ]
+      ];
     },
     [],
-  )
+  );
 
   /**
    * Generate comparative data for session comparison
@@ -322,59 +326,59 @@ export function useTherapistAnalytics(
   const generateComparativeData = useCallback(
     (sessions: TherapistSession[]) => {
       if (sessions.length < 2) {
-        return undefined
+        return undefined;
       }
 
       const sortedSessions = [...sessions].sort(
         (a, b) =>
           new Date(b.startTime).getTime() - new Date(a.startTime).getTime(),
-      )
+      );
 
-      const currentSession = sortedSessions[0]
-      const previousSession = sortedSessions[1]
+      const currentSession = sortedSessions[0];
+      const previousSession = sortedSessions[1];
 
       if (!currentSession || !previousSession) {
-        return undefined
+        return undefined;
       }
 
-      const currentProgress = currentSession.progress ?? 0
-      const previousProgress = previousSession.progress ?? 0
-      const trend: 'improving' | 'declining' | 'stable' =
+      const currentProgress = currentSession.progress ?? 0;
+      const previousProgress = previousSession.progress ?? 0;
+      const trend: "improving" | "declining" | "stable" =
         currentProgress > previousProgress
-          ? 'improving'
+          ? "improving"
           : currentProgress < previousProgress
-            ? 'declining'
-            : 'stable'
+            ? "declining"
+            : "stable";
 
-      const currentSessionData = transformSessionData([currentSession])[0]
-      const previousSessionData = transformSessionData([previousSession])[0]
+      const currentSessionData = transformSessionData([currentSession])[0];
+      const previousSessionData = transformSessionData([previousSession])[0];
 
       if (!currentSessionData) {
-        return undefined
+        return undefined;
       }
 
       return {
         currentSession: currentSessionData,
         previousSession: previousSessionData,
         trend,
-      }
+      };
     },
     [transformSessionData],
-  )
+  );
 
   /**
    * Generate therapist analytics data from sessions
    */
   const generateTherapistData = useCallback((): TherapistAnalyticsChartData => {
-    const sessionMetrics = transformSessionData(sessions)
-    const skillProgress = transformSkillProgressData(sessions)
-    const summaryStats = transformSummaryStats(sessions)
-    const comparativeData = generateComparativeData(sessions)
+    const sessionMetrics = transformSessionData(sessions);
+    const skillProgress = transformSkillProgressData(sessions);
+    const summaryStats = transformSummaryStats(sessions);
+    const comparativeData = generateComparativeData(sessions);
 
     // Generate progress snapshots from session data
     const progressSnapshots = sessions.flatMap(
       (session) => session.progressSnapshots || [],
-    )
+    );
 
     return {
       sessionMetrics,
@@ -382,14 +386,14 @@ export function useTherapistAnalytics(
       summaryStats,
       progressSnapshots,
       comparativeData,
-    }
+    };
   }, [
     sessions,
     transformSessionData,
     transformSkillProgressData,
     transformSummaryStats,
     generateComparativeData,
-  ])
+  ]);
 
   /**
    * Load therapist analytics data
@@ -398,67 +402,67 @@ export function useTherapistAnalytics(
     async (showLoading = true) => {
       try {
         if (showLoading) {
-          setIsLoading(true)
+          setIsLoading(true);
         }
-        setError(null)
+        setError(null);
 
         // Generate data from local sessions (in a real app, this would fetch from API)
-        const therapistData = generateTherapistData()
-        setData(therapistData)
+        const therapistData = generateTherapistData();
+        setData(therapistData);
 
-        logger.info('Therapist analytics data generated successfully')
+        logger.info("Therapist analytics data generated successfully");
       } catch (loadError) {
         const message =
           loadError instanceof Error && loadError.message
             ? loadError.message
-            : 'Unknown error occurred'
+            : "Unknown error occurred";
         const analyticsError = new AnalyticsErrorClass(
-          'GENERATION_ERROR',
+          "GENERATION_ERROR",
           message,
           loadError,
-        )
+        );
 
-        setError(analyticsError as unknown as AnalyticsErrorType)
-        logger.error('Failed to generate therapist analytics data', {
+        setError(analyticsError as unknown as AnalyticsErrorType);
+        logger.error("Failed to generate therapist analytics data", {
           error: analyticsError,
-        })
+        });
       } finally {
         if (showLoading) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
     },
     [generateTherapistData],
-  )
+  );
 
   /**
    * Manual refetch function
    */
   const refetch = useCallback(async () => {
-    await loadData(true)
-  }, [loadData])
+    await loadData(true);
+  }, [loadData]);
 
   /**
    * Clear error state
    */
   const clearError = useCallback(() => {
-    setError(null)
-  }, [])
+    setError(null);
+  }, []);
 
   /**
    * Load data when sessions change
    */
   useEffect(() => {
     // Always load data, even if sessions is empty (will result in empty data structure)
-    void loadData(true)
-  }, [sessions, loadData])
+    void loadData(true);
+  }, [sessions, loadData]);
 
   // Auto-refresh (silent) based on options passed in via filters.config (if present)
   useEffect(() => {
-    const config = _filters.config
+    const config = _filters.config;
 
     if (!config?.enableAutoRefresh || !config?.refreshInterval) {
-      return
+      return;
     }
 
     // Only allow safe, finite numbers for refreshInterval
@@ -467,21 +471,21 @@ export function useTherapistAnalytics(
       config.refreshInterval <= 0 ||
       config.refreshInterval >= 3600000 // max 1 hour
     ) {
-      return
+      return;
     }
 
     refreshIntervalRef.current = setInterval(() => {
       // silent refresh: do not toggle isLoading
-      void loadData(false)
-    }, config.refreshInterval)
+      void loadData(false);
+    }, config.refreshInterval);
 
     return () => {
       if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current)
-        refreshIntervalRef.current = null
+        clearInterval(refreshIntervalRef.current);
+        refreshIntervalRef.current = null;
       }
-    }
-  }, [_filters.config, loadData])
+    };
+  }, [_filters.config, loadData]);
 
   /**
    * Cleanup on unmount
@@ -490,11 +494,11 @@ export function useTherapistAnalytics(
     return () => {
       // Clear refresh interval
       if (refreshIntervalRef.current) {
-        clearInterval(refreshIntervalRef.current as unknown as number)
-        refreshIntervalRef.current = null
+        clearInterval(refreshIntervalRef.current as unknown as number);
+        refreshIntervalRef.current = null;
       }
-    }
-  }, [])
+    };
+  }, []);
 
   return {
     data,
@@ -502,5 +506,5 @@ export function useTherapistAnalytics(
     error,
     refetch,
     clearError,
-  }
+  };
 }

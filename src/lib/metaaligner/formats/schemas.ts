@@ -4,7 +4,7 @@
  * These schemas are used for validation and to ensure consistency across the MetaAligner pipeline.
  */
 
-import { z } from 'zod'
+import { z } from "zod";
 
 /**
  * Zod schema for the {@link LLMOutput} interface.
@@ -13,7 +13,7 @@ export const LLMOutputSchema = z.object({
   content: z.union([z.string(), z.record(z.unknown())]),
   metadata: z.record(z.unknown()).optional(),
   version: z.string().optional(),
-})
+});
 
 /**
  * Zod schema for the {@link UnifiedContext} interface.
@@ -22,7 +22,7 @@ export const UnifiedContextSchema = z.object({
   userQuery: z.string(),
   conversationHistory: z.array(z.string()).optional(),
   version: z.string().optional(),
-})
+});
 
 /**
  * Zod schema for the {@link UnifiedProcessingRequest} interface.
@@ -31,7 +31,7 @@ export const UnifiedProcessingRequestSchema = z.object({
   llmOutput: LLMOutputSchema,
   context: UnifiedContextSchema,
   version: z.string().optional(),
-})
+});
 
 /**
  * Zod schema for the {@link UnifiedProcessingResponse} interface.
@@ -49,4 +49,4 @@ export const UnifiedProcessingResponseSchema = z.object({
     .array(z.object({ message: z.string(), stage: z.string() }))
     .optional(),
   version: z.string().optional(),
-})
+});

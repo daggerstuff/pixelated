@@ -26,33 +26,33 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
+
       {{- with .Values.training.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
+
       {{- with .Values.training.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      
+
       securityContext:
         {{- toYaml .Values.training.podSecurityContext | nindent 8 }}
-      
+
       serviceAccountName: {{ include "pixelated-empathy.fullname" . }}-training
-      
+
       containers:
       - name: training
         image: "{{ .Values.training.image.repository }}:{{ .Values.training.image.tag }}"
         imagePullPolicy: {{ .Values.training.image.pullPolicy }}
-        
+
         securityContext:
           {{- toYaml .Values.training.securityContext | nindent 10 }}
-        
+
         resources:
           {{- toYaml .Values.training.resources | nindent 10 }}
-        
+
         env:
         {{- range .Values.training.env }}
         - name: {{ .name }}
@@ -63,18 +63,18 @@ spec:
             {{- toYaml .valueFrom | nindent 12 }}
           {{- end }}
         {{- end }}
-        
+
         ports:
         - containerPort: {{ .Values.training.service.targetPort | default 8003 }}
           protocol: TCP
           name: http
-        
+
         livenessProbe:
           {{- toYaml .Values.training.livenessProbe | nindent 10 }}
-        
+
         readinessProbe:
           {{- toYaml .Values.training.readinessProbe | nindent 10 }}
-        
+
         volumeMounts:
         {{- range .Values.training.volumeMounts }}
         - name: {{ .name }}
@@ -83,7 +83,7 @@ spec:
           readOnly: {{ .readOnly }}
           {{- end }}
         {{- end }}
-      
+
       volumes:
       {{- range .Values.training.volumes }}
       - name: {{ .name }}

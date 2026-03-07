@@ -1,6 +1,6 @@
 ---
-mode: 'agent'
-description: 'Analyze Azure resources used in the app (IaC files and/or resources in a target rg) and optimize costs - creating GitHub issues for identified optimizations.'
+mode: "agent"
+description: "Analyze Azure resources used in the app (IaC files and/or resources in a target rg) and optimize costs - creating GitHub issues for identified optimizations."
 ---
 
 # Azure Cost Optimize
@@ -8,6 +8,7 @@ description: 'Analyze Azure resources used in the app (IaC files and/or resource
 This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to generate cost optimization recommendations. It creates individual GitHub issues for each optimization opportunity plus one EPIC issue to coordinate implementation, enabling efficient tracking and execution of cost savings initiatives.
 
 ## Prerequisites
+
 - Azure MCP server configured and authenticated
 - GitHub MCP server configured and authenticated
 - Target GitHub repository identified
@@ -17,18 +18,22 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
 ## Workflow Steps
 
 ### Step 1: Get Azure Best Practices
+
 **Action**: Retrieve cost optimization best practices before analysis
 **Tools**: Azure MCP best practices tool
 **Process**:
+
 1. **Load Best Practices**:
    - Execute `azmcp-bestpractices-get` to get some of the latest Azure optimization guidelines. This may not cover all scenarios but provides a foundation.
    - Use these practices to inform subsequent analysis and recommendations as much as possible
    - Reference best practices in optimization recommendations, either from the MCP tool output or general Azure documentation
 
 ### Step 2: Discover Azure Infrastructure
+
 **Action**: Dynamically discover and analyze Azure resources and configurations
 **Tools**: Azure MCP tools + Azure CLI fallback + Local file system access
 **Process**:
+
 1. **Resource Discovery**:
    - Execute `azmcp-subscription-list` to find available subscriptions
    - Execute `azmcp-group-list --subscription <subscription-id>` to find resource groups
@@ -47,7 +52,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
      - ... and so on for other resource types
 
 2. **IaC Detection**:
-   - Use `file_search` to scan for IaC files: "**/*.bicep", "**/*.tf", "**/main.json", "**/*template*.json"
+   - Use `file_search` to scan for IaC files: "**/\*.bicep", "**/*.tf", "**/main.json", "**/*template\*.json"
    - Parse resource definitions to understand intended configurations
    - Compare against discovered resources to identify discrepancies
    - Note presence of IaC files for implementation recommendations later on
@@ -60,9 +65,11 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - Map resource utilization patterns where available
 
 ### Step 3: Collect Usage Metrics & Validate Current Costs
+
 **Action**: Gather utilization data AND verify actual resource costs
 **Tools**: Azure MCP monitoring tools + Azure CLI
 **Process**:
+
 1. **Find Monitoring Sources**:
    - Use `azmcp-monitor-workspace-list --subscription <id>` to find Log Analytics workspaces
    - Use `azmcp-monitor-table-list --subscription <id> --workspace <name> --table-type "CustomLog"` to discover available data
@@ -72,6 +79,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
      - Query: "recent" for recent activity patterns
      - Query: "errors" for error-level logs indicating issues
    - For custom analysis, use KQL queries:
+
    ```kql
    // CPU utilization for App Services
    AppServiceAppLogs
@@ -103,9 +111,11 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - Calculate realistic current monthly total before proceeding to recommendations
 
 ### Step 4: Generate Cost Optimization Recommendations
+
 **Action**: Analyze resources to identify optimization opportunities
 **Tools**: Local analysis using collected data
 **Process**:
+
 1. **Apply Optimization Patterns** based on resource types found:
 
    **Compute Optimizations**:
@@ -134,6 +144,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - Document pricing source for both current and target configurations
 
 3. **Calculate Priority Score** for each recommendation:
+
    ```
    Priority Score = (Value Score × Monthly Savings) / (Risk Score × Implementation Days)
 
@@ -149,9 +160,12 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - Ensure all savings calculations have supporting evidence
 
 ### Step 5: User Confirmation
+
 **Action**: Present summary and get approval before creating GitHub issues
 **Process**:
+
 1. **Display Optimization Summary**:
+
    ```
    🎯 Azure Cost Optimization Summary
 
@@ -178,20 +192,24 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
 2. **Wait for User Confirmation**: Only proceed if user confirms
 
 ### Step 6: Create Individual Optimization Issues
+
 **Action**: Create separate GitHub issues for each optimization opportunity. Label them with "cost-optimization" (green color), "azure" (blue color).
 **MCP Tools Required**: `create_issue` for each recommendation
 **Process**:
+
 1. **Create Individual Issues** using this template:
 
    **Title Format**: `[COST-OPT] [Resource Type] - [Brief Description] - $X/month savings`
 
    **Body Template**:
-   ```markdown
+
+   ````markdown
    ## 💰 Cost Optimization: [Brief Title]
 
    **Monthly Savings**: $X | **Risk Level**: [Low/Medium/High] | **Implementation Effort**: X days
 
    ### 📋 Description
+
    [Clear explanation of the optimization and why it's needed]
 
    ### 🔧 Implementation
@@ -208,6 +226,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    # ⚠️ No IaC files found. If they exist elsewhere, modify those instead.
    az appservice plan update --name [plan] --sku B2
    ```
+   ````
 
    ### 📊 Evidence
    - Current Configuration: [details]
@@ -226,24 +245,31 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - [Risk 2 and mitigation]
 
    **Priority Score**: X | **Value**: X/10 | **Risk**: X/10
+
+   ```
+
    ```
 
 ### Step 7: Create EPIC Coordinating Issue
+
 **Action**: Create master issue to track all optimization work. Label it with "cost-optimization" (green color), "azure" (blue color), and "epic" (purple color).
 **MCP Tools Required**: `create_issue` for EPIC
 **Note about mermaid diagrams**: Ensure you verify mermaid syntax is correct and create the diagrams taking accessibility guidelines into account (styling, colors, etc.).
 **Process**:
+
 1. **Create EPIC Issue**:
 
    **Title**: `[EPIC] Azure Cost Optimization Initiative - $X/month potential savings`
 
    **Body Template**:
-   ```markdown
+
+   ````markdown
    # 🎯 Azure Cost Optimization EPIC
 
    **Total Potential Savings**: $X/month | **Implementation Timeline**: X weeks
 
    ## 📊 Executive Summary
+
    - **Resources Analyzed**: X
    - **Optimization Opportunities**: Y
    - **Total Monthly Savings Potential**: $X
@@ -257,6 +283,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
            [Generated architecture diagram showing current resources and costs]
        end
    ```
+   ````
 
    ## 📋 Implementation Tracking
 
@@ -278,7 +305,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
 
    ## 🎯 Success Criteria
    - [ ] All high-priority optimizations implemented
-   - [ ] >80% of estimated savings realized
+   - [ ] > 80% of estimated savings realized
    - [ ] No performance degradation observed
    - [ ] Cost monitoring dashboard updated
 
@@ -286,9 +313,13 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
    - Review and update this EPIC as issues are completed
    - Monitor actual vs. estimated savings
    - Consider scheduling regular cost optimization reviews
+
+   ```
+
    ```
 
 ## Error Handling
+
 - **Cost Validation**: If savings estimates lack supporting evidence or seem inconsistent with Azure pricing, re-verify configurations and pricing sources before proceeding
 - **Azure Authentication Failure**: Provide manual Azure CLI setup steps
 - **No Resources Found**: Create informational issue about Azure resource deployment
@@ -296,6 +327,7 @@ This workflow analyzes Infrastructure-as-Code (IaC) files and Azure resources to
 - **Insufficient Usage Data**: Note limitations and provide configuration-based recommendations only
 
 ## Success Criteria
+
 - ✅ All cost estimates verified against actual resource configurations and Azure pricing
 - ✅ Individual issues created for each optimization (trackable and assignable)
 - ✅ EPIC issue provides comprehensive coordination and tracking

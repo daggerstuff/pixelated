@@ -11,7 +11,7 @@ export {
   cleanupTemporaryData,
   verifyPrivacySettings,
   generateConsentForm,
-} from './privacy'
+} from "./privacy";
 
 // Export scenario utilities
 export {
@@ -19,4 +19,4 @@ export {
   getScenarioById,
   filterScenarios,
   getRecommendedScenario,
-} from './scenarios'
+} from "./scenarios";

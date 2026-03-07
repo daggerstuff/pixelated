@@ -26,7 +26,9 @@ interface TherapyProgressChartsProps {
   data: TherapistAnalyticsChartData | null;
 }
 
-export default function TherapyProgressCharts({ data }: TherapyProgressChartsProps) {
+export default function TherapyProgressCharts({
+  data,
+}: TherapyProgressChartsProps) {
   if (!data) {
     return (
       <div className="flex items-center justify-center p-8 text-muted-foreground">

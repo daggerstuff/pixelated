@@ -1,6 +1,6 @@
 ---
-applyTo: '**/*.tsx,**/*.jsx,**/*.astro,**/components/**/*,**/ui/**/*'
-description: 'UI/UX design guidelines for Pixelated Empathy'
+applyTo: "**/*.tsx,**/*.jsx,**/*.astro,**/components/**/*,**/ui/**/*"
+description: "UI/UX design guidelines for Pixelated Empathy"
 ---
 
 # UI/UX Design Guidelines for Pixelated Empathy
@@ -19,12 +19,16 @@ export const tokens = {
     foreground: "hsl(var(--foreground))",
     muted: "hsl(var(--muted))",
     accent: "hsl(var(--accent))",
-    destructive: "hsl(var(--destructive))"
+    destructive: "hsl(var(--destructive))",
   },
   spacing: {
-    xs: "0.25rem", sm: "0.5rem", md: "1rem",
-    lg: "1.5rem", xl: "2rem", "2xl": "3rem"
-  }
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "1rem",
+    lg: "1.5rem",
+    xl: "2rem",
+    "2xl": "3rem",
+  },
 };
 ```
 
@@ -56,7 +60,7 @@ export function Button({
         "inline-flex items-center justify-center rounded-md font-medium transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         variants[variant],
-        sizes[size]
+        sizes[size],
       )}
       {...props}
     >
@@ -72,7 +76,7 @@ export function Button({
 
 All UI components must meet WCAG AA standards for healthcare applications:
 
-```tsx
+````tsx
 // ✅ Accessible form components
 export function FormField({ label, error, required, ...props }) {
   const id = useId();
@@ -178,7 +182,7 @@ Use mobile-first approach with Tailwind CSS breakpoints:
     {/* Chat area */}
   </main>
 </div>
-```
+````
 
 ## Performance Optimization
 
@@ -186,17 +190,27 @@ Optimize components for the real-time chat interface:
 
 ```tsx
 // ✅ Lazy load heavy AI components
-const AIChat = React.lazy(() => import('~/components/ai/AIChat'));
-const BiasDetection = React.lazy(() => import('~/components/ai/BiasDetection'));
+const AIChat = React.lazy(() => import("~/components/ai/AIChat"));
+const BiasDetection = React.lazy(() => import("~/components/ai/BiasDetection"));
 
 // ✅ Optimized chat message rendering
 const ChatMessage = memo(({ message, isTyping }) => {
   return (
-    <div className={cn("flex gap-3 p-4", message.role === 'user' ? 'justify-end' : 'justify-start')}>
-      {message.role === 'assistant' && <Avatar />}
-      <div className={cn("max-w-[80%] rounded-lg p-3",
-        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-      )}>
+    <div
+      className={cn(
+        "flex gap-3 p-4",
+        message.role === "user" ? "justify-end" : "justify-start",
+      )}
+    >
+      {message.role === "assistant" && <Avatar />}
+      <div
+        className={cn(
+          "max-w-[80%] rounded-lg p-3",
+          message.role === "user"
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted",
+        )}
+      >
         {isTyping ? <TypingIndicator /> : message.content}
       </div>
     </div>
@@ -204,14 +218,17 @@ const ChatMessage = memo(({ message, isTyping }) => {
 });
 
 // ✅ Virtualized chat history for performance
-import { FixedSizeList as List } from 'react-window';
+import { FixedSizeList as List } from "react-window";
 
 function ChatHistory({ messages }) {
-  const renderMessage = useCallback(({ index, style }) => (
-    <div style={style}>
-      <ChatMessage message={messages[index]} />
-    </div>
-  ), [messages]);
+  const renderMessage = useCallback(
+    ({ index, style }) => (
+      <div style={style}>
+        <ChatMessage message={messages[index]} />
+      </div>
+    ),
+    [messages],
+  );
 
   return (
     <List
@@ -234,11 +251,7 @@ Provide clear feedback for AI interactions and secure operations:
 // ✅ AI processing states
 function AIResponseButton({ isProcessing, onSubmit }) {
   return (
-    <Button
-      onClick={onSubmit}
-      disabled={isProcessing}
-      className="w-full"
-    >
+    <Button onClick={onSubmit} disabled={isProcessing} className="w-full">
       {isProcessing ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -258,12 +271,17 @@ function AIResponseButton({ isProcessing, onSubmit }) {
 function SecurityStatus({ encryptionStatus, biasScore }) {
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Shield className={cn("h-4 w-4",
-        encryptionStatus === 'encrypted' ? 'text-green-500' : 'text-yellow-500'
-      )} />
+      <Shield
+        className={cn(
+          "h-4 w-4",
+          encryptionStatus === "encrypted"
+            ? "text-green-500"
+            : "text-yellow-500",
+        )}
+      />
       <span>FHE Encrypted</span>
       {biasScore !== null && (
-        <Badge variant={biasScore < 0.3 ? 'default' : 'destructive'}>
+        <Badge variant={biasScore < 0.3 ? "default" : "destructive"}>
           Bias: {(biasScore * 100).toFixed(1)}%
         </Badge>
       )}
@@ -315,24 +333,27 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "underline-offset-4 hover:underline text-primary"
+        link: "underline-offset-4 hover:underline text-primary",
       },
       size: {
         default: "h-10 py-2 px-4",
         sm: "h-9 px-3 rounded-md",
         lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10"
-      }
+        icon: "h-10 w-10",
+      },
     },
     defaultVariants: {
       variant: "default",
-      size: "default"
-    }
-  }
+      size: "default",
+    },
+  },
 );
 
 // ✅ Dark mode support
@@ -344,8 +365,10 @@ function ThemeProvider({ children, defaultTheme = "system" }) {
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark" : "light";
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
       root.classList.add(systemTheme);
       return;
     }
@@ -367,30 +390,30 @@ Test UI components for accessibility and functionality:
 
 ```tsx
 // ✅ Accessibility testing
-import { render, screen } from '@testing-library/react';
-import { axe, toHaveNoViolations } from 'jest-axe';
+import { render, screen } from "@testing-library/react";
+import { axe, toHaveNoViolations } from "jest-axe";
 
 expect.extend(toHaveNoViolations);
 
-test('ChatMessage is accessible', async () => {
+test("ChatMessage is accessible", async () => {
   const { container } = render(
     <ChatMessage
-      message={{ role: 'assistant', content: 'Hello' }}
+      message={{ role: "assistant", content: "Hello" }}
       isTyping={false}
-    />
+    />,
   );
 
   const results = await axe(container);
   expect(results).toHaveNoViolations();
 
   // Test keyboard navigation
-  const message = screen.getByRole('article');
+  const message = screen.getByRole("article");
   expect(message).toBeInTheDocument();
 });
 
 // ✅ Responsive testing with Playwright
-test('dashboard layout adapts to screen size', async ({ page }) => {
-  await page.goto('/dashboard');
+test("dashboard layout adapts to screen size", async ({ page }) => {
+  await page.goto("/dashboard");
 
   // Mobile view
   await page.setViewportSize({ width: 375, height: 667 });

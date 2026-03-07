@@ -33,20 +33,19 @@ For standard React components, we follow traditional React testing patterns:
 
 ```tsx
 // Example: Button.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react';
-;
-import Button from '../Button';
+import { render, screen, fireEvent } from "@testing-library/react";
+import Button from "../Button";
 
-describe('Button', () => {
-  it('renders correctly', () => {
+describe("Button", () => {
+  it("renders correctly", () => {
     render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+    expect(screen.getByText("Click me")).toBeInTheDocument();
   });
 
-  it('handles click events', () => {
+  it("handles click events", () => {
     const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
-    fireEvent.click(screen.getByText('Click me'));
+    fireEvent.click(screen.getByText("Click me"));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
@@ -69,19 +68,19 @@ For full Astro component testing:
 
 ```ts
 // Example: Button.spec.ts (Playwright)
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('Button component renders correctly', async ({ page }) => {
+test("Button component renders correctly", async ({ page }) => {
   // Navigate to the test page that includes the component
-  await page.goto('/test-components/button');
+  await page.goto("/test-components/button");
 
   // Check that the button is rendered
-  const button = page.locator('button.btn');
+  const button = page.locator("button.btn");
   await expect(button).toBeVisible();
 
   // Test interactions
   await button.click();
-  await expect(page.locator('.result')).toHaveText('Button clicked');
+  await expect(page.locator(".result")).toHaveText("Button clicked");
 });
 ```
 
@@ -95,10 +94,10 @@ Update your test imports to point to the React version of the component:
 
 ```tsx
 // Before conversion
-import SearchDemo from '../SearchDemo';
+import SearchDemo from "../SearchDemo";
 
 // After conversion
-import SearchDemoReact from '../SearchDemoReact';
+import SearchDemoReact from "../SearchDemoReact";
 ```
 
 ### 2. Update Component References
@@ -117,20 +116,22 @@ render(<SearchDemoReact />);
 
 ```ts
 // Example: SearchDemo.spec.ts (Playwright)
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('SearchDemo renders correctly with Astro wrapper', async ({ page }) => {
-  await page.goto('/test-components/search-demo');
+test("SearchDemo renders correctly with Astro wrapper", async ({ page }) => {
+  await page.goto("/test-components/search-demo");
 
   // Check that the wrapper adds the expected structure
-  await expect(page.locator('.search-demo-wrapper')).toBeVisible();
+  await expect(page.locator(".search-demo-wrapper")).toBeVisible();
 
   // Check that the React component hydrates correctly
-  await page.fill('input[placeholder="Search..."]', 'test query');
+  await page.fill('input[placeholder="Search..."]', "test query");
   await page.click('button[type="submit"]');
 
   // Check for expected results after hydration
-  await expect(page.locator('.search-results')).toContainText('Results for: test query');
+  await expect(page.locator(".search-results")).toContainText(
+    "Results for: test query",
+  );
 });
 ```
 
@@ -169,7 +170,7 @@ render(
   <CardReact>
     <h2>Card Title</h2>
     <p>Card content</p>
-  </CardReact>
+  </CardReact>,
 );
 ```
 

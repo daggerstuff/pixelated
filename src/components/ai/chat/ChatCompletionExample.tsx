@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { useChatCompletion } from './useChatCompletion'
+import React, { useState } from "react";
+import { useChatCompletion } from "./useChatCompletion";
 
 /**
  * Example component demonstrating the enhanced useChatCompletion hook
  */
 export default function ChatCompletionExample() {
-  const [inputMessage, setInputMessage] = useState('')
-  const [streamingMode, setStreamingMode] = useState(true)
+  const [inputMessage, setInputMessage] = useState("");
+  const [streamingMode, setStreamingMode] = useState(true);
 
   const {
     messages,
@@ -30,43 +30,43 @@ export default function ChatCompletionExample() {
   } = useChatCompletion({
     streamingEnabled: streamingMode,
     autoSave: true,
-    persistKey: 'chat-completion-demo',
+    persistKey: "chat-completion-demo",
     onProgress: (chunk, accumulated) => {
-      console.log('Progress:', chunk, accumulated.length)
+      console.log("Progress:", chunk, accumulated.length);
     },
     onComplete: (response) => {
-      console.log('Completed:', response)
+      console.log("Completed:", response);
     },
     onError: (error) => {
-      console.error('Chat error:', error)
+      console.error("Chat error:", error);
     },
-  })
+  });
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) {
-      return
+      return;
     }
 
     if (streamingMode) {
-      const generator = sendStreamingMessage(inputMessage)
+      const generator = sendStreamingMessage(inputMessage);
       for await (const chunk of generator) {
-        console.log('Streaming chunk:', chunk)
+        console.log("Streaming chunk:", chunk);
       }
     } else {
-      await sendMessage(inputMessage)
+      await sendMessage(inputMessage);
     }
 
-    setInputMessage('')
-  }
+    setInputMessage("");
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
-  const messageStats = getMessageStats()
+  const messageStats = getMessageStats();
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
@@ -111,9 +111,9 @@ export default function ChatCompletionExample() {
 
           <button
             onClick={() => {
-              const exported = exportConversation()
-              navigator.clipboard.writeText(exported)
-              alert('Conversation copied to clipboard!')
+              const exported = exportConversation();
+              navigator.clipboard.writeText(exported);
+              alert("Conversation copied to clipboard!");
             }}
             className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
@@ -152,8 +152,8 @@ export default function ChatCompletionExample() {
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="text-sm text-gray-600">
-                {isStreaming ? 'Streaming...' : 'Loading...'}
-                {isTyping && ' (AI is typing)'}
+                {isStreaming ? "Streaming..." : "Loading..."}
+                {isTyping && " (AI is typing)"}
               </div>
               <div className="text-sm text-blue-600">
                 {progress.toFixed(1)}%
@@ -188,15 +188,15 @@ export default function ChatCompletionExample() {
             <div
               key={`${message.role}-${index}-${message.content.slice(0, 20)}`}
               className={`p-3 rounded-lg ${
-                message.role === 'user'
-                  ? 'bg-blue-100 ml-8'
-                  : 'bg-gray-100 mr-8'
+                message.role === "user"
+                  ? "bg-blue-100 ml-8"
+                  : "bg-gray-100 mr-8"
               }`}
             >
               <div className="flex justify-between items-start">
                 <div>
                   <div className="font-medium text-sm mb-1">
-                    {message.role === 'user' ? 'You' : 'AI'}
+                    {message.role === "user" ? "You" : "AI"}
                   </div>
                   <div className="whitespace-pre-wrap">{message.content}</div>
                 </div>
@@ -205,11 +205,11 @@ export default function ChatCompletionExample() {
                   <button
                     onClick={() => {
                       const newContent = prompt(
-                        'Edit message:',
+                        "Edit message:",
                         message.content,
-                      )
+                      );
                       if (newContent !== null) {
-                        editMessage(index, newContent)
+                        editMessage(index, newContent);
                       }
                     }}
                     className="text-xs text-blue-600 hover:text-blue-800"
@@ -222,7 +222,7 @@ export default function ChatCompletionExample() {
                   >
                     Delete
                   </button>
-                  {message.role === 'user' && (
+                  {message.role === "user" && (
                     <button
                       onClick={() => resendMessage(index)}
                       className="text-xs text-green-600 hover:text-green-800"
@@ -254,7 +254,7 @@ export default function ChatCompletionExample() {
             disabled={isLoading || !inputMessage.trim()}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Sending...' : 'Send'}
+            {isLoading ? "Sending..." : "Send"}
           </button>
         </div>
 
@@ -269,5 +269,5 @@ export default function ChatCompletionExample() {
         )}
       </div>
     </div>
-  )
+  );
 }

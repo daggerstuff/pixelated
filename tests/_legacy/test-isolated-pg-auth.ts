@@ -38,7 +38,6 @@ async function testIsolatedAuth() {
     console.log("Session ID:", session.session?.id || "No session ID");
 
     console.log("\n🎉 Isolated auth test completed!");
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

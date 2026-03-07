@@ -1,6 +1,6 @@
-import React from 'react'
-import { MentalHealthCard } from '../mental-health-card'
-import { Activity, Brain, Heart, TrendingUp } from 'lucide-react'
+import React from "react";
+import { MentalHealthCard } from "../mental-health-card";
+import { Activity, Brain, Heart, TrendingUp } from "lucide-react";
 
 export default function GlowCardDemo() {
   return (
@@ -47,5 +47,5 @@ export default function GlowCardDemo() {
         />
       </div>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 ---
-title: 'The Art of Micro-Joys: Finding Happiness in Small Moments'
+title: "The Art of Micro-Joys: Finding Happiness in Small Moments"
 description: >-
   Discover how cultivating awareness of tiny moments of joy can transform your
   daily mental wellness and create lasting happiness

@@ -38,7 +38,6 @@ async function testDirectAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Direct auth test completed!");
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

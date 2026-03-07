@@ -1,7 +1,7 @@
 ---
-title: 'CPTSD and Addiction Comorbidity'
-description: 'Understanding and treating comorbid CPTSD and addiction'
-author: 'Resource Team'
+title: "CPTSD and Addiction Comorbidity"
+description: "Understanding and treating comorbid CPTSD and addiction"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 
