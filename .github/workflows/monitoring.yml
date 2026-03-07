@@ -10,7 +10,7 @@ permissions:
 
 env:
   NODE_VERSION: 24.13.0
-  PNPM_VERSION: 10.29.2
+
   NODE_ENV: production
   DEFAULT_BASE_URL: "https://pixelatedempathy.com"
   HEALTH_CHECK_TIMEOUT_PROD: 30
@@ -46,8 +46,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: get-pnpm-store-path
@@ -357,8 +356,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: get-pnpm-store-path
@@ -573,8 +571,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: get-pnpm-store-path

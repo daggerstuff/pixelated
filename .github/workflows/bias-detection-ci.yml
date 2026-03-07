@@ -32,7 +32,7 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
+
 
 jobs:
   security-scan:
@@ -87,8 +87,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -179,8 +178,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -346,8 +344,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -485,8 +482,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -550,8 +546,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+                    run_install: false
 
       - name: Get pnpm store directory
         id: pnpm-cache
