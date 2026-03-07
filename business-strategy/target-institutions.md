@@ -3,7 +3,6 @@
 ## Tier 1 Prospects (Immediate Outreach)
 
 ### Progressive Medical Schools
-
 1. **Harvard Medical School**
    - Contact: Dr. Sarah Johnson, Director of Medical Education
    - Email: sarah.johnson@hms.harvard.edu
@@ -23,7 +22,6 @@
    - Why: Emphasis on mental health training innovation
 
 ### Psychology Graduate Programs
-
 4. **UCLA Psychology Department**
    - Contact: Dr. James Wilson, Clinical Training Director
    - Email: jwilson@psych.ucla.edu
@@ -37,7 +35,6 @@
    - Why: Strong research focus on training effectiveness
 
 ### Healthcare Systems
-
 6. **Mayo Clinic**
    - Contact: Dr. Robert Kim, Chief Education Officer
    - Email: kim.robert@mayo.edu
@@ -59,7 +56,6 @@
 ## Tier 2 Prospects (Follow-up Outreach)
 
 ### Regional Medical Schools
-
 9. **University of Washington School of Medicine**
 10. **Emory University School of Medicine**
 11. **University of Michigan Medical School**
@@ -67,7 +63,6 @@
 13. **University of North Carolina School of Medicine**
 
 ### Psychology Programs
-
 14. **Yale University Psychology Department**
 15. **Columbia University Psychology Department**
 16. **University of Chicago Psychology Department**
@@ -75,7 +70,6 @@
 18. **Duke University Psychology Department**
 
 ### Healthcare Systems
-
 19. **Kaiser Permanente**
 20. **Intermountain Healthcare**
 21. **Geisinger Health System**
@@ -85,7 +79,6 @@
 ## Outreach Strategy
 
 ### Initial Contact Template
-
 ```
 Subject: Revolutionary AI Training Platform - Zero-Risk Mental Health Simulation
 
@@ -115,7 +108,6 @@ Pixelated Empathy
 ```
 
 ### Follow-up Sequence
-
 - **Day 3**: LinkedIn connection request
 - **Day 7**: Follow-up email with case study
 - **Day 14**: Phone call attempt
@@ -124,21 +116,17 @@ Pixelated Empathy
 ## Conference Calendar 2024
 
 ### Q1 Conferences
-
 - **AAMC Annual Meeting** (March 15-17, Washington DC)
 - **APA Division 17 Conference** (March 22-24, Chicago)
 
 ### Q2 Conferences
-
 - **Society for Simulation in Healthcare** (April 8-11, San Diego)
 - **International Association of Medical Science Educators** (May 12-15, Boston)
 
 ### Q3 Conferences
-
 - **APA Annual Convention** (August 8-11, Seattle)
 - **Association of Directors of Psychology Training Centers** (September 15-17, Denver)
 
 ### Q4 Conferences
-
 - **AAMC Learn Serve Lead** (November 8-12, Phoenix)
 - **International Conference on Medical Education** (December 5-7, Miami)

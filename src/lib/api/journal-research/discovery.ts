@@ -1,4 +1,4 @@
-import { journalResearchApiClient } from "./client";
+import { journalResearchApiClient } from './client'
 import {
   DiscoveryInitiatePayload,
   DiscoveryResponse,
@@ -8,11 +8,11 @@ import {
   SourceListSchema,
   SourceSchema,
   serializeDiscoveryInitiatePayload,
-} from "./types";
+} from './types'
 
 export interface ListSourcesParams {
-  page?: number;
-  pageSize?: number;
+  page?: number
+  pageSize?: number
 }
 
 export async function initiateDiscovery(
@@ -22,18 +22,18 @@ export async function initiateDiscovery(
   return journalResearchApiClient.request<DiscoveryResponse>(
     `/sessions/${sessionId}/discovery`,
     {
-      method: "POST",
+      method: 'POST',
       body: serializeDiscoveryInitiatePayload(payload),
       validator: DiscoveryResponseSchema,
     },
-  );
+  )
 }
 
 export async function listSources(
   sessionId: string,
   params: ListSourcesParams = {},
 ): Promise<SourceList> {
-  const { page, pageSize } = params;
+  const { page, pageSize } = params
   return journalResearchApiClient.request<SourceList>(
     `/sessions/${sessionId}/discovery/sources`,
     {
@@ -43,7 +43,7 @@ export async function listSources(
       },
       validator: SourceListSchema,
     },
-  );
+  )
 }
 
 export async function getSource(
@@ -55,5 +55,5 @@ export async function getSource(
     {
       validator: SourceSchema,
     },
-  );
+  )
 }

@@ -1,89 +1,89 @@
-import { test, expect } from "@playwright/test";
-import fs from "node:fs/promises";
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs/promises'
 
-import { FEATURES } from "../lib/browser/feature-detection";
-import { safeJoin, ALLOWED_DIRECTORIES } from "../utils/path-security";
+import { FEATURES } from '../lib/browser/feature-detection'
+import { safeJoin, ALLOWED_DIRECTORIES } from '../utils/path-security'
 
 // Define types for compatibility results
 interface PageResult {
-  navigationSuccessful?: boolean;
-  visualIssues?: string[];
-  criticalElements?: Record<string, boolean>;
-  interactions?: Record<string, { success: boolean; details?: string }>;
-  jsErrors?: string[];
+  navigationSuccessful?: boolean
+  visualIssues?: string[]
+  criticalElements?: Record<string, boolean>
+  interactions?: Record<string, { success: boolean; details?: string }>
+  jsErrors?: string[]
   viewportAdaption?: {
-    viewport: { width: number; height: number };
-    hasViewportMeta: boolean;
-    hasHorizontalOverflow: boolean;
-    tooSmallTapTargets: Element[];
-  };
-  touchInputResults?: Record<string, { success: boolean; details?: string }>;
+    viewport: { width: number; height: number }
+    hasViewportMeta: boolean
+    hasHorizontalOverflow: boolean
+    tooSmallTapTargets: Element[]
+  }
+  touchInputResults?: Record<string, { success: boolean; details?: string }>
 }
 
 interface CompatibilityResults {
   browsers: Record<
     string,
     {
-      pages: Record<string, PageResult>;
-      features: Record<string, boolean>;
+      pages: Record<string, PageResult>
+      features: Record<string, boolean>
     }
-  >;
+  >
 }
 
 // Skip browser compatibility tests in CI environment
-const skipTests = process.env["SKIP_BROWSER_COMPAT_TESTS"] === "true";
+const skipTests = process.env['SKIP_BROWSER_COMPAT_TESTS'] === 'true'
 
 // Create a separate test suite
-(skipTests ? test.describe.skip : test.describe)(
-  "Browser Features and Compatibility",
+;(skipTests ? test.describe.skip : test.describe)(
+  'Browser Features and Compatibility',
   () => {
-    test("should test browser features and compatibility", async ({
+    test('should test browser features and compatibility', async ({
       page,
     }: {
-      page: any;
+      page: any
     }) => {
       const compatibilityResults: CompatibilityResults = {
         browsers: {},
-      };
+      }
 
       // Test each feature
       for (const [featureKey, feature] of Object.entries(FEATURES)) {
-        const detectionCode = feature.detectionFn.toString();
-        const result = await page.evaluate(`(${detectionCode})()`);
-        compatibilityResults.browsers["chromium"] = {
-          ...compatibilityResults.browsers["chromium"],
+        const detectionCode = feature.detectionFn.toString()
+        const result = await page.evaluate(`(${detectionCode})()`)
+        compatibilityResults.browsers['chromium'] = {
+          ...compatibilityResults.browsers['chromium'],
           features: {
-            ...compatibilityResults.browsers["chromium"]?.features,
+            ...compatibilityResults.browsers['chromium']?.features,
             [featureKey]: Boolean(result),
           },
-        };
+        }
       }
 
       // Save results
       const resultsPath = safeJoin(
         ALLOWED_DIRECTORIES.PROJECT_ROOT,
-        "browser-compatibility-results.json",
-      );
+        'browser-compatibility-results.json',
+      )
       await fs.writeFile(
         resultsPath,
         JSON.stringify(compatibilityResults, null, 2),
-      );
+      )
 
       // Basic assertion to ensure test ran
-      expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1);
-    });
+      expect(Object.keys(compatibilityResults.browsers)).toHaveLength(1)
+    })
   },
-);
+)
 
 // Use conditional test execution for a standalone test
 if (!skipTests) {
-  test("should work in all browsers", async ({
+  test('should work in all browsers', async ({
     page: _page,
     browserName: _browserName,
   }: {
-    page: any;
-    browserName: string;
+    page: any
+    browserName: string
   }) => {
     // ... test implementation ...
-  });
+  })
 }

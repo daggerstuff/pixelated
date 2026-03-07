@@ -1,59 +1,59 @@
-import { useEffect, useState } from "react";
-import type { NotificationItem } from "@/lib/services/notification/NotificationService";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useWebSocket } from "@/hooks/useWebSocket";
-import { NotificationStatus } from "@/lib/services/notification/NotificationService";
-import { cn } from "@/lib/utils";
-import { Bell, Check, X } from "lucide-react";
+import { useEffect, useState } from 'react'
+import type { NotificationItem } from '@/lib/services/notification/NotificationService'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { useWebSocket } from '@/hooks/useWebSocket'
+import { NotificationStatus } from '@/lib/services/notification/NotificationService'
+import { cn } from '@/lib/utils'
+import { Bell, Check, X } from 'lucide-react'
 
 interface NotificationCenterProps {
-  className?: string;
+  className?: string
 }
 
 export function NotificationCenter({ className }: NotificationCenterProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [isOpen, setIsOpen] = useState(false)
+  const [notifications, setNotifications] = useState<NotificationItem[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const { sendMessage } = useWebSocket({
-    url: "ws://localhost:8080", // Placeholder URL
-    sessionId: "placeholder-session", // Placeholder session ID
+    url: 'ws://localhost:8080', // Placeholder URL
+    sessionId: 'placeholder-session', // Placeholder session ID
     onMessage: (message) => {
       // TODO: This is where incoming messages (lastMessage equivalent) would be handled
-      console.log("Received message:", message);
+      console.log('Received message:', message)
       // For now, parsing and handling logic from the original useEffect [lastMessage] needs to be adapted here
       // Example of how you might handle based on your previous logic:
       // const data = JSON.parse(message.content) as unknown // Assuming message.content is the stringified data
       // switch (data.type) { ... }
     },
-  });
+  })
 
   useEffect(() => {
     // Request initial notifications
     sendMessage({
-      id: "init-notifications", // Placeholder ID
-      role: "system", // Placeholder role
+      id: 'init-notifications', // Placeholder ID
+      role: 'system', // Placeholder role
       content: JSON.stringify({
-        type: "get_notifications",
+        type: 'get_notifications',
         limit: 20,
         offset: 0,
       }), // Stringify custom payload
       // type: 'get_notifications',
       // limit: 20,
       // offset: 0,
-    });
-  }, [sendMessage]);
+    })
+  }, [sendMessage])
 
   const handleMarkAsRead = async (notificationId: string) => {
     sendMessage({
       id: `mark-read-${notificationId}`,
-      role: "system",
-      content: JSON.stringify({ type: "mark_read", notificationId }),
+      role: 'system',
+      content: JSON.stringify({ type: 'mark_read', notificationId }),
       // type: 'mark_read',
       // notificationId,
-    });
+    })
 
     setNotifications((prev: NotificationItem[]) =>
       prev.map((n: NotificationItem) =>
@@ -61,32 +61,32 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
           ? { ...n, status: NotificationStatus.READ, readAt: Date.now() }
           : n,
       ),
-    );
-    setUnreadCount((prev: number) => Math.max(0, prev - 1));
-  };
+    )
+    setUnreadCount((prev: number) => Math.max(0, prev - 1))
+  }
 
   const handleDismiss = async (notificationId: string) => {
     sendMessage({
       id: `dismiss-${notificationId}`,
-      role: "system",
-      content: JSON.stringify({ type: "dismiss", notificationId }),
+      role: 'system',
+      content: JSON.stringify({ type: 'dismiss', notificationId }),
       // type: 'dismiss',
       // notificationId,
-    });
+    })
 
     setNotifications((prev: NotificationItem[]) =>
       prev.filter((n: NotificationItem) => n.id !== notificationId),
-    );
+    )
     if (
       notifications.find((n: NotificationItem) => n.id === notificationId)
         ?.status === NotificationStatus.PENDING
     ) {
-      setUnreadCount((prev: number) => Math.max(0, prev - 1));
+      setUnreadCount((prev: number) => Math.max(0, prev - 1))
     }
-  };
+  }
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       <Button
         variant="ghost"
         size="icon"
@@ -128,9 +128,9 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                   <div
                     key={notification.id}
                     className={cn(
-                      "flex items-start gap-4 p-4 transition-colors",
+                      'flex items-start gap-4 p-4 transition-colors',
                       notification.status === NotificationStatus.PENDING &&
-                        "bg-muted/50",
+                        'bg-muted/50',
                     )}
                   >
                     <div className="flex-1">
@@ -169,5 +169,5 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         </Card>
       )}
     </div>
-  );
+  )
 }

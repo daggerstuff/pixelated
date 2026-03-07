@@ -252,8 +252,8 @@ body {
   margin-top: 8px;
 }
 
-.search-result-item[aria-selected="true"] {
-  --uno: "bg-[#88888811] dark:bg-[#88888818]";
+.search-result-item[aria-selected='true'] {
+  --uno: 'bg-[#88888811] dark:bg-[#88888818]';
 }
 
 .search-result-excerpt {
@@ -267,7 +267,7 @@ body {
 .search-result-excerpt mark,
 mark.pagefind-highlight {
   color: var(--c-text);
-  --uno: "bg-[#88888830] dark:bg-[#8888884d]";
+  --uno: 'bg-[#88888830] dark:bg-[#8888884d]';
 }
 
 .search-kbd-key {
@@ -285,5 +285,5 @@ mark.pagefind-highlight {
   line-height: 1;
   text-transform: uppercase;
 
-  --uno: "b-[#0000002e] bg-[#ffffffd9] dark:b-[#ffffff38] dark:bg-[#ffffff0F]";
+  --uno: 'b-[#0000002e] bg-[#ffffffd9] dark:b-[#ffffff38] dark:bg-[#ffffff0F]';
 }

@@ -4,6 +4,6 @@
  * Handles document and data exports in various formats.
  */
 
-import { BaseService } from "./base-service";
+import { BaseService } from './base-service'
 
-export class ExportService extends BaseService {}
+export class ExportService extends BaseService { }

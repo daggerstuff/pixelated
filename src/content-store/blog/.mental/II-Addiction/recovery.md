@@ -1,7 +1,7 @@
 ---
-title: "Addiction Recovery"
-description: "Comprehensive guide to addiction recovery processes and support systems"
-author: "Resource Team"
+title: 'Addiction Recovery'
+description: 'Comprehensive guide to addiction recovery processes and support systems'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

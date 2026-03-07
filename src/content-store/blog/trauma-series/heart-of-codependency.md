@@ -1,18 +1,20 @@
 ---
-title: "The Heart of Codependency"
-description: "Explore the deep connection between trauma and codependent relationships, understanding how early experiences shape our attachment patterns"
-author: "Dr. Sarah Chen"
+title: 'The Heart of Codependency'
+description: 'Explore the deep connection between trauma and codependent relationships, understanding how early experiences shape our attachment patterns'
+author: 'Dr. Sarah Chen'
 pubDate: 2024-02-15
 readingTime: 12
-tags: ["trauma", "relationships", "codependency", "attachment"]
-series: "Understanding Trauma"
+tags: ['trauma', 'relationships', 'codependency', 'attachment']
+series: 'Understanding Trauma'
 seriesOrder: 1
 image:
   {
-    url: "https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-    alt: "Two silhouettes reflecting the complexity of codependent relationships",
+    url: 'https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    alt: 'Two silhouettes reflecting the complexity of codependent relationships',
   }
 ---
+
+
 
 # The Heart of Codependency
 

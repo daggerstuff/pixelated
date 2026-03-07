@@ -17,7 +17,6 @@ on:
 env:
   NODE_VERSION: 24.13.0
   PYTHON_VERSION: 3.11
-  PNPM_VERSION: 10.29.2
 
 jobs:
   analyze:
@@ -57,8 +56,6 @@ jobs:
       - name: Setup pnpm
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory

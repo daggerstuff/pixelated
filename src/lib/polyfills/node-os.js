@@ -3,35 +3,35 @@
  */
 
 export function hostname() {
-  return "browser";
+  return 'browser'
 }
 
 export function platform() {
-  return "browser";
+  return 'browser'
 }
 
 export function release() {
-  return "1.0.0";
+  return '1.0.0'
 }
 
 export function type() {
-  return "Browser";
+  return 'Browser'
 }
 
 export function uptime() {
-  return 0;
+  return 0
 }
 
 export function totalmem() {
-  return 0;
+  return 0
 }
 
 export function freemem() {
-  return 0;
+  return 0
 }
 
 export function cpus() {
-  return [];
+  return []
 }
 
 export default {
@@ -43,4 +43,4 @@ export default {
   totalmem,
   freemem,
   cpus,
-};
+}

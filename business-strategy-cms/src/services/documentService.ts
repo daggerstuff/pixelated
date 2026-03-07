@@ -5,9 +5,9 @@ import {
   DocumentSearchFilters,
   DocumentSearchResult,
   DocumentStatus,
-} from "@/types/document";
-import { DocumentModel } from "@/models/Document";
-import { UserModel } from "@/models/User";
+} from '@/types/document'
+import { DocumentModel } from '@/models/Document'
+import { UserModel } from '@/models/User'
 
 export class DocumentService {
   static async createDocument(
@@ -15,23 +15,23 @@ export class DocumentService {
     authorId: string,
   ): Promise<Document> {
     // Validate author exists
-    const author = await UserModel.findById(authorId);
+    const author = await UserModel.findById(authorId)
     if (!author) {
-      throw new Error("Author not found");
+      throw new Error('Author not found')
     }
 
-    const wordCount = documentData.content.split(/\s+/).length;
-    const readingTime = Math.ceil(wordCount / 200); // Average reading speed
+    const wordCount = documentData.content.split(/\s+/).length
+    const readingTime = Math.ceil(wordCount / 200) // Average reading speed
 
-    const metadata: Document["metadata"] = {
+    const metadata: Document['metadata'] = {
       wordCount,
       readingTime,
       lastEditedBy: authorId,
       fileSize: new Blob([documentData.content]).size,
-      mimeType: "text/html",
+      mimeType: 'text/html',
       customFields: documentData.metadata?.customFields || {},
       ...documentData.metadata,
-    };
+    }
 
     const document = await DocumentModel.create({
       ...documentData,
@@ -40,19 +40,19 @@ export class DocumentService {
       collaborators: documentData.collaborators || [],
       tags: documentData.tags || [],
       metadata,
-    });
+    })
 
-    return document;
+    return document
   }
 
   static async getDocument(id: string): Promise<Document | null> {
-    return DocumentModel.findById(id);
+    return DocumentModel.findById(id)
   }
 
   static async getDocuments(
     filters?: DocumentSearchFilters,
   ): Promise<DocumentSearchResult> {
-    const docs = await DocumentModel.findAll(filters);
+    const docs = await DocumentModel.findAll(filters)
 
     return {
       documents: docs,
@@ -60,7 +60,7 @@ export class DocumentService {
       page: 1,
       limit: 50,
       hasMore: false,
-    };
+    }
   }
 
   static async updateDocument(
@@ -68,50 +68,50 @@ export class DocumentService {
     updates: DocumentUpdate,
     userId: string,
   ): Promise<Document | null> {
-    const document = await DocumentModel.findById(id);
+    const document = await DocumentModel.findById(id)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Check if user has permission to edit
     const canEdit =
-      document.authorId === userId || document.collaborators.includes(userId);
+      document.authorId === userId || document.collaborators.includes(userId)
 
     if (!canEdit) {
-      throw new Error("Insufficient permissions to edit this document");
+      throw new Error('Insufficient permissions to edit this document')
     }
 
     // Update metadata
-    const updatedMetadata = { ...document.metadata };
+    const updatedMetadata = { ...document.metadata }
     if (updates.content) {
-      const wordCount = updates.content.split(/\s+/).length;
-      const readingTime = Math.ceil(wordCount / 200);
-      updatedMetadata.wordCount = wordCount;
-      updatedMetadata.readingTime = readingTime;
-      updatedMetadata.fileSize = new Blob([updates.content]).size;
+      const wordCount = updates.content.split(/\s+/).length
+      const readingTime = Math.ceil(wordCount / 200)
+      updatedMetadata.wordCount = wordCount
+      updatedMetadata.readingTime = readingTime
+      updatedMetadata.fileSize = new Blob([updates.content]).size
     }
-    updatedMetadata.lastEditedBy = userId;
+    updatedMetadata.lastEditedBy = userId
 
     const updatedDocument = await DocumentModel.update(id, {
       ...updates,
       metadata: updatedMetadata,
-    });
+    })
 
-    return updatedDocument;
+    return updatedDocument
   }
 
   static async deleteDocument(id: string, userId: string): Promise<boolean> {
-    const document = await DocumentModel.findById(id);
+    const document = await DocumentModel.findById(id)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Only author can delete
     if (document.authorId !== userId) {
-      throw new Error("Only the author can delete this document");
+      throw new Error('Only the author can delete this document')
     }
 
-    return DocumentModel.delete(id);
+    return DocumentModel.delete(id)
   }
 
   static async addCollaborator(
@@ -119,23 +119,23 @@ export class DocumentService {
     userId: string,
     requesterId: string,
   ): Promise<Document | null> {
-    const document = await DocumentModel.findById(documentId);
+    const document = await DocumentModel.findById(documentId)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Only author can add collaborators
     if (document.authorId !== requesterId) {
-      throw new Error("Only the author can add collaborators");
+      throw new Error('Only the author can add collaborators')
     }
 
     // Check if user exists
-    const user = await UserModel.findById(userId);
+    const user = await UserModel.findById(userId)
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found')
     }
 
-    return DocumentModel.addCollaborator(documentId, userId);
+    return DocumentModel.addCollaborator(documentId, userId)
   }
 
   static async removeCollaborator(
@@ -143,94 +143,94 @@ export class DocumentService {
     userId: string,
     requesterId: string,
   ): Promise<Document | null> {
-    const document = await DocumentModel.findById(documentId);
+    const document = await DocumentModel.findById(documentId)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Only author can remove collaborators
     if (document.authorId !== requesterId) {
-      throw new Error("Only the author can remove collaborators");
+      throw new Error('Only the author can remove collaborators')
     }
 
-    return DocumentModel.removeCollaborator(documentId, userId);
+    return DocumentModel.removeCollaborator(documentId, userId)
   }
 
   static async getDocumentVersions(documentId: string): Promise<any[]> {
-    const document = await DocumentModel.findById(documentId);
+    const document = await DocumentModel.findById(documentId)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
-    return DocumentModel.getVersions(documentId);
+    return DocumentModel.getVersions(documentId)
   }
 
   static async getDocumentVersion(
     documentId: string,
     version: number,
   ): Promise<any> {
-    const document = await DocumentModel.findById(documentId);
+    const document = await DocumentModel.findById(documentId)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
-    return DocumentModel.getVersion(documentId, version);
+    return DocumentModel.getVersion(documentId, version)
   }
 
   static async publishDocument(
     id: string,
     userId: string,
   ): Promise<Document | null> {
-    const document = await DocumentModel.findById(id);
+    const document = await DocumentModel.findById(id)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Check if user has permission to publish
     const canPublish =
-      document.authorId === userId || document.collaborators.includes(userId);
+      document.authorId === userId || document.collaborators.includes(userId)
 
     if (!canPublish) {
-      throw new Error("Insufficient permissions to publish this document");
+      throw new Error('Insufficient permissions to publish this document')
     }
 
     return DocumentModel.update(id, {
       status: DocumentStatus.PUBLISHED,
       publishedAt: new Date(),
-    });
+    })
   }
 
   static async archiveDocument(
     id: string,
     userId: string,
   ): Promise<Document | null> {
-    const document = await DocumentModel.findById(id);
+    const document = await DocumentModel.findById(id)
     if (!document) {
-      throw new Error("Document not found");
+      throw new Error('Document not found')
     }
 
     // Only author can archive
     if (document.authorId !== userId) {
-      throw new Error("Only the author can archive this document");
+      throw new Error('Only the author can archive this document')
     }
 
-    return DocumentModel.update(id, { status: DocumentStatus.ARCHIVED });
+    return DocumentModel.update(id, { status: DocumentStatus.ARCHIVED })
   }
 
   static async getDocumentById(id: string): Promise<Document | null> {
-    return DocumentModel.findById(id);
+    return DocumentModel.findById(id)
   }
 
   static async getUserById(id: string): Promise<any> {
-    return UserModel.findById(id);
+    return UserModel.findById(id)
   }
 
   static async checkDocumentPermission(
     _documentId: string,
     _userId: string,
-    _permission: "read" | "write" | "admin",
+    _permission: 'read' | 'write' | 'admin',
   ): Promise<boolean> {
     // Placeholder implementation
-    return true;
+    return true
   }
 }

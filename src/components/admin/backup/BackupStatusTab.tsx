@@ -1,5 +1,5 @@
-import type { FC } from "react";
-import { Button } from "@/components/ui/button";
+import type { FC } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -7,39 +7,39 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   BackupType,
   BackupStatus,
-} from "../../../lib/security/backup/backup-types";
+} from '../../../lib/security/backup/backup-types'
 
 // Helper function to format file size
 const formatBytes = (bytes: number, decimals = 2) => {
   if (bytes === 0) {
-    return "0 Bytes";
+    return '0 Bytes'
   }
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-};
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
 
 // Helper function to format date string
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString();
-};
+  const date = new Date(dateString)
+  return date.toLocaleString()
+}
 
 // Helper function to render status badge
 const renderStatusBadge = (status: BackupStatus) => {
   switch (status) {
     case BackupStatus.PENDING:
-      return <Badge variant="outline">Pending</Badge>;
+      return <Badge variant="outline">Pending</Badge>
 
     case BackupStatus.IN_PROGRESS:
       return (
@@ -49,7 +49,7 @@ const renderStatusBadge = (status: BackupStatus) => {
         >
           In Progress
         </Badge>
-      );
+      )
 
     case BackupStatus.COMPLETED:
       return (
@@ -59,10 +59,10 @@ const renderStatusBadge = (status: BackupStatus) => {
         >
           Completed
         </Badge>
-      );
+      )
 
     case BackupStatus.FAILED:
-      return <Badge variant="destructive">Failed</Badge>;
+      return <Badge variant="destructive">Failed</Badge>
 
     case BackupStatus.VERIFIED:
       return (
@@ -72,10 +72,10 @@ const renderStatusBadge = (status: BackupStatus) => {
         >
           Verified
         </Badge>
-      );
+      )
 
     case BackupStatus.VERIFICATION_FAILED:
-      return <Badge variant="destructive">Verification Failed</Badge>;
+      return <Badge variant="destructive">Verification Failed</Badge>
 
     case BackupStatus.EXPIRED:
       return (
@@ -85,12 +85,12 @@ const renderStatusBadge = (status: BackupStatus) => {
         >
           Expired
         </Badge>
-      );
+      )
 
     default:
-      return null;
+      return null
   }
-};
+}
 
 // Helper function to render backup type badge
 const renderTypeBadge = (type: BackupType) => {
@@ -103,7 +103,7 @@ const renderTypeBadge = (type: BackupType) => {
         >
           Full
         </Badge>
-      );
+      )
 
     case BackupType.DIFFERENTIAL:
       return (
@@ -113,7 +113,7 @@ const renderTypeBadge = (type: BackupType) => {
         >
           Differential
         </Badge>
-      );
+      )
 
     case BackupType.TRANSACTION:
       return (
@@ -123,27 +123,27 @@ const renderTypeBadge = (type: BackupType) => {
         >
           Transaction
         </Badge>
-      );
+      )
 
     default:
-      return null;
+      return null
   }
-};
+}
 
 interface Backup {
-  id: string;
-  type: BackupType;
-  timestamp: string;
-  size: number;
-  location: string;
-  status: BackupStatus;
-  retentionDate: string;
+  id: string
+  type: BackupType
+  timestamp: string
+  size: number
+  location: string
+  status: BackupStatus
+  retentionDate: string
 }
 
 interface BackupStatusTabProps {
-  backups: Backup[];
-  onCreateBackup: (type: BackupType) => void;
-  onVerifyBackup: (backupId: string) => void;
+  backups: Backup[]
+  onCreateBackup: (type: BackupType) => void
+  onVerifyBackup: (backupId: string) => void
 }
 
 const BackupStatusTab: FC<BackupStatusTabProps> = ({
@@ -191,8 +191,8 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
               className={
                 backup.status === BackupStatus.FAILED ||
                 backup.status === BackupStatus.VERIFICATION_FAILED
-                  ? "border-red-200"
-                  : ""
+                  ? 'border-red-200'
+                  : ''
               }
             >
               <CardHeader className="pb-2">
@@ -282,12 +282,12 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                   <td className="py-2">
                     {(() => {
                       // Calculate next Sunday
-                      const now = new Date();
-                      const daysUntilSunday = 7 - now.getDay();
-                      const nextSunday = new Date(now);
-                      nextSunday.setDate(now.getDate() + daysUntilSunday);
-                      nextSunday.setHours(0, 0, 0, 0);
-                      return nextSunday.toLocaleDateString();
+                      const now = new Date()
+                      const daysUntilSunday = 7 - now.getDay()
+                      const nextSunday = new Date(now)
+                      nextSunday.setDate(now.getDate() + daysUntilSunday)
+                      nextSunday.setHours(0, 0, 0, 0)
+                      return nextSunday.toLocaleDateString()
                     })()}
                   </td>
                   <td className="py-2">365 days</td>
@@ -298,11 +298,11 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                   <td className="py-2">
                     {(() => {
                       // Calculate next day at midnight
-                      const now = new Date();
-                      const tomorrow = new Date(now);
-                      tomorrow.setDate(now.getDate() + 1);
-                      tomorrow.setHours(0, 0, 0, 0);
-                      return tomorrow.toLocaleDateString();
+                      const now = new Date()
+                      const tomorrow = new Date(now)
+                      tomorrow.setDate(now.getDate() + 1)
+                      tomorrow.setHours(0, 0, 0, 0)
+                      return tomorrow.toLocaleDateString()
                     })()}
                   </td>
                   <td className="py-2">30 days</td>
@@ -313,10 +313,10 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                   <td className="py-2">
                     {(() => {
                       // Calculate next hour
-                      const now = new Date();
-                      const nextHour = new Date(now);
-                      nextHour.setHours(now.getHours() + 1, 0, 0, 0);
-                      return nextHour.toLocaleTimeString();
+                      const now = new Date()
+                      const nextHour = new Date(now)
+                      nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+                      return nextHour.toLocaleTimeString()
                     })()}
                   </td>
                   <td className="py-2">7 days</td>
@@ -327,7 +327,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
         </Card>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BackupStatusTab;
+export default BackupStatusTab

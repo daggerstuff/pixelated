@@ -1,4 +1,4 @@
-import type { Source } from "@/lib/api/journal-research/types";
+import type { Source } from '@/lib/api/journal-research/types'
 import {
   Card,
   CardContent,
@@ -6,34 +6,34 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card/card";
-import { format } from "date-fns";
-import { ExternalLink } from "lucide-react";
+} from '@/components/ui/card/card'
+import { format } from 'date-fns'
+import { ExternalLink } from 'lucide-react'
 
 export interface SourceCardProps {
-  source: Source;
-  onClick?: () => void;
-  className?: string;
+  source: Source
+  onClick?: () => void
+  className?: string
 }
 
 export function SourceCard({ source, onClick, className }: SourceCardProps) {
   const handleLinkClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    window.open(source.url, "_blank", "noopener,noreferrer");
-  };
+    e.stopPropagation()
+    window.open(source.url, '_blank', 'noopener,noreferrer')
+  }
 
   return (
     <Card
-      className={`transition-shadow hover:shadow-lg ${onClick ? "cursor-pointer" : ""} ${className ?? ""}`}
+      className={`transition-shadow hover:shadow-lg ${onClick ? 'cursor-pointer' : ''} ${className ?? ''}`}
       onClick={onClick}
-      role={onClick ? "button" : undefined}
+      role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onClick();
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onClick()
               }
             }
           : undefined
@@ -44,7 +44,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
           {source.title}
         </CardTitle>
         <CardDescription className="mt-1">
-          {source.authors.join(", ")}
+          {source.authors.join(', ')}
         </CardDescription>
       </CardHeader>
 
@@ -74,7 +74,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
             <div>
               <span className="text-muted-foreground">Published:</span>
               <span className="ml-2 font-medium">
-                {format(source.publicationDate, "MMM yyyy")}
+                {format(source.publicationDate, 'MMM yyyy')}
               </span>
             </div>
             <div>
@@ -101,7 +101,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
 
       <CardFooter className="flex items-center justify-between">
         <div className="text-xs text-muted-foreground">
-          Discovered {format(source.discoveryDate, "MMM d, yyyy")}
+          Discovered {format(source.discoveryDate, 'MMM d, yyyy')}
         </div>
         <a
           href={source.url}
@@ -116,5 +116,5 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
         </a>
       </CardFooter>
     </Card>
-  );
+  )
 }

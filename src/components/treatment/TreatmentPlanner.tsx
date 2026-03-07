@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import RecommendationDisplay from "../ai/RecommendationDisplay";
-import type { TreatmentRecommendation } from "../../lib/ai/services/RecommendationService";
+import React, { useState } from 'react'
+import RecommendationDisplay from '../ai/RecommendationDisplay'
+import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 
 interface TreatmentPlannerProps {
-  pageTitle: string;
-  pageDescription: string;
+  pageTitle: string
+  pageDescription: string
   // Define any props this component might receive from Astro, if necessary
 }
 
@@ -12,33 +12,33 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
   pageTitle,
   pageDescription,
 }) => {
-  const [clientId, setClientId] = useState("");
-  const [indications, setIndications] = useState("");
+  const [clientId, setClientId] = useState('')
+  const [indications, setIndications] = useState('')
   const [recommendations, setRecommendations] = useState<
     TreatmentRecommendation[]
-  >([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState("all");
+  >([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState('all')
 
   async function fetchRecommendations(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setRecommendations([]);
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setRecommendations([])
     try {
       if (!clientId || !indications) {
-        setError("Client ID and at least one indication are required.");
-        setLoading(false);
-        return;
+        setError('Client ID and at least one indication are required.')
+        setLoading(false)
+        return
       }
-      const res = await fetch("/api/ai/recommendations/enhanced", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/ai/recommendations/enhanced', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientId,
           indications: indications
-            .split(",")
+            .split(',')
             .map((s) => s.trim())
             .filter(Boolean),
           includePersonalization: true,
@@ -46,31 +46,29 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           includeAlternativeApproaches: true,
           maxMediaRecommendations: 3,
         }),
-      });
-      const data = await res.json();
+      })
+      const data = await res.json()
       if (!res.ok || !data.success) {
-        setError(data.error || "Failed to fetch recommendations");
-        setLoading(false);
-        return;
+        setError(data.error || 'Failed to fetch recommendations')
+        setLoading(false)
+        return
       }
-      setRecommendations(
-        data.data.recommendations as TreatmentRecommendation[],
-      );
+      setRecommendations(data.data.recommendations as TreatmentRecommendation[])
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : "Unknown error";
-      setError(errorMessage);
+          : 'Unknown error'
+      setError(errorMessage)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
   const filteredRecommendations =
-    filter === "all"
+    filter === 'all'
       ? recommendations
-      : recommendations.filter((rec) => rec.priority === filter);
+      : recommendations.filter((rec) => rec.priority === filter)
 
   return (
     <>
@@ -132,29 +130,29 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       <div className="flex gap-2 mb-6">
         <button
           type="button"
-          className={`filter-btn${filter === "all" ? " active" : ""}`}
-          onClick={() => setFilter("all")}
+          className={`filter-btn${filter === 'all' ? ' active' : ''}`}
+          onClick={() => setFilter('all')}
         >
           All
         </button>
         <button
           type="button"
-          className={`filter-btn${filter === "high" ? " active" : ""}`}
-          onClick={() => setFilter("high")}
+          className={`filter-btn${filter === 'high' ? ' active' : ''}`}
+          onClick={() => setFilter('high')}
         >
           High Priority
         </button>
         <button
           type="button"
-          className={`filter-btn${filter === "medium" ? " active" : ""}`}
-          onClick={() => setFilter("medium")}
+          className={`filter-btn${filter === 'medium' ? ' active' : ''}`}
+          onClick={() => setFilter('medium')}
         >
           Medium
         </button>
         <button
           type="button"
-          className={`filter-btn${filter === "low" ? " active" : ""}`}
-          onClick={() => setFilter("low")}
+          className={`filter-btn${filter === 'low' ? ' active' : ''}`}
+          onClick={() => setFilter('low')}
         >
           Low
         </button>
@@ -169,7 +167,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
         <RecommendationDisplay recommendations={filteredRecommendations} />
       )}
     </>
-  );
-};
+  )
+}
 
-export default TreatmentPlanner;
+export default TreatmentPlanner

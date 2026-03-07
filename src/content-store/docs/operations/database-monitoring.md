@@ -1,12 +1,12 @@
 ---
-title: "Database Monitoring Configuration"
-description: "Setting up and configuring database performance monitoring"
-pubDate: "2025-01-01"
-author: "DevOps Team"
+title: 'Database Monitoring Configuration'
+description: 'Setting up and configuring database performance monitoring'
+pubDate: '2025-01-01'
+author: 'DevOps Team'
 draft: false
 toc: true
 share: true
-date: "2025-04-14"
+date: '2025-04-14'
 ---
 
 # Database Performance Monitoring
@@ -75,9 +75,9 @@ Add the following to your `prometheus.yml` configuration:
 
 ```yaml
 scrape_configs:
-  - job_name: "postgres"
+  - job_name: 'postgres'
     static_configs:
-      - targets: ["postgres-exporter:9187"]
+      - targets: ['postgres-exporter:9187']
     metrics_path: /metrics
     scrape_interval: 15s
     scrape_timeout: 10s

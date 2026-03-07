@@ -1,60 +1,60 @@
-import { FC } from "react";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Heart, Brain, Shield, Zap } from "lucide-react";
+import { FC } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
 
 // Types for the component
 export interface EnhancedMentalHealthAnalysis {
-  timestamp: number;
-  category: "low" | "medium" | "high" | "critical";
-  explanation: string;
-  expertGuided: boolean;
-  scores: Record<string, unknown>;
-  summary: string;
-  hasMentalHealthIssue: boolean;
-  confidence: number;
-  supportingEvidence: string[];
-  riskLevel: "low" | "medium" | "high";
-  emotions?: string[];
-  riskFactors?: string[];
+  timestamp: number
+  category: 'low' | 'medium' | 'high' | 'critical'
+  explanation: string
+  expertGuided: boolean
+  scores: Record<string, unknown>
+  summary: string
+  hasMentalHealthIssue: boolean
+  confidence: number
+  supportingEvidence: string[]
+  riskLevel: 'low' | 'medium' | 'high'
+  emotions?: string[]
+  riskFactors?: string[]
 }
 
 interface MentalHealthInsightsProps {
-  analysis: EnhancedMentalHealthAnalysis;
+  analysis: EnhancedMentalHealthAnalysis
 }
 
 const RISK_BADGE_VARIANT_MAP: Record<
-  "low" | "medium" | "high",
-  "destructive" | "outline" | "secondary"
+  'low' | 'medium' | 'high',
+  'destructive' | 'outline' | 'secondary'
 > = {
-  high: "destructive",
-  medium: "outline",
-  low: "secondary",
-} as const;
+  high: 'destructive',
+  medium: 'outline',
+  low: 'secondary',
+} as const
 
 const getRiskIconComponent = (
-  riskLevel: "low" | "medium" | "high",
+  riskLevel: 'low' | 'medium' | 'high',
 ): React.ReactElement => {
   switch (riskLevel) {
-    case "high":
-      return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    case "medium":
-      return <Shield className="h-4 w-4 text-yellow-500" />;
-    case "low":
+    case 'high':
+      return <AlertTriangle className="h-4 w-4 text-red-500" />
+    case 'medium':
+      return <Shield className="h-4 w-4 text-yellow-500" />
+    case 'low':
     default:
-      return <Heart className="h-4 w-4 text-green-500" />;
+      return <Heart className="h-4 w-4 text-green-500" />
   }
-};
+}
 
 export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
   analysis,
 }) => {
   const getRiskIcon = () => {
-    return getRiskIconComponent(analysis.riskLevel);
-  };
+    return getRiskIconComponent(analysis.riskLevel)
+  }
 
   const getRiskBadgeVariant = () => {
-    return RISK_BADGE_VARIANT_MAP[analysis.riskLevel] || "secondary";
-  };
+    return RISK_BADGE_VARIANT_MAP[analysis.riskLevel] || 'secondary'
+  }
 
   return (
     <div className="space-y-4">
@@ -169,7 +169,7 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MentalHealthInsights;
+export default MentalHealthInsights

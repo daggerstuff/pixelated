@@ -6,119 +6,119 @@
 export interface PerformanceConfig {
   // API Performance
   api: {
-    timeout: number;
-    retries: number;
+    timeout: number
+    retries: number
     rateLimit: {
-      windowMs: number;
-      maxRequests: number;
-    };
+      windowMs: number
+      maxRequests: number
+    }
     compression: {
-      enabled: boolean;
-      threshold: number;
-      level: number;
-    };
+      enabled: boolean
+      threshold: number
+      level: number
+    }
     caching: {
-      enabled: boolean;
-      ttl: number;
-      etag: boolean;
-    };
-  };
+      enabled: boolean
+      ttl: number
+      etag: boolean
+    }
+  }
 
   // Database Performance
   database: {
     pool: {
-      min: number;
-      max: number;
-      idleTimeout: number;
-      connectionTimeout: number;
-    };
+      min: number
+      max: number
+      idleTimeout: number
+      connectionTimeout: number
+    }
     query: {
-      timeout: number;
-      slowQueryThreshold: number;
-      maxRetries: number;
-    };
+      timeout: number
+      slowQueryThreshold: number
+      maxRetries: number
+    }
     optimization: {
-      enableQueryCache: boolean;
-      enableConnectionPooling: boolean;
-      enableSlowQueryLog: boolean;
-    };
-  };
+      enableQueryCache: boolean
+      enableConnectionPooling: boolean
+      enableSlowQueryLog: boolean
+    }
+  }
 
   // Redis Cache Performance
   redis: {
     connection: {
-      host: string;
-      port: number;
-      password?: string;
-      db: number;
-      maxRetriesPerRequest: number;
-      retryDelayOnFailover: number;
-    };
+      host: string
+      port: number
+      password?: string
+      db: number
+      maxRetriesPerRequest: number
+      retryDelayOnFailover: number
+    }
     cache: {
-      defaultTTL: number;
-      compressionThreshold: number;
-      compressionLevel: number;
-      maxKeyLength: number;
-    };
+      defaultTTL: number
+      compressionThreshold: number
+      compressionLevel: number
+      maxKeyLength: number
+    }
     performance: {
-      enableCompression: boolean;
-      enablePipeline: boolean;
-      batchSize: number;
-    };
-  };
+      enableCompression: boolean
+      enablePipeline: boolean
+      batchSize: number
+    }
+  }
 
   // ML Model Performance
   ml: {
     model: {
-      batchSize: number;
-      maxConcurrent: number;
-      timeout: number;
-      cacheResults: boolean;
-    };
+      batchSize: number
+      maxConcurrent: number
+      timeout: number
+      cacheResults: boolean
+    }
     optimization: {
-      enableModelCaching: boolean;
-      enableBatchProcessing: boolean;
-      enableAsyncProcessing: boolean;
-    };
-  };
+      enableModelCaching: boolean
+      enableBatchProcessing: boolean
+      enableAsyncProcessing: boolean
+    }
+  }
 
   // Frontend Performance
   frontend: {
     bundle: {
-      enableCodeSplitting: boolean;
-      enableTreeShaking: boolean;
-      enableCompression: boolean;
-      maxChunkSize: number;
-    };
+      enableCodeSplitting: boolean
+      enableTreeShaking: boolean
+      enableCompression: boolean
+      maxChunkSize: number
+    }
     assets: {
-      enableImageOptimization: boolean;
-      enableLazyLoading: boolean;
-      enablePreloading: boolean;
-      cdnUrl?: string;
-    };
+      enableImageOptimization: boolean
+      enableLazyLoading: boolean
+      enablePreloading: boolean
+      cdnUrl?: string
+    }
     runtime: {
-      enableServiceWorker: boolean;
-      enablePrefetching: boolean;
-      enableCaching: boolean;
-    };
-  };
+      enableServiceWorker: boolean
+      enablePrefetching: boolean
+      enableCaching: boolean
+    }
+  }
 
   // Monitoring and Alerting
   monitoring: {
-    enabled: boolean;
-    sampleRate: number;
+    enabled: boolean
+    sampleRate: number
     thresholds: {
-      apiResponseTime: number;
-      databaseQueryTime: number;
-      cacheHitRate: number;
-      errorRate: number;
-    };
+      apiResponseTime: number
+      databaseQueryTime: number
+      cacheHitRate: number
+      errorRate: number
+    }
     alerting: {
-      enabled: boolean;
-      channels: string[];
-      cooldownMinutes: number;
-    };
-  };
+      enabled: boolean
+      channels: string[]
+      cooldownMinutes: number
+    }
+  }
 }
 
 // Environment-specific configurations
@@ -162,8 +162,8 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
         db: 0,
         maxRetriesPerRequest: 3,
@@ -268,8 +268,8 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
         db: 1,
         maxRetriesPerRequest: 3,
@@ -329,7 +329,7 @@ const ENV_CONFIGS = {
       },
       alerting: {
         enabled: true,
-        channels: ["email"],
+        channels: ['email'],
         cooldownMinutes: 10,
       },
     },
@@ -374,8 +374,8 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST || "localhost",
-        port: parseInt(process.env.REDIS_PORT || "6379"),
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
         password: process.env.REDIS_PASSWORD,
         db: 2,
         maxRetriesPerRequest: 5,
@@ -436,20 +436,20 @@ const ENV_CONFIGS = {
       },
       alerting: {
         enabled: true,
-        channels: ["email", "slack"],
+        channels: ['email', 'slack'],
         cooldownMinutes: 15,
       },
     },
   },
-};
+}
 
 /**
  * Get performance configuration for current environment
  */
 export function getPerformanceConfig(): PerformanceConfig {
-  const env = process.env.NODE_ENV || "development";
+  const env = process.env.NODE_ENV || 'development'
   const config =
-    ENV_CONFIGS[env as keyof typeof ENV_CONFIGS] || ENV_CONFIGS.development;
+    ENV_CONFIGS[env as keyof typeof ENV_CONFIGS] || ENV_CONFIGS.development
 
   // Override with environment variables if present
   return {
@@ -486,17 +486,17 @@ export function getPerformanceConfig(): PerformanceConfig {
         ),
       },
     },
-  };
+  }
 }
 
 /**
  * Performance optimization utilities
  */
 export class PerformanceOptimizer {
-  private config: PerformanceConfig;
+  private config: PerformanceConfig
 
   constructor() {
-    this.config = getPerformanceConfig();
+    this.config = getPerformanceConfig()
   }
 
   /**
@@ -505,37 +505,37 @@ export class PerformanceOptimizer {
   optimizeApiResponse(
     data: any,
     options: {
-      enableCompression?: boolean;
-      enableCaching?: boolean;
-      etag?: string;
+      enableCompression?: boolean
+      enableCaching?: boolean
+      etag?: string
     } = {},
   ): {
-    data: any;
-    headers: Record<string, string>;
+    data: any
+    headers: Record<string, string>
   } {
     const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-Response-Time": Date.now().toString(),
-    };
+      'Content-Type': 'application/json',
+      'X-Response-Time': Date.now().toString(),
+    }
 
     // Add compression headers if enabled
     if (options.enableCompression ?? this.config.api.compression.enabled) {
-      headers["Content-Encoding"] = "gzip";
-      headers["Vary"] = "Accept-Encoding";
+      headers['Content-Encoding'] = 'gzip'
+      headers['Vary'] = 'Accept-Encoding'
     }
 
     // Add caching headers if enabled
     if (options.enableCaching ?? this.config.api.caching.enabled) {
-      headers["Cache-Control"] = `max-age=${this.config.api.caching.ttl}`;
-      headers["ETag"] = options.etag || `"${this.generateETag(data)}"`;
+      headers['Cache-Control'] = `max-age=${this.config.api.caching.ttl}`
+      headers['ETag'] = options.etag || `"${this.generateETag(data)}"`
     }
 
     // Add security headers
-    headers["X-Content-Type-Options"] = "nosniff";
-    headers["X-Frame-Options"] = "DENY";
-    headers["X-XSS-Protection"] = "1; mode=block";
+    headers['X-Content-Type-Options'] = 'nosniff'
+    headers['X-Frame-Options'] = 'DENY'
+    headers['X-XSS-Protection'] = '1; mode=block'
 
-    return { data, headers };
+    return { data, headers }
   }
 
   /**
@@ -543,31 +543,31 @@ export class PerformanceOptimizer {
    */
   private generateETag(data: any): string {
     // Use guarded runtime require helper to avoid bundling Node crypto into frontend builds
-    let createHash: ((algo: string) => import("crypto").Hash) | undefined;
+    let createHash: ((algo: string) => import('crypto').Hash) | undefined
     try {
       // Use dynamic import to avoid top-level circular imports in some environments
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const utils = require("@/lib/utils") as typeof import("@/lib/utils");
-      const crypto = utils.tryRequireNode("crypto");
-      createHash = crypto?.createHash;
+      const utils = require('@/lib/utils') as typeof import('@/lib/utils')
+      const crypto = utils.tryRequireNode('crypto')
+      createHash = crypto?.createHash
     } catch {
-      createHash = undefined;
+      createHash = undefined
     }
 
     if (!createHash) {
       // Fallback to a deterministic but weaker hash if crypto isn't available.
       // This avoids runtime exceptions while keeping behavior predictable.
-      const str = JSON.stringify(data);
-      let hash = 0;
+      const str = JSON.stringify(data)
+      let hash = 0
       for (let i = 0; i < str.length; i++) {
-        const chr = str.charCodeAt(i);
-        hash = (hash << 5) - hash + chr;
-        hash |= 0;
+        const chr = str.charCodeAt(i)
+        hash = (hash << 5) - hash + chr
+        hash |= 0
       }
-      return Math.abs(hash).toString(16);
+      return Math.abs(hash).toString(16)
     }
 
-    return createHash("md5").update(JSON.stringify(data)).digest("hex");
+    return createHash('md5').update(JSON.stringify(data)).digest('hex')
   }
 
   /**
@@ -577,15 +577,15 @@ export class PerformanceOptimizer {
     _query: string,
     _params: any[] = [],
     _options: {
-      enableCache?: boolean;
-      cacheKey?: string;
-      cacheTTL?: number;
+      enableCache?: boolean
+      cacheKey?: string
+      cacheTTL?: number
     } = {},
   ): Promise<T> {
     // Implementation would depend on actual database client
     // This is a placeholder for the optimization logic
 
-    return {} as T;
+    return {} as T
   }
 
   /**
@@ -593,40 +593,40 @@ export class PerformanceOptimizer {
    */
   optimizeRedisOperations(operations: any[]): any[] {
     // Group operations by type for batching
-    const batchedOperations = this.batchOperations(operations);
+    const batchedOperations = this.batchOperations(operations)
 
-    return batchedOperations;
+    return batchedOperations
   }
 
   /**
    * Batch operations for better performance
    */
   private batchOperations(operations: any[]): any[] {
-    const batchSize = this.config.redis.performance.batchSize;
-    const batches: any[] = [];
+    const batchSize = this.config.redis.performance.batchSize
+    const batches: any[] = []
 
     for (let i = 0; i < operations.length; i += batchSize) {
-      batches.push(operations.slice(i, i + batchSize));
+      batches.push(operations.slice(i, i + batchSize))
     }
 
-    return batches;
+    return batches
   }
 
   /**
    * Optimize ML model inference with batching and caching
    */
   optimizeMLInference(inputs: any[]): any[] {
-    const batchSize = this.config.ml.model.batchSize;
-    const maxConcurrent = this.config.ml.model.maxConcurrent;
+    const batchSize = this.config.ml.model.batchSize
+    const maxConcurrent = this.config.ml.model.maxConcurrent
 
     // Split into batches
-    const batches: any[] = [];
+    const batches: any[] = []
     for (let i = 0; i < inputs.length; i += batchSize) {
-      batches.push(inputs.slice(i, i + batchSize));
+      batches.push(inputs.slice(i, i + batchSize))
     }
 
     // Process batches with concurrency limit
-    return this.processBatchesConcurrently(batches, maxConcurrent);
+    return this.processBatchesConcurrently(batches, maxConcurrent)
   }
 
   /**
@@ -637,7 +637,7 @@ export class PerformanceOptimizer {
     _maxConcurrent: number,
   ): any[] {
     // Implementation would handle concurrent processing
-    return _batches;
+    return _batches
   }
 
   /**
@@ -645,14 +645,14 @@ export class PerformanceOptimizer {
    */
   optimizeFrontendBundle(
     options: {
-      enableCodeSplitting?: boolean;
-      enableTreeShaking?: boolean;
-      enableCompression?: boolean;
+      enableCodeSplitting?: boolean
+      enableTreeShaking?: boolean
+      enableCompression?: boolean
     } = {},
   ): {
-    chunks: any[];
-    assets: any[];
-    optimization: any;
+    chunks: any[]
+    assets: any[]
+    optimization: any
   } {
     const config = {
       enableCodeSplitting:
@@ -664,23 +664,23 @@ export class PerformanceOptimizer {
       enableCompression:
         options.enableCompression ??
         this.config.frontend.bundle.enableCompression,
-    };
+    }
 
     return {
       chunks: [],
       assets: [],
       optimization: config,
-    };
+    }
   }
 
   /**
    * Monitor performance metrics
    */
   async monitorPerformance(): Promise<{
-    apiLatency: number;
-    databaseLatency: number;
-    cacheHitRate: number;
-    errorRate: number;
+    apiLatency: number
+    databaseLatency: number
+    cacheHitRate: number
+    errorRate: number
   }> {
     // Implementation would collect actual metrics
     return {
@@ -688,29 +688,29 @@ export class PerformanceOptimizer {
       databaseLatency: 0,
       cacheHitRate: 0,
       errorRate: 0,
-    };
+    }
   }
 
   /**
    * Check if performance thresholds are met
    */
   checkPerformanceThresholds(metrics: {
-    apiLatency: number;
-    databaseLatency: number;
-    cacheHitRate: number;
-    errorRate: number;
+    apiLatency: number
+    databaseLatency: number
+    cacheHitRate: number
+    errorRate: number
   }): {
-    passed: boolean;
-    violations: string[];
+    passed: boolean
+    violations: string[]
   } {
-    const violations: string[] = [];
+    const violations: string[] = []
 
     if (
       metrics.apiLatency > this.config.monitoring.thresholds.apiResponseTime
     ) {
       violations.push(
         `API latency ${metrics.apiLatency}ms exceeds threshold ${this.config.monitoring.thresholds.apiResponseTime}ms`,
-      );
+      )
     }
 
     if (
@@ -719,39 +719,39 @@ export class PerformanceOptimizer {
     ) {
       violations.push(
         `Database latency ${metrics.databaseLatency}ms exceeds threshold ${this.config.monitoring.thresholds.databaseQueryTime}ms`,
-      );
+      )
     }
 
     if (metrics.cacheHitRate < this.config.monitoring.thresholds.cacheHitRate) {
       violations.push(
         `Cache hit rate ${metrics.cacheHitRate} below threshold ${this.config.monitoring.thresholds.cacheHitRate}`,
-      );
+      )
     }
 
     if (metrics.errorRate > this.config.monitoring.thresholds.errorRate) {
       violations.push(
         `Error rate ${metrics.errorRate} exceeds threshold ${this.config.monitoring.thresholds.errorRate}`,
-      );
+      )
     }
 
     return {
       passed: violations.length === 0,
       violations,
-    };
+    }
   }
 }
 
 // Export singleton instance
-export const performanceOptimizer = new PerformanceOptimizer();
+export const performanceOptimizer = new PerformanceOptimizer()
 
 /**
  * Performance monitoring service
  */
 export class PerformanceMonitoringService {
-  private config: PerformanceConfig;
+  private config: PerformanceConfig
 
   constructor() {
-    this.config = getPerformanceConfig();
+    this.config = getPerformanceConfig()
   }
 
   /**
@@ -759,14 +759,14 @@ export class PerformanceMonitoringService {
    */
   start(): void {
     if (!this.config.monitoring.enabled) {
-      logger.info("Performance monitoring is disabled");
-      return;
+      logger.info('Performance monitoring is disabled')
+      return
     }
 
-    logger.info("Starting performance monitoring service");
+    logger.info('Starting performance monitoring service')
 
     // Set up monitoring intervals
-    this.setupMonitoringIntervals();
+    this.setupMonitoringIntervals()
   }
 
   /**
@@ -775,13 +775,13 @@ export class PerformanceMonitoringService {
   private setupMonitoringIntervals(): void {
     // Monitor every 30 seconds
     setInterval(() => {
-      this.collectMetrics();
-    }, 30000);
+      this.collectMetrics()
+    }, 30000)
 
     // Report every 5 minutes
     setInterval(() => {
-      this.reportMetrics();
-    }, 300000);
+      this.reportMetrics()
+    }, 300000)
   }
 
   /**
@@ -789,22 +789,22 @@ export class PerformanceMonitoringService {
    */
   private async collectMetrics(): Promise<void> {
     try {
-      const metrics = await performanceOptimizer.monitorPerformance();
+      const metrics = await performanceOptimizer.monitorPerformance()
       const thresholdCheck =
-        performanceOptimizer.checkPerformanceThresholds(metrics);
+        performanceOptimizer.checkPerformanceThresholds(metrics)
 
       if (!thresholdCheck.passed) {
-        logger.warn("Performance thresholds violated", {
+        logger.warn('Performance thresholds violated', {
           violations: thresholdCheck.violations,
-        });
+        })
 
         // Send alerts if enabled
         if (this.config.monitoring.alerting.enabled) {
-          await this.sendAlerts(thresholdCheck.violations);
+          await this.sendAlerts(thresholdCheck.violations)
         }
       }
     } catch (error) {
-      logger.error("Failed to collect performance metrics", { error });
+      logger.error('Failed to collect performance metrics', { error })
     }
   }
 
@@ -813,7 +813,7 @@ export class PerformanceMonitoringService {
    */
   private async reportMetrics(): Promise<void> {
     // Implementation would send metrics to external service
-    logger.info("Performance metrics reported");
+    logger.info('Performance metrics reported')
   }
 
   /**
@@ -821,13 +821,13 @@ export class PerformanceMonitoringService {
    */
   private async sendAlerts(violations: string[]): Promise<void> {
     // Implementation would send alerts via configured channels
-    logger.info("Performance alerts sent", { violations });
+    logger.info('Performance alerts sent', { violations })
   }
 }
 
 // Export monitoring service
-export const performanceMonitoring = new PerformanceMonitoringService();
+export const performanceMonitoring = new PerformanceMonitoringService()
 
 // Logger instance
-import { getLogger } from "@/lib/logging";
-const logger = getLogger("performance-config");
+import { getLogger } from '@/lib/logging'
+const logger = getLogger('performance-config')

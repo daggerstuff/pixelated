@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
 interface Message {
   /** The message to be announced */
-  message: string;
+  message: string
   /** Whether to use assertive or polite announcement */
-  assertive?: boolean;
+  assertive?: boolean
   /** Delay in milliseconds before clearing the message */
-  clearDelay?: number;
+  clearDelay?: number
 }
 
 /**
@@ -22,36 +22,36 @@ export function AccessibilityAnnouncer({
   assertive = false,
   clearDelay = 1000,
 }: Message) {
-  const [currentMessage, setCurrentMessage] = useState("");
+  const [currentMessage, setCurrentMessage] = useState('')
 
   useEffect(() => {
     if (message) {
-      setCurrentMessage(message);
+      setCurrentMessage(message)
       if (clearDelay > 0) {
         const timer = setTimeout(() => {
-          setCurrentMessage("");
-        }, clearDelay);
-        return () => clearTimeout(timer);
+          setCurrentMessage('')
+        }, clearDelay)
+        return () => clearTimeout(timer)
       }
       // If clearDelay is 0 or less, immediately clear the message for accessibility.
       // This ensures screen readers do not announce stale or empty messages.
       // See: https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19 for best practices.
     } else {
-      setCurrentMessage(""); // Immediately clear message for accessibility when clearDelay <= 0
+      setCurrentMessage('') // Immediately clear message for accessibility when clearDelay <= 0
     }
     // Implicitly returns undefined if no timer was set, which is valid for useEffect cleanup.
-  }, [message, clearDelay]);
+  }, [message, clearDelay])
 
   return (
     <div
       role="status"
-      aria-live={assertive ? "assertive" : "polite"}
+      aria-live={assertive ? 'assertive' : 'polite'}
       aria-atomic="true"
       className="sr-only"
     >
       {currentMessage}
     </div>
-  );
+  )
 }
 
 /**
@@ -62,28 +62,28 @@ export function announceToScreenReader(
   message: string,
   options: { assertive?: boolean; clearDelay?: number } = {},
 ) {
-  const { assertive = false, clearDelay = 1000 } = options;
+  const { assertive = false, clearDelay = 1000 } = options
 
   // Create a temporary element for the announcemen
-  const announcer = document.createElement("div");
-  announcer.className = "sr-only";
-  announcer.setAttribute("aria-live", assertive ? "assertive" : "polite");
-  announcer.setAttribute("aria-atomic", "true");
+  const announcer = document.createElement('div')
+  announcer.className = 'sr-only'
+  announcer.setAttribute('aria-live', assertive ? 'assertive' : 'polite')
+  announcer.setAttribute('aria-atomic', 'true')
 
   // Add to DOM
-  document.body.appendChild(announcer);
+  document.body.appendChild(announcer)
 
   // Set the message (slight delay to ensure screen readers pick it up)
   setTimeout(() => {
-    announcer.textContent = message;
-  }, 50);
+    announcer.textContent = message
+  }, 50)
 
   // Remove after the specified delay
   setTimeout(() => {
     if (document.body.contains(announcer)) {
-      document.body.removeChild(announcer);
+      document.body.removeChild(announcer)
     }
-  }, clearDelay + 100);
+  }, clearDelay + 100)
 }
 
 /**
@@ -94,17 +94,17 @@ export function announceToScreenReader(
  * @param {number} [message.clearDelay] - Delay before clearing in milliseconds
  */
 export function announce(message: Message) {
-  const { assertive = false, clearDelay = 1000 } = message;
+  const { assertive = false, clearDelay = 1000 } = message
   const element = document.getElementById(
-    assertive ? "assertive-announce" : "polite-announce",
-  );
+    assertive ? 'assertive-announce' : 'polite-announce',
+  )
 
   if (element) {
-    element.textContent = message.message;
+    element.textContent = message.message
     if (clearDelay > 0) {
       setTimeout(() => {
-        element.textContent = "";
-      }, clearDelay);
+        element.textContent = ''
+      }, clearDelay)
     }
   }
 }

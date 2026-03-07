@@ -2,23 +2,23 @@
  * Locks the scroll position of the document.
  */
 export function lockScroll() {
-  const bodyEl = document.body;
+  const bodyEl = document.body
 
-  const scrollbarWidth = window.innerWidth - bodyEl.clientWidth;
-  const hasRose = document.getElementById("bg-rose");
+  const scrollbarWidth = window.innerWidth - bodyEl.clientWidth
+  const hasRose = document.getElementById('bg-rose')
   if (scrollbarWidth > 0 && !hasRose)
-    bodyEl.style.paddingRight = `${scrollbarWidth}px`;
-  bodyEl.style.overflow = "hidden";
+    bodyEl.style.paddingRight = `${scrollbarWidth}px`
+  bodyEl.style.overflow = 'hidden'
 }
 
 /**
  * Unlocks the scroll position of the document.
  */
 export function unlockScroll() {
-  const bodyEl = document.body;
+  const bodyEl = document.body
 
-  bodyEl.style.removeProperty("overflow");
-  bodyEl.style.removeProperty("padding-right");
+  bodyEl.style.removeProperty('overflow')
+  bodyEl.style.removeProperty('padding-right')
 }
 
 /**
@@ -28,37 +28,37 @@ export function unlockScroll() {
 export function toggleFadeEffect(
   elementId: string,
   visible: boolean,
-  hiddenClass: string,
+  hiddenClass: string
 ) {
-  const element = document.getElementById(elementId);
-  if (!element) return;
+  const element = document.getElementById(elementId)
+  if (!element) return
 
   if (visible) {
-    element.classList.remove(hiddenClass);
-    if (elementId === "backdrop") lockScroll();
+    element.classList.remove(hiddenClass)
+    if (elementId === 'backdrop') lockScroll()
     // if (elementId === 'backdrop') document.body.style.overflow = 'hidden'
     // if (elementId === 'backdrop') document.documentElement.style.overflow = 'hidden'
-    if (window.matchMedia("(prefers-reduced-motion)").matches) return;
-    element.classList.add("fade-in");
+    if (window.matchMedia('(prefers-reduced-motion)').matches) return
+    element.classList.add('fade-in')
   } else {
-    if (window.matchMedia("(prefers-reduced-motion)").matches) {
-      element.classList.add(hiddenClass);
-      if (elementId === "backdrop") unlockScroll();
+    if (window.matchMedia('(prefers-reduced-motion)').matches) {
+      element.classList.add(hiddenClass)
+      if (elementId === 'backdrop') unlockScroll()
       // if (elementId === 'backdrop') document.body.style.overflow = ''
       // if (elementId === 'backdrop') document.documentElement.style.overflow = ''
-      return;
+      return
     }
-    element.classList.add("fade-out");
+    element.classList.add('fade-out')
     element.addEventListener(
-      "animationend",
+      'animationend',
       () => {
-        element.classList.remove("fade-in", "fade-out");
-        element.classList.add(hiddenClass);
-        if (elementId === "backdrop") unlockScroll();
+        element.classList.remove('fade-in', 'fade-out')
+        element.classList.add(hiddenClass)
+        if (elementId === 'backdrop') unlockScroll()
         // if (elementId === 'backdrop') document.body.style.overflow = ''
         // if (elementId === 'backdrop') document.documentElement.style.overflow = ''
       },
-      { once: true },
-    );
+      { once: true }
+    )
   }
 }

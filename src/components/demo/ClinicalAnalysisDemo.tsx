@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Badge } from '@/components/ui/badge'
+import { Textarea } from '@/components/ui/textarea'
+import { Progress } from '@/components/ui/progress'
 import {
   Brain,
   AlertTriangle,
@@ -16,62 +16,62 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-} from "lucide-react";
+} from 'lucide-react'
 
 interface RiskAssessment {
-  level: "low" | "moderate" | "high" | "critical";
-  score: number;
-  factors: string[];
-  recommendations: string[];
-  immediateActions?: string[];
+  level: 'low' | 'moderate' | 'high' | 'critical'
+  score: number
+  factors: string[]
+  recommendations: string[]
+  immediateActions?: string[]
 }
 
 interface Recommendation {
-  type: "intervention" | "assessment" | "referral" | "monitoring";
-  priority: "low" | "medium" | "high" | "urgent";
-  description: string;
-  rationale: string;
-  timeline: string;
+  type: 'intervention' | 'assessment' | 'referral' | 'monitoring'
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  description: string
+  rationale: string
+  timeline: string
 }
 
 interface AnalysisResult {
-  overallRisk: RiskAssessment;
+  overallRisk: RiskAssessment
   mentalHealthIndicators: {
-    name: string;
-    present: boolean;
-    confidence: number;
-    severity?: number;
-    notes?: string;
-  }[];
-  recommendations: Recommendation[];
-  clinicalSummary: string;
-  followUpRequired: boolean;
-  estimatedDuration: string;
-  confidence: number;
-  processingTime: number;
+    name: string
+    present: boolean
+    confidence: number
+    severity?: number
+    notes?: string
+  }[]
+  recommendations: Recommendation[]
+  clinicalSummary: string
+  followUpRequired: boolean
+  estimatedDuration: string
+  confidence: number
+  processingTime: number
 }
 
 export default function ClinicalAnalysisDemo() {
-  const [inputText, setInputText] = useState("");
-  const [analyzing, setAnalyzing] = useState(false);
-  const [results, setResults] = useState<AnalysisResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [inputText, setInputText] = useState('')
+  const [analyzing, setAnalyzing] = useState(false)
+  const [results, setResults] = useState<AnalysisResult | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const performAnalysis = async () => {
     if (!inputText.trim()) {
-      setError("Please enter clinical content to analyze");
-      return;
+      setError('Please enter clinical content to analyze')
+      return
     }
 
-    setAnalyzing(true);
-    setError(null);
-    setResults(null);
+    setAnalyzing(true)
+    setError(null)
+    setResults(null)
 
     try {
-      const response = await fetch("/api/psychology/analyze", {
-        method: "POST",
+      const response = await fetch('/api/psychology/analyze', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           content: inputText,
@@ -79,17 +79,17 @@ export default function ClinicalAnalysisDemo() {
             includeRiskAssessment: true,
             includeRecommendations: true,
             includeInterventions: true,
-            analysisDepth: "comprehensive",
+            analysisDepth: 'comprehensive',
             confidenceThreshold: 0.6,
           },
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.status}`);
+        throw new Error(`Analysis failed: ${response.status}`)
       }
 
-      const apiResult = await response.json();
+      const apiResult = await response.json()
 
       // Transform API response to match our interface
       const analysisResult: AnalysisResult = {
@@ -102,11 +102,11 @@ export default function ClinicalAnalysisDemo() {
         },
         mentalHealthIndicators: apiResult.indicators.map(
           (indicator: {
-            condition: string;
-            present: boolean;
-            confidence: number;
-            severity: number;
-            notes: string;
+            condition: string
+            present: boolean
+            confidence: number
+            severity: number
+            notes: string
           }) => ({
             name: indicator.condition,
             present: indicator.present,
@@ -117,11 +117,11 @@ export default function ClinicalAnalysisDemo() {
         ),
         recommendations: apiResult.recommendations.map(
           (rec: {
-            type: string;
-            priority: string;
-            intervention: string;
-            rationale: string;
-            timeline: string;
+            type: string
+            priority: string
+            intervention: string
+            rationale: string
+            timeline: string
           }) => ({
             type: rec.type,
             priority: rec.priority,
@@ -135,138 +135,138 @@ export default function ClinicalAnalysisDemo() {
         estimatedDuration: apiResult.analysis.estimatedDuration,
         confidence: apiResult.analysis.overallConfidence,
         processingTime: apiResult.metadata.processingTime,
-      };
+      }
 
-      setResults(analysisResult);
+      setResults(analysisResult)
     } catch (error: unknown) {
-      console.error("Clinical analysis failed:", error);
-      setError("Analysis failed. Please try again.");
+      console.error('Clinical analysis failed:', error)
+      setError('Analysis failed. Please try again.')
 
       // Fallback to demo data for demonstration
       const demoResults: AnalysisResult = {
         overallRisk: {
-          level: "moderate",
+          level: 'moderate',
           score: 0.65,
           factors: [
-            "Sleep disturbances reported",
-            "Persistent worry patterns",
-            "Functional impairment in work/social areas",
-            "Duration of symptoms > 6 months",
+            'Sleep disturbances reported',
+            'Persistent worry patterns',
+            'Functional impairment in work/social areas',
+            'Duration of symptoms > 6 months',
           ],
           recommendations: [
-            "Monitor closely for escalation",
-            "Consider therapeutic intervention",
-            "Assess for concurrent conditions",
-            "Evaluate support system strength",
+            'Monitor closely for escalation',
+            'Consider therapeutic intervention',
+            'Assess for concurrent conditions',
+            'Evaluate support system strength',
           ],
         },
         mentalHealthIndicators: [
           {
-            name: "Generalized Anxiety Disorder",
+            name: 'Generalized Anxiety Disorder',
             present: true,
             confidence: 0.85,
             severity: 6,
-            notes: "Strong indicators present",
+            notes: 'Strong indicators present',
           },
           {
-            name: "Major Depressive Episode",
+            name: 'Major Depressive Episode',
             present: false,
             confidence: 0.25,
-            notes: "Some overlapping symptoms but insufficient criteria",
+            notes: 'Some overlapping symptoms but insufficient criteria',
           },
           {
-            name: "Sleep Disorder",
+            name: 'Sleep Disorder',
             present: true,
             confidence: 0.72,
             severity: 5,
-            notes: "Secondary to anxiety symptoms",
+            notes: 'Secondary to anxiety symptoms',
           },
           {
-            name: "Panic Disorder",
+            name: 'Panic Disorder',
             present: false,
             confidence: 0.15,
-            notes: "No discrete panic attacks reported",
+            notes: 'No discrete panic attacks reported',
           },
         ],
         recommendations: [
           {
-            type: "intervention",
-            priority: "high",
+            type: 'intervention',
+            priority: 'high',
             description:
-              "Cognitive Behavioral Therapy (CBT) for anxiety management",
+              'Cognitive Behavioral Therapy (CBT) for anxiety management',
             rationale:
-              "Evidence-based treatment for GAD with strong efficacy data",
-            timeline: "12-16 weeks",
+              'Evidence-based treatment for GAD with strong efficacy data',
+            timeline: '12-16 weeks',
           },
           {
-            type: "assessment",
-            priority: "medium",
-            description: "Comprehensive sleep study evaluation",
-            rationale: "Sleep disturbances may require targeted intervention",
-            timeline: "2-3 weeks",
+            type: 'assessment',
+            priority: 'medium',
+            description: 'Comprehensive sleep study evaluation',
+            rationale: 'Sleep disturbances may require targeted intervention',
+            timeline: '2-3 weeks',
           },
           {
-            type: "monitoring",
-            priority: "medium",
-            description: "Weekly symptom tracking and check-ins",
-            rationale: "Monitor treatment progress and symptom trajectory",
-            timeline: "Ongoing during treatment",
+            type: 'monitoring',
+            priority: 'medium',
+            description: 'Weekly symptom tracking and check-ins',
+            rationale: 'Monitor treatment progress and symptom trajectory',
+            timeline: 'Ongoing during treatment',
           },
         ],
         clinicalSummary:
-          "Client presents with symptoms consistent with Generalized Anxiety Disorder, characterized by excessive worry, sleep disturbances, and functional impairment. Symptoms have persisted for 6+ months and are causing significant distress. Cognitive-behavioral interventions are recommended as first-line treatment.",
+          'Client presents with symptoms consistent with Generalized Anxiety Disorder, characterized by excessive worry, sleep disturbances, and functional impairment. Symptoms have persisted for 6+ months and are causing significant distress. Cognitive-behavioral interventions are recommended as first-line treatment.',
         followUpRequired: true,
-        estimatedDuration: "12-16 weeks for initial treatment phase",
+        estimatedDuration: '12-16 weeks for initial treatment phase',
         confidence: 0.82,
         processingTime: 1.3,
-      };
+      }
 
       setTimeout(() => {
-        setResults(demoResults);
-        setError(null);
-      }, 2000);
+        setResults(demoResults)
+        setError(null)
+      }, 2000)
     } finally {
-      setAnalyzing(false);
+      setAnalyzing(false)
     }
-  };
+  }
 
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "moderate":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "high":
-        return "bg-orange-100 text-orange-800 border-orange-200";
-      case "critical":
-        return "bg-red-100 text-red-800 border-red-200";
+      case 'low':
+        return 'bg-green-100 text-green-800 border-green-200'
+      case 'moderate':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'high':
+        return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'critical':
+        return 'bg-red-100 text-red-800 border-red-200'
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case "urgent":
-        return <AlertTriangle className="w-4 h-4 text-red-600" />;
-      case "high":
-        return <AlertCircle className="w-4 h-4 text-orange-600" />;
-      case "medium":
-        return <Clock className="w-4 h-4 text-yellow-600" />;
-      case "low":
-        return <CheckCircle className="w-4 h-4 text-green-600" />;
+      case 'urgent':
+        return <AlertTriangle className="w-4 h-4 text-red-600" />
+      case 'high':
+        return <AlertCircle className="w-4 h-4 text-orange-600" />
+      case 'medium':
+        return <Clock className="w-4 h-4 text-yellow-600" />
+      case 'low':
+        return <CheckCircle className="w-4 h-4 text-green-600" />
       default:
-        return <Clock className="w-4 h-4 text-gray-600" />;
+        return <Clock className="w-4 h-4 text-gray-600" />
     }
-  };
+  }
 
   const getIndicatorIcon = (present: boolean, confidence: number) => {
     if (present && confidence > 0.7)
-      return <CheckCircle className="w-4 h-4 text-green-600" />;
+      return <CheckCircle className="w-4 h-4 text-green-600" />
     if (present && confidence > 0.5)
-      return <AlertCircle className="w-4 h-4 text-yellow-600" />;
-    return <XCircle className="w-4 h-4 text-gray-400" />;
-  };
+      return <AlertCircle className="w-4 h-4 text-yellow-600" />
+    return <XCircle className="w-4 h-4 text-gray-400" />
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-6">
@@ -482,10 +482,10 @@ export default function ClinicalAnalysisDemo() {
                           key={indicator.name}
                           className={`border-l-4 ${
                             indicator.present && indicator.confidence > 0.7
-                              ? "border-l-green-500"
+                              ? 'border-l-green-500'
                               : indicator.present
-                                ? "border-l-yellow-500"
-                                : "border-l-gray-300"
+                                ? 'border-l-yellow-500'
+                                : 'border-l-gray-300'
                           }`}
                         >
                           <CardContent className="p-4">
@@ -553,13 +553,13 @@ export default function ClinicalAnalysisDemo() {
                                   <Badge
                                     variant="outline"
                                     className={`text-xs ${
-                                      rec.priority === "urgent"
-                                        ? "border-red-200 text-red-700"
-                                        : rec.priority === "high"
-                                          ? "border-orange-200 text-orange-700"
-                                          : rec.priority === "medium"
-                                            ? "border-yellow-200 text-yellow-700"
-                                            : "border-green-200 text-green-700"
+                                      rec.priority === 'urgent'
+                                        ? 'border-red-200 text-red-700'
+                                        : rec.priority === 'high'
+                                          ? 'border-orange-200 text-orange-700'
+                                          : rec.priority === 'medium'
+                                            ? 'border-yellow-200 text-yellow-700'
+                                            : 'border-green-200 text-green-700'
                                     }`}
                                   >
                                     {rec.priority} priority
@@ -638,5 +638,5 @@ export default function ClinicalAnalysisDemo() {
         </div>
       )}
     </div>
-  );
+  )
 }

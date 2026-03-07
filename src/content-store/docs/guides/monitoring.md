@@ -68,7 +68,6 @@ To enable production health checks, configure the `APP_URL` variable:
    - `https://yourdomain.com`
 
 **Note**: If you see HTTP 522 errors, this typically means:
-
 - The site is not actually deployed to a server
 - DNS is not correctly configured
 - Cloudflare settings don't match your hosting provider

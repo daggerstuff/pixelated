@@ -1,35 +1,35 @@
-import type { APIRoute } from "astro";
+import type { APIRoute } from 'astro'
 import {
   prepareAllFormats,
   prepareForOpenAI,
   prepareForHuggingFace,
   preparedDatasetsExist,
   type DatasetPaths,
-} from "../../../../lib/ai/datasets/prepare-fine-tuning";
-import { mergedDatasetExists } from "../../../../lib/ai/datasets/merge-datasets";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-const logger = createBuildSafeLogger("dataset-prepare");
+} from '../../../../lib/ai/datasets/prepare-fine-tuning'
+import { mergedDatasetExists } from '../../../../lib/ai/datasets/merge-datasets'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger('dataset-prepare')
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Check request authentication (implement proper auth here)
-    const authHeader = request.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Unauthorized",
+          error: 'Unauthorized',
         }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Parse request body
-    const body = await request.json();
-    const { format = "all", force = false } = body;
+    const body = await request.json()
+    const { format = 'all', force = false } = body
 
     // Check if merged dataset exists
     if (!mergedDatasetExists()) {
@@ -37,52 +37,52 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error:
-            "Merged dataset not found. Run the dataset merge process first.",
+            'Merged dataset not found. Run the dataset merge process first.',
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Check if prepared datasets already exist and force is not enabled
-    const existingDatasets = preparedDatasetsExist();
+    const existingDatasets = preparedDatasetsExist()
     if (
       !force &&
-      ((format === "all" &&
+      ((format === 'all' &&
         existingDatasets.openai &&
         existingDatasets.huggingface) ||
-        (format === "openai" && existingDatasets.openai) ||
-        (format === "huggingface" && existingDatasets.huggingface))
+        (format === 'openai' && existingDatasets.openai) ||
+        (format === 'huggingface' && existingDatasets.huggingface))
     ) {
       return new Response(
         JSON.stringify({
           success: false,
           error:
-            "Prepared datasets already exist. Use force: true to recreate.",
+            'Prepared datasets already exist. Use force: true to recreate.',
           existingDatasets,
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Prepare datasets based on the requested format
-    let result: DatasetPaths | null = null;
-    if (format === "all") {
+    let result: DatasetPaths | null = null
+    if (format === 'all') {
       // sourcery skip: dont-self-assign-variables
-      result = await prepareAllFormats();
-    } else if (format === "openai") {
-      const openaiPath = await prepareForOpenAI();
+      result = await prepareAllFormats()
+    } else if (format === 'openai') {
+      const openaiPath = await prepareForOpenAI()
       // sourcery skip: dont-self-assign-variables
-      result = { openai: openaiPath, huggingface: null };
-    } else if (format === "huggingface") {
-      const huggingfacePath = await prepareForHuggingFace();
+      result = { openai: openaiPath, huggingface: null }
+    } else if (format === 'huggingface') {
+      const huggingfacePath = await prepareForHuggingFace()
       // sourcery skip: dont-self-assign-variables
-      result = { openai: null, huggingface: huggingfacePath };
+      result = { openai: null, huggingface: huggingfacePath }
     } else {
       return new Response(
         JSON.stringify({
@@ -91,65 +91,65 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Check if preparation was successful
     if (
       !result ||
-      (format === "all" && (!result.openai || !result.huggingface)) ||
-      (format === "openai" && !result.openai) ||
-      (format === "huggingface" && !result.huggingface)
+      (format === 'all' && (!result.openai || !result.huggingface)) ||
+      (format === 'openai' && !result.openai) ||
+      (format === 'huggingface' && !result.huggingface)
     ) {
-      logger.error("Dataset preparation failed via API call");
+      logger.error('Dataset preparation failed via API call')
       return new Response(
         JSON.stringify({
           success: false,
-          error: "Failed to prepare datasets. Check server logs for details.",
+          error: 'Failed to prepare datasets. Check server logs for details.',
         }),
         {
           status: 500,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Return success response with paths
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Datasets prepared successfully",
+        message: 'Datasets prepared successfully',
         openai: result.openai,
         huggingface: result.huggingface,
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logger.error(`Error in dataset preparation API: ${error}`);
+    logger.error(`Error in dataset preparation API: ${error}`)
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "An unexpected error occurred",
+        error: 'An unexpected error occurred',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-};
+}
 
 // Also allow GET to check dataset preparation status
 export const GET: APIRoute = async () => {
   try {
-    const preparedStatus = preparedDatasetsExist();
-    const mergedExists = mergedDatasetExists();
+    const preparedStatus = preparedDatasetsExist()
+    const mergedExists = mergedDatasetExists()
 
     return new Response(
       JSON.stringify({
@@ -158,21 +158,21 @@ export const GET: APIRoute = async () => {
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   } catch (error: unknown) {
-    logger.error(`Error in dataset preparation status API: ${error}`);
+    logger.error(`Error in dataset preparation status API: ${error}`)
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "An unexpected error occurred",
+        error: 'An unexpected error occurred',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-};
+}

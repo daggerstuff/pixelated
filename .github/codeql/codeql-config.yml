@@ -1,4 +1,4 @@
-name: "Pixelated Empathy Security Analysis"
+name: 'Pixelated Empathy Security Analysis'
 
 # Keep default queries enabled
 disable-default-queries: false
@@ -20,26 +20,26 @@ paths:
 
 # Exclude generated code, dependencies, and test files
 paths-ignore:
-  - "**/node_modules"
-  - "**/dist"
-  - "**/build"
-  - "**/.next"
-  - "**/.astro"
-  - "**/test"
-  - "**/tests"
-  - "**/__tests__"
-  - "**/spec"
-  - "**/mocks"
-  - "**/__mocks__"
-  - "**/*.test.*"
-  - "**/*.spec.*"
-  - "**/coverage"
-  - "**/.venv"
-  - "**/venv"
-  - "**/site-packages"
-  - "**/__pycache__"
-  - "**/*.pyc"
-  - "**/playwright-report"
-  - "**/test-results"
+  - '**/node_modules'
+  - '**/dist'
+  - '**/build'
+  - '**/.next'
+  - '**/.astro'
+  - '**/test'
+  - '**/tests'
+  - '**/__tests__'
+  - '**/spec'
+  - '**/mocks'
+  - '**/__mocks__'
+  - '**/*.test.*'
+  - '**/*.spec.*'
+  - '**/coverage'
+  - '**/.venv'
+  - '**/venv'
+  - '**/site-packages'
+  - '**/__pycache__'
+  - '**/*.pyc'
+  - '**/playwright-report'
+  - '**/test-results'
 
 # Custom queries are loaded in the workflow to avoid initialization conflicts

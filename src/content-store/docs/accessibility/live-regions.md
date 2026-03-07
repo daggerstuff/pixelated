@@ -1,9 +1,9 @@
 ---
-title: "Live Region System"
-description: "Live Region System documentation"
+title: 'Live Region System'
+description: 'Live Region System documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -129,10 +129,10 @@ function handleFormSubmission() {
 The global `window.LiveRegionSystem` object provides these methods:
 
 ```ts
-window.LiveRegionSystem.announceStatus(message, (clearDelay = 5000));
-window.LiveRegionSystem.announceAlert(message, (clearDelay = 7000));
-window.LiveRegionSystem.log(message, (clear = false));
-window.LiveRegionSystem.announceProgress(value, max, label);
+window.LiveRegionSystem.announceStatus(message, (clearDelay = 5000))
+window.LiveRegionSystem.announceAlert(message, (clearDelay = 7000))
+window.LiveRegionSystem.log(message, (clear = false))
+window.LiveRegionSystem.announceProgress(value, max, label)
 ```
 
 ### React Context API
@@ -187,15 +187,15 @@ announceProgress(value, max, label)
 
 ```tsx
 function handleSubmit(e) {
-  e.preventDefault();
+  e.preventDefault()
 
   if (!isValid) {
-    announceAlert("Form has 3 errors. Please correct the highlighted fields.");
+    announceAlert('Form has 3 errors. Please correct the highlighted fields.')
   } else {
-    announceStatus("Submitting form...");
+    announceStatus('Submitting form...')
 
     // After submission completes
-    announceStatus("Form submitted successfully");
+    announceStatus('Form submitted successfully')
   }
 }
 ```
@@ -204,10 +204,10 @@ function handleSubmit(e) {
 
 ```tsx
 function refreshData() {
-  announceStatus("Refreshing data...");
+  announceStatus('Refreshing data...')
 
   // After data loads
-  announceStatus("Data updated. 5 new items available.");
+  announceStatus('Data updated. 5 new items available.')
 }
 ```
 
@@ -215,16 +215,16 @@ function refreshData() {
 
 ```tsx
 function startDownload() {
-  let progress = 0;
+  let progress = 0
 
   const interval = setInterval(() => {
-    progress += 10;
-    announceProgress(progress, 100, "Downloading file");
+    progress += 10
+    announceProgress(progress, 100, 'Downloading file')
 
     if (progress >= 100) {
-      clearInterval(interval);
-      announceStatus("Download complete");
+      clearInterval(interval)
+      announceStatus('Download complete')
     }
-  }, 500);
+  }, 500)
 }
 ```

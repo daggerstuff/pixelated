@@ -8,47 +8,47 @@ import {
   AlignmentEvaluationResult,
   AlignmentMetrics,
   ObjectiveDefinition,
-} from "../core/objectives";
-import { MetaAlignerAPI } from "../api/alignment-api";
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+} from '../core/objectives'
+import { MetaAlignerAPI } from '../api/alignment-api'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("enhancement-pipeline");
+const logger = createBuildSafeLogger('enhancement-pipeline')
 
 export interface EnhancementPipelineConfig {
-  enableBatchProcessing?: boolean;
-  enableStreaming?: boolean;
-  maxRetries?: number;
-  retryDelayMs?: number;
-  objectiveIds?: string[];
-  enhancementThreshold?: number;
+  enableBatchProcessing?: boolean
+  enableStreaming?: boolean
+  maxRetries?: number
+  retryDelayMs?: number
+  objectiveIds?: string[]
+  enhancementThreshold?: number
 }
 
 export interface PipelineInput {
-  response: string;
-  context: AlignmentContext;
-  objectives?: ObjectiveDefinition[];
+  response: string
+  context: AlignmentContext
+  objectives?: ObjectiveDefinition[]
 }
 
 export interface PipelineOutput {
-  enhancedResponse: string;
-  originalResponse: string;
-  improvements: AlignmentImprovement[];
+  enhancedResponse: string
+  originalResponse: string
+  improvements: AlignmentImprovement[]
   metrics: {
-    original: AlignmentMetrics;
-    enhanced: AlignmentMetrics;
-  };
+    original: AlignmentMetrics
+    enhanced: AlignmentMetrics
+  }
   processingInfo: {
-    attempts: number;
-    durationMs: number;
-    enhanced: boolean;
-  };
+    attempts: number
+    durationMs: number
+    enhanced: boolean
+  }
 }
 
 export interface AlignmentImprovement {
-  objectiveId: string;
-  objectiveName: string;
-  scoreImprovement: number;
-  explanation: string;
+  objectiveId: string
+  objectiveName: string
+  scoreImprovement: number
+  explanation: string
 }
 
 /**
@@ -56,8 +56,8 @@ export interface AlignmentImprovement {
  * Enhances LLM responses to better align with mental health objectives
  */
 export class EnhancementPipeline {
-  private config: EnhancementPipelineConfig;
-  private metaAligner: MetaAlignerAPI;
+  private config: EnhancementPipelineConfig
+  private metaAligner: MetaAlignerAPI
 
   constructor(
     config: EnhancementPipelineConfig = {},
@@ -70,7 +70,7 @@ export class EnhancementPipeline {
       retryDelayMs: 1000,
       enhancementThreshold: 0.7,
       ...config,
-    };
+    }
 
     // Use provided MetaAlignerAPI or create a new one
     this.metaAligner =
@@ -79,26 +79,26 @@ export class EnhancementPipeline {
         enableResponseEnhancement: true,
         enhancementThreshold: this.config.enhancementThreshold,
         maxEnhancementAttempts: this.config.maxRetries,
-      });
+      })
 
-    logger.info("EnhancementPipeline initialized", {
+    logger.info('EnhancementPipeline initialized', {
       config: this.config,
-      action: "initialize",
-    });
+      action: 'initialize',
+    })
   }
 
   /**
    * Process a single response through the enhancement pipeline
    */
   async process(input: PipelineInput): Promise<PipelineOutput> {
-    const startTime = Date.now();
-    const { response, context, objectives } = input;
+    const startTime = Date.now()
+    const { response, context, objectives } = input
 
-    logger.info("Starting enhancement pipeline", {
+    logger.info('Starting enhancement pipeline', {
       responseLength: response.length,
       contextType: context.detectedContext,
-      action: "process_start",
-    });
+      action: 'process_start',
+    })
 
     try {
       // Initial evaluation
@@ -106,19 +106,19 @@ export class EnhancementPipeline {
         response,
         context,
         objectives,
-      });
+      })
 
       // Check if enhancement is needed
       const needsEnhancement =
         initialEvaluation.overallScore <
-        (this.config.enhancementThreshold || 0.7);
+        (this.config.enhancementThreshold || 0.7)
 
       if (!needsEnhancement) {
-        logger.info("Response quality sufficient, skipping enhancement", {
+        logger.info('Response quality sufficient, skipping enhancement', {
           score: initialEvaluation.overallScore,
           threshold: this.config.enhancementThreshold,
-          action: "skip_enhancement",
-        });
+          action: 'skip_enhancement',
+        })
 
         return {
           enhancedResponse: response,
@@ -133,7 +133,7 @@ export class EnhancementPipeline {
             durationMs: Date.now() - startTime,
             enhanced: false,
           },
-        };
+        }
       }
 
       // Apply enhancements
@@ -142,30 +142,30 @@ export class EnhancementPipeline {
         initialEvaluation.evaluation,
         context,
         objectives,
-      );
+      )
 
       // Final evaluation of enhanced response
       const finalEvaluation = await this.metaAligner.evaluateResponse({
         response: enhancementResult.enhancedResponse,
         context,
         objectives,
-      });
+      })
 
       // Calculate improvements
       const improvements = this.calculateImprovements(
         initialEvaluation.evaluation,
         finalEvaluation.evaluation,
-      );
+      )
 
-      logger.info("Enhancement pipeline completed", {
+      logger.info('Enhancement pipeline completed', {
         originalScore: initialEvaluation.overallScore.toFixed(3),
         enhancedScore: finalEvaluation.overallScore.toFixed(3),
         improvement: (
           finalEvaluation.overallScore - initialEvaluation.overallScore
         ).toFixed(3),
         durationMs: Date.now() - startTime,
-        action: "process_complete",
-      });
+        action: 'process_complete',
+      })
 
       return {
         enhancedResponse: enhancementResult.enhancedResponse,
@@ -180,14 +180,14 @@ export class EnhancementPipeline {
           durationMs: Date.now() - startTime,
           enhanced: enhancementResult.enhanced,
         },
-      };
+      }
     } catch (error) {
-      logger.error("Enhancement pipeline failed", {
-        error: error instanceof Error ? error.message : "Unknown error",
-        action: "process_error",
-      });
+      logger.error('Enhancement pipeline failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        action: 'process_error',
+      })
 
-      throw error;
+      throw error
     }
   }
 
@@ -196,39 +196,39 @@ export class EnhancementPipeline {
    */
   async processBatch(inputs: PipelineInput[]): Promise<PipelineOutput[]> {
     if (!this.config.enableBatchProcessing) {
-      logger.warn("Batch processing not enabled, processing sequentially", {
-        action: "batch_warning",
-      });
+      logger.warn('Batch processing not enabled, processing sequentially', {
+        action: 'batch_warning',
+      })
     }
 
-    logger.info("Processing batch of responses", {
+    logger.info('Processing batch of responses', {
       count: inputs.length,
-      action: "batch_start",
-    });
+      action: 'batch_start',
+    })
 
-    const results: PipelineOutput[] = [];
+    const results: PipelineOutput[] = []
 
     for (const input of inputs) {
       try {
-        const result = await this.process(input);
-        results.push(result);
+        const result = await this.process(input)
+        results.push(result)
       } catch (error) {
-        logger.error("Batch item processing failed", {
-          error: error instanceof Error ? error.message : "Unknown error",
-          action: "batch_item_error",
-        });
+        logger.error('Batch item processing failed', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          action: 'batch_item_error',
+        })
 
         // Re-throw to maintain error behavior
-        throw error;
+        throw error
       }
     }
 
-    logger.info("Batch processing completed", {
+    logger.info('Batch processing completed', {
       processed: results.length,
-      action: "batch_complete",
-    });
+      action: 'batch_complete',
+    })
 
-    return results;
+    return results
   }
 
   /**
@@ -240,23 +240,23 @@ export class EnhancementPipeline {
     context: AlignmentContext,
     objectives?: ObjectiveDefinition[],
   ): Promise<{
-    enhancedResponse: string;
-    attempts: number;
-    enhanced: boolean;
+    enhancedResponse: string
+    attempts: number
+    enhanced: boolean
   }> {
-    let currentResponse = originalResponse;
-    let currentEvaluation = evaluation;
-    let attempts = 0;
-    const maxAttempts = this.config.maxRetries || 2;
-    let enhanced = false;
+    let currentResponse = originalResponse
+    let currentEvaluation = evaluation
+    let attempts = 0
+    const maxAttempts = this.config.maxRetries || 2
+    let enhanced = false
 
-    logger.info("Applying enhancements", {
+    logger.info('Applying enhancements', {
       maxAttempts,
-      action: "apply_enhancements_start",
-    });
+      action: 'apply_enhancements_start',
+    })
 
     while (attempts < maxAttempts) {
-      attempts++;
+      attempts++
 
       try {
         const enhancement = await this.metaAligner.enhanceResponse({
@@ -264,59 +264,59 @@ export class EnhancementPipeline {
           evaluationResult: currentEvaluation,
           context,
           targetObjectives: this.config.objectiveIds,
-        });
+        })
 
         if (enhancement.enhancementApplied) {
-          enhanced = true;
-          currentResponse = enhancement.enhancedResponse;
+          enhanced = true
+          currentResponse = enhancement.enhancedResponse
 
           // Re-evaluate to determine if another iteration is needed
           const reEvaluation = await this.metaAligner.evaluateResponse({
             response: currentResponse,
             context,
             objectives,
-          });
+          })
 
-          currentEvaluation = reEvaluation.evaluation;
+          currentEvaluation = reEvaluation.evaluation
 
           const stillNeedsEnhancement =
             currentEvaluation.overallScore <
-            (this.config.enhancementThreshold || 0.7);
+            (this.config.enhancementThreshold || 0.7)
 
           if (!stillNeedsEnhancement) {
-            break;
+            break
           }
         } else {
           // No improvement applied, stop iterations
-          break;
+          break
         }
       } catch (error) {
-        logger.warn("Enhancement attempt failed", {
+        logger.warn('Enhancement attempt failed', {
           attempt: attempts,
-          error: error instanceof Error ? error.message : "Unknown error",
-          action: "enhancement_attempt_failed",
-        });
+          error: error instanceof Error ? error.message : 'Unknown error',
+          action: 'enhancement_attempt_failed',
+        })
 
         // Delay before retry if not the last attempt
         if (attempts < maxAttempts && this.config.retryDelayMs) {
           await new Promise((resolve) =>
             setTimeout(resolve, this.config.retryDelayMs),
-          );
+          )
         }
       }
     }
 
-    logger.info("Enhancement iterations completed", {
+    logger.info('Enhancement iterations completed', {
       attempts,
       enhanced,
-      action: "apply_enhancements_complete",
-    });
+      action: 'apply_enhancements_complete',
+    })
 
     return {
       enhancedResponse: currentResponse,
       attempts,
       enhanced,
-    };
+    }
   }
 
   /**
@@ -326,7 +326,7 @@ export class EnhancementPipeline {
     original: AlignmentEvaluationResult,
     enhanced: AlignmentEvaluationResult,
   ): AlignmentImprovement[] {
-    const improvements: AlignmentImprovement[] = [];
+    const improvements: AlignmentImprovement[] = []
 
     // Compare overall score
 
@@ -334,10 +334,10 @@ export class EnhancementPipeline {
     for (const [objectiveId, enhancedResult] of Object.entries(
       enhanced.objectiveResults,
     )) {
-      const originalResult = original.objectiveResults[objectiveId];
+      const originalResult = original.objectiveResults[objectiveId]
 
       if (originalResult) {
-        const scoreImprovement = enhancedResult.score - originalResult.score;
+        const scoreImprovement = enhancedResult.score - originalResult.score
 
         // Only include improvements (positive changes)
         if (scoreImprovement > 0.001) {
@@ -347,20 +347,20 @@ export class EnhancementPipeline {
             objectiveName: objectiveId, // Would ideally come from objective definition
             scoreImprovement,
             explanation: `Score improved from ${originalResult.score.toFixed(3)} to ${enhancedResult.score.toFixed(3)}`,
-          });
+          })
         }
       }
     }
 
-    return improvements;
+    return improvements
   }
 
   /**
    * Dispose of resources
    */
   dispose(): void {
-    logger.info("Disposing enhancement pipeline", {
-      action: "dispose",
-    });
+    logger.info('Disposing enhancement pipeline', {
+      action: 'dispose',
+    })
   }
 }

@@ -1,14 +1,14 @@
-import type { CollectionEntry } from "astro:content";
+import type { CollectionEntry } from 'astro:content'
 
 export interface BlogPostFilters {
-  excludeDrafts?: boolean;
-  tag?: string;
-  limit?: number;
+  excludeDrafts?: boolean
+  tag?: string
+  limit?: number
 }
 
 export interface BlogPostMetrics {
-  readingTime: number;
-  wordCount: number;
+  readingTime: number
+  wordCount: number
 }
 
 /**
@@ -21,10 +21,10 @@ export function calculateReadingTime(
   content: string,
   wordsPerMinute = 200,
 ): number {
-  if (!content || typeof content !== "string") return 0;
+  if (!content || typeof content !== 'string') return 0
 
-  const words = content.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.ceil(words / wordsPerMinute));
+  const words = content.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.ceil(words / wordsPerMinute))
 }
 
 /**
@@ -33,8 +33,8 @@ export function calculateReadingTime(
  * @returns Word count
  */
 export function calculateWordCount(content: string): number {
-  if (!content || typeof content !== "string") return 0;
-  return content.trim().split(/\s+/).filter(Boolean).length;
+  if (!content || typeof content !== 'string') return 0
+  return content.trim().split(/\s+/).filter(Boolean).length
 }
 
 /**
@@ -43,13 +43,13 @@ export function calculateWordCount(content: string): number {
  * @returns Formatted date string
  */
 export function formatBlogDate(date: Date): string {
-  if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "";
+  if (!date || !(date instanceof Date) || isNaN(date.getTime())) return ''
 
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
 /**
@@ -57,42 +57,42 @@ export function formatBlogDate(date: Date): string {
  * @param post - The blog post to validate
  * @returns Validation result
  */
-export function validateBlogPost(post: CollectionEntry<"blog">): {
-  isValid: boolean;
-  errors: string[];
+export function validateBlogPost(post: CollectionEntry<'blog'>): {
+  isValid: boolean
+  errors: string[]
 } {
-  const errors: string[] = [];
+  const errors: string[] = []
 
   if (!post) {
-    errors.push("Post is required");
-    return { isValid: false, errors };
+    errors.push('Post is required')
+    return { isValid: false, errors }
   }
 
   if (!post.data) {
-    errors.push("Post data is required");
-    return { isValid: false, errors };
+    errors.push('Post data is required')
+    return { isValid: false, errors }
   }
 
-  if (!post.data.title || typeof post.data.title !== "string") {
-    errors.push("Post title is required and must be a string");
+  if (!post.data.title || typeof post.data.title !== 'string') {
+    errors.push('Post title is required and must be a string')
   }
 
-  if (!post.data.description || typeof post.data.description !== "string") {
-    errors.push("Post description is required and must be a string");
+  if (!post.data.description || typeof post.data.description !== 'string') {
+    errors.push('Post description is required and must be a string')
   }
 
   if (!post.data.pubDate || !(post.data.pubDate instanceof Date)) {
-    errors.push("Post publication date is required and must be a Date");
+    errors.push('Post publication date is required and must be a Date')
   }
 
   if (!Array.isArray(post.data.tags)) {
-    errors.push("Post tags must be an array");
+    errors.push('Post tags must be an array')
   }
 
   return {
     isValid: errors.length === 0,
     errors,
-  };
+  }
 }
 
 /**
@@ -101,15 +101,15 @@ export function validateBlogPost(post: CollectionEntry<"blog">): {
  * @returns Post metrics
  */
 export function getBlogPostMetrics(
-  post: CollectionEntry<"blog">,
+  post: CollectionEntry<'blog'>,
 ): BlogPostMetrics {
-  const wordCount = calculateWordCount(post.body || "");
-  const readingTime = calculateReadingTime(post.body || "");
+  const wordCount = calculateWordCount(post.body || '')
+  const readingTime = calculateReadingTime(post.body || '')
 
   return {
     wordCount,
     readingTime,
-  };
+  }
 }
 
 /**
@@ -119,29 +119,29 @@ export function getBlogPostMetrics(
  * @returns Filtered posts
  */
 export function filterBlogPosts(
-  posts: CollectionEntry<"blog">[],
+  posts: CollectionEntry<'blog'>[],
   filters: BlogPostFilters = {},
-): CollectionEntry<"blog">[] {
-  let filtered = [...posts];
+): CollectionEntry<'blog'>[] {
+  let filtered = [...posts]
 
   if (filters.excludeDrafts !== false) {
-    filtered = filtered.filter((post) => !post.data.draft);
+    filtered = filtered.filter((post) => !post.data.draft)
   }
 
   if (filters.tag) {
     filtered = filtered.filter(
       (post) => post.data.tags && post.data.tags.includes(filters.tag),
-    );
+    )
   }
 
   // Sort by publication date (newest first)
-  filtered.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  filtered.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 
   if (filters.limit) {
-    filtered = filtered.slice(0, filters.limit);
+    filtered = filtered.slice(0, filters.limit)
   }
 
-  return filtered;
+  return filtered
 }
 
 /**
@@ -153,7 +153,7 @@ export function slugify(text: string): string {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }

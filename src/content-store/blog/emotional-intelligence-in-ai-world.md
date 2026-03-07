@@ -1,9 +1,9 @@
 ---
 title: When Machines Think But Can't Feel - The EQ Crisis
-description: "Why emotional intelligence matters more than ever in our AI-saturated reality"
+description: 'Why emotional intelligence matters more than ever in our AI-saturated reality'
 pubDate: 2025-03-02
 lastModDate: 2025-04-11
-author: "Vivi"
+author: 'Vivi'
 slug: emotional-intelligence-in-ai-world
 toc: true
 share: true

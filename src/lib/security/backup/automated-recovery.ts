@@ -12,8 +12,11 @@
  * - Integration with audit logging
  */
 
-import {} from "../../audit";
-import type { TestEnvironmentType } from "./backup-types";
+import {} from '../../audit'
+import type { TestEnvironmentType } from './backup-types'
+
+
+
 
 // Create an auditService wrapper for backward compatibility
 
@@ -21,33 +24,33 @@ import type { TestEnvironmentType } from "./backup-types";
  * Configuration for the automated recovery testing system
  */
 export interface AutomatedRecoveryConfig {
-  enabled: boolean;
-  schedule: string; // Cron expression
-  backupSelectionStrategy: BackupSelectionStrategy;
-  environmentRotation: boolean; // Whether to rotate through different test environments
-  environments: TestEnvironmentType[];
-  notificationChannels: string[];
+  enabled: boolean
+  schedule: string // Cron expression
+  backupSelectionStrategy: BackupSelectionStrategy
+  environmentRotation: boolean // Whether to rotate through different test environments
+  environments: TestEnvironmentType[]
+  notificationChannels: string[]
   reportConfig: {
-    generateHtml: boolean;
-    generatePdf: boolean;
-    storageLocation: string;
-    retentionDays: number;
-  };
+    generateHtml: boolean
+    generatePdf: boolean
+    storageLocation: string
+    retentionDays: number
+  }
   testCaseConfig?: {
-    customTestCases?: string[]; // IDs of custom test cases to use
-    includeDefaultTests: boolean;
-  };
+    customTestCases?: string[] // IDs of custom test cases to use
+    includeDefaultTests: boolean
+  }
 }
 
 /**
  * Strategies for selecting which backups to test
  */
 export enum BackupSelectionStrategy {
-  LATEST_EACH_TYPE = "latest_each_type", // Latest backup of each type
-  LATEST_FULL_ONLY = "latest_full_only", // Only test the latest full backup
-  RANDOM_SAMPLING = "random_sampling", // Random sampling across backup types
-  ALL_RECENT = "all_recent", // All backups within a recent timeframe
-  WEIGHTED_RISK = "weighted_risk", // Prioritize based on risk factors
+  LATEST_EACH_TYPE = 'latest_each_type', // Latest backup of each type
+  LATEST_FULL_ONLY = 'latest_full_only', // Only test the latest full backup
+  RANDOM_SAMPLING = 'random_sampling', // Random sampling across backup types
+  ALL_RECENT = 'all_recent', // All backups within a recent timeframe
+  WEIGHTED_RISK = 'weighted_risk', // Prioritize based on risk factors
 }
 
 /**
@@ -62,6 +65,7 @@ export class AutomatedRecoverySystem {
   private _isInitialized = false
   private _currentEnvironmentIndex = 0
   */
+
   /**
    * Create a new automated recovery testing system
    *
@@ -69,7 +73,8 @@ export class AutomatedRecoverySystem {
    * @param recoveryManager Reference to the recovery testing manager
    * @param backupProvider Function that returns available backups
    */
+
 }
 
 // Export the automated recovery system
-export default AutomatedRecoverySystem;
+export default AutomatedRecoverySystem

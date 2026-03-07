@@ -1,4 +1,4 @@
-import { journalResearchApiClient } from "./client";
+import { journalResearchApiClient } from './client'
 import {
   Report,
   ReportGeneratePayload,
@@ -6,11 +6,11 @@ import {
   ReportListSchema,
   ReportSchema,
   serializeReportGeneratePayload,
-} from "./types";
+} from './types'
 
 export interface ListReportsParams {
-  page?: number;
-  pageSize?: number;
+  page?: number
+  pageSize?: number
 }
 
 export async function generateReport(
@@ -20,18 +20,18 @@ export async function generateReport(
   return journalResearchApiClient.request<Report>(
     `/sessions/${sessionId}/reports`,
     {
-      method: "POST",
+      method: 'POST',
       body: serializeReportGeneratePayload(payload),
       validator: ReportSchema,
     },
-  );
+  )
 }
 
 export async function listReports(
   sessionId: string,
   params: ListReportsParams = {},
 ): Promise<ReportList> {
-  const { page, pageSize } = params;
+  const { page, pageSize } = params
   return journalResearchApiClient.request<ReportList>(
     `/sessions/${sessionId}/reports`,
     {
@@ -41,7 +41,7 @@ export async function listReports(
       },
       validator: ReportListSchema,
     },
-  );
+  )
 }
 
 export async function getReport(
@@ -53,5 +53,5 @@ export async function getReport(
     {
       validator: ReportSchema,
     },
-  );
+  )
 }

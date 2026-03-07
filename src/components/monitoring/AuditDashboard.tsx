@@ -1,20 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
 // import { LineChart } from '../ui/charts/LineChart'
 // import { PieChart } from '../ui/charts/PieChart'
 
 interface AuditMetrics {
   accessByTime: {
-    labels: string[];
-    data: number[];
-  };
+    labels: string[]
+    data: number[]
+  }
   accessByType: {
-    labels: string[];
-    data: number[];
-  };
+    labels: string[]
+    data: number[]
+  }
   unusualAccess: {
-    count: number;
-    details: string[];
-  };
+    count: number
+    details: string[]
+  }
 }
 
 export function AuditDashboard() {
@@ -22,40 +22,40 @@ export function AuditDashboard() {
     accessByTime: { labels: [], data: [] },
     accessByType: { labels: [], data: [] },
     unusualAccess: { count: 0, details: [] },
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchAuditMetrics = async () => {
       try {
         // Fetch audit logs and process them into metrics
-        const response = await fetch("/api/audit/metrics");
+        const response = await fetch('/api/audit/metrics')
         if (!response.ok) {
-          throw new Error("Failed to fetch audit metrics");
+          throw new Error('Failed to fetch audit metrics')
         }
 
-        const data = await response.json();
-        setMetrics(data);
+        const data = await response.json()
+        setMetrics(data)
       } catch (err: unknown) {
         setError(
           err instanceof Error
             ? (err as Error)?.message || String(err)
-            : "Failed to load audit metrics",
-        );
+            : 'Failed to load audit metrics',
+        )
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchAuditMetrics();
+    fetchAuditMetrics()
     // Refresh metrics every 5 minutes
-    const interval = setInterval(fetchAuditMetrics, 5 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    const interval = setInterval(fetchAuditMetrics, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
 
-  if (loading) return <div>Loading audit metrics...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>Loading audit metrics...</div>
+  if (error) return <div>Error: {error}</div>
 
   return (
     <div className="space-y-6 p-6">
@@ -120,5 +120,5 @@ export function AuditDashboard() {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -6,6 +6,6 @@
 // to avoid redeclaring globals in other type roots.
 /// <reference types="vitest/globals" />
 
-export {};
+export {}
 
 // types module

@@ -19,11 +19,13 @@ This document describes the DevOps setup for Pixelated, including CI/CD pipeline
 Our CI/CD pipeline is implemented using GitHub Actions and consists of the following stages:
 
 1. **Build and Test**
+
    - Installs dependencies
    - Runs test suite
    - Builds application
 
 2. **Deployment**
+
    - Staging deployment
    - Production deployment
    - Automatic rollback on failure
@@ -33,11 +35,13 @@ Our CI/CD pipeline is implemented using GitHub Actions and consists of the follo
 Infrastructure is managed using Terraform with the following components:
 
 1. **Vercel Configuration**
+
    - Project settings
    - Environment variables
    - Domain configuration
 
 2. **GitHub Configuration**
+
    - Repository settings
    - Branch protection rules
    - Action secrets
@@ -167,18 +171,21 @@ terraform destroy -var-file=environments/development.tfvars
 ### Common Issues
 
 1. **Deployment Failures**
+
    - Check deployment logs in Vercel
    - Verify GitHub Actions logs
    - Check application logs
    - Run health checks
 
 2. **Monitoring Issues**
+
    - Verify Prometheus targets
    - Check metric collection
    - Validate alert rules
    - Check Grafana datasources
 
 3. **Infrastructure Issues**
+
    - Review Terraform state
    - Check provider status
    - Verify credentials
@@ -204,11 +211,13 @@ This document describes the DevOps setup for Pixelated, including CI/CD pipeline
 Our CI/CD pipeline is implemented using GitHub Actions and consists of the following stages:
 
 1. **Build and Test**
+
    - Installs dependencies
    - Runs test suite
    - Builds application
 
 2. **Deployment**
+
    - Staging deployment
    - Production deployment
    - Automatic rollback on failure
@@ -218,11 +227,13 @@ Our CI/CD pipeline is implemented using GitHub Actions and consists of the follo
 Infrastructure is managed using Terraform with the following components:
 
 1. **Vercel Configuration**
+
    - Project settings
    - Environment variables
    - Domain configuration
 
 2. **GitHub Configuration**
+
    - Repository settings
    - Branch protection rules
    - Action secrets
@@ -352,18 +363,21 @@ terraform destroy -var-file=environments/development.tfvars
 ### Common Issues 2
 
 1. **Deployment Failures**
+
    - Check deployment logs in Vercel
    - Verify GitHub Actions logs
    - Check application logs
    - Run health checks
 
 2. **Monitoring Issues**
+
    - Verify Prometheus targets
    - Check metric collection
    - Validate alert rules
    - Check Grafana datasources
 
 3. **Infrastructure Issues**
+
    - Review Terraform state
    - Check provider status
    - Verify credentials

@@ -2,10 +2,10 @@
 // Provide a global GPUTexture declaration so @types/three's ExternalTexture.d.ts resolves
 declare global {
   interface GPUTexture {
-    label?: string;
+    label?: string
   }
 }
 
-export {};
+export {}
 
 // types module

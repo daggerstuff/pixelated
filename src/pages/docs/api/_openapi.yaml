@@ -4,15 +4,15 @@ info:
   description: |
     The Pixelated Empathy API provides a comprehensive set of endpoints for integrating
     with our platform.
-  version: "1.0.0"
+  version: '1.0.0'
   contact:
     name: Pixelated Empathy API Support
     email: api-support@pixelated.dev
     url: https://pixelated.dev/support
 servers:
-  - url: "https://api.pixelated.dev/api/v1"
+  - url: 'https://api.pixelated.dev/api/v1'
     description: Production API server
-  - url: "https://staging-api.pixelated.dev/api/v1"
+  - url: 'https://staging-api.pixelated.dev/api/v1'
     description: Staging API server (for testing)
 security:
   - ApiKeyAuth: []
@@ -32,7 +32,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Successful search
           content:
             application/json:
@@ -42,16 +42,16 @@ paths:
                   version:
                     type: string
                     description: API version
-                    example: "v1"
+                    example: 'v1'
                   results:
                     type: array
                     maxItems: 100
                     items:
-                      $ref: "#/components/schemas/SearchResult"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
+                      $ref: '#/components/schemas/SearchResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /users:
     get:
       summary: List users
@@ -76,7 +76,7 @@ paths:
             minimum: 0
             default: 0
       responses:
-        "200":
+        '200':
           description: List of users
           content:
             application/json:
@@ -87,11 +87,11 @@ paths:
                     type: array
                     maxItems: 100
                     items:
-                      $ref: "#/components/schemas/User"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
+                      $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -159,19 +159,19 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Unauthorized
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
     Forbidden:
       description: Forbidden
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error"
+            $ref: '#/components/schemas/Error'
 tags:
   - name: Search
     description: Search operations

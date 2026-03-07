@@ -2,33 +2,33 @@ import type {
   ComplianceDocument,
   ComplianceVerification,
   ComplianceRequirement,
-} from "./types";
+} from './types'
 import {
   ComplianceLevel,
   VerificationMethod,
   BusinessAssociateType,
   ServiceCategory,
-} from "./types";
-import { generateId } from "../../utils/ids";
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+} from './types'
+import { generateId } from '../../utils/ids'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger for PHI audit logging
-const logger = createBuildSafeLogger("phi-audit");
+const logger = createBuildSafeLogger('phi-audit')
 
 /**
  * Service for managing vendor compliance verification
  */
 export class ComplianceVerificationService {
-  private verifications: Map<string, ComplianceVerification> = new Map();
-  private documents: Map<string, ComplianceDocument> = new Map();
-  private requirements: Map<string, ComplianceRequirement> = new Map();
+  private verifications: Map<string, ComplianceVerification> = new Map()
+  private documents: Map<string, ComplianceDocument> = new Map()
+  private requirements: Map<string, ComplianceRequirement> = new Map()
 
   constructor() {
     // Log initialization for audit trail
-    logger.info("ComplianceVerificationService initialized", {
-      component: "ComplianceVerificationService",
-      action: "initialize",
-    });
+    logger.info('ComplianceVerificationService initialized', {
+      component: 'ComplianceVerificationService',
+      action: 'initialize',
+    })
   }
 
   /**
@@ -44,7 +44,7 @@ export class ComplianceVerificationService {
     notes?: string,
     attachments: string[] = [],
   ): ComplianceVerification {
-    const id = generateId();
+    const id = generateId()
     const verification: ComplianceVerification = {
       id,
       businessAssociateId,
@@ -55,21 +55,21 @@ export class ComplianceVerificationService {
       verifiedBy,
       notes,
       attachments,
-    };
+    }
 
-    this.verifications.set(id, verification);
+    this.verifications.set(id, verification)
 
     // Audit log for verification creation
-    logger.info("Compliance verification created", {
+    logger.info('Compliance verification created', {
       verificationId: id,
       businessAssociateId,
       complianceLevel,
       verificationMethod,
       verifiedBy,
-      action: "create_verification",
-    });
+      action: 'create_verification',
+    })
 
-    return verification;
+    return verification
   }
 
   /**
@@ -82,32 +82,32 @@ export class ComplianceVerificationService {
       .filter((v) => v.businessAssociateId === businessAssociateId)
       .sort(
         (a, b) => b.verificationDate.getTime() - a.verificationDate.getTime(),
-      );
+      )
 
     // Audit log for retrieving verifications
-    logger.info("Compliance verifications accessed", {
+    logger.info('Compliance verifications accessed', {
       businessAssociateId,
       count: verifications.length,
-      action: "get_verifications",
-    });
+      action: 'get_verifications',
+    })
 
-    return verifications;
+    return verifications
   }
 
   /**
    * Get a verification by ID
    */
   public getVerification(id: string): ComplianceVerification | undefined {
-    const verification = this.verifications.get(id);
+    const verification = this.verifications.get(id)
 
     // Audit log for verification access
-    logger.info("Compliance verification accessed", {
+    logger.info('Compliance verification accessed', {
       verificationId: id,
       found: !!verification,
-      action: "get_verification",
-    });
+      action: 'get_verification',
+    })
 
-    return verification;
+    return verification
   }
 
   /**
@@ -117,55 +117,55 @@ export class ComplianceVerificationService {
     id: string,
     updates: Partial<ComplianceVerification>,
   ): ComplianceVerification | undefined {
-    const verification = this.verifications.get(id);
+    const verification = this.verifications.get(id)
     if (!verification) {
       logger.warn(
-        "Compliance verification update failed - verification not found",
+        'Compliance verification update failed - verification not found',
         {
           verificationId: id,
-          action: "update_verification_failed",
+          action: 'update_verification_failed',
         },
-      );
-      return undefined;
+      )
+      return undefined
     }
 
     // Prevent modification of certain fields
-    const { id: _, ...updatableFields } = updates;
+    const { id: _, ...updatableFields } = updates
 
     const updatedVerification = {
       ...verification,
       ...updatableFields,
-    };
+    }
 
-    this.verifications.set(id, updatedVerification);
+    this.verifications.set(id, updatedVerification)
 
     // Audit log for verification update
-    logger.info("Compliance verification updated", {
+    logger.info('Compliance verification updated', {
       verificationId: id,
       businessAssociateId: verification.businessAssociateId,
       updatedFields: Object.keys(updatableFields),
-      action: "update_verification",
-    });
+      action: 'update_verification',
+    })
 
-    return updatedVerification;
+    return updatedVerification
   }
 
   /**
    * Delete a verification
    */
   public deleteVerification(id: string): boolean {
-    const verification = this.verifications.get(id);
-    const result = this.verifications.delete(id);
+    const verification = this.verifications.get(id)
+    const result = this.verifications.delete(id)
 
     // Audit log for verification deletion
-    logger.info("Compliance verification deleted", {
+    logger.info('Compliance verification deleted', {
       verificationId: id,
       businessAssociateId: verification?.businessAssociateId,
       success: result,
-      action: "delete_verification",
-    });
+      action: 'delete_verification',
+    })
 
-    return result;
+    return result
   }
 
   /**
@@ -176,14 +176,14 @@ export class ComplianceVerificationService {
     name: string,
     documentUrl: string,
     uploadedBy: string,
-    type: ComplianceDocument["type"] = "other",
+    type: ComplianceDocument['type'] = 'other',
     description?: string,
     expiryDate?: Date,
     tags: string[] = [],
     relatedVerificationId?: string,
     isValid: boolean = true,
   ): ComplianceDocument {
-    const id = generateId();
+    const id = generateId()
     const document: ComplianceDocument = {
       id,
       businessAssociateId,
@@ -197,20 +197,20 @@ export class ComplianceVerificationService {
       tags,
       relatedVerificationId,
       isValid,
-    };
+    }
 
-    this.documents.set(id, document);
+    this.documents.set(id, document)
 
     // Audit log for document creation
-    logger.info("Compliance document created", {
+    logger.info('Compliance document created', {
       documentId: id,
       businessAssociateId,
       documentType: type,
       uploadedBy,
-      action: "create_document",
-    });
+      action: 'create_document',
+    })
 
-    return document;
+    return document
   }
 
   /**
@@ -219,32 +219,32 @@ export class ComplianceVerificationService {
   public getDocuments(businessAssociateId: string): ComplianceDocument[] {
     const documents = Array.from(this.documents.values())
       .filter((d) => d.businessAssociateId === businessAssociateId)
-      .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime());
+      .sort((a, b) => b.uploadDate.getTime() - a.uploadDate.getTime())
 
     // Audit log for retrieving documents
-    logger.info("Compliance documents accessed", {
+    logger.info('Compliance documents accessed', {
       businessAssociateId,
       count: documents.length,
-      action: "get_documents",
-    });
+      action: 'get_documents',
+    })
 
-    return documents;
+    return documents
   }
 
   /**
    * Get a document by ID
    */
   public getDocument(id: string): ComplianceDocument | undefined {
-    const document = this.documents.get(id);
+    const document = this.documents.get(id)
 
     // Audit log for document access
-    logger.info("Compliance document accessed", {
+    logger.info('Compliance document accessed', {
       documentId: id,
       found: !!document,
-      action: "get_document",
-    });
+      action: 'get_document',
+    })
 
-    return document;
+    return document
   }
 
   /**
@@ -254,34 +254,34 @@ export class ComplianceVerificationService {
     id: string,
     updates: Partial<ComplianceDocument>,
   ): ComplianceDocument | undefined {
-    const document = this.documents.get(id);
+    const document = this.documents.get(id)
     if (!document) {
-      logger.warn("Compliance document update failed - document not found", {
+      logger.warn('Compliance document update failed - document not found', {
         documentId: id,
-        action: "update_document_failed",
-      });
-      return undefined;
+        action: 'update_document_failed',
+      })
+      return undefined
     }
 
     // Prevent modification of certain fields
-    const { id: _, ...updatableFields } = updates;
+    const { id: _, ...updatableFields } = updates
 
     const updatedDocument = {
       ...document,
       ...updatableFields,
-    };
+    }
 
-    this.documents.set(id, updatedDocument);
+    this.documents.set(id, updatedDocument)
 
     // Audit log for document update
-    logger.info("Compliance document updated", {
+    logger.info('Compliance document updated', {
       documentId: id,
       businessAssociateId: document.businessAssociateId,
       updatedFields: Object.keys(updatableFields),
-      action: "update_document",
-    });
+      action: 'update_document',
+    })
 
-    return updatedDocument;
+    return updatedDocument
   }
 
   /**
@@ -291,52 +291,52 @@ export class ComplianceVerificationService {
     id: string,
     isValid: boolean,
   ): ComplianceDocument | undefined {
-    const document = this.documents.get(id);
+    const document = this.documents.get(id)
     if (!document) {
       logger.warn(
-        "Compliance document validity update failed - document not found",
+        'Compliance document validity update failed - document not found',
         {
           documentId: id,
-          action: "update_document_validity_failed",
+          action: 'update_document_validity_failed',
         },
-      );
-      return undefined;
+      )
+      return undefined
     }
 
     const updatedDocument = {
       ...document,
       isValid,
-    };
+    }
 
-    this.documents.set(id, updatedDocument);
+    this.documents.set(id, updatedDocument)
 
     // Audit log for document validity update
-    logger.info("Compliance document validity updated", {
+    logger.info('Compliance document validity updated', {
       documentId: id,
       businessAssociateId: document.businessAssociateId,
       isValid,
-      action: "update_document_validity",
-    });
+      action: 'update_document_validity',
+    })
 
-    return updatedDocument;
+    return updatedDocument
   }
 
   /**
    * Delete a document
    */
   public deleteDocument(id: string): boolean {
-    const document = this.documents.get(id);
-    const result = this.documents.delete(id);
+    const document = this.documents.get(id)
+    const result = this.documents.delete(id)
 
     // Audit log for document deletion
-    logger.info("Compliance document deleted", {
+    logger.info('Compliance document deleted', {
       documentId: id,
       businessAssociateId: document?.businessAssociateId,
       success: result,
-      action: "delete_document",
-    });
+      action: 'delete_document',
+    })
 
-    return result;
+    return result
   }
 
   /**
@@ -351,9 +351,9 @@ export class ComplianceVerificationService {
     minimumComplianceLevel: ComplianceLevel,
     isRequired: boolean,
     verificationMethod: VerificationMethod,
-    frequency: ComplianceRequirement["frequency"],
+    frequency: ComplianceRequirement['frequency'],
   ): ComplianceRequirement {
-    const id = generateId();
+    const id = generateId()
     const requirement: ComplianceRequirement = {
       id,
       name,
@@ -365,35 +365,35 @@ export class ComplianceVerificationService {
       isRequired,
       verificationMethod,
       frequency,
-    };
+    }
 
-    this.requirements.set(id, requirement);
+    this.requirements.set(id, requirement)
 
     // Audit log for requirement creation
-    logger.info("Compliance requirement created", {
+    logger.info('Compliance requirement created', {
       requirementId: id,
       name,
       minimumComplianceLevel,
       isRequired,
-      action: "create_requirement",
-    });
+      action: 'create_requirement',
+    })
 
-    return requirement;
+    return requirement
   }
 
   /**
    * Get all compliance requirements
    */
   public getAllRequirements(): ComplianceRequirement[] {
-    const requirements = Array.from(this.requirements.values());
+    const requirements = Array.from(this.requirements.values())
 
     // Audit log for retrieving all requirements
-    logger.info("All compliance requirements accessed", {
+    logger.info('All compliance requirements accessed', {
       count: requirements.length,
-      action: "get_all_requirements",
-    });
+      action: 'get_all_requirements',
+    })
 
-    return requirements;
+    return requirements
   }
 
   /**
@@ -408,35 +408,35 @@ export class ComplianceVerificationService {
         return (
           req.applicableTypes.includes(type) &&
           req.applicableCategories.some((cat) => categories.includes(cat))
-        );
+        )
       },
-    );
+    )
 
     // Audit log for retrieving applicable requirements
-    logger.info("Applicable compliance requirements accessed", {
+    logger.info('Applicable compliance requirements accessed', {
       associateType: type,
       serviceCategories: categories,
       count: requirements.length,
-      action: "get_applicable_requirements",
-    });
+      action: 'get_applicable_requirements',
+    })
 
-    return requirements;
+    return requirements
   }
 
   /**
    * Get a requirement by ID
    */
   public getRequirement(id: string): ComplianceRequirement | undefined {
-    const requirement = this.requirements.get(id);
+    const requirement = this.requirements.get(id)
 
     // Audit log for requirement access
-    logger.info("Compliance requirement accessed", {
+    logger.info('Compliance requirement accessed', {
       requirementId: id,
       found: !!requirement,
-      action: "get_requirement",
-    });
+      action: 'get_requirement',
+    })
 
-    return requirement;
+    return requirement
   }
 
   /**
@@ -446,54 +446,54 @@ export class ComplianceVerificationService {
     id: string,
     updates: Partial<ComplianceRequirement>,
   ): ComplianceRequirement | undefined {
-    const requirement = this.requirements.get(id);
+    const requirement = this.requirements.get(id)
     if (!requirement) {
       logger.warn(
-        "Compliance requirement update failed - requirement not found",
+        'Compliance requirement update failed - requirement not found',
         {
           requirementId: id,
-          action: "update_requirement_failed",
+          action: 'update_requirement_failed',
         },
-      );
-      return undefined;
+      )
+      return undefined
     }
 
     // Prevent modification of certain fields
-    const { id: _, ...updatableFields } = updates;
+    const { id: _, ...updatableFields } = updates
 
     const updatedRequirement = {
       ...requirement,
       ...updatableFields,
-    };
+    }
 
-    this.requirements.set(id, updatedRequirement);
+    this.requirements.set(id, updatedRequirement)
 
     // Audit log for requirement update
-    logger.info("Compliance requirement updated", {
+    logger.info('Compliance requirement updated', {
       requirementId: id,
       updatedFields: Object.keys(updatableFields),
-      action: "update_requirement",
-    });
+      action: 'update_requirement',
+    })
 
-    return updatedRequirement;
+    return updatedRequirement
   }
 
   /**
    * Delete a requirement
    */
   public deleteRequirement(id: string): boolean {
-    const requirement = this.requirements.get(id);
-    const result = this.requirements.delete(id);
+    const requirement = this.requirements.get(id)
+    const result = this.requirements.delete(id)
 
     // Audit log for requirement deletion
-    logger.info("Compliance requirement deleted", {
+    logger.info('Compliance requirement deleted', {
       requirementId: id,
       name: requirement?.name,
       success: result,
-      action: "delete_requirement",
-    });
+      action: 'delete_requirement',
+    })
 
-    return result;
+    return result
   }
 
   /**
@@ -501,16 +501,16 @@ export class ComplianceVerificationService {
    */
   public initializeDefaultRequirements() {
     // Clear any existing requirements
-    this.requirements.clear();
+    this.requirements.clear()
 
-    logger.info("Initializing default compliance requirements", {
-      action: "initialize_default_requirements",
-    });
+    logger.info('Initializing default compliance requirements', {
+      action: 'initialize_default_requirements',
+    })
 
     // HIPAA Security Rule requirements
     this.createRequirement(
-      "Security Risk Assessment",
-      "A comprehensive evaluation of potential risks and vulnerabilities to the confidentiality, integrity, and availability of PHI.",
+      'Security Risk Assessment',
+      'A comprehensive evaluation of potential risks and vulnerabilities to the confidentiality, integrity, and availability of PHI.',
       [
         BusinessAssociateType.EHR_VENDOR,
         BusinessAssociateType.CLOUD_SERVICE,
@@ -522,16 +522,16 @@ export class ComplianceVerificationService {
         ServiceCategory.SOFTWARE_SERVICES,
         ServiceCategory.CONSULTING,
       ],
-      ["risk_assessment"],
+      ['risk_assessment'],
       ComplianceLevel.HIGH,
       true,
       VerificationMethod.THIRD_PARTY_AUDIT,
-      "annual",
-    );
+      'annual',
+    )
 
     this.createRequirement(
-      "HIPAA Security Training",
-      "Evidence of regular HIPAA and security awareness training for all staff with access to PHI.",
+      'HIPAA Security Training',
+      'Evidence of regular HIPAA and security awareness training for all staff with access to PHI.',
       [
         BusinessAssociateType.EHR_VENDOR,
         BusinessAssociateType.CLOUD_SERVICE,
@@ -543,34 +543,34 @@ export class ComplianceVerificationService {
         ServiceCategory.SOFTWARE_SERVICES,
         ServiceCategory.CONSULTING,
       ],
-      ["training_records"],
+      ['training_records'],
       ComplianceLevel.MEDIUM,
       true,
       VerificationMethod.DOCUMENTATION_REVIEW,
-      "annual",
-    );
+      'annual',
+    )
 
     // Additional standard requirements...
     // Note: Actual implementation would include many more requirements
 
-    logger.info("Default compliance requirements initialized", {
+    logger.info('Default compliance requirements initialized', {
       count: this.requirements.size,
-      action: "default_requirements_initialized",
-    });
+      action: 'default_requirements_initialized',
+    })
   }
 
   /**
    * Get verification statistics
    */
   public getVerificationStatistics(): {
-    totalVerifications: number;
-    verificationsByLevel: Record<ComplianceLevel, number>;
-    verificationsByMethod: Record<VerificationMethod, number>;
-    documentsUploaded: number;
-    expiringVerifications: number;
+    totalVerifications: number
+    verificationsByLevel: Record<ComplianceLevel, number>
+    verificationsByMethod: Record<VerificationMethod, number>
+    documentsUploaded: number
+    expiringVerifications: number
   } {
-    const verifications = Array.from(this.verifications.values());
-    const documents = Array.from(this.documents.values());
+    const verifications = Array.from(this.verifications.values())
+    const documents = Array.from(this.documents.values())
 
     const stats = {
       totalVerifications: verifications.length,
@@ -595,15 +595,15 @@ export class ComplianceVerificationService {
       },
       documentsUploaded: documents.length,
       expiringVerifications: 0,
-    };
+    }
 
     // Calculate stats
     verifications.forEach((verification) => {
       // Count by level
-      stats.verificationsByLevel[verification.complianceLevel]++;
+      stats.verificationsByLevel[verification.complianceLevel]++
 
       // Count by method
-      stats.verificationsByMethod[verification.verificationMethod]++;
+      stats.verificationsByMethod[verification.verificationMethod]++
 
       // Count expiring (within 30 days)
       if (
@@ -611,18 +611,18 @@ export class ComplianceVerificationService {
         verification.expiryDate.getTime() - new Date().getTime() <
           30 * 24 * 60 * 60 * 1000
       ) {
-        stats.expiringVerifications++;
+        stats.expiringVerifications++
       }
-    });
+    })
 
     // Audit log for statistics access
-    logger.info("Compliance verification statistics accessed", {
+    logger.info('Compliance verification statistics accessed', {
       totalVerifications: stats.totalVerifications,
       documentsUploaded: stats.documentsUploaded,
       expiringVerifications: stats.expiringVerifications,
-      action: "get_verification_statistics",
-    });
+      action: 'get_verification_statistics',
+    })
 
-    return stats;
+    return stats
   }
 }

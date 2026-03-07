@@ -4,8 +4,8 @@
 
 // Simple type definitions for mdast
 interface Root {
-  type: "root";
-  children: Node[];
+  type: 'root'
+  children: Node[]
 }
 
 // interface Paragraph {
@@ -23,12 +23,12 @@ interface Root {
 
 // Simple type definitions for mdast
 interface Node {
-  type: string;
-  children?: Node[];
-  value?: string;
-  url?: string;
-  alt?: string;
-  data?: any;
+  type: string
+  children?: Node[]
+  value?: string
+  url?: string
+  alt?: string
+  data?: any
 }
 
 // interface ImageNode extends Node {
@@ -38,8 +38,8 @@ interface Node {
 // }
 
 interface ParagraphNode extends Node {
-  type: "paragraph";
-  children: Node[];
+  type: 'paragraph'
+  children: Node[]
 }
 
 // Simple visit function implementation - local version
@@ -49,43 +49,43 @@ function visit(
   callback: (node: Node) => void,
 ) {
   const testFn =
-    typeof test === "string" ? (node: Node) => node.type === test : test;
+    typeof test === 'string' ? (node: Node) => node.type === test : test
 
   function walk(node: Node) {
     if (testFn(node)) {
-      callback(node);
+      callback(node)
     }
     if (node.children) {
-      node.children.forEach(walk);
+      node.children.forEach(walk)
     }
   }
 
-  walk(tree);
+  walk(tree)
 }
 
 export function remarkImageContainer() {
   return (tree: Root) => {
-    visit(tree, "paragraph", (node: any) => {
-      const paragraph = node as ParagraphNode;
+    visit(tree, 'paragraph', (node: any) => {
+      const paragraph = node as ParagraphNode
 
       // Check if paragraph contains only images
       if (paragraph.children && paragraph.children.length > 0) {
         const hasOnlyImages = paragraph.children.every(
-          (child: any) => child.type === "image",
-        );
+          (child: any) => child.type === 'image',
+        )
 
         if (hasOnlyImages) {
           // Transform paragraph to image container
           paragraph.data = {
-            hName: "div",
+            hName: 'div',
             hProperties: {
-              className: ["image-container"],
+              className: ['image-container'],
             },
-          };
+          }
         }
       }
-    });
-  };
+    })
+  }
 }
 
-export default remarkImageContainer;
+export default remarkImageContainer

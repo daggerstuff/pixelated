@@ -1,21 +1,21 @@
-import { initializeDatabase, query } from "@/lib/db";
-import { getCache } from "@/lib/cache/redis-cache";
-import type { APIRoute } from "astro";
+import { initializeDatabase, query } from '@/lib/db'
+import { getCache } from '@/lib/cache/redis-cache'
+import type { APIRoute } from 'astro'
 
 export const GET: APIRoute = async ({ url }) => {
   try {
     // Initialize database connection if not already done
-    initializeDatabase();
+    initializeDatabase()
 
-    const { searchParams } = url;
-    const days = parseInt(searchParams.get("days") || "30");
-    const cache = getCache();
+    const { searchParams } = url
+    const days = parseInt(searchParams.get('days') || '30')
+    const cache = getCache()
 
     // Try to get cached analytics data first
-    let cachedData = await cache.getAnalyticsData("comprehensive", days);
+    let cachedData = await cache.getAnalyticsData('comprehensive', days)
 
     if (cachedData) {
-      console.log("✅ Analytics data served from cache");
+      console.log('✅ Analytics data served from cache')
       return new Response(
         JSON.stringify({
           ...cachedData,
@@ -24,12 +24,12 @@ export const GET: APIRoute = async ({ url }) => {
         }),
         {
           status: 200,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
-    console.log("🔄 Computing fresh analytics data...");
+    console.log('🔄 Computing fresh analytics data...')
 
     // Get historical data for the specified number of days
     const historicalQuery = `
@@ -44,9 +44,9 @@ export const GET: APIRoute = async ({ url }) => {
       WHERE created_at >= NOW() - INTERVAL '${days} days'
       GROUP BY DATE(created_at)
       ORDER BY DATE(created_at)
-    `;
+    `
 
-    const historicalResult = await query(historicalQuery);
+    const historicalResult = await query(historicalQuery)
 
     // Get demographic breakdown
     const demographicQuery = `
@@ -60,9 +60,9 @@ export const GET: APIRoute = async ({ url }) => {
       WHERE created_at >= NOW() - INTERVAL '${days} days'
       GROUP BY demographics->>'gender', demographics->>'ethnicity', demographics->>'age'
       ORDER BY count DESC
-    `;
+    `
 
-    const demographicResult = await query(demographicQuery);
+    const demographicResult = await query(demographicQuery)
 
     // Get bias distribution by score ranges
     const distributionQuery = `
@@ -86,9 +86,9 @@ export const GET: APIRoute = async ({ url }) => {
           ELSE 'Critical (80-100%)'
         END
       ORDER BY count DESC
-    `;
+    `
 
-    const distributionResult = await query(distributionQuery);
+    const distributionResult = await query(distributionQuery)
 
     // Get top bias patterns
     const patternsQuery = `
@@ -102,35 +102,35 @@ export const GET: APIRoute = async ({ url }) => {
       GROUP BY layer_results->'preprocessing'->>'layer'
       ORDER BY avg_score DESC
       LIMIT 5
-    `;
+    `
 
-    const patternsResult = await query(patternsQuery);
+    const patternsResult = await query(patternsQuery)
 
     // Cache the computed data
     const computedData = {
       historical: historicalResult.rows.map((row) => ({
         date: row.date,
-        biasScore: parseFloat(row.avg_bias_score || "0"),
-        sessionCount: parseInt(row.session_count || "0"),
-        alertCount: parseInt(row.alert_count || "0"),
-        minBias: parseFloat(row.min_bias || "0"),
-        maxBias: parseFloat(row.max_bias || "0"),
+        biasScore: parseFloat(row.avg_bias_score || '0'),
+        sessionCount: parseInt(row.session_count || '0'),
+        alertCount: parseInt(row.alert_count || '0'),
+        minBias: parseFloat(row.min_bias || '0'),
+        maxBias: parseFloat(row.max_bias || '0'),
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender || "Unknown",
-        ethnicity: row.ethnicity || "Unknown",
-        ageGroup: row.age_group || "Unknown",
-        count: parseInt(row.count || "0"),
-        avgBias: parseFloat(row.avg_bias || "0"),
+        gender: row.gender || 'Unknown',
+        ethnicity: row.ethnicity || 'Unknown',
+        ageGroup: row.age_group || 'Unknown',
+        count: parseInt(row.count || '0'),
+        avgBias: parseFloat(row.avg_bias || '0'),
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || "0"),
+        count: parseInt(row.count || '0'),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer || "Unknown",
-        avgScore: parseFloat(row.avg_score || "0"),
-        occurrences: parseInt(row.occurrences || "0"),
+        layer: row.layer || 'Unknown',
+        avgScore: parseFloat(row.avg_score || '0'),
+        occurrences: parseInt(row.occurrences || '0'),
       })),
       metadata: {
         days,
@@ -138,42 +138,42 @@ export const GET: APIRoute = async ({ url }) => {
         dateRange: {
           start: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
             .toISOString()
-            .split("T")[0],
-          end: new Date().toISOString().split("T")[0],
+            .split('T')[0],
+          end: new Date().toISOString().split('T')[0],
         },
         generatedAt: new Date().toISOString(),
       },
-    };
+    }
 
     // Cache the data for 15 minutes
-    await cache.setAnalyticsData("comprehensive", days, computedData);
-    console.log("💾 Analytics data cached for 15 minutes");
+    await cache.setAnalyticsData('comprehensive', days, computedData)
+    console.log('💾 Analytics data cached for 15 minutes')
 
     // Format response
     const response = {
       historical: historicalResult.rows.map((row) => ({
         date: row.date,
-        biasScore: parseFloat(row.avg_bias_score || "0"),
-        sessionCount: parseInt(row.session_count || "0"),
-        alertCount: parseInt(row.alert_count || "0"),
-        minBias: parseFloat(row.min_bias || "0"),
-        maxBias: parseFloat(row.max_bias || "0"),
+        biasScore: parseFloat(row.avg_bias_score || '0'),
+        sessionCount: parseInt(row.session_count || '0'),
+        alertCount: parseInt(row.alert_count || '0'),
+        minBias: parseFloat(row.min_bias || '0'),
+        maxBias: parseFloat(row.max_bias || '0'),
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender || "Unknown",
-        ethnicity: row.ethnicity || "Unknown",
-        ageGroup: row.age_group || "Unknown",
-        count: parseInt(row.count || "0"),
-        avgBias: parseFloat(row.avg_bias || "0"),
+        gender: row.gender || 'Unknown',
+        ethnicity: row.ethnicity || 'Unknown',
+        ageGroup: row.age_group || 'Unknown',
+        count: parseInt(row.count || '0'),
+        avgBias: parseFloat(row.avg_bias || '0'),
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row.bias_range,
-        count: parseInt(row.count || "0"),
+        count: parseInt(row.count || '0'),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer || "Unknown",
-        avgScore: parseFloat(row.avg_score || "0"),
-        occurrences: parseInt(row.occurrences || "0"),
+        layer: row.layer || 'Unknown',
+        avgScore: parseFloat(row.avg_score || '0'),
+        occurrences: parseInt(row.occurrences || '0'),
       })),
       metadata: {
         days,
@@ -181,29 +181,29 @@ export const GET: APIRoute = async ({ url }) => {
         dateRange: {
           start: new Date(Date.now() - days * 24 * 60 * 60 * 1000)
             .toISOString()
-            .split("T")[0],
-          end: new Date().toISOString().split("T")[0],
+            .split('T')[0],
+          end: new Date().toISOString().split('T')[0],
         },
         generatedAt: new Date().toISOString(),
       },
-    };
+    }
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+      headers: { 'Content-Type': 'application/json' },
+    })
   } catch (error: any) {
-    console.error("Analytics API error:", error);
+    console.error('Analytics API error:', error)
     return new Response(
       JSON.stringify({
-        error: "Failed to fetch analytics data",
+        error: 'Failed to fetch analytics data',
         details:
-          process.env["NODE_ENV"] === "development" ? error.message : undefined,
+          process.env['NODE_ENV'] === 'development' ? error.message : undefined,
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       },
-    );
+    )
   }
-};
+}

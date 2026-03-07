@@ -1,60 +1,60 @@
-import React, { useState, useEffect } from "react";
-import type { User } from "@/types/user";
-import { SkeletonProfile } from "@/components/ui/skeleton";
+import React, { useState, useEffect } from 'react'
+import type { User } from '@/types/user'
+import { SkeletonProfile } from '@/components/ui/skeleton'
 
 interface ProfileComponentProps {
-  user: User;
+  user: User
 }
 
 export function ProfileComponent({ user }: ProfileComponentProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [formData, setFormData] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
-    bio: "",
-    profession: "",
-    specialization: "",
-    experience: "",
-  });
+    name: user?.name || '',
+    email: user?.email || '',
+    bio: '',
+    profession: '',
+    specialization: '',
+    experience: '',
+  })
 
   // Simulate loading state on initial render
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+      setIsLoading(false)
+    }, 1500)
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     // Show loading state while saving
-    setIsLoading(true);
+    setIsLoading(true)
 
     // Here you would typically send the updated profile to the server
-    console.log("Updated profile:", formData);
+    console.log('Updated profile:', formData)
 
     // Mock successful update with delay
     setTimeout(() => {
-      setIsLoading(false);
-      setIsEditing(false);
+      setIsLoading(false)
+      setIsEditing(false)
       // Show success toast or message
-    }, 1000);
-  };
+    }, 1000)
+  }
 
   if (isLoading) {
-    return <SkeletonProfile />;
+    return <SkeletonProfile />
   }
 
   if (isEditing) {
@@ -206,13 +206,13 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
                   Saving...
                 </>
               ) : (
-                "Save Changes"
+                'Save Changes'
               )}
             </button>
           </div>
         </form>
       </div>
-    );
+    )
   }
 
   return (
@@ -229,9 +229,9 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
             {user?.name ? (
               <span className="text-2xl font-bold text-primary">
                 {user.name
-                  .split(" ")
+                  .split(' ')
                   .map((n) => n[0])
-                  .join("")}
+                  .join('')}
               </span>
             ) : (
               <span className="material-symbols-outlined text-3xl text-primary">
@@ -250,14 +250,14 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
               <h4 className="text-sm font-medium text-muted-foreground">
                 Full Name
               </h4>
-              <p>{user?.name || "Not set"}</p>
+              <p>{user?.name || 'Not set'}</p>
             </div>
 
             <div className="space-y-1">
               <h4 className="text-sm font-medium text-muted-foreground">
                 Email Address
               </h4>
-              <p>{user?.email || "Not set"}</p>
+              <p>{user?.email || 'Not set'}</p>
             </div>
 
             <div className="space-y-1">
@@ -328,5 +328,5 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

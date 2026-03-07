@@ -22,6 +22,7 @@ async function testMinimalAuth() {
     console.log("User ID:", user.user.id);
 
     console.log("\n🎉 Minimal auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

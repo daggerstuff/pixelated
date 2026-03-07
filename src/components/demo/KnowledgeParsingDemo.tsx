@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Loader2,
   Brain,
@@ -16,103 +16,103 @@ import {
   BarChart3,
   Download,
   History,
-} from "lucide-react";
+} from 'lucide-react'
 
 interface Entity {
-  text: string;
-  type: string;
-  confidence: number;
-  start?: number;
-  end?: number;
+  text: string
+  type: string
+  confidence: number
+  start?: number
+  end?: number
 }
 
 interface Concept {
-  concept: string;
-  relevance: number;
-  category?: string;
+  concept: string
+  relevance: number
+  category?: string
 }
 
 interface RiskFactor {
-  factor: string;
-  severity: "High" | "Moderate" | "Low";
-  probability?: number;
+  factor: string
+  severity: 'High' | 'Moderate' | 'Low'
+  probability?: number
 }
 
 interface AnalysisResults {
-  entities: Entity[];
-  concepts: Concept[];
-  riskFactors: RiskFactor[];
+  entities: Entity[]
+  concepts: Concept[]
+  riskFactors: RiskFactor[]
   metadata?: {
-    processingTime: number;
-    wordCount: number;
-    sentenceCount: number;
-    complexity: number;
-    readabilityScore: number;
-  };
+    processingTime: number
+    wordCount: number
+    sentenceCount: number
+    complexity: number
+    readabilityScore: number
+  }
   insights?: Array<{
-    category: string;
-    insight: string;
-    confidence: number;
-  }>;
+    category: string
+    insight: string
+    confidence: number
+  }>
 }
 
 interface AnalysisHistory {
-  id: string;
-  text: string;
-  result: AnalysisResults;
-  timestamp: number;
-  processingTime: number;
+  id: string
+  text: string
+  result: AnalysisResults
+  timestamp: number
+  processingTime: number
 }
 
 export default function KnowledgeParsingDemo() {
-  const [inputText, setInputText] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [results, setResults] = useState<AnalysisResults | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [analysisHistory, setAnalysisHistory] = useState<AnalysisHistory[]>([]);
-  const [processingTime, setProcessingTime] = useState<number | null>(null);
-  const [isRealTimeMode, setIsRealTimeMode] = useState(false);
-  const [confidence, setConfidence] = useState<number>(0);
-  const realTimeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [inputText, setInputText] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [results, setResults] = useState<AnalysisResults | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [analysisHistory, setAnalysisHistory] = useState<AnalysisHistory[]>([])
+  const [processingTime, setProcessingTime] = useState<number | null>(null)
+  const [isRealTimeMode, setIsRealTimeMode] = useState(false)
+  const [confidence, setConfidence] = useState<number>(0)
+  const realTimeTimeout = useRef<NodeJS.Timeout | null>(null)
 
   // Save to history
   const saveToHistory = useCallback(
     (text: string, result: AnalysisResults, processingTime: number) => {
       const historyItem: AnalysisHistory = {
         id: Date.now().toString(),
-        text: text.substring(0, 100) + (text.length > 100 ? "..." : ""),
+        text: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
         result,
         timestamp: Date.now(),
         processingTime,
-      };
-      const newHistory = [historyItem, ...analysisHistory.slice(0, 9)]; // Keep last 10
-      setAnalysisHistory(newHistory);
+      }
+      const newHistory = [historyItem, ...analysisHistory.slice(0, 9)] // Keep last 10
+      setAnalysisHistory(newHistory)
       localStorage.setItem(
-        "knowledgeParsingHistory",
+        'knowledgeParsingHistory',
         JSON.stringify(newHistory),
-      );
+      )
     },
     [analysisHistory],
-  );
+  )
 
   const analyze = useCallback(async () => {
     if (!inputText.trim()) {
-      setError("Please enter some text to analyze");
-      return;
+      setError('Please enter some text to analyze')
+      return
     }
 
-    setIsAnalyzing(true);
-    setResults(null);
-    setError(null);
-    setProcessingTime(null);
-    const startTime = Date.now();
+    setIsAnalyzing(true)
+    setResults(null)
+    setError(null)
+    setProcessingTime(null)
+    const startTime = Date.now()
 
     try {
       // Use the enhanced API client with retry logic
-      const response = await fetch("/api/psychology/parse", {
-        method: "POST",
+      const response = await fetch('/api/psychology/parse', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           content: inputText,
@@ -126,17 +126,17 @@ export default function KnowledgeParsingDemo() {
             includeMetadata: true,
           },
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        throw new Error(`API request failed: ${response.status}`)
       }
 
-      const apiResults = await response.json();
+      const apiResults = await response.json()
 
-      const endTime = Date.now();
-      const requestTime = endTime - startTime;
-      setProcessingTime(requestTime);
+      const endTime = Date.now()
+      const requestTime = endTime - startTime
+      setProcessingTime(requestTime)
 
       // Enhanced result processing with metadata
       const enhancedResults: AnalysisResults = {
@@ -151,44 +151,44 @@ export default function KnowledgeParsingDemo() {
             100 - (inputText.split(/\s+/).length / 20) * 10,
           ),
         },
-      };
+      }
 
-      setResults(enhancedResults);
+      setResults(enhancedResults)
 
       // Calculate overall confidence
       const avgConfidence =
         enhancedResults.entities.reduce(
           (acc, entity) => acc + entity.confidence,
           0,
-        ) / enhancedResults.entities.length || 0;
-      setConfidence(avgConfidence * 100);
+        ) / enhancedResults.entities.length || 0
+      setConfidence(avgConfidence * 100)
 
       // Save to history
-      saveToHistory(inputText, enhancedResults, requestTime);
+      saveToHistory(inputText, enhancedResults, requestTime)
     } catch (err: unknown) {
-      console.error("Analysis failed:", err);
+      console.error('Analysis failed:', err)
       setError(
         err instanceof Error
           ? (err as Error)?.message || String(err)
-          : "Analysis failed. Please try again.",
-      );
+          : 'Analysis failed. Please try again.',
+      )
 
       // Fallback to demo data for demonstration
       const demoResults: AnalysisResults = {
         entities: [
-          { text: "anxiety", type: "Condition", confidence: 0.92 },
-          { text: "depression", type: "Condition", confidence: 0.88 },
-          { text: "therapy", type: "Treatment", confidence: 0.95 },
+          { text: 'anxiety', type: 'Condition', confidence: 0.92 },
+          { text: 'depression', type: 'Condition', confidence: 0.88 },
+          { text: 'therapy', type: 'Treatment', confidence: 0.95 },
         ],
         concepts: [
-          { concept: "Mental Health", relevance: 0.95 },
-          { concept: "Treatment Planning", relevance: 0.87 },
-          { concept: "Risk Assessment", relevance: 0.73 },
+          { concept: 'Mental Health', relevance: 0.95 },
+          { concept: 'Treatment Planning', relevance: 0.87 },
+          { concept: 'Risk Assessment', relevance: 0.73 },
         ],
         riskFactors: [
-          { factor: "Social Isolation", severity: "Moderate" },
-          { factor: "Sleep Disturbance", severity: "High" },
-          { factor: "Substance Use", severity: "Low" },
+          { factor: 'Social Isolation', severity: 'Moderate' },
+          { factor: 'Sleep Disturbance', severity: 'High' },
+          { factor: 'Substance Use', severity: 'Low' },
         ],
         metadata: {
           processingTime: Date.now() - startTime,
@@ -197,57 +197,57 @@ export default function KnowledgeParsingDemo() {
           complexity: 65,
           readabilityScore: 78,
         },
-      };
-      setResults(demoResults);
-      setConfidence(88.3);
+      }
+      setResults(demoResults)
+      setConfidence(88.3)
     } finally {
-      setIsAnalyzing(false);
+      setIsAnalyzing(false)
     }
-  }, [inputText, saveToHistory]);
+  }, [inputText, saveToHistory])
 
   // Real-time analysis with debouncing
   useEffect(() => {
     if (isRealTimeMode && inputText.trim().length > 10) {
       if (realTimeTimeout.current) {
-        clearTimeout(realTimeTimeout.current);
+        clearTimeout(realTimeTimeout.current)
       }
       realTimeTimeout.current = setTimeout(() => {
-        analyze();
-      }, 1500);
+        analyze()
+      }, 1500)
     }
     return () => {
       if (realTimeTimeout.current) {
-        clearTimeout(realTimeTimeout.current);
+        clearTimeout(realTimeTimeout.current)
       }
-    };
-  }, [inputText, isRealTimeMode, analyze]);
+    }
+  }, [inputText, isRealTimeMode, analyze])
 
   // Load analysis history from localStorage
   useEffect(() => {
-    const savedHistory = localStorage.getItem("knowledgeParsingHistory");
+    const savedHistory = localStorage.getItem('knowledgeParsingHistory')
     if (savedHistory) {
       try {
-        setAnalysisHistory(JSON.parse(savedHistory) as AnalysisHistory[]);
+        setAnalysisHistory(JSON.parse(savedHistory) as AnalysisHistory[])
       } catch (e) {
-        console.warn("Failed to load analysis history:", e);
+        console.warn('Failed to load analysis history:', e)
       }
     }
-  }, []);
+  }, [])
 
   const loadFromHistory = (historyItem: AnalysisHistory) => {
-    setInputText(historyItem.text);
-    setResults(historyItem.result);
-    setProcessingTime(historyItem.processingTime);
-  };
+    setInputText(historyItem.text)
+    setResults(historyItem.result)
+    setProcessingTime(historyItem.processingTime)
+  }
 
   const clearHistory = () => {
-    setAnalysisHistory([]);
-    localStorage.removeItem("knowledgeParsingHistory");
-  };
+    setAnalysisHistory([])
+    localStorage.removeItem('knowledgeParsingHistory')
+  }
 
   const exportResults = () => {
     if (!results) {
-      return;
+      return
     }
 
     const exportData = {
@@ -255,18 +255,18 @@ export default function KnowledgeParsingDemo() {
       results,
       timestamp: new Date().toISOString(),
       processingTime,
-    };
+    }
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `knowledge-analysis-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `knowledge-analysis-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
@@ -292,10 +292,10 @@ export default function KnowledgeParsingDemo() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsRealTimeMode(!isRealTimeMode)}
-                className={isRealTimeMode ? "bg-green-50 border-green-200" : ""}
+                className={isRealTimeMode ? 'bg-green-50 border-green-200' : ''}
               >
                 <Activity className="w-4 h-4 mr-2" />
-                {isRealTimeMode ? "Real-time ON" : "Real-time OFF"}
+                {isRealTimeMode ? 'Real-time ON' : 'Real-time OFF'}
               </Button>
               {results && (
                 <Button variant="outline" size="sm" onClick={exportResults}>
@@ -317,7 +317,7 @@ export default function KnowledgeParsingDemo() {
               />
               <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
                 <span>
-                  {inputText.length} characters,{" "}
+                  {inputText.length} characters,{' '}
                   {inputText.split(/\s+/).filter((w) => w).length} words
                 </span>
                 {isRealTimeMode && inputText.length > 10 && (
@@ -490,11 +490,11 @@ export default function KnowledgeParsingDemo() {
                       <Badge
                         variant="outline"
                         className={
-                          risk.severity === "High"
-                            ? "border-red-200 text-red-700 bg-red-50"
-                            : risk.severity === "Moderate"
-                              ? "border-yellow-200 text-yellow-700 bg-yellow-50"
-                              : "border-green-200 text-green-700 bg-green-50"
+                          risk.severity === 'High'
+                            ? 'border-red-200 text-red-700 bg-red-50'
+                            : risk.severity === 'Moderate'
+                              ? 'border-yellow-200 text-yellow-700 bg-yellow-50'
+                              : 'border-green-200 text-green-700 bg-green-50'
                         }
                       >
                         {risk.severity}
@@ -685,7 +685,7 @@ export default function KnowledgeParsingDemo() {
                       {item.text}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {new Date(item.timestamp).toLocaleString()} •{" "}
+                      {new Date(item.timestamp).toLocaleString()} •{' '}
                       {item.processingTime}ms
                     </p>
                   </div>
@@ -701,5 +701,5 @@ export default function KnowledgeParsingDemo() {
         </Card>
       )}
     </div>
-  );
+  )
 }

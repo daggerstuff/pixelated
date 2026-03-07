@@ -1,11 +1,11 @@
 // Historical progress tracking dashboard component
 
-import type { FC } from "react";
-import type { HistoricalComparison } from "../../../lib/types/bias-detection";
+import type { FC } from 'react'
+import type { HistoricalComparison } from '../../../lib/types/bias-detection'
 
 interface HistoricalProgressTrackerProps {
-  comparison: HistoricalComparison;
-  currentScore: number;
+  comparison: HistoricalComparison
+  currentScore: number
 }
 
 export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
@@ -15,21 +15,21 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
   // Helper function to get trend styling
   const getTrendStyle = (trend: string) => {
     switch (trend) {
-      case "improving":
-        return "text-green-600 bg-green-100";
-      case "worsening":
-        return "text-red-600 bg-red-100";
-      case "stable":
-        return "text-blue-600 bg-blue-100";
+      case 'improving':
+        return 'text-green-600 bg-green-100'
+      case 'worsening':
+        return 'text-red-600 bg-red-100'
+      case 'stable':
+        return 'text-blue-600 bg-blue-100'
       default:
-        return "text-gray-600 bg-gray-100";
+        return 'text-gray-600 bg-gray-100'
     }
-  };
+  }
 
   // Helper function to get trend icon
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "improving":
+      case 'improving':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -38,8 +38,8 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               clipRule="evenodd"
             />
           </svg>
-        );
-      case "worsening":
+        )
+      case 'worsening':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -48,8 +48,8 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               clipRule="evenodd"
             />
           </svg>
-        );
-      case "stable":
+        )
+      case 'stable':
         return (
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path
@@ -58,32 +58,32 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               clipRule="evenodd"
             />
           </svg>
-        );
+        )
       default:
-        return null;
+        return null
     }
-  };
+  }
 
   // Helper function to format percentage
-  const formatPercentage = (value: number) => `${(value * 100).toFixed(1)}%`;
+  const formatPercentage = (value: number) => `${(value * 100).toFixed(1)}%`
 
   // Helper function to get percentile color
   const getPercentileColor = (percentile: number) => {
     if (percentile >= 80) {
-      return "text-green-600";
+      return 'text-green-600'
     }
     if (percentile >= 60) {
-      return "text-yellow-600";
+      return 'text-yellow-600'
     }
     if (percentile >= 40) {
-      return "text-orange-600";
+      return 'text-orange-600'
     }
-    return "text-red-600";
-  };
+    return 'text-red-600'
+  }
 
   // Calculate improvement/decline from 30-day average
-  const scoreDifference = currentScore - comparison.thirtyDayAverage;
-  const isImprovement = scoreDifference < 0; // Lower bias score is better
+  const scoreDifference = currentScore - comparison.thirtyDayAverage
+  const isImprovement = scoreDifference < 0 // Lower bias score is better
 
   return (
     <div className="historical-progress-tracker space-y-6">
@@ -107,9 +107,9 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             </div>
             <div className="text-sm text-gray-600 mb-2">Current Score</div>
             <div
-              className={`text-sm font-medium ${isImprovement ? "text-green-600" : "text-red-600"}`}
+              className={`text-sm font-medium ${isImprovement ? 'text-green-600' : 'text-red-600'}`}
             >
-              {isImprovement ? "↓" : "↑"}{" "}
+              {isImprovement ? '↓' : '↑'}{' '}
               {formatPercentage(Math.abs(scoreDifference))}
               <span className="text-gray-500 ml-1">vs avg</span>
             </div>
@@ -138,12 +138,12 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             <div className="text-sm text-purple-800 mb-2">Percentile</div>
             <div className="text-xs text-purple-600">
               {comparison.percentileRank >= 80
-                ? "Excellent"
+                ? 'Excellent'
                 : comparison.percentileRank >= 60
-                  ? "Good"
+                  ? 'Good'
                   : comparison.percentileRank >= 40
-                    ? "Fair"
-                    : "Needs Improvement"}
+                    ? 'Fair'
+                    : 'Needs Improvement'}
             </div>
           </div>
         </div>
@@ -162,12 +162,12 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             </div>
             <div className="text-sm opacity-80 mb-1">7-Day Trend</div>
             <div className="text-xs opacity-70">
-              {comparison.sevenDayTrend === "improving" &&
-                "Bias scores decreasing"}
-              {comparison.sevenDayTrend === "worsening" &&
-                "Bias scores increasing"}
-              {comparison.sevenDayTrend === "stable" &&
-                "Consistent performance"}
+              {comparison.sevenDayTrend === 'improving' &&
+                'Bias scores decreasing'}
+              {comparison.sevenDayTrend === 'worsening' &&
+                'Bias scores increasing'}
+              {comparison.sevenDayTrend === 'stable' &&
+                'Consistent performance'}
             </div>
           </div>
         </div>
@@ -194,12 +194,12 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               <div
                 className={`h-3 rounded-full ${
                   currentScore >= 0.8
-                    ? "bg-red-500"
+                    ? 'bg-red-500'
                     : currentScore >= 0.6
-                      ? "bg-orange-500"
+                      ? 'bg-orange-500'
                       : currentScore >= 0.4
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
                 }`}
                 style={{ width: `${currentScore * 100}%` }}
               />
@@ -234,7 +234,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               <>
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
-                  Current session shows{" "}
+                  Current session shows{' '}
                   {formatPercentage(Math.abs(scoreDifference))} improvement over
                   historical average
                 </li>
@@ -247,7 +247,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               <>
                 <li className="flex items-start">
                   <span className="text-orange-500 mr-2">⚠</span>
-                  Current session shows{" "}
+                  Current session shows{' '}
                   {formatPercentage(Math.abs(scoreDifference))} higher bias than
                   historical average
                 </li>
@@ -265,14 +265,14 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               similar sessions
             </li>
 
-            {comparison.sevenDayTrend === "improving" && (
+            {comparison.sevenDayTrend === 'improving' && (
               <li className="flex items-start">
                 <span className="text-green-500 mr-2">📈</span>
                 Recent 7-day trend shows consistent improvement
               </li>
             )}
 
-            {comparison.sevenDayTrend === "worsening" && (
+            {comparison.sevenDayTrend === 'worsening' && (
               <li className="flex items-start">
                 <span className="text-red-500 mr-2">📉</span>
                 Recent 7-day trend indicates need for attention
@@ -313,7 +313,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             </div>
           )}
 
-          {comparison.sevenDayTrend === "worsening" && (
+          {comparison.sevenDayTrend === 'worsening' && (
             <div className="flex items-start">
               <svg
                 className="w-5 h-5 text-blue-600 mr-2 mt-0.5"
@@ -388,7 +388,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default HistoricalProgressTracker;
+export default HistoricalProgressTracker
