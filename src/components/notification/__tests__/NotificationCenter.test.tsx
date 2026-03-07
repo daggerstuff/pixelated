@@ -16,6 +16,7 @@ describe('notificationCenter', () => {
       error: null,
       sendMessage: vi.fn(),
       sendStatus: vi.fn(),
+      sendRaw: vi.fn(),
     })
   })
 
@@ -36,6 +37,7 @@ describe('notificationCenter', () => {
         error: null,
         sendMessage: vi.fn(),
         sendStatus: vi.fn(),
+        sendRaw: vi.fn(),
       }
     })
 
@@ -74,6 +76,7 @@ describe('notificationCenter', () => {
         error: null,
         sendMessage: vi.fn(),
         sendStatus: vi.fn(),
+        sendRaw: vi.fn(),
       }
     })
 
@@ -102,7 +105,7 @@ describe('notificationCenter', () => {
   })
 
   it('marks notification as read when clicking check button', async () => {
-    const mockSendMessage = vi.fn()
+    const mockSendRaw = vi.fn()
     let capturedOnMessage: (message: { content: string }) => void = () => {}
 
     vi.mocked(useWebSocket).mockImplementation(({ onMessage }) => {
@@ -110,8 +113,9 @@ describe('notificationCenter', () => {
       return {
         isConnected: true,
         error: null,
-        sendMessage: mockSendMessage,
+        sendMessage: vi.fn(),
         sendStatus: vi.fn(),
+        sendRaw: mockSendRaw,
       }
     })
 
@@ -138,15 +142,14 @@ describe('notificationCenter', () => {
     const checkButton = screen.getByRole('button', { name: /mark as read/i })
     fireEvent.click(checkButton)
 
-    expect(mockSendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: expect.stringContaining('"type":"mark_read"'),
-      }),
-    )
+    expect(mockSendRaw).toHaveBeenCalledWith({
+      type: 'mark_read',
+      notificationId: '1',
+    })
   })
 
   it('dismisses notification when clicking dismiss button', async () => {
-    const mockSendMessage = vi.fn()
+    const mockSendRaw = vi.fn()
     let capturedOnMessage: (message: { content: string }) => void = () => {}
 
     vi.mocked(useWebSocket).mockImplementation(({ onMessage }) => {
@@ -154,8 +157,9 @@ describe('notificationCenter', () => {
       return {
         isConnected: true,
         error: null,
-        sendMessage: mockSendMessage,
+        sendMessage: vi.fn(),
         sendStatus: vi.fn(),
+        sendRaw: mockSendRaw,
       }
     })
 
@@ -184,11 +188,10 @@ describe('notificationCenter', () => {
     })
     fireEvent.click(dismissButton)
 
-    expect(mockSendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        content: expect.stringContaining('"type":"dismiss"'),
-      }),
-    )
+    expect(mockSendRaw).toHaveBeenCalledWith({
+      type: 'dismiss',
+      notificationId: '1',
+    })
   })
 
   it('closes notification panel when clicking close button', () => {
@@ -210,6 +213,7 @@ describe('notificationCenter', () => {
         error: null,
         sendMessage: vi.fn(),
         sendStatus: vi.fn(),
+        sendRaw: vi.fn(),
       }
     })
 
