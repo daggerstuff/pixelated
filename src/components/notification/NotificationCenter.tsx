@@ -23,7 +23,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
 
-  const { sendRaw } = useWebSocket({
+  const { sendMessage } = useWebSocket({
     url: 'ws://localhost:8080', // Placeholder URL
     sessionId: 'placeholder-session', // Placeholder session ID
     onMessage: (message) => {
@@ -64,15 +64,23 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
 
   useEffect(() => {
     // Request initial notifications
-    sendRaw({
-      type: 'get_notifications',
-      limit: 20,
-      offset: 0,
+    sendMessage({
+      id: 'init-notifications', // Placeholder ID
+      role: 'system', // Placeholder role
+      content: JSON.stringify({
+        type: 'get_notifications',
+        limit: 20,
+        offset: 0,
+      }), // Stringify custom payload
     })
-  }, [sendRaw])
+  }, [sendMessage])
 
   const handleMarkAsRead = async (notificationId: string) => {
-    sendRaw({ type: 'mark_read', notificationId })
+    sendMessage({
+      id: `mark-read-${notificationId}`,
+      role: 'system',
+      content: JSON.stringify({ type: 'mark_read', notificationId }),
+    })
 
     setNotifications((prev: NotificationItem[]) =>
       prev.map((n: NotificationItem) =>
@@ -85,7 +93,11 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   }
 
   const handleDismiss = async (notificationId: string) => {
-    sendRaw({ type: 'dismiss', notificationId })
+    sendMessage({
+      id: `dismiss-${notificationId}`,
+      role: 'system',
+      content: JSON.stringify({ type: 'dismiss', notificationId }),
+    })
 
     setNotifications((prev: NotificationItem[]) =>
       prev.filter((n: NotificationItem) => n.id !== notificationId),

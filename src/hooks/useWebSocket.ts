@@ -167,17 +167,10 @@ export function useWebSocket({
     [sessionId, encrypted],
   )
 
-  const sendRaw = useCallback((data: any) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(data))
-    }
-  }, [])
-
   return {
     isConnected,
     error,
     sendMessage,
     sendStatus,
-    sendRaw,
   }
 }

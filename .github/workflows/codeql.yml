@@ -40,9 +40,8 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
-          queries: +security-and-quality,security-extended
+          queries: security-and-quality,security-extended${{ matrix.language == "javascript" && ",./.github/codeql/custom-queries/unvalidated-fhir-access.ql,./.github/codeql/custom-queries/insecure-fhir-ops.ql,./.github/codeql/custom-queries/missing-fhir-version.ql,./.github/codeql/custom-queries/insecure-fhir-search.ql,./.github/codeql/custom-queries/unencrypted-ehr-data.ql,./.github/codeql/custom-queries/insecure-ehr-auth.ql,./.github/codeql/custom-queries/missing-audit-log.ql,./.github/codeql/custom-queries/ehr-security-patterns.ql" || "" }}
           # Enable ML-powered alerts for JavaScript/TypeScript
-          setup-python-dependencies: ${{ matrix.language == 'python' }}
           # Increase RAM allocation for analysis
           ram: 16384
 
