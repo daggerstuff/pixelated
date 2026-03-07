@@ -1,64 +1,72 @@
-import { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { SessionList } from '../lists/SessionList'
-import { ProgressCharts } from '../charts/ProgressCharts'
-import { SessionCard } from '../shared/SessionCard'
+import { useMemo } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { SessionList } from "../lists/SessionList";
+import { ProgressCharts } from "../charts/ProgressCharts";
+import { SessionCard } from "../shared/SessionCard";
 import {
   useSessionListQuery,
   useSessionQuery,
-} from '@/lib/hooks/journal-research'
-import { useJournalSessionStore } from '@/lib/stores/journal-research'
-import { useProgressQuery, useProgressMetricsQuery } from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+} from "@/lib/hooks/journal-research";
+import { useJournalSessionStore } from "@/lib/stores/journal-research";
+import {
+  useProgressQuery,
+  useProgressMetricsQuery,
+} from "@/lib/hooks/journal-research";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 export interface DashboardProps {
-  className?: string
+  className?: string;
 }
 
 export function Dashboard({ className }: DashboardProps) {
   const selectedSessionId = useJournalSessionStore(
     (state) => state.selectedSessionId,
-  )
+  );
 
   const { data: sessions, isLoading: sessionsLoading } = useSessionListQuery({
     page: 1,
     pageSize: 5,
-  })
+  });
 
-  const { data: selectedSession } = useSessionQuery(selectedSessionId)
+  const { data: selectedSession } = useSessionQuery(selectedSessionId);
   const { data: progress } = useProgressQuery(selectedSessionId, {
     enabled: Boolean(selectedSessionId),
-  })
+  });
   const { data: metrics } = useProgressMetricsQuery(selectedSessionId, {
     enabled: Boolean(selectedSessionId),
     refetchInterval: 5000,
-  })
+  });
 
   const recentSessions = useMemo(() => {
-    if (!sessions) return []
+    if (!sessions) return [];
     return sessions.items
       .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
-      .slice(0, 5)
-  }, [sessions])
+      .slice(0, 5);
+  }, [sessions]);
 
   const quickActions = [
     {
-      label: 'New Session',
+      label: "New Session",
       action: () => {
-        useJournalSessionStore.getState().openCreateDrawer()
+        useJournalSessionStore.getState().openCreateDrawer();
       },
     },
     {
-      label: 'View All Sessions',
+      label: "View All Sessions",
       action: () => {
         // Navigate to sessions page
       },
     },
-  ]
+  ];
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -120,7 +128,7 @@ export function Dashboard({ className }: DashboardProps) {
                   onClick={() => {
                     useJournalSessionStore
                       .getState()
-                      .setSelectedSessionId(session.sessionId)
+                      .setSelectedSessionId(session.sessionId);
                   }}
                 />
               ))}
@@ -136,12 +144,20 @@ export function Dashboard({ className }: DashboardProps) {
         </CardHeader>
         <CardContent>
           <SessionList
-            sessions={sessions ?? { items: [], total: 0, page: 1, pageSize: 10, totalPages: 0 }}
+            sessions={
+              sessions ?? {
+                items: [],
+                total: 0,
+                page: 1,
+                pageSize: 10,
+                totalPages: 0,
+              }
+            }
             isLoading={sessionsLoading}
             onSessionClick={(session) => {
               useJournalSessionStore
                 .getState()
-                .setSelectedSessionId(session.sessionId)
+                .setSelectedSessionId(session.sessionId);
             }}
           />
         </CardContent>
@@ -167,7 +183,7 @@ export function Dashboard({ className }: DashboardProps) {
                   <div>
                     <p className="font-medium">{session.sessionId}</p>
                     <p className="text-sm text-muted-foreground">
-                      Started {format(session.startDate, 'MMM d, yyyy')} •{' '}
+                      Started {format(session.startDate, "MMM d, yyyy")} •{" "}
                       {session.currentPhase}
                     </p>
                   </div>
@@ -184,5 +200,5 @@ export function Dashboard({ className }: DashboardProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

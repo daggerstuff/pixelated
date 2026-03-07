@@ -52,15 +52,15 @@ queue.mem:
 
 # Processors
 processors:
-- add_host_metadata: ~
-- add_cloud_metadata: ~
-- add_docker_metadata: ~
-- add_kubernetes_metadata: ~
-- add_fields:
-    target: ''
-    fields:
-      environment: production
-      application: pixelated-empathy
+  - add_host_metadata: ~
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+  - add_fields:
+      target: ""
+      fields:
+        environment: production
+        application: pixelated-empathy
 
 # Monitoring
 monitoring.enabled: false

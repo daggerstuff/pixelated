@@ -1,9 +1,9 @@
 ---
-title: 'Mistral-7B RAG Implementation for Therapy Support'
-description: 'Mistral-7B RAG Implementation for Therapy Support documentation'
+title: "Mistral-7B RAG Implementation for Therapy Support"
+description: "Mistral-7B RAG Implementation for Therapy Support documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -20,22 +20,22 @@ This document outlines the implementation of a Retrieval Augmented Generation (R
 
 ```typescript
 interface RAGSystem {
-  llm: Mistral7B
-  vectorStore: ChromaDB
-  embeddings: SentenceTransformer
-  retriever: DocumentRetriever
-  promptManager: PromptManager
+  llm: Mistral7B;
+  vectorStore: ChromaDB;
+  embeddings: SentenceTransformer;
+  retriever: DocumentRetriever;
+  promptManager: PromptManager;
 }
 
 interface DocumentRetriever {
-  search(query: string): Promise<Document[]>
-  addDocuments(docs: Document[]): Promise<void>
-  updateDocuments(docs: Document[]): Promise<void>
+  search(query: string): Promise<Document[]>;
+  addDocuments(docs: Document[]): Promise<void>;
+  updateDocuments(docs: Document[]): Promise<void>;
 }
 
 interface PromptManager {
-  generatePrompt(query: string, context: Document[]): string
-  formatResponse(response: string): string
+  generatePrompt(query: string, context: Document[]): string;
+  formatResponse(response: string): string;
 }
 ```
 

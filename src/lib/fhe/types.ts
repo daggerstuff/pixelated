@@ -14,10 +14,10 @@
  * Encryption modes available in the system
  */
 export enum EncryptionMode {
-  NONE = 'none', // No encryption
-  STANDARD = 'standard', // Standard encryption (not FHE)
-  FHE = 'fhe', // Full homomorphic encryption
-  HIPAA = 'hipaa', // HIPAA-compliant encryption
+  NONE = "none", // No encryption
+  STANDARD = "standard", // Standard encryption (not FHE)
+  FHE = "fhe", // Full homomorphic encryption
+  HIPAA = "hipaa", // HIPAA-compliant encryption
 }
 
 /**
@@ -27,77 +27,77 @@ export enum EncryptionMode {
  */
 export enum FHEOperation {
   // Basic arithmetic operations
-  Addition = 'addition',
-  Subtraction = 'subtraction',
-  Multiplication = 'multiplication',
-  Square = 'square',
-  Negation = 'negation',
-  Rotation = 'rotation',
-  Polynomial = 'polynomial',
-  Rescale = 'rescale',
+  Addition = "addition",
+  Subtraction = "subtraction",
+  Multiplication = "multiplication",
+  Square = "square",
+  Negation = "negation",
+  Rotation = "rotation",
+  Polynomial = "polynomial",
+  Rescale = "rescale",
 
   // Text analysis operations
-  SENTIMENT = 'sentiment',
-  CATEGORIZE = 'categorize',
-  SUMMARIZE = 'summarize',
-  TOKENIZE = 'tokenize',
-  FILTER = 'filter',
-  CUSTOM = 'custom',
-  WORD_COUNT = 'word_count',
-  CHARACTER_COUNT = 'character_count',
-  KEYWORD_DENSITY = 'keyword_density',
-  READING_LEVEL = 'reading_level',
-  ANALYZE = 'ANALYZE',
+  SENTIMENT = "sentiment",
+  CATEGORIZE = "categorize",
+  SUMMARIZE = "summarize",
+  TOKENIZE = "tokenize",
+  FILTER = "filter",
+  CUSTOM = "custom",
+  WORD_COUNT = "word_count",
+  CHARACTER_COUNT = "character_count",
+  KEYWORD_DENSITY = "keyword_density",
+  READING_LEVEL = "reading_level",
+  ANALYZE = "ANALYZE",
 }
 
 /**
  * FHE error types
  */
 export enum FHEErrorType {
-  INITIALIZATION_ERROR = 'initialization_error',
-  ENCRYPTION_ERROR = 'encryption_error',
-  DECRYPTION_ERROR = 'decryption_error',
-  OPERATION_ERROR = 'operation_error',
-  INVALID_FORMAT = 'invalid_format',
-  INVALID_KEY = 'invalid_key',
-  PERMISSION_DENIED = 'permission_denied',
-  CONFIGURATION_ERROR = 'configuration_error',
-  NETWORK_ERROR = 'network_error',
-  UNKNOWN_ERROR = 'unknown_error',
+  INITIALIZATION_ERROR = "initialization_error",
+  ENCRYPTION_ERROR = "encryption_error",
+  DECRYPTION_ERROR = "decryption_error",
+  OPERATION_ERROR = "operation_error",
+  INVALID_FORMAT = "invalid_format",
+  INVALID_KEY = "invalid_key",
+  PERMISSION_DENIED = "permission_denied",
+  CONFIGURATION_ERROR = "configuration_error",
+  NETWORK_ERROR = "network_error",
+  UNKNOWN_ERROR = "unknown_error",
 }
 
 /**
  * FHE operation type
  */
 export enum FHEOperationType {
-  ENCRYPT = 'encrypt',
-  DECRYPT = 'decrypt',
-  PROCESS = 'process',
-  KEY_GENERATION = 'key_generation',
-  REENCRYPTION = 'reencryption',
+  ENCRYPT = "encrypt",
+  DECRYPT = "decrypt",
+  PROCESS = "process",
+  KEY_GENERATION = "key_generation",
+  REENCRYPTION = "reencryption",
 }
 
 /**
  * Therapy content category
  */
 export enum TherapyCategory {
-  ANXIETY = 'anxiety',
-  DEPRESSION = 'depression',
-  TRAUMA = 'trauma',
-  RELATIONSHIP = 'relationship',
-  SUBSTANCE_USE = 'substance_use',
-  GENERAL = 'general',
-  OTHER = 'other',
+  ANXIETY = "anxiety",
+  DEPRESSION = "depression",
+  TRAUMA = "trauma",
+  RELATIONSHIP = "relationship",
+  SUBSTANCE_USE = "substance_use",
+  GENERAL = "general",
+  OTHER = "other",
 }
 
 /**
  * Therapy content sentiment
  */
 export enum TherapySentiment {
-  POSITIVE = 'positive',
-  NEGATIVE = 'negative',
-  NEUTRAL = 'neutral',
-  MIXED = 'mixed',
+  POSITIVE = "positive",
+  NEGATIVE = "negative",
+  NEUTRAL = "neutral",
+  MIXED = "mixed",
 }
 
 //---------------------------------------------------------------
@@ -107,9 +107,9 @@ export enum TherapySentiment {
 /**
  * Explicit key types for TFHE/SEAL
  */
-export type ClientKey = unknown
-export type ServerKey = unknown
-export type PublicKey = unknown
+export type ClientKey = unknown;
+export type ServerKey = unknown;
+export type PublicKey = unknown;
 
 /**
  * Polynomial Representation
@@ -118,14 +118,14 @@ export type PublicKey = unknown
  *
  * Used in FHE operations like the polynomial evaluation operation.
  */
-export type Polynomial = number[]
+export type Polynomial = number[];
 
 /**
  * TFHE Security Level type
  * Different FHE libraries have their own security level implementations.
  * See SealSecurityLevel in seal-types.ts for the SEAL-specific version.
  */
-export type TFHESecurityLevel = number
+export type TFHESecurityLevel = number;
 
 //---------------------------------------------------------------
 // Configuration Interfaces
@@ -136,27 +136,27 @@ export type TFHESecurityLevel = number
  */
 export interface TenantConfig {
   /** Unique identifier for the tenant */
-  tenantId: string
+  tenantId: string;
 
   /** Optional tenant-specific encryption key */
-  encryptionKey?: string
+  encryptionKey?: string;
 
   /** Optional metadata for the tenant */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 
   /** Isolation level for the tenant */
-  isolationLevel?: 'shared' | 'dedicated' | 'custom'
+  isolationLevel?: "shared" | "dedicated" | "custom";
 
   /** Custom configuration for tenant-specific settings */
-  customConfig?: Record<string, unknown>
+  customConfig?: Record<string, unknown>;
 
   /** Resource limits for this tenant */
   resourceLimits?: {
-    maxOperationsPerMinute?: number
-    maxKeySize?: number
-    maxDataSize?: number
-    maxConcurrentOperations?: number
-  }
+    maxOperationsPerMinute?: number;
+    maxKeySize?: number;
+    maxDataSize?: number;
+    maxConcurrentOperations?: number;
+  };
 }
 
 /**
@@ -164,29 +164,29 @@ export interface TenantConfig {
  * This is a general interface that specific implementations can extend.
  */
 export interface EncryptionOptions {
-  mode?: EncryptionMode
-  keySize?: number
-  securityLevel?: string | TFHESecurityLevel
-  enableDebug?: boolean
-  keyRotationPeriod?: number
-  enableBackup?: boolean
+  mode?: EncryptionMode;
+  keySize?: number;
+  securityLevel?: string | TFHESecurityLevel;
+  enableDebug?: boolean;
+  keyRotationPeriod?: number;
+  enableBackup?: boolean;
 }
 
 /**
  * Options for initializing an FHE service
  */
 export interface FHEServiceOptions {
-  mode: EncryptionMode
-  sealScheme?: string
-  useMock?: boolean
-  keySize?: number
-  securityLevel?: string | TFHESecurityLevel
-  enableDebug?: boolean
-  keyRotationPeriod?: number
-  enableBackup?: boolean
+  mode: EncryptionMode;
+  sealScheme?: string;
+  useMock?: boolean;
+  keySize?: number;
+  securityLevel?: string | TFHESecurityLevel;
+  enableDebug?: boolean;
+  keyRotationPeriod?: number;
+  enableBackup?: boolean;
   /** Multi-tenant configuration */
-  tenantConfig?: TenantConfig
-  [key: string]: unknown
+  tenantConfig?: TenantConfig;
+  [key: string]: unknown;
 }
 
 /**
@@ -196,53 +196,53 @@ export interface FHEServiceOptions {
  */
 export interface FHEConfig {
   /** Mode of encryption */
-  mode: EncryptionMode
+  mode: EncryptionMode;
 
   /** Key size in bits */
-  keySize?: number
+  keySize?: number;
 
   /** Security level */
-  securityLevel?: string | TFHESecurityLevel
+  securityLevel?: string | TFHESecurityLevel;
 
   /** Enable debug mode */
-  enableDebug?: boolean
+  enableDebug?: boolean;
 
   /** Polynomial modulus degree */
-  polyModulusDegree?: number
+  polyModulusDegree?: number;
 
   /** Coefficient modulus bits */
-  coeffModulusBits?: number[]
+  coeffModulusBits?: number[];
 
   /** Plain modulus (for BFV scheme) */
-  plainModulus?: number
+  plainModulus?: number;
 
   /** Scale (for CKKS scheme) */
-  scale?: number
+  scale?: number;
 
   /** Maximum computation depth */
-  maxDepth?: number
+  maxDepth?: number;
 
   /** Implementation-specific configuration */
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 
 /**
  * Parameters for FHE operations
  */
 export interface FHEOperationParams {
-  categories?: Record<string, string[]>
-  filterTerms?: string[]
-  operation?: string
-  operationParams?: Record<string, unknown>
+  categories?: Record<string, string[]>;
+  filterTerms?: string[];
+  operation?: string;
+  operationParams?: Record<string, unknown>;
 }
 
 /**
  * Key management options for FHE secure storage and rotation
  */
 export interface KeyManagementOptions {
-  rotationPeriodDays?: number
-  persistKeys?: boolean
-  storagePrefix?: string
+  rotationPeriodDays?: number;
+  persistKeys?: boolean;
+  storagePrefix?: string;
 }
 
 /**
@@ -250,35 +250,35 @@ export interface KeyManagementOptions {
  */
 export interface TEEOptions {
   provider:
-    | 'aws-nitro'
-    | 'azure-confidential-computing'
-    | 'gcp-confidential-vm'
-    | 'intel-sgx'
-  attestationService?: string
-  verificationKeys?: string[]
-  enableRemoteAttestation?: boolean
+    | "aws-nitro"
+    | "azure-confidential-computing"
+    | "gcp-confidential-vm"
+    | "intel-sgx";
+  attestationService?: string;
+  verificationKeys?: string[];
+  enableRemoteAttestation?: boolean;
 }
 
 /**
  * Compliance configuration for different regulatory standards
  */
 export interface ComplianceConfig {
-  hipaa?: boolean
-  gdpr?: boolean
-  ccpa?: boolean
-  pci?: boolean
-  auditLog?: boolean
-  auditLogRetentionDays?: number
+  hipaa?: boolean;
+  gdpr?: boolean;
+  ccpa?: boolean;
+  pci?: boolean;
+  auditLog?: boolean;
+  auditLogRetentionDays?: number;
 }
 
 /**
  * FHE initialization options
  */
 export interface FHEInitOptions {
-  mode: EncryptionMode
-  securityLevel: 'low' | 'medium' | 'high'
-  keyRotationPeriod?: number
-  enableBackup?: boolean
+  mode: EncryptionMode;
+  securityLevel: "low" | "medium" | "high";
+  keyRotationPeriod?: number;
+  enableBackup?: boolean;
 }
 
 //---------------------------------------------------------------
@@ -292,89 +292,89 @@ export interface FHEInitOptions {
  */
 export interface EncryptedData<T = unknown> {
   /** Unique identifier for the encrypted data */
-  id: string
+  id: string;
 
   /** Optional metadata for the encrypted data */
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>;
 
   /** Implementation-specific data */
-  data: T
+  data: T;
 
   /** Data type for type checking */
-  dataType: 'number' | 'string' | 'boolean' | 'array' | 'object'
+  dataType: "number" | "string" | "boolean" | "array" | "object";
 }
 
 /**
  * Type guard for EncryptedData
  */
 export function isEncryptedData(obj: unknown): obj is EncryptedData<unknown> {
-  if (!obj || typeof obj !== 'object') {
-    return false
+  if (!obj || typeof obj !== "object") {
+    return false;
   }
-  const record = obj as Record<string, unknown>
+  const record = obj as Record<string, unknown>;
 
   return (
-    typeof record['id'] === 'string' &&
-    typeof record['dataType'] === 'string' &&
-    'data' in record
-  )
+    typeof record["id"] === "string" &&
+    typeof record["dataType"] === "string" &&
+    "data" in record
+  );
 }
 
 /**
  * Encrypted message interface
  */
 export interface EncryptedMessage {
-  id: string
-  content: string // Encrypted content
-  timestamp: number
-  metadata?: EncryptedMessageMetadata
+  id: string;
+  content: string; // Encrypted content
+  timestamp: number;
+  metadata?: EncryptedMessageMetadata;
 }
 
 /**
  * Metadata for an encrypted message
  */
 export interface EncryptedMessageMetadata {
-  encryptionMode: EncryptionMode
-  keyId?: string
-  timestamp: number
-  contentType?: string
-  verificationToken?: string
+  encryptionMode: EncryptionMode;
+  keyId?: string;
+  timestamp: number;
+  contentType?: string;
+  verificationToken?: string;
 }
 
 /**
  * TFHE context for cryptographic operations
  */
 export interface TFHEContext {
-  initialized: boolean
-  config?: unknown
-  clientKey: unknown
-  publicKey: unknown
-  keySize?: number
-  securityLevel?: string | TFHESecurityLevel
+  initialized: boolean;
+  config?: unknown;
+  clientKey: unknown;
+  publicKey: unknown;
+  keySize?: number;
+  securityLevel?: string | TFHESecurityLevel;
 }
 
 /**
  * TFHE key pair for storage and management
  */
 export interface TFHEKeyPair {
-  id: string
-  publicKey: string
-  privateKeyEncrypted: string
-  created: number
-  expires: number
-  version: string
+  id: string;
+  publicKey: string;
+  privateKeyEncrypted: string;
+  created: number;
+  expires: number;
+  version: string;
 }
 
 /**
  * FHE key pair
  */
 export interface FHEKeyPair {
-  publicKey: string
-  privateKey: string
-  keyId: string
-  created: number
-  expires?: number
-  securityLevel: string
+  publicKey: string;
+  privateKey: string;
+  keyId: string;
+  created: number;
+  expires?: number;
+  securityLevel: string;
 }
 
 /**
@@ -382,33 +382,33 @@ export interface FHEKeyPair {
  */
 export interface FHEKeys {
   /** Key identifier */
-  keyId: string
+  keyId: string;
 
   /** When the key was created */
-  createdAt: Date
+  createdAt: Date;
 
   /** Optional key expiration */
-  expiresAt?: Date
+  expiresAt?: Date;
 
   /** Associated scheme */
-  scheme: string
+  scheme: string;
 
   /** Key status */
-  status: 'active' | 'expired' | 'revoked'
+  status: "active" | "expired" | "revoked";
 }
 
 /**
  * FHE Session
  */
 export interface FHESession {
-  id: string
-  therapistId: string
-  patientId?: string
-  keyPairId: string
-  created: number
-  lastActive: number
-  encryptionMode: string
-  active: boolean
+  id: string;
+  therapistId: string;
+  patientId?: string;
+  keyPairId: string;
+  created: number;
+  lastActive: number;
+  encryptionMode: string;
+  active: boolean;
 }
 
 //---------------------------------------------------------------
@@ -420,16 +420,16 @@ export interface FHESession {
  */
 export interface FHEScheme {
   /** Name of the scheme */
-  name: string
+  name: string;
 
   /** Version of the scheme */
-  version: string
+  version: string;
 
   /** Get all operations supported by this scheme */
-  getOperations(): FHEOperation[]
+  getOperations(): FHEOperation[];
 
   /** Check if a specific operation is supported */
-  supportsOperation(operation: FHEOperation): boolean
+  supportsOperation(operation: FHEOperation): boolean;
 }
 
 /**
@@ -437,26 +437,26 @@ export interface FHEScheme {
  */
 export interface FHEService {
   /** The cryptographic scheme used by this service */
-  scheme: FHEScheme
+  scheme: FHEScheme;
 
   /** Initialize the service (load keys, prepare environment) */
-  initialize(options?: unknown): Promise<void | boolean>
+  initialize(options?: unknown): Promise<void | boolean>;
 
   /** Generate new encryption keys */
-  generateKeys(config?: FHEConfig): Promise<FHEKeys>
+  generateKeys(config?: FHEConfig): Promise<FHEKeys>;
 
   /** Check if the service is initialized and ready */
-  isInitialized(): boolean
+  isInitialized(): boolean;
 
   /** Check if a specific operation is supported */
-  supportsOperation(operation: FHEOperation): boolean
+  supportsOperation(operation: FHEOperation): boolean;
 
   /**
    * Encrypt a value
    * @param value The value to encrypt
    * @returns The encrypted data
    */
-  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData<unknown>>
+  encrypt<T>(value: T, options?: unknown): Promise<EncryptedData<unknown>>;
 
   /**
    * Decrypt encrypted data
@@ -466,7 +466,7 @@ export interface FHEService {
   decrypt<T>(
     encryptedData: EncryptedData<unknown>,
     options?: unknown,
-  ): Promise<T>
+  ): Promise<T>;
 
   /**
    * Add two encrypted values
@@ -477,7 +477,7 @@ export interface FHEService {
   add?(
     a: EncryptedData<unknown>,
     b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData<unknown>>;
 
   /**
    * Subtract one encrypted value from another
@@ -488,7 +488,7 @@ export interface FHEService {
   subtract?(
     a: EncryptedData<unknown>,
     b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData<unknown>>;
 
   /**
    * Multiply encrypted value
@@ -499,14 +499,14 @@ export interface FHEService {
   multiply?(
     a: EncryptedData<unknown>,
     b: EncryptedData<unknown> | number,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData<unknown>>;
 
   /**
    * Negate an encrypted value
    * @param value Encrypted value to negate
    * @returns Negated encrypted value
    */
-  negate?(value: EncryptedData<unknown>): Promise<EncryptedData<unknown>>
+  negate?(value: EncryptedData<unknown>): Promise<EncryptedData<unknown>>;
 
   /**
    * Apply a polynomial function to encrypted data
@@ -517,7 +517,7 @@ export interface FHEService {
   applyPolynomial?(
     value: EncryptedData<unknown>,
     coefficients: Polynomial,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData<unknown>>;
 
   /**
    * Rotate elements in an encrypted vector
@@ -528,7 +528,7 @@ export interface FHEService {
   rotate?(
     vector: EncryptedData<unknown>,
     steps: number,
-  ): Promise<EncryptedData<unknown>>
+  ): Promise<EncryptedData<unknown>>;
 
   /**
    * Process encrypted data
@@ -537,17 +537,17 @@ export interface FHEService {
     encryptedData: string,
     operation: FHEOperation | string,
     params?: Record<string, unknown>,
-  ): Promise<FHEOperationResult<string>>
+  ): Promise<FHEOperationResult<string>>;
 }
 
 /**
  * Extended service interface with additional methods
  */
 export interface FHEServiceInterface extends FHEService {
-  dispose(): void
-  rotateKeys(): Promise<void>
-  getMode(): EncryptionMode
-  encryptData(data: unknown): Promise<string>
+  dispose(): void;
+  rotateKeys(): Promise<void>;
+  getMode(): EncryptionMode;
+  encryptData(data: unknown): Promise<string>;
 }
 
 //---------------------------------------------------------------
@@ -558,72 +558,72 @@ export interface FHEServiceInterface extends FHEService {
  * Result of a homomorphic operation
  */
 export interface HomomorphicOperationResult {
-  success: boolean
-  result?: string // Encrypted result
-  operationType: string
-  timestamp: number
-  error?: string
-  metadata?: Record<string, unknown> // Additional operation metadata
+  success: boolean;
+  result?: string; // Encrypted result
+  operationType: string;
+  timestamp: number;
+  error?: string;
+  metadata?: Record<string, unknown>; // Additional operation metadata
 }
 
 /**
  * Results of an FHE operation
  */
 export interface FHEOperationResult<T = unknown> {
-  success: boolean
-  result?: T
-  error?: string
-  operation: FHEOperation
-  metadata?: Record<string, unknown>
+  success: boolean;
+  result?: T;
+  error?: string;
+  operation: FHEOperation;
+  metadata?: Record<string, unknown>;
 }
 
 /**
  * Result of a TFHE operation
  */
 export interface TFHEOperationResult {
-  success: boolean
-  data?: unknown
-  error?: string
-  operationId?: string
-  timestamp: number
+  success: boolean;
+  data?: unknown;
+  error?: string;
+  operationId?: string;
+  timestamp: number;
 }
 
 /**
  * Performance metrics for FHE operations
  */
 export interface FHEPerformanceMetrics {
-  operationId: string
-  operation: FHEOperation
-  startTime: number
-  endTime: number
-  duration: number
-  inputSize: number
-  outputSize: number
-  success: boolean
+  operationId: string;
+  operation: FHEOperation;
+  startTime: number;
+  endTime: number;
+  duration: number;
+  inputSize: number;
+  outputSize: number;
+  success: boolean;
 }
 
 /**
  * Security audit log entry for FHE operations
  */
 export interface FHESecurityAuditEntry {
-  timestamp: number
-  operation: string
-  keyId?: string
-  success: boolean
-  errorCode?: string
-  ipAddress?: string
-  userId?: string
+  timestamp: number;
+  operation: string;
+  keyId?: string;
+  success: boolean;
+  errorCode?: string;
+  ipAddress?: string;
+  userId?: string;
 }
 
 /**
  * FHE operation context
  */
 export interface FHEOperationContext {
-  operationType: string
-  contextId: string
-  timestamp: number
-  parameters?: Record<string, unknown>
-  metrics?: FHEPerformanceMetrics
+  operationType: string;
+  contextId: string;
+  timestamp: number;
+  parameters?: Record<string, unknown>;
+  metrics?: FHEPerformanceMetrics;
 }
 
 //---------------------------------------------------------------
@@ -634,39 +634,39 @@ export interface FHEOperationContext {
  * Therapy message encryption request
  */
 export interface TherapyEncryptionRequest {
-  message: string
-  therapistId: string
-  patientId?: string
-  scenario?: string
-  securityLevel: string
-  encryptionMode: string
+  message: string;
+  therapistId: string;
+  patientId?: string;
+  scenario?: string;
+  securityLevel: string;
+  encryptionMode: string;
 }
 
 /**
  * Therapy message decryption request
  */
 export interface TherapyDecryptionRequest {
-  encryptedMessage: string
-  therapistId: string
-  patientId?: string
-  requestId: string
+  encryptedMessage: string;
+  therapistId: string;
+  patientId?: string;
+  requestId: string;
 }
 
 /**
  * Therapy homomorphic operation request
  */
 export interface TherapyHomomorphicRequest {
-  encryptedMessage: string
-  operation: string
-  therapistId: string
-  patientId?: string
-  parameters?: Record<string, unknown>
+  encryptedMessage: string;
+  operation: string;
+  therapistId: string;
+  patientId?: string;
+  parameters?: Record<string, unknown>;
 }
 
 // Export error type for use in error handling
 export class OperationError extends Error {
   constructor(message: string) {
-    super(message)
-    this.name = 'OperationError'
+    super(message);
+    this.name = "OperationError";
   }
 }

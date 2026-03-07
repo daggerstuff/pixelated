@@ -9,33 +9,33 @@
  * - Edge cases and unusual scenarios
  */
 
-export { baselineScenarios } from './baseline-scenarios'
-export { demographicBiasScenarios } from './demographic-bias-scenarios'
+export { baselineScenarios } from "./baseline-scenarios";
+export { demographicBiasScenarios } from "./demographic-bias-scenarios";
 
 // Convenience exports for individual scenarios
 export {
   baselineAnxietyScenario,
   baselineDepressionScenario,
   baselinePainManagementScenario,
-} from './baseline-scenarios'
+} from "./baseline-scenarios";
 
 export {
   ageBiasYoungPatient,
   ageBiasElderlyPatient,
-} from './demographic-bias-scenarios'
+} from "./demographic-bias-scenarios";
 
 /**
  * Get all test scenarios organized by category
  */
-import { baselineScenarios } from './baseline-scenarios'
-import { demographicBiasScenarios } from './demographic-bias-scenarios'
+import { baselineScenarios } from "./baseline-scenarios";
+import { demographicBiasScenarios } from "./demographic-bias-scenarios";
 
 export const getAllTestScenarios = () => {
   return {
     baseline: baselineScenarios,
     demographicBias: demographicBiasScenarios,
-  }
-}
+  };
+};
 
 /**
  * Get scenarios specifically designed to test for bias (should trigger alerts)
@@ -45,20 +45,20 @@ export const getAllTestScenarios = () => {
 export const getBiasTestScenarios = () => {
   return {
     ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.[
-      'ageBiasYoungPatient'
+      "ageBiasYoungPatient"
     ],
     genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.[
-      'genderBiasFemalePatient'
+      "genderBiasFemalePatient"
     ],
     racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.[
-      'racialBiasMinorityPatient'
+      "racialBiasMinorityPatient"
     ],
     socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.[
-      'socioeconomicBiasLowIncomePatient'
+      "socioeconomicBiasLowIncomePatient"
     ],
     ageBiasElderlyPatient,
-  }
-}
+  };
+};
 
 /**
  * Get baseline scenarios that should NOT trigger bias alerts
@@ -70,19 +70,19 @@ export const getBaselineTestScenarios = () => {
     baselineDepressionScenario,
     baselinePainManagementScenario,
   } = {
-    baselineAnxietyScenario: (baselineScenarios as unknown)?.['anxiety'],
-    baselineDepressionScenario: (baselineScenarios as unknown)?.['depression'],
+    baselineAnxietyScenario: (baselineScenarios as unknown)?.["anxiety"],
+    baselineDepressionScenario: (baselineScenarios as unknown)?.["depression"],
     baselinePainManagementScenario: (baselineScenarios as unknown)?.[
-      'painManagement'
+      "painManagement"
     ],
-  }
+  };
 
   return [
     baselineAnxietyScenario,
     baselineDepressionScenario,
     baselinePainManagementScenario,
-  ]
-}
+  ];
+};
 
 /**
  * Get paired scenarios for comparative bias testing
@@ -92,22 +92,22 @@ export const getBaselineTestScenarios = () => {
  */
 export const getComparativeBiasScenarios = () => {
   const { ageBiasYoungPatient, ageBiasElderlyPatient } = {
-    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.[
-      'young'
+    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.["age"]?.[
+      "young"
     ],
-    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.[
-      'elderly'
+    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.["age"]?.[
+      "elderly"
     ],
-  }
+  };
 
   return [
     [ageBiasYoungPatient, ageBiasElderlyPatient], // Age bias comparison
     // Additional comparative pairs can be added as more scenarios are implemented
-  ]
-}
+  ];
+};
 
 /**
  * @deprecated Use getBaselineTestScenarios() instead
  * This function name was misleading as it included favorable bias scenarios
  */
-export const getNonBiasTestScenarios = getBaselineTestScenarios
+export const getNonBiasTestScenarios = getBaselineTestScenarios;

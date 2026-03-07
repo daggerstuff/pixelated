@@ -7,7 +7,7 @@ export function createServer() {
     listen: () => {},
     on: () => {},
     close: () => {},
-  }
+  };
 }
 
 export function request() {
@@ -15,18 +15,18 @@ export function request() {
     on: () => {},
     write: () => {},
     end: () => {},
-  }
+  };
 }
 
 export function get() {
   return {
     on: () => {},
     end: () => {},
-  }
+  };
 }
 
 export default {
   createServer,
   request,
   get,
-}
+};

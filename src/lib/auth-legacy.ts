@@ -1,24 +1,24 @@
-import type { AstroCookies } from 'astro'
-import type { AuthRole } from '../config/auth.config'
-import type { AuditMetadata } from './audit/types'
-import { authConfig, hasRolePrivilege } from '../config/auth.config'
+import type { AstroCookies } from "astro";
+import type { AuthRole } from "../config/auth.config";
+import type { AuditMetadata } from "./audit/types";
+import { authConfig, hasRolePrivilege } from "../config/auth.config";
 import {
   createHIPAACompliantAuditLog,
   AuditEventType,
   AuditEventStatus,
   type AuditDetails,
-} from './audit'
-import { validateToken } from './auth/auth0-jwt-service'
-import { auth0UserService } from '@/services/auth0.service'
+} from "./audit";
+import { validateToken } from "./auth/auth0-jwt-service";
+import { auth0UserService } from "@/services/auth0.service";
 
 export interface AuthUser {
-  id: string
-  email: string
-  role: AuthRole
-  fullName?: string | null
-  avatarUrl?: string | null
-  lastLogin?: Date | null
-  metadata?: Record<string, unknown>
+  id: string;
+  email: string;
+  role: AuthRole;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  lastLogin?: Date | null;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -27,24 +27,24 @@ export interface AuthUser {
 export async function getCurrentUser(
   cookies: AstroCookies,
 ): Promise<AuthUser | null> {
-  const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
+  const accessToken = cookies.get(authConfig.cookies.accessToken)?.value;
 
   if (!accessToken) {
-    return null
+    return null;
   }
 
   try {
-    const decoded = await validateToken(accessToken)
+    const decoded = await validateToken(accessToken);
     if (!decoded) {
-      return null
+      return null;
     }
 
-    const {userId} = decoded
+    const { userId } = decoded;
 
     // Fetch user from Auth0
-    const user = await auth0UserService.getUserById(userId)
+    const user = await auth0UserService.getUserById(userId);
     if (!user) {
-      return null
+      return null;
     }
 
     return {
@@ -55,10 +55,10 @@ export async function getCurrentUser(
       avatarUrl: user.avatarUrl,
       lastLogin: user.lastLogin,
       metadata: (user.userMetadata as Record<string, unknown>) || {},
-    }
+    };
   } catch (error: unknown) {
-    console.error('Error getting current user:', error)
-    return null
+    console.error("Error getting current user:", error);
+    return null;
   }
 }
 
@@ -66,23 +66,23 @@ export async function getCurrentUser(
  * Check if the user is authenticated
  */
 export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
-  if (typeof window !== 'undefined') {
-    return false
+  if (typeof window !== "undefined") {
+    return false;
   }
 
-  const accessToken = cookies.get(authConfig.cookies.accessToken)?.value
-  const refreshToken = cookies.get(authConfig.cookies.refreshToken)?.value
+  const accessToken = cookies.get(authConfig.cookies.accessToken)?.value;
+  const refreshToken = cookies.get(authConfig.cookies.refreshToken)?.value;
 
   if (!accessToken || !refreshToken) {
-    return false
+    return false;
   }
 
   try {
-    const decoded = await validateToken(accessToken)
-    return !!decoded
+    const decoded = await validateToken(accessToken);
+    return !!decoded;
   } catch (error: unknown) {
-    console.error('Error checking authentication:', error)
-    return false
+    console.error("Error checking authentication:", error);
+    return false;
   }
 }
 
@@ -93,23 +93,23 @@ export async function hasRole(
   cookies: AstroCookies,
   requiredRole: AuthRole,
 ): Promise<boolean> {
-  const user = await getCurrentUser(cookies)
+  const user = await getCurrentUser(cookies);
   if (!user) {
-    return false
+    return false;
   }
 
-  return hasRolePrivilege(user.role, requiredRole)
+  return hasRolePrivilege(user.role, requiredRole);
 }
 
 /**
  * Log an audit event from auth module
  */
 export async function createAuthAuditLog(entry: {
-  userId: string
-  action: string
-  resource: string
-  resourceId?: string
-  metadata?: AuditMetadata
+  userId: string;
+  action: string;
+  resource: string;
+  resourceId?: string;
+  metadata?: AuditMetadata;
 }): Promise<void> {
   try {
     await createHIPAACompliantAuditLog({
@@ -120,9 +120,9 @@ export async function createAuthAuditLog(entry: {
       ...(entry.metadata && { details: entry.metadata as AuditDetails }),
       eventType: AuditEventType.SECURITY,
       status: AuditEventStatus.SUCCESS,
-    })
+    });
   } catch (error: unknown) {
-    console.error('Error logging auth audit event:', error)
+    console.error("Error logging auth audit event:", error);
   }
 }
 
@@ -137,14 +137,14 @@ export async function createAuditLogFromParams(
   metadata?: AuditMetadata | null,
 ): Promise<void> {
   await createHIPAACompliantAuditLog({
-    userId: userId || 'system',
+    userId: userId || "system",
     action,
     resource,
     ...(resourceId && { resourceId }),
     ...(metadata && { details: metadata as AuditDetails }),
     eventType: AuditEventType.SYSTEM,
     status: AuditEventStatus.SUCCESS,
-  })
+  });
 }
 
 /**
@@ -155,19 +155,19 @@ export async function requireAuth({
   redirect,
   request,
 }: {
-  cookies: AstroCookies
-  redirect: (url: string) => Response
-  request: Request
+  cookies: AstroCookies;
+  redirect: (url: string) => Response;
+  request: Request;
 }) {
-  const user = await getCurrentUser(cookies)
+  const user = await getCurrentUser(cookies);
 
   if (!user) {
-    const loginUrl = new URL(authConfig.redirects.authRequired, request.url)
-    loginUrl.searchParams.set('redirect', request.url)
-    return redirect(loginUrl.toString())
+    const loginUrl = new URL(authConfig.redirects.authRequired, request.url);
+    loginUrl.searchParams.set("redirect", request.url);
+    return redirect(loginUrl.toString());
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -179,63 +179,63 @@ export async function requireRole({
   request,
   role,
 }: {
-  cookies: AstroCookies
-  redirect: (url: string) => Response
-  request: Request
-  role: AuthRole
+  cookies: AstroCookies;
+  redirect: (url: string) => Response;
+  request: Request;
+  role: AuthRole;
 }) {
-  const user = await getCurrentUser(cookies)
+  const user = await getCurrentUser(cookies);
 
   if (!user) {
-    const loginUrl = new URL(authConfig.redirects.authRequired, request.url)
-    loginUrl.searchParams.set('redirect', request.url)
-    return redirect(loginUrl.toString())
+    const loginUrl = new URL(authConfig.redirects.authRequired, request.url);
+    loginUrl.searchParams.set("redirect", request.url);
+    return redirect(loginUrl.toString());
   }
 
   if (!hasRolePrivilege(user.role, role)) {
-    return redirect(authConfig.redirects.forbidden)
+    return redirect(authConfig.redirects.forbidden);
   }
 
-  return null
+  return null;
 }
 
 export class Auth {
   async verifySession(request: Request): Promise<{ userId: string } | null> {
-    const cookies = this.getCookiesFromRequest(request)
-    const user = await getCurrentUser(cookies)
-    return user ? { userId: user.id } : null
+    const cookies = this.getCookiesFromRequest(request);
+    const user = await getCurrentUser(cookies);
+    return user ? { userId: user.id } : null;
   }
 
   private getCookiesFromRequest(request: Request): AstroCookies {
-    const cookieHeader = request.headers.get('cookie') || ''
+    const cookieHeader = request.headers.get("cookie") || "";
     const cookies = new Map(
-      cookieHeader.split(';').map((c) => {
-        const [key, ...v] = c.trim().split('=')
-        return [key, v.join('=')]
+      cookieHeader.split(";").map((c) => {
+        const [key, ...v] = c.trim().split("=");
+        return [key, v.join("=")];
       }),
-    )
+    );
 
     return {
       get: (name: string) => {
-        const value = cookies.get(name)
-        return value ? { value, json: () => JSON.parse(value) } : undefined
+        const value = cookies.get(name);
+        return value ? { value, json: () => JSON.parse(value) } : undefined;
       },
       has: (name: string) => cookies.has(name),
       set: () => {
-        throw new Error('Setting cookies is not supported in this context.')
+        throw new Error("Setting cookies is not supported in this context.");
       },
       delete: () => {
-        throw new Error('Deleting cookies is not supported in this context.')
+        throw new Error("Deleting cookies is not supported in this context.");
       },
       getAll: () => {
         return Array.from(cookies.entries()).map(([name, value]) => ({
           name,
           value,
-        }))
+        }));
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any
+    } as any;
   }
 }
 
-export const auth = new Auth()
+export const auth = new Auth();

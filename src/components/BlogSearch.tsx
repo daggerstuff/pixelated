@@ -1,38 +1,40 @@
-import React, { useState } from 'react'
-import { Input } from './ui/input.js'
-import { Button } from './ui/button/index.js'
-import { Search } from 'lucide-react'
-import { cn } from '../lib/utils.js'
+import React, { useState } from "react";
+import { Input } from "./ui/input.js";
+import { Button } from "./ui/button/index.js";
+import { Search } from "lucide-react";
+import { cn } from "../lib/utils.js";
 
 interface SearchResult {
-  id: string
-  title: string
-  description: string
-  slug: string
+  id: string;
+  title: string;
+  description: string;
+  slug: string;
 }
 
 export function BlogSearch() {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [isSearching, setIsSearching] = useState(false)
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   async function handleSearch(
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> {
-    e.preventDefault()
+    e.preventDefault();
     if (!query.trim()) {
-      return
+      return;
     }
 
-    setIsSearching(true)
+    setIsSearching(true);
     try {
-      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`)
-      const data = await response.json()
-      setResults(data.results)
+      const response = await fetch(
+        `/api/search?q=${encodeURIComponent(query)}`,
+      );
+      const data = await response.json();
+      setResults(data.results);
     } catch (error: unknown) {
-      console.error('Search failed:', error)
+      console.error("Search failed:", error);
     } finally {
-      setIsSearching(false)
+      setIsSearching(false);
     }
   }
 
@@ -54,12 +56,12 @@ export function BlogSearch() {
           variant="ghost"
           size="sm"
           className={cn(
-            'absolute right-0 top-0 h-full px-3',
-            isSearching && 'opacity-50 cursor-not-allowed',
+            "absolute right-0 top-0 h-full px-3",
+            isSearching && "opacity-50 cursor-not-allowed",
           )}
           disabled={isSearching}
         >
-          {isSearching ? 'Searching...' : 'Search'}
+          {isSearching ? "Searching..." : "Search"}
         </Button>
       </form>
 
@@ -81,5 +83,5 @@ export function BlogSearch() {
         </div>
       )}
     </div>
-  )
+  );
 }

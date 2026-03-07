@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getAcquisition,
   initiateAcquisition,
@@ -8,47 +8,44 @@ import {
   type AcquisitionInitiatePayload,
   type AcquisitionList,
   type AcquisitionUpdatePayload,
-} from '@/lib/api/journal-research'
+} from "@/lib/api/journal-research";
 import {
   journalResearchMutationKeys,
   journalResearchQueryKeys,
-} from '@/lib/api/journal-research/react-query'
+} from "@/lib/api/journal-research/react-query";
 import {
   type AcquisitionStatus,
   useAcquisitionStore,
-} from '@/lib/stores/journal-research'
+} from "@/lib/stores/journal-research";
 
 interface UseAcquisitionListOptions {
-  page?: number
-  pageSize?: number
-  enabled?: boolean
+  page?: number;
+  pageSize?: number;
+  enabled?: boolean;
 }
 
 const filterAcquisitions = (
   data: AcquisitionList,
-  filters: ReturnType<typeof useAcquisitionStore.getState>['filters'],
+  filters: ReturnType<typeof useAcquisitionStore.getState>["filters"],
 ): AcquisitionList => {
   const filteredItems = data.items.filter((acquisition) => {
     if (
       filters.statuses.length &&
       !filters.statuses.includes(acquisition.status as AcquisitionStatus)
     ) {
-      return false
+      return false;
     }
 
-    if (
-      filters.showDownloadFailuresOnly &&
-      acquisition.status !== 'failed'
-    ) {
-      return false
+    if (filters.showDownloadFailuresOnly && acquisition.status !== "failed") {
+      return false;
     }
 
-    return true
-  })
+    return true;
+  });
 
-  const total = filteredItems.length
-  const pageSize = data.pageSize
-  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const total = filteredItems.length;
+  const pageSize = data.pageSize;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return {
     ...data,
@@ -56,66 +53,66 @@ const filterAcquisitions = (
     total,
     page: Math.min(data.page, totalPages),
     totalPages,
-  }
-}
+  };
+};
 
 export const useAcquisitionListQuery = (
   sessionId: string | null,
   { page = 1, pageSize = 25, enabled = true }: UseAcquisitionListOptions = {},
 ) => {
-  const filters = useAcquisitionStore((state) => state.filters)
+  const filters = useAcquisitionStore((state) => state.filters);
 
   return useQuery({
     queryKey: journalResearchQueryKeys.acquisition.list(
-      sessionId ?? 'unknown',
+      sessionId ?? "unknown",
       { page, pageSize, filters },
     ),
-    queryFn: () => listAcquisitions(sessionId ?? '', { page, pageSize }),
+    queryFn: () => listAcquisitions(sessionId ?? "", { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data) => filterAcquisitions(data, filters),
-  })
-}
+  });
+};
 
 export const useAcquisitionQuery = (
   sessionId: string | null,
   acquisitionId: string | null,
   options: { enabled?: boolean } = {},
 ) => {
-  const { enabled = true } = options
+  const { enabled = true } = options;
   return useQuery({
     queryKey: journalResearchQueryKeys.acquisition.detail(
-      sessionId ?? 'unknown',
-      acquisitionId ?? 'unknown',
+      sessionId ?? "unknown",
+      acquisitionId ?? "unknown",
     ),
-    queryFn: () => getAcquisition(sessionId ?? '', acquisitionId ?? ''),
+    queryFn: () => getAcquisition(sessionId ?? "", acquisitionId ?? ""),
     enabled: Boolean(sessionId && acquisitionId) && enabled,
-  })
-}
+  });
+};
 
 export const useAcquisitionInitiateMutation = (sessionId: string | null) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.acquisition.initiate(),
     mutationFn: (payload: AcquisitionInitiatePayload) =>
-      initiateAcquisition(sessionId ?? '', payload),
+      initiateAcquisition(sessionId ?? "", payload),
     onSuccess: (acquisition: Acquisition) => {
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(
-          sessionId ?? 'unknown',
+          sessionId ?? "unknown",
           {},
         ),
         exact: false,
-      })
-      useAcquisitionStore.getState().setSelectedAcquisitionId(
-        acquisition.acquisitionId,
-      )
+      });
+      useAcquisitionStore
+        .getState()
+        .setSelectedAcquisitionId(acquisition.acquisitionId);
     },
-  })
-}
+  });
+};
 
 export const useAcquisitionUpdateMutation = (sessionId: string | null) => {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.acquisition.update(),
@@ -123,26 +120,26 @@ export const useAcquisitionUpdateMutation = (sessionId: string | null) => {
       acquisitionId,
       payload,
     }: {
-      acquisitionId: string
-      payload: AcquisitionUpdatePayload
-    }) => updateAcquisition(sessionId ?? '', acquisitionId, payload),
+      acquisitionId: string;
+      payload: AcquisitionUpdatePayload;
+    }) => updateAcquisition(sessionId ?? "", acquisitionId, payload),
     onSuccess: (acquisition: Acquisition) => {
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.detail(
-          sessionId ?? 'unknown',
+          sessionId ?? "unknown",
           acquisition.acquisitionId,
         ),
-      })
+      });
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(
-          sessionId ?? 'unknown',
+          sessionId ?? "unknown",
           {},
         ),
         exact: false,
-      })
+      });
     },
-  })
-}
+  });
+};
 
 export const useAcquisitionSelection = () =>
   useAcquisitionStore((state) => ({
@@ -151,4 +148,4 @@ export const useAcquisitionSelection = () =>
     expandedRowIds: state.expandedRowIds,
     expandRow: state.expandRow,
     collapseRow: state.collapseRow,
-  }))
+  }));

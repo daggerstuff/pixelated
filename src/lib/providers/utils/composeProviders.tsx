@@ -1,10 +1,10 @@
-import React from 'react'
-import type { ComponentType, ReactNode } from 'react'
+import React from "react";
+import type { ComponentType, ReactNode } from "react";
 
 // Define more specific provider props type to avoid explicit unknown/any
-type ProviderProps = Record<string, unknown>
-type ProviderType = ComponentType<{ children: ReactNode } & ProviderProps>
-type ProviderComponentProps = { children: ReactNode } & ProviderProps
+type ProviderProps = Record<string, unknown>;
+type ProviderType = ComponentType<{ children: ReactNode } & ProviderProps>;
+type ProviderComponentProps = { children: ReactNode } & ProviderProps;
 
 /**
  * Composes multiple providers into a single provider component
@@ -27,7 +27,9 @@ type ProviderComponentProps = { children: ReactNode } & ProviderProps
 export function composeProviders(
   ...providers: ProviderType[]
 ): ComponentType<ProviderComponentProps> {
-  const BaseProvider = ({ children }: ProviderComponentProps) => <>{children}</>
+  const BaseProvider = ({ children }: ProviderComponentProps) => (
+    <>{children}</>
+  );
 
   const ComposedProvider = providers.reduce(
     (
@@ -38,16 +40,16 @@ export function composeProviders(
         <Accumulated {...props}>
           <Current {...props}>{children}</Current>
         </Accumulated>
-      )
+      );
 
-      NextProvider.displayName = `ComposedProvider(${Current.displayName || 'Component'})`
-      return NextProvider
+      NextProvider.displayName = `ComposedProvider(${Current.displayName || "Component"})`;
+      return NextProvider;
     },
     BaseProvider,
-  )
+  );
 
-  ComposedProvider.displayName = 'ComposedProvider'
-  return ComposedProvider
+  ComposedProvider.displayName = "ComposedProvider";
+  return ComposedProvider;
 }
 
 /**
@@ -84,11 +86,11 @@ export function createProviderComposition(
         ),
 
         children,
-      )
+      );
 
-    ProviderComposition.displayName = 'ProviderComposition'
-    return ProviderComposition
-  }
+    ProviderComposition.displayName = "ProviderComposition";
+    return ProviderComposition;
+  };
 }
 
 /**
@@ -96,7 +98,7 @@ export function createProviderComposition(
  * Extracts props type from a provider component
  */
 export type ExtractProviderProps<T> =
-  T extends ComponentType<infer P> ? P : never
+  T extends ComponentType<infer P> ? P : never;
 
 /**
  * Creates a strongly typed provider composition
@@ -125,7 +127,7 @@ export function createTypedProviderComposition<
   Props extends Record<string, unknown> = Record<string, unknown>,
 >(...providers: T[]) {
   return <P extends Props>() => {
-    type TypedProviderProps = { children: ReactNode } & P
+    type TypedProviderProps = { children: ReactNode } & P;
     // Create a wrapper function that uses createElement instead of JSX
     const TypedProviderComposition = ({
       children,
@@ -138,11 +140,11 @@ export function createTypedProviderComposition<
           Provider,
           // Props are handled here in a way that TypeScript can understand
           Object.assign({}, props, { children: accumulated }),
-        )
-      }, children)
-    }
+        );
+      }, children);
+    };
 
-    TypedProviderComposition.displayName = 'TypedProviderComposition'
-    return TypedProviderComposition
-  }
+    TypedProviderComposition.displayName = "TypedProviderComposition";
+    return TypedProviderComposition;
+  };
 }

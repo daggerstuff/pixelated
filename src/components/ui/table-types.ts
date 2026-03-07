@@ -3,23 +3,23 @@
  */
 export interface TableColumn<T> {
   /** Unique identifier for the column */
-  id: string
+  id: string;
   /** Header text to display */
-  header: string
+  header: string;
   /** Function to access the cell value from a row */
-  accessor: (row: T) => React.ReactNode
+  accessor: (row: T) => React.ReactNode;
   /** Whether this column is sortable */
-  sortable?: boolean
+  sortable?: boolean;
   /** Custom cell renderer */
-  Cell?: (props: { value: unknown; row: T }) => React.ReactNode
+  Cell?: (props: { value: unknown; row: T }) => React.ReactNode;
   /** Column width (CSS value) */
-  width?: string
+  width?: string;
   /** Whether to hide column on mobile */
-  hideMobile?: boolean
+  hideMobile?: boolean;
   /** Custom header renderer */
-  Header?: React.ReactNode
+  Header?: React.ReactNode;
   /** Column alignment */
-  align?: 'left' | 'center' | 'right'
+  align?: "left" | "center" | "right";
 }
 
 /**
@@ -27,28 +27,28 @@ export interface TableColumn<T> {
  */
 export interface TableRowData {
   /** Unique identifier for the row */
-  id: string | number
+  id: string | number;
   /** Whether the row is selected */
-  selected?: boolean
+  selected?: boolean;
   /** Whether the row is disabled */
-  disabled?: boolean
+  disabled?: boolean;
   /** Custom CSS class names */
-  className?: string
+  className?: string;
 }
 
 /**
  * Sort direction type
  */
-export type SortDirection = 'asc' | 'desc' | null
+export type SortDirection = "asc" | "desc" | null;
 
 /**
  * Sort state for table
  */
 export interface TableSortState {
   /** Column ID being sorted */
-  sortBy: string
+  sortBy: string;
   /** Sort direction */
-  direction: SortDirection
+  direction: SortDirection;
 }
 
 /**
@@ -56,13 +56,13 @@ export interface TableSortState {
  */
 export interface TableDataSource<T extends TableRowData> {
   /** Array of row data */
-  data: T[]
+  data: T[];
   /** Total number of rows (for pagination) */
-  totalCount: number
+  totalCount: number;
   /** Whether data is loading */
-  loading?: boolean
+  loading?: boolean;
   /** Error message if data fetch failed */
-  error?: string
+  error?: string;
 }
 
 /**
@@ -70,11 +70,11 @@ export interface TableDataSource<T extends TableRowData> {
  */
 export interface TableState {
   /** Current sort state */
-  sort?: TableSortState
+  sort?: TableSortState;
   /** Current page number */
-  currentPage: number
+  currentPage: number;
   /** Number of rows per page */
-  pageSize: number
+  pageSize: number;
   /** Selected row IDs */
-  selectedRows?: Set<string | number>
+  selectedRows?: Set<string | number>;
 }

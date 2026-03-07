@@ -9,28 +9,28 @@
  * - Redirect to secure endpoints for sensitive operations
  */
 
-import type { APIContext, MiddlewareNext } from 'astro'
-import { defineMiddleware } from 'astro/middleware'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type { PIIType } from '.'
+import type { APIContext, MiddlewareNext } from "astro";
+import { defineMiddleware } from "astro/middleware";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+import type { PIIType } from ".";
 
-const logger = createBuildSafeLogger('PIIMiddleware')
+const logger = createBuildSafeLogger("PIIMiddleware");
 
 /**
  * PII Detection Middleware Configuration
  */
 export interface PIIMiddlewareConfig {
-  enabled: boolean
-  redactRequests: boolean
-  redactResponses: boolean
-  blockRequests: boolean
-  auditDetections: boolean
-  sensitivePathPatterns: RegExp[]
-  excludePathPatterns: RegExp[]
-  sensitiveContentTypes: string[]
-  sensitiveParameters: string[]
-  redirectPath?: string
-  typesToCheck?: PIIType[]
+  enabled: boolean;
+  redactRequests: boolean;
+  redactResponses: boolean;
+  blockRequests: boolean;
+  auditDetections: boolean;
+  sensitivePathPatterns: RegExp[];
+  excludePathPatterns: RegExp[];
+  sensitiveContentTypes: string[];
+  sensitiveParameters: string[];
+  redirectPath?: string;
+  typesToCheck?: PIIType[];
 }
 
 // Default configuration
@@ -48,23 +48,23 @@ const DEFAULT_CONFIG: PIIMiddlewareConfig = {
   ],
   excludePathPatterns: [/\/static\/.*/, /\/images\/.*/, /\/favicon\.ico/],
   sensitiveContentTypes: [
-    'application/json',
-    'application/x-www-form-urlencoded',
-    'text/plain',
-    'multipart/form-data',
+    "application/json",
+    "application/x-www-form-urlencoded",
+    "text/plain",
+    "multipart/form-data",
   ],
   sensitiveParameters: [
-    'password',
-    'token',
-    'api_key',
-    'email',
-    'phone',
-    'address',
-    'ssn',
-    'dob',
-    'birthdate',
+    "password",
+    "token",
+    "api_key",
+    "email",
+    "phone",
+    "address",
+    "ssn",
+    "dob",
+    "birthdate",
   ],
-}
+};
 
 /**
  * Main PII middleware implementation
@@ -78,41 +78,41 @@ async function piiMiddleware(
   const finalConfig: PIIMiddlewareConfig = {
     ...DEFAULT_CONFIG,
     ...config,
-  }
+  };
 
   // Skip if middleware is disabled
   if (!finalConfig.enabled) {
-    return next()
+    return next();
   }
 
   try {
     // Check if path should be excluded
-    const url = new URL(request.url)
+    const url = new URL(request.url);
     if (
       finalConfig.excludePathPatterns.some((pattern) =>
         pattern.test(url.pathname),
       )
     ) {
-      return next()
+      return next();
     }
 
     // Check if path requires special handling
     const isSensitivePath = finalConfig.sensitivePathPatterns.some((pattern) =>
       pattern.test(url.pathname),
-    )
+    );
 
     // Process request
     if (isSensitivePath) {
       // Implement your PII detection logic here
       // For now, just pass through
-      logger.info('Processing sensitive path', { path: url.pathname })
+      logger.info("Processing sensitive path", { path: url.pathname });
     }
 
     // Continue to next middleware/handler
-    return next()
+    return next();
   } catch (error: unknown) {
-    logger.error('Error in PII middleware', { error })
-    return new Response('Internal Server Error', { status: 500 })
+    logger.error("Error in PII middleware", { error });
+    return new Response("Internal Server Error", { status: 500 });
   }
 }
 
@@ -122,23 +122,23 @@ async function piiMiddleware(
 export const onRequest = defineMiddleware(
   async (context: APIContext, next: MiddlewareNext) => {
     try {
-      console.log('onRequest context:', context)
+      console.log("onRequest context:", context);
       // Add PII detection logic here
-      return await next()
+      return await next();
     } catch (error: unknown) {
-      logger.error('Error in PII middleware', { error })
-      return new Response('Internal Server Error', { status: 500 })
+      logger.error("Error in PII middleware", { error });
+      return new Response("Internal Server Error", { status: 500 });
     }
   },
-)
+);
 
 /**
  * Middleware factory function for easier configuration
  */
 export function createPIIMiddleware(config: Partial<PIIMiddlewareConfig> = {}) {
   return (request: Request, next: () => Promise<Response>) =>
-    piiMiddleware(request, next, config)
+    piiMiddleware(request, next, config);
 }
 
 // Export default for convenience
-export default createPIIMiddleware
+export default createPIIMiddleware;

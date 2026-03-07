@@ -1,4 +1,3 @@
-
 services:
   journal-research-mcp-server:
     build:
@@ -14,12 +13,12 @@ services:
       - MCP_PORT=${MCP_PORT:-8001}
       - MCP_ENVIRONMENT=${MCP_ENVIRONMENT:-production}
       - MCP_DEBUG=${MCP_DEBUG:-false}
-      
+
       # Protocol configuration
       - MCP_PROTOCOL_VERSION=2024-11-05
       - MCP_SERVER_NAME=journal-dataset-research-mcp
       - MCP_SERVER_VERSION=0.1.0
-      
+
       # Authentication
       - MCP_AUTH_ENABLED=${MCP_AUTH_ENABLED:-true}
       - MCP_AUTH_API_KEY_REQUIRED=${MCP_AUTH_API_KEY_REQUIRED:-true}
@@ -27,22 +26,22 @@ services:
       - MCP_JWT_SECRET=${MCP_JWT_SECRET:-}
       - MCP_JWT_ALGORITHM=${MCP_JWT_ALGORITHM:-HS256}
       - MCP_JWT_EXPIRATION_MINUTES=${MCP_JWT_EXPIRATION_MINUTES:-1440}
-      
+
       # Rate limiting
       - MCP_RATE_LIMITS_ENABLED=${MCP_RATE_LIMITS_ENABLED:-true}
       - MCP_RATE_LIMIT_PER_MINUTE=${MCP_RATE_LIMIT_PER_MINUTE:-60}
       - MCP_RATE_LIMIT_PER_HOUR=${MCP_RATE_LIMIT_PER_HOUR:-1000}
       - MCP_RATE_LIMIT_BURST=${MCP_RATE_LIMIT_BURST:-10}
-      
+
       # Logging
       - MCP_LOG_LEVEL=${MCP_LOG_LEVEL:-INFO}
       - MCP_LOG_FILE=${MCP_LOG_FILE:-/app/logs/mcp.log}
       - MCP_AUDIT_LOG_PATH=${MCP_AUDIT_LOG_PATH:-/app/logs/mcp_audit.log}
-      
+
       # Async operations
       - MCP_ASYNC_TIMEOUT=${MCP_ASYNC_TIMEOUT:-3600}
       - MCP_PROGRESS_UPDATE_INTERVAL=${MCP_PROGRESS_UPDATE_INTERVAL:-5}
-      
+
       # Session storage
       - SESSION_STORAGE_PATH=${SESSION_STORAGE_PATH:-/app/sessions}
     volumes:
@@ -51,7 +50,13 @@ services:
     networks:
       - journal-research-network
     healthcheck:
-      test: ["CMD", "python", "-c", "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, \'handle_request\') else 1); except Exception: import sys; sys.exit(1)"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "try: from ai.journal_dataset_research.mcp.server import MCPServer; server = MCPServer(); import sys; sys.exit(0 if hasattr(server, 'handle_request') else 1); except Exception: import sys; sys.exit(1)",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,10 +65,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0'
+          cpus: "2.0"
           memory: 2G
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 512M
 
 volumes:
@@ -75,4 +80,3 @@ volumes:
 networks:
   journal-research-network:
     driver: bridge
-

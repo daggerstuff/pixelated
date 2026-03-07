@@ -1,10 +1,10 @@
 ---
-title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
-description: 'Exploring the intersection of artificial intelligence and emotional wellbeing, from digital therapeutics to AI-enhanced mental health support'
-author: 'AI & Psychology Team'
+title: "AI & Emotional Intelligence: The Future of Mental Wellness"
+description: "Exploring the intersection of artificial intelligence and emotional wellbeing, from digital therapeutics to AI-enhanced mental health support"
+author: "AI & Psychology Team"
 pubDate: 2024-04-26
 draft: false
-timeframe: 'May-June 2024'
+timeframe: "May-June 2024"
 ---
 
 # 🤖 AI & Emotional Intelligence Series
@@ -12,13 +12,13 @@ timeframe: 'May-June 2024'
 ## Series Blueprint 📋
 
 ```yaml
-title: 'AI & Emotional Intelligence: The Future of Mental Wellness'
-description: 'Investigating how AI is transforming our understanding and support of emotional wellbeing'
-timeframe: 'June-July 2024'
+title: "AI & Emotional Intelligence: The Future of Mental Wellness"
+description: "Investigating how AI is transforming our understanding and support of emotional wellbeing"
+timeframe: "June-July 2024"
 articles: 5
-frequency: 'Weekly'
-audience: 'Mental health professionals, tech enthusiasts, general public'
-impact_goal: 'Bridge the gap between AI technology and emotional wellness'
+frequency: "Weekly"
+audience: "Mental health professionals, tech enthusiasts, general public"
+impact_goal: "Bridge the gap between AI technology and emotional wellness"
 ```
 
 ## 🎯 Series Vision

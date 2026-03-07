@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react'
-import { KVStore } from '@/lib/db/KVStore'
+import { useState, useEffect } from "react";
+import { KVStore } from "@/lib/db/KVStore";
 import type {
   PatientResponseStyleConfig,
   CognitiveModel,
-} from '@/lib/ai/types/CognitiveModel'
-import { cn } from '@/lib/utils'
+} from "@/lib/ai/types/CognitiveModel";
+import { cn } from "@/lib/utils";
 
 type ModelIdentifier = {
-  id: string
-  name: string
-  presentingIssues: string[]
-  diagnosisSummary?: string
-}
+  id: string;
+  name: string;
+  presentingIssues: string[];
+  diagnosisSummary?: string;
+};
 
 interface CognitiveModelSelectorProps {
-  selectedModelId: string | null
-  onSelectModel: (modelId: string) => void
-  onStyleConfigChange?: (config: PatientResponseStyleConfig) => void
-  className?: string
+  selectedModelId: string | null;
+  onSelectModel: (modelId: string) => void;
+  onStyleConfigChange?: (config: PatientResponseStyleConfig) => void;
+  className?: string;
 }
 
 export function CognitiveModelSelector({
@@ -26,145 +26,145 @@ export function CognitiveModelSelector({
   onStyleConfigChange,
   className,
 }: CognitiveModelSelectorProps) {
-  const [models, setModels] = useState<ModelIdentifier[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [models, setModels] = useState<ModelIdentifier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentModelDetails, setCurrentModelDetails] =
-    useState<CognitiveModel | null>(null)
+    useState<CognitiveModel | null>(null);
 
   // Response style configuration
   const [styleConfig, setStyleConfig] = useState<PatientResponseStyleConfig>({
     openness: 5,
     coherence: 7,
     defenseLevel: 5,
-    disclosureStyle: 'selective',
-    challengeResponses: 'curious',
-  })
+    disclosureStyle: "selective",
+    challengeResponses: "curious",
+  });
 
   // Fetch available patient models
   useEffect(() => {
     const fetchModels = async () => {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       try {
-        const kvStore = new KVStore('cognitive_models_', true)
+        const kvStore = new KVStore("cognitive_models_", true);
         const modelList = await kvStore.get<ModelIdentifier[]>(
-          'patient_models_list',
-        )
+          "patient_models_list",
+        );
 
         if (modelList && modelList.length > 0) {
-          setModels(modelList)
+          setModels(modelList);
 
           // Set the first model as selected if none is selected
           if (!selectedModelId && onSelectModel && modelList[0]) {
-            onSelectModel(modelList[0].id)
+            onSelectModel(modelList[0].id);
           }
 
           // Load details for the selected model
           if (selectedModelId) {
-            loadModelDetails(selectedModelId)
+            loadModelDetails(selectedModelId);
           }
         } else {
           // If no models found, set up some example data
           setModels([
             {
-              id: 'example-depression',
-              name: 'Sarah - Depression',
+              id: "example-depression",
+              name: "Sarah - Depression",
               presentingIssues: [
-                'Depression',
-                'Low self-esteem',
-                'Work stress',
+                "Depression",
+                "Low self-esteem",
+                "Work stress",
               ],
 
-              diagnosisSummary: 'Major Depressive Disorder',
+              diagnosisSummary: "Major Depressive Disorder",
             },
             {
-              id: 'example-anxiety',
-              name: 'Mark - Anxiety',
+              id: "example-anxiety",
+              name: "Mark - Anxiety",
               presentingIssues: [
-                'Generalized anxiety',
-                'Panic attacks',
-                'Social avoidance',
+                "Generalized anxiety",
+                "Panic attacks",
+                "Social avoidance",
               ],
 
-              diagnosisSummary: 'Generalized Anxiety Disorder',
+              diagnosisSummary: "Generalized Anxiety Disorder",
             },
             {
-              id: 'example-trauma',
-              name: 'Elena - Trauma',
+              id: "example-trauma",
+              name: "Elena - Trauma",
               presentingIssues: [
-                'PTSD symptoms',
-                'Nightmares',
-                'Hypervigilance',
+                "PTSD symptoms",
+                "Nightmares",
+                "Hypervigilance",
               ],
 
-              diagnosisSummary: 'Post-Traumatic Stress Disorder',
+              diagnosisSummary: "Post-Traumatic Stress Disorder",
             },
-          ])
+          ]);
 
           // Set the first example model as selected if none is selected
           if (!selectedModelId && onSelectModel) {
-            onSelectModel('example-depression')
+            onSelectModel("example-depression");
           }
         }
       } catch (err: unknown) {
-        console.error('Failed to fetch cognitive models:', err)
-        setError('Failed to load patient models. Please try again later.')
+        console.error("Failed to fetch cognitive models:", err);
+        setError("Failed to load patient models. Please try again later.");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchModels()
-  }, [selectedModelId, onSelectModel])
+    fetchModels();
+  }, [selectedModelId, onSelectModel]);
 
   // Load detailed information for the selected model
   const loadModelDetails = async (modelId: string) => {
     if (!modelId) {
-      return
+      return;
     }
 
     try {
-      const kvStore = new KVStore('cognitive_models_', true)
+      const kvStore = new KVStore("cognitive_models_", true);
       const modelDetails = await kvStore.get<CognitiveModel>(
         `patient_model_${modelId}`,
-      )
+      );
 
       if (modelDetails) {
-        setCurrentModelDetails(modelDetails)
-      } else if (modelId === 'example-depression') {
+        setCurrentModelDetails(modelDetails);
+      } else if (modelId === "example-depression") {
         setCurrentModelDetails({
-          id: 'example-depression',
-          name: 'Sarah',
+          id: "example-depression",
+          name: "Sarah",
           demographicInfo: {
             age: 34,
-            gender: 'Female',
-            occupation: 'Marketing Manager',
-            familyStatus: 'Single',
+            gender: "Female",
+            occupation: "Marketing Manager",
+            familyStatus: "Single",
             culturalFactors: [],
           },
-          presentingIssues: ['Depression', 'Low self-esteem', 'Work stress'],
+          presentingIssues: ["Depression", "Low self-esteem", "Work stress"],
           diagnosisInfo: {
-            primaryDiagnosis: 'Major Depressive Disorder',
+            primaryDiagnosis: "Major Depressive Disorder",
             secondaryDiagnoses: [],
-            durationOfSymptoms: '6 months',
-            severity: 'moderate',
+            durationOfSymptoms: "6 months",
+            severity: "moderate",
           },
           coreBeliefs: [
             {
               belief: "I'm not good enough",
               strength: 8,
               evidence: [],
-              formationContext: 'Childhood criticism',
-              relatedDomains: ['work', 'relationships'],
+              formationContext: "Childhood criticism",
+              relatedDomains: ["work", "relationships"],
             },
             {
               belief: "I'm going to fail",
               strength: 7,
               evidence: [],
-              formationContext: 'Past work setbacks',
-              relatedDomains: ['career', 'future'],
+              formationContext: "Past work setbacks",
+              relatedDomains: ["career", "future"],
             },
           ],
           distortionPatterns: [],
@@ -177,7 +177,7 @@ export function CognitiveModelSelector({
             helpfulInterventions: [],
             unhelpfulInterventions: [],
             insights: [],
-            progressMade: '',
+            progressMade: "",
             remainingChallenges: [],
           },
           conversationalStyle: {
@@ -192,50 +192,50 @@ export function CognitiveModelSelector({
             insights: [],
             skillsAcquired: [],
             resistanceLevel: 5,
-            changeReadiness: 'contemplation',
+            changeReadiness: "contemplation",
             sessionProgressLog: [],
             trustLevel: 5,
             rapportScore: 5,
-            therapistPerception: 'neutral',
-            transferenceState: 'none',
+            therapistPerception: "neutral",
+            transferenceState: "none",
           },
-        })
-      } else if (modelId === 'example-anxiety') {
+        });
+      } else if (modelId === "example-anxiety") {
         setCurrentModelDetails({
-          id: 'example-anxiety',
-          name: 'Mark',
+          id: "example-anxiety",
+          name: "Mark",
           demographicInfo: {
             age: 29,
-            gender: 'Male',
-            occupation: 'Software Developer',
-            familyStatus: 'Married',
+            gender: "Male",
+            occupation: "Software Developer",
+            familyStatus: "Married",
             culturalFactors: [],
           },
           presentingIssues: [
-            'Generalized anxiety',
-            'Panic attacks',
-            'Social avoidance',
+            "Generalized anxiety",
+            "Panic attacks",
+            "Social avoidance",
           ],
           diagnosisInfo: {
-            primaryDiagnosis: 'Generalized Anxiety Disorder',
+            primaryDiagnosis: "Generalized Anxiety Disorder",
             secondaryDiagnoses: [],
-            durationOfSymptoms: '2 years',
-            severity: 'severe',
+            durationOfSymptoms: "2 years",
+            severity: "severe",
           },
           coreBeliefs: [
             {
               belief: "I'm always in danger",
               strength: 8,
               evidence: [],
-              formationContext: 'Childhood trauma',
-              relatedDomains: ['safety', 'health'],
+              formationContext: "Childhood trauma",
+              relatedDomains: ["safety", "health"],
             },
             {
               belief: "I can't handle uncertainty",
               strength: 9,
               evidence: [],
-              formationContext: 'Unpredictable family environment',
-              relatedDomains: ['control', 'future'],
+              formationContext: "Unpredictable family environment",
+              relatedDomains: ["control", "future"],
             },
           ],
           distortionPatterns: [],
@@ -248,7 +248,7 @@ export function CognitiveModelSelector({
             helpfulInterventions: [],
             unhelpfulInterventions: [],
             insights: [],
-            progressMade: '',
+            progressMade: "",
             remainingChallenges: [],
           },
           conversationalStyle: {
@@ -263,46 +263,46 @@ export function CognitiveModelSelector({
             insights: [],
             skillsAcquired: [],
             resistanceLevel: 5,
-            changeReadiness: 'contemplation',
+            changeReadiness: "contemplation",
             sessionProgressLog: [],
             trustLevel: 5,
             rapportScore: 5,
-            therapistPerception: 'neutral',
-            transferenceState: 'none',
+            therapistPerception: "neutral",
+            transferenceState: "none",
           },
-        })
-      } else if (modelId === 'example-trauma') {
+        });
+      } else if (modelId === "example-trauma") {
         setCurrentModelDetails({
-          id: 'example-trauma',
-          name: 'Elena',
+          id: "example-trauma",
+          name: "Elena",
           demographicInfo: {
             age: 42,
-            gender: 'Female',
-            occupation: 'Teacher',
-            familyStatus: 'Divorced',
+            gender: "Female",
+            occupation: "Teacher",
+            familyStatus: "Divorced",
             culturalFactors: [],
           },
-          presentingIssues: ['PTSD symptoms', 'Nightmares', 'Hypervigilance'],
+          presentingIssues: ["PTSD symptoms", "Nightmares", "Hypervigilance"],
           diagnosisInfo: {
-            primaryDiagnosis: 'Post-Traumatic Stress Disorder',
+            primaryDiagnosis: "Post-Traumatic Stress Disorder",
             secondaryDiagnoses: [],
-            durationOfSymptoms: '1 year',
-            severity: 'moderate',
+            durationOfSymptoms: "1 year",
+            severity: "moderate",
           },
           coreBeliefs: [
             {
-              belief: 'The world is dangerous',
+              belief: "The world is dangerous",
               strength: 9,
               evidence: [],
-              formationContext: 'Traumatic incident',
-              relatedDomains: ['safety', 'trust'],
+              formationContext: "Traumatic incident",
+              relatedDomains: ["safety", "trust"],
             },
             {
-              belief: 'I have to be on guard at all times',
+              belief: "I have to be on guard at all times",
               strength: 8,
               evidence: [],
-              formationContext: 'Post-trauma hypervigilance',
-              relatedDomains: ['safety', 'control'],
+              formationContext: "Post-trauma hypervigilance",
+              relatedDomains: ["safety", "control"],
             },
           ],
           distortionPatterns: [],
@@ -315,7 +315,7 @@ export function CognitiveModelSelector({
             helpfulInterventions: [],
             unhelpfulInterventions: [],
             insights: [],
-            progressMade: '',
+            progressMade: "",
             remainingChallenges: [],
           },
           conversationalStyle: {
@@ -330,25 +330,25 @@ export function CognitiveModelSelector({
             insights: [],
             skillsAcquired: [],
             resistanceLevel: 5,
-            changeReadiness: 'contemplation',
+            changeReadiness: "contemplation",
             sessionProgressLog: [],
             trustLevel: 5,
             rapportScore: 5,
-            therapistPerception: 'neutral',
-            transferenceState: 'none',
+            therapistPerception: "neutral",
+            transferenceState: "none",
           },
-        })
+        });
       }
     } catch (err: unknown) {
-      console.error(`Failed to load model details for ${modelId}:`, err)
+      console.error(`Failed to load model details for ${modelId}:`, err);
     }
-  }
+  };
 
   // Handle model selection
   const handleModelSelect = (modelId: string) => {
-    onSelectModel(modelId)
-    loadModelDetails(modelId)
-  }
+    onSelectModel(modelId);
+    loadModelDetails(modelId);
+  };
 
   // Handle style config changes
   const handleStyleChange = (
@@ -358,42 +358,42 @@ export function CognitiveModelSelector({
     const updatedConfig = {
       ...styleConfig,
       [field]: value,
-    }
-    setStyleConfig(updatedConfig)
+    };
+    setStyleConfig(updatedConfig);
 
     if (onStyleConfigChange) {
-      onStyleConfigChange(updatedConfig)
+      onStyleConfigChange(updatedConfig);
     }
-  }
+  };
 
   // Handle disclosure style selection
   const handleDisclosureStyleChange = (
-    style: 'guarded' | 'selective' | 'reflective' | 'open',
+    style: "guarded" | "selective" | "reflective" | "open",
   ) => {
-    handleStyleChange('disclosureStyle', style)
-  }
+    handleStyleChange("disclosureStyle", style);
+  };
 
   // Handle challenge response selection
   const handleChallengeResponseChange = (
-    response: 'defensive' | 'curious' | 'dismissive' | 'receptive',
+    response: "defensive" | "curious" | "dismissive" | "receptive",
   ) => {
-    handleStyleChange('challengeResponses', response)
-  }
+    handleStyleChange("challengeResponses", response);
+  };
 
   if (loading) {
     return (
       <div className="flex justify-center p-4">Loading patient models...</div>
-    )
+    );
   }
 
   if (error) {
-    return <div className="text-red-500 p-4">{error}</div>
+    return <div className="text-red-500 p-4">{error}</div>;
   }
 
   return (
     <div
       className={cn(
-        'patient-model-selector bg-gray-50 border rounded-lg p-4',
+        "patient-model-selector bg-gray-50 border rounded-lg p-4",
         className,
       )}
     >
@@ -407,16 +407,16 @@ export function CognitiveModelSelector({
               <button
                 key={model.id}
                 className={cn(
-                  'w-full text-left p-3 rounded-md border transition-colors',
+                  "w-full text-left p-3 rounded-md border transition-colors",
                   selectedModelId === model.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:bg-gray-100',
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:bg-gray-100",
                 )}
                 onClick={() => handleModelSelect(model.id)}
               >
                 <div className="font-medium">{model.name}</div>
                 <div className="text-sm text-gray-500">
-                  {model.presentingIssues.join(', ')}
+                  {model.presentingIssues.join(", ")}
                 </div>
                 {model.diagnosisSummary && (
                   <div className="text-xs text-gray-500 mt-1">
@@ -478,7 +478,7 @@ export function CognitiveModelSelector({
                             key={`belief-${belief.belief}-${index}`}
                             className="mb-1"
                           >
-                            &ldquo;{belief.belief}&rdquo; (Strength:{' '}
+                            &ldquo;{belief.belief}&rdquo; (Strength:{" "}
                             {belief.strength}/10)
                           </li>
                         ),
@@ -509,7 +509,7 @@ export function CognitiveModelSelector({
                   max="10"
                   value={styleConfig.openness}
                   onChange={(e) =>
-                    handleStyleChange('openness', parseInt(e.target.value))
+                    handleStyleChange("openness", parseInt(e.target.value))
                   }
                   className="w-full"
                   aria-label="Openness level from 1 to 10"
@@ -536,7 +536,7 @@ export function CognitiveModelSelector({
                   max="10"
                   value={styleConfig.coherence}
                   onChange={(e) =>
-                    handleStyleChange('coherence', parseInt(e.target.value))
+                    handleStyleChange("coherence", parseInt(e.target.value))
                   }
                   className="w-full"
                   aria-label="Coherence level from 1 to 10"
@@ -563,7 +563,7 @@ export function CognitiveModelSelector({
                   max="10"
                   value={styleConfig.defenseLevel}
                   onChange={(e) =>
-                    handleStyleChange('defenseLevel', parseInt(e.target.value))
+                    handleStyleChange("defenseLevel", parseInt(e.target.value))
                   }
                   className="w-full"
                   aria-label="Defense level from 1 to 10"
@@ -585,15 +585,15 @@ export function CognitiveModelSelector({
                 </label>
                 <div className="grid grid-cols-4 gap-1">
                   {(
-                    ['guarded', 'selective', 'reflective', 'open'] as const
+                    ["guarded", "selective", "reflective", "open"] as const
                   ).map((style) => (
                     <button
                       key={style}
                       className={cn(
-                        'text-xs py-1 px-2 rounded',
+                        "text-xs py-1 px-2 rounded",
                         styleConfig.disclosureStyle === style
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 hover:bg-gray-200',
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 hover:bg-gray-200",
                       )}
                       onClick={() => handleDisclosureStyleChange(style)}
                     >
@@ -612,15 +612,15 @@ export function CognitiveModelSelector({
                 </label>
                 <div className="grid grid-cols-4 gap-1">
                   {(
-                    ['defensive', 'curious', 'dismissive', 'receptive'] as const
+                    ["defensive", "curious", "dismissive", "receptive"] as const
                   ).map((response) => (
                     <button
                       key={response}
                       className={cn(
-                        'text-xs py-1 px-2 rounded',
+                        "text-xs py-1 px-2 rounded",
                         styleConfig.challengeResponses === response
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 hover:bg-gray-200',
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 hover:bg-gray-200",
                       )}
                       onClick={() => handleChallengeResponseChange(response)}
                     >
@@ -634,5 +634,5 @@ export function CognitiveModelSelector({
         </div>
       </div>
     </div>
-  )
+  );
 }

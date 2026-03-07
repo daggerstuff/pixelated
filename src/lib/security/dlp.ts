@@ -5,11 +5,11 @@
  * Integrates with PHI detection to scan content before transmission.
  */
 
-import { detectAndRedactPHI } from './phiDetection'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { AuditEventType, logAuditEvent, type AuditDetails } from '../audit'
+import { detectAndRedactPHI } from "./phiDetection";
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { AuditEventType, logAuditEvent, type AuditDetails } from "../audit";
 
-const logger = createBuildSafeLogger('dlp-service')
+const logger = createBuildSafeLogger("dlp-service");
 
 // Simple class to wrap audit logging functionality
 class AuditLogger {
@@ -18,30 +18,30 @@ class AuditLogger {
     userId,
     data,
   }: {
-    type: AuditEventType
-    userId: string
-    action: string
-    data?: Record<string, unknown>
-    severity?: string
+    type: AuditEventType;
+    userId: string;
+    action: string;
+    data?: Record<string, unknown>;
+    severity?: string;
   }) {
-    logAuditEvent(type, 'dlp', userId, 'security', data as AuditDetails)
+    logAuditEvent(type, "dlp", userId, "security", data as AuditDetails);
   }
 }
 
-const auditLogger = new AuditLogger()
+const auditLogger = new AuditLogger();
 
 /**
  * DLP policy levels determining how to handle detected sensitive data
  */
 export enum DLPAction {
   /** Allow transmission with logging */
-  ALLOW = 'allow',
+  ALLOW = "allow",
   /** Allow transmission after redaction */
-  REDACT = 'redact',
+  REDACT = "redact",
   /** Block transmission and log as security event */
-  BLOCK = 'block',
+  BLOCK = "block",
   /** Block transmission and alert security team */
-  BLOCK_AND_ALERT = 'block_and_alert',
+  BLOCK_AND_ALERT = "block_and_alert",
 }
 
 /**
@@ -49,19 +49,19 @@ export enum DLPAction {
  */
 export interface DLPRule {
   /** Unique rule identifier */
-  id: string
+  id: string;
   /** Human readable name */
-  name: string
+  name: string;
   /** Rule description */
-  description: string
+  description: string;
   /** What action to take when rule is triggered */
-  action: DLPAction
+  action: DLPAction;
   /** Whether this rule is currently active */
-  isActive: boolean
+  isActive: boolean;
   /** Function determining if a piece of content matches this rule */
-  matches: (content: string, metadata?: Record<string, unknown>) => boolean
+  matches: (content: string, metadata?: Record<string, unknown>) => boolean;
   /** Optional custom redaction function */
-  redact?: (content: string) => string
+  redact?: (content: string) => string;
 }
 
 /**
@@ -69,13 +69,13 @@ export interface DLPRule {
  */
 export interface DLPResult {
   /** Whether the content is allowed to be transmitted */
-  allowed: boolean
+  allowed: boolean;
   /** If not allowed, the reason for blocking */
-  reason?: string
+  reason?: string;
   /** If redaction was applied, the redacted content */
-  redactedContent?: string
+  redactedContent?: string;
   /** IDs of the triggered rules */
-  triggeredRules: string[]
+  triggeredRules: string[];
 }
 
 /**
@@ -86,13 +86,13 @@ export class DLPService {
     _dataStr: string,
     _arg1: { action: string; contentType: string; preserveFormat: boolean },
   ) {
-    throw new Error('Method not implemented.')
+    throw new Error("Method not implemented.");
   }
-  private rules: DLPRule[] = []
+  private rules: DLPRule[] = [];
 
   constructor() {
     // Initialize with default rules
-    this.addDefaultRules()
+    this.addDefaultRules();
   }
 
   /**
@@ -101,32 +101,32 @@ export class DLPService {
   private addDefaultRules() {
     // Rule to detect and redact PHI/PII
     this.addRule({
-      id: 'phi-detection',
-      name: 'PHI/PII Detection',
-      description: 'Detects and redacts PHI/PII in outgoing content',
+      id: "phi-detection",
+      name: "PHI/PII Detection",
+      description: "Detects and redacts PHI/PII in outgoing content",
       action: DLPAction.REDACT,
       isActive: true,
       matches: (content) => {
         // If the redacted version differs from original, PHI was found
-        return detectAndRedactPHI(content) !== content
+        return detectAndRedactPHI(content) !== content;
       },
       redact: (content) => detectAndRedactPHI(content),
-    })
+    });
 
     // Rule to prevent large data dumps that might contain excessive PHI
     this.addRule({
-      id: 'large-data-volume',
-      name: 'Large Data Volume Protection',
+      id: "large-data-volume",
+      name: "Large Data Volume Protection",
       description:
-        'Prevents large volumes of data export that might contain PHI',
+        "Prevents large volumes of data export that might contain PHI",
       action: DLPAction.BLOCK,
       isActive: true,
       matches: (content, metadata) => {
-        const maxSize = 100 * 1024 // 100KB default threshold
-        const dataSize = (metadata?.['dataSize'] as number) || content.length
-        return dataSize > maxSize && this.containsPotentialPHI(content)
+        const maxSize = 100 * 1024; // 100KB default threshold
+        const dataSize = (metadata?.["dataSize"] as number) || content.length;
+        return dataSize > maxSize && this.containsPotentialPHI(content);
       },
-    })
+    });
   }
 
   /**
@@ -134,13 +134,13 @@ export class DLPService {
    * @param rule Rule configuration
    */
   addRule(rule: DLPRule): void {
-    const existingIndex = this.rules.findIndex((r) => r.id === rule.id)
+    const existingIndex = this.rules.findIndex((r) => r.id === rule.id);
     if (existingIndex >= 0) {
-      this.rules[existingIndex] = rule
+      this.rules[existingIndex] = rule;
     } else {
-      this.rules.push(rule)
+      this.rules.push(rule);
     }
-    logger.info(`DLP rule added: ${rule.id} - ${rule.name}`)
+    logger.info(`DLP rule added: ${rule.id} - ${rule.name}`);
   }
 
   /**
@@ -148,8 +148,8 @@ export class DLPService {
    * @param ruleId Rule ID to remove
    */
   removeRule(ruleId: string): void {
-    this.rules = this.rules.filter((rule) => rule.id !== ruleId)
-    logger.info(`DLP rule removed: ${ruleId}`)
+    this.rules = this.rules.filter((rule) => rule.id !== ruleId);
+    logger.info(`DLP rule removed: ${ruleId}`);
   }
 
   /**
@@ -157,7 +157,7 @@ export class DLPService {
    * @param ruleId Rule ID to delete
    */
   deleteRule(ruleId: string): void {
-    this.removeRule(ruleId)
+    this.removeRule(ruleId);
   }
 
   /**
@@ -165,7 +165,7 @@ export class DLPService {
    * @returns Array of all DLP rules
    */
   getRules(): DLPRule[] {
-    return [...this.rules] // Return a copy to prevent external modification
+    return [...this.rules]; // Return a copy to prevent external modification
   }
 
   /**
@@ -175,7 +175,7 @@ export class DLPService {
    */
   private containsPotentialPHI(content: string): boolean {
     // Simple check for common PHI patterns
-    return detectAndRedactPHI(content) !== content
+    return detectAndRedactPHI(content) !== content;
   }
 
   /**
@@ -187,30 +187,30 @@ export class DLPService {
   scanContent(
     content: string,
     context: {
-      userId: string
-      action: string
-      destination?: string
-      metadata?: Record<string, unknown>
+      userId: string;
+      action: string;
+      destination?: string;
+      metadata?: Record<string, unknown>;
     },
   ): DLPResult {
-    const activeRules = this.rules.filter((rule) => rule.isActive)
-    const triggeredRules: DLPRule[] = []
-    let currentContent = content
-    let allowed = true
-    let reason = ''
+    const activeRules = this.rules.filter((rule) => rule.isActive);
+    const triggeredRules: DLPRule[] = [];
+    let currentContent = content;
+    let allowed = true;
+    let reason = "";
 
     // First pass: identify all triggered rules
     for (const rule of activeRules) {
       if (rule.matches(content, context.metadata)) {
-        triggeredRules.push(rule)
+        triggeredRules.push(rule);
 
         // Find the most restrictive action
         if (
           rule.action === DLPAction.BLOCK ||
           rule.action === DLPAction.BLOCK_AND_ALERT
         ) {
-          allowed = false
-          reason = `Blocked by DLP rule: ${rule.name}`
+          allowed = false;
+          reason = `Blocked by DLP rule: ${rule.name}`;
         }
       }
     }
@@ -223,7 +223,7 @@ export class DLPService {
       // Apply redactions from all matching rules
       for (const rule of triggeredRules) {
         if (rule.action === DLPAction.REDACT && rule.redact) {
-          currentContent = rule.redact(currentContent)
+          currentContent = rule.redact(currentContent);
         }
       }
     }
@@ -236,7 +236,7 @@ export class DLPService {
       triggeredRules: triggeredRules.map((r) => r.id),
       reason,
       destination: context.destination,
-    })
+    });
 
     // Generate alerts for high-severity blocks
     if (
@@ -250,7 +250,7 @@ export class DLPService {
         triggeredRules: triggeredRules
           .filter((r) => r.action === DLPAction.BLOCK_AND_ALERT)
           .map((r) => r.id),
-      })
+      });
     }
 
     return {
@@ -259,23 +259,23 @@ export class DLPService {
       redactedContent:
         allowed && currentContent !== content ? currentContent : undefined,
       triggeredRules: triggeredRules.map((rule) => rule.id),
-    }
+    };
   }
 
   /**
    * Log a DLP event for audit purposes
    */
   private logDLPEvent(event: {
-    userId: string
-    action: string
-    allowed: boolean
-    triggeredRules: string[]
-    reason?: string | undefined
-    destination?: string | undefined
+    userId: string;
+    action: string;
+    allowed: boolean;
+    triggeredRules: string[];
+    reason?: string | undefined;
+    destination?: string | undefined;
   }): void {
     // Log to application logs
     logger.info(
-      `DLP ${event.allowed ? 'allowed' : 'blocked'} ${event.action}`,
+      `DLP ${event.allowed ? "allowed" : "blocked"} ${event.action}`,
       {
         userId: event.userId,
         action: event.action,
@@ -284,7 +284,7 @@ export class DLPService {
         reason: event.reason,
         destination: event.destination,
       },
-    )
+    );
 
     // Log to audit trail
     auditLogger.log({
@@ -298,41 +298,41 @@ export class DLPService {
         reason: event.reason,
         destination: event.destination,
       },
-    })
+    });
   }
 
   /**
    * Generate a security alert for a blocked DLP event
    */
   private generateSecurityAlert(event: {
-    userId: string
-    action: string
-    destination?: string | undefined
-    triggeredRules: string[]
+    userId: string;
+    action: string;
+    destination?: string | undefined;
+    triggeredRules: string[];
   }): void {
-    logger.warn('DLP security alert generated', {
+    logger.warn("DLP security alert generated", {
       userId: event.userId,
       action: event.action,
       destination: event.destination,
       triggeredRules: event.triggeredRules,
-    })
+    });
 
     // In a real implementation, this would send alerts through
     // notification systems, security incident management, etc.
     // For now, we just log it as a serious security event
     auditLogger.log({
       type: AuditEventType.SECURITY_ALERT,
-      severity: 'high',
+      severity: "high",
       userId: event.userId,
-      action: 'dlp_violation',
+      action: "dlp_violation",
       data: {
         action: event.action,
         destination: event.destination,
         triggeredRules: event.triggeredRules,
       },
-    })
+    });
   }
 }
 
 // Export singleton instance
-export const dlpService = new DLPService()
+export const dlpService = new DLPService();

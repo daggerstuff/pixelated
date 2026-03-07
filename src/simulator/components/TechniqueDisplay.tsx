@@ -1,10 +1,10 @@
-import React from 'react'
-import { useSimulator } from '../context/SimulatorContext'
-import { Badge } from '../../components/ui/badge'
+import React from "react";
+import { useSimulator } from "../context/SimulatorContext";
+import { Badge } from "../../components/ui/badge";
 
 export const TechniqueDisplay: React.FC = () => {
-  const { state } = useSimulator()
-  const { detectedTechniques } = state
+  const { state } = useSimulator();
+  const { detectedTechniques } = state;
 
   if (!detectedTechniques || detectedTechniques.length === 0) {
     return (
@@ -14,7 +14,7 @@ export const TechniqueDisplay: React.FC = () => {
           No therapeutic techniques detected yet.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -24,7 +24,7 @@ export const TechniqueDisplay: React.FC = () => {
         {detectedTechniques.map((technique) => (
           <Badge
             key={technique.name}
-            variant={technique.confidence > 0.8 ? 'default' : 'secondary'}
+            variant={technique.confidence > 0.8 ? "default" : "secondary"}
             className="text-sm"
           >
             {technique.name} ({(technique.confidence * 100).toFixed(1)}%)
@@ -32,5 +32,5 @@ export const TechniqueDisplay: React.FC = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 // Load environment variables first
 dotenv.config();
@@ -27,7 +27,6 @@ async function testWithDotenv() {
     console.log("User ID:", user.user.id);
 
     console.log("\n🎉 Dotenv test completed!");
-
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

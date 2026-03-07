@@ -1,18 +1,18 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('audit-log')
+const logger = createBuildSafeLogger("audit-log");
 
 // Define the structure for the audit log entry
 export interface AuditLogEntry {
-  id: string
-  userId: string
-  action: string
+  id: string;
+  userId: string;
+  action: string;
   resource: {
-    id: string
-    type: string | undefined
-  }
-  metadata: Record<string, unknown>
-  timestamp: Date
+    id: string;
+    type: string | undefined;
+  };
+  metadata: Record<string, unknown>;
+  timestamp: Date;
 }
 
 export async function getUserAuditLogs(
@@ -21,14 +21,14 @@ export async function getUserAuditLogs(
   offset = 0,
 ): Promise<AuditLogEntry[]> {
   try {
-    logger.info('Getting user audit logs', { userId, limit, offset })
+    logger.info("Getting user audit logs", { userId, limit, offset });
 
     // TODO: Replace with actual database implementation
     // For now, return empty array to prevent build errors
-    return []
+    return [];
   } catch (error: unknown) {
-    logger.error('Error getting user audit logs:', error)
-    return []
+    logger.error("Error getting user audit logs:", error);
+    return [];
   }
 }
 
@@ -40,18 +40,18 @@ export async function logAuditEvent(
   metadata?: Record<string, unknown>,
 ): Promise<void> {
   try {
-    logger.info('Logging audit event', {
+    logger.info("Logging audit event", {
       userId,
       action,
       resourceId,
       resourceType,
       metadata,
-    })
+    });
 
     // TODO: Replace with actual database implementation
     // For now, just log to console to prevent build errors
   } catch (error: unknown) {
-    logger.error('Error logging audit event:', error)
+    logger.error("Error logging audit event:", error);
   }
 }
 
@@ -65,7 +65,7 @@ export async function createAuditLog(
   resourceType?: string,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+  return logAuditEvent(userId, action, resourceId, resourceType, metadata);
 }
 
 /**
@@ -78,5 +78,5 @@ export async function createResourceAuditLog(
   resourceType: string,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+  return logAuditEvent(userId, action, resourceId, resourceType, metadata);
 }

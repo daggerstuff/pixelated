@@ -1,14 +1,14 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy } from "react";
 
 // Lazy load the heavy bias dashboard
 const BiasDashboard = lazy(() =>
-  import('./BiasDashboard').then((module) => ({
+  import("./BiasDashboard").then((module) => ({
     default: module.BiasDashboard,
   })),
-)
+);
 
 interface LazyBiasDashboardProps {
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 
 function BiasLoadingFallback() {
@@ -69,7 +69,7 @@ function BiasLoadingFallback() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function LazyBiasDashboard(props: LazyBiasDashboardProps) {
@@ -77,5 +77,5 @@ export default function LazyBiasDashboard(props: LazyBiasDashboardProps) {
     <Suspense fallback={<BiasLoadingFallback />}>
       <BiasDashboard {...props} />
     </Suspense>
-  )
+  );
 }

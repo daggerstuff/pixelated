@@ -8,16 +8,16 @@ export function channel(_name) {
     publish: () => false,
     subscribe: () => {},
     unsubscribe: () => {},
-  }
+  };
 }
 
 export function subscribe(_name, _onMessage) {}
 export function unsubscribe(_name, _onMessage) {}
-export const tracingChannel = channel('tracing')
+export const tracingChannel = channel("tracing");
 
 export default {
   channel,
   subscribe,
   unsubscribe,
   tracingChannel,
-}
+};

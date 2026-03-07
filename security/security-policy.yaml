@@ -14,34 +14,34 @@ spec:
       policyTypes:
         - Ingress
         - Egress
-    
+
     - name: allow-app-traffic
       podSelector:
         matchLabels:
           app: pixelated-empathy
       ingress:
         - from:
-          - podSelector:
-              matchLabels:
-                app: nginx-ingress
+            - podSelector:
+                matchLabels:
+                  app: nginx-ingress
           ports:
-          - protocol: TCP
-            port: 3000
+            - protocol: TCP
+              port: 3000
       egress:
         - to:
-          - podSelector:
-              matchLabels:
-                app: postgresql
+            - podSelector:
+                matchLabels:
+                  app: postgresql
           ports:
-          - protocol: TCP
-            port: 5432
+            - protocol: TCP
+              port: 5432
         - to:
-          - podSelector:
-              matchLabels:
-                app: redis
+            - podSelector:
+                matchLabels:
+                  app: redis
           ports:
-          - protocol: TCP
-            port: 6379
+            - protocol: TCP
+              port: 6379
 
   # Pod Security Standards
   podSecurityStandards:

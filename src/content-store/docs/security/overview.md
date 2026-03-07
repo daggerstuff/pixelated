@@ -1,8 +1,8 @@
 ---
-title: 'Security Overview'
-description: 'Learn about Pixelated Healths comprehensive security features and compliance measures'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Security Overview"
+description: "Learn about Pixelated Healths comprehensive security features and compliance measures"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true

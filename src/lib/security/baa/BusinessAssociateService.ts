@@ -2,16 +2,16 @@ import type {
   BusinessAssociate,
   BusinessAssociateType,
   ServiceCategory,
-} from './types'
-import { ComplianceLevel } from './types'
-import { generateId } from '../../utils/ids'
+} from "./types";
+import { ComplianceLevel } from "./types";
+import { generateId } from "../../utils/ids";
 
 /**
  * Service for managing Business Associates (vendors, partners, etc.)
  * and their HIPAA compliance verification
  */
 export class BusinessAssociateService {
-  private businessAssociates: Map<string, BusinessAssociate> = new Map()
+  private businessAssociates: Map<string, BusinessAssociate> = new Map();
 
   /**
    * Create a new business associate record
@@ -28,7 +28,7 @@ export class BusinessAssociateService {
     website?: string,
     notes?: string,
   ): BusinessAssociate {
-    const id = generateId()
+    const id = generateId();
     const associate: BusinessAssociate = {
       id,
       name,
@@ -43,24 +43,24 @@ export class BusinessAssociateService {
       dateAdded: new Date(),
       complianceLevel,
       agreementHistory: [],
-    }
+    };
 
-    this.businessAssociates.set(id, associate)
-    return associate
+    this.businessAssociates.set(id, associate);
+    return associate;
   }
 
   /**
    * Get a business associate by ID
    */
   public getBusinessAssociate(id: string): BusinessAssociate | undefined {
-    return this.businessAssociates.get(id)
+    return this.businessAssociates.get(id);
   }
 
   /**
    * Get all business associates
    */
   public getAllBusinessAssociates(): BusinessAssociate[] {
-    return Array.from(this.businessAssociates.values())
+    return Array.from(this.businessAssociates.values());
   }
 
   /**
@@ -70,28 +70,28 @@ export class BusinessAssociateService {
     id: string,
     updates: Partial<BusinessAssociate>,
   ): BusinessAssociate | undefined {
-    const associate = this.businessAssociates.get(id)
+    const associate = this.businessAssociates.get(id);
     if (!associate) {
-      return undefined
+      return undefined;
     }
 
     // Prevent modification of certain fields
-    const { id: _, ...updatableFields } = updates
+    const { id: _, ...updatableFields } = updates;
 
     const updatedAssociate = {
       ...associate,
       ...updatableFields,
-    }
+    };
 
-    this.businessAssociates.set(id, updatedAssociate)
-    return updatedAssociate
+    this.businessAssociates.set(id, updatedAssociate);
+    return updatedAssociate;
   }
 
   /**
    * Delete a business associate
    */
   public deleteBusinessAssociate(id: string): boolean {
-    return this.businessAssociates.delete(id)
+    return this.businessAssociates.delete(id);
   }
 
   /**
@@ -102,16 +102,16 @@ export class BusinessAssociateService {
     type?: BusinessAssociateType,
     complianceLevel?: ComplianceLevel,
   ): BusinessAssociate[] {
-    const normalizedQuery = query.toLowerCase()
+    const normalizedQuery = query.toLowerCase();
     return this.getAllBusinessAssociates().filter((associate) => {
       const matchesQuery =
-        !query || associate.name.toLowerCase().includes(normalizedQuery)
-      const matchesType = !type || associate.type === type
+        !query || associate.name.toLowerCase().includes(normalizedQuery);
+      const matchesType = !type || associate.type === type;
       const matchesCompliance =
-        !complianceLevel || associate.complianceLevel === complianceLevel
+        !complianceLevel || associate.complianceLevel === complianceLevel;
 
-      return matchesQuery && matchesType && matchesCompliance
-    })
+      return matchesQuery && matchesType && matchesCompliance;
+    });
   }
 
   /**
@@ -124,9 +124,9 @@ export class BusinessAssociateService {
     expiryDate?: Date,
     notes?: string,
   ): BusinessAssociate | undefined {
-    const associate = this.businessAssociates.get(id)
+    const associate = this.businessAssociates.get(id);
     if (!associate) {
-      return undefined
+      return undefined;
     }
 
     const updatedAssociate = {
@@ -139,10 +139,10 @@ export class BusinessAssociateService {
           ? `${associate.notes}\n\n${notes}`
           : notes
         : associate.notes,
-    }
+    };
 
-    this.businessAssociates.set(id, updatedAssociate)
-    return updatedAssociate
+    this.businessAssociates.set(id, updatedAssociate);
+    return updatedAssociate;
   }
 
   /**
@@ -153,24 +153,24 @@ export class BusinessAssociateService {
     agreementId: string,
     isActive: boolean = true,
   ): BusinessAssociate | undefined {
-    const associate = this.businessAssociates.get(id)
+    const associate = this.businessAssociates.get(id);
     if (!associate) {
-      return undefined
+      return undefined;
     }
 
-    const updatedHistory = [...associate.agreementHistory]
+    const updatedHistory = [...associate.agreementHistory];
     if (!updatedHistory.includes(agreementId)) {
-      updatedHistory.push(agreementId)
+      updatedHistory.push(agreementId);
     }
 
     const updatedAssociate = {
       ...associate,
       agreementHistory: updatedHistory,
       activeAgreementId: isActive ? agreementId : associate.activeAgreementId,
-    }
+    };
 
-    this.businessAssociates.set(id, updatedAssociate)
-    return updatedAssociate
+    this.businessAssociates.set(id, updatedAssociate);
+    return updatedAssociate;
   }
 
   /**
@@ -180,35 +180,35 @@ export class BusinessAssociateService {
   public getExpiringCompliance(
     daysThreshold: number = 30,
   ): BusinessAssociate[] {
-    const now = new Date()
-    const thresholdDate = new Date()
-    thresholdDate.setDate(now.getDate() + daysThreshold)
+    const now = new Date();
+    const thresholdDate = new Date();
+    thresholdDate.setDate(now.getDate() + daysThreshold);
 
     return this.getAllBusinessAssociates().filter((associate) => {
       if (!associate.complianceExpiryDate) {
-        return false
+        return false;
       }
 
       return (
         associate.complianceExpiryDate <= thresholdDate &&
         associate.complianceExpiryDate > now
-      )
-    })
+      );
+    });
   }
 
   /**
    * Get business associates with expired compliance verification
    */
   public getExpiredCompliance(): BusinessAssociate[] {
-    const now = new Date()
+    const now = new Date();
 
     return this.getAllBusinessAssociates().filter((associate) => {
       if (!associate.complianceExpiryDate) {
-        return false
+        return false;
       }
 
-      return associate.complianceExpiryDate < now
-    })
+      return associate.complianceExpiryDate < now;
+    });
   }
 
   /**
@@ -217,16 +217,16 @@ export class BusinessAssociateService {
   public getComplianceStatistics(): Record<ComplianceLevel, number> {
     const stats = Object.values(ComplianceLevel).reduce(
       (acc, level) => {
-        acc[level] = 0
-        return acc
+        acc[level] = 0;
+        return acc;
       },
       {} as Record<ComplianceLevel, number>,
-    )
+    );
 
     this.getAllBusinessAssociates().forEach((associate) => {
-      stats[associate.complianceLevel]++
-    })
+      stats[associate.complianceLevel]++;
+    });
 
-    return stats
+    return stats;
   }
 }

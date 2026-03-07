@@ -35,24 +35,26 @@ These tests focus on how our layout components work together with other componen
 Example:
 
 ```typescript
-test('Dashboard layout renders with sidebar and content area', async ({ page }) => {
-  await page.goto('/dashboard');
-  
+test("Dashboard layout renders with sidebar and content area", async ({
+  page,
+}) => {
+  await page.goto("/dashboard");
+
   // Check that sidebar is visible
-  await expect(page.locator('aside')).toBeVisible();
-  
+  await expect(page.locator("aside")).toBeVisible();
+
   // Check that main content area is visible
-  await expect(page.locator('main.dashboard-content')).toBeVisible();
-  
+  await expect(page.locator("main.dashboard-content")).toBeVisible();
+
   // Verify sidebar toggle button works
   const sidebarToggle = page.locator('button[aria-label="Toggle sidebar"]');
   await expect(sidebarToggle).toBeVisible();
-  
+
   // Click the toggle button
   await sidebarToggle.click();
-  
+
   // Verify sidebar state changes
-  await expect(page.locator('aside')).toHaveAttribute('data-collapsed', 'true');
+  await expect(page.locator("aside")).toHaveAttribute("data-collapsed", "true");
 });
 ```
 
@@ -68,17 +70,17 @@ These tests verify that our Astro pages render correctly on the server before an
 Example:
 
 ```typescript
-test('Page loads with pre-rendered HTML (SSR)', async ({ page }) => {
+test("Page loads with pre-rendered HTML (SSR)", async ({ page }) => {
   // Disable JavaScript to test pure SSR content
-  await page.context().route('**/*.js', route => route.abort());
-  
+  await page.context().route("**/*.js", (route) => route.abort());
+
   // Go to the homepage
-  await page.goto('/');
-  
+  await page.goto("/");
+
   // Verify that the page content is still visible even without JS
-  await expect(page.locator('main')).toBeVisible();
-  await expect(page.locator('header')).toBeVisible();
-  await expect(page.locator('footer')).toBeVisible();
+  await expect(page.locator("main")).toBeVisible();
+  await expect(page.locator("header")).toBeVisible();
+  await expect(page.locator("footer")).toBeVisible();
 });
 ```
 
@@ -94,25 +96,29 @@ These tests focus on interactive components that use Astro's client directives:
 Example:
 
 ```typescript
-test('Theme toggle hydrates and functions correctly', async ({ page }) => {
-  await page.goto('/');
-  
+test("Theme toggle hydrates and functions correctly", async ({ page }) => {
+  await page.goto("/");
+
   // Theme toggle uses client:load directive
   await page.waitForSelector('button[aria-label="Toggle theme"]');
-  
+
   // Check initial theme
   const initialTheme = await page.evaluate(() => {
-    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    return document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
   });
-  
+
   // Click the theme toggle
   await page.click('button[aria-label="Toggle theme"]');
-  
+
   // Check that the theme changed
   const newTheme = await page.evaluate(() => {
-    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    return document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
   });
-  
+
   expect(newTheme).not.toEqual(initialTheme);
 });
 ```
@@ -129,21 +135,25 @@ These tests verify that our content collections and static generation features w
 Example:
 
 ```typescript
-test('Blog content is correctly generated from content collections', async ({ page }) => {
-  await page.goto('/blog');
-  
+test("Blog content is correctly generated from content collections", async ({
+  page,
+}) => {
+  await page.goto("/blog");
+
   // Check that multiple article cards are rendered
-  await expect(page.locator('.article-card')).toHaveCount.greaterThan(1);
-  
+  await expect(page.locator(".article-card")).toHaveCount.greaterThan(1);
+
   // Get the first article link
-  const firstArticleLink = page.locator('.article-card a').first();
+  const firstArticleLink = page.locator(".article-card a").first();
   const articleTitle = await firstArticleLink.textContent();
-  
+
   // Click on the first article
   await firstArticleLink.click();
-  
+
   // Check that the article title on the detail page matches
-  await expect(page.locator('.blog-post-title')).toContainText(articleTitle || '');
+  await expect(page.locator(".blog-post-title")).toContainText(
+    articleTitle || "",
+  );
 });
 ```
 

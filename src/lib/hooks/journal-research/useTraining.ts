@@ -2,20 +2,23 @@
  * React hooks for training pipeline integration
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   integrateDataset,
   integrateAllDatasets,
   getTrainingStatus,
   getPipelineStatus,
-  } from '@/lib/api/journal-research/training'
-import { journalResearchQueryKeys, journalResearchMutationKeys } from '@/lib/api/journal-research/react-query'
+} from "@/lib/api/journal-research/training";
+import {
+  journalResearchQueryKeys,
+  journalResearchMutationKeys,
+} from "@/lib/api/journal-research/react-query";
 
 /**
  * Hook for integrating a single dataset into the training pipeline
  */
 export function useIntegrateDataset(sessionId: string) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.training.integrate(sessionId),
@@ -23,52 +26,52 @@ export function useIntegrateDataset(sessionId: string) {
       sourceId,
       autoIntegrate = true,
     }: {
-      sourceId: string
-      autoIntegrate?: boolean
+      sourceId: string;
+      autoIntegrate?: boolean;
     }) => {
-      return integrateDataset(sessionId, sourceId, autoIntegrate)
+      return integrateDataset(sessionId, sourceId, autoIntegrate);
     },
     onSuccess: () => {
       // Invalidate training status queries
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.status(sessionId),
-      })
+      });
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.pipelineStatus(),
-      })
+      });
       // Also invalidate acquisition queries to refresh integration status
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(sessionId),
-      })
+      });
     },
-  })
+  });
 }
 
 /**
  * Hook for integrating all datasets from a session
  */
 export function useIntegrateAllDatasets(sessionId: string) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.training.integrateAll(sessionId),
     mutationFn: async (autoIntegrate: boolean = true) => {
-      return integrateAllDatasets(sessionId, autoIntegrate)
+      return integrateAllDatasets(sessionId, autoIntegrate);
     },
     onSuccess: () => {
       // Invalidate training status queries
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.status(sessionId),
-      })
+      });
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.training.pipelineStatus(),
-      })
+      });
       // Also invalidate acquisition queries
       queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.acquisition.list(sessionId),
-      })
+      });
     },
-  })
+  });
 }
 
 /**
@@ -81,7 +84,7 @@ export function useTrainingStatus(sessionId: string, enabled: boolean = true) {
     enabled: enabled && !!sessionId,
     staleTime: 10000, // 10 seconds
     refetchInterval: 30000, // Refetch every 30 seconds
-  })
+  });
 }
 
 /**
@@ -94,5 +97,5 @@ export function usePipelineStatus(enabled: boolean = true) {
     enabled,
     staleTime: 10000, // 10 seconds
     refetchInterval: 30000, // Refetch every 30 seconds
-  })
+  });
 }

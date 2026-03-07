@@ -6,60 +6,60 @@
  * and other auth-related settings.
  */
 
-export type AuthRole = 'admin' | 'staff' | 'therapist' | 'user' | 'guest'
+export type AuthRole = "admin" | "staff" | "therapist" | "user" | "guest";
 
 export interface AuthConfig {
   /** Session duration in seconds (default: 1 week) */
-  sessionDuration: number
+  sessionDuration: number;
 
   /** Cookie options */
   cookies: {
     /** Access token cookie name */
-    accessToken: string
+    accessToken: string;
     /** Refresh token cookie name */
-    refreshToken: string
+    refreshToken: string;
     /** Cookie path */
-    path: string
+    path: string;
     /** Cookie domain (undefined for current domain) */
     domain?:
       | string
       /** Secure cookie flag (HTTPS only) */
-      | undefined
+      | undefined;
     /** Secure cookie flag (HTTPS only) */
-    secure: boolean
+    secure: boolean;
     /** HTTP only flag (not accessible via JavaScript) */
-    httpOnly: boolean
+    httpOnly: boolean;
     /** Same site cookie policy */
-    sameSite: 'strict' | 'lax' | 'none'
-  }
+    sameSite: "strict" | "lax" | "none";
+  };
 
   /** Redirect paths */
   redirects: {
     /** Path to redirect after successful login */
-    afterLogin: string
+    afterLogin: string;
     /** Path to redirect after logout */
-    afterLogout: string
+    afterLogout: string;
     /** Path to redirect when authentication is required */
-    authRequired: string
+    authRequired: string;
     /** Path to redirect when access is forbidden */
-    forbidden: string
-  }
+    forbidden: string;
+  };
 
   /** Role configuration */
   roles: {
     /** Default role for new users */
-    default: AuthRole
+    default: AuthRole;
     /** Role hierarchy (ordered from highest to lowest privileges) */
-    hierarchy: AuthRole[]
-  }
+    hierarchy: AuthRole[];
+  };
 
   /** Rate limiting for auth-related requests */
   rateLimit: {
     /** Maximum login attempts before temporary lockout */
-    maxLoginAttempts: number
+    maxLoginAttempts: number;
     /** Lockout duration in seconds after too many failed attempts */
-    lockoutDuration: number
-  }
+    lockoutDuration: number;
+  };
 }
 
 /**
@@ -69,32 +69,32 @@ export const authConfig: AuthConfig = {
   sessionDuration: 7 * 24 * 60 * 60, // 1 week in seconds
 
   cookies: {
-    accessToken: 'auth-token',
-    refreshToken: 'refresh-token',
-    path: '/',
+    accessToken: "auth-token",
+    refreshToken: "refresh-token",
+    path: "/",
     domain: undefined,
     secure: true,
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: "lax",
   },
 
   redirects: {
-    afterLogin: '/dashboard',
-    afterLogout: '/',
-    authRequired: '/login',
-    forbidden: '/access-denied',
+    afterLogin: "/dashboard",
+    afterLogout: "/",
+    authRequired: "/login",
+    forbidden: "/access-denied",
   },
 
   roles: {
-    default: 'user',
-    hierarchy: ['admin', 'staff', 'therapist', 'user', 'guest'],
+    default: "user",
+    hierarchy: ["admin", "staff", "therapist", "user", "guest"],
   },
 
   rateLimit: {
     maxLoginAttempts: 5,
     lockoutDuration: 15 * 60, // 15 minutes in seconds
   },
-}
+};
 
 /**
  * Check if a role has higher or equal privileges than another role
@@ -107,18 +107,18 @@ export function hasRolePrivilege(
   userRole: AuthRole,
   requiredRole: AuthRole,
 ): boolean {
-  const { hierarchy } = authConfig.roles
+  const { hierarchy } = authConfig.roles;
 
   // Get the indices of both roles in the hierarchy
-  const userRoleIndex = hierarchy.indexOf(userRole)
-  const requiredRoleIndex = hierarchy.indexOf(requiredRole)
+  const userRoleIndex = hierarchy.indexOf(userRole);
+  const requiredRoleIndex = hierarchy.indexOf(requiredRole);
 
   // Lower index means higher privilege (admin is 0)
   return (
     userRoleIndex !== -1 &&
     requiredRoleIndex !== -1 &&
     userRoleIndex <= requiredRoleIndex
-  )
+  );
 }
 
-export default authConfig
+export default authConfig;

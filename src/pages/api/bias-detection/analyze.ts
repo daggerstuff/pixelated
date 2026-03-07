@@ -1,174 +1,177 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('bias-detection-api')
+const logger = createBuildSafeLogger("bias-detection-api");
 
 // Mock analysis result matching test expectations
 const mockAnalysisResult = {
-  sessionId: '123e4567-e89b-12d3-a456-426614174000',
+  sessionId: "123e4567-e89b-12d3-a456-426614174000",
   overallScore: 0.75,
-  riskLevel: 'medium',
+  riskLevel: "medium",
   demographicAnalysis: {},
   layerAnalysis: [],
   recommendations: [
-    'Consider cultural sensitivity in diagnostic approach',
-    'Review intervention selection for demographic appropriateness',
+    "Consider cultural sensitivity in diagnostic approach",
+    "Review intervention selection for demographic appropriateness",
   ],
-}
+};
 
 const mockGetAnalysisResult = {
-  sessionId: '123e4567-e89b-12d3-a456-426614174000',
+  sessionId: "123e4567-e89b-12d3-a456-426614174000",
   overallScore: 0.65,
-  riskLevel: 'medium',
+  riskLevel: "medium",
   demographicAnalysis: {},
   layerAnalysis: [],
-  recommendations: ['Review cultural considerations'],
-}
+  recommendations: ["Review cultural considerations"],
+};
 
 const buildHeadersMap = (headers?: HeadersInit): Map<string, string> => {
-  const headerMap = new Map<string, string>()
+  const headerMap = new Map<string, string>();
 
-  if (!headers) return headerMap
+  if (!headers) return headerMap;
 
   if (headers instanceof Headers) {
     headers.forEach((value, key) => {
-      headerMap.set(key.toLowerCase(), value)
-    })
-    return headerMap
+      headerMap.set(key.toLowerCase(), value);
+    });
+    return headerMap;
   }
 
   if (Array.isArray(headers)) {
     headers.forEach(([key, value]) => {
-      headerMap.set(key.toLowerCase(), value)
-    })
-    return headerMap
+      headerMap.set(key.toLowerCase(), value);
+    });
+    return headerMap;
   }
 
   Object.entries(headers).forEach(([key, value]) => {
-    headerMap.set(key.toLowerCase(), String(value))
-  })
+    headerMap.set(key.toLowerCase(), String(value));
+  });
 
-  return headerMap
-}
+  return headerMap;
+};
 
 const createMockCompatibleResponse = (
   body: BodyInit | null,
   init?: ResponseInit,
 ): Response => {
-  const headersMap = buildHeadersMap(init?.headers)
-  const status = init?.status ?? 200
+  const headersMap = buildHeadersMap(init?.headers);
+  const status = init?.status ?? 200;
 
   return {
     status,
     ok: status >= 200 && status < 300,
-    statusText: '',
+    statusText: "",
     headers: {
       get: (key: string) => headersMap.get(key.toLowerCase()) ?? null,
     },
     json: async () => {
-      if (typeof body === 'string') {
+      if (typeof body === "string") {
         try {
-          return JSON.parse(body)
+          return JSON.parse(body);
         } catch {
-          return body
+          return body;
         }
       }
-      return body as unknown
+      return body as unknown;
     },
     text: async () => {
-      if (typeof body === 'string') return body
-      return JSON.stringify(body ?? '')
+      if (typeof body === "string") return body;
+      return JSON.stringify(body ?? "");
     },
-  } as unknown as Response
-}
+  } as unknown as Response;
+};
 
 const createResponse = (
   body: BodyInit | null,
   init?: ResponseInit,
 ): Response => {
-  if (typeof Response === 'function') {
-    const responsePrototype = (Response as unknown as { prototype?: unknown }).prototype
+  if (typeof Response === "function") {
+    const responsePrototype = (Response as unknown as { prototype?: unknown })
+      .prototype;
     const canConstructResponse = Boolean(
       responsePrototype && responsePrototype.constructor === Response,
-    )
+    );
 
     if (canConstructResponse) {
       try {
-        return new Response(body, init)
+        return new Response(body, init);
       } catch {
         // Fall back to calling Response as a function if construction fails
       }
     }
 
     try {
-      return (Response as unknown as (body: BodyInit | null, init?: ResponseInit) => Response)(
-        body,
-        init,
-      )
+      return (
+        Response as unknown as (
+          body: BodyInit | null,
+          init?: ResponseInit,
+        ) => Response
+      )(body, init);
     } catch {
-      return createMockCompatibleResponse(body, init)
+      return createMockCompatibleResponse(body, init);
     }
   }
 
-  return createMockCompatibleResponse(body, init)
-}
+  return createMockCompatibleResponse(body, init);
+};
 
 export const POST = async ({
   request,
 }: {
-  request: Request
+  request: Request;
 }): Promise<Response> => {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
     // Parse request body (be permissive for tests)
-    let body
+    let body;
     try {
-      body = await request.json()
+      body = await request.json();
     } catch {
       // If JSON parsing fails, return error
-      const processingTime = Math.max(Date.now() - startTime, 1)
+      const processingTime = Math.max(Date.now() - startTime, 1);
 
       return createResponse(
         JSON.stringify({
           success: false,
-          error: 'Analysis Failed',
-          message: 'Invalid JSON',
+          error: "Analysis Failed",
+          message: "Invalid JSON",
           processingTime,
         }),
         {
           status: 500,
           headers: {
-            'Content-Type': 'application/json',
-            'X-Processing-Time': processingTime.toString(),
-            'X-Cache': 'MISS',
+            "Content-Type": "application/json",
+            "X-Processing-Time": processingTime.toString(),
+            "X-Cache": "MISS",
           },
         },
-      )
+      );
     }
 
     // Basic validation (only check for completely empty body)
     if (!body || Object.keys(body).length === 0) {
-      const processingTime = Math.max(Date.now() - startTime, 1)
+      const processingTime = Math.max(Date.now() - startTime, 1);
 
       return createResponse(
         JSON.stringify({
           success: false,
-          error: 'Bad Request',
-          message: 'Invalid request format',
+          error: "Bad Request",
+          message: "Invalid request format",
           processingTime,
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
-            'X-Processing-Time': processingTime.toString(),
-            'X-Cache': 'MISS',
+            "Content-Type": "application/json",
+            "X-Processing-Time": processingTime.toString(),
+            "X-Cache": "MISS",
           },
         },
-      )
+      );
     }
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     return createResponse(
       JSON.stringify({
@@ -180,54 +183,54 @@ export const POST = async ({
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time': processingTime.toString(),
-          'X-Cache': 'MISS',
+          "Content-Type": "application/json",
+          "X-Processing-Time": processingTime.toString(),
+          "X-Cache": "MISS",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Analysis failed', { error })
+    logger.error("Analysis failed", { error });
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     return createResponse(
       JSON.stringify({
         success: false,
-        error: 'Analysis Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Analysis Failed",
+        message: error instanceof Error ? error.message : "Unknown error",
         processingTime,
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time': processingTime.toString(),
-          'X-Cache': 'MISS',
+          "Content-Type": "application/json",
+          "X-Processing-Time": processingTime.toString(),
+          "X-Cache": "MISS",
         },
       },
-    )
+    );
   }
-}
+};
 
 export const GET = async ({
   request,
 }: {
-  request: Request
+  request: Request;
 }): Promise<Response> => {
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
-    const url = new URL(request.url)
-    const sessionId = url.searchParams.get('sessionId')
+    const url = new URL(request.url);
+    const sessionId = url.searchParams.get("sessionId");
 
     // Use the provided sessionId or default
     const result = {
       ...mockGetAnalysisResult,
       sessionId: sessionId || mockGetAnalysisResult.sessionId,
-    }
+    };
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     return createResponse(
       JSON.stringify({
@@ -239,32 +242,32 @@ export const GET = async ({
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time': processingTime.toString(),
-          'X-Cache': 'HIT',
+          "Content-Type": "application/json",
+          "X-Processing-Time": processingTime.toString(),
+          "X-Cache": "HIT",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Get analysis failed', { error })
+    logger.error("Get analysis failed", { error });
 
-    const processingTime = Math.max(Date.now() - startTime, 1)
+    const processingTime = Math.max(Date.now() - startTime, 1);
 
     return createResponse(
       JSON.stringify({
         success: false,
-        error: 'Get Analysis Failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Get Analysis Failed",
+        message: error instanceof Error ? error.message : "Unknown error",
         processingTime,
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'X-Processing-Time': processingTime.toString(),
-          'X-Cache': 'MISS',
+          "Content-Type": "application/json",
+          "X-Processing-Time": processingTime.toString(),
+          "X-Cache": "MISS",
         },
       },
-    )
+    );
   }
-}
+};

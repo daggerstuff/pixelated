@@ -1,11 +1,11 @@
-import { FC } from 'react'
-import MentalHealthChatDemo from './MentalHealthChatDemo'
+import { FC } from "react";
+import MentalHealthChatDemo from "./MentalHealthChatDemo";
 
 interface MindMirrorDemoProps {
-  className?: string
+  className?: string;
 }
 
-export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
+export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = "" }) => {
   return (
     <div className={`w-full ${className}`}>
       <MentalHealthChatDemo
@@ -14,7 +14,7 @@ export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
         initialTab="analysis"
       />
     </div>
-  )
-}
+  );
+};
 
-export default MindMirrorDemo
+export default MindMirrorDemo;

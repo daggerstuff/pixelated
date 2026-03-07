@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import useSkillProgress, { SkillProgress } from '@/hooks/useSkillProgress'
-import type { TherapistSession } from '@/types/dashboard'
-import { ProgressBar } from './ProgressBar'
-import { SessionMetrics } from './SessionMetrics'
-import { cn } from '@/lib/utils'
+import React, { useState } from "react";
+import useSkillProgress, { SkillProgress } from "@/hooks/useSkillProgress";
+import type { TherapistSession } from "@/types/dashboard";
+import { ProgressBar } from "./ProgressBar";
+import { SessionMetrics } from "./SessionMetrics";
+import { cn } from "@/lib/utils";
 
 interface TherapistProgressTrackerProps {
-  session: TherapistSession
-  className?: string
+  session: TherapistSession;
+  className?: string;
 }
 
 export function TherapistProgressTracker({
@@ -15,18 +15,18 @@ export function TherapistProgressTracker({
   className,
 }: TherapistProgressTrackerProps) {
   // Calculate session duration
-  const startTime = new Date(session.startTime)
-  const endTime = session.endTime ? new Date(session.endTime) : new Date()
-  const durationMs = endTime.getTime() - startTime.getTime()
-  const durationMinutes = Math.floor(durationMs / 60000)
-  const durationHours = Math.floor(durationMinutes / 60)
-  const remainingMinutes = durationMinutes % 60
+  const startTime = new Date(session.startTime);
+  const endTime = session.endTime ? new Date(session.endTime) : new Date();
+  const durationMs = endTime.getTime() - startTime.getTime();
+  const durationMinutes = Math.floor(durationMs / 60000);
+  const durationHours = Math.floor(durationMinutes / 60);
+  const remainingMinutes = durationMinutes % 60;
   // We call the hook with the session to derive or fetch skill progress data
   const {
     data: skillProgress,
     loading: skillsLoading,
     error: skillsError,
-  } = useSkillProgress(session)
+  } = useSkillProgress(session);
 
   // Expandable sections for better keyboard navigation
   const [expandedSections, setExpandedSections] = useState<
@@ -36,29 +36,29 @@ export function TherapistProgressTracker({
     progress: true,
     skills: true,
     notes: true,
-  })
+  });
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
-    }))
-  }
+    }));
+  };
 
   // Fallback mock data if hook returns nothing
   const fallbackSkills: SkillProgress[] = [
-    { skill: 'Active Listening', score: 85, trend: 'up' },
-    { skill: 'Empathy', score: 78, trend: 'stable' },
-    { skill: 'Questioning', score: 92, trend: 'up' },
-    { skill: 'Reflection', score: 71, trend: 'down' },
-  ]
+    { skill: "Active Listening", score: 85, trend: "up" },
+    { skill: "Empathy", score: 78, trend: "stable" },
+    { skill: "Questioning", score: 92, trend: "up" },
+    { skill: "Reflection", score: 71, trend: "down" },
+  ];
 
   const effectiveSkills =
-    skillProgress && skillProgress.length > 0 ? skillProgress : fallbackSkills
+    skillProgress && skillProgress.length > 0 ? skillProgress : fallbackSkills;
 
   return (
     <div
-      className={cn('space-y-6', className)}
+      className={cn("space-y-6", className)}
       aria-label="Therapist Progress Tracker"
       tabIndex={0}
     >
@@ -73,30 +73,30 @@ export function TherapistProgressTracker({
             Session Overview
           </h4>
           <button
-            onClick={() => toggleSection('overview')}
+            onClick={() => toggleSection("overview")}
             aria-label={
-              expandedSections['overview']
-                ? 'Collapse session overview'
-                : 'Expand session overview'
+              expandedSections["overview"]
+                ? "Collapse session overview"
+                : "Expand session overview"
             }
             className="text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-            aria-expanded={expandedSections['overview']}
+            aria-expanded={expandedSections["overview"]}
           >
-            {expandedSections['overview'] ? '−' : '+'}
+            {expandedSections["overview"] ? "−" : "+"}
           </button>
         </div>
-        {expandedSections['overview'] && (
+        {expandedSections["overview"] && (
           <SessionMetrics
             metrics={[
-              { label: 'Session ID', value: session.id },
-              { label: 'Status', value: session.status },
+              { label: "Session ID", value: session.id },
+              { label: "Status", value: session.status },
               {
-                label: 'Duration',
+                label: "Duration",
                 value: session.endTime
                   ? `${durationHours}h ${remainingMinutes}m`
-                  : 'In Progress',
+                  : "In Progress",
               },
-              { label: 'Progress', value: `${session.progress}%` },
+              { label: "Progress", value: `${session.progress}%` },
             ]}
           />
         )}
@@ -113,19 +113,19 @@ export function TherapistProgressTracker({
             Overall Progress
           </h4>
           <button
-            onClick={() => toggleSection('progress')}
+            onClick={() => toggleSection("progress")}
             aria-label={
-              expandedSections['progress']
-                ? 'Collapse overall progress'
-                : 'Expand overall progress'
+              expandedSections["progress"]
+                ? "Collapse overall progress"
+                : "Expand overall progress"
             }
             className="text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-            aria-expanded={expandedSections['progress']}
+            aria-expanded={expandedSections["progress"]}
           >
-            {expandedSections['progress'] ? '−' : '+'}
+            {expandedSections["progress"] ? "−" : "+"}
           </button>
         </div>
-        {expandedSections['progress'] && (
+        {expandedSections["progress"] && (
           <ProgressBar value={session.progress} label="Session Completion" />
         )}
       </section>
@@ -141,20 +141,20 @@ export function TherapistProgressTracker({
             Skill Development
           </h4>
           <button
-            onClick={() => toggleSection('skills')}
+            onClick={() => toggleSection("skills")}
             aria-label={
-              expandedSections['skills']
-                ? 'Collapse skill development'
-                : 'Expand skill development'
+              expandedSections["skills"]
+                ? "Collapse skill development"
+                : "Expand skill development"
             }
             className="text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-            aria-expanded={expandedSections['skills']}
+            aria-expanded={expandedSections["skills"]}
           >
-            {expandedSections['skills'] ? '−' : '+'}
+            {expandedSections["skills"] ? "−" : "+"}
           </button>
         </div>
 
-        {expandedSections['skills'] && (
+        {expandedSections["skills"] && (
           <div className="space-y-3">
             {skillsLoading && (
               <div className="text-sm text-muted-foreground">
@@ -199,18 +199,18 @@ export function TherapistProgressTracker({
                           </span>
                           <span
                             className={cn(
-                              'text-xs',
-                              skill.trend === 'up' && 'text-green-600',
-                              skill.trend === 'down' && 'text-red-600',
-                              skill.trend === 'stable' && 'text-gray-600',
+                              "text-xs",
+                              skill.trend === "up" && "text-green-600",
+                              skill.trend === "down" && "text-red-600",
+                              skill.trend === "stable" && "text-gray-600",
                             )}
-                            aria-label={`Trend: ${skill.trend === 'up' ? 'improving' : skill.trend === 'down' ? 'declining' : 'stable'}`}
+                            aria-label={`Trend: ${skill.trend === "up" ? "improving" : skill.trend === "down" ? "declining" : "stable"}`}
                           >
-                            {skill.trend === 'up'
-                              ? '↗'
-                              : skill.trend === 'down'
-                                ? '↘'
-                                : '→'}
+                            {skill.trend === "up"
+                              ? "↗"
+                              : skill.trend === "down"
+                                ? "↘"
+                                : "→"}
                           </span>
                         </div>
                       </div>
@@ -233,19 +233,19 @@ export function TherapistProgressTracker({
             Session Notes
           </h4>
           <button
-            onClick={() => toggleSection('notes')}
+            onClick={() => toggleSection("notes")}
             aria-label={
-              expandedSections['notes']
-                ? 'Collapse session notes'
-                : 'Expand session notes'
+              expandedSections["notes"]
+                ? "Collapse session notes"
+                : "Expand session notes"
             }
             className="text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-            aria-expanded={expandedSections['notes']}
+            aria-expanded={expandedSections["notes"]}
           >
-            {expandedSections['notes'] ? '−' : '+'}
+            {expandedSections["notes"] ? "−" : "+"}
           </button>
         </div>
-        {expandedSections['notes'] && (
+        {expandedSections["notes"] && (
           <div className="text-sm">
             {session.notes ? (
               <p>{session.notes}</p>
@@ -258,7 +258,7 @@ export function TherapistProgressTracker({
         )}
       </section>
     </div>
-  )
+  );
 }
 
-export default TherapistProgressTracker
+export default TherapistProgressTracker;

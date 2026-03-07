@@ -1,12 +1,12 @@
 ---
-title: 'Email Service'
-description: 'Guide to Pixelated Healths email service implementation and configuration'
+title: "Email Service"
+description: "Guide to Pixelated Healths email service implementation and configuration"
 pubDate: 2025-03-24
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ['email', 'services', 'communication']
-author: 'Pixelated Team'
+tags: ["email", "services", "communication"]
+author: "Pixelated Team"
 ---
 
 # Email Service
@@ -27,38 +27,37 @@ The Email Service in Pixelated is designed to handle all transactional email com
 ### Basic Usage
 
 ```tsx
-
-const emailService = new EmailService()
+const emailService = new EmailService();
 
 // Queue an email
 await emailService.queueEmail({
-  to: 'patient@example.com',
-  templateAlias: 'appointment-reminder',
+  to: "patient@example.com",
+  templateAlias: "appointment-reminder",
   templateModel: {
-    name: 'John Doe',
-    date: '2025-03-15',
-    time: '14:00',
+    name: "John Doe",
+    date: "2025-03-15",
+    time: "14:00",
   },
-})
+});
 ```
 
 ### Creating Templates
 
 ```tsx
 await emailService.upsertTemplate({
-  alias: 'appointment-reminder',
-  subject: 'Your upcoming appointment',
+  alias: "appointment-reminder",
+  subject: "Your upcoming appointment",
   htmlBody: `
   `,
-  from: 'appointments@gradiant.dev',
-})
+  from: "appointments@gradiant.dev",
+});
 ```
 
 ### Monitoring Queue Status
 
 ```tsx
-const stats = await emailService.getQueueStats()
-console.log(`Queued: ${stats.queued}, Processing: ${stats.processing}`)
+const stats = await emailService.getQueueStats();
+console.log(`Queued: ${stats.queued}, Processing: ${stats.processing}`);
 ```
 
 ## Configuration
@@ -93,16 +92,16 @@ After 3 failed attempts, the email is considered permanently failed and logged.
 
 ```tsx
 interface EmailData {
-  to: string
-  templateAlias: string
-  templateModel: Record<string, unknown>
+  to: string;
+  templateAlias: string;
+  templateModel: Record<string, unknown>;
   attachments?: Array<{
-    name: string
-    content: string
-    contentType: string
-  }>
-  metadata?: Record<string, string>
-  messageStream?: string
+    name: string;
+    content: string;
+    contentType: string;
+  }>;
+  metadata?: Record<string, string>;
+  messageStream?: string;
 }
 ```
 
@@ -110,12 +109,12 @@ interface EmailData {
 
 ```tsx
 interface EmailTemplate {
-  alias: string
-  subject: string
-  htmlBody: string
-  textBody?: string
-  from: string
-  replyTo?: string
+  alias: string;
+  subject: string;
+  htmlBody: string;
+  textBody?: string;
+  from: string;
+  replyTo?: string;
 }
 ```
 
@@ -196,7 +195,7 @@ Monitor the email service using:
 1. Queue Statistics
 
    ```tsx
-   const stats = await emailService.getQueueStats()
+   const stats = await emailService.getQueueStats();
    ```
 
 2. Logs

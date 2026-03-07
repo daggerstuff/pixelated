@@ -1,12 +1,12 @@
-import { z } from 'zod'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { z } from "zod";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('default')
+const logger = createBuildSafeLogger("default");
 
 export const backupConfigSchema = z.object({
   // Backup storage configuration
   storage: z.object({
-    provider: z.enum(['s3', 'gcs', 'azure']),
+    provider: z.enum(["s3", "gcs", "azure"]),
     bucket: z.string(),
     prefix: z.string(),
     region: z.string(),
@@ -25,7 +25,7 @@ export const backupConfigSchema = z.object({
   // Encryption configuration
   encryption: z.object({
     enabled: z.boolean(),
-    algorithm: z.enum(['aes-256-gcm', 'chacha20-poly1305']),
+    algorithm: z.enum(["aes-256-gcm", "chacha20-poly1305"]),
     keyRotationDays: z.number().int().positive(),
   }),
 
@@ -46,25 +46,25 @@ export const backupConfigSchema = z.object({
     // Email recipients
     emailRecipients: z.array(z.string().email()).optional(),
   }),
-})
+});
 
-export type BackupConfig = z.infer<typeof backupConfigSchema>
+export type BackupConfig = z.infer<typeof backupConfigSchema>;
 
 export const defaultBackupConfig: BackupConfig = {
   storage: {
-    provider: 's3',
-    bucket: 'pixelated-backups',
-    prefix: 'prod',
-    region: 'us-east-1',
+    provider: "s3",
+    bucket: "pixelated-backups",
+    prefix: "prod",
+    region: "us-east-1",
   },
   schedule: {
-    full: '0 0 * * 0', // Every Sunday at midnight
-    incremental: '0 0 * * 1-6', // Every day except Sunday at midnight
+    full: "0 0 * * 0", // Every Sunday at midnight
+    incremental: "0 0 * * 1-6", // Every day except Sunday at midnight
     retentionDays: 30,
   },
   encryption: {
     enabled: true,
-    algorithm: 'aes-256-gcm',
+    algorithm: "aes-256-gcm",
     keyRotationDays: 90,
   },
   verification: {
@@ -74,31 +74,31 @@ export const defaultBackupConfig: BackupConfig = {
   },
   notifications: {
     enabled: true,
-    slackWebhook: process.env['SLACK_WEBHOOK'],
-    emailRecipients: process.env['BACKUP_EMAIL_RECIPIENTS']?.split(','),
+    slackWebhook: process.env["SLACK_WEBHOOK"],
+    emailRecipients: process.env["BACKUP_EMAIL_RECIPIENTS"]?.split(","),
   },
-}
+};
 
 export class BackupService {
-  private static instance: BackupService
-  private config: BackupConfig
-  private initialized: boolean = false
+  private static instance: BackupService;
+  private config: BackupConfig;
+  private initialized: boolean = false;
 
   private constructor() {
-    this.config = defaultBackupConfig
+    this.config = defaultBackupConfig;
   }
 
   public static getInstance(): BackupService {
     if (!BackupService.instance) {
-      BackupService.instance = new BackupService()
+      BackupService.instance = new BackupService();
     }
-    return BackupService.instance
+    return BackupService.instance;
   }
 
   public async initialize(config?: Partial<BackupConfig>): Promise<void> {
     if (this.initialized) {
-      logger.warn('BackupService already initialized')
-      return
+      logger.warn("BackupService already initialized");
+      return;
     }
 
     try {
@@ -106,142 +106,144 @@ export class BackupService {
       const mergedConfig = {
         ...defaultBackupConfig,
         ...config,
-      }
+      };
 
       // Validate config
-      this.config = backupConfigSchema.parse(mergedConfig)
+      this.config = backupConfigSchema.parse(mergedConfig);
 
       // Initialize storage
-      await this.initializeStorage()
+      await this.initializeStorage();
 
       // Set up backup schedules
-      await this.initializeSchedules()
+      await this.initializeSchedules();
 
       // Configure encryption
-      await this.initializeEncryption()
+      await this.initializeEncryption();
 
       // Set up verification
-      await this.initializeVerification()
+      await this.initializeVerification();
 
       // Configure notifications
-      await this.initializeNotifications()
+      await this.initializeNotifications();
 
-      this.initialized = true
-      logger.info('BackupService initialized successfully')
+      this.initialized = true;
+      logger.info("BackupService initialized successfully");
     } catch (error: unknown) {
-      logger.error('Failed to initialize BackupService', {
+      logger.error("Failed to initialize BackupService", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   private async initializeStorage(): Promise<void> {
     try {
-      const { storage } = this.config
-      logger.info(`Initializing backup storage: ${storage.provider}`)
+      const { storage } = this.config;
+      logger.info(`Initializing backup storage: ${storage.provider}`);
 
       // Here you would typically initialize your storage client
       // based on the provider (S3, GCS, Azure)
     } catch (error: unknown) {
-      logger.error('Failed to initialize storage', {
+      logger.error("Failed to initialize storage", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   private async initializeSchedules(): Promise<void> {
     try {
-      const { schedule } = this.config
-      logger.info('Setting up backup schedules')
+      const { schedule } = this.config;
+      logger.info("Setting up backup schedules");
 
       // Set up full backup schedule
-      logger.info(`Full backup schedule: ${schedule.full}`)
+      logger.info(`Full backup schedule: ${schedule.full}`);
       // Here you would typically set up a cron job for full backups
 
       // Set up incremental backup schedule
-      logger.info(`Incremental backup schedule: ${schedule.incremental}`)
+      logger.info(`Incremental backup schedule: ${schedule.incremental}`);
       // Here you would typically set up a cron job for incremental backups
 
       // Set up retention policy
-      logger.info(`Retention period: ${schedule.retentionDays} days`)
+      logger.info(`Retention period: ${schedule.retentionDays} days`);
       // Here you would typically set up a job to clean up old backups
     } catch (error: unknown) {
-      logger.error('Failed to initialize schedules', {
+      logger.error("Failed to initialize schedules", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   private async initializeEncryption(): Promise<void> {
     try {
-      const { encryption } = this.config
+      const { encryption } = this.config;
       if (!encryption.enabled) {
-        return
+        return;
       }
 
-      logger.info(`Initializing encryption: ${encryption.algorithm}`)
+      logger.info(`Initializing encryption: ${encryption.algorithm}`);
       // Here you would typically set up encryption keys and rotation
     } catch (error: unknown) {
-      logger.error('Failed to initialize encryption', {
+      logger.error("Failed to initialize encryption", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   private async initializeVerification(): Promise<void> {
     try {
-      const { verification } = this.config
+      const { verification } = this.config;
       if (!verification.enabled) {
-        return
+        return;
       }
 
-      logger.info(`Setting up backup verification: ${verification.sampleRate}%`)
+      logger.info(
+        `Setting up backup verification: ${verification.sampleRate}%`,
+      );
       // Here you would typically set up verification jobs
     } catch (error: unknown) {
-      logger.error('Failed to initialize verification', {
+      logger.error("Failed to initialize verification", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   private async initializeNotifications(): Promise<void> {
     try {
-      const { notifications } = this.config
+      const { notifications } = this.config;
       if (!notifications.enabled) {
-        return
+        return;
       }
 
-      logger.info('Setting up backup notifications')
+      logger.info("Setting up backup notifications");
       // Here you would typically set up notification handlers
     } catch (error: unknown) {
-      logger.error('Failed to initialize notifications', {
+      logger.error("Failed to initialize notifications", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
-  public async createBackup(type: 'full' | 'incremental'): Promise<string> {
+  public async createBackup(type: "full" | "incremental"): Promise<string> {
     try {
-      logger.info(`Creating ${type} backup`)
-      const timestamp = new Date().toISOString()
-      return `${type}-${timestamp}`
+      logger.info(`Creating ${type} backup`);
+      const timestamp = new Date().toISOString();
+      return `${type}-${timestamp}`;
     } catch (error: unknown) {
       logger.error(`Failed to create ${type} backup`, {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   public async restoreBackup(backupId: string): Promise<void> {
     try {
-      logger.info(`Restoring backup: ${backupId}`)
+      logger.info(`Restoring backup: ${backupId}`);
 
       // Here you would typically:
       // 1. Download the backup
@@ -252,14 +254,14 @@ export class BackupService {
     } catch (error: unknown) {
       logger.error(`Failed to restore backup: ${backupId}`, {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   public async verifyBackup(backupId: string): Promise<boolean> {
     try {
-      logger.info(`Verifying backup: ${backupId}`)
+      logger.info(`Verifying backup: ${backupId}`);
 
       // Here you would typically:
       // 1. Download the backup
@@ -267,45 +269,45 @@ export class BackupService {
       // 3. Verify integrity
       // 4. Send notifications
 
-      return true
+      return true;
     } catch (error: unknown) {
       logger.error(`Failed to verify backup: ${backupId}`, {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      return false
+      });
+      return false;
     }
   }
 
   public async listBackups(): Promise<
     Array<{
-      id: string
-      type: 'full' | 'incremental'
-      timestamp: string
-      size: number
-      verified: boolean
+      id: string;
+      type: "full" | "incremental";
+      timestamp: string;
+      size: number;
+      verified: boolean;
     }>
   > {
     try {
-      logger.info('Listing backups')
+      logger.info("Listing backups");
 
       // Here you would typically:
       // 1. List backups from storage
       // 2. Get metadata for each backup
       // 3. Return formatted list
 
-      return []
+      return [];
     } catch (error: unknown) {
-      logger.error('Failed to list backups', {
+      logger.error("Failed to list backups", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   public async cleanupOldBackups(): Promise<void> {
     try {
-      const { retentionDays } = this.config.schedule
-      logger.info(`Cleaning up backups older than ${retentionDays} days`)
+      const { retentionDays } = this.config.schedule;
+      logger.info(`Cleaning up backups older than ${retentionDays} days`);
 
       // Here you would typically:
       // 1. List all backups
@@ -313,22 +315,22 @@ export class BackupService {
       // 3. Delete old backups
       // 4. Send notifications
     } catch (error: unknown) {
-      logger.error('Failed to clean up old backups', {
+      logger.error("Failed to clean up old backups", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
   public async getBackupMetrics(): Promise<{
-    totalBackups: number
-    totalSize: number
-    lastBackupTime: string
-    successRate: number
-    verificationRate: number
+    totalBackups: number;
+    totalSize: number;
+    lastBackupTime: string;
+    successRate: number;
+    verificationRate: number;
   }> {
     try {
-      logger.info('Getting backup metrics')
+      logger.info("Getting backup metrics");
 
       // Here you would typically:
       // 1. Get backup statistics
@@ -341,12 +343,12 @@ export class BackupService {
         lastBackupTime: new Date().toISOString(),
         successRate: 100,
         verificationRate: 100,
-      }
+      };
     } catch (error: unknown) {
-      logger.error('Failed to get backup metrics', {
+      logger.error("Failed to get backup metrics", {
         error: error instanceof Error ? String(error) : String(error),
-      })
-      throw error
+      });
+      throw error;
     }
   }
 }

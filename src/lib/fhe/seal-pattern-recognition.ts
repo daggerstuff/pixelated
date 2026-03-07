@@ -5,10 +5,10 @@
  * for homomorphic encryption.
  */
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { SealService } from './seal-service'
-import { FHEOperation } from './types'
-import type { FHEService, FHEConfig, FHEKeys, EncryptedData } from './types'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { SealService } from "./seal-service";
+import { FHEOperation } from "./types";
+import type { FHEService, FHEConfig, FHEKeys, EncryptedData } from "./types";
 import type {
   EncryptedPattern,
   EncryptedAnalysis,
@@ -16,60 +16,60 @@ import type {
   TrendPattern,
   CrossSessionPattern,
   RiskCorrelation,
-} from './pattern-recognition'
-import type { EmotionAnalysis, TherapySession } from '../ai/interfaces/therapy'
-import { createEnhancedFHEService } from './enhanced-service'
+} from "./pattern-recognition";
+import type { EmotionAnalysis, TherapySession } from "../ai/interfaces/therapy";
+import { createEnhancedFHEService } from "./enhanced-service";
 
 // Initialize logger
-const logger = createBuildSafeLogger('seal-pattern-recognition')
+const logger = createBuildSafeLogger("seal-pattern-recognition");
 
 /**
  * Implementation of pattern recognition using SEAL for FHE
  */
 export class SealPatternRecognitionService implements FHEService {
-  private sealService: SealService
-  private enhancedService: ReturnType<typeof createEnhancedFHEService>
+  private sealService: SealService;
+  private enhancedService: ReturnType<typeof createEnhancedFHEService>;
 
   constructor() {
-    this.sealService = SealService.getInstance()
-    this.enhancedService = createEnhancedFHEService()
+    this.sealService = SealService.getInstance();
+    this.enhancedService = createEnhancedFHEService();
   }
 
   /**
    * Initialize the pattern recognition service
    */
   async initialize(options?: unknown): Promise<void | boolean> {
-    logger.info('Initializing SEAL pattern recognition service')
-    await this.enhancedService.initialize(options)
-    return true
+    logger.info("Initializing SEAL pattern recognition service");
+    await this.enhancedService.initialize(options);
+    return true;
   }
 
   /**
    * Check if the service is initialized
    */
   isInitialized(): boolean {
-    return this.enhancedService.isInitialized()
+    return this.enhancedService.isInitialized();
   }
 
   /**
    * Get the cryptographic scheme used by this service
    */
   get scheme() {
-    return this.enhancedService.scheme
+    return this.enhancedService.scheme;
   }
 
   /**
    * Generate new encryption keys
    */
   async generateKeys(config?: FHEConfig): Promise<FHEKeys> {
-    return this.enhancedService.generateKeys(config) as Promise<FHEKeys>
+    return this.enhancedService.generateKeys(config) as Promise<FHEKeys>;
   }
 
   /**
    * Check if an operation is supported
    */
   supportsOperation(operation: FHEOperation): boolean {
-    return this.enhancedService.supportsOperation(operation)
+    return this.enhancedService.supportsOperation(operation);
   }
 
   /**
@@ -79,7 +79,7 @@ export class SealPatternRecognitionService implements FHEService {
     value: T,
     options?: unknown,
   ): Promise<EncryptedData<unknown>> {
-    return this.enhancedService.encrypt(value, options)
+    return this.enhancedService.encrypt(value, options);
   }
 
   /**
@@ -89,7 +89,7 @@ export class SealPatternRecognitionService implements FHEService {
     encryptedData: EncryptedData<unknown>,
     options?: unknown,
   ): Promise<T> {
-    return this.enhancedService.decrypt(encryptedData, options)
+    return this.enhancedService.decrypt(encryptedData, options);
   }
 
   /**
@@ -98,34 +98,34 @@ export class SealPatternRecognitionService implements FHEService {
   async processPatterns(
     data: unknown[],
     options: {
-      windowSize: number
-      minPoints: number
-      threshold: number
+      windowSize: number;
+      minPoints: number;
+      threshold: number;
     },
   ): Promise<EncryptedPattern[]> {
-    logger.info('Processing patterns with SEAL', {
+    logger.info("Processing patterns with SEAL", {
       dataPointCount: data.length,
       options,
-    })
+    });
 
     try {
       // Ensure we have enough data points
       if (data.length < options.minPoints) {
         throw new Error(
           `Not enough data points (${data.length}) for pattern analysis. Required: ${options.minPoints}`,
-        )
+        );
       }
 
       // Extract numerical features from data for processing
-      const features = this.extractFeaturesFromData(data)
+      const features = this.extractFeaturesFromData(data);
 
       // Use SEAL for secure processing
 
       // Encrypt the features
-      const encryptedFeatures: any[] = []
+      const encryptedFeatures: any[] = [];
       for (const feature of features) {
-        const encrypted = await this.sealService.encrypt(feature)
-        encryptedFeatures.push(encrypted)
+        const encrypted = await this.sealService.encrypt(feature);
+        encryptedFeatures.push(encrypted);
       }
 
       // Perform temporal analysis on encrypted features
@@ -133,7 +133,7 @@ export class SealPatternRecognitionService implements FHEService {
         encryptedFeatures,
         options.windowSize,
         options.threshold,
-      )
+      );
 
       // Create result object with encrypted data
       const encryptedResult: EncryptedPattern = {
@@ -150,15 +150,15 @@ export class SealPatternRecognitionService implements FHEService {
         }),
         metadata: {
           timestamp: Date.now(),
-          patternType: 'temporal',
+          patternType: "temporal",
         },
-      }
+      };
 
       // Return as an array to match PatternRecognitionOps
-      return [encryptedResult]
+      return [encryptedResult];
     } catch (error: unknown) {
-      logger.error('Error processing patterns', { error })
-      throw error
+      logger.error("Error processing patterns", { error });
+      throw error;
     }
   }
 
@@ -168,35 +168,35 @@ export class SealPatternRecognitionService implements FHEService {
   async decryptPatterns(
     encryptedPatterns: EncryptedPattern[],
   ): Promise<TrendPattern[]> {
-    logger.info('Decrypting pattern analysis')
+    logger.info("Decrypting pattern analysis");
 
     try {
       // Accept an array of EncryptedPattern and process each
-      const allPatterns: TrendPattern[] = []
+      const allPatterns: TrendPattern[] = [];
       for (const encryptedData of encryptedPatterns) {
-        const data = JSON.parse(encryptedData.encryptedData) as any
+        const data = JSON.parse(encryptedData.encryptedData) as any;
 
         // In a real implementation, we would decrypt the data using SEAL
         // For now, we'll generate synthetic data based on the encrypted info
         const patternTypes = [
-          'increasing',
-          'decreasing',
-          'cyclical',
-          'spike',
-          'drop',
-        ]
-        const decodedPatterns: TrendPattern[] = []
+          "increasing",
+          "decreasing",
+          "cyclical",
+          "spike",
+          "drop",
+        ];
+        const decodedPatterns: TrendPattern[] = [];
 
         // Use the results info from the encrypted data if available
-        const resultCount = (data.results as any[] | undefined)?.length || 2
+        const resultCount = (data.results as any[] | undefined)?.length || 2;
 
         for (let i = 0; i < resultCount; i++) {
           const basePattern = (data.results as any[] | undefined)?.[i] || {
             type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
             confidence: 0.7 + Math.random() * 0.25,
-          }
+          };
 
-          const now = Date.now()
+          const now = Date.now();
           // Create a pattern with start/end dates and other required fields
           decodedPatterns.push({
             id: `trend-${now}-${i}`,
@@ -204,16 +204,16 @@ export class SealPatternRecognitionService implements FHEService {
             confidence: basePattern.confidence,
             startDate: new Date(now - 1000 * 60 * 60 * 24 * (i + 1)),
             endDate: new Date(now - 1000 * 60 * 60 * 24 * i),
-            indicators: ['mood', 'anxiety'],
-            description: 'Synthetic trend pattern',
-          } as TrendPattern)
+            indicators: ["mood", "anxiety"],
+            description: "Synthetic trend pattern",
+          } as TrendPattern);
         }
-        allPatterns.push(...decodedPatterns)
+        allPatterns.push(...decodedPatterns);
       }
-      return allPatterns
+      return allPatterns;
     } catch (error: unknown) {
-      logger.error('Error decrypting pattern analysis', { error })
-      throw error
+      logger.error("Error decrypting pattern analysis", { error });
+      throw error;
     }
   }
 
@@ -224,35 +224,35 @@ export class SealPatternRecognitionService implements FHEService {
     sessions: TherapySession[],
     threshold: number,
   ): Promise<EncryptedAnalysis> {
-    logger.info('Analyzing cross-session patterns', {
+    logger.info("Analyzing cross-session patterns", {
       sessionCount: sessions.length,
       threshold,
-    })
+    });
 
     try {
       // Ensure we have enough sessions
       if (sessions.length < 2) {
         throw new Error(
-          'At least 2 sessions required for cross-session analysis',
-        )
+          "At least 2 sessions required for cross-session analysis",
+        );
       }
 
       // Extract features from sessions
       const sessionFeatures = sessions.map((session) =>
         this.extractSessionFeatures(session),
-      )
+      );
 
       // Use SEAL for secure processing
 
       // Encrypt the session features
-      const encryptedFeatures: any[] = []
+      const encryptedFeatures: any[] = [];
       for (const features of sessionFeatures) {
-        const encrypted = await this.sealService.encrypt(features)
-        encryptedFeatures.push(encrypted)
+        const encrypted = await this.sealService.encrypt(features);
+        encryptedFeatures.push(encrypted);
       }
 
       // Compare sessions to identify patterns
-      const patternStrengths = await this.compareSessions(encryptedFeatures)
+      const patternStrengths = await this.compareSessions(encryptedFeatures);
 
       // Create encrypted result
       const encryptedResult: EncryptedAnalysis = {
@@ -266,14 +266,14 @@ export class SealPatternRecognitionService implements FHEService {
         }),
         metadata: {
           timestamp: Date.now(),
-          analysisType: 'cross-session',
+          analysisType: "cross-session",
         },
-      }
+      };
 
-      return encryptedResult
+      return encryptedResult;
     } catch (error: unknown) {
-      logger.error('Error analyzing cross sessions', { error })
-      throw error
+      logger.error("Error analyzing cross sessions", { error });
+      throw error;
     }
   }
 
@@ -283,42 +283,42 @@ export class SealPatternRecognitionService implements FHEService {
   async decryptCrossSessionAnalysis(
     encryptedData: EncryptedAnalysis,
   ): Promise<CrossSessionPattern[]> {
-    logger.info('Decrypting cross-session analysis')
+    logger.info("Decrypting cross-session analysis");
 
     try {
       // Parse the encrypted data
-      const data = JSON.parse(encryptedData.encryptedData) as any
+      const data = JSON.parse(encryptedData.encryptedData) as any;
 
       // Session IDs from the encrypted data
-      const sessionIds = data.sessionIds as string[]
+      const sessionIds = data.sessionIds as string[];
 
       // Generate synthetic patterns
-      const patterns: CrossSessionPattern[] = []
+      const patterns: CrossSessionPattern[] = [];
 
       // Pattern types that might be detected
       const patternTypes = [
-        'trigger',
-        'response',
-        'coping_mechanism',
-        'outcome',
-      ]
+        "trigger",
+        "response",
+        "coping_mechanism",
+        "outcome",
+      ];
       const patternDescriptions = [
-        'Recurring anxiety when discussing work-related topics',
-        'Improvement in emotional regulation techniques',
-        'Resistance pattern when exploring childhood memories',
-        'Positive engagement with mindfulness exercises',
-        'Avoidance pattern with interpersonal conflicts',
-      ]
+        "Recurring anxiety when discussing work-related topics",
+        "Improvement in emotional regulation techniques",
+        "Resistance pattern when exploring childhood memories",
+        "Positive engagement with mindfulness exercises",
+        "Avoidance pattern with interpersonal conflicts",
+      ];
 
       // Generate patterns based on data
-      const patternCount = 1 + Math.floor(Math.random() * 3) // 1-3 patterns
+      const patternCount = 1 + Math.floor(Math.random() * 3); // 1-3 patterns
 
       for (let i = 0; i < patternCount; i++) {
         // Select a subset of sessions for this pattern
         const sessionCount =
-          2 + Math.floor(Math.random() * (sessionIds.length - 1))
-        const patternSessions = this.getRandomSubset(sessionIds, sessionCount)
-        const patternType = patternTypes[i % patternTypes.length]
+          2 + Math.floor(Math.random() * (sessionIds.length - 1));
+        const patternSessions = this.getRandomSubset(sessionIds, sessionCount);
+        const patternType = patternTypes[i % patternTypes.length];
 
         patterns.push({
           id: `cross-${Date.now()}-${i}`,
@@ -328,14 +328,14 @@ export class SealPatternRecognitionService implements FHEService {
           confidence: 0.7 + Math.random() * 0.25, // 0.7-0.95
           significance: Math.random() > 0.5 ? 1 : 0.5,
           strength: 0.65 + Math.random() * 0.3,
-          categories: ['emotional', 'behavioral'],
-        } as CrossSessionPattern)
+          categories: ["emotional", "behavioral"],
+        } as CrossSessionPattern);
       }
 
-      return patterns
+      return patterns;
     } catch (error: unknown) {
-      logger.error('Error decrypting cross-session analysis', { error })
-      throw error
+      logger.error("Error decrypting cross-session analysis", { error });
+      throw error;
     }
   }
 
@@ -346,37 +346,37 @@ export class SealPatternRecognitionService implements FHEService {
     analyses: EmotionAnalysis[],
     weights: Record<string, number>,
   ): Promise<EncryptedCorrelation[]> {
-    logger.info('Processing risk correlations', {
+    logger.info("Processing risk correlations", {
       analysesCount: analyses.length,
       factorCount: Object.keys(weights).length,
-    })
+    });
 
     try {
       // Ensure we have enough analyses
       if (analyses.length < 3) {
         throw new Error(
-          'At least 3 emotion analyses required for risk correlation',
-        )
+          "At least 3 emotion analyses required for risk correlation",
+        );
       }
 
       // Extract risk factors from analyses
-      const riskFactors = this.extractRiskFactors(analyses)
+      const riskFactors = this.extractRiskFactors(analyses);
 
       // Apply weights to risk factors
-      const weightedFactors = this.applyWeights(riskFactors, weights)
+      const weightedFactors = this.applyWeights(riskFactors, weights);
 
       // Use SEAL for secure processing
 
       // Encrypt the weighted factors
-      const encryptedFactors: any[] = []
+      const encryptedFactors: any[] = [];
       for (const factor of weightedFactors) {
-        const encrypted = await this.sealService.encrypt(factor)
-        encryptedFactors.push(encrypted)
+        const encrypted = await this.sealService.encrypt(factor);
+        encryptedFactors.push(encrypted);
       }
 
       // Calculate correlations between risk factors
       const correlationMatrix =
-        await this.calculateCorrelations(encryptedFactors)
+        await this.calculateCorrelations(encryptedFactors);
 
       // Create encrypted result
       const encryptedResult: EncryptedCorrelation = {
@@ -389,15 +389,15 @@ export class SealPatternRecognitionService implements FHEService {
         }),
         metadata: {
           timestamp: Date.now(),
-          correlationType: 'risk-factors',
+          correlationType: "risk-factors",
         },
-      }
+      };
 
       // Return as array to match PatternRecognitionOps
-      return [encryptedResult]
+      return [encryptedResult];
     } catch (error: unknown) {
-      logger.error('Error processing risk correlations', { error })
-      throw error
+      logger.error("Error processing risk correlations", { error });
+      throw error;
     }
   }
 
@@ -407,15 +407,15 @@ export class SealPatternRecognitionService implements FHEService {
   async decryptRiskCorrelations(
     encryptedCorrelations: EncryptedCorrelation[],
   ): Promise<RiskCorrelation[]> {
-    logger.info('Decrypting risk correlations')
+    logger.info("Decrypting risk correlations");
 
     try {
-      const correlations: RiskCorrelation[] = []
+      const correlations: RiskCorrelation[] = [];
       for (const _encryptedData of encryptedCorrelations) {
         // Generate synthetic correlations
-        const factorTypes = ['depression', 'anxiety', 'suicidal']
+        const factorTypes = ["depression", "anxiety", "suicidal"];
         for (let i = 0; i < 2; i++) {
-          const riskFactor = factorTypes[i % factorTypes.length]
+          const riskFactor = factorTypes[i % factorTypes.length];
           const correlatedFactors = [
             {
               factor: factorTypes[(i + 1) % factorTypes.length],
@@ -425,21 +425,21 @@ export class SealPatternRecognitionService implements FHEService {
               factor: factorTypes[(i + 2) % factorTypes.length],
               strength: 0.4 + Math.random() * 0.2,
             },
-          ]
+          ];
           correlations.push({
             id: `risk-${Date.now()}-${i}`,
             riskFactor,
             correlatedFactors,
             confidence: 0.7 + Math.random() * 0.25,
-            significance: 'medium',
+            significance: "medium",
             severityScore: 0.3 + Math.random() * 0.4,
-          } as RiskCorrelation)
+          } as RiskCorrelation);
         }
       }
-      return correlations
+      return correlations;
     } catch (error: unknown) {
-      logger.error('Error decrypting risk correlations', { error })
-      throw error
+      logger.error("Error decrypting risk correlations", { error });
+      throw error;
     }
   }
 
@@ -447,11 +447,11 @@ export class SealPatternRecognitionService implements FHEService {
    * Enhanced service methods for cache and stats
    */
   async clearCache(): Promise<void> {
-    return this.enhancedService.clearCache()
+    return this.enhancedService.clearCache();
   }
 
   getStats(): Record<string, number> {
-    return this.enhancedService.getStats()
+    return this.enhancedService.getStats();
   }
 
   //----------------------------------------------------------------------
@@ -463,63 +463,63 @@ export class SealPatternRecognitionService implements FHEService {
    */
   private extractFeaturesFromData(data: unknown[]): number[][] {
     // Convert complex data objects into numerical features for SEAL processing
-    const features: number[][] = []
+    const features: number[][] = [];
 
     for (const item of data) {
-      const featureVector: number[] = []
+      const featureVector: number[] = [];
 
       // Extract numerical features based on data type
-      if (typeof item === 'object' && item !== null) {
+      if (typeof item === "object" && item !== null) {
         // Handle emotion values if available
         if (
-          'emotionValues' in item &&
-          typeof item.emotionValues === 'object' &&
+          "emotionValues" in item &&
+          typeof item.emotionValues === "object" &&
           item.emotionValues
         ) {
-          const emotions = item.emotionValues as Record<string, number>
-          featureVector.push(emotions['valence'] || 0)
-          featureVector.push(emotions['arousal'] || 0)
-          featureVector.push(emotions['dominance'] || 0)
+          const emotions = item.emotionValues as Record<string, number>;
+          featureVector.push(emotions["valence"] || 0);
+          featureVector.push(emotions["arousal"] || 0);
+          featureVector.push(emotions["dominance"] || 0);
         }
 
         // Handle intensity if available
-        if ('intensity' in item && typeof item.intensity === 'number') {
-          featureVector.push(item.intensity)
+        if ("intensity" in item && typeof item.intensity === "number") {
+          featureVector.push(item.intensity);
         }
 
         // Add timestamp as a feature (normalized)
-        if ('date' in item && item.date instanceof Date) {
+        if ("date" in item && item.date instanceof Date) {
           // Normalize date to seconds since epoch / 10^9 to get a reasonable scale
-          featureVector.push(item.date.getTime() / 1e9)
+          featureVector.push(item.date.getTime() / 1e9);
         }
       }
 
       // If no features extracted or invalid data, use zeros
       if (featureVector.length === 0) {
-        features.push([0, 0, 0, 0])
+        features.push([0, 0, 0, 0]);
       } else {
         // Pad to ensure consistent vector size
         while (featureVector.length < 4) {
-          featureVector.push(0)
+          featureVector.push(0);
         }
-        features.push(featureVector)
+        features.push(featureVector);
       }
     }
 
-    return features
+    return features;
   }
 
   /**
    * Extract features from a therapy session
    */
   private extractSessionFeatures(session: TherapySession): number[] {
-    const features: number[] = []
+    const features: number[] = [];
 
     // We need to extract values from session but TherapySession doesn't have emotions
     // So we'll add default values and retrieve what we can
 
     // Add emotion-related values with defaults
-    features.push(0, 0, 0) // default valence, arousal, dominance
+    features.push(0, 0, 0); // default valence, arousal, dominance
 
     // Extract session duration if available
     const duration =
@@ -534,79 +534,79 @@ export class SealPatternRecognitionService implements FHEService {
             ).getTime()) /
           60000 /
           60
-        : 0
-    features.push(duration)
+        : 0;
+    features.push(duration);
 
     // Add additional features with default values
-    features.push(0) // default engagement score
-    features.push(0) // default sentiment
+    features.push(0); // default engagement score
+    features.push(0); // default sentiment
 
-    return features
+    return features;
   }
 
   /**
    * Extract risk factors from emotion analyses
    */
   private extractRiskFactors(analyses: EmotionAnalysis[]): number[][] {
-    const riskFactors: number[][] = []
+    const riskFactors: number[][] = [];
 
     for (const analysis of analyses) {
-      const factorVector: number[] = []
+      const factorVector: number[] = [];
 
       // Extract risk information from the arrays of emotion objects
       // For valence/arousal/dominance, we'll need to extract from the emotions array
       if ((analysis.emotions || []).length > 0) {
         // Find valence-related emotion
         const valenceEmotion = analysis.emotions!.find(
-          (e) => String(e.type) === 'valence' || String(e.type) === 'happiness',
-        )
+          (e) => String(e.type) === "valence" || String(e.type) === "happiness",
+        );
         // Find arousal-related emotion
         const arousalEmotion = analysis.emotions!.find(
-          (e) => String(e.type) === 'arousal' || String(e.type) === 'anxiety',
-        )
+          (e) => String(e.type) === "arousal" || String(e.type) === "anxiety",
+        );
         // Find dominance-related emotion
         const dominanceEmotion = analysis.emotions!.find(
-          (e) => String(e.type) === 'dominance' || String(e.type) === 'control',
-        )
+          (e) => String(e.type) === "dominance" || String(e.type) === "control",
+        );
 
         // Extract values or use defaults
         factorVector.push(
           valenceEmotion ? 1 - (valenceEmotion.confidence || 0.5) : 0.5,
-        )
+        );
         factorVector.push(
           arousalEmotion ? arousalEmotion.intensity || 0.5 : 0.5,
-        )
+        );
         factorVector.push(
           dominanceEmotion ? 1 - (dominanceEmotion.confidence || 0.5) : 0.5,
-        )
+        );
       } else {
-        factorVector.push(0.5, 0.5, 0.5)
+        factorVector.push(0.5, 0.5, 0.5);
       }
 
       // Extract risk factors from the riskFactors array
       if ((analysis.riskFactors || []).length > 0) {
         // Find specific risk factors
         const suicidalRisk = analysis.riskFactors!.find((r) =>
-          r.type.includes('suicid'),
-        )
+          r.type.includes("suicid"),
+        );
         const substanceRisk = analysis.riskFactors!.find((r) =>
-          r.type.includes('substance'),
-        )
+          r.type.includes("substance"),
+        );
         const isolationRisk = analysis.riskFactors!.find((r) =>
-          r.type.includes('isolation'),
-        )
+          r.type.includes("isolation"),
+        );
 
-        factorVector.push(suicidalRisk ? suicidalRisk.severity || 0 : 0)
-        factorVector.push(substanceRisk ? substanceRisk.severity || 0 : 0)
-        factorVector.push(isolationRisk ? isolationRisk.severity || 0 : 0)
+        factorVector.push(suicidalRisk ? suicidalRisk.severity || 0 : 0);
+        factorVector.push(substanceRisk ? substanceRisk.severity || 0 : 0);
+        factorVector.push(isolationRisk ? isolationRisk.severity || 0 : 0);
       } else {
-        factorVector.push(0, 0, 0)
+        factorVector.push(0, 0, 0);
       }
 
-      riskFactors.push(factorVector)
+      riskFactors.push(factorVector);
     }
 
-    return riskFactors
+    return riskFactors;
   }
 
   /**
@@ -618,18 +618,18 @@ export class SealPatternRecognitionService implements FHEService {
   ): number[][] {
     // Get weight values in consistent order
     const weightValues = [
-      weights['depression'] ?? 1,
-      weights['anxiety'] ?? 1,
-      weights['helplessness'] ?? 1,
-      weights['suicidal'] ?? 1,
-      weights['substance_use'] ?? 1,
-      weights['isolation'] ?? 1,
-    ]
+      weights["depression"] ?? 1,
+      weights["anxiety"] ?? 1,
+      weights["helplessness"] ?? 1,
+      weights["suicidal"] ?? 1,
+      weights["substance_use"] ?? 1,
+      weights["isolation"] ?? 1,
+    ];
 
     // Apply weights to each factor
     return factors.map((factor) =>
       factor.map((value, index) => value * (weightValues[index] ?? 1)),
-    )
+    );
   }
 
   /**
@@ -644,29 +644,29 @@ export class SealPatternRecognitionService implements FHEService {
     // For this mock, we'll return synthetic results
 
     const patternTypes = [
-      'increasing',
-      'decreasing',
-      'cyclical',
-      'spike',
-      'drop',
-    ]
-    const results: Array<{ type: string; confidence: number }> = []
+      "increasing",
+      "decreasing",
+      "cyclical",
+      "spike",
+      "drop",
+    ];
+    const results: Array<{ type: string; confidence: number }> = [];
 
     // Generate 1-3 pattern results
-    const patternCount = 1 + Math.floor(Math.random() * 3)
+    const patternCount = 1 + Math.floor(Math.random() * 3);
 
     for (let i = 0; i < patternCount; i++) {
       const type =
-        patternTypes[Math.floor(Math.random() * patternTypes.length)]!
-      const confidence = threshold + Math.random() * (1 - threshold)
+        patternTypes[Math.floor(Math.random() * patternTypes.length)]!;
+      const confidence = threshold + Math.random() * (1 - threshold);
 
       results.push({
         type,
         confidence,
-      })
+      });
     }
 
-    return results
+    return results;
   }
 
   /**
@@ -678,23 +678,23 @@ export class SealPatternRecognitionService implements FHEService {
     // This would use SEAL operations to compare session features
     // For this mock, we'll return synthetic correlation matrix
 
-    const matrix: number[][] = []
-    const size = encryptedFeatures.length
+    const matrix: number[][] = [];
+    const size = encryptedFeatures.length;
 
     for (let i = 0; i < size; i++) {
-      const row: number[] = []
+      const row: number[] = [];
       for (let j = 0; j < size; j++) {
         if (i === j) {
-          row.push(1) // Self-correlation is always 1
+          row.push(1); // Self-correlation is always 1
         } else {
           // Random correlation between 0.3 and 0.9
-          row.push(0.3 + Math.random() * 0.6)
+          row.push(0.3 + Math.random() * 0.6);
         }
       }
-      matrix.push(row)
+      matrix.push(row);
     }
 
-    return matrix
+    return matrix;
   }
 
   /**
@@ -706,22 +706,22 @@ export class SealPatternRecognitionService implements FHEService {
     // This would use SEAL operations to calculate correlations
     // For this mock, we'll return synthetic correlation matrix
 
-    const matrix: number[][] = []
-    const size = encryptedFactors.length
+    const matrix: number[][] = [];
+    const size = encryptedFactors.length;
 
     for (let i = 0; i < size; i++) {
-      const row: number[] = []
+      const row: number[] = [];
       for (let j = 0; j < size; j++) {
         row.push(
           i === j
             ? 1 // Self-correlation is always 1
             : 0.4 + Math.random() * 0.5, // Random correlation between 0.4 and 0.9
-        )
+        );
       }
-      matrix.push(row)
+      matrix.push(row);
     }
 
-    return matrix
+    return matrix;
   }
 
   /**
@@ -729,19 +729,19 @@ export class SealPatternRecognitionService implements FHEService {
    */
   private getRandomSubset<T>(array: T[], count: number): T[] {
     if (count >= array.length) {
-      return [...array]
+      return [...array];
     }
 
-    const result: T[] = []
-    const copy = [...array]
+    const result: T[] = [];
+    const copy = [...array];
 
     for (let i = 0; i < count; i++) {
-      const index = Math.floor(Math.random() * copy.length)
-      result.push(copy[index] as T)
-      copy.splice(index, 1)
+      const index = Math.floor(Math.random() * copy.length);
+      result.push(copy[index] as T);
+      copy.splice(index, 1);
     }
 
-    return result
+    return result;
   }
 }
 
@@ -749,5 +749,5 @@ export class SealPatternRecognitionService implements FHEService {
  * Create a pattern recognition FHE service with SEAL implementation
  */
 export function createSealPatternRecognitionService(): FHEService {
-  return new SealPatternRecognitionService()
+  return new SealPatternRecognitionService();
 }
