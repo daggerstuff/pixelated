@@ -170,7 +170,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -238,7 +238,7 @@ jobs:
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
         with:
-          python-
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Ensure `uv` shim is available
         run: |
@@ -371,7 +371,7 @@ jobs:
       - name: Setup Python for ML service
         uses: actions/setup-python@v6
         with:
-          python-
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Ensure `uv` shim is available
         run: |
@@ -538,7 +538,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Enable Corepack
         run: corepack enable

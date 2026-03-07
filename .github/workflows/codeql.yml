@@ -42,6 +42,7 @@ jobs:
           config-file: .github/codeql/codeql-config.yml
           queries: +security-and-quality,security-extended
           # Enable ML-powered alerts for JavaScript/TypeScript
+          setup-python-dependencies: ${{ matrix.language == 'python' }}
           # Increase RAM allocation for analysis
           ram: 16384
 
