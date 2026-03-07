@@ -1,9 +1,9 @@
 ---
-title: "API Security Features"
-description: "API Security Features documentation"
+title: 'API Security Features'
+description: 'API Security Features documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation", "security"]
+author: 'Pixelated Team'
+tags: ['documentation', 'security']
 draft: false
 toc: true
 ---

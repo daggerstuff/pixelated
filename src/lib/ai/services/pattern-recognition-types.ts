@@ -1,6 +1,6 @@
-import { z } from "zod";
-import type { TherapySession } from "../models/ai-types";
-import type { EmotionAnalysis } from "../emotions/types";
+import { z } from 'zod'
+import type { TherapySession } from '../models/ai-types'
+import type { EmotionAnalysis } from '../emotions/types'
 
 // Base schemas for statistical metrics
 export const StatisticalMetricsSchema = z.object({
@@ -8,13 +8,13 @@ export const StatisticalMetricsSchema = z.object({
   standardDeviation: z.number().min(0),
   outlierCount: z.number().int().min(0),
   correlationStrength: z.number().min(-1).max(1),
-});
+})
 
 export const TimelineAnalysisSchema = z.object({
   firstOccurrence: z.date(),
   lastOccurrence: z.date(),
   frequency: z.number().min(0),
-  trend: z.enum(["increasing", "decreasing", "stable"]),
+  trend: z.enum(['increasing', 'decreasing', 'stable']),
   trendStrength: z.number().min(0).max(1),
   seasonality: z
     .object({
@@ -23,20 +23,20 @@ export const TimelineAnalysisSchema = z.object({
       confidence: z.number().min(0).max(1),
     })
     .optional(),
-});
+})
 
 export const ClinicalRelevanceSchema = z.object({
-  significance: z.enum(["low", "medium", "high"]),
+  significance: z.enum(['low', 'medium', 'high']),
   recommendation: z.string(),
   interventionSuggested: z.boolean(),
-  urgency: z.enum(["none", "low", "medium", "high", "critical"]),
+  urgency: z.enum(['none', 'low', 'medium', 'high', 'critical']),
   evidenceScore: z.number().min(0).max(1),
-});
+})
 
 // Pattern Recognition Result Schema
 export const PatternRecognitionResultSchema = z.object({
   patternId: z.string(),
-  type: z.enum(["behavioral", "emotional", "cognitive", "communication"]),
+  type: z.enum(['behavioral', 'emotional', 'cognitive', 'communication']),
   description: z.string(),
   frequency: z.number().min(0),
   confidence: z.number().min(0).max(1),
@@ -44,7 +44,7 @@ export const PatternRecognitionResultSchema = z.object({
   timelineAnalysis: TimelineAnalysisSchema,
   clinicalRelevance: ClinicalRelevanceSchema,
   statisticalMetrics: StatisticalMetricsSchema,
-});
+})
 
 // Risk Correlation Schema
 export const RiskCorrelationSchema = z.object({
@@ -55,7 +55,7 @@ export const RiskCorrelationSchema = z.object({
       correlation: z.number().min(-1).max(1),
       confidence: z.number().min(0).max(1),
       pValue: z.number().min(0).max(1),
-      effectSize: z.enum(["small", "medium", "large"]),
+      effectSize: z.enum(['small', 'medium', 'large']),
     }),
   ),
   timeFrame: z.object({
@@ -63,7 +63,7 @@ export const RiskCorrelationSchema = z.object({
     end: z.date(),
     duration: z.number().min(0),
   }),
-  severity: z.enum(["low", "medium", "high", "critical"]),
+  severity: z.enum(['low', 'medium', 'high', 'critical']),
   actionRequired: z.boolean(),
   recommendations: z.array(z.string()),
   statisticalMetrics: z.object({
@@ -80,7 +80,7 @@ export const RiskCorrelationSchema = z.object({
       privacyPreserved: z.boolean(),
     })
     .optional(),
-});
+})
 
 // Trend Pattern Schema
 export const TrendPatternSchema = z.object({
@@ -93,10 +93,10 @@ export const TrendPatternSchema = z.object({
   description: z.string(),
   algorithmicAnalysis: z.object({
     trendDirection: z.enum([
-      "increasing",
-      "decreasing",
-      "stable",
-      "oscillating",
+      'increasing',
+      'decreasing',
+      'stable',
+      'oscillating',
     ]),
     trendStrength: z.number().min(0).max(1),
     linearRegression: z.object({
@@ -117,17 +117,17 @@ export const TrendPatternSchema = z.object({
       z.object({
         timestamp: z.date(),
         confidenceLevel: z.number().min(0).max(1),
-        changeType: z.enum(["increase", "decrease", "plateau"]),
+        changeType: z.enum(['increase', 'decrease', 'plateau']),
       }),
     ),
   }),
   clinicalImplications: z.object({
-    severity: z.enum(["low", "medium", "high", "critical"]),
+    severity: z.enum(['low', 'medium', 'high', 'critical']),
     interventionWindow: z.number().min(0),
     followUpRecommended: z.boolean(),
     escalationRequired: z.boolean(),
   }),
-});
+})
 
 // Cross Session Pattern Schema
 export const CrossSessionPatternSchema = z.object({
@@ -156,43 +156,43 @@ export const CrossSessionPatternSchema = z.object({
     phaseShift: z.number(),
     amplitudeVariation: z.number().min(0),
   }),
-});
+})
 
 // Type definitions
 export type PatternRecognitionResult = z.infer<
   typeof PatternRecognitionResultSchema
->;
-export type RiskCorrelation = z.infer<typeof RiskCorrelationSchema>;
-export type TrendPattern = z.infer<typeof TrendPatternSchema>;
-export type CrossSessionPattern = z.infer<typeof CrossSessionPatternSchema>;
+>
+export type RiskCorrelation = z.infer<typeof RiskCorrelationSchema>
+export type TrendPattern = z.infer<typeof TrendPatternSchema>
+export type CrossSessionPattern = z.infer<typeof CrossSessionPatternSchema>
 
 // Type guards
 export function isPatternRecognitionResult(
   value: unknown,
 ): value is PatternRecognitionResult {
   try {
-    PatternRecognitionResultSchema.parse(value);
-    return true;
+    PatternRecognitionResultSchema.parse(value)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
 export function isRiskCorrelation(value: unknown): value is RiskCorrelation {
   try {
-    RiskCorrelationSchema.parse(value);
-    return true;
+    RiskCorrelationSchema.parse(value)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
 export function isTrendPattern(value: unknown): value is TrendPattern {
   try {
-    TrendPatternSchema.parse(value);
-    return true;
+    TrendPatternSchema.parse(value)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -200,10 +200,10 @@ export function isCrossSessionPattern(
   value: unknown,
 ): value is CrossSessionPattern {
   try {
-    CrossSessionPatternSchema.parse(value);
-    return true;
+    CrossSessionPatternSchema.parse(value)
+    return true
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -212,36 +212,36 @@ export interface PatternRecognitionService {
   detectCrossSessionPatterns(
     clientId: string,
     sessions: TherapySession[],
-  ): Promise<PatternRecognitionResult[]>;
+  ): Promise<PatternRecognitionResult[]>
 
   analyzeSessionPatterns(
     session: TherapySession,
-  ): Promise<PatternRecognitionResult[]>;
+  ): Promise<PatternRecognitionResult[]>
 
   comparePatterns(
     patterns1: PatternRecognitionResult[],
     patterns2: PatternRecognitionResult[],
   ): Promise<{
-    common: PatternRecognitionResult[];
-    unique1: PatternRecognitionResult[];
-    unique2: PatternRecognitionResult[];
-  }>;
+    common: PatternRecognitionResult[]
+    unique1: PatternRecognitionResult[]
+    unique2: PatternRecognitionResult[]
+  }>
 
   analyzeRiskFactorCorrelations(
     clientId: string,
     analyses: EmotionAnalysis[],
-  ): Promise<RiskCorrelation[]>;
+  ): Promise<RiskCorrelation[]>
 
   analyzeLongTermTrends(
     clientId: string,
     startDate: Date,
     endDate: Date,
-  ): Promise<TrendPattern[]>;
+  ): Promise<TrendPattern[]>
 
   detectCrossSessionPatternsAdvanced(
     clientId: string,
     sessions: TherapySession[],
-  ): Promise<CrossSessionPattern[]>;
+  ): Promise<CrossSessionPattern[]>
 }
 
 // Error types
@@ -251,21 +251,21 @@ export class PatternRecognitionError extends Error {
     public readonly code: string,
     public readonly details?: unknown,
   ) {
-    super(message);
-    this.name = "PatternRecognitionError";
+    super(message)
+    this.name = 'PatternRecognitionError'
   }
 }
 
 export class ValidationError extends PatternRecognitionError {
   constructor(message: string, details?: unknown) {
-    super(message, "VALIDATION_ERROR", details);
-    this.name = "ValidationError";
+    super(message, 'VALIDATION_ERROR', details)
+    this.name = 'ValidationError'
   }
 }
 
 export class ProcessingError extends PatternRecognitionError {
   constructor(message: string, details?: unknown) {
-    super(message, "PROCESSING_ERROR", details);
-    this.name = "ProcessingError";
+    super(message, 'PROCESSING_ERROR', details)
+    this.name = 'ProcessingError'
   }
 }

@@ -1,127 +1,127 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
 // Helper function for string concatenation
 const formatStorageLocation = (type, bucket) => {
   switch (type) {
-    case "s3":
-      return `s3://${bucket}`;
-    case "azure":
-      return `Azure: ${bucket}`;
-    case "gcp":
-      return `GCS: ${bucket}`;
+    case 's3':
+      return `s3://${bucket}`
+    case 'azure':
+      return `Azure: ${bucket}`
+    case 'gcp':
+      return `GCS: ${bucket}`
     default:
-      return "";
+      return ''
   }
-};
+}
 
 export default function BackupLocationTab() {
   const [locations, setLocations] = useState([
     {
-      id: "1",
-      name: "Local Storage",
-      type: "local",
-      path: "/var/backups/pixelated",
+      id: '1',
+      name: 'Local Storage',
+      type: 'local',
+      path: '/var/backups/pixelated',
       credentialsValid: true,
       isDefault: true,
-      status: "active",
-      lastSync: "2025-03-15T14:30:00Z",
+      status: 'active',
+      lastSync: '2025-03-15T14:30:00Z',
     },
     {
-      id: "2",
-      name: "AWS S3 Backup",
-      type: "s3",
-      bucket: "pixelated-backups",
-      region: "us-west-2",
+      id: '2',
+      name: 'AWS S3 Backup',
+      type: 's3',
+      bucket: 'pixelated-backups',
+      region: 'us-west-2',
       credentialsValid: true,
       isDefault: false,
-      status: "active",
-      lastSync: "2025-03-15T14:30:00Z",
+      status: 'active',
+      lastSync: '2025-03-15T14:30:00Z',
     },
-  ]);
-  const [isAddingLocation, setIsAddingLocation] = useState(false);
-  const [isFormLoading, setIsFormLoading] = useState(false);
+  ])
+  const [isAddingLocation, setIsAddingLocation] = useState(false)
+  const [isFormLoading, setIsFormLoading] = useState(false)
   const [newLocation, setNewLocation] = useState({
-    type: "local",
-    name: "",
-    path: "",
-    bucket: "",
-    region: "",
+    type: 'local',
+    name: '',
+    path: '',
+    bucket: '',
+    region: '',
     isDefault: false,
-  });
+  })
 
   const handleAddLocation = () => {
-    setIsAddingLocation(true);
-  };
+    setIsAddingLocation(true)
+  }
 
   const handleCancelAdd = () => {
-    setIsAddingLocation(false);
+    setIsAddingLocation(false)
     setNewLocation({
-      type: "local",
-      name: "",
-      path: "",
-      bucket: "",
-      region: "",
+      type: 'local',
+      name: '',
+      path: '',
+      bucket: '',
+      region: '',
       isDefault: false,
-    });
-  };
+    })
+  }
 
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target;
-    if (type === "checkbox") {
-      const { checked } = e.target;
+    const { name, value, type } = e.target
+    if (type === 'checkbox') {
+      const { checked } = e.target
       setNewLocation({
         ...newLocation,
         [name]: checked,
-      });
+      })
     } else {
       setNewLocation({
         ...newLocation,
         [name]: value,
-      });
+      })
     }
-  };
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsFormLoading(true);
+    e.preventDefault()
+    setIsFormLoading(true)
     // Simulate API call
     setTimeout(() => {
-      const id = Math.random().toString(36).substring(7);
+      const id = Math.random().toString(36).substring(7)
       // Handle default location changes
       setLocations((prev) => {
-        let updatedLocations = [...prev];
+        let updatedLocations = [...prev]
         if (newLocation.isDefault) {
           updatedLocations = updatedLocations.map((loc) => ({
             ...loc,
             isDefault: false,
-          }));
+          }))
         }
         const createdLocation = {
           id,
-          name: newLocation.name || "New Location",
+          name: newLocation.name || 'New Location',
           type: newLocation.type,
           path: newLocation.path,
           bucket: newLocation.bucket,
           region: newLocation.region,
           credentialsValid: true,
           isDefault: newLocation.isDefault || false,
-          status: "active",
+          status: 'active',
           lastSync: new Date().toISOString(),
-        };
-        return [...updatedLocations, createdLocation];
-      });
-      setIsAddingLocation(false);
-      setIsFormLoading(false);
+        }
+        return [...updatedLocations, createdLocation]
+      })
+      setIsAddingLocation(false)
+      setIsFormLoading(false)
       setNewLocation({
-        type: "local",
-        name: "",
-        path: "",
-        bucket: "",
-        region: "",
+        type: 'local',
+        name: '',
+        path: '',
+        bucket: '',
+        region: '',
         isDefault: false,
-      });
-    }, 1000);
-  };
+      })
+    }, 1000)
+  }
 
   const setDefaultLocation = (id) => {
     setLocations((prev) =>
@@ -129,24 +129,24 @@ export default function BackupLocationTab() {
         ...location,
         isDefault: location.id === id,
       })),
-    );
-  };
+    )
+  }
 
   const removeLocation = (id) => {
     // Don't allow removing the default location
-    const locationToRemove = locations.find((loc) => loc.id === id);
+    const locationToRemove = locations.find((loc) => loc.id === id)
     if (locationToRemove?.isDefault) {
-      return;
+      return
     }
-    setLocations((prev) => prev.filter((location) => location.id !== id));
-  };
+    setLocations((prev) => prev.filter((location) => location.id !== id))
+  }
 
   const testConnection = (id) => {
     setLocations((prev) =>
       prev.map((location) =>
-        location.id === id ? { ...location, status: "configuring" } : location,
+        location.id === id ? { ...location, status: 'configuring' } : location,
       ),
-    );
+    )
     // Simulate testing connection
     setTimeout(() => {
       setLocations((prev) =>
@@ -154,15 +154,15 @@ export default function BackupLocationTab() {
           location.id === id
             ? {
                 ...location,
-                status: "active",
+                status: 'active',
                 credentialsValid: true,
                 lastSync: new Date().toISOString(),
               }
             : location,
         ),
-      );
-    }, 2000);
-  };
+      )
+    }, 2000)
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
@@ -239,32 +239,32 @@ export default function BackupLocationTab() {
                     {location.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {location.type === "local" && "Local Storage"}
-                    {location.type === "s3" && "AWS S3"}
-                    {location.type === "azure" && "Azure Blob Storage"}
-                    {location.type === "gcp" && "Google Cloud Storage"}
+                    {location.type === 'local' && 'Local Storage'}
+                    {location.type === 's3' && 'AWS S3'}
+                    {location.type === 'azure' && 'Azure Blob Storage'}
+                    {location.type === 'gcp' && 'Google Cloud Storage'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {location.type === "local" && location.path}
-                    {location.type === "s3" &&
-                      formatStorageLocation("s3", location.bucket)}
-                    {location.type === "azure" &&
-                      formatStorageLocation("azure", location.bucket)}
-                    {location.type === "gcp" &&
-                      formatStorageLocation("gcp", location.bucket)}
+                    {location.type === 'local' && location.path}
+                    {location.type === 's3' &&
+                      formatStorageLocation('s3', location.bucket)}
+                    {location.type === 'azure' &&
+                      formatStorageLocation('azure', location.bucket)}
+                    {location.type === 'gcp' &&
+                      formatStorageLocation('gcp', location.bucket)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {location.status === "active" && (
+                    {location.status === 'active' && (
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
                         Active
                       </span>
                     )}
-                    {location.status === "error" && (
+                    {location.status === 'error' && (
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">
                         Error
                       </span>
                     )}
-                    {location.status === "configuring" && (
+                    {location.status === 'configuring' && (
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
                         Configuring...
                       </span>
@@ -278,7 +278,7 @@ export default function BackupLocationTab() {
                     ) : (
                       <button
                         onClick={function () {
-                          return setDefaultLocation(location.id);
+                          return setDefaultLocation(location.id)
                         }}
                         className="text-gray-600 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400 font-medium"
                       >
@@ -289,15 +289,15 @@ export default function BackupLocationTab() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     {location.lastSync
                       ? new Date(location.lastSync).toLocaleString()
-                      : "-"}
+                      : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex space-x-2 justify-end">
                       <button
                         onClick={function () {
-                          return testConnection(location.id);
+                          return testConnection(location.id)
                         }}
-                        disabled={location.status === "configuring"}
+                        disabled={location.status === 'configuring'}
                         className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
                       >
                         Test
@@ -305,7 +305,7 @@ export default function BackupLocationTab() {
                       {!location.isDefault && (
                         <button
                           onClick={function () {
-                            return removeLocation(location.id);
+                            return removeLocation(location.id)
                           }}
                           className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         >
@@ -315,7 +315,7 @@ export default function BackupLocationTab() {
                     </div>
                   </td>
                 </tr>
-              );
+              )
             })}
           </tbody>
         </table>
@@ -365,7 +365,7 @@ export default function BackupLocationTab() {
                 </select>
               </div>
 
-              {newLocation.type === "local" && (
+              {newLocation.type === 'local' && (
                 <div className="sm:col-span-6">
                   <label
                     htmlFor="path"
@@ -386,9 +386,9 @@ export default function BackupLocationTab() {
                 </div>
               )}
 
-              {(newLocation.type === "s3" ||
-                newLocation.type === "azure" ||
-                newLocation.type === "gcp") && (
+              {(newLocation.type === 's3' ||
+                newLocation.type === 'azure' ||
+                newLocation.type === 'gcp') && (
                 <>
                   <div className="sm:col-span-4">
                     <label
@@ -408,7 +408,7 @@ export default function BackupLocationTab() {
                     />
                   </div>
 
-                  {newLocation.type === "s3" && (
+                  {newLocation.type === 's3' && (
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="region"
@@ -471,8 +471,8 @@ export default function BackupLocationTab() {
                 disabled={isFormLoading}
                 className={`inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
                   isFormLoading
-                    ? "bg-gray-400"
-                    : "bg-primary-600 hover:bg-primary-700"
+                    ? 'bg-gray-400'
+                    : 'bg-primary-600 hover:bg-primary-700'
                 } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
               >
                 {isFormLoading ? (
@@ -500,7 +500,7 @@ export default function BackupLocationTab() {
                     Adding...
                   </>
                 ) : (
-                  "Add Location"
+                  'Add Location'
                 )}
               </button>
             </div>
@@ -508,5 +508,5 @@ export default function BackupLocationTab() {
         </div>
       )}
     </div>
-  );
+  )
 }

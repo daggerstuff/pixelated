@@ -9,15 +9,15 @@ export const logger = {
   debug: vi.fn(),
   trace: vi.fn(),
   log: vi.fn(),
-};
+}
 
-export type Logger = typeof logger;
-export const Logger = logger;
+export type Logger = typeof logger
+export const Logger = logger
 
-export const getLogger = vi.fn(() => logger);
+export const getLogger = vi.fn(() => logger)
 
 export default {
   logger,
   getLogger,
   Logger,
-};
+}

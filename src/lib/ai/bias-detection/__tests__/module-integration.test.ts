@@ -1,19 +1,19 @@
 /// <reference types="vitest/globals" />
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { PythonBiasDetectionBridge } from "../python-bridge";
-import { BiasMetricsCollector } from "../metrics-collector";
-import { BiasAlertSystem } from "../alerts-system";
-import type { BiasDetectionConfig, BiasAnalysisResult } from "../types";
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { PythonBiasDetectionBridge } from '../python-bridge'
+import { BiasMetricsCollector } from '../metrics-collector'
+import { BiasAlertSystem } from '../alerts-system'
+import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
 // Mock the entire Python bridge to avoid network calls
-vi.mock("../python-bridge", () => ({
-  PythonBiasDetectionBridge: vi.fn().mockImplementation(function () {
+vi.mock('../python-bridge', () => ({
+  PythonBiasDetectionBridge: vi.fn().mockImplementation(function() {
     return {
       initialize: vi.fn().mockResolvedValue(undefined),
       analyzeSession: vi.fn().mockResolvedValue({
-        sessionId: "test-session",
+        sessionId: 'test-session',
         overallBiasScore: 0.3,
-        alertLevel: "medium",
+        alertLevel: 'medium',
         layerResults: {
           preprocessing: { biasScore: 0.2 },
           modelLevel: { biasScore: 0.3 },
@@ -21,7 +21,7 @@ vi.mock("../python-bridge", () => ({
           evaluation: { biasScore: 0.3 },
         },
       }),
-      checkHealth: vi.fn().mockResolvedValue({ status: "healthy" }),
+      checkHealth: vi.fn().mockResolvedValue({ status: 'healthy' }),
       dispose: vi.fn().mockResolvedValue(undefined),
       getDashboardMetrics: vi.fn().mockResolvedValue({
         summary: {
@@ -40,21 +40,21 @@ vi.mock("../python-bridge", () => ({
         requests_per_second: 5.5,
         error_rate: 0.01,
         uptime_seconds: 3600,
-        health_status: "healthy",
+        health_status: 'healthy',
       }),
       getSessionData: vi.fn().mockResolvedValue({
-        sessionId: "test-session",
+        sessionId: 'test-session',
         overallBiasScore: 0.3,
-        alertLevel: "low",
+        alertLevel: 'low',
       }),
       storeMetrics: vi.fn().mockResolvedValue(undefined),
       getAlertStatistics: vi.fn().mockResolvedValue({ total: 10, resolved: 8 }),
     };
   }),
-}));
+}))
 
 // Mock the connection pool for Python bridge
-vi.mock("../connection-pool", () => ({
+vi.mock('../connection-pool', () => ({
   ConnectionPool: vi.fn().mockImplementation(() => ({
     getConnection: vi.fn().mockResolvedValue({
       request: vi.fn().mockResolvedValue({
@@ -70,57 +70,57 @@ vi.mock("../connection-pool", () => ({
     }),
     close: vi.fn(),
   })),
-}));
+}))
 
-describe("Module Integration Tests", () => {
-  let pythonBridge: PythonBiasDetectionBridge;
-  let metricsCollector: BiasMetricsCollector;
-  let alertSystem: BiasAlertSystem;
-  let mockConfig: BiasDetectionConfig;
+describe('Module Integration Tests', () => {
+  let pythonBridge: PythonBiasDetectionBridge
+  let metricsCollector: BiasMetricsCollector
+  let alertSystem: BiasAlertSystem
+  let mockConfig: BiasDetectionConfig
 
   beforeEach(() => {
     // Reset all mocks
-    vi.clearAllMocks();
+    vi.clearAllMocks()
 
     // Setup mock configuration
     mockConfig = {
-      pythonServiceUrl: "http://localhost:5000",
+      pythonServiceUrl: 'http://localhost:5000',
       pythonServiceTimeout: 30000,
       metricsConfig: {
         enableRealTimeMonitoring: true,
         metricsRetentionDays: 30,
-        aggregationIntervals: ["1h", "1d"],
+        aggregationIntervals: ['1h', '1d'],
         dashboardRefreshRate: 60,
-        exportFormats: ["json"],
+        exportFormats: ['json'],
       },
-    };
+    }
 
     // Create module instances
     pythonBridge = new PythonBiasDetectionBridge(
       mockConfig.pythonServiceUrl!,
       mockConfig.pythonServiceTimeout!,
-    );
+    )
 
-    metricsCollector = new BiasMetricsCollector(mockConfig, pythonBridge);
+    metricsCollector = new BiasMetricsCollector(mockConfig, pythonBridge)
     alertSystem = new BiasAlertSystem(
       {
         pythonServiceUrl: mockConfig.pythonServiceUrl,
         timeout: mockConfig.pythonServiceTimeout,
       },
       pythonBridge,
-    );
-  });
+    )
+  })
 
-  describe("Python Bridge ↔ Metrics Collector Integration", () => {
-    it("should pass analysis results from Python bridge to metrics collector", async () => {
-      await pythonBridge.initialize();
-      await metricsCollector.initialize();
+  describe('Python Bridge ↔ Metrics Collector Integration', () => {
+    it('should pass analysis results from Python bridge to metrics collector', async () => {
+      await pythonBridge.initialize()
+      await metricsCollector.initialize()
 
       const mockAnalysisResult: BiasAnalysisResult = {
-        sessionId: "module-integration-test-1",
+        sessionId: 'module-integration-test-1',
         timestamp: new Date(),
         overallBiasScore: 0.4,
-        alertLevel: "medium",
+        alertLevel: 'medium',
         layerResults: {
           preprocessing: {
             biasScore: 0.3,
@@ -204,7 +204,7 @@ describe("Module Integration Tests", () => {
               patientSafety: 0.98,
             },
             temporalAnalysis: {
-              trendDirection: "stable",
+              trendDirection: 'stable',
               changeRate: 0.01,
               seasonalPatterns: [],
               interventionEffectiveness: [],
@@ -212,62 +212,62 @@ describe("Module Integration Tests", () => {
             recommendations: [],
           },
         },
-        recommendations: ["Monitor for emerging patterns"],
+        recommendations: ['Monitor for emerging patterns'],
         confidence: 0.85,
         demographics: {
-          age: "30",
-          gender: "female",
-          ethnicity: "caucasian",
-          primaryLanguage: "english",
+          age: '30',
+          gender: 'female',
+          ethnicity: 'caucasian',
+          primaryLanguage: 'english',
         },
-      };
+      }
 
       // Store result in metrics collector
-      await metricsCollector.storeAnalysisResult?.(mockAnalysisResult);
+      await metricsCollector.storeAnalysisResult?.(mockAnalysisResult)
 
       // Verify metrics were stored and can be retrieved
-      const metrics = await metricsCollector.getMetrics?.();
-      expect(metrics).toBeDefined();
-      expect(metrics?.overall_stats?.total_sessions).toBeGreaterThan(0);
-    });
+      const metrics = await metricsCollector.getMetrics?.()
+      expect(metrics).toBeDefined()
+      expect(metrics?.overall_stats?.total_sessions).toBeGreaterThan(0)
+    })
 
-    it("should handle metrics collection failures gracefully", async () => {
-      await pythonBridge.initialize();
-      await metricsCollector.initialize();
+    it('should handle metrics collection failures gracefully', async () => {
+      await pythonBridge.initialize()
+      await metricsCollector.initialize()
 
       const invalidResult: BiasAnalysisResult = {
-        sessionId: "invalid-test",
+        sessionId: 'invalid-test',
         timestamp: new Date(),
         overallBiasScore: NaN, // Invalid score
-        alertLevel: "low",
+        alertLevel: 'low',
         layerResults: {} as any, // Invalid layer results
         recommendations: [],
         confidence: 0.5,
         demographics: {
-          age: "30",
-          gender: "female",
-          ethnicity: "caucasian",
-          primaryLanguage: "english",
+          age: '30',
+          gender: 'female',
+          ethnicity: 'caucasian',
+          primaryLanguage: 'english',
         },
-      };
+      }
 
       // Should not throw error even with invalid data
       await expect(
         metricsCollector.storeAnalysisResult?.(invalidResult),
-      ).resolves.not.toThrow();
-    });
-  });
+      ).resolves.not.toThrow()
+    })
+  })
 
-  describe("Python Bridge ↔ Alert System Integration", () => {
-    it("should trigger alerts through the alert system", async () => {
-      await pythonBridge.initialize();
-      await alertSystem.initialize?.();
+  describe('Python Bridge ↔ Alert System Integration', () => {
+    it('should trigger alerts through the alert system', async () => {
+      await pythonBridge.initialize()
+      await alertSystem.initialize?.()
 
       const highBiasResult: BiasAnalysisResult = {
-        sessionId: "alert-integration-test-1",
+        sessionId: 'alert-integration-test-1',
         timestamp: new Date(),
         overallBiasScore: 0.8,
-        alertLevel: "critical",
+        alertLevel: 'critical',
         layerResults: {
           preprocessing: {
             biasScore: 0.7,
@@ -278,11 +278,11 @@ describe("Module Integration Tests", () => {
               culturalBiasScore: 0.3,
               biasedTerms: [
                 {
-                  term: "concerning term",
-                  context: "therapeutic context",
-                  biasType: "gender_bias",
-                  severity: "medium",
-                  suggestedAlternative: "neutral term",
+                  term: 'concerning term',
+                  context: 'therapeutic context',
+                  biasType: 'gender_bias',
+                  severity: 'medium',
+                  suggestedAlternative: 'neutral term',
                 },
               ],
               sentimentAnalysis: {
@@ -294,7 +294,7 @@ describe("Module Integration Tests", () => {
             },
             representationAnalysis: {
               demographicDistribution: {},
-              underrepresentedGroups: ["minority_group"],
+              underrepresentedGroups: ['minority_group'],
               overrepresentedGroups: [],
               diversityIndex: 0.4,
               intersectionalityAnalysis: [],
@@ -307,7 +307,7 @@ describe("Module Integration Tests", () => {
               validity: 0.8,
               missingDataByDemographic: {},
             },
-            recommendations: ["Address representation issues"],
+            recommendations: ['Address representation issues'],
           },
           modelLevel: {
             biasScore: 0.8,
@@ -329,7 +329,7 @@ describe("Module Integration Tests", () => {
               demographicBreakdown: {},
             },
             groupPerformanceComparison: [],
-            recommendations: ["Review fairness constraints"],
+            recommendations: ['Review fairness constraints'],
           },
           interactive: {
             biasScore: 0.75,
@@ -339,46 +339,46 @@ describe("Module Integration Tests", () => {
               consistencyScore: 0.6,
               problematicScenarios: [
                 {
-                  scenarioId: "bias_scenario_1",
+                  scenarioId: 'bias_scenario_1',
                   originalDemographics: {
-                    age: "30",
-                    gender: "female",
-                    ethnicity: "caucasian",
-                    primaryLanguage: "english",
+                    age: '30',
+                    gender: 'female',
+                    ethnicity: 'caucasian',
+                    primaryLanguage: 'english',
                   },
                   alteredDemographics: {
-                    age: "30",
-                    gender: "male",
-                    ethnicity: "caucasian",
-                    primaryLanguage: "english",
+                    age: '30',
+                    gender: 'male',
+                    ethnicity: 'caucasian',
+                    primaryLanguage: 'english',
                   },
-                  outcomeChange: "response quality decreased",
-                  biasType: "gender_bias",
-                  severity: "medium",
+                  outcomeChange: 'response quality decreased',
+                  biasType: 'gender_bias',
+                  severity: 'medium',
                 },
                 {
-                  scenarioId: "bias_scenario_2",
+                  scenarioId: 'bias_scenario_2',
                   originalDemographics: {
-                    age: "25",
-                    gender: "male",
-                    ethnicity: "hispanic",
-                    primaryLanguage: "spanish",
+                    age: '25',
+                    gender: 'male',
+                    ethnicity: 'hispanic',
+                    primaryLanguage: 'spanish',
                   },
                   alteredDemographics: {
-                    age: "25",
-                    gender: "male",
-                    ethnicity: "caucasian",
-                    primaryLanguage: "english",
+                    age: '25',
+                    gender: 'male',
+                    ethnicity: 'caucasian',
+                    primaryLanguage: 'english',
                   },
-                  outcomeChange: "cultural context ignored",
-                  biasType: "cultural_bias",
-                  severity: "high",
+                  outcomeChange: 'cultural context ignored',
+                  biasType: 'cultural_bias',
+                  severity: 'high',
                 },
               ],
             },
             featureImportance: [],
             whatIfScenarios: [],
-            recommendations: ["Investigate interactive bias"],
+            recommendations: ['Investigate interactive bias'],
           },
           evaluation: {
             biasScore: 0.85,
@@ -396,27 +396,27 @@ describe("Module Integration Tests", () => {
               patientSafety: 0.8,
             },
             temporalAnalysis: {
-              trendDirection: "worsening",
+              trendDirection: 'worsening',
               changeRate: 0.15,
               seasonalPatterns: [],
               interventionEffectiveness: [],
             },
-            recommendations: ["Immediate intervention required"],
+            recommendations: ['Immediate intervention required'],
           },
         },
         recommendations: [
-          "Critical bias detected - immediate action required",
-          "Escalate to senior review team",
-          "Implement immediate safeguards",
+          'Critical bias detected - immediate action required',
+          'Escalate to senior review team',
+          'Implement immediate safeguards',
         ],
         confidence: 0.95,
         demographics: {
-          age: "25",
-          gender: "male",
-          ethnicity: "hispanic",
-          primaryLanguage: "spanish",
+          age: '25',
+          gender: 'male',
+          ethnicity: 'hispanic',
+          primaryLanguage: 'spanish',
         },
-      };
+      }
 
       // Process alert through alert system
       await alertSystem.processAlert?.({
@@ -424,32 +424,32 @@ describe("Module Integration Tests", () => {
         level: highBiasResult.alertLevel,
         biasScore: highBiasResult.overallBiasScore,
         analysisResult: highBiasResult,
-      });
+      })
 
       // Verify alert statistics are updated
-      const stats = await alertSystem.getAlertStatistics?.();
-      expect(stats).toBeDefined();
-    });
+      const stats = await alertSystem.getAlertStatistics?.()
+      expect(stats).toBeDefined()
+    })
 
-    it("should handle alert processing failures gracefully", async () => {
-      await pythonBridge.initialize();
-      await alertSystem.initialize?.();
+    it('should handle alert processing failures gracefully', async () => {
+      await pythonBridge.initialize()
+      await alertSystem.initialize?.()
 
       const malformedResult: BiasAnalysisResult = {
-        sessionId: "malformed-alert-test",
+        sessionId: 'malformed-alert-test',
         timestamp: new Date(),
         overallBiasScore: 0.9,
-        alertLevel: "critical",
+        alertLevel: 'critical',
         layerResults: {} as any, // Malformed layer results
         recommendations: [],
         confidence: 0.8,
         demographics: {
-          age: "25",
-          gender: "male",
-          ethnicity: "hispanic",
-          primaryLanguage: "spanish",
+          age: '25',
+          gender: 'male',
+          ethnicity: 'hispanic',
+          primaryLanguage: 'spanish',
         },
-      };
+      }
 
       // Should not throw error even with malformed data
       await expect(
@@ -459,91 +459,91 @@ describe("Module Integration Tests", () => {
           biasScore: malformedResult.overallBiasScore,
           analysisResult: malformedResult,
         }),
-      ).resolves.not.toThrow();
-    });
-  });
+      ).resolves.not.toThrow()
+    })
+  })
 
-  describe("Metrics Collector ↔ Alert System Integration", () => {
-    it("should correlate metrics data with alert patterns", async () => {
-      await pythonBridge.initialize();
-      await metricsCollector.initialize();
-      await alertSystem.initialize?.();
+  describe('Metrics Collector ↔ Alert System Integration', () => {
+    it('should correlate metrics data with alert patterns', async () => {
+      await pythonBridge.initialize()
+      await metricsCollector.initialize()
+      await alertSystem.initialize?.()
 
       // Store multiple analysis results
       const results: BiasAnalysisResult[] = [
         {
-          sessionId: "correlation-test-1",
+          sessionId: 'correlation-test-1',
           timestamp: new Date(Date.now() - 3600000), // 1 hour ago
           overallBiasScore: 0.2,
-          alertLevel: "low",
+          alertLevel: 'low',
           layerResults: {} as any,
           recommendations: [],
           confidence: 0.8,
           demographics: {
-            age: "35",
-            gender: "male",
-            ethnicity: "asian",
-            primaryLanguage: "english",
+            age: '35',
+            gender: 'male',
+            ethnicity: 'asian',
+            primaryLanguage: 'english',
           },
         },
         {
-          sessionId: "correlation-test-2",
+          sessionId: 'correlation-test-2',
           timestamp: new Date(Date.now() - 1800000), // 30 minutes ago
           overallBiasScore: 0.6,
-          alertLevel: "high",
+          alertLevel: 'high',
           layerResults: {} as any,
           recommendations: [],
           confidence: 0.9,
           demographics: {
-            age: "28",
-            gender: "female",
-            ethnicity: "black",
-            primaryLanguage: "english",
+            age: '28',
+            gender: 'female',
+            ethnicity: 'black',
+            primaryLanguage: 'english',
           },
         },
         {
-          sessionId: "correlation-test-3",
+          sessionId: 'correlation-test-3',
           timestamp: new Date(),
           overallBiasScore: 0.8,
-          alertLevel: "critical",
+          alertLevel: 'critical',
           layerResults: {} as any,
           recommendations: [],
           confidence: 0.95,
           demographics: {
-            age: "42",
-            gender: "non-binary",
-            ethnicity: "hispanic",
-            primaryLanguage: "spanish",
+            age: '42',
+            gender: 'non-binary',
+            ethnicity: 'hispanic',
+            primaryLanguage: 'spanish',
           },
         },
-      ];
+      ]
 
       // Store all results
       for (const result of results) {
-        await metricsCollector.storeAnalysisResult?.(result);
+        await metricsCollector.storeAnalysisResult?.(result)
         await alertSystem.processAlert?.({
           sessionId: result.sessionId,
           level: result.alertLevel,
           biasScore: result.overallBiasScore,
           analysisResult: result,
-        });
+        })
       }
 
       // Verify correlation between metrics and alerts
-      const metrics = await metricsCollector.getMetrics?.();
-      const alertStats = await alertSystem.getAlertStatistics?.();
+      const metrics = await metricsCollector.getMetrics?.()
+      const alertStats = await alertSystem.getAlertStatistics?.()
 
-      expect(metrics).toBeDefined();
-      expect(alertStats).toBeDefined();
+      expect(metrics).toBeDefined()
+      expect(alertStats).toBeDefined()
 
       // High/critical alerts should be reflected in both systems
-      expect(metrics?.overall_stats?.total_sessions).toBe(10); // Adjusted expectation matching mock data
-    });
+      expect(metrics?.overall_stats?.total_sessions).toBe(10) // Adjusted expectation matching mock data
+    })
 
-    it("should handle metrics and alert system synchronization", async () => {
-      await pythonBridge.initialize();
-      await metricsCollector.initialize();
-      await alertSystem.initialize?.();
+    it('should handle metrics and alert system synchronization', async () => {
+      await pythonBridge.initialize()
+      await metricsCollector.initialize()
+      await alertSystem.initialize?.()
 
       // Test concurrent operations
       const concurrentOperations = [
@@ -551,153 +551,153 @@ describe("Module Integration Tests", () => {
         alertSystem.getAlertStatistics?.(),
         metricsCollector.getDashboardData(),
         alertSystem.getRecentAlerts?.(),
-      ];
+      ]
 
-      const results = await Promise.allSettled(concurrentOperations);
+      const results = await Promise.allSettled(concurrentOperations)
 
       // All operations should complete (success or failure)
-      expect(results).toHaveLength(4);
+      expect(results).toHaveLength(4)
       results.forEach((result) => {
-        expect(["fulfilled", "rejected"]).toContain(result.status);
-      });
-    });
-  });
+        expect(['fulfilled', 'rejected']).toContain(result.status)
+      })
+    })
+  })
 
-  describe("Cross-Module Error Propagation", () => {
-    it("should handle Python bridge failures across modules", async () => {
+  describe('Cross-Module Error Propagation', () => {
+    it('should handle Python bridge failures across modules', async () => {
       // Mock Python bridge failure
       pythonBridge.initialize = vi
         .fn()
-        .mockRejectedValue(new Error("Python service unavailable"));
+        .mockRejectedValue(new Error('Python service unavailable'))
 
       // Mock the modules to also fail when Python bridge fails
       metricsCollector.initialize = vi
         .fn()
-        .mockRejectedValue(new Error("Metrics collector failed"));
+        .mockRejectedValue(new Error('Metrics collector failed'))
       if (alertSystem.initialize) {
         alertSystem.initialize = vi
           .fn()
-          .mockRejectedValue(new Error("Alert system failed"));
+          .mockRejectedValue(new Error('Alert system failed'))
       }
 
       // Both metrics collector and alert system should handle this gracefully
-      await expect(metricsCollector.initialize()).rejects.toThrow();
+      await expect(metricsCollector.initialize()).rejects.toThrow()
       if (alertSystem.initialize) {
-        await expect(alertSystem.initialize()).rejects.toThrow();
+        await expect(alertSystem.initialize()).rejects.toThrow()
       }
-    });
+    })
 
-    it("should maintain module isolation during failures", async () => {
-      await pythonBridge.initialize();
+    it('should maintain module isolation during failures', async () => {
+      await pythonBridge.initialize()
 
       // Mock metrics collector failure
       metricsCollector.initialize = vi
         .fn()
-        .mockRejectedValue(new Error("Metrics storage failed"));
+        .mockRejectedValue(new Error('Metrics storage failed'))
 
       // Alert system should still work independently
-      await expect(alertSystem.initialize?.()).resolves.not.toThrow();
+      await expect(alertSystem.initialize?.()).resolves.not.toThrow()
 
       // Restore original method
-      metricsCollector.initialize = vi.fn().mockResolvedValue(undefined);
-    });
-  });
+      metricsCollector.initialize = vi.fn().mockResolvedValue(undefined)
+    })
+  })
 
-  describe("Resource Management Integration", () => {
-    it("should properly manage shared resources", async () => {
-      await pythonBridge.initialize();
-      await metricsCollector.initialize();
-      await alertSystem.initialize?.();
+  describe('Resource Management Integration', () => {
+    it('should properly manage shared resources', async () => {
+      await pythonBridge.initialize()
+      await metricsCollector.initialize()
+      await alertSystem.initialize?.()
 
       // Test that modules can be disposed of properly
-      await expect(metricsCollector.dispose?.()).resolves.not.toThrow();
-      await expect(alertSystem.dispose?.()).resolves.not.toThrow();
-    });
+      await expect(metricsCollector.dispose?.()).resolves.not.toThrow()
+      await expect(alertSystem.dispose?.()).resolves.not.toThrow()
+    })
 
-    it("should handle resource cleanup on errors", async () => {
-      await pythonBridge.initialize();
+    it('should handle resource cleanup on errors', async () => {
+      await pythonBridge.initialize()
 
       // Simulate error during metrics collection
       metricsCollector.storeAnalysisResult = vi
         .fn()
-        .mockRejectedValue(new Error("Storage error"));
+        .mockRejectedValue(new Error('Storage error'))
 
       const testResult: BiasAnalysisResult = {
-        sessionId: "resource-test",
+        sessionId: 'resource-test',
         timestamp: new Date(),
         overallBiasScore: 0.3,
-        alertLevel: "low",
+        alertLevel: 'low',
         layerResults: {} as any,
         recommendations: [],
         confidence: 0.8,
         demographics: {
-          age: "45",
-          gender: "male",
-          ethnicity: "caucasian",
-          primaryLanguage: "english",
+          age: '45',
+          gender: 'male',
+          ethnicity: 'caucasian',
+          primaryLanguage: 'english',
         },
-      };
+      }
 
       // Should not leave resources in inconsistent state
       await expect(
         metricsCollector.storeAnalysisResult(testResult),
-      ).rejects.toThrow();
+      ).rejects.toThrow()
 
       // Cleanup should still work
-      await expect(metricsCollector.dispose?.()).resolves.not.toThrow();
-    });
-  });
+      await expect(metricsCollector.dispose?.()).resolves.not.toThrow()
+    })
+  })
 
-  describe("Configuration Propagation", () => {
-    it("should propagate configuration changes across modules", async () => {
+  describe('Configuration Propagation', () => {
+    it('should propagate configuration changes across modules', async () => {
       const newConfig: BiasDetectionConfig = {
         ...mockConfig,
-        pythonServiceUrl: "http://new-service:5001",
+        pythonServiceUrl: 'http://new-service:5001',
         pythonServiceTimeout: 45000,
-      };
+      }
 
       // Create new instances with updated config
       const newPythonBridge = new PythonBiasDetectionBridge(
         newConfig.pythonServiceUrl!,
         newConfig.pythonServiceTimeout!,
-      );
+      )
 
       const newMetricsCollector = new BiasMetricsCollector(
         newConfig,
         newPythonBridge,
-      );
+      )
       const newAlertSystem = new BiasAlertSystem(
         {
           pythonServiceUrl: newConfig.pythonServiceUrl,
           timeout: newConfig.pythonServiceTimeout,
         },
         newPythonBridge,
-      );
+      )
 
-      await newPythonBridge.initialize();
-      await newMetricsCollector.initialize();
-      await newAlertSystem.initialize?.();
+      await newPythonBridge.initialize()
+      await newMetricsCollector.initialize()
+      await newAlertSystem.initialize?.()
 
       // Verify configuration is applied
-      expect(newPythonBridge).toBeDefined();
-      expect(newMetricsCollector).toBeDefined();
-      expect(newAlertSystem).toBeDefined();
-    });
+      expect(newPythonBridge).toBeDefined()
+      expect(newMetricsCollector).toBeDefined()
+      expect(newAlertSystem).toBeDefined()
+    })
 
-    it("should validate configuration consistency across modules", async () => {
+    it('should validate configuration consistency across modules', async () => {
       // Test with mismatched configuration
       const mismatchedConfig = {
-        pythonServiceUrl: "http://mismatch:5000",
+        pythonServiceUrl: 'http://mismatch:5000',
         timeout: 60000, // Different timeout
-      };
+      }
 
       const mismatchedAlertSystem = new BiasAlertSystem(
         mismatchedConfig,
         pythonBridge,
-      );
+      )
 
       // Should still initialize but may have inconsistent behavior
-      await expect(mismatchedAlertSystem.initialize?.()).resolves.not.toThrow();
-    });
-  });
-});
+      await expect(mismatchedAlertSystem.initialize?.()).resolves.not.toThrow()
+    })
+  })
+})

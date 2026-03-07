@@ -7,9 +7,9 @@
  * by additional text or markdown formatting.
  */
 
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("JsonExtraction");
+const logger = createBuildSafeLogger('JsonExtraction')
 
 /**
  * Extract JSON from a string using balanced brace matching
@@ -34,52 +34,52 @@ const logger = createBuildSafeLogger("JsonExtraction");
  * ```
  */
 export function extractJsonFromString(text: string): string | null {
-  const trimmed = text.trim();
+  const trimmed = text.trim()
 
   // Find the first opening brace
-  const startIndex = trimmed.indexOf("{");
+  const startIndex = trimmed.indexOf('{')
   if (startIndex === -1) {
-    return null;
+    return null
   }
 
   // Use a stack to find the matching closing brace
-  let braceCount = 0;
-  let inString = false;
-  let escaped = false;
+  let braceCount = 0
+  let inString = false
+  let escaped = false
 
   for (let i = startIndex; i < trimmed.length; i++) {
-    const char = trimmed[i];
+    const char = trimmed[i]
 
     if (escaped) {
-      escaped = false;
-      continue;
+      escaped = false
+      continue
     }
 
-    if (char === "\\" && inString) {
-      escaped = true;
-      continue;
+    if (char === '\\' && inString) {
+      escaped = true
+      continue
     }
 
     if (char === '"' && !escaped) {
-      inString = !inString;
-      continue;
+      inString = !inString
+      continue
     }
 
     if (!inString) {
-      if (char === "{") {
-        braceCount++;
-      } else if (char === "}") {
-        braceCount--;
+      if (char === '{') {
+        braceCount++
+      } else if (char === '}') {
+        braceCount--
         if (braceCount === 0) {
           // Found the matching closing brace
-          return trimmed.substring(startIndex, i + 1);
+          return trimmed.substring(startIndex, i + 1)
         }
       }
     }
   }
 
   // No matching closing brace found
-  return null;
+  return null
 }
 
 /**
@@ -99,13 +99,13 @@ export function extractJsonFromString(text: string): string | null {
  */
 export function safeJsonParse<T = unknown>(jsonString: string): T | null {
   try {
-    return JSON.parse(jsonString) as unknown as T;
+    return JSON.parse(jsonString) as unknown as T
   } catch (error: unknown) {
-    logger.error("Failed to parse JSON string", {
+    logger.error('Failed to parse JSON string', {
       error: error instanceof Error ? String(error) : String(error),
       jsonPreview: jsonString.slice(0, 100),
-    });
-    return null;
+    })
+    return null
   }
 }
 
@@ -128,9 +128,9 @@ export function safeJsonParse<T = unknown>(jsonString: string): T | null {
  * ```
  */
 export function extractAndParseJson<T = unknown>(text: string): T | null {
-  const jsonString = extractJsonFromString(text);
+  const jsonString = extractJsonFromString(text)
   if (!jsonString) {
-    return null;
+    return null
   }
-  return safeJsonParse<T>(jsonString);
+  return safeJsonParse<T>(jsonString)
 }

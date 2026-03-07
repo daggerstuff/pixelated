@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import MultidimensionalEmotionChart from "../dashboard/MultidimensionalEmotionChart";
-import useMultidimensionalEmotions from "../../hooks/useMultidimensionalEmotions";
+import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import MultidimensionalEmotionChart from '../dashboard/MultidimensionalEmotionChart'
+import useMultidimensionalEmotions from '../../hooks/useMultidimensionalEmotions'
 
 const EmotionVisualizationPage: FC = () => {
-  const { clientId } = useParams<{ clientId: string }>();
-  const [timeRange, setTimeRange] = useState<"day" | "week" | "month" | "year">(
-    "week",
-  );
-  const [dataPoints, setDataPoints] = useState<number>(50);
+  const { clientId } = useParams<{ clientId: string }>()
+  const [timeRange, setTimeRange] = useState<'day' | 'week' | 'month' | 'year'>(
+    'week',
+  )
+  const [dataPoints, setDataPoints] = useState<number>(50)
 
   const {
     data: emotionData,
     isLoading,
     error,
-  } = useMultidimensionalEmotions(clientId || "unknown", timeRange, dataPoints);
+  } = useMultidimensionalEmotions(clientId || 'unknown', timeRange, dataPoints)
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -35,7 +35,7 @@ const EmotionVisualizationPage: FC = () => {
             id="timeRange"
             value={timeRange}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setTimeRange(e.target.value as "day" | "week" | "month" | "year")
+              setTimeRange(e.target.value as 'day' | 'week' | 'month' | 'year')
             }
             className="border rounded px-3 py-2"
           >
@@ -105,7 +105,7 @@ const EmotionVisualizationPage: FC = () => {
         </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default EmotionVisualizationPage;
+export default EmotionVisualizationPage

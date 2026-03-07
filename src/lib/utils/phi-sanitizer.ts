@@ -15,13 +15,13 @@
  *          otherwise returns an empty string or a representation for empty.
  */
 export function redactPotentialPhi(text: string | undefined | null): string {
-  if (text === null || text === undefined || text.trim() === "") {
+  if (text === null || text === undefined || text.trim() === '') {
     // Return empty string or a specific placeholder like '[EMPTY_CONTENT]'
     // if distinguishing between empty and redacted is important.
-    return "";
+    return ''
   }
   // Using a generic placeholder for any non-empty potentially sensitive text.
-  return "[USER_OR_MODEL_TEXT_REDACTED]";
+  return '[USER_OR_MODEL_TEXT_REDACTED]'
 }
 
 /**
@@ -39,26 +39,26 @@ export function sanitizeMessagesForLogging(
     | null,
 ): string {
   if (!messages || messages.length === 0) {
-    return "[NO_MESSAGES]";
+    return '[NO_MESSAGES]'
   }
   try {
     return messages
       .map((msg, index) => {
         if (
-          typeof msg === "object" &&
+          typeof msg === 'object' &&
           msg !== null &&
-          "role" in msg &&
-          "content" in msg
+          'role' in msg &&
+          'content' in msg
         ) {
-          const content = typeof msg.content === "string" ? msg.content : "";
-          return `Message ${index + 1} (Role: ${msg.role || "unknown"}): ${redactPotentialPhi(content)}`;
+          const content = typeof msg.content === 'string' ? msg.content : ''
+          return `Message ${index + 1} (Role: ${msg.role || 'unknown'}): ${redactPotentialPhi(content)}`
         }
-        return `Message ${index + 1} (Role: unknown): [CONTENT_REDACTED]`;
+        return `Message ${index + 1} (Role: unknown): [CONTENT_REDACTED]`
       })
-      .join("\\n");
+      .join('\\n')
   } catch {
     // Fallback in case message structure is unexpected
-    return "[MESSAGES_REDACTION_ERROR]";
+    return '[MESSAGES_REDACTION_ERROR]'
   }
 }
 
@@ -74,25 +74,25 @@ export function sanitizeObjectForLogging(
   data: Record<string, unknown> | undefined | null,
 ): string {
   if (!data) {
-    return "[NO_DATA_OBJECT]";
+    return '[NO_DATA_OBJECT]'
   }
   try {
-    const sanitizedObject: Record<string, unknown> = {};
+    const sanitizedObject: Record<string, unknown> = {}
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const value = data[key];
-        if (typeof value === "string") {
-          sanitizedObject[key] = redactPotentialPhi(value);
-        } else if (typeof value === "object" && value !== null) {
+        const value = data[key]
+        if (typeof value === 'string') {
+          sanitizedObject[key] = redactPotentialPhi(value)
+        } else if (typeof value === 'object' && value !== null) {
           // Optionally, could recurse or use a more generic placeholder for nested objects
-          sanitizedObject[key] = "[OBJECT_DATA]";
+          sanitizedObject[key] = '[OBJECT_DATA]'
         } else {
-          sanitizedObject[key] = value;
+          sanitizedObject[key] = value
         }
       }
     }
-    return JSON.stringify(sanitizedObject);
+    return JSON.stringify(sanitizedObject)
   } catch {
-    return "[OBJECT_REDACTION_ERROR]";
+    return '[OBJECT_REDACTION_ERROR]'
   }
 }

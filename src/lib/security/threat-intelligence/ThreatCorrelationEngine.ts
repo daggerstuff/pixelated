@@ -4,233 +4,233 @@
  * Integrates with Pixelated's AI infrastructure for advanced correlation
  */
 
-import { EventEmitter } from "events";
-import { MongoClient, Db, Collection } from "mongodb";
-import { Redis } from "ioredis";
-import { v4 as uuidv4 } from "uuid";
-import { logger } from "../../logger";
+import { EventEmitter } from 'events'
+import { MongoClient, Db, Collection } from 'mongodb'
+import { Redis } from 'ioredis'
+import { v4 as uuidv4 } from 'uuid'
+import { logger } from '../../logger'
 
-import { auditLog } from "../audit-logging";
+import { auditLog } from '../audit-logging'
 
 // Types
 export interface ThreatCorrelation {
-  id: string;
-  timestamp: Date;
-  correlation_type: "temporal" | "spatial" | "behavioral" | "attribution";
-  confidence: number;
-  threats: CorrelatedThreat[];
-  patterns: ThreatPattern[];
-  analysis: CorrelationAnalysis;
-  recommendations: string[];
-  metadata: Record<string, unknown>;
+  id: string
+  timestamp: Date
+  correlation_type: 'temporal' | 'spatial' | 'behavioral' | 'attribution'
+  confidence: number
+  threats: CorrelatedThreat[]
+  patterns: ThreatPattern[]
+  analysis: CorrelationAnalysis
+  recommendations: string[]
+  metadata: Record<string, unknown>
 }
 
 export interface CorrelatedThreat {
-  threat_id: string;
-  region: string;
-  location: string;
-  severity: "low" | "medium" | "high" | "critical";
-  confidence: number;
-  indicators: ThreatIndicator[];
-  timestamp: Date;
+  threat_id: string
+  region: string
+  location: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  indicators: ThreatIndicator[]
+  timestamp: Date
 }
 
 export interface ThreatIndicator {
-  type: string;
-  value: string;
-  confidence: number;
-  source: string;
+  type: string
+  value: string
+  confidence: number
+  source: string
 }
 
 export interface ThreatPattern {
-  pattern_id: string;
-  pattern_type: string;
-  description: string;
-  confidence: number;
-  frequency: number;
-  temporal_span: number; // seconds
-  spatial_span: number; // kilometers
-  indicators: string[];
+  pattern_id: string
+  pattern_type: string
+  description: string
+  confidence: number
+  frequency: number
+  temporal_span: number // seconds
+  spatial_span: number // kilometers
+  indicators: string[]
 }
 
 export interface CorrelationAnalysis {
-  similarity_score: number;
-  relationship_strength: number;
-  common_attributes: string[];
-  unique_attributes: string[];
-  statistical_significance: number;
-  machine_learning_insights: MLInsight[];
+  similarity_score: number
+  relationship_strength: number
+  common_attributes: string[]
+  unique_attributes: string[]
+  statistical_significance: number
+  machine_learning_insights: MLInsight[]
 }
 
 export interface MLInsight {
-  algorithm: string;
-  insight: string;
-  confidence: number;
-  evidence: string[];
+  algorithm: string
+  insight: string
+  confidence: number
+  evidence: string[]
 }
 
 export interface CorrelationEngineConfig {
   mongodb: {
-    url: string;
-    database: string;
-  };
+    url: string
+    database: string
+  }
   redis: {
-    url: string;
-    password?: string;
-  };
+    url: string
+    password?: string
+  }
   algorithms: {
-    temporal: AlgorithmConfig;
-    spatial: AlgorithmConfig;
-    behavioral: AlgorithmConfig;
-    attribution: AlgorithmConfig;
-  };
+    temporal: AlgorithmConfig
+    spatial: AlgorithmConfig
+    behavioral: AlgorithmConfig
+    attribution: AlgorithmConfig
+  }
   thresholds: {
-    min_correlation_confidence: number;
-    min_similarity_score: number;
-    max_correlation_distance: number;
-    temporal_window: number; // seconds
-  };
+    min_correlation_confidence: number
+    min_similarity_score: number
+    max_correlation_distance: number
+    temporal_window: number // seconds
+  }
   performance: {
-    batch_size: number;
-    processing_interval: number;
-    max_concurrent_correlations: number;
-  };
+    batch_size: number
+    processing_interval: number
+    max_concurrent_correlations: number
+  }
 }
 
 export interface AlgorithmConfig {
-  name: string;
-  enabled: boolean;
-  parameters: Record<string, unknown>;
-  weight: number;
+  name: string
+  enabled: boolean
+  parameters: Record<string, unknown>
+  weight: number
 }
 
 // Add new interfaces for threat data structures
 export interface ThreatData {
-  id: string;
-  type: string;
-  severity: "low" | "medium" | "high" | "critical";
-  confidence: number;
-  region: string;
+  id: string
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  region: string
   location?: {
-    name?: string;
+    name?: string
     coordinates?: {
-      latitude: number;
-      longitude: number;
-    };
-  };
-  indicators?: ThreatIndicator[];
-  timestamp: string | Date;
-  tactics?: string;
-  tools?: string;
+      latitude: number
+      longitude: number
+    }
+  }
+  indicators?: ThreatIndicator[]
+  timestamp: string | Date
+  tactics?: string
+  tools?: string
   attribution?: {
-    actor?: string;
-    campaign?: string;
-    motivation?: string;
-    sophistication?: string;
-    region?: string;
-  };
+    actor?: string
+    campaign?: string
+    motivation?: string
+    sophistication?: string
+    region?: string
+  }
 }
 
 export interface TimeGroup {
-  start_time: string | Date;
-  end_time: string | Date;
-  threats: ThreatData[];
+  start_time: string | Date
+  end_time: string | Date
+  threats: ThreatData[]
 }
 
 export interface SpatialGroup {
-  threats: ThreatData[];
-  distance: number;
+  threats: ThreatData[]
+  distance: number
   center: {
-    latitude: number;
-    longitude: number;
-  };
+    latitude: number
+    longitude: number
+  }
 }
 
 export interface BehavioralGroup {
-  threats: ThreatData[];
-  pattern: string;
+  threats: ThreatData[]
+  pattern: string
 }
 
 export interface AttributionGroup {
-  threats: ThreatData[];
-  attribution: Record<string, string>;
+  threats: ThreatData[]
+  attribution: Record<string, string>
 }
 
 export interface CorrelationResult {
-  confidence: number;
-  patterns: ThreatPattern[];
-  analysis: CorrelationAnalysis;
-  time_span?: number;
-  geographic_span?: number;
-  similarity_metrics?: Record<string, number>;
-  confidence_factors?: Record<string, number>;
+  confidence: number
+  patterns: ThreatPattern[]
+  analysis: CorrelationAnalysis
+  time_span?: number
+  geographic_span?: number
+  similarity_metrics?: Record<string, number>
+  confidence_factors?: Record<string, number>
 }
 
 export interface SpatialCorrelationResult extends CorrelationResult {
-  geographic_span: number;
+  geographic_span: number
 }
 
 export interface TemporalCorrelationResult extends CorrelationResult {
-  time_span: number;
+  time_span: number
 }
 
 export interface BehavioralCorrelationResult extends CorrelationResult {
-  similarity_metrics: Record<string, number>;
+  similarity_metrics: Record<string, number>
 }
 
 export interface AttributionCorrelationResult extends CorrelationResult {
-  confidence_factors: Record<string, number>;
+  confidence_factors: Record<string, number>
 }
 
 export interface Recommendation {
-  id: string;
-  type: string;
-  priority: "low" | "medium" | "high" | "critical";
-  description: string;
-  action: string;
-  context: Record<string, unknown>;
+  id: string
+  type: string
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  description: string
+  action: string
+  context: Record<string, unknown>
 }
 
 export interface CorrelationMetrics {
-  confidence: number;
-  similarity_score: number;
-  relationship_strength: number;
-  threat_count: number;
-  patterns: ThreatPattern[];
-  span_value?: number;
+  confidence: number
+  similarity_score: number
+  relationship_strength: number
+  threat_count: number
+  patterns: ThreatPattern[]
+  span_value?: number
 }
 
 export interface CorrelationStats {
-  total_correlations: number;
-  type_distribution: Record<string, number>;
+  total_correlations: number
+  type_distribution: Record<string, number>
   confidence_distribution: Array<{
-    _id: string;
-    count: number;
-  }>;
-  recent_correlations_24h: number;
+    _id: string
+    count: number
+  }>
+  recent_correlations_24h: number
 }
 
 export interface DistanceCoordinates {
-  latitude: number;
-  longitude: number;
+  latitude: number
+  longitude: number
 }
 
 export class ThreatCorrelationEngine extends EventEmitter {
-  private config: CorrelationEngineConfig;
-  private mongoClient: MongoClient;
-  private db: Db;
-  private threatsCollection: Collection<ThreatData>;
-  private correlationsCollection: Collection<ThreatCorrelation>;
-  private redis: Redis;
-  private isInitialized = false;
-  private processingInterval: NodeJS.Timeout | null = null;
-  private correlationQueue: string[] = [];
-  private isProcessing = false;
+  private config: CorrelationEngineConfig
+  private mongoClient: MongoClient
+  private db: Db
+  private threatsCollection: Collection<ThreatData>
+  private correlationsCollection: Collection<ThreatCorrelation>
+  private redis: Redis
+  private isInitialized = false
+  private processingInterval: NodeJS.Timeout | null = null
+  private correlationQueue: string[] = []
+  private isProcessing = false
 
   constructor(config: CorrelationEngineConfig) {
-    super();
-    this.config = config;
-    this.setMaxListeners(0);
+    super()
+    this.config = config
+    this.setMaxListeners(0)
   }
 
   /**
@@ -238,45 +238,45 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   async initialize(): Promise<void> {
     try {
-      logger.info("Initializing Threat Correlation Engine");
+      logger.info('Initializing Threat Correlation Engine')
 
       // Initialize MongoDB connection
-      this.mongoClient = new MongoClient(this.config.mongodb.url);
-      await this.mongoClient.connect();
-      this.db = this.mongoClient.db(this.config.mongodb.database);
+      this.mongoClient = new MongoClient(this.config.mongodb.url)
+      await this.mongoClient.connect()
+      this.db = this.mongoClient.db(this.config.mongodb.database)
 
       // Initialize collections
-      this.threatsCollection = this.db.collection("threat_intelligence");
-      this.correlationsCollection = this.db.collection("threat_correlations");
+      this.threatsCollection = this.db.collection('threat_intelligence')
+      this.correlationsCollection = this.db.collection('threat_correlations')
 
       // Create indexes for performance
-      await this.createIndexes();
+      await this.createIndexes()
 
       // Initialize Redis connection
       this.redis = new Redis(this.config.redis.url, {
         password: this.config.redis.password,
         enableReadyCheck: true,
         maxRetriesPerRequest: 3,
-      });
+      })
 
       // Set up Redis pub/sub for real-time correlation
-      await this.setupRedisPubSub();
+      await this.setupRedisPubSub()
 
       // Start background processing
-      this.startCorrelationProcessing();
+      this.startCorrelationProcessing()
 
-      this.isInitialized = true;
-      logger.info("Threat Correlation Engine initialized successfully");
+      this.isInitialized = true
+      logger.info('Threat Correlation Engine initialized successfully')
 
-      this.emit("initialized", { timestamp: new Date() });
+      this.emit('initialized', { timestamp: new Date() })
     } catch (error) {
-      logger.error("Failed to initialize Threat Correlation Engine", {
+      logger.error('Failed to initialize Threat Correlation Engine', {
         error: error.message,
-      });
+      })
       throw new Error(
         `Failed to initialize threat correlation engine: ${error.message}`,
         { cause: error },
-      );
+      )
     }
   }
 
@@ -290,23 +290,23 @@ export class ThreatCorrelationEngine extends EventEmitter {
         this.threatsCollection.createIndex({ id: 1 }),
         this.threatsCollection.createIndex({ region: 1, timestamp: -1 }),
         this.threatsCollection.createIndex({ type: 1, severity: 1 }),
-        this.threatsCollection.createIndex({ "indicators.value": 1 }),
-        this.threatsCollection.createIndex({ location: "2dsphere" }),
+        this.threatsCollection.createIndex({ 'indicators.value': 1 }),
+        this.threatsCollection.createIndex({ location: '2dsphere' }),
 
         // Correlations indexes
         this.correlationsCollection.createIndex({ id: 1 }, { unique: true }),
         this.correlationsCollection.createIndex({ timestamp: -1 }),
         this.correlationsCollection.createIndex({ correlation_type: 1 }),
         this.correlationsCollection.createIndex({ confidence: -1 }),
-        this.correlationsCollection.createIndex({ "threats.threat_id": 1 }),
-      ]);
+        this.correlationsCollection.createIndex({ 'threats.threat_id': 1 }),
+      ])
 
-      logger.info("Database indexes created successfully");
+      logger.info('Database indexes created successfully')
     } catch (error) {
-      logger.error("Failed to create database indexes", {
+      logger.error('Failed to create database indexes', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -315,25 +315,25 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate();
-      await subscriber.connect();
+      const subscriber = this.redis.duplicate()
+      await subscriber.connect()
 
       // Subscribe to new threat notifications
-      await subscriber.subscribe("new-threat", async (message) => {
+      await subscriber.subscribe('new-threat', async (message) => {
         try {
-          const threatData = JSON.parse(message);
-          await this.queueThreatForCorrelation(threatData.threat_id);
+          const threatData = JSON.parse(message)
+          await this.queueThreatForCorrelation(threatData.threat_id)
         } catch (error) {
-          logger.error("Failed to process new threat notification", {
+          logger.error('Failed to process new threat notification', {
             error: error.message,
-          });
+          })
         }
-      });
+      })
 
-      logger.info("Redis pub/sub setup completed");
+      logger.info('Redis pub/sub setup completed')
     } catch (error) {
-      logger.error("Failed to setup Redis pub/sub", { error: error.message });
-      throw error;
+      logger.error('Failed to setup Redis pub/sub', { error: error.message })
+      throw error
     }
   }
 
@@ -342,25 +342,25 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   async queueThreatForCorrelation(threatId: string): Promise<void> {
     if (!this.isInitialized) {
-      throw new Error("Threat correlation engine not initialized");
+      throw new Error('Threat correlation engine not initialized')
     }
 
     try {
       // Add to correlation queue
-      this.correlationQueue.push(threatId);
+      this.correlationQueue.push(threatId)
 
       // Limit queue size to prevent memory issues
       if (this.correlationQueue.length > 1000) {
-        this.correlationQueue = this.correlationQueue.slice(-500);
+        this.correlationQueue = this.correlationQueue.slice(-500)
       }
 
-      logger.debug("Threat queued for correlation", { threatId });
+      logger.debug('Threat queued for correlation', { threatId })
     } catch (error) {
-      logger.error("Failed to queue threat for correlation", {
+      logger.error('Failed to queue threat for correlation', {
         error: error.message,
         threatId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -370,46 +370,46 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private startCorrelationProcessing(): void {
     this.processingInterval = setInterval(async () => {
       if (this.correlationQueue.length > 0 && !this.isProcessing) {
-        await this.processCorrelationQueue();
+        await this.processCorrelationQueue()
       }
-    }, this.config.performance.processing_interval);
+    }, this.config.performance.processing_interval)
   }
 
   /**
    * Process correlation queue
    */
   private async processCorrelationQueue(): Promise<void> {
-    this.isProcessing = true;
+    this.isProcessing = true
 
     try {
       const batchSize = Math.min(
         this.correlationQueue.length,
         this.config.performance.batch_size,
-      );
+      )
 
-      const threatIds = this.correlationQueue.splice(0, batchSize);
-      logger.info("Processing correlation batch", { count: threatIds.length });
+      const threatIds = this.correlationQueue.splice(0, batchSize)
+      logger.info('Processing correlation batch', { count: threatIds.length })
 
       // Get threat details
-      const threats = await this.getThreatsByIds(threatIds);
+      const threats = await this.getThreatsByIds(threatIds)
 
       // Perform correlation analysis
-      const correlations = await this.analyzeCorrelations(threats);
+      const correlations = await this.analyzeCorrelations(threats)
 
       // Store correlation results
       for (const correlation of correlations) {
-        await this.storeCorrelation(correlation);
+        await this.storeCorrelation(correlation)
       }
 
-      logger.info("Correlation batch processing completed", {
+      logger.info('Correlation batch processing completed', {
         count: correlations.length,
-      });
+      })
     } catch (error) {
-      logger.error("Failed to process correlation queue", {
+      logger.error('Failed to process correlation queue', {
         error: error.message,
-      });
+      })
     } finally {
-      this.isProcessing = false;
+      this.isProcessing = false
     }
   }
 
@@ -420,10 +420,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
     try {
       return await this.threatsCollection
         .find({ id: { $in: threatIds } })
-        .toArray();
+        .toArray()
     } catch (error) {
-      logger.error("Failed to get threats by IDs", { error: error.message });
-      throw error;
+      logger.error('Failed to get threats by IDs', { error: error.message })
+      throw error
     }
   }
 
@@ -433,55 +433,55 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private async analyzeCorrelations(
     threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
-    const correlations: ThreatCorrelation[] = [];
+    const correlations: ThreatCorrelation[] = []
 
     try {
       // Temporal correlation
       if (this.config.algorithms.temporal.enabled) {
         const temporalCorrelations =
-          await this.analyzeTemporalCorrelations(threats);
-        correlations.push(...temporalCorrelations);
+          await this.analyzeTemporalCorrelations(threats)
+        correlations.push(...temporalCorrelations)
       }
 
       // Spatial correlation
       if (this.config.algorithms.spatial.enabled) {
         const spatialCorrelations =
-          await this.analyzeSpatialCorrelations(threats);
-        correlations.push(...spatialCorrelations);
+          await this.analyzeSpatialCorrelations(threats)
+        correlations.push(...spatialCorrelations)
       }
 
       // Behavioral correlation
       if (this.config.algorithms.behavioral.enabled) {
         const behavioralCorrelations =
-          await this.analyzeBehavioralCorrelations(threats);
-        correlations.push(...behavioralCorrelations);
+          await this.analyzeBehavioralCorrelations(threats)
+        correlations.push(...behavioralCorrelations)
       }
 
       // Attribution correlation
       if (this.config.algorithms.attribution.enabled) {
         const attributionCorrelations =
-          await this.analyzeAttributionCorrelations(threats);
-        correlations.push(...attributionCorrelations);
+          await this.analyzeAttributionCorrelations(threats)
+        correlations.push(...attributionCorrelations)
       }
 
-      logger.info("Correlation analysis completed", {
+      logger.info('Correlation analysis completed', {
         total_correlations: correlations.length,
-        temporal: correlations.filter((c) => c.correlation_type === "temporal")
+        temporal: correlations.filter((c) => c.correlation_type === 'temporal')
           .length,
-        spatial: correlations.filter((c) => c.correlation_type === "spatial")
+        spatial: correlations.filter((c) => c.correlation_type === 'spatial')
           .length,
         behavioral: correlations.filter(
-          (c) => c.correlation_type === "behavioral",
+          (c) => c.correlation_type === 'behavioral',
         ).length,
         attribution: correlations.filter(
-          (c) => c.correlation_type === "attribution",
+          (c) => c.correlation_type === 'attribution',
         ).length,
-      });
+      })
 
-      return correlations;
+      return correlations
     } catch (error) {
-      logger.error("Failed to analyze correlations", { error: error.message });
-      throw error;
+      logger.error('Failed to analyze correlations', { error: error.message })
+      throw error
     }
   }
 
@@ -491,18 +491,18 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private async analyzeTemporalCorrelations(
     threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
-    const correlations: ThreatCorrelation[] = [];
+    const correlations: ThreatCorrelation[] = []
 
     try {
       // Group threats by time windows
-      const timeWindow = this.config.thresholds.temporal_window;
-      const timeGroups = this.groupThreatsByTimeWindow(threats, timeWindow);
+      const timeWindow = this.config.thresholds.temporal_window
+      const timeGroups = this.groupThreatsByTimeWindow(threats, timeWindow)
 
       for (const group of timeGroups) {
-        if (group.threats.length < 2) continue;
+        if (group.threats.length < 2) continue
 
         // Calculate temporal correlation metrics
-        const correlation = this.calculateTemporalCorrelation(group.threats);
+        const correlation = this.calculateTemporalCorrelation(group.threats)
 
         if (
           correlation.confidence >=
@@ -511,7 +511,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           correlations.push({
             id: uuidv4(),
             timestamp: new Date(),
-            correlation_type: "temporal",
+            correlation_type: 'temporal',
             confidence: correlation.confidence,
             threats: group.threats.map((t) => this.mapToCorrelatedThreat(t)),
             patterns: correlation.patterns,
@@ -522,124 +522,119 @@ export class ThreatCorrelationEngine extends EventEmitter {
               threat_count: group.threats.length,
               time_span: correlation.time_span,
             },
-          });
+          })
         }
       }
 
-      return correlations;
+      return correlations
     } catch (error) {
-      logger.error("Failed to analyze temporal correlations", {
+      logger.error('Failed to analyze temporal correlations', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
   /**
    * Group threats by time windows
    */
-  private groupThreatsByTimeWindow(
-    threats: ThreatData[],
-    windowSize: number,
-  ): TimeGroup[] {
-    const groups: TimeGroup[] = [];
+  private groupThreatsByTimeWindow(threats: ThreatData[], windowSize: number): TimeGroup[] {
+    const groups: TimeGroup[] = []
     const sortedThreats = [...threats].sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
+    )
 
-    let currentGroup: TimeGroup | null = null;
+    let currentGroup: TimeGroup | null = null
 
     for (const threat of sortedThreats) {
-      const threatTime = new Date(threat.timestamp).getTime();
+      const threatTime = new Date(threat.timestamp).getTime()
 
       if (
         !currentGroup ||
         threatTime - new Date(currentGroup.end_time).getTime() >
-          windowSize * 1000
+        windowSize * 1000
       ) {
         // Start new group
         if (currentGroup) {
-          groups.push(currentGroup);
+          groups.push(currentGroup)
         }
         currentGroup = {
           start_time: threat.timestamp,
           end_time: threat.timestamp,
           threats: [threat],
-        };
+        }
       } else {
         // Add to current group
-        currentGroup.threats.push(threat);
-        currentGroup.end_time = threat.timestamp;
+        currentGroup.threats.push(threat)
+        currentGroup.end_time = threat.timestamp
       }
     }
 
     if (currentGroup) {
-      groups.push(currentGroup);
+      groups.push(currentGroup)
     }
 
-    return groups;
+    return groups
   }
 
   /**
    * Calculate temporal correlation
    */
-  private calculateTemporalCorrelation(
-    threats: ThreatData[],
-  ): TemporalCorrelationResult {
+  private calculateTemporalCorrelation(threats: ThreatData[]): TemporalCorrelationResult {
     try {
       // Calculate time span
-      const timestamps = threats.map((t) => new Date(t.timestamp).getTime());
-      const minTime = Math.min(...timestamps);
-      const maxTime = Math.max(...timestamps);
-      const timeSpan = (maxTime - minTime) / 1000; // seconds
+      const timestamps = threats.map((t) => new Date(t.timestamp).getTime())
+      const minTime = Math.min(...timestamps)
+      const maxTime = Math.max(...timestamps)
+      const timeSpan = (maxTime - minTime) / 1000 // seconds
 
       // Calculate similarity score based on various factors
-      let similarityScore = 0;
-      let patterns: ThreatPattern[] = [];
+      let similarityScore = 0
+      let patterns: ThreatPattern[] = []
 
       // Check for similar threat types
-      const typeGroups = this.groupBy(threats, "type");
+      const typeGroups = this.groupBy(threats, 'type')
       for (const [type, typeThreats] of Object.entries(typeGroups)) {
         if (typeThreats.length > 1) {
-          similarityScore += 0.3;
+          similarityScore += 0.3
           patterns.push({
             pattern_id: `temporal_type_${type}`,
-            pattern_type: "threat_type_clustering",
+            pattern_type: 'threat_type_clustering',
             description: `Multiple ${type} threats in temporal proximity`,
             confidence: 0.8,
             frequency: typeThreats.length,
             temporal_span: timeSpan,
             spatial_span: this.calculateSpatialSpan(typeThreats),
             indicators: [type],
-          });
+          })
         }
       }
 
       // Check for similar indicators
       const allIndicators = threats.flatMap(
         (t) => t.indicators?.map((i: ThreatIndicator) => i.value) || [],
-      );
-      const indicatorCounts = this.countOccurrences(allIndicators);
+      )
+      const indicatorCounts = this.countOccurrences(allIndicators)
 
       for (const [indicator, count] of Object.entries(indicatorCounts)) {
         if (count > 1) {
-          similarityScore += 0.2;
+          similarityScore += 0.2
           patterns.push({
             pattern_id: `temporal_indicator_${indicator}`,
-            pattern_type: "indicator_reuse",
+            pattern_type: 'indicator_reuse',
             description: `Indicator ${indicator} appears in multiple threats`,
             confidence: 0.7,
             frequency: count,
             temporal_span: timeSpan,
             spatial_span: 0,
             indicators: [indicator],
-          });
+          })
         }
       }
 
       // Calculate final confidence
-      const confidence = Math.min(similarityScore, 1.0);
+      const confidence = Math.min(similarityScore, 1.0)
 
       return {
         confidence,
@@ -658,12 +653,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
           machine_learning_insights: [],
         },
         time_span,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to calculate temporal correlation", {
+      logger.error('Failed to calculate temporal correlation', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -673,19 +668,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private async analyzeSpatialCorrelations(
     threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
-    const correlations: ThreatCorrelation[] = [];
+    const correlations: ThreatCorrelation[] = []
 
     try {
       // Group threats by geographic proximity
-      const spatialGroups = this.groupThreatsByProximity(threats);
+      const spatialGroups = this.groupThreatsByProximity(threats)
 
       for (const group of spatialGroups) {
-        if (group.threats.length < 2) continue;
+        if (group.threats.length < 2) continue
 
         const correlation = this.calculateSpatialCorrelation(
           group.threats,
           group.distance,
-        );
+        )
 
         if (
           correlation.confidence >=
@@ -694,7 +689,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           correlations.push({
             id: uuidv4(),
             timestamp: new Date(),
-            correlation_type: "spatial",
+            correlation_type: 'spatial',
             confidence: correlation.confidence,
             threats: group.threats.map((t) => this.mapToCorrelatedThreat(t)),
             patterns: correlation.patterns,
@@ -705,16 +700,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
               threat_count: group.threats.length,
               geographic_span: correlation.geographic_span,
             },
-          });
+          })
         }
       }
 
-      return correlations;
+      return correlations
     } catch (error) {
-      logger.error("Failed to analyze spatial correlations", {
+      logger.error('Failed to analyze spatial correlations', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -722,75 +717,72 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Group threats by geographic proximity
    */
   private groupThreatsByProximity(threats: ThreatData[]): SpatialGroup[] {
-    const groups: SpatialGroup[] = [];
-    const processed = new Set<string>();
+    const groups: SpatialGroup[] = []
+    const processed = new Set<string>()
 
     for (const threat of threats) {
-      if (processed.has(threat.id)) continue;
+      if (processed.has(threat.id)) continue
 
       const group: SpatialGroup = {
         threats: [threat],
         distance: 0,
         center: threat.location?.coordinates || { latitude: 0, longitude: 0 },
-      };
+      }
 
       // Find nearby threats
       for (const otherThreat of threats) {
         if (otherThreat.id === threat.id || processed.has(otherThreat.id))
-          continue;
+          continue
 
         const distance = this.calculateDistance(
           threat.location?.coordinates,
           otherThreat.location?.coordinates,
-        );
+        )
 
         if (distance <= this.config.thresholds.max_correlation_distance) {
-          group.threats.push(otherThreat);
-          group.distance = Math.max(group.distance, distance);
-          processed.add(otherThreat.id);
+          group.threats.push(otherThreat)
+          group.distance = Math.max(group.distance, distance)
+          processed.add(otherThreat.id)
         }
       }
 
       if (group.threats.length > 1) {
-        groups.push(group);
+        groups.push(group)
       }
 
-      processed.add(threat.id);
+      processed.add(threat.id)
     }
 
-    return groups;
+    return groups
   }
 
   /**
    * Calculate distance between two coordinates
    */
-  private calculateDistance(
-    coord1: DistanceCoordinates,
-    coord2: DistanceCoordinates,
-  ): number {
-    if (!coord1 || !coord2) return Infinity;
+  private calculateDistance(coord1: DistanceCoordinates, coord2: DistanceCoordinates): number {
+    if (!coord1 || !coord2) return Infinity
 
-    const R = 6371; // Earth's radius in kilometers
-    const dLat = this.toRadians(coord2.latitude - coord1.latitude);
-    const dLon = this.toRadians(coord2.longitude - coord1.longitude);
+    const R = 6371 // Earth's radius in kilometers
+    const dLat = this.toRadians(coord2.latitude - coord1.latitude)
+    const dLon = this.toRadians(coord2.longitude - coord1.longitude)
 
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(this.toRadians(coord1.latitude)) *
-        Math.cos(this.toRadians(coord2.latitude)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(this.toRadians(coord2.latitude)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
 
-    return R * c;
+    return R * c
   }
 
   /**
    * Convert degrees to radians
    */
   private toRadians(degrees: number): number {
-    return degrees * (Math.PI / 180);
+    return degrees * (Math.PI / 180)
   }
 
   /**
@@ -801,19 +793,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
     maxDistance: number,
   ): SpatialCorrelationResult {
     try {
-      const geographicSpan = this.computeGeographicSpan(threats);
+      const geographicSpan = this.computeGeographicSpan(threats)
 
       // Validate threats are within max distance threshold
       if (geographicSpan > maxDistance) {
-        logger.warn("Geographic span exceeds max distance threshold", {
+        logger.warn('Geographic span exceeds max distance threshold', {
           geographicSpan,
           maxDistance,
-        });
+        })
       }
 
-      const patterns = this.detectSpatialPatterns(threats, geographicSpan);
-      const similarityScore = this.scoreSpatialSimilarity(threats, patterns);
-      const confidence = Math.min(similarityScore, 1.0);
+      const patterns = this.detectSpatialPatterns(threats, geographicSpan)
+      const similarityScore = this.scoreSpatialSimilarity(threats, patterns)
+      const confidence = Math.min(similarityScore, 1.0)
 
       return {
         confidence,
@@ -825,12 +817,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
           geographicSpan,
         ),
         geographic_span: geographicSpan,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to calculate spatial correlation", {
+      logger.error('Failed to calculate spatial correlation', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -840,19 +832,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private computeGeographicSpan(threats: ThreatData[]): number {
     const coordinates = threats
       .map((t) => t.location?.coordinates)
-      .filter((coord) => coord && coord.latitude && coord.longitude);
+      .filter((coord) => coord && coord.latitude && coord.longitude)
 
-    if (coordinates.length < 2) return 0;
+    if (coordinates.length < 2) return 0
 
-    let maxDistance = 0;
+    let maxDistance = 0
     for (let i = 0; i < coordinates.length; i++) {
       for (let j = i + 1; j < coordinates.length; j++) {
-        const distance = this.calculateDistance(coordinates[i], coordinates[j]);
-        maxDistance = Math.max(maxDistance, distance);
+        const distance = this.calculateDistance(coordinates[i], coordinates[j])
+        maxDistance = Math.max(maxDistance, distance)
       }
     }
 
-    return maxDistance;
+    return maxDistance
   }
 
   /**
@@ -862,47 +854,47 @@ export class ThreatCorrelationEngine extends EventEmitter {
     threats: ThreatData[],
     geographicSpan: number,
   ): ThreatPattern[] {
-    const patterns: ThreatPattern[] = [];
+    const patterns: ThreatPattern[] = []
 
     // Check for coordinated attacks (similar types in close proximity)
-    const typeGroups = this.groupBy(threats, "type");
+    const typeGroups = this.groupBy(threats, 'type')
     for (const [type, typeThreats] of Object.entries(typeGroups)) {
       if (typeThreats.length > 1) {
         patterns.push({
           pattern_id: `spatial_type_${type}`,
-          pattern_type: "coordinated_attack",
+          pattern_type: 'coordinated_attack',
           description: `Multiple ${type} threats in geographic proximity`,
           confidence: 0.9,
           frequency: typeThreats.length,
           temporal_span: this.calculateTemporalSpan(typeThreats),
           spatial_span: geographicSpan,
           indicators: [type],
-        });
+        })
       }
     }
 
     // Check for indicator sharing across locations
     const allIndicators = threats.flatMap(
       (t) => t.indicators?.map((i) => i.value) || [],
-    );
-    const indicatorCounts = this.countOccurrences(allIndicators);
+    )
+    const indicatorCounts = this.countOccurrences(allIndicators)
 
     for (const [indicator, count] of Object.entries(indicatorCounts)) {
       if (count > 1) {
         patterns.push({
           pattern_id: `spatial_indicator_${indicator}`,
-          pattern_type: "indicator_propagation",
+          pattern_type: 'indicator_propagation',
           description: `Indicator ${indicator} spans multiple geographic locations`,
           confidence: 0.8,
           frequency: count,
           temporal_span: this.calculateTemporalSpan(threats),
           spatial_span: geographicSpan,
           indicators: [indicator],
-        });
+        })
       }
     }
 
-    return patterns;
+    return patterns
   }
 
   /**
@@ -912,21 +904,21 @@ export class ThreatCorrelationEngine extends EventEmitter {
     threats: ThreatData[],
     patterns: ThreatPattern[],
   ): number {
-    let score = 0;
+    let score = 0
 
     // Score based on coordinated attack patterns
     const coordinatedPatterns = patterns.filter(
-      (p) => p.pattern_type === "coordinated_attack",
-    );
-    score += coordinatedPatterns.length * 0.4;
+      (p) => p.pattern_type === 'coordinated_attack',
+    )
+    score += coordinatedPatterns.length * 0.4
 
     // Score based on indicator propagation
     const propagationPatterns = patterns.filter(
-      (p) => p.pattern_type === "indicator_propagation",
-    );
-    score += propagationPatterns.length * 0.3;
+      (p) => p.pattern_type === 'indicator_propagation',
+    )
+    score += propagationPatterns.length * 0.3
 
-    return Math.min(score, 1.0);
+    return Math.min(score, 1.0)
   }
 
   /**
@@ -938,7 +930,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     confidence: number,
     geographicSpan: number,
   ): CorrelationAnalysis {
-    const typeGroups = this.groupBy(threats, "type");
+    const typeGroups = this.groupBy(threats, 'type')
 
     return {
       similarity_score: similarityScore,
@@ -952,7 +944,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
         geographicSpan,
       ),
       machine_learning_insights: [],
-    };
+    }
   }
 
   /**
@@ -961,19 +953,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private async analyzeBehavioralCorrelations(
     threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
-    const correlations: ThreatCorrelation[] = [];
+    const correlations: ThreatCorrelation[] = []
 
     try {
       // Group threats by behavioral patterns
-      const behavioralGroups = this.groupThreatsByBehavior(threats);
+      const behavioralGroups = this.groupThreatsByBehavior(threats)
 
       for (const group of behavioralGroups) {
-        if (group.threats.length < 2) continue;
+        if (group.threats.length < 2) continue
 
         const correlation = this.calculateBehavioralCorrelation(
           group.threats,
           group.pattern,
-        );
+        )
 
         if (
           correlation.confidence >=
@@ -982,7 +974,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           correlations.push({
             id: uuidv4(),
             timestamp: new Date(),
-            correlation_type: "behavioral",
+            correlation_type: 'behavioral',
             confidence: correlation.confidence,
             threats: group.threats.map((t) => this.mapToCorrelatedThreat(t)),
             patterns: correlation.patterns,
@@ -994,16 +986,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
               threat_count: group.threats.length,
               similarity_metrics: correlation.similarity_metrics,
             },
-          });
+          })
         }
       }
 
-      return correlations;
+      return correlations
     } catch (error) {
-      logger.error("Failed to analyze behavioral correlations", {
+      logger.error('Failed to analyze behavioral correlations', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1011,168 +1003,162 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Group threats by behavioral patterns
    */
   private groupThreatsByBehavior(threats: ThreatData[]): BehavioralGroup[] {
-    const groups: BehavioralGroup[] = [];
+    const groups: BehavioralGroup[] = []
 
     // Define behavioral patterns to look for
     const behavioralPatterns = [
-      "similar_tactics",
-      "similar_tools",
-      "similar_timing",
-      "similar_targets",
-      "escalation_pattern",
-    ];
+      'similar_tactics',
+      'similar_tools',
+      'similar_timing',
+      'similar_targets',
+      'escalation_pattern',
+    ]
 
     for (const pattern of behavioralPatterns) {
-      const grouped = this.groupThreatsByPattern(threats, pattern);
-      groups.push(...grouped);
+      const grouped = this.groupThreatsByPattern(threats, pattern)
+      groups.push(...grouped)
     }
 
-    return groups;
+    return groups
   }
 
   /**
    * Group threats by specific pattern
    */
-  private groupThreatsByPattern(
-    threats: ThreatData[],
-    pattern: string,
-  ): BehavioralGroup[] {
-    const groups: BehavioralGroup[] = [];
+  private groupThreatsByPattern(threats: ThreatData[], pattern: string): BehavioralGroup[] {
+    const groups: BehavioralGroup[] = []
 
     switch (pattern) {
-      case "similar_tactics": {
+      case 'similar_tactics': {
         // Group by similar attack tactics
-        const tacticGroups = this.groupBy(threats, "tactics");
+        const tacticGroups = this.groupBy(threats, 'tactics')
         for (const [tactic, tacticThreats] of Object.entries(tacticGroups)) {
           if (tacticThreats.length > 1) {
             groups.push({
               threats: tacticThreats,
               pattern: `similar_tactics_${tactic}`,
-            });
+            })
           }
         }
-        break;
+        break
       }
 
-      case "similar_tools": {
+      case 'similar_tools': {
         // Group by similar tools/techniques
-        const toolGroups = this.groupBy(threats, "tools");
+        const toolGroups = this.groupBy(threats, 'tools')
         for (const [tool, toolThreats] of Object.entries(toolGroups)) {
           if (toolThreats.length > 1) {
             groups.push({
               threats: toolThreats,
               pattern: `similar_tools_${tool}`,
-            });
+            })
           }
         }
-        break;
+        break
       }
 
-      case "escalation_pattern": {
+      case 'escalation_pattern': {
         // Group by escalation patterns (increasing severity)
-        const escalationGroups = this.identifyEscalationPatterns(threats);
-        groups.push(...escalationGroups);
-        break;
+        const escalationGroups = this.identifyEscalationPatterns(threats)
+        groups.push(...escalationGroups)
+        break
       }
     }
 
-    return groups;
+    return groups
   }
 
   /**
    * Identify escalation patterns
    */
   private identifyEscalationPatterns(threats: ThreatData[]): BehavioralGroup[] {
-    const groups: BehavioralGroup[] = [];
+    const groups: BehavioralGroup[] = []
     const sortedThreats = [...threats].sort(
       (a, b) =>
         new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
-    );
+    )
 
     // Look for sequences of increasing severity
-    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 };
+    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
 
     for (let i = 0; i < sortedThreats.length - 1; i++) {
-      const sequence = [sortedThreats[i]];
+      const sequence = [sortedThreats[i]]
       let currentSeverity =
         severityOrder[
-          sortedThreats[i].severity as keyof typeof severityOrder
-        ] || 0;
+        sortedThreats[i].severity as keyof typeof severityOrder
+        ] || 0
 
       for (let j = i + 1; j < sortedThreats.length; j++) {
         const nextSeverity =
           severityOrder[
-            sortedThreats[j].severity as keyof typeof severityOrder
-          ] || 0;
+          sortedThreats[j].severity as keyof typeof severityOrder
+          ] || 0
 
         if (nextSeverity > currentSeverity) {
-          sequence.push(sortedThreats[j] as ThreatData);
-          currentSeverity = nextSeverity;
+          sequence.push(sortedThreats[j] as ThreatData)
+          currentSeverity = nextSeverity
         } else {
-          break;
+          break
         }
       }
 
       if (sequence.length >= 3) {
         groups.push({
           threats: sequence,
-          pattern: "escalation_pattern",
-        });
+          pattern: 'escalation_pattern',
+        })
       }
     }
 
-    return groups;
+    return groups
   }
 
   /**
    * Calculate behavioral correlation
    */
-  private calculateBehavioralCorrelation(
-    threats: ThreatData[],
-    pattern: string,
-  ): BehavioralCorrelationResult {
+  private calculateBehavioralCorrelation(threats: ThreatData[], pattern: string): BehavioralCorrelationResult {
     try {
-      let similarityScore = 0;
-      let patterns: ThreatPattern[] = [];
-      let similarityMetrics: Record<string, number> = {};
+      let similarityScore = 0
+      let patterns: ThreatPattern[] = []
+      let similarityMetrics: Record<string, number> = {}
 
       // Calculate similarity based on behavioral attributes
       switch (pattern) {
-        case "similar_tactics":
-          similarityScore = 0.9; // High confidence for same tactics
+        case 'similar_tactics':
+          similarityScore = 0.9 // High confidence for same tactics
           patterns.push({
             pattern_id: `behavioral_tactics_${pattern}`,
-            pattern_type: "behavioral_similarity",
+            pattern_type: 'behavioral_similarity',
             description: `Threats exhibit similar tactical approaches`,
             confidence: 0.9,
             frequency: threats.length,
             temporal_span: this.calculateTemporalSpan(threats),
             spatial_span: this.calculateSpatialSpan(threats),
-            indicators: ["tactics"],
-          });
-          break;
+            indicators: ['tactics'],
+          })
+          break
 
-        case "escalation_pattern":
-          similarityScore = 0.95; // Very high confidence for escalation
+        case 'escalation_pattern':
+          similarityScore = 0.95 // Very high confidence for escalation
           patterns.push({
             pattern_id: `behavioral_escalation_${pattern}`,
-            pattern_type: "escalation_pattern",
+            pattern_type: 'escalation_pattern',
             description: `Threats show escalating severity pattern`,
             confidence: 0.95,
             frequency: threats.length,
             temporal_span: this.calculateTemporalSpan(threats),
             spatial_span: this.calculateSpatialSpan(threats),
-            indicators: ["severity_progression"],
-          });
+            indicators: ['severity_progression'],
+          })
           similarityMetrics = {
             severity_increase_rate: this.calculateSeverityIncreaseRate(threats),
             time_between_escalations:
               this.calculateAverageTimeBetweenThreats(threats),
-          };
-          break;
+          }
+          break
       }
 
-      const confidence = Math.min(similarityScore, 1.0);
+      const confidence = Math.min(similarityScore, 1.0)
 
       return {
         confidence,
@@ -1189,12 +1175,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
           machine_learning_insights: [],
         },
         similarity_metrics: similarityMetrics,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to calculate behavioral correlation", {
+      logger.error('Failed to calculate behavioral correlation', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1204,19 +1190,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private async analyzeAttributionCorrelations(
     threats: ThreatData[],
   ): Promise<ThreatCorrelation[]> {
-    const correlations: ThreatCorrelation[] = [];
+    const correlations: ThreatCorrelation[] = []
 
     try {
       // Group threats by attribution attributes
-      const attributionGroups = this.groupThreatsByAttribution(threats);
+      const attributionGroups = this.groupThreatsByAttribution(threats)
 
       for (const group of attributionGroups) {
-        if (group.threats.length < 2) continue;
+        if (group.threats.length < 2) continue
 
         const correlation = this.calculateAttributionCorrelation(
           group.threats,
           group.attribution,
-        );
+        )
 
         if (
           correlation.confidence >=
@@ -1225,7 +1211,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           correlations.push({
             id: uuidv4(),
             timestamp: new Date(),
-            correlation_type: "attribution",
+            correlation_type: 'attribution',
             confidence: correlation.confidence,
             threats: group.threats.map((t) => this.mapToCorrelatedThreat(t)),
             patterns: correlation.patterns,
@@ -1237,16 +1223,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
               threat_count: group.threats.length,
               confidence_factors: correlation.confidence_factors,
             },
-          });
+          })
         }
       }
 
-      return correlations;
+      return correlations
     } catch (error) {
-      logger.error("Failed to analyze attribution correlations", {
+      logger.error('Failed to analyze attribution correlations', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1254,30 +1240,30 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Group threats by attribution
    */
   private groupThreatsByAttribution(threats: ThreatData[]): AttributionGroup[] {
-    const groups: AttributionGroup[] = [];
+    const groups: AttributionGroup[] = []
 
     // Group by attribution attributes
     const attributionFields = [
-      "actor",
-      "campaign",
-      "motivation",
-      "sophistication",
-      "region",
-    ];
+      'actor',
+      'campaign',
+      'motivation',
+      'sophistication',
+      'region',
+    ]
 
     for (const field of attributionFields) {
-      const fieldGroups = this.groupBy(threats, `attribution.${field}`);
+      const fieldGroups = this.groupBy(threats, `attribution.${field}`)
       for (const [value, valueThreats] of Object.entries(fieldGroups)) {
         if (value && valueThreats.length > 1) {
           groups.push({
             threats: valueThreats as ThreatData[],
             attribution: { [field]: value },
-          });
+          })
         }
       }
     }
 
-    return groups;
+    return groups
   }
 
   /**
@@ -1288,31 +1274,31 @@ export class ThreatCorrelationEngine extends EventEmitter {
     attribution: Record<string, string>,
   ): CorrelationResult {
     try {
-      let similarityScore = 0;
-      let patterns: ThreatPattern[] = [];
-      let confidenceFactors: Record<string, number> = {};
+      let similarityScore = 0
+      let patterns: ThreatPattern[] = []
+      let confidenceFactors: Record<string, number> = {}
 
       // Calculate confidence based on attribution strength
       for (const [key, value] of Object.entries(attribution)) {
         if (value) {
-          const factorScore = 0.8; // High confidence for attribution matches
-          similarityScore += factorScore;
-          confidenceFactors[key] = factorScore;
+          const factorScore = 0.8 // High confidence for attribution matches
+          similarityScore += factorScore
+          confidenceFactors[key] = factorScore
 
           patterns.push({
             pattern_id: `attribution_${key}_${value}`,
-            pattern_type: "attribution_match",
+            pattern_type: 'attribution_match',
             description: `Threats share common ${key}: ${value}`,
             confidence: factorScore,
             frequency: threats.length,
             temporal_span: this.calculateTemporalSpan(threats),
             spatial_span: this.calculateSpatialSpan(threats),
             indicators: [key],
-          });
+          })
         }
       }
 
-      const confidence = Math.min(similarityScore, 1.0);
+      const confidence = Math.min(similarityScore, 1.0)
 
       return {
         confidence,
@@ -1329,12 +1315,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
           machine_learning_insights: [],
         },
         confidence_factors: confidenceFactors,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to calculate attribution correlation", {
+      logger.error('Failed to calculate attribution correlation', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1344,52 +1330,52 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private groupBy<T>(array: T[], key: string): Record<string, T[]> {
     return array.reduce(
       (groups, item) => {
-        const value = this.getNestedValue(item, key) || "unknown";
-        groups[value] = groups[value] || [];
-        groups[value].push(item);
-        return groups;
+        const value = this.getNestedValue(item, key) || 'unknown'
+        groups[value] = groups[value] || []
+        groups[value].push(item)
+        return groups
       },
       {} as Record<string, T[]>,
-    );
+    )
   }
 
   private getNestedValue(obj: unknown, path: string): unknown {
-    return path.split(".").reduce((current, key) => current?.[key], obj);
+    return path.split('.').reduce((current, key) => current?.[key], obj)
   }
 
   private countOccurrences(array: string[]): Record<string, number> {
     return array.reduce(
       (counts, item) => {
-        counts[item] = (counts[item] || 0) + 1;
-        return counts;
+        counts[item] = (counts[item] || 0) + 1
+        return counts
       },
       {} as Record<string, number>,
-    );
+    )
   }
 
   private calculateTemporalSpan(threats: ThreatData[]): number {
-    const timestamps = threats.map((t) => new Date(t.timestamp).getTime());
-    const minTime = Math.min(...timestamps);
-    const maxTime = Math.max(...timestamps);
-    return (maxTime - minTime) / 1000; // seconds
+    const timestamps = threats.map((t) => new Date(t.timestamp).getTime())
+    const minTime = Math.min(...timestamps)
+    const maxTime = Math.max(...timestamps)
+    return (maxTime - minTime) / 1000 // seconds
   }
 
   private calculateSpatialSpan(threats: ThreatData[]): number {
     const coordinates = threats
       .map((t) => t.location?.coordinates)
-      .filter((coord) => coord && coord.latitude && coord.longitude);
+      .filter((coord) => coord && coord.latitude && coord.longitude)
 
-    if (coordinates.length < 2) return 0;
+    if (coordinates.length < 2) return 0
 
-    let maxDistance = 0;
+    let maxDistance = 0
     for (let i = 0; i < coordinates.length; i++) {
       for (let j = i + 1; j < coordinates.length; j++) {
-        const distance = this.calculateDistance(coordinates[i], coordinates[j]);
-        maxDistance = Math.max(maxDistance, distance);
+        const distance = this.calculateDistance(coordinates[i], coordinates[j])
+        maxDistance = Math.max(maxDistance, distance)
       }
     }
 
-    return maxDistance;
+    return maxDistance
   }
 
   private calculateStatisticalSignificance(
@@ -1398,40 +1384,40 @@ export class ThreatCorrelationEngine extends EventEmitter {
   ): number {
     // Simplified statistical significance calculation
     // In a real implementation, this would use proper statistical methods
-    const baseSignificance = Math.min(threatCount / 10, 1.0);
-    const spanFactor = span > 0 ? Math.min(1 / span, 1.0) : 1.0;
-    return Math.min(baseSignificance * (1 + spanFactor), 1.0);
+    const baseSignificance = Math.min(threatCount / 10, 1.0)
+    const spanFactor = span > 0 ? Math.min(1 / span, 1.0) : 1.0
+    return Math.min(baseSignificance * (1 + spanFactor), 1.0)
   }
 
   private calculateSeverityIncreaseRate(threats: ThreatData[]): number {
-    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 };
-    let totalIncrease = 0;
+    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
+    let totalIncrease = 0
 
     for (let i = 1; i < threats.length; i++) {
       const prevSeverity =
         severityOrder[threats[i - 1].severity as keyof typeof severityOrder] ||
-        0;
+        0
       const currSeverity =
-        severityOrder[threats[i].severity as keyof typeof severityOrder] || 0;
-      totalIncrease += Math.max(0, currSeverity - prevSeverity);
+        severityOrder[threats[i].severity as keyof typeof severityOrder] || 0
+      totalIncrease += Math.max(0, currSeverity - prevSeverity)
     }
 
-    return threats.length > 1 ? totalIncrease / (threats.length - 1) : 0;
+    return threats.length > 1 ? totalIncrease / (threats.length - 1) : 0
   }
 
   private calculateAverageTimeBetweenThreats(threats: ThreatData[]): number {
-    if (threats.length < 2) return 0;
+    if (threats.length < 2) return 0
 
     const timestamps = threats
       .map((t) => new Date(t.timestamp).getTime())
-      .sort();
-    let totalTime = 0;
+      .sort()
+    let totalTime = 0
 
     for (let i = 1; i < timestamps.length; i++) {
-      totalTime += timestamps[i] - timestamps[i - 1];
+      totalTime += timestamps[i] - timestamps[i - 1]
     }
 
-    return totalTime / (timestamps.length - 1) / 1000; // seconds
+    return totalTime / (timestamps.length - 1) / 1000 // seconds
   }
 
   private mapToCorrelatedThreat(threat: ThreatData): CorrelatedThreat {
@@ -1443,7 +1429,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       confidence: threat.confidence,
       indicators: threat.indicators || [],
       timestamp: new Date(threat.timestamp),
-    };
+    }
   }
 
   /**
@@ -1452,7 +1438,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private generateTemporalRecommendations(
     correlation: TemporalCorrelationResult,
   ): string[] {
-    const recommendations: string[] = [];
+    const recommendations: string[] = []
     const metrics: CorrelationMetrics = {
       confidence: correlation.confidence,
       similarity_score: correlation.analysis.similarity_score,
@@ -1460,35 +1446,35 @@ export class ThreatCorrelationEngine extends EventEmitter {
       threat_count: correlation.patterns.length,
       patterns: correlation.patterns,
       span_value: correlation.time_span,
-    };
+    }
 
     recommendations.push(
       `Monitor for similar threats within ${Math.round(metrics.span_value || 0)}s time windows (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
-    );
+    )
 
     if (metrics.confidence > 0.8) {
       recommendations.push(
-        "HIGH PRIORITY: Review security logs for coordinated attack patterns",
-      );
+        'HIGH PRIORITY: Review security logs for coordinated attack patterns',
+      )
     }
 
     if (metrics.threat_count > 3) {
       recommendations.push(
         `Implement temporal-based blocking rules for ${metrics.threat_count} detected patterns`,
-      );
+      )
     }
 
     recommendations.push(
-      "Investigate potential coordinated attack campaigns across time periods",
-    );
+      'Investigate potential coordinated attack campaigns across time periods',
+    )
 
-    return recommendations;
+    return recommendations
   }
 
   private generateSpatialRecommendations(
     correlation: SpatialCorrelationResult,
   ): string[] {
-    const recommendations: string[] = [];
+    const recommendations: string[] = []
     const metrics: CorrelationMetrics = {
       confidence: correlation.confidence,
       similarity_score: correlation.analysis.similarity_score,
@@ -1496,113 +1482,113 @@ export class ThreatCorrelationEngine extends EventEmitter {
       threat_count: correlation.patterns.length,
       patterns: correlation.patterns,
       span_value: correlation.geographic_span,
-    };
+    }
 
     recommendations.push(
       `Implement geographic-based access controls for ${Math.round(metrics.span_value || 0)}km radius (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
-    );
+    )
 
     if (metrics.confidence > 0.8) {
       recommendations.push(
-        "HIGH PRIORITY: Coordinate with regional security teams immediately",
-      );
+        'HIGH PRIORITY: Coordinate with regional security teams immediately',
+      )
     }
 
     const regions = new Set(
       correlation.patterns.flatMap((p) => p.indicators || []),
-    );
+    )
     if (regions.size > 1) {
       recommendations.push(
         `Monitor network traffic from ${regions.size} affected regions`,
-      );
+      )
     }
 
     recommendations.push(
-      "Consider location-based threat intelligence sharing with partners",
-    );
+      'Consider location-based threat intelligence sharing with partners',
+    )
 
-    return recommendations;
+    return recommendations
   }
 
   private generateBehavioralRecommendations(
     correlation: BehavioralCorrelationResult,
   ): string[] {
-    const recommendations: string[] = [];
+    const recommendations: string[] = []
     const metrics: CorrelationMetrics = {
       confidence: correlation.confidence,
       similarity_score: correlation.analysis.similarity_score,
       relationship_strength: correlation.analysis.relationship_strength,
       threat_count: correlation.patterns.length,
       patterns: correlation.patterns,
-    };
+    }
 
     const behaviorTypes = new Set(
       correlation.patterns.map((p) => p.pattern_type),
-    );
+    )
 
     recommendations.push(
       `Update behavioral detection rules for ${behaviorTypes.size} pattern types (confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
-    );
+    )
 
     if (metrics.similarity_score > 0.9) {
       recommendations.push(
-        "HIGH PRIORITY: Implement immediate user behavior analytics",
-      );
+        'HIGH PRIORITY: Implement immediate user behavior analytics',
+      )
     }
 
     if (correlation.similarity_metrics?.severity_increase_rate) {
       recommendations.push(
         `Monitor for escalation patterns (rate: ${correlation.similarity_metrics.severity_increase_rate.toFixed(2)})`,
-      );
+      )
     }
 
     recommendations.push(
       `Review and update security policies based on ${metrics.threat_count} detected patterns`,
-    );
+    )
 
-    return recommendations;
+    return recommendations
   }
 
   private generateAttributionRecommendations(
     correlation: AttributionCorrelationResult,
   ): string[] {
-    const recommendations: string[] = [];
+    const recommendations: string[] = []
     const metrics: CorrelationMetrics = {
       confidence: correlation.confidence,
       similarity_score: correlation.analysis.similarity_score,
       relationship_strength: correlation.analysis.relationship_strength,
       threat_count: correlation.patterns.length,
       patterns: correlation.patterns,
-    };
+    }
 
     const attributionFactors = Object.keys(
       correlation.confidence_factors || {},
-    ).length;
+    ).length
 
     recommendations.push(
       `Investigate attributed threat actor activities (${attributionFactors} attribution factors, confidence: ${(metrics.confidence * 100).toFixed(1)}%)`,
-    );
+    )
 
     if (metrics.confidence > 0.85) {
       recommendations.push(
-        "HIGH PRIORITY: Share attribution intelligence with security partners",
-      );
+        'HIGH PRIORITY: Share attribution intelligence with security partners',
+      )
     }
 
     const actors = new Set(
       correlation.patterns.flatMap((p) => p.indicators || []),
-    );
+    )
     if (actors.size > 0) {
       recommendations.push(
         `Implement actor-specific countermeasures for ${actors.size} identified actors`,
-      );
+      )
     }
 
     recommendations.push(
       `Monitor for related campaign indicators across ${metrics.threat_count} patterns`,
-    );
+    )
 
-    return recommendations;
+    return recommendations
   }
 
   /**
@@ -1615,35 +1601,35 @@ export class ThreatCorrelationEngine extends EventEmitter {
       await this.correlationsCollection.insertOne({
         ...correlation,
         created_at: new Date(),
-      });
+      })
 
       // Emit correlation event
-      this.emit("correlation:detected", correlation);
+      this.emit('correlation:detected', correlation)
 
       // Audit log
       await auditLog({
-        action: "threat_correlation",
+        action: 'threat_correlation',
         resource: `correlation:${correlation.id}`,
         details: {
           type: correlation.correlation_type,
           confidence: correlation.confidence,
           threat_count: correlation.threats.length,
         },
-        userId: "system",
-        ip: "internal",
-      });
+        userId: 'system',
+        ip: 'internal',
+      })
 
-      logger.info("Correlation stored successfully", {
+      logger.info('Correlation stored successfully', {
         correlationId: correlation.id,
         type: correlation.correlation_type,
         confidence: correlation.confidence,
-      });
+      })
     } catch (error) {
-      logger.error("Failed to store correlation", {
+      logger.error('Failed to store correlation', {
         error: error.message,
         correlationId: correlation.id,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1659,13 +1645,13 @@ export class ThreatCorrelationEngine extends EventEmitter {
         .find({ correlation_type: type })
         .sort({ timestamp: -1 })
         .limit(limit)
-        .toArray();
+        .toArray()
     } catch (error) {
-      logger.error("Failed to get correlations by type", {
+      logger.error('Failed to get correlations by type', {
         error: error.message,
         type,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1677,15 +1663,15 @@ export class ThreatCorrelationEngine extends EventEmitter {
   ): Promise<ThreatCorrelation[]> {
     try {
       return await this.correlationsCollection
-        .find({ "threats.threat_id": threatId })
+        .find({ 'threats.threat_id': threatId })
         .sort({ timestamp: -1 })
-        .toArray();
+        .toArray()
     } catch (error) {
-      logger.error("Failed to get correlations by threat ID", {
+      logger.error('Failed to get correlations by threat ID', {
         error: error.message,
         threatId,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1693,45 +1679,45 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Search correlations
    */
   async searchCorrelations(query: {
-    types?: string[];
-    minConfidence?: number;
-    startDate?: Date;
-    endDate?: Date;
-    regions?: string[];
-    limit?: number;
+    types?: string[]
+    minConfidence?: number
+    startDate?: Date
+    endDate?: Date
+    regions?: string[]
+    limit?: number
   }): Promise<ThreatCorrelation[]> {
     try {
-      const filter: Record<string, unknown> = {};
+      const filter: Record<string, unknown> = {}
 
       if (query.types && query.types.length > 0) {
-        filter.correlation_type = { $in: query.types };
+        filter.correlation_type = { $in: query.types }
       }
 
       if (query.minConfidence) {
-        filter.confidence = { $gte: query.minConfidence };
+        filter.confidence = { $gte: query.minConfidence }
       }
 
       if (query.startDate || query.endDate) {
-        filter.timestamp = {};
-        if (query.startDate) filter.timestamp.$gte = query.startDate;
-        if (query.endDate) filter.timestamp.$lte = query.endDate;
+        filter.timestamp = {}
+        if (query.startDate) filter.timestamp.$gte = query.startDate
+        if (query.endDate) filter.timestamp.$lte = query.endDate
       }
 
       if (query.regions && query.regions.length > 0) {
-        filter["threats.region"] = { $in: query.regions };
+        filter['threats.region'] = { $in: query.regions }
       }
 
       return await this.correlationsCollection
         .find(filter)
         .sort({ timestamp: -1 })
         .limit(query.limit || 100)
-        .toArray();
+        .toArray()
     } catch (error) {
-      logger.error("Failed to search correlations", {
+      logger.error('Failed to search correlations', {
         error: error.message,
         query,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1749,16 +1735,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
         this.correlationsCollection.countDocuments(),
         this.correlationsCollection
           .aggregate([
-            { $group: { _id: "$correlation_type", count: { $sum: 1 } } },
+            { $group: { _id: '$correlation_type', count: { $sum: 1 } } },
           ])
           .toArray(),
         this.correlationsCollection
           .aggregate([
             {
               $bucket: {
-                groupBy: "$confidence",
+                groupBy: '$confidence',
                 boundaries: [0, 0.3, 0.6, 0.8, 1.0],
-                default: "other",
+                default: 'other',
                 output: { count: { $sum: 1 } },
               },
             },
@@ -1769,25 +1755,25 @@ export class ThreatCorrelationEngine extends EventEmitter {
             timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
           })
           .count(),
-      ]);
+      ])
 
       return {
         total_correlations: totalCorrelations,
         type_distribution: typeDistribution.reduce(
           (acc, item) => {
-            acc[item._id] = item.count;
-            return acc;
+            acc[item._id] = item.count
+            return acc
           },
           {} as Record<string, number>,
         ),
         confidence_distribution: confidenceDistribution,
         recent_correlations_24h: recentCorrelations,
-      };
+      }
     } catch (error) {
-      logger.error("Failed to get correlation statistics", {
+      logger.error('Failed to get correlation statistics', {
         error: error.message,
-      });
-      throw error;
+      })
+      throw error
     }
   }
 
@@ -1796,22 +1782,22 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   async shutdown(): Promise<void> {
     try {
-      logger.info("Shutting down Threat Correlation Engine");
+      logger.info('Shutting down Threat Correlation Engine')
 
       if (this.processingInterval) {
-        clearInterval(this.processingInterval);
+        clearInterval(this.processingInterval)
       }
 
-      await this.redis.quit();
-      await this.mongoClient.close();
+      await this.redis.quit()
+      await this.mongoClient.close()
 
-      this.isInitialized = false;
-      this.emit("shutdown", { timestamp: new Date() });
+      this.isInitialized = false
+      this.emit('shutdown', { timestamp: new Date() })
 
-      logger.info("Threat Correlation Engine shutdown completed");
+      logger.info('Threat Correlation Engine shutdown completed')
     } catch (error) {
-      logger.error("Error during shutdown", { error: error.message });
-      throw error;
+      logger.error('Error during shutdown', { error: error.message })
+      throw error
     }
   }
 
@@ -1819,8 +1805,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Get initialization status
    */
   get isReady(): boolean {
-    return this.isInitialized;
+    return this.isInitialized
   }
 }
 
-export default ThreatCorrelationEngine;
+export default ThreatCorrelationEngine

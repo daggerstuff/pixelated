@@ -1,14 +1,11 @@
-import { useEffect } from "react";
-import {
-  useRUMData,
-  getPerformanceIndicator,
-} from "../../lib/monitoring/hooks";
+import { useEffect } from 'react'
+import { useRUMData, getPerformanceIndicator } from '../../lib/monitoring/hooks'
 
 interface RUMWidgetProps {
-  compact?: boolean;
-  showTitle?: boolean;
-  refreshInterval?: number;
-  className?: string;
+  compact?: boolean
+  showTitle?: boolean
+  refreshInterval?: number
+  className?: string
 }
 
 /**
@@ -18,7 +15,7 @@ export default function RUMWidget({
   compact = false,
   showTitle = true,
   refreshInterval = 60000,
-  className = "",
+  className = '',
 }: RUMWidgetProps) {
   const {
     loadingPerformance,
@@ -27,25 +24,25 @@ export default function RUMWidget({
     isLoading,
     lastUpdated,
     refreshData,
-  } = useRUMData();
+  } = useRUMData()
 
   // Set up refresh interval
   useEffect(() => {
     const intervalId = setInterval(() => {
-      refreshData();
-    }, refreshInterval);
+      refreshData()
+    }, refreshInterval)
 
-    return () => clearInterval(intervalId);
-  }, [refreshData, refreshInterval]);
+    return () => clearInterval(intervalId)
+  }, [refreshData, refreshInterval])
 
   // Helper function to render a metric with color coding
-  const renderMetric = (name: string, value: number, unit: string = "ms") => {
-    const status = getPerformanceIndicator(name, value);
+  const renderMetric = (name: string, value: number, unit: string = 'ms') => {
+    const status = getPerformanceIndicator(name, value)
     const statusColors = {
-      good: "text-green-500",
-      "needs-improvement": "text-yellow-500",
-      poor: "text-red-500",
-    };
+      'good': 'text-green-500',
+      'needs-improvement': 'text-yellow-500',
+      'poor': 'text-red-500',
+    }
 
     return (
       <div className="flex justify-between items-center">
@@ -57,8 +54,8 @@ export default function RUMWidget({
           {unit}
         </span>
       </div>
-    );
-  };
+    )
+  }
 
   // Compact view shows just critical metrics
   if (compact) {
@@ -78,14 +75,14 @@ export default function RUMWidget({
             </div>
           ) : (
             <>
-              {renderMetric("LCP", loadingPerformance["lcp"] || 0)}
-              {renderMetric("CLS", visualStability["cls"] || 0, "")}
-              {renderMetric("FID", interactivityMetrics["fid"] || 0)}
+              {renderMetric('LCP', loadingPerformance['lcp'] || 0)}
+              {renderMetric('CLS', visualStability['cls'] || 0, '')}
+              {renderMetric('FID', interactivityMetrics['fid'] || 0)}
             </>
           )}
         </div>
       </div>
-    );
+    )
   }
 
   // Full view shows all metrics organized by category
@@ -110,9 +107,9 @@ export default function RUMWidget({
               Loading
             </div>
             <div className="space-y-1">
-              {renderMetric("TTFB", loadingPerformance["ttfb"] || 0)}
-              {renderMetric("FCP", loadingPerformance["fcp"] || 0)}
-              {renderMetric("LCP", loadingPerformance["lcp"] || 0)}
+              {renderMetric('TTFB', loadingPerformance['ttfb'] || 0)}
+              {renderMetric('FCP', loadingPerformance['fcp'] || 0)}
+              {renderMetric('LCP', loadingPerformance['lcp'] || 0)}
             </div>
           </div>
 
@@ -121,8 +118,8 @@ export default function RUMWidget({
               Interactivity
             </div>
             <div className="space-y-1">
-              {renderMetric("FID", interactivityMetrics["fid"] || 0)}
-              {renderMetric("TBT", interactivityMetrics["tbt"] || 0)}
+              {renderMetric('FID', interactivityMetrics['fid'] || 0)}
+              {renderMetric('TBT', interactivityMetrics['tbt'] || 0)}
             </div>
           </div>
 
@@ -131,7 +128,7 @@ export default function RUMWidget({
               Stability
             </div>
             <div className="space-y-1">
-              {renderMetric("CLS", visualStability["cls"] || 0, "")}
+              {renderMetric('CLS', visualStability['cls'] || 0, '')}
             </div>
           </div>
         </div>
@@ -153,5 +150,5 @@ export default function RUMWidget({
         </div>
       )}
     </div>
-  );
+  )
 }

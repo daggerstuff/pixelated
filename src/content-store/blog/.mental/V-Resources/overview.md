@@ -1,7 +1,7 @@
 ---
-title: "Resources Overview"
-description: "Comprehensive overview of resources for CPTSD and addiction recovery"
-author: "Resource Team"
+title: 'Resources Overview'
+description: 'Comprehensive overview of resources for CPTSD and addiction recovery'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

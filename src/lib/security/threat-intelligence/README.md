@@ -37,14 +37,12 @@ The Global Threat Intelligence Network is a modular, scalable threat intelligenc
 ## 🚀 Key Features
 
 ### Real-Time Threat Processing
-
 - Sub-second threat detection and correlation
 - 10,000+ threats per second processing capacity
 - Real-time propagation across all regions
 - Intelligent load balancing and failover
 
 ### AI/ML Integration
-
 - TensorFlow.js models for anomaly detection
 - Machine learning-based threat classification
 - Pattern recognition and clustering algorithms
@@ -52,7 +50,6 @@ The Global Threat Intelligence Network is a modular, scalable threat intelligenc
 - Continuous model learning and updates
 
 ### Enterprise Security
-
 - HIPAA compliance for healthcare data
 - AES-256-GCM encryption for data at rest and in transit
 - JWT-based authentication with RBAC
@@ -60,7 +57,6 @@ The Global Threat Intelligence Network is a modular, scalable threat intelligenc
 - Rate limiting and DDoS protection
 
 ### Standards Compliance
-
 - **STIX 2.1** - Structured Threat Information Expression
 - **TAXII 2.1** - Trusted Automated Exchange of Intelligence Information
 - **MISP** - Malware Information Sharing Platform
@@ -104,7 +100,7 @@ SENTRY_DSN=https://...
 Each component can be configured independently through the centralized configuration system:
 
 ```typescript
-import { threatIntelligenceConfig } from "./config";
+import { threatIntelligenceConfig } from './config';
 
 const config = {
   database: threatIntelligenceConfig.database,
@@ -123,15 +119,15 @@ const config = {
 ### 1. Initialize the Network
 
 ```typescript
-import ThreatIntelligenceNetwork from "./src/lib/security/threat-intelligence";
+import ThreatIntelligenceNetwork from './src/lib/security/threat-intelligence';
 
 const threatIntelNetwork = new ThreatIntelligenceNetwork({
   // Optional: override default configuration
   global: {
     regions: {
-      us_east_1: { endpoint: "https://your-api.com/us-east" },
-    },
-  },
+      us_east_1: { endpoint: 'https://your-api.com/us-east' }
+    }
+  }
 });
 
 await threatIntelNetwork.initialize();
@@ -141,39 +137,38 @@ await threatIntelNetwork.initialize();
 
 ```typescript
 const result = await threatIntelNetwork.processThreat({
-  id: "threat-123",
-  type: "ip",
-  value: "192.168.1.100",
-  severity: "high",
+  id: 'threat-123',
+  type: 'ip',
+  value: '192.168.1.100',
+  severity: 'high',
   confidence: 0.9,
-  source: "user_report",
-  metadata: { reporter: "security_team" },
+  source: 'user_report',
+  metadata: { reporter: 'security_team' }
 });
 
-console.log("Threat processing result:", result);
+console.log('Threat processing result:', result);
 ```
 
 ### 3. Get System Metrics
 
 ```typescript
 const metrics = threatIntelNetwork.getMetrics();
-console.log("System health:", metrics.systemHealth);
-console.log("Detection accuracy:", metrics.detectionAccuracy);
+console.log('System health:', metrics.systemHealth);
+console.log('Detection accuracy:', metrics.detectionAccuracy);
 ```
 
 ### 4. Access Individual Components
 
 ```typescript
 // Get the threat hunting system
-const huntingSystem =
-  threatIntelNetwork.getComponent<ThreatHuntingSystem>("hunting");
+const huntingSystem = threatIntelNetwork.getComponent<ThreatHuntingSystem>('hunting');
 
 // Create a new hunt
 const huntId = await huntingSystem.createHunt({
-  name: "Suspicious Network Activity",
-  description: "Hunt for unusual network patterns",
-  hunt_type: "network",
-  priority: "high",
+  name: 'Suspicious Network Activity',
+  description: 'Hunt for unusual network patterns',
+  hunt_type: 'network',
+  priority: 'high'
 });
 
 // Execute the hunt
@@ -183,7 +178,6 @@ const results = await huntingSystem.executeHunt(huntId);
 ## 📈 Monitoring & Observability
 
 ### Built-in Metrics
-
 - Threat processing volume and velocity
 - Detection accuracy and false positive rates
 - System health and component status
@@ -191,14 +185,12 @@ const results = await huntingSystem.executeHunt(huntId);
 - Geographic threat distribution
 
 ### Integration Points
-
 - **Sentry** for error tracking and performance monitoring
 - **Prometheus** metrics export
 - **Grafana** dashboards
 - **Custom webhooks** for external systems
 
 ### Alerting
-
 - Real-time threat alerts
 - System health notifications
 - Performance degradation warnings
@@ -207,21 +199,18 @@ const results = await huntingSystem.executeHunt(huntId);
 ## 🔒 Security Features
 
 ### Data Protection
-
 - End-to-end encryption using AES-256-GCM
 - Secure key management with rotation
 - Data anonymization and pseudonymization
 - GDPR and HIPAA compliance
 
 ### Access Control
-
 - Role-based access control (RBAC)
 - Multi-factor authentication support
 - API key management
 - Audit trail for all operations
 
 ### Threat Protection
-
 - Rate limiting and DDoS protection
 - Input validation and sanitization
 - SQL injection prevention
@@ -230,25 +219,21 @@ const results = await huntingSystem.executeHunt(huntId);
 ## 🧪 Testing
 
 ### Unit Tests
-
 ```bash
 pnpm test:unit
 ```
 
 ### Integration Tests
-
 ```bash
 pnpm test:integration
 ```
 
 ### Security Tests
-
 ```bash
 pnpm test:security
 ```
 
 ### Performance Tests
-
 ```bash
 pnpm test:performance
 ```
@@ -256,7 +241,6 @@ pnpm test:performance
 ## 🚢 Deployment
 
 ### Docker Deployment
-
 ```bash
 # Build and start all services
 pnpm docker:up
@@ -269,7 +253,6 @@ docker-compose up --scale edge-detection=5
 ```
 
 ### Kubernetes Deployment
-
 ```bash
 # Apply Kubernetes manifests
 kubectl apply -f k8s/
@@ -289,7 +272,6 @@ kubectl get pods -n threat-intel
 - `GET /api/health` - System health check
 
 ### WebSocket Events
-
 - `threat:detected` - Real-time threat detection
 - `threat:correlated` - Threat correlation results
 - `system:alert` - System alerts and notifications
@@ -297,34 +279,31 @@ kubectl get pods -n threat-intel
 ## 🤝 Integration Examples
 
 ### Integration with SIEM
-
 ```typescript
 const siemIntegration = {
-  api_endpoint: "https://your-siem.com/api",
-  authentication: "api_key",
+  api_endpoint: 'https://your-siem.com/api',
+  authentication: 'api_key',
   event_mapping: {
-    threat_detected: "security.alert",
-    threat_correlated: "security.correlation",
-    response_triggered: "security.response",
-  },
+    threat_detected: 'security.alert',
+    threat_correlated: 'security.correlation',
+    response_triggered: 'security.response'
+  }
 };
 ```
 
 ### Integration with Firewall
-
 ```typescript
 const firewallIntegration = {
-  api_endpoint: "https://your-firewall.com/api",
-  block_action: "automatic",
-  whitelist_domains: ["pixelatedempathy.com"],
-  response_timeout: 30000,
+  api_endpoint: 'https://your-firewall.com/api',
+  block_action: 'automatic',
+  whitelist_domains: ['pixelatedempathy.com'],
+  response_timeout: 30000
 };
 ```
 
 ## 📋 Compliance & Standards
 
 ### Supported Standards
-
 - **STIX 2.1** - Structured Threat Information Expression
 - **TAXII 2.1** - Trusted Automated Exchange of Intelligence Information
 - **MISP** - Malware Information Sharing Platform
@@ -332,7 +311,6 @@ const firewallIntegration = {
 - **HIPAA** - Health Insurance Portability and Accountability Act
 
 ### Compliance Features
-
 - Data retention policies
 - Audit logging and reporting
 - Access control and authentication
@@ -359,7 +337,6 @@ const firewallIntegration = {
    - Fine-tune validation criteria
 
 ### Debug Mode
-
 ```bash
 # Enable debug logging
 DEBUG=threat-intel:* pnpm dev
@@ -371,7 +348,6 @@ DEBUG=threat-intel:correlation pnpm dev
 ## 📞 Support
 
 For issues and questions:
-
 - Check the troubleshooting section
 - Review logs in `/logs` directory
 - Monitor system health via `/api/health`

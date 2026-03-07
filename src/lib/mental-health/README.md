@@ -14,11 +14,9 @@ A production-grade mental health analysis and therapeutic response system for ch
 ## Components
 
 ### MentalHealthAnalyzer
-
 Analyzes text for mental health indicators using keyword detection and pattern matching.
 
 **Detected Conditions:**
-
 - Depression
 - Anxiety
 - Stress
@@ -27,18 +25,14 @@ Analyzes text for mental health indicators using keyword detection and pattern m
 - Crisis situations
 
 ### TherapeuticResponseGenerator
-
 Generates therapeutic responses using evidence-based approaches:
-
 - **Crisis**: Immediate safety and resource connection
 - **Cognitive**: Thought challenging and restructuring
 - **Behavioral**: Activity scheduling and goal setting
 - **Supportive**: Active listening and validation
 
 ### MentalHealthService
-
 Main orchestration service that:
-
 - Processes chat messages
 - Maintains conversation history
 - Tracks analysis trends
@@ -48,29 +42,29 @@ Main orchestration service that:
 ## Usage
 
 ```typescript
-import { MentalHealthService } from "@/lib/mental-health";
+import { MentalHealthService } from '@/lib/mental-health'
 
 const service = new MentalHealthService({
   enableAnalysis: true,
   confidenceThreshold: 0.6,
   interventionThreshold: 0.7,
   analysisMinLength: 10,
-  enableCrisisDetection: true,
-});
+  enableCrisisDetection: true
+})
 
 // Process a message
-const result = await service.processMessage("conversation-id", {
-  id: "msg-1",
-  role: "user",
-  content: "I feel really depressed today",
-  timestamp: Date.now(),
-});
+const result = await service.processMessage('conversation-id', {
+  id: 'msg-1',
+  role: 'user',
+  content: 'I feel really depressed today',
+  timestamp: Date.now()
+})
 
 // Generate therapeutic response
-const response = await service.generateTherapeuticResponse("conversation-id");
+const response = await service.generateTherapeuticResponse('conversation-id')
 
 // Check if intervention is needed
-const needsHelp = service.needsIntervention("conversation-id");
+const needsHelp = service.needsIntervention('conversation-id')
 ```
 
 ## Configuration
@@ -91,7 +85,6 @@ const needsHelp = service.needsIntervention("conversation-id");
 ## Crisis Resources
 
 The system automatically provides crisis resources when critical situations are detected:
-
 - National Suicide Prevention Lifeline: 988
 - Crisis Text Line: Text HOME to 741741
 - Emergency services: 911
@@ -106,7 +99,6 @@ The system automatically provides crisis resources when critical situations are 
 ## Testing
 
 Run tests with:
-
 ```bash
 npm test src/lib/mental-health
 ```

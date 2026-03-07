@@ -1,4 +1,4 @@
-import { journalResearchApiClient } from "./client";
+import { journalResearchApiClient } from './client'
 import {
   Evaluation,
   EvaluationInitiatePayload,
@@ -8,11 +8,11 @@ import {
   EvaluationUpdatePayload,
   serializeEvaluationInitiatePayload,
   serializeEvaluationUpdatePayload,
-} from "./types";
+} from './types'
 
 export interface ListEvaluationsParams {
-  page?: number;
-  pageSize?: number;
+  page?: number
+  pageSize?: number
 }
 
 export async function initiateEvaluation(
@@ -22,18 +22,18 @@ export async function initiateEvaluation(
   return journalResearchApiClient.request<Evaluation>(
     `/sessions/${sessionId}/evaluation`,
     {
-      method: "POST",
+      method: 'POST',
       body: serializeEvaluationInitiatePayload(payload),
       validator: EvaluationSchema,
     },
-  );
+  )
 }
 
 export async function listEvaluations(
   sessionId: string,
   params: ListEvaluationsParams = {},
 ): Promise<EvaluationList> {
-  const { page, pageSize } = params;
+  const { page, pageSize } = params
   return journalResearchApiClient.request<EvaluationList>(
     `/sessions/${sessionId}/evaluation`,
     {
@@ -43,7 +43,7 @@ export async function listEvaluations(
       },
       validator: EvaluationListSchema,
     },
-  );
+  )
 }
 
 export async function getEvaluation(
@@ -55,7 +55,7 @@ export async function getEvaluation(
     {
       validator: EvaluationSchema,
     },
-  );
+  )
 }
 
 export async function updateEvaluation(
@@ -66,9 +66,9 @@ export async function updateEvaluation(
   return journalResearchApiClient.request<Evaluation>(
     `/sessions/${sessionId}/evaluation/${evaluationId}`,
     {
-      method: "PUT",
+      method: 'PUT',
       body: serializeEvaluationUpdatePayload(payload),
       validator: EvaluationSchema,
     },
-  );
+  )
 }

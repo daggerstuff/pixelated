@@ -1,12 +1,12 @@
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion'
 // Replace Next.js font with @fontsource/inter
-import "@fontsource/inter";
+import '@fontsource/inter'
 // Remove Next.js Image import
 
-import { Button } from "~/components/ui/button";
+import { Button } from '~/components/ui/button'
 
 // Replace Next.js font initialization with a CSS class
-const interFont = 'font-["Inter"]';
+const interFont = 'font-["Inter"]'
 
 function FloatingPaths({ position }: { position: number }) {
   const paths = Array.from({ length: 24 }, (_, i) => ({
@@ -20,7 +20,7 @@ function FloatingPaths({ position }: { position: number }) {
     } ${875 - i * 6} ${684 - i * 5 * position} ${875 - i * 6}`,
     opacity: 0.04 + i * 0.01,
     width: 0.3 + i * 0.02,
-  }));
+  }))
 
   return (
     <div className="absolute inset-0 pointer-events-none mix-blend-soft-light">
@@ -46,13 +46,13 @@ function FloatingPaths({ position }: { position: number }) {
             transition={{
               duration: 25 + Math.random() * 10,
               repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
+              ease: 'linear',
             }}
           />
         ))}
       </svg>
     </div>
-  );
+  )
 }
 
 export default function CubePaths() {
@@ -97,7 +97,7 @@ export default function CubePaths() {
             transition={{
               duration: 1.5,
               delay: 1.2,
-              ease: "easeOut",
+              ease: 'easeOut',
             }}
             className="mb-10 tracking-wider"
           >
@@ -137,5 +137,5 @@ export default function CubePaths() {
         </motion.div>
       </div>
     </div>
-  );
+  )
 }

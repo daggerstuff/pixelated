@@ -4,16 +4,16 @@
 
 export function createInterface() {
   return {
-    question: (_, cb) => cb(""),
+    question: (_, cb) => cb(''),
     close: () => {},
     on: () => {},
     once: () => {},
     removeListener: () => {},
     setPrompt: () => {},
     prompt: () => {},
-  };
+  }
 }
 
 export default {
   createInterface,
-};
+}

@@ -1,149 +1,149 @@
-import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Heart, Zap, Shield, User } from "lucide-react";
-import { Activity, Eye, Sparkles, TrendingUp } from "lucide-react";
+import React, { useState, useMemo } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Brain, Heart, Zap, Shield, User } from 'lucide-react'
+import { Activity, Eye, Sparkles, TrendingUp } from 'lucide-react'
 
 // Archetype definitions inspired by Mind-Mirror
 export interface ArchetypeResult {
-  main_archetype: string;
-  confidence: number;
-  secondary_archetype?: string;
-  color: string;
-  description: string;
+  main_archetype: string
+  confidence: number
+  secondary_archetype?: string
+  color: string
+  description: string
 }
 
 export interface MoodVector {
-  emotional_intensity: number;
-  cognitive_clarity: number;
-  energy_level: number;
-  social_connection: number;
-  coherence_index: number;
-  urgency_score: number;
+  emotional_intensity: number
+  cognitive_clarity: number
+  energy_level: number
+  social_connection: number
+  coherence_index: number
+  urgency_score: number
 }
 
 export interface MindMirrorAnalysis {
-  archetype: ArchetypeResult;
-  mood_vector: MoodVector;
-  timestamp: number;
-  session_id: string;
-  insights: string[];
-  recommendations: string[];
+  archetype: ArchetypeResult
+  mood_vector: MoodVector
+  timestamp: number
+  session_id: string
+  insights: string[]
+  recommendations: string[]
 }
 
 interface MindMirrorDashboardProps {
-  analysis?: MindMirrorAnalysis;
-  isAnalyzing?: boolean;
-  className?: string;
+  analysis?: MindMirrorAnalysis
+  isAnalyzing?: boolean
+  className?: string
 }
 
 const ARCHETYPES = {
   wounded_healer: {
-    name: "Wounded Healer",
-    icon: "🩹",
-    color: "#FF6B6B",
-    description: "Transforms pain into healing wisdom",
-    gradient: "from-red-400 to-pink-500",
+    name: 'Wounded Healer',
+    icon: '🩹',
+    color: '#FF6B6B',
+    description: 'Transforms pain into healing wisdom',
+    gradient: 'from-red-400 to-pink-500',
   },
   shadow_strategist: {
-    name: "Shadow Strategist",
-    icon: "🎯",
-    color: "#4ECDC4",
-    description: "Strategic thinker with deep analytical skills",
-    gradient: "from-teal-400 to-cyan-500",
+    name: 'Shadow Strategist',
+    icon: '🎯',
+    color: '#4ECDC4',
+    description: 'Strategic thinker with deep analytical skills',
+    gradient: 'from-teal-400 to-cyan-500',
   },
   visionary: {
-    name: "Visionary",
-    icon: "🔮",
-    color: "#45B7D1",
-    description: "Future-focused creative innovator",
-    gradient: "from-blue-400 to-indigo-500",
+    name: 'Visionary',
+    icon: '🔮',
+    color: '#45B7D1',
+    description: 'Future-focused creative innovator',
+    gradient: 'from-blue-400 to-indigo-500',
   },
   inner_child: {
-    name: "Inner Child",
-    icon: "👶",
-    color: "#96CEB4",
-    description: "Innocent wonder and emotional authenticity",
-    gradient: "from-green-400 to-emerald-500",
+    name: 'Inner Child',
+    icon: '👶',
+    color: '#96CEB4',
+    description: 'Innocent wonder and emotional authenticity',
+    gradient: 'from-green-400 to-emerald-500',
   },
   wise_elder: {
-    name: "Wise Elder",
-    icon: "🧙",
-    color: "#FECA57",
-    description: "Experience-based guidance and wisdom",
-    gradient: "from-yellow-400 to-orange-500",
+    name: 'Wise Elder',
+    icon: '🧙',
+    color: '#FECA57',
+    description: 'Experience-based guidance and wisdom',
+    gradient: 'from-yellow-400 to-orange-500',
   },
   rebel_spirit: {
-    name: "Rebel Spirit",
-    icon: "⚡",
-    color: "#FF9FF3",
-    description: "Change agent with revolutionary energy",
-    gradient: "from-purple-400 to-pink-500",
+    name: 'Rebel Spirit',
+    icon: '⚡',
+    color: '#FF9FF3',
+    description: 'Change agent with revolutionary energy',
+    gradient: 'from-purple-400 to-pink-500',
   },
   caregiver: {
-    name: "Caregiver",
-    icon: "💝",
-    color: "#54A0FF",
+    name: 'Caregiver',
+    icon: '💝',
+    color: '#54A0FF',
     description: "Nurturing protector focused on others' wellbeing",
-    gradient: "from-blue-400 to-purple-500",
+    gradient: 'from-blue-400 to-purple-500',
   },
-};
+}
 
 export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
   analysis,
   isAnalyzing = false,
-  className = "",
+  className = '',
 }) => {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState('overview')
 
   const archetypeInfo = useMemo(() => {
     if (!analysis?.archetype) {
-      return null;
+      return null
     }
     const archetypeKey = analysis.archetype.main_archetype
       .toLowerCase()
-      .replace(" ", "_");
-    return ARCHETYPES[archetypeKey as keyof typeof ARCHETYPES] || null;
-  }, [analysis?.archetype]);
+      .replace(' ', '_')
+    return ARCHETYPES[archetypeKey as keyof typeof ARCHETYPES] || null
+  }, [analysis?.archetype])
 
   const moodMetrics = useMemo(() => {
     if (!analysis?.mood_vector) {
-      return [];
+      return []
     }
 
-    const { mood_vector } = analysis;
+    const { mood_vector } = analysis
     return [
       {
-        label: "Emotional Intensity",
+        label: 'Emotional Intensity',
         value: mood_vector.emotional_intensity,
         icon: Heart,
-        color: "text-red-500",
-        bgColor: "bg-red-50",
+        color: 'text-red-500',
+        bgColor: 'bg-red-50',
       },
       {
-        label: "Cognitive Clarity",
+        label: 'Cognitive Clarity',
         value: mood_vector.cognitive_clarity,
         icon: Brain,
-        color: "text-blue-500",
-        bgColor: "bg-blue-50",
+        color: 'text-blue-500',
+        bgColor: 'bg-blue-50',
       },
       {
-        label: "Energy Level",
+        label: 'Energy Level',
         value: mood_vector.energy_level,
         icon: Zap,
-        color: "text-yellow-500",
-        bgColor: "bg-yellow-50",
+        color: 'text-yellow-500',
+        bgColor: 'bg-yellow-50',
       },
       {
-        label: "Social Connection",
+        label: 'Social Connection',
         value: mood_vector.social_connection,
         icon: User,
-        color: "text-green-500",
-        bgColor: "bg-green-50",
+        color: 'text-green-500',
+        bgColor: 'bg-green-50',
       },
-    ];
-  }, [analysis?.mood_vector]);
+    ]
+  }, [analysis?.mood_vector])
 
   if (isAnalyzing) {
     return (
@@ -159,7 +159,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   if (!analysis) {
@@ -177,7 +177,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
           </CardContent>
         </Card>
       </div>
-    );
+    )
   }
 
   return (
@@ -226,7 +226,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className={`h-2 rounded-full bg-gradient-to-r ${metric.color.replace("text-", "from-")} to-opacity-60`}
+                        className={`h-2 rounded-full bg-gradient-to-r ${metric.color.replace('text-', 'from-')} to-opacity-60`}
                         style={{ width: `${metric.value * 100}%` }}
                       />
                     </div>
@@ -263,8 +263,8 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
                 <Badge
                   variant={
                     analysis.mood_vector.coherence_index > 0.7
-                      ? "default"
-                      : "secondary"
+                      ? 'default'
+                      : 'secondary'
                   }
                 >
                   {Math.round(analysis.mood_vector.coherence_index * 100)}%
@@ -275,8 +275,8 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
                 <Badge
                   variant={
                     analysis.mood_vector.urgency_score > 0.7
-                      ? "destructive"
-                      : "outline"
+                      ? 'destructive'
+                      : 'outline'
                   }
                 >
                   {Math.round(analysis.mood_vector.urgency_score * 100)}%
@@ -343,7 +343,7 @@ export const MindMirrorDashboard: FC<MindMirrorDashboardProps> = ({
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
+  )
+}
 
-export default MindMirrorDashboard;
+export default MindMirrorDashboard

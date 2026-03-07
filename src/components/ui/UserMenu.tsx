@@ -1,26 +1,26 @@
-import React, { useState, useRef, useEffect } from "react";
-import { authClient } from "@/lib/auth-client";
-import { Avatar } from "./avatar";
+import React, { useState, useRef, useEffect } from 'react'
+import { authClient } from '@/lib/auth-client'
+import { Avatar } from './avatar'
 
 export interface UserMenuProps {
-  className?: string;
+  className?: string
 }
 
-export function UserMenu({ className = "" }: UserMenuProps) {
-  const { data: user, isPending } = authClient.useSession();
-  const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+export function UserMenu({ className = '' }: UserMenuProps) {
+  const { data: user, isPending } = authClient.useSession()
+  const [isOpen, setIsOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   if (isPending) {
     return (
@@ -29,7 +29,7 @@ export function UserMenu({ className = "" }: UserMenuProps) {
           Loading...
         </div>
       </div>
-    );
+    )
   }
 
   if (!user) {
@@ -42,7 +42,7 @@ export function UserMenu({ className = "" }: UserMenuProps) {
           Sign in
         </a>
       </div>
-    );
+    )
   }
 
   return (
@@ -55,7 +55,7 @@ export function UserMenu({ className = "" }: UserMenuProps) {
         <span className="sr-only">Open user menu</span>
         <Avatar
           src={user.user_metadata?.avatar_url}
-          initials={((user.email as string)?.[0] || "U").toUpperCase()}
+          initials={((user.email as string)?.[0] || 'U').toUpperCase()}
           size="sm"
           className="w-8 h-8"
         />
@@ -68,7 +68,7 @@ export function UserMenu({ className = "" }: UserMenuProps) {
               {user.user_metadata?.full_name || user.email}
             </span>
             <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-              {user.email?.toString() || ""}
+              {user.email?.toString() || ''}
             </span>
           </div>
           <ul className="py-2" role="none">
@@ -93,8 +93,8 @@ export function UserMenu({ className = "" }: UserMenuProps) {
             <li>
               <button
                 onClick={async () => {
-                  await authClient.signOut();
-                  window.location.href = "/";
+                  await authClient.signOut()
+                  window.location.href = '/'
                 }}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                 role="menuitem"
@@ -106,7 +106,7 @@ export function UserMenu({ className = "" }: UserMenuProps) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default UserMenu;
+export default UserMenu

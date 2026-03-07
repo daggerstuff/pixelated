@@ -1,56 +1,56 @@
-import { cleanup } from "@testing-library/react";
-import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { cleanup } from '@testing-library/react'
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 // import AIChat from '../AIChat.astro' // Astro components not supported in TypeScript tests
 
 // Define interface for component props
 interface AIChatProps {
-  availableModels?: Array<{ id: string; name: string }>;
-  showModelSelector?: boolean;
-  title?: string;
-  description?: string;
-  [key: string]: any;
+  availableModels?: Array<{ id: string; name: string }>
+  showModelSelector?: boolean
+  title?: string
+  description?: string
+  [key: string]: any
 }
 
 // Mock the AIChatReact component
-vi.mock("../AIChatReact", () => {
-  const mockFn = vi.fn();
+vi.mock('../AIChatReact', () => {
+  const mockFn = vi.fn()
   mockFn.mockImplementation((props: AIChatProps) => {
     // Return a mock implementation description rather than JSX
     // This avoids TypeScript errors while still mocking the component
     return {
-      type: "div",
+      type: 'div',
       props: {
-        "data-testid": "ai-chat-react",
-        "data-props": JSON.stringify(props),
-        children: [
+        'data-testid': 'ai-chat-react',
+        'data-props': JSON.stringify(props),
+        'children': [
           {
-            type: "div",
+            type: 'div',
             props: {
-              className: "chat-window",
+              className: 'chat-window',
               children: [
                 {
-                  type: "div",
+                  type: 'div',
                   props: {
-                    className: "chat-messages",
-                    children: "AI: How can I assist you today?",
+                    className: 'chat-messages',
+                    children: 'AI: How can I assist you today?',
                   },
                 },
                 {
-                  type: "div",
+                  type: 'div',
                   props: {
-                    className: "chat-input",
+                    className: 'chat-input',
                     children: [
                       {
-                        type: "input",
+                        type: 'input',
                         props: {
-                          type: "text",
-                          placeholder: "Type your message...",
+                          type: 'text',
+                          placeholder: 'Type your message...',
                         },
                       },
                       {
-                        type: "button",
+                        type: 'button',
                         props: {
-                          children: "Send",
+                          children: 'Send',
                         },
                       },
                     ],
@@ -61,39 +61,39 @@ vi.mock("../AIChatReact", () => {
           },
           props.showModelSelector
             ? {
-                type: "div",
-                props: {
-                  className: "model-selector",
-                  children: [
-                    {
-                      type: "label",
-                      props: {
-                        children: "Select AI Model",
-                      },
+              type: 'div',
+              props: {
+                className: 'model-selector',
+                children: [
+                  {
+                    type: 'label',
+                    props: {
+                      children: 'Select AI Model',
                     },
-                    {
-                      type: "select",
-                      props: {
-                        children: props.availableModels?.map((model) => ({
-                          type: "option",
-                          props: {
-                            key: model.id,
-                            value: model.id,
-                            children: model.name,
-                          },
-                        })),
-                      },
+                  },
+                  {
+                    type: 'select',
+                    props: {
+                      children: props.availableModels?.map((model) => ({
+                        type: 'option',
+                        props: {
+                          key: model.id,
+                          value: model.id,
+                          children: model.name,
+                        },
+                      })),
                     },
-                  ],
-                },
-              }
+                  },
+                ],
+              },
+            }
             : null,
         ].filter(Boolean),
       },
-    };
-  });
-  return { default: mockFn };
-});
+    }
+  })
+  return { default: mockFn }
+})
 
 // Helper function to render Astro components in tests
 // Note: Currently unused but kept for future test implementation
@@ -102,25 +102,25 @@ async function renderAstroComponent(
   Component: any,
   props = {},
 ): Promise<{ container: HTMLDivElement }> {
-  const { default: defaultExport } = Component;
-  const html = await defaultExport.render(props);
-  const container = document.createElement("div");
-  container.innerHTML = html.html;
-  document.body.appendChild(container);
-  return { container };
+  const { default: defaultExport } = Component
+  const html = await defaultExport.render(props)
+  const container = document.createElement('div')
+  container.innerHTML = html.html
+  document.body.appendChild(container)
+  return { container }
 }
 
-describe("AIChat.astro", () => {
+describe('AIChat.astro', () => {
   beforeEach(() => {
-    document.body.innerHTML = "";
-  });
+    document.body.innerHTML = ''
+  })
 
   afterEach(() => {
-    cleanup();
-    vi.clearAllMocks();
-  });
+    cleanup()
+    vi.clearAllMocks()
+  })
 
-  it.skip("renders with default props", async () => {
+  it.skip('renders with default props', async () => {
     // Skip this test as Astro components cannot be directly imported in TypeScript tests
     // const { container } = await renderAstroComponent(AIChat)
 
@@ -135,10 +135,10 @@ describe("AIChat.astro", () => {
 
     // // Check if client component placeholder exists
     // expect(container.innerHTML).toContain('ai-chat-react')
-    expect(true).toBe(true); // Placeholder test
-  });
+    expect(true).toBe(true) // Placeholder test
+  })
 
-  it.skip("renders with custom props", async () => {
+  it.skip('renders with custom props', async () => {
     // const { container } = await renderAstroComponent(AIChat, {
     //   availableModels: [
     //     { id: 'openai/gpt-4', name: 'GPT-4' },
@@ -163,10 +163,10 @@ describe("AIChat.astro", () => {
     // expect(htmlContent).toContain('showModelSelector={false}')
     // expect(htmlContent).toContain('openai/gpt-4')
     // expect(htmlContent).toContain('anthropic/claude-3')
-    expect(true).toBe(true); // Placeholder test
-  });
+    expect(true).toBe(true) // Placeholder test
+  })
 
-  it.skip("applies transition styles", async () => {
+  it.skip('applies transition styles', async () => {
     // const { container } = await renderAstroComponent(AIChat)
 
     // // Check if transition styles are applied
@@ -178,16 +178,16 @@ describe("AIChat.astro", () => {
     // const styleElement = container.querySelector('style')
     // expect(styleElement).toBeTruthy()
     // expect(styleElement?.textContent).toContain('--transition-duration: 300ms')
-    expect(true).toBe(true); // Placeholder test
-  });
+    expect(true).toBe(true) // Placeholder test
+  })
 
-  it.skip("has responsive layout classes", async () => {
+  it.skip('has responsive layout classes', async () => {
     // const { container } = await renderAstroComponent(AIChat)
 
     // const mainDiv = container.querySelector('div')
     // expect(mainDiv?.classList.contains('w-full')).toBe(true)
     // expect(mainDiv?.classList.contains('max-w-2xl')).toBe(true)
     // expect(mainDiv?.classList.contains('mx-auto')).toBe(true)
-    expect(true).toBe(true); // Placeholder test
-  });
-});
+    expect(true).toBe(true) // Placeholder test
+  })
+})

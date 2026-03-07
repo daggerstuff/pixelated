@@ -1,5 +1,5 @@
-import { useState, type FC } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, type FC } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardHeader,
@@ -7,112 +7,112 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select'
 import {
   BackupType,
   BackupStatus,
   RecoveryTestStatus,
-} from "../../../lib/security/backup/backup-types";
+} from '../../../lib/security/backup/backup-types'
 
 interface Backup {
-  id: string;
-  type: BackupType;
-  timestamp: string;
-  size: number;
-  location: string;
-  status: BackupStatus;
-  retentionDate: string;
+  id: string
+  type: BackupType
+  timestamp: string
+  size: number
+  location: string
+  status: BackupStatus
+  retentionDate: string
 }
 
 interface RecoveryTest {
-  id: string;
-  backupId: string;
-  testDate: string;
-  status: RecoveryTestStatus;
-  timeTaken: number;
-  environment: string;
+  id: string
+  backupId: string
+  testDate: string
+  status: RecoveryTestStatus
+  timeTaken: number
+  environment: string
 }
 
 interface BackupReportTabProps {
-  backups: Backup[];
-  recoveryTests: RecoveryTest[];
+  backups: Backup[]
+  recoveryTests: RecoveryTest[]
 }
 
 // Helper function to format file size
 const formatBytes = (bytes: number, decimals = 2) => {
   if (bytes === 0) {
-    return "0 Bytes";
+    return '0 Bytes'
   }
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
 
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-};
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
 
 const calculateSuccessRate = (successful: number, total: number) => {
   if (total === 0) {
-    return "0%";
+    return '0%'
   }
-  return `${Math.round((successful / total) * 100)}%`;
-};
+  return `${Math.round((successful / total) * 100)}%`
+}
 
 const BackupReportTab: FC<BackupReportTabProps> = ({
   backups,
   recoveryTests,
 }) => {
-  const [reportPeriod, setReportPeriod] = useState("last30days");
+  const [reportPeriod, setReportPeriod] = useState('last30days')
 
   // Calculate backup statistics
-  const totalBackups = backups.length;
+  const totalBackups = backups.length
   const successfulBackups = backups.filter(
     (b) =>
       b.status === BackupStatus.COMPLETED || b.status === BackupStatus.VERIFIED,
-  ).length;
+  ).length
   const failedBackups = backups.filter(
     (b) =>
       b.status === BackupStatus.FAILED ||
       b.status === BackupStatus.VERIFICATION_FAILED,
-  ).length;
+  ).length
 
   // Calculate recovery test statistics
-  const totalTests = recoveryTests.length;
+  const totalTests = recoveryTests.length
   const successfulTests = recoveryTests.filter(
     (t) => t.status === RecoveryTestStatus.PASSED,
-  ).length;
+  ).length
   const failedTests = recoveryTests.filter(
     (t) => t.status === RecoveryTestStatus.FAILED,
-  ).length;
+  ).length
 
   // Calculate backup storage statistics
   const totalStorageUsed = backups.reduce(
     (total, backup) => total + backup.size,
     0,
-  );
+  )
 
   // Calculate average backup size
   const averageBackupSize =
-    totalBackups > 0 ? totalStorageUsed / totalBackups : 0;
+    totalBackups > 0 ? totalStorageUsed / totalBackups : 0
 
   // Count backups by type
   const backupsByType = backups.reduce(
     (counts, backup) => {
-      counts[backup.type] = (counts[backup.type] || 0) + 1;
-      return counts;
+      counts[backup.type] = (counts[backup.type] || 0) + 1
+      return counts
     },
     {} as Record<string, number>,
-  );
+  )
 
   return (
     <div className="space-y-6">
@@ -241,7 +241,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                 <dd className="font-medium">
                   {recoveryTests.length > 0
                     ? new Date(recoveryTests[0]!.testDate).toLocaleDateString()
-                    : "No tests run"}
+                    : 'No tests run'}
                 </dd>
               </div>
             </dl>
@@ -467,7 +467,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
         </CardFooter>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default BackupReportTab;
+export default BackupReportTab

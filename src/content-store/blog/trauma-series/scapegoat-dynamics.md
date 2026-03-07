@@ -1,18 +1,20 @@
 ---
-title: "Understanding the Scapegoat Dynamic"
-description: "Explore the complex role of the scapegoat in family systems and how this dynamic affects personal development and relationships"
-author: "Dr. James Wilson"
+title: 'Understanding the Scapegoat Dynamic'
+description: 'Explore the complex role of the scapegoat in family systems and how this dynamic affects personal development and relationships'
+author: 'Dr. James Wilson'
 pubDate: 2024-02-20
 readingTime: 10
-tags: ["trauma", "family-systems", "scapegoat", "healing"]
-series: "Understanding Trauma"
+tags: ['trauma', 'family-systems', 'scapegoat', 'healing']
+series: 'Understanding Trauma'
 seriesOrder: 2
 image:
   {
-    url: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-    alt: "Person standing apart from a group, symbolizing the scapegoat dynamic",
+    url: 'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    alt: 'Person standing apart from a group, symbolizing the scapegoat dynamic',
   }
 ---
+
+
 
 # Understanding the Scapegoat Dynamic
 

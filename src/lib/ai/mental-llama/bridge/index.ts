@@ -1,2 +1,2 @@
 // Exports for bridge module
-export {};
+export {}

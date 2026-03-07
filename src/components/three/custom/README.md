@@ -12,13 +12,13 @@ Instead of importing SpotLight from drei:
 
 ```jsx
 // DON'T DO THIS - it will cause build errors
-import { SpotLight } from "@react-three/drei";
+import { SpotLight } from '@react-three/drei';
 ```
 
 Import our custom component:
 
 ```jsx
-import { CustomSpotLight } from "../components/three/custom";
+import { CustomSpotLight } from '../components/three/custom';
 
 // Then use it just like the original SpotLight
 function Scene() {
@@ -32,7 +32,9 @@ function Scene() {
         color="white"
         castShadow
       />
-      <mesh>{/* Your other scene elements */}</mesh>
+      <mesh>
+        {/* Your other scene elements */}
+      </mesh>
     </Canvas>
   );
 }

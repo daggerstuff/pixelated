@@ -36,63 +36,67 @@ The core implementation is in the `src/lib/auth/serverAuth.ts` file, which provi
 ### Protecting API Routes
 
 ```typescript
-import { protectRoute } from "../lib/auth/serverAuth";
+import { protectRoute } from '../lib/auth/serverAuth'
 
 // Basic protection - requires authentication
-export const GET: APIRoute = protectRoute({})(async ({ locals }) => {
-  const user = locals.user;
-  // Your route logic here
-  return new Response(JSON.stringify({ data: "success" }));
-});
+export const GET: APIRoute = protectRoute({})(
+  async ({ locals }) => {
+    const user = locals.user
+    // Your route logic here
+    return new Response(JSON.stringify({ data: 'success' }))
+  }
+)
 
 // Role-based protection - requires specific role
 export const POST: APIRoute = protectRoute({
-  requiredRole: "admin",
+  requiredRole: 'admin',
   validateIPMatch: true,
   validateUserAgent: true,
-})(async ({ locals, request }) => {
-  const admin = locals.user;
-  // Your admin-only logic here
-  return new Response(JSON.stringify({ data: "success" }));
-});
+})(
+  async ({ locals, request }) => {
+    const admin = locals.user
+    // Your admin-only logic here
+    return new Response(JSON.stringify({ data: 'success' }))
+  }
+)
 ```
 
 ### Configuration Options
 
 The `protectRoute()` function accepts the following options:
 
-| Option              | Type       | Default     | Description                                   |
-| ------------------- | ---------- | ----------- | --------------------------------------------- |
-| `requiredRole`      | `AuthRole` | `undefined` | Required role for accessing the route         |
-| `validateIPMatch`   | `boolean`  | `true`      | Check if IP matches previous requests         |
-| `validateUserAgent` | `boolean`  | `true`      | Check if user agent matches previous requests |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `requiredRole` | `AuthRole` | `undefined` | Required role for accessing the route |
+| `validateIPMatch` | `boolean` | `true` | Check if IP matches previous requests |
+| `validateUserAgent` | `boolean` | `true` | Check if user agent matches previous requests |
 
 ### Manual Authentication
 
 For custom authentication flows, use the `verifyServerAuth()` function directly:
 
 ```typescript
-import { verifyServerAuth } from "../lib/auth/serverAuth";
+import { verifyServerAuth } from '../lib/auth/serverAuth'
 
 async function customAuthFlow(context: APIContext) {
-  const { cookies, request } = context;
-  const requestIp = request.headers.get("x-forwarded-for") || "unknown";
+  const { cookies, request } = context
+  const requestIp = request.headers.get('x-forwarded-for') || 'unknown'
 
   const { authenticated, user, reason } = await verifyServerAuth({
     cookies,
     request,
     requestIp,
-    requiredRole: "user",
-  });
+    requiredRole: 'user',
+  })
 
   if (!authenticated) {
     // Handle authentication failure
-    console.log(`Auth failed: ${reason}`);
-    return new Response("Unauthorized", { status: 401 });
+    console.log(`Auth failed: ${reason}`)
+    return new Response('Unauthorized', { status: 401 })
   }
 
   // User is authenticated
-  return user;
+  return user
 }
 ```
 

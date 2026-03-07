@@ -1,127 +1,127 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import type { SearchResult } from "../../lib/search";
+import { useState, useEffect, useRef, useMemo } from 'react'
+import type { SearchResult } from '../../lib/search'
 
 interface SearchBoxProps {
-  placeholder?: string;
-  maxResults?: number;
-  minQueryLength?: number;
-  showNoResults?: boolean;
-  autoFocus?: boolean;
-  className?: string;
-  onSearch?: (query: string, results: SearchResult[]) => void;
-  onResultClick?: (result: SearchResult) => void;
+  placeholder?: string
+  maxResults?: number
+  minQueryLength?: number
+  showNoResults?: boolean
+  autoFocus?: boolean
+  className?: string
+  onSearch?: (query: string, results: SearchResult[]) => void
+  onResultClick?: (result: SearchResult) => void
 }
 
 export default function SearchBox({
-  placeholder = "Search...",
+  placeholder = 'Search...',
   maxResults = 5,
   minQueryLength = 2,
   showNoResults = true,
   autoFocus = false,
-  className = "",
+  className = '',
   onSearch,
   onResultClick,
 }: SearchBoxProps) {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [isSearchReady, setIsSearchReady] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [shortcutSymbol, setShortcutSymbol] = useState("Ctrl");
-  const inputRef = useRef<HTMLInputElement>(null);
-  const resultsRef = useRef<HTMLDivElement>(null);
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [isSearchReady, setIsSearchReady] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
+  const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   // Track if the search is actually showing results
-  const hasResults = useMemo(() => results.length > 0, [results]);
+  const hasResults = useMemo(() => results.length > 0, [results])
   const showResults = useMemo(
     () => isOpen && query.length >= minQueryLength,
     [isOpen, query, minQueryLength],
-  );
+  )
 
   // Initialize search when component mounts
   useEffect(() => {
     const handleSearchReady = () => {
-      setIsSearchReady(true);
-    };
+      setIsSearchReady(true)
+    }
 
     // Check if search is already initialized
-    if (typeof window !== "undefined" && window.searchClient) {
-      setIsSearchReady(true);
+    if (typeof window !== 'undefined' && window.searchClient) {
+      setIsSearchReady(true)
     }
 
     // Listen for search ready event
-    window.addEventListener("search:ready", handleSearchReady);
+    window.addEventListener('search:ready', handleSearchReady)
 
     return () => {
-      window.removeEventListener("search:ready", handleSearchReady);
-    };
-  }, []);
+      window.removeEventListener('search:ready', handleSearchReady)
+    }
+  }, [])
 
   // Handle auto focus
   useEffect(() => {
     if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  }, [autoFocus]);
+  }, [autoFocus])
 
   // Detect OS for shortcut symbol
   useEffect(() => {
     if (
-      typeof navigator !== "undefined" &&
+      typeof navigator !== 'undefined' &&
       /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
     ) {
-      setShortcutSymbol("⌘");
+      setShortcutSymbol('⌘')
     }
-  }, []);
+  }, [])
 
   // Handle global keyboard shortcut
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        inputRef.current?.focus();
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
       }
-    };
+    }
 
-    document.addEventListener("keydown", handleGlobalKeyDown);
+    document.addEventListener('keydown', handleGlobalKeyDown)
     return () => {
-      document.removeEventListener("keydown", handleGlobalKeyDown);
-    };
-  }, []);
+      document.removeEventListener('keydown', handleGlobalKeyDown)
+    }
+  }, [])
 
   // Reset active index when results change
   useEffect(() => {
-    setActiveIndex(-1);
-  }, [results]);
+    setActiveIndex(-1)
+  }, [results])
 
   // Handle searching when query changes
   useEffect(() => {
     if (!isSearchReady || query.length < minQueryLength) {
-      setResults([]);
-      return;
+      setResults([])
+      return
     }
 
     try {
       // Use the global search client
-      const searchResults = window.searchClient.search(query);
+      const searchResults = window.searchClient.search(query)
 
       // Apply filtering after search
-      let limitedResults = searchResults;
+      let limitedResults = searchResults
       if (maxResults && searchResults.length > maxResults) {
-        limitedResults = searchResults.slice(0, maxResults);
+        limitedResults = searchResults.slice(0, maxResults)
       }
 
-      setResults(limitedResults);
+      setResults(limitedResults)
 
       // Call onSearch callback if provided
       if (onSearch) {
-        onSearch(query, limitedResults);
+        onSearch(query, limitedResults)
       }
     } catch (error: unknown) {
-      console.error("Search error:", error);
-      setResults([]);
+      console.error('Search error:', error)
+      setResults([])
     }
-  }, [query, isSearchReady, maxResults, minQueryLength, onSearch]);
+  }, [query, isSearchReady, maxResults, minQueryLength, onSearch])
 
   // Close results when clicking outside
   useEffect(() => {
@@ -131,70 +131,70 @@ export default function SearchBox({
         !resultsRef.current.contains(event.target as Node) &&
         !inputRef.current?.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       if (query.length > 0) {
         // Clear text on Escape if present
-        setQuery("");
-        setIsOpen(false);
-        if (onSearch) onSearch("", []);
+        setQuery('')
+        setIsOpen(false)
+        if (onSearch) onSearch('', [])
         // Keep focus on input
       } else {
-        setIsOpen(false);
-        inputRef.current?.blur();
+        setIsOpen(false)
+        inputRef.current?.blur()
       }
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
       if (!isOpen) {
-        setIsOpen(true);
+        setIsOpen(true)
       } else if (results.length > 0) {
-        setActiveIndex((prev) => (prev + 1) % results.length);
+        setActiveIndex((prev) => (prev + 1) % results.length)
       }
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
       if (!isOpen) {
-        setIsOpen(true);
+        setIsOpen(true)
       } else if (results.length > 0) {
-        setActiveIndex((prev) => (prev - 1 + results.length) % results.length);
+        setActiveIndex((prev) => (prev - 1 + results.length) % results.length)
       }
-    } else if (e.key === "Enter") {
+    } else if (e.key === 'Enter') {
       if (isOpen && activeIndex >= 0 && results[activeIndex]) {
-        e.preventDefault();
-        handleResultClick(results[activeIndex]);
+        e.preventDefault()
+        handleResultClick(results[activeIndex])
       }
     }
-  };
+  }
 
   // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
-    setQuery(newQuery);
-    setIsOpen(newQuery.length > 0);
-  };
+    const newQuery = e.target.value
+    setQuery(newQuery)
+    setIsOpen(newQuery.length > 0)
+  }
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
-    setIsOpen(false);
-    setQuery("");
+    setIsOpen(false)
+    setQuery('')
 
     if (onResultClick) {
-      onResultClick(result);
+      onResultClick(result)
     } else {
-      window.location.href = result.url;
+      window.location.href = result.url
     }
-  };
+  }
 
   return (
     <div
@@ -214,14 +214,12 @@ export default function SearchBox({
           onFocus={() => query.length >= minQueryLength && setIsOpen(true)}
           placeholder={placeholder}
           aria-label="Search"
-          aria-keyshortcuts={shortcutSymbol === "⌘" ? "Meta+K" : "Control+K"}
+          aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
           className={`w-full py-2 px-4 rounded-md border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-800 ${className}`}
           aria-autocomplete="list"
           aria-controls="search-results"
           aria-activedescendant={
-            showResults && activeIndex >= 0
-              ? `result-${activeIndex}`
-              : undefined
+            showResults && activeIndex >= 0 ? `result-${activeIndex}` : undefined
           }
           autoComplete="off"
         />
@@ -239,9 +237,9 @@ export default function SearchBox({
             type="button"
             className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             onClick={() => {
-              setQuery("");
-              setIsOpen(false);
-              inputRef.current?.focus();
+              setQuery('')
+              setIsOpen(false)
+              inputRef.current?.focus()
             }}
             aria-label="Clear search"
             tabIndex={-1}
@@ -281,11 +279,10 @@ export default function SearchBox({
                     type="button"
                     role="option"
                     aria-selected={index === activeIndex}
-                    className={`w-full text-left px-4 py-3 focus:outline-none ${
-                      index === activeIndex
-                        ? "bg-gray-100 dark:bg-gray-700"
-                        : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                    }`}
+                    className={`w-full text-left px-4 py-3 focus:outline-none ${index === activeIndex
+                        ? 'bg-gray-100 dark:bg-gray-700'
+                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
                     onClick={() => handleResultClick(result)}
                     tabIndex={-1}
                   >
@@ -319,5 +316,5 @@ export default function SearchBox({
         </div>
       )}
     </div>
-  );
+  )
 }

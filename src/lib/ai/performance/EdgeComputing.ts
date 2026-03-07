@@ -1,85 +1,85 @@
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("default");
+const logger = createBuildSafeLogger('default')
 
 export interface EdgeComputeConfig {
-  region: string;
-  endpoint: string;
-  maxLatency: number;
-  fallbackEndpoint?: string;
-  retryAttempts: number;
+  region: string
+  endpoint: string
+  maxLatency: number
+  fallbackEndpoint?: string
+  retryAttempts: number
 }
 
 export interface EdgePerformanceMetrics {
-  latency: number;
-  throughput: number;
-  errorRate: number;
-  cpuUsage: number;
-  memoryUsage: number;
-  timestamp: number;
+  latency: number
+  throughput: number
+  errorRate: number
+  cpuUsage: number
+  memoryUsage: number
+  timestamp: number
 }
 
 export interface EdgeComputeTask {
-  id: string;
-  type: "inference" | "training" | "preprocessing";
-  priority: "low" | "medium" | "high" | "critical";
-  payload: Record<string, unknown>;
-  timeout: number;
+  id: string
+  type: 'inference' | 'training' | 'preprocessing'
+  priority: 'low' | 'medium' | 'high' | 'critical'
+  payload: Record<string, unknown>
+  timeout: number
 }
 
 export interface EdgeComputeResult {
-  taskId: string;
-  success: boolean;
-  result?: Record<string, unknown>;
-  error?: string;
-  metrics: EdgePerformanceMetrics;
-  executionTime: number;
+  taskId: string
+  success: boolean
+  result?: Record<string, unknown>
+  error?: string
+  metrics: EdgePerformanceMetrics
+  executionTime: number
 }
 
 /**
  * Edge Computing Service for AI workloads
  */
 export class EdgeComputing {
-  private config: EdgeComputeConfig;
-  private activeConnections = new Map<string, WebSocket>();
-  private taskQueue: EdgeComputeTask[] = [];
-  private isProcessing = false;
+  private config: EdgeComputeConfig
+  private activeConnections = new Map<string, WebSocket>()
+  private taskQueue: EdgeComputeTask[] = []
+  private isProcessing = false
 
   constructor(config: EdgeComputeConfig) {
-    this.config = config;
-    logger.info("EdgeComputing initialized", { config });
+    this.config = config
+    logger.info('EdgeComputing initialized', { config })
   }
 
   /**
    * Execute a task on the edge compute infrastructure
    */
   async executeTask(task: EdgeComputeTask): Promise<EdgeComputeResult> {
-    const startTime = Date.now();
+    const startTime = Date.now()
 
     try {
-      logger.debug("Executing edge compute task", {
+      logger.debug('Executing edge compute task', {
         taskId: task.id,
         type: task.type,
         endpoint: this.config.endpoint,
-      });
+      })
 
       // Check if task execution time exceeds max latency
       if (Date.now() - startTime > this.config.maxLatency) {
         // Try fallback endpoint if available
         if (this.config.fallbackEndpoint) {
-          logger.warn("Switching to fallback endpoint due to latency", {
+          logger.warn('Switching to fallback endpoint due to latency', {
             taskId: task.id,
             originalEndpoint: this.config.endpoint,
             fallbackEndpoint: this.config.fallbackEndpoint,
-          });
+          })
         } else {
-          throw new Error("Task execution exceeded max latency");
+          throw new Error('Task execution exceeded max latency')
         }
       }
 
       // Simulate edge computation with appropriate latency
-      const simulatedLatency = 50 + Math.random() * 100; // 50-150ms
-      await new Promise((resolve) => setTimeout(resolve, simulatedLatency));
+      const simulatedLatency = 50 + Math.random() * 100 // 50-150ms
+      await new Promise((resolve) => setTimeout(resolve, simulatedLatency))
 
       // Mock successful computation
       const result = {
@@ -88,23 +88,23 @@ export class EdgeComputing {
         result: {
           processed: true,
           data: task.payload,
-          model: "edge-ai-v1",
+          model: 'edge-ai-v1',
           confidence: 0.85 + Math.random() * 0.15,
           region: this.config.region,
         },
         metrics: this.generateMockMetrics(),
         executionTime: Date.now() - startTime,
-      };
+      }
 
-      logger.info("Edge compute task completed", {
+      logger.info('Edge compute task completed', {
         taskId: task.id,
         executionTime: result.executionTime,
         region: this.config.region,
-      });
+      })
 
-      return result;
+      return result
     } catch (error: unknown) {
-      logger.error("Edge compute task failed", { taskId: task.id, error });
+      logger.error('Edge compute task failed', { taskId: task.id, error })
 
       return {
         taskId: task.id,
@@ -112,7 +112,7 @@ export class EdgeComputing {
         error: `Edge compute error: ${error}`,
         metrics: this.generateMockMetrics(),
         executionTime: Date.now() - startTime,
-      };
+      }
     }
   }
 
@@ -120,14 +120,14 @@ export class EdgeComputing {
    * Add task to processing queue
    */
   queueTask(task: EdgeComputeTask): void {
-    this.taskQueue.push(task);
-    logger.debug("Task queued", {
+    this.taskQueue.push(task)
+    logger.debug('Task queued', {
       taskId: task.id,
       queueLength: this.taskQueue.length,
-    });
+    })
 
     if (!this.isProcessing) {
-      this.processQueue();
+      this.processQueue()
     }
   }
 
@@ -135,7 +135,7 @@ export class EdgeComputing {
    * Get current performance metrics
    */
   getPerformanceMetrics(): EdgePerformanceMetrics {
-    return this.generateMockMetrics();
+    return this.generateMockMetrics()
   }
 
   /**
@@ -143,18 +143,18 @@ export class EdgeComputing {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      logger.debug("Performing edge compute health check");
+      logger.debug('Performing edge compute health check')
 
       // Simulate health check
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10))
 
-      const isHealthy = Math.random() > 0.1; // 90% uptime simulation
+      const isHealthy = Math.random() > 0.1 // 90% uptime simulation
 
-      logger.info("Edge compute health check completed", { isHealthy });
-      return isHealthy;
+      logger.info('Edge compute health check completed', { isHealthy })
+      return isHealthy
     } catch (error: unknown) {
-      logger.error("Edge compute health check failed", { error });
-      return false;
+      logger.error('Edge compute health check failed', { error })
+      return false
     }
   }
 
@@ -163,16 +163,16 @@ export class EdgeComputing {
    */
   async scaleResources(targetCapacity: number): Promise<boolean> {
     try {
-      logger.info("Scaling edge compute resources", { targetCapacity });
+      logger.info('Scaling edge compute resources', { targetCapacity })
 
       // Simulate scaling operation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      logger.info("Edge compute resources scaled successfully");
-      return true;
+      logger.info('Edge compute resources scaled successfully')
+      return true
     } catch (error: unknown) {
-      logger.error("Failed to scale edge compute resources", { error });
-      return false;
+      logger.error('Failed to scale edge compute resources', { error })
+      return false
     }
   }
 
@@ -183,39 +183,39 @@ export class EdgeComputing {
     return {
       length: this.taskQueue.length,
       processing: this.isProcessing,
-    };
+    }
   }
 
   private async processQueue(): Promise<void> {
     if (this.isProcessing || this.taskQueue.length === 0) {
-      return;
+      return
     }
 
-    this.isProcessing = true;
-    logger.debug("Starting queue processing");
+    this.isProcessing = true
+    logger.debug('Starting queue processing')
 
     while (this.taskQueue.length > 0) {
       // Sort by priority
       this.taskQueue.sort((a, b) => {
-        const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
-        return priorityOrder[b.priority] - priorityOrder[a.priority];
-      });
+        const priorityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
+        return priorityOrder[b.priority] - priorityOrder[a.priority]
+      })
 
-      const task = this.taskQueue.shift();
+      const task = this.taskQueue.shift()
       if (task) {
         try {
-          await this.executeTask(task);
+          await this.executeTask(task)
         } catch (error: unknown) {
-          logger.error("Queue task execution failed", {
+          logger.error('Queue task execution failed', {
             taskId: task.id,
             error,
-          });
+          })
         }
       }
     }
 
-    this.isProcessing = false;
-    logger.debug("Queue processing completed");
+    this.isProcessing = false
+    logger.debug('Queue processing completed')
   }
 
   private generateMockMetrics(): EdgePerformanceMetrics {
@@ -226,7 +226,7 @@ export class EdgeComputing {
       cpuUsage: 0.3 + Math.random() * 0.4,
       memoryUsage: 0.4 + Math.random() * 0.3,
       timestamp: Date.now(),
-    };
+    }
   }
 
   /**
@@ -234,10 +234,10 @@ export class EdgeComputing {
    */
   dispose() {
     this.activeConnections.forEach((connection) => {
-      connection.close();
-    });
-    this.activeConnections.clear();
-    this.taskQueue = [];
-    logger.info("EdgeComputing disposed");
+      connection.close()
+    })
+    this.activeConnections.clear()
+    this.taskQueue = []
+    logger.info('EdgeComputing disposed')
   }
 }

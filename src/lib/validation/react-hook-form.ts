@@ -2,29 +2,25 @@
  * React Hook Form integration utilities with Zod validation
  */
 
-import { useForm, type UseFormReturn, type FieldValues } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useState, useCallback } from "react";
-import {
-  normalizeError,
-  getFieldErrors,
-  type ValidationError,
-} from "@/lib/error";
+import { useForm, type UseFormReturn, type FieldValues } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { useState, useCallback } from 'react'
+import { normalizeError, getFieldErrors, type ValidationError } from '@/lib/error'
 
 export interface UseValidatedFormOptions<T extends FieldValues> {
-  schema: z.ZodType<T>;
-  defaultValues?: Partial<T>;
-  onSubmit: (data: T) => void | Promise<void>;
-  onError?: (error: ValidationError) => void;
+  schema: z.ZodType<T>
+  defaultValues?: Partial<T>
+  onSubmit: (data: T) => void | Promise<void>
+  onError?: (error: ValidationError) => void
 }
 
 export interface UseValidatedFormReturn<T extends FieldValues> {
-  form: UseFormReturn<T>;
-  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
-  isSubmitting: boolean;
-  fieldErrors: Record<string, string>;
-  clearErrors: () => void;
+  form: UseFormReturn<T>
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
+  isSubmitting: boolean
+  fieldErrors: Record<string, string>
+  clearErrors: () => void
 }
 
 /**
@@ -36,66 +32,66 @@ export function useValidatedForm<T extends FieldValues>({
   onSubmit,
   onError,
 }: UseValidatedFormOptions<T>): UseValidatedFormReturn<T> {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const form = useForm<T>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues as T,
-    mode: "onChange", // Validate on change for real-time feedback
-  });
+    mode: 'onChange', // Validate on change for real-time feedback
+  })
 
   const handleSubmit = useCallback(
     async (e?: React.BaseSyntheticEvent) => {
       if (e) {
-        e.preventDefault();
+        e.preventDefault()
       }
 
-      setIsSubmitting(true);
-      setFieldErrors({});
+      setIsSubmitting(true)
+      setFieldErrors({})
 
       try {
-        const isValid = await form.trigger();
+        const isValid = await form.trigger()
         if (!isValid) {
-          const errors = form.formState.errors;
-          const fieldErrorMap: Record<string, string> = {};
+          const errors = form.formState.errors
+          const fieldErrorMap: Record<string, string> = {}
           Object.keys(errors).forEach((key) => {
-            const error = errors[key as keyof typeof errors];
+            const error = errors[key as keyof typeof errors]
             if (error?.message) {
-              fieldErrorMap[key] = String(error.message);
+              fieldErrorMap[key] = String(error.message)
             }
-          });
-          setFieldErrors(fieldErrorMap);
-          setIsSubmitting(false);
-          return;
+          })
+          setFieldErrors(fieldErrorMap)
+          setIsSubmitting(false)
+          return
         }
 
-        const data = form.getValues();
-        await onSubmit(data);
+        const data = form.getValues()
+        await onSubmit(data)
       } catch (error) {
-        const normalized = normalizeError(error);
-        const fieldErrs = getFieldErrors(error) ?? {};
+        const normalized = normalizeError(error)
+        const fieldErrs = getFieldErrors(error) ?? {}
 
         if (normalized instanceof ValidationError) {
-          setFieldErrors(normalized.fieldErrors ?? fieldErrs);
+          setFieldErrors(normalized.fieldErrors ?? fieldErrs)
         } else {
-          setFieldErrors(fieldErrs);
+          setFieldErrors(fieldErrs)
         }
 
         if (onError && normalized instanceof ValidationError) {
-          onError(normalized);
+          onError(normalized)
         }
       } finally {
-        setIsSubmitting(false);
+        setIsSubmitting(false)
       }
     },
     [form, onSubmit, onError],
-  );
+  )
 
   const clearErrors = useCallback(() => {
-    form.clearErrors();
-    setFieldErrors({});
-  }, [form]);
+    form.clearErrors()
+    setFieldErrors({})
+  }, [form])
 
   return {
     form,
@@ -103,7 +99,7 @@ export function useValidatedForm<T extends FieldValues>({
     isSubmitting,
     fieldErrors,
     clearErrors,
-  };
+  }
 }
 
 /**
@@ -113,8 +109,8 @@ export function getFormFieldError<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): string | undefined {
-  const error = form.formState.errors[fieldName];
-  return error?.message ? String(error.message) : undefined;
+  const error = form.formState.errors[fieldName]
+  return error?.message ? String(error.message) : undefined
 }
 
 /**
@@ -124,7 +120,7 @@ export function hasFormFieldError<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): boolean {
-  return !!form.formState.errors[fieldName];
+  return !!form.formState.errors[fieldName]
 }
 
 /**
@@ -134,7 +130,7 @@ export function isFormFieldTouched<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): boolean {
-  return !!form.formState.touchedFields[fieldName];
+  return !!form.formState.touchedFields[fieldName]
 }
 
 /**
@@ -144,5 +140,5 @@ export function isFormFieldDirty<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): boolean {
-  return !!form.formState.dirtyFields[fieldName];
+  return !!form.formState.dirtyFields[fieldName]
 }

@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { X } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { Button } from "./button";
-import FocusTrap from "../accessibility/FocusTrap";
+import React, { useCallback, useEffect, useState } from 'react'
+import { X } from 'lucide-react'
+import { cn } from '../../lib/utils'
+import { Button } from './button'
+import FocusTrap from '../accessibility/FocusTrap'
 import type {
   DialogContextType,
   DialogRootProps,
@@ -11,30 +11,30 @@ import type {
   DialogHookResult,
   ConfirmDialogHookResult,
   DialogMaxWidth,
-} from "./dialog-types";
-import { maxWidthClasses } from "./dialog-types";
+} from './dialog-types'
+import { maxWidthClasses } from './dialog-types'
 
 // Custom Dialog Context
 const DialogContext = React.createContext<DialogContextType>({
   open: false,
   onOpenChange: () => undefined,
-});
+})
 
 // Shadcn/UI Dialog Components
 const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
-  const [isOpen, setIsOpen] = useState(open);
+  const [isOpen, setIsOpen] = useState(open)
 
   useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
+    setIsOpen(open)
+  }, [open])
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
-      setIsOpen(newOpen);
-      onOpenChange?.(newOpen);
+      setIsOpen(newOpen)
+      onOpenChange?.(newOpen)
     },
     [onOpenChange],
-  );
+  )
 
   return (
     <DialogContext.Provider
@@ -42,56 +42,58 @@ const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
     >
       {children}
     </DialogContext.Provider>
-  );
-};
+  )
+}
 
-interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface DialogTriggerProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode
 }
 
 const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   ({ children, ...props }, ref) => {
-    const { onOpenChange } = React.useContext(DialogContext);
+    const { onOpenChange } = React.useContext(DialogContext)
 
     return (
       <button ref={ref} onClick={() => onOpenChange(true)} {...props}>
         {children}
       </button>
-    );
+    )
   },
-);
-DialogTrigger.displayName = "DialogTrigger";
+)
+DialogTrigger.displayName = 'DialogTrigger'
 
 const DialogPortal = ({ children }: { children: React.ReactNode }) => {
-  const { open } = React.useContext(DialogContext);
+  const { open } = React.useContext(DialogContext)
 
   if (!open) {
-    return null;
+    return null
   }
 
-  return <div className="fixed inset-0 z-50">{children}</div>;
-};
+  return <div className="fixed inset-0 z-50">{children}</div>
+}
 
-interface DialogOverlayProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
+interface DialogOverlayProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  className?: string
 }
 
 const DialogOverlay = React.forwardRef<HTMLButtonElement, DialogOverlayProps>(
   ({ className, ...props }, ref) => {
-    const { onOpenChange } = React.useContext(DialogContext);
+    const { onOpenChange } = React.useContext(DialogContext)
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        onOpenChange(false);
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onOpenChange(false)
       }
-    };
+    }
 
     return (
       <button
         ref={ref}
         className={cn(
-          "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm animate-in fade-in-0 border-0 p-0",
+          'fixed inset-0 z-50 bg-background/80 backdrop-blur-sm animate-in fade-in-0 border-0 p-0',
           className,
         )}
         onClick={() => onOpenChange(false)}
@@ -99,22 +101,22 @@ const DialogOverlay = React.forwardRef<HTMLButtonElement, DialogOverlayProps>(
         aria-label="Close dialog"
         {...props}
       />
-    );
+    )
   },
-);
-DialogOverlay.displayName = "DialogOverlay";
+)
+DialogOverlay.displayName = 'DialogOverlay'
 
 interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
-  children: React.ReactNode;
+  className?: string
+  children: React.ReactNode
 }
 
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   ({ className, children, ...props }, ref) => {
-    const { open, onOpenChange } = React.useContext(DialogContext);
+    const { open, onOpenChange } = React.useContext(DialogContext)
 
     if (!open) {
-      return null;
+      return null
     }
 
     return (
@@ -123,14 +125,14 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
         <div
           ref={ref}
           className={cn(
-            "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg",
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg',
             className,
           )}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              e.stopPropagation();
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              e.stopPropagation()
             }
           }}
           role="dialog"
@@ -149,13 +151,13 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
           </button>
         </div>
       </DialogPortal>
-    );
+    )
   },
-);
-DialogContent.displayName = "DialogContent";
+)
+DialogContent.displayName = 'DialogContent'
 
 interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
+  className?: string
 }
 
 const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
@@ -163,17 +165,17 @@ const DialogHeader = React.forwardRef<HTMLDivElement, DialogHeaderProps>(
     <div
       ref={ref}
       className={cn(
-        "flex flex-col space-y-1.5 text-center sm:text-left",
+        'flex flex-col space-y-1.5 text-center sm:text-left',
         className,
       )}
       {...props}
     />
   ),
-);
-DialogHeader.displayName = "DialogHeader";
+)
+DialogHeader.displayName = 'DialogHeader'
 
 interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {
-  className?: string;
+  className?: string
 }
 
 const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
@@ -181,43 +183,44 @@ const DialogFooter = React.forwardRef<HTMLDivElement, DialogFooterProps>(
     <div
       ref={ref}
       className={cn(
-        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+        'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
         className,
       )}
       {...props}
     />
   ),
-);
-DialogFooter.displayName = "DialogFooter";
+)
+DialogFooter.displayName = 'DialogFooter'
 
 interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  className?: string;
-  children?: React.ReactNode;
+  className?: string
+  children?: React.ReactNode
 }
 
 const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className, children, ...props }, ref) => {
     if (!children) {
-      return null;
+      return null
     }
     return (
       <h2
         ref={ref}
         className={cn(
-          "text-lg font-semibold leading-none tracking-tight",
+          'text-lg font-semibold leading-none tracking-tight',
           className,
         )}
         {...props}
       >
         {children}
       </h2>
-    );
+    )
   },
-);
-DialogTitle.displayName = "DialogTitle";
+)
+DialogTitle.displayName = 'DialogTitle'
 
-interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {
-  className?: string;
+interface DialogDescriptionProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
+  className?: string
 }
 
 const DialogDescription = React.forwardRef<
@@ -226,11 +229,11 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn('text-sm text-muted-foreground', className)}
     {...props}
   />
-));
-DialogDescription.displayName = "DialogDescription";
+))
+DialogDescription.displayName = 'DialogDescription'
 
 function DialogModal<TData>({
   isOpen,
@@ -239,67 +242,67 @@ function DialogModal<TData>({
   children,
   footer,
   showCloseButton = true,
-  className = "",
-  backdropClassName = "",
-  maxWidth = "md",
+  className = '',
+  backdropClassName = '',
+  maxWidth = 'md',
   closeOnOutsideClick = true,
   closeOnEsc = true,
 }: DialogProps<TData>) {
   // Close on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (isOpen && closeOnEsc && e.key === "Escape") {
-        onClose();
+      if (isOpen && closeOnEsc && e.key === 'Escape') {
+        onClose()
       }
-    };
+    }
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
+      document.addEventListener('keydown', handleEscape)
     }
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen, onClose, closeOnEsc]);
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen, onClose, closeOnEsc])
 
   // Prevent body scrolling when dialog is open
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden'
     } else {
-      document.body.style.overflow = "";
+      document.body.style.overflow = ''
     }
 
     return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
 
   // Handle outside click
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (closeOnOutsideClick && e.target === e.currentTarget) {
-        onClose();
+        onClose()
       }
     },
     [closeOnOutsideClick, onClose],
-  );
+  )
 
   if (!isOpen) {
-    return null;
+    return null
   }
 
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4",
+        'fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4',
         backdropClassName,
       )}
       onClick={handleBackdropClick}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          handleBackdropClick(e as React.MouseEvent<HTMLDivElement>);
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleBackdropClick(e as React.MouseEvent<HTMLDivElement>)
         }
       }}
       tabIndex={-1}
@@ -309,15 +312,15 @@ function DialogModal<TData>({
       <FocusTrap active={isOpen}>
         <div
           className={cn(
-            "w-full rounded-lg bg-white shadow-lg dark:bg-gray-800",
-            "overflow-hidden flex flex-col",
+            'w-full rounded-lg bg-white shadow-lg dark:bg-gray-800',
+            'overflow-hidden flex flex-col',
             maxWidthClasses[maxWidth as DialogMaxWidth],
             className,
           )}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.stopPropagation();
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation()
             }
           }}
           tabIndex={-1}
@@ -366,7 +369,7 @@ function DialogModal<TData>({
         </div>
       </FocusTrap>
     </div>
-  );
+  )
 }
 
 function ConfirmDialog<TData>({
@@ -375,41 +378,41 @@ function ConfirmDialog<TData>({
   onConfirm,
   title,
   children,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
   confirmButtonProps = {},
   cancelButtonProps = {},
   isDanger = false,
   loading = false,
-  className = "",
-  backdropClassName = "",
-  maxWidth = "sm",
+  className = '',
+  backdropClassName = '',
+  maxWidth = 'sm',
   closeOnOutsideClick = true,
 }: ConfirmDialogProps<TData>) {
-  const [isConfirming, setIsConfirming] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false)
 
   const handleConfirm = useCallback(async () => {
-    setIsConfirming(true);
+    setIsConfirming(true)
     try {
-      await onConfirm();
+      await onConfirm()
     } catch (error: unknown) {
-      console.error("Error in confirmation handler:", error);
+      console.error('Error in confirmation handler:', error)
     } finally {
-      setIsConfirming(false);
-      onClose();
+      setIsConfirming(false)
+      onClose()
     }
-  }, [onConfirm, onClose]);
+  }, [onConfirm, onClose])
 
   if (!isOpen) {
-    return null;
+    return null
   }
 
-  const isLoading = loading || isConfirming;
+  const isLoading = loading || isConfirming
 
   return (
     <div
       className={cn(
-        "fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4",
+        'fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4',
         backdropClassName,
       )}
       onClick={
@@ -417,11 +420,11 @@ function ConfirmDialog<TData>({
       }
       onKeyDown={(e) => {
         if (
-          (e.key === "Enter" || e.key === " ") &&
+          (e.key === 'Enter' || e.key === ' ') &&
           !(!closeOnOutsideClick || isLoading)
         ) {
-          e.preventDefault();
-          onClose();
+          e.preventDefault()
+          onClose()
         }
       }}
       tabIndex={-1}
@@ -431,15 +434,15 @@ function ConfirmDialog<TData>({
       <FocusTrap active={isOpen}>
         <div
           className={cn(
-            "w-full rounded-lg bg-white shadow-lg dark:bg-gray-800",
-            "overflow-hidden flex flex-col",
-            maxWidth === "sm" ? "max-w-sm" : "max-w-md",
+            'w-full rounded-lg bg-white shadow-lg dark:bg-gray-800',
+            'overflow-hidden flex flex-col',
+            maxWidth === 'sm' ? 'max-w-sm' : 'max-w-md',
             className,
           )}
           onClick={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.stopPropagation();
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation()
             }
           }}
           tabIndex={-1}
@@ -467,7 +470,7 @@ function ConfirmDialog<TData>({
               {cancelText}
             </Button>
             <Button
-              variant={isDanger ? "destructive" : "default"}
+              variant={isDanger ? 'destructive' : 'default'}
               onClick={handleConfirm}
               disabled={isLoading}
               {...confirmButtonProps}
@@ -481,65 +484,65 @@ function ConfirmDialog<TData>({
         </div>
       </FocusTrap>
     </div>
-  );
+  )
 }
 
 /**
  * Custom hook for using a dialog
  */
 function useDialog(initialState = false): DialogHookResult {
-  const [isOpen, setIsOpen] = useState(initialState);
+  const [isOpen, setIsOpen] = useState(initialState)
 
-  const open = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => setIsOpen(false), []);
-  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
+  const open = useCallback(() => setIsOpen(true), [])
+  const close = useCallback(() => setIsOpen(false), [])
+  const toggle = useCallback(() => setIsOpen((prev) => !prev), [])
 
-  return { isOpen, open, close, toggle };
+  return { isOpen, open, close, toggle }
 }
 
 /**
  * Custom hook for using a confirm dialog
  */
 function useConfirmDialog<TData>(): ConfirmDialogHookResult<TData> {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
   const [confirmProps, setConfirmProps] = useState<
-    Omit<ConfirmDialogProps<TData>, "isOpen" | "onClose">
+    Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>
   >({
-    title: "Confirm",
-    message: "",
+    title: 'Confirm',
+    message: '',
     onConfirm: () => Promise.resolve(),
-  });
+  })
 
   const confirm = useCallback(
-    (props: Omit<ConfirmDialogProps<TData>, "isOpen" | "onClose">) => {
-      setConfirmProps(props);
-      setIsOpen(true);
+    (props: Omit<ConfirmDialogProps<TData>, 'isOpen' | 'onClose'>) => {
+      setConfirmProps(props)
+      setIsOpen(true)
 
       return new Promise<boolean>((resolve) => {
         setConfirmProps({
           ...props,
           onConfirm: async () => {
             if (props.onConfirm) {
-              await props.onConfirm();
+              await props.onConfirm()
             }
-            resolve(true);
+            resolve(true)
           },
-        });
-      });
+        })
+      })
     },
     [],
-  );
+  )
 
   const close = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    setIsOpen(false)
+  }, [])
 
   return {
     isOpen,
     confirm,
     close,
     confirmProps,
-  };
+  }
 }
 
 export {
@@ -556,4 +559,4 @@ export {
   ConfirmDialog,
   useDialog,
   useConfirmDialog,
-};
+}

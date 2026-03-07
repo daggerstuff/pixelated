@@ -4,7 +4,7 @@ description: A modern, secure, and feature-rich web application
 date: 2024-03-20
 draft: false
 featured: true
-tags: ["welcome", "intro"]
+tags: ['welcome', 'intro']
 ---
 
 Glad you made it here! This is a customizable, feature-rich :link[Astro]{id=withastro/astro} theme for blog and portfolio creation, inspired by the minimalist style of :link[antfu.me]{link=https://antfu.me/ imageUrl=https://antfu.me/favicon.svg}. The design has been refined and its functionality expanded for greater flexibility.

@@ -1,12 +1,12 @@
-import type { Database } from "../../types/supabase";
-import { createAuditLog } from "../audit";
-import { mongoClient } from "./mongoClient";
+import type { Database } from '../../types/supabase'
+import { createAuditLog } from '../audit'
+import { mongoClient } from './mongoClient'
 
-export type Conversation = Database["public"]["Tables"]["conversations"]["Row"];
+export type Conversation = Database['public']['Tables']['conversations']['Row']
 export type NewConversation =
-  Database["public"]["Tables"]["conversations"]["Insert"];
+  Database['public']['Tables']['conversations']['Insert']
 export type UpdateConversation =
-  Database["public"]["Tables"]["conversations"]["Update"];
+  Database['public']['Tables']['conversations']['Update']
 
 /**
  * Get all conversations for a user
@@ -15,12 +15,12 @@ export async function getConversations(
   userId: string,
 ): Promise<Conversation[]> {
   const conversations = await mongoClient.db
-    .collection("conversations")
+    .collection('conversations')
     .find({ user_id: userId })
     .sort({ last_message_at: -1 })
-    .toArray();
+    .toArray()
 
-  return conversations as Conversation[];
+  return conversations as Conversation[]
 }
 
 /**
@@ -31,10 +31,10 @@ export async function getConversation(
   userId: string,
 ): Promise<Conversation | null> {
   const conversation = await mongoClient.db
-    .collection("conversations")
-    .findOne({ _id: id, user_id: userId });
+    .collection('conversations')
+    .findOne({ _id: id, user_id: userId })
 
-  return conversation as Conversation | null;
+  return conversation as Conversation | null
 }
 
 /**
@@ -45,28 +45,28 @@ export async function createConversation(
   request?: Request,
 ): Promise<Conversation> {
   const result = await mongoClient.db
-    .collection("conversations")
-    .insertOne(conversation);
+    .collection('conversations')
+    .insertOne(conversation)
 
   const newConversation = {
     ...conversation,
     _id: result.insertedId,
-  };
+  }
 
   // Log the event for HIPAA compliance
   await createAuditLog({
     userId: conversation.user_id,
-    action: "conversation_created",
-    resource: "conversations",
+    action: 'conversation_created',
+    resource: 'conversations',
     metadata: {
       conversationId: newConversation._id.toHexString(),
       title: conversation.title,
-      ipAddress: request?.headers.get("x-forwarded-for"),
-      userAgent: request?.headers.get("user-agent"),
+      ipAddress: request?.headers.get('x-forwarded-for'),
+      userAgent: request?.headers.get('user-agent'),
     },
-  });
+  })
 
-  return newConversation as Conversation;
+  return newConversation as Conversation
 }
 
 /**
@@ -79,31 +79,31 @@ export async function updateConversation(
   request?: Request,
 ): Promise<Conversation> {
   const result = await mongoClient.db
-    .collection("conversations")
+    .collection('conversations')
     .findOneAndUpdate(
       { _id: id, user_id: userId },
       { $set: updates },
-      { returnDocument: "after" },
-    );
+      { returnDocument: 'after' },
+    )
 
   if (!result.value) {
-    throw new Error("Failed to update conversation");
+    throw new Error('Failed to update conversation')
   }
 
   // Log the event for HIPAA compliance
   await createAuditLog({
     userId,
-    action: "conversation_updated",
-    resource: "conversations",
+    action: 'conversation_updated',
+    resource: 'conversations',
     metadata: {
       conversationId: id,
       updates,
-      ipAddress: request?.headers.get("x-forwarded-for"),
-      userAgent: request?.headers.get("user-agent"),
+      ipAddress: request?.headers.get('x-forwarded-for'),
+      userAgent: request?.headers.get('user-agent'),
     },
-  });
+  })
 
-  return result.value as Conversation;
+  return result.value as Conversation
 }
 
 /**
@@ -115,24 +115,24 @@ export async function deleteConversation(
   request?: Request,
 ): Promise<void> {
   const result = await mongoClient.db
-    .collection("conversations")
-    .deleteOne({ _id: id, user_id: userId });
+    .collection('conversations')
+    .deleteOne({ _id: id, user_id: userId })
 
   if (result.deletedCount === 0) {
-    throw new Error("Failed to delete conversation");
+    throw new Error('Failed to delete conversation')
   }
 
   // Log the event for HIPAA compliance
   await createAuditLog({
     userId,
-    action: "conversation_deleted",
-    resource: "conversations",
+    action: 'conversation_deleted',
+    resource: 'conversations',
     metadata: {
       conversationId: id,
-      ipAddress: request?.headers.get("x-forwarded-for"),
-      userAgent: request?.headers.get("user-agent"),
+      ipAddress: request?.headers.get('x-forwarded-for'),
+      userAgent: request?.headers.get('user-agent'),
     },
-  });
+  })
 }
 
 /**
@@ -140,10 +140,10 @@ export async function deleteConversation(
  */
 export async function adminGetAllConversations(): Promise<Conversation[]> {
   const conversations = await mongoClient.db
-    .collection("conversations")
+    .collection('conversations')
     .find()
     .sort({ created_at: -1 })
-    .toArray();
+    .toArray()
 
-  return conversations as Conversation[];
+  return conversations as Conversation[]
 }

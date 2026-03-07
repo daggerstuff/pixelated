@@ -1,7 +1,7 @@
 ---
-title: "Family Resources"
-description: "Comprehensive resource bundle for families and support networks"
-author: "Resource Team"
+title: 'Family Resources'
+description: 'Comprehensive resource bundle for families and support networks'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

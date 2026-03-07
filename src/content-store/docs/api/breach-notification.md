@@ -1,12 +1,12 @@
 ---
-title: "Breach Notification API"
-description: "API documentation for the breach notification system"
+title: 'Breach Notification API'
+description: 'API documentation for the breach notification system'
 pubDate: 2025-03-25
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ["api", "security", "breach-notification"]
-author: "Pixelated Team"
+tags: ['api', 'security', 'breach-notification']
+author: 'Pixelated Team'
 ---
 
 # Breach Notification API Reference
@@ -418,20 +418,21 @@ Official SDKs are available for:
 Example using TypeScript SDK:
 
 ```typescript
-const client = new BreachNotificationClient("your-api-key");
+
+const client = new BreachNotificationClient('your-api-key')
 
 async function reportBreach() {
   const breach = await client.breaches.create({
-    type: "unauthorized_access",
-    severity: "high",
-    description: "Unauthorized access detected",
-    affectedUsers: ["user_1", "user_2"],
-    affectedData: ["personal_info"],
-    detectionMethod: "system_monitoring",
-    remediation: "Access revoked",
-  });
+    type: 'unauthorized_access',
+    severity: 'high',
+    description: 'Unauthorized access detected',
+    affectedUsers: ['user_1', 'user_2'],
+    affectedData: ['personal_info'],
+    detectionMethod: 'system_monitoring',
+    remediation: 'Access revoked',
+  })
 
-  console.log("Breach reported:", breach.id);
+  console.log('Breach reported:', breach.id)
 }
 ```
 

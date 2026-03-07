@@ -1,51 +1,51 @@
-import React, { useCallback, useMemo, useState, type FC } from "react";
-import { fetchJSONWithRetry } from "@/lib/net/index";
-import type { FHEOperation } from "@/lib/fhe/types";
+import React, { useCallback, useMemo, useState, type FC } from 'react'
+import { fetchJSONWithRetry } from '@/lib/net/index'
+import type { FHEOperation } from '@/lib/fhe/types'
 
 interface Props {
-  defaultMessage?: string;
+  defaultMessage?: string
 }
 
 export const FHEDemo: FC<Props> = ({
-  defaultMessage = "Your data is protected with FHE technology",
+  defaultMessage = 'Your data is protected with FHE technology',
 }) => {
   const [plainText, setPlainText] = useState(
-    "Therapist: How are you feeling today?",
-  );
+    'Therapist: How are you feeling today?',
+  )
   const [operation, setOperation] = useState<
-    FHEOperation | "word_count" | "sentiment"
-  >("word_count");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<unknown>(null);
+    FHEOperation | 'word_count' | 'sentiment'
+  >('word_count')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<unknown>(null)
 
   const operations = useMemo(
     () => [
-      { value: "word_count", label: "Word Count" },
-      { value: "character_count", label: "Character Count" },
-      { value: "SENTIMENT", label: "Sentiment (demo)" },
+      { value: 'word_count', label: 'Word Count' },
+      { value: 'character_count', label: 'Character Count' },
+      { value: 'SENTIMENT', label: 'Sentiment (demo)' },
     ],
     [],
-  );
+  )
 
   const encryptLocally = useCallback(async (text: string) => {
     // Demo local "encryption" shim so we can send something that looks encrypted
     // The API/service will accept any string and process
     // Modern base64 encoding for UTF-8 strings (replaces deprecated unescape)
-    return `test-fhe:v1:${btoa(String.fromCharCode(...new TextEncoder().encode(text)))}`;
-  }, []);
+    return `test-fhe:v1:${btoa(String.fromCharCode(...new TextEncoder().encode(text)))}`
+  }, [])
 
   const handleProcess = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    setResult(null);
+    setIsLoading(true)
+    setError(null)
+    setResult(null)
     try {
-      const encryptedData = await encryptLocally(plainText);
+      const encryptedData = await encryptLocally(plainText)
       const json = await fetchJSONWithRetry<unknown>(
-        "/api/fhe/process",
+        '/api/fhe/process',
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             encryptedData,
             operation,
@@ -53,37 +53,37 @@ export const FHEDemo: FC<Props> = ({
           }),
         },
         { retries: 2, timeout: 8000 },
-      );
-      if (typeof json === "object" && json !== null && "result" in json) {
-        setResult((json as { result?: unknown }).result ?? json);
+      )
+      if (typeof json === 'object' && json !== null && 'result' in json) {
+        setResult((json as { result?: unknown }).result ?? json)
       } else {
-        setResult(json);
+        setResult(json)
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [encryptLocally, operation, plainText]);
+  }, [encryptLocally, operation, plainText])
 
   const handleRotateKeys = useCallback(async () => {
     try {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
       await fetchJSONWithRetry(
-        "/api/fhe/rotate-keys",
-        { method: "POST" },
+        '/api/fhe/rotate-keys',
+        { method: 'POST' },
         {
           retries: 2,
           timeout: 8000,
         },
-      );
+      )
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Failed to rotate keys");
+      setError(e instanceof Error ? e.message : 'Failed to rotate keys')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   return (
     <div className="space-y-4">
@@ -111,7 +111,7 @@ export const FHEDemo: FC<Props> = ({
               value={operation}
               onChange={(e) =>
                 setOperation(
-                  e.target.value as FHEOperation | "word_count" | "sentiment",
+                  e.target.value as FHEOperation | 'word_count' | 'sentiment',
                 )
               }
             >
@@ -128,7 +128,7 @@ export const FHEDemo: FC<Props> = ({
             onClick={handleProcess}
             disabled={isLoading}
           >
-            {isLoading ? "Processing…" : "Process Encrypted Data"}
+            {isLoading ? 'Processing…' : 'Process Encrypted Data'}
           </button>
 
           <button
@@ -154,7 +154,7 @@ export const FHEDemo: FC<Props> = ({
         </pre>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FHEDemo;
+export default FHEDemo
