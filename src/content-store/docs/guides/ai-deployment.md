@@ -1,9 +1,9 @@
 ---
-title: 'AI Deployment Guide'
-description: 'AI Deployment Guide documentation'
+title: "AI Deployment Guide"
+description: "AI Deployment Guide documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -229,17 +229,16 @@ For horizontal scaling:
 2. Implement distributed caching with Redis:
 
 ```typescript
-
 const redisClient = createClient({
   url: process.env.REDIS_URL,
-})
+});
 
-await redisClient.connect()
+await redisClient.connect();
 
 // In your performance optimization wrapper
 async function getCachedResponse(key: string): Promise<AICompletion | null> {
-  const cached = await redisClient.get(key)
-  return cached ? JSON.parse(cached) : null
+  const cached = await redisClient.get(key);
+  return cached ? JSON.parse(cached) : null;
 }
 
 async function cacheResponse(
@@ -247,7 +246,7 @@ async function cacheResponse(
   response: AICompletion,
   ttl: number,
 ): Promise<void> {
-  await redisClient.set(key, JSON.stringify(response), { EX: ttl })
+  await redisClient.set(key, JSON.stringify(response), { EX: ttl });
 }
 ```
 
@@ -272,19 +271,18 @@ Implement a multi-level caching strategy:
 1. In-memory LRU cache for frequently used prompts:
 
 ```typescript
-
 const memoryCache = new LRUCache<string, AICompletion>({
   max: 1000,
   ttl: 1000 * 60 * 60, // 1 hour
-})
+});
 
 // In your performance optimization wrapper
 function getCachedResponseFromMemory(key: string): AICompletion | undefined {
-  return memoryCache.get(key)
+  return memoryCache.get(key);
 }
 
 function cacheResponseInMemory(key: string, response: AICompletion): void {
-  memoryCache.set(key, response)
+  memoryCache.set(key, response);
 }
 ```
 
@@ -310,7 +308,6 @@ Set up performance monitoring:
 1. Implement custom metrics for AI operations:
 
 ```typescript
-
 // In your performance optimization wrapper
 async function trackPerformance(
   operation: string,
@@ -318,21 +315,21 @@ async function trackPerformance(
   model: string,
   startTime: number,
   tokenUsage?: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
   },
 ): Promise<void> {
-  const duration = Date.now() - startTime
+  const duration = Date.now() - startTime;
 
-  Metrics.recordLatency(operation, provider, model, duration)
+  Metrics.recordLatency(operation, provider, model, duration);
 
   if (tokenUsage) {
-    Metrics.recordTokenUsage(operation, provider, model, tokenUsage)
+    Metrics.recordTokenUsage(operation, provider, model, tokenUsage);
   }
 
   if (duration > Number(process.env.SLOW_REQUEST_THRESHOLD || 5000)) {
-    Metrics.recordSlowRequest(operation, provider, model, duration)
+    Metrics.recordSlowRequest(operation, provider, model, duration);
   }
 }
 ```
@@ -348,7 +345,6 @@ Set up usage tracking:
 1. Implement database logging for AI usage:
 
 ```typescript
-
 // In your performance optimization wrapper
 async function trackUsage(
   userId: string,
@@ -356,12 +352,12 @@ async function trackUsage(
   provider: string,
   model: string,
   tokenUsage?: {
-    prompt_tokens: number
-    completion_tokens: number
-    total_tokens: number
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
   },
 ): Promise<void> {
-  await db.insert('ai_usage', {
+  await db.insert("ai_usage", {
     user_id: userId,
     operation,
     provider,
@@ -370,7 +366,7 @@ async function trackUsage(
     completion_tokens: tokenUsage?.completion_tokens || 0,
     total_tokens: tokenUsage?.total_tokens || 0,
     timestamp: new Date(),
-  })
+  });
 }
 ```
 
@@ -385,7 +381,6 @@ Set up HIPAA-compliant audit logging:
 1. Implement comprehensive audit logging:
 
 ```typescript
-
 // In your AI service wrapper
 async function logAuditEvent(
   userId: string,
@@ -399,10 +394,10 @@ async function logAuditEvent(
     resource,
     details,
     ip_address:
-      request.headers.get('x-forwarded-for') || request.socket.remoteAddress,
-    user_agent: request.headers.get('user-agent'),
+      request.headers.get("x-forwarded-for") || request.socket.remoteAddress,
+    user_agent: request.headers.get("user-agent"),
     timestamp: new Date(),
-  })
+  });
 }
 ```
 
@@ -459,22 +454,21 @@ Implement content filtering for AI inputs and outputs:
 1. Set up input validation and sanitization:
 
 ```typescript
-
 const messageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant']),
+  role: z.enum(["system", "user", "assistant"]),
   content: z.string().min(1).max(32768),
-})
+});
 
 const completionRequestSchema = z.object({
   messages: z.array(messageSchema).min(1).max(100),
   model: z.string().min(1),
   temperature: z.number().min(0).max(2).optional(),
   max_tokens: z.number().min(1).max(32768).optional(),
-  provider: z.enum(['openai', 'anthropic']).optional(),
-})
+  provider: z.enum(["openai", "anthropic"]).optional(),
+});
 
 // In your API route
-const validatedData = completionRequestSchema.parse(await request.json())
+const validatedData = completionRequestSchema.parse(await request.json());
 ```
 
 2. Implement output filtering for sensitive information
@@ -488,22 +482,21 @@ Implement access control for AI features:
 1. Set up role-based access control:
 
 ```typescript
-
 // In your API route
-if (!AccessControl.can(user, 'use', 'ai:sentiment-analysis')) {
+if (!AccessControl.can(user, "use", "ai:sentiment-analysis")) {
   return new Response(
     JSON.stringify({
       error: {
-        message: 'You do not have permission to use this feature.',
-        code: 'PERMISSION_DENIED',
+        message: "You do not have permission to use this feature.",
+        code: "PERMISSION_DENIED",
         statusCode: 403,
       },
     }),
     {
       status: 403,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     },
-  )
+  );
 }
 ```
 
@@ -520,14 +513,13 @@ Implement HIPAA-compliant data protection:
 1. Encrypt sensitive data in transit and at rest:
 
 ```typescript
-
 // Encrypt sensitive data before storing
-const encryptedData = await encrypt(sensitiveData, encryptionKey)
-await db.insert('ai_data', { encrypted_data: encryptedData })
+const encryptedData = await encrypt(sensitiveData, encryptionKey);
+await db.insert("ai_data", { encrypted_data: encryptedData });
 
 // Decrypt data when needed
-const encryptedData = await db.select('ai_data').where({ id })
-const decryptedData = await decrypt(encryptedData, encryptionKey)
+const encryptedData = await db.select("ai_data").where({ id });
+const decryptedData = await decrypt(encryptedData, encryptionKey);
 ```
 
 2. Implement secure data deletion policies
@@ -570,20 +562,19 @@ Implement a failover strategy:
 1. Set up provider failover for AI services:
 
 ```typescript
-
 async function createCompletionWithFailover(
   messages: AIMessage[],
   options?: AIServiceOptions,
 ): Promise<AICompletion> {
   const primaryProvider =
-    options?.provider || process.env.DEFAULT_AI_PROVIDER || 'openai'
-  const fallbackProviders = ['anthropic', 'openai'].filter(
+    options?.provider || process.env.DEFAULT_AI_PROVIDER || "openai";
+  const fallbackProviders = ["anthropic", "openai"].filter(
     (p) => p !== primaryProvider,
-  )
+  );
 
   try {
-    const aiService = createAIService({ provider: primaryProvider })
-    return await aiService.createChatCompletion(messages, options)
+    const aiService = createAIService({ provider: primaryProvider });
+    return await aiService.createChatCompletion(messages, options);
   } catch (error) {
     if (
       error instanceof AIError &&
@@ -595,8 +586,8 @@ async function createCompletionWithFailover(
         try {
           const fallbackService = createAIService({
             provider: fallbackProvider,
-          })
-          return await fallbackService.createChatCompletion(messages, options)
+          });
+          return await fallbackService.createChatCompletion(messages, options);
         } catch (fallbackError) {
           // Continue to next fallback
         }
@@ -604,7 +595,7 @@ async function createCompletionWithFailover(
     }
 
     // If all providers fail, throw the original error
-    throw error
+    throw error;
   }
 }
 ```

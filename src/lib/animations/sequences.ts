@@ -3,7 +3,7 @@
  * Provides coordinated animation systems for complex UI interactions
  */
 
-import { type Variants } from 'framer-motion'
+import { type Variants } from "framer-motion";
 
 // Base timing constants for consistent animation feel
 export const TIMING = {
@@ -12,7 +12,7 @@ export const TIMING = {
   slow: 0.6,
   slower: 0.8,
   slowest: 1.2,
-} as const
+} as const;
 
 export const EASING = {
   ease: [0.25, 0.1, 0.25, 1],
@@ -22,7 +22,7 @@ export const EASING = {
   backOut: [0.34, 1.56, 0.64, 1],
   anticipate: [0.22, 1, 0.36, 1],
   bouncy: [0.68, -0.55, 0.265, 1.55],
-} as const
+} as const;
 
 // Advanced stagger configurations
 export const STAGGER = {
@@ -31,7 +31,7 @@ export const STAGGER = {
   normal: 0.1,
   slow: 0.2,
   reverse: -0.1,
-} as const
+} as const;
 
 /**
  * Page transition sequences
@@ -105,13 +105,13 @@ export const pageTransitionSequences: Record<string, Variants> = {
     initial: {
       opacity: 0,
       scale: 0.8,
-      borderRadius: '50%',
+      borderRadius: "50%",
       rotate: -5,
     },
     animate: {
       opacity: 1,
       scale: 1,
-      borderRadius: '0%',
+      borderRadius: "0%",
       rotate: 0,
       transition: {
         duration: TIMING.slower,
@@ -124,7 +124,7 @@ export const pageTransitionSequences: Record<string, Variants> = {
     exit: {
       opacity: 0,
       scale: 0.8,
-      borderRadius: '50%',
+      borderRadius: "50%",
       rotate: 5,
       transition: {
         duration: TIMING.normal,
@@ -132,7 +132,7 @@ export const pageTransitionSequences: Record<string, Variants> = {
       },
     },
   },
-}
+};
 
 /**
  * List item animation sequences with staggered reveals
@@ -209,7 +209,7 @@ export const listAnimationSequences: Record<string, Variants> = {
       },
     },
   },
-}
+};
 
 /**
  * Individual list item animations
@@ -244,7 +244,7 @@ export const listItemSequences: Record<string, Variants> = {
       y: 0,
       rotateX: 0,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 25,
       },
@@ -308,14 +308,14 @@ export const listItemSequences: Record<string, Variants> = {
     initial: {
       opacity: 0,
       scale: 0.8,
-      borderRadius: '50%',
-      filter: 'blur(10px)',
+      borderRadius: "50%",
+      filter: "blur(10px)",
     },
     animate: {
       opacity: 1,
       scale: 1,
-      borderRadius: '8px',
-      filter: 'blur(0px)',
+      borderRadius: "8px",
+      filter: "blur(0px)",
       transition: {
         duration: TIMING.slower,
         ease: EASING.anticipate,
@@ -326,15 +326,15 @@ export const listItemSequences: Record<string, Variants> = {
     exit: {
       opacity: 0,
       scale: 0.8,
-      borderRadius: '50%',
-      filter: 'blur(10px)',
+      borderRadius: "50%",
+      filter: "blur(10px)",
       transition: {
         duration: TIMING.normal,
         ease: EASING.easeIn,
       },
     },
   },
-}
+};
 
 /**
  * Modal/Dialog animation sequences
@@ -388,13 +388,13 @@ export const modalSequences: Record<string, Variants> = {
     initial: {
       opacity: 0,
       scale: 0.5,
-      borderRadius: '50%',
+      borderRadius: "50%",
       rotate: 180,
     },
     animate: {
       opacity: 1,
       scale: 1,
-      borderRadius: '12px',
+      borderRadius: "12px",
       rotate: 0,
       transition: {
         duration: TIMING.slower,
@@ -405,7 +405,7 @@ export const modalSequences: Record<string, Variants> = {
     exit: {
       opacity: 0,
       scale: 0.5,
-      borderRadius: '50%',
+      borderRadius: "50%",
       rotate: -180,
       transition: {
         duration: TIMING.normal,
@@ -413,7 +413,7 @@ export const modalSequences: Record<string, Variants> = {
       },
     },
   },
-}
+};
 
 /**
  * Interactive element sequences (buttons, inputs, etc.)
@@ -444,12 +444,12 @@ export const interactiveSequences: Record<string, Variants> = {
     rest: {
       y: 0,
       scale: 1,
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
     },
     hover: {
       y: -8,
       scale: 1.02,
-      boxShadow: '0 20px 25px rgba(0, 0, 0, 0.15)',
+      boxShadow: "0 20px 25px rgba(0, 0, 0, 0.15)",
       transition: {
         duration: TIMING.normal,
         ease: EASING.easeOut,
@@ -460,13 +460,13 @@ export const interactiveSequences: Record<string, Variants> = {
   inputFocus: {
     rest: {
       scale: 1,
-      borderColor: 'rgba(0, 0, 0, 0.1)',
-      boxShadow: '0 0 0 0 rgba(59, 130, 246, 0)',
+      borderColor: "rgba(0, 0, 0, 0.1)",
+      boxShadow: "0 0 0 0 rgba(59, 130, 246, 0)",
     },
     focus: {
       scale: 1.02,
-      borderColor: 'rgba(59, 130, 246, 1)',
-      boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+      borderColor: "rgba(59, 130, 246, 1)",
+      boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
       transition: {
         duration: TIMING.fast,
         ease: EASING.easeOut,
@@ -480,12 +480,12 @@ export const interactiveSequences: Record<string, Variants> = {
       rotate: 360,
       transition: {
         duration: 1,
-        ease: 'linear',
+        ease: "linear",
         repeat: Infinity,
       },
     },
   },
-}
+};
 
 /**
  * Notification/Toast sequences
@@ -520,7 +520,7 @@ export const notificationSequences: Record<string, Variants> = {
       scale: 1,
       y: 0,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 20,
       },
@@ -540,16 +540,16 @@ export const notificationSequences: Record<string, Variants> = {
     initial: {
       opacity: 0,
       scale: 0.5,
-      borderRadius: '50%',
-      width: '50px',
-      height: '50px',
+      borderRadius: "50%",
+      width: "50px",
+      height: "50px",
     },
     animate: {
       opacity: 1,
       scale: 1,
-      borderRadius: '8px',
-      width: 'auto',
-      height: 'auto',
+      borderRadius: "8px",
+      width: "auto",
+      height: "auto",
       transition: {
         duration: TIMING.slower,
         ease: EASING.anticipate,
@@ -560,14 +560,14 @@ export const notificationSequences: Record<string, Variants> = {
     exit: {
       opacity: 0,
       scale: 0.5,
-      borderRadius: '50%',
+      borderRadius: "50%",
       transition: {
         duration: TIMING.normal,
         ease: EASING.easeIn,
       },
     },
   },
-}
+};
 
 /**
  * Loading animation sequences
@@ -610,7 +610,7 @@ export const loadingSequences: Record<string, Variants> = {
       },
     },
   },
-}
+};
 
 /**
  * Complex orchestrated sequences for dashboard/analytics
@@ -655,25 +655,25 @@ export const dashboardSequences: Record<string, Variants> = {
       },
     },
   },
-}
+};
 
 /**
  * Utility function to get reduced motion variants
  */
 export function getReducedMotionVariant(variants: Variants): Variants {
-  const reducedVariants: Variants = {}
+  const reducedVariants: Variants = {};
 
   Object.keys(variants).forEach((key) => {
-    const variant = variants[key]
-    if (typeof variant === 'object' && variant !== null) {
+    const variant = variants[key];
+    if (typeof variant === "object" && variant !== null) {
       reducedVariants[key] = {
         opacity: variant.opacity || 1,
         transition: { duration: 0.1 },
-      }
+      };
     }
-  })
+  });
 
-  return reducedVariants
+  return reducedVariants;
 }
 
 /**
@@ -701,15 +701,15 @@ export const animationPresets = {
 
   // Loading
   loading: loadingSequences.pulse,
-} as const
+} as const;
 
-export type AnimationPreset = keyof typeof animationPresets
+export type AnimationPreset = keyof typeof animationPresets;
 export type SequenceType =
-  | 'page'
-  | 'list'
-  | 'item'
-  | 'modal'
-  | 'interactive'
-  | 'notification'
-  | 'loading'
-  | 'dashboard'
+  | "page"
+  | "list"
+  | "item"
+  | "modal"
+  | "interactive"
+  | "notification"
+  | "loading"
+  | "dashboard";

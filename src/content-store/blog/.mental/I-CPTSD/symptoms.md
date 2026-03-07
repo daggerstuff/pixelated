@@ -1,7 +1,7 @@
 ---
-title: 'CPTSD Symptoms'
-description: 'Detailed guide to Complex PTSD symptoms and manifestations'
-author: 'Resource Team'
+title: "CPTSD Symptoms"
+description: "Detailed guide to Complex PTSD symptoms and manifestations"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

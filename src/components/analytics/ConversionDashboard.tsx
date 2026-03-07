@@ -1,122 +1,124 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { AnalyticsService } from '@/lib/analytics'
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { AnalyticsService } from "@/lib/analytics";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Button } from '@/components/ui/button'
-import { IconRefresh, IconDownload, IconFilter } from '@/components/ui/icons'
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { IconRefresh, IconDownload, IconFilter } from "@/components/ui/icons";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 // Types
 interface ConversionEvent {
-  conversionId: string
-  value?: number
-  timestamp: number
-  path?: string
-  source?: string
+  conversionId: string;
+  value?: number;
+  timestamp: number;
+  path?: string;
+  source?: string;
   // Additional optional properties for conversion events
-  category?: string
-  userId?: string
-  metadata?: Record<string, string | number | boolean>
-  tags?: string[]
+  category?: string;
+  userId?: string;
+  metadata?: Record<string, string | number | boolean>;
+  tags?: string[];
   deviceInfo?: {
-    type: string
-    browser: string
-    os: string
-  }
+    type: string;
+    browser: string;
+    os: string;
+  };
 }
 
 export function ConversionDashboard() {
-  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('weekly')
-  const [filter, setFilter] = useState<string>('all')
-  const [isLoading, setIsLoading] = useState(true)
+  const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">(
+    "weekly",
+  );
+  const [filter, setFilter] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(true);
   const [conversionEvents, setConversionEvents] = useState<ConversionEvent[]>(
     [],
-  )
-  const [activeTab, setActiveTab] = useState('overview')
+  );
+  const [activeTab, setActiveTab] = useState("overview");
 
-  const analytics = AnalyticsService.getInstance()
+  const analytics = AnalyticsService.getInstance();
 
   // Define loadConversionData function
   const loadConversionData = useCallback(async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // In a real implementation, this would fetch from an API
       // Here we're getting data from the AnalyticsService
       const events = analytics
         .getEvents()
-        .filter((event) => event.eventType === 'conversion_event')
+        .filter((event) => event.eventType === "conversion_event");
 
       // Transform to our expected format
       const conversions = events.map((event) => ({
-        conversionId: event.data['conversionId'],
-        value: event.data['value'],
+        conversionId: event.data["conversionId"],
+        value: event.data["value"],
         timestamp: event.timestamp,
-        path: event.data['path'],
-        source: event.data['source'],
+        path: event.data["path"],
+        source: event.data["source"],
         ...event.data,
-      }))
+      }));
 
       // Apply filter if needed
       const filtered =
-        filter === 'all'
+        filter === "all"
           ? conversions
-          : conversions.filter((c) => String(c.conversionId) === filter)
+          : conversions.filter((c) => String(c.conversionId) === filter);
 
-      setConversionEvents(filtered as ConversionEvent[])
+      setConversionEvents(filtered as ConversionEvent[]);
     } catch (error: unknown) {
-      console.error('Failed to load conversion data', error)
+      console.error("Failed to load conversion data", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [analytics, filter])
+  }, [analytics, filter]);
 
   // Load conversion data
   useEffect(() => {
-    loadConversionData()
-  }, [period, filter, loadConversionData])
+    loadConversionData();
+  }, [period, filter, loadConversionData]);
 
   // Calculate summary metrics
   const summaryData = useMemo(() => {
     // Group by conversion ID
-    const conversionTypes = {} as Record<string, ConversionEvent[]>
+    const conversionTypes = {} as Record<string, ConversionEvent[]>;
     conversionEvents.forEach((event) => {
       if (!conversionTypes[event.conversionId]) {
-        conversionTypes[event.conversionId] = []
+        conversionTypes[event.conversionId] = [];
       }
-      conversionTypes[event.conversionId]!.push(event)
-    })
+      conversionTypes[event.conversionId]!.push(event);
+    });
 
     // Generate summary for each conversion type
     return Object.entries(conversionTypes).map(([id, events]) => {
       const totalValue = events.reduce(
         (sum, event) => sum + (event.value || 0),
         0,
-      )
+      );
 
       // Calculate trend (last 7 days)
-      const now = Date.now()
-      const oneDay = 24 * 60 * 60 * 1000
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
       const trend = Array(7)
         .fill(0)
         .map((_, i) => {
-          const dayStart = now - (6 - i) * oneDay
-          const dayEnd = dayStart + oneDay
+          const dayStart = now - (6 - i) * oneDay;
+          const dayEnd = dayStart + oneDay;
           return events.filter(
             (e) => e.timestamp >= dayStart && e.timestamp < dayEnd,
-          ).length
-        })
+          ).length;
+        });
 
       return {
         id,
@@ -124,57 +126,57 @@ export function ConversionDashboard() {
         totalValue,
         conversionRate: (events.length / 1000) * 100, // Mockup rate based on 1000 page views
         trend,
-      }
-    })
-  }, [conversionEvents])
+      };
+    });
+  }, [conversionEvents]);
 
   // Calculate sources breakdown
   const sourceData = useMemo(() => {
-    const sources = {} as Record<string, { count: number; value: number }>
+    const sources = {} as Record<string, { count: number; value: number }>;
 
     conversionEvents.forEach((event) => {
-      const source = event.source || 'direct'
+      const source = event.source || "direct";
       if (!sources[source]) {
-        sources[source] = { count: 0, value: 0 }
+        sources[source] = { count: 0, value: 0 };
       }
-      sources[source].count++
-      sources[source].value += event.value || 0
-    })
+      sources[source].count++;
+      sources[source].value += event.value || 0;
+    });
 
-    const totalCount = conversionEvents.length
+    const totalCount = conversionEvents.length;
 
     return Object.entries(sources).map(([source, data]) => ({
       source,
       count: data.count,
       value: data.value,
       percentage: (data.count / totalCount) * 100,
-    }))
-  }, [conversionEvents])
+    }));
+  }, [conversionEvents]);
 
   // Calculate pages breakdown
   const pageData = useMemo(() => {
-    const pages = {} as Record<string, { count: number; value: number }>
+    const pages = {} as Record<string, { count: number; value: number }>;
 
     conversionEvents.forEach((event) => {
-      const path = event.path || '(not set)'
+      const path = event.path || "(not set)";
       if (!pages[path]) {
-        pages[path] = { count: 0, value: 0 }
+        pages[path] = { count: 0, value: 0 };
       }
-      pages[path].count++
-      pages[path].value += event.value || 0
-    })
+      pages[path].count++;
+      pages[path].value += event.value || 0;
+    });
 
     // Page views would come from analytics in a real implementation
     const pageViews = {
-      '/': 300,
-      '/about': 120,
-      '/products': 200,
-      '/contact': 80,
-      '/login': 150,
-      '/signup': 100,
-      '/checkout': 50,
-      '(not set)': 50,
-    }
+      "/": 300,
+      "/about": 120,
+      "/products": 200,
+      "/contact": 80,
+      "/login": 150,
+      "/signup": 100,
+      "/checkout": 50,
+      "(not set)": 50,
+    };
 
     return Object.entries(pages).map(([path, data]) => ({
       path,
@@ -182,45 +184,45 @@ export function ConversionDashboard() {
       value: data.value,
       conversionRate:
         (data.count / (pageViews[path as keyof typeof pageViews] || 1)) * 100,
-    }))
-  }, [conversionEvents])
+    }));
+  }, [conversionEvents]);
 
   // Chart data for conversions over time
   const timeChartData = useMemo(() => {
-    let labels: string[] = []
+    let labels: string[] = [];
 
     // Generate labels based on selected period
-    const now = new Date()
-    if (period === 'daily') {
+    const now = new Date();
+    if (period === "daily") {
       // Last 7 days
       labels = Array(7)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setDate(now.getDate() - (6 - i))
-          return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          })
-        })
-    } else if (period === 'weekly') {
+          const date = new Date();
+          date.setDate(now.getDate() - (6 - i));
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          });
+        });
+    } else if (period === "weekly") {
       // Last 6 weeks
       labels = Array(6)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setDate(now.getDate() - (5 - i) * 7)
-          return `Week ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
-        })
+          const date = new Date();
+          date.setDate(now.getDate() - (5 - i) * 7);
+          return `Week ${date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+        });
     } else {
       // Last 6 months
       labels = Array(6)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setMonth(now.getMonth() - (5 - i))
-          return date.toLocaleDateString('en-US', { month: 'short' })
-        })
+          const date = new Date();
+          date.setMonth(now.getMonth() - (5 - i));
+          return date.toLocaleDateString("en-US", { month: "short" });
+        });
     }
 
     // Generate dataset - in a real implementation this would use actual data
@@ -229,15 +231,15 @@ export function ConversionDashboard() {
       labels,
       datasets: [
         {
-          label: 'Conversions',
+          label: "Conversions",
           data: [12, 19, 15, 22, 24, 28],
-          backgroundColor: 'rgba(99, 102, 241, 0.5)',
-          borderColor: 'rgb(99, 102, 241)',
+          backgroundColor: "rgba(99, 102, 241, 0.5)",
+          borderColor: "rgb(99, 102, 241)",
           borderWidth: 1,
         },
       ],
-    }
-  }, [period])
+    };
+  }, [period]);
 
   // Chart data for conversion types
   const typeChartData = useMemo(() => {
@@ -245,50 +247,53 @@ export function ConversionDashboard() {
       labels: summaryData.map((item) => item.id),
       datasets: [
         {
-          label: 'Count',
+          label: "Count",
           data: summaryData.map((item) => item.count),
           backgroundColor: [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)',
-            'rgba(75, 192, 192, 0.6)',
-            'rgba(153, 102, 255, 0.6)',
+            "rgba(255, 99, 132, 0.6)",
+            "rgba(54, 162, 235, 0.6)",
+            "rgba(255, 206, 86, 0.6)",
+            "rgba(75, 192, 192, 0.6)",
+            "rgba(153, 102, 255, 0.6)",
           ],
         },
       ],
-    }
-  }, [summaryData])
+    };
+  }, [summaryData]);
 
   // Export data as CSV
   const exportToCsv = () => {
     if (conversionEvents.length === 0) {
-      return
+      return;
     }
 
     // Create CSV content
-    const headers = ['Conversion ID', 'Value', 'Timestamp', 'Source', 'Path']
+    const headers = ["Conversion ID", "Value", "Timestamp", "Source", "Path"];
     const csvRows = [
-      headers.join(','),
+      headers.join(","),
       ...conversionEvents.map((event) =>
         [
           event.conversionId,
           event.value || 0,
           new Date(event.timestamp).toISOString(),
-          event.source || 'direct',
-          event.path || '(not set)',
-        ].join(','),
+          event.source || "direct",
+          event.path || "(not set)",
+        ].join(","),
       ),
-    ]
+    ];
 
     // Create and download file
-    const csvContent = csvRows.join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.setAttribute('href', url)
-    link.setAttribute('download', `conversions-${new Date().toISOString()}.csv`)
-    link.click()
-  }
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `conversions-${new Date().toISOString()}.csv`,
+    );
+    link.click();
+  };
 
   return (
     <div className="space-y-4">
@@ -347,23 +352,23 @@ export function ConversionDashboard() {
 
             <div className="flex space-x-2">
               <Button
-                variant={period === 'daily' ? 'default' : 'outline'}
+                variant={period === "daily" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setPeriod('daily')}
+                onClick={() => setPeriod("daily")}
               >
                 Daily
               </Button>
               <Button
-                variant={period === 'weekly' ? 'default' : 'outline'}
+                variant={period === "weekly" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setPeriod('weekly')}
+                onClick={() => setPeriod("weekly")}
               >
                 Weekly
               </Button>
               <Button
-                variant={period === 'monthly' ? 'default' : 'outline'}
+                variant={period === "monthly" ? "default" : "outline"}
                 size="sm"
-                onClick={() => setPeriod('monthly')}
+                onClick={() => setPeriod("monthly")}
               >
                 Monthly
               </Button>
@@ -434,7 +439,7 @@ export function ConversionDashboard() {
                                     className="bg-primary rounded-sm w-full"
                                     style={{
                                       height: `${Math.max(20, (value / Math.max(...summary.trend)) * 100)}%`,
-                                      minHeight: '4px',
+                                      minHeight: "4px",
                                     }}
                                   ></div>
                                 ))}
@@ -461,8 +466,8 @@ export function ConversionDashboard() {
                   </CardHeader>
                   <CardContent className="h-[300px] flex items-center justify-center">
                     <div className="text-center text-gray-500">
-                      [Chart Component Would Render Here with{' '}
-                      {timeChartData.labels.join(', ')}]
+                      [Chart Component Would Render Here with{" "}
+                      {timeChartData.labels.join(", ")}]
                     </div>
                   </CardContent>
                 </Card>
@@ -473,8 +478,8 @@ export function ConversionDashboard() {
                   </CardHeader>
                   <CardContent className="h-[300px] flex items-center justify-center">
                     <div className="text-center text-gray-500">
-                      [Pie Chart Would Render Here with{' '}
-                      {typeChartData.labels.join(', ')}]
+                      [Pie Chart Would Render Here with{" "}
+                      {typeChartData.labels.join(", ")}]
                     </div>
                   </CardContent>
                 </Card>
@@ -666,13 +671,13 @@ export function ConversionDashboard() {
                                 <td className="px-6 py-4">
                                   {event.value
                                     ? `$${event.value.toFixed(2)}`
-                                    : '-'}
+                                    : "-"}
                                 </td>
                                 <td className="px-6 py-4">
-                                  {event.source || 'direct'}
+                                  {event.source || "direct"}
                                 </td>
                                 <td className="px-6 py-4">
-                                  {event.path || '(not set)'}
+                                  {event.path || "(not set)"}
                                 </td>
                               </tr>
                             ))}
@@ -692,5 +697,5 @@ export function ConversionDashboard() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,53 +1,53 @@
-import { useState, useEffect, useRef } from 'react'
-import { DashboardWidget } from './DashboardWidget'
+import { useState, useEffect, useRef } from "react";
+import { DashboardWidget } from "./DashboardWidget";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
+} from "@/components/ui/select";
 
 // Optional: Import type definitions for better TypeScript support
-type ChartType = 'line' | 'bar' | 'pie' | 'doughnut'
-type TimeRange = 'day' | 'week' | 'month' | 'quarter' | 'year'
+type ChartType = "line" | "bar" | "pie" | "doughnut";
+type TimeRange = "day" | "week" | "month" | "quarter" | "year";
 
 // Chart.js type for better type safety
 type ChartInstance = {
-  destroy: () => void
-  update: () => void
-  resize: () => void
-  render: () => void
-}
+  destroy: () => void;
+  update: () => void;
+  resize: () => void;
+  render: () => void;
+};
 
 interface DataPoint {
-  label: string
-  value: number
-  color?: string
+  label: string;
+  value: number;
+  color?: string;
 }
 
 interface DataSeries {
-  name: string
-  data: number[]
-  color?: string
+  name: string;
+  data: number[];
+  color?: string;
 }
 
 export interface ChartWidgetProps {
-  title: string
-  description?: string
-  chartType: ChartType
-  labels: string[]
-  series: DataSeries[] | DataPoint[]
-  isTimeSeries?: boolean
-  height?: number
-  allowRangeSelection?: boolean
-  isLoading?: boolean
-  className?: string
-  refreshInterval?: number
+  title: string;
+  description?: string;
+  chartType: ChartType;
+  labels: string[];
+  series: DataSeries[] | DataPoint[];
+  isTimeSeries?: boolean;
+  height?: number;
+  allowRangeSelection?: boolean;
+  isLoading?: boolean;
+  className?: string;
+  refreshInterval?: number;
   fetchData?: (range: TimeRange) => Promise<{
-    labels: string[]
-    series: DataSeries[] | DataPoint[]
-  }>
+    labels: string[];
+    series: DataSeries[] | DataPoint[];
+  }>;
 }
 
 export function ChartWidget({
@@ -60,23 +60,23 @@ export function ChartWidget({
   height = 300,
   allowRangeSelection = false,
   isLoading: initialLoading = false,
-  className = '',
+  className = "",
   refreshInterval,
   fetchData,
 }: ChartWidgetProps) {
-  const [labels, setLabels] = useState<string[]>(initialLabels)
+  const [labels, setLabels] = useState<string[]>(initialLabels);
   const [series, setSeries] = useState<DataSeries[] | DataPoint[]>(
     initialSeries,
-  )
-  const [isLoading, setIsLoading] = useState(initialLoading)
-  const [range, setRange] = useState<TimeRange>('week')
-  const [chart, setChart] = useState<ChartInstance | null>(null)
-  const chartRef = useRef<HTMLCanvasElement>(null)
+  );
+  const [isLoading, setIsLoading] = useState(initialLoading);
+  const [range, setRange] = useState<TimeRange>("week");
+  const [chart, setChart] = useState<ChartInstance | null>(null);
+  const chartRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     // Dynamically import Chart.js only in browser environment
-    if (typeof window !== 'undefined' && chartRef.current) {
-      import('chart.js').then((ChartJS) => {
+    if (typeof window !== "undefined" && chartRef.current) {
+      import("chart.js").then((ChartJS) => {
         // Register required controllers and elements
         ChartJS.Chart.register(
           ChartJS.CategoryScale,
@@ -87,32 +87,32 @@ export function ChartWidget({
           ChartJS.ArcElement,
           ChartJS.Tooltip,
           ChartJS.Legend,
-        )
+        );
 
-        const ctx = chartRef.current?.getContext('2d')
+        const ctx = chartRef.current?.getContext("2d");
         if (ctx) {
           // Destroy any existing chart
           if (chart) {
-            chart.destroy()
+            chart.destroy();
           }
 
           // Create configuration based on chart type
-          const config = createChartConfig(chartType, labels, series)
+          const config = createChartConfig(chartType, labels, series);
 
           // Create and store the chart
-          const newChart = new ChartJS.Chart(ctx, config) as ChartInstance
-          setChart(newChart)
+          const newChart = new ChartJS.Chart(ctx, config) as ChartInstance;
+          setChart(newChart);
         }
-      })
+      });
     }
 
     return () => {
       // Clean up chart on unmount
       if (chart) {
-        chart.destroy()
+        chart.destroy();
       }
-    }
-  }, [chartType, labels, series, isTimeSeries, chart])
+    };
+  }, [chartType, labels, series, isTimeSeries, chart]);
 
   // Function to create chart configuration based on type
   const createChartConfig = (
@@ -122,17 +122,17 @@ export function ChartWidget({
   ) => {
     // Default color palette
     const defaultColors = [
-      'rgba(59, 130, 246, 0.5)', // Blue
-      'rgba(16, 185, 129, 0.5)', // Green
-      'rgba(249, 115, 22, 0.5)', // Orange
-      'rgba(139, 92, 246, 0.5)', // Purple
-      'rgba(236, 72, 153, 0.5)', // Pink
-      'rgba(245, 158, 11, 0.5)', // Amber
-    ]
+      "rgba(59, 130, 246, 0.5)", // Blue
+      "rgba(16, 185, 129, 0.5)", // Green
+      "rgba(249, 115, 22, 0.5)", // Orange
+      "rgba(139, 92, 246, 0.5)", // Purple
+      "rgba(236, 72, 153, 0.5)", // Pink
+      "rgba(245, 158, 11, 0.5)", // Amber
+    ];
 
     // For pie/doughnut charts
-    if (type === 'pie' || type === 'doughnut') {
-      const dataPoints = chartSeries as DataPoint[]
+    if (type === "pie" || type === "doughnut") {
+      const dataPoints = chartSeries as DataPoint[];
       return {
         type,
         data: {
@@ -152,15 +152,15 @@ export function ChartWidget({
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              position: 'bottom' as const,
+              position: "bottom" as const,
             },
           },
         },
-      }
+      };
     }
 
     // For line/bar charts with multiple series
-    const multiSeries = chartSeries as DataSeries[]
+    const multiSeries = chartSeries as DataSeries[];
     return {
       type,
       data: {
@@ -172,11 +172,11 @@ export function ChartWidget({
             series.color || defaultColors[i % defaultColors.length],
           borderColor:
             series.color ||
-            defaultColors[i % defaultColors.length]?.replace('0.5', '1') ||
-            'rgba(59, 130, 246, 1)',
-          borderWidth: type === 'line' ? 2 : 1,
+            defaultColors[i % defaultColors.length]?.replace("0.5", "1") ||
+            "rgba(59, 130, 246, 1)",
+          borderWidth: type === "line" ? 2 : 1,
           tension: 0.4,
-          fill: type === 'line' ? false : undefined,
+          fill: type === "line" ? false : undefined,
         })),
       },
       options: {
@@ -191,75 +191,75 @@ export function ChartWidget({
           y: {
             beginAtZero: true,
             grid: {
-              color: 'rgba(0, 0, 0, 0.05)',
+              color: "rgba(0, 0, 0, 0.05)",
             },
           },
         },
         plugins: {
           legend: {
-            position: 'bottom' as const,
+            position: "bottom" as const,
             display: multiSeries.length > 1,
           },
           tooltip: {
-            mode: 'index' as const,
+            mode: "index" as const,
             intersect: false,
           },
         },
         interaction: {
-          mode: 'nearest' as const,
-          axis: 'x' as const,
+          mode: "nearest" as const,
+          axis: "x" as const,
           intersect: false,
         },
       },
-    }
-  }
+    };
+  };
 
   // Handle data fetching
   useEffect(() => {
     const loadData = async () => {
       if (fetchData) {
         try {
-          setIsLoading(true)
-          const data = await fetchData(range)
-          setLabels(data.labels)
-          setSeries(data.series)
+          setIsLoading(true);
+          const data = await fetchData(range);
+          setLabels(data.labels);
+          setSeries(data.series);
         } catch (error: unknown) {
-          console.error('Error fetching chart data:', error)
+          console.error("Error fetching chart data:", error);
         } finally {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
-    }
+    };
 
-    loadData()
+    loadData();
 
     if (refreshInterval && fetchData) {
-      const interval = setInterval(loadData, refreshInterval)
-      return () => clearInterval(interval)
+      const interval = setInterval(loadData, refreshInterval);
+      return () => clearInterval(interval);
     }
 
     // Return undefined explicitly to satisfy TypeScript
-    return undefined
-  }, [range, fetchData, refreshInterval])
+    return undefined;
+  }, [range, fetchData, refreshInterval]);
 
   // Handle refresh
   const handleRefresh = () => {
     if (fetchData) {
       const refreshAsync = async () => {
         try {
-          setIsLoading(true)
-          const data = await fetchData(range)
-          setLabels(data.labels)
-          setSeries(data.series)
+          setIsLoading(true);
+          const data = await fetchData(range);
+          setLabels(data.labels);
+          setSeries(data.series);
         } catch (error: unknown) {
-          console.error('Error refreshing chart data:', error)
+          console.error("Error refreshing chart data:", error);
         } finally {
-          setIsLoading(false)
+          setIsLoading(false);
         }
-      }
-      refreshAsync()
+      };
+      refreshAsync();
     }
-  }
+  };
 
   // Custom actions for the widget
   const rangeSelector = allowRangeSelection ? (
@@ -278,12 +278,12 @@ export function ChartWidget({
         <SelectItem value="year">Year</SelectItem>
       </SelectContent>
     </Select>
-  ) : null
+  ) : null;
 
   return (
     <DashboardWidget
       title={title}
-      description={description || ''}
+      description={description || ""}
       isLoading={isLoading}
       {...(fetchData && { onRefresh: handleRefresh })}
       className={className}
@@ -301,5 +301,5 @@ export function ChartWidget({
         <canvas ref={chartRef}></canvas>
       </div>
     </DashboardWidget>
-  )
+  );
 }

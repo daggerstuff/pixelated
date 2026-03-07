@@ -1,19 +1,18 @@
 ---
-title: 'Development'
-description: 'Preview changes locally to update your docs'
+title: "Development"
+description: "Preview changes locally to update your docs"
 pubDate: 2024-01-15
 author: Pixelated Empathy Team
 ---
 
-  **Prerequisite**: Please install Node.js (version 19 or higher) before
-  proceeding. <br />
-  Please upgrade to ```docs.json``` before proceeding and delete the legacy
-  ```mint.json``` file.
+**Prerequisite**: Please install Node.js (version 19 or higher) before
+proceeding. <br />
+Please upgrade to `docs.json` before proceeding and delete the legacy
+`mint.json` file.
 
 Follow these steps to install and run Mintlify on your operating system:
 
 **Step 1**: Install Mintlify:
-
 
 ```bash npm
 npm i -g mintlify
@@ -22,7 +21,6 @@ npm i -g mintlify
 ```bash yarn
 yarn global add mintlify
 ```
-
 
 **Step 2**: Navigate to the docs directory (where the `docs.json` file is located) and execute the following command:
 
@@ -50,7 +48,6 @@ Port 3000 is already in use. Trying 3001 instead.
 
 Please note that each CLI release is associated with a specific version of Mintlify. If your local website doesn't align with the production version, please update the CLI:
 
-
 ```bash npm
 npm i -g mintlify@latest
 ```
@@ -58,7 +55,6 @@ npm i -g mintlify@latest
 ```bash yarn
 yarn global upgrade mintlify
 ```
-
 
 ## Validating Links
 
@@ -70,8 +66,8 @@ mintlify broken-links
 
 ## Deployment
 
-  Unlimited editors available under the [Pro Plan](https://mintlify.com/pricing)
-  and above.
+Unlimited editors available under the [Pro Plan](https://mintlify.com/pricing)
+and above.
 
 If the deployment is successful, you should see the following:
 
@@ -80,7 +76,6 @@ If the deployment is successful, you should see the following:
 We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
 
 ## Troubleshooting
-
 
     This may be due to an outdated version of node. Try the following:
     1. Remove the currently-installed version of mintlify: `npm remove -g mintlify`

@@ -1,7 +1,7 @@
-import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger.ts'
-import { EvidenceService } from './evidence/EvidenceService.ts'
-import { ClinicalKnowledgeBase } from './ClinicalKnowledgeBase.ts'
-import { ClinicalAnalysisHelpers } from './ClinicalAnalysisHelpers.ts'
+import { getClinicalAnalysisLogger } from "@/lib/logging/standardized-logger.ts";
+import { EvidenceService } from "./evidence/EvidenceService.ts";
+import { ClinicalKnowledgeBase } from "./ClinicalKnowledgeBase.ts";
+import { ClinicalAnalysisHelpers } from "./ClinicalAnalysisHelpers.ts";
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidedAnalysisResult,
@@ -10,27 +10,27 @@ import type {
   CrisisContext,
   ICrisisNotificationHandler,
   IModelProvider,
-} from './types/mentalLLaMATypes.ts'
+} from "./types/mentalLLaMATypes.ts";
 
-const logger = getClinicalAnalysisLogger('general')
+const logger = getClinicalAnalysisLogger("general");
 
 /**
  * Expert Guidance Orchestrator coordinates the expert-guided analysis process,
  * integrating clinical knowledge, analysis helpers, and evidence services.
  */
 export class ExpertGuidanceOrchestrator {
-  private clinicalKnowledgeBase: ClinicalKnowledgeBase
-  private clinicalAnalysisHelpers: ClinicalAnalysisHelpers
+  private clinicalKnowledgeBase: ClinicalKnowledgeBase;
+  private clinicalAnalysisHelpers: ClinicalAnalysisHelpers;
 
   constructor(
     private evidenceService: EvidenceService,
     private modelProvider?: IModelProvider,
     private crisisNotifier?: ICrisisNotificationHandler,
   ) {
-    this.clinicalKnowledgeBase = new ClinicalKnowledgeBase()
+    this.clinicalKnowledgeBase = new ClinicalKnowledgeBase();
     this.clinicalAnalysisHelpers = new ClinicalAnalysisHelpers(
       this.modelProvider,
-    )
+    );
   }
 
   /**
@@ -42,17 +42,17 @@ export class ExpertGuidanceOrchestrator {
     fetchExpertGuidance: boolean = true,
     routingContextParams?: Partial<RoutingContext>,
   ): Promise<ExpertGuidedAnalysisResult> {
-    const analysisTimestamp = new Date().toISOString()
+    const analysisTimestamp = new Date().toISOString();
 
     try {
       // Step 1: Fetch expert guidance if requested and available
-      let expertGuidance: ExpertGuidance | undefined
+      let expertGuidance: ExpertGuidance | undefined;
       if (fetchExpertGuidance) {
         expertGuidance = await this.clinicalKnowledgeBase.fetchExpertGuidance(
           baseAnalysis.mentalHealthCategory,
           text,
           baseAnalysis,
-        )
+        );
       }
 
       // Step 2: Generate expert-guided analysis using LLM with clinical prompts
@@ -61,7 +61,7 @@ export class ExpertGuidanceOrchestrator {
           text,
           baseAnalysis,
           expertGuidance,
-        )
+        );
 
       // Step 3: Perform comprehensive risk assessment
       const riskAssessment =
@@ -69,7 +69,7 @@ export class ExpertGuidanceOrchestrator {
           text,
           baseAnalysis,
           expertGuidance,
-        )
+        );
 
       // Step 4: Generate clinical recommendations
       const clinicalRecommendations =
@@ -77,7 +77,7 @@ export class ExpertGuidanceOrchestrator {
           baseAnalysis,
           expertGuidance,
           riskAssessment,
-        )
+        );
 
       // Step 5: Calculate quality metrics
       const qualityMetrics =
@@ -85,31 +85,31 @@ export class ExpertGuidanceOrchestrator {
           expertGuidedAnalysis,
           expertGuidance,
           baseAnalysis,
-        )
+        );
 
       // Step 6: Update routing decision insights
       const updatedRoutingDecision = baseAnalysis._routingDecision
         ? {
-          ...baseAnalysis._routingDecision,
-          insights: {
-            ...baseAnalysis._routingDecision.insights,
-            expertGuidanceApplied: true,
-            expertGuidanceSource: fetchExpertGuidance
-              ? 'clinical_knowledge_base'
-              : 'llm_only',
-            clinicalEnhancement: true,
-          },
-        }
-        : undefined
+            ...baseAnalysis._routingDecision,
+            insights: {
+              ...baseAnalysis._routingDecision.insights,
+              expertGuidanceApplied: true,
+              expertGuidanceSource: fetchExpertGuidance
+                ? "clinical_knowledge_base"
+                : "llm_only",
+              clinicalEnhancement: true,
+            },
+          }
+        : undefined;
 
       // Step 7: Extract comprehensive evidence for expert-guided analysis
-      let enhancedEvidence: string[] = baseAnalysis.supportingEvidence || []
+      let enhancedEvidence: string[] = baseAnalysis.supportingEvidence || [];
       try {
         const enhancedContext = {
           ...routingContextParams,
           explicitTaskHint:
-            routingContextParams?.explicitTaskHint || 'expert_guided_analysis',
-        }
+            routingContextParams?.explicitTaskHint || "expert_guided_analysis",
+        };
 
         const evidenceResult =
           await this.evidenceService.extractSupportingEvidence(
@@ -117,23 +117,23 @@ export class ExpertGuidanceOrchestrator {
             baseAnalysis.mentalHealthCategory,
             baseAnalysis,
             enhancedContext,
-          )
+          );
 
         // Prioritize high-quality evidence
-        const prioritizedEvidence = evidenceResult.evidenceItems.slice(0, 10)
-        enhancedEvidence = prioritizedEvidence
+        const prioritizedEvidence = evidenceResult.evidenceItems.slice(0, 10);
+        enhancedEvidence = prioritizedEvidence;
 
-        logger.info('Expert-guided evidence extraction completed', {
+        logger.info("Expert-guided evidence extraction completed", {
           originalCount: baseAnalysis.supportingEvidence?.length || 0,
           enhancedCount: enhancedEvidence.length,
           evidenceStrength: evidenceResult.processingMetadata.evidenceStrength,
           category: baseAnalysis.mentalHealthCategory,
-        })
+        });
       } catch (evidenceError) {
-        logger.error('Expert-guided evidence extraction failed', {
+        logger.error("Expert-guided evidence extraction failed", {
           error: evidenceError,
           category: baseAnalysis.mentalHealthCategory,
-        })
+        });
         // Use original evidence if extraction fails
       }
 
@@ -152,48 +152,48 @@ export class ExpertGuidanceOrchestrator {
           _routingDecision: updatedRoutingDecision,
         }),
         timestamp: analysisTimestamp,
-      }
+      };
 
       // Step 9: Handle crisis scenarios with expert guidance and enhanced evidence
       if (result.isCrisis && expertGuidance) {
-        await this.handleCrisisWithExpertGuidance(result, routingContextParams)
+        await this.handleCrisisWithExpertGuidance(result, routingContextParams);
 
         // Extract crisis-specific evidence for enhanced crisis handling
         try {
           const crisisEvidence =
-            await this.evidenceService.extractCrisisEvidence(text, result)
+            await this.evidenceService.extractCrisisEvidence(text, result);
 
           // Add crisis evidence to the crisis context for better crisis response
           if (crisisEvidence.immediateRiskIndicators.length > 0) {
-            logger.warn('Immediate risk indicators identified', {
+            logger.warn("Immediate risk indicators identified", {
               count: crisisEvidence.immediateRiskIndicators.length,
               indicators: crisisEvidence.immediateRiskIndicators,
               userId: routingContextParams?.userId,
-            })
+            });
           }
         } catch (crisisEvidenceError) {
-          logger.error('Crisis evidence extraction failed', {
+          logger.error("Crisis evidence extraction failed", {
             error: crisisEvidenceError,
             userId: routingContextParams?.userId,
-          })
+          });
         }
       }
 
-      logger.info('Expert-guided analysis completed successfully', {
+      logger.info("Expert-guided analysis completed successfully", {
         userId: routingContextParams?.userId,
         category: result.mentalHealthCategory,
         expertGuided: result.expertGuided,
         overallRisk: result.riskAssessment?.overallRisk,
         recommendationCount: result.clinicalRecommendations?.length || 0,
-      })
+      });
 
-      return result
+      return result;
     } catch (error: unknown) {
-      logger.error('Error in expert-guided analysis orchestration', {
+      logger.error("Error in expert-guided analysis orchestration", {
         error,
         userId: routingContextParams?.userId,
-      })
-      throw error // Re-throw for handling by caller
+      });
+      throw error; // Re-throw for handling by caller
     }
   }
 
@@ -204,10 +204,10 @@ export class ExpertGuidanceOrchestrator {
     result: ExpertGuidedAnalysisResult,
     routingContextParams?: Partial<RoutingContext>,
   ): Promise<void> {
-    logger.warn('Handling crisis with expert guidance', {
+    logger.warn("Handling crisis with expert guidance", {
       userId: routingContextParams?.userId,
       overallRisk: result.riskAssessment?.overallRisk,
-    })
+    });
 
     // Enhanced crisis context with expert guidance
     if (this.crisisNotifier) {
@@ -225,20 +225,20 @@ export class ExpertGuidanceOrchestrator {
           explicitTaskHint: routingContextParams.explicitTaskHint,
         }),
         textSample:
-          result.supportingEvidence?.join(' | ') || 'No evidence available',
+          result.supportingEvidence?.join(" | ") || "No evidence available",
         timestamp: result.timestamp,
         decisionDetails: result._routingDecision || {},
         analysisResult: {
           ...result,
           explanation: `[EXPERT-GUIDED] ${result.explanation}`,
         },
-      }
+      };
 
       try {
-        await this.crisisNotifier.sendCrisisAlert(enhancedCrisisContext)
-        logger.info('Enhanced crisis alert sent successfully')
+        await this.crisisNotifier.sendCrisisAlert(enhancedCrisisContext);
+        logger.info("Enhanced crisis alert sent successfully");
       } catch (error: unknown) {
-        logger.error('Failed to send enhanced crisis alert', { error })
+        logger.error("Failed to send enhanced crisis alert", { error });
       }
     }
   }

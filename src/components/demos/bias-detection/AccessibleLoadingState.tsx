@@ -1,23 +1,23 @@
 // Accessible loading state component with better UX
-import React from 'react'
-import { motion } from 'framer-motion'
+import React from "react";
+import { motion } from "framer-motion";
 
 interface AccessibleLoadingStateProps {
-  message?: string
-  progress?: number
-  steps?: string[]
-  currentStep?: number
+  message?: string;
+  progress?: number;
+  steps?: string[];
+  currentStep?: number;
 }
 
 export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
-  message = 'Analyzing content for bias patterns...',
+  message = "Analyzing content for bias patterns...",
   progress = 0,
   steps = [
-    'Processing content structure',
-    'Analyzing demographic patterns',
-    'Checking cultural assumptions',
-    'Evaluating language bias',
-    'Generating recommendations',
+    "Processing content structure",
+    "Analyzing demographic patterns",
+    "Checking cultural assumptions",
+    "Evaluating language bias",
+    "Generating recommendations",
   ],
   currentStep = 0,
 }) => {
@@ -36,7 +36,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
           <motion.div
             className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             aria-hidden="true"
           />
         </div>
@@ -80,10 +80,10 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
             <div
               className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                 index < currentStep
-                  ? 'bg-green-100 text-green-800'
+                  ? "bg-green-100 text-green-800"
                   : index === currentStep
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-600'
+                    ? "bg-blue-100 text-blue-800"
+                    : "bg-gray-100 text-gray-600"
               }`}
             >
               {index < currentStep ? (
@@ -110,7 +110,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
             </div>
             <span
               className={`text-sm ${
-                index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                index <= currentStep ? "text-gray-900" : "text-gray-500"
               }`}
             >
               {step}
@@ -125,7 +125,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
           `Currently processing: ${steps[currentStep]}`}
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
-export default AccessibleLoadingState
+export default AccessibleLoadingState;

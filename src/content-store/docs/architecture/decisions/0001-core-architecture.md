@@ -32,21 +32,18 @@ Key requirements:
 We have decided to implement a microservices-based architecture with the following key components:
 
 1. Frontend Layer:
-
    - Next.js for server-side rendering and static generation
    - React for component-based UI
    - TailwindCSS for styling
    - Vercel Edge Runtime for optimal performance
 
 2. API Layer:
-
    - GraphQL API with federation
    - REST API for specific endpoints
    - WebSocket for real-time communication
    - Edge Functions for performance-critical operations
 
 3. Core Services:
-
    - Authentication Service (Supabase)
    - AI Analysis Service (Custom)
    - Zero-Knowledge Proof Service (MP-SPDZ)
@@ -54,7 +51,6 @@ We have decided to implement a microservices-based architecture with the followi
    - Analytics Service (Custom)
 
 4. Data Layer:
-
    - PostgreSQL for relational data
    - Redis for caching and real-time data
    - S3 for file storage
@@ -89,13 +85,11 @@ Negative:
 ### Alternatives Considered
 
 1. Monolithic Architecture:
-
    - Rejected due to scalability limitations
    - Would have been simpler initially
    - Would limit future flexibility
 
 2. Serverless-only Architecture:
-
    - Rejected due to cold start concerns
    - Would have higher costs at scale
    - Limited by platform constraints
@@ -108,27 +102,23 @@ Negative:
 ## Implementation
 
 1. Infrastructure Setup:
-
    - Deploy base AWS infrastructure with Terraform
    - Set up monitoring and logging
    - Configure security groups and networking
 
 2. Core Services:
-
    - Implement authentication service
    - Build AI analysis pipeline
    - Create zero-knowledge proof system
    - Set up storage service
 
 3. API Layer:
-
    - Implement GraphQL schema
    - Create REST endpoints
    - Set up WebSocket handlers
    - Configure Edge Functions
 
 4. Frontend:
-
    - Build component library
    - Implement pages and routing
    - Add authentication flow

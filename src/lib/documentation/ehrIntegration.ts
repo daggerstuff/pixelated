@@ -3,17 +3,17 @@ import type {
   EHRExportOptions,
   EHRExportResult,
   FHIRDocumentReference,
-} from './types'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+} from "./types";
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('ehr-integration')
+const logger = createBuildSafeLogger("ehr-integration");
 
 /**
  * Class that handles integration between our documentation system and EHR systems
  */
 export class EHRIntegration {
-  private fhirClient: unknown
-  private auditLog: boolean
+  private fhirClient: unknown;
+  private auditLog: boolean;
 
   /**
    * Create a new EHR integration
@@ -21,11 +21,11 @@ export class EHRIntegration {
    * @param options Additional options for the integration
    */
   constructor(fhirClient: unknown, options: { auditLog?: boolean } = {}) {
-    if (!fhirClient || typeof fhirClient !== 'object') {
-      throw new Error('Invalid FHIR client provided.')
+    if (!fhirClient || typeof fhirClient !== "object") {
+      throw new Error("Invalid FHIR client provided.");
     }
-    this.fhirClient = fhirClient
-    this.auditLog = options.auditLog ?? true
+    this.fhirClient = fhirClient;
+    this.auditLog = options.auditLog ?? true;
   }
 
   /**
@@ -39,31 +39,31 @@ export class EHRIntegration {
     options: EHRExportOptions,
   ): Promise<EHRExportResult> {
     try {
-      logger.info('Exporting documentation to EHR', {
+      logger.info("Exporting documentation to EHR", {
         format: options.format,
         patientId: options.patientId,
-      })
+      });
 
       // Convert documentation to appropriate format
       const formattedDocument = await this.formatDocumentForEHR(
         sessionDocumentation,
         options,
-      )
+      );
 
       // Create a FHIR DocumentReference resource
       const documentReference = await this.createDocumentReference(
         formattedDocument,
         options,
-      )
+      );
 
       if (this.auditLog && documentReference.id) {
         await this.createAuditLog({
-          action: 'export',
-          resourceType: 'DocumentReference',
+          action: "export",
+          resourceType: "DocumentReference",
           resourceId: documentReference.id,
           userId: options.providerId,
           patientId: options.patientId,
-        })
+        });
       }
 
       // Compose EHRExportResult according to the imported type
@@ -77,14 +77,14 @@ export class EHRIntegration {
           patientId: options.patientId,
           providerId: options.providerId,
         },
-      }
-      return result
+      };
+      return result;
     } catch (error: unknown) {
-      logger.error('Failed to export documentation to EHR', {
+      logger.error("Failed to export documentation to EHR", {
         error,
         format: options.format,
         patientId: options.patientId,
-      })
+      });
 
       const result: EHRExportResult = {
         success: false,
@@ -96,8 +96,8 @@ export class EHRIntegration {
           patientId: options.patientId,
           providerId: options.providerId,
         },
-      }
-      return result
+      };
+      return result;
     }
   }
 
@@ -112,14 +112,14 @@ export class EHRIntegration {
     options: EHRExportOptions,
   ): Promise<Record<string, unknown>> {
     switch (options.format) {
-      case 'fhir':
-        return this.convertToFHIRDocument(documentation, options)
-      case 'ccda':
-        return this.convertToCCDA(documentation, options)
-      case 'pdf':
-        return this.convertToPDF(documentation, options)
+      case "fhir":
+        return this.convertToFHIRDocument(documentation, options);
+      case "ccda":
+        return this.convertToCCDA(documentation, options);
+      case "pdf":
+        return this.convertToPDF(documentation, options);
       default:
-        throw new Error(`Unsupported format: ${options.format}`)
+        throw new Error(`Unsupported format: ${options.format}`);
     }
   }
 
@@ -135,14 +135,14 @@ export class EHRIntegration {
   ): Record<string, unknown> {
     // Create a FHIR Composition resource
     return {
-      resourceType: 'Composition',
-      status: 'final',
+      resourceType: "Composition",
+      status: "final",
       type: {
         coding: [
           {
-            system: 'http://loinc.org',
-            code: '11488-4',
-            display: 'Consultation note',
+            system: "http://loinc.org",
+            code: "11488-4",
+            display: "Consultation note",
           },
         ],
       },
@@ -155,45 +155,45 @@ export class EHRIntegration {
           reference: `Practitioner/${options.providerId}`,
         },
       ],
-      title: 'Therapy Session Documentation',
+      title: "Therapy Session Documentation",
       section: [
         {
-          title: 'Notes',
+          title: "Notes",
           text: {
-            status: 'additional',
+            status: "additional",
             div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.notes}</div>`,
           },
         },
         {
-          title: 'Interventions',
+          title: "Interventions",
           text: {
-            status: 'additional',
-            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.interventions.join('<br/>')}</div>`,
+            status: "additional",
+            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.interventions.join("<br/>")}</div>`,
           },
         },
         {
-          title: 'Outcomes',
+          title: "Outcomes",
           text: {
-            status: 'additional',
-            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.outcomes.join('<br/>')}</div>`,
+            status: "additional",
+            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.outcomes.join("<br/>")}</div>`,
           },
         },
         {
-          title: 'Next Steps',
+          title: "Next Steps",
           text: {
-            status: 'additional',
-            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.nextSteps.join('<br/>')}</div>`,
+            status: "additional",
+            div: `<div xmlns="http://www.w3.org/1999/xhtml">${documentation.nextSteps.join("<br/>")}</div>`,
           },
         },
         {
-          title: 'Risk Assessment',
+          title: "Risk Assessment",
           text: {
-            status: 'additional',
-            div: `<div xmlns="http://www.w3.org/1999/xhtml">Level: ${documentation.riskAssessment.level}<br/>Factors: ${documentation.riskAssessment.factors.join(', ')}<br/>Recommendations: ${documentation.riskAssessment.recommendations.join(', ')}</div>`,
+            status: "additional",
+            div: `<div xmlns="http://www.w3.org/1999/xhtml">Level: ${documentation.riskAssessment.level}<br/>Factors: ${documentation.riskAssessment.factors.join(", ")}<br/>Recommendations: ${documentation.riskAssessment.recommendations.join(", ")}</div>`,
           },
         },
       ],
-    }
+    };
   }
 
   /**
@@ -207,7 +207,7 @@ export class EHRIntegration {
     _options: EHRExportOptions,
   ): Record<string, unknown> {
     return {
-      documentType: 'CCDA',
+      documentType: "CCDA",
       content: `<?xml version="1.0" encoding="UTF-8"?>
         <ClinicalDocument xmlns="urn:hl7-org:v3">
           <title>Therapy Session Documentation</title>
@@ -218,23 +218,23 @@ export class EHRIntegration {
             </section>
             <section>
               <title>Interventions</title>
-              <text>${documentation.interventions.join(', ')}</text>
+              <text>${documentation.interventions.join(", ")}</text>
             </section>
             <section>
               <title>Outcomes</title>
-              <text>${documentation.outcomes.join(', ')}</text>
+              <text>${documentation.outcomes.join(", ")}</text>
             </section>
             <section>
               <title>Next Steps</title>
-              <text>${documentation.nextSteps.join(', ')}</text>
+              <text>${documentation.nextSteps.join(", ")}</text>
             </section>
             <section>
               <title>Risk Assessment</title>
-              <text>Level: ${documentation.riskAssessment.level}; Factors: ${documentation.riskAssessment.factors.join(', ')}; Recommendations: ${documentation.riskAssessment.recommendations.join(', ')}</text>
+              <text>Level: ${documentation.riskAssessment.level}; Factors: ${documentation.riskAssessment.factors.join(", ")}; Recommendations: ${documentation.riskAssessment.recommendations.join(", ")}</text>
             </section>
           </component>
         </ClinicalDocument>`,
-    }
+    };
   }
 
   /**
@@ -248,7 +248,7 @@ export class EHRIntegration {
     _options: EHRExportOptions,
   ): Record<string, unknown> {
     return {
-      documentType: 'PDF',
+      documentType: "PDF",
       content: Buffer.from(`
         Title: Therapy Session Documentation
         Date: ${new Date().toISOString()}
@@ -259,20 +259,20 @@ export class EHRIntegration {
         ${documentation.notes}
 
         INTERVENTIONS:
-        ${documentation.interventions.join('\n- ')}
+        ${documentation.interventions.join("\n- ")}
 
         OUTCOMES:
-        ${documentation.outcomes.join('\n- ')}
+        ${documentation.outcomes.join("\n- ")}
 
         NEXT STEPS:
-        ${documentation.nextSteps.join('\n- ')}
+        ${documentation.nextSteps.join("\n- ")}
 
         RISK ASSESSMENT:
         Level: ${documentation.riskAssessment.level}
-        Factors: ${documentation.riskAssessment.factors.join(', ')}
-        Recommendations: ${documentation.riskAssessment.recommendations.join(', ')}
+        Factors: ${documentation.riskAssessment.factors.join(", ")}
+        Recommendations: ${documentation.riskAssessment.recommendations.join(", ")}
       `),
-    }
+    };
   }
 
   /**
@@ -285,19 +285,19 @@ export class EHRIntegration {
     formattedDocument: Record<string, unknown>,
     options: EHRExportOptions,
   ): Promise<FHIRDocumentReference> {
-    const now = new Date().toISOString()
+    const now = new Date().toISOString();
 
     // Create the DocumentReference resource
     const documentReference: FHIRDocumentReference = {
-      resourceType: 'DocumentReference',
-      status: 'current',
-      docStatus: 'final',
+      resourceType: "DocumentReference",
+      status: "current",
+      docStatus: "final",
       type: {
         coding: [
           {
-            system: 'http://loinc.org',
-            code: '11488-4',
-            display: 'Consultation note',
+            system: "http://loinc.org",
+            code: "11488-4",
+            display: "Consultation note",
           },
         ],
       },
@@ -319,29 +319,29 @@ export class EHRIntegration {
             contentType: this.getContentType(options.format),
             data: this.getEncodedData(formattedDocument),
             title:
-              (formattedDocument['title'] as string) ||
-              'Therapy Session Documentation',
+              (formattedDocument["title"] as string) ||
+              "Therapy Session Documentation",
             creation: now,
           },
         },
       ],
-    }
+    };
 
     // Create the DocumentReference in the EHR system
     if (
       this.fhirClient &&
-      typeof this.fhirClient === 'object' &&
-      'createResource' in this.fhirClient &&
-      typeof this.fhirClient.createResource === 'function'
+      typeof this.fhirClient === "object" &&
+      "createResource" in this.fhirClient &&
+      typeof this.fhirClient.createResource === "function"
     ) {
-      return await this.fhirClient.createResource(documentReference)
+      return await this.fhirClient.createResource(documentReference);
     }
 
     // Return a mock object for environments where fhirClient is not available
     return {
       ...documentReference,
-      id: 'mock-doc-ref-id-12345',
-    }
+      id: "mock-doc-ref-id-12345",
+    };
   }
 
   /**
@@ -349,32 +349,32 @@ export class EHRIntegration {
    * @param auditInfo Audit information
    */
   private async createAuditLog(auditInfo: {
-    action: string
-    resourceType: string
-    resourceId: string
-    userId: string
-    patientId: string
+    action: string;
+    resourceType: string;
+    resourceId: string;
+    userId: string;
+    patientId: string;
   }): Promise<void> {
     try {
       const auditEvent = {
-        resourceType: 'AuditEvent',
+        resourceType: "AuditEvent",
         type: {
-          system: 'http://terminology.hl7.org/CodeSystem/audit-event-type',
-          code: 'rest',
-          display: 'RESTful Operation',
+          system: "http://terminology.hl7.org/CodeSystem/audit-event-type",
+          code: "rest",
+          display: "RESTful Operation",
         },
         action: auditInfo.action,
         recorded: new Date().toISOString(),
-        outcome: 'success',
+        outcome: "success",
         agent: [
           {
             type: {
               coding: [
                 {
                   system:
-                    'http://terminology.hl7.org/CodeSystem/v3-ParticipationType',
-                  code: 'AUT',
-                  display: 'author (originator)',
+                    "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
+                  code: "AUT",
+                  display: "author (originator)",
                 },
               ],
             },
@@ -385,7 +385,7 @@ export class EHRIntegration {
         ],
         source: {
           observer: {
-            reference: 'Device/system',
+            reference: "Device/system",
           },
         },
         entity: [
@@ -400,42 +400,42 @@ export class EHRIntegration {
             },
           },
         ],
-      }
+      };
 
       // Only attempt to create the audit event if the FHIR client is properly configured
       if (
         this.fhirClient &&
-        typeof this.fhirClient === 'object' &&
-        'createResource' in this.fhirClient &&
-        typeof this.fhirClient.createResource === 'function'
+        typeof this.fhirClient === "object" &&
+        "createResource" in this.fhirClient &&
+        typeof this.fhirClient.createResource === "function"
       ) {
         try {
-          await this.fhirClient.createResource(auditEvent)
+          await this.fhirClient.createResource(auditEvent);
         } catch (error: unknown) {
-          logger.error('Failed to create audit event in FHIR server', {
+          logger.error("Failed to create audit event in FHIR server", {
             error,
             auditInfo,
             auditEvent,
-          })
+          });
           // Fall through to the catch block below
-          throw error
+          throw error;
         }
       } else {
         // Log that we're in a non-FHIR environment
-        const fhirClient = this.fhirClient as Record<string, unknown> | null
+        const fhirClient = this.fhirClient as Record<string, unknown> | null;
         logger.debug(
-          'Skipping audit event creation - FHIR client not properly configured',
+          "Skipping audit event creation - FHIR client not properly configured",
           {
             hasFhirClient: !!fhirClient,
-            isObject: fhirClient && typeof fhirClient === 'object',
-            hasCreateResource: fhirClient && 'createResource' in fhirClient,
+            isObject: fhirClient && typeof fhirClient === "object",
+            hasCreateResource: fhirClient && "createResource" in fhirClient,
             isFunction:
-              fhirClient && typeof fhirClient['createResource'] === 'function',
+              fhirClient && typeof fhirClient["createResource"] === "function",
           },
-        )
+        );
       }
     } catch (error: unknown) {
-      logger.error('Failed to create audit log', { error, auditInfo })
+      logger.error("Failed to create audit log", { error, auditInfo });
     }
   }
 
@@ -444,16 +444,16 @@ export class EHRIntegration {
    * @param format The format
    * @returns The content type
    */
-  private getContentType(format: 'fhir' | 'ccda' | 'pdf'): string {
+  private getContentType(format: "fhir" | "ccda" | "pdf"): string {
     switch (format) {
-      case 'fhir':
-        return 'application/fhir+json'
-      case 'ccda':
-        return 'application/xml'
-      case 'pdf':
-        return 'application/pdf'
+      case "fhir":
+        return "application/fhir+json";
+      case "ccda":
+        return "application/xml";
+      case "pdf":
+        return "application/pdf";
       default:
-        return 'application/json'
+        return "application/json";
     }
   }
 
@@ -463,15 +463,15 @@ export class EHRIntegration {
    * @returns Base64 encoded data
    */
   private getEncodedData(document: Record<string, unknown>): string {
-    if (typeof document['content'] === 'string') {
-      return Buffer.from(document['content']).toString('base64')
+    if (typeof document["content"] === "string") {
+      return Buffer.from(document["content"]).toString("base64");
     }
 
-    if (document['content'] instanceof Buffer) {
-      return document['content'].toString('base64')
+    if (document["content"] instanceof Buffer) {
+      return document["content"].toString("base64");
     }
 
-    return Buffer.from(JSON.stringify(document)).toString('base64')
+    return Buffer.from(JSON.stringify(document)).toString("base64");
   }
 }
-export type { EHRExportOptions, EHRExportResult } from './types'
+export type { EHRExportOptions, EHRExportResult } from "./types";

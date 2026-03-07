@@ -7,6 +7,7 @@ This is a production-grade implementation of the Mental Arena synthetic therapeu
 The production implementation consists of three main components:
 
 ### 1. MentalArenaAdapter (`MentalArenaAdapter.ts`)
+
 - **Primary Interface**: Main class for generating synthetic therapeutic conversations
 - **Features**:
   - Multi-disorder support (anxiety, depression, PTSD, ADHD, OCD, etc.)
@@ -17,6 +18,7 @@ The production implementation consists of three main components:
   - Comprehensive error handling and recovery
 
 ### 2. MentalArenaPythonBridge (`MentalArenaPythonBridge.ts`)
+
 - **Purpose**: Secure bridge for Python ML model integration
 - **Features**:
   - Secure Python process management
@@ -26,6 +28,7 @@ The production implementation consists of three main components:
   - Security constraints and path validation
 
 ### 3. Type System (`types.ts` + Internal Types)
+
 - **Comprehensive Types**: Full TypeScript definitions for all components
 - **Key Interfaces**: Provider abstractions, configuration options, results, validation
 
@@ -37,31 +40,31 @@ The production implementation consists of three main components:
 import {
   MentalArenaAdapter,
   MentalArenaPythonBridge,
-  DisorderCategory
-} from './lib/ai/mental-arena'
+  DisorderCategory,
+} from "./lib/ai/mental-arena";
 
 // Initialize components
-const provider = new YourMentalArenaProvider()
+const provider = new YourMentalArenaProvider();
 const pythonBridge = new MentalArenaPythonBridge({
-  pythonPath: 'python3',
+  pythonPath: "python3",
   timeout: 60000,
-  enableSandbox: true
-})
+  enableSandbox: true,
+});
 
-const adapter = new MentalArenaAdapter(provider, undefined, pythonBridge)
+const adapter = new MentalArenaAdapter(provider, undefined, pythonBridge);
 
 // Generate synthetic conversations
 const result = await adapter.generateSyntheticData({
   numConversations: 10,
   avgTurnsPerConversation: 8,
   disorders: [DisorderCategory.Anxiety, DisorderCategory.Depression],
-  complexityLevel: 'medium',
+  complexityLevel: "medium",
   includeValidation: true,
-  enableEncryption: false
-})
+  enableEncryption: false,
+});
 
-console.log(`Generated ${result.conversations.length} conversations`)
-console.log(`Average accuracy: ${result.qualityMetrics.averageAccuracy}%`)
+console.log(`Generated ${result.conversations.length} conversations`);
+console.log(`Average accuracy: ${result.qualityMetrics.averageAccuracy}%`);
 ```
 
 ### Command Line Usage
@@ -94,11 +97,13 @@ The system provides comprehensive quality assessment:
 ## 🔒 Security Features
 
 ### Encryption Support
+
 - Optional FHE (Fully Homomorphic Encryption) for sensitive data
 - HIPAA-compliant data handling patterns
 - Secure data serialization and transmission
 
 ### Python Sandbox
+
 - Restricted Python execution environment
 - Module whitelist for security
 - Resource limits and timeout protection
@@ -107,6 +112,7 @@ The system provides comprehensive quality assessment:
 ## 📈 Performance Monitoring
 
 Built-in performance tracking includes:
+
 - Generation time per conversation
 - Memory usage monitoring
 - Error rate tracking
@@ -118,12 +124,14 @@ Built-in performance tracking includes:
 The system includes sophisticated validation mechanisms:
 
 ### Clinical Accuracy Validation
+
 - Symptom identification accuracy
 - Therapeutic intervention appropriateness
 - Risk assessment validation
 - Emergency protocol compliance
 
 ### Conversation Quality Validation
+
 - Natural dialogue flow
 - Appropriate therapeutic boundaries
 - Consistent persona maintenance
@@ -132,28 +140,30 @@ The system includes sophisticated validation mechanisms:
 ## 🔧 Configuration Options
 
 ### Generation Parameters
+
 ```typescript
 interface GenerationOptions {
-  numConversations: number
-  avgTurnsPerConversation: number
-  disorders: DisorderCategory[]
-  complexityLevel: 'low' | 'medium' | 'high'
-  includeValidation: boolean
-  enableEncryption: boolean
-  outputFormat: 'json' | 'jsonl'
-  qualityThreshold: number
-  diversityWeight: number
+  numConversations: number;
+  avgTurnsPerConversation: number;
+  disorders: DisorderCategory[];
+  complexityLevel: "low" | "medium" | "high";
+  includeValidation: boolean;
+  enableEncryption: boolean;
+  outputFormat: "json" | "jsonl";
+  qualityThreshold: number;
+  diversityWeight: number;
 }
 ```
 
 ### Python Bridge Configuration
+
 ```typescript
 interface PythonBridgeConfig {
-  pythonPath: string
-  timeout: number
-  maxMemoryMB?: number
-  enableSandbox: boolean
-  allowedModules: string[]
+  pythonPath: string;
+  timeout: number;
+  maxMemoryMB?: number;
+  enableSandbox: boolean;
+  allowedModules: string[];
 }
 ```
 
@@ -162,6 +172,7 @@ interface PythonBridgeConfig {
 Generated data includes:
 
 ### Conversation Data (JSONL)
+
 ```json
 {
   "patientText": "I've been feeling anxious lately...",
@@ -174,6 +185,7 @@ Generated data includes:
 ```
 
 ### Metadata (JSON)
+
 ```json
 {
   "metadata": {
@@ -208,11 +220,13 @@ The system provides detailed validation reports:
 ## 📋 Requirements
 
 ### Runtime Dependencies
+
 - Node.js 18+
 - TypeScript 5+
 - Python 3.8+ (for Python bridge)
 
 ### Optional Dependencies
+
 - FHE encryption library (for encryption features)
 - ML libraries (numpy, pandas, sklearn, torch, transformers)
 
@@ -236,23 +250,29 @@ This implementation is designed for production use with:
 ### MentalArenaAdapter
 
 #### `generateSyntheticData(options: GenerationOptions): Promise<GenerationResult>`
+
 Generates synthetic therapeutic conversations with comprehensive quality metrics.
 
 #### `validateConversation(conversation: SyntheticConversation): Promise<ValidationResult>`
+
 Validates individual conversations for clinical accuracy and quality.
 
 #### `analyzeQuality(conversations: SyntheticConversation[]): Promise<QualityMetrics>`
+
 Performs comprehensive quality analysis across multiple conversations.
 
 ### MentalArenaPythonBridge
 
 #### `executeScript(script: string, args: string[]): Promise<ExecutionResult>`
+
 Securely executes Python scripts with sandbox protection.
 
 #### `serializeData(data: any): Promise<string>`
+
 Safely serializes complex data for Python processing.
 
 #### `cleanup(): Promise<void>`
+
 Cleans up Python processes and resources.
 
 ## 🐛 Troubleshooting
@@ -267,16 +287,18 @@ Cleans up Python processes and resources.
 ### Debug Mode
 
 Enable debug logging:
+
 ```typescript
 const adapter = new MentalArenaAdapter(provider, fheService, pythonBridge, {
   debug: true,
-  logLevel: 'verbose'
-})
+  logLevel: "verbose",
+});
 ```
 
 ## 🤝 Contributing
 
 This production implementation follows enterprise coding standards:
+
 - Comprehensive error handling
 - Full test coverage
 - TypeScript strict mode

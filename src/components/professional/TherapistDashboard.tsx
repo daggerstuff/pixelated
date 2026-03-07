@@ -1,26 +1,26 @@
-import type { FC } from 'react'
-import React from 'react'
-import { usePersistentState } from '@/hooks/usePersistentState'
-import { AdvancedVisualization } from '@/lib/analytics/advancedVisualization'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
+import type { FC } from "react";
+import React from "react";
+import { usePersistentState } from "@/hooks/usePersistentState";
+import { AdvancedVisualization } from "@/lib/analytics/advancedVisualization";
+import { OfflineIndicator } from "@/components/layout/OfflineIndicator";
+import { FadeIn, SlideUp } from "@/components/layout/AdvancedAnimations";
+import { ResponsiveContainer } from "@/components/layout/ResponsiveUtils";
 
 interface PatientSummary {
-  id: string
-  name: string
-  lastSession: Date
-  riskLevel: 'low' | 'medium' | 'high' | 'critical'
-  progress: number // 0-100
-  nextAppointment?: Date
-  alerts: string[]
+  id: string;
+  name: string;
+  lastSession: Date;
+  riskLevel: "low" | "medium" | "high" | "critical";
+  progress: number; // 0-100
+  nextAppointment?: Date;
+  alerts: string[];
 }
 
 interface SessionMetrics {
-  totalSessions: number
-  avgSessionLength: number
-  completionRate: number
-  patientSatisfaction: number
+  totalSessions: number;
+  avgSessionLength: number;
+  completionRate: number;
+  patientSatisfaction: number;
 }
 
 /**
@@ -29,53 +29,53 @@ interface SessionMetrics {
 export const TherapistDashboard: FC = () => {
   // Persistent dashboard preferences
   const [dashboardView, setDashboardView] = usePersistentState<
-    'overview' | 'patients' | 'analytics' | 'schedule'
-  >('therapist_dashboard_view', 'overview')
+    "overview" | "patients" | "analytics" | "schedule"
+  >("therapist_dashboard_view", "overview");
   const [timeRange, setTimeRange] = usePersistentState<
-    'week' | 'month' | 'quarter' | 'year'
-  >('therapist_dashboard_timerange', 'month')
+    "week" | "month" | "quarter" | "year"
+  >("therapist_dashboard_timerange", "month");
   const [selectedPatients, setSelectedPatients] = usePersistentState<string[]>(
-    'therapist_selected_patients',
+    "therapist_selected_patients",
     [],
-  )
+  );
 
   // Mock data - in real app would come from API
   const patients: PatientSummary[] = [
     {
-      id: '1',
-      name: 'Sarah Johnson',
-      lastSession: new Date('2024-01-15'),
-      riskLevel: 'medium',
+      id: "1",
+      name: "Sarah Johnson",
+      lastSession: new Date("2024-01-15"),
+      riskLevel: "medium",
       progress: 65,
-      nextAppointment: new Date('2024-01-22'),
-      alerts: ['Missed last homework', 'Anxiety spike detected'],
+      nextAppointment: new Date("2024-01-22"),
+      alerts: ["Missed last homework", "Anxiety spike detected"],
     },
     {
-      id: '2',
-      name: 'Michael Chen',
-      lastSession: new Date('2024-01-14'),
-      riskLevel: 'low',
+      id: "2",
+      name: "Michael Chen",
+      lastSession: new Date("2024-01-14"),
+      riskLevel: "low",
       progress: 80,
-      nextAppointment: new Date('2024-01-21'),
+      nextAppointment: new Date("2024-01-21"),
       alerts: [],
     },
     {
-      id: '3',
-      name: 'Emily Rodriguez',
-      lastSession: new Date('2024-01-13'),
-      riskLevel: 'high',
+      id: "3",
+      name: "Emily Rodriguez",
+      lastSession: new Date("2024-01-13"),
+      riskLevel: "high",
       progress: 45,
-      nextAppointment: new Date('2024-01-20'),
-      alerts: ['Requires immediate attention', 'Family session needed'],
+      nextAppointment: new Date("2024-01-20"),
+      alerts: ["Requires immediate attention", "Family session needed"],
     },
-  ]
+  ];
 
   const sessionMetrics: SessionMetrics = {
     totalSessions: 47,
     avgSessionLength: 52, // minutes
     completionRate: 94,
     patientSatisfaction: 4.2, // out of 5
-  }
+  };
 
   const analyticsData = patients.map((patient, _index) => ({
     patientId: patient.id,
@@ -84,15 +84,15 @@ export const TherapistDashboard: FC = () => {
     avgMoodScore: Math.random() * 2 + 3, // 3-5 scale
     progressScore: patient.progress,
     riskScore:
-      patient.riskLevel === 'critical'
+      patient.riskLevel === "critical"
         ? 4
-        : patient.riskLevel === 'high'
+        : patient.riskLevel === "high"
           ? 3
-          : patient.riskLevel === 'medium'
+          : patient.riskLevel === "medium"
             ? 2
             : 1,
     lastContact: patient.lastSession,
-  }))
+  }));
 
   return (
     <ResponsiveContainer size="full">
@@ -131,18 +131,18 @@ export const TherapistDashboard: FC = () => {
           <div className="px-6">
             <nav className="flex space-x-8">
               {[
-                { id: 'overview', label: 'Overview', icon: '📊' },
-                { id: 'patients', label: 'Patients', icon: '👥' },
-                { id: 'analytics', label: 'Analytics', icon: '📈' },
-                { id: 'schedule', label: 'Schedule', icon: '📅' },
+                { id: "overview", label: "Overview", icon: "📊" },
+                { id: "patients", label: "Patients", icon: "👥" },
+                { id: "analytics", label: "Analytics", icon: "📈" },
+                { id: "schedule", label: "Schedule", icon: "📅" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
                   className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                     dashboardView === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
                   <span>{tab.icon}</span>
@@ -155,7 +155,7 @@ export const TherapistDashboard: FC = () => {
 
         {/* Main Content */}
         <main className="p-6">
-          {dashboardView === 'overview' && (
+          {dashboardView === "overview" && (
             <OverviewTab
               patients={patients}
               metrics={sessionMetrics}
@@ -163,55 +163,55 @@ export const TherapistDashboard: FC = () => {
                 if (selectedPatients.includes(patientId)) {
                   setSelectedPatients((prev) =>
                     prev.filter((id) => id !== patientId),
-                  )
+                  );
                 } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
+                  setSelectedPatients((prev) => [...prev, patientId]);
                 }
               }}
               selectedPatients={selectedPatients}
             />
           )}
 
-          {dashboardView === 'patients' && (
+          {dashboardView === "patients" && (
             <PatientsTab
               patients={patients}
               onPatientSelect={(patientId) => {
                 if (selectedPatients.includes(patientId)) {
                   setSelectedPatients((prev) =>
                     prev.filter((id) => id !== patientId),
-                  )
+                  );
                 } else {
-                  setSelectedPatients((prev) => [...prev, patientId])
+                  setSelectedPatients((prev) => [...prev, patientId]);
                 }
               }}
               selectedPatients={selectedPatients}
             />
           )}
 
-          {dashboardView === 'analytics' && (
+          {dashboardView === "analytics" && (
             <AnalyticsTab data={analyticsData} timeRange={timeRange} />
           )}
 
-          {dashboardView === 'schedule' && <ScheduleTab patients={patients} />}
+          {dashboardView === "schedule" && <ScheduleTab patients={patients} />}
         </main>
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
 /**
  * Overview Tab Component
  */
 const OverviewTab: FC<{
-  patients: PatientSummary[]
-  metrics: SessionMetrics
-  onPatientSelect: (patientId: string) => void
-  selectedPatients: string[]
+  patients: PatientSummary[];
+  metrics: SessionMetrics;
+  onPatientSelect: (patientId: string) => void;
+  selectedPatients: string[];
 }> = ({ patients, metrics, onPatientSelect, selectedPatients }) => {
   const urgentPatients = patients.filter(
-    (p) => p.riskLevel === 'high' || p.riskLevel === 'critical',
-  )
-  const patientsNeedingAttention = patients.filter((p) => p.alerts.length > 0)
+    (p) => p.riskLevel === "high" || p.riskLevel === "critical",
+  );
+  const patientsNeedingAttention = patients.filter((p) => p.alerts.length > 0);
 
   return (
     <div className="space-y-6">
@@ -233,11 +233,11 @@ const OverviewTab: FC<{
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              This{' '}
-              {timeRange === 'week'
-                ? 'week'
-                : timeRange === 'month'
-                  ? 'month'
+              This{" "}
+              {timeRange === "week"
+                ? "week"
+                : timeRange === "month"
+                  ? "month"
                   : timeRange}
             </p>
           </div>
@@ -435,16 +435,16 @@ const OverviewTab: FC<{
         </div>
       </SlideUp>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Patients Tab Component
  */
 const PatientsTab: FC<{
-  patients: PatientSummary[]
-  onPatientSelect: (patientId: string) => void
-  selectedPatients: string[]
+  patients: PatientSummary[];
+  onPatientSelect: (patientId: string) => void;
+  selectedPatients: string[];
 }> = ({ patients, onPatientSelect, selectedPatients }) => {
   return (
     <div className="space-y-6">
@@ -517,9 +517,9 @@ const PatientsTab: FC<{
                     </div>
                     <div>Progress: {patient.progress}%</div>
                     <div>
-                      Next appointment:{' '}
+                      Next appointment:{" "}
                       {patient.nextAppointment?.toLocaleDateString() ||
-                        'Not scheduled'}
+                        "Not scheduled"}
                     </div>
                     <div>Alerts: {patient.alerts.length}</div>
                   </div>
@@ -542,39 +542,39 @@ const PatientsTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Analytics Tab Component
  */
 const AnalyticsTab: FC<{
-  data: any[]
-  timeRange: string
+  data: any[];
+  timeRange: string;
 }> = ({ data, timeRange }) => {
   const visualizationConfig = {
-    type: 'scatter' as const,
+    type: "scatter" as const,
     dimensions: {
       x: {
-        field: 'sessionsCompleted',
-        label: 'Sessions Completed',
-        type: 'numeric' as const,
+        field: "sessionsCompleted",
+        label: "Sessions Completed",
+        type: "numeric" as const,
       },
       y: {
-        field: 'avgMoodScore',
-        label: 'Average Mood Score',
-        type: 'numeric' as const,
+        field: "avgMoodScore",
+        label: "Average Mood Score",
+        type: "numeric" as const,
       },
       color: {
-        field: 'riskScore',
-        label: 'Risk Level',
-        type: 'numeric' as const,
+        field: "riskScore",
+        label: "Risk Level",
+        type: "numeric" as const,
       },
     },
     filters: {},
     interactive: true,
     realTime: false,
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -592,20 +592,20 @@ const AnalyticsTab: FC<{
         data={data}
         config={visualizationConfig}
         onInsightGenerated={(insight) => {
-          console.log('New insight generated:', insight)
+          console.log("New insight generated:", insight);
         }}
       />
     </div>
-  )
-}
+  );
+};
 
 /**
  * Schedule Tab Component
  */
 const ScheduleTab: FC<{
-  patients: PatientSummary[]
+  patients: PatientSummary[];
 }> = ({ patients }) => {
-  const today = new Date()
+  const today = new Date();
   const upcomingAppointments = patients
     .filter((p) => p.nextAppointment && p.nextAppointment >= today)
     .sort(
@@ -613,7 +613,7 @@ const ScheduleTab: FC<{
         (a.nextAppointment?.getTime() || 0) -
         (b.nextAppointment?.getTime() || 0),
     )
-    .slice(0, 10)
+    .slice(0, 10);
 
   return (
     <div className="space-y-6">
@@ -638,10 +638,10 @@ const ScheduleTab: FC<{
                     {patient.name}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {patient.nextAppointment?.toLocaleDateString()} at{' '}
+                    {patient.nextAppointment?.toLocaleDateString()} at{" "}
                     {patient.nextAppointment?.toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
@@ -659,11 +659,11 @@ const ScheduleTab: FC<{
           <h3 className="text-lg font-semibold mb-4">Session Templates</h3>
           <div className="space-y-3">
             {[
-              'Initial Assessment',
-              'CBT Session',
-              'Crisis Intervention',
-              'Progress Review',
-              'Termination Session',
+              "Initial Assessment",
+              "CBT Session",
+              "Crisis Intervention",
+              "Progress Review",
+              "Termination Session",
             ].map((template) => (
               <button
                 key={template}
@@ -681,19 +681,19 @@ const ScheduleTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // Helper function (defined outside component to avoid recreation)
 function getRiskColor(risk: string) {
   const colors = {
-    low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
+    low: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
     medium:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
-    high: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200',
-    critical: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
-  }
-  return colors[risk as keyof typeof colors] || colors.low
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
+    high: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
+    critical: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
+  };
+  return colors[risk as keyof typeof colors] || colors.low;
 }
 
-export default TherapistDashboard
+export default TherapistDashboard;

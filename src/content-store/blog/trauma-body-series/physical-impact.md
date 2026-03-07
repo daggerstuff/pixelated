@@ -1,20 +1,18 @@
 ---
-title: 'The Physical Impact of Trauma'
-description: 'Understanding how trauma affects the nervous system and manifests in physical symptoms'
-author: 'Dr. Maya Patel'
+title: "The Physical Impact of Trauma"
+description: "Understanding how trauma affects the nervous system and manifests in physical symptoms"
+author: "Dr. Maya Patel"
 pubDate: 2024-03-04
 readingTime: 15
-tags: ['trauma', 'neuroscience', 'body', 'healing']
-series: 'Trauma and the Body'
+tags: ["trauma", "neuroscience", "body", "healing"]
+series: "Trauma and the Body"
 seriesOrder: 1
 image:
   {
-    url: 'https://images.unsplash.com/photo-1559757175-7cb036e0d465?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Abstract representation of the nervous system',
+    url: "https://images.unsplash.com/photo-1559757175-7cb036e0d465?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Abstract representation of the nervous system",
   }
 ---
-
-
 
 ## The Physical Impact of Trauma
 
@@ -129,34 +127,33 @@ Take a moment to consider:
 - Questions to ask
 - What to expect
 
-
 ### Share This Article
 
 <SocialShare
-  platforms={['twitter', 'linkedin', 'facebook', 'email']}
-  title="The Physical Impact of Trauma"
-  description="Explore how trauma affects the nervous system and manifests in physical symptoms"
-  url="/blog/trauma-body-series/physical-impact"
+platforms={['twitter', 'linkedin', 'facebook', 'email']}
+title="The Physical Impact of Trauma"
+description="Explore how trauma affects the nervous system and manifests in physical symptoms"
+url="/blog/trauma-body-series/physical-impact"
 />
 
 ### About the Author
 
 <AuthorBio
-  name="Dr. Maya Patel"
-  image="/authors/maya-patel.jpg"
-  credentials="PhD in Clinical Psychology, Certified Somatic Experiencing Practitioner"
-  specialties={['Trauma-Informed Care', 'Somatic Psychology', 'Neuroscience']}
-  bio="Dr. Maya Patel specializes in the intersection of trauma, neuroscience,
-  and somatic approaches to healing. She has over 15 years of experience working
-  with trauma survivors and training clinicians in body-based approaches."
+name="Dr. Maya Patel"
+image="/authors/maya-patel.jpg"
+credentials="PhD in Clinical Psychology, Certified Somatic Experiencing Practitioner"
+specialties={['Trauma-Informed Care', 'Somatic Psychology', 'Neuroscience']}
+bio="Dr. Maya Patel specializes in the intersection of trauma, neuroscience,
+and somatic approaches to healing. She has over 15 years of experience working
+with trauma survivors and training clinicians in body-based approaches."
 />
 
 ### Continue Learning
 
 <SeriesNavigation
-  series="Trauma and the Body"
-  current="The Physical Impact of Trauma"
-  next={{
+series="Trauma and the Body"
+current="The Physical Impact of Trauma"
+next={{
     title: 'Understanding Somatic Responses',
     url: '/blog/trauma-body-series/somatic-responses',
   }}
@@ -164,8 +161,8 @@ Take a moment to consider:
 
 #### Join the Discussion
 
-{/* Comments component temporarily disabled until implementation */}
-{/* <Comments /> */}
+{/_ Comments component temporarily disabled until implementation _/}
+{/_ <Comments /> _/}
 
 ### Stay Updated
 

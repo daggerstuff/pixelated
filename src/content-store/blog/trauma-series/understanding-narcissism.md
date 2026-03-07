@@ -1,20 +1,18 @@
 ---
-title: 'Understanding Narcissism and Complex Trauma'
-description: 'Exploring the connection between narcissistic behaviors, codependency, and complex trauma'
-author: 'Dr. Sarah Chen'
+title: "Understanding Narcissism and Complex Trauma"
+description: "Exploring the connection between narcissistic behaviors, codependency, and complex trauma"
+author: "Dr. Sarah Chen"
 pubDate: 2024-02-18
 readingTime: 10
-tags: ['narcissism', 'complex trauma', 'codependency', 'relationships']
-series: 'Understanding Trauma'
+tags: ["narcissism", "complex trauma", "codependency", "relationships"]
+series: "Understanding Trauma"
 seriesOrder: 3
 image:
   {
-    url: 'https://images.unsplash.com/photo-1541199249251-f713e6145474?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Mirror reflection representing narcissistic patterns',
+    url: "https://images.unsplash.com/photo-1541199249251-f713e6145474?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Mirror reflection representing narcissistic patterns",
   }
 ---
-
-
 
 ## The Root of Codependency
 

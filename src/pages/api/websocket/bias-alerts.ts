@@ -6,49 +6,49 @@
  * bias detection alerts and dashboard updates.
  */
 
-import { BiasWebSocketServer } from '../../../lib/services/websocket/BiasWebSocketServer'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { BiasWebSocketServer } from "../../../lib/services/websocket/BiasWebSocketServer";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('BiasAlertsWebSocketAPI')
+const logger = createBuildSafeLogger("BiasAlertsWebSocketAPI");
 
 // Singleton WebSocket server instance
-let wsServer: BiasWebSocketServer | null = null
+let wsServer: BiasWebSocketServer | null = null;
 
 const wsConfig = {
-  port: parseInt(process.env['WS_PORT'] || '8080'),
+  port: parseInt(process.env["WS_PORT"] || "8080"),
   heartbeatInterval: 30000, // 30 seconds
-  maxConnections: parseInt(process.env['WS_MAX_CONNECTIONS'] || '1000'),
-  authRequired: process.env['WS_AUTH_REQUIRED'] === 'true',
-  corsOrigins: process.env['WS_CORS_ORIGINS']?.split(',') || [
-    'http://localhost:3000',
-    'http://localhost:4321',
+  maxConnections: parseInt(process.env["WS_MAX_CONNECTIONS"] || "1000"),
+  authRequired: process.env["WS_AUTH_REQUIRED"] === "true",
+  corsOrigins: process.env["WS_CORS_ORIGINS"]?.split(",") || [
+    "http://localhost:3000",
+    "http://localhost:4321",
   ],
   rateLimitConfig: {
-    maxMessagesPerMinute: parseInt(process.env['WS_RATE_LIMIT'] || '60'),
-    banDurationMs: parseInt(process.env['WS_BAN_DURATION'] || '300000'), // 5 minutes
+    maxMessagesPerMinute: parseInt(process.env["WS_RATE_LIMIT"] || "60"),
+    banDurationMs: parseInt(process.env["WS_BAN_DURATION"] || "300000"), // 5 minutes
   },
-}
+};
 
 /**
  * Initialize WebSocket server if not already running
  */
 async function initializeWebSocketServer(): Promise<BiasWebSocketServer> {
   if (!wsServer) {
-    wsServer = new BiasWebSocketServer(wsConfig)
+    wsServer = new BiasWebSocketServer(wsConfig);
 
     try {
-      await wsServer.start()
-      logger.info('WebSocket server initialized successfully', {
+      await wsServer.start();
+      logger.info("WebSocket server initialized successfully", {
         port: wsConfig.port,
         maxConnections: wsConfig.maxConnections,
-      })
+      });
     } catch (error: unknown) {
-      logger.error('Failed to initialize WebSocket server', { error })
-      throw error
+      logger.error("Failed to initialize WebSocket server", { error });
+      throw error;
     }
   }
 
-  return wsServer
+  return wsServer;
 }
 
 /**
@@ -56,9 +56,9 @@ async function initializeWebSocketServer(): Promise<BiasWebSocketServer> {
  */
 export const GET = async () => {
   try {
-    const server = await initializeWebSocketServer()
-    const status = server.getStats()
-    const clients = server.getClients()
+    const server = await initializeWebSocketServer();
+    const status = server.getStats();
+    const clients = server.getClients();
 
     return new Response(
       JSON.stringify({
@@ -83,40 +83,40 @@ export const GET = async () => {
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache',
+          "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Failed to get WebSocket server status', { error })
+    logger.error("Failed to get WebSocket server status", { error });
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to get WebSocket server status',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to get WebSocket server status",
+        message: error instanceof Error ? String(error) : "Unknown error",
         timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * Send test bias alert (for development/testing)
  */
 export const POST = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { type = 'test', level = 'medium', message, sessionId } = body
+    const body = await request.json();
+    const { type = "test", level = "medium", message, sessionId } = body;
 
-    const server = await initializeWebSocketServer()
+    const server = await initializeWebSocketServer();
 
     // Create test alert
     const testAlert = {
@@ -129,10 +129,10 @@ export const POST = async ({ request }: { request: Request }) => {
       acknowledged: false,
       details: {
         test: true,
-        generatedBy: 'API',
+        generatedBy: "API",
         requestId: crypto.randomUUID(),
       },
-    }
+    };
 
     // Create test analysis result
     const testAnalysisResult = {
@@ -140,7 +140,7 @@ export const POST = async ({ request }: { request: Request }) => {
       timestamp: new Date(),
       overallBiasScore:
         Math.random() * 0.5 +
-        (level === 'critical' ? 0.8 : level === 'high' ? 0.6 : 0.3),
+        (level === "critical" ? 0.8 : level === "high" ? 0.6 : 0.3),
       alertLevel: level,
       confidence: Math.random() * 0.3 + 0.7,
       layerResults: {
@@ -226,7 +226,7 @@ export const POST = async ({ request }: { request: Request }) => {
             patientSafety: Math.random() * 0.2 + 0.8,
           },
           temporalAnalysis: {
-            trendDirection: 'stable' as const,
+            trendDirection: "stable" as const,
             changeRate: 0,
             seasonalPatterns: [],
             interventionEffectiveness: [],
@@ -236,25 +236,25 @@ export const POST = async ({ request }: { request: Request }) => {
       },
       recommendations: [`Test recommendation for ${level} bias alert`],
       demographics: {
-        age: '25',
-        gender: 'other',
-        ethnicity: 'test',
-        primaryLanguage: 'en',
+        age: "25",
+        gender: "other",
+        ethnicity: "test",
+        primaryLanguage: "en",
         totalSamples: 100,
         categories: {
           test: 100,
         },
       },
-    }
+    };
 
     // Broadcast the test alert
-    await server.broadcastBiasAlert(testAlert, testAnalysisResult)
+    await server.broadcastBiasAlert(testAlert, testAnalysisResult);
 
-    logger.info('Test bias alert sent', {
+    logger.info("Test bias alert sent", {
       alertId: testAlert.alertId,
       level: testAlert.level,
       sessionId: testAlert.sessionId,
-    })
+    });
 
     return new Response(
       JSON.stringify({
@@ -262,63 +262,63 @@ export const POST = async ({ request }: { request: Request }) => {
         data: {
           alert: testAlert,
           analysisResult: testAnalysisResult,
-          broadcastStatus: 'sent',
+          broadcastStatus: "sent",
         },
         timestamp: new Date().toISOString(),
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Failed to send test bias alert', { error })
+    logger.error("Failed to send test bias alert", { error });
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to send test bias alert',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to send test bias alert",
+        message: error instanceof Error ? String(error) : "Unknown error",
         timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * Update WebSocket server configuration
  */
 export const PATCH = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { action } = body
+    const body = await request.json();
+    const { action } = body;
 
-    const server = await initializeWebSocketServer()
+    const server = await initializeWebSocketServer();
 
     switch (action) {
-      case 'restart':
-        await server.stop()
-        await server.start()
-        logger.info('WebSocket server restarted')
-        break
+      case "restart":
+        await server.stop();
+        await server.start();
+        logger.info("WebSocket server restarted");
+        break;
 
-      case 'status':
+      case "status":
         // Just return current status
-        break
+        break;
 
       default:
-        throw new Error(`Unknown action: ${action}`)
+        throw new Error(`Unknown action: ${action}`);
     }
 
-    const status = server.getStats()
+    const status = server.getStats();
 
     return new Response(
       JSON.stringify({
@@ -333,29 +333,29 @@ export const PATCH = async ({ request }: { request: Request }) => {
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Failed to update WebSocket server', { error })
+    logger.error("Failed to update WebSocket server", { error });
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to update WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to update WebSocket server",
+        message: error instanceof Error ? String(error) : "Unknown error",
         timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * Gracefully shutdown WebSocket server
@@ -363,57 +363,57 @@ export const PATCH = async ({ request }: { request: Request }) => {
 export const DELETE = async () => {
   try {
     if (wsServer) {
-      await wsServer.stop()
-      wsServer = null
-      logger.info('WebSocket server stopped')
+      await wsServer.stop();
+      wsServer = null;
+      logger.info("WebSocket server stopped");
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         data: {
-          message: 'WebSocket server stopped successfully',
+          message: "WebSocket server stopped successfully",
         },
         timestamp: new Date().toISOString(),
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Failed to stop WebSocket server', { error })
+    logger.error("Failed to stop WebSocket server", { error });
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Failed to stop WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to stop WebSocket server",
+        message: error instanceof Error ? String(error) : "Unknown error",
         timestamp: new Date().toISOString(),
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 // Export the WebSocket server instance for use by other modules
 export function getWebSocketServer(): BiasWebSocketServer | null {
-  return wsServer
+  return wsServer;
 }
 
 // Initialize server on module load in production
 if (
-  process.env['NODE_ENV'] === 'production' &&
-  process.env['WS_AUTO_START'] === 'true'
+  process.env["NODE_ENV"] === "production" &&
+  process.env["WS_AUTO_START"] === "true"
 ) {
   initializeWebSocketServer().catch((error) => {
-    logger.error('Failed to auto-start WebSocket server', { error })
-  })
+    logger.error("Failed to auto-start WebSocket server", { error });
+  });
 }

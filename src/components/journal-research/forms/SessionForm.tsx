@@ -1,28 +1,38 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   CreateSessionPayloadSchema,
   UpdateSessionPayloadSchema,
   type CreateSessionPayload,
   type UpdateSessionPayload,
   type Session,
-} from '@/lib/api/journal-research/types'
-import { z } from 'zod'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button/button'
-import { cn } from '@/lib/utils'
-import { getFieldErrors } from '@/lib/error'
-import { ErrorMessage, FieldError } from '@/components/journal-research/shared/ErrorMessage'
+} from "@/lib/api/journal-research/types";
+import { z } from "zod";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button/button";
+import { cn } from "@/lib/utils";
+import { getFieldErrors } from "@/lib/error";
+import {
+  ErrorMessage,
+  FieldError,
+} from "@/components/journal-research/shared/ErrorMessage";
 
 export interface SessionFormProps {
-  session?: Session
-  onSubmit: (data: CreateSessionPayload | UpdateSessionPayload) => void | Promise<void>
-  onCancel?: () => void
-  isLoading?: boolean
-  className?: string
+  session?: Session;
+  onSubmit: (
+    data: CreateSessionPayload | UpdateSessionPayload,
+  ) => void | Promise<void>;
+  onCancel?: () => void;
+  isLoading?: boolean;
+  className?: string;
 }
 
-const availableSources = ['pubmed', 'doaj', 'arxiv', 'ieee', 'acm']
+const availableSources = ["pubmed", "doaj", "arxiv", "ieee", "acm"];
 
 export function SessionForm({
   session,
@@ -31,21 +41,25 @@ export function SessionForm({
   isLoading = false,
   className,
 }: SessionFormProps) {
-  const isEdit = !!session
-  const schema = isEdit ? UpdateSessionPayloadSchema : CreateSessionPayloadSchema
+  const isEdit = !!session;
+  const schema = isEdit
+    ? UpdateSessionPayloadSchema
+    : CreateSessionPayloadSchema;
 
-  const [formData, setFormData] = useState<CreateSessionPayload | UpdateSessionPayload>({
+  const [formData, setFormData] = useState<
+    CreateSessionPayload | UpdateSessionPayload
+  >({
     sessionId: session?.sessionId,
-    targetSources: session?.targetSources ?? ['pubmed', 'doaj'],
+    targetSources: session?.targetSources ?? ["pubmed", "doaj"],
     searchKeywords: session?.searchKeywords ?? {},
     weeklyTargets: session?.weeklyTargets ?? {},
-  })
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [touched, setTouched] = useState<Record<string, boolean>>({})
-  const [submitError, setSubmitError] = useState<unknown>(null)
-  const [keywordInput, setKeywordInput] = useState('')
-  const [keywordCategory, setKeywordCategory] = useState('default')
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitError, setSubmitError] = useState<unknown>(null);
+  const [keywordInput, setKeywordInput] = useState("");
+  const [keywordCategory, setKeywordCategory] = useState("default");
 
   useEffect(() => {
     if (session) {
@@ -54,65 +68,64 @@ export function SessionForm({
         searchKeywords: session.searchKeywords,
         weeklyTargets: session.weeklyTargets,
         currentPhase: session.currentPhase,
-      })
+      });
     }
-  }, [session])
+  }, [session]);
 
   const validateField = (fieldName: string, value: unknown) => {
     try {
-      const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape]
+      const fieldSchema = schema.shape[fieldName as keyof typeof schema.shape];
       if (fieldSchema) {
-        fieldSchema.parse(value)
+        fieldSchema.parse(value);
         setErrors((prev) => {
-          const next = { ...prev }
-          delete next[fieldName]
-          return next
-        })
+          const next = { ...prev };
+          delete next[fieldName];
+          return next;
+        });
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const fieldError = error.issues[0]?.message
+        const fieldError = error.issues[0]?.message;
         if (fieldError) {
-          setErrors((prev) => ({ ...prev, [fieldName]: fieldError }))
+          setErrors((prev) => ({ ...prev, [fieldName]: fieldError }));
         }
       }
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrors({})
-    setSubmitError(null)
+    e.preventDefault();
+    setErrors({});
+    setSubmitError(null);
 
     try {
-      const validated = schema.parse(formData)
-      await onSubmit(validated)
+      const validated = schema.parse(formData);
+      await onSubmit(validated);
     } catch (error) {
-
-      const fieldErrs = getFieldErrors(error) ?? {}
+      const fieldErrs = getFieldErrors(error) ?? {};
 
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
-        setErrors(fieldErrs)
+        setErrors(fieldErrs);
       } else {
-        setSubmitError(error)
+        setSubmitError(error);
       }
     }
-  }
+  };
 
   const handleSourceToggle = (source: string) => {
-    const current = formData.targetSources ?? []
+    const current = formData.targetSources ?? [];
     const updated = current.includes(source)
       ? current.filter((s) => s !== source)
-      : [...current, source]
-    setFormData({ ...formData, targetSources: updated })
-  }
+      : [...current, source];
+    setFormData({ ...formData, targetSources: updated });
+  };
 
   const handleAddKeyword = () => {
-    if (!keywordInput.trim()) return
+    if (!keywordInput.trim()) return;
 
-    const keywords = formData.searchKeywords ?? {}
-    const category = keywordCategory || 'default'
-    const categoryKeywords = keywords[category] ?? []
+    const keywords = formData.searchKeywords ?? {};
+    const category = keywordCategory || "default";
+    const categoryKeywords = keywords[category] ?? [];
 
     if (!categoryKeywords.includes(keywordInput.trim())) {
       setFormData({
@@ -121,25 +134,25 @@ export function SessionForm({
           ...keywords,
           [category]: [...categoryKeywords, keywordInput.trim()],
         },
-      })
-      setKeywordInput('')
+      });
+      setKeywordInput("");
     }
-  }
+  };
 
   const handleRemoveKeyword = (category: string, keyword: string) => {
-    const keywords = formData.searchKeywords ?? {}
-    const categoryKeywords = keywords[category] ?? []
+    const keywords = formData.searchKeywords ?? {};
+    const categoryKeywords = keywords[category] ?? [];
     setFormData({
       ...formData,
       searchKeywords: {
         ...keywords,
         [category]: categoryKeywords.filter((k) => k !== keyword),
       },
-    })
-  }
+    });
+  };
 
   const handleWeeklyTargetChange = (week: string, value: string) => {
-    const numValue = parseInt(value, 10)
+    const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 0) {
       setFormData({
         ...formData,
@@ -147,14 +160,14 @@ export function SessionForm({
           ...formData.weeklyTargets,
           [week]: numValue,
         },
-      })
+      });
     }
-  }
+  };
 
   return (
-    <Card className={cn('w-full', className)}>
+    <Card className={cn("w-full", className)}>
       <CardHeader>
-        <CardTitle>{isEdit ? 'Edit Session' : 'Create New Session'}</CardTitle>
+        <CardTitle>{isEdit ? "Edit Session" : "Create New Session"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -164,28 +177,41 @@ export function SessionForm({
               <input
                 id="sessionId"
                 type="text"
-                value={(formData as CreateSessionPayload).sessionId ?? ''}
+                value={(formData as CreateSessionPayload).sessionId ?? ""}
                 onChange={(e) => {
-                  setFormData({ ...formData, sessionId: e.target.value })
+                  setFormData({ ...formData, sessionId: e.target.value });
                   if (touched.sessionId) {
-                    validateField('sessionId', e.target.value)
+                    validateField("sessionId", e.target.value);
                   }
                 }}
                 onBlur={() => {
-                  setTouched((prev) => ({ ...prev, sessionId: true }))
-                  validateField('sessionId', (formData as CreateSessionPayload).sessionId)
+                  setTouched((prev) => ({ ...prev, sessionId: true }));
+                  validateField(
+                    "sessionId",
+                    (formData as CreateSessionPayload).sessionId,
+                  );
                 }}
                 className={cn(
-                  'w-full rounded-md border bg-background px-3 py-2 text-sm',
+                  "w-full rounded-md border bg-background px-3 py-2 text-sm",
                   errors.sessionId && touched.sessionId
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                    : 'border-input',
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                    : "border-input",
                 )}
                 placeholder="Leave empty for auto-generated ID"
                 aria-invalid={!!errors.sessionId && touched.sessionId}
-                aria-describedby={errors.sessionId && touched.sessionId ? 'sessionId-error' : undefined}
+                aria-describedby={
+                  errors.sessionId && touched.sessionId
+                    ? "sessionId-error"
+                    : undefined
+                }
               />
-              <FieldError error={errors.sessionId && touched.sessionId ? errors.sessionId : undefined} />
+              <FieldError
+                error={
+                  errors.sessionId && touched.sessionId
+                    ? errors.sessionId
+                    : undefined
+                }
+              />
             </div>
           )}
 
@@ -225,9 +251,9 @@ export function SessionForm({
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddKeyword()
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddKeyword();
                   }
                 }}
                 placeholder="Enter keyword"
@@ -259,7 +285,9 @@ export function SessionForm({
                             {keyword}
                             <button
                               type="button"
-                              onClick={() => handleRemoveKeyword(category, keyword)}
+                              onClick={() =>
+                                handleRemoveKeyword(category, keyword)
+                              }
                               className="text-muted-foreground hover:text-foreground"
                               aria-label={`Remove ${keyword}`}
                             >
@@ -277,7 +305,7 @@ export function SessionForm({
           <div className="space-y-2">
             <Label>Weekly Targets</Label>
             <div className="grid grid-cols-4 gap-2">
-              {['week1', 'week2', 'week3', 'week4'].map((week) => (
+              {["week1", "week2", "week3", "week4"].map((week) => (
                 <div key={week} className="space-y-1">
                   <Label htmlFor={week} className="text-xs capitalize">
                     {week}
@@ -287,7 +315,7 @@ export function SessionForm({
                     type="number"
                     min="0"
                     value={
-                      (formData.weeklyTargets ?? {})[week]?.toString() ?? '0'
+                      (formData.weeklyTargets ?? {})[week]?.toString() ?? "0"
                     }
                     onChange={(e) =>
                       handleWeeklyTargetChange(week, e.target.value)
@@ -299,12 +327,12 @@ export function SessionForm({
             </div>
           </div>
 
-          {isEdit && 'currentPhase' in formData && (
+          {isEdit && "currentPhase" in formData && (
             <div className="space-y-2">
               <Label htmlFor="currentPhase">Current Phase</Label>
               <select
                 id="currentPhase"
-                value={formData.currentPhase ?? ''}
+                value={formData.currentPhase ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData, currentPhase: e.target.value })
                 }
@@ -328,11 +356,15 @@ export function SessionForm({
               </Button>
             )}
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Saving...' : isEdit ? 'Update Session' : 'Create Session'}
+              {isLoading
+                ? "Saving..."
+                : isEdit
+                  ? "Update Session"
+                  : "Create Session"}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

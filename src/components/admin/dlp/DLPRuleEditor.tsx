@@ -1,6 +1,6 @@
-import React, { useState, useEffect, forwardRef } from 'react'
-import type { ReactNode } from 'react'
-import { dlpService, type DLPRule, DLPAction } from '../../../lib/security/dlp'
+import React, { useState, useEffect, forwardRef } from "react";
+import type { ReactNode } from "react";
+import { dlpService, type DLPRule, DLPAction } from "../../../lib/security/dlp";
 
 /**
  * Workaround: Inline minimal UI components due to persistent import/alias resolution errors.
@@ -13,7 +13,7 @@ const Card = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   >
     {children}
   </div>
-)
+);
 
 const CardHeader = ({
   children,
@@ -22,7 +22,7 @@ const CardHeader = ({
   <div className="flex flex-col space-y-1.5 p-6" {...props}>
     {children}
   </div>
-)
+);
 
 const CardTitle = ({
   children,
@@ -31,7 +31,7 @@ const CardTitle = ({
   <h3 className="text-2xl font-semibold leading-none tracking-tight" {...props}>
     {children}
   </h3>
-)
+);
 
 const CardDescription = ({
   children,
@@ -40,7 +40,7 @@ const CardDescription = ({
   <p className="text-sm text-muted-foreground" {...props}>
     {children}
   </p>
-)
+);
 
 const CardContent = ({
   children,
@@ -49,16 +49,16 @@ const CardContent = ({
   <div className="p-6 pt-0" {...props}>
     {children}
   </div>
-)
+);
 
 const Switch = ({
   checked,
   onCheckedChange,
   id,
 }: {
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
-  id: string
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  id: string;
 }) => (
   <input
     type="checkbox"
@@ -67,7 +67,7 @@ const Switch = ({
     onChange={(e) => onCheckedChange(e.target.checked)}
     className="peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 peer-checked:bg-primary peer-unchecked:bg-input bg-input"
   />
-)
+);
 
 const Button = ({
   children,
@@ -79,36 +79,36 @@ const Button = ({
   >
     {children}
   </button>
-)
+);
 
 /**
  * Workaround: Inline Input component due to persistent import/alias resolution error.
  * Remove this and restore import when tooling is fixed.
  */
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
-  className?: string
-  type?: string
-}
+  className?: string;
+  type?: string;
+};
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, ...props }, ref) => (
     <input
       type={type}
       className={
-        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
-        (className ? ' ' + className : '')
+        "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" +
+        (className ? " " + className : "")
       }
       ref={ref}
       {...props}
     />
   ),
-)
-Input.displayName = 'Input'
+);
+Input.displayName = "Input";
 
 // Create an inline Label component
 interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
-  htmlFor: string
-  children: ReactNode
+  htmlFor: string;
+  children: ReactNode;
 }
 
 const Label = ({ htmlFor, children, ...props }: LabelProps) => (
@@ -119,16 +119,15 @@ const Label = ({ htmlFor, children, ...props }: LabelProps) => (
   >
     {children}
   </label>
-)
+);
 
 // Create an inline Textarea component
-interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  id?: string
-  placeholder?: string
-  value?: string
-  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  rows?: number
+interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  id?: string;
+  placeholder?: string;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  rows?: number;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -144,9 +143,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       {...props}
     />
   ),
-)
+);
 
-Textarea.displayName = 'Textarea'
+Textarea.displayName = "Textarea";
 
 /**
  * Minimal Select component workaround.
@@ -157,9 +156,9 @@ const Select = ({
   onValueChange,
   children,
 }: {
-  value: string
-  onValueChange: (value: string) => void
-  children: React.ReactNode
+  value: string;
+  onValueChange: (value: string) => void;
+  children: React.ReactNode;
 }) => (
   <select
     value={value}
@@ -168,30 +167,30 @@ const Select = ({
   >
     {children}
   </select>
-)
+);
 const SelectContent = ({ children }: { children: React.ReactNode }) => (
   <>{children}</>
-)
+);
 const SelectItem = ({
   value,
   children,
 }: {
-  value: string
-  children: React.ReactNode
-}) => <option value={value}>{children}</option>
+  value: string;
+  children: React.ReactNode;
+}) => <option value={value}>{children}</option>;
 const SelectTrigger = ({ children }: { children: React.ReactNode }) => (
   <>{children}</>
-)
-const SelectValue = () => null
+);
+const SelectValue = () => null;
 
 // Default empty rule
 const defaultRule = {
-  id: '',
-  name: '',
-  description: '',
+  id: "",
+  name: "",
+  description: "",
   action: DLPAction.REDACT,
   isActive: true,
-}
+};
 
 /**
  * DLP Rule Editor Component
@@ -200,138 +199,138 @@ const defaultRule = {
  */
 export default function DLPRuleEditor() {
   // State for the rule being edited
-  const [currentRule, setCurrentRule] = useState<Partial<DLPRule>>(defaultRule)
-  const [isEditing, setIsEditing] = useState(false)
+  const [currentRule, setCurrentRule] = useState<Partial<DLPRule>>(defaultRule);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Listen for edit-rule events
   useEffect(() => {
     const handleEditRule = (event: CustomEvent) => {
-      setCurrentRule(event.detail)
-      setIsEditing(true)
-    }
+      setCurrentRule(event.detail);
+      setIsEditing(true);
+    };
 
     const handleNewRule = () => {
-      setCurrentRule(defaultRule)
-      setIsEditing(false)
-    }
+      setCurrentRule(defaultRule);
+      setIsEditing(false);
+    };
 
     // Add event listeners
-    document.addEventListener('dlp:edit-rule', handleEditRule as EventListener)
-    document.addEventListener('dlp:new-rule', handleNewRule)
+    document.addEventListener("dlp:edit-rule", handleEditRule as EventListener);
+    document.addEventListener("dlp:new-rule", handleNewRule);
 
     // Clean up event listeners on unmount
     return () => {
       document.removeEventListener(
-        'dlp:edit-rule',
+        "dlp:edit-rule",
         handleEditRule as EventListener,
-      )
-      document.removeEventListener('dlp:new-rule', handleNewRule)
-    }
-  }, [])
+      );
+      document.removeEventListener("dlp:new-rule", handleNewRule);
+    };
+  }, []);
 
   // Handle input changes
   const handleChange = (field: string, value: string | boolean) => {
     setCurrentRule({
       ...currentRule,
       [field]: value,
-    })
-  }
+    });
+  };
 
   // Save rule
   const saveRule = () => {
     // Validation
     if (!currentRule.id || !currentRule.name) {
       document.dispatchEvent(
-        new CustomEvent('dlp:error', {
-          detail: { message: 'Rule ID and name are required' },
+        new CustomEvent("dlp:error", {
+          detail: { message: "Rule ID and name are required" },
         }),
-      )
-      return
+      );
+      return;
     }
 
     try {
       // Need to construct a valid rule with a matches function
       const ruleToSave: DLPRule = {
-        id: currentRule.id || '',
-        name: currentRule.name || '',
-        description: currentRule.description || '',
+        id: currentRule.id || "",
+        name: currentRule.name || "",
+        description: currentRule.description || "",
         action: (currentRule.action as DLPAction) || DLPAction.REDACT,
         isActive:
           currentRule.isActive === undefined ? true : !!currentRule.isActive,
         // Default matcher looks for the term specified in the rule name
         matches: (content: string) => {
-          const searchTerm = currentRule.name?.toLowerCase() || ''
-          return content.toLowerCase().includes(searchTerm)
+          const searchTerm = currentRule.name?.toLowerCase() || "";
+          return content.toLowerCase().includes(searchTerm);
         },
-      }
+      };
 
       // If it's a REDACT rule, add a redact function
       if (ruleToSave.action === DLPAction.REDACT) {
         ruleToSave.redact = (content: string) => {
-          const searchTerm = currentRule.name?.toLowerCase() || ''
-          return content.replace(new RegExp(searchTerm, 'gi'), '[REDACTED]')
-        }
+          const searchTerm = currentRule.name?.toLowerCase() || "";
+          return content.replace(new RegExp(searchTerm, "gi"), "[REDACTED]");
+        };
       }
 
       // Add to DLP service
-      dlpService.addRule(ruleToSave)
+      dlpService.addRule(ruleToSave);
 
       // Dispatch event to notify that a rule has been saved
       document.dispatchEvent(
-        new CustomEvent('dlp:rule-saved', {
+        new CustomEvent("dlp:rule-saved", {
           detail: {
             rule: ruleToSave,
             isEditing,
           },
         }),
-      )
+      );
 
       // Reset the form and switch to rules tab
-      setCurrentRule(defaultRule)
-      setIsEditing(false)
+      setCurrentRule(defaultRule);
+      setIsEditing(false);
 
       // Switch back to rules tab
       const rulesTab = document.querySelector(
         '[value="rules"]',
-      ) as HTMLElement as HTMLElement
+      ) as HTMLElement as HTMLElement;
       if (rulesTab) {
         setTimeout(() => {
-          rulesTab.click()
+          rulesTab.click();
 
           // Trigger event to refresh rules list
-          document.dispatchEvent(new CustomEvent('dlp:rules-updated'))
-        }, 100)
+          document.dispatchEvent(new CustomEvent("dlp:rules-updated"));
+        }, 100);
       }
     } catch (error: unknown) {
-      console.error('Error saving rule:', error)
+      console.error("Error saving rule:", error);
       document.dispatchEvent(
-        new CustomEvent('dlp:error', {
+        new CustomEvent("dlp:error", {
           detail: {
             message: `Error saving rule: ${error instanceof Error ? String(error) : String(error)}`,
           },
         }),
-      )
+      );
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          {isEditing ? 'Edit DLP Rule' : 'Create New DLP Rule'}
+          {isEditing ? "Edit DLP Rule" : "Create New DLP Rule"}
         </CardTitle>
         <CardDescription>
           {isEditing
-            ? 'Modify the existing DLP rule'
-            : 'Define a new rule to control how sensitive data is handled'}
+            ? "Modify the existing DLP rule"
+            : "Define a new rule to control how sensitive data is handled"}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form
           className="space-y-4"
           onSubmit={(e) => {
-            e.preventDefault()
-            saveRule()
+            e.preventDefault();
+            saveRule();
           }}
         >
           <div className="grid grid-cols-2 gap-4">
@@ -341,9 +340,9 @@ export default function DLPRuleEditor() {
                 id="rule-id"
                 placeholder="unique-rule-id"
                 value={currentRule.id}
-                onChange={(e) => handleChange('id', e.target.value)}
+                onChange={(e) => handleChange("id", e.target.value)}
                 readOnly={isEditing}
-                className={isEditing ? 'bg-muted' : ''}
+                className={isEditing ? "bg-muted" : ""}
               />
             </div>
 
@@ -353,7 +352,7 @@ export default function DLPRuleEditor() {
                 id="rule-name"
                 placeholder="PHI Detection"
                 value={currentRule.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                onChange={(e) => handleChange("name", e.target.value)}
               />
             </div>
           </div>
@@ -365,7 +364,7 @@ export default function DLPRuleEditor() {
               placeholder="Describe what this rule does and when it applies"
               value={currentRule.description}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                handleChange('description', e.target.value)
+                handleChange("description", e.target.value)
               }
               rows={3}
             />
@@ -376,7 +375,7 @@ export default function DLPRuleEditor() {
               <Label htmlFor="rule-action">Action</Label>
               <Select
                 value={currentRule.action as string}
-                onValueChange={(value: string) => handleChange('action', value)}
+                onValueChange={(value: string) => handleChange("action", value)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -397,7 +396,7 @@ export default function DLPRuleEditor() {
                 id="rule-active"
                 checked={!!currentRule.isActive}
                 onCheckedChange={(checked: boolean) =>
-                  handleChange('isActive', checked)
+                  handleChange("isActive", checked)
                 }
               />
 
@@ -414,7 +413,7 @@ export default function DLPRuleEditor() {
               <div className="text-sm">
                 <span>Original: </span>
                 <span className="font-mono">
-                  This contains {currentRule.name || '[term]'}
+                  This contains {currentRule.name || "[term]"}
                 </span>
               </div>
               <div className="text-sm">
@@ -428,26 +427,26 @@ export default function DLPRuleEditor() {
             <Button
               type="button"
               onClick={() => {
-                setCurrentRule(defaultRule)
-                setIsEditing(false)
+                setCurrentRule(defaultRule);
+                setIsEditing(false);
 
                 // Switch back to rules tab
                 const rulesTab = document.querySelector(
                   '[value="rules"]',
-                ) as HTMLElement
+                ) as HTMLElement;
                 if (rulesTab) {
-                  rulesTab.click()
+                  rulesTab.click();
                 }
               }}
             >
               Cancel
             </Button>
             <Button type="submit">
-              {isEditing ? 'Update Rule' : 'Create Rule'}
+              {isEditing ? "Update Rule" : "Create Rule"}
             </Button>
           </div>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

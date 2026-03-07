@@ -1,48 +1,48 @@
-import type { WebRTCServiceInterface, WebRTCConnectionConfig } from '../types'
+import type { WebRTCServiceInterface, WebRTCConnectionConfig } from "../types";
 
 /**
  * Service for managing real-time WebRTC audio/video communication
  * Implements privacy-first architecture with zero data retention
  */
 export class WebRTCService implements WebRTCServiceInterface {
-  private peerConnection: RTCPeerConnection | null = null
-  private localStream: MediaStream | null = null
-  private remoteStream: MediaStream | null = null
-  private connectionConfig: WebRTCConnectionConfig | null = null
-  private streamListeners: Array<(stream: MediaStream) => void> = []
-  private disconnectListeners: Array<() => void> = []
-  private connectionAttempts = 0
-  private maxConnectionAttempts = 3
-  private connectionRetryIntervalMs = 3000
-  private connectionRetryTimeout: ReturnType<typeof setTimeout> | null = null
+  private peerConnection: RTCPeerConnection | null = null;
+  private localStream: MediaStream | null = null;
+  private remoteStream: MediaStream | null = null;
+  private connectionConfig: WebRTCConnectionConfig | null = null;
+  private streamListeners: Array<(stream: MediaStream) => void> = [];
+  private disconnectListeners: Array<() => void> = [];
+  private connectionAttempts = 0;
+  private maxConnectionAttempts = 3;
+  private connectionRetryIntervalMs = 3000;
+  private connectionRetryTimeout: ReturnType<typeof setTimeout> | null = null;
   private connectionMonitorInterval: ReturnType<typeof setInterval> | null =
-    null
-  private isShuttingDown = false
-  private lastIceCandidate: RTCIceCandidate | null = null
-  private isInitialized = false
+    null;
+  private isShuttingDown = false;
+  private lastIceCandidate: RTCIceCandidate | null = null;
+  private isInitialized = false;
 
   /**
    * Initialize the WebRTC connection with the specified configuration
    */
   async initializeConnection(config: WebRTCConnectionConfig): Promise<void> {
     // Cleanup existing connection first
-    this.cleanupConnection()
+    this.cleanupConnection();
 
     try {
-      this.connectionConfig = config
-      this.isInitialized = true
+      this.connectionConfig = config;
+      this.isInitialized = true;
 
       // Reset connection state
-      this.connectionAttempts = 0
-      this.isShuttingDown = false
+      this.connectionAttempts = 0;
+      this.isShuttingDown = false;
 
       // Log initialization but not config (for privacy)
-      console.log('WebRTC service initialized')
+      console.log("WebRTC service initialized");
     } catch (error: unknown) {
-      console.error('Error initializing WebRTC connection:', error)
-      throw new Error('Failed to initialize WebRTC connection', {
+      console.error("Error initializing WebRTC connection:", error);
+      throw new Error("Failed to initialize WebRTC connection", {
         cause: error,
-      })
+      });
     }
   }
 
@@ -50,11 +50,11 @@ export class WebRTCService implements WebRTCServiceInterface {
    * Create and configure a local media stream with the specified constraints
    */
   async createLocalStream(
-    audioConstraints: MediaStreamConstraints['audio'],
-    videoConstraints: MediaStreamConstraints['video'],
+    audioConstraints: MediaStreamConstraints["audio"],
+    videoConstraints: MediaStreamConstraints["video"],
   ): Promise<MediaStream> {
     if (!this.isInitialized) {
-      throw new Error('WebRTC service not initialized')
+      throw new Error("WebRTC service not initialized");
     }
 
     try {
@@ -62,17 +62,19 @@ export class WebRTCService implements WebRTCServiceInterface {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: audioConstraints,
         video: videoConstraints,
-      })
+      });
 
-      this.localStream = stream
+      this.localStream = stream;
 
       // Apply additional processing for better therapeutic interactions
-      this.applyAudioProcessing(stream)
+      this.applyAudioProcessing(stream);
 
-      return stream
+      return stream;
     } catch (error: unknown) {
-      console.error('Error creating local stream:', error)
-      throw new Error('Failed to access microphone or camera', { cause: error })
+      console.error("Error creating local stream:", error);
+      throw new Error("Failed to access microphone or camera", {
+        cause: error,
+      });
     }
   }
 
@@ -83,15 +85,15 @@ export class WebRTCService implements WebRTCServiceInterface {
     try {
       // Create audio context with latency optimization
       const audioContext = new AudioContext({
-        latencyHint: 'interactive',
+        latencyHint: "interactive",
         sampleRate: 48000,
-      })
+      });
 
       // Get the audio track from the stream
-      const audioTrack = stream.getAudioTracks()[0]
+      const audioTrack = stream.getAudioTracks()[0];
       if (!audioTrack) {
-        console.warn('No audio track found in stream')
-        return
+        console.warn("No audio track found in stream");
+        return;
       }
 
       // Configure audio track constraints for built-in noise suppression and echo cancellation
@@ -101,73 +103,75 @@ export class WebRTCService implements WebRTCServiceInterface {
           noiseSuppression: true,
           autoGainControl: true,
         })
-        .catch((err) => console.warn('Could not apply audio constraints:', err))
+        .catch((err) =>
+          console.warn("Could not apply audio constraints:", err),
+        );
 
       // Create a MediaStreamSource from the original stream
-      const source = audioContext.createMediaStreamSource(stream)
+      const source = audioContext.createMediaStreamSource(stream);
 
       // Create a more sophisticated audio processing pipeline
 
       // 1. Dynamics processing for consistent voice levels
-      const compressor = audioContext.createDynamicsCompressor()
-      compressor.threshold.value = -24
-      compressor.knee.value = 30
-      compressor.ratio.value = 12
-      compressor.attack.value = 0.003
-      compressor.release.value = 0.25
+      const compressor = audioContext.createDynamicsCompressor();
+      compressor.threshold.value = -24;
+      compressor.knee.value = 30;
+      compressor.ratio.value = 12;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
 
       // 2. Create a parametric EQ for voice enhancement
       // High-pass filter to remove rumble
-      const highPass = audioContext.createBiquadFilter()
-      highPass.type = 'highpass'
-      highPass.frequency.value = 150
-      highPass.Q.value = 0.7
+      const highPass = audioContext.createBiquadFilter();
+      highPass.type = "highpass";
+      highPass.frequency.value = 150;
+      highPass.Q.value = 0.7;
 
       // Low-pass filter to remove hiss
-      const lowPass = audioContext.createBiquadFilter()
-      lowPass.type = 'lowpass'
-      lowPass.frequency.value = 7500
-      lowPass.Q.value = 0.7
+      const lowPass = audioContext.createBiquadFilter();
+      lowPass.type = "lowpass";
+      lowPass.frequency.value = 7500;
+      lowPass.Q.value = 0.7;
 
       // 3. Create analyzer node for monitoring
-      const analyzer = audioContext.createAnalyser()
-      analyzer.fftSize = 2048
-      analyzer.smoothingTimeConstant = 0.8
+      const analyzer = audioContext.createAnalyser();
+      analyzer.fftSize = 2048;
+      analyzer.smoothingTimeConstant = 0.8;
 
       // Presence boost for clearer voice
-      const presenceBoost = audioContext.createBiquadFilter()
-      presenceBoost.type = 'peaking'
-      presenceBoost.frequency.value = 2500
-      presenceBoost.gain.value = 3
-      presenceBoost.Q.value = 1.0
+      const presenceBoost = audioContext.createBiquadFilter();
+      presenceBoost.type = "peaking";
+      presenceBoost.frequency.value = 2500;
+      presenceBoost.gain.value = 3;
+      presenceBoost.Q.value = 1.0;
 
       // 4. Gain adjustment
-      const gainNode = audioContext.createGain()
-      gainNode.gain.value = 1.1 // Slight boost
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 1.1; // Slight boost
 
       // 5. Limiter to prevent clipping
-      const limiter = audioContext.createDynamicsCompressor()
-      limiter.threshold.value = -1.0
-      limiter.knee.value = 0.0
-      limiter.ratio.value = 20.0
-      limiter.attack.value = 0.001
-      limiter.release.value = 0.1
+      const limiter = audioContext.createDynamicsCompressor();
+      limiter.threshold.value = -1.0;
+      limiter.knee.value = 0.0;
+      limiter.ratio.value = 20.0;
+      limiter.attack.value = 0.001;
+      limiter.release.value = 0.1;
 
       // Connect the audio processing chain
-      source.connect(highPass)
-      highPass.connect(lowPass)
-      lowPass.connect(presenceBoost)
-      presenceBoost.connect(compressor)
-      compressor.connect(gainNode)
-      gainNode.connect(limiter)
-      gainNode.connect(analyzer) // For monitoring
+      source.connect(highPass);
+      highPass.connect(lowPass);
+      lowPass.connect(presenceBoost);
+      presenceBoost.connect(compressor);
+      compressor.connect(gainNode);
+      gainNode.connect(limiter);
+      gainNode.connect(analyzer); // For monitoring
 
       // Create a destination node for the processed audio
-      const destination = audioContext.createMediaStreamDestination()
-      limiter.connect(destination)
+      const destination = audioContext.createMediaStreamDestination();
+      limiter.connect(destination);
 
       // Get the processed audio track
-      const processedAudioTrack = destination.stream.getAudioTracks()[0]
+      const processedAudioTrack = destination.stream.getAudioTracks()[0];
 
       // Replace the original audio track with the processed one
       if (processedAudioTrack) {
@@ -179,29 +183,29 @@ export class WebRTCService implements WebRTCServiceInterface {
             autoGainControl: true,
           })
           .catch((err) =>
-            console.warn('Could not apply processed track constraints:', err),
-          )
+            console.warn("Could not apply processed track constraints:", err),
+          );
 
         // Stop the original track
-        audioTrack.stop()
+        audioTrack.stop();
 
         // Remove the original track from the stream
-        stream.removeTrack(audioTrack)
+        stream.removeTrack(audioTrack);
 
         // Add the processed track to the stream
-        stream.addTrack(processedAudioTrack)
+        stream.addTrack(processedAudioTrack);
 
         console.log(
-          'Applied professional audio processing for therapeutic clarity',
-        )
+          "Applied professional audio processing for therapeutic clarity",
+        );
 
         // Set up audio monitoring and visualization if needed
-        this.setupAudioMonitoring(analyzer)
+        this.setupAudioMonitoring(analyzer);
       } else {
-        console.warn('Failed to create processed audio track')
+        console.warn("Failed to create processed audio track");
       }
     } catch (error: unknown) {
-      console.error('Error applying audio processing:', error)
+      console.error("Error applying audio processing:", error);
       // Fall back to unprocessed audio if processing fails
     }
   }
@@ -213,31 +217,31 @@ export class WebRTCService implements WebRTCServiceInterface {
     // This could be expanded to visualize audio for the therapist
     // or to provide additional analytics about voice patterns
 
-    const bufferLength = analyzer.frequencyBinCount
-    const dataArray = new Uint8Array(bufferLength)
+    const bufferLength = analyzer.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
 
     // Example monitoring function that could be expanded
     const monitorAudio = () => {
-      analyzer.getByteFrequencyData(dataArray)
+      analyzer.getByteFrequencyData(dataArray);
 
       // Calculate average energy level (for demonstration)
-      let sum = 0
+      let sum = 0;
       for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i]
+        sum += dataArray[i];
       }
-      const averageEnergy = sum / bufferLength
+      const averageEnergy = sum / bufferLength;
 
       // Log significant audio events for debugging
       if (averageEnergy > 200) {
-        console.debug('High energy audio detected')
+        console.debug("High energy audio detected");
       }
 
       // Continue monitoring
-      requestAnimationFrame(monitorAudio)
-    }
+      requestAnimationFrame(monitorAudio);
+    };
 
     // Start monitoring
-    monitorAudio()
+    monitorAudio();
   }
 
   /**
@@ -245,46 +249,46 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   async connectToPeer(): Promise<void> {
     if (!this.isInitialized || !this.connectionConfig) {
-      throw new Error('WebRTC service not initialized')
+      throw new Error("WebRTC service not initialized");
     }
 
     if (!this.localStream) {
-      throw new Error('Local stream not created')
+      throw new Error("Local stream not created");
     }
 
     try {
       // Increment connection attempts
-      this.connectionAttempts++
+      this.connectionAttempts++;
 
       // Create and configure RTCPeerConnection with production ICE servers
-      this.peerConnection = new RTCPeerConnection(this.connectionConfig)
+      this.peerConnection = new RTCPeerConnection(this.connectionConfig);
 
       // Set up event handlers
-      this.setupPeerConnectionEventHandlers()
+      this.setupPeerConnectionEventHandlers();
 
       // Add local stream tracks to peer connection
       this.localStream.getTracks().forEach((track) => {
         if (this.peerConnection && this.localStream) {
-          this.peerConnection.addTrack(track, this.localStream)
+          this.peerConnection.addTrack(track, this.localStream);
         }
-      })
+      });
 
       // Create remote stream container
-      this.remoteStream = new MediaStream()
+      this.remoteStream = new MediaStream();
 
       // Notify listeners about the remote stream
-      this.notifyStreamListeners(this.remoteStream)
+      this.notifyStreamListeners(this.remoteStream);
 
       // Start the real peer connection process
-      await this.initiateRealPeerConnection()
+      await this.initiateRealPeerConnection();
 
       // Start connection monitoring
-      this.startConnectionMonitoring()
+      this.startConnectionMonitoring();
 
-      console.log('Connected to peer')
+      console.log("Connected to peer");
     } catch (error: unknown) {
-      console.error('Error connecting to peer:', error)
-      this.handleConnectionFailure()
+      console.error("Error connecting to peer:", error);
+      this.handleConnectionFailure();
     }
   }
 
@@ -293,55 +297,55 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private setupPeerConnectionEventHandlers() {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
     // Handle ICE candidates
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.lastIceCandidate = event.candidate
+        this.lastIceCandidate = event.candidate;
         // In a production implementation, send this to the signaling server
-        this.sendIceCandidateToSignalingServer(event.candidate)
+        this.sendIceCandidateToSignalingServer(event.candidate);
       }
-    }
+    };
 
     // Handle connection state changes
     this.peerConnection.onconnectionstatechange = () => {
-      this.handleConnectionStateChange()
-    }
+      this.handleConnectionStateChange();
+    };
 
     // Handle ICE connection state changes
     this.peerConnection.oniceconnectionstatechange = () => {
-      this.handleIceConnectionStateChange()
-    }
+      this.handleIceConnectionStateChange();
+    };
 
     // Handle tracks from the remote stream
     this.peerConnection.ontrack = (event) => {
       if (this.remoteStream) {
         // Add remote tracks to the remote stream
         event.streams[0].getTracks().forEach((track) => {
-          this.remoteStream?.addTrack(track)
-        })
+          this.remoteStream?.addTrack(track);
+        });
 
         // Notify listeners about the updated remote stream
-        this.notifyStreamListeners(this.remoteStream)
+        this.notifyStreamListeners(this.remoteStream);
       }
-    }
+    };
 
     // Handle negotiation needed events
     this.peerConnection.onnegotiationneeded = async () => {
       try {
-        await this.createAndSendOffer()
+        await this.createAndSendOffer();
       } catch (error: unknown) {
-        console.error('Error during negotiation:', error)
+        console.error("Error during negotiation:", error);
       }
-    }
+    };
 
     // Handle data channel for text-based communication if needed
     this.peerConnection.ondatachannel = (event) => {
-      const dataChannel = event.channel
-      this.setupDataChannel(dataChannel)
-    }
+      const dataChannel = event.channel;
+      this.setupDataChannel(dataChannel);
+    };
   }
 
   /**
@@ -349,17 +353,17 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private setupDataChannel(dataChannel: RTCDataChannel): void {
     dataChannel.onopen = () => {
-      console.log('Data channel opened')
-    }
+      console.log("Data channel opened");
+    };
 
     dataChannel.onclose = () => {
-      console.log('Data channel closed')
-    }
+      console.log("Data channel closed");
+    };
 
     dataChannel.onmessage = (event) => {
       // Process incoming messages
-      console.log('Received message:', event.data)
-    }
+      console.log("Received message:", event.data);
+    };
   }
 
   /**
@@ -369,15 +373,15 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private async initiateRealPeerConnection(): Promise<void> {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
     try {
       // Create and send an offer
-      await this.createAndSendOffer()
+      await this.createAndSendOffer();
     } catch (error: unknown) {
-      console.error('Error initiating peer connection:', error)
-      throw error
+      console.error("Error initiating peer connection:", error);
+      throw error;
     }
   }
 
@@ -386,7 +390,7 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private async createAndSendOffer(): Promise<void> {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
     try {
@@ -394,17 +398,17 @@ export class WebRTCService implements WebRTCServiceInterface {
       const offer = await this.peerConnection.createOffer({
         offerToReceiveAudio: true,
         offerToReceiveVideo: true,
-      })
+      });
 
       // Set local description
-      await this.peerConnection.setLocalDescription(offer)
+      await this.peerConnection.setLocalDescription(offer);
 
       // In a production system, send this offer to the signaling server
       // For this implementation, we'll use a local signaling mechanism
-      this.sendOfferToSignalingServer(offer)
+      this.sendOfferToSignalingServer(offer);
     } catch (error: unknown) {
-      console.error('Error creating offer:', error)
-      throw error
+      console.error("Error creating offer:", error);
+      throw error;
     }
   }
 
@@ -414,16 +418,16 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private sendOfferToSignalingServer(offer: RTCSessionDescriptionInit): void {
     // In a production app, this would send the offer to a WebSocket server
-    console.log('Sending offer to signaling server')
+    console.log("Sending offer to signaling server");
 
     // Simulate receiving an answer from the peer
     // For this implementation, we'll automatically create an answer locally
     setTimeout(() => {
       this.handleReceivedAnswer({
-        type: 'answer',
+        type: "answer",
         sdp: offer.sdp,
-      })
-    }, 500)
+      });
+    }, 500);
   }
 
   /**
@@ -431,7 +435,7 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private sendIceCandidateToSignalingServer(candidate: RTCIceCandidate): void {
     // In a production app, this would send the ICE candidate to a WebSocket server
-    console.log('Sending ICE candidate to signaling server')
+    console.log("Sending ICE candidate to signaling server");
 
     // For this implementation, we'll simulate received remote ICE candidates
     setTimeout(() => {
@@ -441,14 +445,14 @@ export class WebRTCService implements WebRTCServiceInterface {
           candidate: candidate.candidate,
           sdpMid: candidate.sdpMid,
           sdpMLineIndex: candidate.sdpMLineIndex,
-        })
+        });
 
         // Add the simulated remote candidate
         this.peerConnection
           .addIceCandidate(remoteCandidate)
-          .catch((err) => console.error('Error adding ICE candidate:', err))
+          .catch((err) => console.error("Error adding ICE candidate:", err));
       }
-    }, 300)
+    }, 300);
   }
 
   /**
@@ -458,16 +462,16 @@ export class WebRTCService implements WebRTCServiceInterface {
     answer: RTCSessionDescriptionInit,
   ): Promise<void> {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
     try {
       // Set the remote description using the received answer
-      await this.peerConnection.setRemoteDescription(answer)
-      console.log('Successfully set remote description from answer')
+      await this.peerConnection.setRemoteDescription(answer);
+      console.log("Successfully set remote description from answer");
     } catch (error: unknown) {
-      console.error('Error setting remote description:', error)
-      throw error
+      console.error("Error setting remote description:", error);
+      throw error;
     }
   }
 
@@ -478,15 +482,15 @@ export class WebRTCService implements WebRTCServiceInterface {
     candidate: RTCIceCandidate,
   ): Promise<void> {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
     try {
       // Add the received ICE candidate
-      await this.peerConnection.addIceCandidate(candidate)
-      console.log('Successfully added remote ICE candidate')
+      await this.peerConnection.addIceCandidate(candidate);
+      console.log("Successfully added remote ICE candidate");
     } catch (error: unknown) {
-      console.error('Error adding received ICE candidate:', error)
+      console.error("Error adding received ICE candidate:", error);
     }
   }
 
@@ -495,26 +499,26 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private handleConnectionStateChange() {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
-    const state = this.peerConnection.connectionState
+    const state = this.peerConnection.connectionState;
 
-    console.log(`Connection state changed: ${state}`)
+    console.log(`Connection state changed: ${state}`);
 
     switch (state) {
-      case 'connected':
+      case "connected":
         // Reset connection attempts on successful connection
-        this.connectionAttempts = 0
-        break
+        this.connectionAttempts = 0;
+        break;
 
-      case 'disconnected':
-      case 'failed':
-      case 'closed':
+      case "disconnected":
+      case "failed":
+      case "closed":
         if (!this.isShuttingDown) {
-          this.handleConnectionFailure()
+          this.handleConnectionFailure();
         }
-        break
+        break;
     }
   }
 
@@ -523,21 +527,21 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private handleIceConnectionStateChange() {
     if (!this.peerConnection) {
-      return
+      return;
     }
 
-    const state = this.peerConnection.iceConnectionState
+    const state = this.peerConnection.iceConnectionState;
 
-    console.log(`ICE connection state changed: ${state}`)
+    console.log(`ICE connection state changed: ${state}`);
 
     switch (state) {
-      case 'disconnected':
-      case 'failed':
-      case 'closed':
+      case "disconnected":
+      case "failed":
+      case "closed":
         if (!this.isShuttingDown) {
-          this.handleConnectionFailure()
+          this.handleConnectionFailure();
         }
-        break
+        break;
     }
   }
 
@@ -549,25 +553,25 @@ export class WebRTCService implements WebRTCServiceInterface {
     if (this.connectionAttempts < this.maxConnectionAttempts) {
       console.log(
         `Connection attempt ${this.connectionAttempts} failed, retrying...`,
-      )
+      );
 
       // Clean up existing connection
-      this.cleanupPeerConnection()
+      this.cleanupPeerConnection();
 
       // Try to reconnect after delay
       this.connectionRetryTimeout = setTimeout(() => {
         this.connectToPeer().catch((err) => {
-          console.error('Reconnection failed:', err)
-        })
-      }, this.connectionRetryIntervalMs)
+          console.error("Reconnection failed:", err);
+        });
+      }, this.connectionRetryIntervalMs);
     } else {
-      console.error('Max connection attempts reached, giving up')
+      console.error("Max connection attempts reached, giving up");
 
       // Notify disconnect listeners
-      this.notifyDisconnectListeners()
+      this.notifyDisconnectListeners();
 
       // Clean up
-      this.cleanupConnection()
+      this.cleanupConnection();
     }
   }
 
@@ -576,18 +580,18 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private startConnectionMonitoring() {
     // Clear any existing monitor
-    this.stopConnectionMonitoring()
+    this.stopConnectionMonitoring();
 
     // Check connection status periodically
     this.connectionMonitorInterval = setInterval(() => {
       if (this.peerConnection) {
-        const state = this.peerConnection.iceConnectionState
-        if (state === 'disconnected' || state === 'failed') {
-          console.log('Connection problem detected by monitor')
-          this.handleConnectionFailure()
+        const state = this.peerConnection.iceConnectionState;
+        if (state === "disconnected" || state === "failed") {
+          console.log("Connection problem detected by monitor");
+          this.handleConnectionFailure();
         }
       }
-    }, 5000)
+    }, 5000);
   }
 
   /**
@@ -595,8 +599,8 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private stopConnectionMonitoring() {
     if (this.connectionMonitorInterval) {
-      clearInterval(this.connectionMonitorInterval)
-      this.connectionMonitorInterval = null
+      clearInterval(this.connectionMonitorInterval);
+      this.connectionMonitorInterval = null;
     }
   }
 
@@ -604,10 +608,10 @@ export class WebRTCService implements WebRTCServiceInterface {
    * Disconnect from the current peer
    */
   disconnectFromPeer() {
-    this.isShuttingDown = true
-    this.cleanupConnection()
-    this.notifyDisconnectListeners()
-    console.log('Disconnected from peer')
+    this.isShuttingDown = true;
+    this.cleanupConnection();
+    this.notifyDisconnectListeners();
+    console.log("Disconnected from peer");
   }
 
   /**
@@ -616,8 +620,8 @@ export class WebRTCService implements WebRTCServiceInterface {
   private cleanupPeerConnection() {
     if (this.peerConnection) {
       // Close the connection
-      this.peerConnection.close()
-      this.peerConnection = null
+      this.peerConnection.close();
+      this.peerConnection = null;
     }
   }
 
@@ -626,39 +630,39 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private cleanupConnection() {
     // Stop connection monitoring
-    this.stopConnectionMonitoring()
+    this.stopConnectionMonitoring();
 
     // Clear any pending reconnection attempt
     if (this.connectionRetryTimeout) {
-      clearTimeout(this.connectionRetryTimeout)
-      this.connectionRetryTimeout = null
+      clearTimeout(this.connectionRetryTimeout);
+      this.connectionRetryTimeout = null;
     }
 
     // Clean up peer connection
-    this.cleanupPeerConnection()
+    this.cleanupPeerConnection();
 
     // Clean up local stream
     if (this.localStream) {
-      this.localStream.getTracks().forEach((track) => track.stop())
-      this.localStream = null
+      this.localStream.getTracks().forEach((track) => track.stop());
+      this.localStream = null;
     }
 
     // Clean up remote stream
-    this.remoteStream = null
+    this.remoteStream = null;
 
     // Reset state variables
-    this.lastIceCandidate = null
+    this.lastIceCandidate = null;
   }
 
   /**
    * Register a callback for stream events
    */
   onStream(callback: (stream: MediaStream) => void): void {
-    this.streamListeners.push(callback)
+    this.streamListeners.push(callback);
 
     // If we already have a remote stream, notify immediately
     if (this.remoteStream) {
-      callback(this.remoteStream)
+      callback(this.remoteStream);
     }
   }
 
@@ -666,7 +670,7 @@ export class WebRTCService implements WebRTCServiceInterface {
    * Register a callback for disconnect events
    */
   onDisconnect(callback: () => void): void {
-    this.disconnectListeners.push(callback)
+    this.disconnectListeners.push(callback);
   }
 
   /**
@@ -675,11 +679,11 @@ export class WebRTCService implements WebRTCServiceInterface {
   private notifyStreamListeners(stream: MediaStream): void {
     this.streamListeners.forEach((listener) => {
       try {
-        listener(stream)
+        listener(stream);
       } catch (error: unknown) {
-        console.error('Error in stream listener:', error)
+        console.error("Error in stream listener:", error);
       }
-    })
+    });
   }
 
   /**
@@ -688,11 +692,11 @@ export class WebRTCService implements WebRTCServiceInterface {
   private notifyDisconnectListeners() {
     this.disconnectListeners.forEach((listener) => {
       try {
-        listener()
+        listener();
       } catch (error: unknown) {
-        console.error('Error in disconnect listener:', error)
+        console.error("Error in disconnect listener:", error);
       }
-    })
+    });
   }
 }
 

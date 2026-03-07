@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Shield,
   Activity,
@@ -18,77 +18,81 @@ import {
   Download,
   Clock,
   Lock,
-} from 'lucide-react'
+} from "lucide-react";
 
 interface SystemMetrics {
-  uptime: number
-  totalRequests: number
-  activeUsers: number
-  errorRate: number
-  averageResponseTime: number
-  databaseConnections: number
-  cacheHitRate: number
-  memoryUsage: number
-  cpuUsage: number
+  uptime: number;
+  totalRequests: number;
+  activeUsers: number;
+  errorRate: number;
+  averageResponseTime: number;
+  databaseConnections: number;
+  cacheHitRate: number;
+  memoryUsage: number;
+  cpuUsage: number;
 }
 
 interface SecurityMetrics {
-  authenticationAttempts: number
-  failedLogins: number
-  blockedIPs: string[]
+  authenticationAttempts: number;
+  failedLogins: number;
+  blockedIPs: string[];
   securityAlerts: Array<{
-    id: string
-    type: string
-    severity: 'low' | 'medium' | 'high' | 'critical'
-    message: string
-    timestamp: number
-  }>
-  lastSecurityScan: number
-  vulnerabilities: number
+    id: string;
+    type: string;
+    severity: "low" | "medium" | "high" | "critical";
+    message: string;
+    timestamp: number;
+  }>;
+  lastSecurityScan: number;
+  vulnerabilities: number;
 }
 
 interface UserAnalytics {
-  totalUsers: number
-  activeToday: number
-  activeThisWeek: number
-  activeThisMonth: number
-  newRegistrations: number
-  userRetention: number
-  averageSessionDuration: number
+  totalUsers: number;
+  activeToday: number;
+  activeThisWeek: number;
+  activeThisMonth: number;
+  newRegistrations: number;
+  userRetention: number;
+  averageSessionDuration: number;
   mostUsedFeatures: Array<{
-    feature: string
-    usage: number
-  }>
+    feature: string;
+    usage: number;
+  }>;
 }
 
 interface APIHealth {
   endpoints: Array<{
-    name: string
-    url: string
-    status: 'healthy' | 'degraded' | 'down'
-    responseTime: number
-    successRate: number
-    lastCheck: number
+    name: string;
+    url: string;
+    status: "healthy" | "degraded" | "down";
+    responseTime: number;
+    successRate: number;
+    lastCheck: number;
     errors: Array<{
-      timestamp: number
-      error: string
-      count: number
-    }>
-  }>
-  totalRequests: number
-  successfulRequests: number
-  failedRequests: number
+      timestamp: number;
+      error: string;
+      count: number;
+    }>;
+  }>;
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
 }
 
 export default function EnterpriseAdminDashboard() {
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null)
+  const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(
+    null,
+  );
   const [securityMetrics, setSecurityMetrics] =
-    useState<SecurityMetrics | null>(null)
-  const [userAnalytics, setUserAnalytics] = useState<UserAnalytics | null>(null)
-  const [apiHealth, setApiHealth] = useState<APIHealth | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
-  const [autoRefresh, setAutoRefresh] = useState(true)
+    useState<SecurityMetrics | null>(null);
+  const [userAnalytics, setUserAnalytics] = useState<UserAnalytics | null>(
+    null,
+  );
+  const [apiHealth, setApiHealth] = useState<APIHealth | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   // Initialize demo data
   useEffect(() => {
@@ -103,31 +107,31 @@ export default function EnterpriseAdminDashboard() {
         cacheHitRate: 94.7,
         memoryUsage: 67.3,
         cpuUsage: 23.8,
-      }
+      };
 
       const security: SecurityMetrics = {
         authenticationAttempts: 45723,
         failedLogins: 127,
-        blockedIPs: ['192.168.1.100', '10.0.0.45', '172.16.0.33'],
+        blockedIPs: ["192.168.1.100", "10.0.0.45", "172.16.0.33"],
         securityAlerts: [
           {
-            id: '1',
-            type: 'Unusual Login Pattern',
-            severity: 'medium',
-            message: 'Multiple login attempts from new location detected',
+            id: "1",
+            type: "Unusual Login Pattern",
+            severity: "medium",
+            message: "Multiple login attempts from new location detected",
             timestamp: Date.now() - 3600000,
           },
           {
-            id: '2',
-            type: 'Rate Limiting Triggered',
-            severity: 'low',
-            message: 'API rate limit exceeded for user session',
+            id: "2",
+            type: "Rate Limiting Triggered",
+            severity: "low",
+            message: "API rate limit exceeded for user session",
             timestamp: Date.now() - 7200000,
           },
         ],
         lastSecurityScan: Date.now() - 86400000,
         vulnerabilities: 0,
-      }
+      };
 
       const users: UserAnalytics = {
         totalUsers: 28456,
@@ -138,54 +142,54 @@ export default function EnterpriseAdminDashboard() {
         userRetention: 89.3,
         averageSessionDuration: 23.4,
         mostUsedFeatures: [
-          { feature: 'Crisis Detection', usage: 89.2 },
-          { feature: 'Chat Analysis', usage: 76.8 },
-          { feature: 'Knowledge Parsing', usage: 65.3 },
-          { feature: 'Therapy Scenarios', usage: 58.7 },
-          { feature: 'Risk Assessment', usage: 45.9 },
+          { feature: "Crisis Detection", usage: 89.2 },
+          { feature: "Chat Analysis", usage: 76.8 },
+          { feature: "Knowledge Parsing", usage: 65.3 },
+          { feature: "Therapy Scenarios", usage: 58.7 },
+          { feature: "Risk Assessment", usage: 45.9 },
         ],
-      }
+      };
 
       const api: APIHealth = {
         endpoints: [
           {
-            name: 'Psychology Parse',
-            url: '/api/psychology/parse',
-            status: 'healthy',
+            name: "Psychology Parse",
+            url: "/api/psychology/parse",
+            status: "healthy",
             responseTime: 187,
             successRate: 99.8,
             lastCheck: Date.now(),
             errors: [],
           },
           {
-            name: 'Crisis Detection',
-            url: '/api/mental-health/crisis-detection',
-            status: 'healthy',
+            name: "Crisis Detection",
+            url: "/api/mental-health/crisis-detection",
+            status: "healthy",
             responseTime: 423,
             successRate: 99.7,
             lastCheck: Date.now(),
             errors: [],
           },
           {
-            name: 'Chat API',
-            url: '/api/mental-health/chat',
-            status: 'healthy',
+            name: "Chat API",
+            url: "/api/mental-health/chat",
+            status: "healthy",
             responseTime: 256,
             successRate: 99.9,
             lastCheck: Date.now(),
             errors: [],
           },
           {
-            name: 'Scenario Generation',
-            url: '/api/psychology/generate-scenario',
-            status: 'degraded',
+            name: "Scenario Generation",
+            url: "/api/psychology/generate-scenario",
+            status: "degraded",
             responseTime: 892,
             successRate: 98.2,
             lastCheck: Date.now(),
             errors: [
               {
                 timestamp: Date.now() - 1800000,
-                error: 'Timeout on AI model request',
+                error: "Timeout on AI model request",
                 count: 3,
               },
             ],
@@ -194,55 +198,55 @@ export default function EnterpriseAdminDashboard() {
         totalRequests: 2847293,
         successfulRequests: 2844156,
         failedRequests: 3137,
-      }
+      };
 
-      setSystemMetrics(metrics)
-      setSecurityMetrics(security)
-      setUserAnalytics(users)
-      setApiHealth(api)
-      setIsLoading(false)
-      setLastRefresh(new Date())
-    }
+      setSystemMetrics(metrics);
+      setSecurityMetrics(security);
+      setUserAnalytics(users);
+      setApiHealth(api);
+      setIsLoading(false);
+      setLastRefresh(new Date());
+    };
 
-    loadDashboardData()
+    loadDashboardData();
 
     // Auto-refresh every 30 seconds if enabled
     const interval = setInterval(() => {
       if (autoRefresh) {
-        loadDashboardData()
+        loadDashboardData();
       }
-    }, 30000)
+    }, 30000);
 
-    return () => clearInterval(interval)
-  }, [autoRefresh])
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy':
-        return 'text-green-600 bg-green-50 border-green-200'
-      case 'degraded':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'down':
-        return 'text-red-600 bg-red-50 border-red-200'
+      case "healthy":
+        return "text-green-600 bg-green-50 border-green-200";
+      case "degraded":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      case "down":
+        return "text-red-600 bg-red-50 border-red-200";
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return "text-gray-600 bg-gray-50 border-gray-200";
     }
-  }
+  };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low':
-        return 'text-blue-600 bg-blue-50 border-blue-200'
-      case 'medium':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'high':
-        return 'text-orange-600 bg-orange-50 border-orange-200'
-      case 'critical':
-        return 'text-red-600 bg-red-50 border-red-200'
+      case "low":
+        return "text-blue-600 bg-blue-50 border-blue-200";
+      case "medium":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      case "high":
+        return "text-orange-600 bg-orange-50 border-orange-200";
+      case "critical":
+        return "text-red-600 bg-red-50 border-red-200";
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return "text-gray-600 bg-gray-50 border-gray-200";
     }
-  }
+  };
 
   const exportMetrics = () => {
     const exportData = {
@@ -251,18 +255,18 @@ export default function EnterpriseAdminDashboard() {
       userAnalytics,
       apiHealth,
       timestamp: new Date().toISOString(),
-    }
+    };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `admin-metrics-${Date.now()}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `admin-metrics-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (isLoading) {
     return (
@@ -272,7 +276,7 @@ export default function EnterpriseAdminDashboard() {
           <p className="text-gray-600">Loading admin dashboard...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -284,7 +288,7 @@ export default function EnterpriseAdminDashboard() {
             Enterprise Admin Dashboard
           </h1>
           <p className="text-gray-600 mt-1">
-            Comprehensive system monitoring and analytics • Last updated:{' '}
+            Comprehensive system monitoring and analytics • Last updated:{" "}
             {lastRefresh.toLocaleTimeString()}
           </p>
         </div>
@@ -293,10 +297,10 @@ export default function EnterpriseAdminDashboard() {
             variant="outline"
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={autoRefresh ? 'bg-green-50 border-green-200' : ''}
+            className={autoRefresh ? "bg-green-50 border-green-200" : ""}
           >
             <RefreshCw
-              className={`w-4 h-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`}
+              className={`w-4 h-4 mr-2 ${autoRefresh ? "animate-spin" : ""}`}
             />
             Auto Refresh
           </Button>
@@ -472,8 +476,8 @@ export default function EnterpriseAdminDashboard() {
                     variant="outline"
                     className={
                       systemMetrics && systemMetrics.errorRate < 1
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-red-50 text-red-700 border-red-200'
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-red-50 text-red-700 border-red-200"
                     }
                   >
                     {systemMetrics?.errorRate}%
@@ -526,8 +530,8 @@ export default function EnterpriseAdminDashboard() {
                     variant="outline"
                     className={
                       securityMetrics && securityMetrics.failedLogins < 200
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-yellow-50 text-yellow-700 border-yellow-200"
                     }
                   >
                     {securityMetrics?.failedLogins}
@@ -679,13 +683,13 @@ export default function EnterpriseAdminDashboard() {
                         variant="outline"
                         className={getStatusColor(endpoint.status)}
                       >
-                        {endpoint.status === 'healthy' && (
+                        {endpoint.status === "healthy" && (
                           <CheckCircle className="w-3 h-3 mr-1" />
                         )}
-                        {endpoint.status === 'degraded' && (
+                        {endpoint.status === "degraded" && (
                           <AlertTriangle className="w-3 h-3 mr-1" />
                         )}
-                        {endpoint.status === 'down' && (
+                        {endpoint.status === "down" && (
                           <AlertTriangle className="w-3 h-3 mr-1" />
                         )}
                         {endpoint.status}
@@ -761,5 +765,5 @@ export default function EnterpriseAdminDashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

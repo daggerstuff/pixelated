@@ -1,20 +1,20 @@
 // import type { APIRoute } from 'astro'
-import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getSession } from '../../../lib/auth/session'
+import { z } from "zod";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { getSession } from "../../../lib/auth/session";
 
-const logger = createBuildSafeLogger('api:patient-rights:update-export')
+const logger = createBuildSafeLogger("api:patient-rights:update-export");
 
 // Schema for validating the request body
 const updateExportSchema = z.object({
-  exportId: z.string().min(1, 'Export ID is required'),
+  exportId: z.string().min(1, "Export ID is required"),
   status: z.enum([
-    'pending',
-    'processing',
-    'completed',
-    'failed',
-    'cancelled',
-    'delivered',
+    "pending",
+    "processing",
+    "completed",
+    "failed",
+    "cancelled",
+    "delivered",
   ]),
   notes: z.string().optional(),
   completionDetails: z
@@ -26,50 +26,50 @@ const updateExportSchema = z.object({
       fileChecksum: z.string().optional(),
     })
     .optional(),
-})
+});
 
 export const put = async ({ request }) => {
   try {
     // Verify user is authenticated and authorized
-    const sessionData = await getSession(request)
+    const sessionData = await getSession(request);
     if (!sessionData || !sessionData.user) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Unauthorized' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } },
-      )
+        JSON.stringify({ success: false, message: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json" } },
+      );
     }
 
-    const { user } = sessionData
+    const { user } = sessionData;
 
     // Check if user has permission to update export requests
-    if (!user.app_metadata?.permissions?.includes('update:data_exports')) {
+    if (!user.app_metadata?.permissions?.includes("update:data_exports")) {
       return new Response(
-        JSON.stringify({ success: false, message: 'Insufficient permissions' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
-      )
+        JSON.stringify({ success: false, message: "Insufficient permissions" }),
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // Parse and validate request body
-    const requestData = await request.json()
-    const validationResult = updateExportSchema.safeParse(requestData)
+    const requestData = await request.json();
+    const validationResult = updateExportSchema.safeParse(requestData);
 
     if (!validationResult.success) {
-      logger.warn('Invalid export update data', {
+      logger.warn("Invalid export update data", {
         errors: validationResult.error.errors,
         userId: user.id,
-      })
+      });
 
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'Invalid request data',
+          message: "Invalid request data",
           errors: validationResult.error.errors,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
-    const validatedData = validationResult.data
+    const validatedData = validationResult.data;
 
     // In a real implementation, you would retrieve the existing export request
     // const existingExport = await db.exportRequests.findUnique({ where: { id: validatedData.exportId } });
@@ -104,16 +104,16 @@ export const put = async ({ request }) => {
 
     // Required fields for specific status transitions
     if (
-      validatedData.status === 'completed' &&
+      validatedData.status === "completed" &&
       !validatedData.completionDetails
     ) {
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'Completion details are required when status is completed',
+          message: "Completion details are required when status is completed",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // Update the export request
@@ -130,12 +130,12 @@ export const put = async ({ request }) => {
     // });
 
     // Log the update for audit purposes
-    logger.info('Export request updated', {
+    logger.info("Export request updated", {
       exportId: validatedData.exportId,
       userId: user.id,
       newStatus: validatedData.status,
       hasCompletionDetails: !!validatedData.completionDetails,
-    })
+    });
 
     // If status changed to 'delivered', send notification to patient/recipient
     // if (validatedData.status === 'delivered') {
@@ -145,19 +145,19 @@ export const put = async ({ request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Export request updated successfully',
+        message: "Export request updated successfully",
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } },
-    )
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
   } catch (error: unknown) {
-    logger.error('Error updating export request', { error })
+    logger.error("Error updating export request", { error });
 
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'An error occurred while processing your request',
+        message: "An error occurred while processing your request",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
-    )
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
   }
-}
+};

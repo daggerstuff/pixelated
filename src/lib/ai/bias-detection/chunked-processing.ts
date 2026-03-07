@@ -11,14 +11,14 @@ export async function processInChunks<T, R>(
   chunkSize: number,
   processChunk: (chunk: T[], chunkIndex: number) => Promise<R>,
 ): Promise<R[]> {
-  const results: R[] = []
+  const results: R[] = [];
   for (let i = 0; i < items.length; i += chunkSize) {
-    const chunk = items.slice(i, i + chunkSize)
+    const chunk = items.slice(i, i + chunkSize);
     // Process and immediately release memory for the chunk
-    const result = await processChunk(chunk, i / chunkSize)
-    results.push(result)
+    const result = await processChunk(chunk, i / chunkSize);
+    results.push(result);
   }
-  return results
+  return results;
 }
 
 // Example usage:

@@ -1,13 +1,13 @@
-import { useEffect } from 'react'
-import { authClient } from '@/lib/auth-client'
-import type { AuthRole } from '@/config/auth.config'
-import type { UserRole } from '@/types/auth'
+import { useEffect } from "react";
+import { authClient } from "@/lib/auth-client";
+import type { AuthRole } from "@/config/auth.config";
+import type { UserRole } from "@/types/auth";
 
 export interface ProtectedRouteProps {
-  children: React.ReactNode
-  requiredRole?: AuthRole | AuthRole[] | UserRole | UserRole[]
-  redirectTo?: string
-  fallback?: React.ReactNode
+  children: React.ReactNode;
+  requiredRole?: AuthRole | AuthRole[] | UserRole | UserRole[];
+  redirectTo?: string;
+  fallback?: React.ReactNode;
 }
 
 /**
@@ -16,32 +16,34 @@ export interface ProtectedRouteProps {
 export function ProtectedRoute({
   children,
   requiredRole,
-  redirectTo = '/login',
+  redirectTo = "/login",
   fallback,
 }: ProtectedRouteProps) {
-  const { data: session, isPending: loading } = authClient.useSession()
+  const { data: session, isPending: loading } = authClient.useSession();
 
   // Simple role check function
-  const hasRole = (role: AuthRole | AuthRole[] | UserRole | UserRole[]): boolean => {
+  const hasRole = (
+    role: AuthRole | AuthRole[] | UserRole | UserRole[],
+  ): boolean => {
     if (!session?.user) {
-      return false
+      return false;
     }
 
-    const userRole = session.user.role
+    const userRole = session.user.role;
 
     if (Array.isArray(role)) {
-      return (role as string[]).includes(userRole)
+      return (role as string[]).includes(userRole);
     }
 
-    return userRole === role
-  }
+    return userRole === role;
+  };
 
   useEffect(() => {
     if (!loading && !session) {
-      const currentPath = window.location.pathname
-      window.location.href = `${redirectTo}?redirect=${encodeURIComponent(currentPath)}`
+      const currentPath = window.location.pathname;
+      window.location.href = `${redirectTo}?redirect=${encodeURIComponent(currentPath)}`;
     }
-  }, [session, loading, redirectTo])
+  }, [session, loading, redirectTo]);
 
   // Show loading state
   if (loading) {
@@ -54,7 +56,7 @@ export function ProtectedRoute({
           </div>
         </div>
       )
-    )
+    );
   }
 
   // Not authenticated
@@ -78,7 +80,7 @@ export function ProtectedRoute({
           </div>
         </div>
       )
-    )
+    );
   }
 
   // Check role if required
@@ -102,8 +104,8 @@ export function ProtectedRoute({
           </div>
         </div>
       )
-    )
+    );
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

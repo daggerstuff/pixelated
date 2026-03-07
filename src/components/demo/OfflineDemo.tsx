@@ -1,20 +1,20 @@
-import type { FC } from 'react'
-import React from 'react'
-import { useOfflineManager } from '@/hooks/useOfflineManager'
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
+import type { FC } from "react";
+import React from "react";
+import { useOfflineManager } from "@/hooks/useOfflineManager";
+import { OfflineIndicator } from "@/components/layout/OfflineIndicator";
 import {
   AnimationWrapper,
   FadeIn,
-} from '@/components/layout/AdvancedAnimations'
+} from "@/components/layout/AdvancedAnimations";
 import {
   ResponsiveContainer,
   ResponsiveText,
-} from '@/components/layout/ResponsiveUtils'
+} from "@/components/layout/ResponsiveUtils";
 
 interface DemoData {
-  id: string
-  message: string
-  timestamp: number
+  id: string;
+  message: string;
+  timestamp: number;
 }
 
 /**
@@ -31,70 +31,70 @@ export const OfflineDemo: FC = () => {
     sync,
     clearQueue,
   } = useOfflineManager({
-    criticalPaths: ['/api/important'],
+    criticalPaths: ["/api/important"],
     onRequestQueued: (request) => {
-      console.log('Request queued for offline sync:', request)
+      console.log("Request queued for offline sync:", request);
     },
     onSyncComplete: () => {
-      console.log('Offline sync completed')
+      console.log("Offline sync completed");
     },
-  })
+  });
 
-  const [localData, setLocalData] = React.useState<DemoData[]>([])
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [simulatedOffline, setSimulatedOffline] = React.useState(false)
+  const [localData, setLocalData] = React.useState<DemoData[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [simulatedOffline, setSimulatedOffline] = React.useState(false);
 
   // Simulate API call
   const simulateApiCall = async (isCritical = false) => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const response = await offlineFetch(
-        isCritical ? '/api/important/data' : '/api/normal/data',
+        isCritical ? "/api/important/data" : "/api/normal/data",
         {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: `Demo message ${Date.now()}`,
-            type: isCritical ? 'critical' : 'normal',
+            type: isCritical ? "critical" : "normal",
           }),
         },
-      )
+      );
 
       if (response.status === 202) {
         // Request was queued
         const newData: DemoData = {
           id: Date.now().toString(),
-          message: `Request queued for sync (${isCritical ? 'critical' : 'normal'})`,
+          message: `Request queued for sync (${isCritical ? "critical" : "normal"})`,
           timestamp: Date.now(),
-        }
-        setLocalData((prev) => [newData, ...prev])
+        };
+        setLocalData((prev) => [newData, ...prev]);
       } else {
         // Request succeeded
-        const result = await response.json()
+        const result = await response.json();
         const newData: DemoData = {
           id: Date.now().toString(),
-          message: `Request succeeded: ${result.message || 'OK'}`,
+          message: `Request succeeded: ${result.message || "OK"}`,
           timestamp: Date.now(),
-        }
-        setLocalData((prev) => [newData, ...prev])
+        };
+        setLocalData((prev) => [newData, ...prev]);
       }
     } catch (error) {
       const newData: DemoData = {
         id: Date.now().toString(),
-        message: `Request failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: `Request failed: ${error instanceof Error ? error.message : "Unknown error"}`,
         timestamp: Date.now(),
-      }
-      setLocalData((prev) => [newData, ...prev])
+      };
+      setLocalData((prev) => [newData, ...prev]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const simulateOfflineMode = () => {
-    setSimulatedOffline(!simulatedOffline)
+    setSimulatedOffline(!simulatedOffline);
     // In a real app, you'd trigger offline mode programmatically for testing
-  }
+  };
 
   return (
     <ResponsiveContainer size="lg">
@@ -115,10 +115,10 @@ export const OfflineDemo: FC = () => {
               <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
+                    className={`w-3 h-3 rounded-full ${isOnline ? "bg-green-500" : "bg-red-500"}`}
                   />
                   <span className="font-medium">
-                    Status: {isOnline ? 'Online' : 'Offline'}
+                    Status: {isOnline ? "Online" : "Offline"}
                   </span>
                 </div>
 
@@ -159,7 +159,7 @@ export const OfflineDemo: FC = () => {
                 disabled={isLoading}
                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white rounded-lg transition-colors"
               >
-                {isLoading ? 'Sending...' : 'Send Normal Request'}
+                {isLoading ? "Sending..." : "Send Normal Request"}
               </button>
 
               <button
@@ -167,7 +167,7 @@ export const OfflineDemo: FC = () => {
                 disabled={isLoading}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white rounded-lg transition-colors"
               >
-                {isLoading ? 'Sending...' : 'Send Critical Request'}
+                {isLoading ? "Sending..." : "Send Critical Request"}
               </button>
 
               <button
@@ -175,7 +175,7 @@ export const OfflineDemo: FC = () => {
                 disabled={!hasPendingRequests || !isOnline || isSyncing}
                 className="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white rounded-lg transition-colors"
               >
-                {isSyncing ? 'Syncing...' : 'Force Sync'}
+                {isSyncing ? "Syncing..." : "Force Sync"}
               </button>
 
               <button
@@ -190,7 +190,7 @@ export const OfflineDemo: FC = () => {
                 onClick={simulateOfflineMode}
                 className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
               >
-                {simulatedOffline ? 'Exit Offline Mode' : 'Simulate Offline'}
+                {simulatedOffline ? "Exit Offline Mode" : "Simulate Offline"}
               </button>
             </div>
           </section>
@@ -289,7 +289,7 @@ export const OfflineDemo: FC = () => {
         </FadeIn>
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
-export default OfflineDemo
+export default OfflineDemo;

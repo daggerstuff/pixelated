@@ -1,7 +1,7 @@
 ---
-title: 'CPTSD Treatment'
-description: 'Evidence-based treatment approaches for Complex PTSD'
-author: 'Resource Team'
+title: "CPTSD Treatment"
+description: "Evidence-based treatment approaches for Complex PTSD"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

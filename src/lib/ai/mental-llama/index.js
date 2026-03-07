@@ -9,4 +9,4 @@ export {
   MentalLLaMAModelProvider,
   MentalHealthTaskRouter,
   createMentalLLaMAPythonBridge,
-} from './index.ts'
+} from "./index.ts";

@@ -3,4 +3,4 @@ export const logger = {
   error: () => {},
   warn: () => {},
   debug: () => {},
-}
+};

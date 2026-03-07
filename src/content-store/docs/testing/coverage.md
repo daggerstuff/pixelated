@@ -1,8 +1,8 @@
 ---
-title: 'Coverage Requirements'
-description: 'Test coverage requirements and guidelines for Pixelated'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "Coverage Requirements"
+description: "Test coverage requirements and guidelines for Pixelated"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true

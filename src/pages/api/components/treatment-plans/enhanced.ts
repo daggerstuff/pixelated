@@ -1,12 +1,12 @@
-import type { APIRoute } from 'astro'
-export const prerender = false
+import type { APIRoute } from "astro";
+export const prerender = false;
 
-import { z } from 'zod'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
-import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { z } from "zod";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { protectRoute } from "@/lib/auth/serverAuth";
+import type { AuthAPIContext } from "@/lib/auth/apiRouteTypes";
 
-const logger = createBuildSafeLogger('enhanced-treatment-plans-api')
+const logger = createBuildSafeLogger("enhanced-treatment-plans-api");
 
 // Enhanced schemas for the treatment plan manager component
 const milestoneSchema = z.object({
@@ -16,24 +16,24 @@ const milestoneSchema = z.object({
   completedDate: z.string().datetime().optional(),
   notes: z.string().optional(),
   dueDate: z.string().datetime().optional(),
-})
+});
 
 const treatmentGoalEnhancedSchema = z.object({
   id: z.string(),
   title: z.string().min(1),
   description: z.string().min(1),
   targetDate: z.string().datetime(),
-  priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
+  priority: z.enum(["low", "medium", "high", "urgent"]).default("medium"),
   status: z
-    .enum(['not-started', 'in-progress', 'completed', 'on-hold'])
-    .default('not-started'),
+    .enum(["not-started", "in-progress", "completed", "on-hold"])
+    .default("not-started"),
   progress: z.number().min(0).max(100).default(0),
   category: z.enum([
-    'behavioral',
-    'cognitive',
-    'emotional',
-    'social',
-    'physical',
+    "behavioral",
+    "cognitive",
+    "emotional",
+    "social",
+    "physical",
   ]),
   milestones: z.array(milestoneSchema).default([]),
   metrics: z
@@ -44,7 +44,7 @@ const treatmentGoalEnhancedSchema = z.object({
       lastActivityDate: z.string().datetime().optional(),
     })
     .optional(),
-})
+});
 
 const treatmentPlanEnhancedSchema = z.object({
   id: z.string().optional(),
@@ -55,16 +55,16 @@ const treatmentPlanEnhancedSchema = z.object({
   createdDate: z.string().datetime().optional(),
   lastModified: z.string().datetime().optional(),
   duration: z.number().min(1), // weeks
-  status: z.enum(['active', 'completed', 'paused', 'draft']).default('draft'),
+  status: z.enum(["active", "completed", "paused", "draft"]).default("draft"),
   goals: z.array(treatmentGoalEnhancedSchema).min(1),
-  notes: z.string().default(''),
+  notes: z.string().default(""),
   metadata: z
     .object({
       totalSessions: z.number().default(0),
       completedSessions: z.number().default(0),
       overallProgress: z.number().min(0).max(100).default(0),
       nextSessionDate: z.string().datetime().optional(),
-      riskLevel: z.enum(['low', 'medium', 'high']).default('low'),
+      riskLevel: z.enum(["low", "medium", "high"]).default("low"),
       interventionHistory: z
         .array(
           z.object({
@@ -77,56 +77,56 @@ const treatmentPlanEnhancedSchema = z.object({
         .default([]),
     })
     .optional(),
-})
+});
 
 interface TreatmentPlanEnhanced {
-  id: string
-  clientName: string
-  therapistName: string
-  clientId: string
-  therapistId: string
-  createdDate: string
-  lastModified: string
-  duration: number
-  status: 'active' | 'completed' | 'paused' | 'draft'
+  id: string;
+  clientName: string;
+  therapistName: string;
+  clientId: string;
+  therapistId: string;
+  createdDate: string;
+  lastModified: string;
+  duration: number;
+  status: "active" | "completed" | "paused" | "draft";
   goals: Array<{
-    id: string
-    title: string
-    description: string
-    targetDate: string
-    priority: 'low' | 'medium' | 'high' | 'urgent'
-    status: 'not-started' | 'in-progress' | 'completed' | 'on-hold'
-    progress: number
-    category: 'behavioral' | 'cognitive' | 'emotional' | 'social' | 'physical'
+    id: string;
+    title: string;
+    description: string;
+    targetDate: string;
+    priority: "low" | "medium" | "high" | "urgent";
+    status: "not-started" | "in-progress" | "completed" | "on-hold";
+    progress: number;
+    category: "behavioral" | "cognitive" | "emotional" | "social" | "physical";
     milestones: Array<{
-      id: string
-      title: string
-      completed: boolean
-      completedDate?: string
-      notes?: string
-      dueDate?: string
-    }>
+      id: string;
+      title: string;
+      completed: boolean;
+      completedDate?: string;
+      notes?: string;
+      dueDate?: string;
+    }>;
     metrics?: {
-      sessionsCompleted: number
-      exercisesAssigned: number
-      exercisesCompleted: number
-      lastActivityDate?: string
-    }
-  }>
-  notes: string
+      sessionsCompleted: number;
+      exercisesAssigned: number;
+      exercisesCompleted: number;
+      lastActivityDate?: string;
+    };
+  }>;
+  notes: string;
   metadata?: {
-    totalSessions: number
-    completedSessions: number
-    overallProgress: number
-    nextSessionDate?: string
-    riskLevel: 'low' | 'medium' | 'high'
+    totalSessions: number;
+    completedSessions: number;
+    overallProgress: number;
+    nextSessionDate?: string;
+    riskLevel: "low" | "medium" | "high";
     interventionHistory: Array<{
-      date: string
-      intervention: string
-      outcome: string
-      effectiveness: number
-    }>
-  }
+      date: string;
+      intervention: string;
+      outcome: string;
+      effectiveness: number;
+    }>;
+  };
 }
 
 /**
@@ -137,85 +137,85 @@ interface TreatmentPlanEnhanced {
  */
 export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
   try {
-    const { locals, request } = context
-    const { user } = locals
+    const { locals, request } = context;
+    const { user } = locals;
 
     if (!user) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ error: "Authentication required" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     // Parse query parameters
-    const url = new URL(request.url)
-    const clientId = url.searchParams.get('clientId')
-    const planId = url.searchParams.get('planId')
-    const status = url.searchParams.get('status')
-    const includeMetrics = url.searchParams.get('includeMetrics') === 'true'
+    const url = new URL(request.url);
+    const clientId = url.searchParams.get("clientId");
+    const planId = url.searchParams.get("planId");
+    const status = url.searchParams.get("status");
+    const includeMetrics = url.searchParams.get("includeMetrics") === "true";
 
     // TODO: Replace with actual database queries
     const mockPlans: TreatmentPlanEnhanced[] = [
       {
-        id: 'plan-1',
-        clientName: 'Sarah Johnson',
-        therapistName: 'Dr. Emily Chen',
-        clientId: clientId || 'client-1',
+        id: "plan-1",
+        clientName: "Sarah Johnson",
+        therapistName: "Dr. Emily Chen",
+        clientId: clientId || "client-1",
         therapistId: user.id,
         createdDate: new Date(
           Date.now() - 7 * 24 * 60 * 60 * 1000,
         ).toISOString(),
         lastModified: new Date().toISOString(),
         duration: 12,
-        status: 'active',
+        status: "active",
         notes:
-          'Patient shows excellent engagement and motivation. Responding well to CBT interventions.',
+          "Patient shows excellent engagement and motivation. Responding well to CBT interventions.",
         goals: [
           {
-            id: 'goal-1',
-            title: 'Reduce Anxiety Symptoms',
+            id: "goal-1",
+            title: "Reduce Anxiety Symptoms",
             description:
-              'Learn and practice anxiety management techniques to reduce daily anxiety levels from 8/10 to 4/10',
+              "Learn and practice anxiety management techniques to reduce daily anxiety levels from 8/10 to 4/10",
             targetDate: new Date(
               Date.now() + 30 * 24 * 60 * 60 * 1000,
             ).toISOString(),
-            priority: 'high',
-            status: 'in-progress',
+            priority: "high",
+            status: "in-progress",
             progress: 65,
-            category: 'emotional',
+            category: "emotional",
             milestones: [
               {
-                id: 'm1',
-                title: 'Learn deep breathing techniques',
+                id: "m1",
+                title: "Learn deep breathing techniques",
                 completed: true,
                 completedDate: new Date(
                   Date.now() - 5 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
-                notes: 'Mastered 4-7-8 breathing technique',
+                notes: "Mastered 4-7-8 breathing technique",
               },
               {
-                id: 'm2',
-                title: 'Practice daily meditation (10 min)',
+                id: "m2",
+                title: "Practice daily meditation (10 min)",
                 completed: true,
                 completedDate: new Date(
                   Date.now() - 3 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
-                notes: 'Consistently practicing for 2 weeks',
+                notes: "Consistently practicing for 2 weeks",
               },
               {
-                id: 'm3',
-                title: 'Identify personal anxiety triggers',
+                id: "m3",
+                title: "Identify personal anxiety triggers",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 7 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
               },
               {
-                id: 'm4',
-                title: 'Develop coping strategy toolkit',
+                id: "m4",
+                title: "Develop coping strategy toolkit",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 14 * 24 * 60 * 60 * 1000,
@@ -232,38 +232,38 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
             },
           },
           {
-            id: 'goal-2',
-            title: 'Improve Sleep Quality',
+            id: "goal-2",
+            title: "Improve Sleep Quality",
             description:
-              'Establish healthy sleep patterns and achieve 7-8 hours of quality sleep nightly',
+              "Establish healthy sleep patterns and achieve 7-8 hours of quality sleep nightly",
             targetDate: new Date(
               Date.now() + 21 * 24 * 60 * 60 * 1000,
             ).toISOString(),
-            priority: 'medium',
-            status: 'in-progress',
+            priority: "medium",
+            status: "in-progress",
             progress: 40,
-            category: 'physical',
+            category: "physical",
             milestones: [
               {
-                id: 'm5',
-                title: 'Create consistent bedtime routine',
+                id: "m5",
+                title: "Create consistent bedtime routine",
                 completed: true,
                 completedDate: new Date(
                   Date.now() - 4 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
-                notes: 'Established 9 PM routine',
+                notes: "Established 9 PM routine",
               },
               {
-                id: 'm6',
-                title: 'Limit screen time 1 hour before bed',
+                id: "m6",
+                title: "Limit screen time 1 hour before bed",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 10 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
               },
               {
-                id: 'm7',
-                title: 'Track sleep patterns for 2 weeks',
+                id: "m7",
+                title: "Track sleep patterns for 2 weeks",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 14 * 24 * 60 * 60 * 1000,
@@ -280,37 +280,37 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
             },
           },
           {
-            id: 'goal-3',
-            title: 'Enhance Social Connections',
+            id: "goal-3",
+            title: "Enhance Social Connections",
             description:
-              'Build and maintain meaningful relationships and expand social support network',
+              "Build and maintain meaningful relationships and expand social support network",
             targetDate: new Date(
               Date.now() + 45 * 24 * 60 * 60 * 1000,
             ).toISOString(),
-            priority: 'medium',
-            status: 'not-started',
+            priority: "medium",
+            status: "not-started",
             progress: 0,
-            category: 'social',
+            category: "social",
             milestones: [
               {
-                id: 'm8',
-                title: 'Join local support group',
+                id: "m8",
+                title: "Join local support group",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 14 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
               },
               {
-                id: 'm9',
-                title: 'Reconnect with 2 old friends',
+                id: "m9",
+                title: "Reconnect with 2 old friends",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 21 * 24 * 60 * 60 * 1000,
                 ).toISOString(),
               },
               {
-                id: 'm10',
-                title: 'Practice social skills in low-pressure settings',
+                id: "m10",
+                title: "Practice social skills in low-pressure settings",
                 completed: false,
                 dueDate: new Date(
                   Date.now() + 35 * 24 * 60 * 60 * 1000,
@@ -331,42 +331,44 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
           nextSessionDate: new Date(
             Date.now() + 3 * 24 * 60 * 60 * 1000,
           ).toISOString(),
-          riskLevel: 'low',
+          riskLevel: "low",
           interventionHistory: [
             {
               date: new Date(
                 Date.now() - 7 * 24 * 60 * 60 * 1000,
               ).toISOString(),
-              intervention: 'Cognitive Behavioral Therapy - Anxiety Module',
-              outcome: 'Reduced anxiety from 8/10 to 6/10',
+              intervention: "Cognitive Behavioral Therapy - Anxiety Module",
+              outcome: "Reduced anxiety from 8/10 to 6/10",
               effectiveness: 4,
             },
             {
               date: new Date(
                 Date.now() - 14 * 24 * 60 * 60 * 1000,
               ).toISOString(),
-              intervention: 'Mindfulness-Based Stress Reduction',
-              outcome: 'Improved stress coping mechanisms',
+              intervention: "Mindfulness-Based Stress Reduction",
+              outcome: "Improved stress coping mechanisms",
               effectiveness: 5,
             },
           ],
         },
       },
-    ]
+    ];
 
     // Filter plans based on query parameters
-    let filteredPlans = mockPlans
+    let filteredPlans = mockPlans;
 
     if (planId) {
-      filteredPlans = filteredPlans.filter((plan) => plan.id === planId)
+      filteredPlans = filteredPlans.filter((plan) => plan.id === planId);
     }
 
     if (clientId) {
-      filteredPlans = filteredPlans.filter((plan) => plan.clientId === clientId)
+      filteredPlans = filteredPlans.filter(
+        (plan) => plan.clientId === clientId,
+      );
     }
 
     if (status) {
-      filteredPlans = filteredPlans.filter((plan) => plan.status === status)
+      filteredPlans = filteredPlans.filter((plan) => plan.status === status);
     }
 
     // Remove metrics if not requested
@@ -374,8 +376,8 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       filteredPlans = filteredPlans.map((plan) => ({
         ...plan,
         goals: plan.goals.map((goal) => {
-          const { _metrics, ...goalWithoutMetrics } = goal
-          return goalWithoutMetrics
+          const { _metrics, ...goalWithoutMetrics } = goal;
+          return goalWithoutMetrics;
         }),
         metadata: plan.metadata
           ? {
@@ -383,39 +385,39 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
               interventionHistory: [],
             }
           : undefined,
-      }))
+      }));
     }
 
-    logger.info('Retrieved enhanced treatment plans', {
+    logger.info("Retrieved enhanced treatment plans", {
       planCount: filteredPlans.length,
       clientId,
       planId,
       includeMetrics,
       userId: user.id,
-    })
+    });
 
     return new Response(JSON.stringify(filteredPlans), {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'private, max-age=300', // 5-minute cache
+        "Content-Type": "application/json",
+        "Cache-Control": "private, max-age=300", // 5-minute cache
       },
-    })
+    });
   } catch (error: unknown) {
-    logger.error('Error retrieving enhanced treatment plans', { error })
+    logger.error("Error retrieving enhanced treatment plans", { error });
 
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-})
+});
 
 /**
  * POST endpoint for creating/updating treatment plans
@@ -424,44 +426,44 @@ export const POST: APIRoute = protectRoute()(async (
   context: AuthAPIContext,
 ) => {
   try {
-    const { locals, request } = context
-    const { user } = locals
+    const { locals, request } = context;
+    const { user } = locals;
 
     if (!user) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ error: "Authentication required" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    const body = await request.json()
+    const body = await request.json();
 
     // Validate the request body
-    const validationResult = treatmentPlanEnhancedSchema.safeParse(body)
+    const validationResult = treatmentPlanEnhancedSchema.safeParse(body);
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
-          error: 'Invalid treatment plan data',
+          error: "Invalid treatment plan data",
           details: validationResult.error.errors,
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
-    const planData = validationResult.data
-    const currentTime = new Date().toISOString()
+    const planData = validationResult.data;
+    const currentTime = new Date().toISOString();
 
     // Calculate overall progress
-    const totalGoals = planData.goals.length
+    const totalGoals = planData.goals.length;
     const totalProgress = planData.goals.reduce(
       (sum, goal) => sum + goal.progress,
       0,
-    )
+    );
     const overallProgress =
-      totalGoals > 0 ? Math.round(totalProgress / totalGoals) : 0
+      totalGoals > 0 ? Math.round(totalProgress / totalGoals) : 0;
 
     const newPlan: TreatmentPlanEnhanced = {
       id: planData.id || `plan-${Date.now()}`,
@@ -486,42 +488,42 @@ export const POST: APIRoute = protectRoute()(async (
         completedSessions: planData.metadata?.completedSessions || 0,
         overallProgress,
         nextSessionDate: planData.metadata?.nextSessionDate,
-        riskLevel: planData.metadata?.riskLevel || 'low',
+        riskLevel: planData.metadata?.riskLevel || "low",
         interventionHistory: planData.metadata?.interventionHistory || [],
       },
-    }
+    };
 
     // TODO: Save to database
     // const repository = new TreatmentPlanRepository()
     // await repository.saveTreatmentPlan(newPlan)
 
-    logger.info('Created/updated enhanced treatment plan', {
+    logger.info("Created/updated enhanced treatment plan", {
       planId: newPlan.id,
       clientId: newPlan.clientId,
       goalCount: newPlan.goals.length,
       overallProgress,
       userId: user.id,
-    })
+    });
 
     return new Response(JSON.stringify(newPlan), {
       status: 201,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    logger.error('Error creating/updating enhanced treatment plan', { error })
+    logger.error("Error creating/updating enhanced treatment plan", { error });
 
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-})
+});
 
 /**
  * PATCH endpoint for updating specific goals or milestones
@@ -530,30 +532,30 @@ export const PATCH: APIRoute = protectRoute()(async (
   context: AuthAPIContext,
 ) => {
   try {
-    const { locals, request } = context
-    const { user } = locals
+    const { locals, request } = context;
+    const { user } = locals;
 
     if (!user) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ error: "Authentication required" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    const body = await request.json()
-    const { planId, goalId, milestoneId, updates } = body
+    const body = await request.json();
+    const { planId, goalId, milestoneId, updates } = body;
 
     if (!planId || !updates) {
       return new Response(
-        JSON.stringify({ error: 'planId and updates are required' }),
+        JSON.stringify({ error: "planId and updates are required" }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     // TODO: Implement actual database update
@@ -568,32 +570,32 @@ export const PATCH: APIRoute = protectRoute()(async (
       milestoneId,
       updates,
       lastModified: new Date().toISOString(),
-    }
+    };
 
-    logger.info('Updated treatment plan component', {
+    logger.info("Updated treatment plan component", {
       planId,
       goalId,
       milestoneId,
       updateKeys: Object.keys(updates),
       userId: user.id,
-    })
+    });
 
     return new Response(JSON.stringify(response), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    logger.error('Error updating treatment plan component', { error })
+    logger.error("Error updating treatment plan component", { error });
 
     return new Response(
       JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-})
+});

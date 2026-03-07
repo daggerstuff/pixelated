@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import type { TherapistDashboardProps } from '@/types/dashboard'
-import { AnalyticsCharts } from './AnalyticsCharts'
+import React, { useState, useEffect, useMemo } from "react";
+import type { TherapistDashboardProps } from "@/types/dashboard";
+import { AnalyticsCharts } from "./AnalyticsCharts";
 
-import SessionControls from './SessionControls'
-import { TherapistProgressTracker } from './TherapistProgressTracker'
-import TherapyProgressCharts from './TherapyProgressCharts'
-import { useTherapistAnalytics } from '@/hooks/useTherapistAnalytics'
-import type { AnalyticsFilters } from '@/types/analytics'
-import { cn } from '@/lib/utils'
+import SessionControls from "./SessionControls";
+import { TherapistProgressTracker } from "./TherapistProgressTracker";
+import TherapyProgressCharts from "./TherapyProgressCharts";
+import { useTherapistAnalytics } from "@/hooks/useTherapistAnalytics";
+import type { AnalyticsFilters } from "@/types/analytics";
+import { cn } from "@/lib/utils";
 
 // Accessibility: ARIA roles, keyboard navigation, WCAG 2.1 compliance
 // Responsive grid layout using Tailwind
@@ -20,53 +20,55 @@ export function TherapistDashboard({
   // Find the session with the latest valid startTime for progress tracking
   const latestSession = useMemo(() => {
     if (!Array.isArray(sessions) || sessions.length === 0) {
-      return null
+      return null;
     }
-    let latest: (typeof sessions)[0] | null = null
-    let latestTime = -Infinity
+    let latest: (typeof sessions)[0] | null = null;
+    let latestTime = -Infinity;
     for (const session of sessions) {
-      const t = session?.startTime ? new Date(session.startTime).getTime() : NaN
+      const t = session?.startTime
+        ? new Date(session.startTime).getTime()
+        : NaN;
       if (!isNaN(t) && t > latestTime) {
-        latest = session
-        latestTime = t
+        latest = session;
+        latestTime = t;
       }
     }
-    return latest ?? null
-  }, [sessions])
+    return latest ?? null;
+  }, [sessions]);
   if (!onSessionControl) {
-    throw new Error('TherapistDashboard requires onSessionControl prop')
+    throw new Error("TherapistDashboard requires onSessionControl prop");
   }
 
   // Skip link state for accessibility
-  const [showSkipLink, setShowSkipLink] = useState(false)
+  const [showSkipLink, setShowSkipLink] = useState(false);
 
   // Handle keyboard navigation for skip links
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        setShowSkipLink(true)
+      if (e.key === "Tab") {
+        setShowSkipLink(true);
       }
-    }
+    };
 
     const handleMouseDown = () => {
-      setShowSkipLink(false)
-    }
+      setShowSkipLink(false);
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleMouseDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
-    }
-  }, [])
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleMouseDown);
+    };
+  }, []);
 
   // Use therapist analytics hook
-  const defaultFilters: AnalyticsFilters = { timeRange: '30d' }
+  const defaultFilters: AnalyticsFilters = { timeRange: "30d" };
   const { data: therapistData } = useTherapistAnalytics(
     defaultFilters,
     sessions,
-  )
+  );
 
   return (
     <div className="relative">
@@ -85,10 +87,10 @@ export function TherapistDashboard({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-background focus:text-foreground focus:underline focus:ring-2 focus:ring-primary"
           onClick={(e) => {
-            e.preventDefault()
-            const mainContent = document.getElementById('main-content')
+            e.preventDefault();
+            const mainContent = document.getElementById("main-content");
             if (mainContent) {
-              mainContent.focus()
+              mainContent.focus();
             }
           }}
         >
@@ -99,9 +101,9 @@ export function TherapistDashboard({
       <section
         id="main-content"
         className={cn(
-          'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6',
-          'bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]',
-          'focus:outline-none',
+          "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6",
+          "bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]",
+          "focus:outline-none",
         )}
         aria-label="Therapist Dashboard"
         role="main"
@@ -160,7 +162,7 @@ export function TherapistDashboard({
         {children}
       </section>
     </div>
-  )
+  );
 }
 
-export default TherapistDashboard
+export default TherapistDashboard;

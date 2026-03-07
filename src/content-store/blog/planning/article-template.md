@@ -1,16 +1,15 @@
 ---
-title: '🧬 Research Article Template'
-description: 'Template for creating cutting-edge neuroplasticity and trauma research articles with evidence-based insights and clinical applications'
-author: 'Research & Clinical Team'
+title: "🧬 Research Article Template"
+description: "Template for creating cutting-edge neuroplasticity and trauma research articles with evidence-based insights and clinical applications"
+author: "Research & Clinical Team"
 pubDate: 2025-05-06
-tags: ['template', 'guidelines', 'writing', 'blog']
+tags: ["template", "guidelines", "writing", "blog"]
 image:
   {
-    url: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-    alt: 'Writer at desk with notebook and computer',
+    url: "https://images.unsplash.com/photo-1455390582262-044cdead277a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
+    alt: "Writer at desk with notebook and computer",
   }
 ---
-
 
 # 📑 Research Article Template
 
@@ -18,15 +17,15 @@ image:
 
 ```yaml
 metadata:
-  title: 'Your Research Title'
-  type: 'research_article | clinical_guide | innovation_spotlight'
-  series: 'Neuroplasticity & Trauma'
+  title: "Your Research Title"
+  type: "research_article | clinical_guide | innovation_spotlight"
+  series: "Neuroplasticity & Trauma"
   seriesOrder: 1
   pubDate: YYYY-MM-DD
   author:
-    name: 'Researcher Name, Credentials'
-    role: 'Research Position'
-    institution: 'Institution Name'
+    name: "Researcher Name, Credentials"
+    role: "Research Position"
+    institution: "Institution Name"
   tags:
     - neuroplasticity
     - trauma
@@ -40,11 +39,11 @@ metadata:
 
 ```yaml
 structure:
-  background: 'Current understanding and research gap'
-  objective: 'Primary research question and hypotheses'
-  methods: 'Study design and methodology'
-  results: 'Key findings and statistical significance'
-  conclusions: 'Clinical implications and future directions'
+  background: "Current understanding and research gap"
+  objective: "Primary research question and hypotheses"
+  methods: "Study design and methodology"
+  results: "Key findings and statistical significance"
+  conclusions: "Clinical implications and future directions"
 ```
 
 ### Clinical Relevance

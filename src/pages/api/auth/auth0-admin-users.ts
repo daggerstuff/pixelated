@@ -3,16 +3,16 @@
  * Handles user administration with Auth0 integration
  */
 
-import type { APIRoute } from 'astro'
-import { validateToken } from '@/lib/auth/auth0-jwt-service'
-import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
-import { getUserById, getAllUsers, updateUser } from '@/services/auth0.service'
-import { createAuditLog } from '@/lib/audit'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { APIRoute } from "astro";
+import { validateToken } from "@/lib/auth/auth0-jwt-service";
+import { extractTokenFromRequest } from "@/lib/auth/auth0-middleware";
+import { getUserById, getAllUsers, updateUser } from "@/services/auth0.service";
+import { createAuditLog } from "@/lib/audit";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-export const prerender = false
+export const prerender = false;
 
-const logger = createBuildSafeLogger('auth0-admin-users-api')
+const logger = createBuildSafeLogger("auth0-admin-users-api");
 
 /**
  * Get all users (admin only)
@@ -20,114 +20,115 @@ const logger = createBuildSafeLogger('auth0-admin-users-api')
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request as unknown as Request);
 
     if (!token) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ error: "Authentication required" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Validate token
-    const validation = await validateToken(token, 'access')
+    const validation = await validateToken(token, "access");
 
     if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Invalid or expired token' }),
+        JSON.stringify({ error: "Invalid or expired token" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Get user from Auth0
-    const user = await getUserById(validation.userId!)
+    const user = await getUserById(validation.userId!);
 
     if (!user) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+      return new Response(JSON.stringify({ error: "User not found" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Check if user has admin permissions
-    if (user.role !== 'admin' && user.role !== 'superadmin') {
+    if (user.role !== "admin" && user.role !== "superadmin") {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
-        'auth.admin.users.forbidden',
+        "access_denied",
+        "auth.admin.users.forbidden",
         user.id,
-        'auth-admin-users',
-        { action: 'get_users', reason: 'insufficient_permissions' }
-      )
+        "auth-admin-users",
+        { action: "get_users", reason: "insufficient_permissions" },
+      );
 
       return new Response(
-        JSON.stringify({ error: 'Forbidden: Admin access required' }),
+        JSON.stringify({ error: "Forbidden: Admin access required" }),
         {
           status: 403,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
-    const params = new URL(request.url).searchParams
+    const params = new URL(request.url).searchParams;
 
     // Parse pagination parameters
-    const page = parseInt(params.get('page') || '1', 10)
-    const limit = Math.min(parseInt(params.get('limit') || '20', 10), 100) // Cap limit to 100
-    const offset = (page - 1) * limit
+    const page = parseInt(params.get("page") || "1", 10);
+    const limit = Math.min(parseInt(params.get("limit") || "20", 10), 100); // Cap limit to 100
+    const offset = (page - 1) * limit;
 
     // Parse filter parameters
-    const role = params.get('role')
-    const search = params.get('search')
+    const role = params.get("role");
+    const search = params.get("search");
 
-    logger.info('Admin fetching users', {
+    logger.info("Admin fetching users", {
       adminId: user.id,
       page,
       limit,
       role,
       search,
-    })
+    });
 
     // Get all users from Auth0
-    const allUsers = await getAllUsers()
+    const allUsers = await getAllUsers();
 
     // Filter users based on parameters
-    let filteredUsers = allUsers
+    let filteredUsers = allUsers;
 
     if (role) {
-      filteredUsers = filteredUsers.filter(u => u.role === role)
+      filteredUsers = filteredUsers.filter((u) => u.role === role);
     }
 
     if (search) {
-      const searchTerm = search.toLowerCase()
-      filteredUsers = filteredUsers.filter(u =>
-        u.email.toLowerCase().includes(searchTerm) ||
-        (u.fullName && u.fullName.toLowerCase().includes(searchTerm))
-      )
+      const searchTerm = search.toLowerCase();
+      filteredUsers = filteredUsers.filter(
+        (u) =>
+          u.email.toLowerCase().includes(searchTerm) ||
+          (u.fullName && u.fullName.toLowerCase().includes(searchTerm)),
+      );
     }
 
     // Apply pagination
-    const paginatedUsers = filteredUsers.slice(offset, offset + limit)
-    const count = filteredUsers.length
+    const paginatedUsers = filteredUsers.slice(offset, offset + limit);
+    const count = filteredUsers.length;
 
     // Create audit log
     await createAuditLog(
-      'admin_user_list',
-      'auth.admin.users.list',
+      "admin_user_list",
+      "auth.admin.users.list",
       user.id,
-      'auth-admin-users',
-      { action: 'list_users', page, limit, role, search, count, offset }
-    )
+      "auth-admin-users",
+      { action: "list_users", page, limit, role, search, count, offset },
+    );
 
     return new Response(
       JSON.stringify({
-        data: paginatedUsers.map(u => ({
+        data: paginatedUsers.map((u) => ({
           id: u.id,
           email: u.email,
           role: u.role,
@@ -145,39 +146,39 @@ export const GET: APIRoute = async ({ request }) => {
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Error fetching users:', error)
+    logger.error("Error fetching users:", error);
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
-      'auth.admin.users.error',
-      'anonymous',
-      'auth-admin-users',
+      "system_error",
+      "auth.admin.users.error",
+      "anonymous",
+      "auth-admin-users",
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
-    )
+      },
+    );
 
     return new Response(
       JSON.stringify({
-        error: 'Failed to fetch users',
-        message: 'An error occurred while fetching users',
+        error: "Failed to fetch users",
+        message: "An error occurred while fetching users",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * Update user (admin only)
@@ -185,92 +186,92 @@ export const GET: APIRoute = async ({ request }) => {
 export const PATCH: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request as unknown as Request);
 
     if (!token) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
+        JSON.stringify({ error: "Authentication required" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Validate token
-    const validation = await validateToken(token, 'access')
+    const validation = await validateToken(token, "access");
 
     if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Invalid or expired token' }),
+        JSON.stringify({ error: "Invalid or expired token" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Get user from Auth0
-    const admin = await getUserById(validation.userId!)
+    const admin = await getUserById(validation.userId!);
 
     if (!admin) {
-      return new Response(JSON.stringify({ error: 'User not found' }), {
+      return new Response(JSON.stringify({ error: "User not found" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Check if user has admin permissions
-    if (admin.role !== 'admin' && admin.role !== 'superadmin') {
+    if (admin.role !== "admin" && admin.role !== "superadmin") {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
-        'auth.admin.users.forbidden',
+        "access_denied",
+        "auth.admin.users.forbidden",
         admin.id,
-        'auth-admin-users',
-        { action: 'update_user', reason: 'insufficient_permissions' }
-      )
+        "auth-admin-users",
+        { action: "update_user", reason: "insufficient_permissions" },
+      );
 
       return new Response(
-        JSON.stringify({ error: 'Forbidden: Admin access required' }),
+        JSON.stringify({ error: "Forbidden: Admin access required" }),
         {
           status: 403,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
-    const body = await request.json()
-    const { userId, updates } = body
+    const body = await request.json();
+    const { userId, updates } = body;
 
     if (!userId || !updates) {
       return new Response(
         JSON.stringify({
-          error: 'Missing required fields',
-          message: 'userId and updates are required',
+          error: "Missing required fields",
+          message: "userId and updates are required",
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         },
-      )
+      );
     }
 
-    logger.info('Admin updating user', { adminId: admin.id, userId, updates })
+    logger.info("Admin updating user", { adminId: admin.id, userId, updates });
 
     // Update user in Auth0
-    const updatedUser = await updateUser(userId, updates)
+    const updatedUser = await updateUser(userId, updates);
 
     // Create audit log
     await createAuditLog(
-      'admin_user_update',
-      'auth.admin.users.update',
+      "admin_user_update",
+      "auth.admin.users.update",
       admin.id,
-      'auth-admin-users',
-      { action: 'update_user', userId, updates, updatedBy: admin.id }
-    )
+      "auth-admin-users",
+      { action: "update_user", userId, updates, updatedBy: admin.id },
+    );
 
     return new Response(
       JSON.stringify({
@@ -281,41 +282,41 @@ export const PATCH: APIRoute = async ({ request }) => {
           fullName: updatedUser.fullName,
           updatedAt: updatedUser.updatedAt,
         },
-        message: 'User updated successfully',
+        message: "User updated successfully",
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('Error updating user:', error)
+    logger.error("Error updating user:", error);
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
-      'auth.admin.users.error',
-      'anonymous',
-      'auth-admin-users',
+      "system_error",
+      "auth.admin.users.error",
+      "anonymous",
+      "auth-admin-users",
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      }
-    )
+      },
+    );
 
     return new Response(
       JSON.stringify({
-        error: 'Failed to update user',
-        message: 'An error occurred while updating the user',
+        error: "Failed to update user",
+        message: "An error occurred while updating the user",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};

@@ -1,6 +1,6 @@
 ---
-applyTo: 'ai/**/*.py,**/*.py,ai/**/*.ipynb,**/*.ipynb'
-description: 'Python AI/ML development guidelines for Linux with CUDA/ROCm'
+applyTo: "ai/**/*.py,**/*.py,ai/**/*.ipynb,**/*.ipynb"
+description: "Python AI/ML development guidelines for Linux with CUDA/ROCm"
 ---
 
 # Python AI/ML Development Guidelines

@@ -1,18 +1,23 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
-import { EvaluationCard } from '../shared/EvaluationCard'
-import { EvaluationForm } from '../forms/EvaluationForm'
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
+import { EvaluationCard } from "../shared/EvaluationCard";
+import { EvaluationForm } from "../forms/EvaluationForm";
 import {
   useEvaluationQuery,
   useEvaluationUpdateMutation,
-} from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+} from "@/lib/hooks/journal-research";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 export interface EvaluationDetailProps {
-  sessionId: string
-  evaluationId: string
-  className?: string
+  sessionId: string;
+  evaluationId: string;
+  className?: string;
 }
 
 export function EvaluationDetail({
@@ -20,37 +25,37 @@ export function EvaluationDetail({
   evaluationId,
   className,
 }: EvaluationDetailProps) {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
   const { data: evaluation, isLoading } = useEvaluationQuery(
     sessionId,
     evaluationId,
-  )
-  const updateMutation = useEvaluationUpdateMutation(sessionId)
+  );
+  const updateMutation = useEvaluationUpdateMutation(sessionId);
 
   if (isLoading) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Loading evaluation...</p>
       </div>
-    )
+    );
   }
 
   if (!evaluation) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">Evaluation not found</p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Evaluation Details</h1>
           <p className="text-muted-foreground mt-1">
-            Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')} by{' '}
+            Evaluated {format(evaluation.evaluationDate, "MMM d, yyyy")} by{" "}
             {evaluation.evaluator}
           </p>
         </div>
@@ -58,7 +63,7 @@ export function EvaluationDetail({
           onClick={() => setIsEditing(!isEditing)}
           className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
         >
-          {isEditing ? 'Cancel' : 'Edit'}
+          {isEditing ? "Cancel" : "Edit"}
         </button>
       </div>
 
@@ -82,10 +87,10 @@ export function EvaluationDetail({
                   },
                   {
                     onSuccess: () => {
-                      setIsEditing(false)
+                      setIsEditing(false);
                     },
                   },
-                )
+                );
               }}
               onCancel={() => setIsEditing(false)}
             />
@@ -154,7 +159,9 @@ export function EvaluationDetail({
               <p className="text-sm font-medium text-muted-foreground">
                 Evaluation Date
               </p>
-              <p className="mt-1">{format(evaluation.evaluationDate, 'PPpp')}</p>
+              <p className="mt-1">
+                {format(evaluation.evaluationDate, "PPpp")}
+              </p>
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">
@@ -166,5 +173,5 @@ export function EvaluationDetail({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

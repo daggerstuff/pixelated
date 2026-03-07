@@ -1,62 +1,64 @@
-import { useState } from 'react'
-import EmotionTrackingChart from './EmotionTrackingChart'
+import { useState } from "react";
+import EmotionTrackingChart from "./EmotionTrackingChart";
 
 // Define an interface matching EmotionTimelineData from EmotionTrackingChart
 interface EmotionDataPoint {
-  timestamp: string
-  valence: number
-  arousal: number
-  dominance: number
-  label?: string
+  timestamp: string;
+  valence: number;
+  arousal: number;
+  dominance: number;
+  label?: string;
 }
 
 interface SessionAnalysisProps {
-  sessionId: string
-  clientId: string
+  sessionId: string;
+  clientId: string;
 }
 
 export default function SessionAnalysis({
   sessionId,
   clientId,
 }: SessionAnalysisProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([])
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [emotionData, setEmotionData] = useState<EmotionDataPoint[]>([]);
 
   useEffect(() => {
     const fetchSessionEmotionData = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
         // Construct API URL with query parameters
         const url = new URL(
-          '/api/emotions/session-analysis',
+          "/api/emotions/session-analysis",
           window.location.origin,
-        )
-        url.searchParams.append('sessionId', sessionId)
+        );
+        url.searchParams.append("sessionId", sessionId);
 
         // Fetch data from API
-        const response = await fetch(url.toString())
+        const response = await fetch(url.toString());
 
         if (!response.ok) {
-          throw new Error(`Error fetching emotion data: ${response.statusText}`)
+          throw new Error(
+            `Error fetching emotion data: ${response.statusText}`,
+          );
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
         // Define an interface for the API response items
         interface EmotionApiItem {
-          timestamp?: string
+          timestamp?: string;
           dimensions?: {
-            valence?: number
-            arousal?: number
-            dominance?: number
-          }
-          valence?: number
-          arousal?: number
-          dominance?: number
-          label?: string
+            valence?: number;
+            arousal?: number;
+            dominance?: number;
+          };
+          valence?: number;
+          arousal?: number;
+          dominance?: number;
+          label?: string;
         }
 
         // Transform API data into the expected format
@@ -65,52 +67,52 @@ export default function SessionAnalysis({
               const baseData = {
                 timestamp: item.timestamp
                   ? new Date(item.timestamp).toISOString()
-                  : '',
+                  : "",
                 valence:
-                  item.dimensions && typeof item.dimensions.valence === 'number'
+                  item.dimensions && typeof item.dimensions.valence === "number"
                     ? item.dimensions.valence
-                    : typeof item.valence === 'number'
+                    : typeof item.valence === "number"
                       ? item.valence
                       : 0,
                 arousal:
-                  item.dimensions && typeof item.dimensions.arousal === 'number'
+                  item.dimensions && typeof item.dimensions.arousal === "number"
                     ? item.dimensions.arousal
-                    : typeof item.arousal === 'number'
+                    : typeof item.arousal === "number"
                       ? item.arousal
                       : 0,
                 dominance:
                   item.dimensions &&
-                  typeof item.dimensions.dominance === 'number'
+                  typeof item.dimensions.dominance === "number"
                     ? item.dimensions.dominance
-                    : typeof item.dominance === 'number'
+                    : typeof item.dominance === "number"
                       ? item.dominance
                       : 0,
-              }
+              };
 
               // Conditionally add label only when it exists
               return item.label
                 ? { ...baseData, label: `${item.label}` }
-                : baseData
+                : baseData;
             })
-          : []
+          : [];
 
-        setEmotionData(formattedData)
+        setEmotionData(formattedData);
       } catch (err: unknown) {
-        console.error('Error fetching session emotion data:', err)
+        console.error("Error fetching session emotion data:", err);
         setError(
           err instanceof Error
             ? (err as Error)?.message || String(err)
-            : 'An unknown error occurred',
-        )
+            : "An unknown error occurred",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     if (sessionId) {
-      fetchSessionEmotionData()
+      fetchSessionEmotionData();
     }
-  }, [sessionId, clientId])
+  }, [sessionId, clientId]);
 
   if (error) {
     return (
@@ -122,7 +124,7 @@ export default function SessionAnalysis({
           <p>Error loading session data: {error}</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -175,5 +177,5 @@ export default function SessionAnalysis({
         </div>
       </div>
     </div>
-  )
+  );
 }
