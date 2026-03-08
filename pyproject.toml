@@ -18,7 +18,7 @@ dependencies = [
   "shap>=0.41.0",
   "lime",
   "spacy>=3.8.11", # Updated to latest secure version
-  "nltk",
+  "nltk>=3.9.3",  # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip)
   "evaluate",
   "cryptography>=46.0.5", # Updated to latest secure version
   "requests>=2.32.4", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
@@ -209,6 +209,8 @@ select = [
   "RUF",
 ]
 ignore = ["E501", "UP017", "PLR2004"]
+[tool.ruff.lint.per-file-ignores]
+"scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true
