@@ -38,6 +38,7 @@ async function testCorrectAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Correct auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

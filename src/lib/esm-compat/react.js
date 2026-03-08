@@ -1,6 +1,6 @@
 // ESM compatibility wrapper for React
-import React from "react";
-export default React;
+import React from 'react'
+export default React
 export const {
   useState,
   useEffect,
@@ -26,4 +26,4 @@ export const {
   PureComponent,
   memo,
   forwardRef,
-} = React;
+} = React

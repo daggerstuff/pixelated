@@ -1,28 +1,28 @@
-import type { FC } from "react";
-import React from "react";
+import type { FC } from 'react'
+import React from 'react'
 import {
   usePersistentState,
   usePersistentObject,
   usePersistentArray,
   usePersistentMap,
-} from "@/hooks/usePersistentState";
-import { FadeIn, SlideUp } from "@/components/layout/AdvancedAnimations";
+} from '@/hooks/usePersistentState'
+import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import {
   ResponsiveContainer,
   ResponsiveText,
-} from "@/components/layout/ResponsiveUtils";
+} from '@/components/layout/ResponsiveUtils'
 
 interface DemoObject {
-  theme: "light" | "dark";
-  language: string;
-  notifications: boolean;
-  itemsPerPage: number;
+  theme: 'light' | 'dark'
+  language: string
+  notifications: boolean
+  itemsPerPage: number
 }
 
 interface DemoItem {
-  id: string;
-  text: string;
-  completed: boolean;
+  id: string
+  text: string
+  completed: boolean
 }
 
 /**
@@ -31,86 +31,86 @@ interface DemoItem {
 export const PersistentStateDemo: FC = () => {
   // Basic persistent state
   const [counter, setCounter, counterLoaded] = usePersistentState({
-    key: "demo_counter",
+    key: 'demo_counter',
     defaultValue: 0,
     debounceMs: 500,
-  });
+  })
 
   const [userName, setUserName, nameLoaded] = usePersistentState({
-    key: "demo_username",
-    defaultValue: "",
+    key: 'demo_username',
+    defaultValue: '',
     syncAcrossTabs: true,
-  });
+  })
 
   // Persistent object state
   const [preferences, setPreferences, updatePreference, , prefsLoaded] =
     usePersistentObject<DemoObject>({
-      key: "demo_preferences",
+      key: 'demo_preferences',
       defaultValue: {
-        theme: "light",
-        language: "en",
+        theme: 'light',
+        language: 'en',
         notifications: true,
         itemsPerPage: 10,
       },
       debounceMs: 300,
-    });
+    })
 
   // Persistent array state
   const [todoItems, todoActions, todosLoaded] = usePersistentArray<DemoItem>({
-    key: "demo_todos",
+    key: 'demo_todos',
     defaultValue: [
-      { id: "1", text: "Learn React", completed: true },
-      { id: "2", text: "Build persistent storage", completed: false },
+      { id: '1', text: 'Learn React', completed: true },
+      { id: '2', text: 'Build persistent storage', completed: false },
     ],
-  });
+  })
 
   // Persistent map state
   const [userScores, scoreActions, scoresLoaded] = usePersistentMap<
     string,
     number
   >({
-    key: "demo_scores",
+    key: 'demo_scores',
     defaultValue: new Map([
-      ["level1", 100],
-      ["level2", 85],
+      ['level1', 100],
+      ['level2', 85],
     ]),
-  });
+  })
 
   const addTodo = () => {
     const newTodo: DemoItem = {
       id: Date.now().toString(),
       text: `New task ${todoItems.length + 1}`,
       completed: false,
-    };
-    todoActions.push(newTodo);
-  };
+    }
+    todoActions.push(newTodo)
+  }
 
   const toggleTodo = (index: number) => {
-    const item = todoItems[index];
+    const item = todoItems[index]
     if (item) {
-      todoActions.updateAt(index, { ...item, completed: !item.completed });
+      todoActions.updateAt(index, { ...item, completed: !item.completed })
     }
-  };
+  }
 
   const updateScore = (level: string, score: number) => {
-    scoreActions.set(level, score);
-  };
+    scoreActions.set(level, score)
+  }
 
   const resetAll = () => {
-    setCounter(0);
-    setUserName("");
+    setCounter(0)
+    setUserName('')
     setPreferences({
-      theme: "light",
-      language: "en",
+      theme: 'light',
+      language: 'en',
       notifications: true,
       itemsPerPage: 10,
-    });
-    todoActions.clear();
-    scoreActions.clear();
-  };
+    })
+    todoActions.clear()
+    scoreActions.clear()
+  }
 
   const isLoaded =
-    counterLoaded && nameLoaded && prefsLoaded && todosLoaded && scoresLoaded;
+    counterLoaded && nameLoaded && prefsLoaded && todosLoaded && scoresLoaded
 
   return (
     <ResponsiveContainer size="lg">
@@ -201,8 +201,8 @@ export const PersistentStateDemo: FC = () => {
                           value={preferences.theme}
                           onChange={(e) =>
                             updatePreference(
-                              "theme",
-                              e.target.value as "light" | "dark",
+                              'theme',
+                              e.target.value as 'light' | 'dark',
                             )
                           }
                           className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
@@ -217,7 +217,7 @@ export const PersistentStateDemo: FC = () => {
                         <select
                           value={preferences.language}
                           onChange={(e) =>
-                            updatePreference("language", e.target.value)
+                            updatePreference('language', e.target.value)
                           }
                           className="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-sm"
                         >
@@ -234,21 +234,21 @@ export const PersistentStateDemo: FC = () => {
                         <button
                           onClick={() =>
                             updatePreference(
-                              "notifications",
+                              'notifications',
                               !preferences.notifications,
                             )
                           }
                           className={`w-12 h-6 rounded-full transition-colors ${
                             preferences.notifications
-                              ? "bg-green-500"
-                              : "bg-gray-300 dark:bg-gray-600"
+                              ? 'bg-green-500'
+                              : 'bg-gray-300 dark:bg-gray-600'
                           }`}
                         >
                           <div
                             className={`w-5 h-5 bg-white rounded-full transition-transform ${
                               preferences.notifications
-                                ? "translate-x-6"
-                                : "translate-x-1"
+                                ? 'translate-x-6'
+                                : 'translate-x-1'
                             }`}
                           />
                         </button>
@@ -265,7 +265,7 @@ export const PersistentStateDemo: FC = () => {
                           value={preferences.itemsPerPage}
                           onChange={(e) =>
                             updatePreference(
-                              "itemsPerPage",
+                              'itemsPerPage',
                               parseInt(e.target.value) || 10,
                             )
                           }
@@ -314,16 +314,16 @@ export const PersistentStateDemo: FC = () => {
                         key={item.id}
                         className={`flex items-center gap-3 p-3 border rounded-lg transition-all ${
                           item.completed
-                            ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
-                            : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                            : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
                         }`}
                       >
                         <button
                           onClick={() => toggleTodo(index)}
                           className={`w-5 h-5 rounded border-2 transition-colors ${
                             item.completed
-                              ? "bg-green-500 border-green-500"
-                              : "border-gray-300 dark:border-gray-600"
+                              ? 'bg-green-500 border-green-500'
+                              : 'border-gray-300 dark:border-gray-600'
                           }`}
                         >
                           {item.completed && (
@@ -341,7 +341,7 @@ export const PersistentStateDemo: FC = () => {
                           )}
                         </button>
                         <span
-                          className={`flex-1 ${item.completed ? "line-through text-gray-500" : ""}`}
+                          className={`flex-1 ${item.completed ? 'line-through text-gray-500' : ''}`}
                         >
                           {item.text}
                         </span>
@@ -455,7 +455,7 @@ export const PersistentStateDemo: FC = () => {
         )}
       </div>
     </ResponsiveContainer>
-  );
-};
+  )
+}
 
-export default PersistentStateDemo;
+export default PersistentStateDemo

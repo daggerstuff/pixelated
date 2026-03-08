@@ -1,76 +1,75 @@
-import { useState, type FC } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, type FC } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardHeader,
   CardContent,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { RecoveryTestStatus } from "../../../lib/security/backup/backup-types";
-import type { BackupType, BackupStatus } from "../../../lib/security/backup";
-import { toast } from "@/components/ui/toast";
+} from '@/components/ui/select'
+import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
+import type { BackupType, BackupStatus } from '../../../lib/security/backup'
+import { toast } from '@/components/ui/toast'
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {
-  Sandbox = "sandbox",
-  Docker = "docker",
-  Kubernetes = "kubernetes",
-  VM = "vm",
+  Sandbox = 'sandbox',
+  Docker = 'docker',
+  Kubernetes = 'kubernetes',
+  VM = 'vm',
 }
 
 interface Backup {
-  id: string;
-  type: BackupType;
-  timestamp: string;
-  size: number;
-  location: string;
-  status: BackupStatus;
-  retentionDate: string;
+  id: string
+  type: BackupType
+  timestamp: string
+  size: number
+  location: string
+  status: BackupStatus
+  retentionDate: string
 }
 
 interface RecoveryTest {
-  id: string;
-  backupId: string;
-  testDate: string;
-  status: RecoveryTestStatus;
-  timeTaken: number;
-  environment: string;
+  id: string
+  backupId: string
+  testDate: string
+  status: RecoveryTestStatus
+  timeTaken: number
+  environment: string
   verificationResults?: Array<{
-    testCase: string;
-    passed: boolean;
-    details: Record<string, unknown>;
-  }>;
+    testCase: string
+    passed: boolean
+    details: Record<string, unknown>
+  }>
   issues?: Array<{
-    type: string;
-    description: string;
-    severity: "low" | "medium" | "high" | "critical";
-  }>;
+    type: string
+    description: string
+    severity: 'low' | 'medium' | 'high' | 'critical'
+  }>
 }
 
 interface BackupRecoveryTabProps {
-  backups: Backup[];
-  recoveryHistory: RecoveryTest[];
+  backups: Backup[]
+  recoveryHistory: RecoveryTest[]
 }
 
 // Helper functions
-const formatDate = (dateString: string) =>
-  new Date(dateString).toLocaleString();
+const formatDate = (dateString: string) => new Date(dateString).toLocaleString()
 
 const formatDuration = (ms: number) => {
   if (ms < 1000) {
-    return `${ms}ms`;
+    return `${ms}ms`
   }
-  return `${(ms / 1000).toFixed(2)}s`;
-};
+  return `${(ms / 1000).toFixed(2)}s`
+}
 
 const renderStatusBadge = (status: RecoveryTestStatus) => {
   switch (status) {
@@ -79,98 +78,98 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
         <Badge variant="outline" className="bg-green-100 text-green-800">
           Passed
         </Badge>
-      );
+      )
     case RecoveryTestStatus.FAILED:
-      return <Badge variant="destructive">Failed</Badge>;
+      return <Badge variant="destructive">Failed</Badge>
     case RecoveryTestStatus.IN_PROGRESS:
       return (
         <Badge variant="outline" className="bg-blue-100 text-blue-800">
           In Progress
         </Badge>
-      );
+      )
     default:
-      return <Badge variant="secondary">{status}</Badge>;
+      return <Badge variant="secondary">{status}</Badge>
   }
-};
+}
 
 const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   backups,
   recoveryHistory: initialRecoveryHistory,
 }) => {
-  const [selectedBackupId, setSelectedBackupId] = useState<string>("");
-  const [isTesting, setIsTesting] = useState(false);
+  const [selectedBackupId, setSelectedBackupId] = useState<string>('')
+  const [isTesting, setIsTesting] = useState(false)
   const [latestTestResult, setLatestTestResult] = useState<RecoveryTest | null>(
     null,
-  );
+  )
   const [recoveryHistory, setRecoveryHistory] = useState<RecoveryTest[]>(
     initialRecoveryHistory,
-  );
-  const [selectedTest, setSelectedTest] = useState<string | null>(null);
+  )
+  const [selectedTest, setSelectedTest] = useState<string | null>(null)
 
   const [testEnvironment, setTestEnvironment] = useState<TestEnvironmentType>(
     TestEnvironmentType.Sandbox,
-  );
+  )
 
-  const selectedBackup = backups.find((b) => b.id === selectedBackupId);
+  const selectedBackup = backups.find((b) => b.id === selectedBackupId)
 
   const handleRunTest = async () => {
     if (!selectedBackup) {
-      toast.error("Please select a backup to test.");
-      return;
+      toast.error('Please select a backup to test.')
+      return
     }
 
-    setIsTesting(true);
-    setLatestTestResult(null);
+    setIsTesting(true)
+    setLatestTestResult(null)
 
     try {
-      const response = await fetch("/api/admin/backup/recovery-test", {
-        method: "POST",
+      const response = await fetch('/api/admin/backup/recovery-test', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           backupId: selectedBackup.id,
           environment: testEnvironment,
         }),
-      });
+      })
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to run recovery test.");
+        throw new Error(data.error || 'Failed to run recovery test.')
       }
 
-      setLatestTestResult(data);
-      setRecoveryHistory([data, ...recoveryHistory]);
-      toast.success("Recovery test completed successfully!");
+      setLatestTestResult(data)
+      setRecoveryHistory([data, ...recoveryHistory])
+      toast.success('Recovery test completed successfully!')
     } catch (error: unknown) {
-      console.error("Recovery test failed:", error);
+      console.error('Recovery test failed:', error)
 
       // Type guard to safely access String(error)
       const errorMessage =
         error instanceof Error
           ? String(error)
-          : typeof error === "object" && error !== null && "message" in error
+          : typeof error === 'object' && error !== null && 'message' in error
             ? String((error as { message: unknown }).message)
-            : "An unexpected error occurred.";
+            : 'An unexpected error occurred.'
 
-      toast.error(errorMessage);
+      toast.error(errorMessage)
     } finally {
-      setIsTesting(false);
+      setIsTesting(false)
     }
-  };
+  }
 
   const handleSelectTest = (testId: string) => {
     if (selectedTest === testId) {
-      setSelectedTest(null);
+      setSelectedTest(null)
     } else {
-      setSelectedTest(testId);
+      setSelectedTest(testId)
     }
-  };
+  }
 
   const availableBackups = backups.filter(
-    (b) => b.status === "completed" || b.status === "verified",
-  );
+    (b) => b.status === 'completed' || b.status === 'verified',
+  )
 
   return (
     <div className="space-y-6">
@@ -201,7 +200,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                 <SelectContent>
                   {availableBackups.map((backup) => (
                     <SelectItem key={backup.id} value={backup.id}>
-                      {new Date(backup.timestamp).toLocaleString()} -{" "}
+                      {new Date(backup.timestamp).toLocaleString()} -{' '}
                       {backup.type}
                     </SelectItem>
                   ))}
@@ -243,7 +242,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             onClick={handleRunTest}
             disabled={isTesting || !selectedBackupId}
           >
-            {isTesting ? "Testing..." : "Run Test"}
+            {isTesting ? 'Testing...' : 'Run Test'}
           </Button>
         </CardContent>
       </Card>
@@ -273,7 +272,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                 <span className="text-sm font-medium">Environment:</span>
                 <span className="ml-2">{latestTestResult.environment}</span>
               </div>
-            </div>{" "}
+            </div>{' '}
           </CardContent>
         </Card>
       )}
@@ -302,7 +301,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             ) : (
               <div className="divide-y">
                 {recoveryHistory.map((test) => {
-                  const backup = backups.find((b) => b.id === test.backupId);
+                  const backup = backups.find((b) => b.id === test.backupId)
 
                   return (
                     <div key={test.id}>
@@ -312,8 +311,8 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                         <div className="col-span-4 truncate">
                           {backup ? (
                             <>
-                              <span className="font-medium">{backup.type}</span>{" "}
-                              -{" "}
+                              <span className="font-medium">{backup.type}</span>{' '}
+                              -{' '}
                               {new Date(backup.timestamp).toLocaleDateString()}
                             </>
                           ) : (
@@ -323,92 +322,92 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                           )}
                         </div>
 
-                        <div className="col-span-3">
-                          {formatDate(test.testDate)}
-                        </div>
-
-                        <div className="col-span-2">
-                          {renderStatusBadge(test.status)}
-                        </div>
-
-                        <div className="col-span-2">
-                          {formatDuration(test.timeTaken)}
-                        </div>
-
-                        <div className="col-span-1 text-right">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSelectTest(test.id)}
-                          >
-                            {selectedTest === test.id ? "Hide" : "View"}
-                          </Button>
-                        </div>
+                      <div className="col-span-3">
+                        {formatDate(test.testDate)}
                       </div>
 
-                      {selectedTest === test.id && (
-                        <div className="col-span-12 p-3 bg-slate-50 dark:bg-slate-800 mt-1 rounded-md">
-                          <h4 className="font-medium mb-2">Test Results</h4>
+                      <div className="col-span-2">
+                        {renderStatusBadge(test.status)}
+                      </div>
 
-                          <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                  Environment
-                                </h5>
-                                <p className="text-sm">{test.environment}</p>
-                              </div>
-                              <div>
-                                <h5 className="text-xs text-gray-500 dark:text-gray-400">
-                                  Test ID
-                                </h5>
-                                <p className="text-sm font-mono text-xs">
-                                  {test.id}
-                                </p>
-                              </div>
+                      <div className="col-span-2">
+                        {formatDuration(test.timeTaken)}
+                      </div>
+
+                      <div className="col-span-1 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSelectTest(test.id)}
+                        >
+                          {selectedTest === test.id ? 'Hide' : 'View'}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {selectedTest === test.id && (
+                      <div className="col-span-12 p-3 bg-slate-50 dark:bg-slate-800 mt-1 rounded-md">
+                        <h4 className="font-medium mb-2">Test Results</h4>
+
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
+                                Environment
+                              </h5>
+                              <p className="text-sm">{test.environment}</p>
                             </div>
+                            <div>
+                              <h5 className="text-xs text-gray-500 dark:text-gray-400">
+                                Test ID
+                              </h5>
+                              <p className="text-sm font-mono text-xs">
+                                {test.id}
+                              </p>
+                            </div>
+                          </div>
 
-                            {test.verificationResults &&
-                              test.verificationResults.length > 0 && (
-                                <div className="mt-3">
-                                  <h5 className="text-sm font-medium mb-2">
-                                    Verification Results
-                                  </h5>
-                                  <div className="rounded-md border divide-y">
-                                    {test.verificationResults.map((vr, idx) => (
-                                      <div
-                                        key={`vr-${vr.testCase}-${vr.id || idx}`}
-                                        className="p-2 flex justify-between items-center"
-                                      >
-                                        <div>
-                                          <span className="font-medium">
-                                            {vr.testCase}
-                                          </span>
-                                          <Badge
-                                            variant="outline"
-                                            className={`
-                                            ${vr.status === "critical" ? "bg-red-100 text-red-800" : ""}
-                                            ${vr.status === "high" ? "bg-orange-100 text-orange-800" : ""}
-                                            ${vr.status === "medium" ? "bg-yellow-100 text-yellow-800" : ""}
-                                            ${vr.status === "low" ? "bg-blue-100 text-blue-800" : ""}
+                          {test.verificationResults &&
+                            test.verificationResults.length > 0 && (
+                              <div className="mt-3">
+                                <h5 className="text-sm font-medium mb-2">
+                                  Verification Results
+                                </h5>
+                                <div className="rounded-md border divide-y">
+                                  {test.verificationResults.map((vr, idx) => (
+                                    <div
+                                      key={`vr-${vr.testCase}-${vr.id || idx}`}
+                                      className="p-2 flex justify-between items-center"
+                                    >
+                                      <div>
+                                        <span className="font-medium">
+                                          {vr.testCase}
+                                        </span>
+                                        <Badge
+                                          variant="outline"
+                                          className={`
+                                            ${vr.status === 'critical' ? 'bg-red-100 text-red-800' : ''}
+                                            ${vr.status === 'high' ? 'bg-orange-100 text-orange-800' : ''}
+                                            ${vr.status === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''}
+                                            ${vr.status === 'low' ? 'bg-blue-100 text-blue-800' : ''}
                                           `}
-                                          >
-                                            {vr.status}
-                                          </Badge>
-                                        </div>
-                                        <p className="text-sm mt-1">
-                                          {vr.description}
-                                        </p>
+                                        >
+                                          {vr.status}
+                                        </Badge>
                                       </div>
-                                    ))}
-                                  </div>
+                                      <p className="text-sm mt-1">
+                                        {vr.description}
+                                      </p>
+                                    </div>
+                                  ))}
                                 </div>
-                              )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                     </div>
-                  );
+                  )
                 })}
               </div>
             )}
@@ -416,7 +415,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
         </CardContent>
       </Card>
     </div>
-  );
-};
+  )
+}
 
-export default BackupRecoveryTab;
+export default BackupRecoveryTab

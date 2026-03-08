@@ -1,32 +1,32 @@
-import { Pool } from "pg";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { Pool } from 'pg'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Define a specific interface for the crisis event data
 export interface CrisisEventData {
-  caseId: string;
-  patientId: string;
-  sessionId: string;
-  alertLevel: string;
-  detectionScore: number;
-  detectedRisks: string[];
-  textSample: string;
-  timestamp: string;
+  caseId: string
+  patientId: string
+  sessionId: string
+  alertLevel: string
+  detectionScore: number
+  detectedRisks: string[]
+  textSample: string
+  timestamp: string
 }
 
 // Initialize logger
-const logger = createBuildSafeLogger("crisis-event-db");
+const logger = createBuildSafeLogger('crisis-event-db')
 
-if (!process.env["DATABASE_URL"]) {
-  throw new Error("DATABASE_URL is not defined in the environment variables.");
+if (!process.env['DATABASE_URL']) {
+  throw new Error('DATABASE_URL is not defined in the environment variables.')
 }
 
 const pool = new Pool({
-  connectionString: process.env["DATABASE_URL"],
+  connectionString: process.env['DATABASE_URL'],
   ssl:
-    process.env["NODE_ENV"] === "production"
+    process.env['NODE_ENV'] === 'production'
       ? { rejectUnauthorized: false }
       : undefined,
-});
+})
 
 export async function recordCrisisEventToDb(
   eventData: CrisisEventData,
@@ -40,7 +40,7 @@ export async function recordCrisisEventToDb(
     detectedRisks,
     textSample,
     timestamp,
-  } = eventData;
+  } = eventData
 
   try {
     await pool.query(
@@ -57,18 +57,18 @@ export async function recordCrisisEventToDb(
         textSample,
         timestamp,
       ],
-    );
-    logger.info("Crisis event recorded successfully", { caseId });
+    )
+    logger.info('Crisis event recorded successfully', { caseId })
   } catch (error: unknown) {
-    logger.error("Failed to record crisis event to database", {
+    logger.error('Failed to record crisis event to database', {
       error: error instanceof Error ? String(error) : String(error),
       stack: error instanceof Error ? (error as Error)?.stack : undefined,
       caseId,
-    });
+    })
     // Rethrow to allow calling code to handle the error if needed
     throw new Error(
       `Failed to record crisis event: ${error instanceof Error ? String(error) : String(error)}`,
       { cause: error },
-    );
+    )
   }
 }

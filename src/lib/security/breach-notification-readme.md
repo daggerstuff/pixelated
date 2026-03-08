@@ -23,20 +23,20 @@ This system provides real-time notification capabilities for security breaches, 
 2. **Slack Webhook Setup**
 
    a. Go to your Slack workspace and create a new app (or use an existing one):
-   - Visit https://api.slack.com/apps
-   - Click "Create New App" → "From scratch"
-   - Name it "Security Breach Alerts" and select your workspace
+      - Visit https://api.slack.com/apps
+      - Click "Create New App" → "From scratch"
+      - Name it "Security Breach Alerts" and select your workspace
 
    b. Enable Incoming Webhooks:
-   - In the app settings, go to "Incoming Webhooks"
-   - Turn on "Activate Incoming Webhooks"
-   - Click "Add New Webhook to Workspace"
-   - Select the channel for security alerts (create a private #security-alerts channel if needed)
-   - Copy the webhook URL and add it to your .env file as SLACK_WEBHOOK
+      - In the app settings, go to "Incoming Webhooks"
+      - Turn on "Activate Incoming Webhooks"
+      - Click "Add New Webhook to Workspace"
+      - Select the channel for security alerts (create a private #security-alerts channel if needed)
+      - Copy the webhook URL and add it to your .env file as SLACK_WEBHOOK
 
    c. Customize the app (optional):
-   - Set an app icon and description
-   - Add the app to your #security-alerts channel
+      - Set an app icon and description
+      - Add the app to your #security-alerts channel
 
 ## Usage
 
@@ -66,34 +66,34 @@ pnpm security:breach-status BREACH_ID
 #### Reporting a Breach
 
 ```typescript
-import { BreachNotificationSystem } from "@/lib/security/breach-notification";
+import { BreachNotificationSystem } from '@/lib/security/breach-notification'
 
 // Report a security breach
 const breachId = await BreachNotificationSystem.reportBreach({
-  type: "unauthorized_access", // 'unauthorized_access', 'data_leak', 'system_compromise', 'other'
-  severity: "high", // 'low', 'medium', 'high', 'critical'
-  description: "Detailed description of what happened",
-  affectedUsers: ["user1", "user2", "user3"], // User IDs of affected users
-  affectedData: ["PII", "PHI", "credentials"], // Types of affected data
-  detectionMethod: "Automated system monitoring",
-  remediation: "Accounts locked, passwords reset, logs analyzed",
-});
+  type: 'unauthorized_access', // 'unauthorized_access', 'data_leak', 'system_compromise', 'other'
+  severity: 'high', // 'low', 'medium', 'high', 'critical'
+  description: 'Detailed description of what happened',
+  affectedUsers: ['user1', 'user2', 'user3'], // User IDs of affected users
+  affectedData: ['PII', 'PHI', 'credentials'], // Types of affected data
+  detectionMethod: 'Automated system monitoring',
+  remediation: 'Accounts locked, passwords reset, logs analyzed',
+})
 
-console.log(`Breach reported with ID: ${breachId}`);
+console.log(`Breach reported with ID: ${breachId}`)
 ```
 
 #### Checking Breach Status
 
 ```typescript
-const breachStatus = await BreachNotificationSystem.getBreachStatus(breachId);
-console.log("Current status:", breachStatus.notificationStatus);
+const breachStatus = await BreachNotificationSystem.getBreachStatus(breachId)
+console.log('Current status:', breachStatus.notificationStatus)
 ```
 
 #### Listing Recent Breaches
 
 ```typescript
-const recentBreaches = await BreachNotificationSystem.listRecentBreaches();
-console.log(`Found ${recentBreaches.length} recent breaches`);
+const recentBreaches = await BreachNotificationSystem.listRecentBreaches()
+console.log(`Found ${recentBreaches.length} recent breaches`)
 ```
 
 #### Running a Test Scenario
@@ -101,10 +101,10 @@ console.log(`Found ${recentBreaches.length} recent breaches`);
 ```typescript
 // Test the notification system without creating a real breach
 const testBreachId = await BreachNotificationSystem.runTestScenario({
-  type: "data_leak",
-  severity: "medium",
+  type: 'data_leak',
+  severity: 'medium',
   affectedUsers: 5, // Number of test users to generate
-});
+})
 ```
 
 ## Slack Notification Format
@@ -161,7 +161,6 @@ The system sends rich, formatted Slack notifications with the following elements
 ## Compliance Information
 
 This system adheres to HIPAA Breach Notification Rule requirements:
-
 - Notification within 60 days for breaches affecting 500+ individuals
 - Annual reporting of smaller breaches
 - Proper documentation of all notification efforts

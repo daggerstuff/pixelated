@@ -2,102 +2,103 @@
 
 /* jshint esversion: 6, node: true */
 // IMPORTANT: Import Sentry instrumentation first
-import "../instrument.mjs";
+import '../instrument.mjs'
 
 /**
  * 🌟 Pixelated Blog Web Interface 🌟
  * A simple web-based UI for blog management
  */
 
-import { spawnSync } from "child_process";
-import http from "http";
+import { spawnSync } from 'child_process'
+import http from 'http'
 
-import { URL } from "url";
-import { fileURLToPath } from "url";
+
+import { URL } from 'url'
+import { fileURLToPath } from 'url'
 
 // Get current directory
-const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url)
 // Avoid path.dirname to prevent security scanner issues
 const lastSlash = Math.max(
-  __filename.lastIndexOf("/"),
-  __filename.lastIndexOf("\\"),
-);
-const __dirname = lastSlash > 0 ? __filename.substring(0, lastSlash) : ".";
+  __filename.lastIndexOf('/'),
+  __filename.lastIndexOf('\\'),
+)
+const __dirname = lastSlash > 0 ? __filename.substring(0, lastSlash) : '.'
 // Path cache removed - was unused
 
 // Run blog publisher command
 // Basic argument parsing and validation reused from CLI
 function parseArgs(command) {
-  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g;
-  const args = [];
-  let m;
+  const re = /[^\s"']+|"([^"]*)"|'([^']*)'/g
+  const args = []
+  let m
   while ((m = re.exec(command)) !== null) {
-    args.push(m[1] ?? m[2] ?? m[0]);
+    args.push(m[1] ?? m[2] ?? m[0])
   }
-  return args;
+  return args
 }
 
 function isSafeToken(token) {
-  if (typeof token !== "string" || token.length === 0) {
-    return false;
+  if (typeof token !== 'string' || token.length === 0) {
+    return false
   }
-  return !/[;&|$`<>\\\n\r]/.test(token);
+  return !/[;&|$`<>\\\n\r]/.test(token)
 }
 
 const ALLOWED_TOP_LEVEL = new Set([
-  "status",
-  "series",
-  "upcoming",
-  "overdue",
-  "report",
-  "generate",
-]);
+  'status',
+  'series',
+  'upcoming',
+  'overdue',
+  'report',
+  'generate',
+])
 
 function runBlogCommand(command) {
   try {
-    const tokens = parseArgs(command);
+    const tokens = parseArgs(command)
     if (tokens.length === 0) {
-      return { success: false, error: "Empty command" };
+      return { success: false, error: 'Empty command' }
     }
 
-    const top = tokens[0];
+    const top = tokens[0]
     if (!ALLOWED_TOP_LEVEL.has(top)) {
-      return { success: false, error: `Disallowed command: ${top}` };
+      return { success: false, error: `Disallowed command: ${top}` }
     }
 
     for (const t of tokens) {
       if (!isSafeToken(t)) {
-        return { success: false, error: "Invalid characters in arguments" };
+        return { success: false, error: 'Invalid characters in arguments' }
       }
     }
 
-    const args = ["run", "blog-publisher", "--", ...tokens];
-    const proc = spawnSync("pnpm", args, {
-      encoding: "utf8",
-      stdio: "pipe",
+    const args = ['run', 'blog-publisher', '--', ...tokens]
+    const proc = spawnSync('pnpm', args, {
+      encoding: 'utf8',
+      stdio: 'pipe',
       shell: false,
-    });
+    })
 
     if (proc.error) {
-      return { success: false, error: proc.error.message };
+      return { success: false, error: proc.error.message }
     }
 
     if (proc.status === 0) {
-      return { success: true, output: proc.stdout || "" };
+      return { success: true, output: proc.stdout || '' }
     }
 
     return {
       success: false,
-      error: proc.stderr || "Unknown error",
-      output: proc.stdout || "",
-    };
+      error: proc.stderr || 'Unknown error',
+      output: proc.stdout || '',
+    }
   } catch (err) {
-    return { success: false, error: err.message };
+    return { success: false, error: err.message }
   }
 }
 
 // Generate HTML interface
-function generateHTML(content = "", message = "") {
+function generateHTML(content = '', message = '') {
   return `
 <!DOCTYPE html>
 <html>
@@ -211,13 +212,12 @@ function generateHTML(content = "", message = "") {
     <h1>📝 Blog Management Interface</h1>
   </header>
 
-  ${
-    message
-      ? `<div class="message ${message.type || ""}">
+  ${message
+      ? `<div class="message ${message.type || ''}">
     ${message.text}
   </div>`
-      : ""
-  }
+      : ''
+    }
 
   <div class="card">
     <h2>Actions</h2>
@@ -234,29 +234,29 @@ function generateHTML(content = "", message = "") {
   ${content}
 </body>
 </html>
-`;
+`
 }
 
 // Generate new post form
 function generatePostForm() {
   // Get series from the blog publisher
-  const seriesResult = runBlogCommand("series");
-  let seriesOptions = "";
+  const seriesResult = runBlogCommand('series')
+  let seriesOptions = ''
 
   if (seriesResult.success) {
-    const seriesLines = seriesResult.output.split("\n");
-    const seriesList = [];
+    const seriesLines = seriesResult.output.split('\n')
+    const seriesList = []
 
     for (const line of seriesLines) {
       if (line.trim().match(/^[^\s]+.*:$/)) {
-        const seriesName = line.trim().replace(/:$/, "").trim();
-        seriesList.push(seriesName);
+        const seriesName = line.trim().replace(/:$/, '').trim()
+        seriesList.push(seriesName)
       }
     }
 
     seriesOptions = seriesList
       .map((series) => `<option value="${series}">${series}</option>`)
-      .join("");
+      .join('')
   }
 
   return `
@@ -294,12 +294,12 @@ function generatePostForm() {
       }
     });
   </script>
-  `;
+  `
 }
 
 // Handle status/report actions
 function handleStatusAction(action) {
-  const result = runBlogCommand(action);
+  const result = runBlogCommand(action)
 
   if (result.success) {
     return {
@@ -310,15 +310,15 @@ function handleStatusAction(action) {
         </div>
       `,
       message: null,
-    };
+    }
   } else {
     const response = {
-      content: "",
+      content: '',
       message: {
-        type: "error",
+        type: 'error',
         text: `Error: ${result.error}`,
       },
-    };
+    }
 
     if (result.output) {
       response.content = `
@@ -326,36 +326,36 @@ function handleStatusAction(action) {
           <h2>Error Output</h2>
           <pre class="content">${result.output}</pre>
         </div>
-      `;
+      `
     }
 
-    return response;
+    return response
   }
 }
 
 // Handle post generation
 function handleGenerateAction(url) {
-  const title = url.searchParams.get("title");
-  let series = url.searchParams.get("series");
-  const newSeries = url.searchParams.get("newSeries");
+  const title = url.searchParams.get('title')
+  let series = url.searchParams.get('series')
+  const newSeries = url.searchParams.get('newSeries')
 
   if (!title) {
     return {
       content: generatePostForm(),
       message: {
-        type: "error",
-        text: "Post title is required",
+        type: 'error',
+        text: 'Post title is required',
       },
-    };
+    }
   }
 
   // If "new" is selected and newSeries is provided, use that
-  if (series === "new" && newSeries) {
-    series = newSeries;
+  if (series === 'new' && newSeries) {
+    series = newSeries
   }
 
-  const seriesArg = series ? `"${series}"` : '""';
-  const generateResult = runBlogCommand(`generate ${seriesArg} "${title}"`);
+  const seriesArg = series ? `"${series}"` : '""'
+  const generateResult = runBlogCommand(`generate ${seriesArg} "${title}"`)
 
   if (generateResult.success) {
     return {
@@ -366,29 +366,29 @@ function handleGenerateAction(url) {
         </div>
       `,
       message: {
-        type: "success",
-        text: "Post created successfully!",
+        type: 'success',
+        text: 'Post created successfully!',
       },
-    };
+    }
   } else {
     return {
       content: `
         <div class="card">
           <h2>Error Output</h2>
-          <pre class="content">${generateResult.output || "No output available"}</pre>
+          <pre class="content">${generateResult.output || 'No output available'}</pre>
         </div>
       `,
       message: {
-        type: "error",
+        type: 'error',
         text: `Failed to create post: ${generateResult.error}`,
       },
-    };
+    }
   }
 }
 
 // Route request to appropriate handler
 function handleRequest(url) {
-  const action = url.searchParams.get("action");
+  const action = url.searchParams.get('action')
 
   if (!action) {
     return {
@@ -399,76 +399,76 @@ function handleRequest(url) {
         </div>
       `,
       message: null,
-    };
+    }
   }
 
   switch (action) {
-    case "status":
-    case "series":
-    case "upcoming":
-    case "overdue":
-    case "report":
-      return handleStatusAction(action);
+    case 'status':
+    case 'series':
+    case 'upcoming':
+    case 'overdue':
+    case 'report':
+      return handleStatusAction(action)
 
-    case "generate_form":
+    case 'generate_form':
       return {
         content: generatePostForm(),
         message: null,
-      };
+      }
 
-    case "generate":
-      return handleGenerateAction(url);
+    case 'generate':
+      return handleGenerateAction(url)
 
     default:
       return {
-        content: "",
+        content: '',
         message: {
-          type: "error",
+          type: 'error',
           text: `Unknown action: ${action}`,
         },
-      };
+      }
   }
 }
 
 // Handle HTTP requests
 const server = http.createServer((req, res) => {
-  const url = new URL(req.url, `http://${req.headers.host}`);
-  const { content, message } = handleRequest(url);
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const { content, message } = handleRequest(url)
 
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(generateHTML(content, message));
-});
+  res.writeHead(200, { 'Content-Type': 'text/html' })
+  res.end(generateHTML(content, message))
+})
 
 // Start server
-const PORT = process.env.PORT || 3333;
+const PORT = process.env.PORT || 3333
 server.listen(PORT, () => {
-  const url = `http://localhost:${PORT}`;
-  console.log(`Blog management interface running at ${url}`);
+  const url = `http://localhost:${PORT}`
+  console.log(`Blog management interface running at ${url}`)
 
   // Try to open the URL in the default browser
   try {
     const command =
-      process.platform === "darwin"
-        ? "open"
-        : process.platform === "win32"
-          ? "start"
-          : "xdg-open";
+      process.platform === 'darwin'
+        ? 'open'
+        : process.platform === 'win32'
+          ? 'start'
+          : 'xdg-open'
 
     // spawn without shell; pass URL as separate arg
-    const opener = spawnSync(command, [url], { stdio: "ignore", shell: false });
+    const opener = spawnSync(command, [url], { stdio: 'ignore', shell: false })
     if (opener.error) {
-      throw opener.error;
+      throw opener.error
     }
   } catch (_err) {
-    console.log(`Please open your browser to: ${url}`);
+    console.log(`Please open your browser to: ${url}`)
   }
-});
+})
 
 // Gracefully handle ctrl+c
-process.on("SIGINT", () => {
-  console.log("\nShutting down server...");
+process.on('SIGINT', () => {
+  console.log('\nShutting down server...')
   server.close(() => {
-    console.log("Server terminated");
-    process.exit(0);
-  });
-});
+    console.log('Server terminated')
+    process.exit(0)
+  })
+})

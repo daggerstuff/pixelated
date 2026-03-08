@@ -1,32 +1,32 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from 'react'
 // Card components not used - using GlowCard instead
-import { Badge } from "@/components/ui/badge";
-import { GlowCard } from "../glow-card/GlowCard";
+import { Badge } from '@/components/ui/badge'
+import { GlowCard } from '../glow-card/GlowCard'
 
 interface MentalHealthCardProps {
-  title?: string;
-  description?: string;
-  metric?: string;
-  metricValue?: string;
-  status?: "active" | "completed" | "pending";
-  icon?: ReactNode;
-  glowColor?: "blue" | "purple" | "green" | "red" | "orange";
+  title?: string
+  description?: string
+  metric?: string
+  metricValue?: string
+  status?: 'active' | 'completed' | 'pending'
+  icon?: ReactNode
+  glowColor?: 'blue' | 'purple' | 'green' | 'red' | 'orange'
 }
 
 const statusColors = {
-  active: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  completed: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  pending: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-};
+  active: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+  completed: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  pending: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+}
 
 export const MentalHealthCard: React.FC<MentalHealthCardProps> = ({
-  title = "Mindfulness Session",
-  description = "Daily meditation and breathing exercises to reduce stress and improve focus",
-  metric = "Progress",
-  metricValue = "85%",
-  status = "active",
+  title = 'Mindfulness Session',
+  description = 'Daily meditation and breathing exercises to reduce stress and improve focus',
+  metric = 'Progress',
+  metricValue = '85%',
+  status = 'active',
   icon = null,
-  glowColor = "blue",
+  glowColor = 'blue',
 }) => {
   return (
     <GlowCard glowColor={glowColor} className="w-full max-w-md">
@@ -64,5 +64,5 @@ export const MentalHealthCard: React.FC<MentalHealthCardProps> = ({
         </div>
       </div>
     </GlowCard>
-  );
-};
+  )
+}

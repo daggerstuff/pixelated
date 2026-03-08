@@ -12,7 +12,7 @@ services:
       - /app/node_modules
     ports:
       - "3000:3000"
-      - "9229:9229" # Debug port
+      - "9229:9229"  # Debug port
     command: npm run dev
 
   db:

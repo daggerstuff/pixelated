@@ -2,39 +2,39 @@
  * Unit tests for the Bias Detection Dashboard API Endpoint
  */
 
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock fetch globally
-global.fetch = vi.fn();
+global.fetch = vi.fn()
 
 // Mock all dependencies
-vi.mock("@/lib/ai/bias-detection", () => ({
+vi.mock('@/lib/ai/bias-detection', () => ({
   BiasDetectionEngine: vi.fn(),
-}));
+}))
 const { mockLogger } = vi.hoisted(() => ({
   mockLogger: {
     info: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  },
-}));
+  }
+}))
 
-vi.mock("@/lib/logging/build-safe-logger", () => ({
+vi.mock('@/lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: vi.fn(() => mockLogger),
-}));
+}))
 
-import { BiasDetectionEngine } from "@/lib/ai/bias-detection";
+import { BiasDetectionEngine } from '@/lib/ai/bias-detection'
 
-import type { BiasDashboardData } from "@/lib/ai/bias-detection";
+import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 
 // Import the actual handler
-let GET: any;
+let GET: any
 
-describe("Bias Detection Dashboard API Endpoint", () => {
+describe('Bias Detection Dashboard API Endpoint', () => {
   let mockBiasEngine: {
-    getDashboardData: ReturnType<typeof vi.fn>;
-  };
+    getDashboardData: ReturnType<typeof vi.fn>
+  }
 
   const mockDashboardData: BiasDashboardData = {
     summary: {
@@ -48,34 +48,34 @@ describe("Bias Detection Dashboard API Endpoint", () => {
     },
     alerts: [
       {
-        alertId: "alert-1",
-        timestamp: "2024-01-15T09:30:00.000Z",
-        level: "high",
-        type: "high_bias",
-        message: "High bias detected in therapeutic session",
-        sessionId: "session-123",
+        alertId: 'alert-1',
+        timestamp: '2024-01-15T09:30:00.000Z',
+        level: 'high',
+        type: 'high_bias',
+        message: 'High bias detected in therapeutic session',
+        sessionId: 'session-123',
         acknowledged: false,
       },
       {
-        alertId: "alert-2",
-        timestamp: "2024-01-15T08:45:00.000Z",
-        level: "medium",
-        type: "medium_bias",
-        message: "Medium bias detected in therapeutic session",
-        sessionId: "session-124",
+        alertId: 'alert-2',
+        timestamp: '2024-01-15T08:45:00.000Z',
+        level: 'medium',
+        type: 'medium_bias',
+        message: 'Medium bias detected in therapeutic session',
+        sessionId: 'session-124',
         acknowledged: false,
       },
     ],
     trends: [
       {
-        date: "2024-01-14T00:00:00.000Z",
+        date: '2024-01-14T00:00:00.000Z',
         biasScore: 0.32,
         sessionCount: 25,
         alertCount: 3,
         demographicBreakdown: { age: 0.3, gender: 0.2 },
       },
       {
-        date: "2024-01-15T00:00:00.000Z",
+        date: '2024-01-15T00:00:00.000Z',
         biasScore: 0.35,
         sessionCount: 28,
         alertCount: 4,
@@ -84,11 +84,11 @@ describe("Bias Detection Dashboard API Endpoint", () => {
     ],
     demographics: {
       age: {
-        "18-24": 20,
-        "25-34": 35,
-        "35-44": 25,
-        "45-54": 15,
-        "55+": 5,
+        '18-24': 20,
+        '25-34': 35,
+        '35-44': 25,
+        '45-54': 15,
+        '55+': 5,
       },
       gender: {
         male: 45,
@@ -111,8 +111,8 @@ describe("Bias Detection Dashboard API Endpoint", () => {
     },
     recentAnalyses: [
       {
-        sessionId: "session-123",
-        timestamp: "2024-01-15T09:30:00.000Z",
+        sessionId: 'session-123',
+        timestamp: '2024-01-15T09:30:00.000Z',
         overallBiasScore: 0.75,
         layerResults: {
           preprocessing: {
@@ -197,7 +197,7 @@ describe("Bias Detection Dashboard API Endpoint", () => {
               patientSafety: 0.9,
             },
             temporalAnalysis: {
-              trendDirection: "worsening",
+              trendDirection: 'worsening',
               changeRate: 0.05,
               seasonalPatterns: [],
               interventionEffectiveness: [],
@@ -206,98 +206,95 @@ describe("Bias Detection Dashboard API Endpoint", () => {
           },
         },
         demographics: {
-          age: "25-35",
-          gender: "female",
-          ethnicity: "hispanic",
-          primaryLanguage: "en",
+          age: '25-35',
+          gender: 'female',
+          ethnicity: 'hispanic',
+          primaryLanguage: 'en',
         },
         recommendations: [],
-        alertLevel: "high",
+        alertLevel: 'high',
         confidence: 0.85,
       },
     ],
     recommendations: [],
-  };
+  }
 
   const createMockRequest = (
     searchParams: Record<string, string> = {},
     headers: Record<string, string> = {},
   ) => {
-    const url = new URL("http://localhost:3000/api/bias-detection/dashboard");
+    const url = new URL('http://localhost:3000/api/bias-detection/dashboard')
     Object.entries(searchParams).forEach(([key, value]) => {
-      url.searchParams.set(key, value);
-    });
+      url.searchParams.set(key, value)
+    })
 
     const defaultHeaders: Record<string, string> = {
-      authorization: "Bearer valid-token",
-      "content-type": "application/json",
+      'authorization': 'Bearer valid-token',
+      'content-type': 'application/json',
       ...headers,
-    };
+    }
 
     return {
       url: url.toString(),
       headers: {
         get: vi.fn((key: string) => defaultHeaders[key.toLowerCase()] || null),
       },
-    };
-  };
+    }
+  }
 
   beforeEach(async () => {
-    vi.clearAllMocks();
+    vi.clearAllMocks()
 
     // mockLogger is handled by the vi.mock factory
     if (!GET) {
-      const module = await import("./dashboard");
-      GET = module.GET;
+      const module = await import('./dashboard')
+      GET = module.GET
     }
 
-    vi.stubGlobal(
-      "Response",
-      vi.fn(function (body: string, init?: ResponseInit) {
-        let responseData: any;
-        try {
-          responseData = JSON.parse(body);
-        } catch {
-          responseData = { error: "Invalid JSON" };
-        }
+    vi.stubGlobal('Response', vi.fn(function(body: string, init?: ResponseInit) {
+      let responseData: any
+      try {
+        responseData = JSON.parse(body)
+      } catch {
+        responseData = { error: 'Invalid JSON' }
+      }
 
-        const defaultHeaders = new Map([
-          ["Content-Type", "application/json"],
-          ["X-Processing-Time", "150"],
-        ]);
+      const defaultHeaders = new Map([
+        ['Content-Type', 'application/json'],
+        ['X-Processing-Time', '150'],
+      ])
 
-        return {
-          status: init?.status || 200,
-          json: vi.fn().mockResolvedValue(responseData),
-          headers: {
-            get: vi.fn((key: string) => defaultHeaders.get(key) || null),
-          },
-        };
-      }),
-    );
+      return {
+        status: init?.status || 200,
+        json: vi.fn().mockResolvedValue(responseData),
+        headers: {
+          get: vi.fn((key: string) => defaultHeaders.get(key) || null),
+        },
+      }
+    }))
 
     mockBiasEngine = {
       getDashboardData: vi.fn().mockResolvedValue(mockDashboardData),
-    };
-    vi.mocked(BiasDetectionEngine).mockImplementation(() => mockBiasEngine);
-  });
+    }
+    vi.mocked(BiasDetectionEngine).mockImplementation(() => mockBiasEngine)
+  })
 
   afterEach(() => {
-    vi.clearAllMocks();
-    vi.unstubAllGlobals();
-  });
+    vi.clearAllMocks()
+    vi.unstubAllGlobals()
+  })
 
-  describe("GET /api/bias-detection/dashboard", () => {
-    it("should successfully return dashboard data with default parameters", async () => {
-      const request = createMockRequest();
-      const response = await GET({ request } as { request: Request });
+  describe('GET /api/bias-detection/dashboard', () => {
+    it('should successfully return dashboard data with default parameters', async () => {
+      const request = createMockRequest()
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
-      expect(responseData.data).toEqual(mockDashboardData);
-      expect(typeof responseData.processingTime).toBe("number");
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true)
+      expect(responseData.data).toEqual(mockDashboardData)
+      expect(typeof responseData.processingTime).toBe('number')
 
       // Note: Mock API doesn't call engine
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
@@ -312,82 +309,79 @@ describe("Bias Detection Dashboard API Endpoint", () => {
       //     demographicFilter: 'all',
       //   },
       // )
-    });
+    })
 
-    it("should handle custom time range parameter", async () => {
-      const request = createMockRequest({ timeRange: "7d" });
-      const response = await GET({ request } as { request: Request });
+    it('should handle custom time range parameter', async () => {
+      const request = createMockRequest({ timeRange: '7d' })
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true)
 
       // Note: Mock API doesn't call engine
       // // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
       //   timeRange: '7d',
       //   demographicFilter: 'all',
       // })
-    });
+    })
 
-    it("should handle custom demographic filter parameter", async () => {
-      const request = createMockRequest({ demographic: "female" });
-      const response = await GET({ request } as { request: Request });
+    it('should handle custom demographic filter parameter', async () => {
+      const request = createMockRequest({ demographic: 'female' })
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true)
 
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
       //   timeRange: '24h',
       //   demographicFilter: 'female',
       // })
-    });
+    })
 
-    it("should handle multiple query parameters", async () => {
+    it('should handle multiple query parameters', async () => {
       const request = createMockRequest({
-        timeRange: "30d",
-        demographic: "hispanic",
-      });
-      const response = await GET({ request } as { request: Request });
+        timeRange: '30d',
+        demographic: 'hispanic',
+      })
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true)
 
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
       //   timeRange: '30d',
       //   demographicFilter: 'hispanic',
       // })
-    });
+    })
 
-    it("should handle bias detection engine errors", async () => {
-      const error = new Error("Database connection failed");
-      mockBiasEngine.getDashboardData.mockRejectedValue(error);
+    it('should handle bias detection engine errors', async () => {
+      const error = new Error('Database connection failed')
+      mockBiasEngine.getDashboardData.mockRejectedValue(error)
 
-      const request = createMockRequest();
+      const request = createMockRequest()
 
-      vi.stubGlobal(
-        "Response",
-        vi.fn(function (body: string, init?: ResponseInit) {
-          return {
-            status: init?.status || 500,
-            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-            headers: {
-              get: vi.fn((_key: string) => "application/json"),
-            },
-          };
-        }),
-      );
+      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
+        return {
+          status: init?.status || 500,
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
+          headers: {
+            get: vi.fn((_key: string) => "application/json"),
+          },
+        }
+      }))
 
-      const response = await GET({ request } as { request: Request });
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200); // Mock API always returns 200
+      expect(response.status).toBe(200) // Mock API always returns 200
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true); // Mock API always succeeds
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true) // Mock API always succeeds
       // expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
       // expect(responseData.message).toBe('Database connection failed')
 
@@ -397,9 +391,9 @@ describe("Bias Detection Dashboard API Endpoint", () => {
       //     error: String(error),
       //   }),
       // )
-    });
+    })
 
-    it("should handle empty dashboard data", async () => {
+    it('should handle empty dashboard data', async () => {
       const emptyDashboardData: BiasDashboardData = {
         summary: {
           totalSessions: 0,
@@ -421,115 +415,112 @@ describe("Bias Detection Dashboard API Endpoint", () => {
         },
         recentAnalyses: [],
         recommendations: [],
-      };
+      }
 
-      mockBiasEngine.getDashboardData.mockResolvedValue(emptyDashboardData);
+      mockBiasEngine.getDashboardData.mockResolvedValue(emptyDashboardData)
 
-      const request = createMockRequest();
-      const response = await GET({ request } as { request: Request });
+      const request = createMockRequest()
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
-      expect(responseData.data).toEqual(mockDashboardData); // Mock API returns standard data
-      expect(responseData.data.summary.totalSessions).toBe(150); // Mock value
-      expect(responseData.data.alerts).toHaveLength(2); // Mock has 2 alerts
-    });
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true)
+      expect(responseData.data).toEqual(mockDashboardData) // Mock API returns standard data
+      expect(responseData.data.summary.totalSessions).toBe(150) // Mock value
+      expect(responseData.data.alerts).toHaveLength(2) // Mock has 2 alerts
+    })
 
-    it("should validate time range parameter values", async () => {
-      const validTimeRanges = ["1h", "6h", "24h", "7d", "30d", "90d"];
+    it('should validate time range parameter values', async () => {
+      const validTimeRanges = ['1h', '6h', '24h', '7d', '30d', '90d']
 
       for (const timeRange of validTimeRanges) {
-        const request = createMockRequest({ timeRange });
-        const response = await GET({ request } as { request: Request });
+        const request = createMockRequest({ timeRange })
+        const response = await GET({ request } as { request: Request })
 
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(200)
         // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
         //   timeRange,
         //   demographicFilter: 'all',
         // })
       }
-    });
+    })
 
-    it("should handle invalid time range gracefully", async () => {
-      const request = createMockRequest({ timeRange: "invalid" });
-      const response = await GET({ request } as { request: Request });
+    it('should handle invalid time range gracefully', async () => {
+      const request = createMockRequest({ timeRange: 'invalid' })
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
       //   timeRange: 'invalid',
       //   demographicFilter: 'all',
       // })
-    });
+    })
 
-    it("should set appropriate response headers", async () => {
-      const request = createMockRequest();
-      const response = await GET({ request } as { request: Request });
+    it('should set appropriate response headers', async () => {
+      const request = createMockRequest()
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.headers.get("Content-Type")).toBe("application/json");
-      expect(response.headers.get("X-Processing-Time")).toBeDefined();
-    });
+      expect(response.headers.get('Content-Type')).toBe('application/json')
+      expect(response.headers.get('X-Processing-Time')).toBeDefined()
+    })
 
-    it("should handle concurrent requests properly", async () => {
+    it('should handle concurrent requests properly', async () => {
       const requests = Array.from({ length: 5 }, () =>
-        createMockRequest({ timeRange: "24h" }),
-      );
+        createMockRequest({ timeRange: '24h' }),
+      )
 
       const responses = await Promise.all(
         requests.map((request) => GET({ request } as { request: Request })),
-      );
+      )
 
       responses.forEach((response: Response) => {
-        expect(response.status).toBe(200);
-      });
+        expect(response.status).toBe(200)
+      })
 
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledTimes(5)
-    });
+    })
 
-    it("should handle network timeout scenarios", async () => {
+    it('should handle network timeout scenarios', async () => {
       mockBiasEngine.getDashboardData.mockImplementation(
         () =>
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Request timeout")), 100),
+            setTimeout(() => reject(new Error('Request timeout')), 100),
           ),
-      );
+      )
 
-      const request = createMockRequest();
+      const request = createMockRequest()
 
-      vi.stubGlobal(
-        "Response",
-        vi.fn(function (body: string, init?: ResponseInit) {
-          return {
-            status: init?.status || 500,
-            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-            headers: {
-              get: vi.fn((_key: string) => "application/json"),
-            },
-          };
-        }),
-      );
+      vi.stubGlobal("Response", vi.fn(function(body: string, init?: ResponseInit) {
+        return {
+          status: init?.status || 500,
+          json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
+          headers: {
+            get: vi.fn((_key: string) => "application/json"),
+          },
+        }
+      }))
 
-      const response = await GET({ request } as { request: Request });
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200); // Mock API always returns 200
+      expect(response.status).toBe(200) // Mock API always returns 200
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true); // Mock API always succeeds
+      const responseData = await response.json()
+      expect(responseData.success).toBe(true) // Mock API always succeeds
       // expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
       // expect(responseData.message).toBe('Request timeout')
-    });
+    })
 
-    it("should log performance metrics", async () => {
-      const request = createMockRequest();
-      const response = await GET({ request } as { request: Request });
+    it('should log performance metrics', async () => {
+      const request = createMockRequest()
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
-      const responseData = await response.json();
-      expect(typeof responseData.processingTime).toBe("number");
-      expect(responseData.processingTime).toBeGreaterThan(0);
+      const responseData = await response.json()
+      expect(typeof responseData.processingTime).toBe('number')
+      expect(responseData.processingTime).toBeGreaterThan(0)
 
       // expect(mockLogger.info).toHaveBeenCalledWith(
       //   'Dashboard data retrieved successfully',
@@ -539,30 +530,30 @@ describe("Bias Detection Dashboard API Endpoint", () => {
       //     sessionCount: mockDashboardData.summary.totalSessions,
       //   }),
       // )
-    });
+    })
 
-    it("should handle malformed URL parameters", async () => {
+    it('should handle malformed URL parameters', async () => {
       const request = {
-        url: "http://localhost:3000/api/bias-detection/dashboard?timeRange=",
+        url: 'http://localhost:3000/api/bias-detection/dashboard?timeRange=',
         headers: {
           get: vi.fn((key: string) => {
             const headers: Record<string, string> = {
-              authorization: "Bearer valid-token",
-              "content-type": "application/json",
-            };
-            return headers[key.toLowerCase()] || null;
+              'authorization': 'Bearer valid-token',
+              'content-type': 'application/json',
+            }
+            return headers[key.toLowerCase()] || null
           }),
         },
-      };
+      }
 
-      const response = await GET({ request } as { request: Request });
+      const response = await GET({ request } as { request: Request })
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(200)
 
       // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
       //   timeRange: '24h',
       //   demographicFilter: 'all',
       // })
-    });
-  });
-});
+    })
+  })
+})

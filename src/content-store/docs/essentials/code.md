@@ -1,12 +1,12 @@
 ---
-title: "Code Blocks"
-description: "Display inline code and code blocks"
-pubDate: "2025-01-01"
-author: "Pixelated Empathy Team"
+title: 'Code Blocks'
+description: 'Display inline code and code blocks'
+pubDate: '2025-01-01'
+author: 'Pixelated Empathy Team'
 draft: false
 toc: true
 share: true
-icon: "code"
+icon: 'code'
 ---
 
 ## Basic

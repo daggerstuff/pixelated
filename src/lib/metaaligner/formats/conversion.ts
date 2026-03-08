@@ -3,15 +3,15 @@
  * @description This module provides format conversion utilities.
  */
 
-import { validateData } from "./validation";
+import { validateData } from './validation'
 import {
   UnifiedProcessingRequestSchema,
   UnifiedProcessingResponseSchema,
-} from "./schemas";
+} from './schemas'
 import type {
   UnifiedProcessingRequest,
   UnifiedProcessingResponse,
-} from "../api/unified-api";
+} from '../api/unified-api'
 
 /**
  * Converts data to the UnifiedProcessingRequest format.
@@ -22,7 +22,7 @@ import type {
 export async function toUnifiedProcessingRequest(
   data: unknown,
 ): Promise<UnifiedProcessingRequest> {
-  return validateData(UnifiedProcessingRequestSchema, data);
+  return validateData(UnifiedProcessingRequestSchema, data)
 }
 
 /**
@@ -34,5 +34,5 @@ export async function toUnifiedProcessingRequest(
 export async function toUnifiedProcessingResponse(
   data: unknown,
 ): Promise<UnifiedProcessingResponse> {
-  return validateData(UnifiedProcessingResponseSchema, data);
+  return validateData(UnifiedProcessingResponseSchema, data)
 }

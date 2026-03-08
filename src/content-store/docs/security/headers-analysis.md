@@ -11,7 +11,6 @@ toc: true
 # Security Headers Analysis
 
 ## Found Headers (7/7)
-
 - [x] Strict-Transport-Security
 - [x] X-Content-Type-Options
 - [x] X-Frame-Options
@@ -21,5 +20,4 @@ toc: true
 - [x] Content-Security-Policy
 
 ## All Required Headers Found
-
 All security headers required for HIPAA compliance are properly configured.

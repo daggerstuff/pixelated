@@ -1,5 +1,5 @@
 ---
-title: "Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities"
+title: 'Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities'
 description: >-
   Exploring how combining neuroscience-informed, somatic, psychedelic, and
   technology-enhanced approaches creates more effective trauma healing pathways

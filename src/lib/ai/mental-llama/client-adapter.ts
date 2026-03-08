@@ -3,14 +3,14 @@
  * This module prevents server-side dependencies (like MongoDB) from being bundled in client-side code
  */
 
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
-} from "./types/mentalLLaMATypes";
-import type { MentalLLaMAAdapter as ServerAdapter } from "./index";
+} from './types/mentalLLaMATypes'
+import type { MentalLLaMAAdapter as ServerAdapter } from './index'
 
-const logger = createBuildSafeLogger("mental-llama-client");
+const logger = createBuildSafeLogger('mental-llama-client')
 
 /**
  * Client-side interface for MentalLLaMA functionality
@@ -21,7 +21,7 @@ export interface ClientMentalLLaMAAdapter {
     content: string,
     route: string,
     context: RoutingContext,
-  ): Promise<MentalHealthAnalysisResult>;
+  ): Promise<MentalHealthAnalysisResult>
 }
 
 /**
@@ -34,41 +34,41 @@ class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
     context: RoutingContext,
   ): Promise<MentalHealthAnalysisResult> {
     try {
-      const response = await fetch("/api/ai/mental-health/analyze", {
-        method: "POST",
+      const response = await fetch('/api/ai/mental-health/analyze', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           text: content,
           useExpertGuidance: true,
           routingContext: context,
         }),
-      });
+      })
 
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        throw new Error(`API request failed with status ${response.status}`)
       }
 
-      const result = await response.json();
-      return result as MentalHealthAnalysisResult;
+      const result = await response.json()
+      return result as MentalHealthAnalysisResult
     } catch (error) {
-      logger.error("Failed to analyze mental health via API", { error });
+      logger.error('Failed to analyze mental health via API', { error })
 
       // Return a fallback analysis result
       return {
         hasMentalHealthIssue: false,
-        mentalHealthCategory: "general",
-        explanation: "Analysis temporarily unavailable",
+        mentalHealthCategory: 'general',
+        explanation: 'Analysis temporarily unavailable',
         confidence: 0,
         supportingEvidence: [],
         isCrisis: false,
-        stressLevel: "low",
+        stressLevel: 'low',
         modelInfo: {
           directModelAvailable: false,
-          modelTier: "7B",
+          modelTier: '7B',
         },
-      };
+      }
     }
   }
 }
@@ -78,20 +78,20 @@ class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
  * This will not import any server-side dependencies
  */
 export async function createClientMentalLLaMAAdapter(): Promise<{
-  adapter: ClientMentalLLaMAAdapter;
+  adapter: ClientMentalLLaMAAdapter
 }> {
-  logger.info("Creating client-side MentalLLaMA adapter");
+  logger.info('Creating client-side MentalLLaMA adapter')
 
   return {
     adapter: new ApiMentalLLaMAAdapter(),
-  };
+  }
 }
 
 /**
  * Check if we're running on the client side
  */
 function isClientSide(): boolean {
-  return typeof window !== "undefined";
+  return typeof window !== 'undefined'
 }
 
 /**
@@ -100,22 +100,22 @@ function isClientSide(): boolean {
  * On server: dynamically imports and returns the real adapter
  */
 export async function createMentalLLaMAFromEnvSafe(): Promise<{
-  adapter: ClientMentalLLaMAAdapter | ServerAdapter;
+  adapter: ClientMentalLLaMAAdapter | ServerAdapter
 }> {
   if (isClientSide()) {
     // Client side - use API adapter
-    logger.info("Client-side detected, using API adapter");
-    return createClientMentalLLaMAAdapter();
+    logger.info('Client-side detected, using API adapter')
+    return createClientMentalLLaMAAdapter()
   } else {
     // Server side - dynamically import the real implementation
-    logger.info("Server-side detected, using real MentalLLaMA adapter");
+    logger.info('Server-side detected, using real MentalLLaMA adapter')
     try {
-      const { createMentalLLaMAFromEnv } = await import("./index.js");
-      return await createMentalLLaMAFromEnv();
+      const { createMentalLLaMAFromEnv } = await import('./index.js')
+      return await createMentalLLaMAFromEnv()
     } catch (error) {
-      logger.error("Failed to load server-side MentalLLaMA adapter", { error });
+      logger.error('Failed to load server-side MentalLLaMA adapter', { error })
       // Fallback to client adapter even on server if there's an issue
-      return createClientMentalLLaMAAdapter();
+      return createClientMentalLLaMAAdapter()
     }
   }
 }

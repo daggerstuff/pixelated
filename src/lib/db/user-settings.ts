@@ -1,52 +1,52 @@
 // Use server-only helper for MongoDB types
-import type { ObjectId } from "@/lib/server-only/mongodb-types";
+import type { ObjectId } from '@/lib/server-only/mongodb-types'
 
-let ObjectId: unknown;
+let ObjectId: unknown
 
 // MongoDB-based user settings types
 
 export interface UserSettings {
-  _id?: ObjectId;
-  user_id: string;
-  theme: string;
-  notifications_enabled: boolean;
-  email_notifications: boolean;
-  language: string;
+  _id?: ObjectId
+  user_id: string
+  theme: string
+  notifications_enabled: boolean
+  email_notifications: boolean
+  language: string
   preferences: {
-    showWelcomeScreen: boolean;
-    autoSave: boolean;
-    fontSize: string;
-    [key: string]: unknown;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
+    showWelcomeScreen: boolean
+    autoSave: boolean
+    fontSize: string
+    [key: string]: unknown
+  }
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface NewUserSettings {
-  user_id: string;
-  theme: string;
-  notifications_enabled: boolean;
-  email_notifications: boolean;
-  language: string;
+  user_id: string
+  theme: string
+  notifications_enabled: boolean
+  email_notifications: boolean
+  language: string
   preferences: {
-    showWelcomeScreen: boolean;
-    autoSave: boolean;
-    fontSize: string;
-    [key: string]: unknown;
-  };
+    showWelcomeScreen: boolean
+    autoSave: boolean
+    fontSize: string
+    [key: string]: unknown
+  }
 }
 
 export interface UpdateUserSettings {
-  theme?: string;
-  notifications_enabled?: boolean;
-  email_notifications?: boolean;
-  language?: string;
+  theme?: string
+  notifications_enabled?: boolean
+  email_notifications?: boolean
+  language?: string
   preferences?: {
-    showWelcomeScreen?: boolean;
-    autoSave?: boolean;
-    fontSize?: string;
-    [key: string]: unknown;
-  };
+    showWelcomeScreen?: boolean
+    autoSave?: boolean
+    fontSize?: string
+    [key: string]: unknown
+  }
 }
 
 /**
@@ -56,7 +56,7 @@ export async function getUserSettings(
   _userId: string,
 ): Promise<UserSettings | null> {
   // TODO: Replace with MongoDB implementation
-  return null;
+  return null
 }
 
 /**
@@ -67,7 +67,7 @@ export async function createUserSettings(
   _request?: Request,
 ): Promise<UserSettings> {
   // TODO: Replace with MongoDB implementation
-  return settings as UserSettings;
+  return settings as UserSettings
 }
 
 /**
@@ -79,7 +79,7 @@ export async function updateUserSettings(
   _request?: Request,
 ): Promise<UserSettings> {
   // TODO: Replace with MongoDB implementation
-  return { ...updates, user_id: userId } as UserSettings;
+  return { ...updates, user_id: userId } as UserSettings
 }
 
 /**
@@ -90,28 +90,28 @@ export async function getOrCreateUserSettings(
   request?: Request,
 ): Promise<UserSettings> {
   // Try to get existing settings
-  const settings = await getUserSettings(userId);
+  const settings = await getUserSettings(userId)
 
   // If settings exist, return them
   if (settings) {
-    return settings;
+    return settings
   }
 
   // Otherwise, create default settings
   const defaultSettings: NewUserSettings = {
     user_id: userId,
-    theme: "system",
+    theme: 'system',
     notifications_enabled: true,
     email_notifications: true,
-    language: "en",
+    language: 'en',
     preferences: {
       showWelcomeScreen: true,
       autoSave: true,
-      fontSize: "medium",
+      fontSize: 'medium',
     },
-  };
+  }
 
-  return createUserSettings(defaultSettings, request);
+  return createUserSettings(defaultSettings, request)
 }
 
 /**
@@ -122,7 +122,7 @@ export async function updateTheme(
   theme: string,
   request?: Request,
 ): Promise<UserSettings> {
-  return updateUserSettings(userId, { theme }, request);
+  return updateUserSettings(userId, { theme }, request)
 }
 
 /**
@@ -133,7 +133,7 @@ export async function updateLanguage(
   language: string,
   request?: Request,
 ): Promise<UserSettings> {
-  return updateUserSettings(userId, { language }, request);
+  return updateUserSettings(userId, { language }, request)
 }
 
 /**
@@ -144,11 +144,7 @@ export async function toggleNotifications(
   enabled: boolean,
   request?: Request,
 ): Promise<UserSettings> {
-  return updateUserSettings(
-    userId,
-    { notifications_enabled: enabled },
-    request,
-  );
+  return updateUserSettings(userId, { notifications_enabled: enabled }, request)
 }
 
 /**
@@ -159,5 +155,5 @@ export async function toggleEmailNotifications(
   enabled: boolean,
   request?: Request,
 ): Promise<UserSettings> {
-  return updateUserSettings(userId, { email_notifications: enabled }, request);
+  return updateUserSettings(userId, { email_notifications: enabled }, request)
 }

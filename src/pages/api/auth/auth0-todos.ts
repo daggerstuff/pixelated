@@ -3,14 +3,14 @@
  * Handles todo operations with Auth0 integration
  */
 
-import type { APIRoute } from "astro";
-import { ObjectId } from "mongodb";
-import { todoDAO } from "@/services/mongodb.dao";
-import { validateToken } from "@/lib/auth/auth0-jwt-service";
-import { extractTokenFromRequest } from "@/lib/auth/auth0-middleware";
-import { createAuditLog } from "@/lib/audit";
+import type { APIRoute } from 'astro'
+import { ObjectId } from 'mongodb'
+import { todoDAO } from '@/services/mongodb.dao'
+import { validateToken } from '@/lib/auth/auth0-jwt-service'
+import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { createAuditLog } from '@/lib/audit'
 
-export const prerender = false;
+export const prerender = false
 
 /**
  * GET /api/auth/auth0-todos - Get all todos for authenticated user
@@ -18,41 +18,41 @@ export const prerender = false;
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request);
+    const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
       return new Response(
-        JSON.stringify({ error: "Authentication required" }),
+        JSON.stringify({ error: 'Authentication required' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
 
     // Validate token
-    const validation = await validateToken(token, "access");
+    const validation = await validateToken(token, 'access')
 
     if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: "Invalid or expired token" }),
+        JSON.stringify({ error: 'Invalid or expired token' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
 
-    const todos = await todoDAO.findAll(validation.userId!);
+    const todos = await todoDAO.findAll(validation.userId!)
 
     // Create audit log
     await createAuditLog(
-      "todos_access",
-      "auth.todos.access",
+      'todos_access',
+      'auth.todos.access',
       validation.userId!,
-      "auth-todos",
-      { action: "get_todos", count: todos.length },
-    );
+      'auth-todos',
+      { action: 'get_todos', count: todos.length }
+    )
 
     return new Response(
       JSON.stringify({
@@ -61,37 +61,37 @@ export const GET: APIRoute = async ({ request }) => {
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   } catch (error: unknown) {
-    logError("GET /api/auth/auth0-todos", error);
+    logError('GET /api/auth/auth0-todos', error)
 
     // Create audit log for the error
     await createAuditLog(
-      "system_error",
-      "auth.todos.error",
-      "anonymous",
-      "auth-todos",
+      'system_error',
+      'auth.todos.error',
+      'anonymous',
+      'auth-todos',
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
-    );
+      }
+    )
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Failed to fetch todos",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to fetch todos',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
-};
+}
 
 /**
  * POST /api/auth/auth0-todos - Create a new todo
@@ -99,39 +99,39 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request);
+    const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
       return new Response(
-        JSON.stringify({ error: "Authentication required" }),
+        JSON.stringify({ error: 'Authentication required' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
 
     // Validate token
-    const validation = await validateToken(token, "access");
+    const validation = await validateToken(token, 'access')
 
     if (!validation.valid) {
       return new Response(
-        JSON.stringify({ error: "Invalid or expired token" }),
+        JSON.stringify({ error: 'Invalid or expired token' }),
         {
           status: 401,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
     }
 
-    const body = await request.json();
-    const { name, description } = body;
+    const body = await request.json()
+    const { name, description } = body
 
     if (!name) {
-      return new Response(JSON.stringify({ error: "Name is required" }), {
+      return new Response(JSON.stringify({ error: 'Name is required' }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     const todo = await todoDAO.create({
@@ -139,16 +139,16 @@ export const POST: APIRoute = async ({ request }) => {
       name,
       description,
       completed: false,
-    });
+    })
 
     // Create audit log
     await createAuditLog(
-      "todo_create",
-      "auth.todos.create",
+      'todo_create',
+      'auth.todos.create',
       validation.userId!,
-      "auth-todos",
-      { action: "create_todo", todoId: todo._id.toString() },
-    );
+      'auth-todos',
+      { action: 'create_todo', todoId: todo._id.toString() }
+    )
 
     return new Response(
       JSON.stringify({
@@ -157,37 +157,37 @@ export const POST: APIRoute = async ({ request }) => {
       }),
       {
         status: 201,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   } catch (error: unknown) {
-    logError("POST /api/auth/auth0-todos", error);
+    logError('POST /api/auth/auth0-todos', error)
 
     // Create audit log for the error
     await createAuditLog(
-      "system_error",
-      "auth.todos.error",
-      "anonymous",
-      "auth-todos",
+      'system_error',
+      'auth.todos.error',
+      'anonymous',
+      'auth-todos',
       {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-      },
-    );
+      }
+    )
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: "Failed to create todo",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to create todo',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
-};
+}
 
 // Provide minimal structured error logging to aid debugging in CI and local
 // development. For production-grade logging, route these through the
@@ -198,7 +198,7 @@ function logError(context: string, err: unknown) {
   console.error(
     `[auth0-todos.api] ${context} -`,
     err instanceof Error ? err.stack || err.message : String(err),
-  );
+  )
 }
 
 // Rate limiting should be implemented at the edge or via middleware (API gateway,

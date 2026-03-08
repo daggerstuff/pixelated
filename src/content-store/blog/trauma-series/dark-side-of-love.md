@@ -1,18 +1,20 @@
 ---
-title: "The Dark Side of Love"
-description: "Understanding Narcissism and Codependency in Relationships"
-author: "Dr. Sarah Chen"
+title: 'The Dark Side of Love'
+description: 'Understanding Narcissism and Codependency in Relationships'
+author: 'Dr. Sarah Chen'
 pubDate: 2024-02-20
 readingTime: 8
-tags: ["narcissism", "codependency", "relationships", "trauma"]
-series: "Understanding Trauma"
+tags: ['narcissism', 'codependency', 'relationships', 'trauma']
+series: 'Understanding Trauma'
 seriesOrder: 4
 image:
   {
-    url: "https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-    alt: "Two silhouettes symbolizing complex relationship dynamics",
+    url: 'https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+    alt: 'Two silhouettes symbolizing complex relationship dynamics',
   }
 ---
+
+
 
 # The Dark Side of Love: Understanding Narcissism and Codependency
 

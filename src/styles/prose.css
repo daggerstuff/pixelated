@@ -3,7 +3,7 @@
   font-size: 1rem;
   line-height: 1.75;
 }
-.prose [class~="lead"] {
+.prose [class~='lead'] {
   color: #4b5563;
   font-size: 1.25em;
   line-height: 1.6;
@@ -19,31 +19,31 @@
   color: var(--fg-deep);
   font-weight: 600;
 }
-.prose ol[type="A"] {
+.prose ol[type='A'] {
   --list-counter-style: upper-alpha;
 }
-.prose ol[type="a"] {
+.prose ol[type='a'] {
   --list-counter-style: lower-alpha;
 }
-.prose ol[type="A s"] {
+.prose ol[type='A s'] {
   --list-counter-style: upper-alpha;
 }
-.prose ol[type="a s"] {
+.prose ol[type='a s'] {
   --list-counter-style: lower-alpha;
 }
-.prose ol[type="I"] {
+.prose ol[type='I'] {
   --list-counter-style: upper-roman;
 }
-.prose ol[type="i"] {
+.prose ol[type='i'] {
   --list-counter-style: lower-roman;
 }
-.prose ol[type="I s"] {
+.prose ol[type='I s'] {
   --list-counter-style: upper-roman;
 }
-.prose ol[type="i s"] {
+.prose ol[type='i s'] {
   --list-counter-style: lower-roman;
 }
-.prose ol[type="1"] {
+.prose ol[type='1'] {
   --list-counter-style: decimal;
 }
 .prose ol > li {
@@ -51,7 +51,7 @@
   padding-left: 1.75em;
 }
 .prose ol > li::before {
-  content: counter(list-item, var(--list-counter-style, decimal)) ".";
+  content: counter(list-item, var(--list-counter-style, decimal)) '.';
   position: absolute;
   font-weight: 400;
   color: #6b7280;
@@ -62,7 +62,7 @@
   padding-left: 1.75em;
 }
 .prose ul > li::before {
-  content: "";
+  content: '';
   position: absolute;
   background-color: #d1d5db;
   border-radius: 50%;
@@ -82,7 +82,7 @@
   color: inherit;
   border-left-width: 0.25rem;
   border-color: rgba(125, 125, 125, 0.3);
-  quotes: "\201C" "\201D" "\2018" "\2019";
+  quotes: '\201C' '\201D' '\2018' '\2019';
   margin-top: 1.6em;
   margin-bottom: 1.6em;
   padding-left: 1em;

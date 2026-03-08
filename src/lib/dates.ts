@@ -2,34 +2,34 @@
  * Date utility functions for consistent date handling across the application
  */
 
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import updateLocale from "dayjs/plugin/updateLocale";
-import calendar from "dayjs/plugin/calendar";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import updateLocale from 'dayjs/plugin/updateLocale'
+import calendar from 'dayjs/plugin/calendar'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 
 // Initialize plugins
-dayjs.extend(relativeTime);
-dayjs.extend(updateLocale);
-dayjs.extend(calendar);
-dayjs.extend(utc);
-dayjs.extend(timezone);
+dayjs.extend(relativeTime)
+dayjs.extend(updateLocale)
+dayjs.extend(calendar)
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 // Default date format
-export const DEFAULT_FORMAT = "YYYY-MM-DD HH:mm:ss";
+export const DEFAULT_FORMAT = 'YYYY-MM-DD HH:mm:ss'
 
 // Friendly date format
-export const FRIENDLY_FORMAT = "MMM D, YYYY h:mm A";
+export const FRIENDLY_FORMAT = 'MMM D, YYYY h:mm A'
 
 // ISO date format
-export const ISO_FORMAT = "YYYY-MM-DDTHH:mm:ss.SSSZ";
+export const ISO_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSSZ'
 
 // Date only format
-export const DATE_ONLY_FORMAT = "YYYY-MM-DD";
+export const DATE_ONLY_FORMAT = 'YYYY-MM-DD'
 
 // Time only format
-export const TIME_ONLY_FORMAT = "HH:mm:ss";
+export const TIME_ONLY_FORMAT = 'HH:mm:ss'
 
 /**
  * Format a date with the given format
@@ -42,9 +42,9 @@ export function formatDate(
   format: string = DEFAULT_FORMAT,
 ): string {
   if (!date) {
-    return "";
+    return ''
   }
-  return dayjs(date).format(format);
+  return dayjs(date).format(format)
 }
 
 /**
@@ -56,9 +56,9 @@ export function formatFriendlyDate(
   date: Date | string | number | undefined,
 ): string {
   if (!date) {
-    return "";
+    return ''
   }
-  return dayjs(date).format(FRIENDLY_FORMAT);
+  return dayjs(date).format(FRIENDLY_FORMAT)
 }
 
 /**
@@ -68,9 +68,9 @@ export function formatFriendlyDate(
  */
 export function fromNow(date: Date | string | number | undefined): string {
   if (!date) {
-    return "";
+    return ''
   }
-  return dayjs(date).fromNow();
+  return dayjs(date).fromNow()
 }
 
 /**
@@ -82,9 +82,9 @@ export function formatCalendar(
   date: Date | string | number | undefined,
 ): string {
   if (!date) {
-    return "";
+    return ''
   }
-  return dayjs(date).calendar();
+  return dayjs(date).calendar()
 }
 
 /**
@@ -94,9 +94,9 @@ export function formatCalendar(
  */
 export function isPast(date: Date | string | number | undefined): boolean {
   if (!date) {
-    return false;
+    return false
   }
-  return dayjs(date).isBefore(dayjs());
+  return dayjs(date).isBefore(dayjs())
 }
 
 /**
@@ -106,9 +106,9 @@ export function isPast(date: Date | string | number | undefined): boolean {
  */
 export function isFuture(date: Date | string | number | undefined): boolean {
   if (!date) {
-    return false;
+    return false
   }
-  return dayjs(date).isAfter(dayjs());
+  return dayjs(date).isAfter(dayjs())
 }
 
 /**
@@ -118,9 +118,9 @@ export function isFuture(date: Date | string | number | undefined): boolean {
  */
 export function toUTC(date: Date | string | number | undefined): string {
   if (!date) {
-    return "";
+    return ''
   }
-  return dayjs(date).utc().format(ISO_FORMAT);
+  return dayjs(date).utc().format(ISO_FORMAT)
 }
 
 /**
@@ -130,9 +130,9 @@ export function toUTC(date: Date | string | number | undefined): string {
  */
 export function fromUTC(date: Date | string | number | undefined): Date {
   if (!date) {
-    return new Date();
+    return new Date()
   }
-  return dayjs.utc(date).local().toDate();
+  return dayjs.utc(date).local().toDate()
 }
 
 /**
@@ -146,9 +146,9 @@ export function timeElapsed(
   end: Date | string | number = new Date(),
 ): number {
   if (!date) {
-    return 0;
+    return 0
   }
-  return dayjs(end).diff(dayjs(date));
+  return dayjs(end).diff(dayjs(date))
 }
 
 /**
@@ -157,19 +157,19 @@ export function timeElapsed(
  * @returns Formatted elapsed time (e.g., "2h 30m")
  */
 export function formatElapsedTime(ms: number): string {
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+  const seconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
 
   if (days > 0) {
-    return `${days}d ${hours % 24}h`;
+    return `${days}d ${hours % 24}h`
   } else if (hours > 0) {
-    return `${hours}h ${minutes % 60}m`;
+    return `${hours}h ${minutes % 60}m`
   } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
+    return `${minutes}m ${seconds % 60}s`
   } else {
-    return `${seconds}s`;
+    return `${seconds}s`
   }
 }
 
@@ -182,32 +182,32 @@ export function formatTimestamp(
   timestamp: Date | string | number | undefined,
 ): string {
   if (!timestamp) {
-    return "";
+    return ''
   }
 
   // Convert to Date object
-  const date = new Date(timestamp);
+  const date = new Date(timestamp)
 
   // Get current date for comparison
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
 
   // Check if the date is today or yesterday
   if (date >= today) {
-    return `Today at ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+    return `Today at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
   } else if (date >= yesterday) {
-    return `Yesterday at ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+    return `Yesterday at ${date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
   } else {
     // Format as month day, year
     return date.toLocaleDateString([], {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-    });
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    })
   }
 }
 
@@ -223,4 +223,4 @@ export default {
   timeElapsed,
   formatElapsedTime,
   formatTimestamp,
-};
+}

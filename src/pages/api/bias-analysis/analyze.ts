@@ -1,90 +1,88 @@
-import type { APIRoute } from "astro";
-import { securityMiddleware } from "@/middleware/security";
-import { Pool } from "pg";
-import { randomUUID } from "crypto";
+import type { APIRoute } from 'astro'
+import { securityMiddleware } from '@/middleware/security'
+import { Pool } from 'pg'
+import { randomUUID } from 'crypto'
 
 // Database connection
 const pool = new Pool({
-  host: process.env["DATABASE_HOST"] || "localhost",
-  port: parseInt(process.env["DATABASE_PORT"] || "5432"),
-  database: process.env["DATABASE_NAME"] || "pixelated",
-  user: process.env["DATABASE_USER"] || "pixelated_user",
-  password: process.env["DATABASE_PASSWORD"] || "pixelated_pass",
+  host: process.env['DATABASE_HOST'] || 'localhost',
+  port: parseInt(process.env['DATABASE_PORT'] || '5432'),
+  database: process.env['DATABASE_NAME'] || 'pixelated',
+  user: process.env['DATABASE_USER'] || 'pixelated_user',
+  password: process.env['DATABASE_PASSWORD'] || 'pixelated_pass',
   max: 20,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
-});
+})
 
 // Simple bias detection algorithm (placeholder for real ML model)
 function simpleBiasDetection(text: string): {
-  overallBiasScore: number;
-  alertLevel: "low" | "medium" | "high" | "critical";
-  confidence: number;
-  layerResults: any;
-  recommendations: string[];
+  overallBiasScore: number
+  alertLevel: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  layerResults: any
+  recommendations: string[]
 } {
   // Simple keyword-based analysis (placeholder)
   const biasKeywords = {
-    high: ["racist", "sexist", "homophobic", "transphobic", "discriminatory"],
-    medium: ["biased", "unfair", "prejudiced", "stereotypical", "offensive"],
-    low: ["concerning", "questionable", "inappropriate", "problematic"],
-  };
+    high: ['racist', 'sexist', 'homophobic', 'transphobic', 'discriminatory'],
+    medium: ['biased', 'unfair', 'prejudiced', 'stereotypical', 'offensive'],
+    low: ['concerning', 'questionable', 'inappropriate', 'problematic'],
+  }
 
-  const textLower = text.toLowerCase();
-  let biasScore = 0;
-  let foundKeywords: string[] = [];
+  const textLower = text.toLowerCase()
+  let biasScore = 0
+  let foundKeywords: string[] = []
 
   // Check for high-bias keywords
   biasKeywords.high.forEach((keyword) => {
     if (textLower.includes(keyword)) {
-      biasScore += 0.8;
-      foundKeywords.push(keyword);
+      biasScore += 0.8
+      foundKeywords.push(keyword)
     }
-  });
+  })
 
   // Check for medium-bias keywords
   biasKeywords.medium.forEach((keyword) => {
     if (textLower.includes(keyword)) {
-      biasScore += 0.4;
-      foundKeywords.push(keyword);
+      biasScore += 0.4
+      foundKeywords.push(keyword)
     }
-  });
+  })
 
   // Check for low-bias keywords
   biasKeywords.low.forEach((keyword) => {
     if (textLower.includes(keyword)) {
-      biasScore += 0.2;
-      foundKeywords.push(keyword);
+      biasScore += 0.2
+      foundKeywords.push(keyword)
     }
-  });
+  })
 
   // Normalize score
-  biasScore = Math.min(biasScore, 1.0);
+  biasScore = Math.min(biasScore, 1.0)
 
   // Determine alert level
-  let alertLevel: "low" | "medium" | "high" | "critical";
+  let alertLevel: 'low' | 'medium' | 'high' | 'critical'
   if (biasScore >= 0.8) {
-    alertLevel = "critical";
+    alertLevel = 'critical'
   } else if (biasScore >= 0.6) {
-    alertLevel = "high";
+    alertLevel = 'high'
   } else if (biasScore >= 0.3) {
-    alertLevel = "medium";
+    alertLevel = 'medium'
   } else {
-    alertLevel = "low";
+    alertLevel = 'low'
   }
 
   // Generate recommendations
-  const recommendations: string[] = [];
+  const recommendations: string[] = []
   if (biasScore > 0.5) {
     recommendations.push(
-      "Consider reviewing language patterns for potential bias",
-    );
-    recommendations.push("Consult with a cultural competency expert");
+      'Consider reviewing language patterns for potential bias',
+    )
+    recommendations.push('Consult with a cultural competency expert')
   } else if (biasScore > 0.2) {
-    recommendations.push("Monitor communication patterns in future sessions");
-    recommendations.push(
-      "Consider additional training in cultural sensitivity",
-    );
+    recommendations.push('Monitor communication patterns in future sessions')
+    recommendations.push('Consider additional training in cultural sensitivity')
   }
 
   return {
@@ -94,110 +92,110 @@ function simpleBiasDetection(text: string): {
     layerResults: {
       keyword_analysis: {
         bias_score: biasScore,
-        layer: "keyword_analysis",
+        layer: 'keyword_analysis',
         confidence: 0.8,
         keywords_found: foundKeywords,
       },
       sentiment_analysis: {
         bias_score: Math.random() * 0.3,
-        layer: "sentiment_analysis",
+        layer: 'sentiment_analysis',
         confidence: 0.6,
       },
       contextual_analysis: {
         bias_score: Math.random() * 0.4,
-        layer: "contextual_analysis",
+        layer: 'contextual_analysis',
         confidence: 0.5,
       },
     },
     recommendations,
-  };
+  }
 }
 
 // Add: production flag, safe headers, and error scrubbing helpers
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production'
 const SAFE_HEADERS = {
-  "Content-Type": "application/json",
-  "X-Content-Type-Options": "nosniff",
-  "X-Frame-Options": "DENY",
-  "X-XSS-Protection": "1; mode=block",
-};
+  'Content-Type': 'application/json',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+}
 
 function safeErrorForLogging(err: unknown) {
   return {
     message: err instanceof Error ? err.message : String(err),
     stack: err instanceof Error ? err.stack : undefined,
-  };
+  }
 }
 
 // Basic scrubber: remove stack/trace-like fields from objects sent to clients
 function scrubForClient(input: unknown): unknown {
   if (input instanceof Error) {
-    return { error: input.message };
+    return { error: input.message }
   }
-  if (input === null || typeof input !== "object") return input;
+  if (input === null || typeof input !== 'object') return input
   try {
     // JSON round-trip with replacer to drop stack/trace-like keys
     return JSON.parse(
       JSON.stringify(input, (_key, value) => {
         if (
-          typeof _key === "string" &&
-          (_key.toLowerCase().includes("stack") ||
-            _key.toLowerCase().includes("trace") ||
-            _key.toLowerCase().includes("password") ||
-            _key.toLowerCase().includes("secret") ||
-            _key.toLowerCase().includes("token"))
+          typeof _key === 'string' &&
+          (_key.toLowerCase().includes('stack') ||
+            _key.toLowerCase().includes('trace') ||
+            _key.toLowerCase().includes('password') ||
+            _key.toLowerCase().includes('secret') ||
+            _key.toLowerCase().includes('token'))
         ) {
-          return undefined;
+          return undefined
         }
-        return value;
+        return value
       }),
-    );
+    )
   } catch {
-    return { error: "An error occurred" };
+    return { error: 'An error occurred' }
   }
 }
 
 export const POST: APIRoute = async ({ request }) => {
   // Generate unique UUIDs first
-  const analysisId = randomUUID();
-  const sessionId = randomUUID();
+  const analysisId = randomUUID()
+  const sessionId = randomUUID()
   // New: per-request id for safe correlation
-  const requestId = randomUUID();
+  const requestId = randomUUID()
   // Use null for therapist and client IDs since no users exist yet
-  const therapistId = null;
-  const clientId = null;
+  const therapistId = null
+  const clientId = null
 
   try {
     // Apply security middleware
-    const securityResult = await securityMiddleware(request, {});
+    const securityResult = await securityMiddleware(request, {})
     if (securityResult) {
-      return securityResult;
+      return securityResult
     }
 
     // Parse request body
-    const body = await request.json();
-    const { text, context, demographics, sessionType, therapistNotes } = body;
+    const body = await request.json()
+    const { text, context, demographics, sessionType, therapistNotes } = body
 
     // Validate required fields
-    if (!text || typeof text !== "string" || text.trim().length < 50) {
+    if (!text || typeof text !== 'string' || text.trim().length < 50) {
       return new Response(
         JSON.stringify({
-          error: "Text is required and must be at least 50 characters",
+          error: 'Text is required and must be at least 50 characters',
         }),
         {
           status: 400,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     }
 
     // Perform bias analysis
-    const analysisResult = simpleBiasDetection(text);
+    const analysisResult = simpleBiasDetection(text)
 
     // Store in database
-    const client = await pool.connect();
+    const client = await pool.connect()
     try {
-      await client.query("BEGIN");
+      await client.query('BEGIN')
 
       // Insert session
       await client.query(
@@ -209,13 +207,13 @@ export const POST: APIRoute = async ({ request }) => {
           sessionId,
           therapistId,
           clientId,
-          sessionType || "individual",
-          JSON.stringify({ description: context || "" }),
+          sessionType || 'individual',
+          JSON.stringify({ description: context || '' }),
           new Date(),
-          "completed",
-          therapistNotes || "",
+          'completed',
+          therapistNotes || '',
         ],
-      );
+      )
 
       // Insert bias analysis
       await client.query(
@@ -238,9 +236,9 @@ export const POST: APIRoute = async ({ request }) => {
           Math.floor(Math.random() * 1000) + 500, // 500-1500ms processing time
           new Date(),
         ],
-      );
+      )
 
-      await client.query("COMMIT");
+      await client.query('COMMIT')
 
       // Return successful response
       return new Response(
@@ -251,39 +249,39 @@ export const POST: APIRoute = async ({ request }) => {
             sessionId,
             ...analysisResult,
             demographics: demographics || {},
-            sessionType: sessionType || "individual",
+            sessionType: sessionType || 'individual',
             processingTimeMs: Math.floor(Math.random() * 1000) + 500,
             createdAt: new Date().toISOString(),
           },
         }),
         {
           status: 200,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     } catch (dbError) {
-      await client.query("ROLLBACK");
-      throw dbError;
+      await client.query('ROLLBACK')
+      throw dbError
     } finally {
-      client.release();
+      client.release()
     }
   } catch (error) {
     // Log safe error server-side (includes stack for internal debugging)
     console.error(
       `Bias analysis POST error - requestId=${requestId}`,
       safeErrorForLogging(error),
-    );
+    )
 
     const clientMessage = isProduction
-      ? "An internal error occurred. Provide the requestId to support for details."
+      ? 'An internal error occurred. Provide the requestId to support for details.'
       : error instanceof Error
         ? error.message
-        : String(error);
+        : String(error)
 
     return new Response(
       JSON.stringify(
         scrubForClient({
-          error: "Internal server error",
+          error: 'Internal server error',
           message: clientMessage,
           requestId,
         }),
@@ -292,63 +290,63 @@ export const POST: APIRoute = async ({ request }) => {
         status: 500,
         headers: SAFE_HEADERS,
       },
-    );
+    )
   }
-};
+}
 
 export const GET: APIRoute = async ({ request }) => {
   // New: per-request id for safe correlation
-  const requestId = randomUUID();
+  const requestId = randomUUID()
 
   try {
     // Apply security middleware
-    const securityResult = await securityMiddleware(request, {});
+    const securityResult = await securityMiddleware(request, {})
     if (securityResult) {
-      return securityResult;
+      return securityResult
     }
 
     // Test database connection
-    const client = await pool.connect();
+    const client = await pool.connect()
     try {
       const result = await client.query(
-        "SELECT COUNT(*) as analysis_count FROM bias_analyses",
-      );
-      const analysisCount = result.rows[0].analysis_count;
+        'SELECT COUNT(*) as analysis_count FROM bias_analyses',
+      )
+      const analysisCount = result.rows[0].analysis_count
 
       return new Response(
         JSON.stringify({
           success: true,
-          message: "Bias analysis API is operational",
+          message: 'Bias analysis API is operational',
           stats: {
             totalAnalyses: parseInt(analysisCount),
-            databaseStatus: "connected",
+            databaseStatus: 'connected',
           },
         }),
         {
           status: 200,
-          headers: { "Content-Type": "application/json" },
+          headers: { 'Content-Type': 'application/json' },
         },
-      );
+      )
     } finally {
-      client.release();
+      client.release()
     }
   } catch (error) {
     // Log safe error server-side (includes stack for internal debugging)
     console.error(
       `API status check error - requestId=${requestId}`,
       safeErrorForLogging(error),
-    );
+    )
 
     const clientMessage = isProduction
-      ? "An internal error occurred. Provide the requestId to support for details."
+      ? 'An internal error occurred. Provide the requestId to support for details.'
       : error instanceof Error
         ? error.message
-        : String(error);
+        : String(error)
 
     return new Response(
       JSON.stringify(
         scrubForClient({
-          error: "Service unavailable",
+          error: 'Service unavailable',
           message: clientMessage,
           requestId,
         }),
@@ -357,6 +355,6 @@ export const GET: APIRoute = async ({ request }) => {
         status: 503,
         headers: SAFE_HEADERS,
       },
-    );
+    )
   }
-};
+}

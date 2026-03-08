@@ -3,15 +3,13 @@ title: "Professional Prompt Builder - Vitest"
 key: professional-prompt-builder-vitest
 ---
 
-````markdown
+```markdown
 # Professional Prompt Builder for Copilot (Vitest Edition)
 
 ## Purpose
-
 This prompt guides you in creating high-quality, structured prompts for Copilot, specifically tailored for Vitest testing scenarios in JavaScript/TypeScript projects.
 
 ## Instructions
-
 - Clearly state the testing goal and context.
 - Specify Vitest as the required test framework.
 - Use TypeScript syntax and idioms.
@@ -22,38 +20,30 @@ This prompt guides you in creating high-quality, structured prompts for Copilot,
 - Request output in markdown format for easy review.
 
 ## Output Format
-
 - Structured markdown with sections for feedback, suggestions, and code examples.
 - Highlight best practices and areas for improvement.
 
 ## Example
-
-````markdown
+```markdown
 ## Feedback
-
 - Test covers main logic but misses edge cases for null/undefined input.
 - Error handling assertions could be more explicit.
 
 ## Suggestions
-
 - Add tests for invalid input scenarios.
 - Use `beforeEach` for setup to avoid code duplication.
 
 ## Example Code
-
 ```typescript
-import { describe, it, expect } from "vitest";
-import { myFunction } from "../src/myModule";
+import { describe, it, expect } from 'vitest';
+import { myFunction } from '../src/myModule';
 
-describe("myFunction", () => {
-  it("should handle null input", () => {
-    expect(() => myFunction(null)).toThrow("Invalid input");
+describe('myFunction', () => {
+  it('should handle null input', () => {
+    expect(() => myFunction(null)).toThrow('Invalid input');
   });
 });
 ```
-````
-````
-
 ```
 
-```
+````

@@ -1,9 +1,9 @@
 ---
-title: "AI Development Guide"
-description: "AI Development Guide documentation"
+title: 'AI Development Guide'
+description: 'AI Development Guide documentation'
 pubDate: 2024-01-15
-author: "Pixelated Team"
-tags: ["documentation"]
+author: 'Pixelated Team'
+tags: ['documentation']
 draft: false
 toc: true
 ---
@@ -104,14 +104,14 @@ interface AIService {
   createChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AICompletion>;
+  ): Promise<AICompletion>
 
   createStreamingChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AIStreamingCompletion>;
+  ): Promise<AIStreamingCompletion>
 
-  getModelInfo(model: string): ModelInfo;
+  getModelInfo(model: string): ModelInfo
 }
 ```
 
@@ -124,16 +124,16 @@ interface AIProvider {
   createChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AICompletion>;
+  ): Promise<AICompletion>
 
   createStreamingChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
-  ): Promise<AIStreamingCompletion>;
+  ): Promise<AIStreamingCompletion>
 
-  getModelInfo(model: string): ModelInfo;
+  getModelInfo(model: string): ModelInfo
 
-  getSupportedModels(): string[];
+  getSupportedModels(): string[]
 }
 ```
 
@@ -143,8 +143,8 @@ The `AIMessage` interface defines the structure of messages in a conversation:
 
 ```typescript
 interface AIMessage {
-  role: "system" | "user" | "assistant";
-  content: string;
+  role: 'system' | 'user' | 'assistant'
+  content: string
 }
 ```
 
@@ -154,13 +154,13 @@ The `AICompletion` interface defines the structure of AI completions:
 
 ```typescript
 interface AICompletion {
-  content: string;
-  model: string;
+  content: string
+  model: string
   usage?: {
-    prompt_tokens: number;
-    completion_tokens: number;
-    total_tokens: number;
-  };
+    prompt_tokens: number
+    completion_tokens: number
+    total_tokens: number
+  }
 }
 ```
 
@@ -170,12 +170,12 @@ The `AIError` class provides standardized error handling:
 
 ```typescript
 class AIError extends Error {
-  code: AIErrorCode;
-  statusCode: number;
-  context?: Record<string, any>;
-  cause?: Error;
+  code: AIErrorCode
+  statusCode: number
+  context?: Record<string, any>
+  cause?: Error
 
-  constructor(message: string, options: AIErrorOptions);
+  constructor(message: string, options: AIErrorOptions)
 }
 ```
 
@@ -186,11 +186,12 @@ class AIError extends Error {
 Use the `createAIService` factory function to create an AI service:
 
 ```typescript
+
 const aiService = createAIService({
-  provider: "openai", // or 'anthropic'
+  provider: 'openai', // or 'anthropic'
   enableErrorHandling: true,
   enablePerformanceOptimization: true,
-});
+})
 ```
 
 ### Creating a Chat Completion
@@ -200,13 +201,13 @@ Use the `createChatCompletion` method to generate a completion:
 ```typescript
 const completion = await aiService.createChatCompletion(
   [
-    { role: "system", content: "You are a helpful assistant." },
-    { role: "user", content: "Hello, how are you?" },
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: 'Hello, how are you?' },
   ],
-  { model: "gpt-4o" },
-);
+  { model: 'gpt-4o' },
+)
 
-console.log(completion.content);
+console.log(completion.content)
 ```
 
 ### Creating a Streaming Chat Completion
@@ -216,14 +217,14 @@ Use the `createStreamingChatCompletion` method to generate a streaming completio
 ```typescript
 const { stream } = await aiService.createStreamingChatCompletion(
   [
-    { role: "system", content: "You are a helpful assistant." },
-    { role: "user", content: "Hello, how are you?" },
+    { role: 'system', content: 'You are a helpful assistant.' },
+    { role: 'user', content: 'Hello, how are you?' },
   ],
-  { model: "gpt-4o" },
-);
+  { model: 'gpt-4o' },
+)
 
 for await (const chunk of stream) {
-  process.stdout.write(chunk.content);
+  process.stdout.write(chunk.content)
 }
 ```
 
@@ -234,12 +235,13 @@ for await (const chunk of stream) {
 Use the `SentimentAnalysisService` to analyze the sentiment of text:
 
 ```typescript
-const aiService = createAIService();
-const sentimentService = new SentimentAnalysisService({ aiService });
+
+const aiService = createAIService()
+const sentimentService = new SentimentAnalysisService({ aiService })
 
 const result = await sentimentService.analyzeSentiment(
-  "I am feeling great today!",
-);
+  'I am feeling great today!',
+)
 // { sentiment: 'positive', score: 0.85, explanation: '...', model: '...', processingTime: 123 }
 ```
 
@@ -248,12 +250,13 @@ const result = await sentimentService.analyzeSentiment(
 Use the `CrisisDetectionService` to detect potential crisis situations:
 
 ```typescript
-const aiService = createAIService();
-const crisisService = new CrisisDetectionService({ aiService });
+
+const aiService = createAIService()
+const crisisService = new CrisisDetectionService({ aiService })
 
 const result = await crisisService.detectCrisis(
-  "I am feeling really down lately.",
-);
+  'I am feeling really down lately.',
+)
 // { is_crisis: true, risk_level: 'low', crisis_type: 'depression', confidence: 0.65, ... }
 ```
 
@@ -262,12 +265,13 @@ const result = await crisisService.detectCrisis(
 Use the `ResponseGenerationService` to generate therapeutic responses:
 
 ```typescript
-const aiService = createAIService();
-const responseService = new ResponseGenerationService({ aiService });
+
+const aiService = createAIService()
+const responseService = new ResponseGenerationService({ aiService })
 
 const result = await responseService.generateResponse([
-  { role: "user", content: "Hello, how are you?" },
-]);
+  { role: 'user', content: 'Hello, how are you?' },
+])
 // { response: 'I am doing well, thank you!', model: '...', processingTime: 123 }
 ```
 
@@ -276,14 +280,15 @@ const result = await responseService.generateResponse([
 Use the `InterventionAnalysisService` to analyze the effectiveness of interventions:
 
 ```typescript
-const aiService = createAIService();
-const interventionService = new InterventionAnalysisService({ aiService });
+
+const aiService = createAIService()
+const interventionService = new InterventionAnalysisService({ aiService })
 
 const result = await interventionService.analyzeIntervention(
   conversation,
   interventionMessage,
   userResponse,
-);
+)
 // { effectiveness_score: 8, user_receptiveness: 'high', emotional_impact: 'positive', ... }
 ```
 
@@ -294,18 +299,19 @@ const result = await interventionService.analyzeIntervention(
 Use try-catch blocks to handle AI errors:
 
 ```typescript
-const aiService = createAIService();
+
+const aiService = createAIService()
 
 try {
   const completion = await aiService.createChatCompletion(
-    [{ role: "user", content: "Hello, how are you?" }],
-    { model: "invalid-model" },
-  );
+    [{ role: 'user', content: 'Hello, how are you?' }],
+    { model: 'invalid-model' },
+  )
 } catch (error) {
   if (error instanceof AIError && error.code === AIErrorCodes.INVALID_MODEL) {
-    console.error("Invalid model specified");
+    console.error('Invalid model specified')
   } else {
-    console.error("An unexpected error occurred:", error);
+    console.error('An unexpected error occurred:', error)
   }
 }
 ```
@@ -315,11 +321,12 @@ try {
 Use the error handling utilities for more advanced error handling:
 
 ```typescript
+
 try {
   // Call AI service
 } catch (error) {
-  const aiError = handleAIServiceError(error, { model: "gpt-4o" });
-  console.error(`AI Error: ${aiError.message} (${aiError.code})`);
+  const aiError = handleAIServiceError(error, { model: 'gpt-4o' })
+  console.error(`AI Error: ${aiError.message} (${aiError.code})`)
 }
 ```
 
@@ -348,12 +355,13 @@ Use the API error handling utility in API routes:
 Use the optimized AI service wrapper for better performance:
 
 ```typescript
+
 const optimizedService = createOptimizedAIService(aiService, {
   logToConsole: true,
   createAuditLogs: true,
   slowRequestThreshold: 3000,
   highTokenUsageThreshold: 1000,
-});
+})
 ```
 
 ### Token Usage Optimization
@@ -361,10 +369,11 @@ const optimizedService = createOptimizedAIService(aiService, {
 Use the token optimization utilities to manage token usage:
 
 ```typescript
-const tokenCount = estimateMessagesTokenCount(messages);
-console.log(`Estimated token count: ${tokenCount}`);
 
-const truncatedMessages = truncateMessages(messages, 4000, 1000);
+const tokenCount = estimateMessagesTokenCount(messages)
+console.log(`Estimated token count: ${tokenCount}`)
+
+const truncatedMessages = truncateMessages(messages, 4000, 1000)
 ```
 
 ### Retry with Exponential Backoff
@@ -372,11 +381,12 @@ const truncatedMessages = truncateMessages(messages, 4000, 1000);
 Use the retry utility for handling transient errors:
 
 ```typescript
+
 const completion = await withRetry(
   () =>
     aiService.createChatCompletion(
-      [{ role: "user", content: "Hello, how are you?" }],
-      { model: "gpt-4o" },
+      [{ role: 'user', content: 'Hello, how are you?' }],
+      { model: 'gpt-4o' },
     ),
   {
     maxRetries: 3,
@@ -384,7 +394,7 @@ const completion = await withRetry(
     maxDelay: 10000,
     factor: 2,
   },
-);
+)
 ```
 
 ## API Routes
@@ -475,33 +485,33 @@ Use Vitest for unit testing AI components:
 ```typescript
 // src/lib/ai/services/sentiment.test.ts
 
-test("analyzeSentiment returns correct sentiment analysis", async () => {
+test('analyzeSentiment returns correct sentiment analysis', async () => {
   // Mock AI service
   const mockAIService = {
     createChatCompletion: vi.fn().mockResolvedValue({
       content: JSON.stringify({
-        sentiment: "positive",
+        sentiment: 'positive',
         score: 0.85,
-        explanation: "The text expresses positive emotions.",
+        explanation: 'The text expresses positive emotions.',
       }),
-      model: "gpt-4o",
+      model: 'gpt-4o',
     }),
-  };
+  }
 
   const sentimentService = new SentimentAnalysisService({
     aiService: mockAIService,
-  });
+  })
 
   const result = await sentimentService.analyzeSentiment(
-    "I am feeling great today!",
-  );
+    'I am feeling great today!',
+  )
 
-  expect(result.sentiment).toBe("positive");
-  expect(result.score).toBe(0.85);
-  expect(result.explanation).toBe("The text expresses positive emotions.");
-  expect(result.model).toBe("gpt-4o");
-  expect(result.processingTime).toBeGreaterThan(0);
-});
+  expect(result.sentiment).toBe('positive')
+  expect(result.score).toBe(0.85)
+  expect(result.explanation).toBe('The text expresses positive emotions.')
+  expect(result.model).toBe('gpt-4o')
+  expect(result.processingTime).toBeGreaterThan(0)
+})
 ```
 
 ### Integration Testing
@@ -511,26 +521,26 @@ Use Vitest for integration testing AI components:
 ```typescript
 // src/lib/ai/integration.test.ts
 
-test("SentimentAnalysisService integrates with AIService", async () => {
+test('SentimentAnalysisService integrates with AIService', async () => {
   // Skip test if no API key is available
   if (!process.env.OPENAI_API_KEY) {
-    console.log("Skipping test: No OpenAI API key available");
-    return;
+    console.log('Skipping test: No OpenAI API key available')
+    return
   }
 
-  const aiService = createAIService({ provider: "openai" });
-  const sentimentService = new SentimentAnalysisService({ aiService });
+  const aiService = createAIService({ provider: 'openai' })
+  const sentimentService = new SentimentAnalysisService({ aiService })
 
   const result = await sentimentService.analyzeSentiment(
-    "I am feeling great today!",
-  );
+    'I am feeling great today!',
+  )
 
-  expect(result.sentiment).toBe("positive");
-  expect(result.score).toBeGreaterThan(0.5);
-  expect(result.explanation).toBeTruthy();
-  expect(result.model).toBeTruthy();
-  expect(result.processingTime).toBeGreaterThan(0);
-});
+  expect(result.sentiment).toBe('positive')
+  expect(result.score).toBeGreaterThan(0.5)
+  expect(result.explanation).toBeTruthy()
+  expect(result.model).toBeTruthy()
+  expect(result.processingTime).toBeGreaterThan(0)
+})
 ```
 
 ### Mocking AI Providers
@@ -728,13 +738,11 @@ To add a new specialized service:
 2. Export the new service in `src/lib/ai/services/index.ts`:
 
 ```typescript
-
 ```
 
 3. Update the main exports in `src/lib/ai/index.ts`:
 
 ```typescript
-
 ```
 
 ## Troubleshooting
@@ -785,11 +793,11 @@ Enable detailed logging for debugging:
 
 ```typescript
 const aiService = createAIService({
-  provider: "openai",
+  provider: 'openai',
   enableErrorHandling: true,
   enablePerformanceOptimization: true,
-  logLevel: "debug",
-});
+  logLevel: 'debug',
+})
 ```
 
 #### Request Tracing
@@ -797,12 +805,13 @@ const aiService = createAIService({
 Implement request tracing for complex issues:
 
 ```typescript
-const aiService = createAIService();
+
+const aiService = createAIService()
 const tracedService = withTracing(aiService, {
   logRequests: true,
   logResponses: true,
   logErrors: true,
-});
+})
 ```
 
 #### Error Context
@@ -813,16 +822,16 @@ Add context to errors for better debugging:
 try {
   // AI service call
 } catch (error) {
-  throw new AIError("Failed to process request", {
+  throw new AIError('Failed to process request', {
     code: AIErrorCodes.INTERNAL_ERROR,
     statusCode: 500,
     context: {
-      operation: "sentiment-analysis",
+      operation: 'sentiment-analysis',
       input: text,
       timestamp: new Date().toISOString(),
     },
     cause: error,
-  });
+  })
 }
 ```
 

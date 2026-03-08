@@ -1,12 +1,12 @@
 ---
-title: "WebSocket Implementation"
-description: "Guide to implementing and using WebSocket connections"
+title: 'WebSocket Implementation'
+description: 'Guide to implementing and using WebSocket connections'
 pubDate: 2025-03-24
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ["websocket", "real-time", "communication"]
-author: "Pixelated Team"
+tags: ['websocket', 'real-time', 'communication']
+author: 'Pixelated Team'
 ---
 
 ## WebSocket System
@@ -118,13 +118,13 @@ Features:
 
 ```typescript
 const { isConnected, sendMessage, error } = useWebSocket({
-  url: "wss://your-server/ws",
-  sessionId: "therapy-session-id",
+  url: 'wss://your-server/ws',
+  sessionId: 'therapy-session-id',
   onMessage: (message) => {
     // Handle incoming messages
   },
   encrypted: true,
-});
+})
 ```
 
 ## Security Considerations
@@ -147,7 +147,7 @@ const { isConnected, sendMessage, error } = useWebSocket({
 ## Testing
 
 ```typescript
-describe("TherapyChatWebSocketServer", () => {
+describe('TherapyChatWebSocketServer', () => {
   // Test connection handling
   // Test message processing
   // Test error scenarios
@@ -155,7 +155,7 @@ describe("TherapyChatWebSocketServer", () => {
 ```
 
 ```typescript
-describe("useWebSocket", () => {
+describe('useWebSocket', () => {
   // Test connection lifecycle
   // Test message handling
   // Test reconnection logic

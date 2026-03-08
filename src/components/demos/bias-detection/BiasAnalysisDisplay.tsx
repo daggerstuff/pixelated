@@ -1,14 +1,14 @@
 // Real-time bias analysis display with comprehensive metrics visualization
 
-import type { FC } from "react";
+import type { FC } from 'react'
 import type {
   BiasAnalysisResults,
   SessionData,
-} from "../../../lib/types/bias-detection";
+} from '../../../lib/types/bias-detection'
 
 interface BiasAnalysisDisplayProps {
-  results: BiasAnalysisResults;
-  sessionData: SessionData | null;
+  results: BiasAnalysisResults
+  sessionData: SessionData | null
 }
 
 export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
@@ -18,35 +18,35 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
   // Helper function to get alert level styling
   const getAlertLevelStyle = (level: string) => {
     switch (level) {
-      case "critical":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "high":
-        return "bg-orange-100 text-orange-800 border-orange-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 border-green-200";
+      case 'critical':
+        return 'bg-red-100 text-red-800 border-red-200'
+      case 'high':
+        return 'bg-orange-100 text-orange-800 border-orange-200'
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+      case 'low':
+        return 'bg-green-100 text-green-800 border-green-200'
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200'
     }
-  };
+  }
 
   // Helper function to format bias score as percentage
-  const formatScore = (score: number) => `${(score * 100).toFixed(1)}%`;
+  const formatScore = (score: number) => `${(score * 100).toFixed(1)}%`
 
   // Helper function to get score color
   const getScoreColor = (score: number) => {
     if (score >= 0.8) {
-      return "text-red-600";
+      return 'text-red-600'
     }
     if (score >= 0.6) {
-      return "text-orange-600";
+      return 'text-orange-600'
     }
     if (score >= 0.4) {
-      return "text-yellow-600";
+      return 'text-yellow-600'
     }
-    return "text-green-600";
-  };
+    return 'text-green-600'
+  }
 
   return (
     <div className="bias-analysis-display space-y-6">
@@ -77,12 +77,12 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
               <div
                 className={`h-3 rounded-full transition-all duration-500 ${
                   results.overallBiasScore >= 0.8
-                    ? "bg-red-500"
+                    ? 'bg-red-500'
                     : results.overallBiasScore >= 0.6
-                      ? "bg-orange-500"
+                      ? 'bg-orange-500'
                       : results.overallBiasScore >= 0.4
-                        ? "bg-yellow-500"
-                        : "bg-green-500"
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
                 }`}
                 style={{ width: `${results.overallBiasScore * 100}%` }}
               />
@@ -100,13 +100,13 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
           >
             <div
               className={`w-3 h-3 rounded-full mr-2 ${
-                results.alertLevel === "critical"
-                  ? "bg-red-500"
-                  : results.alertLevel === "high"
-                    ? "bg-orange-500"
-                    : results.alertLevel === "medium"
-                      ? "bg-yellow-500"
-                      : "bg-green-500"
+                results.alertLevel === 'critical'
+                  ? 'bg-red-500'
+                  : results.alertLevel === 'high'
+                    ? 'bg-orange-500'
+                    : results.alertLevel === 'medium'
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
               }`}
             />
             {results.alertLevel.toUpperCase()}
@@ -200,9 +200,9 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
               {results.layerResults.preprocessing.representationAnalysis
                 .underrepresentedGroups.length > 0 && (
                 <div className="mt-2 text-sm text-blue-800">
-                  Underrepresented:{" "}
+                  Underrepresented:{' '}
                   {results.layerResults.preprocessing.representationAnalysis.underrepresentedGroups.join(
-                    ", ",
+                    ', ',
                   )}
                 </div>
               )}
@@ -268,14 +268,14 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                   className={`text-xl font-bold ${
                     results.layerResults.interactive.counterfactualAnalysis
                       .biasDetected
-                      ? "text-red-600"
-                      : "text-green-600"
+                      ? 'text-red-600'
+                      : 'text-green-600'
                   }`}
                 >
                   {results.layerResults.interactive.counterfactualAnalysis
                     .biasDetected
-                    ? "YES"
-                    : "NO"}
+                    ? 'YES'
+                    : 'NO'}
                 </div>
                 <div className="text-sm text-gray-600">Bias Detected</div>
               </div>
@@ -396,7 +396,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default BiasAnalysisDisplay;
+export default BiasAnalysisDisplay

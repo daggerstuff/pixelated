@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import EmotionProgressDashboard from "../../components/analytics/EmotionProgressDashboard";
-import useEmotionProgress from "../../hooks/useEmotionProgress";
+import React, { useState } from 'react'
+import EmotionProgressDashboard from '../../components/analytics/EmotionProgressDashboard'
+import useEmotionProgress from '../../hooks/useEmotionProgress'
 
 const EmotionProgressDemo: FC = () => {
   const [timeRange, setTimeRange] = useState<
-    "week" | "month" | "quarter" | "year"
-  >("month");
+    'week' | 'month' | 'quarter' | 'year'
+  >('month')
 
-  const { data, isLoading, error } = useEmotionProgress({ timeRange });
+  const { data, isLoading, error } = useEmotionProgress({ timeRange })
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -94,7 +94,7 @@ const EmotionProgressDemo: FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default EmotionProgressDemo;
+export default EmotionProgressDemo

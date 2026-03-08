@@ -52,8 +52,8 @@ const userData = {
 For client-side API access in framework components (React, Vue, etc.), use the API client libraries:
 
 ```tsx
-import { useState, useEffect } from "react";
-import { api } from "../../lib/api/client";
+import { useState, useEffect } from 'react';
+import { api } from '../../lib/api/client';
 
 export default function UserProfileClient({ userData }) {
   const [loading, setLoading] = useState(false);
@@ -66,7 +66,7 @@ export default function UserProfileClient({ userData }) {
         const data = await api.getUserMetrics(userData.id);
         setMetrics(data);
       } catch (error) {
-        console.error("Error fetching metrics:", error);
+        console.error('Error fetching metrics:', error);
       } finally {
         setLoading(false);
       }
@@ -175,7 +175,6 @@ try {
 ### Performance Optimization
 
 1. **Cache frequently accessed data with `fetch()` caching**
-
    ```astro
    ---
    // Uses built-in caching
@@ -193,7 +192,6 @@ try {
 ## Advanced Integration
 
 For more advanced integration patterns, refer to:
-
 - [API Client Library Documentation](../clients/javascript.md)
 - [Authentication Integration](../auth/integration.md)
 - [Real-time Data Updates](../streaming/websockets.md)

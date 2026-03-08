@@ -1,12 +1,12 @@
 ---
-title: "Redis Testing Guide"
-description: "Guide for testing Redis functionality"
+title: 'Redis Testing Guide'
+description: 'Guide for testing Redis functionality'
 pubDate: 2025-03-25
 share: true
 toc: true
 lastModDate: 2025-03-25
-tags: ["redis", "testing", "vitest"]
-author: "Pixelated Team"
+tags: ['redis', 'testing', 'vitest']
+author: 'Pixelated Team'
 ---
 
 ## Redis Service Testing Guide
@@ -28,9 +28,9 @@ non-functional requirements.
 
 {' '}
 
-Tests interaction between Redis service and other system components. - Cache
-service integration - Session management - Analytics integration - Pattern
-recognition
+  Tests interaction between Redis service and other system components. - Cache
+  service integration - Session management - Analytics integration - Pattern
+  recognition
 
     Tests system behavior under various load conditions.
     - Connection pool management
@@ -44,7 +44,6 @@ recognition
    ```bash
    # Install dependencies
    pnpm install --no-frozen-lockfile
-   ```
 
 # Start Redis server
 
@@ -79,6 +78,7 @@ pnpm test:redis:watch
    # Open coverage report
    open coverage/lcov-report/index.html
    ```
+
 
 ## Test Configuration
 
@@ -189,10 +189,10 @@ name: Redis Service Tests
 on:
   push:
     paths:
-      - "src/lib/services/redis/**"
+      - 'src/lib/services/redis/**'
   pull_request:
     paths:
-      - "src/lib/services/redis/**"
+      - 'src/lib/services/redis/**'
 
 jobs:
   test:
@@ -209,8 +209,8 @@ jobs:
       - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v6
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -219,7 +219,7 @@ jobs:
         run: pnpm test:redis:all
         env:
           REDIS_URL: redis://localhost:6379
-          REDIS_KEY_PREFIX: "test:"
+          REDIS_KEY_PREFIX: 'test:'
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

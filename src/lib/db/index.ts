@@ -3,65 +3,65 @@
  * Supports PostgreSQL with connection pooling and migration management
  */
 
-import { Pool, PoolClient, QueryResult } from "pg";
-import { createHash } from "crypto";
+import { Pool, PoolClient, QueryResult } from 'pg'
+import { createHash } from 'crypto'
 
 // Database configuration
 export interface DatabaseConfig {
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
-  max: number;
-  idleTimeoutMillis: number;
-  connectionTimeoutMillis: number;
-  ssl?: boolean | object;
+  host: string
+  port: number
+  database: string
+  user: string
+  password: string
+  max: number
+  idleTimeoutMillis: number
+  connectionTimeoutMillis: number
+  ssl?: boolean | object
 }
 
 // Default configuration
 const DEFAULT_CONFIG: DatabaseConfig = {
-  host: process.env["DB_HOST"] || "localhost",
-  port: parseInt(process.env["DB_PORT"] || "5432"),
-  database: process.env["DB_NAME"] || "pixelated",
-  user: process.env["DB_USER"] || "postgres",
-  password: process.env["DB_PASSWORD"] || "",
-  max: parseInt(process.env["DB_MAX_CONNECTIONS"] || "20"),
-  idleTimeoutMillis: parseInt(process.env["DB_IDLE_TIMEOUT"] || "30000"),
+  host: process.env['DB_HOST'] || 'localhost',
+  port: parseInt(process.env['DB_PORT'] || '5432'),
+  database: process.env['DB_NAME'] || 'pixelated',
+  user: process.env['DB_USER'] || 'postgres',
+  password: process.env['DB_PASSWORD'] || '',
+  max: parseInt(process.env['DB_MAX_CONNECTIONS'] || '20'),
+  idleTimeoutMillis: parseInt(process.env['DB_IDLE_TIMEOUT'] || '30000'),
   connectionTimeoutMillis: parseInt(
-    process.env["DB_CONNECTION_TIMEOUT"] || "2000",
+    process.env['DB_CONNECTION_TIMEOUT'] || '2000',
   ),
-  ssl: process.env["NODE_ENV"] === "production",
-};
+  ssl: process.env['NODE_ENV'] === 'production',
+}
 
 // Connection pool
-let pool: Pool | null = null;
+let pool: Pool | null = null
 
 /**
  * Initialize database connection pool
  */
 export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   if (pool) {
-    return pool;
+    return pool
   }
 
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
-  pool = new Pool(finalConfig);
+  const finalConfig = { ...DEFAULT_CONFIG, ...config }
+  pool = new Pool(finalConfig)
 
   // Handle pool errors
-  pool.on("error", (err: Error) => {
-    console.error("Unexpected error on idle client", err);
-    process.exit(-1);
-  });
+  pool.on('error', (err: Error) => {
+    console.error('Unexpected error on idle client', err)
+    process.exit(-1)
+  })
 
-  pool.on("connect", (_client: PoolClient) => {
-    console.log("New client connected to database");
-  });
+  pool.on('connect', (_client: PoolClient) => {
+    console.log('New client connected to database')
+  })
 
   console.log(
     `Database pool initialized with ${finalConfig.max} max connections`,
-  );
-  return pool;
+  )
+  return pool
 }
 
 /**
@@ -70,10 +70,10 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
 export function getPool(): Pool {
   if (!pool) {
     throw new Error(
-      "Database not initialized. Call initializeDatabase() first.",
-    );
+      'Database not initialized. Call initializeDatabase() first.',
+    )
   }
-  return pool;
+  return pool
 }
 
 /**
@@ -83,11 +83,11 @@ export async function query<T = unknown>(
   text: string,
   params?: unknown[],
 ): Promise<QueryResult<T>> {
-  const client = await getPool().connect();
+  const client = await getPool().connect()
   try {
     return await client.query(text, params);
   } finally {
-    client.release();
+    client.release()
   }
 }
 
@@ -97,17 +97,17 @@ export async function query<T = unknown>(
 export async function transaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  const client = await getPool().connect();
+  const client = await getPool().connect()
   try {
-    await client.query("BEGIN");
-    const result = await callback(client);
-    await client.query("COMMIT");
-    return result;
+    await client.query('BEGIN')
+    const result = await callback(client)
+    await client.query('COMMIT')
+    return result
   } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
+    await client.query('ROLLBACK')
+    throw error
   } finally {
-    client.release();
+    client.release()
   }
 }
 
@@ -115,39 +115,39 @@ export async function transaction<T>(
  * Health check for database connection
  */
 export async function healthCheck(): Promise<{
-  status: "healthy" | "unhealthy";
-  latency: number;
+  status: 'healthy' | 'unhealthy'
+  latency: number
   connections: {
-    total: number;
-    idle: number;
-    waiting: number;
-  };
+    total: number
+    idle: number
+    waiting: number
+  }
 }> {
-  const startTime = Date.now();
+  const startTime = Date.now()
   try {
-    await query("SELECT 1");
-    const latency = Date.now() - startTime;
+    await query('SELECT 1')
+    const latency = Date.now() - startTime
 
-    const poolState = getPool();
+    const poolState = getPool()
     return {
-      status: "healthy",
+      status: 'healthy',
       latency,
       connections: {
         total: poolState.totalCount,
         idle: poolState.idleCount,
         waiting: poolState.waitingCount,
       },
-    };
+    }
   } catch {
     return {
-      status: "unhealthy",
+      status: 'unhealthy',
       latency: Date.now() - startTime,
       connections: {
         total: 0,
         idle: 0,
         waiting: 0,
       },
-    };
+    }
   }
 }
 
@@ -156,24 +156,16 @@ export async function healthCheck(): Promise<{
  */
 export async function closeDatabase(): Promise<void> {
   if (pool) {
-    await pool.end();
-    pool = null;
-    console.log("Database connection pool closed");
+    await pool.end()
+    pool = null
+    console.log('Database connection pool closed')
   }
 }
 
 /**
  * Create content hash for caching bias analysis results
  */
-export function createContentHash(
-  content: string,
-  demographics: {
-    age?: unknown;
-    gender?: unknown;
-    ethnicity?: unknown;
-    primaryLanguage?: unknown;
-  },
-): string {
+export function createContentHash(content: string, demographics: { age?: unknown; gender?: unknown; ethnicity?: unknown; primaryLanguage?: unknown }): string {
   const hashInput = JSON.stringify({
     content: content.trim().toLowerCase(),
     demographics: {
@@ -182,21 +174,21 @@ export function createContentHash(
       ethnicity: demographics.ethnicity,
       primaryLanguage: demographics.primaryLanguage,
     },
-  });
-  return createHash("sha256").update(hashInput).digest("hex");
+  })
+  return createHash('sha256').update(hashInput).digest('hex')
 }
 
 /**
  * Database migration utilities
  */
 export class DatabaseMigration {
-  private migrations: Map<string, string> = new Map();
+  private migrations: Map<string, string> = new Map()
 
   /**
    * Register a migration
    */
   register(name: string, sql: string): void {
-    this.migrations.set(name, sql);
+    this.migrations.set(name, sql)
   }
 
   /**
@@ -204,13 +196,13 @@ export class DatabaseMigration {
    */
   async runMigrations(): Promise<void> {
     for (const [name, sql] of this.migrations) {
-      console.log(`Running migration: ${name}`);
+      console.log(`Running migration: ${name}`)
       try {
-        await query(sql);
-        console.log(`✅ Migration ${name} completed`);
+        await query(sql)
+        console.log(`✅ Migration ${name} completed`)
       } catch (error) {
-        console.error(`❌ Migration ${name} failed:`, error);
-        throw error;
+        console.error(`❌ Migration ${name} failed:`, error)
+        throw error
       }
     }
   }
@@ -225,7 +217,7 @@ export class DatabaseMigration {
         name VARCHAR(255) UNIQUE NOT NULL,
         executed_at TIMESTAMP DEFAULT NOW()
       )
-    `);
+    `)
   }
 
   /**
@@ -233,21 +225,21 @@ export class DatabaseMigration {
    */
   async getExecutedMigrations(): Promise<string[]> {
     const result = await query(
-      "SELECT name FROM schema_migrations ORDER BY executed_at",
-    );
-    return result.rows.map((row) => row.name);
+      'SELECT name FROM schema_migrations ORDER BY executed_at',
+    )
+    return result.rows.map((row) => row.name)
   }
 
   /**
    * Mark migration as executed
    */
   async markMigrationExecuted(name: string): Promise<void> {
-    await query("INSERT INTO schema_migrations (name) VALUES ($1)", [name]);
+    await query('INSERT INTO schema_migrations (name) VALUES ($1)', [name])
   }
 }
 
 // Global migration instance
-export const migrations = new DatabaseMigration();
+export const migrations = new DatabaseMigration()
 
 /**
  * User management utilities
@@ -257,13 +249,13 @@ export class UserManager {
    * Create a new user
    */
   async createUser(userData: {
-    email: string;
-    passwordHash: string;
-    firstName: string;
-    lastName: string;
-    role?: string;
-    institution?: string;
-    licenseNumber?: string;
+    email: string
+    passwordHash: string
+    firstName: string
+    lastName: string
+    role?: string
+    institution?: string
+    licenseNumber?: string
   }): Promise<string> {
     const result = await query(
       `
@@ -279,13 +271,13 @@ export class UserManager {
         userData.passwordHash,
         userData.firstName,
         userData.lastName,
-        userData.role || "therapist",
+        userData.role || 'therapist',
         userData.institution,
         userData.licenseNumber,
       ],
-    );
+    )
 
-    return result.rows[0].id;
+    return result.rows[0].id
   }
 
   /**
@@ -300,9 +292,9 @@ export class UserManager {
       WHERE u.id = $1 AND u.is_active = true
     `,
       [id],
-    );
+    )
 
-    return result.rows[0] || null;
+    return result.rows[0] || null
   }
 
   /**
@@ -317,9 +309,9 @@ export class UserManager {
       WHERE u.email = $1 AND u.is_active = true
     `,
       [email],
-    );
+    )
 
-    return result.rows[0] || null;
+    return result.rows[0] || null
   }
 
   /**
@@ -328,12 +320,12 @@ export class UserManager {
   async updateUserProfile(
     userId: string,
     profileData: {
-      bio?: string;
-      specializations?: string[];
-      years_experience?: number;
-      certifications?: string[];
-      languages?: string[];
-      timezone?: string;
+      bio?: string
+      specializations?: string[]
+      years_experience?: number
+      certifications?: string[]
+      languages?: string[]
+      timezone?: string
     },
   ): Promise<void> {
     await query(
@@ -359,10 +351,10 @@ export class UserManager {
         profileData.specializations,
         profileData.yearsExperience,
         profileData.certifications,
-        profileData.languages || ["en"],
-        profileData.timezone || "UTC",
+        profileData.languages || ['en'],
+        profileData.timezone || 'UTC',
       ],
-    );
+    )
   }
 }
 
@@ -374,10 +366,10 @@ export class SessionManager {
    * Create a new therapy session
    */
   async createSession(sessionData: {
-    therapistId: string;
-    clientId?: string;
-    sessionType?: string;
-    context?: Record<string, unknown>;
+    therapistId: string
+    clientId?: string
+    sessionType?: string
+    context?: Record<string, unknown>
   }): Promise<string> {
     const result = await query(
       `
@@ -390,12 +382,12 @@ export class SessionManager {
       [
         sessionData.therapistId,
         sessionData.clientId,
-        sessionData.sessionType || "individual",
+        sessionData.sessionType || 'individual',
         JSON.stringify(sessionData.context || {}),
       ],
-    );
+    )
 
-    return result.rows[0].id;
+    return result.rows[0].id
   }
 
   /**
@@ -409,7 +401,7 @@ export class SessionManager {
       WHERE id = $1
     `,
       [sessionId, summary],
-    );
+    )
   }
 
   /**
@@ -424,9 +416,9 @@ export class SessionManager {
       WHERE s.id = $1
     `,
       [sessionId],
-    );
+    )
 
-    return result.rows[0] || null;
+    return result.rows[0] || null
   }
 
   /**
@@ -446,9 +438,9 @@ export class SessionManager {
       LIMIT $2
     `,
       [therapistId, limit],
-    );
+    )
 
-    return result.rows;
+    return result.rows
   }
 }
 
@@ -460,16 +452,16 @@ export class BiasAnalysisManager {
    * Save bias analysis result
    */
   async saveAnalysis(analysisData: {
-    sessionId: string;
-    therapistId: string;
-    overallBiasScore: number;
-    alertLevel: string;
-    confidence: number;
-    layerResults: Record<string, unknown>;
-    detectedBiases: string[];
-    demographics: Record<string, unknown>;
-    contentHash: string;
-    processingTimeMs: number;
+    sessionId: string
+    therapistId: string
+    overallBiasScore: number
+    alertLevel: string
+    confidence: number
+    layerResults: Record<string, unknown>
+    detectedBiases: string[]
+    demographics: Record<string, unknown>
+    contentHash: string
+    processingTimeMs: number
   }): Promise<string> {
     const result = await query(
       `
@@ -493,9 +485,9 @@ export class BiasAnalysisManager {
         analysisData.contentHash,
         analysisData.processingTimeMs,
       ],
-    );
+    )
 
-    return result.rows[0].id;
+    return result.rows[0].id
   }
 
   /**
@@ -510,9 +502,9 @@ export class BiasAnalysisManager {
       LIMIT 1
     `,
       [contentHash],
-    );
+    )
 
-    return result.rows[0] || null;
+    return result.rows[0] || null
   }
 
   /**
@@ -532,9 +524,9 @@ export class BiasAnalysisManager {
       LIMIT $2
     `,
       [therapistId, limit],
-    );
+    )
 
-    return result.rows;
+    return result.rows
   }
 
   /**
@@ -554,7 +546,7 @@ export class BiasAnalysisManager {
         AND created_at >= NOW() - INTERVAL '${days} days'
     `,
       [therapistId],
-    );
+    )
 
     return (
       result.rows[0] || {
@@ -564,24 +556,24 @@ export class BiasAnalysisManager {
         low_alerts: 0,
         last_analysis: null,
       }
-    );
+    )
   }
 }
 
 // Export utility instances
-export const userManager = new UserManager();
-export const sessionManager = new SessionManager();
-export const biasAnalysisManager = new BiasAnalysisManager();
+export const userManager = new UserManager()
+export const sessionManager = new SessionManager()
+export const biasAnalysisManager = new BiasAnalysisManager()
 
 // Graceful shutdown
-process.on("SIGINT", async () => {
-  console.log("Received SIGINT, closing database connections...");
-  await closeDatabase();
-  process.exit(0);
-});
+process.on('SIGINT', async () => {
+  console.log('Received SIGINT, closing database connections...')
+  await closeDatabase()
+  process.exit(0)
+})
 
-process.on("SIGTERM", async () => {
-  console.log("Received SIGTERM, closing database connections...");
-  await closeDatabase();
-  process.exit(0);
-});
+process.on('SIGTERM', async () => {
+  console.log('Received SIGTERM, closing database connections...')
+  await closeDatabase()
+  process.exit(0)
+})

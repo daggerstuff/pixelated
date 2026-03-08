@@ -23,54 +23,43 @@ This document explains the type system for protected API routes in our Astro app
 The type definitions are located in `src/lib/auth/apiRouteTypes.ts`:
 
 ```typescript
-import type { APIContext, APIRoute } from "astro";
-import type { AuthRole } from "../../config/auth.config";
-import type { AuthUser } from "./types";
+import type { APIContext, APIRoute } from 'astro'
+import type { AuthRole } from '../../config/auth.config'
+import type { AuthUser } from './types'
 
 // Extended APIContext with auth user information
 export interface AuthAPIContext<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<
-    string,
-    string | undefined
-  >,
+  Params extends Record<string, string | undefined> = Record<string, string | undefined>
 > extends APIContext<Props, Params> {
   locals: {
-    user: AuthUser;
-    [key: string]: unknown;
-  };
+    user: AuthUser
+    [key: string]: unknown
+  }
 }
 
 // Protected API route handler function type
 export type ProtectedAPIRoute<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<
-    string,
-    string | undefined
-  >,
-> = (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>;
+  Params extends Record<string, string | undefined> = Record<string, string | undefined>
+> = (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
 
 // Options for protecting an API route
 export interface ProtectRouteOptions {
-  requiredRole?: AuthRole;
-  validateIPMatch?: boolean;
-  validateUserAgent?: boolean;
+  requiredRole?: AuthRole
+  validateIPMatch?: boolean
+  validateUserAgent?: boolean
 }
 
 // Higher-order function to apply protection to an API route
 export type ProtectRouteFunction = <
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<
-    string,
-    string | undefined
-  >,
+  Params extends Record<string, string | undefined> = Record<string, string | undefined>
 >(
-  options: ProtectRouteOptions,
+  options: ProtectRouteOptions
 ) => (
-  handler: (
-    context: AuthAPIContext<Props, Params>,
-  ) => Response | Promise<Response>,
-) => APIRoute;
+  handler: (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
+) => APIRoute
 ```
 
 ### 2. The `protectRoute` Function
@@ -80,31 +69,26 @@ The `protectRoute` function in `src/lib/auth/serverAuth.ts` is a higher-order fu
 ```typescript
 export function protectRoute<
   Props extends Record<string, any> = Record<string, any>,
-  Params extends Record<string, string | undefined> = Record<
-    string,
-    string | undefined
-  >,
+  Params extends Record<string, string | undefined> = Record<string, string | undefined>
 >(
-  options: ProtectRouteOptions,
+  options: ProtectRouteOptions
 ): (
-  handler: (
-    context: AuthAPIContext<Props, Params>,
-  ) => Response | Promise<Response>,
+  handler: (context: AuthAPIContext<Props, Params>) => Response | Promise<Response>
 ) => APIRoute {
   return (handler) => {
     const apiRouteHandler: APIRoute = async (context) => {
       // Authentication and authorization checks...
 
       // If authenticated, create auth context with user
-      context.locals.user = user;
-      const authContext = context as unknown as AuthAPIContext<Props, Params>;
+      context.locals.user = user
+      const authContext = context as unknown as AuthAPIContext<Props, Params>
 
       // Call the handler with the auth context
-      return handler(authContext);
-    };
+      return handler(authContext)
+    }
 
-    return apiRouteHandler;
-  };
+    return apiRouteHandler
+  }
 }
 ```
 
@@ -156,34 +140,34 @@ The `protectRoute` function provides several security features:
 Here's a complete example of a protected API route:
 
 ```typescript
-import { protectRoute } from "../../../lib/auth/serverAuth";
-import { getLogger } from "../../../lib/logging";
+import { protectRoute } from '../../../lib/auth/serverAuth'
+import { getLogger } from '../../../lib/logging'
 
-const logger = getLogger("my-api");
+const logger = getLogger('my-api')
 
 export const GET = protectRoute({
-  requiredRole: "user",
+  requiredRole: 'user',
   validateIPMatch: true,
 })(async ({ locals, request }) => {
   try {
-    const user = locals.user;
-    logger.info(`User ${user.id} accessed protected resource`);
+    const user = locals.user
+    logger.info(`User ${user.id} accessed protected resource`)
 
     // Your API logic here
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: "Protected resource accessed successfully",
+        message: 'Protected resource accessed successfully'
       }),
-      { status: 200, headers: { "Content-Type": "application/json" } },
-    );
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    )
   } catch (error) {
-    logger.error("Error in protected route:", error);
+    logger.error('Error in protected route:', error)
     return new Response(
-      JSON.stringify({ error: "An unexpected error occurred" }),
-      { status: 500, headers: { "Content-Type": "application/json" } },
-    );
+      JSON.stringify({ error: 'An unexpected error occurred' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
   }
-});
+})
 ```
