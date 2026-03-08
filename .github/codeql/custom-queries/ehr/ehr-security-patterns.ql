@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -14,7 +14,10 @@ import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
 import DataFlow::PathGraph
 
-class EHRCredentialSource extends DataFlow::Node {
+/**
+ * A source node representing EHR credentials.
+ */
+class EHRCredentialSource extends DataFlow::SourceNode {
   EHRCredentialSource() {
     exists(DataFlow::PropRead read |
       read = this and
@@ -28,10 +31,13 @@ class EHRCredentialSource extends DataFlow::Node {
   }
 }
 
-class EHREndpoint extends DataFlow::Node {
+/**
+ * A source node representing an EHR endpoint URL.
+ */
+class EHREndpoint extends DataFlow::SourceNode {
   EHREndpoint() {
     exists(string url |
-      url = this.getStringValue() and
+      url = this.asExpr().(StringLiteral).getValue() and
       (
         url.matches("%/fhir/%") or
         url.matches("%/ehr/%") or
@@ -65,9 +71,6 @@ module InsecureEHRConfig implements DataFlow::ConfigSig {
   }
 }
 
-/**
- * Taint tracking for insecure EHR credential usage.
- */
 module InsecureEHRFlow = TaintTracking::Global<InsecureEHRConfig>;
 
 /**
@@ -86,22 +89,22 @@ module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
+      // Use SourceNode.flowsTo() as recommended by repository memory
+      exists(EHREndpoint endpoint |
+        endpoint.flowsTo(call.getAnArgument())
+      )
     )
   }
 }
 
-/**
- * Taint tracking for unsafe EHR endpoint access.
- */
 module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
 
 from DataFlow::PathNode source, DataFlow::PathNode sink, string msg
 where
   (
-    InsecureEHRFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to $@."
+    InsecureEHRFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to log/URL."
   ) or (
-    UnsafeEHRAccessFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to $@."
+    UnsafeEHRAccessFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to unsafe EHR access."
   )
 select sink.getNode(), source, sink, msg,
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
