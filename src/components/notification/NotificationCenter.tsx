@@ -7,6 +7,12 @@ import { useWebSocket } from '@/hooks/useWebSocket'
 import { NotificationStatus } from '@/lib/services/notification/NotificationService'
 import { cn } from '@/lib/utils'
 import { Bell, Check, X } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface NotificationCenterProps {
   className?: string
@@ -86,88 +92,126 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
   }
 
   return (
-    <div className={cn('relative', className)}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <Bell className="h-5 w-5" />
-        {unreadCount > 0 && (
-          <Badge
-            variant="destructive"
-            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-          >
-            {unreadCount}
-          </Badge>
-        )}
-      </Button>
-
-      {isOpen && (
-        <Card className="absolute right-0 top-12 z-50 w-96 shadow-lg">
-          <div className="flex items-center justify-between border-b p-4">
-            <h2 className="text-lg font-semibold">Notifications</h2>
+    <TooltipProvider>
+      <div className={cn('relative', className)}>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsOpen(false)}
+              className="relative"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle notifications"
+              aria-expanded={isOpen}
+              aria-haspopup="true"
             >
-              <X className="h-4 w-4" />
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+                >
+                  {unreadCount}
+                </Badge>
+              )}
             </Button>
-          </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Notifications</p>
+          </TooltipContent>
+        </Tooltip>
 
-          <div className="h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
-                No notifications
-              </div>
-            ) : (
-              <div className="divide-y">
-                {notifications.map((notification: NotificationItem) => (
-                  <div
-                    key={notification.id}
-                    className={cn(
-                      'flex items-start gap-4 p-4 transition-colors',
-                      notification.status === NotificationStatus.PENDING &&
-                        'bg-muted/50',
-                    )}
+        {isOpen && (
+          <Card className="absolute right-0 top-12 z-50 w-96 shadow-lg">
+            <div className="flex items-center justify-between border-b p-4">
+              <h2 className="text-lg font-semibold">Notifications</h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsOpen(false)}
+                    aria-label="Close notifications"
                   >
-                    <div className="flex-1">
-                      <h3 className="font-medium">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {notification.body}
-                      </p>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        {new Date(notification.createdAt).toLocaleString()}
+                    <X className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Close</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+
+            <div className="h-96 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
+                  No notifications
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {notifications.map((notification: NotificationItem) => (
+                    <div
+                      key={notification.id}
+                      className={cn(
+                        'flex items-start gap-4 p-4 transition-colors',
+                        notification.status === NotificationStatus.PENDING &&
+                          'bg-muted/50',
+                      )}
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-medium">{notification.title}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {notification.body}
+                        </p>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {new Date(notification.createdAt).toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-1">
+                        {notification.status === NotificationStatus.PENDING && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() =>
+                                  handleMarkAsRead(notification.id)
+                                }
+                                aria-label="Mark as read"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Mark as read</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDismiss(notification.id)}
+                              aria-label="Dismiss notification"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Dismiss</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </div>
-
-                    <div className="flex gap-1">
-                      {notification.status === NotificationStatus.PENDING && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleMarkAsRead(notification.id)}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDismiss(notification.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </Card>
-      )}
-    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
