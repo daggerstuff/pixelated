@@ -88,11 +88,7 @@ module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
         call.getCalleeName().matches("%fetch%") or
         call.getCalleeName().matches("%axios%")
       ) and
-      sink = call.getAnArgument() and
-      exists(EHREndpoint endpoint |
-        // Use a simple reachability check for the endpoint URL
-        endpoint.getALocalSource() = call.getAnArgument().getALocalSource()
-      )
+      sink = call.getAnArgument()
     )
   }
 }
@@ -102,6 +98,12 @@ module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
 from DataFlow::PathNode source, DataFlow::PathNode sink
 where
   InsecureEHRFlow::hasFlowPath(source, sink) or
-  UnsafeEHRAccessFlow::hasFlowPath(source, sink)
+  (
+    UnsafeEHRAccessFlow::hasFlowPath(source, sink) and
+    exists(EHREndpoint endpoint |
+      // Basic reachability check to ensure the sink is indeed an EHR endpoint
+      TaintTracking::localTaint(endpoint, sink.getNode())
+    )
+  )
 select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
