@@ -13,39 +13,47 @@
 
 import javascript
 
-predicate isDataTransmissionCall(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%http%") or
-      name.matches("%fetch%") or
-      name.matches("%axios%") or
-      name.matches("%request%")
+module UnencryptedEHRDataConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    exists(string name |
+      name = source.asExpr().toString().toLowerCase() and
+      (
+        name.matches("%patient%") or
+        name.matches("%health%") or
+        name.matches("%record%") or
+        name.matches("%ehr%") or
+        name.matches("%fhir%") or
+        name.matches("%clinical%")
+      )
     )
-  )
+  }
+
+  predicate isSink(DataFlow::Node sink) {
+    exists(CallExpr call |
+      exists(string name |
+        name = call.getCalleeName() and
+        (
+          name.matches("%http%") or
+          name.matches("%fetch%") or
+          name.matches("%axios%") or
+          name.matches("%request%")
+        )
+      ) and
+      sink.asExpr() = call.getAnArgument()
+    )
+  }
+
+  predicate isBarrier(DataFlow::Node node) {
+    exists(CallExpr encryptCall |
+      encryptCall.getCalleeName().matches("%encrypt%") and
+      node.asExpr() = encryptCall.getAnArgument()
+    )
+  }
 }
 
-predicate isEHRData(DataFlow::Node node) {
-  exists(string name |
-    name = node.asExpr().toString().toLowerCase() and
-    (
-      name.matches("%patient%") or
-      name.matches("%health%") or
-      name.matches("%record%") or
-      name.matches("%ehr%") or
-      name.matches("%fhir%") or
-      name.matches("%clinical%")
-    )
-  )
-}
+module UnencryptedEHRDataFlow = TaintTracking::Global<UnencryptedEHRDataConfig>;
 
-from CallExpr call, DataFlow::Node data
-where
-  isDataTransmissionCall(call) and
-  isEHRData(data) and
-  not exists(CallExpr encryptCall |
-    encryptCall.getCalleeName().matches("%encrypt%") and
-    DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument()))
-  )
-select call,
-  "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
+from DataFlow::Node source, DataFlow::Node sink
+where UnencryptedEHRDataFlow::flow(source, sink)
+select sink, "Potential unencrypted EHR data transmission from $@. HIPAA compliance requires encryption.",
+  source, "source of EHR data"
