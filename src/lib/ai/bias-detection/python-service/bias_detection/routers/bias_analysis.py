@@ -5,10 +5,9 @@ Bias analysis API endpoints.
 import time
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-
 from bias_detection.deps import get_analysis_orchestrator, get_database_service
 from bias_detection.models import BiasAnalysisRequest, BiasAnalysisResponse
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
 router = APIRouter(prefix="/api/bias-analysis", tags=["bias-analysis"])
 

@@ -8,15 +8,13 @@ Reference: https://docs.sentry.io/platforms/python/metrics/
 Requires sentry-sdk >= 2.44.0
 """
 
-import os
 import logging
-from typing import Optional
-from functools import wraps
-from datetime import datetime, timezone
+import os
 import time
+from functools import wraps
 
 import sentry_sdk
-from sentry_sdk.types import Metric, Hint
+from sentry_sdk.types import Hint, Metric
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +33,7 @@ SENTRY_ENABLE_METRICS = (
 )
 
 
-def before_send_metric(metric: Metric, hint: Hint) -> Optional[Metric]:
+def before_send_metric(metric: Metric, hint: Hint) -> Metric | None:
     """
     Filter or modify metrics before they are sent to Sentry.
 
@@ -57,9 +55,9 @@ def before_send_metric(metric: Metric, hint: Hint) -> Optional[Metric]:
 
 
 def init_sentry(
-    dsn: Optional[str] = None,
-    environment: Optional[str] = None,
-    release: Optional[str] = None,
+    dsn: str | None = None,
+    environment: str | None = None,
+    release: str | None = None,
     sample_rate: float = 1.0,
     traces_sample_rate: float = 0.2,
     profiles_sample_rate: float = 0.05,
@@ -122,7 +120,7 @@ def init_sentry(
 def count_metric(
     name: str,
     value: int = 1,
-    attributes: Optional[dict] = None,
+    attributes: dict | None = None,
 ) -> None:
     """
     Emit a counter metric.
@@ -152,8 +150,8 @@ def count_metric(
 def gauge_metric(
     name: str,
     value: float,
-    attributes: Optional[dict] = None,
-    unit: Optional[str] = None,
+    attributes: dict | None = None,
+    unit: str | None = None,
 ) -> None:
     """
     Emit a gauge metric.
@@ -187,8 +185,8 @@ def gauge_metric(
 def distribution_metric(
     name: str,
     value: float,
-    attributes: Optional[dict] = None,
-    unit: Optional[str] = None,
+    attributes: dict | None = None,
+    unit: str | None = None,
 ) -> None:
     """
     Emit a distribution metric.
@@ -267,7 +265,7 @@ class BiasMetrics:
     def score_recorded(
         layer: str,
         score: float,
-        bias_type: Optional[str] = None,
+        bias_type: str | None = None,
     ) -> None:
         """Track bias score distribution."""
         attrs = {"layer": layer}
@@ -430,7 +428,7 @@ class ServiceMetrics:
 
 def track_latency(
     metric_name: str,
-    attributes: Optional[dict] = None,
+    attributes: dict | None = None,
 ):
     """
     Decorator to track function execution latency.
