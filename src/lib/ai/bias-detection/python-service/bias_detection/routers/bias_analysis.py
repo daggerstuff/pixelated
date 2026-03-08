@@ -5,7 +5,7 @@ Bias analysis API endpoints.
 import time
 
 import structlog
-from bias_detection.deps import get_analysis_orchestrator, get_database_service
+from bias_detection.deps import get_analysis_orchestrator, get_database_service, require_rate_limit
 from bias_detection.models import BiasAnalysisRequest, BiasAnalysisResponse
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
@@ -14,6 +14,7 @@ router = APIRouter(prefix="/api/bias-analysis", tags=["bias-analysis"])
 # Module-level Depends() values to satisfy B008 (no function calls in default args)
 _DEP_ORCHESTRATOR = Depends(get_analysis_orchestrator)
 _DEP_DATABASE = Depends(get_database_service)
+_DEP_RATE_LIMIT = Depends(require_rate_limit)
 logger = structlog.get_logger(__name__)
 
 
@@ -21,9 +22,10 @@ logger = structlog.get_logger(__name__)
 async def analyze_bias(
     request: BiasAnalysisRequest,
     response: Response,
+    _rate_limit: None = _DEP_RATE_LIMIT,
     orchestrator=_DEP_ORCHESTRATOR,
 ):
-    """Analyze text for bias. Delegates to AnalysisOrchestrator for rate limit, analysis, metrics, and usage tracking."""
+    """Analyze text for bias. Rate limit enforced by Depends(require_rate_limit); orchestrator runs analysis and records metrics/usage."""
     request_id = response.headers.get("X-Request-ID", str(time.time()))
     analysis_start = time.time()
 

@@ -1,14 +1,13 @@
 """
-Orchestrates bias analysis: rate limiting, core analysis, metrics, and usage tracking.
-Keeps HTTP route handlers thin by centralizing business and infrastructure concerns.
+Orchestrates bias analysis: business logic (analysis) and persistence (metrics, usage tracking).
+Rate limiting is handled by the FastAPI dependency require_rate_limit before the handler runs.
 """
 
 import time
 
-from fastapi import HTTPException, status
+from fastapi import status
 
 from .. import metrics as app_metrics
-from ..config import settings
 from ..models import BiasAnalysisRequest, BiasAnalysisResponse
 from .bias_detection_service import BiasDetectionService
 from .cache_service import cache_service
@@ -18,7 +17,7 @@ ANALYZE_ENDPOINT = "/api/bias-analysis/analyze"
 
 
 class AnalysisOrchestrator:
-    """Handles rate limiting, analysis execution, metrics, and usage tracking."""
+    """Runs analysis (business) and records metrics/usage (persistence)."""
 
     def __init__(
         self,
@@ -34,27 +33,29 @@ class AnalysisOrchestrator:
         request_id: str,
     ) -> BiasAnalysisResponse:
         """
-        Execute bias analysis with rate limiting, metrics, and usage tracking.
-        Raises HTTPException for rate limit; propagates other exceptions.
+        Run analysis (business) then record success (metrics, rate-limit counter, usage).
+        Rate limiting is enforced by the route's Depends(require_rate_limit).
         """
         analysis_start = time.time()
-
-        if request.user_id:
-            await self._enforce_rate_limit(request.user_id)
-
         result = await self.bias_service.analyze_bias(request, request_id)
         analysis_time = time.time() - analysis_start
+        await self._record_analysis_success(request, result, analysis_time)
+        return result
 
+    async def _record_analysis_success(
+        self,
+        request: BiasAnalysisRequest,
+        result: BiasAnalysisResponse,
+        analysis_time: float,
+    ) -> None:
+        """Record successful analysis: metrics, rate-limit counter, and API usage."""
         app_metrics.analysis_count.labels(
             status="success", bias_types=len(result.bias_scores)
         ).inc()
         app_metrics.analysis_duration.labels(model_framework="ensemble").observe(
             analysis_time
         )
-
-        if request.user_id:
-            await cache_service.increment_rate_limit_counter(f"user:{request.user_id}")
-
+        # Rate-limit counter is incremented in require_rate_limit dependency (atomic check).
         await self.database_service.track_api_usage(
             user_id=request.user_id,
             session_id=request.session_id,
@@ -63,17 +64,6 @@ class AnalysisOrchestrator:
             status_code=status.HTTP_200_OK,
             response_time_ms=int(analysis_time * 1000),
         )
-
-        return result
-
-    async def _enforce_rate_limit(self, user_id: str) -> None:
-        """Raise HTTP 429 if user has exceeded rate limit."""
-        count = await cache_service.get_rate_limit_counter(f"user:{user_id}")
-        if count >= settings.rate_limit_per_minute:
-            raise HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Rate limit exceeded",
-            )
 
     async def record_analysis_error(
         self,
