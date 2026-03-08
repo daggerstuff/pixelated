@@ -39,14 +39,27 @@ predicate isEHRData(DataFlow::Node node) {
   )
 }
 
-from DataFlow::CallNode call, DataFlow::Node data
+module UnencryptedEHRDataSig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) { isEHRData(source) }
+
+  predicate isSink(DataFlow::Node sink) {
+    exists(DataFlow::CallNode call |
+      isDataTransmissionCall(call) and
+      sink = call.getAnArgument()
+    )
+  }
+}
+
+module UnencryptedEHRDataFlow = DataFlow::Global<UnencryptedEHRDataSig>;
+
+from DataFlow::Node source, DataFlow::Node sink, DataFlow::CallNode call
 where
+  UnencryptedEHRDataFlow::flow(source, sink) and
+  sink = call.getAnArgument() and
   isDataTransmissionCall(call) and
-  isEHRData(data) and
-  data.flowsTo(call.getAnArgument()) and
   not exists(DataFlow::CallNode encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    data.flowsTo(encryptCall.getAnArgument())
+    UnencryptedEHRDataFlow::flow(source, encryptCall.getAnArgument())
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
