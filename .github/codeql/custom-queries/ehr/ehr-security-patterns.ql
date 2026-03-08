@@ -11,7 +11,6 @@
  */
 
 import javascript
-import DataFlow::PathGraph
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
@@ -27,7 +26,7 @@ class EHRCredentialSource extends DataFlow::Node {
   }
 }
 
-class EHREndpoint extends DataFlow::Node {
+class EHREndpoint extends DataFlow::SourceNode {
   EHREndpoint() {
     exists(string url |
       url = this.getStringValue() and
@@ -68,7 +67,7 @@ module EHRSecurityConfig implements DataFlow::ConfigSig {
       ) and
       sink = call.getAnArgument() and
       exists(EHREndpoint endpoint |
-        DataFlow::localFlow(endpoint, sink)
+        endpoint.flowsTo(sink)
       )
     )
   }
