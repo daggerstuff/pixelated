@@ -218,13 +218,22 @@ export class PerformanceOptimizer {
 
     const existingEntry = this.cache.get(key)
     if (existingEntry) {
-      // Re-insert to update position for LRU (O(1))
-      this.cache.delete(key)
-      this.cache.set(key, {
-        value,
-        timestamp: now,
-        accessCount: existingEntry.accessCount + 1,
-      })
+      if (this.config.cache.strategy === 'LRU') {
+        // Re-insert to update position for LRU (O(1))
+        this.cache.delete(key)
+        this.cache.set(key, {
+          value,
+          timestamp: now,
+          accessCount: existingEntry.accessCount + 1,
+        })
+      } else {
+        // FIFO or LFU: update value and accessCount in place
+        existingEntry.value = value
+        existingEntry.accessCount++
+        // For FIFO, we don't update timestamp to keep original insertion time
+        // For LFU, timestamp update is optional, but we keep it for TTL
+        existingEntry.timestamp = now
+      }
       return
     }
 
@@ -255,11 +264,13 @@ export class PerformanceOptimizer {
     }
 
     entry.accessCount++
-    entry.timestamp = now // Update timestamp for LRU
 
-    // Re-insert to move to end of Map (most recently used)
-    this.cache.delete(key)
-    this.cache.set(key, entry)
+    if (this.config.cache.strategy === 'LRU') {
+      entry.timestamp = now // Update timestamp for sliding window TTL
+      // Re-insert to move to end of Map (most recently used)
+      this.cache.delete(key)
+      this.cache.set(key, entry)
+    }
 
     return entry.value
   }
