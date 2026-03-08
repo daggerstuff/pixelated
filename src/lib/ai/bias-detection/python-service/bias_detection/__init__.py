@@ -12,9 +12,9 @@ from .models import BiasAnalysisRequest, BiasAnalysisResponse
 from .services import BiasDetectionService
 
 __all__ = [
-    "Settings",
     "BiasAnalysisRequest",
     "BiasAnalysisResponse",
     "BiasDetectionService",
+    "Settings",
     "create_app",
 ]

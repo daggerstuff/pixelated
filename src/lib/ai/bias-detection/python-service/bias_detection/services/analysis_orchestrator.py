@@ -4,13 +4,12 @@ Keeps HTTP route handlers thin by centralizing business and infrastructure conce
 """
 
 import time
-from typing import Optional
 
 from fastapi import HTTPException, status
 
+from .. import metrics as app_metrics
 from ..config import settings
 from ..models import BiasAnalysisRequest, BiasAnalysisResponse
-from .. import metrics as app_metrics
 from .bias_detection_service import BiasDetectionService
 from .cache_service import cache_service
 from .database_service import DatabaseService

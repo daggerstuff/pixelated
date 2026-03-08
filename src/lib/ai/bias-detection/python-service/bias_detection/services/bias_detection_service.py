@@ -5,7 +5,7 @@ Main bias detection service integrating all components
 import hashlib
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -66,7 +66,7 @@ class BiasDetectionService:
 
         except Exception as e:
             logger.error(
-                f"Failed to initialize bias detection service: {str(e)}", error=str(e)
+                f"Failed to initialize bias detection service: {e!s}", error=str(e)
             )
             return False
 
@@ -85,7 +85,7 @@ class BiasDetectionService:
             logger.info("Bias detection service shutdown completed")
 
         except Exception as e:
-            logger.error(f"Error during service shutdown: {str(e)}", error=str(e))
+            logger.error(f"Error during service shutdown: {e!s}", error=str(e))
 
     async def analyze_bias(
         self, request: BiasAnalysisRequest, request_id: str
@@ -135,7 +135,7 @@ class BiasDetectionService:
 
         except Exception as e:
             logger.error(
-                f"Bias analysis failed: {str(e)}", request_id=request_id, error=str(e)
+                f"Bias analysis failed: {e!s}", request_id=request_id, error=str(e)
             )
             raise
 
@@ -194,19 +194,19 @@ class BiasDetectionService:
     @retry(
         stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
     )
-    async def _get_model_predictions(self, text: str) -> Dict[str, Any]:
+    async def _get_model_predictions(self, text: str) -> dict[str, Any]:
         """Get predictions from ML models"""
         try:
             # Use ensemble service for predictions
             return await self.model_service.predict_ensemble(text)
 
         except Exception as e:
-            logger.error(f"Model prediction failed: {str(e)}", error=str(e))
+            logger.error(f"Model prediction failed: {e!s}", error=str(e))
             raise
 
     def _process_model_results(
-        self, model_results: Dict[str, Any], request: BiasAnalysisRequest
-    ) -> List[BiasScore]:
+        self, model_results: dict[str, Any], request: BiasAnalysisRequest
+    ) -> list[BiasScore]:
         """Process model results into bias scores"""
         bias_scores = []
 
@@ -232,7 +232,7 @@ class BiasDetectionService:
 
         return bias_scores
 
-    def _should_include_bias(self, result: Dict[str, Any], sensitivity: str) -> bool:
+    def _should_include_bias(self, result: dict[str, Any], sensitivity: str) -> bool:
         """Determine if bias should be included based on sensitivity"""
         score = result["score"]
 
@@ -241,7 +241,7 @@ class BiasDetectionService:
         threshold = sensitivity_thresholds.get(sensitivity.lower(), 0.5)
         return score >= threshold
 
-    def _calculate_overall_score(self, bias_scores: List[BiasScore]) -> float:
+    def _calculate_overall_score(self, bias_scores: list[BiasScore]) -> float:
         """Calculate overall bias score"""
         if not bias_scores:
             return 0.0
@@ -256,14 +256,14 @@ class BiasDetectionService:
 
         return total_weighted_score / total_confidence if total_confidence > 0 else 0.0
 
-    def _get_dominant_bias_types(self, bias_scores: List[BiasScore]) -> List[BiasType]:
+    def _get_dominant_bias_types(self, bias_scores: list[BiasScore]) -> list[BiasType]:
         """Get dominant bias types (top 3 by score)"""
         sorted_scores = sorted(bias_scores, key=lambda x: x.score, reverse=True)
         return [score.bias_type for score in sorted_scores[:3]]
 
     async def _generate_recommendations(
-        self, bias_scores: List[BiasScore], request: BiasAnalysisRequest
-    ) -> List[Recommendation]:
+        self, bias_scores: list[BiasScore], request: BiasAnalysisRequest
+    ) -> list[Recommendation]:
         """Generate bias mitigation recommendations"""
         recommendations = []
 
@@ -280,7 +280,7 @@ class BiasDetectionService:
 
     def _get_bias_specific_recommendations(
         self, bias_score: BiasScore
-    ) -> List[Recommendation]:
+    ) -> list[Recommendation]:
         """Get recommendations specific to bias type"""
         recommendations = []
 
@@ -351,8 +351,8 @@ class BiasDetectionService:
         )
 
     async def _generate_counterfactuals(
-        self, content: str, bias_scores: List[BiasScore]
-    ) -> List[CounterfactualScenario]:
+        self, content: str, bias_scores: list[BiasScore]
+    ) -> list[CounterfactualScenario]:
         """Generate counterfactual scenarios"""
         counterfactuals = []
 
@@ -364,7 +364,7 @@ class BiasDetectionService:
 
     def _create_counterfactual(
         self, content: str, bias_score: BiasScore
-    ) -> Optional[CounterfactualScenario]:
+    ) -> CounterfactualScenario | None:
         """Create counterfactual scenario for specific bias"""
         # Simplified counterfactual generation
         # In production, this would use more sophisticated NLP techniques
@@ -401,7 +401,7 @@ class BiasDetectionService:
 
         return None
 
-    async def _perform_sentiment_analysis(self, text: str) -> Dict[str, Any]:
+    async def _perform_sentiment_analysis(self, text: str) -> dict[str, Any]:
         """Perform sentiment analysis"""
         # Simplified sentiment analysis
         # In production, this would use a proper sentiment analysis model
@@ -434,7 +434,7 @@ class BiasDetectionService:
             "negative_words": negative_count,
         }
 
-    async def _perform_keyword_analysis(self, text: str) -> Dict[str, Any]:
+    async def _perform_keyword_analysis(self, text: str) -> dict[str, Any]:
         """Perform keyword analysis"""
         words = text.lower().split()
         word_freq = {}
@@ -454,8 +454,8 @@ class BiasDetectionService:
         }
 
     async def _perform_contextual_analysis(
-        self, text: str, context: Optional[str]
-    ) -> Dict[str, Any]:
+        self, text: str, context: str | None
+    ) -> dict[str, Any]:
         """Perform contextual analysis"""
         analysis = {
             "has_context": bool(context),
@@ -483,7 +483,7 @@ class BiasDetectionService:
 
     async def _get_cached_analysis(
         self, content_hash: str
-    ) -> Optional[BiasAnalysisResponse]:
+    ) -> BiasAnalysisResponse | None:
         """Get cached analysis result"""
         if not settings.enable_caching:
             return None
@@ -506,7 +506,7 @@ class BiasDetectionService:
         try:
             await self.database_service.store_analysis(result)
         except Exception as e:
-            logger.warning(f"Failed to store analysis result: {str(e)}", error=str(e))
+            logger.warning(f"Failed to store analysis result: {e!s}", error=str(e))
 
     def _get_model_version(self) -> str:
         """Get model version"""
@@ -518,7 +518,7 @@ class BiasDetectionService:
         # In production, use proper language detection library
         return "en"  # Default to English
 
-    async def get_health_status(self) -> Dict[str, Any]:
+    async def get_health_status(self) -> dict[str, Any]:
         """Get service health status"""
         health_status = {
             "service": "bias_detection",
@@ -544,7 +544,7 @@ class BiasDetectionService:
 
         return health_status
 
-    async def _get_model_service_health(self) -> Dict[str, Any]:
+    async def _get_model_service_health(self) -> dict[str, Any]:
         """Get model service health status"""
         try:
             ensemble_info = self.model_service.get_ensemble_info()
@@ -560,10 +560,10 @@ class BiasDetectionService:
         except Exception as e:
             return {"status": "unhealthy", "error": str(e)}
 
-    async def _get_cache_service_health(self) -> Dict[str, Any]:
+    async def _get_cache_service_health(self) -> dict[str, Any]:
         """Get cache service health status"""
         return await cache_service.get_health_status()
 
-    async def _get_database_service_health(self) -> Dict[str, Any]:
+    async def _get_database_service_health(self) -> dict[str, Any]:
         """Get database service health status"""
         return await self.database_service.get_health_status()

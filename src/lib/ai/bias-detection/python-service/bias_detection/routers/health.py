@@ -4,13 +4,12 @@ Health, readiness, liveness, and metrics endpoints.
 
 import time
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import Response
-from prometheus_client import generate_latest
-
 from bias_detection.config import settings
 from bias_detection.deps import get_bias_service
 from bias_detection.models import HealthResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
+from prometheus_client import generate_latest
 
 router = APIRouter(tags=["health"])
 

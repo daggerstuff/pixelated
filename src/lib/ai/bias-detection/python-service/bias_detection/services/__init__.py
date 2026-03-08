@@ -9,15 +9,15 @@ from .model_service import ModelService, PyTorchModelService, TensorFlowModelSer
 from .nvidia_api_service import NvidiaAPIService, get_nvidia_service, kimi_chat_completion
 
 __all__ = [
-    "ModelService",
-    "TensorFlowModelService",
-    "PyTorchModelService",
     "BiasDetectionService",
     "CacheService",
     "DatabaseService",
+    "ModelService",
     "NvidiaAPIService",
-    "kimi_chat_completion",
-    "get_nvidia_service",
+    "PyTorchModelService",
+    "TensorFlowModelService",
     "cache_service",
     "database_service",
+    "get_nvidia_service",
+    "kimi_chat_completion",
 ]

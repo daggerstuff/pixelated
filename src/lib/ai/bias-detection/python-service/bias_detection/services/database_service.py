@@ -3,13 +3,13 @@ Database service for PostgreSQL and MongoDB integration
 """
 
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import asyncpg
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from tenacity import stop_after_attempt, wait_exponential, retry
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ..config import settings
 from ..models import BiasAnalysisResponse
@@ -21,7 +21,7 @@ class DatabaseService:
     """Database service for PostgreSQL and MongoDB operations"""
 
     def __init__(self):
-        self.pg_pool: Optional[asyncpg.Pool] = None
+        self.pg_pool: asyncpg.Pool | None = None
         self.async_engine = None
         self.async_session = None
         self.is_connected = False
@@ -44,7 +44,7 @@ class DatabaseService:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to connect to databases: {str(e)}", error=str(e))
+            logger.error(f"Failed to connect to databases: {e!s}", error=str(e))
             return False
 
     async def disconnect(self) -> None:
@@ -61,7 +61,7 @@ class DatabaseService:
             logger.info("Database connections closed")
 
         except Exception as e:
-            logger.error(f"Error during database disconnect: {str(e)}", error=str(e))
+            logger.error(f"Error during database disconnect: {e!s}", error=str(e))
 
     async def _connect_postgresql(self) -> bool:
         """Connect to PostgreSQL"""
@@ -99,7 +99,7 @@ class DatabaseService:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to connect to PostgreSQL: {str(e)}", error=str(e))
+            logger.error(f"Failed to connect to PostgreSQL: {e!s}", error=str(e))
             return False
 
     async def _initialize_schema(self) -> None:
@@ -229,7 +229,7 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to initialize database schema: {str(e)}", error=str(e)
+                f"Failed to initialize database schema: {e!s}", error=str(e)
             )
             raise
 
@@ -311,13 +311,13 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to store analysis result: {str(e)}",
+                f"Failed to store analysis result: {e!s}",
                 analysis_id=str(analysis.id),
                 error=str(e),
             )
             return False
 
-    async def get_analysis_by_id(self, analysis_id: str) -> Optional[Dict[str, Any]]:
+    async def get_analysis_by_id(self, analysis_id: str) -> dict[str, Any] | None:
         """Get analysis by ID"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -332,7 +332,7 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to get analysis by ID: {str(e)}",
+                f"Failed to get analysis by ID: {e!s}",
                 analysis_id=analysis_id,
                 error=str(e),
             )
@@ -340,7 +340,7 @@ class DatabaseService:
 
     async def get_analysis_by_request_id(
         self, request_id: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get analysis by request ID"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -355,7 +355,7 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to get analysis by request ID: {str(e)}",
+                f"Failed to get analysis by request ID: {e!s}",
                 request_id=request_id,
                 error=str(e),
             )
@@ -363,7 +363,7 @@ class DatabaseService:
 
     async def get_user_analyses(
         self, user_id: str, limit: int = 100, offset: int = 0
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get analyses for a user"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -383,11 +383,11 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to get user analyses: {str(e)}", user_id=user_id, error=str(e)
+                f"Failed to get user analyses: {e!s}", user_id=user_id, error=str(e)
             )
             return []
 
-    async def get_analytics_summary(self, days: int = 30) -> Dict[str, Any]:
+    async def get_analytics_summary(self, days: int = 30) -> dict[str, Any]:
         """Get analytics summary for the last N days"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -450,14 +450,14 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to get analytics summary: {str(e)}", days=days, error=str(e)
+                f"Failed to get analytics summary: {e!s}", days=days, error=str(e)
             )
             return {}
 
     async def track_api_usage(
         self,
-        user_id: Optional[str],
-        session_id: Optional[str],
+        user_id: str | None,
+        session_id: str | None,
         endpoint: str,
         method: str,
         status_code: int,
@@ -489,7 +489,7 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to track API usage: {str(e)}", endpoint=endpoint, error=str(e)
+                f"Failed to track API usage: {e!s}", endpoint=endpoint, error=str(e)
             )
             return False
 
@@ -498,8 +498,8 @@ class DatabaseService:
         model_name: str,
         model_version: str,
         prediction_count: int = 1,
-        processing_time_ms: Optional[int] = None,
-        accuracy_score: Optional[float] = None,
+        processing_time_ms: int | None = None,
+        accuracy_score: float | None = None,
         error_count: int = 0,
     ) -> bool:
         """Update model performance metrics"""
@@ -577,13 +577,13 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to update model metrics: {str(e)}",
+                f"Failed to update model metrics: {e!s}",
                 model_name=model_name,
                 error=str(e),
             )
             return False
 
-    async def get_model_metrics(self, model_name: str) -> Optional[Dict[str, Any]]:
+    async def get_model_metrics(self, model_name: str) -> dict[str, Any] | None:
         """Get model performance metrics"""
         try:
             async with self.pg_pool.acquire() as conn:
@@ -598,13 +598,13 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to get model metrics: {str(e)}",
+                f"Failed to get model metrics: {e!s}",
                 model_name=model_name,
                 error=str(e),
             )
             return None
 
-    async def get_health_status(self) -> Dict[str, Any]:
+    async def get_health_status(self) -> dict[str, Any]:
         """Get database service health status"""
         if not self.is_connected:
             return {
@@ -631,12 +631,11 @@ class DatabaseService:
                         "connected": True,
                         "pool_stats": pool_stats,
                     }
-                else:
-                    return {
-                        "status": "degraded",
-                        "connected": True,
-                        "error": "Test query failed",
-                    }
+                return {
+                    "status": "degraded",
+                    "connected": True,
+                    "error": "Test query failed",
+                }
 
         except Exception as e:
             return {"status": "unhealthy", "connected": True, "error": str(e)}

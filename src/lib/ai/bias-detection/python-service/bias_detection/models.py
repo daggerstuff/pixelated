@@ -4,7 +4,7 @@ Data models for bias detection service
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, validator
@@ -63,10 +63,10 @@ class BiasAnalysisRequest(BaseModel):
     language: str = Field(
         default="en", description="Language of the content (ISO 639-1 code)"
     )
-    context: Optional[str] = Field(
+    context: str | None = Field(
         default=None, description="Additional context about the content"
     )
-    bias_types: Optional[List[BiasType]] = Field(
+    bias_types: list[BiasType] | None = Field(
         default=None, description="Specific bias types to check for"
     )
     sensitivity: str = Field(
@@ -78,10 +78,10 @@ class BiasAnalysisRequest(BaseModel):
     include_counterfactuals: bool = Field(
         default=True, description="Whether to include counterfactual scenarios"
     )
-    user_id: Optional[str] = Field(
+    user_id: str | None = Field(
         default=None, description="User ID for tracking and personalization"
     )
-    session_id: Optional[str] = Field(
+    session_id: str | None = Field(
         default=None, description="Session ID for request correlation"
     )
 
@@ -127,7 +127,7 @@ class BiasScore(BaseModel):
         ge=0.0, le=1.0, description="Confidence in the bias detection"
     )
     confidence_level: ConfidenceLevel
-    evidence: List[str] = Field(
+    evidence: list[str] = Field(
         description="Text snippets that support the bias detection"
     )
     explanation: str = Field(description="Explanation of why this bias was detected")
@@ -146,7 +146,7 @@ class Recommendation(BaseModel):
     priority: str = Field(description="Priority: high, medium, low")
     implementation_difficulty: str = Field(description="Difficulty: easy, medium, hard")
     estimated_impact: str = Field(description="Expected impact: low, medium, high")
-    examples: List[str] = Field(
+    examples: list[str] = Field(
         default_factory=list, description="Example implementations"
     )
 
@@ -183,27 +183,27 @@ class BiasAnalysisResponse(BaseModel):
     overall_bias_score: float = Field(
         ge=0.0, le=1.0, description="Overall bias score across all detected biases"
     )
-    bias_scores: List[BiasScore] = Field(description="Individual bias scores by type")
-    dominant_bias_types: List[BiasType] = Field(
+    bias_scores: list[BiasScore] = Field(description="Individual bias scores by type")
+    dominant_bias_types: list[BiasType] = Field(
         description="Most significant bias types detected"
     )
 
     # Additional analysis
-    sentiment_analysis: Optional[Dict[str, Any]] = Field(
+    sentiment_analysis: dict[str, Any] | None = Field(
         default=None, description="Sentiment analysis results"
     )
-    keyword_analysis: Optional[Dict[str, Any]] = Field(
+    keyword_analysis: dict[str, Any] | None = Field(
         default=None, description="Keyword-based analysis results"
     )
-    contextual_analysis: Optional[Dict[str, Any]] = Field(
+    contextual_analysis: dict[str, Any] | None = Field(
         default=None, description="Contextual analysis results"
     )
 
     # Recommendations and insights
-    recommendations: List[Recommendation] = Field(
+    recommendations: list[Recommendation] = Field(
         default_factory=list, description="Bias mitigation recommendations"
     )
-    counterfactual_scenarios: List[CounterfactualScenario] = Field(
+    counterfactual_scenarios: list[CounterfactualScenario] = Field(
         default_factory=list, description="Counterfactual scenarios"
     )
 
@@ -215,7 +215,7 @@ class BiasAnalysisResponse(BaseModel):
 
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = Field(default=None)
+    completed_at: datetime | None = Field(default=None)
 
     class Config:
         """Pydantic configuration"""
@@ -233,10 +233,10 @@ class HealthResponse(BaseModel):
     status: str = Field(description="Service status: healthy, degraded, unhealthy")
     version: str = Field(description="Service version")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    dependencies: Dict[str, str] = Field(
+    dependencies: dict[str, str] = Field(
         default_factory=dict, description="Status of external dependencies"
     )
-    metrics: Dict[str, Any] = Field(default_factory=dict, description="Service metrics")
+    metrics: dict[str, Any] = Field(default_factory=dict, description="Service metrics")
 
 
 class ErrorResponse(BaseModel):
@@ -244,6 +244,6 @@ class ErrorResponse(BaseModel):
 
     error: str = Field(description="Error type")
     message: str = Field(description="Error message")
-    details: Optional[Dict[str, Any]] = Field(default=None, description="Error details")
-    request_id: Optional[str] = Field(default=None, description="Request ID")
+    details: dict[str, Any] | None = Field(default=None, description="Error details")
+    request_id: str | None = Field(default=None, description="Request ID")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
