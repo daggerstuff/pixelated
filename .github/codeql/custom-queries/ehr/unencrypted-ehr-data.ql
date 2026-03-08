@@ -1,7 +1,7 @@
 /**
  * @name Unencrypted EHR Data Transfer
  * @description Detects potential unencrypted EHR data transfers
- * @kind path-problem
+ * @kind problem
  * @problem.severity error
  * @security-severity 9.0
  * @precision high
@@ -12,7 +12,6 @@
  */
 
 import javascript
-import DataFlow::PathGraph
 
 /**
  * Predicate to identify sensitive EHR-related data.
@@ -72,6 +71,6 @@ module UnencryptedEHRConfig implements DataFlow::ConfigSig {
 
 module UnencryptedEHRFlow = TaintTracking::Global<UnencryptedEHRConfig>;
 
-from UnencryptedEHRFlow::PathNode source, UnencryptedEHRFlow::PathNode sink
-where UnencryptedEHRFlow::hasFlowPath(source, sink)
-select sink.getNode(), source, sink, "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
+from DataFlow::Node source, DataFlow::Node sink
+where UnencryptedEHRFlow::hasFlow(source, sink)
+select sink, "Potential unencrypted EHR data transmission detected from $@. HIPAA compliance requires encryption.", source, "EHR data source"

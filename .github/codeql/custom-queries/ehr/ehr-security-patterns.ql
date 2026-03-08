@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind path-problem
+ * @kind problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -12,7 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
 /**
  * A source node representing EHR credentials.
@@ -99,12 +98,11 @@ module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
 
 module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
 
-from DataFlow::PathNode source, DataFlow::PathNode sink, string msg
+from DataFlow::Node source, DataFlow::Node sink, string msg
 where
   (
-    InsecureEHRFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to log/URL."
+    InsecureEHRFlow::hasFlow(source, sink) and msg = "Potential EHR security issue: sensitive data flows to log/URL."
   ) or (
-    UnsafeEHRAccessFlow::hasFlowPath(source, sink) and msg = "Potential EHR security issue: $@ flows to unsafe EHR access."
+    UnsafeEHRAccessFlow::hasFlow(source, sink) and msg = "Potential EHR security issue: remote input flows to unsafe EHR access."
   )
-select sink.getNode(), source, sink, msg,
-  source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
+select sink, msg

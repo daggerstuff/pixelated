@@ -1,0 +1,20 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="114.406238">
+<testsuite name="e2e/smoke/bias-detection-smoke.spec.ts" timestamp="2026-03-08T20:51:08.688Z" hostname="chromium" tests="8" failures="0" skipped="0" time="5.87" errors="0">
+<testcase name="Bias Detection Engine - Smoke Tests › Health check endpoint is accessible" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.417">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › Python ML service is running" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.04">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › Dashboard page loads without errors" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="5.213">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › API endpoints respond correctly" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.061">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › Database connectivity" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.048">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › Redis connectivity" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.036">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › Response times are within acceptable limits" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.034">
+</testcase>
+<testcase name="Bias Detection Engine - Smoke Tests › CORS headers are properly configured" classname="e2e/smoke/bias-detection-smoke.spec.ts" time="0.021">
+</testcase>
+</testsuite>
+</testsuites>
