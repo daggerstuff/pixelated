@@ -24,10 +24,8 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ============================================
 
-SENTRY_DSN = os.environ.get(
-    "SENTRY_DSN",
-    "https://ef4ca2c0d2530a95efb0ef55c168b661@o4509483611979776.ingest.us.sentry.io/4509483637932032",
-)
+# DSN must be set via SENTRY_DSN environment variable. No hardcoded fallback.
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
 SENTRY_ENVIRONMENT = os.environ.get(
     "SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production")
 )
@@ -63,7 +61,7 @@ def init_sentry(
     environment: Optional[str] = None,
     release: Optional[str] = None,
     sample_rate: float = 1.0,
-    traces_sample_rate: float = 0.1,
+    traces_sample_rate: float = 0.2,
     profiles_sample_rate: float = 0.05,
 ) -> None:
     """

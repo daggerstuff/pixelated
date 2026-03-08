@@ -1,0 +1,35 @@
+{
+  "dataset_name": "Pixelated Empathy Stage 2 - Defense Mechanisms & Clinical Reasoning",
+  "version": "2.0.0",
+  "compiled_at": "2026-03-07T20:18:32.403907+00:00",
+  "total_records": 246,
+  "splits": {
+    "train": 221,
+    "val": 12,
+    "test": 13
+  },
+  "features": {
+    "defense_mechanisms": true,
+    "persona_profiles": true,
+    "clinical_reasoning": true,
+    "chatml_format": true
+  },
+  "defense_mechanism_labels": [
+    "Action Defenses",
+    "Narcissistic Defenses",
+    "Primitive Defenses",
+    "Major Image-Distorting Defenses",
+    "Minor Image-Distorting Defenses"
+  ],
+  "sources": [
+    "synthetic_minority_generated.jsonl",
+    "pix8_long_sessions",
+    "pix8_edge_cases"
+  ],
+  "format": "ChatML (messages: [{role, content}])",
+  "quality_gates": {
+    "pii_scrubbed": true,
+    "deduplicated": true,
+    "min_turns_per_conversation": 2
+  }
+}
