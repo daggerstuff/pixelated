@@ -6,12 +6,11 @@ import asyncio
 import json
 import os
 import time
-from typing import Any, AsyncGenerator, Dict, List, Optional
+from collections.abc import AsyncGenerator
+from typing import Any
 
 import httpx
 import structlog
-
-from bias_detection.config import settings
 
 logger = structlog.get_logger(__name__)
 
@@ -33,7 +32,7 @@ class NvidiaAPIService:
 
         try:
             if os.path.exists(config_path):
-                with open(config_path, 'r') as f:
+                with open(config_path) as f:
                     config = json.load(f)
 
                 # Find NVIDIA provider configuration
@@ -61,19 +60,19 @@ class NvidiaAPIService:
                 raise ValueError("NVIDIA API key not found in configuration or environment")
 
         except Exception as e:
-            logger.error(f"Failed to load NVIDIA API configuration: {str(e)}")
+            logger.error(f"Failed to load NVIDIA API configuration: {e!s}")
             raise
 
     async def chat_completion(
             self,
-            messages: List[Dict[str, str]],
+            messages: list[dict[str, str]],
             max_tokens: int = 16384,
             temperature: float = 1.0,
             top_p: float = 1.0,
             stream: bool = False,
             thinking: bool = True,
-            timeout: Optional[float] = None
-    ) -> Dict[str, Any] | AsyncGenerator[str, None]:
+            timeout: float | None = None
+    ) -> dict[str, Any] | AsyncGenerator[str, None]:
         """
         Send chat completion request to Kimi-k2.5 model via NVIDIA API
 
@@ -132,16 +131,15 @@ class NvidiaAPIService:
 
                 if stream:
                     return self._stream_response(response)
-                else:
-                    result = response.json()
-                    logger.info(
-                        "NVIDIA API completion successful",
-                        model=self.model_name,
-                        processing_time_ms=int(processing_time * 1000),
-                        prompt_tokens=result.get("usage", {}).get("prompt_tokens", 0),
-                        completion_tokens=result.get("usage", {}).get("completion_tokens", 0)
-                    )
-                    return result
+                result = response.json()
+                logger.info(
+                    "NVIDIA API completion successful",
+                    model=self.model_name,
+                    processing_time_ms=int(processing_time * 1000),
+                    prompt_tokens=result.get("usage", {}).get("prompt_tokens", 0),
+                    completion_tokens=result.get("usage", {}).get("completion_tokens", 0)
+                )
+                return result
 
         except httpx.HTTPStatusError as e:
             logger.error(
@@ -193,7 +191,7 @@ class NvidiaAPIService:
                     # Pass through other lines
                     yield line
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """
         Check health of NVIDIA API service
 
@@ -241,13 +239,13 @@ async def get_nvidia_service() -> NvidiaAPIService:
 
 
 async def kimi_chat_completion(
-        messages: List[Dict[str, str]],
+        messages: list[dict[str, str]],
         max_tokens: int = 16384,
         temperature: float = 1.0,
         top_p: float = 1.0,
         stream: bool = False,
         thinking: bool = True
-) -> Dict[str, Any] | AsyncGenerator[str, None]:
+) -> dict[str, Any] | AsyncGenerator[str, None]:
     """
     Convenience function for Kimi-k2.5 chat completion
 
@@ -295,7 +293,7 @@ async def example_usage():
         # Streaming example
         print("\nStreaming response:")
         stream_response = await service.chat_completion(messages, stream=True)
-        if hasattr(stream_response, '__aiter__'):
+        if hasattr(stream_response, "__aiter__"):
             async for chunk in stream_response:
                 if isinstance(chunk, dict) and "choices" in chunk:
                     content = chunk["choices"][0].get("delta", {}).get("content", "")

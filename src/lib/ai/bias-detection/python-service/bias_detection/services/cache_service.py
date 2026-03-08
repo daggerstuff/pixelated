@@ -4,7 +4,7 @@ Cache service for Redis configuration and management
 
 import json
 import time
-from typing import Any, Dict, Optional
+from typing import Any
 
 import redis.asyncio as redis
 import structlog
@@ -23,7 +23,7 @@ class CacheService:
     """Redis cache service for bias detection service"""
 
     def __init__(self):
-        self.redis_client: Optional[redis.Redis] = None
+        self.redis_client: redis.Redis | None = None
         self.is_connected = False
         self.connection_retry_count = 0
         self.max_retries = 3
@@ -55,7 +55,7 @@ class CacheService:
 
         except Exception as e:
             logger.error(
-                f"Failed to connect to Redis: {str(e)}",
+                f"Failed to connect to Redis: {e!s}",
                 redis_url=str(settings.redis_url),
                 error=str(e),
             )
@@ -70,11 +70,11 @@ class CacheService:
                 self.is_connected = False
                 logger.info("Redis connection closed")
             except Exception as e:
-                logger.warning(f"Error closing Redis connection: {str(e)}")
+                logger.warning(f"Error closing Redis connection: {e!s}")
             finally:
                 self.redis_client = None
 
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Any | None:
         """Get value from cache"""
         if (
             not self.is_connected
@@ -95,11 +95,11 @@ class CacheService:
             return None
 
         except RedisError as e:
-            logger.warning(f"Redis get error for key {key}: {str(e)}")
+            logger.warning(f"Redis get error for key {key}: {e!s}")
             return None
 
     async def set(
-        self, key: str, value: Any, ttl: Optional[int] = None, serialize: bool = True
+        self, key: str, value: Any, ttl: int | None = None, serialize: bool = True
     ) -> bool:
         """Set value in cache"""
         if (
@@ -123,7 +123,7 @@ class CacheService:
             return True
 
         except RedisError as e:
-            logger.warning(f"Redis set error for key {key}: {str(e)}")
+            logger.warning(f"Redis set error for key {key}: {e!s}")
             return False
 
     async def delete(self, key: str) -> bool:
@@ -136,7 +136,7 @@ class CacheService:
             return result > 0
 
         except RedisError as e:
-            logger.warning(f"Redis delete error for key {key}: {str(e)}")
+            logger.warning(f"Redis delete error for key {key}: {e!s}")
             return False
 
     async def exists(self, key: str) -> bool:
@@ -148,11 +148,11 @@ class CacheService:
             return bool(await self.redis_client.exists(key))
 
         except RedisError as e:
-            logger.warning(f"Redis exists error for key {key}: {str(e)}")
+            logger.warning(f"Redis exists error for key {key}: {e!s}")
             return False
 
     async def cache_analysis_result(
-        self, content_hash: str, result: Dict[str, Any], ttl: Optional[int] = None
+        self, content_hash: str, result: dict[str, Any], ttl: int | None = None
     ) -> bool:
         """Cache bias analysis result"""
         key = f"bias:analysis:{content_hash}"
@@ -160,7 +160,7 @@ class CacheService:
 
         return await self.set(key, result, ttl)
 
-    async def get_analysis_result(self, content_hash: str) -> Optional[Dict[str, Any]]:
+    async def get_analysis_result(self, content_hash: str) -> dict[str, Any] | None:
         """Get cached bias analysis result"""
         key = f"bias:analysis:{content_hash}"
         return await self.get(key)
@@ -169,8 +169,8 @@ class CacheService:
         self,
         model_name: str,
         text_hash: str,
-        prediction: Dict[str, Any],
-        ttl: Optional[int] = None,
+        prediction: dict[str, Any],
+        ttl: int | None = None,
     ) -> bool:
         """Cache model prediction"""
         key = f"model:{model_name}:prediction:{text_hash}"
@@ -180,13 +180,13 @@ class CacheService:
 
     async def get_model_prediction(
         self, model_name: str, text_hash: str
-    ) -> Optional[Dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get cached model prediction"""
         key = f"model:{model_name}:prediction:{text_hash}"
         return await self.get(key)
 
     async def cache_user_session(
-        self, user_id: str, session_data: Dict[str, Any], ttl: Optional[int] = None
+        self, user_id: str, session_data: dict[str, Any], ttl: int | None = None
     ) -> bool:
         """Cache user session data"""
         key = f"user:session:{user_id}"
@@ -194,7 +194,7 @@ class CacheService:
 
         return await self.set(key, session_data, ttl)
 
-    async def get_user_session(self, user_id: str) -> Optional[Dict[str, Any]]:
+    async def get_user_session(self, user_id: str) -> dict[str, Any] | None:
         """Get cached user session data"""
         key = f"user:session:{user_id}"
         return await self.get(key)
@@ -217,7 +217,7 @@ class CacheService:
             return current_count
 
         except RedisError as e:
-            logger.warning(f"Redis rate limit error: {str(e)}")
+            logger.warning(f"Redis rate limit error: {e!s}")
             return 0
 
     async def get_rate_limit_counter(self, identifier: str) -> int:
@@ -231,11 +231,11 @@ class CacheService:
             return int(count) if count else 0
 
         except RedisError as e:
-            logger.warning(f"Redis rate limit get error: {str(e)}")
+            logger.warning(f"Redis rate limit get error: {e!s}")
             return 0
 
     async def cache_dashboard_metrics(
-        self, metrics: Dict[str, Any], ttl: Optional[int] = None
+        self, metrics: dict[str, Any], ttl: int | None = None
     ) -> bool:
         """Cache dashboard metrics"""
         key = "dashboard:metrics"
@@ -243,13 +243,13 @@ class CacheService:
 
         return await self.set(key, metrics, ttl)
 
-    async def get_dashboard_metrics(self) -> Optional[Dict[str, Any]]:
+    async def get_dashboard_metrics(self) -> dict[str, Any] | None:
         """Get cached dashboard metrics"""
         key = "dashboard:metrics"
         return await self.get(key)
 
     async def cache_model_info(
-        self, model_name: str, model_info: Dict[str, Any], ttl: Optional[int] = None
+        self, model_name: str, model_info: dict[str, Any], ttl: int | None = None
     ) -> bool:
         """Cache model information"""
         key = f"model:info:{model_name}"
@@ -257,7 +257,7 @@ class CacheService:
 
         return await self.set(key, model_info, ttl)
 
-    async def get_model_info(self, model_name: str) -> Optional[Dict[str, Any]]:
+    async def get_model_info(self, model_name: str) -> dict[str, Any] | None:
         """Get cached model information"""
         key = f"model:info:{model_name}"
         return await self.get(key)
@@ -284,10 +284,10 @@ class CacheService:
             # Delete keys
             return await self.redis_client.delete(*keys) if keys else 0
         except RedisError as e:
-            logger.warning(f"Redis clear pattern error: {str(e)}")
+            logger.warning(f"Redis clear pattern error: {e!s}")
             return 0
 
-    async def get_health_status(self) -> Dict[str, Any]:
+    async def get_health_status(self) -> dict[str, Any]:
         """Get cache service health status"""
         if not self.is_connected or self.redis_client is None:
             return {
@@ -311,12 +311,11 @@ class CacheService:
                     "memory_usage": await self.redis_client.info("memory"),
                     "stats": await self.redis_client.info("stats"),
                 }
-            else:
-                return {
-                    "status": "degraded",
-                    "connected": True,
-                    "error": "Test operation failed",
-                }
+            return {
+                "status": "degraded",
+                "connected": True,
+                "error": "Test operation failed",
+            }
 
         except Exception as e:
             return {"status": "unhealthy", "connected": True, "error": str(e)}

@@ -3,19 +3,20 @@ Analytics API endpoints.
 """
 
 import structlog
+from bias_detection.deps import get_database_service
 from fastapi import APIRouter, Depends, Response
-
-from ..deps import get_database_service
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 logger = structlog.get_logger(__name__)
+
+_DEP_DATABASE = Depends(get_database_service)
 
 
 @router.get("/summary")
 async def get_analytics_summary(
     response: Response,
     days: int = 30,
-    db=Depends(get_database_service),
+    db=_DEP_DATABASE,
 ):
     """Get analytics summary."""
     request_id = response.headers.get("X-Request-ID")
