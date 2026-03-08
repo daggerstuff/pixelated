@@ -18,7 +18,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, '../src'),
       'react-dom/test-utils': path.resolve(
         __dirname,
         '__mocks__/react-dom/test-utils.js',
