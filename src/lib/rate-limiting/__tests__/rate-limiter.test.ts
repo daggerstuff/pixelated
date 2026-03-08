@@ -127,7 +127,7 @@ describe('DistributedRateLimiter', () => {
       const pipeline = redis.pipeline()
       vi.mocked(pipeline.exec).mockRejectedValueOnce(new Error('Redis connection failed'))
       // We need to re-mock pipeline for this test to return the failing one
-      // But our stateful mock returns a persistent object. 
+      // But our stateful mock returns a persistent object.
       // Let's override the mock implementation of pipeline temporarily
       const failingPipeline = {
         ...pipeline,

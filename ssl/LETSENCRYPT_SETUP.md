@@ -181,7 +181,7 @@ Or for Apache:
 ### "Connection refused" error
 
 **Problem**: Port 80 or 443 blocked
-**Solution**: 
+**Solution**:
 ```bash
 # Check firewall rules
 sudo ufw status

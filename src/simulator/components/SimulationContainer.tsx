@@ -36,7 +36,7 @@ export function SimulationContainer({
     transcribedText?: string
     isConnected?: boolean
   }
-  
+
   const currentScenario = typedState?.currentScenario
   const isProcessing = typedState?.isProcessing ?? false
   const realtimeFeedback = typedState?.realtimeFeedback ?? []

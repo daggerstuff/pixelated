@@ -164,4 +164,4 @@ DevOps is not just about tools or automation; it's fundamentally about culture a
 
 ---
 
-<!-- End of DevOps Core Principles Instructions --> 
+<!-- End of DevOps Core Principles Instructions -->

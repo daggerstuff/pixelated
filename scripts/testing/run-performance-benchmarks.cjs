@@ -215,7 +215,7 @@ class PerformanceBenchmarkRunner {
 
     try {
       // Create test payload
-      
+
 
       // In a real environment, this would make an actual HTTP request
       // For now, we'll simulate the request timing

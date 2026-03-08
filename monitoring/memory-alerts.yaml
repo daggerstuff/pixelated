@@ -17,13 +17,13 @@ data:
       warning: 75  # 75% memory usage
       critical: 85  # 85% memory usage
       emergency: 95  # 95% memory usage
-    
+
     # Build-specific thresholds
     build_thresholds:
       warning: 70
       critical: 80
       emergency: 90
-    
+
     # Alert configuration
     alerts:
       enabled: true
@@ -31,7 +31,7 @@ data:
         - slack
         - email
       cooldown: 300  # 5 minutes between alerts
-    
+
     # Monitoring intervals
     intervals:
       check: 30  # Check every 30 seconds
@@ -63,7 +63,7 @@ spec:
             summary: "High memory usage detected"
             description: "Memory usage is above 75% for more than 2 minutes"
             runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+
         # Critical memory usage alert
         - alert: CriticalMemoryUsage
           expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
@@ -75,7 +75,7 @@ spec:
             summary: "Critical memory usage detected"
             description: "Memory usage is above 85% for more than 1 minute"
             runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+
         # Emergency memory usage alert
         - alert: EmergencyMemoryUsage
           expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 95
@@ -87,7 +87,7 @@ spec:
             summary: "Emergency memory usage detected"
             description: "Memory usage is above 95% for more than 30 seconds"
             runbook_url: "https://docs.pixelatedempathy.com/runbooks/memory-alerts"
-        
+
         # GitLab runner memory alert
         - alert: GitLabRunnerHighMemory
           expr: container_memory_usage_bytes{pod_name=~"gitlab-runner-.*"} / container_spec_memory_limit_bytes > 0.8
@@ -99,7 +99,7 @@ spec:
             summary: "GitLab Runner high memory usage"
             description: "GitLab Runner memory usage is above 80%"
             runbook_url: "https://docs.pixelatedempathy.com/runbooks/gitlab-runner-memory"
-        
+
         # Build process memory alert
         - alert: BuildProcessHighMemory
           expr: container_memory_usage_bytes{container_name=~"build", pod_name=~"runner-.*"} / container_spec_memory_limit_bytes > 0.9

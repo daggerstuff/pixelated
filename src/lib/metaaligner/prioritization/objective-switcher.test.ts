@@ -140,7 +140,7 @@ describe('ObjectiveSwitcher', () => {
 
       const objectives = switcher.getObjectives()
       expect(objectives.length).toBeGreaterThan(0)
-      
+
       // Crisis should prioritize safety
       const safetyObj = objectives.find(obj => obj.key === 'safety')
       expect(safetyObj).toBeDefined()
@@ -421,7 +421,7 @@ describe('ObjectiveSwitcher', () => {
           },
           to: {
             turnId: i + 1,
-            contextType: i % 3 === 0 ? ContextType.EDUCATIONAL : 
+            contextType: i % 3 === 0 ? ContextType.EDUCATIONAL :
                         i % 3 === 1 ? ContextType.SUPPORT : ContextType.INFORMATIONAL,
             confidence: 0.85,
             urgency: 'medium',
@@ -729,7 +729,7 @@ describe('ObjectiveSwitcher', () => {
   describe('getObjectives', () => {
     it('should return read-only objectives', () => {
       const objectives = switcher.getObjectives()
-      
+
       // Should be frozen
       expect(Object.isFrozen(objectives)).toBe(true)
     })
@@ -760,7 +760,7 @@ describe('ObjectiveSwitcher', () => {
 
       const objectives = switcher.getObjectives()
       expect(objectives.length).toBeGreaterThan(0)
-      
+
       // Should have informativeness high for educational context
       const infoObj = objectives.find(obj => obj.key === 'informativeness')
       expect(infoObj).toBeDefined()

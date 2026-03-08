@@ -178,4 +178,3 @@
 - **Week 9–10 (Sprint 2):** E2E tests, bias & crisis scenario runs
 - **Week 10 (Sprint 3):** Expert panel feedback, iteration & re-testing
 - **End of Week 10:** Phase 4 sign-off; proceed to Phase 5 (Production Deployment)
-

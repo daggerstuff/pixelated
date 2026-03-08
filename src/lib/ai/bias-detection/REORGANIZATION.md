@@ -104,4 +104,3 @@ python -m bias_detection.app
 4. ✅ Create documentation - **DONE**
 5. ⏳ Consider migrating to FastAPI service in future
 6. ⏳ Consolidate duplicate functionality if needed
-

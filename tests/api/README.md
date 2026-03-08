@@ -152,7 +152,7 @@ expect(responseTime).toBeLessThan(1000); // Should respond within 1 second
 
 ### Concurrent Request Testing
 ```typescript
-const requests = Array.from({ length: 10 }, () => 
+const requests = Array.from({ length: 10 }, () =>
   () => request.get('/api/user/profile')
 );
 const results = await APITestUtils.batchRequests(requests, 5);

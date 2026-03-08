@@ -281,5 +281,3 @@ export const useJournalResearchWebSocket = ({
     reconnect,
   }
 }
-
-

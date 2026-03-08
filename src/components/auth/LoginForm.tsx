@@ -206,7 +206,7 @@ export function LoginForm({
     // Validate form on submission to show errors
     // This will set errors state which React will render
     const isValid = validateForm()
-    
+
     if (!isValid) {
       // Errors are now set in state and will be displayed
       toast.error('Please correct the form errors')

@@ -1,6 +1,6 @@
 /**
  * Business Strategy Expansion & CMS System
- * 
+ *
  * Core module for business intelligence and content management
  * Integrates with existing Pixelated Empathy infrastructure
  */

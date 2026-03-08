@@ -88,9 +88,9 @@ export function SessionForm({
       const validated = schema.parse(formData)
       await onSubmit(validated)
     } catch (error) {
-      
+
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -113,7 +113,7 @@ export function SessionForm({
     const keywords = formData.searchKeywords ?? {}
     const category = keywordCategory || 'default'
     const categoryKeywords = keywords[category] ?? []
-    
+
     if (!categoryKeywords.includes(keywordInput.trim())) {
       setFormData({
         ...formData,
@@ -336,4 +336,3 @@ export function SessionForm({
     </Card>
   )
 }
-

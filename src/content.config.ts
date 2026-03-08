@@ -8,14 +8,14 @@ import { postSchema, projectsSchema, techniqueSchema, prsSchema, releasesSchema,
 
 /**
  * KNOWN ISSUE: Astro 5.15+ "Invalid key in record" Bug
- * 
+ *
  * You will see "Invalid key in record" warnings for all collections during sync.
  * This is a CONFIRMED BUG in Astro 5.15+ Content Layer validation.
- * 
+ *
  * - Collections sync successfully (Exit code 0)
  * - Content loads correctly
  * - Builds succeed
- * 
+ *
  * PLEASE IGNORE THESE WARNINGS.
  */
 

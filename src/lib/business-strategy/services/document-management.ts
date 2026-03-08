@@ -1,6 +1,6 @@
 /**
  * Document Management Service
- * 
+ *
  * Provides functionality for managing business strategy documents,
  * versions, comments, and analytics.
  */

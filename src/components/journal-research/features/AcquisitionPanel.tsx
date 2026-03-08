@@ -22,7 +22,7 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
     pageSize: 25,
   })
   const initiateMutation = useAcquisitionInitiateMutation(sessionId)
-  
+
   const integrateAllMutation = useIntegrateAllDatasets(sessionId ?? '')
   const { data: pipelineStatus } = usePipelineStatus(true)
 
@@ -144,4 +144,3 @@ export function AcquisitionPanel({ sessionId, className }: AcquisitionPanelProps
     </div>
   )
 }
-

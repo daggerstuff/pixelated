@@ -503,7 +503,7 @@ IntersectionObserver.prototype._computeTargetAndRootIntersection =
      let intersectionRect = targetRect;
      let parent = getParentNode(target);
      let atRoot = false;
-   
+
      while (!atRoot && parent) {
        let parentRect = null;
        const parentComputedStyle = parent.nodeType == 1 ?

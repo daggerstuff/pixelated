@@ -487,13 +487,13 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: queryWithPII,
         })
-        
+
         // Spy on logger to ensure no PII is logged
         const loggerSpy = vi.spyOn(console, 'log')
         const result = await contextDetector.detectContext(queryWithPII)
-        
+
         expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-        
+
         // Check that no logged messages contain PII
         const logCalls = loggerSpy.mock.calls
         for (const call of logCalls) {
@@ -501,7 +501,7 @@ describe('ContextDetector', () => {
           expect(logMessage).not.toContain('John Smith')
           expect(logMessage).not.toContain('123-45-6789')
         }
-        
+
         loggerSpy.mockRestore()
       })
 

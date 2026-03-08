@@ -1,9 +1,9 @@
 /**
  * Context Transition Detection & Handling System for MetaAligner
- * 
+ *
  * Tracks context changes across conversation turns and manages smooth transitions
  * between different context types (crisis, educational, support, clinical, informational).
- * 
+ *
  * Features:
  * - History-based transition detection
  * - Crisis elevation with immediate switching
@@ -64,7 +64,7 @@ export interface TransitionDetectorConfig {
 
 /**
  * Context Transition Detector
- * 
+ *
  * Manages detection and handling of context transitions across conversation turns.
  * Implements smoothing to prevent oscillation and immediate crisis elevation.
  */

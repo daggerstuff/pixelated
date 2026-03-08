@@ -186,4 +186,3 @@ export function Dashboard({ className }: DashboardProps) {
     </div>
   )
 }
-

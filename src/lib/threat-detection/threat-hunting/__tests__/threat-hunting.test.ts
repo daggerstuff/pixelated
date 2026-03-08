@@ -198,7 +198,7 @@ describe('Threat Hunting Service', () => {
 
       mockRedis.get.mockResolvedValue(JSON.stringify(existingInvestigation))
       mockRedis.set.mockResolvedValue('OK')
-      
+
       // Create updated investigation object
       const updatedInvestigationData = {
         ...existingInvestigation,

@@ -127,4 +127,3 @@ export const mockProgressMetrics = {
   integrationPlansCreated: 1,
   lastUpdated: new Date('2024-01-15'),
 }
-

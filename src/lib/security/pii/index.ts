@@ -210,7 +210,7 @@ class PIIDetectionService {
 
       // Simulate model loading with validation
       const loadStartTime = Date.now()
-      
+
       // Simulate loading delay for realistic behavior
       await new Promise((resolve) => setTimeout(resolve, 500))
 
@@ -238,11 +238,11 @@ class PIIDetectionService {
       })
 
       this.mlModelLoaded = false
-      
+
       // Graceful fallback to pattern matching
       logger.info('Falling back to pattern matching due to ML model loading failure')
       this.config.patternMatchingOnly = true
-      
+
       // Log the fallback for audit purposes
       if (this.config.auditDetections) {
         logger.info('ML model fallback activated', {
@@ -361,7 +361,7 @@ class PIIDetectionService {
         !this.config.patternMatchingOnly
       ) {
         logger.debug('Using ML-based detection')
-        
+
         // Enhanced ML detection with better heuristics
         mlConfidence = this.calculateMLConfidence(textLower, detectedPII)
 
@@ -707,10 +707,10 @@ class PIIDetectionService {
   private isEncryptedText(text: string): boolean {
     // Check for common encryption prefixes used in the system
     const encryptionPrefixes = ['ENC:', 'FHE:', 'AES:', 'RSA:']
-    
+
     // Also check for base64-like patterns that might indicate encryption
     const base64Pattern = /^[A-Za-z0-9+/]{20,}={0,2}$/
-    
+
     return encryptionPrefixes.some(prefix => text.startsWith(prefix)) ||
            (text.length > 20 && base64Pattern.test(text))
   }
@@ -723,25 +723,25 @@ class PIIDetectionService {
    */
   private calculateMLConfidence(text: string, detectedPatterns: PIIType[]): number {
     let mlConfidence = 0
-    
+
     // Enhanced keyword categories for better detection
     const sensitiveKeywords = {
       high: ['ssn', 'social security', 'password', 'credit card', 'bank account'],
       medium: ['confidential', 'private', 'secret', 'medical', 'patient', 'diagnosis'],
       low: ['health', 'insurance', 'record', 'birth', 'address', 'phone', 'email'],
     }
-    
+
     // Score based on keyword categories
     for (const [category, keywords] of Object.entries(sensitiveKeywords)) {
       const categoryScore = category === 'high' ? 0.15 : category === 'medium' ? 0.1 : 0.05
-      
+
       for (const keyword of keywords) {
         if (text.includes(keyword)) {
           mlConfidence += categoryScore
         }
       }
     }
-    
+
     // Bonus for context indicators
     const contextIndicators = ['personal', 'identification', 'identity', 'biometric']
     for (const indicator of contextIndicators) {
@@ -749,12 +749,12 @@ class PIIDetectionService {
         mlConfidence += 0.05
       }
     }
-    
+
     // Penalize if no patterns were detected but text is very short
     if (detectedPatterns.length === 0 && text.length < 10) {
       mlConfidence *= 0.5
     }
-    
+
     // Cap confidence at 1.0
     return Math.min(mlConfidence, 1.0)
   }

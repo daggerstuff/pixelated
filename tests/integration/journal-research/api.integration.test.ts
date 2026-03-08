@@ -13,10 +13,10 @@ import {
 
 /**
  * Integration tests for Journal Research API
- * 
+ *
  * These tests verify the API client works correctly with the backend.
  * Note: These tests require a running backend server or mocked API.
- * 
+ *
  * To run these tests:
  * 1. Start the backend API server
  * 2. Set TEST_API_URL environment variable if different from default

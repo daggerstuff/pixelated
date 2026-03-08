@@ -123,4 +123,3 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
     </Card>
   )
 }
-

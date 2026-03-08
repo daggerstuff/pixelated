@@ -208,4 +208,3 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
     </div>
   )
 }
-

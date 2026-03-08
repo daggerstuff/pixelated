@@ -81,20 +81,20 @@ import { verifyServerAuth } from '../lib/auth/serverAuth'
 async function customAuthFlow(context: APIContext) {
   const { cookies, request } = context
   const requestIp = request.headers.get('x-forwarded-for') || 'unknown'
-  
+
   const { authenticated, user, reason } = await verifyServerAuth({
     cookies,
     request,
     requestIp,
     requiredRole: 'user',
   })
-  
+
   if (!authenticated) {
     // Handle authentication failure
     console.log(`Auth failed: ${reason}`)
     return new Response('Unauthorized', { status: 401 })
   }
-  
+
   // User is authenticated
   return user
 }

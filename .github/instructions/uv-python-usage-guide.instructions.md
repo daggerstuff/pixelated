@@ -322,7 +322,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    
+
     - name: Install UV
       run: curl -LsSf https://astral.sh/uv/install.sh | sh
 
@@ -332,7 +332,7 @@ jobs:
     - name: Install dependencies
       run: |
         uv pip install -e ".[test]"
-        
+
     - name: Run tests
       run: uv run pytest
 ```
@@ -402,7 +402,7 @@ build/
   ```bash
   # Update lockfile
   uv lock
-  
+
   # Sync environment with lockfile
   uv sync
   ```
@@ -500,7 +500,7 @@ uv pip install --no-build-isolation package-name
    ```bash
    # Try with --verbose for more information
    uv pip install --verbose package-name
-   
+
    # Force reinstall
    uv pip install --force-reinstall package-name
    ```
@@ -517,7 +517,7 @@ uv pip install --no-build-isolation package-name
    ```bash
    # Check for conflicts
    uv pip check
-   
+
    # Show dependency tree
    uv pip tree
    ```
@@ -667,7 +667,7 @@ python-version = "3.12"
    ```bash
    # Install multiple extras
    uv add 'flask[async,dotenv]'
-   
+
    # Install all extras
    uv add 'flask[all]'
    ```

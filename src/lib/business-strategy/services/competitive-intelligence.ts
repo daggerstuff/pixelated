@@ -1,6 +1,6 @@
 /**
  * Competitive Intelligence Service
- * 
+ *
  * Provides functionality for competitor tracking, SWOT analysis,
  * and market positioning.
  */

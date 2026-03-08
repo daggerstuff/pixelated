@@ -30,7 +30,7 @@
   - HIPAA compliance mapping
   - Troubleshooting guide
   - Customization instructions
-  
+
 - **QUICK_REFERENCE.md**: Developer-focused guide with:
   - Common issues and fixes
   - Code examples (bad vs good)

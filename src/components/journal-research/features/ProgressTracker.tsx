@@ -281,4 +281,3 @@ export function ProgressTracker({ sessionId, className }: ProgressTrackerProps) 
     </div>
   )
 }
-

@@ -164,7 +164,7 @@ This system adheres to HIPAA Breach Notification Rule requirements:
 - Notification within 60 days for breaches affecting 500+ individuals
 - Annual reporting of smaller breaches
 - Proper documentation of all notification efforts
-- Retention of records for at least 6 years 
+- Retention of records for at least 6 years
 
 ## Troubleshooting
 
@@ -174,4 +174,4 @@ If Slack notifications aren't working:
 2. Ensure the Slack app has proper permissions for the channel
 3. Check network connectivity to Slack's API endpoints
 4. Examine logs for specific error messages
-5. Try running a test with `pnpm security:breach-test --severity high` to test the notification pipeline 
+5. Try running a test with `pnpm security:breach-test --severity high` to test the notification pipeline

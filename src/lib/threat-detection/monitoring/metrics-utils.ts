@@ -1,6 +1,6 @@
 /**
  * Metrics Utilities Module
- * 
+ *
  * Provides utility functions for metrics calculation, anomaly detection,
  * and performance monitoring.
  */

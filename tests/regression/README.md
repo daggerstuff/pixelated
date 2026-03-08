@@ -14,7 +14,7 @@ This directory contains regression tests to ensure that previously fixed bugs do
 - Expired token handling
 - Concurrent login race conditions
 
-### Chat Functionality Regressions  
+### Chat Functionality Regressions
 - Message history persistence
 - Special character handling
 - Duplicate message prevention
@@ -82,7 +82,7 @@ Regression tests include performance monitoring to catch performance regressions
 
 Security regression tests validate:
 - XSS protection
-- CSRF protection  
+- CSRF protection
 - Input sanitization
 - File upload security
 - Authentication security

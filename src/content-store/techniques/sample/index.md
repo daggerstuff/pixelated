@@ -21,4 +21,4 @@ This is just placeholder content to ensure the techniques collection is not empt
 
 ## Usage
 
-With this file in place, the build warnings about empty techniques collections should be resolved. 
+With this file in place, the build warnings about empty techniques collections should be resolved.

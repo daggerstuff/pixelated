@@ -468,5 +468,3 @@ export const serializeReportGeneratePayload = (
       : undefined,
   }
 }
-
-

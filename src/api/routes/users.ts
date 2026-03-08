@@ -57,7 +57,7 @@ router.get('/:userId', asyncHandler(async (req: Request, res: Response) => {
 
     const pool = getPostgresPool()
     const result = await pool.query(
-        `SELECT id, email, name, role, status, created_at, updated_at 
+        `SELECT id, email, name, role, status, created_at, updated_at
      FROM users WHERE id = $1`,
         [userId]
     )

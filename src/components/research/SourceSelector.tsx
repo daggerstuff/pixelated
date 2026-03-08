@@ -42,7 +42,7 @@ export default function SourceSelector({ selectedSources, onChange }: SourceSele
         }
 
         // If nothing selected, default back to all? Or empty? Let's say empty effectively implies all or user must select one.
-        // Ideally, if empty, we might revert to 'all' or show validation error. 
+        // Ideally, if empty, we might revert to 'all' or show validation error.
         // For this UX, let's treat empty as 'all' or just empty.
         if (newSources.length === 0) {
             newSources = ['all'];

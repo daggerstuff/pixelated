@@ -208,4 +208,3 @@ export function ReportGenerator({ sessionId, className }: ReportGeneratorProps) 
     </div>
   )
 }
-

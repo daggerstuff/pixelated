@@ -16,13 +16,13 @@ router.get('/dashboard', async (_req, res) => {
     try {
         const documents = await DocumentModelMongoose.find({}).lean()
 
-        // We can either compute this on the fly or read from metadata. 
+        // We can either compute this on the fly or read from metadata.
         // Since we ran the import script, metadata should be populated.
         // However, if new documents are added, we might want to trigger a check.
         // For this dashboard, we'll return the stored metadata + a summary.
 
         const dashboardData = await Promise.all(documents.map(async (doc: any) => {
-            // If metadata is missing, maybe compute it? 
+            // If metadata is missing, maybe compute it?
             // For now, assume import populated it, or return nulls.
 
             const strategies = {

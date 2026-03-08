@@ -5,7 +5,7 @@ const router = Router()
 /**
  * Auth0 Login Endpoint
  * Redirects to Auth0 hosted login page
- * 
+ *
  * Note: In production, this logic is typically handled by Auth0 SDK
  * or through frontend-initiated OAuth flows. This is a placeholder
  * for Express-based auth flows if needed.
@@ -37,7 +37,7 @@ router.get('/login', (req: Request, res: Response) => {
 /**
  * Auth0 Callback Endpoint
  * Handles the OAuth callback from Auth0
- * 
+ *
  * Note: This is a basic implementation. In production, you should use
  * the Auth0 SDK's built-in callback handling.
  */

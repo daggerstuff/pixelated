@@ -28,7 +28,7 @@ export class DatabaseService {
    * Store competitor analysis in MongoDB
    */
   async storeCompetitorAnalysis(analysis: CompetitorAnalysis): Promise<void> {
-    // Assuming one analysis per industry per day? Or just strictly structured. 
+    // Assuming one analysis per industry per day? Or just strictly structured.
     // The previous code used ID, but the interface doesn't always have ID for analysis.
     // The schema I created for CompetitorAnalysis uses default ID.
     // Let's assume we create a new record or update based on a key if provided.

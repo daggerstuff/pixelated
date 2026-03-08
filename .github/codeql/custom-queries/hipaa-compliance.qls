@@ -1,0 +1,15 @@
+- description: HIPAA compliance security checks
+  queries: fhir
+  include:
+    id:
+      - js/unvalidated-fhir-access
+      - js/insecure-fhir-ops
+      - js/missing-fhir-version
+      - js/insecure-fhir-search
+- queries: ehr
+  include:
+    id:
+      - js/unencrypted-ehr-data
+      - js/insecure-ehr-auth
+      - js/missing-audit-log
+      - js/ehr-security

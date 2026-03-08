@@ -1,6 +1,6 @@
 /**
  * Page Object Model for Pixel Multimodal Chat
- * 
+ *
  * Encapsulates all interactions with the multimodal chat component
  * following the Page Object pattern for maintainable E2E tests.
  */

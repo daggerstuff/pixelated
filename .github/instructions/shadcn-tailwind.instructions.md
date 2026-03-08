@@ -34,7 +34,7 @@ const componentVariants = cva(
   }
 )
 
-interface ComponentProps 
+interface ComponentProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof componentVariants> {
   // Additional props
@@ -102,8 +102,8 @@ export const useTherapySession = create<TherapySessionState>((set) => ({
   isActive: false,
   biasAlerts: [],
   setSession: (id) => set({ sessionId: id, isActive: true }),
-  addBiasAlert: (alert) => set((state) => ({ 
-    biasAlerts: [...state.biasAlerts, alert] 
+  addBiasAlert: (alert) => set((state) => ({
+    biasAlerts: [...state.biasAlerts, alert]
   })),
 }))
 ```
@@ -169,16 +169,16 @@ className="transition-all duration-300" // Can cause jank
 // ✅ Reduced motion support (required for accessibility)
 const useReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-  
+
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setPrefersReducedMotion(mediaQuery.matches)
-    
+
     const handler = () => setPrefersReducedMotion(mediaQuery.matches)
     mediaQuery.addEventListener('change', handler)
     return () => mediaQuery.removeEventListener('change', handler)
   }, [])
-  
+
   return prefersReducedMotion
 }
 ```
@@ -234,7 +234,7 @@ import { useTheme } from "next-themes"
 // Theme-aware components
 function TherapyInterface() {
   const { theme } = useTheme()
-  
+
   return (
     <div className={cn(
       "bg-background text-foreground",
@@ -354,12 +354,12 @@ import { BiasAlert } from "@/components/BiasAlert"
 describe("BiasAlert", () => {
   it("displays bias warning with correct severity", () => {
     render(
-      <BiasAlert 
-        severity="high" 
-        message="Potential gender bias detected" 
+      <BiasAlert
+        severity="high"
+        message="Potential gender bias detected"
       />
     )
-    
+
     expect(screen.getByRole("alert")).toBeInTheDocument()
     expect(screen.getByText("Potential gender bias detected")).toBeInTheDocument()
     expect(screen.getByTestId("bias-alert")).toHaveClass("border-destructive")

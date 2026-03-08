@@ -180,5 +180,3 @@ export const useEvaluationSelection = () =>
     isBulkEditMode: state.isBulkEditMode,
     toggleBulkEditMode: state.toggleBulkEditMode,
   }))
-
-

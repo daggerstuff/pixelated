@@ -55,7 +55,7 @@ Example: `mintlify`
 
     Link shows a button. GitHub shows the repo information at the url provided including the number of GitHub stars.
     If `link`: What the button links to.
-    
+
     If `github`: Link to the repository to load GitHub information from.
     Text inside the button. Only required if `type` is a `link`.
 
@@ -111,7 +111,7 @@ Example: `mintlify`
 
   A string or an array of strings of URL(s) or relative path(s) pointing to your
   OpenAPI file.
-  
+
   Examples:
     ```json Absolute
     "openapi": "https://example.com/openapi.json"
@@ -125,8 +125,8 @@ Example: `mintlify`
 
 
   An object of social media accounts where the key:property pair represents the social media platform and the account url.
-  
-  Example: 
+
+  Example:
   ```json
   {
     "x": "https://x.com/mintlify",
@@ -134,10 +134,10 @@ Example: `mintlify`
   }
   ```
     One of the following values `website`, `facebook`, `x`, `discord`, `slack`, `github`, `linkedin`, `instagram`, `hacker-news`
-    
+
     Example: `x`
     The URL to the social platform.
-    
+
     Example: `https://x.com/mintlify`
 
   Configurations to enable feedback buttons
@@ -149,7 +149,7 @@ Example: `mintlify`
       Set if you always want to show light or dark mode for new users. When not
       set, we default to the same mode as the user's operating system.
       Set to true to hide the dark/light mode toggle. You can combine `isHidden` with `default` to force your docs to only use light or dark mode. For example:
-      
+
       ```json Only Dark Mode
       "modeToggle": {
         "default": "dark",

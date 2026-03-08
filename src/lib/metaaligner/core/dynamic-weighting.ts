@@ -1,7 +1,7 @@
 /**
  * Dynamic Weighting System with Smoothing and Hysteresis
  * Implements weighted blending, crisis overrides, and stability guards
- * 
+ *
  * PIX-22: Dynamic weighting based on context
  */
 

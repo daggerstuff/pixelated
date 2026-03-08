@@ -1,6 +1,6 @@
 /**
  * Service Factory
- * 
+ *
  * Central point for accessing business strategy services.
  * Ensures services are properly initialized and shared across the application.
  */

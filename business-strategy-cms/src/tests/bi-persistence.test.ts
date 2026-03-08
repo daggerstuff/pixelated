@@ -45,7 +45,7 @@ describe('Business Intelligence Persistence Tests', () => {
 
         await dbService.storeCompetitorAnalysis(analysis)
 
-        // Competitor analysis doesn't have a specific GET by unique key in DatabaseService yet, 
+        // Competitor analysis doesn't have a specific GET by unique key in DatabaseService yet,
         // but we can check if it creates a record.
         // Let's check the DatabaseService implementation for a getter.
     })

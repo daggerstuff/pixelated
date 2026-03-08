@@ -375,4 +375,3 @@ export const useJournalResearchNotificationPreferences = () => {
     resetPreferences: store.resetPreferences,
   }
 }
-

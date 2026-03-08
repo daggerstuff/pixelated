@@ -14,7 +14,7 @@ spec:
       policyTypes:
         - Ingress
         - Egress
-    
+
     - name: allow-app-traffic
       podSelector:
         matchLabels:

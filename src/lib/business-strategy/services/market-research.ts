@@ -1,6 +1,6 @@
 /**
  * Market Research Service
- * 
+ *
  * Provides functionality for market analysis, trend tracking,
  * and opportunity identification.
  */

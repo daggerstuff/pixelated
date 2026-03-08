@@ -105,4 +105,4 @@ Ready to join us? Check out our [GitHub](https://github.com/vivirox/pixelated), 
 
 ---
 
-*Together, we're building a future where everyone has access to personalized, effective mental health support. One pixel at a time.* 
+*Together, we're building a future where everyone has access to personalized, effective mental health support. One pixel at a time.*

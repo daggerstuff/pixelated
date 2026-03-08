@@ -106,4 +106,4 @@ If you need help:
 
 - Check the [FAQ](/docs/faq)
 - Browse the [API documentation](/api-docs)
-- Contact support at support@pixelatedempathy.com 
+- Contact support at support@pixelatedempathy.com

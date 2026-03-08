@@ -260,7 +260,7 @@ The real-time analysis endpoint is optimized for:
 **Common Error Codes:**
 
 - `400 Bad Request`: Invalid request parameters
-- `405 Method Not Allowed`: Wrong HTTP method 
+- `405 Method Not Allowed`: Wrong HTTP method
 - `429 Too Many Requests`: Rate limit exceeded
 - `500 Internal Server Error`: Server-side processing error
 
@@ -285,4 +285,4 @@ The Emotion Analysis API uses a combination of models:
 - All API requests should be made over HTTPS
 - API keys should be kept secure and not exposed in client-side code
 - Consider using the server-to-server API for sensitive communications
-- Data is temporarily cached for performance but not permanently stored without consent 
+- Data is temporarily cached for performance but not permanently stored without consent

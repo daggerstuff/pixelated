@@ -70,7 +70,7 @@ export default function ExportPanel({ results, isOpen, onClose }: ExportPanelPro
         URL.revokeObjectURL(url);
 
         // Optional: Close panel after export
-        // onClose(); 
+        // onClose();
     };
 
     return (

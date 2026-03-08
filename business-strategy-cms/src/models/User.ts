@@ -94,7 +94,7 @@ export class UserModel {
     values.push(id)
     const sql = `
       UPDATE users 
-      SET ${setClause.join(', ')} 
+      SET ${setClause.join(', ')}
       WHERE id = $${paramIndex}
       RETURNING *
     `

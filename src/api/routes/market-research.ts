@@ -32,9 +32,9 @@ router.post('/', asyncHandler(async (req: Request, res: Response) => {
     const { user } = req as any
 
     if (!title || !industry) {
-        throw new ValidationError('title and industry are required', { 
-            title: !title ? 'Title is required' : '', 
-            industry: !industry ? 'Industry is required' : '' 
+        throw new ValidationError('title and industry are required', {
+            title: !title ? 'Title is required' : '',
+            industry: !industry ? 'Industry is required' : ''
         })
     }
 

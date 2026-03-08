@@ -199,4 +199,3 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
     </div>
   )
 }
-

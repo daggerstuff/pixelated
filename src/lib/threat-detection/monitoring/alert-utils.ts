@@ -1,6 +1,6 @@
 /**
  * Alert Utilities Module
- * 
+ *
  * Provides utility functions for alert management, severity calculation,
  * escalation logic, and reporting.
  */

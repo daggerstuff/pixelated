@@ -6,7 +6,7 @@
 
 Hi Dr. [Name],
 
-I wanted to follow up on the AI mental health training pilot proposal I sent on [DATE]. 
+I wanted to follow up on the AI mental health training pilot proposal I sent on [DATE].
 
 The key points:
 - **75% diagnostic accuracy improvement** (guaranteed or full refund)

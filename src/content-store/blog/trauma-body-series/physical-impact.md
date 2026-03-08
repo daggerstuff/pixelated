@@ -170,4 +170,3 @@ Take a moment to consider:
 ### Stay Updated
 
 Subscribe to receive notifications about new articles and resources:
-

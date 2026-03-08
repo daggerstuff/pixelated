@@ -49,7 +49,7 @@ class TenantManager {
     }
 
     const { customConfig, resourceLimits } = tenant
-    
+
     // Create a new config merging base, custom, and resource limits
     // We prioritize tenant specific overrides
     const newConfig = {

@@ -1,6 +1,6 @@
 /**
  * Analytics Service
- * 
+ *
  * Cross-system analytics and reporting for the business strategy system.
  */
 

@@ -88,7 +88,7 @@ We suggest using extensions on your IDE to recognize and format MDX. If you're a
     3. Reinstall mintlify: `npm install -g mintlify`
 
 
-  
+
     Solution: Go to the root of your device and delete the \~/.mintlify folder. Afterwards, run `mintlify dev` again.
 
 Curious about what changed in the CLI version? [Check out the CLI changelog.](https://www.npmjs.com/package/mintlify?activeTab=versions)

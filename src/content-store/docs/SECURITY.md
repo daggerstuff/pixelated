@@ -127,4 +127,4 @@ This security policy will be reviewed and updated quarterly or as needed based o
 - Incident response learnings
 - Team feedback
 
-Last Updated: March 2025 
+Last Updated: March 2025

@@ -521,4 +521,3 @@ export {
   captureError as captureException,
   captureMessage as sentryCaptureMessage,
 }
-

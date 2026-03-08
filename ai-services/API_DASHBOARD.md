@@ -40,7 +40,7 @@
 - **Signals**: Self-harm, Violence, Despair, Substance Abuse, Medical
 - **Output**: Risk Level (Minimal → Imminent) + Escalation Protocol
 - **Safeguards**: Intended as decision support only; requires clinician review/override. Provide explainability, confidence thresholds, and audit logging before any escalation.
-- **Clinical Safeguards**: 
+- **Clinical Safeguards**:
   - **Explainability**: All risk determinations include clear reasoning and contributing factors
   - **Clinician Override**: All automated decisions can be overridden by qualified clinicians
   - **FDA/CE Intended Use**: Clearly documented for clinical decision support, not diagnosis

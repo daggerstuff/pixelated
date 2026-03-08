@@ -6,13 +6,13 @@
 
 **Pixelated Empathy AI** ("Company")  
 [Your Company Address]  
-[Your Contact Information]  
+[Your Contact Information]
 
-and  
+and
 
 **[INSTITUTION NAME]** ("Institution")  
 [Institution Address]  
-[Primary Contact Name and Title]  
+[Primary Contact Name and Title]
 
 ---
 
@@ -125,16 +125,16 @@ and
 ## SIGNATURES
 
 **Pixelated Empathy AI:**  
-By: _________________________  
+By: _________________________
 Name: [Your Name]  
 Title: [Your Title]  
-Date: _________________________  
+Date: _________________________
 
 **[INSTITUTION NAME]:**  
-By: _________________________  
+By: _________________________
 Name: [Primary Contact Name]  
 Title: [Title]  
-Date: _________________________  
+Date: _________________________
 
 ---
 
@@ -152,6 +152,6 @@ Date: _________________________
 
 **Next Steps After Signing:**
 1. Technical setup within 1 week
-2. Participant onboarding within 2 weeks  
+2. Participant onboarding within 2 weeks
 3. Baseline assessment within 3 weeks
 4. Program launch within 4 weeks

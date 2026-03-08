@@ -365,7 +365,7 @@ export function Sidebar() {
                     const hasChildren = item.children && item.children.length > 0
                     const itemKey = `${section.title}-${item.name}`
                     const isExpanded = expandedItems[itemKey] ?? (isActive && hasChildren)
-                    
+
                     return (
                       <li key={item.name}>
                         <div>

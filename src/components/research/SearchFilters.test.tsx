@@ -38,7 +38,7 @@ describe('SearchFilters', () => {
         const topicButton = screen.getByText('CBT');
         fireEvent.click(topicButton);
 
-        // Note: The component uses local state, so we expect the button style to change 
+        // Note: The component uses local state, so we expect the button style to change
         // AND handleApply calls onChange. But wait, toggleTopic updates local state.
         // We verify the button indicates it is pressed or selected visually (class check or aria-pressed).
         // After clicking, it should be pressed (true)

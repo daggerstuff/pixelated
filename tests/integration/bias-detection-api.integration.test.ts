@@ -342,7 +342,7 @@ describe('Bias Detection API Integration Tests', () => {
                 // Test expects: ethnicity: '[ANONYMIZED]', others match validTestSession.
                 // The validTestSession has age, gender.
               }
-              // Test expects logic: 
+              // Test expects logic:
               // expect(analysisData.demographics.age).toBe(testSession.participantDemographics.age)
               // This matches default logic if we only redact explicitly.
             }

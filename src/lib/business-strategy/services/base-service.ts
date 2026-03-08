@@ -1,6 +1,6 @@
 /**
  * Base Service Class
- * 
+ *
  * Provides common functionality for all business strategy services
  */
 

@@ -310,5 +310,3 @@ interface ChatResponse {
   followUp: unknown
   metadata: unknown
 }
-
-

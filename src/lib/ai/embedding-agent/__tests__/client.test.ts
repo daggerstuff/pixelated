@@ -272,4 +272,3 @@ describe('createEmbeddingAgentClient', () => {
     expect(client).toBeInstanceOf(EmbeddingAgentClient)
   })
 })
-

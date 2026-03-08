@@ -1,9 +1,9 @@
 /**
  * User Preferences Module for MetaAligner Objective Personalization
- * 
+ *
  * Manages user preferences that influence objective selection and weighting.
  * Supports storage, retrieval, validation, and application of preferences.
- * 
+ *
  * Features:
  * - Preference storage with validation
  * - Default preferences with sensible fallbacks
@@ -94,7 +94,7 @@ export interface PreferenceValidationResult {
 
 /**
  * User Preference Manager
- * 
+ *
  * Manages user preferences with validation, storage, and application logic.
  */
 export class UserPreferenceManager {
@@ -261,7 +261,7 @@ export class UserPreferenceManager {
 
 /**
  * Apply user preferences to objective priorities
- * 
+ *
  * Adjusts objective weights based on user preferences including:
  * - Support style preferences
  * - Custom weight overrides

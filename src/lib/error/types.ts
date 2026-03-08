@@ -146,4 +146,3 @@ export class AuthorizationError extends AppError {
     this.name = 'AuthorizationError'
   }
 }
-

@@ -49,9 +49,9 @@ export function DiscoveryForm({
       const validated = DiscoveryInitiatePayloadSchema.parse(payload)
       await onSubmit(validated)
     } catch (error) {
-      
+
       const fieldErrs = getFieldErrors(error) ?? {}
-      
+
       if (fieldErrs && Object.keys(fieldErrs).length > 0) {
         setErrors(fieldErrs)
       } else {
@@ -177,4 +177,3 @@ export function DiscoveryForm({
     </Card>
   )
 }
-

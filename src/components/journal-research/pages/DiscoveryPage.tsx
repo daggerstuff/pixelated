@@ -12,4 +12,3 @@ export function DiscoveryPage({ sessionId }: DiscoveryPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

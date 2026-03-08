@@ -78,15 +78,15 @@ export function protectRoute<
   return (handler) => {
     const apiRouteHandler: APIRoute = async (context) => {
       // Authentication and authorization checks...
-      
+
       // If authenticated, create auth context with user
       context.locals.user = user
       const authContext = context as unknown as AuthAPIContext<Props, Params>
-      
+
       // Call the handler with the auth context
       return handler(authContext)
     }
-    
+
     return apiRouteHandler
   }
 }
@@ -108,9 +108,9 @@ export const GET = protectRoute({
 })(async ({ locals, request }) => {
   // Access the authenticated user from locals
   const user = locals.user
-  
+
   // Your protected route logic here...
-  
+
   return new Response(
     JSON.stringify({ success: true, data: /* your data */ }),
     { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -152,11 +152,11 @@ export const GET = protectRoute({
   try {
     const user = locals.user
     logger.info(`User ${user.id} accessed protected resource`)
-    
+
     // Your API logic here
-    
+
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         message: 'Protected resource accessed successfully'
       }),

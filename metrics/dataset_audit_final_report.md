@@ -202,7 +202,7 @@
 - Run orchestrator on S3 data
 - Generate local training packages
 
-### Option B: **YouTube/Books Scripts** 
+### Option B: **YouTube/Books Scripts**
 - Implement missing extraction scripts
 - Process additional sources
 - Expand dataset coverage

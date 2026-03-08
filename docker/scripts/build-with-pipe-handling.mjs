@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * Build wrapper that handles EPIPE errors gracefully
- * 
+ *
  * Problem: During CI builds, parent process may close stdout/stderr pipes
  * before the build completes, causing Node.js to throw unhandled EPIPE errors
- * 
+ *
  * Solution: This wrapper handles broken pipe errors and exits cleanly
  */
 import { spawn } from 'child_process';

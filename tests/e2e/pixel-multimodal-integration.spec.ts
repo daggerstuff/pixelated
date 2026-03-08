@@ -1,6 +1,6 @@
 /**
  * E2E Integration Tests for Pixel Multimodal Chat
- * 
+ *
  * Tests the complete multimodal flow:
  * - Audio recording → text input → streaming/REST → UI updates
  * - WebSocket real-time interaction
@@ -8,7 +8,7 @@
  * - Reconnection scenarios
  * - Crisis detection integration
  * - Emotion visualization
- * 
+ *
  * Phase 4.5: E2E Integration Testing
  */
 

@@ -1,18 +1,18 @@
 /**
  * K6 Load Test for Pixel Multimodal REST API
- * 
+ *
  * Tests the /api/ai/pixel/infer REST endpoint under load
  * to validate:
  * - Latency percentiles (P50, P95, P99) < 200ms target
  * - Throughput (requests/second)
  * - Error rate < 1%
  * - Resource utilization
- * 
+ *
  * Phase 4.6: Performance Load Testing
- * 
+ *
  * Run with:
  *   k6 run tests/performance/k6-rest-inference-load.js
- * 
+ *
  * Run with different load profiles:
  *   k6 run --vus 10 --duration 30s tests/performance/k6-rest-inference-load.js
  *   k6 run --vus 50 --duration 2m tests/performance/k6-rest-inference-load.js

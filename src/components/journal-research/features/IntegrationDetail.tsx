@@ -205,4 +205,3 @@ ${Object.entries(plan.schemaMapping).map(([k, v]) => `# ${k} -> ${v}`).join('\n'
     </div>
   )
 }
-

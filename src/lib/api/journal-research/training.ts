@@ -1,6 +1,6 @@
 /**
  * Training Pipeline Integration API
- * 
+ *
  * Provides methods for integrating journal research datasets into the training pipeline.
  */
 
@@ -124,4 +124,3 @@ export async function getPipelineStatus(): Promise<TrainingPipelineStatus> {
   )
   return response
 }
-

@@ -45,15 +45,15 @@ class TherapeuticResponseModel(nn.Module):
     def __init__(self, config):
         super().__init__()
         # Model architecture with memory optimization
-        
+
 # ai/inference/ - Production inference services
 class BiasDetectionEngine:
     def __init__(self):
         self.model = self._load_optimized_model()
-    
+
     async def detect_bias(self, text: str) -> BiasMetrics:
         # Real-time bias detection with <50ms latency
-        
+
 # ai/training/ - Training pipelines and scripts
 def train_with_fhe_privacy(model, dataloader):
     # Privacy-preserving training with FHE

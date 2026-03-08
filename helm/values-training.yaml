@@ -9,12 +9,12 @@ training:
   enabled: true
   namespace: pixelated-training
   replicaCount: 1
-  
+
   image:
     repository: ghcr.io/pixelated/training-service
     tag: "latest"
     pullPolicy: IfNotPresent
-  
+
   # Resources for H100 GPU training
   resources:
     requests:
@@ -25,18 +25,18 @@ training:
       cpu: "16"
       memory: "64Gi"
       nvidia.com/gpu: 1
-  
+
   # Node selection for GPU nodes
   nodeSelector:
     accelerator: nvidia-tesla-h100
     node-type: gpu
-  
+
   # Tolerations for GPU nodes
   tolerations:
   - key: nvidia.com/gpu
     operator: Exists
     effect: NoSchedule
-  
+
   # Affinity for optimal GPU scheduling
   affinity:
     nodeAffinity:
@@ -46,7 +46,7 @@ training:
           - key: accelerator
             operator: In
             values: ["nvidia-tesla-h100", "nvidia-a100"]
-  
+
   # Security contexts for HIPAA compliance
   podSecurityContext:
     runAsNonRoot: true
@@ -56,7 +56,7 @@ training:
     seccompProfile:
       type: RuntimeDefault
     supplementalGroups: [1001]
-  
+
   securityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
@@ -68,7 +68,7 @@ training:
       - ALL
     seccompProfile:
       type: RuntimeDefault
-  
+
   # Environment variables
   env:
   - name: CUDA_VISIBLE_DEVICES
@@ -90,13 +90,13 @@ training:
       secretKeyRef:
         name: training-secrets
         key: huggingface-token
-  
+
   # Service configuration
   service:
     type: ClusterIP
     port: 80
     targetPort: 8003
-  
+
   # Health checks
   livenessProbe:
     httpGet:
@@ -106,7 +106,7 @@ training:
     periodSeconds: 60
     timeoutSeconds: 30
     failureThreshold: 3
-  
+
   readinessProbe:
     httpGet:
       path: /ready
@@ -115,7 +115,7 @@ training:
     periodSeconds: 30
     timeoutSeconds: 15
     failureThreshold: 5
-  
+
   # Volume mounts
   volumeMounts:
   - name: training-data
@@ -129,7 +129,7 @@ training:
     mountPath: /dev/shm
   - name: cache
     mountPath: /app/cache
-  
+
   # Volumes
   volumes:
   - name: training-data
@@ -152,7 +152,7 @@ training:
 # Enhanced monitoring for training
 monitoring:
   enabled: true
-  
+
   prometheus:
     enabled: true
     serviceMonitor:
@@ -161,7 +161,7 @@ monitoring:
       scrapeTimeout: 10s
       labels:
         app: training-service
-    
+
     rules:
       enabled: true
       groups:
@@ -175,7 +175,7 @@ monitoring:
           annotations:
             summary: "Training service is down"
             description: "Training service has been down for more than 5 minutes"
-        
+
         - alert: GPUMemoryHigh
           expr: nvidia_gpu_memory_used_bytes / nvidia_gpu_memory_total_bytes > 0.9
           for: 10m
@@ -184,7 +184,7 @@ monitoring:
           annotations:
             summary: "GPU memory usage is high"
             description: "GPU memory usage is above 90% for more than 10 minutes"
-        
+
         - alert: TrainingStalled
           expr: increase(training_batches_processed_total[30m]) == 0
           for: 30m
@@ -201,13 +201,13 @@ storage:
     accessMode: ReadOnlyMany
     size: 500Gi
     storageClass: ssd-retain
-  
+
   modelOutput:
     enabled: true
     accessMode: ReadWriteOnce
     size: 200Gi
     storageClass: ssd-retain
-  
+
   checkpoints:
     enabled: true
     accessMode: ReadWriteOnce

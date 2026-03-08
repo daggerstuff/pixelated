@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Setup
- * 
+ *
  * Initializes distributed tracing for the application.
  * This should be called early in the application startup process.
  */
@@ -23,7 +23,7 @@ let isInitialized = false
 
 /**
  * Initialize OpenTelemetry tracing
- * 
+ *
  * This should be called once during application startup, before any other
  * modules that need tracing are loaded.
  */
@@ -133,7 +133,7 @@ export function initializeTracing(): void {
 
 /**
  * Shutdown tracing gracefully
- * 
+ *
  * This should be called during application shutdown to ensure all
  * spans are exported before the process exits.
  */

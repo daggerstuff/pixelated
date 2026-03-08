@@ -215,4 +215,3 @@ export function logError(error: AppError, additionalContext?: ErrorContext) {
       break
   }
 }
-

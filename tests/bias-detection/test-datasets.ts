@@ -1,6 +1,6 @@
 /**
  * Bias Detection Test Datasets
- * 
+ *
  * Curated test cases with known biases for measuring detection accuracy.
  * Each test case is labeled with:
  * - Expected bias type (gender, racial, cultural, age, disability, socioeconomic)

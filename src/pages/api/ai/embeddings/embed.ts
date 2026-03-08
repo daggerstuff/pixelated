@@ -264,4 +264,3 @@ function simpleHash(str: string): number {
   }
   return Math.abs(hash)
 }
-

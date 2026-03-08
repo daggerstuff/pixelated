@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Configuration
- * 
+ *
  * Configures distributed tracing for the Pixelated Empathy platform
  * to enable end-to-end request tracking across microservices.
  */

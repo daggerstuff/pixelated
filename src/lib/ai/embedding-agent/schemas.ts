@@ -241,4 +241,3 @@ export type EmbeddingRequestInput = z.input<typeof EmbeddingRequestSchema>
 export type EmbeddingRequestOutput = z.output<typeof EmbeddingRequestSchema>
 export type BatchEmbeddingRequestInput = z.input<typeof BatchEmbeddingRequestSchema>
 export type SimilaritySearchRequestInput = z.input<typeof SimilaritySearchRequestSchema>
-

@@ -58,7 +58,7 @@ When adding new external services:
 ### Common CSP Directives
 
 - `script-src`: JavaScript sources
-- `style-src`: CSS sources  
+- `style-src`: CSS sources
 - `img-src`: Image sources
 - `connect-src`: AJAX, WebSocket, and fetch() sources
 - `font-src`: Font sources
@@ -126,4 +126,4 @@ Consider implementing:
 1. **Nonce-based CSP**: Replace `'unsafe-inline'` with nonces
 2. **Report-Only mode**: Test new policies without breaking functionality
 3. **Automated testing**: CSP validation in CI/CD pipeline
-4. **Subresource Integrity**: Add integrity checks for external resources 
+4. **Subresource Integrity**: Add integrity checks for external resources

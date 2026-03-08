@@ -58,10 +58,10 @@ We've built more than just software—we've built a new language for understandi
 ### 🎭 **Emotional Cartography**
 We don't just analyze sentiment. We map the emotional journey of every conversation, identifying the moments that matter: vulnerability, trust-building, emotional shifts, and connection points that traditional analytics miss entirely.
 
-### 🌊 **Conversational Dynamics Engine**  
+### 🌊 **Conversational Dynamics Engine**
 Understanding that communication is more than words, our system analyzes the *flow* of dialogue—tone patterns, response timing, emotional reciprocity, and the subtle dance of human interaction that builds (or breaks) rapport.
 
-### 🧩 **Persona Intelligence**  
+### 🧩 **Persona Intelligence**
 People aren't static, and neither are our insights. Our Dual-Persona framework recognizes when someone is shifting roles—mentor, peer, or help-seeker—and adapts our analysis accordingly.
 
 </div>

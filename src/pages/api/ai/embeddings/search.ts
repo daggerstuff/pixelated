@@ -267,4 +267,3 @@ function generateMockSearchResults(request: SimilaritySearchRequest): Similarity
     modelUsed: 'mock-embedding-v1',
   }
 }
-

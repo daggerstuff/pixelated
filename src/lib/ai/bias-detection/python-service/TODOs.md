@@ -67,4 +67,3 @@ Suggested next steps (small, safe changes):
 If you want I can:
 - Create issues from each P0/P1 item and link them to this file.
 - Implement step (1) now and add a unit test (fast). Tell me which you'd prefer.
-

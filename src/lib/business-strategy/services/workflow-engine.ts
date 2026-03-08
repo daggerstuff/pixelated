@@ -1,6 +1,6 @@
 /**
  * Workflow Engine Service
- * 
+ *
  * Provides functionality for defining and executing business
  * workflows, approvals, and automated tasks.
  */
@@ -94,7 +94,7 @@ export class WorkflowEngineService extends BaseService {
 
             // Update PostgreSQL approval record if any
             await this.db.postgresql.pool.query(
-                `UPDATE ${this.db.postgresql.schema}.${this.tableNames.approvals} 
+                `UPDATE ${this.db.postgresql.schema}.${this.tableNames.approvals}
                  SET status = 'approved', decision = 'approve', feedback = $1, decided_at = $2
                  WHERE workflow_execution_id = $3 AND step_id = $4 AND approver_id = $5`,
                 [feedback, timestamp, executionId, stepId, userId]

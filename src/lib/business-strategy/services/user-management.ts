@@ -1,7 +1,7 @@
 /**
  * User Management Service
- * 
- * Provides functionality for managing system users, roles, 
+ *
+ * Provides functionality for managing system users, roles,
  * and permissions.
  */
 

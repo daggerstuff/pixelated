@@ -127,7 +127,7 @@ describe('Dashboard', () => {
   it('handles quick action click for new session', () => {
     const openCreateDrawer = vi.fn()
     mockUseJournalSessionStore.mockReturnValue(null)
-    
+
     // Mock store methods
     vi.spyOn(store.useJournalSessionStore, 'getState').mockReturnValue({
       openCreateDrawer,

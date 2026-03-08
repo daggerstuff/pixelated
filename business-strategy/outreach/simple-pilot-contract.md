@@ -9,7 +9,7 @@
 
 **Terms:**
 - Company provides AI training platform + support
-- Institution provides participants + assessments  
+- Institution provides participants + assessments
 - Success = 75%+ diagnostic accuracy improvement
 - Full refund if benchmark not met
 - Joint research publication opportunity

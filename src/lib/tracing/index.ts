@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Tracing Module
- * 
+ *
  * Main entry point for distributed tracing functionality.
  */
 

@@ -5,7 +5,7 @@ import type { AuthUser } from './types'
 /**
  * Protect API route by verifying Auth0 token
  * This is a compatibility wrapper for the legacy protectApi used in various endpoints.
- * 
+ *
  * @param request The incoming Request object
  * @returns An object containing success status and user data
  */

@@ -189,7 +189,7 @@ export class BusinessIntelligenceService {
       const result = await this.db.query(
         `SELECT * FROM business_metrics 
          WHERE user_id = $1 
-         ${quarter ? 'AND quarter = $2' : ''} 
+         ${quarter ? 'AND quarter = $2' : ''}
          ${year ? 'AND year = $3' : ''}
          ORDER BY year DESC, quarter DESC`,
         [userId, quarter, year].filter(Boolean),

@@ -61,7 +61,7 @@ export const POST = async ({ request, cookies }: APIContext) => {
       },
     )
 
-    /* 
+    /*
     Legacy implementation removed:
     // Update the password using the AuthService with token verification
     await updatePasswordWithToken(email, token, password)

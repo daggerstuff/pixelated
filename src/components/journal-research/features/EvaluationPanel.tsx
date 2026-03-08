@@ -137,4 +137,3 @@ export function EvaluationPanel({ sessionId, className }: EvaluationPanelProps) 
     </div>
   )
 }
-

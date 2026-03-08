@@ -18,4 +18,4 @@ This is just placeholder content to ensure the blog collection is not empty.
 
 ## Conclusion
 
-With this file in place, the build warnings about empty blog collections should be resolved. 
+With this file in place, the build warnings about empty blog collections should be resolved.

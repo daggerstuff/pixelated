@@ -8,7 +8,7 @@ The production implementation consists of three main components:
 
 ### 1. MentalArenaAdapter (`MentalArenaAdapter.ts`)
 - **Primary Interface**: Main class for generating synthetic therapeutic conversations
-- **Features**: 
+- **Features**:
   - Multi-disorder support (anxiety, depression, PTSD, ADHD, OCD, etc.)
   - Configurable conversation complexity levels
   - Quality assessment and validation systems
@@ -34,10 +34,10 @@ The production implementation consists of three main components:
 ### Basic Usage
 
 ```typescript
-import { 
-  MentalArenaAdapter, 
-  MentalArenaPythonBridge, 
-  DisorderCategory 
+import {
+  MentalArenaAdapter,
+  MentalArenaPythonBridge,
+  DisorderCategory
 } from './lib/ai/mental-arena'
 
 // Initialize components

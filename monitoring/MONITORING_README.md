@@ -236,7 +236,7 @@ app.get('/health', (req, res) => {
     },
     memory: process.memoryUsage()
   };
-  
+
   updateHealthMetrics(healthData);
   res.json(healthData);
 });
@@ -308,7 +308,7 @@ rate({job="pixelated-empathy"}[5m])
    ```bash
    # Check memory metrics
    curl http://localhost:9090/api/v1/query?query=process_resident_memory_bytes
-   
+
    # Check container memory
    docker stats
    ```
@@ -317,7 +317,7 @@ rate({job="pixelated-empathy"}[5m])
    ```bash
    # Check database metrics
    curl http://localhost:9187/metrics | grep pg_stat_database_numbackends
-   
+
    # Check connection pool
    curl http://localhost:3000/health
    ```
@@ -326,7 +326,7 @@ rate({job="pixelated-empathy"}[5m])
    ```bash
    # Check error metrics
    curl http://localhost:9090/api/v1/query?query=rate(http_requests_total{status=~"5.."}[5m])
-   
+
    # Check application logs
    docker logs pixelated-empathy-app
    ```

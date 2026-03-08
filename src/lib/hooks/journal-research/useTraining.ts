@@ -96,4 +96,3 @@ export function usePipelineStatus(enabled: boolean = true) {
     refetchInterval: 30000, // Refetch every 30 seconds
   })
 }
-

@@ -25,4 +25,3 @@ export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
     </JournalResearchQueryProvider>
   )
 }
-

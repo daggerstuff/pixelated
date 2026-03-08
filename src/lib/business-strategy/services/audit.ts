@@ -1,6 +1,6 @@
 /**
  * Audit Service
- * 
+ *
  * Handles audit logging for all business strategy system activities
  * Ensures compliance and traceability
  */

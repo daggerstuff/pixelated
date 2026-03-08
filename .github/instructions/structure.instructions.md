@@ -9,7 +9,7 @@ description: 'Project structure and organization rules for Pixelated Empathy'
 
 ### Root Organization
 - `src/` - Frontend Astro/React application
-- `ai/` - Python AI/ML services and pipelines  
+- `ai/` - Python AI/ML services and pipelines
 - `scripts/` - Build, deployment, and utility scripts
 - `docker/` - Service-specific Docker configurations
 - `docs/` - Project documentation

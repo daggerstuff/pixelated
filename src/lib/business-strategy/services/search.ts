@@ -1,6 +1,6 @@
 /**
  * Search Service
- * 
+ *
  * Advanced search capabilities across all strategy entities.
  */
 

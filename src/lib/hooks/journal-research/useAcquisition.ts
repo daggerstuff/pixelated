@@ -152,5 +152,3 @@ export const useAcquisitionSelection = () =>
     expandRow: state.expandRow,
     collapseRow: state.collapseRow,
   }))
-
-

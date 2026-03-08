@@ -1,6 +1,6 @@
 /**
  * E2E Integration Tests using Page Object Model
- * 
+ *
  * Focused, maintainable tests for the multimodal chat flow
  * using the PixelMultimodalChatPage abstraction.
  */

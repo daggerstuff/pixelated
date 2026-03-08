@@ -9,7 +9,7 @@ A comprehensive visual explanation system that demonstrates how Pixelated Empath
 **Purpose:** Side-by-side comparison showing the problems with traditional training methods versus AI simulation solutions
 **Key Points:**
 - Limited exposure vs unlimited practice
-- Ethical barriers vs zero-risk environment  
+- Ethical barriers vs zero-risk environment
 - Supervision bottlenecks vs instant availability
 - Risk to patients vs complete safety
 
@@ -74,7 +74,7 @@ A comprehensive visual explanation system that demonstrates how Pixelated Empath
 ### **Technical Details**
 - **Format:** SVG (Scalable Vector Graphics)
 - **Dimensions:** 1200x800 viewBox for optimal scaling
-- **Color Palette:** 
+- **Color Palette:**
   - Primary: Blues (#74c0fc, #339af0)
   - Success: Greens (#51cf66, #40c057)
   - Warning: Oranges (#ffa94d, #fd7e14)
@@ -122,12 +122,12 @@ A comprehensive visual explanation system that demonstrates how Pixelated Empath
 ### **HTML Usage**
 ```html
 <!-- Inline SVG -->
-<img src="/images/explainers/1-traditional-vs-ai-training.svg" 
-     alt="Traditional Training vs AI-First Simulation Comparison" 
+<img src="/images/explainers/1-traditional-vs-ai-training.svg"
+     alt="Traditional Training vs AI-First Simulation Comparison"
      style="width: 100%; max-width: 1200px;">
 
 <!-- As background image -->
-<div style="background-image: url('/images/explainers/2-edge-case-generator.svg'); 
+<div style="background-image: url('/images/explainers/2-edge-case-generator.svg');
             background-size: contain; background-repeat: no-repeat;">
 ```
 
@@ -145,7 +145,7 @@ const { graphic, alt, maxWidth = "1200px" } = Astro.props;
 ---
 
 <div class="explainer-container">
-  <img 
+  <img
     src={`/images/explainers/${graphic}.svg`}
     alt={alt}
     style={`max-width: ${maxWidth}; width: 100%; height: auto;`}
@@ -206,4 +206,4 @@ For custom versions, translations, or specific format requirements, contact the 
 **Created:** January 2025  
 **Last Updated:** January 2025  
 **Version:** 1.0  
-**License:** Proprietary - Pixelated Empathy 
+**License:** Proprietary - Pixelated Empathy

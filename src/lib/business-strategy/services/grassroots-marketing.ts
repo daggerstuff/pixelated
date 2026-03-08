@@ -1,6 +1,6 @@
 /**
  * Grassroots Marketing Service
- * 
+ *
  * Manages community-driven marketing initiatives and outreach.
  */
 

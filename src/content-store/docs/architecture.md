@@ -124,30 +124,30 @@ created_at TIMESTAMPTZ DEFAULT NOW()
 ### Liftoff Features
 
 
-- Chat interface adaptation 
-- Dashboard layouts 
+- Chat interface adaptation
+- Dashboard layouts
 - Form components
 - Navigation elements
 
 
 
-- Real-time updates 
-- Cache management 
-- Optimistic updates 
+- Real-time updates
+- Cache management
+- Optimistic updates
 - Error handling
 
 
 ### PocketBase Inspired Features
 
 
-- Adapted for Supabase 
-- Enhanced with ZK principles 
+- Adapted for Supabase
+- Enhanced with ZK principles
 - Role-based access control
 
 
 
-- RESTful endpoints 
-- Real-time subscriptions 
+- RESTful endpoints
+- Real-time subscriptions
 - Request validation
 
 
@@ -179,7 +179,7 @@ flowchart LR
 
 
 - Code splitting
-- Lazy loading  
+- Lazy loading
 - Image optimization
 - Bundle size reduction
 

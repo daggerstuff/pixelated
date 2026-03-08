@@ -1,6 +1,6 @@
 /**
  * Database Configuration for Business Strategy System
- * 
+ *
  * Integrates with existing Pixelated Empathy database infrastructure
  * while maintaining separation of concerns for business strategy data
  */

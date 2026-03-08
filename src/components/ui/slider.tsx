@@ -58,7 +58,7 @@ const Slider: FC<SliderProps> = ({
           ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
         `}
         style={{
-          background: `linear-gradient(to ${isVertical ? 'top' : 'right'}, 
+          background: `linear-gradient(to ${isVertical ? 'top' : 'right'},
             #3b82f6 0%, #3b82f6 ${((sliderValue - min) / (max - min)) * 100}%, 
             #e5e7eb ${((sliderValue - min) / (max - min)) * 100}%, #e5e7eb 100%)`,
         }}

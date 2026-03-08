@@ -96,4 +96,3 @@ export function SourceDiscovery({ sessionId, className }: SourceDiscoveryProps) 
     </div>
   )
 }
-

@@ -4,7 +4,7 @@ import { authenticateRequest } from '../../lib/auth/auth0-middleware'
 /**
  * Express middleware for Auth0 authentication
  * Validates JWT tokens and attaches user information to the request
- * 
+ *
  * This middleware should be applied to protected Express API routes.
  * For Astro middleware integration, see src/middleware.ts
  */

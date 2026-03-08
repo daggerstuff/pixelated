@@ -169,7 +169,7 @@ import { auditLogger } from '../lib/audit/logger';
 async function processPatientDataWithAI(patientData, userId) {
   // Sanitize inputs
   const sanitizedPrompt = sanitizePrompt(patientData.prompt);
-  
+
   // Log the operation
   auditLogger.log({
     action: 'AI_PROCESS',
@@ -178,13 +178,13 @@ async function processPatientDataWithAI(patientData, userId) {
     resource: 'patient',
     resourceId: patientData.id
   });
-  
+
   // Process with AI
   const aiResponse = await aiService.process(sanitizedPrompt);
-  
+
   // Filter response for potential PHI or sensitive data
   const safeResponse = filterResponse(aiResponse);
-  
+
   return safeResponse;
 }
 ```

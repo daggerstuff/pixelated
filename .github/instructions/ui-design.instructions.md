@@ -22,7 +22,7 @@ export const tokens = {
     destructive: "hsl(var(--destructive))"
   },
   spacing: {
-    xs: "0.25rem", sm: "0.5rem", md: "1rem", 
+    xs: "0.25rem", sm: "0.5rem", md: "1rem",
     lg: "1.5rem", xl: "2rem", "2xl": "3rem"
   }
 };
@@ -42,13 +42,13 @@ interface ButtonProps {
   rightIcon?: React.ReactNode;
 }
 
-export function Button({ 
-  variant = "primary", 
-  size = "md", 
-  children, 
-  leftIcon, 
-  rightIcon, 
-  ...props 
+export function Button({
+  variant = "primary",
+  size = "md",
+  children,
+  leftIcon,
+  rightIcon,
+  ...props
 }: ButtonProps) {
   return (
     <button
@@ -77,7 +77,7 @@ All UI components must meet WCAG AA standards for healthcare applications:
 export function FormField({ label, error, required, ...props }) {
   const id = useId();
   const errorId = error ? `${id}-error` : undefined;
-  
+
   return (
     <div className="space-y-2">
       <label htmlFor={id} className="text-sm font-medium">
@@ -106,21 +106,21 @@ export function FormField({ label, error, required, ...props }) {
 // ✅ Modal with focus management
 export function Modal({ isOpen, onClose, children }) {
   const modalRef = useRef<HTMLDivElement>(null);
-  
+
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const focusableElements = modalRef.current?.querySelectorAll(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     const firstElement = focusableElements?.[0] as HTMLElement;
     const lastElement = focusableElements?.[focusableElements.length - 1] as HTMLElement;
-    
+
     firstElement?.focus();
-    
+
     const handleTabKey = (e: KeyboardEvent) => {
       if (e.key !== 'Tab') return;
-      
+
       if (e.shiftKey) {
         if (document.activeElement === firstElement) {
           lastElement?.focus();
@@ -133,13 +133,13 @@ export function Modal({ isOpen, onClose, children }) {
         }
       }
     };
-    
+
     document.addEventListener('keydown', handleTabKey);
     return () => document.removeEventListener('keydown', handleTabKey);
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
       <div
@@ -194,7 +194,7 @@ const ChatMessage = memo(({ message, isTyping }) => {
   return (
     <div className={cn("flex gap-3 p-4", message.role === 'user' ? 'justify-end' : 'justify-start')}>
       {message.role === 'assistant' && <Avatar />}
-      <div className={cn("max-w-[80%] rounded-lg p-3", 
+      <div className={cn("max-w-[80%] rounded-lg p-3",
         message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
       )}>
         {isTyping ? <TypingIndicator /> : message.content}
@@ -234,7 +234,7 @@ Provide clear feedback for AI interactions and secure operations:
 // ✅ AI processing states
 function AIResponseButton({ isProcessing, onSubmit }) {
   return (
-    <Button 
+    <Button
       onClick={onSubmit}
       disabled={isProcessing}
       className="w-full"
@@ -258,7 +258,7 @@ function AIResponseButton({ isProcessing, onSubmit }) {
 function SecurityStatus({ encryptionStatus, biasScore }) {
   return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Shield className={cn("h-4 w-4", 
+      <Shield className={cn("h-4 w-4",
         encryptionStatus === 'encrypted' ? 'text-green-500' : 'text-yellow-500'
       )} />
       <span>FHE Encrypted</span>
@@ -374,15 +374,15 @@ expect.extend(toHaveNoViolations);
 
 test('ChatMessage is accessible', async () => {
   const { container } = render(
-    <ChatMessage 
-      message={{ role: 'assistant', content: 'Hello' }} 
-      isTyping={false} 
+    <ChatMessage
+      message={{ role: 'assistant', content: 'Hello' }}
+      isTyping={false}
     />
   );
-  
+
   const results = await axe(container);
   expect(results).toHaveNoViolations();
-  
+
   // Test keyboard navigation
   const message = screen.getByRole('article');
   expect(message).toBeInTheDocument();
@@ -391,11 +391,11 @@ test('ChatMessage is accessible', async () => {
 // ✅ Responsive testing with Playwright
 test('dashboard layout adapts to screen size', async ({ page }) => {
   await page.goto('/dashboard');
-  
+
   // Mobile view
   await page.setViewportSize({ width: 375, height: 667 });
   await expect(page.locator('[data-testid="sidebar"]')).toHaveClass(/hidden/);
-  
+
   // Desktop view
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator('[data-testid="sidebar"]')).toBeVisible();

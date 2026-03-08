@@ -141,4 +141,3 @@ export default React.memo(function ResultCard({ result }: ResultCardProps) {
     </motion.div>
   );
 });
-

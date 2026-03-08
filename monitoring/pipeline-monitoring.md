@@ -132,15 +132,15 @@ ALERT_WEBHOOK="$MONITORING_WEBHOOK"
 check_health() {
     local response
     local status_code
-    
+
     response=$(curl -s -w "%{http_code}" "$HEALTH_ENDPOINT" -o /tmp/health_response)
     status_code="${response: -3}"
-    
+
     if [ "$status_code" -eq 200 ]; then
         # Parse health response
         local health_status
         health_status=$(jq -r '.status' /tmp/health_response 2>/dev/null || echo "unknown")
-        
+
         if [ "$health_status" = "healthy" ]; then
             echo "✅ Health check passed"
             return 0
@@ -159,7 +159,7 @@ check_health() {
 send_alert() {
     local title="$1"
     local message="$2"
-    
+
     curl -X POST "$ALERT_WEBHOOK" \
         -H "Content-Type: application/json" \
         -d '{
@@ -192,7 +192,7 @@ resource-monitor:
       echo "Duration: $CI_PIPELINE_DURATION seconds" >> resource-report.txt
       echo "Jobs: $(echo $CI_JOB_NAME | wc -w)" >> resource-report.txt
       echo "Timestamp: $(date)" >> resource-report.txt
-      
+
       # Send to monitoring system
       if [ -n "$METRICS_ENDPOINT" ]; then
         curl -X POST "$METRICS_ENDPOINT" \
@@ -227,12 +227,12 @@ cache-metrics:
         CACHE_SIZE=$(du -sh .pnpm-store | cut -f1)
         echo "pnpm cache size: $CACHE_SIZE"
       fi
-      
+
       if [ -d "node_modules" ]; then
         NODE_MODULES_SIZE=$(du -sh node_modules | cut -f1)
         echo "node_modules size: $NODE_MODULES_SIZE"
       fi
-      
+
       # Calculate cache hit ratio (if available)
       if [ -f "pnpm-debug.log" ]; then
         CACHE_HITS=$(grep -c "cache hit" pnpm-debug.log || echo "0")

@@ -311,7 +311,7 @@ export async function generateTokenPair(
   _clientInfo: ClientInfo
 ): Promise<TokenPair> {
   // This is a dummy implementation as tokens should come from Auth0
-  // In a real migration, we might use the Management API to create a token or 
+  // In a real migration, we might use the Management API to create a token or
   // simply rely on the signIn/refresh flow which already returns these.
   throw new Error('Direct token generation not supported in Auth0-native mode. Use signIn or refresh instead.')
 }

@@ -28,7 +28,7 @@ export function AcquisitionList({
 }: AcquisitionListProps) {
   const integrateMutation = useIntegrateDataset(sessionId ?? '')
   const { data: trainingStatus } = useTrainingStatus(sessionId ?? '', !!sessionId)
-  
+
   // Create a map of integration statuses
   const integrationStatusMap = useMemo(() => {
     const map = new Map<string, boolean>()
@@ -209,7 +209,7 @@ export function AcquisitionList({
       accessor: (row) => {
         const isIntegrated = integrationStatusMap.get(row.sourceId) ?? false
         const isIntegrating = integrateMutation.isPending
-        
+
         if (isIntegrated) {
           return (
             <div className="flex items-center gap-2">
@@ -218,7 +218,7 @@ export function AcquisitionList({
             </div>
           )
         }
-        
+
         if (isIntegrating) {
           return (
             <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export function AcquisitionList({
             </div>
           )
         }
-        
+
         if (row.status === 'completed' && sessionId) {
           return (
             <Button
@@ -244,7 +244,7 @@ export function AcquisitionList({
             </Button>
           )
         }
-        
+
         return <span className="text-xs text-muted-foreground">-</span>
       },
       sortable: false,
@@ -307,4 +307,3 @@ export function AcquisitionList({
     </div>
   )
 }
-

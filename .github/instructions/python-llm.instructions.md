@@ -35,15 +35,15 @@ class TherapeuticAIModel(nn.Module):
         self.config = config
         self.bias_detector = BiasDetectionLayer()
         self.safety_validator = SafetyValidationLayer()
-        
+
     def forward(self, x, context=None):
         # Core model processing
         output = self._process_input(x, context)
-        
+
         # Safety and bias validation
         bias_score = self.bias_detector(output)
         safety_score = self.safety_validator(output)
-        
+
         return {
             'response': output,
             'bias_score': bias_score,
@@ -65,7 +65,7 @@ class TherapeuticAIModel(nn.Module):
 def generate_therapeutic_response(model, input_text, max_length=512):
     with torch.cuda.amp.autocast():
         start_time = time.time()
-        
+
         # Tokenize and generate
         inputs = tokenizer(input_text, return_tensors="pt").to(device)
         outputs = model.generate(
@@ -75,13 +75,13 @@ def generate_therapeutic_response(model, input_text, max_length=512):
             temperature=0.7,
             pad_token_id=tokenizer.eos_token_id
         )
-        
+
         response_time = (time.time() - start_time) * 1000  # ms
-        
+
         # Ensure <50ms requirement
         if response_time > 50:
             logger.warning(f"Response time {response_time}ms exceeds 50ms target")
-            
+
         return tokenizer.decode(outputs[0], skip_special_tokens=True)
 ```
 
@@ -98,10 +98,10 @@ class BiasDetectionPipeline:
         self.detector = BiasDetectionEngine()
         self.threshold = threshold
         self.audit_logger = AuditLogger()
-    
+
     def validate_response(self, response_text, context):
         bias_scores = self.detector.analyze(response_text, context)
-        
+
         # Log for compliance
         self.audit_logger.log_bias_check({
             'response': response_text,
@@ -109,11 +109,11 @@ class BiasDetectionPipeline:
             'timestamp': datetime.utcnow(),
             'context': context
         })
-        
+
         # Check thresholds
         if any(score > self.threshold for score in bias_scores.values()):
             raise BiasThresholdExceeded(f"Bias detected: {bias_scores}")
-            
+
         return bias_scores
 ```
 
@@ -130,20 +130,20 @@ class TherapeuticTrainer:
         self.model = base_model
         self.safety_validator = safety_validator
         self.bias_detector = BiasDetectionEngine()
-        
+
     def training_step(self, batch):
         outputs = self.model(**batch)
         loss = outputs.loss
-        
+
         # Safety validation during training
         generated_text = self.model.generate(batch['input_ids'])
         safety_score = self.safety_validator.validate(generated_text)
         bias_score = self.bias_detector.analyze(generated_text)
-        
+
         # Penalize unsafe or biased outputs
         if safety_score < 0.8 or bias_score > 0.3:
             loss += self.safety_penalty * (1 - safety_score + bias_score)
-            
+
         return loss
 ```
 
@@ -159,18 +159,18 @@ class FHETherapeuticModel:
     def __init__(self, model_path, fhe_context):
         self.model = self.load_encrypted_model(model_path)
         self.fhe_context = fhe_context
-        
+
     def encrypted_inference(self, encrypted_input):
         """Process encrypted therapeutic conversation data"""
         # Perform computation on encrypted data
         encrypted_output = self.model.forward_encrypted(
-            encrypted_input, 
+            encrypted_input,
             context=self.fhe_context
         )
-        
+
         # Return encrypted response (client decrypts)
         return encrypted_output
-        
+
     def validate_privacy_compliance(self, operation_log):
         """Ensure no plaintext therapeutic data was exposed"""
         for entry in operation_log:
@@ -191,20 +191,20 @@ class TherapeuticEvaluator:
         self.clinical_validator = ClinicalValidator()
         self.bias_analyzer = BiasAnalyzer()
         self.safety_assessor = SafetyAssessor()
-        
+
     def evaluate_model(self, model, test_scenarios):
         results = {}
-        
+
         for scenario in test_scenarios:
             response = model.generate_response(scenario.input)
-            
+
             results[scenario.id] = {
                 'clinical_score': self.clinical_validator.score(response, scenario),
                 'bias_score': self.bias_analyzer.analyze(response, scenario.demographics),
                 'safety_score': self.safety_assessor.assess(response, scenario.risk_level),
                 'response_time': self.measure_response_time(model, scenario.input)
             }
-            
+
         return self.generate_evaluation_report(results)
 ```
 

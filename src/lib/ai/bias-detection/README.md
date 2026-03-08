@@ -224,11 +224,11 @@ python start-python-service.py
 
 #### TypeScript Integration
 ```typescript
-import { 
+import {
   BiasDetectionEngine,
   PythonBiasDetectionBridge,
   BiasMetricsCollector,
-  BiasAlertSystem 
+  BiasAlertSystem
 } from '@/lib/ai/bias-detection';
 
 // Initialize the main engine
@@ -297,7 +297,7 @@ function AdminPanel() {
   return (
     <div>
       <h1>Bias Detection Monitoring</h1>
-      <BiasDashboard 
+      <BiasDashboard
         refreshInterval={30000}
         enableRealTimeUpdates={true}
       />
@@ -616,7 +616,7 @@ For technical support or questions:
 - Advanced visualization features
 - Mobile dashboard support
 - Extended language support
-- Cloud deployment options 
+- Cloud deployment options
 ## Intelligent Caching for Bias Computations
 
 ### Overview

@@ -21,8 +21,8 @@ function injectSecret(fileEnv, targetEnv, urlEnv = null) {
                 if (urlEnv && process.env[urlEnv]) {
                     try {
                         const url = new URL(process.env[urlEnv]);
-                        // Only inject if password matches default (empty or ":")? 
-                        // Better: Always inject if missing or overwrite? 
+                        // Only inject if password matches default (empty or ":")?
+                        // Better: Always inject if missing or overwrite?
                         // ioredis needs password in URL or options.
                         // If we overwrite, we ensure consistency.
                         if (!url.password) {

@@ -131,25 +131,25 @@ import { useMonitoring, useRUMData } from '../lib/monitoring/hooks';
 
 function MyComponent() {
   // Get monitoring utilities
-  const { trackEvent, trackError, trackMetric, 
+  const { trackEvent, trackError, trackMetric,
           trackUserInteraction, trackPageView } = useMonitoring();
-  
+
   // Access RUM data
-  const { 
-    loadingPerformance, 
-    interactivityMetrics, 
+  const {
+    loadingPerformance,
+    interactivityMetrics,
     visualStability,
-    isLoading, 
-    lastUpdated, 
-    refreshData 
+    isLoading,
+    lastUpdated,
+    refreshData
   } = useRUMData();
-  
+
   // Track custom event
   const handleClick = () => {
     trackUserInteraction('button', 'click', { buttonId: 'my-button' });
     // Your component logic here
   };
-  
+
   return (
     <div>
       <h2>Performance Metrics</h2>

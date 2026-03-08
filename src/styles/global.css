@@ -237,13 +237,13 @@ samp {
   main {
     padding: 1.5rem 1rem;
   }
-  
+
   /* Ensure no horizontal overflow on mobile */
   body {
     width: 100vw;
     overflow-x: hidden;
   }
-  
+
   /* Constrain wide elements */
   .container, .max-w-7xl, .max-w-6xl, .max-w-5xl, .max-w-4xl {
     max-width: calc(100vw - 2rem);

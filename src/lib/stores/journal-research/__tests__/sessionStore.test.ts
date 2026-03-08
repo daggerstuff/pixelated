@@ -149,4 +149,3 @@ describe('sessionStore', () => {
     })
   })
 })
-

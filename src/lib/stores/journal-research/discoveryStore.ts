@@ -91,5 +91,3 @@ export const useDiscoveryStore = create<DiscoveryStoreState>((set) => ({
 
   resetFilters: () => set({ filters: defaultFilters }),
 }))
-
-

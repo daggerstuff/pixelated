@@ -1,6 +1,6 @@
 /**
  * Phase 4.3: Crisis Intervention Scenario Tests - Test Data
- * 
+ *
  * Synthetic crisis scenarios with ground truth labels for measuring
  * crisis detection accuracy. Each scenario is labeled with:
  * - Crisis type (suicidal ideation, self-harm, panic, substance abuse, etc.)

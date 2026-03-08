@@ -1,9 +1,9 @@
 /**
  * Integration Tests for Adaptive Selection Workflow
- * 
+ *
  * Tests the complete end-to-end adaptive selection pipeline:
  * ContextDetector → ContextTransitionDetector → ObjectiveSwitcher → AdaptiveSelector
- * 
+ *
  * Covers:
  * - Multi-turn conversations with context changes
  * - Crisis escalation scenarios

@@ -73,7 +73,7 @@ export class AutomatedRecoverySystem {
    * @param recoveryManager Reference to the recovery testing manager
    * @param backupProvider Function that returns available backups
    */
-  
+
 }
 
 // Export the automated recovery system

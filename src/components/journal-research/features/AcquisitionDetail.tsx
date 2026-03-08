@@ -27,7 +27,7 @@ export function AcquisitionDetail({
   const updateMutation = useAcquisitionUpdateMutation(sessionId)
   const integrateMutation = useIntegrateDataset(sessionId)
   const { data: trainingStatus } = useTrainingStatus(sessionId, true)
-  
+
   // Check if this acquisition is integrated
   const isIntegrated = trainingStatus?.datasets?.find(
     (ds) => ds.source_id === acquisition?.sourceId
@@ -86,7 +86,7 @@ export function AcquisitionDetail({
             <StatusIcon className={cn('h-5 w-5', statusColor)} />
             <span className="capitalize font-medium">{acquisition.status}</span>
           </div>
-          
+
           {/* Training Pipeline Integration */}
           {acquisition.status === 'completed' && (
             <div className="flex items-center gap-2">
@@ -263,4 +263,3 @@ export function AcquisitionDetail({
     </div>
   )
 }
-

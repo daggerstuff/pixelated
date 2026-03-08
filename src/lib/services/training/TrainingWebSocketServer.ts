@@ -223,7 +223,7 @@ export class TrainingWebSocketServer {
 
   /**
    * Validate client authentication token and return user info
-   * 
+   *
    * @param token - Authentication token (JWT access token)
    * @returns ClientAuthResult if valid, null otherwise
    */
@@ -282,7 +282,7 @@ export class TrainingWebSocketServer {
 
   /**
    * Map authentication UserRole to training session role
-   * 
+   *
    * @param authRole - User role from authentication system
    * @returns Training session role (trainee, observer, or supervisor)
    */
@@ -516,7 +516,7 @@ export class TrainingWebSocketServer {
 
   /**
    * Broadcast message to clients in a session, filtered by role
-   * 
+   *
    * @param sessionId - Session ID to broadcast to
    * @param allowedRoles - Array of roles that should receive the message
    * @param message - Message to broadcast

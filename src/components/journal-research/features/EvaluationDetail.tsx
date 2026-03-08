@@ -168,4 +168,3 @@ export function EvaluationDetail({
     </div>
   )
 }
-

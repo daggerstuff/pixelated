@@ -1,6 +1,6 @@
 /**
  * K6 WebSocket Load Test for Pixel Multimodal Streaming
- * 
+ *
  * Tests the /ws/pixel-multimodal WebSocket endpoint under load
  * to validate:
  * - Connection establishment rate
@@ -8,12 +8,12 @@
  * - Streaming latency < 50ms per chunk
  * - Concurrent connections (target: 1000)
  * - Connection stability
- * 
+ *
  * Phase 4.6: Performance Load Testing
- * 
+ *
  * Run with:
  *   k6 run tests/performance/k6-websocket-streaming-load.js
- * 
+ *
  * Run with different profiles:
  *   k6 run --vus 100 --duration 2m tests/performance/k6-websocket-streaming-load.js
  *   k6 run --vus 500 --duration 5m tests/performance/k6-websocket-streaming-load.js

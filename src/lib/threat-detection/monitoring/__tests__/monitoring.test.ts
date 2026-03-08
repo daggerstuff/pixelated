@@ -108,7 +108,7 @@ describe('Enhanced Monitoring Service', () => {
         mockAIService,
       )
       // Check defaults logic in implementation if needed, or if stub uses config
-      // But we passed NO config (undefined). 
+      // But we passed NO config (undefined).
       // Implementation doesn't handle undefined config gracefully in constructor currently?
       // "this.config = config".
       // I need to update implementation to default config.

@@ -11,18 +11,18 @@ This implementation demonstrates best practices for dependency injection using t
 ```typescript
 export class EmotionSynthesizer {
   private static instance: EmotionSynthesizer | null = null;
-  
+
   public static getInstance(): EmotionSynthesizer {
     if (!EmotionSynthesizer.instance) {
       EmotionSynthesizer.instance = new EmotionSynthesizer();
     }
     return EmotionSynthesizer.instance;
   }
-  
+
   public static createTestInstance(): EmotionSynthesizer {
     return new EmotionSynthesizer();
   }
-  
+
   public static resetInstance(): void {
     EmotionSynthesizer.instance = null;
   }
@@ -82,7 +82,7 @@ describe('PatientResponseService', () => {
   beforeEach(() => {
     EmotionSynthesizer.resetInstance(); // Clean state
   });
-  
+
   it('should synthesize emotions correctly', () => {
     const service = createTestPatientResponseService();
     // Test with isolated dependencies
@@ -143,7 +143,7 @@ const service = createPatientResponseService();
 
 // Use emotional synthesis in response generation
 const emotionalContext = await service.synthesizeEmotionalContext(
-  responseContext, 
+  responseContext,
   'sadness'
 );
 

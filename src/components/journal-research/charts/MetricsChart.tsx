@@ -19,7 +19,7 @@ export function MetricsChart({
                         // Filter metrics based on time range
                         const now = new Date()
                         let filteredMetrics = metrics
-                    
+
                         if (timeRange === 'week') {
                           const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
                           filteredMetrics = metrics.filter(
@@ -31,14 +31,14 @@ export function MetricsChart({
                             (m) => m.lastUpdated && m.lastUpdated >= monthAgo,
                           )
                         }
-                    
+
                         // Sort by date
                         filteredMetrics.sort((a, b) => {
                           const dateA = a.lastUpdated ?? new Date(0)
                           const dateB = b.lastUpdated ?? new Date(0)
                           return dateA.getTime() - dateB.getTime()
                         })
-                    
+
                         const labels = filteredMetrics.map((m, index) => {
                           if (m.lastUpdated) {
                             return m.lastUpdated.toLocaleDateString('en-US', {
@@ -48,7 +48,7 @@ export function MetricsChart({
                           }
                           return `Point ${index + 1}`
                         })
-                    
+
                         return {
                           labels,
                           datasets: [
@@ -132,4 +132,3 @@ export function MetricsChart({
     </Card>
   )
 }
-

@@ -21,7 +21,7 @@ I can share:
 
 **Available times this week:**
 - Tuesday 2-4pm PST
-- Wednesday 10am-12pm PST  
+- Wednesday 10am-12pm PST
 - Thursday 1-3pm PST
 
 Looking forward to your thoughts,

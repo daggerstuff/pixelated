@@ -15,7 +15,7 @@ export interface StrategyReview {
 export class AIStrategyReviewService {
     /**
      * Performs an AI-driven review of a strategy document.
-     * In a real implementation, this would call an LLM (e.g., GPT-4o) 
+     * In a real implementation, this would call an LLM (e.g., GPT-4o)
      * with the document content and market context.
      */
     static async reviewDocument(documentId: string): Promise<StrategyReview> {

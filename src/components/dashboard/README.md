@@ -304,8 +304,8 @@ function DashboardPage() {
   }
 
   return (
-    <TherapistDashboard 
-      sessions={sessions} 
+    <TherapistDashboard
+      sessions={sessions}
       onSessionControl={handleSessionControl}
     >
       <div>Additional dashboard content</div>
