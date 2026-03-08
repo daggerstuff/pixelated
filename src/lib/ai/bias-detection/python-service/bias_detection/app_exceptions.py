@@ -4,15 +4,23 @@ Global exception handlers for the FastAPI application.
 
 import sentry_sdk
 import structlog
-from fastapi import HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 logger = structlog.get_logger(__name__)
 
 
-async def validation_exception_handler(request: Request, exc: ValidationError):
-    """Handle Pydantic validation errors."""
+def register_exception_handlers(app: FastAPI) -> None:
+    """Register all global exception handlers on the app."""
+    app.add_exception_handler(ValidationError, validation_exception_handler)
+    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(Exception, general_exception_handler)
+
+
+async def validation_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Handle Pydantic validation errors. Handler is registered for ValidationError only."""
+    assert isinstance(exc, ValidationError)
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
@@ -24,8 +32,9 @@ async def validation_exception_handler(request: Request, exc: ValidationError):
     )
 
 
-async def http_exception_handler(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions."""
+async def http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Handle HTTP exceptions. Handler is registered for HTTPException only."""
+    assert isinstance(exc, HTTPException)
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -36,7 +45,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-async def general_exception_handler(request: Request, exc: Exception):
+async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle unhandled exceptions."""
     logger.error(
         "Unhandled exception",
