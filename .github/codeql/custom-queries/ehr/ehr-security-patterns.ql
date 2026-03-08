@@ -11,8 +11,6 @@
  */
 
 import javascript
-import semmle.javascript.security.dataflow.RemoteFlowSources
-import semmle.javascript.security.dataflow.TaintTracking
 import DataFlow::PathGraph
 
 class EHRCredentialSource extends DataFlow::Node {
@@ -45,14 +43,13 @@ class EHREndpoint extends DataFlow::Node {
   }
 }
 
-class InsecureEHRConfig extends TaintTracking::Configuration {
-  InsecureEHRConfig() { this = "InsecureEHRConfig" }
-
-  override predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource
+module EHRSecurityConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    source instanceof EHRCredentialSource or
+    source instanceof RemoteFlowSource
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(DataFlow::CallNode call |
       call.getCalleeName().matches("%log%") and
       sink = call.getAnArgument()
@@ -62,17 +59,7 @@ class InsecureEHRConfig extends TaintTracking::Configuration {
       write.getPropertyName().matches("%url%") and
       sink = write.getRhs()
     )
-  }
-}
-
-class UnsafeEHRAccess extends TaintTracking::Configuration {
-  UnsafeEHRAccess() { this = "UnsafeEHRAccess" }
-
-  override predicate isSource(DataFlow::Node source) {
-    source instanceof RemoteFlowSource
-  }
-
-  override predicate isSink(DataFlow::Node sink) {
+    or
     exists(DataFlow::CallNode call |
       (
         call.getCalleeName().matches("%request%") or
@@ -80,17 +67,18 @@ class UnsafeEHRAccess extends TaintTracking::Configuration {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
+      exists(EHREndpoint endpoint |
+        DataFlow::localFlow(endpoint, sink)
+      )
     )
   }
 }
 
-from DataFlow::PathNode source, DataFlow::PathNode sink, TaintTracking::Configuration config
-where
-  (
-    config instanceof InsecureEHRConfig or
-    config instanceof UnsafeEHRAccess
-  ) and
-  config.hasFlowPath(source, sink)
+module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
+
+import EHRSecurityFlow::PathGraph
+
+from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
+where EHRSecurityFlow::hasFlowPath(source, sink)
 select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
