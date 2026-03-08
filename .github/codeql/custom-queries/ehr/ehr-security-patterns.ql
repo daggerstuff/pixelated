@@ -11,12 +11,13 @@
  */
 
 import javascript
-import semmle.javascript.security.dataflow.RemoteFlowSources
+import DataFlow::PathGraph
 
-class EHRCredentialSource extends DataFlow::Node {
-  EHRCredentialSource() {
+module EHRSecurityConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    // Source 1: EHR Credentials
     exists(DataFlow::PropRead read |
-      read = this and
+      read = source and
       (
         read.getPropertyName().matches("%token%") or
         read.getPropertyName().matches("%apiKey%") or
@@ -24,58 +25,39 @@ class EHRCredentialSource extends DataFlow::Node {
         read.getPropertyName().matches("%password%")
       )
     )
-  }
-}
-
-class EHREndpoint extends DataFlow::Node {
-  EHREndpoint() {
-    exists(string url |
-      url = this.getStringValue() and
-      (
-        url.matches("%/fhir/%") or
-        url.matches("%/ehr/%") or
-        url.matches("%/api/v%") or
-        url.matches("%/epic/%") or
-        url.matches("%/cerner/%") or
-        url.matches("%/allscripts/%")
-      )
-    )
-  }
-}
-
-module EHRSecurityConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource or
+    or
+    // Source 2: Remote Flow Sources
     source instanceof RemoteFlowSource
   }
 
   predicate isSink(DataFlow::Node sink) {
+    // Sink 1: Logging sensitive data
     exists(DataFlow::CallNode call |
       call.getCalleeName().matches("%log%") and
       sink = call.getAnArgument()
     )
     or
+    // Sink 2: Sensitive data in URL
     exists(DataFlow::PropWrite write |
       write.getPropertyName().matches("%url%") and
       sink = write.getRhs()
     )
     or
+    // Sink 3: Remote flow sources used in EHR request
     exists(DataFlow::CallNode call |
       (
         call.getCalleeName().matches("%request%") or
         call.getCalleeName().matches("%fetch%") or
         call.getCalleeName().matches("%axios%")
       ) and
-      sink = call.getAnArgument() and
-      exists(EHREndpoint endpoint | endpoint.flowsTo(call.getAnArgument()))
+      sink = call.getAnArgument()
     )
   }
 }
 
 module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
-import EHRSecurityFlow::PathGraph
 
-from DataFlow::PathNode source, DataFlow::PathNode sink
+from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
 where EHRSecurityFlow::hasFlowPath(source, sink)
 select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
