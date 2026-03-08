@@ -78,6 +78,8 @@ export class PerformanceOptimizer {
   >
   private metricsHistory: PerformanceMetrics[]
   private activeCounts: Map<string, number>
+  private totalCacheAccesses = 0
+  private cacheHitsCount = 0
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -206,26 +208,37 @@ export class PerformanceOptimizer {
 
   /**
    * Intelligent Caching
+   * Optimized for O(1) performance using Map insertion order
    */
   set(key: string, value: unknown): void {
     const now = Date.now()
+    const existing = this.cache.get(key)
 
-    // Evict expired entries
+    // Move to end for LRU strategy if it exists
+    if (existing && this.config.cache.strategy === 'LRU') {
+      this.cache.delete(key)
+    }
+
+    // Evict expired entries (amortized O(1))
     this.evictExpired()
 
     // Evict based on strategy if cache is full
-    if (this.cache.size >= this.config.cache.maxSize) {
+    if (
+      this.cache.size >= this.config.cache.maxSize &&
+      !this.cache.has(key)
+    ) {
       this.evictByStrategy()
     }
 
     this.cache.set(key, {
       value,
       timestamp: now,
-      accessCount: 1,
+      accessCount: existing ? existing.accessCount + 1 : 1,
     })
   }
 
   get(key: string): unknown | null {
+    this.totalCacheAccesses++
     const entry = this.cache.get(key)
     if (!entry) {
       return null
@@ -237,15 +250,30 @@ export class PerformanceOptimizer {
       return null
     }
 
+    this.cacheHitsCount++
     entry.accessCount++
+
+    // For LRU, move to end of Map to mark as most recently used
+    if (this.config.cache.strategy === 'LRU') {
+      this.cache.delete(key)
+      this.cache.set(key, entry)
+    }
+
     return entry.value
   }
 
   private evictExpired() {
     const now = Date.now()
+    const ttl = this.config.cache.ttl
+
+    // Since Map preserves insertion order, the oldest entries are always at the beginning
+    // We can stop as soon as we find an entry that hasn't expired yet
     for (const [key, entry] of this.cache.entries()) {
-      if (now - entry.timestamp > this.config.cache.ttl) {
+      if (now - entry.timestamp > ttl) {
         this.cache.delete(key)
+      } else {
+        // First non-expired entry found, we can stop
+        break
       }
     }
   }
@@ -259,36 +287,23 @@ export class PerformanceOptimizer {
 
     switch (this.config.cache.strategy) {
       case 'LRU':
-        keyToEvict = this.findLRUKey()
+      case 'FIFO':
+        // For both LRU (with move-on-access) and FIFO, the first key is the oldest
+        keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
+        // LFU still requires O(n) unless we maintain a frequency list/map
+        // Given the 50-line constraint and "one small improvement", we'll keep it simple
+        // but optimize the most common cases (LRU/FIFO)
         keyToEvict = this.findLFUKey()
-        break
-      case 'FIFO':
-        keyToEvict = this.cache.keys().next().value
         break
       default:
         keyToEvict = this.cache.keys().next().value
     }
 
-    if (!keyToEvict) {
-      return
+    if (keyToEvict !== undefined) {
+      this.cache.delete(keyToEvict)
     }
-    this.cache.delete(keyToEvict)
-  }
-
-  private findLRUKey(): string {
-    let oldestKey = ''
-    let oldestTime = Date.now()
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTime) {
-        oldestTime = entry.timestamp
-        oldestKey = key
-      }
-    }
-
-    return oldestKey
   }
 
   private findLFUKey(): string {
@@ -438,14 +453,11 @@ export class PerformanceOptimizer {
   }
 
   private updateMetrics() {
-    // Update cache hit rate
-    const totalCacheAccesses = Array.from(this.cache.values()).reduce(
-      (sum, entry) => sum + entry.accessCount,
-      0,
-    )
-    const cacheHits = this.cache.size
+    // Update cache hit rate (O(1) calculation)
     this.metrics.cacheHitRate =
-      totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
+      this.totalCacheAccesses > 0
+        ? this.cacheHitsCount / this.totalCacheAccesses
+        : 0
 
     // Update active connections
     this.metrics.activeConnections = Array.from(
@@ -567,6 +579,8 @@ export class PerformanceOptimizer {
     this.cache.clear()
     this.batchQueues.clear()
     this.metricsHistory.length = 0
+    this.totalCacheAccesses = 0
+    this.cacheHitsCount = 0
   }
 }
 

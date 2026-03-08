@@ -1,0 +1,3 @@
+## 2025-05-15 - [PerformanceOptimizer Cache Optimization]
+**Learning:** In-memory caches using O(n) searching for eviction (LRU/FIFO) and metrics calculation become significant bottlenecks as the cache size grows. JavaScript's `Map` preserves insertion order, which can be leveraged to implement O(1) LRU and FIFO eviction by re-inserting keys on access to mark them as "recent". Additionally, amortized O(1) expiration can be achieved by checking only the oldest entries at the start of the `Map` during writes.
+**Action:** Always prefer `Map` insertion order for O(1) LRU/FIFO implementations in TypeScript/JavaScript instead of manual array searching or O(n) iteration. Maintain private counters for hit/miss metrics to avoid O(n) calculation in monitoring paths.
