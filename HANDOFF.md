@@ -1,8 +1,14 @@
 # Handoff: OVH Persona Regeneration Job (Stage2)
 
-## 🟢 Current Status: Fixed & Relaunched (2026-03-01)
+## 🟢 Current Status: Pipeline Verified; NIM-Only (No Gemini) (2026-03-07)
 
-The OVH Persona Re-Generation job has been successfully debugged and relaunched.
+- **Lightning path verified** (2026-03-07): `scripts/ovh/run-persona-regeneration-lightning.sh` runs successfully: S3 listing/load, checkpoint discovery, GestaltSimulator init, and record processing.
+- **LLM backend**: Persona re-generation uses **NVIDIA NIM only** (OpenAI-compatible API). Gemini is not used. Set **NIM_API_KEY** or **NVIDIA_API_KEY** (and optionally **OPENAI_BASE_URL**, **PERSONA_NIM_MODEL** / **LLM_MODEL**).
+- **To run the batch**: Ensure NIM credentials are set, then run the Lightning script (default 10k records) or with `MAX_RECORDS=5000`. No Gemini key required.
+
+## Previous Status: Fixed & Relaunched (2026-03-01)
+
+The OVH Persona Re-Generation job had been successfully debugged and relaunched.
 
 ### 🛠️ Fixes Applied
 
@@ -33,10 +39,11 @@ The OVH Persona Re-Generation job has been successfully debugged and relaunched.
 
 ## 🛠️ Next Steps
 
-1. **Monitor Logs**: Confirm the first few records are processed without
-   GPU/memory issues.
-2. **Verify S3 Output**: Once the job finishes, check
-   `s3://pixel-data/final_dataset/shards/curriculum/stage2/synthetic_persona_batch_5k.jsonl`.
+1. **Run the batch**: Set **NIM_API_KEY** or **NVIDIA_API_KEY**, then run
+   `scripts/ovh/run-persona-regeneration-lightning.sh` (default 10k records) or
+   with `MAX_RECORDS=5000` for 5k. Optional: `--no-notify` to skip Slack.
+2. **Verify S3 output**: After a successful run, check
+   `s3://pixel-data/final_dataset/shards/curriculum/stage2/synthetic_persona_batch_<N>.jsonl`.
 3. **Clean up Registry**: Periodically delete old timestamped tags from Docker
    Hub to save space.
 
