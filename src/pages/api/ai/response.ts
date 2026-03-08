@@ -35,7 +35,7 @@ interface Session {
 /**
  * GET handler - returns information about the AI response endpoint
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request: _request }) => {
   try {
     // Verify session for security
     const session: Session | null = await getSession();
