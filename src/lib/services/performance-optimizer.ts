@@ -307,9 +307,8 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
-        // LFU still requires a scan or a more complex data structure.
-        // For simplicity and speed, we fallback to LRU which is usually better anyway.
-        // If LFU is strictly required, this would be O(n).
+        // LFU still requires a scan (O(n)) or a more complex data structure (like frequency Map + Set).
+        // Since this class is optimized for high throughput, we perform the O(n) scan only if strictly requested.
         keyToEvict = this.findLFUKey()
         break
       default:
