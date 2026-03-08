@@ -1,34 +1,34 @@
-import { Logger } from '../../utils/logger'
-import { ConfigurationManager } from './ConfigurationManager'
-import { HealthMonitor } from './HealthMonitor'
-import { EventEmitter } from 'events'
-import { createClient } from '@clickhouse/client'
-import { MongoClient } from 'mongodb'
-import { Redis } from 'ioredis'
-import * as cockroach from 'cockroach'
-import { v4 as uuidv4 } from 'uuid'
+import { Logger } from "../../utils/logger";
+import { ConfigurationManager } from "./ConfigurationManager";
+import { HealthMonitor } from "./HealthMonitor";
+import { EventEmitter } from "events";
+import { createClient } from "@clickhouse/client";
+import { MongoClient } from "mongodb";
+import { Redis } from "ioredis";
+import * as cockroach from "cockroach";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Cross-Region Data Synchronization Manager
  * Handles data synchronization across multiple regions using CockroachDB
  */
 export class CrossRegionDataSyncManager extends EventEmitter {
-  private logger: Logger
-  private config: ConfigurationManager
-  private healthMonitor: HealthMonitor
-  private cockroachClient: cockroach.Client | null = null
-  private mongoClients: Map<string, MongoClient> = new Map()
-  private redisClients: Map<string, Redis> = new Map()
-  private clickhouseClient: any = null
-  private syncInterval: NodeJS.Timeout | null = null
-  private isInitialized = false
-  private syncStatus: Map<string, SyncStatus> = new Map()
+  private logger: Logger;
+  private config: ConfigurationManager;
+  private healthMonitor: HealthMonitor;
+  private cockroachClient: cockroach.Client | null = null;
+  private mongoClients: Map<string, MongoClient> = new Map();
+  private redisClients: Map<string, Redis> = new Map();
+  private clickhouseClient: any = null;
+  private syncInterval: NodeJS.Timeout | null = null;
+  private isInitialized = false;
+  private syncStatus: Map<string, SyncStatus> = new Map();
 
   constructor(config: ConfigurationManager, healthMonitor: HealthMonitor) {
-    super()
-    this.config = config
-    this.healthMonitor = healthMonitor
-    this.logger = new Logger('CrossRegionDataSyncManager')
+    super();
+    this.config = config;
+    this.healthMonitor = healthMonitor;
+    this.logger = new Logger("CrossRegionDataSyncManager");
   }
 
   /**
@@ -36,35 +36,35 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   async initialize(): Promise<void> {
     try {
-      this.logger.info('Initializing CrossRegionDataSyncManager...')
+      this.logger.info("Initializing CrossRegionDataSyncManager...");
 
       // Initialize CockroachDB connection
-      await this.initializeCockroachDB()
+      await this.initializeCockroachDB();
 
       // Initialize MongoDB connections for each region
-      await this.initializeMongoDBConnections()
+      await this.initializeMongoDBConnections();
 
       // Initialize Redis connections for caching
-      await this.initializeRedisConnections()
+      await this.initializeRedisConnections();
 
       // Initialize ClickHouse for analytics
-      await this.initializeClickHouse()
+      await this.initializeClickHouse();
 
       // Set up sync intervals
-      this.setupSyncIntervals()
+      this.setupSyncIntervals();
 
       // Register health checks
-      this.registerHealthChecks()
+      this.registerHealthChecks();
 
-      this.isInitialized = true
-      this.logger.info('CrossRegionDataSyncManager initialized successfully')
+      this.isInitialized = true;
+      this.logger.info("CrossRegionDataSyncManager initialized successfully");
 
-      this.emit('initialized')
+      this.emit("initialized");
     } catch (error) {
-      this.logger.error('Failed to initialize CrossRegionDataSyncManager', {
+      this.logger.error("Failed to initialize CrossRegionDataSyncManager", {
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -73,7 +73,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async initializeCockroachDB(): Promise<void> {
     try {
-      const cockroachConfig = this.config.getCockroachDBConfig()
+      const cockroachConfig = this.config.getCockroachDBConfig();
 
       this.cockroachClient = new cockroach.Client({
         host: cockroachConfig.host,
@@ -88,18 +88,18 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         max: 20, // Maximum number of connections
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
-      })
+      });
 
-      await this.cockroachClient.connect()
-      this.logger.info('CockroachDB connection established')
+      await this.cockroachClient.connect();
+      this.logger.info("CockroachDB connection established");
 
       // Create distributed tables
-      await this.createDistributedTables()
+      await this.createDistributedTables();
     } catch (error) {
-      this.logger.error('Failed to initialize CockroachDB connection', {
+      this.logger.error("Failed to initialize CockroachDB connection", {
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -109,7 +109,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
   private async createDistributedTables(): Promise<void> {
     const tables = [
       {
-        name: 'users',
+        name: "users",
         schema: `
           CREATE TABLE IF NOT EXISTS users (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -126,7 +126,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'sessions',
+        name: "sessions",
         schema: `
           CREATE TABLE IF NOT EXISTS sessions (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -143,7 +143,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'conversations',
+        name: "conversations",
         schema: `
           CREATE TABLE IF NOT EXISTS conversations (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -161,7 +161,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'messages',
+        name: "messages",
         schema: `
           CREATE TABLE IF NOT EXISTS messages (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -181,7 +181,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'ai_analyses',
+        name: "ai_analyses",
         schema: `
           CREATE TABLE IF NOT EXISTS ai_analyses (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -202,7 +202,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'sync_log',
+        name: "sync_log",
         schema: `
           CREATE TABLE IF NOT EXISTS sync_log (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -222,15 +222,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           ) LOCALITY GLOBAL
         `,
       },
-    ]
+    ];
 
     for (const table of tables) {
       try {
-        await this.cockroachClient!.query(table.schema)
-        this.logger.info(`Created distributed table: ${table.name}`)
+        await this.cockroachClient!.query(table.schema);
+        this.logger.info(`Created distributed table: ${table.name}`);
       } catch (error) {
-        this.logger.error(`Failed to create table ${table.name}`, { error })
-        throw error
+        this.logger.error(`Failed to create table ${table.name}`, { error });
+        throw error;
       }
     }
   }
@@ -239,28 +239,30 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Initialize MongoDB connections for each region
    */
   private async initializeMongoDBConnections(): Promise<void> {
-    const regions = this.config.getRegions()
+    const regions = this.config.getRegions();
 
     for (const region of regions) {
       try {
-        const mongoConfig = this.config.getMongoDBConfig(region)
+        const mongoConfig = this.config.getMongoDBConfig(region);
 
         const client = new MongoClient(mongoConfig.connectionString, {
           maxPoolSize: 10,
           serverSelectionTimeoutMS: 5000,
           socketTimeoutMS: 45000,
-        })
+        });
 
-        await client.connect()
-        this.mongoClients.set(region, client)
+        await client.connect();
+        this.mongoClients.set(region, client);
 
-        this.logger.info(`MongoDB connection established for region: ${region}`)
+        this.logger.info(
+          `MongoDB connection established for region: ${region}`,
+        );
       } catch (error) {
         this.logger.error(
           `Failed to initialize MongoDB for region: ${region}`,
           { error },
-        )
-        throw error
+        );
+        throw error;
       }
     }
   }
@@ -269,11 +271,11 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Initialize Redis connections for caching
    */
   private async initializeRedisConnections(): Promise<void> {
-    const regions = this.config.getRegions()
+    const regions = this.config.getRegions();
 
     for (const region of regions) {
       try {
-        const redisConfig = this.config.getRedisConfig(region)
+        const redisConfig = this.config.getRedisConfig(region);
 
         const client = new Redis({
           host: redisConfig.host,
@@ -283,19 +285,19 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           maxRetriesPerRequest: 3,
           retryDelayOnFailover: 100,
           enableReadyCheck: true,
-          maxmemoryPolicy: 'allkeys-lru',
-        })
+          maxmemoryPolicy: "allkeys-lru",
+        });
 
         // Test connection
-        await client.ping()
-        this.redisClients.set(region, client)
+        await client.ping();
+        this.redisClients.set(region, client);
 
-        this.logger.info(`Redis connection established for region: ${region}`)
+        this.logger.info(`Redis connection established for region: ${region}`);
       } catch (error) {
         this.logger.error(`Failed to initialize Redis for region: ${region}`, {
           error,
-        })
-        throw error
+        });
+        throw error;
       }
     }
   }
@@ -305,7 +307,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async initializeClickHouse(): Promise<void> {
     try {
-      const clickhouseConfig = this.config.getClickHouseConfig()
+      const clickhouseConfig = this.config.getClickHouseConfig();
 
       this.clickhouseClient = createClient({
         host: clickhouseConfig.host,
@@ -313,18 +315,18 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         username: clickhouseConfig.username,
         password: clickhouseConfig.password,
         database: clickhouseConfig.database,
-        application: 'pixelated-multi-region',
+        application: "pixelated-multi-region",
         max_open_connections: 10,
         request_timeout: 30000,
-      })
+      });
 
       // Create analytics tables
-      await this.createAnalyticsTables()
+      await this.createAnalyticsTables();
 
-      this.logger.info('ClickHouse connection established')
+      this.logger.info("ClickHouse connection established");
     } catch (error) {
-      this.logger.error('Failed to initialize ClickHouse', { error })
-      throw error
+      this.logger.error("Failed to initialize ClickHouse", { error });
+      throw error;
     }
   }
 
@@ -334,7 +336,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
   private async createAnalyticsTables(): Promise<void> {
     const tables = [
       {
-        name: 'user_analytics',
+        name: "user_analytics",
         schema: `
           CREATE TABLE IF NOT EXISTS user_analytics (
             timestamp DateTime,
@@ -352,7 +354,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         `,
       },
       {
-        name: 'performance_metrics',
+        name: "performance_metrics",
         schema: `
           CREATE TABLE IF NOT EXISTS performance_metrics (
             timestamp DateTime,
@@ -366,7 +368,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           TTL timestamp + INTERVAL 30 DAY
         `,
       },
-    ]
+    ];
 
     for (const table of tables) {
       try {
@@ -375,13 +377,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           clickhouse_settings: {
             wait_end_of_query: 1,
           },
-        })
-        this.logger.info(`Created ClickHouse table: ${table.name}`)
+        });
+        this.logger.info(`Created ClickHouse table: ${table.name}`);
       } catch (error) {
         this.logger.error(`Failed to create ClickHouse table ${table.name}`, {
           error,
-        })
-        throw error
+        });
+        throw error;
       }
     }
   }
@@ -390,147 +392,147 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Set up synchronization intervals
    */
   private setupSyncIntervals(): void {
-    const syncConfig = this.config.getSyncConfig()
+    const syncConfig = this.config.getSyncConfig();
 
     // Real-time sync for critical data
     this.syncInterval = setInterval(() => {
       this.performRealTimeSync().catch((error) => {
-        this.logger.error('Real-time sync failed', { error })
-      })
-    }, syncConfig.realTimeSyncInterval)
+        this.logger.error("Real-time sync failed", { error });
+      });
+    }, syncConfig.realTimeSyncInterval);
 
     // Batch sync for analytics data
     setInterval(() => {
       this.performBatchSync().catch((error) => {
-        this.logger.error('Batch sync failed', { error })
-      })
-    }, syncConfig.batchSyncInterval)
+        this.logger.error("Batch sync failed", { error });
+      });
+    }, syncConfig.batchSyncInterval);
 
     // Cleanup old sync logs
     setInterval(() => {
       this.cleanupSyncLogs().catch((error) => {
-        this.logger.error('Sync log cleanup failed', { error })
-      })
-    }, syncConfig.cleanupInterval)
+        this.logger.error("Sync log cleanup failed", { error });
+      });
+    }, syncConfig.cleanupInterval);
 
-    this.logger.info('Sync intervals configured')
+    this.logger.info("Sync intervals configured");
   }
 
   /**
    * Register health checks
    */
   private registerHealthChecks(): void {
-    this.healthMonitor.registerCheck('cockroachdb', async () => {
+    this.healthMonitor.registerCheck("cockroachdb", async () => {
       try {
         if (!this.cockroachClient)
           return {
-            status: 'unhealthy',
-            message: 'CockroachDB client not initialized',
-          }
+            status: "unhealthy",
+            message: "CockroachDB client not initialized",
+          };
 
-        const _result = await this.cockroachClient.query('SELECT 1')
-        return { status: 'healthy', message: 'CockroachDB connection active' }
+        const _result = await this.cockroachClient.query("SELECT 1");
+        return { status: "healthy", message: "CockroachDB connection active" };
       } catch (error) {
         return {
-          status: 'unhealthy',
+          status: "unhealthy",
           message: `CockroachDB error: ${error.message}`,
-        }
+        };
       }
-    })
+    });
 
-    this.healthMonitor.registerCheck('mongodb', async () => {
+    this.healthMonitor.registerCheck("mongodb", async () => {
       try {
-        const regions = Array.from(this.mongoClients.keys())
+        const regions = Array.from(this.mongoClients.keys());
         const results = await Promise.all(
           regions.map(async (region) => {
-            const client = this.mongoClients.get(region)
+            const client = this.mongoClients.get(region);
             if (!client)
               return {
                 region,
-                status: 'unhealthy',
-                message: 'Client not found',
-              }
+                status: "unhealthy",
+                message: "Client not found",
+              };
 
             try {
-              await client.db().admin().ping()
+              await client.db().admin().ping();
               return {
                 region,
-                status: 'healthy',
-                message: 'MongoDB connection active',
-              }
+                status: "healthy",
+                message: "MongoDB connection active",
+              };
             } catch (error) {
               return {
                 region,
-                status: 'unhealthy',
+                status: "unhealthy",
                 message: `MongoDB error: ${error.message}`,
-              }
+              };
             }
           }),
-        )
+        );
 
-        const unhealthy = results.filter((r) => r.status === 'unhealthy')
+        const unhealthy = results.filter((r) => r.status === "unhealthy");
         if (unhealthy.length > 0) {
           return {
-            status: 'unhealthy',
-            message: `MongoDB issues in regions: ${unhealthy.map((r) => r.region).join(', ')}`,
-          }
+            status: "unhealthy",
+            message: `MongoDB issues in regions: ${unhealthy.map((r) => r.region).join(", ")}`,
+          };
         }
 
-        return { status: 'healthy', message: 'All MongoDB connections active' }
+        return { status: "healthy", message: "All MongoDB connections active" };
       } catch (error) {
         return {
-          status: 'unhealthy',
+          status: "unhealthy",
           message: `MongoDB health check error: ${error.message}`,
-        }
+        };
       }
-    })
+    });
 
-    this.healthMonitor.registerCheck('redis', async () => {
+    this.healthMonitor.registerCheck("redis", async () => {
       try {
-        const regions = Array.from(this.redisClients.keys())
+        const regions = Array.from(this.redisClients.keys());
         const results = await Promise.all(
           regions.map(async (region) => {
-            const client = this.redisClients.get(region)
+            const client = this.redisClients.get(region);
             if (!client)
               return {
                 region,
-                status: 'unhealthy',
-                message: 'Client not found',
-              }
+                status: "unhealthy",
+                message: "Client not found",
+              };
 
             try {
-              await client.ping()
+              await client.ping();
               return {
                 region,
-                status: 'healthy',
-                message: 'Redis connection active',
-              }
+                status: "healthy",
+                message: "Redis connection active",
+              };
             } catch (error) {
               return {
                 region,
-                status: 'unhealthy',
+                status: "unhealthy",
                 message: `Redis error: ${error.message}`,
-              }
+              };
             }
           }),
-        )
+        );
 
-        const unhealthy = results.filter((r) => r.status === 'unhealthy')
+        const unhealthy = results.filter((r) => r.status === "unhealthy");
         if (unhealthy.length > 0) {
           return {
-            status: 'unhealthy',
-            message: `Redis issues in regions: ${unhealthy.map((r) => r.region).join(', ')}`,
-          }
+            status: "unhealthy",
+            message: `Redis issues in regions: ${unhealthy.map((r) => r.region).join(", ")}`,
+          };
         }
 
-        return { status: 'healthy', message: 'All Redis connections active' }
+        return { status: "healthy", message: "All Redis connections active" };
       } catch (error) {
         return {
-          status: 'unhealthy',
+          status: "unhealthy",
           message: `Redis health check error: ${error.message}`,
-        }
+        };
       }
-    })
+    });
   }
 
   /**
@@ -538,24 +540,24 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async performRealTimeSync(): Promise<void> {
     try {
-      this.logger.debug('Performing real-time sync...')
+      this.logger.debug("Performing real-time sync...");
 
       // Sync user data
-      await this.syncUserData()
+      await this.syncUserData();
 
       // Sync session data
-      await this.syncSessionData()
+      await this.syncSessionData();
 
       // Sync conversation data
-      await this.syncConversationData()
+      await this.syncConversationData();
 
       // Process pending sync logs
-      await this.processSyncLogs()
+      await this.processSyncLogs();
 
-      this.logger.debug('Real-time sync completed')
+      this.logger.debug("Real-time sync completed");
     } catch (error) {
-      this.logger.error('Real-time sync failed', { error })
-      throw error
+      this.logger.error("Real-time sync failed", { error });
+      throw error;
     }
   }
 
@@ -564,15 +566,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async syncUserData(): Promise<void> {
     try {
-      const regions = this.config.getRegions()
-      const syncConfig = this.config.getSyncConfig()
+      const regions = this.config.getRegions();
+      const syncConfig = this.config.getSyncConfig();
 
       for (const region of regions) {
-        const client = this.mongoClients.get(region)
-        if (!client) continue
+        const client = this.mongoClients.get(region);
+        if (!client) continue;
 
-        const db = client.db()
-        const usersCollection = db.collection('users')
+        const db = client.db();
+        const usersCollection = db.collection("users");
 
         // Find users that need syncing
         const pendingUsers = await usersCollection
@@ -584,16 +586,16 @@ export class CrossRegionDataSyncManager extends EventEmitter {
                   $lt: new Date(Date.now() - syncConfig.userSyncInterval),
                 },
               },
-              { syncStatus: 'pending' },
+              { syncStatus: "pending" },
             ],
           })
           .limit(100)
-          .toArray()
+          .toArray();
 
         for (const user of pendingUsers) {
           try {
             // Sync to CockroachDB
-            await this.syncUserToCockroachDB(user, region)
+            await this.syncUserToCockroachDB(user, region);
 
             // Update sync status
             await usersCollection.updateOne(
@@ -601,32 +603,32 @@ export class CrossRegionDataSyncManager extends EventEmitter {
               {
                 $set: {
                   lastSyncedAt: new Date(),
-                  syncStatus: 'synced',
+                  syncStatus: "synced",
                 },
               },
-            )
+            );
 
             // Log sync
-            await this.logSync('users', 'sync', user._id, region, 'completed')
+            await this.logSync("users", "sync", user._id, region, "completed");
           } catch (error) {
             this.logger.error(
               `Failed to sync user ${user._id} from ${region}`,
               { error },
-            )
+            );
             await this.logSync(
-              'users',
-              'sync',
+              "users",
+              "sync",
               user._id,
               region,
-              'failed',
+              "failed",
               error.message,
-            )
+            );
           }
         }
       }
     } catch (error) {
-      this.logger.error('User data sync failed', { error })
-      throw error
+      this.logger.error("User data sync failed", { error });
+      throw error;
     }
   }
 
@@ -645,7 +647,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         username = EXCLUDED.username,
         metadata = EXCLUDED.metadata,
         updated_at = EXCLUDED.updated_at
-    `
+    `;
 
     const values = [
       user._id.toString(),
@@ -655,9 +657,9 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       JSON.stringify(user.metadata || {}),
       user.createdAt || new Date(),
       user.updatedAt || new Date(),
-    ]
+    ];
 
-    await this.cockroachClient!.query(query, values)
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -665,61 +667,61 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async syncSessionData(): Promise<void> {
     try {
-      const regions = this.config.getRegions()
+      const regions = this.config.getRegions();
 
       for (const region of regions) {
-        const client = this.mongoClients.get(region)
-        if (!client) continue
+        const client = this.mongoClients.get(region);
+        if (!client) continue;
 
-        const db = client.db()
-        const sessionsCollection = db.collection('sessions')
+        const db = client.db();
+        const sessionsCollection = db.collection("sessions");
 
         // Find sessions that need syncing
         const pendingSessions = await sessionsCollection
           .find({
-            syncStatus: 'pending',
+            syncStatus: "pending",
           })
           .limit(50)
-          .toArray()
+          .toArray();
 
         for (const session of pendingSessions) {
           try {
             // Sync to CockroachDB
-            await this.syncSessionToCockroachDB(session, region)
+            await this.syncSessionToCockroachDB(session, region);
 
             // Update sync status
             await sessionsCollection.updateOne(
               { _id: session._id },
-              { $set: { syncStatus: 'synced' } },
-            )
+              { $set: { syncStatus: "synced" } },
+            );
 
             // Log sync
             await this.logSync(
-              'sessions',
-              'sync',
+              "sessions",
+              "sync",
               session._id,
               region,
-              'completed',
-            )
+              "completed",
+            );
           } catch (error) {
             this.logger.error(
               `Failed to sync session ${session._id} from ${region}`,
               { error },
-            )
+            );
             await this.logSync(
-              'sessions',
-              'sync',
+              "sessions",
+              "sync",
               session._id,
               region,
-              'failed',
+              "failed",
               error.message,
-            )
+            );
           }
         }
       }
     } catch (error) {
-      this.logger.error('Session data sync failed', { error })
-      throw error
+      this.logger.error("Session data sync failed", { error });
+      throw error;
     }
   }
 
@@ -736,7 +738,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       ON CONFLICT (id) DO UPDATE SET
         expires_at = EXCLUDED.expires_at,
         metadata = EXCLUDED.metadata
-    `
+    `;
 
     const values = [
       session._id.toString(),
@@ -746,9 +748,9 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       session.expiresAt,
       JSON.stringify(session.metadata || {}),
       session.createdAt || new Date(),
-    ]
+    ];
 
-    await this.cockroachClient!.query(query, values)
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -756,39 +758,39 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async syncConversationData(): Promise<void> {
     try {
-      const regions = this.config.getRegions()
+      const regions = this.config.getRegions();
 
       for (const region of regions) {
-        const client = this.mongoClients.get(region)
-        if (!client) continue
+        const client = this.mongoClients.get(region);
+        if (!client) continue;
 
-        const db = client.db()
-        const conversationsCollection = db.collection('conversations')
-        const messagesCollection = db.collection('messages')
+        const db = client.db();
+        const conversationsCollection = db.collection("conversations");
+        const messagesCollection = db.collection("messages");
 
         // Sync conversations
         const pendingConversations = await conversationsCollection
           .find({
-            syncStatus: 'pending',
+            syncStatus: "pending",
           })
           .limit(20)
-          .toArray()
+          .toArray();
 
         for (const conversation of pendingConversations) {
           try {
             // Sync conversation to CockroachDB
-            await this.syncConversationToCockroachDB(conversation, region)
+            await this.syncConversationToCockroachDB(conversation, region);
 
             // Sync related messages
             const messages = await messagesCollection
               .find({
                 conversationId: conversation._id,
-                syncStatus: 'pending',
+                syncStatus: "pending",
               })
-              .toArray()
+              .toArray();
 
             for (const message of messages) {
-              await this.syncMessageToCockroachDB(message, region)
+              await this.syncMessageToCockroachDB(message, region);
 
               // Sync AI analyses if available
               if (message.aiAnalysis) {
@@ -797,49 +799,49 @@ export class CrossRegionDataSyncManager extends EventEmitter {
                   message._id,
                   conversation.userId,
                   region,
-                )
+                );
               }
             }
 
             // Update sync status
             await conversationsCollection.updateOne(
               { _id: conversation._id },
-              { $set: { syncStatus: 'synced' } },
-            )
+              { $set: { syncStatus: "synced" } },
+            );
 
             // Update message sync status
             await messagesCollection.updateMany(
               { conversationId: conversation._id },
-              { $set: { syncStatus: 'synced' } },
-            )
+              { $set: { syncStatus: "synced" } },
+            );
 
             // Log sync
             await this.logSync(
-              'conversations',
-              'sync',
+              "conversations",
+              "sync",
               conversation._id,
               region,
-              'completed',
-            )
+              "completed",
+            );
           } catch (error) {
             this.logger.error(
               `Failed to sync conversation ${conversation._id} from ${region}`,
               { error },
-            )
+            );
             await this.logSync(
-              'conversations',
-              'sync',
+              "conversations",
+              "sync",
               conversation._id,
               region,
-              'failed',
+              "failed",
               error.message,
-            )
+            );
           }
         }
       }
     } catch (error) {
-      this.logger.error('Conversation data sync failed', { error })
-      throw error
+      this.logger.error("Conversation data sync failed", { error });
+      throw error;
     }
   }
 
@@ -858,20 +860,20 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         status = EXCLUDED.status,
         metadata = EXCLUDED.metadata,
         updated_at = EXCLUDED.updated_at
-    `
+    `;
 
     const values = [
       conversation._id.toString(),
       conversation.userId.toString(),
       region,
       conversation.title,
-      conversation.status || 'active',
+      conversation.status || "active",
       JSON.stringify(conversation.metadata || {}),
       conversation.createdAt || new Date(),
       conversation.updatedAt || new Date(),
-    ]
+    ];
 
-    await this.cockroachClient!.query(query, values)
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -888,7 +890,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         content = EXCLUDED.content,
         sentiment_score = EXCLUDED.sentiment_score,
         metadata = EXCLUDED.metadata
-    `
+    `;
 
     const values = [
       message._id.toString(),
@@ -896,13 +898,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       message.userId.toString(),
       region,
       message.content,
-      message.messageType || 'text',
+      message.messageType || "text",
       message.sentimentScore || null,
       JSON.stringify(message.metadata || {}),
       message.createdAt || new Date(),
-    ]
+    ];
 
-    await this.cockroachClient!.query(query, values)
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -922,7 +924,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         empathy_score = EXCLUDED.empathy_score,
         mental_health_score = EXCLUDED.mental_health_score,
         recommendations = EXCLUDED.recommendations
-    `
+    `;
 
     const values = [
       analysis._id || uuidv4(),
@@ -935,9 +937,9 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       analysis.mentalHealthScore || null,
       JSON.stringify(analysis.recommendations || {}),
       analysis.createdAt || new Date(),
-    ]
+    ];
 
-    await this.cockroachClient!.query(query, values)
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -954,7 +956,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     const query = `
       INSERT INTO sync_log (table_name, operation, record_id, region, sync_status, error_message)
       VALUES ($1, $2, $3, $4, $5, $6)
-    `
+    `;
 
     const values = [
       tableName,
@@ -963,8 +965,8 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       region,
       status,
       errorMessage || null,
-    ]
-    await this.cockroachClient!.query(query, values)
+    ];
+    await this.cockroachClient!.query(query, values);
   }
 
   /**
@@ -977,34 +979,34 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         WHERE sync_status = 'failed' AND retry_count < 3
         ORDER BY created_at ASC
         LIMIT 50
-      `
+      `;
 
-      const result = await this.cockroachClient!.query(query)
+      const result = await this.cockroachClient!.query(query);
 
       for (const log of result.rows) {
         try {
           // Retry the failed operation
-          await this.retrySyncOperation(log)
+          await this.retrySyncOperation(log);
 
           // Update sync log
           await this.cockroachClient!.query(
-            'UPDATE sync_log SET sync_status = $1, retry_count = retry_count + 1, updated_at = now() WHERE id = $2',
-            ['completed', log.id],
-          )
+            "UPDATE sync_log SET sync_status = $1, retry_count = retry_count + 1, updated_at = now() WHERE id = $2",
+            ["completed", log.id],
+          );
         } catch (error) {
           this.logger.error(`Failed to retry sync operation ${log.id}`, {
             error,
-          })
+          });
 
           // Update retry count
           await this.cockroachClient!.query(
-            'UPDATE sync_log SET retry_count = retry_count + 1, error_message = $1, updated_at = now() WHERE id = $2',
+            "UPDATE sync_log SET retry_count = retry_count + 1, error_message = $1, updated_at = now() WHERE id = $2",
             [error.message, log.id],
-          )
+          );
         }
       }
     } catch (error) {
-      this.logger.error('Failed to process sync logs', { error })
+      this.logger.error("Failed to process sync logs", { error });
     }
   }
 
@@ -1015,7 +1017,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     // Implementation depends on the specific operation
     this.logger.info(
       `Retrying sync operation for ${log.table_name} record ${log.record_id}`,
-    )
+    );
 
     // Add retry logic based on table and operation type
     // This is a placeholder - implement specific retry logic as needed
@@ -1026,21 +1028,21 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async performBatchSync(): Promise<void> {
     try {
-      this.logger.debug('Performing batch sync for analytics...')
+      this.logger.debug("Performing batch sync for analytics...");
 
       // Sync performance metrics to ClickHouse
-      await this.syncPerformanceMetrics()
+      await this.syncPerformanceMetrics();
 
       // Sync user analytics
-      await this.syncUserAnalytics()
+      await this.syncUserAnalytics();
 
       // Cleanup old data
-      await this.cleanupOldData()
+      await this.cleanupOldData();
 
-      this.logger.debug('Batch sync completed')
+      this.logger.debug("Batch sync completed");
     } catch (error) {
-      this.logger.error('Batch sync failed', { error })
-      throw error
+      this.logger.error("Batch sync failed", { error });
+      throw error;
     }
   }
 
@@ -1049,15 +1051,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async syncPerformanceMetrics(): Promise<void> {
     try {
-      const regions = this.config.getRegions()
-      const metrics = []
+      const regions = this.config.getRegions();
+      const metrics = [];
 
       for (const region of regions) {
-        const client = this.redisClients.get(region)
-        if (!client) continue
+        const client = this.redisClients.get(region);
+        if (!client) continue;
 
         // Get performance metrics from Redis
-        const regionMetrics = await client.hgetall(`metrics:${region}`)
+        const regionMetrics = await client.hgetall(`metrics:${region}`);
 
         for (const [metricName, metricValue] of Object.entries(regionMetrics)) {
           metrics.push({
@@ -1065,24 +1067,24 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             region,
             metric_name: metricName,
             metric_value: parseFloat(metricValue) || 0,
-            tags: JSON.stringify({ source: 'redis' }),
-          })
+            tags: JSON.stringify({ source: "redis" }),
+          });
         }
       }
 
       // Insert into ClickHouse
       if (metrics.length > 0) {
         await this.clickhouseClient.insert({
-          table: 'performance_metrics',
+          table: "performance_metrics",
           values: metrics,
-          format: 'JSONEachRow',
-        })
+          format: "JSONEachRow",
+        });
       }
 
-      this.logger.debug(`Synced ${metrics.length} performance metrics`)
+      this.logger.debug(`Synced ${metrics.length} performance metrics`);
     } catch (error) {
-      this.logger.error('Failed to sync performance metrics', { error })
-      throw error
+      this.logger.error("Failed to sync performance metrics", { error });
+      throw error;
     }
   }
 
@@ -1091,15 +1093,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   private async syncUserAnalytics(): Promise<void> {
     try {
-      const regions = this.config.getRegions()
-      const analytics = []
+      const regions = this.config.getRegions();
+      const analytics = [];
 
       for (const region of regions) {
-        const client = this.mongoClients.get(region)
-        if (!client) continue
+        const client = this.mongoClients.get(region);
+        if (!client) continue;
 
-        const db = client.db()
-        const analyticsCollection = db.collection('user_analytics')
+        const db = client.db();
+        const analyticsCollection = db.collection("user_analytics");
 
         // Get recent analytics data
         const recentAnalytics = await analyticsCollection
@@ -1107,7 +1109,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             syncedAt: { $exists: false },
           })
           .limit(1000)
-          .toArray()
+          .toArray();
 
         for (const analytic of recentAnalytics) {
           analytics.push({
@@ -1117,31 +1119,31 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             event_type: analytic.eventType,
             event_data: JSON.stringify(analytic.eventData || {}),
             session_id: analytic.sessionId?.toString() || uuidv4(),
-            ip_address: analytic.ipAddress || '',
-            user_agent: analytic.userAgent || '',
-          })
+            ip_address: analytic.ipAddress || "",
+            user_agent: analytic.userAgent || "",
+          });
         }
 
         // Mark as synced
         await analyticsCollection.updateMany(
           { _id: { $in: recentAnalytics.map((a) => a._id) } },
           { $set: { syncedAt: new Date() } },
-        )
+        );
       }
 
       // Insert into ClickHouse
       if (analytics.length > 0) {
         await this.clickhouseClient.insert({
-          table: 'user_analytics',
+          table: "user_analytics",
           values: analytics,
-          format: 'JSONEachRow',
-        })
+          format: "JSONEachRow",
+        });
       }
 
-      this.logger.debug(`Synced ${analytics.length} user analytics events`)
+      this.logger.debug(`Synced ${analytics.length} user analytics events`);
     } catch (error) {
-      this.logger.error('Failed to sync user analytics', { error })
-      throw error
+      this.logger.error("Failed to sync user analytics", { error });
+      throw error;
     }
   }
 
@@ -1155,13 +1157,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         DELETE FROM sync_log
         WHERE created_at < now() - INTERVAL '30 days'
         AND sync_status = 'completed'
-      `
+      `;
 
-      const result = await this.cockroachClient!.query(cleanupQuery)
-      this.logger.debug(`Cleaned up ${result.rowCount} old sync logs`)
+      const result = await this.cockroachClient!.query(cleanupQuery);
+      this.logger.debug(`Cleaned up ${result.rowCount} old sync logs`);
     } catch (error) {
-      this.logger.error('Failed to cleanup old data', { error })
-      throw error
+      this.logger.error("Failed to cleanup old data", { error });
+      throw error;
     }
   }
 
@@ -1175,12 +1177,12 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         WHERE created_at < now() - INTERVAL '7 days'
         AND sync_status IN ('completed', 'failed')
         AND retry_count >= 3
-      `
+      `;
 
-      const result = await this.cockroachClient!.query(query)
-      this.logger.debug(`Cleaned up ${result.rowCount} old sync log entries`)
+      const result = await this.cockroachClient!.query(query);
+      this.logger.debug(`Cleaned up ${result.rowCount} old sync log entries`);
     } catch (error) {
-      this.logger.error('Failed to cleanup sync logs', { error })
+      this.logger.error("Failed to cleanup sync logs", { error });
     }
   }
 
@@ -1188,7 +1190,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Get sync status for all regions
    */
   async getSyncStatus(): Promise<Map<string, SyncStatus>> {
-    return new Map(this.syncStatus)
+    return new Map(this.syncStatus);
   }
 
   /**
@@ -1207,9 +1209,9 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         WHERE created_at > now() - INTERVAL '24 hours'
         GROUP BY region
         ORDER BY region
-      `
+      `;
 
-      const result = await this.cockroachClient!.query(query)
+      const result = await this.cockroachClient!.query(query);
 
       const distribution: DataDistribution = {
         totalRecords: 0,
@@ -1217,7 +1219,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         failedSync: 0,
         completedSync: 0,
         regions: {},
-      }
+      };
 
       for (const row of result.rows) {
         distribution.regions[row.region] = {
@@ -1225,18 +1227,18 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           pendingSync: parseInt(row.pending_sync),
           failedSync: parseInt(row.failed_sync),
           completedSync: parseInt(row.completed_sync),
-        }
+        };
 
-        distribution.totalRecords += parseInt(row.total_records)
-        distribution.pendingSync += parseInt(row.pending_sync)
-        distribution.failedSync += parseInt(row.failed_sync)
-        distribution.completedSync += parseInt(row.completed_sync)
+        distribution.totalRecords += parseInt(row.total_records);
+        distribution.pendingSync += parseInt(row.pending_sync);
+        distribution.failedSync += parseInt(row.failed_sync);
+        distribution.completedSync += parseInt(row.completed_sync);
       }
 
-      return distribution
+      return distribution;
     } catch (error) {
-      this.logger.error('Failed to get data distribution', { error })
-      throw error
+      this.logger.error("Failed to get data distribution", { error });
+      throw error;
     }
   }
 
@@ -1245,28 +1247,28 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   async forceSync(tableName: string, region: string): Promise<void> {
     try {
-      this.logger.info(`Force syncing ${tableName} for region ${region}...`)
+      this.logger.info(`Force syncing ${tableName} for region ${region}...`);
 
       switch (tableName) {
-        case 'users':
-          await this.syncUserData()
-          break
-        case 'sessions':
-          await this.syncSessionData()
-          break
-        case 'conversations':
-          await this.syncConversationData()
-          break
+        case "users":
+          await this.syncUserData();
+          break;
+        case "sessions":
+          await this.syncSessionData();
+          break;
+        case "conversations":
+          await this.syncConversationData();
+          break;
         default:
-          throw new Error(`Unsupported table: ${tableName}`)
+          throw new Error(`Unsupported table: ${tableName}`);
       }
 
-      this.logger.info(`Force sync completed for ${tableName} in ${region}`)
+      this.logger.info(`Force sync completed for ${tableName} in ${region}`);
     } catch (error) {
       this.logger.error(`Force sync failed for ${tableName} in ${region}`, {
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -1281,20 +1283,20 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         FROM sync_log
         WHERE region = $1
         AND sync_status = 'completed'
-      `
+      `;
 
-      const result = await this.cockroachClient!.query(query, [region])
+      const result = await this.cockroachClient!.query(query, [region]);
 
       if (result.rows.length > 0 && result.rows[0].lag_seconds !== null) {
-        return parseFloat(result.rows[0].lag_seconds)
+        return parseFloat(result.rows[0].lag_seconds);
       }
 
-      return 0
+      return 0;
     } catch (error) {
       this.logger.error(`Failed to get replication lag for ${region}`, {
         error,
-      })
-      throw error
+      });
+      throw error;
     }
   }
 
@@ -1303,74 +1305,74 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    */
   async shutdown(): Promise<void> {
     try {
-      this.logger.info('Shutting down CrossRegionDataSyncManager...')
+      this.logger.info("Shutting down CrossRegionDataSyncManager...");
 
       // Clear sync intervals
       if (this.syncInterval) {
-        clearInterval(this.syncInterval)
-        this.syncInterval = null
+        clearInterval(this.syncInterval);
+        this.syncInterval = null;
       }
 
       // Close CockroachDB connection
       if (this.cockroachClient) {
-        await this.cockroachClient.end()
-        this.cockroachClient = null
+        await this.cockroachClient.end();
+        this.cockroachClient = null;
       }
 
       // Close MongoDB connections
       for (const [region, client] of this.mongoClients) {
-        await client.close()
-        this.logger.info(`MongoDB connection closed for region: ${region}`)
+        await client.close();
+        this.logger.info(`MongoDB connection closed for region: ${region}`);
       }
-      this.mongoClients.clear()
+      this.mongoClients.clear();
 
       // Close Redis connections
       for (const [region, client] of this.redisClients) {
-        await client.quit()
-        this.logger.info(`Redis connection closed for region: ${region}`)
+        await client.quit();
+        this.logger.info(`Redis connection closed for region: ${region}`);
       }
-      this.redisClients.clear()
+      this.redisClients.clear();
 
       // Close ClickHouse connection
       if (this.clickhouseClient) {
-        await this.clickhouseClient.close()
-        this.clickhouseClient = null
+        await this.clickhouseClient.close();
+        this.clickhouseClient = null;
       }
 
-      this.isInitialized = false
-      this.logger.info('CrossRegionDataSyncManager shutdown completed')
+      this.isInitialized = false;
+      this.logger.info("CrossRegionDataSyncManager shutdown completed");
 
-      this.emit('shutdown')
+      this.emit("shutdown");
     } catch (error) {
-      this.logger.error('Error during shutdown', { error })
-      throw error
+      this.logger.error("Error during shutdown", { error });
+      throw error;
     }
   }
 }
 
 // Types
 interface SyncStatus {
-  region: string
-  tableName: string
-  lastSync: Date
-  pendingRecords: number
-  failedRecords: number
-  status: 'syncing' | 'idle' | 'error'
+  region: string;
+  tableName: string;
+  lastSync: Date;
+  pendingRecords: number;
+  failedRecords: number;
+  status: "syncing" | "idle" | "error";
 }
 
 interface DataDistribution {
-  totalRecords: number
-  pendingSync: number
-  failedSync: number
-  completedSync: number
+  totalRecords: number;
+  pendingSync: number;
+  failedSync: number;
+  completedSync: number;
   regions: {
     [region: string]: {
-      totalRecords: number
-      pendingSync: number
-      failedSync: number
-      completedSync: number
-    }
-  }
+      totalRecords: number;
+      pendingSync: number;
+      failedSync: number;
+      completedSync: number;
+    };
+  };
 }
 
-export { SyncStatus, DataDistribution }
+export { SyncStatus, DataDistribution };

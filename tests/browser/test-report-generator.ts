@@ -1,78 +1,78 @@
-import { writeFileSync, mkdirSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync, mkdirSync } from "fs";
+import { join } from "path";
 
 interface TestResult {
-  test: string
-  browser: string
-  status: 'passed' | 'failed' | 'skipped' | 'warning' | 'error'
-  details?: any
-  error?: string
-  viewport?: string
+  test: string;
+  browser: string;
+  status: "passed" | "failed" | "skipped" | "warning" | "error";
+  details?: any;
+  error?: string;
+  viewport?: string;
 }
 
 interface TestReport {
   summary: {
-    totalTests: number
-    passedTests: number
-    failedTests: number
-    skippedTests: number
-    passRate: number
+    totalTests: number;
+    passedTests: number;
+    failedTests: number;
+    skippedTests: number;
+    passRate: number;
     browserStats: Record<
       string,
       { passed: number; failed: number; skipped: number }
-    >
-  }
-  details: TestResult[]
-  recommendations: Recommendation[]
+    >;
+  };
+  details: TestResult[];
+  recommendations: Recommendation[];
 }
 
 interface Recommendation {
-  priority: 'high' | 'medium' | 'low'
-  category: string
-  browser?: string
-  message: string
-  details?: any
+  priority: "high" | "medium" | "low";
+  category: string;
+  browser?: string;
+  message: string;
+  details?: any;
 }
 
 export class TestReportGenerator {
-  private reportDir = 'tests/reports'
+  private reportDir = "tests/reports";
 
   constructor() {
-    mkdirSync(this.reportDir, { recursive: true })
+    mkdirSync(this.reportDir, { recursive: true });
   }
 
   generateHTMLReport(
     report: TestReport,
-    outputFile: string = 'theme-test-report.html',
+    outputFile: string = "theme-test-report.html",
   ) {
-    const html = this.buildHTMLReport(report)
-    const filePath = join(this.reportDir, outputFile)
-    writeFileSync(filePath, html)
-    return filePath
+    const html = this.buildHTMLReport(report);
+    const filePath = join(this.reportDir, outputFile);
+    writeFileSync(filePath, html);
+    return filePath;
   }
 
   generateMarkdownReport(
     report: TestReport,
-    outputFile: string = 'theme-test-report.md',
+    outputFile: string = "theme-test-report.md",
   ) {
-    const markdown = this.buildMarkdownReport(report)
-    const filePath = join(this.reportDir, outputFile)
-    writeFileSync(filePath, markdown)
-    return filePath
+    const markdown = this.buildMarkdownReport(report);
+    const filePath = join(this.reportDir, outputFile);
+    writeFileSync(filePath, markdown);
+    return filePath;
   }
 
   generateJSONReport(
     report: TestReport,
-    outputFile: string = 'theme-test-report.json',
+    outputFile: string = "theme-test-report.json",
   ) {
-    const json = JSON.stringify(report, null, 2)
-    const filePath = join(this.reportDir, outputFile)
-    writeFileSync(filePath, json)
-    return filePath
+    const json = JSON.stringify(report, null, 2);
+    const filePath = join(this.reportDir, outputFile);
+    writeFileSync(filePath, json);
+    return filePath;
   }
 
   private buildHTMLReport(report: TestReport): string {
-    const { summary, details, recommendations } = report
+    const { summary, details, recommendations } = report;
 
     return `
 <!DOCTYPE html>
@@ -310,9 +310,9 @@ export class TestReportGenerator {
             <tbody>
                 ${Object.entries(summary.browserStats)
                   .map(([browser, stats]) => {
-                    const total = stats.passed + stats.failed + stats.skipped
+                    const total = stats.passed + stats.failed + stats.skipped;
                     const successRate =
-                      total > 0 ? (stats.passed / total) * 100 : 0
+                      total > 0 ? (stats.passed / total) * 100 : 0;
                     return `
                     <tr>
                         <td><strong>${browser}</strong></td>
@@ -321,9 +321,9 @@ export class TestReportGenerator {
                         <td><span class="status-badge status-skipped">${stats.skipped}</span></td>
                         <td>${successRate.toFixed(1)}%</td>
                     </tr>
-                  `
+                  `;
                   })
-                  .join('')}
+                  .join("")}
             </tbody>
         </table>
     </div>
@@ -335,12 +335,12 @@ export class TestReportGenerator {
             (rec) => `
             <div class="recommendation ${rec.priority}">
                 <strong>${rec.priority.toUpperCase()}:</strong> ${rec.message}
-                ${rec.browser ? `<br><em>Browser: ${rec.browser}</em>` : ''}
-                ${rec.category ? `<br><em>Category: ${rec.category}</em>` : ''}
+                ${rec.browser ? `<br><em>Browser: ${rec.browser}</em>` : ""}
+                ${rec.category ? `<br><em>Category: ${rec.category}</em>` : ""}
             </div>
         `,
           )
-          .join('')}
+          .join("")}
     </div>
 
     <div class="test-details">
@@ -360,13 +360,13 @@ export class TestReportGenerator {
                     (test) => `
                     <tr>
                         <td><strong>${test.test}</strong></td>
-                        <td>${test.browser}${test.viewport ? ` (${test.viewport})` : ''}</td>
+                        <td>${test.browser}${test.viewport ? ` (${test.viewport})` : ""}</td>
                         <td><span class="status-badge status-${test.status}">${test.status}</span></td>
-                        <td>${test.error || test.details?.message || 'No additional details'}</td>
+                        <td>${test.error || test.details?.message || "No additional details"}</td>
                     </tr>
                 `,
                   )
-                  .join('')}
+                  .join("")}
             </tbody>
         </table>
     </div>
@@ -402,11 +402,11 @@ export class TestReportGenerator {
     </script>
 </body>
 </html>
-    `
+    `;
   }
 
   private buildMarkdownReport(report: TestReport): string {
-    const { summary, details, recommendations } = report
+    const { summary, details, recommendations } = report;
 
     return `# 🎨 Theme Implementation Test Report
 
@@ -428,22 +428,22 @@ Generated on: ${new Date().toLocaleString()}
 |---------|--------|--------|---------|--------------|
 ${Object.entries(summary.browserStats)
   .map(([browser, stats]) => {
-    const total = stats.passed + stats.failed + stats.skipped
-    const successRate = total > 0 ? (stats.passed / total) * 100 : 0
-    return `| ${browser} | ${stats.passed} | ${stats.failed} | ${stats.skipped} | ${successRate.toFixed(1)}% |`
+    const total = stats.passed + stats.failed + stats.skipped;
+    const successRate = total > 0 ? (stats.passed / total) * 100 : 0;
+    return `| ${browser} | ${stats.passed} | ${stats.failed} | ${stats.skipped} | ${successRate.toFixed(1)}% |`;
   })
-  .join('\n')}
+  .join("\n")}
 
 ## 💡 Recommendations
 
 ${recommendations
   .map((rec) => {
-    const priority = rec.priority.toUpperCase()
-    const browserInfo = rec.browser ? ` (${rec.browser})` : ''
-    const categoryInfo = rec.category ? ` [${rec.category}]` : ''
-    return `- **${priority}**${browserInfo}${categoryInfo}: ${rec.message}`
+    const priority = rec.priority.toUpperCase();
+    const browserInfo = rec.browser ? ` (${rec.browser})` : "";
+    const categoryInfo = rec.category ? ` [${rec.category}]` : "";
+    return `- **${priority}**${browserInfo}${categoryInfo}: ${rec.message}`;
   })
-  .join('\n')}
+  .join("\n")}
 
 ## 🔍 Detailed Test Results
 
@@ -451,12 +451,12 @@ ${recommendations
 |------|---------|--------|---------|
 ${details
   .map((test) => {
-    const viewport = test.viewport ? ` (${test.viewport})` : ''
+    const viewport = test.viewport ? ` (${test.viewport})` : "";
     const details =
-      test.error || test.details?.message || 'No additional details'
-    return `| ${test.test} | ${test.browser}${viewport} | ${test.status} | ${details} |`
+      test.error || test.details?.message || "No additional details";
+    return `| ${test.test} | ${test.browser}${viewport} | ${test.status} | ${details} |`;
   })
-  .join('\n')}
+  .join("\n")}
 
 ## 🚀 Next Steps
 
@@ -469,23 +469,23 @@ ${details
 ---
 
 *This report was generated automatically by the Theme Implementation Test Suite*
-`
+`;
   }
 
   generateExecutiveSummary(report: TestReport): string {
-    const { summary, recommendations } = report
+    const { summary, recommendations } = report;
 
     const highPriorityIssues = recommendations.filter(
-      (r) => r.priority === 'high',
-    ).length
+      (r) => r.priority === "high",
+    ).length;
     const mediumPriorityIssues = recommendations.filter(
-      (r) => r.priority === 'medium',
-    ).length
+      (r) => r.priority === "medium",
+    ).length;
 
     return `
 ## Executive Summary
 
-**Overall Status**: ${summary.passRate >= 90 ? '✅ Excellent' : summary.passRate >= 80 ? '⚠️ Good' : '❌ Needs Attention'}
+**Overall Status**: ${summary.passRate >= 90 ? "✅ Excellent" : summary.passRate >= 80 ? "⚠️ Good" : "❌ Needs Attention"}
 
 **Key Findings**:
 - ${summary.totalTests} tests executed across multiple browsers and devices
@@ -495,15 +495,15 @@ ${details
 
 **Critical Issues**:
 ${recommendations
-  .filter((r) => r.priority === 'high')
+  .filter((r) => r.priority === "high")
   .map((rec) => `- ${rec.message}`)
-  .join('\n')}
+  .join("\n")}
 
 **Recommended Actions**:
 1. Address browser-specific compatibility issues
 2. Optimize performance for theme switching
 3. Enhance accessibility compliance
 4. Improve responsive design consistency
-`
+`;
   }
 }

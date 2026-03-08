@@ -1,7 +1,7 @@
 ---
 title: CPTSD vs. PTSD
-description: 'Comprehensive guide for mental health professionals and individuals in recovery'
-author: 'Resource Team'
+description: "Comprehensive guide for mental health professionals and individuals in recovery"
+author: "Resource Team"
 pubDate: 2024-02-28
 ---
 

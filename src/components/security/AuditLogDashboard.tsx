@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '../ui/card'
-import { Input } from '../ui/input'
+} from "../ui/card";
+import { Input } from "../ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select'
-import { Button } from '../ui/button'
+} from "../ui/select";
+import { Button } from "../ui/button";
 import {
   Table as UITable,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
+} from "../ui/table";
 import {
   BarChart,
   Bar,
@@ -31,19 +31,19 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts'
-import { format } from 'date-fns'
+} from "recharts";
+import { format } from "date-fns";
 
 export interface AuditLogEntry {
-  id: string
-  userId: string
-  action: string
+  id: string;
+  userId: string;
+  action: string;
   resource: {
-    id: string
-    type: string | undefined
-  }
-  metadata: Record<string, unknown>
-  timestamp: string // Will be parsed as Date in code
+    id: string;
+    type: string | undefined;
+  };
+  metadata: Record<string, unknown>;
+  timestamp: string; // Will be parsed as Date in code
 }
 
 // Simple Table wrapper that doesn't require the complex props
@@ -57,82 +57,82 @@ const Table: FC<React.PropsWithChildren> = ({ children }) => {
     >
       {children}
     </UITable>
-  )
-}
+  );
+};
 
 interface AuditLogFilters {
-  eventType: string
-  userId: string
-  startDate: string
-  endDate: string
-  searchTerm: string
+  eventType: string;
+  userId: string;
+  startDate: string;
+  endDate: string;
+  searchTerm: string;
 }
 
 export function AuditLogDashboard() {
-  const [logs, setLogs] = useState<AuditLogEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<AuditLogFilters>({
-    eventType: '',
-    userId: '',
-    startDate: '',
-    endDate: '',
-    searchTerm: '',
-  })
+    eventType: "",
+    userId: "",
+    startDate: "",
+    endDate: "",
+    searchTerm: "",
+  });
 
   // Event type options from our audit system
   const eventTypes = [
-    'access',
-    'create',
-    'modify',
-    'delete',
-    'export',
-    'share',
-    'login',
-    'logout',
-    'system',
-    'security',
-    'admin',
-    'consent',
-    'ai',
-    'dlp_allowed',
-    'dlp_blocked',
-    'security_alert',
-  ]
+    "access",
+    "create",
+    "modify",
+    "delete",
+    "export",
+    "share",
+    "login",
+    "logout",
+    "system",
+    "security",
+    "admin",
+    "consent",
+    "ai",
+    "dlp_allowed",
+    "dlp_blocked",
+    "security_alert",
+  ];
 
   const fetchLogs = React.useCallback(async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       // Build query parameters
-      const params = new URLSearchParams()
+      const params = new URLSearchParams();
       if (filters.eventType) {
-        params.append('eventType', filters.eventType)
+        params.append("eventType", filters.eventType);
       }
       if (filters.userId) {
-        params.append('userId', filters.userId)
+        params.append("userId", filters.userId);
       }
       // Optionally handle pagination/limits here if desired
 
-      const res = await fetch('/api/admin/audit-logs?' + params.toString())
-      const data = await res.json()
-      let fetchedLogs: AuditLogEntry[] = data.logs || []
+      const res = await fetch("/api/admin/audit-logs?" + params.toString());
+      const data = await res.json();
+      let fetchedLogs: AuditLogEntry[] = data.logs || [];
 
       // Apply date range filter if set
       if (filters.startDate || filters.endDate) {
         fetchedLogs = fetchedLogs.filter((log) => {
-          const logDate = new Date(log.timestamp)
+          const logDate = new Date(log.timestamp);
           if (filters.startDate && logDate < new Date(filters.startDate)) {
-            return false
+            return false;
           }
           if (filters.endDate && logDate > new Date(filters.endDate)) {
-            return false
+            return false;
           }
-          return true
-        })
+          return true;
+        });
       }
 
       // Apply search term filter if set
       if (filters.searchTerm) {
-        const searchLower = filters.searchTerm.toLowerCase()
+        const searchLower = filters.searchTerm.toLowerCase();
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
@@ -141,64 +141,64 @@ export function AuditLogDashboard() {
             (log.resource.id &&
               log.resource.id.toLowerCase().includes(searchLower)) ||
             log.userId.toLowerCase().includes(searchLower),
-        )
+        );
       }
 
-      setLogs(fetchedLogs)
+      setLogs(fetchedLogs);
     } catch (error: unknown) {
-      console.error('Error fetching audit logs:', error)
+      console.error("Error fetching audit logs:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [filters])
+  }, [filters]);
 
   useEffect(() => {
-    fetchLogs()
-  }, [fetchLogs])
+    fetchLogs();
+  }, [fetchLogs]);
 
   const getEventTypeStats = () => {
     const stats = logs.reduce(
       (acc, log) => {
-        const type = log.action
-        acc[type] = (acc[type] || 0) + 1
-        return acc
+        const type = log.action;
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
       },
       {} as Record<string, number>,
-    )
+    );
 
     return Object.entries(stats).map(([name, value]) => ({
       name,
       value,
-    }))
-  }
+    }));
+  };
 
   const columns = [
     {
-      header: 'Timestamp',
-      cell: (log: AuditLogEntry) => format(new Date(log.timestamp), 'PPpp'),
+      header: "Timestamp",
+      cell: (log: AuditLogEntry) => format(new Date(log.timestamp), "PPpp"),
     },
     {
-      header: 'Action',
+      header: "Action",
       cell: (log: AuditLogEntry) => log.action,
     },
     {
-      header: 'User ID',
+      header: "User ID",
       cell: (log: AuditLogEntry) => log.userId,
     },
     {
-      header: 'Resource Type',
+      header: "Resource Type",
       cell: (log: AuditLogEntry) => log.resource.type,
     },
     {
-      header: 'Resource ID',
+      header: "Resource ID",
       cell: (log: AuditLogEntry) => log.resource.id,
     },
     {
-      header: 'Details',
+      header: "Details",
       cell: (log: AuditLogEntry) =>
-        log.metadata ? JSON.stringify(log.metadata) : '-',
+        log.metadata ? JSON.stringify(log.metadata) : "-",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-4">
@@ -325,5 +325,5 @@ export function AuditLogDashboard() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

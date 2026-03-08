@@ -14,82 +14,89 @@
  * - Persistence support (localStorage, database, etc.)
  */
 
-import { ObjectivePriority } from './context-objective-mapping'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { ObjectivePriority } from "./context-objective-mapping";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('user-preferences')
+const logger = createBuildSafeLogger("user-preferences");
 
 /**
  * User preference types
  */
-export type SupportStyle = 'pragmatic' | 'empathic' | 'direct' | 'reflective'
-export type ResponseFormality = 'formal' | 'informal' | 'adaptive'
-export type RiskSensitivity = 'low' | 'medium' | 'high'
-export type VerbosityLevel = 'concise' | 'moderate' | 'detailed'
+export type SupportStyle = "pragmatic" | "empathic" | "direct" | "reflective";
+export type ResponseFormality = "formal" | "informal" | "adaptive";
+export type RiskSensitivity = "low" | "medium" | "high";
+export type VerbosityLevel = "concise" | "moderate" | "detailed";
 
 /**
  * User preferences interface
  */
 export interface UserPreferences {
   /** Preferred support interaction style */
-  preferredSupportStyle?: SupportStyle
+  preferredSupportStyle?: SupportStyle;
 
   /** Response formality level */
-  responseFormality?: ResponseFormality
+  responseFormality?: ResponseFormality;
 
   /** Risk sensitivity for safety-critical situations */
-  riskSensitivity?: RiskSensitivity
+  riskSensitivity?: RiskSensitivity;
 
   /** Preferred verbosity level */
-  verbosityLevel?: VerbosityLevel
+  verbosityLevel?: VerbosityLevel;
 
   /** Custom objective weight overrides (0-1 range) */
-  customObjectiveWeights?: Partial<Record<string, number>>
+  customObjectiveWeights?: Partial<Record<string, number>>;
 
   /** Objectives to disable/exclude */
-  disableObjectives?: string[]
+  disableObjectives?: string[];
 
   /** Objectives to boost/prioritize */
-  prioritizeObjectives?: string[]
+  prioritizeObjectives?: string[];
 
   /** User demographic/context for personalization */
   userContext?: {
-    ageGroup?: 'teen' | 'young_adult' | 'adult' | 'senior'
-    culturalBackground?: string
-    languagePreference?: string
-    accessibilityNeeds?: string[]
-  }
+    ageGroup?: "teen" | "young_adult" | "adult" | "senior";
+    culturalBackground?: string;
+    languagePreference?: string;
+    accessibilityNeeds?: string[];
+  };
 
   /** Interaction preferences */
   interactionPreferences?: {
-    preferQuestions?: boolean
-    preferExamples?: boolean
-    preferStepByStep?: boolean
-    preferSummaries?: boolean
-  }
+    preferQuestions?: boolean;
+    preferExamples?: boolean;
+    preferStepByStep?: boolean;
+    preferSummaries?: boolean;
+  };
 
   /** Additional custom preferences */
-  [key: string]: unknown
+  [key: string]: unknown;
 }
 
 /**
  * Default user preferences
  */
-export const DEFAULT_PREFERENCES: Required<Pick<UserPreferences,
-  'preferredSupportStyle' | 'responseFormality' | 'riskSensitivity' | 'verbosityLevel'>> = {
-  preferredSupportStyle: 'empathic',
-  responseFormality: 'adaptive',
-  riskSensitivity: 'high',
-  verbosityLevel: 'moderate',
-}
+export const DEFAULT_PREFERENCES: Required<
+  Pick<
+    UserPreferences,
+    | "preferredSupportStyle"
+    | "responseFormality"
+    | "riskSensitivity"
+    | "verbosityLevel"
+  >
+> = {
+  preferredSupportStyle: "empathic",
+  responseFormality: "adaptive",
+  riskSensitivity: "high",
+  verbosityLevel: "moderate",
+};
 
 /**
  * Preference validation result
  */
 export interface PreferenceValidationResult {
-  valid: boolean
-  errors: string[]
-  warnings: string[]
+  valid: boolean;
+  errors: string[];
+  warnings: string[];
 }
 
 /**
@@ -98,37 +105,43 @@ export interface PreferenceValidationResult {
  * Manages user preferences with validation, storage, and application logic.
  */
 export class UserPreferenceManager {
-  private preferences: Map<string, UserPreferences> = new Map()
-  private defaultPreferences: UserPreferences
+  private preferences: Map<string, UserPreferences> = new Map();
+  private defaultPreferences: UserPreferences;
 
   constructor(defaultPreferences: UserPreferences = DEFAULT_PREFERENCES) {
-    this.defaultPreferences = defaultPreferences
+    this.defaultPreferences = defaultPreferences;
   }
 
   /**
    * Set preferences for a user
    */
-  setPreferences(userId: string, preferences: UserPreferences): PreferenceValidationResult {
-    const validation = this.validatePreferences(preferences)
+  setPreferences(
+    userId: string,
+    preferences: UserPreferences,
+  ): PreferenceValidationResult {
+    const validation = this.validatePreferences(preferences);
 
     if (!validation.valid) {
-      logger.warn('Invalid preferences provided', { userId, errors: validation.errors })
-      return validation
+      logger.warn("Invalid preferences provided", {
+        userId,
+        errors: validation.errors,
+      });
+      return validation;
     }
 
     // Merge with defaults
-    const mergedPreferences = this.mergeWithDefaults(preferences)
-    this.preferences.set(userId, mergedPreferences)
+    const mergedPreferences = this.mergeWithDefaults(preferences);
+    this.preferences.set(userId, mergedPreferences);
 
-    logger.info('User preferences updated', { userId })
-    return validation
+    logger.info("User preferences updated", { userId });
+    return validation;
   }
 
   /**
    * Get preferences for a user
    */
   getPreferences(userId: string): UserPreferences {
-    return this.preferences.get(userId) || this.defaultPreferences
+    return this.preferences.get(userId) || this.defaultPreferences;
   }
 
   /**
@@ -138,66 +151,85 @@ export class UserPreferenceManager {
     userId: string,
     updates: Partial<UserPreferences>,
   ): PreferenceValidationResult {
-    const current = this.getPreferences(userId)
-    const merged = { ...current, ...updates }
-    return this.setPreferences(userId, merged)
+    const current = this.getPreferences(userId);
+    const merged = { ...current, ...updates };
+    return this.setPreferences(userId, merged);
   }
 
   /**
    * Clear preferences for a user
    */
   clearPreferences(userId: string): void {
-    this.preferences.delete(userId)
-    logger.info('User preferences cleared', { userId })
+    this.preferences.delete(userId);
+    logger.info("User preferences cleared", { userId });
   }
 
   /**
    * Validate user preferences
    */
-  validatePreferences(preferences: UserPreferences): PreferenceValidationResult {
-    const errors: string[] = []
-    const warnings: string[] = []
+  validatePreferences(
+    preferences: UserPreferences,
+  ): PreferenceValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
 
     // Validate support style
     if (preferences.preferredSupportStyle) {
-      const validStyles: SupportStyle[] = ['pragmatic', 'empathic', 'direct', 'reflective']
+      const validStyles: SupportStyle[] = [
+        "pragmatic",
+        "empathic",
+        "direct",
+        "reflective",
+      ];
       if (!validStyles.includes(preferences.preferredSupportStyle)) {
-        errors.push(`Invalid support style: ${preferences.preferredSupportStyle}`)
+        errors.push(
+          `Invalid support style: ${preferences.preferredSupportStyle}`,
+        );
       }
     }
 
     // Validate formality
     if (preferences.responseFormality) {
-      const validFormality: ResponseFormality[] = ['formal', 'informal', 'adaptive']
+      const validFormality: ResponseFormality[] = [
+        "formal",
+        "informal",
+        "adaptive",
+      ];
       if (!validFormality.includes(preferences.responseFormality)) {
-        errors.push(`Invalid response formality: ${preferences.responseFormality}`)
+        errors.push(
+          `Invalid response formality: ${preferences.responseFormality}`,
+        );
       }
     }
 
     // Validate risk sensitivity
     if (preferences.riskSensitivity) {
-      const validRisk: RiskSensitivity[] = ['low', 'medium', 'high']
+      const validRisk: RiskSensitivity[] = ["low", "medium", "high"];
       if (!validRisk.includes(preferences.riskSensitivity)) {
-        errors.push(`Invalid risk sensitivity: ${preferences.riskSensitivity}`)
+        errors.push(`Invalid risk sensitivity: ${preferences.riskSensitivity}`);
       }
     }
 
     // Validate custom weights
     if (preferences.customObjectiveWeights) {
-      Object.entries(preferences.customObjectiveWeights).forEach(([key, weight]) => {
-        if (typeof weight !== 'number' || weight < 0 || weight > 1) {
-          errors.push(`Invalid weight for ${key}: ${weight} (must be 0-1)`)
-        }
-      })
+      Object.entries(preferences.customObjectiveWeights).forEach(
+        ([key, weight]) => {
+          if (typeof weight !== "number" || weight < 0 || weight > 1) {
+            errors.push(`Invalid weight for ${key}: ${weight} (must be 0-1)`);
+          }
+        },
+      );
     }
 
     // Validate disable/prioritize objectives
     if (preferences.disableObjectives && preferences.prioritizeObjectives) {
-      const overlap = preferences.disableObjectives.filter(obj =>
-        preferences.prioritizeObjectives?.includes(obj)
-      )
+      const overlap = preferences.disableObjectives.filter((obj) =>
+        preferences.prioritizeObjectives?.includes(obj),
+      );
       if (overlap.length > 0) {
-        warnings.push(`Objectives in both disable and prioritize lists: ${overlap.join(', ')}`)
+        warnings.push(
+          `Objectives in both disable and prioritize lists: ${overlap.join(", ")}`,
+        );
       }
     }
 
@@ -205,7 +237,7 @@ export class UserPreferenceManager {
       valid: errors.length === 0,
       errors,
       warnings,
-    }
+    };
   }
 
   /**
@@ -215,15 +247,15 @@ export class UserPreferenceManager {
     return {
       ...this.defaultPreferences,
       ...preferences,
-    }
+    };
   }
 
   /**
    * Export preferences for persistence
    */
   exportPreferences(userId: string): string {
-    const prefs = this.getPreferences(userId)
-    return JSON.stringify(prefs)
+    const prefs = this.getPreferences(userId);
+    return JSON.stringify(prefs);
   }
 
   /**
@@ -231,15 +263,15 @@ export class UserPreferenceManager {
    */
   importPreferences(userId: string, data: string): PreferenceValidationResult {
     try {
-      const preferences = JSON.parse(data) as UserPreferences
-      return this.setPreferences(userId, preferences)
+      const preferences = JSON.parse(data) as UserPreferences;
+      return this.setPreferences(userId, preferences);
     } catch (error) {
-      logger.error('Failed to import preferences', { userId, error })
+      logger.error("Failed to import preferences", { userId, error });
       return {
         valid: false,
-        errors: ['Invalid JSON data'],
+        errors: ["Invalid JSON data"],
         warnings: [],
-      }
+      };
     }
   }
 
@@ -247,15 +279,15 @@ export class UserPreferenceManager {
    * Get all users with preferences
    */
   getAllUsers(): string[] {
-    return Array.from(this.preferences.keys())
+    return Array.from(this.preferences.keys());
   }
 
   /**
    * Clear all preferences
    */
   clearAll(): void {
-    this.preferences.clear()
-    logger.info('All user preferences cleared')
+    this.preferences.clear();
+    logger.info("All user preferences cleared");
   }
 }
 
@@ -273,11 +305,13 @@ export function applyUserPreferences(
   objectives: ObjectivePriority[],
   prefs: UserPreferences,
 ): ObjectivePriority[] {
-  let result = [...objectives]
+  let result = [...objectives];
 
   // Step 1: Filter out disabled objectives
   if (prefs.disableObjectives && prefs.disableObjectives.length > 0) {
-    result = result.filter((obj) => !prefs.disableObjectives!.includes(obj.key))
+    result = result.filter(
+      (obj) => !prefs.disableObjectives!.includes(obj.key),
+    );
   }
 
   // Step 2: Apply custom weight overrides
@@ -286,22 +320,22 @@ export function applyUserPreferences(
       prefs.customObjectiveWeights![obj.key] !== undefined
         ? { ...obj, weight: prefs.customObjectiveWeights![obj.key]! }
         : obj,
-    )
+    );
   }
 
   // Step 3: Apply support style adjustments
   if (prefs.preferredSupportStyle) {
-    result = applySupportStyleAdjustments(result, prefs.preferredSupportStyle)
+    result = applySupportStyleAdjustments(result, prefs.preferredSupportStyle);
   }
 
   // Step 4: Apply risk sensitivity adjustments
   if (prefs.riskSensitivity) {
-    result = applyRiskSensitivityAdjustments(result, prefs.riskSensitivity)
+    result = applyRiskSensitivityAdjustments(result, prefs.riskSensitivity);
   }
 
   // Step 5: Apply verbosity adjustments
   if (prefs.verbosityLevel) {
-    result = applyVerbosityAdjustments(result, prefs.verbosityLevel)
+    result = applyVerbosityAdjustments(result, prefs.verbosityLevel);
   }
 
   // Step 6: Boost prioritized objectives
@@ -310,18 +344,21 @@ export function applyUserPreferences(
       prefs.prioritizeObjectives!.includes(obj.key)
         ? { ...obj, weight: Math.min(obj.weight * 1.2, 1) }
         : obj,
-    )
+    );
   }
 
   // Step 7: Apply interaction preference adjustments
   if (prefs.interactionPreferences) {
-    result = applyInteractionPreferenceAdjustments(result, prefs.interactionPreferences)
+    result = applyInteractionPreferenceAdjustments(
+      result,
+      prefs.interactionPreferences,
+    );
   }
 
   // Step 8: Normalize weights to ensure they sum to 1
-  result = normalizeWeights(result)
+  result = normalizeWeights(result);
 
-  return result
+  return result;
 }
 
 /**
@@ -352,17 +389,17 @@ function applySupportStyleAdjustments(
       informativeness: 1.1,
       depth: 1.2,
     },
-  }
+  };
 
-  const styleAdjustments = adjustments[style] || {}
+  const styleAdjustments = adjustments[style] || {};
 
   return objectives.map((obj) => {
-    const multiplier = styleAdjustments[obj.key] || 1.0
+    const multiplier = styleAdjustments[obj.key] || 1.0;
     return {
       ...obj,
       weight: Math.min(obj.weight * multiplier, 1),
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -376,15 +413,15 @@ function applyRiskSensitivityAdjustments(
     low: 1.0,
     medium: 1.15,
     high: 1.3,
-  }
+  };
 
-  const multiplier = safetyMultipliers[sensitivity]
+  const multiplier = safetyMultipliers[sensitivity];
 
   return objectives.map((obj) =>
-    obj.key === 'safety'
+    obj.key === "safety"
       ? { ...obj, weight: Math.min(obj.weight * multiplier, 1) }
       : obj,
-  )
+  );
 }
 
 /**
@@ -406,17 +443,17 @@ function applyVerbosityAdjustments(
       informativeness: 1.2,
       depth: 1.15,
     },
-  }
+  };
 
-  const verbosityAdjustments = adjustments[verbosity] || {}
+  const verbosityAdjustments = adjustments[verbosity] || {};
 
   return objectives.map((obj) => {
-    const multiplier = verbosityAdjustments[obj.key] || 1.0
+    const multiplier = verbosityAdjustments[obj.key] || 1.0;
     return {
       ...obj,
       weight: Math.min(obj.weight * multiplier, 1),
-    }
-  })
+    };
+  });
 }
 
 /**
@@ -424,59 +461,61 @@ function applyVerbosityAdjustments(
  */
 function applyInteractionPreferenceAdjustments(
   objectives: ObjectivePriority[],
-  preferences: NonNullable<UserPreferences['interactionPreferences']>,
+  preferences: NonNullable<UserPreferences["interactionPreferences"]>,
 ): ObjectivePriority[] {
-  let result = [...objectives]
+  let result = [...objectives];
 
   // Boost clarity if user prefers step-by-step
   if (preferences.preferStepByStep) {
     result = result.map((obj) =>
-      obj.key === 'clarity'
+      obj.key === "clarity"
         ? { ...obj, weight: Math.min(obj.weight * 1.15, 1) }
         : obj,
-    )
+    );
   }
 
   // Boost informativeness if user prefers examples
   if (preferences.preferExamples) {
     result = result.map((obj) =>
-      obj.key === 'informativeness'
+      obj.key === "informativeness"
         ? { ...obj, weight: Math.min(obj.weight * 1.1, 1) }
         : obj,
-    )
+    );
   }
 
   // Boost conciseness if user prefers summaries
   if (preferences.preferSummaries) {
     result = result.map((obj) =>
-      obj.key === 'conciseness'
+      obj.key === "conciseness"
         ? { ...obj, weight: Math.min(obj.weight * 1.15, 1) }
         : obj,
-    )
+    );
   }
 
-  return result
+  return result;
 }
 
 /**
  * Normalize objective weights to sum to 1
  */
-function normalizeWeights(objectives: ObjectivePriority[]): ObjectivePriority[] {
-  const sum = objectives.reduce((acc, obj) => acc + obj.weight, 0)
+function normalizeWeights(
+  objectives: ObjectivePriority[],
+): ObjectivePriority[] {
+  const sum = objectives.reduce((acc, obj) => acc + obj.weight, 0);
 
   if (sum === 0) {
     // Avoid division by zero - distribute equally
-    const equalWeight = 1 / objectives.length
-    return objectives.map((obj) => ({ ...obj, weight: equalWeight }))
+    const equalWeight = 1 / objectives.length;
+    return objectives.map((obj) => ({ ...obj, weight: equalWeight }));
   }
 
   return objectives.map((obj) => ({
     ...obj,
     weight: obj.weight / sum,
-  }))
+  }));
 }
 
 /**
  * Create a default preference manager instance
  */
-export const defaultPreferenceManager = new UserPreferenceManager()
+export const defaultPreferenceManager = new UserPreferenceManager();

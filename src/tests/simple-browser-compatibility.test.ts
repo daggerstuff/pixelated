@@ -1,20 +1,20 @@
-import { test, expect } from '@playwright/test'
-import * as fs from 'fs'
+import { test, expect } from "@playwright/test";
+import * as fs from "fs";
 
 // Ensure screenshots directory exists
 function ensureDirectoryExists(directory): void {
   try {
-    fs.mkdirSync(directory, { recursive: true })
+    fs.mkdirSync(directory, { recursive: true });
   } catch (err: unknown) {
     // Directory already exists or cannot be created
-    console.error(`Failed to create directory ${directory}:`, err)
+    console.error(`Failed to create directory ${directory}:`, err);
   }
 }
 
 // Simple browser compatibility test that doesn't require the application to be running
-test('basic browser compatibility check', async ({ page, browser }) => {
+test("basic browser compatibility check", async ({ page, browser }) => {
   // Log browser information
-  console.log(`Testing browser: ${browser.browserType().name()}`)
+  console.log(`Testing browser: ${browser.browserType().name()}`);
 
   // Simple browser feature detection test that doesn't rely on localStorage
   await page.setContent(`
@@ -58,61 +58,61 @@ test('basic browser compatibility check', async ({ page, browser }) => {
         </script>
       </body>
     </html>
-  `)
+  `);
 
   // Wait for results to be populated
   await page.waitForFunction(
     () => {
-      const content = (document.getElementById('results') as HTMLElement)
-        ?.textContent
-      return content && content !== 'Running tests...'
+      const content = (document.getElementById("results") as HTMLElement)
+        ?.textContent;
+      return content && content !== "Running tests...";
     },
     { timeout: 5000 },
-  )
+  );
 
   // Verify the test ran and completed
-  const content = await page.textContent('#results')
-  console.log('Content:', content)
-  expect(content).toBeTruthy()
+  const content = await page.textContent("#results");
+  console.log("Content:", content);
+  expect(content).toBeTruthy();
 
   // Ensure directories exist before taking screenshots
-  ensureDirectoryExists('./playwright-report')
-  ensureDirectoryExists('./test-results')
+  ensureDirectoryExists("./playwright-report");
+  ensureDirectoryExists("./test-results");
 
   try {
     // Take screenshots for the report
     await page.screenshot({
-      path: './test-results/browser-compatibility-test.png',
-    })
+      path: "./test-results/browser-compatibility-test.png",
+    });
 
     // If we're in a CI environment, take additional screenshots for reporting
     if (process.env.CI) {
-      const browserName = browser.browserType().name()
-      ensureDirectoryExists('./test-results/cross-browser')
+      const browserName = browser.browserType().name();
+      ensureDirectoryExists("./test-results/cross-browser");
       await page.screenshot({
         path: `./test-results/cross-browser/${browserName}-compatibility.png`,
-      })
+      });
     }
   } catch (err: unknown) {
-    console.error('Failed to take screenshot:', err)
+    console.error("Failed to take screenshot:", err);
     // Don't fail the test if screenshot fails
   }
 
   // Parse and validate the content
   try {
-    const featuresJson = JSON.parse(content) as unknown
-    console.log('Features detected:', featuresJson)
+    const featuresJson = JSON.parse(content) as unknown;
+    console.log("Features detected:", featuresJson);
 
     // Verify essential features
-    expect(featuresJson.fetch).toBe(true)
-    expect(featuresJson.promise).toBe(true)
-    expect(featuresJson.arrayMethods).toBe(true)
-    expect(featuresJson.css.flexbox).toBe(true)
+    expect(featuresJson.fetch).toBe(true);
+    expect(featuresJson.promise).toBe(true);
+    expect(featuresJson.arrayMethods).toBe(true);
+    expect(featuresJson.css.flexbox).toBe(true);
   } catch (err: unknown) {
-    console.error('Error parsing features JSON:', err)
+    console.error("Error parsing features JSON:", err);
     // Include the content in the error message for better debugging
     throw new Error(`Failed to parse features JSON. Content: ${content}`, {
       cause: err,
-    })
+    });
   }
-})
+});

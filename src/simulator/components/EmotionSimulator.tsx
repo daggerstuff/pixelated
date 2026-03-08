@@ -1,19 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useRealTimeAnalysis } from '../hooks/useRealTimeAnalysis'
-import { EmotionDisplay } from './EmotionDisplay'
-import { SpeechPatternDisplay } from './SpeechPatternDisplay'
-import { TechniqueDisplay } from './TechniqueDisplay'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Alert } from '@/components/ui/alert'
-import { Loader2 } from 'lucide-react'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import React, { useCallback, useEffect, useState } from "react";
+import { useRealTimeAnalysis } from "../hooks/useRealTimeAnalysis";
+import { EmotionDisplay } from "./EmotionDisplay";
+import { SpeechPatternDisplay } from "./SpeechPatternDisplay";
+import { TechniqueDisplay } from "./TechniqueDisplay";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Alert } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('EmotionSimulator')
+const logger = createBuildSafeLogger("EmotionSimulator");
 
 interface ConnectionStatusProps {
-  isConnected: boolean
-  className?: string
+  isConnected: boolean;
+  className?: string;
 }
 
 const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
@@ -23,19 +23,19 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   <div className={`flex items-center gap-2 ${className}`}>
     <div
       className={`w-2 h-2 rounded-full ${
-        isConnected ? 'bg-green-500' : 'bg-red-500'
+        isConnected ? "bg-green-500" : "bg-red-500"
       }`}
       aria-hidden="true"
     />
 
     <span className="text-sm text-muted-foreground">
-      {isConnected ? 'Connected' : 'Disconnected'}
+      {isConnected ? "Connected" : "Disconnected"}
     </span>
   </div>
-)
+);
 
 export const EmotionSimulator: React.FC = () => {
-  const [hasConsent, setHasConsent] = useState(false)
+  const [hasConsent, setHasConsent] = useState(false);
   const {
     isConnected,
     isProcessing,
@@ -44,55 +44,55 @@ export const EmotionSimulator: React.FC = () => {
     stopAnalysis,
     resetAnalysis,
     updateConsent,
-  } = useRealTimeAnalysis()
+  } = useRealTimeAnalysis();
 
   // Handle connection status changes
   useEffect(() => {
     if (!isConnected) {
-      logger.warn('Connection lost to analysis service')
+      logger.warn("Connection lost to analysis service");
     }
-  }, [isConnected])
+  }, [isConnected]);
 
   const handleConsentChange = useCallback(
     (checked: boolean) => {
       try {
-        setHasConsent(checked)
-        updateConsent(checked)
+        setHasConsent(checked);
+        updateConsent(checked);
       } catch (error: unknown) {
-        logger.error('Error updating consent status:', error)
+        logger.error("Error updating consent status:", error);
       }
     },
     [updateConsent],
-  )
+  );
 
   const handleStart = useCallback(() => {
     if (!hasConsent) {
-      logger.warn('Attempted to start analysis without consent')
-      return
+      logger.warn("Attempted to start analysis without consent");
+      return;
     }
 
     try {
-      startAnalysis()
+      startAnalysis();
     } catch (error: unknown) {
-      logger.error('Error starting analysis:', error)
+      logger.error("Error starting analysis:", error);
     }
-  }, [hasConsent, startAnalysis])
+  }, [hasConsent, startAnalysis]);
 
   const handleStop = useCallback(() => {
     try {
-      stopAnalysis()
+      stopAnalysis();
     } catch (error: unknown) {
-      logger.error('Error stopping analysis:', error)
+      logger.error("Error stopping analysis:", error);
     }
-  }, [stopAnalysis])
+  }, [stopAnalysis]);
 
   const handleReset = useCallback(() => {
     try {
-      resetAnalysis()
+      resetAnalysis();
     } catch (error: unknown) {
-      logger.error('Error resetting analysis:', error)
+      logger.error("Error resetting analysis:", error);
     }
-  }, [resetAnalysis])
+  }, [resetAnalysis]);
 
   return (
     <div
@@ -126,7 +126,7 @@ export const EmotionSimulator: React.FC = () => {
                 Analyzing...
               </>
             ) : (
-              'Start Analysis'
+              "Start Analysis"
             )}
           </Button>
           <Button
@@ -168,5 +168,5 @@ export const EmotionSimulator: React.FC = () => {
 
       <ConnectionStatus isConnected={isConnected} className="mt-4" />
     </div>
-  )
-}
+  );
+};

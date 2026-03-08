@@ -14,31 +14,31 @@ export function toggleFadeEffect(
   visible: boolean,
   hiddenClass: string,
 ) {
-  const element = document.getElementById(elementId) as HTMLElement
+  const element = document.getElementById(elementId) as HTMLElement;
   if (!element) {
-    return
+    return;
   }
 
   if (visible) {
     // console.log('open', element)
-    element.classList.remove(hiddenClass)
-    if (!window.matchMedia('(prefers-reduced-motion)').matches) {
-      element.classList.add('fade-in')
+    element.classList.remove(hiddenClass);
+    if (!window.matchMedia("(prefers-reduced-motion)").matches) {
+      element.classList.add("fade-in");
     }
   } else {
     // console.log('close', element)
-    if (window.matchMedia('(prefers-reduced-motion)').matches) {
-      element.classList.add(hiddenClass)
-      return
+    if (window.matchMedia("(prefers-reduced-motion)").matches) {
+      element.classList.add(hiddenClass);
+      return;
     }
-    element.classList.add('fade-out')
+    element.classList.add("fade-out");
     element.addEventListener(
-      'animationend',
+      "animationend",
       () => {
-        element.classList.remove('fade-in', 'fade-out')
-        element.classList.add(hiddenClass)
+        element.classList.remove("fade-in", "fade-out");
+        element.classList.add(hiddenClass);
       },
       { once: true },
-    )
+    );
   }
 }

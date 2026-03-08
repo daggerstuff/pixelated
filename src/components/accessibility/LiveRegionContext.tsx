@@ -1,22 +1,22 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 import {
   createContext,
   useContext,
   useState,
   useCallback,
   useEffect,
-} from 'react'
+} from "react";
 
 // Define the context interface
 interface LiveRegionContextType {
-  announceStatus: (message: string, clearDelay?: number) => void
-  announceAlert: (message: string, clearDelay?: number) => void
-  log: (message: string, clear?: boolean) => void
+  announceStatus: (message: string, clearDelay?: number) => void;
+  announceAlert: (message: string, clearDelay?: number) => void;
+  log: (message: string, clear?: boolean) => void;
   announceProgress: (
     value: number | string,
     max: number | string,
     label: string,
-  ) => void
+  ) => void;
 }
 
 // Create the context with default values
@@ -25,11 +25,11 @@ const LiveRegionContext = createContext<LiveRegionContextType>({
   announceAlert: () => {},
   log: () => {},
   announceProgress: () => {},
-})
+});
 
 // Provider props
 interface LiveRegionProviderProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
@@ -40,89 +40,89 @@ interface LiveRegionProviderProps {
  */
 export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
   // State for each region (primarily for React to re-render)
-  const [statusMessage, setStatusMessage] = useState('')
-  const [alertMessage, setAlertMessage] = useState('')
-  const [logMessages, setLogMessages] = useState<string[]>([])
-  const [progressMessage, setProgressMessage] = useState('')
+  const [statusMessage, setStatusMessage] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
+  const [logMessages, setLogMessages] = useState<string[]>([]);
+  const [progressMessage, setProgressMessage] = useState("");
   const [progressData, setProgressData] = useState<{
-    value: number | string
-    max: number | string
-    label: string
-  } | null>(null)
+    value: number | string;
+    max: number | string;
+    label: string;
+  } | null>(null);
 
   // Methods for announcing to different regions
   const announceStatus = useCallback((message: string, clearDelay = 5000) => {
-    setStatusMessage(message)
+    setStatusMessage(message);
     if (clearDelay > 0) {
       setTimeout(() => {
-        setStatusMessage('')
-      }, clearDelay)
+        setStatusMessage("");
+      }, clearDelay);
     }
-  }, [])
+  }, []);
 
   const announceAlert = useCallback((message: string, clearDelay = 7000) => {
-    setAlertMessage(message)
+    setAlertMessage(message);
     if (clearDelay > 0) {
       setTimeout(() => {
-        setAlertMessage('')
-      }, clearDelay)
+        setAlertMessage("");
+      }, clearDelay);
     }
-  }, [])
+  }, []);
 
   const log = useCallback((message: string, clear = false) => {
     if (clear) {
-      setLogMessages([message])
+      setLogMessages([message]);
     } else {
-      setLogMessages((prev) => [...prev, message])
+      setLogMessages((prev) => [...prev, message]);
     }
-  }, [])
+  }, []);
 
   const announceProgress = useCallback(
     (value: number | string, max: number | string, label: string) => {
-      const percent = Math.round((Number(value) / Number(max)) * 100)
-      setProgressMessage(`${label}: ${percent}% (${value} of ${max})`)
-      setProgressData({ value, max, label })
+      const percent = Math.round((Number(value) / Number(max)) * 100);
+      setProgressMessage(`${label}: ${percent}% (${value} of ${max})`);
+      setProgressData({ value, max, label });
     },
     [],
-  )
+  );
 
   // Attempt to use global LiveRegionSystem if available (created by LiveRegionSystem.astro)
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       window.LiveRegionSystem &&
       statusMessage
     ) {
-      window.LiveRegionSystem.announceStatus(statusMessage)
+      window.LiveRegionSystem.announceStatus(statusMessage);
     }
-  }, [statusMessage])
+  }, [statusMessage]);
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       window.LiveRegionSystem &&
       alertMessage
     ) {
-      window.LiveRegionSystem.announceAlert(alertMessage)
+      window.LiveRegionSystem.announceAlert(alertMessage);
     }
-  }, [alertMessage])
+  }, [alertMessage]);
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       window.LiveRegionSystem &&
       logMessages.length > 0
     ) {
-      const latestMessage = logMessages[logMessages.length - 1]
+      const latestMessage = logMessages[logMessages.length - 1];
       if (latestMessage) {
-        window.LiveRegionSystem.log(latestMessage)
+        window.LiveRegionSystem.log(latestMessage);
       }
     }
-  }, [logMessages])
+  }, [logMessages]);
 
   useEffect(() => {
     if (
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       window.LiveRegionSystem &&
       progressData
     ) {
@@ -130,9 +130,9 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
         progressData.value,
         progressData.max,
         progressData.label,
-      )
+      );
     }
-  }, [progressData])
+  }, [progressData]);
 
   // Context value
   const contextValue = {
@@ -140,7 +140,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
     announceAlert,
     log,
     announceProgress,
-  }
+  };
 
   return (
     <LiveRegionContext.Provider value={contextValue}>
@@ -181,49 +181,49 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
 
       {children}
     </LiveRegionContext.Provider>
-  )
+  );
 }
 
 /**
  * Hook to use the live region context for screen reader announcements
  */
 export function useLiveRegion() {
-  return useContext(LiveRegionContext)
+  return useContext(LiveRegionContext);
 }
 
 // Expose individual hooks for specific announcement types
 export function useStatusAnnouncer() {
-  const { announceStatus } = useContext(LiveRegionContext)
-  return announceStatus
+  const { announceStatus } = useContext(LiveRegionContext);
+  return announceStatus;
 }
 
 export function useAlertAnnouncer() {
-  const { announceAlert } = useContext(LiveRegionContext)
-  return announceAlert
+  const { announceAlert } = useContext(LiveRegionContext);
+  return announceAlert;
 }
 
 export function useLogAnnouncer() {
-  const { log } = useContext(LiveRegionContext)
-  return log
+  const { log } = useContext(LiveRegionContext);
+  return log;
 }
 
 export function useProgressAnnouncer() {
-  const { announceProgress } = useContext(LiveRegionContext)
-  return announceProgress
+  const { announceProgress } = useContext(LiveRegionContext);
+  return announceProgress;
 }
 
 // Add TypeScript declarations for the global LiveRegionSystem
 declare global {
   interface Window {
     LiveRegionSystem?: {
-      announceStatus: (message: string, clearDelay?: number) => void
-      announceAlert: (message: string, clearDelay?: number) => void
-      log: (message: string, clear?: boolean) => void
+      announceStatus: (message: string, clearDelay?: number) => void;
+      announceAlert: (message: string, clearDelay?: number) => void;
+      log: (message: string, clear?: boolean) => void;
       announceProgress: (
         value: number | string,
         max: number | string,
         label: string,
-      ) => void
-    }
+      ) => void;
+    };
   }
 }

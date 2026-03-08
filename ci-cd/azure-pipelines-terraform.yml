@@ -419,7 +419,7 @@ stages:
   # Stage 3: Refresh state (for troubleshooting)
   - stage: TerraformRefresh
     displayName: "Terraform State Refresh"
-    dependsOn: [ ]
+    dependsOn: []
     condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{ parameters.terraformAction }}', 'refresh'))
     jobs:
       - job: RefreshState

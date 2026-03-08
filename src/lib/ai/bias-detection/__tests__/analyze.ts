@@ -1,1 +1,1 @@
-export { POST, GET } from '../api/analyze'
+export { POST, GET } from "../api/analyze";

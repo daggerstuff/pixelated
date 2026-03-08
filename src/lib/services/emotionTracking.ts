@@ -1,31 +1,31 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from "react";
 
 // Types
 export type EmotionDimensions = {
-  valence: number // Positive/negative dimension (0-10)
-  arousal: number // Energy/activation level (0-10)
-  dominance: number // Feeling of control (0-10)
-}
+  valence: number; // Positive/negative dimension (0-10)
+  arousal: number; // Energy/activation level (0-10)
+  dominance: number; // Feeling of control (0-10)
+};
 
 export type EmotionDataPoint = EmotionDimensions & {
-  timestamp: string
-  label?: string
-  notes?: string
-}
+  timestamp: string;
+  label?: string;
+  notes?: string;
+};
 
 export type EmotionSummary = {
-  averageValence: number
-  averageArousal: number
-  averageDominance: number
-  varianceValence: number
-  varianceArousal: number
-  varianceDominance: number
+  averageValence: number;
+  averageArousal: number;
+  averageDominance: number;
+  varianceValence: number;
+  varianceArousal: number;
+  varianceDominance: number;
   peaks: Array<{
-    dimension: keyof EmotionDimensions
-    value: number
-    timestamp: string
-  }>
-}
+    dimension: keyof EmotionDimensions;
+    value: number;
+    timestamp: string;
+  }>;
+};
 
 /**
  * Retrieves emotion tracking data for a specific session
@@ -36,40 +36,40 @@ export type EmotionSummary = {
 export async function fetchSessionEmotionData(
   sessionId: string,
   options?: {
-    timeRange?: [Date, Date]
-    limit?: number
+    timeRange?: [Date, Date];
+    limit?: number;
   },
 ): Promise<EmotionDataPoint[]> {
   try {
     const url = new URL(
       `/api/sessions/${sessionId}/emotions`,
       window.location.origin,
-    )
+    );
     if (options?.timeRange) {
-      url.searchParams.append('start', options.timeRange[0].toISOString())
-      url.searchParams.append('end', options.timeRange[1].toISOString())
+      url.searchParams.append("start", options.timeRange[0].toISOString());
+      url.searchParams.append("end", options.timeRange[1].toISOString());
     }
     if (options?.limit) {
-      url.searchParams.append('limit', options.limit.toString())
+      url.searchParams.append("limit", options.limit.toString());
     }
 
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-    })
+    });
 
     if (!response.ok) {
-      const errorText = await response.text() // Get the error message from the server
+      const errorText = await response.text(); // Get the error message from the server
       throw new Error(
         `Failed to fetch emotion data: ${response.status} - ${errorText}`,
-      )
+      );
     }
-    return await response.json()
+    return await response.json();
   } catch (error: unknown) {
-    console.error('Error fetching emotion data:', error)
-    return []
+    console.error("Error fetching emotion data:", error);
+    return [];
   }
 }
 
@@ -88,7 +88,7 @@ export function calculateEmotionSummary(
       varianceArousal: 0,
       varianceDominance: 0,
       peaks: [],
-    }
+    };
   }
 
   // Calculate averages
@@ -99,11 +99,11 @@ export function calculateEmotionSummary(
       dominance: acc.dominance + point.dominance,
     }),
     { valence: 0, arousal: 0, dominance: 0 },
-  )
+  );
 
-  const averageValence = sum.valence / data.length
-  const averageArousal = sum.arousal / data.length
-  const averageDominance = sum.dominance / data.length
+  const averageValence = sum.valence / data.length;
+  const averageArousal = sum.arousal / data.length;
+  const averageDominance = sum.dominance / data.length;
 
   // Calculate variances
   const squaredDiffs = data.reduce(
@@ -114,46 +114,46 @@ export function calculateEmotionSummary(
         acc.dominance + Math.pow(point.dominance - averageDominance, 2),
     }),
     { valence: 0, arousal: 0, dominance: 0 },
-  )
+  );
 
-  const varianceValence = squaredDiffs.valence / data.length
-  const varianceArousal = squaredDiffs.arousal / data.length
-  const varianceDominance = squaredDiffs.dominance / data.length
+  const varianceValence = squaredDiffs.valence / data.length;
+  const varianceArousal = squaredDiffs.arousal / data.length;
+  const varianceDominance = squaredDiffs.dominance / data.length;
 
   // Find peaks (points that are at least 1.5 standard deviations above the mean)
   const peaks: Array<{
-    dimension: keyof EmotionDimensions
-    value: number
-    timestamp: string
-  }> = []
+    dimension: keyof EmotionDimensions;
+    value: number;
+    timestamp: string;
+  }> = [];
 
-  const stdValence = Math.sqrt(varianceValence)
-  const stdArousal = Math.sqrt(varianceArousal)
-  const stdDominance = Math.sqrt(varianceDominance)
+  const stdValence = Math.sqrt(varianceValence);
+  const stdArousal = Math.sqrt(varianceArousal);
+  const stdDominance = Math.sqrt(varianceDominance);
 
   data.forEach((point) => {
     if (point.valence > averageValence + 1.5 * stdValence) {
       peaks.push({
-        dimension: 'valence',
+        dimension: "valence",
         value: point.valence,
         timestamp: point.timestamp,
-      })
+      });
     }
     if (point.arousal > averageArousal + 1.5 * stdArousal) {
       peaks.push({
-        dimension: 'arousal',
+        dimension: "arousal",
         value: point.arousal,
         timestamp: point.timestamp,
-      })
+      });
     }
     if (point.dominance > averageDominance + 1.5 * stdDominance) {
       peaks.push({
-        dimension: 'dominance',
+        dimension: "dominance",
         value: point.dominance,
         timestamp: point.timestamp,
-      })
+      });
     }
-  })
+  });
 
   return {
     averageValence,
@@ -163,7 +163,7 @@ export function calculateEmotionSummary(
     varianceArousal,
     varianceDominance,
     peaks,
-  }
+  };
 }
 
 /**
@@ -171,10 +171,10 @@ export function calculateEmotionSummary(
  * This is a placeholder that would integrate with your state management
  */
 export type UseSessionEmotionsReturn = {
-  data: EmotionDataPoint[]
-  isLoading: boolean
-  summary: EmotionSummary
-}
+  data: EmotionDataPoint[];
+  isLoading: boolean;
+  summary: EmotionSummary;
+};
 
 export function useSessionEmotions(
   sessionId: string,
@@ -184,39 +184,39 @@ export function useSessionEmotions(
   // const data = useQuery(['sessions', sessionId, 'emotions'], () => fetchSessionEmotionData(sessionId));
 
   // For now, we'll just return a mock implementation
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [data, setData] = useState<EmotionDataPoint[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [data, setData] = useState<EmotionDataPoint[]>([]);
 
   useEffect(() => {
-    let isMounted = true
+    let isMounted = true;
 
     const loadData = async () => {
       try {
-        const emotionData = await fetchSessionEmotionData(sessionId)
+        const emotionData = await fetchSessionEmotionData(sessionId);
         if (isMounted) {
-          setData(emotionData)
-          setIsLoading(false)
+          setData(emotionData);
+          setIsLoading(false);
         }
       } catch (error: unknown) {
-        console.error('Error loading emotion data:', error)
+        console.error("Error loading emotion data:", error);
         if (isMounted) {
-          setIsLoading(false)
+          setIsLoading(false);
         }
       }
-    }
+    };
 
-    loadData()
+    loadData();
 
     return () => {
-      isMounted = false
-    }
-  }, [sessionId])
+      isMounted = false;
+    };
+  }, [sessionId]);
 
-  const summary = useMemo(() => calculateEmotionSummary(data), [data])
+  const summary = useMemo(() => calculateEmotionSummary(data), [data]);
 
   return {
     data,
     isLoading,
     summary,
-  }
+  };
 }

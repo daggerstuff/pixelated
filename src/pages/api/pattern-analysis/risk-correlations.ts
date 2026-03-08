@@ -1,17 +1,17 @@
-import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { protectRoute } from '@/lib/auth/serverAuth'
-import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
+import { createPatternRecognitionService } from "@/lib/ai/services/PatternRecognitionFactory";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { protectRoute } from "@/lib/auth/serverAuth";
+import type { EmotionAnalysis } from "@/lib/ai/emotions/types";
 
 // Define the ExtendedEmotionAnalysis interface that includes sessionId
 interface ExtendedEmotionAnalysis extends EmotionAnalysis {
-  sessionId: string
-  analysisId: string
-  clientId: string
+  sessionId: string;
+  analysisId: string;
+  clientId: string;
 }
 
 // Get logger instance
-const logger = createBuildSafeLogger('api-pattern-risk')
+const logger = createBuildSafeLogger("api-pattern-risk");
 
 /**
  * API endpoint for retrieving risk factor correlations
@@ -22,48 +22,48 @@ const logger = createBuildSafeLogger('api-pattern-risk')
  */
 export const POST = protectRoute({})(async ({ request, locals }) => {
   try {
-    const { user } = locals
+    const { user } = locals;
 
     // Authentication is now handled by protectRoute middleware
 
     // Parse request body
-    let requestBody
+    let requestBody;
     try {
-      requestBody = await request.json()
+      requestBody = await request.json();
     } catch (error: unknown) {
-      logger.warn('Failed to parse request body', { error })
+      logger.warn("Failed to parse request body", { error });
       return new Response(
-        JSON.stringify({ error: 'Bad Request', message: 'Invalid JSON body' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        JSON.stringify({ error: "Bad Request", message: "Invalid JSON body" }),
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // Extract data from request
-    const { clientId, analyses } = requestBody
+    const { clientId, analyses } = requestBody;
 
     // Validate required parameters
     if (!clientId) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Client ID is required',
+          error: "Bad Request",
+          message: "Client ID is required",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     if (!analyses || !Array.isArray(analyses) || analyses.length === 0) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'Valid emotion analyses are required',
+          error: "Bad Request",
+          message: "Valid emotion analyses are required",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // Validate each analysis
-    const validAnalyses: ExtendedEmotionAnalysis[] = []
+    const validAnalyses: ExtendedEmotionAnalysis[] = [];
     for (const analysis of analyses) {
       if (
         !analysis.analysisId ||
@@ -71,8 +71,8 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
         !analysis.clientId ||
         !analysis.timestamp
       ) {
-        logger.warn('Invalid analysis provided', { analysis })
-        continue
+        logger.warn("Invalid analysis provided", { analysis });
+        continue;
       }
 
       // Format dates properly
@@ -80,56 +80,56 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
         validAnalyses.push({
           ...analysis,
           timestamp: new Date(analysis.timestamp),
-        } as ExtendedEmotionAnalysis)
+        } as ExtendedEmotionAnalysis);
       } catch (error: unknown) {
-        logger.warn('Invalid date format in analysis', { analysis, error })
+        logger.warn("Invalid date format in analysis", { analysis, error });
       }
     }
 
     if (validAnalyses.length === 0) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'At least one valid emotion analysis is required',
+          error: "Bad Request",
+          message: "At least one valid emotion analysis is required",
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 400, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     // Check authorization to access the client data
-    const isTherapist = user.role === 'therapist'
-    const isAdmin = user.role === 'admin'
+    const isTherapist = user.role === "therapist";
+    const isAdmin = user.role === "admin";
 
     if (!isAdmin && isTherapist && user.id !== clientId) {
       // Therapists can only access their own clients
       return new Response(
         JSON.stringify({
-          error: 'Forbidden',
-          message: 'You do not have access to this client',
+          error: "Forbidden",
+          message: "You do not have access to this client",
         }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
-      )
+        { status: 403, headers: { "Content-Type": "application/json" } },
+      );
     }
 
-    logger.info('Processing risk correlation request', {
+    logger.info("Processing risk correlation request", {
       clientId,
       analysesCount: validAnalyses.length,
       user: user.id,
-    })
+    });
 
     // Create the pattern recognition service
-    const patternService = await createPatternRecognitionService()
+    const patternService = await createPatternRecognitionService();
 
     // Analyze risk factor correlations
     const correlations = await patternService.analyzeRiskFactorCorrelations(
       clientId,
       validAnalyses,
-    )
+    );
 
-    logger.info('Successfully retrieved risk correlations', {
+    logger.info("Successfully retrieved risk correlations", {
       clientId,
       correlationCount: correlations.length,
-    })
+    });
 
     // Return the results
     return new Response(
@@ -139,22 +139,22 @@ export const POST = protectRoute({})(async ({ request, locals }) => {
         correlations,
         timestamp: new Date().toISOString(),
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } },
-    )
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    );
   } catch (error: unknown) {
     // Log the error
-    logger.error('Error processing risk correlation request', { error })
+    logger.error("Error processing risk correlation request", { error });
 
     // Return an error response
     return new Response(
       JSON.stringify({
-        error: 'Internal Server Error',
+        error: "Internal Server Error",
         message:
           error instanceof Error
             ? String(error)
-            : 'An unexpected error occurred',
+            : "An unexpected error occurred",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
-    )
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
   }
-})
+});

@@ -115,6 +115,8 @@ opencode.json
 /security-reports/
 /stats.html
 /test-results/
+/config/playwright-report/
+/config/test-results/
 /yarn-debug.log*
 /yarn-error.log*
 MANIFEST

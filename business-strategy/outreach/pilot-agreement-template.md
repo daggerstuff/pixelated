@@ -29,6 +29,7 @@ and
 ## 2. DELIVERABLES
 
 ### Company Will Provide:
+
 - [ ] Access to AI training platform for [NUMBER] users
 - [ ] 410+ validated mental health scenarios
 - [ ] Real-time performance analytics dashboard
@@ -38,6 +39,7 @@ and
 - [ ] Research collaboration and publication support
 
 ### Institution Will Provide:
+
 - [ ] Designated primary contact and project coordinator
 - [ ] Student/faculty participant recruitment
 - [ ] Baseline and post-training assessment coordination
@@ -55,6 +57,7 @@ and
 **Assessment Timeline:** Within 2 weeks of program completion
 
 **Secondary Metrics:**
+
 - Student engagement rate ≥ 90%
 - Platform usage ≥ 80% of available training hours
 - Satisfaction rating ≥ 4.5/5.0
@@ -65,9 +68,10 @@ and
 
 **Total Investment:** $[AMOUNT]
 **Payment Schedule:**
+
 - 50% due upon agreement signing: $[AMOUNT/2]
 - 50% due at program midpoint (March 15, 2026): $[AMOUNT/2]
-**Refund Policy:** Full refund if 75% accuracy benchmark not achieved
+  **Refund Policy:** Full refund if 75% accuracy benchmark not achieved
 
 ---
 
@@ -125,16 +129,16 @@ and
 ## SIGNATURES
 
 **Pixelated Empathy AI:**  
-By: _________________________
+By: ************\_************
 Name: [Your Name]  
 Title: [Your Title]  
-Date: _________________________
+Date: ************\_************
 
 **[INSTITUTION NAME]:**  
-By: _________________________
+By: ************\_************
 Name: [Primary Contact Name]  
 Title: [Title]  
-Date: _________________________
+Date: ************\_************
 
 ---
 
@@ -151,6 +155,7 @@ Date: _________________________
 [Your Name] - [Your Email] - [Your Phone]
 
 **Next Steps After Signing:**
+
 1. Technical setup within 1 week
 2. Participant onboarding within 2 weeks
 3. Baseline assessment within 3 weeks

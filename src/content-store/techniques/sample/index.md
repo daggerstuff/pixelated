@@ -6,7 +6,12 @@ category: "CBT"
 evidenceLevel: "Moderate"
 recommendedFor: ["anxiety", "stress"]
 contraindications: ["severe trauma"]
-steps: ["Step 1: Identify the issue", "Step 2: Apply the technique", "Step 3: Evaluate results"]
+steps:
+  [
+    "Step 1: Identify the issue",
+    "Step 2: Apply the technique",
+    "Step 3: Evaluate results",
+  ]
 references: ["Sample Reference, 2023"]
 created: 2023-10-15
 ---

@@ -1,91 +1,91 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
-type Theme = 'light' | 'dark' | 'system'
+type Theme = "light" | "dark" | "system";
 
 interface ThemeContextType {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-  resolvedTheme: 'light' | 'dark'
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  resolvedTheme: "light" | "dark";
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
+  const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
-  return context
+  return context;
 }
 
-export { ThemeContext }
+export { ThemeContext };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Initialize with dark as default
-  const [theme, setThemeState] = useState<Theme>('dark')
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark')
+  const [theme, setThemeState] = useState<Theme>("dark");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     // Get stored theme or use dark as default
-    const storedTheme = localStorage.getItem('theme') as Theme | null
+    const storedTheme = localStorage.getItem("theme") as Theme | null;
     if (storedTheme) {
-      setThemeState(storedTheme)
+      setThemeState(storedTheme);
     } else {
       // Set dark as default when no preference is stored
-      localStorage.setItem('theme', 'dark')
+      localStorage.setItem("theme", "dark");
     }
-  }, [])
+  }, []);
 
   // Update theme when it changes
   useEffect(() => {
     // Persist theme to localStorage
-    if (theme !== 'system') {
-      localStorage.setItem('theme', theme)
+    if (theme !== "system") {
+      localStorage.setItem("theme", theme);
     } else {
-      localStorage.removeItem('theme')
+      localStorage.removeItem("theme");
     }
 
     // Resolve system theme using media query
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const updateResolvedTheme = () => {
       const newResolvedTheme =
-        theme === 'system' ? (mediaQuery.matches ? 'dark' : 'light') : theme
+        theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme;
 
-      setResolvedTheme(newResolvedTheme)
+      setResolvedTheme(newResolvedTheme);
 
       // Apply theme to HTML element
       document.documentElement.classList.toggle(
-        'dark',
-        newResolvedTheme === 'dark',
-      )
-    }
+        "dark",
+        newResolvedTheme === "dark",
+      );
+    };
 
-    updateResolvedTheme()
+    updateResolvedTheme();
 
     // Listen for system theme changes only when theme is 'system'
-    if (theme === 'system') {
-      mediaQuery.addEventListener('change', updateResolvedTheme)
+    if (theme === "system") {
+      mediaQuery.addEventListener("change", updateResolvedTheme);
     }
 
     // Always return cleanup function
     return () => {
-      if (theme === 'system') {
-        mediaQuery.removeEventListener('change', updateResolvedTheme)
+      if (theme === "system") {
+        mediaQuery.removeEventListener("change", updateResolvedTheme);
       }
-    }
-  }, [theme])
+    };
+  }, [theme]);
 
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-  }
+    setThemeState(newTheme);
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
       {children}
     </ThemeContext.Provider>
-  )
+  );
 }
 
-export default ThemeProvider
+export default ThemeProvider;

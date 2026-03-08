@@ -16,18 +16,21 @@ This guide explains how to set up free, trusted SSL certificates from Let's Encr
 ### Option 1: Using Certbot (Recommended)
 
 **Ubuntu/Debian:**
+
 ```bash
 sudo apt update
 sudo apt install certbot
 ```
 
 **CentOS/RHEL:**
+
 ```bash
 sudo yum install epel-release
 sudo yum install certbot
 ```
 
 **macOS (Homebrew):**
+
 ```bash
 brew install certbot
 ```
@@ -50,6 +53,7 @@ sudo certbot certonly --standalone -d pixelatedempathy.com -d www.pixelatedempat
 ```
 
 This will:
+
 1. Temporarily start a web server on port 80
 2. Validate domain ownership
 3. Issue certificate
@@ -166,12 +170,14 @@ sudo systemctl status certbot.timer
 ```
 
 **Cron job (if needed):**
+
 ```bash
 # Add this to crontab (runs daily at 3:30 AM)
 30 3 * * * certbot renew --quiet --post-hook "systemctl reload nginx"
 ```
 
 Or for Apache:
+
 ```bash
 30 3 * * * certbot renew --quiet --post-hook "systemctl reload apache2"
 ```
@@ -182,6 +188,7 @@ Or for Apache:
 
 **Problem**: Port 80 or 443 blocked
 **Solution**:
+
 ```bash
 # Check firewall rules
 sudo ufw status
@@ -198,6 +205,7 @@ sudo firewall-cmd --reload
 
 **Problem**: Domain not pointing to correct IP
 **Solution**:
+
 ```bash
 # Check DNS propagation
 dig pixelatedempathy.com +short
@@ -235,6 +243,7 @@ renew_hook = systemctl reload nginx
    Visit https://www.ssllabs.com/ssltest/ and run the test
 
 3. **Monitor expiration**:
+
    ```bash
    sudo certbot certificates
    ```

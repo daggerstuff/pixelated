@@ -1,9 +1,9 @@
 ---
-title: 'Audit Logging System'
-description: 'Audit Logging System documentation'
+title: "Audit Logging System"
+description: "Audit Logging System documentation"
 pubDate: 2024-01-15
-author: 'Pixelated Team'
-tags: ['documentation']
+author: "Pixelated Team"
+tags: ["documentation"]
 draft: false
 toc: true
 ---
@@ -20,70 +20,70 @@ The Audit Logging System provides comprehensive tracking, storage, and analysis 
 
 ```typescript
 interface AuditLogEntry {
-  id: string
-  timestamp: Date
+  id: string;
+  timestamp: Date;
   actor: {
-    id: string
-    type: ActorType
-    identifier: string // Username, service name, etc.
-    ipAddress?: string
-    userAgent?: string
-  }
+    id: string;
+    type: ActorType;
+    identifier: string; // Username, service name, etc.
+    ipAddress?: string;
+    userAgent?: string;
+  };
   action: {
-    type: ActionType
-    target: TargetType
-    targetId: string
-    subaction?: string
-    status: 'success' | 'failure' | 'attempt'
-  }
+    type: ActionType;
+    target: TargetType;
+    targetId: string;
+    subaction?: string;
+    status: "success" | "failure" | "attempt";
+  };
   details: {
-    changes?: ChangeSet
-    reason?: string
-    accessRoute?: string
-    sessionId?: string
-    sensitiveDataAccessed?: boolean
-    additionalContext?: Record<string, any>
-  }
+    changes?: ChangeSet;
+    reason?: string;
+    accessRoute?: string;
+    sessionId?: string;
+    sensitiveDataAccessed?: boolean;
+    additionalContext?: Record<string, any>;
+  };
   metadata: {
-    correlationId: string
-    requestId?: string
-    sourceApplication?: string
-    environment: Environment
-    severity: LogSeverity
-  }
-  securityLabels?: string[]
+    correlationId: string;
+    requestId?: string;
+    sourceApplication?: string;
+    environment: Environment;
+    severity: LogSeverity;
+  };
+  securityLabels?: string[];
 }
 
 type ActorType =
-  | 'user'
-  | 'service'
-  | 'system'
-  | 'external-integration'
-  | 'anonymous'
+  | "user"
+  | "service"
+  | "system"
+  | "external-integration"
+  | "anonymous";
 
 type ActionType =
-  | 'read'
-  | 'create'
-  | 'update'
-  | 'delete'
-  | 'login'
-  | 'logout'
-  | 'export'
-  | 'import'
-  | 'share'
-  | 'access'
-  | 'analyze'
+  | "read"
+  | "create"
+  | "update"
+  | "delete"
+  | "login"
+  | "logout"
+  | "export"
+  | "import"
+  | "share"
+  | "access"
+  | "analyze";
 
 type TargetType =
-  | 'session'
-  | 'patient'
-  | 'emotion-data'
-  | 'pattern-analysis'
-  | 'recommendation'
-  | 'document'
-  | 'setting'
-  | 'report'
-  | 'system-config'
+  | "session"
+  | "patient"
+  | "emotion-data"
+  | "pattern-analysis"
+  | "recommendation"
+  | "document"
+  | "setting"
+  | "report"
+  | "system-config";
 ```
 
 ### 2. Logging Service Architecture
@@ -91,11 +91,11 @@ type TargetType =
 ```typescript
 class AuditLoggingService {
   constructor(options: {
-    storage: LogStorageStrategy
-    encryption: LogEncryptionStrategy
-    retention: RetentionPolicy
-    alerting: AlertingConfig
-    securityConfig: LogSecurityConfig
+    storage: LogStorageStrategy;
+    encryption: LogEncryptionStrategy;
+    retention: RetentionPolicy;
+    alerting: AlertingConfig;
+    securityConfig: LogSecurityConfig;
   }) {
     // Initialize audit logging service
   }
@@ -150,19 +150,19 @@ class AuditLoggingService {
 
 ```typescript
 interface LogSecurityConfig {
-  encryptionEnabled: boolean
-  encryptionAlgorithm: EncryptionAlgorithm
-  signatureVerification: boolean
-  redactionRules: RedactionRule[]
-  accessControls: AccessControl[]
-  tamperDetection: TamperDetectionConfig
+  encryptionEnabled: boolean;
+  encryptionAlgorithm: EncryptionAlgorithm;
+  signatureVerification: boolean;
+  redactionRules: RedactionRule[];
+  accessControls: AccessControl[];
+  tamperDetection: TamperDetectionConfig;
 }
 
 interface RedactionRule {
-  target: string // Field path to redact
-  strategy: 'full' | 'partial' | 'hash'
-  pattern?: RegExp // For partial redaction
-  replacement?: string
+  target: string; // Field path to redact
+  strategy: "full" | "partial" | "hash";
+  pattern?: RegExp; // For partial redaction
+  replacement?: string;
 }
 ```
 
@@ -211,34 +211,34 @@ interface RedactionRule {
 ```typescript
 // Middleware integration example
 function auditLogMiddleware(options: {
-  service: AuditLoggingService
-  defaultActor: ActorType
-  sensitiveRoutes: string[]
+  service: AuditLoggingService;
+  defaultActor: ActorType;
+  sensitiveRoutes: string[];
 }) {
   return async (req, res, next) => {
-    const startTime = Date.now()
-    const requestId = generateRequestId()
+    const startTime = Date.now();
+    const requestId = generateRequestId();
 
     // Capture request details
     const requestDetails = {
       method: req.method,
       url: req.originalUrl,
       actor: {
-        id: req.user?.id || 'anonymous',
-        type: req.user ? 'user' : 'anonymous',
-        identifier: req.user?.username || 'anonymous',
+        id: req.user?.id || "anonymous",
+        type: req.user ? "user" : "anonymous",
+        identifier: req.user?.username || "anonymous",
         ipAddress: req.ip,
-        userAgent: req.headers['user-agent'],
+        userAgent: req.headers["user-agent"],
       },
       timestamp: new Date(),
       requestId,
-    }
+    };
 
     // Add response listener
-    res.on('finish', async () => {
+    res.on("finish", async () => {
       const isSensitive = options.sensitiveRoutes.some((route) =>
         req.originalUrl.includes(route),
-      )
+      );
 
       await options.service.log({
         id: generateUniqueId(),
@@ -248,7 +248,7 @@ function auditLogMiddleware(options: {
           type: determineActionType(req.method),
           target: determineTargetType(req.originalUrl),
           targetId: extractTargetId(req.originalUrl, req.params),
-          status: res.statusCode < 400 ? 'success' : 'failure',
+          status: res.statusCode < 400 ? "success" : "failure",
         },
         details: {
           accessRoute: requestDetails.url,
@@ -256,17 +256,17 @@ function auditLogMiddleware(options: {
           reason: req.body?.reason || req.query?.reason,
         },
         metadata: {
-          correlationId: req.headers['x-correlation-id'] || requestId,
+          correlationId: req.headers["x-correlation-id"] || requestId,
           requestId,
-          sourceApplication: req.headers['x-source-application'],
+          sourceApplication: req.headers["x-source-application"],
           environment: process.env.NODE_ENV as Environment,
           severity: determineSeverity(res.statusCode, isSensitive),
         },
-      })
-    })
+      });
+    });
 
-    next()
-  }
+    next();
+  };
 }
 ```
 
@@ -339,20 +339,20 @@ async function analyzeSecurityEvents(
   timeframe: TimeRange,
 ) {
   const failedLogins = await logService.query({
-    action: { type: 'login', status: 'failure' },
+    action: { type: "login", status: "failure" },
     timestamp: { gte: timeframe.start, lte: timeframe.end },
-  })
+  });
 
   const sensitiveAccess = await logService.query({
     details: { sensitiveDataAccessed: true },
     timestamp: { gte: timeframe.start, lte: timeframe.end },
-  })
+  });
 
   const offHoursActivity = await logService.query({
     timestamp: { gte: timeframe.start, lte: timeframe.end },
     // Custom condition for off-hours
     customFilter: (entry) => isOffHours(entry.timestamp),
-  })
+  });
 
   return {
     failedLoginAttempts: groupByActor(failedLogins),
@@ -363,7 +363,7 @@ async function analyzeSecurityEvents(
       sensitiveAccess,
       offHoursActivity,
     ),
-  }
+  };
 }
 ```
 
@@ -403,87 +403,87 @@ async function analyzeSecurityEvents(
 // Initialize logging service
 const auditLogger = new AuditLoggingService({
   storage: new SecureCloudLogStorage({
-    provider: 'aws',
-    region: 'us-east-1',
-    bucketName: 'hipaa-compliant-audit-logs',
-    encryption: 'AES-256',
-    retentionPeriod: '7-years',
+    provider: "aws",
+    region: "us-east-1",
+    bucketName: "hipaa-compliant-audit-logs",
+    encryption: "AES-256",
+    retentionPeriod: "7-years",
   }),
   encryption: new EncryptionService({
-    algorithm: 'AES-GCM',
-    keyRotationPeriod: '90-days',
+    algorithm: "AES-GCM",
+    keyRotationPeriod: "90-days",
   }),
   retention: {
-    defaultPeriod: '7-years',
-    legalHoldExtension: 'indefinite',
-    criticalRecords: '10-years',
+    defaultPeriod: "7-years",
+    legalHoldExtension: "indefinite",
+    criticalRecords: "10-years",
   },
   alerting: {
-    endpoints: ['security@example.com', 'https://alerts.example.com/webhook'],
+    endpoints: ["security@example.com", "https://alerts.example.com/webhook"],
     criticalEvents: [
-      'unauthorized-access',
-      'integrity-violation',
-      'excessive-failures',
+      "unauthorized-access",
+      "integrity-violation",
+      "excessive-failures",
     ],
   },
   securityConfig: {
     encryptionEnabled: true,
-    encryptionAlgorithm: 'AES-256-GCM',
+    encryptionAlgorithm: "AES-256-GCM",
     signatureVerification: true,
     redactionRules: [
-      { target: 'details.changes.oldValue', strategy: 'full' },
+      { target: "details.changes.oldValue", strategy: "full" },
       {
-        target: 'actor.ipAddress',
-        strategy: 'partial',
+        target: "actor.ipAddress",
+        strategy: "partial",
         pattern: /(\d+)\.(\d+)\.(\d+)\.(\d+)/,
-        replacement: '$1.$2.XXX.XXX',
+        replacement: "$1.$2.XXX.XXX",
       },
     ],
     accessControls: [
-      { role: 'security-admin', permissions: ['read', 'export'] },
-      { role: 'compliance-officer', permissions: ['read', 'export'] },
-      { role: 'system-admin', permissions: ['read'] },
+      { role: "security-admin", permissions: ["read", "export"] },
+      { role: "compliance-officer", permissions: ["read", "export"] },
+      { role: "system-admin", permissions: ["read"] },
     ],
     tamperDetection: {
       enabled: true,
-      verificationType: 'blockchain',
-      verificationFrequency: 'hourly',
+      verificationType: "blockchain",
+      verificationFrequency: "hourly",
     },
   },
-})
+});
 
 // Log a session access event
 await auditLogger.log({
   id: generateUniqueId(),
   timestamp: new Date(),
   actor: {
-    id: 'user-123',
-    type: 'user',
-    identifier: 'dr.smith@example.com',
-    ipAddress: '192.168.1.1',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    id: "user-123",
+    type: "user",
+    identifier: "dr.smith@example.com",
+    ipAddress: "192.168.1.1",
+    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
   },
   action: {
-    type: 'read',
-    target: 'session',
-    targetId: 'session-456',
-    status: 'success',
+    type: "read",
+    target: "session",
+    targetId: "session-456",
+    status: "success",
   },
   details: {
-    reason: 'Therapeutic session review',
-    accessRoute: '/sessions/456/view',
-    sessionId: 'session-456',
+    reason: "Therapeutic session review",
+    accessRoute: "/sessions/456/view",
+    sessionId: "session-456",
     sensitiveDataAccessed: true,
   },
   metadata: {
-    correlationId: 'req-789',
-    requestId: 'req-789',
-    sourceApplication: 'therapist-portal',
-    environment: 'production',
-    severity: 'info',
+    correlationId: "req-789",
+    requestId: "req-789",
+    sourceApplication: "therapist-portal",
+    environment: "production",
+    severity: "info",
   },
-  securityLabels: ['phi-access', 'clinical-data'],
-})
+  securityLabels: ["phi-access", "clinical-data"],
+});
 ```
 
 ### 2. Compliance Reporting
@@ -493,30 +493,30 @@ await auditLogger.log({
 async function generateComplianceReport(
   logService: AuditLoggingService,
   timeframe: { start: Date; end: Date },
-  format: 'pdf' | 'csv' | 'json',
+  format: "pdf" | "csv" | "json",
 ) {
   // Fetch all PHI access events
   const phiAccessEvents = await logService.query(
     {
       details: { sensitiveDataAccessed: true },
       timestamp: { gte: timeframe.start, lte: timeframe.end },
-      securityLabels: { includes: 'phi-access' },
+      securityLabels: { includes: "phi-access" },
     },
     {
       limit: 10000,
-      sort: { field: 'timestamp', direction: 'asc' },
+      sort: { field: "timestamp", direction: "asc" },
     },
-  )
+  );
 
   // Analyze access patterns
-  const accessByActor = groupBy(phiAccessEvents, (event) => event.actor.id)
+  const accessByActor = groupBy(phiAccessEvents, (event) => event.actor.id);
   const accessByTarget = groupBy(
     phiAccessEvents,
     (event) => event.action.target,
-  )
+  );
   const failedAccessAttempts = phiAccessEvents.filter(
-    (e) => e.action.status === 'failure',
-  )
+    (e) => e.action.status === "failure",
+  );
 
   // Generate report sections
   const reportSections = {
@@ -541,14 +541,14 @@ async function generateComplianceReport(
     highRiskAccess: identifyHighRiskAccess(phiAccessEvents),
     unusualAccess: identifyUnusualAccessPatterns(phiAccessEvents),
     recommendations: generateSecurityRecommendations(phiAccessEvents),
-  }
+  };
 
   // Format and return report
   return logService.export(format, {
     customData: reportSections,
-    includeRawEvents: format === 'json',
+    includeRawEvents: format === "json",
     reportTitle: `HIPAA Compliance Report: ${timeframe.start.toLocaleDateString()} to ${timeframe.end.toLocaleDateString()}`,
-  })
+  });
 }
 ```
 

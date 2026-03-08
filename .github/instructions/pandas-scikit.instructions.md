@@ -1,6 +1,6 @@
 ---
-applyTo: '**/*.py,**/*.ipynb,**/ai/**/*,**/dataset_pipeline/**/*,**/models/**/*'
-description: 'Pandas and scikit-learn data/ML guidelines for Pixelated Empathy'
+applyTo: "**/*.py,**/*.ipynb,**/ai/**/*,**/dataset_pipeline/**/*,**/models/**/*"
+description: "Pandas and scikit-learn data/ML guidelines for Pixelated Empathy"
 ---
 
 # Data Analysis & ML Guidelines for Pixelated Empathy
@@ -29,6 +29,7 @@ ai/
 ## Data Handling Standards
 
 ### Therapeutic Data Processing
+
 ```python
 # Always validate therapeutic data integrity
 def validate_therapeutic_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -47,6 +48,7 @@ def validate_therapeutic_data(df: pd.DataFrame) -> pd.DataFrame:
 ```
 
 ### Bias Detection Integration
+
 ```python
 from ai.safety.bias_detection import BiasDetectionEngine
 
@@ -73,6 +75,7 @@ def analyze_with_bias_monitoring(df: pd.DataFrame, analysis_func: callable) -> d
 ## ML Model Development
 
 ### Model Architecture Patterns
+
 ```python
 # Use consistent model interfaces
 class TherapeuticMLModel:
@@ -102,6 +105,7 @@ class TherapeuticMLModel:
 ```
 
 ### Performance Optimization
+
 ```python
 # Use efficient data structures for large datasets
 def optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -121,6 +125,7 @@ def optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 ## Visualization & Reporting
 
 ### Therapeutic Data Visualization
+
 ```python
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -148,6 +153,7 @@ def create_therapeutic_dashboard(df: pd.DataFrame) -> None:
 ## Quality Assurance
 
 ### Data Validation Pipeline
+
 ```python
 def comprehensive_data_validation(df: pd.DataFrame) -> dict:
     """Comprehensive validation for therapeutic datasets."""
@@ -176,6 +182,7 @@ def comprehensive_data_validation(df: pd.DataFrame) -> dict:
 ## Environment & Dependencies
 
 ### Required Packages
+
 ```python
 # Core data science stack
 pandas>=2.0.0
@@ -198,6 +205,7 @@ aif360>=0.5.0
 ```
 
 ### Development Workflow
+
 1. **Data Ingestion**: Validate and encrypt all incoming therapeutic data
 2. **Exploratory Analysis**: Use bias-aware analysis functions
 3. **Model Development**: Implement with privacy-preserving techniques

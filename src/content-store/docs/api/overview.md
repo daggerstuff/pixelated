@@ -1,8 +1,8 @@
 ---
-title: 'API Overview'
-description: 'Learn about Pixelated API architecture and capabilities'
-pubDate: '2025-01-01'
-author: 'Pixelated Empathy Team'
+title: "API Overview"
+description: "Learn about Pixelated API architecture and capabilities"
+pubDate: "2025-01-01"
+author: "Pixelated Empathy Team"
 draft: false
 toc: true
 share: true
@@ -26,7 +26,6 @@ Our API supports both REST and GraphQL interfaces, with built-in security measur
 https://api.gradiant.dev/v1
 ```
 
-
 ## Authentication
 
 ```bash Bearer Token
@@ -41,16 +40,14 @@ user = client.users.get()
 ```
 
 ```typescript TypeScript
-
-const client = new GradiantClient('YOUR_API_TOKEN')
-const user = await client.users.get()
+const client = new GradiantClient("YOUR_API_TOKEN");
+const user = await client.users.get();
 ```
-
 
 ## Rate Limiting
 
-  Our rate limits are based on the type of API token and endpoint being
-  accessed.
+Our rate limits are based on the type of API token and endpoint being
+accessed.
 
 | Plan         | Rate Limit | Burst Limit |
 | ------------ | ---------- | ----------- |
@@ -95,25 +92,25 @@ const user = await client.users.get()
 
 ### User Management
 
-  Create a new user account
+Create a new user account
 
-  Retrieve user information
+Retrieve user information
 
-  Update user details
+Update user details
 
 ### Session Management
 
-  Create a new therapy session
+Create a new therapy session
 
-  Retrieve session details
+Retrieve session details
 
-  Update session information
+Update session information
 
 ### Analytics
 
-  Retrieve session analytics
+Retrieve session analytics
 
-  Retrieve user analytics
+Retrieve user analytics
 
 ## SDKs and Libraries
 
@@ -122,7 +119,6 @@ const user = await client.users.get()
     Official Go client
 
 ## Webhooks
-
 
 ```json
 {
@@ -136,23 +132,30 @@ const user = await client.users.get()
 
 ## Best Practices
 
-  ### Use Appropriate Authentication Always use secure authentication methods
-  ### Handle Rate Limits Implement proper rate limit handling and backoff
-  strategies ### Monitor Usage Track your API usage and set up alerts
+### Use Appropriate Authentication Always use secure authentication methods
+
+### Handle Rate Limits Implement proper rate limit handling and backoff
+
+strategies ### Monitor Usage Track your API usage and set up alerts
 
 ## Support
 
 Need help with the API? Contact our developer support:
 
-  <Card
-    title="Developer Discord"
-    icon="discord"
-    href="https://discord.gg/gradiant"
-  >
+<Card
+title="Developer Discord"
+icon="discord"
+href="https://discord.gg/gradiant"
+
+>
+
     Join our developer community
-  <Card
-    title="API Support"
-    icon="headset"
-    href="mailto:api-support@gradiant.dev"
-  >
+
+<Card
+title="API Support"
+icon="headset"
+href="mailto:api-support@gradiant.dev"
+
+>
+
     Contact API support team

@@ -1,8 +1,8 @@
 ---
-title: 'Introducing Pixelated Empathy'
-date: '2025-01-29'
+title: "Introducing Pixelated Empathy"
+date: "2025-01-29"
 duration: 5min
-description: 'Announcing our new platform for advancing mental health through AI and technology'
+description: "Announcing our new platform for advancing mental health through AI and technology"
 ---
 
 [[toc]]
@@ -23,16 +23,19 @@ Mental health is one of the most pressing challenges of our time. Despite growin
 At Pixelated Empathy, we're building AI-powered tools and platforms that complement traditional mental health care, making support more:
 
 ### Accessible
+
 - **24/7 Availability**: Our AI tools are available whenever users need support
 - **Remote Access**: Technology bridges geographic gaps in mental health care
 - **Scalable Solutions**: AI can reach more people than human-only approaches
 
 ### Personalized
+
 - **Individual Assessment**: Our emotion detection models understand each person's unique patterns
 - **Tailored Interventions**: Recommendations are customized based on individual needs and preferences
 - **Adaptive Learning**: Our systems improve and adapt as they learn more about each user
 
 ### Evidence-Based
+
 - **Clinical Validation**: All our approaches are grounded in scientific research
 - **Continuous Monitoring**: We track outcomes to ensure our interventions are effective
 - **Open Science**: We share our findings with the broader research community
@@ -105,4 +108,4 @@ Ready to join us? Check out our [GitHub](https://github.com/vivirox/pixelated), 
 
 ---
 
-*Together, we're building a future where everyone has access to personalized, effective mental health support. One pixel at a time.*
+_Together, we're building a future where everyone has access to personalized, effective mental health support. One pixel at a time._

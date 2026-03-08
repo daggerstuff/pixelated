@@ -2,12 +2,9 @@ import type {
   DefaultOptions,
   MutationKey,
   QueryKey,
-} from '@tanstack/react-query'
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query'
-import { useMemo, useState, type ReactNode } from 'react'
+} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo, useState, type ReactNode } from "react";
 
 /**
  * Optimized query defaults for journal research module
@@ -29,7 +26,7 @@ const baseQueryDefaults: DefaultOptions = {
   mutations: {
     retry: 0,
   },
-}
+};
 
 /**
  * Query-specific stale times based on data volatility
@@ -62,7 +59,7 @@ export const queryStaleTimes = {
   // Reports are static once generated
   reports: 10 * 60_000, // 10 minutes
   reportDetail: 30 * 60_000, // 30 minutes
-} as const
+} as const;
 
 export const createJournalResearchQueryClient = (
   defaultOptions?: DefaultOptions,
@@ -76,195 +73,143 @@ export const createJournalResearchQueryClient = (
       ...baseQueryDefaults.mutations,
       ...defaultOptions?.mutations,
     },
-  }
+  };
 
   const client = new QueryClient({
     defaultOptions: mergedDefaults,
-  })
+  });
 
   // Configure cache size limits
-  client.setQueryDefaults(['journal-research'], {
+  client.setQueryDefaults(["journal-research"], {
     gcTime: 10 * 60_000,
-  })
+  });
 
-  return client
-}
+  return client;
+};
 
-export const journalResearchQueryClient =
-  createJournalResearchQueryClient()
+export const journalResearchQueryClient = createJournalResearchQueryClient();
 
-type QueryKeyFactory = (...args: unknown[]) => QueryKey
-type MutationKeyFactory = (...args: unknown[]) => MutationKey
+type QueryKeyFactory = (...args: unknown[]) => QueryKey;
+type MutationKeyFactory = (...args: unknown[]) => MutationKey;
 
 const _buildKey =
   (...parts: unknown[]): QueryKeyFactory =>
-    (...args) => [...parts, ...args]
+  (...args) => [...parts, ...args];
 
 const buildMutationKey =
   (...parts: unknown[]): MutationKeyFactory =>
-    (...args) => [...parts, ...args]
+  (...args) => [...parts, ...args];
 
 export const journalResearchQueryKeys = {
-  root: ['journal-research'] as const,
+  root: ["journal-research"] as const,
   sessions: {
-    root: ['journal-research', 'sessions'] as const,
-    list: (params?: unknown) => [
-      'journal-research',
-      'sessions',
-      'list',
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string) => [
-      'journal-research',
-      'sessions',
-      'detail',
-      sessionId,
-    ] as const,
+    root: ["journal-research", "sessions"] as const,
+    list: (params?: unknown) =>
+      ["journal-research", "sessions", "list", params ?? {}] as const,
+    detail: (sessionId: string) =>
+      ["journal-research", "sessions", "detail", sessionId] as const,
   },
   discovery: {
-    root: ['journal-research', 'discovery'] as const,
-    list: (sessionId: string, params?: unknown) => [
-      'journal-research',
-      'discovery',
-      sessionId,
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string, sourceId: string) => [
-      'journal-research',
-      'discovery',
-      sessionId,
-      'detail',
-      sourceId,
-    ] as const,
+    root: ["journal-research", "discovery"] as const,
+    list: (sessionId: string, params?: unknown) =>
+      ["journal-research", "discovery", sessionId, params ?? {}] as const,
+    detail: (sessionId: string, sourceId: string) =>
+      ["journal-research", "discovery", sessionId, "detail", sourceId] as const,
   },
   evaluation: {
-    root: ['journal-research', 'evaluation'] as const,
-    list: (sessionId: string, params?: unknown) => [
-      'journal-research',
-      'evaluation',
-      sessionId,
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string, evaluationId: string) => [
-      'journal-research',
-      'evaluation',
-      sessionId,
-      'detail',
-      evaluationId,
-    ] as const,
+    root: ["journal-research", "evaluation"] as const,
+    list: (sessionId: string, params?: unknown) =>
+      ["journal-research", "evaluation", sessionId, params ?? {}] as const,
+    detail: (sessionId: string, evaluationId: string) =>
+      [
+        "journal-research",
+        "evaluation",
+        sessionId,
+        "detail",
+        evaluationId,
+      ] as const,
   },
   acquisition: {
-    root: ['journal-research', 'acquisition'] as const,
-    list: (sessionId: string, params?: unknown) => [
-      'journal-research',
-      'acquisition',
-      sessionId,
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string, acquisitionId: string) => [
-      'journal-research',
-      'acquisition',
-      sessionId,
-      'detail',
-      acquisitionId,
-    ] as const,
+    root: ["journal-research", "acquisition"] as const,
+    list: (sessionId: string, params?: unknown) =>
+      ["journal-research", "acquisition", sessionId, params ?? {}] as const,
+    detail: (sessionId: string, acquisitionId: string) =>
+      [
+        "journal-research",
+        "acquisition",
+        sessionId,
+        "detail",
+        acquisitionId,
+      ] as const,
   },
   integration: {
-    root: ['journal-research', 'integration'] as const,
-    list: (sessionId: string, params?: unknown) => [
-      'journal-research',
-      'integration',
-      sessionId,
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string, planId: string) => [
-      'journal-research',
-      'integration',
-      sessionId,
-      'detail',
-      planId,
-    ] as const,
+    root: ["journal-research", "integration"] as const,
+    list: (sessionId: string, params?: unknown) =>
+      ["journal-research", "integration", sessionId, params ?? {}] as const,
+    detail: (sessionId: string, planId: string) =>
+      ["journal-research", "integration", sessionId, "detail", planId] as const,
   },
   progress: {
-    root: ['journal-research', 'progress'] as const,
-    detail: (sessionId: string) => [
-      'journal-research',
-      'progress',
-      sessionId,
-    ] as const,
-    metrics: (sessionId: string) => [
-      'journal-research',
-      'progress',
-      sessionId,
-      'metrics',
-    ] as const,
+    root: ["journal-research", "progress"] as const,
+    detail: (sessionId: string) =>
+      ["journal-research", "progress", sessionId] as const,
+    metrics: (sessionId: string) =>
+      ["journal-research", "progress", sessionId, "metrics"] as const,
   },
   reports: {
-    root: ['journal-research', 'reports'] as const,
-    list: (sessionId: string, params?: unknown) => [
-      'journal-research',
-      'reports',
-      sessionId,
-      params ?? {},
-    ] as const,
-    detail: (sessionId: string, reportId: string) => [
-      'journal-research',
-      'reports',
-      sessionId,
-      'detail',
-      reportId,
-    ] as const,
+    root: ["journal-research", "reports"] as const,
+    list: (sessionId: string, params?: unknown) =>
+      ["journal-research", "reports", sessionId, params ?? {}] as const,
+    detail: (sessionId: string, reportId: string) =>
+      ["journal-research", "reports", sessionId, "detail", reportId] as const,
   },
   training: {
-    root: ['journal-research', 'training'] as const,
-    status: (sessionId: string) => [
-      'journal-research',
-      'training',
-      'status',
-      sessionId,
-    ] as const,
-    pipelineStatus: () => [
-      'journal-research',
-      'training',
-      'pipeline-status',
-    ] as const,
+    root: ["journal-research", "training"] as const,
+    status: (sessionId: string) =>
+      ["journal-research", "training", "status", sessionId] as const,
+    pipelineStatus: () =>
+      ["journal-research", "training", "pipeline-status"] as const,
   },
-} as const
+} as const;
 
 export const journalResearchMutationKeys = {
-  root: buildMutationKey('journal-research'),
+  root: buildMutationKey("journal-research"),
   sessions: {
-    create: buildMutationKey('journal-research', 'sessions', 'create'),
-    update: buildMutationKey('journal-research', 'sessions', 'update'),
-    delete: buildMutationKey('journal-research', 'sessions', 'delete'),
+    create: buildMutationKey("journal-research", "sessions", "create"),
+    update: buildMutationKey("journal-research", "sessions", "update"),
+    delete: buildMutationKey("journal-research", "sessions", "delete"),
   },
   discovery: {
-    initiate: buildMutationKey('journal-research', 'discovery', 'initiate'),
+    initiate: buildMutationKey("journal-research", "discovery", "initiate"),
   },
   evaluation: {
-    initiate: buildMutationKey('journal-research', 'evaluation', 'initiate'),
-    update: buildMutationKey('journal-research', 'evaluation', 'update'),
+    initiate: buildMutationKey("journal-research", "evaluation", "initiate"),
+    update: buildMutationKey("journal-research", "evaluation", "update"),
   },
   acquisition: {
-    initiate: buildMutationKey('journal-research', 'acquisition', 'initiate'),
-    update: buildMutationKey('journal-research', 'acquisition', 'update'),
+    initiate: buildMutationKey("journal-research", "acquisition", "initiate"),
+    update: buildMutationKey("journal-research", "acquisition", "update"),
   },
   integration: {
-    initiate: buildMutationKey('journal-research', 'integration', 'initiate'),
+    initiate: buildMutationKey("journal-research", "integration", "initiate"),
   },
   reports: {
-    generate: buildMutationKey('journal-research', 'reports', 'generate'),
+    generate: buildMutationKey("journal-research", "reports", "generate"),
   },
   training: {
-    integrate: buildMutationKey('journal-research', 'training', 'integrate'),
-    integrateAll: buildMutationKey('journal-research', 'training', 'integrate-all'),
+    integrate: buildMutationKey("journal-research", "training", "integrate"),
+    integrateAll: buildMutationKey(
+      "journal-research",
+      "training",
+      "integrate-all",
+    ),
   },
-} as const
+} as const;
 
 interface JournalResearchQueryProviderProps {
-  children: ReactNode
-  client?: QueryClient
-  defaultOptions?: DefaultOptions
+  children: ReactNode;
+  client?: QueryClient;
+  defaultOptions?: DefaultOptions;
 }
 
 export function JournalResearchQueryProvider({
@@ -272,16 +217,16 @@ export function JournalResearchQueryProvider({
   client,
   defaultOptions,
 }: JournalResearchQueryProviderProps) {
-  const [statefulClient] = useState(() =>
-    client ?? createJournalResearchQueryClient(defaultOptions),
-  )
-  const memoizedClient = useMemo(() => statefulClient, [statefulClient])
+  const [statefulClient] = useState(
+    () => client ?? createJournalResearchQueryClient(defaultOptions),
+  );
+  const memoizedClient = useMemo(() => statefulClient, [statefulClient]);
 
   return (
     <QueryClientProvider client={memoizedClient}>
       {children}
     </QueryClientProvider>
-  )
+  );
 }
 
 /**
@@ -290,25 +235,29 @@ export function JournalResearchQueryProvider({
 export async function prefetchJournalResearchData(
   queryClient: QueryClient,
   options: {
-    sessionId?: string
-    prefetchSessions?: boolean
-    prefetchProgress?: boolean
+    sessionId?: string;
+    prefetchSessions?: boolean;
+    prefetchProgress?: boolean;
   } = {},
 ) {
-  const { sessionId, prefetchSessions = false, prefetchProgress = false } = options
+  const {
+    sessionId,
+    prefetchSessions = false,
+    prefetchProgress = false,
+  } = options;
 
   if (prefetchSessions) {
     await queryClient.prefetchQuery({
       queryKey: journalResearchQueryKeys.sessions.list(),
       // The actual query function should be imported from the hooks
       // This is a placeholder - actual implementation depends on useSessions hook
-    })
+    });
   }
 
   if (prefetchProgress && sessionId) {
     await queryClient.prefetchQuery({
       queryKey: journalResearchQueryKeys.progress.detail(sessionId),
       // Placeholder - actual implementation depends on useProgress hook
-    })
+    });
   }
 }

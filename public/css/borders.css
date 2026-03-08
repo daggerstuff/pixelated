@@ -48,6 +48,11 @@
 /* DIVIDER */
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
   margin: var(--space-12) 0;
 }

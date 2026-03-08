@@ -1,22 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   useChatWithMemory,
   UseChatWithMemoryReturn,
-} from '@/hooks/useChatWithMemory'
-import { authClient } from '@/lib/auth-client'
-import { ChatContainer } from './ChatContainer'
+} from "@/hooks/useChatWithMemory";
+import { authClient } from "@/lib/auth-client";
+import { ChatContainer } from "./ChatContainer";
 
-import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/components/ui/label'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 import {
   Brain,
   History,
@@ -28,35 +28,35 @@ import {
   Info,
   MessageSquare,
   Lightbulb,
-} from 'lucide-react'
+} from "lucide-react";
 
-import type { Message } from '@/types/chat'
+import type { Message } from "@/types/chat";
 
 interface MemoryAwareChatSystemProps {
-  className?: string
-  sessionId?: string
-  title?: string
-  subtitle?: string
-  enableMemoryToggle?: boolean
-  showMemoryStats?: boolean
-  showMemoryInsights?: boolean
+  className?: string;
+  sessionId?: string;
+  title?: string;
+  subtitle?: string;
+  enableMemoryToggle?: boolean;
+  showMemoryStats?: boolean;
+  showMemoryInsights?: boolean;
 }
 
 export function MemoryAwareChatSystem({
   className,
   sessionId,
-  title = 'AI Assistant with Memory',
-  subtitle = 'Chat with an AI that learns and remembers your conversations',
+  title = "AI Assistant with Memory",
+  subtitle = "Chat with an AI that learns and remembers your conversations",
   enableMemoryToggle = true,
   showMemoryStats = true,
   showMemoryInsights = true,
 }: MemoryAwareChatSystemProps) {
-  const { data: session } = authClient.useSession()
-  const user = session?.user
-  const [enableMemory, setEnableMemory] = useState(true)
-  const [enableAnalysis, setEnableAnalysis] = useState(true)
-  const [showSettings, setShowSettings] = useState(false)
-  const [conversationSummary, setConversationSummary] = useState<string>('')
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const [enableMemory, setEnableMemory] = useState(true);
+  const [enableAnalysis, setEnableAnalysis] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [conversationSummary, setConversationSummary] = useState<string>("");
 
   const { messages, isLoading, sendMessage, memory }: UseChatWithMemoryReturn =
     useChatWithMemory({
@@ -64,26 +64,26 @@ export function MemoryAwareChatSystem({
       enableMemory,
       enableAnalysis,
       maxMemoryContext: 15,
-      api: '/api/mental-health/chat', // Use the actual therapeutic AI endpoint
-    })
+      api: "/api/mental-health/chat", // Use the actual therapeutic AI endpoint
+    });
 
   const getConversationSummary = async () => {
     // This is a placeholder. In a real implementation, you might call an API.
     return `This has been a productive conversation about ${
       memory.stats?.totalMemories
-    } topics.`
-  }
+    } topics.`;
+  };
 
   // Generate conversation summary when messages change
   useEffect(() => {
     if (messages.length > 4) {
-      Promise.resolve(getConversationSummary()).then(setConversationSummary)
+      Promise.resolve(getConversationSummary()).then(setConversationSummary);
     }
-  }, [messages])
+  }, [messages]);
 
   const handleExportConversation = async () => {
     try {
-      const summary = await getConversationSummary()
+      const summary = await getConversationSummary();
       const exportData = {
         timestamp: new Date().toISOString(),
         sessionId,
@@ -95,28 +95,28 @@ export function MemoryAwareChatSystem({
           role: msg.role,
           content: msg.content,
         })),
-      }
+      };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
-      })
+        type: "application/json",
+      });
 
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `conversation-${sessionId}-${Date.now()}.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `conversation-${sessionId}-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (err: unknown) {
-      console.error('Failed to export conversation:', err)
+      console.error("Failed to export conversation:", err);
     }
-  }
+  };
 
   const renderMemoryStats = () => {
     if (!showMemoryStats) {
-      return null
+      return null;
     }
 
     return (
@@ -164,12 +164,12 @@ export function MemoryAwareChatSystem({
           )}
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   const renderConversationInsights = () => {
     if (!showMemoryInsights || !conversationSummary) {
-      return null
+      return null;
     }
 
     return (
@@ -186,12 +186,12 @@ export function MemoryAwareChatSystem({
           </p>
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   const renderSettings = () => {
     if (!showSettings) {
-      return null
+      return null;
     }
 
     return (
@@ -238,21 +238,21 @@ export function MemoryAwareChatSystem({
           </div>
         </CardContent>
       </Card>
-    )
-  }
+    );
+  };
 
   const handleRegenerate = () => {
     // This is a placeholder. A real implementation would be more complex.
     if (messages.length > 0) {
-      sendMessage('Please regenerate the last response.')
+      sendMessage("Please regenerate the last response.");
     }
-  }
+  };
 
   const handleClear = () => {
     // This is a placeholder.
     // In a real implementation, you might want to confirm with the user.
-    memory.clearMemories()
-  }
+    memory.clearMemories();
+  };
 
   const renderActionButtons = () => (
     <div className="flex flex-wrap gap-2">
@@ -329,16 +329,16 @@ export function MemoryAwareChatSystem({
         </Tooltip>
       </TooltipProvider>
     </div>
-  )
+  );
 
   const renderMemoryIndicators = () => {
     if (!enableMemory) {
-      return null
+      return null;
     }
 
     return (
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-        {messages.filter((m) => m.role === 'assistant').length > 0 && (
+        {messages.filter((m) => m.role === "assistant").length > 0 && (
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span>Messages stored in memory</span>
@@ -351,11 +351,11 @@ export function MemoryAwareChatSystem({
           </div>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
-    <div className={cn('flex flex-col h-full space-y-4', className)}>
+    <div className={cn("flex flex-col h-full space-y-4", className)}>
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -448,7 +448,7 @@ export function MemoryAwareChatSystem({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default MemoryAwareChatSystem
+export default MemoryAwareChatSystem;

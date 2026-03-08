@@ -10,7 +10,7 @@ export type {
   AIModelInfo,
   TherapeuticResponse,
   TherapySession,
-} from './models/ai-types'
+} from "./models/ai-types";
 
 // Main AIService implementation
-export { createTogetherAIService } from './services/together'
+export { createTogetherAIService } from "./services/together";

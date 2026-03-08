@@ -1,5 +1,5 @@
 ---
-title: 'Friendship as Medicine: Nurturing Social Wellness'
+title: "Friendship as Medicine: Nurturing Social Wellness"
 description: >-
   Discover how meaningful connections and friendships serve as powerful medicine
   for mental health and emotional wellbeing

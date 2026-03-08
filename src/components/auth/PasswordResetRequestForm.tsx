@@ -1,65 +1,65 @@
-import { useState } from 'react'
-import { authClient } from '@/lib/auth-client'
-import { toast } from '../ui/toast'
+import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
+import { toast } from "../ui/toast";
 
 export default function PasswordResetRequestForm() {
-  const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!email) {
-      toast.error('Email is required')
-      return
+      toast.error("Email is required");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Show loading toast
-      const loadingToastId = toast.loading('Sending password reset email...')
+      const loadingToastId = toast.loading("Sending password reset email...");
 
       // Send password reset request
       const response = await authClient.forgetPassword({
         email,
         redirectTo: `${window.location.origin}/auth-callback`,
-      })
+      });
 
       // Dismiss loading toast
-      toast.dismiss(loadingToastId)
+      toast.dismiss(loadingToastId);
 
       // Check for success (forgetPassword returns { success: true })
-      if ('success' in response && response.success) {
+      if ("success" in response && response.success) {
         // Dispatch custom success event that will be caught by the Astro component
         document.dispatchEvent(
-          new CustomEvent('password-reset-request-success'),
-        )
+          new CustomEvent("password-reset-request-success"),
+        );
 
         // Clear the form
-        setEmail('')
+        setEmail("");
       } else {
-        throw new Error('Failed to send password reset email')
+        throw new Error("Failed to send password reset email");
       }
     } catch (error: unknown) {
-      let errorMessage = 'An error occurred while requesting password reset'
+      let errorMessage = "An error occurred while requesting password reset";
 
       if (error instanceof Error) {
-        errorMessage = String(error)
+        errorMessage = String(error);
       }
 
       // Dispatch custom error event that will be caught by the Astro component
       document.dispatchEvent(
-        new CustomEvent('password-reset-request-error', {
+        new CustomEvent("password-reset-request-error", {
           detail: { message: errorMessage },
         }),
-      )
+      );
 
-      console.error('Password reset request error:', error)
+      console.error("Password reset request error:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,5 +104,5 @@ export default function PasswordResetRequestForm() {
         </a>
       </div>
     </form>
-  )
+  );
 }

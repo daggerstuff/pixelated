@@ -1,60 +1,60 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from "react";
 
 interface FHEOperation {
-  id: string
-  operation: 'add' | 'multiply' | 'compare' | 'aggregate'
-  input1: number
-  input2?: number
-  result?: number
-  encryptedInput1?: string
-  encryptedInput2?: string
-  encryptedResult?: string
-  executionTime?: number
-  status: 'pending' | 'executing' | 'completed' | 'error'
+  id: string;
+  operation: "add" | "multiply" | "compare" | "aggregate";
+  input1: number;
+  input2?: number;
+  result?: number;
+  encryptedInput1?: string;
+  encryptedInput2?: string;
+  encryptedResult?: string;
+  executionTime?: number;
+  status: "pending" | "executing" | "completed" | "error";
 }
 
 interface FHEDemoProps {
-  className?: string
-  showAdvanced?: boolean
-  enableBenchmarks?: boolean
+  className?: string;
+  showAdvanced?: boolean;
+  enableBenchmarks?: boolean;
 }
 
 const FHEDemo: React.FC<FHEDemoProps> = ({
-  className = '',
+  className = "",
   showAdvanced = false,
   enableBenchmarks = true,
 }) => {
-  const [operations, setOperations] = useState<FHEOperation[]>([])
+  const [operations, setOperations] = useState<FHEOperation[]>([]);
   const [currentOperation, setCurrentOperation] = useState<
     Partial<FHEOperation>
   >({
-    operation: 'add',
+    operation: "add",
     input1: 15,
     input2: 25,
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [fheInitialized, setFheInitialized] = useState(false)
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [fheInitialized, setFheInitialized] = useState(false);
   const [benchmarkResults, setBenchmarkResults] = useState<
     {
-      operation: string
-      plaintextTime: number
-      fheTime: number
-      overhead: number
+      operation: string;
+      plaintextTime: number;
+      fheTime: number;
+      overhead: number;
     }[]
-  >([])
+  >([]);
 
   // Simulate FHE library initialization
   useEffect(() => {
     const initializeFHE = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       // Simulate loading time for FHE library
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      setFheInitialized(true)
-      setIsLoading(false)
-    }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setFheInitialized(true);
+      setIsLoading(false);
+    };
 
-    initializeFHE()
-  }, [])
+    initializeFHE();
+  }, []);
 
   // Simulate encryption (in real implementation, this would use actual FHE library)
   const simulateEncryption = (value: number): string => {
@@ -62,40 +62,40 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     const randomBytes = Array.from({ length: 32 }, () =>
       Math.floor(Math.random() * 256)
         .toString(16)
-        .padStart(2, '0'),
-    ).join('')
-    return `0x${randomBytes}...${value.toString(16).padStart(4, '0')}`
-  }
+        .padStart(2, "0"),
+    ).join("");
+    return `0x${randomBytes}...${value.toString(16).padStart(4, "0")}`;
+  };
 
   // Simulate FHE operations
   const performFHEOperation = useCallback(
     async (operation: FHEOperation): Promise<FHEOperation> => {
-      const startTime = performance.now()
+      const startTime = performance.now();
 
       // Simulate computation time (FHE operations are much slower)
-      const computationTime = Math.random() * 1000 + 500 // 500-1500ms
-      await new Promise((resolve) => setTimeout(resolve, computationTime))
+      const computationTime = Math.random() * 1000 + 500; // 500-1500ms
+      await new Promise((resolve) => setTimeout(resolve, computationTime));
 
-      let result: number
+      let result: number;
       switch (operation.operation) {
-        case 'add':
-          result = operation.input1 + (operation.input2 || 0)
-          break
-        case 'multiply':
-          result = operation.input1 * (operation.input2 || 1)
-          break
-        case 'compare':
-          result = operation.input1 > (operation.input2 || 0) ? 1 : 0
-          break
-        case 'aggregate':
+        case "add":
+          result = operation.input1 + (operation.input2 || 0);
+          break;
+        case "multiply":
+          result = operation.input1 * (operation.input2 || 1);
+          break;
+        case "compare":
+          result = operation.input1 > (operation.input2 || 0) ? 1 : 0;
+          break;
+        case "aggregate":
           // Simulate aggregating multiple values
-          result = Math.round((operation.input1 + (operation.input2 || 0)) / 2)
-          break
+          result = Math.round((operation.input1 + (operation.input2 || 0)) / 2);
+          break;
         default:
-          result = 0
+          result = 0;
       }
 
-      const endTime = performance.now()
+      const endTime = performance.now();
 
       return {
         ...operation,
@@ -106,75 +106,75 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
           : undefined,
         encryptedResult: simulateEncryption(result),
         executionTime: endTime - startTime,
-        status: 'completed',
-      }
+        status: "completed",
+      };
     },
     [],
-  )
+  );
 
   const executeOperation = async () => {
-    if (!fheInitialized || !currentOperation.operation) return
+    if (!fheInitialized || !currentOperation.operation) return;
 
     const operation: FHEOperation = {
       id: `op-${Date.now()}`,
       operation: currentOperation.operation,
       input1: currentOperation.input1 || 0,
       input2: currentOperation.input2,
-      status: 'executing',
-    }
+      status: "executing",
+    };
 
-    setOperations((prev) => [operation, ...prev])
+    setOperations((prev) => [operation, ...prev]);
 
     try {
-      const completedOperation = await performFHEOperation(operation)
+      const completedOperation = await performFHEOperation(operation);
       setOperations((prev) =>
         prev.map((op) => (op.id === operation.id ? completedOperation : op)),
-      )
+      );
 
       // Run benchmark if enabled
       if (enableBenchmarks) {
-        runBenchmark(operation)
+        runBenchmark(operation);
       }
     } catch {
       setOperations((prev) =>
         prev.map((op) =>
-          op.id === operation.id ? { ...op, status: 'error' as const } : op,
+          op.id === operation.id ? { ...op, status: "error" as const } : op,
         ),
-      )
+      );
     }
-  }
+  };
 
   const runBenchmark = async (operation: FHEOperation) => {
     // Simulate plaintext operation for comparison
-    const plaintextStart = performance.now()
+    const plaintextStart = performance.now();
 
     // Perform operation and store result to avoid dead code
-    let _result: number
+    let _result: number;
     switch (operation.operation) {
-      case 'add':
-        _result = operation.input1 + (operation.input2 || 0)
-        break
-      case 'multiply':
-        _result = operation.input1 * (operation.input2 || 1)
-        break
-      case 'compare':
-        _result = operation.input1 > (operation.input2 || 0) ? 1 : 0
-        break
-      case 'aggregate':
-        _result = Math.round((operation.input1 + (operation.input2 || 0)) / 2)
-        break
+      case "add":
+        _result = operation.input1 + (operation.input2 || 0);
+        break;
+      case "multiply":
+        _result = operation.input1 * (operation.input2 || 1);
+        break;
+      case "compare":
+        _result = operation.input1 > (operation.input2 || 0) ? 1 : 0;
+        break;
+      case "aggregate":
+        _result = Math.round((operation.input1 + (operation.input2 || 0)) / 2);
+        break;
       default:
-        _result = 0
-        break
+        _result = 0;
+        break;
     }
 
-    const plaintextEnd = performance.now()
-    const plaintextTime = plaintextEnd - plaintextStart
+    const plaintextEnd = performance.now();
+    const plaintextTime = plaintextEnd - plaintextStart;
 
-    const fheOperation = operations.find((op) => op.id === operation.id)
-    const fheTime = fheOperation?.executionTime || 0
+    const fheOperation = operations.find((op) => op.id === operation.id);
+    const fheTime = fheOperation?.executionTime || 0;
 
-    const overhead = fheTime / plaintextTime
+    const overhead = fheTime / plaintextTime;
 
     setBenchmarkResults((prev) => [
       {
@@ -184,43 +184,43 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
         overhead,
       },
       ...prev.slice(0, 9), // Keep last 10 results
-    ])
-  }
+    ]);
+  };
 
   const clearResults = () => {
-    setOperations([])
-    setBenchmarkResults([])
-  }
+    setOperations([]);
+    setBenchmarkResults([]);
+  };
 
   const getOperationIcon = (operation: string) => {
     switch (operation) {
-      case 'add':
-        return '➕'
-      case 'multiply':
-        return '✖️'
-      case 'compare':
-        return '🔍'
-      case 'aggregate':
-        return '📊'
+      case "add":
+        return "➕";
+      case "multiply":
+        return "✖️";
+      case "compare":
+        return "🔍";
+      case "aggregate":
+        return "📊";
       default:
-        return '🔧'
+        return "🔧";
     }
-  }
+  };
 
-  const getStatusColor = (status: FHEOperation['status']) => {
+  const getStatusColor = (status: FHEOperation["status"]) => {
     switch (status) {
-      case 'pending':
-        return 'text-gray-500'
-      case 'executing':
-        return 'text-blue-500'
-      case 'completed':
-        return 'text-green-500'
-      case 'error':
-        return 'text-red-500'
+      case "pending":
+        return "text-gray-500";
+      case "executing":
+        return "text-blue-500";
+      case "completed":
+        return "text-green-500";
+      case "error":
+        return "text-red-500";
       default:
-        return 'text-gray-500'
+        return "text-gray-500";
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -236,7 +236,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
           Encryption operations...
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -258,7 +258,10 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label htmlFor="operation-type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="operation-type"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Operation Type
             </label>
             <select
@@ -267,7 +270,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
               onChange={(e) =>
                 setCurrentOperation({
                   ...currentOperation,
-                  operation: e.target.value as FHEOperation['operation'],
+                  operation: e.target.value as FHEOperation["operation"],
                 })
               }
               className="w-full p-2 border border-gray-300 rounded-md"
@@ -280,7 +283,10 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
           </div>
 
           <div>
-            <label htmlFor="input-1" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="input-1"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Input 1 (Patient Score)
             </label>
             <input
@@ -299,9 +305,12 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
             />
           </div>
 
-          {currentOperation.operation !== 'aggregate' && (
+          {currentOperation.operation !== "aggregate" && (
             <div>
-              <label htmlFor="input-2" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="input-2"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Input 2 (Baseline)
               </label>
               <input
@@ -391,7 +400,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                     <div>
                       <strong>Inputs:</strong> {operation.input1}
                       {operation.input2 !== undefined &&
-                        ` ${operation.operation === 'add' ? '+' : operation.operation === 'multiply' ? '×' : 'vs'} ${operation.input2}`}
+                        ` ${operation.operation === "add" ? "+" : operation.operation === "multiply" ? "×" : "vs"} ${operation.input2}`}
                     </div>
 
                     {operation.result !== undefined && (
@@ -518,7 +527,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
         </ul>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FHEDemo
+export default FHEDemo;

@@ -22,28 +22,24 @@ Pixelated Empathy is built on a modern, secure, and scalable architecture that c
 <Tab title="UI Layer">
   The UI layer is built using React and Next.js, incorporating design elements from Liftoff's interview platform:
 
-  - **Component Structure**
-    - Atomic Design Principles
-    - Shared Component Library
-    - Theme Provider (Dark/Light modes)
-    - Responsive Layout System
+- **Component Structure**
+  - Atomic Design Principles
+  - Shared Component Library
+  - Theme Provider (Dark/Light modes)
+  - Responsive Layout System
 
-  - **State Management**
-    - React Context for global state
-    - React Query for server state
-    - Local storage for persistence
-    - Secure credential handling
-</Tab>
+- **State Management** - React Context for global state - React Query for server state - Local storage for persistence - Secure credential handling
+  </Tab>
 
 <Tab title="Data Flow">
   Data flow follows unidirectional principles:
 
-  1. User actions trigger state changes
-  2. State updates propagate to components
-  3. Side effects handled by middleware
-  4. Server state synchronized via WebSocket
-</Tab>
-</Tabs>
+1. User actions trigger state changes
+2. State updates propagate to components
+3. Side effects handled by middleware
+4. Server state synchronized via WebSocket
+   </Tab>
+   </Tabs>
 
 ### Backend Architecture
 
@@ -99,7 +95,7 @@ encrypted_content TEXT NOT NULL,
 metadata JSONB,
 created_at TIMESTAMPTZ DEFAULT NOW()
 );
-````
+```
 
 ## Security Architecture
 
@@ -116,9 +112,10 @@ created_at TIMESTAMPTZ DEFAULT NOW()
 - Zero-knowledge proof verification
 
 ### 3. Data Protection
-  - Encrypted data storage in Supabase
-  - Secure key management
-  - Regular security audits
+
+- Encrypted data storage in Supabase
+- Secure key management
+- Regular security audits
   </Steps>
 
 ## Integration Points
@@ -162,7 +159,6 @@ flowchart LR
 ```
 
 - **Client-side caching**
-
   - React Query cache
   - Service Worker cache
   - Local storage cache
@@ -238,7 +234,7 @@ pnpm db:migrate
 
 # Testing
 pnpm test
-````
+```
 
 ### CI/CD Pipeline
 

@@ -6,7 +6,7 @@
  * Base user interface
  */
 export interface User {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }

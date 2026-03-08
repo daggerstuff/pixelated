@@ -1,37 +1,45 @@
-import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card/card";
 import {
   useIntegrationPlanListQuery,
   useIntegrationInitiateMutation,
-} from '@/lib/hooks/journal-research'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
+} from "@/lib/hooks/journal-research";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 export interface IntegrationPanelProps {
-  sessionId: string | null
-  className?: string
+  sessionId: string | null;
+  className?: string;
 }
 
-export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps) {
-  const [isInitiating, setIsInitiating] = useState(false)
+export function IntegrationPanel({
+  sessionId,
+  className,
+}: IntegrationPanelProps) {
+  const [isInitiating, setIsInitiating] = useState(false);
   const { data: plans, isLoading } = useIntegrationPlanListQuery(sessionId, {
     page: 1,
     pageSize: 25,
-  })
-  const initiateMutation = useIntegrationInitiateMutation(sessionId)
+  });
+  const initiateMutation = useIntegrationInitiateMutation(sessionId);
 
   if (!sessionId) {
     return (
-      <div className={cn('text-center py-8', className)}>
+      <div className={cn("text-center py-8", className)}>
         <p className="text-muted-foreground">
           Please select a session to view integration plans
         </p>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -45,7 +53,9 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           disabled={initiateMutation.isPending}
         >
-          {initiateMutation.isPending ? 'Planning...' : 'Start Integration Planning'}
+          {initiateMutation.isPending
+            ? "Planning..."
+            : "Start Integration Planning"}
         </button>
       </div>
 
@@ -62,9 +72,7 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
                 plan for all acquired sources.
               </p>
               <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  Target Format
-                </label>
+                <label className="text-sm font-medium">Target Format</label>
                 <select
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   defaultValue="chatml"
@@ -78,13 +86,13 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
                 <button
                   onClick={() => {
                     initiateMutation.mutate(
-                      { sourceIds: [], targetFormat: 'chatml' },
+                      { sourceIds: [], targetFormat: "chatml" },
                       {
                         onSuccess: () => {
-                          setIsInitiating(false)
+                          setIsInitiating(false);
                         },
                       },
-                    )
+                    );
                   }}
                   className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
@@ -147,14 +155,16 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
                         <p className="text-sm font-medium text-muted-foreground">
                           Estimated Effort
                         </p>
-                        <p className="mt-1">{plan.estimatedEffortHours} hours</p>
+                        <p className="mt-1">
+                          {plan.estimatedEffortHours} hours
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-muted-foreground">
                           Created Date
                         </p>
                         <p className="mt-1">
-                          {format(plan.createdDate, 'PPpp')}
+                          {format(plan.createdDate, "PPpp")}
                         </p>
                       </div>
                       {plan.requiredTransformations.length > 0 && (
@@ -163,11 +173,13 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
                             Required Transformations
                           </p>
                           <ul className="mt-1 list-inside list-disc space-y-1">
-                            {plan.requiredTransformations.map((transformation) => (
-                              <li key={transformation} className="text-sm">
-                                {transformation}
-                              </li>
-                            ))}
+                            {plan.requiredTransformations.map(
+                              (transformation) => (
+                                <li key={transformation} className="text-sm">
+                                  {transformation}
+                                </li>
+                              ),
+                            )}
                           </ul>
                         </div>
                       )}
@@ -180,7 +192,7 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
                             {Object.entries(plan.schemaMapping).map(
                               ([key, value]) => (
                                 <div key={key} className="text-sm">
-                                  <span className="font-medium">{key}:</span>{' '}
+                                  <span className="font-medium">{key}:</span>{" "}
                                   {value}
                                 </div>
                               ),
@@ -197,5 +209,5 @@ export function IntegrationPanel({ sessionId, className }: IntegrationPanelProps
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

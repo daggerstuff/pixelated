@@ -1,55 +1,65 @@
-import { DocumentModel } from '@/models/Document'
+import { DocumentModel } from "@/models/Document";
 
 export interface CollaborationSession {
-  documentId: string
-  userId: string
-  userName: string
-  color: string
-  cursorPosition: number
+  documentId: string;
+  userId: string;
+  userName: string;
+  color: string;
+  cursorPosition: number;
   selection?: {
-    start: number
-    end: number
-  }
-  lastActivity: Date
+    start: number;
+    end: number;
+  };
+  lastActivity: Date;
 }
 
 export interface DocumentChange {
-  type: 'insert' | 'delete' | 'format'
-  position: number
-  content?: string
-  length?: number
-  format?: string
-  value?: any
-  userId: string
-  timestamp: Date
+  type: "insert" | "delete" | "format";
+  position: number;
+  content?: string;
+  length?: number;
+  format?: string;
+  value?: any;
+  userId: string;
+  timestamp: Date;
 }
 
 export class CollaborationService {
-  private static sessions: Map<string, CollaborationSession[]> = new Map()
-  private static changes: Map<string, DocumentChange[]> = new Map()
-  private static cursorListeners: Map<string, ((update: any) => void)[]> = new Map()
-  private static contentListeners: Map<string, ((change: DocumentChange) => void)[]> = new Map()
+  private static sessions: Map<string, CollaborationSession[]> = new Map();
+  private static changes: Map<string, DocumentChange[]> = new Map();
+  private static cursorListeners: Map<string, ((update: any) => void)[]> =
+    new Map();
+  private static contentListeners: Map<
+    string,
+    ((change: DocumentChange) => void)[]
+  > = new Map();
 
   static clearAllSessions(): void {
-    this.sessions.clear()
+    this.sessions.clear();
   }
 
   static clearChangeHistory(documentId: string): void {
-    this.changes.delete(documentId)
+    this.changes.delete(documentId);
   }
 
-  static onCursorUpdate(documentId: string, callback: (update: any) => void): void {
+  static onCursorUpdate(
+    documentId: string,
+    callback: (update: any) => void,
+  ): void {
     if (!this.cursorListeners.has(documentId)) {
-      this.cursorListeners.set(documentId, [])
+      this.cursorListeners.set(documentId, []);
     }
-    this.cursorListeners.get(documentId)?.push(callback)
+    this.cursorListeners.get(documentId)?.push(callback);
   }
 
-  static onContentChange(documentId: string, callback: (change: DocumentChange) => void): void {
+  static onContentChange(
+    documentId: string,
+    callback: (change: DocumentChange) => void,
+  ): void {
     if (!this.contentListeners.has(documentId)) {
-      this.contentListeners.set(documentId, [])
+      this.contentListeners.set(documentId, []);
     }
-    this.contentListeners.get(documentId)?.push(callback)
+    this.contentListeners.get(documentId)?.push(callback);
   }
 
   static joinSession(
@@ -57,7 +67,7 @@ export class CollaborationService {
     userId: string,
     userName: string,
   ): CollaborationSession {
-    const color = this.generateUserColor(userId)
+    const color = this.generateUserColor(userId);
     const session: CollaborationSession = {
       documentId,
       userId,
@@ -65,33 +75,35 @@ export class CollaborationService {
       color,
       cursorPosition: 0,
       lastActivity: new Date(),
-    }
+    };
 
     if (!this.sessions.has(documentId)) {
-      this.sessions.set(documentId, [])
+      this.sessions.set(documentId, []);
     }
 
-    const existingSessions = this.sessions.get(documentId) || []
-    const existingIndex = existingSessions.findIndex((s) => s.userId === userId)
+    const existingSessions = this.sessions.get(documentId) || [];
+    const existingIndex = existingSessions.findIndex(
+      (s) => s.userId === userId,
+    );
 
     if (existingIndex >= 0) {
-      existingSessions[existingIndex] = session
+      existingSessions[existingIndex] = session;
     } else {
-      existingSessions.push(session)
+      existingSessions.push(session);
     }
 
-    this.sessions.set(documentId, existingSessions)
-    return session
+    this.sessions.set(documentId, existingSessions);
+    return session;
   }
 
   static leaveSession(documentId: string, userId: string): void {
-    const sessions = this.sessions.get(documentId) || []
-    const filteredSessions = sessions.filter((s) => s.userId !== userId)
-    this.sessions.set(documentId, filteredSessions)
+    const sessions = this.sessions.get(documentId) || [];
+    const filteredSessions = sessions.filter((s) => s.userId !== userId);
+    this.sessions.set(documentId, filteredSessions);
   }
 
   static getActiveUsers(documentId: string): CollaborationSession[] {
-    return this.sessions.get(documentId) || []
+    return this.sessions.get(documentId) || [];
   }
 
   static updateCursor(
@@ -100,16 +112,16 @@ export class CollaborationService {
     position: number,
     selection?: { start: number; end: number },
   ): void {
-    const sessions = this.sessions.get(documentId) || []
-    const session = sessions.find((s) => s.userId === userId)
+    const sessions = this.sessions.get(documentId) || [];
+    const session = sessions.find((s) => s.userId === userId);
 
     if (session) {
-      session.cursorPosition = position
-      session.selection = selection
-      session.lastActivity = new Date()
+      session.cursorPosition = position;
+      session.selection = selection;
+      session.lastActivity = new Date();
 
       // Notify listeners
-      const listeners = this.cursorListeners.get(documentId) || []
+      const listeners = this.cursorListeners.get(documentId) || [];
       listeners.forEach((callback) =>
         callback({
           userId,
@@ -117,38 +129,38 @@ export class CollaborationService {
           selection,
           timestamp: new Date(),
         }),
-      )
+      );
     }
   }
 
   static recordChange(documentId: string, change: DocumentChange): void {
     if (!this.changes.has(documentId)) {
-      this.changes.set(documentId, [])
+      this.changes.set(documentId, []);
     }
 
-    const changes = this.changes.get(documentId) || []
-    changes.push(change)
+    const changes = this.changes.get(documentId) || [];
+    changes.push(change);
 
     // Keep only last 100 changes
     if (changes.length > 100) {
-      changes.shift()
+      changes.shift();
     }
 
-    this.changes.set(documentId, changes)
+    this.changes.set(documentId, changes);
 
     // Notify listeners
-    const listeners = this.contentListeners.get(documentId) || []
-    listeners.forEach((callback) => callback(change))
+    const listeners = this.contentListeners.get(documentId) || [];
+    listeners.forEach((callback) => callback(change));
   }
 
   static getChanges(documentId: string, since?: Date): DocumentChange[] {
-    const changes = this.changes.get(documentId) || []
+    const changes = this.changes.get(documentId) || [];
 
     if (since) {
-      return changes.filter((c) => c.timestamp > since)
+      return changes.filter((c) => c.timestamp > since);
     }
 
-    return changes
+    return changes;
   }
 
   static async autoSave(
@@ -158,15 +170,15 @@ export class CollaborationService {
   ): Promise<void> {
     // Record the change
     this.recordChange(documentId, {
-      type: 'insert',
+      type: "insert",
       position: 0,
       content,
       userId,
       timestamp: new Date(),
-    })
+    });
 
     // Update document with auto-save flag
-    const document = await DocumentModel.findById(documentId)
+    const document = await DocumentModel.findById(documentId);
     if (document) {
       await DocumentModel.update(documentId, {
         content,
@@ -174,46 +186,46 @@ export class CollaborationService {
           ...document.metadata,
           lastEditedBy: userId,
         },
-      })
+      });
     }
   }
 
   static generateUserColor(userId: string): string {
     const colors = [
-      '#FF6B6B',
-      '#4ECDC4',
-      '#45B7D1',
-      '#96CEB4',
-      '#FECA57',
-      '#FF9FF3',
-      '#54A0FF',
-      '#5F27CD',
-      '#00D2D3',
-      '#FF9F43',
-      '#10AC84',
-      '#EE5A24',
-      '#0652DD',
-      '#9980FA',
-      '#D63031',
-    ]
+      "#FF6B6B",
+      "#4ECDC4",
+      "#45B7D1",
+      "#96CEB4",
+      "#FECA57",
+      "#FF9FF3",
+      "#54A0FF",
+      "#5F27CD",
+      "#00D2D3",
+      "#FF9F43",
+      "#10AC84",
+      "#EE5A24",
+      "#0652DD",
+      "#9980FA",
+      "#D63031",
+    ];
 
-    let hash = 0
+    let hash = 0;
     for (let i = 0; i < userId.length; i++) {
-      hash = userId.charCodeAt(i) + ((hash << 5) - hash)
+      hash = userId.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    return colors[Math.abs(hash) % colors.length]
+    return colors[Math.abs(hash) % colors.length];
   }
 
   static cleanupInactiveSessions(): void {
-    const now = new Date()
-    const timeout = 5 * 60 * 1000 // 5 minutes
+    const now = new Date();
+    const timeout = 5 * 60 * 1000; // 5 minutes
 
     for (const [documentId, sessions] of this.sessions.entries()) {
       const activeSessions = sessions.filter(
         (s) => now.getTime() - s.lastActivity.getTime() < timeout,
-      )
-      this.sessions.set(documentId, activeSessions)
+      );
+      this.sessions.set(documentId, activeSessions);
     }
   }
 }

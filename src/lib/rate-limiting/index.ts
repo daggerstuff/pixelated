@@ -10,14 +10,14 @@
  * - Configurable rules with role-based bypass
  */
 
-export { DistributedRateLimiter, createRateLimiter } from './rate-limiter'
-export { RateLimitAnalytics, rateLimitAnalytics } from './analytics'
+export { DistributedRateLimiter, createRateLimiter } from "./rate-limiter";
+export { RateLimitAnalytics, rateLimitAnalytics } from "./analytics";
 
 export {
   createRateLimitMiddleware,
   createBetterAuthRateLimitMiddleware,
   createComprehensiveRateLimitMiddleware,
-} from './middleware'
+} from "./middleware";
 
 export {
   defaultRateLimitConfig,
@@ -29,7 +29,7 @@ export {
   getEnvironmentConfig,
   getConfigFromEnv,
   getMergedConfig,
-} from './config'
+} from "./config";
 
 export type {
   RateLimitConfig,
@@ -48,7 +48,7 @@ export type {
   WebSocketRateLimitConfig,
   RateLimitAlert,
   RateLimitMonitor,
-} from './types'
+} from "./types";
 
 /**
  * Quick setup function for comprehensive rate limiting
@@ -56,17 +56,17 @@ export type {
 export function setupRateLimiting(
   options: {
     /** Enable all features */
-    comprehensive?: boolean
+    comprehensive?: boolean;
     /** Enable Better-Auth integration */
-    betterAuth?: boolean
+    betterAuth?: boolean;
     /** Enable DDoS protection */
-    ddosProtection?: boolean
+    ddosProtection?: boolean;
     /** Custom rule sets */
-    customRuleSets?: import('./types').RateLimitRuleSet[]
+    customRuleSets?: import("./types").RateLimitRuleSet[];
     /** Custom bypass rules */
-    customBypassRules?: import('./types').RateLimitBypassRule[]
+    customBypassRules?: import("./types").RateLimitBypassRule[];
     /** Better-Auth configuration */
-    betterAuthConfig?: import('./types').BetterAuthRateLimitConfig
+    betterAuthConfig?: import("./types").BetterAuthRateLimitConfig;
   } = {},
 ) {
   const {
@@ -76,7 +76,7 @@ export function setupRateLimiting(
     customRuleSets = [],
     customBypassRules = [],
     betterAuthConfig,
-  } = options
+  } = options;
 
   if (comprehensive) {
     return createComprehensiveRateLimitMiddleware({
@@ -85,68 +85,68 @@ export function setupRateLimiting(
       enableDDoS: ddosProtection,
       enableBetterAuth: betterAuth,
       betterAuthConfig,
-    })
+    });
   }
 
   if (betterAuth) {
-    return createBetterAuthRateLimitMiddleware(betterAuthConfig)
+    return createBetterAuthRateLimitMiddleware(betterAuthConfig);
   }
 
   return createRateLimitMiddleware({
     ruleSets: customRuleSets,
     bypassRules: customBypassRules,
-  })
+  });
 }
 
 /**
  * Health check for rate limiting system
  */
 export async function checkRateLimitHealth(): Promise<{
-  status: 'healthy' | 'degraded' | 'unhealthy'
+  status: "healthy" | "degraded" | "unhealthy";
   details: {
-    redis: boolean
-    analytics: boolean
-    monitors: number
-    recentAlerts: number
-  }
+    redis: boolean;
+    analytics: boolean;
+    monitors: number;
+    recentAlerts: number;
+  };
 }> {
   try {
-    const redisHealthy = (await redis.ping()) === 'PONG'
+    const redisHealthy = (await redis.ping()) === "PONG";
 
-    const analyticsHealthy = rateLimitAnalytics !== undefined
+    const analyticsHealthy = rateLimitAnalytics !== undefined;
 
     const monitorCount =
       (rateLimitAnalytics as unknown as { monitors?: unknown[] }).monitors
-        ?.length || 0
+        ?.length || 0;
 
-    const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
+    const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10);
 
     const details = {
       redis: redisHealthy,
       analytics: analyticsHealthy,
       monitors: monitorCount,
       recentAlerts: recentAlerts.length,
-    }
+    };
 
-    let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
+    let status: "healthy" | "degraded" | "unhealthy" = "healthy";
 
     if (!redisHealthy) {
-      status = 'unhealthy'
+      status = "unhealthy";
     } else if (recentAlerts.length > 5) {
-      status = 'degraded'
+      status = "degraded";
     }
 
-    return { status, details }
+    return { status, details };
   } catch {
     return {
-      status: 'unhealthy',
+      status: "unhealthy",
       details: {
         redis: false,
         analytics: false,
         monitors: 0,
         recentAlerts: 0,
       },
-    }
+    };
   }
 }
 
@@ -154,17 +154,17 @@ export async function checkRateLimitHealth(): Promise<{
  * Get rate limiting system status
  */
 export async function getRateLimitStatus(): Promise<{
-  enabled: boolean
-  rules: number
-  monitors: number
-  recentAlerts: number
-  analytics: Awaited<ReturnType<typeof rateLimitAnalytics.getRealTimeMetrics>>
-  health: Awaited<ReturnType<typeof checkRateLimitHealth>>
+  enabled: boolean;
+  rules: number;
+  monitors: number;
+  recentAlerts: number;
+  analytics: Awaited<ReturnType<typeof rateLimitAnalytics.getRealTimeMetrics>>;
+  health: Awaited<ReturnType<typeof checkRateLimitHealth>>;
 }> {
   const [analytics, health] = await Promise.all([
     rateLimitAnalytics.getRealTimeMetrics(),
     checkRateLimitHealth(),
-  ])
+  ]);
 
   return {
     enabled: getMergedConfig().global.enabled,
@@ -173,7 +173,7 @@ export async function getRateLimitStatus(): Promise<{
     recentAlerts: (await rateLimitAnalytics.getRecentAlerts(10)).length,
     analytics,
     health,
-  }
+  };
 }
 
 /**
@@ -201,4 +201,4 @@ export default {
 
   checkRateLimitHealth,
   getRateLimitStatus,
-}
+};

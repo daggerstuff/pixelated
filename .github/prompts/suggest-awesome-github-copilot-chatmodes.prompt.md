@@ -1,7 +1,29 @@
 ---
-mode: 'agent'
-description: 'Suggest relevant GitHub Copilot chatmode files from the awesome-copilot repository based on current repository context and chat history, avoiding duplicates with existing chatmodes in this repository.'
-tools: ['changes', 'codebase', 'editFiles', 'fetch', 'findTestFiles', 'githubRepo', 'new', 'openSimpleBrowser', 'problems', 'runCommands', 'runTasks', 'runTests', 'search', 'searchResults', 'terminalLastCommand', 'terminalSelection', 'testFailure', 'usages', 'vscodeAPI', 'github']
+mode: "agent"
+description: "Suggest relevant GitHub Copilot chatmode files from the awesome-copilot repository based on current repository context and chat history, avoiding duplicates with existing chatmodes in this repository."
+tools:
+  [
+    "changes",
+    "codebase",
+    "editFiles",
+    "fetch",
+    "findTestFiles",
+    "githubRepo",
+    "new",
+    "openSimpleBrowser",
+    "problems",
+    "runCommands",
+    "runTasks",
+    "runTests",
+    "search",
+    "searchResults",
+    "terminalLastCommand",
+    "terminalSelection",
+    "testFailure",
+    "usages",
+    "vscodeAPI",
+    "github",
+  ]
 ---
 
 # Suggest Awesome GitHub Copilot Chatmodes
@@ -24,12 +46,14 @@ Analyze current repository context and suggest relevant chatmode files from the 
 ## Context Analysis Criteria
 
 🔍 **Repository Patterns**:
+
 - Programming languages used (.cs, .js, .py, etc.)
 - Framework indicators (ASP.NET, React, Azure, etc.)
 - Project types (web apps, APIs, libraries, tools)
 - Documentation needs (README, specs, ADRs)
 
 🗨️ **Chat History Context**:
+
 - Recent discussions and pain points
 - Feature requests or implementation needs
 - Code review patterns
@@ -39,11 +63,11 @@ Analyze current repository context and suggest relevant chatmode files from the 
 
 Display analysis results in structured table comparing awesome-copilot chatmodes with existing repository chatmodes:
 
-| Awesome-Copilot Chatmode | Description | Already Installed | Similar Local Chatmode | Suggestion Rationale |
-|---------------------------|-------------|-------------------|-------------------------|---------------------|
-| [code-reviewer.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/code-reviewer.chatmode.md) | Specialized code review chatmode | ❌ No | None | Would enhance development workflow with dedicated code review assistance |
-| [architect.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/architect.chatmode.md) | Software architecture guidance | ✅ Yes | azure_principal_architect.chatmode.md | Already covered by existing architecture chatmodes |
-| [debugging-expert.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/debugging-expert.chatmode.md) | Debug assistance chatmode | ❌ No | None | Could improve troubleshooting efficiency for development team |
+| Awesome-Copilot Chatmode                                                                                                   | Description                      | Already Installed | Similar Local Chatmode                | Suggestion Rationale                                                     |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------------ |
+| [code-reviewer.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/code-reviewer.chatmode.md)       | Specialized code review chatmode | ❌ No             | None                                  | Would enhance development workflow with dedicated code review assistance |
+| [architect.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/architect.chatmode.md)               | Software architecture guidance   | ✅ Yes            | azure_principal_architect.chatmode.md | Already covered by existing architecture chatmodes                       |
+| [debugging-expert.chatmode.md](https://github.com/github/awesome-copilot/blob/main/chatmodes/debugging-expert.chatmode.md) | Debug assistance chatmode        | ❌ No             | None                                  | Could improve troubleshooting efficiency for development team            |
 
 ## Local Chatmodes Discovery Process
 

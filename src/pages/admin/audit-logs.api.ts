@@ -1,5 +1,5 @@
-import type { APIContext } from 'astro'
-import { verifyAuthToken } from '@/utils/auth'
+import type { APIContext } from "astro";
+import { verifyAuthToken } from "@/utils/auth";
 
 /**
  * Handles GET requests for the admin audit logs endpoint.
@@ -14,47 +14,47 @@ import { verifyAuthToken } from '@/utils/auth'
 export async function GET(context: APIContext): Promise<Response> {
   try {
     // Extract authorization token from request
-    const authHeader = context.request.headers.get('Authorization')
+    const authHeader = context.request.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Unauthorized' }),
+        JSON.stringify({ success: false, error: "Unauthorized" }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Verify the auth token
-    const authInfo = await verifyAuthToken(authHeader)
+    const authInfo = await verifyAuthToken(authHeader);
 
     // Check if user has admin role
-    if (authInfo.role !== 'admin') {
+    if (authInfo.role !== "admin") {
       return new Response(
-        JSON.stringify({ success: false, error: 'Forbidden - Admin access required' }),
+        JSON.stringify({
+          success: false,
+          error: "Forbidden - Admin access required",
+        }),
         {
           status: 403,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      )
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Auth passed, return success response
-    return new Response(
-      JSON.stringify({ success: true, authorized: true }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return new Response(JSON.stringify({ success: true, authorized: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error('Authentication error in audit-logs.api.ts:', error)
+    console.error("Authentication error in audit-logs.api.ts:", error);
     return new Response(
-      JSON.stringify({ success: false, error: 'Authentication failed' }),
+      JSON.stringify({ success: false, error: "Authentication failed" }),
       {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 }

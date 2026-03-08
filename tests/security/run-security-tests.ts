@@ -11,108 +11,108 @@
  * - HIPAA compliance tests
  */
 
-import { spawn } from 'child_process'
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
-import { performance } from 'perf_hooks'
-import { getEnvironment, getBaseUrl, getSecurityReportPath } from './utils/env'
+import { spawn } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import { fileURLToPath } from "url";
+import { performance } from "perf_hooks";
+import { getEnvironment, getBaseUrl, getSecurityReportPath } from "./utils/env";
 
 // Get current directory equivalent to __dirname in CommonJS
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configuration
 interface Config {
-  outputDir: string
-  reportTitle: string
-  environment: string
-  baseUrl: string
-  authToken: string
-  adminToken: string
+  outputDir: string;
+  reportTitle: string;
+  environment: string;
+  baseUrl: string;
+  authToken: string;
+  adminToken: string;
 }
 
 interface TestItem {
-  testName: string
-  category: string
-  severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational'
-  status: 'Pass' | 'Fail' | 'Error'
-  details: string
-  evidence?: string
-  responseTime?: number
-  timestamp: string
+  testName: string;
+  category: string;
+  severity: "Critical" | "High" | "Medium" | "Low" | "Informational";
+  status: "Pass" | "Fail" | "Error";
+  details: string;
+  evidence?: string;
+  responseTime?: number;
+  timestamp: string;
 }
 
 interface TestResultOutput {
-  suite: TestSuite
-  output: string
-  duration: number
-  timestamp: string
+  suite: TestSuite;
+  output: string;
+  duration: number;
+  timestamp: string;
 }
 
 interface TestSuite {
-  name: string
-  script: string
-  description: string
-  category: string
+  name: string;
+  script: string;
+  description: string;
+  category: string;
 }
 
 // Default configuration
 const config: Config = {
   outputDir: getSecurityReportPath(),
-  reportTitle: 'AI Security Test Report',
+  reportTitle: "AI Security Test Report",
   environment: getEnvironment(),
   baseUrl: getBaseUrl(),
-  authToken: 'user-token',
-  adminToken: 'admin-token',
-}
+  authToken: "user-token",
+  adminToken: "admin-token",
+};
 
 // Define test suites
 const testSuites: TestSuite[] = [
   {
-    name: 'Endpoint Security',
-    script: 'ai-endpoint-scanner.ts',
-    description: 'Tests AI endpoints for basic security issues',
-    category: 'Endpoint Security',
+    name: "Endpoint Security",
+    script: "ai-endpoint-scanner.ts",
+    description: "Tests AI endpoints for basic security issues",
+    category: "Endpoint Security",
   },
   {
-    name: 'Authentication Bypass',
-    script: 'ai-auth-bypass-tester.ts',
+    name: "Authentication Bypass",
+    script: "ai-auth-bypass-tester.ts",
     description:
-      'Tests for authentication and authorization bypass vulnerabilities',
-    category: 'Authentication',
+      "Tests for authentication and authorization bypass vulnerabilities",
+    category: "Authentication",
   },
   {
-    name: 'Web Vulnerabilities',
-    script: 'ai-web-vulnerability-scanner.ts',
-    description: 'Tests for common web vulnerabilities',
-    category: 'Web Security',
+    name: "Web Vulnerabilities",
+    script: "ai-web-vulnerability-scanner.ts",
+    description: "Tests for common web vulnerabilities",
+    category: "Web Security",
   },
-]
+];
 
 // Ensure output directory exists
 if (!fs.existsSync(config.outputDir)) {
-  fs.mkdirSync(config.outputDir, { recursive: true })
+  fs.mkdirSync(config.outputDir, { recursive: true });
 }
 
 // Create report file
 const reportFile = path.join(
   config.outputDir,
-  `ai-security-report-${new Date().toISOString().split('T')[0]}.html`,
-)
+  `ai-security-report-${new Date().toISOString().split("T")[0]}.html`,
+);
 
 /**
  * Run a test suite
  */
 async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
   return new Promise((resolve, reject) => {
-    const startTime = performance.now()
+    const startTime = performance.now();
 
-    console.log(`\nRunning ${suite.name}...`)
+    console.log(`\nRunning ${suite.name}...`);
 
-    const scriptPath = path.join(__dirname, suite.script)
+    const scriptPath = path.join(__dirname, suite.script);
 
-    const childProcess = spawn('ts-node', [scriptPath], {
+    const childProcess = spawn("ts-node", [scriptPath], {
       env: {
         ...(process.env as NodeJS.ProcessEnv),
         BASE_URL: config.baseUrl,
@@ -120,24 +120,24 @@ async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
         ADMIN_TOKEN: config.adminToken,
         NODE_ENV: config.environment,
       },
-    })
+    });
 
-    let output = ''
-    let error = ''
+    let output = "";
+    let error = "";
 
-    childProcess.stdout.on('data', (data: Buffer) => {
-      output += data
-      console.log(data.toString())
-    })
+    childProcess.stdout.on("data", (data: Buffer) => {
+      output += data;
+      console.log(data.toString());
+    });
 
-    childProcess.stderr.on('data', (data: Buffer) => {
-      error += data
-      console.error(data.toString())
-    })
+    childProcess.stderr.on("data", (data: Buffer) => {
+      error += data;
+      console.error(data.toString());
+    });
 
-    childProcess.on('close', (code: number) => {
-      const endTime = performance.now()
-      const duration = endTime - startTime
+    childProcess.on("close", (code: number) => {
+      const endTime = performance.now();
+      const duration = endTime - startTime;
 
       if (code === 0) {
         resolve({
@@ -145,16 +145,16 @@ async function runTestSuite(suite: TestSuite): Promise<TestResultOutput> {
           output,
           duration,
           timestamp: new Date().toISOString(),
-        })
+        });
       } else {
         reject(
           new Error(
             `Test suite ${suite.name} failed with code ${code}: ${error}`,
           ),
-        )
+        );
       }
-    })
-  })
+    });
+  });
 }
 
 /**
@@ -298,14 +298,14 @@ function generateReport(results: TestResultOutput[]): string {
           <div class="value" style="color: #e53e3e;">
             ${results.reduce((count, result) => {
               try {
-                const data = JSON.parse(result.output) as TestItem[]
+                const data = JSON.parse(result.output) as TestItem[];
                 return (
                   count +
-                  data.filter((item: TestItem) => item.severity === 'Critical')
+                  data.filter((item: TestItem) => item.severity === "Critical")
                     .length
-                )
+                );
               } catch {
-                return count
+                return count;
               }
             }, 0)}
           </div>
@@ -315,14 +315,14 @@ function generateReport(results: TestResultOutput[]): string {
           <div class="value" style="color: #ed8936;">
             ${results.reduce((count, result) => {
               try {
-                const data = JSON.parse(result.output) as TestItem[]
+                const data = JSON.parse(result.output) as TestItem[];
                 return (
                   count +
-                  data.filter((item: TestItem) => item.severity === 'High')
+                  data.filter((item: TestItem) => item.severity === "High")
                     .length
-                )
+                );
               } catch {
-                return count
+                return count;
               }
             }, 0)}
           </div>
@@ -354,7 +354,7 @@ function generateReport(results: TestResultOutput[]): string {
 
         ${(() => {
           try {
-            const data = JSON.parse(result.output) as TestItem[]
+            const data = JSON.parse(result.output) as TestItem[];
             return data
               .map(
                 (item: TestItem) => `
@@ -368,7 +368,7 @@ function generateReport(results: TestResultOutput[]): string {
                     <pre><code>${item.evidence}</code></pre>
                   </div>
                 `
-                    : ''
+                    : ""
                 }
                 <div class="metadata">
                   <strong>Severity:</strong> ${item.severity}
@@ -380,62 +380,62 @@ function generateReport(results: TestResultOutput[]): string {
               </div>
             `,
               )
-              .join('')
+              .join("");
           } catch {
-            return `<p>Error parsing test results</p>`
+            return `<p>Error parsing test results</p>`;
           }
         })()}
       </div>
     `,
       )
-      .join('')}
+      .join("")}
 
     <script>
       // Create severity distribution chart
       const severityData = {
         Critical: ${results.reduce((count, result) => {
           try {
-            const data = JSON.parse(result.output) as TestItem[]
+            const data = JSON.parse(result.output) as TestItem[];
             return (
               count +
-              data.filter((item: TestItem) => item.severity === 'Critical')
+              data.filter((item: TestItem) => item.severity === "Critical")
                 .length
-            )
+            );
           } catch {
-            return count
+            return count;
           }
         }, 0)},
         High: ${results.reduce((count, result) => {
           try {
-            const data = JSON.parse(result.output) as TestItem[]
+            const data = JSON.parse(result.output) as TestItem[];
             return (
               count +
-              data.filter((item: TestItem) => item.severity === 'High').length
-            )
+              data.filter((item: TestItem) => item.severity === "High").length
+            );
           } catch {
-            return count
+            return count;
           }
         }, 0)},
         Medium: ${results.reduce((count, result) => {
           try {
-            const data = JSON.parse(result.output) as TestItem[]
+            const data = JSON.parse(result.output) as TestItem[];
             return (
               count +
-              data.filter((item: TestItem) => item.severity === 'Medium').length
-            )
+              data.filter((item: TestItem) => item.severity === "Medium").length
+            );
           } catch {
-            return count
+            return count;
           }
         }, 0)},
         Low: ${results.reduce((count, result) => {
           try {
-            const data = JSON.parse(result.output) as TestItem[]
+            const data = JSON.parse(result.output) as TestItem[];
             return (
               count +
-              data.filter((item: TestItem) => item.severity === 'Low').length
-            )
+              data.filter((item: TestItem) => item.severity === "Low").length
+            );
           } catch {
-            return count
+            return count;
           }
         }, 0)}
       };
@@ -470,58 +470,58 @@ function generateReport(results: TestResultOutput[]): string {
     </script>
   </body>
   </html>
-    `
+    `;
 }
 
 /**
  * Run all tests and generate report
  */
 async function runTests() {
-  console.log('Starting AI security tests...')
+  console.log("Starting AI security tests...");
 
-  const results: TestResultOutput[] = []
+  const results: TestResultOutput[] = [];
 
   for (const suite of testSuites) {
     // Run the test and capture results
     try {
-      const result = await runTestSuite(suite)
-      results.push(result)
+      const result = await runTestSuite(suite);
+      results.push(result);
     } catch (error: unknown) {
-      console.error(`Error running test suite ${suite.name}:`, error)
+      console.error(`Error running test suite ${suite.name}:`, error);
       results.push({
         suite,
         output: JSON.stringify([
           {
             testName: suite.name,
             category: suite.category,
-            severity: 'High',
-            status: 'Error',
+            severity: "High",
+            status: "Error",
             details: error instanceof Error ? String(error) : String(error),
             timestamp: new Date().toISOString(),
           },
         ]),
         duration: 0,
         timestamp: new Date().toISOString(),
-      })
+      });
     }
   }
 
   // Generate and write report
-  const report = generateReport(results)
-  fs.writeFileSync(reportFile, report)
+  const report = generateReport(results);
+  fs.writeFileSync(reportFile, report);
 
-  console.log(`\nSecurity testing complete. Report saved to: ${reportFile}`)
+  console.log(`\nSecurity testing complete. Report saved to: ${reportFile}`);
 
   // Print summary
-  const totalTests = results.length
+  const totalTests = results.length;
   const totalDuration = results.reduce(
     (total, result) => total + result.duration,
     0,
-  )
+  );
 
-  console.log('\nSummary:')
-  console.log(`- Total test suites: ${totalTests}`)
-  console.log(`- Total duration: ${(totalDuration / 1000).toFixed(2)}s`)
+  console.log("\nSummary:");
+  console.log(`- Total test suites: ${totalTests}`);
+  console.log(`- Total duration: ${(totalDuration / 1000).toFixed(2)}s`);
 
   // Count issues by severity
   const severityCounts: Record<string, number> = {
@@ -529,30 +529,30 @@ async function runTests() {
     High: 0,
     Medium: 0,
     Low: 0,
-  }
+  };
 
   results.forEach((result: TestResultOutput) => {
     try {
-      const data = JSON.parse(result.output) as TestItem[]
+      const data = JSON.parse(result.output) as TestItem[];
       data.forEach((item: TestItem) => {
         if (item.severity && item.severity in severityCounts) {
           severityCounts[item.severity] =
-            (severityCounts[item.severity] || 0) + 1
+            (severityCounts[item.severity] || 0) + 1;
         }
-      })
+      });
     } catch {
       // Ignore parsing errors
     }
-  })
+  });
 
-  console.log('\nIssues by severity:')
+  console.log("\nIssues by severity:");
   Object.entries(severityCounts).forEach(([severity, count]) => {
-    console.log(`- ${severity}: ${count}`)
-  })
+    console.log(`- ${severity}: ${count}`);
+  });
 }
 
 // Run tests
 runTests().catch((error) => {
-  console.error('Error running security tests:', error)
-  process.exit(1)
-})
+  console.error("Error running security tests:", error);
+  process.exit(1);
+});

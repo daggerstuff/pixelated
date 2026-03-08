@@ -2,18 +2,18 @@
 // Implements a subtle 3D tilt effect that responds to mouse movement
 // Based on the elegant card interactions seen in the Mizu theme
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Select all cards that should have parallax tilt effect
-  const cards = document.querySelectorAll('.card');
+  const cards = document.querySelectorAll(".card");
 
-  cards.forEach(card => {
+  cards.forEach((card) => {
     // Get card dimensions
     const cardRect = card.getBoundingClientRect();
     const centerX = cardRect.left + cardRect.width / 2;
     const centerY = cardRect.top + cardRect.height / 2;
 
     // Add mouse move event listener
-    card.addEventListener('mousemove', (e) => {
+    card.addEventListener("mousemove", (e) => {
       // Calculate mouse position relative to card center
       const x = e.clientX - centerX;
       const y = e.clientY - centerY;
@@ -30,17 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Reset transform on mouse leave
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+    card.addEventListener("mouseleave", () => {
+      card.style.transform =
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
     });
   });
 });
 
 // Add support for touch devices
 // This prevents the effect from being too aggressive on mobile
-if ('ontouchstart' in window) {
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('touchmove', (e) => {
+if ("ontouchstart" in window) {
+  document.querySelectorAll(".card").forEach((card) => {
+    card.addEventListener("touchmove", (e) => {
       e.preventDefault();
 
       // For touch, use a simpler version with fixed tilt
@@ -58,14 +59,15 @@ if ('ontouchstart' in window) {
       card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.01)`;
     });
 
-    card.addEventListener('touchend', () => {
-      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
+    card.addEventListener("touchend", () => {
+      card.style.transform =
+        "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
     });
   });
 }
 
 // Add transition for smooth animations
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = `
 .card {
   transition: transform 0.1s ease-out, box-shadow 0.2s ease-out;

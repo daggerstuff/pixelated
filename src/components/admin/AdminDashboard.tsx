@@ -1,35 +1,35 @@
-import type { FC } from 'react'
-import React from 'react'
-import { usePersistentState } from '@/hooks/usePersistentState'
+import type { FC } from "react";
+import React from "react";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
-import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
-import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
-import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
+import { OfflineIndicator } from "@/components/layout/OfflineIndicator";
+import { FadeIn, SlideUp } from "@/components/layout/AdvancedAnimations";
+import { ResponsiveContainer } from "@/components/layout/ResponsiveUtils";
 
 interface InstitutionMetrics {
-  totalPatients: number
-  activePatients: number
-  totalTherapists: number
-  avgSessionsPerPatient: number
-  overallProgress: number
-  complianceScore: number
+  totalPatients: number;
+  activePatients: number;
+  totalTherapists: number;
+  avgSessionsPerPatient: number;
+  overallProgress: number;
+  complianceScore: number;
 }
 
 interface TherapistPerformance {
-  id: string
-  name: string
-  patientsCount: number
-  avgSessionRating: number
-  completionRate: number
-  riskLevelDistribution: Record<string, number>
+  id: string;
+  name: string;
+  patientsCount: number;
+  avgSessionRating: number;
+  completionRate: number;
+  riskLevelDistribution: Record<string, number>;
 }
 
 interface SystemHealth {
-  apiResponseTime: number
-  databasePerformance: number
-  memoryUsage: number
-  errorRate: number
-  uptime: number
+  apiResponseTime: number;
+  databasePerformance: number;
+  memoryUsage: number;
+  errorRate: number;
+  uptime: number;
 }
 
 /**
@@ -38,23 +38,23 @@ interface SystemHealth {
 export const AdminDashboard: FC = () => {
   // Persistent dashboard preferences
   const [dashboardView, setDashboardView] = usePersistentState<
-    'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
+    "overview" | "therapists" | "institutions" | "system" | "compliance"
   >({
-    key: 'admin_dashboard_view',
-    defaultValue: 'overview'
-  })
+    key: "admin_dashboard_view",
+    defaultValue: "overview",
+  });
   const [timeRange, setTimeRange] = usePersistentState<
-    'week' | 'month' | 'quarter' | 'year'
+    "week" | "month" | "quarter" | "year"
   >({
-    key: 'admin_dashboard_timerange',
-    defaultValue: 'month'
-  })
+    key: "admin_dashboard_timerange",
+    defaultValue: "month",
+  });
   const [selectedTherapists, setSelectedTherapists] = usePersistentState<
     string[]
   >({
-    key: 'admin_selected_therapists',
-    defaultValue: []
-  })
+    key: "admin_selected_therapists",
+    defaultValue: [],
+  });
 
   // Mock data - in real app would come from API
   const institutionMetrics: InstitutionMetrics = {
@@ -64,34 +64,34 @@ export const AdminDashboard: FC = () => {
     avgSessionsPerPatient: 8.4,
     overallProgress: 73,
     complianceScore: 94,
-  }
+  };
 
   const therapists: TherapistPerformance[] = [
     {
-      id: '1',
-      name: 'Dr. Sarah Johnson',
+      id: "1",
+      name: "Dr. Sarah Johnson",
       patientsCount: 45,
       avgSessionRating: 4.6,
       completionRate: 96,
       riskLevelDistribution: { low: 60, medium: 30, high: 8, critical: 2 },
     },
     {
-      id: '2',
-      name: 'Dr. Michael Chen',
+      id: "2",
+      name: "Dr. Michael Chen",
       patientsCount: 38,
       avgSessionRating: 4.4,
       completionRate: 94,
       riskLevelDistribution: { low: 55, medium: 35, high: 8, critical: 2 },
     },
     {
-      id: '3',
-      name: 'Dr. Emily Rodriguez',
+      id: "3",
+      name: "Dr. Emily Rodriguez",
       patientsCount: 52,
       avgSessionRating: 4.7,
       completionRate: 98,
       riskLevelDistribution: { low: 65, medium: 25, high: 8, critical: 2 },
     },
-  ]
+  ];
 
   const systemHealth: SystemHealth = {
     apiResponseTime: 45,
@@ -99,7 +99,7 @@ export const AdminDashboard: FC = () => {
     memoryUsage: 67,
     errorRate: 0.02,
     uptime: 99.9,
-  }
+  };
 
   return (
     <ResponsiveContainer size="full">
@@ -113,7 +113,7 @@ export const AdminDashboard: FC = () => {
                   Healthcare Administration
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Institutional Overview • {institutionMetrics.totalTherapists}{' '}
+                  Institutional Overview • {institutionMetrics.totalTherapists}{" "}
                   therapists • {institutionMetrics.totalPatients} patients
                 </p>
               </div>
@@ -138,19 +138,19 @@ export const AdminDashboard: FC = () => {
           <div className="px-6">
             <nav className="flex space-x-8">
               {[
-                { id: 'overview', label: 'Overview', icon: '📊' },
-                { id: 'therapists', label: 'Therapists', icon: '👨‍⚕️' },
-                { id: 'institutions', label: 'Institutions', icon: '🏥' },
-                { id: 'system', label: 'System Health', icon: '🔧' },
-                { id: 'compliance', label: 'Compliance', icon: '📋' },
+                { id: "overview", label: "Overview", icon: "📊" },
+                { id: "therapists", label: "Therapists", icon: "👨‍⚕️" },
+                { id: "institutions", label: "Institutions", icon: "🏥" },
+                { id: "system", label: "System Health", icon: "🔧" },
+                { id: "compliance", label: "Compliance", icon: "📋" },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id as any)}
                   className={`flex items-center gap-2 py-3 px-1 border-b-2 font-medium text-sm transition-colors ${
                     dashboardView === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                   }`}
                 >
                   <span>{tab.icon}</span>
@@ -163,7 +163,7 @@ export const AdminDashboard: FC = () => {
 
         {/* Main Content */}
         <main className="p-6">
-          {dashboardView === 'overview' && (
+          {dashboardView === "overview" && (
             <OverviewTab
               metrics={institutionMetrics}
               therapists={therapists}
@@ -171,9 +171,9 @@ export const AdminDashboard: FC = () => {
                 if (selectedTherapists.includes(therapistId)) {
                   setSelectedTherapists((prev) =>
                     prev.filter((id) => id !== therapistId),
-                  )
+                  );
                 } else {
-                  setSelectedTherapists((prev) => [...prev, therapistId])
+                  setSelectedTherapists((prev) => [...prev, therapistId]);
                 }
               }}
               selectedTherapists={selectedTherapists}
@@ -181,47 +181,53 @@ export const AdminDashboard: FC = () => {
             />
           )}
 
-          {dashboardView === 'therapists' && (
+          {dashboardView === "therapists" && (
             <TherapistsTab
               therapists={therapists}
               onTherapistSelect={(therapistId) => {
                 if (selectedTherapists.includes(therapistId)) {
                   setSelectedTherapists((prev) =>
                     prev.filter((id) => id !== therapistId),
-                  )
+                  );
                 } else {
-                  setSelectedTherapists((prev) => [...prev, therapistId])
+                  setSelectedTherapists((prev) => [...prev, therapistId]);
                 }
               }}
               selectedTherapists={selectedTherapists}
             />
           )}
 
-          {dashboardView === 'institutions' && (
+          {dashboardView === "institutions" && (
             <InstitutionsTab metrics={institutionMetrics} />
           )}
 
-          {dashboardView === 'system' && <SystemTab health={systemHealth} />}
+          {dashboardView === "system" && <SystemTab health={systemHealth} />}
 
-          {dashboardView === 'compliance' && (
+          {dashboardView === "compliance" && (
             <ComplianceTab metrics={institutionMetrics} />
           )}
         </main>
       </div>
     </ResponsiveContainer>
-  )
-}
+  );
+};
 
 /**
  * Overview Tab Component
  */
 const OverviewTab: FC<{
-  metrics: InstitutionMetrics
-  therapists: TherapistPerformance[]
-  onTherapistSelect: (therapistId: string) => void
-  selectedTherapists: string[]
-  timeRange: 'week' | 'month' | 'quarter' | 'year'
-}> = ({ metrics, therapists, onTherapistSelect, selectedTherapists, timeRange }) => {
+  metrics: InstitutionMetrics;
+  therapists: TherapistPerformance[];
+  onTherapistSelect: (therapistId: string) => void;
+  selectedTherapists: string[];
+  timeRange: "week" | "month" | "quarter" | "year";
+}> = ({
+  metrics,
+  therapists,
+  onTherapistSelect,
+  selectedTherapists,
+  timeRange,
+}) => {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
@@ -282,11 +288,11 @@ const OverviewTab: FC<{
               </div>
             </div>
             <p className="text-sm text-gray-500 mt-2">
-              Per patient this{' '}
-              {timeRange === 'week'
-                ? 'week'
-                : timeRange === 'month'
-                  ? 'month'
+              Per patient this{" "}
+              {timeRange === "week"
+                ? "week"
+                : timeRange === "month"
+                  ? "month"
                   : timeRange}
             </p>
           </div>
@@ -344,10 +350,10 @@ const OverviewTab: FC<{
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           therapist.completionRate >= 95
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
                             : therapist.completionRate >= 90
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
                         }`}
                       >
                         {therapist.completionRate}% completion
@@ -504,16 +510,16 @@ const OverviewTab: FC<{
         </SlideUp>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Therapists Tab Component
  */
 const TherapistsTab: FC<{
-  therapists: TherapistPerformance[]
-  onTherapistSelect: (therapistId: string) => void
-  selectedTherapists: string[]
+  therapists: TherapistPerformance[];
+  onTherapistSelect: (therapistId: string) => void;
+  selectedTherapists: string[];
 }> = ({ therapists, onTherapistSelect, selectedTherapists }) => {
   return (
     <div className="space-y-6">
@@ -571,10 +577,10 @@ const TherapistsTab: FC<{
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           therapist.completionRate >= 95
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
                             : therapist.completionRate >= 90
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200'
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200"
                         }`}
                       >
                         {therapist.completionRate}% completion
@@ -626,14 +632,14 @@ const TherapistsTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Institutions Tab Component
  */
 const InstitutionsTab: FC<{
-  metrics: InstitutionMetrics
+  metrics: InstitutionMetrics;
 }> = ({ metrics }) => {
   return (
     <div className="space-y-6">
@@ -657,7 +663,7 @@ const InstitutionsTab: FC<{
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-green-500 h-2 rounded-full"
-                style={{ width: '87%' }}
+                style={{ width: "87%" }}
               />
             </div>
 
@@ -670,7 +676,7 @@ const InstitutionsTab: FC<{
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-blue-500 h-2 rounded-full"
-                style={{ width: '73%' }}
+                style={{ width: "73%" }}
               />
             </div>
 
@@ -683,7 +689,7 @@ const InstitutionsTab: FC<{
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
               <div
                 className="bg-purple-500 h-2 rounded-full"
-                style={{ width: '92%' }}
+                style={{ width: "92%" }}
               />
             </div>
           </div>
@@ -693,10 +699,10 @@ const InstitutionsTab: FC<{
           <h3 className="text-lg font-semibold mb-4">Department Overview</h3>
           <div className="space-y-3">
             {[
-              { name: 'Adult Therapy', patients: 456, therapists: 12 },
-              { name: 'Child & Adolescent', patients: 234, therapists: 8 },
-              { name: 'Crisis Intervention', patients: 89, therapists: 5 },
-              { name: 'Group Therapy', patients: 156, therapists: 4 },
+              { name: "Adult Therapy", patients: 456, therapists: 12 },
+              { name: "Child & Adolescent", patients: 234, therapists: 8 },
+              { name: "Crisis Intervention", patients: 89, therapists: 5 },
+              { name: "Group Therapy", patients: 156, therapists: 4 },
             ].map((dept) => (
               <div
                 key={dept.name}
@@ -719,14 +725,14 @@ const InstitutionsTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * System Tab Component
  */
 const SystemTab: FC<{
-  health: SystemHealth
+  health: SystemHealth;
 }> = ({ health }) => {
   return (
     <div className="space-y-6">
@@ -746,7 +752,7 @@ const SystemTab: FC<{
                 API Response Time
               </span>
               <span
-                className={`font-medium ${health.apiResponseTime < 50 ? 'text-green-600' : health.apiResponseTime < 100 ? 'text-yellow-600' : 'text-red-600'}`}
+                className={`font-medium ${health.apiResponseTime < 50 ? "text-green-600" : health.apiResponseTime < 100 ? "text-yellow-600" : "text-red-600"}`}
               >
                 {health.apiResponseTime}ms
               </span>
@@ -756,7 +762,7 @@ const SystemTab: FC<{
                 Database Performance
               </span>
               <span
-                className={`font-medium ${health.databasePerformance > 90 ? 'text-green-600' : health.databasePerformance > 80 ? 'text-yellow-600' : 'text-red-600'}`}
+                className={`font-medium ${health.databasePerformance > 90 ? "text-green-600" : health.databasePerformance > 80 ? "text-yellow-600" : "text-red-600"}`}
               >
                 {health.databasePerformance}%
               </span>
@@ -766,7 +772,7 @@ const SystemTab: FC<{
                 Memory Usage
               </span>
               <span
-                className={`font-medium ${health.memoryUsage < 70 ? 'text-green-600' : health.memoryUsage < 85 ? 'text-yellow-600' : 'text-red-600'}`}
+                className={`font-medium ${health.memoryUsage < 70 ? "text-green-600" : health.memoryUsage < 85 ? "text-yellow-600" : "text-red-600"}`}
               >
                 {health.memoryUsage}%
               </span>
@@ -776,7 +782,7 @@ const SystemTab: FC<{
                 Error Rate
               </span>
               <span
-                className={`font-medium ${health.errorRate < 0.01 ? 'text-green-600' : health.errorRate < 0.05 ? 'text-yellow-600' : 'text-red-600'}`}
+                className={`font-medium ${health.errorRate < 0.01 ? "text-green-600" : health.errorRate < 0.05 ? "text-yellow-600" : "text-red-600"}`}
               >
                 {(health.errorRate * 100).toFixed(2)}%
               </span>
@@ -811,14 +817,14 @@ const SystemTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /**
  * Compliance Tab Component
  */
 const ComplianceTab: FC<{
-  metrics: InstitutionMetrics
+  metrics: InstitutionMetrics;
 }> = ({ metrics }) => {
   return (
     <div className="space-y-6">
@@ -838,7 +844,7 @@ const ComplianceTab: FC<{
                 HIPAA Compliance
               </span>
               <span
-                className={`font-medium ${metrics.complianceScore >= 95 ? 'text-green-600' : 'text-yellow-600'}`}
+                className={`font-medium ${metrics.complianceScore >= 95 ? "text-green-600" : "text-yellow-600"}`}
               >
                 {metrics.complianceScore}%
               </span>
@@ -869,21 +875,21 @@ const ComplianceTab: FC<{
           <div className="space-y-3">
             {[
               {
-                type: 'Security Audit',
-                date: '2024-01-15',
-                status: 'passed',
+                type: "Security Audit",
+                date: "2024-01-15",
+                status: "passed",
                 score: 96,
               },
               {
-                type: 'HIPAA Compliance',
-                date: '2024-01-10',
-                status: 'passed',
+                type: "HIPAA Compliance",
+                date: "2024-01-10",
+                status: "passed",
                 score: 94,
               },
               {
-                type: 'Data Privacy',
-                date: '2024-01-05',
-                status: 'passed',
+                type: "Data Privacy",
+                date: "2024-01-05",
+                status: "passed",
                 score: 98,
               },
             ].map((audit, index) => (
@@ -902,9 +908,9 @@ const ComplianceTab: FC<{
                 <div className="text-right">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      audit.status === 'passed'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-                        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                      audit.status === "passed"
+                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
+                        : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200"
                     }`}
                   >
                     {audit.status}
@@ -919,7 +925,7 @@ const ComplianceTab: FC<{
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;
