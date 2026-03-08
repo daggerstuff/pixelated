@@ -80,6 +80,7 @@ export class PerformanceOptimizer {
   private activeCounts: Map<string, number>
   private totalCacheAccesses = 0
   private cacheHitsCount = 0
+  private totalActiveConnections = 0
 
   constructor(config: Partial<OptimizationConfig> = {}) {
     this.config = {
@@ -157,6 +158,7 @@ export class PerformanceOptimizer {
     // Return existing connection if available
     if (pool.length > 0) {
       this.activeCounts.set(poolName, getActive() + 1)
+      this.totalActiveConnections++
       return pool.pop()
     }
     // Create new connection if under limit
@@ -165,6 +167,7 @@ export class PerformanceOptimizer {
         const connection = await factory()
         logger.debug(`Created new connection for pool: ${poolName}`)
         this.activeCounts.set(poolName, getActive() + 1)
+        this.totalActiveConnections++
         return connection
       } catch (error: unknown) {
         logger.error(`Failed to create connection for pool: ${poolName}`, {
@@ -182,6 +185,7 @@ export class PerformanceOptimizer {
         if (pool.length > 0) {
           clearTimeout(timeout)
           this.activeCounts.set(poolName, getActive() + 1)
+          this.totalActiveConnections++
           resolve(pool.pop())
         } else {
           setTimeout(checkForConnection, 10)
@@ -200,6 +204,7 @@ export class PerformanceOptimizer {
     const active = this.activeCounts.get(poolName) ?? 0
     if (active > 0) {
       this.activeCounts.set(poolName, active - 1)
+      this.totalActiveConnections = Math.max(0, this.totalActiveConnections - 1)
     }
     if (pool.length < this.config.connectionPool.maxConnections) {
       pool.push(connection)
@@ -208,14 +213,17 @@ export class PerformanceOptimizer {
 
   /**
    * Intelligent Caching
-   * Optimized for O(1) performance using Map insertion order
+   * Optimized for O(1) performance using Map insertion order.
+   * Note: LRU strategy uses sliding window TTL (updates timestamp on access)
+   * to maintain chronological order in the Map for O(1) expiration checks.
    */
   set(key: string, value: unknown): void {
     const now = Date.now()
     const existing = this.cache.get(key)
 
-    // Move to end for LRU strategy if it exists
-    if (existing && this.config.cache.strategy === 'LRU') {
+    // Move to end if it exists to maintain chronological order in Map
+    // (since we update the timestamp). This keeps evictExpired O(1).
+    if (existing) {
       this.cache.delete(key)
     }
 
@@ -253,7 +261,7 @@ export class PerformanceOptimizer {
     this.cacheHitsCount++
     entry.accessCount++
 
-    // For LRU, move to end of Map and update timestamp (sliding window TTL)
+    // For LRU, move to end of Map and update timestamp (sliding window)
     // This ensures Map order matches expiration order, keeping evictExpired O(1)
     if (this.config.cache.strategy === 'LRU') {
       entry.timestamp = now
@@ -268,13 +276,13 @@ export class PerformanceOptimizer {
     const now = Date.now()
     const ttl = this.config.cache.ttl
 
-    // Since Map preserves insertion order, the oldest entries are always at the beginning
-    // We can stop as soon as we find an entry that hasn't expired yet
+    // Since Map preserves insertion order, and we use sliding window for LRU,
+    // the oldest entries (by expiration) are always at the beginning.
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > ttl) {
         this.cache.delete(key)
       } else {
-        // First non-expired entry found, we can stop
+        // First non-expired entry found, we can stop (O(1) amortized)
         break
       }
     }
@@ -294,9 +302,7 @@ export class PerformanceOptimizer {
         keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
-        // LFU still requires O(n) unless we maintain a frequency list/map
-        // Given the 50-line constraint and "one small improvement", we'll keep it simple
-        // but optimize the most common cases (LRU/FIFO)
+        // LFU still requires O(n) without complex frequency tracking
         keyToEvict = this.findLFUKey()
         break
       default:
@@ -455,16 +461,14 @@ export class PerformanceOptimizer {
   }
 
   private updateMetrics() {
-    // Update cache hit rate (O(1) calculation)
+    // Update cache hit rate (O(1) calculation using counters)
     this.metrics.cacheHitRate =
       this.totalCacheAccesses > 0
         ? this.cacheHitsCount / this.totalCacheAccesses
         : 0
 
-    // Update active connections
-    this.metrics.activeConnections = Array.from(
-      this.connectionPool.values(),
-    ).reduce((sum, pool) => sum + pool.length, 0)
+    // Update active connections (O(1) calculation using counter)
+    this.metrics.activeConnections = this.totalActiveConnections
 
     // Update memory usage
     if (typeof process !== 'undefined' && process.memoryUsage) {
@@ -583,6 +587,7 @@ export class PerformanceOptimizer {
     this.metricsHistory.length = 0
     this.totalCacheAccesses = 0
     this.cacheHitsCount = 0
+    this.totalActiveConnections = 0
   }
 }
 
