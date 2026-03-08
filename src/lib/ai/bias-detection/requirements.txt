@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r requirements.txt
     #   matplotlib
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   -r requirements.txt
     #   great-expectations
@@ -165,7 +165,7 @@ filelock==3.20.3
     #   transformers
 flake8==7.3.0
     # via -r requirements.txt
-flask==3.1.2
+flask==3.1.3
     # via
     #   -r requirements.txt
     #   dash
@@ -447,7 +447,7 @@ networkx==3.6.1
     #   -r requirements.txt
     #   scikit-image
     #   torch
-nltk==3.9.2
+nltk==3.9.3
     # via
     #   -r requirements.txt
     #   textblob
@@ -614,7 +614,7 @@ pexpect==4.9.0
     # via
     #   -r requirements.txt
     #   ipython
-pillow==12.1.0
+pillow==12.1.1
     # via
     #   -r requirements.txt
     #   imageio
@@ -1004,7 +1004,7 @@ weasel==0.4.3
     # via
     #   -r requirements.txt
     #   spacy
-werkzeug==3.1.5
+werkzeug==3.1.6
     # via
     #   -r requirements.txt
     #   dash
