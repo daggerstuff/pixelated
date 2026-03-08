@@ -253,8 +253,10 @@ export class PerformanceOptimizer {
     this.cacheHitsCount++
     entry.accessCount++
 
-    // For LRU, move to end of Map to mark as most recently used
+    // For LRU, move to end of Map and update timestamp (sliding window TTL)
+    // This ensures Map order matches expiration order, keeping evictExpired O(1)
     if (this.config.cache.strategy === 'LRU') {
+      entry.timestamp = now
       this.cache.delete(key)
       this.cache.set(key, entry)
     }
