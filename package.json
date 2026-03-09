@@ -131,7 +131,7 @@
     "ts:check:debug": "tsc --noEmit --project config/tsconfig.debug.json",
     "ts:check:main": "tsc --noEmit --project config/tsconfig.json",
     "ts:check:aws": "tsc --noEmit --project config/tsconfig.aws.json",
-    "ts:compare": "pnpm run ts:check:debug && echo '✅ Debug config works' && pnpm run ts:check:main && echo '✅ Main config works'",
+    "ts:compare": "pnpm run ts:check:debug && echo '\u2705 Debug config works' && pnpm run ts:check:main && echo '\u2705 Main config works'",
     "ts:switch:debug": "cp config/tsconfig.json config/tsconfig.json.backup && cp config/tsconfig.debug.json config/tsconfig.json",
     "ts:switch:main": "cp config/tsconfig.json.backup config/tsconfig.json",
     "ts:logs": "echo 'TypeScript logs location varies by system. Run: ./debug-typescript.sh normal'",
