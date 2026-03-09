@@ -60,6 +60,18 @@ class Settings(BaseSettings):
 
     # Security settings
     api_key_header: str = Field(default="X-API-Key", validation_alias="API_KEY_HEADER")
+    cors_allowed_origins: list[str] = Field(
+        default_factory=lambda: [
+            "http://localhost:3000",
+            "http://localhost:4321",
+            "http://localhost:8080",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:4321",
+            "http://127.0.0.1:8080",
+        ],
+        validation_alias="CORS_ALLOWED_ORIGINS",
+        description="Comma-separated list of allowed CORS origins (required when credentials=True)",
+    )
     rate_limit_per_minute: int = Field(
         default=60, validation_alias="RATE_LIMIT_PER_MINUTE"
     )
@@ -80,6 +92,26 @@ class Settings(BaseSettings):
     enable_async_processing: bool = Field(
         default=True, validation_alias="ENABLE_ASYNC_PROCESSING"
     )
+
+    @field_validator("cors_allowed_origins", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: str | list[str] | None) -> list[str]:
+        """Parse CORS_ALLOWED_ORIGINS from comma-separated env or JSON list."""
+        default = [
+            "http://localhost:3000",
+            "http://localhost:4321",
+            "http://localhost:8080",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:4321",
+            "http://127.0.0.1:8080",
+        ]
+        if v is None:
+            return default
+        if isinstance(v, list):
+            return [str(x).strip() for x in v if x] or default
+        if isinstance(v, str):
+            return [x.strip() for x in v.split(",") if x.strip()] or default
+        return default
 
     @field_validator("environment")
     @classmethod

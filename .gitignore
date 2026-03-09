@@ -276,3 +276,5 @@ node_modules
 .beads/dolt-*.pid
 .beads/dolt-*.activity
 .beads/dolt-*.port
+
+.jules
