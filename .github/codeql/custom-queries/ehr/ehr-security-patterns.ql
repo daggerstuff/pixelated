@@ -12,7 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import semmle.javascript.security.TaintTracking
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
