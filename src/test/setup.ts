@@ -4,6 +4,7 @@
  */
 
 import '@testing-library/jest-dom'
+import { cleanup } from '@testing-library/react'
 
 // Add type declarations for DOM testing matchers
 declare module 'vitest' {
@@ -93,6 +94,10 @@ global.URL.createObjectURL = vi.fn()
 global.URL.revokeObjectURL = vi.fn()
 
 // Mock console methods to reduce noise in tests
+afterEach(() => {
+  cleanup()
+})
+
 beforeEach(() => {
   vi.spyOn(console, 'log').mockImplementation(() => { })
   vi.spyOn(console, 'warn').mockImplementation(() => { })

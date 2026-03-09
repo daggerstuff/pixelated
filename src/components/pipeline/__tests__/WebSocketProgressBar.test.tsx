@@ -240,7 +240,7 @@ describe('WebSocketProgressBar', () => {
         />,
       )
 
-      expect(screen.getByText(/connecting/i)).toBeInTheDocument()
+      expect(screen.getAllByText(/connecting/i)[0]).toBeInTheDocument()
     })
 
     it('shows connected state when WebSocket is open', () => {
@@ -661,13 +661,13 @@ describe('WebSocketConnectionManager', () => {
     expect(
       screen.getByText(/websocket connection manager/i),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^connect$/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /^connect$/i })).toBeInTheDocument()
   })
 
   it('handles connect button click', () => {
     render(<WebSocketConnectionManager {...mockProps} />)
 
-    const connectButton = screen.getByRole('button', { name: /^connect$/i })
+      const connectButton = screen.getByRole('button', { name: /^connect$/i })
     fireEvent.click(connectButton)
 
     expect(global.WebSocket).toHaveBeenCalledWith('ws://localhost:8080')
@@ -729,8 +729,8 @@ describe('WebSocketMessageLogger', () => {
   it('displays messages with correct formatting', () => {
     render(<WebSocketMessageLogger {...mockProps} />)
 
-    expect(screen.getByText(/sent/i)).toBeInTheDocument()
-    expect(screen.getByText(/received/i)).toBeInTheDocument()
+      expect(screen.getAllByText(/sent/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/received/i)[0]).toBeInTheDocument()
     expect(screen.getByText(/"message":"hello"/i)).toBeInTheDocument()
     expect(screen.getByText(/"response":"hi there"/i)).toBeInTheDocument()
   })

@@ -326,14 +326,14 @@ describe('PatientResponseService', () => {
       },
     ]
 
-    it('should include basic patient info and style in prompt', () => {
+    it('should include basic patient info and style in prompt', async () => {
       const context: ResponseContext = {
         profile: patientProfile,
         styleConfig: baseStyleConfig,
         sessionNumber: 3,
         therapeuticFocus: ['managing anxiety'],
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain('You are roleplaying as Prompt User')
       expect(prompt).toContain(
@@ -363,7 +363,7 @@ describe('PatientResponseService', () => {
       expect(prompt).toContain('Respond as Prompt User:')
     })
 
-    it('should correctly include new emotional authenticity parameters in prompt', () => {
+    it('should correctly include new emotional authenticity parameters in prompt', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         emotionalNuance: 'subtle',
@@ -376,11 +376,11 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain('Your emotional expression should be subtle.')
       expect(prompt).toContain(
-        'The intensity of your expressed emotion should be around 3/10.',
+        'The intensity of your expressed emotion should be around 3.0/10.',
       )
       expect(prompt).toContain('Focus on conveying sadness.')
       expect(prompt).toContain(
@@ -388,7 +388,7 @@ describe('PatientResponseService', () => {
       )
     })
 
-    it('should correctly include new resistance and defensive mechanism parameters in prompt', () => {
+    it('should correctly include new resistance and defensive mechanism parameters in prompt', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         resistanceLevel: 8,
@@ -399,7 +399,7 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).toContain(
         'Your resistance to therapeutic suggestions is 8/10.',
@@ -412,7 +412,7 @@ describe('PatientResponseService', () => {
       )
     })
 
-    it('should include specific instruction for intellectualization defense', () => {
+    it('should include specific instruction for intellectualization defense', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         activeDefensiveMechanism: 'intellectualization',
@@ -422,13 +422,13 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain(
         'Focus on abstract concepts and avoid expressing direct feelings.',
       )
     })
 
-    it('should include specific instruction for minimization defense', () => {
+    it('should include specific instruction for minimization defense', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         activeDefensiveMechanism: 'minimization',
@@ -438,17 +438,17 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain('Downplay the importance of concerns raised.')
     })
 
-    it('should include instruction for emotional transitions', () => {
+    it('should include instruction for emotional transitions', async () => {
       const context: ResponseContext = {
         profile: patientProfile,
         styleConfig: baseStyleConfig,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
       expect(prompt).toContain(
         "Consider your previous emotional state and the therapist's last statement when forming your response, allowing for natural emotional shifts or intensifications.",
       )
@@ -457,7 +457,7 @@ describe('PatientResponseService', () => {
       )
     })
 
-    it('should handle "none" for nonVerbalIndicatorStyle and activeDefensiveMechanism', () => {
+    it('should handle "none" for nonVerbalIndicatorStyle and activeDefensiveMechanism', async () => {
       const specificStyle: PatientResponseStyleConfig = {
         ...baseStyleConfig,
         nonVerbalIndicatorStyle: 'none',
@@ -468,7 +468,7 @@ describe('PatientResponseService', () => {
         styleConfig: specificStyle,
         sessionNumber: 1,
       }
-      const prompt = responseService.generatePatientPrompt(context)
+      const prompt = await responseService.generatePatientPrompt(context)
 
       expect(prompt).not.toContain(
         'Include textual descriptions of non-verbal cues',

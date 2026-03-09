@@ -60,6 +60,8 @@ export class PerformanceOptimizer {
   private config: OptimizationConfig
   private metrics: PerformanceMetrics
   private connectionPool: Map<string, unknown[]>
+  private totalCacheAccesses = 0
+  private cacheHitsCount = 0
   private cache: Map<
     string,
     { value: unknown; timestamp: number; accessCount: number }
@@ -80,6 +82,8 @@ export class PerformanceOptimizer {
   private activeCounts: Map<string, number>
 
   constructor(config: Partial<OptimizationConfig> = {}) {
+    this.totalCacheAccesses = 0
+    this.cacheHitsCount = 0
     this.config = {
       connectionPool: {
         maxConnections: 100,
@@ -213,6 +217,20 @@ export class PerformanceOptimizer {
     // Evict expired entries
     this.evictExpired()
 
+    const existing = this.cache.get(key)
+    if (existing) {
+      // Re-insert to update order for LRU
+      if (this.config.cache.strategy === 'LRU') {
+        this.cache.delete(key)
+      }
+      this.cache.set(key, {
+        ...existing,
+        value,
+        timestamp: now,
+      })
+      return
+    }
+
     // Evict based on strategy if cache is full
     if (this.cache.size >= this.config.cache.maxSize) {
       this.evictByStrategy()
@@ -226,7 +244,9 @@ export class PerformanceOptimizer {
   }
 
   get(key: string): unknown | null {
+    this.totalCacheAccesses++
     const entry = this.cache.get(key)
+
     if (!entry) {
       return null
     }
@@ -237,7 +257,15 @@ export class PerformanceOptimizer {
       return null
     }
 
+    this.cacheHitsCount++
     entry.accessCount++
+    entry.timestamp = now // Update timestamp for LRU
+
+    if (this.config.cache.strategy === 'LRU') {
+      this.cache.delete(key)
+      this.cache.set(key, entry)
+    }
+
     return entry.value
   }
 
@@ -259,13 +287,11 @@ export class PerformanceOptimizer {
 
     switch (this.config.cache.strategy) {
       case 'LRU':
-        keyToEvict = this.findLRUKey()
+      case 'FIFO':
+        keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
         keyToEvict = this.findLFUKey()
-        break
-      case 'FIFO':
-        keyToEvict = this.cache.keys().next().value
         break
       default:
         keyToEvict = this.cache.keys().next().value
@@ -275,20 +301,6 @@ export class PerformanceOptimizer {
       return
     }
     this.cache.delete(keyToEvict)
-  }
-
-  private findLRUKey(): string {
-    let oldestKey = ''
-    let oldestTime = Date.now()
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTime) {
-        oldestTime = entry.timestamp
-        oldestKey = key
-      }
-    }
-
-    return oldestKey
   }
 
   private findLFUKey(): string {
@@ -439,13 +451,10 @@ export class PerformanceOptimizer {
 
   private updateMetrics() {
     // Update cache hit rate
-    const totalCacheAccesses = Array.from(this.cache.values()).reduce(
-      (sum, entry) => sum + entry.accessCount,
-      0,
-    )
-    const cacheHits = this.cache.size
     this.metrics.cacheHitRate =
-      totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
+      this.totalCacheAccesses > 0
+        ? this.cacheHitsCount / this.totalCacheAccesses
+        : 0
 
     // Update active connections
     this.metrics.activeConnections = Array.from(
@@ -567,6 +576,8 @@ export class PerformanceOptimizer {
     this.cache.clear()
     this.batchQueues.clear()
     this.metricsHistory.length = 0
+    this.totalCacheAccesses = 0
+    this.cacheHitsCount = 0
   }
 }
 
