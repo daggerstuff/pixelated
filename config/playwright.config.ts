@@ -119,10 +119,11 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-    {
-      name: 'msedge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    },
+    // Microsoft Edge is not available in all environments (e.g. some CI runners)
+    // {
+    //   name: 'msedge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
     /* Test against mobile viewports. */
     {
       name: 'Mobile Chrome',
