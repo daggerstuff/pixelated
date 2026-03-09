@@ -3,7 +3,14 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/vitest'
+import { expect, afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+
+// Automatically cleanup after each test
+afterEach(() => {
+  cleanup()
+})
 
 // Add type declarations for DOM testing matchers
 declare module 'vitest' {
