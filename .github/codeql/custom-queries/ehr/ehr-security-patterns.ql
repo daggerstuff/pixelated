@@ -12,41 +12,10 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
-module EHRConfigSig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource or
-    source instanceof RemoteFlowSource
-  }
-
-  predicate isSink(DataFlow::Node sink) {
-    // InsecureEHRConfig sinks: logging credentials or using them in URLs
-    exists(DataFlow::CallNode call |
-      call.getCalleeName().matches("%log%") and
-      sink = call.getAnArgument()
-    )
-    or
-    exists(DataFlow::PropWrite write |
-      write.getPropertyName().matches("%url%") and
-      sink = write.getRhs()
-    )
-    or
-    // UnsafeEHRAccess sinks: remote data flowing to an EHR request
-    exists(DataFlow::CallNode call |
-      (
-        call.getCalleeName().matches("%request%") or
-        call.getCalleeName().matches("%fetch%") or
-        call.getCalleeName().matches("%axios%")
-      ) and
-      sink = call.getAnArgument() and
-      exists(EHREndpoint endpoint | endpoint.flowsTo(sink))
-    )
-  }
-}
-
-module EHRFlow = TaintTracking::Global<EHRConfigSig>;
-
+/**
+ * A source of EHR credentials, identified by property names.
+ */
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
     exists(DataFlow::PropRead read |
@@ -61,10 +30,13 @@ class EHRCredentialSource extends DataFlow::Node {
   }
 }
 
-class EHREndpoint extends DataFlow::Node {
+/**
+ * An EHR or FHIR endpoint.
+ */
+class EHREndpoint extends DataFlow::SourceNode {
   EHREndpoint() {
     exists(string url |
-      url = this.getStringValue() and
+      url = this.asExpr().getStringValue() and
       (
         url.matches("%/fhir/%") or
         url.matches("%/ehr/%") or
@@ -76,6 +48,43 @@ class EHREndpoint extends DataFlow::Node {
     )
   }
 }
+
+/**
+ * Configuration for EHR security data flow.
+ */
+module EHRConfigSig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    source instanceof EHRCredentialSource or
+    source instanceof RemoteFlowSource
+  }
+
+  predicate isSink(DataFlow::Node sink) {
+    // Sinks for credentials: logging or use in URLs
+    exists(DataFlow::CallNode call |
+      call.getCalleeName().matches("%log%") and
+      sink = call.getAnArgument()
+    )
+    or
+    exists(DataFlow::PropWrite write |
+      write.getPropertyName().matches("%url%") and
+      sink = write.getRhs()
+    )
+    or
+    // Sinks for unsafe access: remote data used in requests to EHR endpoints
+    exists(DataFlow::CallNode call |
+      (
+        call.getCalleeName().matches("%request%") or
+        call.getCalleeName().matches("%fetch%") or
+        call.getCalleeName().matches("%axios%")
+      ) and
+      sink = call.getAnArgument() and
+      exists(EHREndpoint endpoint | endpoint.flowsTo(sink))
+    )
+  }
+}
+
+module EHRFlow = TaintTracking::Global<EHRConfigSig>;
+import EHRFlow::PathGraph
 
 from EHRFlow::PathNode source, EHRFlow::PathNode sink
 where EHRFlow::hasFlowPath(source, sink)
