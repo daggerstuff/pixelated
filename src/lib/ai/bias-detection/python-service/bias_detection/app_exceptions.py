@@ -18,9 +18,10 @@ def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(Exception, general_exception_handler)
 
 
-async def validation_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Handle Pydantic validation errors. Handler is registered for ValidationError only."""
-    assert isinstance(exc, ValidationError)
+async def validation_exception_handler(
+    request: Request, exc: ValidationError
+) -> JSONResponse:
+    """Handle Pydantic validation errors."""
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
@@ -32,9 +33,10 @@ async def validation_exception_handler(request: Request, exc: Exception) -> JSON
     )
 
 
-async def http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Handle HTTP exceptions. Handler is registered for HTTPException only."""
-    assert isinstance(exc, HTTPException)
+async def http_exception_handler(
+    request: Request, exc: HTTPException
+) -> JSONResponse:
+    """Handle HTTP exceptions."""
     return JSONResponse(
         status_code=exc.status_code,
         content={
