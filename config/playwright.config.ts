@@ -67,8 +67,8 @@ try {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
-  testIgnore: ['tests/accessibility/**'],
+  testDir: '../tests',
+  testIgnore: ['../tests/accessibility/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

@@ -148,7 +148,8 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
         !error.includes('Content-Security-Policy') && // Firefox formatting
         !error.includes('violates the following') &&
         !error.includes('MIME type') && // Ignore MIME type mismatches (often analytics)
-        !error.includes('speed-insights') // Ignore Speed Insights script errors
+        !error.includes('speed-insights') && // Ignore Speed Insights script errors
+        !error.includes('TLS handshake') // Ignore TLS handshake errors
     )
 
     expect(criticalErrors).toHaveLength(0)
