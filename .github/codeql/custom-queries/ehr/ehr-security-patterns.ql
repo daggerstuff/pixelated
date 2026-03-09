@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind path-problem
+ * @kind problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -12,7 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
 /**
  * A data source representing sensitive EHR credentials.
@@ -32,7 +31,7 @@ class EHRCredentialSource extends DataFlow::Node {
 }
 
 /**
- * A data node representing an EHR endpoint URL.
+ * A data node representing an EHR endpoint URL constant.
  */
 class EHREndpoint extends DataFlow::Node {
   EHREndpoint() {
@@ -50,66 +49,40 @@ class EHREndpoint extends DataFlow::Node {
   }
 }
 
-/**
- * Configuration for detecting sensitive EHR credentials flowing to insecure sinks (logging or URLs).
- */
-module InsecureEHRConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource
-  }
-
-  predicate isSink(DataFlow::Node sink) {
-    exists(DataFlow::CallNode call |
-      call.getCalleeName().matches("%log%") and
-      sink = call.getAnArgument()
-    )
-    or
-    exists(DataFlow::PropWrite write |
-      write.getPropertyName().matches("%url%") and
-      sink = write.getRhs()
-    )
-  }
-}
-
-/**
- * Taint-tracking analysis for insecure EHR configuration.
- */
-module InsecureEHRFlow = TaintTracking::Global<InsecureEHRConfig>;
-
-/**
- * Configuration for detecting remote data flowing to EHR-related request calls.
- */
-module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof RemoteFlowSource
-  }
-
-  predicate isSink(DataFlow::Node sink) {
+from DataFlow::Node source, DataFlow::Node sink, string message
+where
+  (
+    // Insecure config: credentials to logging or URLs
+    source instanceof EHRCredentialSource and
+    (
+      exists(DataFlow::CallNode call |
+        call.getCalleeName().matches("%log%") and
+        DataFlow::localFlow(source, call.getAnArgument()) and
+        sink = call.getAnArgument()
+      ) or
+      exists(DataFlow::PropWrite write |
+        write.getPropertyName().matches("%url%") and
+        DataFlow::localFlow(source, write.getRhs()) and
+        sink = write.getRhs()
+      )
+    ) and
+    message = "Sensitive credential flows to dangerous sink."
+  ) or (
+    // Unsafe access: user data to EHR request
+    source instanceof RemoteFlowSource and
     exists(DataFlow::CallNode call |
       (
         call.getCalleeName().matches("%request%") or
         call.getCalleeName().matches("%fetch%") or
         call.getCalleeName().matches("%axios%")
       ) and
-      sink = call.getAnArgument() and
-      exists(EHREndpoint endpoint | endpoint.flowsTo(call.getAnArgument()))
-    )
-  }
-}
-
-/**
- * Taint-tracking analysis for unsafe EHR access.
- */
-module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
-
-from DataFlow::PathNode source, DataFlow::PathNode sink, string message
-where
-  (
-    InsecureEHRFlow::hasFlowPath(source, sink) and
-    message = "Potential EHR security issue: Sensitive credential flows to dangerous sink."
-  ) or
-  (
-    UnsafeEHRAccessFlow::hasFlowPath(source, sink) and
-    message = "Potential EHR security issue: Remote user data flows to EHR request."
+      DataFlow::localFlow(source, call.getAnArgument()) and
+      exists(EHREndpoint endpoint |
+        DataFlow::localFlow(endpoint, call.getAnArgument()) or
+        endpoint = call.getAnArgument()
+      ) and
+      sink = call.getAnArgument()
+    ) and
+    message = "Remote user data flows to EHR request."
   )
-select sink.getNode(), source, sink, message
+select sink, "Potential EHR security issue: " + message
