@@ -64,6 +64,8 @@ export class PerformanceOptimizer {
     string,
     { value: unknown; timestamp: number; accessCount: number }
   >
+  private totalCacheAccesses = 0
+  private cacheHitsCount = 0
   private circuitBreakers: Map<
     string,
     {
@@ -213,8 +215,11 @@ export class PerformanceOptimizer {
     // Evict expired entries
     this.evictExpired()
 
-    // Evict based on strategy if cache is full
-    if (this.cache.size >= this.config.cache.maxSize) {
+    // If key exists, delete it first to ensure correct LRU order on re-insertion
+    if (this.cache.has(key)) {
+      this.cache.delete(key)
+    } else if (this.cache.size >= this.config.cache.maxSize) {
+      // Evict based on strategy if cache is full
       this.evictByStrategy()
     }
 
@@ -226,6 +231,7 @@ export class PerformanceOptimizer {
   }
 
   get(key: string): unknown | null {
+    this.totalCacheAccesses++
     const entry = this.cache.get(key)
     if (!entry) {
       return null
@@ -237,15 +243,31 @@ export class PerformanceOptimizer {
       return null
     }
 
+    this.cacheHitsCount++
     entry.accessCount++
+
+    // For LRU strategy, re-insert the key to mark it as most recently used
+    // and update timestamp to maintain chronological order for eviction
+    if (this.config.cache.strategy === 'LRU') {
+      entry.timestamp = now
+      this.cache.delete(key)
+      this.cache.set(key, entry)
+    }
+
     return entry.value
   }
 
   private evictExpired() {
     const now = Date.now()
+    // Map iterator follows insertion order.
+    // Since we re-insert entries on update/access (for LRU), the oldest ones are at the beginning.
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > this.config.cache.ttl) {
         this.cache.delete(key)
+      } else {
+        // If we encounter an entry that hasn't expired, all subsequent entries (inserted later)
+        // are also not expired (assuming TTL is constant).
+        break
       }
     }
   }
@@ -259,12 +281,14 @@ export class PerformanceOptimizer {
 
     switch (this.config.cache.strategy) {
       case 'LRU':
-        keyToEvict = this.findLRUKey()
+        // For LRU, because we re-insert on get(), the first key is the least recently used.
+        keyToEvict = this.cache.keys().next().value
         break
       case 'LFU':
         keyToEvict = this.findLFUKey()
         break
       case 'FIFO':
+        // For FIFO, the first key is the one that was inserted first.
         keyToEvict = this.cache.keys().next().value
         break
       default:
@@ -275,20 +299,6 @@ export class PerformanceOptimizer {
       return
     }
     this.cache.delete(keyToEvict)
-  }
-
-  private findLRUKey(): string {
-    let oldestKey = ''
-    let oldestTime = Date.now()
-
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTime) {
-        oldestTime = entry.timestamp
-        oldestKey = key
-      }
-    }
-
-    return oldestKey
   }
 
   private findLFUKey(): string {
@@ -439,13 +449,10 @@ export class PerformanceOptimizer {
 
   private updateMetrics() {
     // Update cache hit rate
-    const totalCacheAccesses = Array.from(this.cache.values()).reduce(
-      (sum, entry) => sum + entry.accessCount,
-      0,
-    )
-    const cacheHits = this.cache.size
     this.metrics.cacheHitRate =
-      totalCacheAccesses > 0 ? cacheHits / totalCacheAccesses : 0
+      this.totalCacheAccesses > 0
+        ? this.cacheHitsCount / this.totalCacheAccesses
+        : 0
 
     // Update active connections
     this.metrics.activeConnections = Array.from(
@@ -551,6 +558,9 @@ export class PerformanceOptimizer {
    * Cleanup resources
    */
   cleanup() {
+    this.totalCacheAccesses = 0
+    this.cacheHitsCount = 0
+
     // Clear all timers
     for (const batch of this.batchQueues.values()) {
       if (batch.timer) {
