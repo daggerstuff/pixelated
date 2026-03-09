@@ -2,6 +2,7 @@
 import express, { Router, Request, Response } from 'express'
 import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import { authMiddleware } from '../middleware/auth'
+import { ensureString, ensureNumber } from '../../utils/security'
 import {
     listStrategicPlans,
     createStrategicPlan,
@@ -18,13 +19,13 @@ const router: Router = express.Router()
 router.use(authMiddleware)
 
 router.get('/', asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, status, ownerId } = req.query
+    const { page, limit, status, ownerId: _ownerId } = req.query
     const { user } = req as any
 
     const result = await listStrategicPlans(user.id, {
-        page: page ? parseInt(page as string) : 1,
-        limit: limit ? parseInt(limit as string) : 50,
-        status: status as string
+        page: ensureNumber(page, 1),
+        limit: ensureNumber(limit, 50),
+        status: ensureString(status)
     })
 
     res.json({
