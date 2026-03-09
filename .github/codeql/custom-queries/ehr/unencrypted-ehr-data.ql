@@ -45,7 +45,7 @@ where
   isEHRData(data) and
   not exists(CallExpr encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    data.flowsTo(DataFlow::exprNode(encryptCall.getAnArgument()))
+    data.getASuccessor*() = DataFlow::exprNode(encryptCall.getAnArgument())
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
