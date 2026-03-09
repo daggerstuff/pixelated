@@ -12,7 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
 /**
  * Sources for EHR credentials.
@@ -51,14 +50,16 @@ class EHREndpoint extends DataFlow::Node {
 }
 
 /**
- * Configuration for detecting insecure EHR configuration where credentials leak to logs or URLs.
+ * Configuration for EHR security patterns.
  */
-module InsecureEHRConfigConfig implements DataFlow::ConfigSig {
+module EHRSecurityConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source instanceof EHRCredentialSource
+    source instanceof EHRCredentialSource or
+    source instanceof RemoteFlowSource
   }
 
   predicate isSink(DataFlow::Node sink) {
+    // Insecure config: credentials to logs/URLs
     exists(DataFlow::CallNode call |
       call.getCalleeName().matches("%log%") and
       sink = call.getAnArgument()
@@ -68,20 +69,8 @@ module InsecureEHRConfigConfig implements DataFlow::ConfigSig {
       write.getPropertyName().matches("%url%") and
       sink = write.getRhs()
     )
-  }
-}
-
-module InsecureEHRConfigFlow = TaintTracking::Global<InsecureEHRConfigConfig>;
-
-/**
- * Configuration for detecting unsafe EHR access where user-controlled data is sent to an EHR endpoint.
- */
-module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    source instanceof RemoteFlowSource
-  }
-
-  predicate isSink(DataFlow::Node sink) {
+    // Unsafe access: data to EHR endpoints
+    or
     exists(DataFlow::CallNode call |
       (
         call.getCalleeName().matches("%request%") or
@@ -94,11 +83,10 @@ module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
   }
 }
 
-module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
+module EHRSecurityFlow = TaintTracking::Global<EHRSecurityConfig>;
+import EHRSecurityFlow::PathGraph
 
-from DataFlow::PathNode source, DataFlow::PathNode sink
-where
-  InsecureEHRConfigFlow::hasFlowPath(source, sink) or
-  UnsafeEHRAccessFlow::hasFlowPath(source, sink)
+from EHRSecurityFlow::PathNode source, EHRSecurityFlow::PathNode sink
+where EHRSecurityFlow::hasFlowPath(source, sink)
 select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
