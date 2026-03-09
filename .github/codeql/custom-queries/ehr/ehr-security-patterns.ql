@@ -89,7 +89,7 @@ module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      exists(EHREndpoint endpoint | endpoint.flowsTo(call.getAnArgument()))
+      exists(EHREndpoint endpoint | endpoint.getASuccessor*() = call.getArgument(0))
     )
   }
 }
