@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -12,8 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import semmle.javascript.security.dataflow.TaintTracking
-import DataFlow::PathGraph
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
@@ -45,14 +43,12 @@ class EHREndpoint extends DataFlow::Node {
   }
 }
 
-class InsecureEHRConfig extends TaintTracking::Configuration {
-  InsecureEHRConfig() { this = "InsecureEHRConfig" }
-
-  override predicate isSource(DataFlow::Node source) {
+module InsecureEHRConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
     source instanceof EHRCredentialSource
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(DataFlow::CallNode call |
       call.getCalleeName().matches("%log%") and
       sink = call.getAnArgument()
@@ -65,14 +61,14 @@ class InsecureEHRConfig extends TaintTracking::Configuration {
   }
 }
 
-class UnsafeEHRAccess extends TaintTracking::Configuration {
-  UnsafeEHRAccess() { this = "UnsafeEHRAccess" }
+module InsecureEHRFlow = TaintTracking::Global<InsecureEHRConfig>;
 
-  override predicate isSource(DataFlow::Node source) {
+module UnsafeEHRAccessConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
     source instanceof RemoteFlowSource
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(DataFlow::CallNode call |
       (
         call.getCalleeName().matches("%request%") or
@@ -80,17 +76,19 @@ class UnsafeEHRAccess extends TaintTracking::Configuration {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
+      any(EHREndpoint endpoint).getASuccessor*() = sink
     )
   }
 }
 
-from DataFlow::PathNode source, DataFlow::PathNode sink, TaintTracking::Configuration config
+module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfig>;
+
+import InsecureEHRFlow::PathGraph
+import UnsafeEHRAccessFlow::PathGraph
+
+from DataFlow::PathNode source, DataFlow::PathNode sink, string message
 where
-  (
-    config instanceof InsecureEHRConfig or
-    config instanceof UnsafeEHRAccess
-  ) and
-  config.hasFlowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
+  (InsecureEHRFlow::hasFlowPath(source, sink) and message = "Potential Insecure EHR Config: $@ flows to $@.") or
+  (UnsafeEHRAccessFlow::hasFlowPath(source, sink) and message = "Potential Unsafe EHR Access: $@ flows to $@.")
+select sink.getNode(), source, sink, message,
   source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
