@@ -1,1 +1,1 @@
-export { GlowCard } from "./GlowCard";
+export { GlowCard } from './GlowCard'

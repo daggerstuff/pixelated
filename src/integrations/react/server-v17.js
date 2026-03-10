@@ -1,68 +1,68 @@
-import React from "react";
-import ReactDOM from "react-dom/server";
-import StaticHtml from "./static-html.js";
+import React from 'react'
+import ReactDOM from 'react-dom/server'
+import StaticHtml from './static-html.js'
 
 const slotName = (str) =>
-  str.trim().replace(/[-_]([a-z])/g, (_, w) => w.toUpperCase());
-const reactTypeof = Symbol.for("react.element");
+  str.trim().replace(/[-_]([a-z])/g, (_, w) => w.toUpperCase())
+const reactTypeof = Symbol.for('react.element')
 
 function errorIsComingFromPreactComponent(err) {
   return (
     err.message &&
     (err.message.startsWith("Cannot read property '__H'") ||
       err.message.includes("(reading '__H')"))
-  );
+  )
 }
 
 function check(Component, props, children) {
   // Note: there are packages that do some unholy things to create "components".
   // Checking the $$typeof property catches most of these patterns.
-  if (typeof Component === "object") {
-    return Component["$$typeof"]
+  if (typeof Component === 'object') {
+    return Component['$$typeof']
       ?.toString()
-      .slice("Symbol(".length)
-      .startsWith("react");
+      .slice('Symbol('.length)
+      .startsWith('react')
   }
-  if (typeof Component !== "function") {
-    return false;
+  if (typeof Component !== 'function') {
+    return false
   }
-  if (Component.name === "QwikComponent") {
-    return false;
+  if (Component.name === 'QwikComponent') {
+    return false
   }
 
   if (
     Component.prototype != null &&
-    typeof Component.prototype.render === "function"
+    typeof Component.prototype.render === 'function'
   ) {
     return (
       React.Component.isPrototypeOf(Component) ||
       React.PureComponent.isPrototypeOf(Component)
-    );
+    )
   }
 
-  let error = null;
-  let isReactComponent = false;
+  let error = null
+  let isReactComponent = false
   const Tester = (...args) => {
     try {
-      const vnode = Component(...args);
-      if (vnode && vnode["$$typeof"] === reactTypeof) {
-        isReactComponent = true;
+      const vnode = Component(...args)
+      if (vnode && vnode['$$typeof'] === reactTypeof) {
+        isReactComponent = true
       }
     } catch (err) {
       if (!errorIsComingFromPreactComponent(err)) {
-        error = err;
+        error = err
       }
     }
 
-    return React.createElement("div");
-  };
+    return React.createElement('div')
+  }
 
-  renderToStaticMarkup(Tester, props, children, {});
+  renderToStaticMarkup(Tester, props, children, {})
 
   if (error) {
-    throw error;
+    throw error
   }
-  return isReactComponent;
+  return isReactComponent
 }
 
 function renderToStaticMarkup(
@@ -71,37 +71,37 @@ function renderToStaticMarkup(
   { default: children, ...slotted },
   metadata,
 ) {
-  delete props["class"];
-  const slots = {};
+  delete props['class']
+  const slots = {}
   for (const [key, value] of Object.entries(slotted)) {
-    const name = slotName(key);
-    slots[name] = React.createElement(StaticHtml, { value, name });
+    const name = slotName(key)
+    slots[name] = React.createElement(StaticHtml, { value, name })
   }
   // Note: create newProps to avoid mutating `props` before they are serialized
   const newProps = {
     ...props,
     ...slots,
-  };
-  const newChildren = children ?? props.children;
+  }
+  const newChildren = children ?? props.children
   if (newChildren != null) {
     newProps.children = React.createElement(StaticHtml, {
       // Adjust how this is hydrated only when the version of Astro supports `astroStaticSlot`
       hydrate: metadata.astroStaticSlot ? !!metadata.hydrate : true,
       value: newChildren,
-    });
+    })
   }
-  const vnode = React.createElement(Component, newProps);
-  let html;
+  const vnode = React.createElement(Component, newProps)
+  let html
   if (metadata?.hydrate) {
-    html = ReactDOM.renderToString(vnode);
+    html = ReactDOM.renderToString(vnode)
   } else {
-    html = ReactDOM.renderToStaticMarkup(vnode);
+    html = ReactDOM.renderToStaticMarkup(vnode)
   }
-  return { html };
+  return { html }
 }
 
 export default {
   check,
   renderToStaticMarkup,
   supportsAstroStaticSlot: true,
-};
+}

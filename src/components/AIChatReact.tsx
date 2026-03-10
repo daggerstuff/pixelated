@@ -1,52 +1,52 @@
-import React, { useState } from "react";
-import type { AIModel } from "../lib/ai/models/types";
+import React, { useState } from 'react'
+import type { AIModel } from '../lib/ai/models/types'
 
 interface Message {
-  id: string; // Add unique ID to each message
-  role: "user" | "assistant";
-  content: string;
+  id: string // Add unique ID to each message
+  role: 'user' | 'assistant'
+  content: string
 }
 
 export interface AIChatReactProps {
-  availableModels: AIModel[];
-  showModelSelector?: boolean;
-  "client:load"?: boolean;
-  "client:visible"?: boolean;
-  "client:idle"?: boolean;
-  "client:only"?: boolean;
+  'availableModels': AIModel[]
+  'showModelSelector'?: boolean
+  'client:load'?: boolean
+  'client:visible'?: boolean
+  'client:idle'?: boolean
+  'client:only'?: boolean
 }
 
 // Helper function to generate unique IDs
 const generateId = () =>
-  `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
 export default function AIChatReact({
   availableModels,
   showModelSelector = true,
 }: AIChatReactProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([])
+  const [inputValue, setInputValue] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [selectedModel, setSelectedModel] = useState(
-    availableModels[0]?.id || "",
-  );
+    availableModels[0]?.id || '',
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!inputValue.trim()) {
-      return;
+      return
     }
 
     const userMessage: Message = {
       id: generateId(), // Generate unique ID
-      role: "user",
+      role: 'user',
       content: inputValue,
-    };
+    }
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInputValue("");
-    setIsLoading(true);
+    setMessages((prev) => [...prev, userMessage])
+    setInputValue('')
+    setIsLoading(true)
 
     try {
       // In a real application, this would call an API
@@ -54,18 +54,18 @@ export default function AIChatReact({
       setTimeout(() => {
         const assistantMessage: Message = {
           id: generateId(), // Generate unique ID
-          role: "assistant",
+          role: 'assistant',
           content: `I'm a demo AI assistant using ${selectedModel}. You said: "${userMessage.content}". In a real implementation, this would connect to the TogetherAI API.`,
-        };
+        }
 
-        setMessages((prev) => [...prev, assistantMessage]);
-        setIsLoading(false);
-      }, 1000);
+        setMessages((prev) => [...prev, assistantMessage])
+        setIsLoading(false)
+      }, 1000)
     } catch (error: unknown) {
-      console.error("Error sending message:", error);
-      setIsLoading(false);
+      console.error('Error sending message:', error)
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="max-w-2xl mx-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
@@ -110,13 +110,13 @@ export default function AIChatReact({
           messages.map((message) => (
             <div
               key={message.id} // Use unique ID as key instead of index
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] px-4 py-2 rounded-lg ${
-                  message.role === "user"
-                    ? "bg-blue-500 text-white rounded-br-none"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none"
+                  message.role === 'user'
+                    ? 'bg-blue-500 text-white rounded-br-none'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
                 }`}
               >
                 {message.content}
@@ -132,11 +132,11 @@ export default function AIChatReact({
                 <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
                 <div
                   className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.2s" }}
+                  style={{ animationDelay: '0.2s' }}
                 ></div>
                 <div
                   className="w-2 h-2 bg-gray-500 rounded-full animate-bounce"
-                  style={{ animationDelay: "0.4s" }}
+                  style={{ animationDelay: '0.4s' }}
                 ></div>
               </div>
             </div>
@@ -168,5 +168,5 @@ export default function AIChatReact({
         </button>
       </form>
     </div>
-  );
+  )
 }

@@ -6,10 +6,10 @@
  * Severity levels for security breaches
  */
 export enum BreachSeverity {
-  LOW = "low",
-  MEDIUM = "medium",
-  HIGH = "high",
-  CRITICAL = "critical",
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
 }
 
 /**
@@ -19,117 +19,117 @@ export interface SecurityBreach {
   /**
    * Unique identifier for the breach
    */
-  id: string;
+  id: string
 
   /**
    * Timestamp when the breach occurred
    */
-  timestamp: Date;
+  timestamp: Date
 
   /**
    * Severity level of the breach
    */
-  severity: BreachSeverity;
+  severity: BreachSeverity
 
   /**
    * Type of breach (e.g., 'data_access', 'unauthorized_login', 'system_intrusion')
    */
-  type: string;
+  type: string
 
   /**
    * Role of the breach (e.g., 'admin', 'user', 'system')
    */
-  role?: string;
+  role?: string
 
   /**
    * Description of the breach
    */
-  description: string;
+  description: string
 
   /**
    * Affected systems or resources
    */
-  affectedSystems: string[];
+  affectedSystems: string[]
 
   /**
    * Number of records or users affected
    */
-  affectedCount: number;
+  affectedCount: number
 
   /**
    * Source IP address if applicable
    */
-  sourceIp?: string;
+  sourceIp?: string
 
   /**
    * User agent if applicable
    */
-  userAgent?: string;
+  userAgent?: string
 
   /**
    * Additional metadata about the breach
    */
-  metadata: Record<string, unknown>;
+  metadata: Record<string, unknown>
 
   /**
    * Whether the breach has been resolved
    */
-  resolved: boolean;
+  resolved: boolean
 
   /**
    * Timestamp when the breach was resolved
    */
-  resolvedAt?: Date;
+  resolvedAt?: Date
 
   /**
    * Actions taken to resolve the breach
    */
-  resolutionActions?: string[];
+  resolutionActions?: string[]
 
   /**
    * Risk score calculated for this breach
    */
-  riskScore?: number;
+  riskScore?: number
 
   /**
    * Source of the breach
    */
-  source?: string;
+  source?: string
 
   /**
    * Remediation steps for the breach
    */
-  remediation?: string;
+  remediation?: string
 
   /**
    * Attack vector used in the breach
    */
-  attackVector?: string;
+  attackVector?: string
 
   /**
    * Types of data affected by the breach
    */
-  dataTypes?: string[];
+  dataTypes?: string[]
 
   /**
    * Time taken to detect the breach (in milliseconds)
    */
-  detectionTime?: number;
+  detectionTime?: number
 
   /**
    * Time taken to respond to the breach (in milliseconds)
    */
-  responseTime?: number;
+  responseTime?: number
 
   /**
    * Number of user accounts specifically affected by the breach (subset of affectedCount)
    */
-  affectedUsers?: number;
+  affectedUsers?: number
 
   /**
    * Status of remediation efforts
    */
-  remediationStatus?: "pending" | "in_progress" | "completed";
+  remediationStatus?: 'pending' | 'in_progress' | 'completed'
 }
 
 /**
@@ -139,32 +139,32 @@ export interface RiskAssessmentResult {
   /**
    * Overall risk score (0-100)
    */
-  score: number;
+  score: number
 
   /**
    * Risk level based on score
    */
-  level: "low" | "medium" | "high" | "critical";
+  level: 'low' | 'medium' | 'high' | 'critical'
 
   /**
    * Factors contributing to the risk score
    */
-  factors: RiskFactor[];
+  factors: RiskFactor[]
 
   /**
    * Recommended actions
    */
-  recommendations: string[];
+  recommendations: string[]
 
   /**
    * Confidence in the assessment (0-1)
    */
-  confidence: number;
+  confidence: number
 
   /**
    * Timestamp of the assessment
    */
-  assessedAt: Date;
+  assessedAt: Date
 }
 
 /**
@@ -174,22 +174,22 @@ export interface RiskFactor {
   /**
    * Name of the risk factor
    */
-  name: string;
+  name: string
 
   /**
    * Weight of this factor in the overall score
    */
-  weight: number;
+  weight: number
 
   /**
    * Value of this factor
    */
-  value: number;
+  value: number
 
   /**
    * Description of why this factor contributes to risk
    */
-  description: string;
+  description: string
 }
 
 /**
@@ -199,20 +199,20 @@ export interface RiskAssessmentConfig {
   /**
    * Time window to consider for assessment (in hours)
    */
-  timeWindow: number;
+  timeWindow: number
 
   /**
    * Minimum severity level to include in assessment
    */
-  minSeverity: BreachSeverity;
+  minSeverity: BreachSeverity
 
   /**
    * Whether to include resolved breaches
    */
-  includeResolved: boolean;
+  includeResolved: boolean
 
   /**
    * Custom weights for different risk factors
    */
-  customWeights?: Record<string, number>;
+  customWeights?: Record<string, number>
 }

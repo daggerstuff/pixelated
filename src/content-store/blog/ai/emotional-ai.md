@@ -1,5 +1,5 @@
 ---
-title: "Emotional AI: Understanding Human Feelings"
+title: 'Emotional AI: Understanding Human Feelings'
 description: >-
   Exploring how artificial intelligence is learning to recognize, interpret, and
   respond to human emotions, with profound implications for mental health and

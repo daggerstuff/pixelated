@@ -1,26 +1,26 @@
-import { useState } from "react";
-import SearchBox from "./ui/SearchBox";
-import type { SearchResult } from "../lib/search";
+import { useState } from 'react'
+import SearchBox from './ui/SearchBox'
+import type { SearchResult } from '../lib/search'
 
 export default function SearchDemo() {
-  const [lastQuery, setLastQuery] = useState<string>("");
-  const [resultCount, setResultCount] = useState<number>(0);
+  const [lastQuery, setLastQuery] = useState<string>('')
+  const [resultCount, setResultCount] = useState<number>(0)
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(
     null,
-  );
+  )
 
   // Handle search events
   const handleSearch = (query: string, results: SearchResult[]) => {
-    setLastQuery(query);
-    setResultCount(results.length);
-  };
+    setLastQuery(query)
+    setResultCount(results.length)
+  }
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
-    setSelectedResult(result);
+    setSelectedResult(result)
     // Normally you would navigate to the result URL, but for demo purposes
     // we'll just display the selected result
-  };
+  }
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
@@ -96,5 +96,5 @@ export default function SearchDemo() {
         </ul>
       </div>
     </div>
-  );
+  )
 }

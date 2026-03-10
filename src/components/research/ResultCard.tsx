@@ -1,9 +1,9 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React from 'react';
+import { motion } from 'framer-motion';
 import { type BookMetadata } from "../../lib/api/research";
 
 interface ResultCardProps {
-  result: BookMetadata;
+    result: BookMetadata;
 }
 
 const ResultCardHeader = ({

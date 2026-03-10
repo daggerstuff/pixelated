@@ -1,24 +1,24 @@
-import { Alert } from "@/components/ui/alert";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Alert } from '@/components/ui/alert'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
-import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
-import { NotificationChannel } from "@/lib/services/notification/NotificationService";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Switch } from '@/components/ui/switch'
+import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
+import { NotificationChannel } from '@/lib/services/notification/NotificationService'
+import { cn } from '@/lib/utils'
 
-type NotificationFrequency = "immediate" | "batched" | "daily" | "weekly";
+type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'weekly'
 
 interface NotificationPreferencesProps {
-  className?: string;
+  className?: string
 }
 
 export function NotificationPreferences({
@@ -32,11 +32,11 @@ export function NotificationPreferences({
     updateFrequency,
     updateQuietHours,
     updateCategory,
-  } = useNotificationPreferences();
+  } = useNotificationPreferences()
 
   if (isLoading) {
     return (
-      <Card className={cn("p-6", className)} aria-busy="true">
+      <Card className={cn('p-6', className)} aria-busy="true">
         <div className="space-y-6" role="status">
           <Skeleton className="h-6 w-1/3" />
           <div className="space-y-4">
@@ -49,7 +49,7 @@ export function NotificationPreferences({
           </div>
         </div>
       </Card>
-    );
+    )
   }
 
   if (error) {
@@ -57,11 +57,11 @@ export function NotificationPreferences({
       <Alert variant="error" className={className}>
         Failed to load notification preferences: {String(error)}
       </Alert>
-    );
+    )
   }
 
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold">Notification Channels</h2>
@@ -125,10 +125,7 @@ export function NotificationPreferences({
           </div>
 
           <div className="space-y-2">
-            <Label
-              id="notification-frequency-label"
-              htmlFor="notification-frequency"
-            >
+            <Label id="notification-frequency-label" htmlFor="notification-frequency">
               Notification Frequency
             </Label>
             <Select
@@ -138,10 +135,7 @@ export function NotificationPreferences({
               }
               placeholder="Select frequency"
             >
-              <SelectTrigger
-                id="notification-frequency"
-                aria-labelledby="notification-frequency-label"
-              >
+              <SelectTrigger id="notification-frequency" aria-labelledby="notification-frequency-label">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -243,5 +237,5 @@ export function NotificationPreferences({
         </div>
       </div>
     </Card>
-  );
+  )
 }

@@ -3,11 +3,12 @@
   // Use 80 if migrating from Prettier; 100 is the Oxfmt default!
   "printWidth": 80,
   "ignorePatterns": [
-    "ai/infra/cloud/helm/",
+    "**/helm/",
+    "**/docker/",
     "ai/infra/monitoring/*.json",
     "ai/infra/config/*.json",
     "ai/training/configs/*.json",
     "tests/test-results/",
-    "tests/verification_output/",
-  ],
+    "tests/verification_output/"
+  ]
 }

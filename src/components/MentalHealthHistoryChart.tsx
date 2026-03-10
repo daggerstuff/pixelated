@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo } from 'react'
 // Use lazy-loaded chart components to reduce bundle size
 import {
   LineChart,
@@ -14,69 +14,69 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from "@/components/ui/LazyChart";
+} from '@/components/ui/LazyChart'
 
 interface MentalHealthHistoryChartProps {
   analysisHistory: Array<{
-    hasMentalHealthIssue: boolean;
-    confidence: number;
-    supportingEvidence: string[];
+    hasMentalHealthIssue: boolean
+    confidence: number
+    supportingEvidence: string[]
     scores: {
-      depression: number;
-      anxiety: number;
-      stress: number;
-      anger: number;
-      socialIsolation: number;
-      bipolarDisorder: number;
-      ocd: number;
-      eatingDisorder: number;
-      socialAnxiety: number;
-      panicDisorder: number;
-    };
-  }>;
+      depression: number
+      anxiety: number
+      stress: number
+      anger: number
+      socialIsolation: number
+      bipolarDisorder: number
+      ocd: number
+      eatingDisorder: number
+      socialAnxiety: number
+      panicDisorder: number
+    }
+  }>
 }
 
 const SCORE_COLORS = {
-  depression: "#ef4444",
-  anxiety: "#f97316",
-  stress: "#eab308",
-  anger: "#dc2626",
-  socialIsolation: "#8b5cf6",
-  bipolarDisorder: "#06b6d4",
-  ocd: "#10b981",
-  eatingDisorder: "#f59e0b",
-  socialAnxiety: "#ec4899",
-  panicDisorder: "#6366f1",
-};
+  depression: '#ef4444',
+  anxiety: '#f97316',
+  stress: '#eab308',
+  anger: '#dc2626',
+  socialIsolation: '#8b5cf6',
+  bipolarDisorder: '#06b6d4',
+  ocd: '#10b981',
+  eatingDisorder: '#f59e0b',
+  socialAnxiety: '#ec4899',
+  panicDisorder: '#6366f1',
+}
 
 const SCORE_LABELS = {
-  depression: "Depression",
-  anxiety: "Anxiety",
-  stress: "Stress",
-  anger: "Anger",
-  socialIsolation: "Social Isolation",
-  bipolarDisorder: "Bipolar",
-  ocd: "OCD",
-  eatingDisorder: "Eating Disorder",
-  socialAnxiety: "Social Anxiety",
-  panicDisorder: "Panic Disorder",
-};
+  depression: 'Depression',
+  anxiety: 'Anxiety',
+  stress: 'Stress',
+  anger: 'Anger',
+  socialIsolation: 'Social Isolation',
+  bipolarDisorder: 'Bipolar',
+  ocd: 'OCD',
+  eatingDisorder: 'Eating Disorder',
+  socialAnxiety: 'Social Anxiety',
+  panicDisorder: 'Panic Disorder',
+}
 
 export function MentalHealthHistoryChart({
   analysisHistory,
 }: MentalHealthHistoryChartProps) {
   const { timeSeriesData, latestScores, hasData } = useMemo(() => {
     if (!analysisHistory.length) {
-      return { timeSeriesData: [], latestScores: [], hasData: false };
+      return { timeSeriesData: [], latestScores: [], hasData: false }
     }
 
     const timeSeriesData = analysisHistory.map((analysis, index) => ({
       session: index + 1,
       ...analysis.scores,
       confidence: analysis.confidence * 100,
-    }));
+    }))
 
-    const latest = analysisHistory[analysisHistory.length - 1];
+    const latest = analysisHistory[analysisHistory.length - 1]
     const latestScores = latest?.scores
       ? Object.entries(latest.scores)
           .filter(([, value]) => value > 0)
@@ -86,10 +86,10 @@ export function MentalHealthHistoryChart({
             fullMark: 100,
           }))
           .sort((a, b) => b.score - a.score)
-      : [];
+      : []
 
-    return { timeSeriesData, latestScores, hasData: true };
-  }, [analysisHistory]);
+    return { timeSeriesData, latestScores, hasData: true }
+  }, [analysisHistory])
 
   if (!hasData) {
     return (
@@ -118,7 +118,7 @@ export function MentalHealthHistoryChart({
           </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -136,13 +136,13 @@ export function MentalHealthHistoryChart({
             />
             <PolarAngleAxis
               dataKey="metric"
-              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
               className="text-xs"
             />
             <PolarRadiusAxis
               angle={90}
               domain={[0, 100]}
-              tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
+              tick={{ fontSize: 8, fill: 'hsl(var(--muted-foreground))' }}
               tickCount={4}
             />
             <Radar
@@ -155,12 +155,12 @@ export function MentalHealthHistoryChart({
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "hsl(var(--background))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "6px",
-                fontSize: "12px",
+                backgroundColor: 'hsl(var(--background))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '6px',
+                fontSize: '12px',
               }}
-              formatter={(value: number) => [`${value}%`, "Score"]}
+              formatter={(value: number) => [`${value}%`, 'Score']}
             />
           </RadarChart>
         </ResponsiveContainer>
@@ -180,27 +180,27 @@ export function MentalHealthHistoryChart({
               />
               <XAxis
                 dataKey="session"
-                tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{
-                  stroke: "hsl(var(--muted-foreground))",
+                  stroke: 'hsl(var(--muted-foreground))',
                   strokeWidth: 0.5,
                 }}
               />
               <YAxis
                 domain={[0, 1]}
-                tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                 axisLine={{
-                  stroke: "hsl(var(--muted-foreground))",
+                  stroke: 'hsl(var(--muted-foreground))',
                   strokeWidth: 0.5,
                 }}
                 tickFormatter={(value: number) => `${Math.round(value * 100)}%`}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--background))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px",
-                  fontSize: "11px",
+                  backgroundColor: 'hsl(var(--background))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '6px',
+                  fontSize: '11px',
                 }}
                 formatter={(value: number, name: string) => [
                   `${Math.round(value * 100)}%`,
@@ -220,7 +220,7 @@ export function MentalHealthHistoryChart({
                 />
               ))}
               <Legend
-                wrapperStyle={{ fontSize: "10px" }}
+                wrapperStyle={{ fontSize: '10px' }}
                 formatter={(value: string) =>
                   SCORE_LABELS[value as keyof typeof SCORE_LABELS] || value
                 }
@@ -230,5 +230,5 @@ export function MentalHealthHistoryChart({
         </div>
       )}
     </div>
-  );
+  )
 }

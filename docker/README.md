@@ -5,7 +5,6 @@ This project provides multiple Dockerfile options for different build environmen
 ## Dockerfiles
 
 ### `Dockerfile` (Primary - BuildKit Required)
-
 - **Use Case**: Local development, GitLab CI, Azure DevOps, or any environment with BuildKit support
 - **Features**:
   - Uses `--mount=type=secret` for secure secret handling
@@ -22,7 +21,6 @@ This project provides multiple Dockerfile options for different build environmen
   ```
 
 ### `Dockerfile.cloudbuild` (Google Cloud Build Compatible)
-
 - **Use Case**: Google Cloud Build (no BuildKit support)
 - **Features**:
   - Compatible with standard Docker builder
@@ -38,25 +36,22 @@ This project provides multiple Dockerfile options for different build environmen
     -t pixelated-empathy .
   ```
 
+
 ## Cloud Build Configuration
 
 ### `cloudbuild.yaml`
-
 Google Cloud Build configuration that:
-
 - Uses `Dockerfile.cloudbuild` for maximum compatibility
 - Reads secrets from Google Secret Manager
 - Pushes to Google Container Registry (GCR)
 - Uses E2_HIGHCPU_8 machine for faster builds
 
 **Required Secrets in Google Secret Manager:**
-
 - `sentry-dsn`
 - `sentry-auth-token`
 - `better-auth-secret`
 
 **Trigger Build:**
-
 ```bash
 gcloud builds submit --config=cloudbuild.yaml .
 ```
@@ -64,7 +59,6 @@ gcloud builds submit --config=cloudbuild.yaml .
 ## Security Notes
 
 ⚠️ **Important**: The `Dockerfile.cloudbuild` passes secrets as build arguments, which means they will be visible in:
-
 - Docker image history (`docker history <image>`)
 - Build logs
 
@@ -73,7 +67,6 @@ For maximum security, use the primary `Dockerfile` with BuildKit-enabled environ
 ## Local Development
 
 For local development with docker-compose:
-
 ```bash
 # Uses Dockerfile by default
 docker-compose up --build

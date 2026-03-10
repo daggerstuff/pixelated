@@ -52,7 +52,7 @@ export class HealthMonitor {
 
   startMonitoring(): void {
     // Start monitoring services
-    console.log("Health monitoring started");
+    // console.log("Health monitoring started");
   }
 
   async getHealth(): Promise<SystemHealth> {

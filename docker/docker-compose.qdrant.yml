@@ -1,3 +1,4 @@
+
 services:
   qdrant:
     image: qdrant/qdrant:v1.9.0
@@ -6,12 +7,7 @@ services:
       - "6333:6333"
     volumes:
       - qdrant_storage:/qdrant/storage:rw
-    command:
-      [
-        "/bin/sh",
-        "-c",
-        "chown -R 1000:1000 /qdrant/storage || true; chmod -R u+rwX /qdrant/storage || true; exec /qdrant/qdrant",
-      ]
+    command: ["/bin/sh", "-c", "chown -R 1000:1000 /qdrant/storage || true; chmod -R u+rwX /qdrant/storage || true; exec /qdrant/qdrant"]
     environment:
       QDRANT__LOG_LEVEL: "INFO"
       QDRANT__SERVICE__HOST: "0.0.0.0"

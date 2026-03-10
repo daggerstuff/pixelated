@@ -64,18 +64,18 @@ All PHI data must be encrypted using:
 Example of compliant encryption implementation:
 
 ```typescript
-import crypto from "crypto";
+import crypto from 'crypto';
 
 // Generate a secure key using proper key derivation
 const key = crypto.scryptSync(password, salt, 32); // 256 bits
 
 // Use AES-256-GCM with proper IV
 const iv = crypto.randomBytes(16);
-const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
 
 // Encrypt the data
-let encryptedData = cipher.update(data, "utf8", "hex");
-encryptedData += cipher.final("hex");
+let encryptedData = cipher.update(data, 'utf8', 'hex');
+encryptedData += cipher.final('hex');
 
 // Get the authentication tag
 const authTag = cipher.getAuthTag();
@@ -92,7 +92,7 @@ Our platform uses Fully Homomorphic Encryption (FHE) to provide advanced protect
 Example of FHE implementation:
 
 ```typescript
-import { FHEService } from "../lib/fhe/FHEService";
+import { FHEService } from '../lib/fhe/FHEService';
 
 // Initialize FHE service with secure parameters
 const fheService = new FHEService();
@@ -115,12 +115,12 @@ All API routes must implement proper authentication and authorization:
 
 ```typescript
 // ❌ Bad - No authentication
-router.get("/patient-data", (req, res) => {
+router.get('/patient-data', (req, res) => {
   // Direct access to patient data
 });
 
 // ✅ Good - With authentication
-router.get("/patient-data", authenticate, authorize("doctor"), (req, res) => {
+router.get('/patient-data', authenticate, authorize('doctor'), (req, res) => {
   // Access to patient data after authentication and authorization
 });
 ```
@@ -132,19 +132,19 @@ All operations involving PHI must be logged for audit purposes:
 ```typescript
 // ❌ Bad - No audit logging
 function updatePatientRecord(patientId, data) {
-  database.update("patients", patientId, data);
+  database.update('patients', patientId, data);
 }
 
 // ✅ Good - With audit logging
 function updatePatientRecord(patientId, data, userId) {
-  database.update("patients", patientId, data);
+  database.update('patients', patientId, data);
   auditLogger.log({
-    action: "UPDATE",
-    resource: "patient",
+    action: 'UPDATE',
+    resource: 'patient',
     resourceId: patientId,
     userId,
     timestamp: new Date(),
-    changes: data,
+    changes: data
   });
 }
 ```
@@ -162,9 +162,9 @@ When using AI with PHI, the following security measures are required:
 Example of secure AI implementation with PHI:
 
 ```typescript
-import { sanitizePrompt } from "../lib/security/promptSanitizer";
-import { filterResponse } from "../lib/security/responseFilter";
-import { auditLogger } from "../lib/audit/logger";
+import { sanitizePrompt } from '../lib/security/promptSanitizer';
+import { filterResponse } from '../lib/security/responseFilter';
+import { auditLogger } from '../lib/audit/logger';
 
 async function processPatientDataWithAI(patientData, userId) {
   // Sanitize inputs
@@ -172,11 +172,11 @@ async function processPatientDataWithAI(patientData, userId) {
 
   // Log the operation
   auditLogger.log({
-    action: "AI_PROCESS",
+    action: 'AI_PROCESS',
     userId,
     timestamp: new Date(),
-    resource: "patient",
-    resourceId: patientData.id,
+    resource: 'patient',
+    resourceId: patientData.id
   });
 
   // Process with AI

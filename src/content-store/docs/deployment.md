@@ -85,13 +85,13 @@ For dynamic content that needs to be generated at request time, use SSR deployme
 Update `astro.config.mjs` to use the appropriate adapter:
 
 ```js
-import { defineConfig } from "astro/config";
-import node from "@astrojs/node";
+import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
 
 export default defineConfig({
-  output: "server",
+  output: 'server',
   adapter: node({
-    mode: "standalone",
+    mode: 'standalone',
   }),
 });
 ```
@@ -183,7 +183,7 @@ docker run -p 3000:3000 \
 Create a `docker-compose.yml` file:
 
 ```yaml
-version: "3"
+version: '3'
 services:
   app:
     build: .
@@ -225,7 +225,7 @@ name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
   deploy:
@@ -236,7 +236,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -258,7 +258,7 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
+          vercel-args: '--prod'
 ```
 
 ## Post-Deployment Verification

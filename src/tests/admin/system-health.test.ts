@@ -4,7 +4,7 @@ import { screen, waitFor } from "@testing-library/react";
 vi.stubGlobal(
   "fetch",
   vi.fn().mockImplementation(() => {
-    return Promise.resolve({
+    const response = {
       ok: true,
       status: 200,
       statusText: "OK",
@@ -61,13 +61,14 @@ vi.stubGlobal(
             },
           },
         }),
-    } as Response);
+    };
+    return Promise.resolve(response as unknown as Response);
   }),
 );
 
 // Helper function to render mock Astro component HTML
 async function renderMockComponent(
-  data: any = {},
+  data: Record<string, string> = {},
 ): Promise<{ container: HTMLDivElement }> {
   const mockHtml = `
     <div>
@@ -145,7 +146,7 @@ describe("System Health Dashboard Page", () => {
   it("handles unhealthy status correctly", async () => {
     // Mock unhealthy status
     vi.mocked(fetch).mockImplementationOnce(() => {
-      return Promise.resolve({
+      const response = {
         ok: true,
         status: 200,
         statusText: "OK",
@@ -174,7 +175,8 @@ describe("System Health Dashboard Page", () => {
               // ... system info same as above
             },
           }),
-      } as Response);
+      };
+      return Promise.resolve(response as unknown as Response);
     });
 
     await renderMockComponent({

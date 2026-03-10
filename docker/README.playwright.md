@@ -5,19 +5,16 @@ This setup uses Playwright's official Docker image which comes with all necessar
 ## Usage
 
 ### Run all E2E tests
-
 ```bash
 pnpm test:e2e:docker
 ```
 
 ### Run tests with UI mode
-
 ```bash
 pnpm test:e2e:docker:ui
 ```
 
 ### Run specific test suites
-
 ```bash
 # Run smoke tests
 docker-compose -f docker/docker-compose.playwright.yml run --rm playwright pnpm test:smoke

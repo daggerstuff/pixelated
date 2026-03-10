@@ -1,22 +1,18 @@
-import { format } from "date-fns";
-import { useMemo, useState } from "react";
-import { Table } from "@/components/ui/table";
-import type {
-  TableColumn,
-  TableDataSource,
-  TableState,
-} from "@/components/ui/table-types";
+import { format } from 'date-fns'
+import { useMemo, useState } from 'react'
+import { Table } from '@/components/ui/table'
+import type { TableColumn, TableDataSource, TableState } from '@/components/ui/table-types'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,
-} from "@/lib/api/journal-research/types";
-import { cn } from "@/lib/utils";
+} from '@/lib/api/journal-research/types'
+import { cn } from '@/lib/utils'
 
 export interface EvaluationListProps {
-  evaluations: EvaluationListType;
-  onEvaluationClick?: (evaluation: Evaluation) => void;
-  isLoading?: boolean;
-  className?: string;
+  evaluations: EvaluationListType
+  onEvaluationClick?: (evaluation: Evaluation) => void
+  isLoading?: boolean
+  className?: string
 }
 
 export function EvaluationList({
@@ -28,106 +24,102 @@ export function EvaluationList({
   const [tableState, setTableState] = useState<TableState>({
     currentPage: evaluations.page ?? 1,
     pageSize: evaluations.pageSize ?? 10,
-  });
+  })
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [tierFilter, setTierFilter] = useState<string>("all");
-  const [scoreFilter, setScoreFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('')
+  const [tierFilter, setTierFilter] = useState<string>('all')
+  const [scoreFilter, setScoreFilter] = useState<string>('all')
 
   const filteredAndSortedEvaluations = useMemo(() => {
-    let filtered = evaluations.items;
+    let filtered = evaluations.items
 
     // Apply search filter
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm.toLowerCase()
       filtered = filtered.filter(
         (evaluation) =>
           evaluation.evaluationId.toLowerCase().includes(term) ||
           evaluation.sourceId.toLowerCase().includes(term) ||
           evaluation.priorityTier.toLowerCase().includes(term) ||
           evaluation.evaluator.toLowerCase().includes(term),
-      );
+      )
     }
 
     // Apply tier filter
-    if (tierFilter !== "all") {
-      filtered = filtered.filter(
-        (evaluation) => evaluation.priorityTier === tierFilter,
-      );
+    if (tierFilter !== 'all') {
+      filtered = filtered.filter((evaluation) => evaluation.priorityTier === tierFilter)
     }
 
     // Apply score filter
-    if (scoreFilter === "high") {
-      filtered = filtered.filter((evaluation) => evaluation.overallScore >= 8);
-    } else if (scoreFilter === "medium") {
+    if (scoreFilter === 'high') {
+      filtered = filtered.filter((evaluation) => evaluation.overallScore >= 8)
+    } else if (scoreFilter === 'medium') {
       filtered = filtered.filter(
-        (evaluation) =>
-          evaluation.overallScore >= 6 && evaluation.overallScore < 8,
-      );
-    } else if (scoreFilter === "low") {
-      filtered = filtered.filter((evaluation) => evaluation.overallScore < 6);
+        (evaluation) => evaluation.overallScore >= 6 && evaluation.overallScore < 8,
+      )
+    } else if (scoreFilter === 'low') {
+      filtered = filtered.filter((evaluation) => evaluation.overallScore < 6)
     }
 
     // Apply sorting
     if (tableState.sort) {
-      const { sortBy, direction } = tableState.sort;
+      const { sortBy, direction } = tableState.sort
       filtered = [...filtered].sort((a, b) => {
-        let aValue: string | number | Date;
-        let bValue: string | number | Date;
+        let aValue: string | number | Date
+        let bValue: string | number | Date
 
         switch (sortBy) {
-          case "overallScore":
-            aValue = a.overallScore;
-            bValue = b.overallScore;
-            break;
-          case "priorityTier":
-            aValue = a.priorityTier;
-            bValue = b.priorityTier;
-            break;
-          case "evaluationDate":
-            aValue = a.evaluationDate;
-            bValue = b.evaluationDate;
-            break;
-          case "therapeuticRelevance":
-            aValue = a.therapeuticRelevance;
-            bValue = b.therapeuticRelevance;
-            break;
+          case 'overallScore':
+            aValue = a.overallScore
+            bValue = b.overallScore
+            break
+          case 'priorityTier':
+            aValue = a.priorityTier
+            bValue = b.priorityTier
+            break
+          case 'evaluationDate':
+            aValue = a.evaluationDate
+            bValue = b.evaluationDate
+            break
+          case 'therapeuticRelevance':
+            aValue = a.therapeuticRelevance
+            bValue = b.therapeuticRelevance
+            break
           default:
-            return 0;
+            return 0
         }
 
-        if (aValue < bValue) return direction === "asc" ? -1 : 1;
-        if (aValue > bValue) return direction === "asc" ? 1 : -1;
-        return 0;
-      });
+        if (aValue < bValue) return direction === 'asc' ? -1 : 1
+        if (aValue > bValue) return direction === 'asc' ? 1 : -1
+        return 0
+      })
     }
 
-    return filtered;
-  }, [evaluations.items, searchTerm, tierFilter, scoreFilter, tableState.sort]);
+    return filtered
+  }, [evaluations.items, searchTerm, tierFilter, scoreFilter, tableState.sort])
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return "text-green-600 dark:text-green-400";
-    if (score >= 6) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
-  };
+    if (score >= 8) return 'text-green-600 dark:text-green-400'
+    if (score >= 6) return 'text-yellow-600 dark:text-yellow-400'
+    return 'text-red-600 dark:text-red-400'
+  }
 
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
-      high: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-      medium:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-      low: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-    };
+      high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+      low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+    }
     return (
       colors[tier.toLowerCase()] ??
-      "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-    );
-  };
+      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    )
+  }
 
   const columns: TableColumn<Evaluation & { id: string }>[] = [
     {
-      id: "evaluationId",
-      header: "Evaluation ID",
+      id: 'evaluationId',
+      header: 'Evaluation ID',
       accessor: (row) => (
         <button
           type="button"
@@ -140,27 +132,27 @@ export function EvaluationList({
       sortable: false,
     },
     {
-      id: "sourceId",
-      header: "Source ID",
+      id: 'sourceId',
+      header: 'Source ID',
       accessor: (row) => (
         <span className="font-mono text-sm">{row.sourceId.slice(0, 8)}...</span>
       ),
       hideMobile: true,
     },
     {
-      id: "overallScore",
-      header: "Score",
+      id: 'overallScore',
+      header: 'Score',
       accessor: (row) => (
         <span className={`font-bold ${getScoreColor(row.overallScore)}`}>
           {row.overallScore.toFixed(1)}
         </span>
       ),
       sortable: true,
-      align: "right",
+      align: 'right',
     },
     {
-      id: "priorityTier",
-      header: "Priority",
+      id: 'priorityTier',
+      header: 'Priority',
       accessor: (row) => (
         <span
           className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${getPriorityColor(row.priorityTier)}`}
@@ -171,8 +163,8 @@ export function EvaluationList({
       sortable: true,
     },
     {
-      id: "metrics",
-      header: "Metrics",
+      id: 'metrics',
+      header: 'Metrics',
       accessor: (row) => (
         <div className="flex gap-1 text-xs">
           <span>T:{row.therapeuticRelevance.toFixed(1)}</span>
@@ -184,13 +176,13 @@ export function EvaluationList({
       hideMobile: true,
     },
     {
-      id: "evaluationDate",
-      header: "Date",
-      accessor: (row) => format(row.evaluationDate, "MMM d, yyyy"),
+      id: 'evaluationDate',
+      header: 'Date',
+      accessor: (row) => format(row.evaluationDate, 'MMM d, yyyy'),
       sortable: true,
       hideMobile: true,
     },
-  ];
+  ]
 
   const tableDataSource: TableDataSource<Evaluation & { id: string }> = {
     data: filteredAndSortedEvaluations.map((evaluation) => ({
@@ -199,14 +191,14 @@ export function EvaluationList({
     })),
     totalCount: filteredAndSortedEvaluations.length,
     loading: isLoading,
-  };
+  }
 
   const tiers = Array.from(
     new Set(evaluations.items.map((e) => e.priorityTier)),
-  );
+  )
 
   return (
-    <div className={cn("space-y-4", className)}>
+    <div className={cn('space-y-4', className)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-2">
           <input
@@ -240,7 +232,7 @@ export function EvaluationList({
           </select>
         </div>
         <div className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedEvaluations.length} of {evaluations.total}{" "}
+          Showing {filteredAndSortedEvaluations.length} of {evaluations.total}{' '}
           evaluations
         </div>
       </div>
@@ -255,5 +247,5 @@ export function EvaluationList({
         bordered
       />
     </div>
-  );
+  )
 }

@@ -1,14 +1,14 @@
 // Counterfactual analysis visualization component
 
-import { useState, type FC } from "react";
+import { useState, type FC } from 'react'
 import type {
   CounterfactualScenario,
   SessionData,
-} from "../../../lib/types/bias-detection";
+} from '../../../lib/types/bias-detection'
 
 interface CounterfactualAnalysisProps {
-  scenarios: CounterfactualScenario[];
-  originalSession: SessionData | null;
+  scenarios: CounterfactualScenario[]
+  originalSession: SessionData | null
 }
 
 export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
@@ -16,74 +16,74 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
   originalSession,
 }) => {
   const [selectedScenario, setSelectedScenario] =
-    useState<CounterfactualScenario | null>(null);
-  const [sortBy, setSortBy] = useState<"likelihood" | "impact" | "change">(
-    "likelihood",
-  );
+    useState<CounterfactualScenario | null>(null)
+  const [sortBy, setSortBy] = useState<'likelihood' | 'impact' | 'change'>(
+    'likelihood',
+  )
 
   // Sort scenarios based on selected criteria
   const sortedScenarios = [...scenarios].sort((a, b) => {
     switch (sortBy) {
-      case "likelihood": {
-        const likelihoodOrder = { high: 3, medium: 2, low: 1 };
+      case 'likelihood': {
+        const likelihoodOrder = { high: 3, medium: 2, low: 1 }
         return (
           likelihoodOrder[b.likelihood as keyof typeof likelihoodOrder] -
           likelihoodOrder[a.likelihood as keyof typeof likelihoodOrder]
-        );
+        )
       }
-      case "impact":
-        return Math.abs(b.biasScoreChange) - Math.abs(a.biasScoreChange);
-      case "change":
-        return a.change.localeCompare(b.change);
+      case 'impact':
+        return Math.abs(b.biasScoreChange) - Math.abs(a.biasScoreChange)
+      case 'change':
+        return a.change.localeCompare(b.change)
       default:
-        return 0;
+        return 0
     }
-  });
+  })
 
   // Helper function to get likelihood styling
   const getLikelihoodStyle = (likelihood: string) => {
     switch (likelihood) {
-      case "high": {
-        return "bg-green-100 text-green-800 border-green-200";
+      case 'high': {
+        return 'bg-green-100 text-green-800 border-green-200'
       }
-      case "medium": {
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case 'medium': {
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
       }
-      case "low": {
-        return "bg-red-100 text-red-800 border-red-200";
+      case 'low': {
+        return 'bg-red-100 text-red-800 border-red-200'
       }
       default: {
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return 'bg-gray-100 text-gray-800 border-gray-200'
       }
     }
-  };
+  }
 
   // Helper function to get impact color
   const getImpactColor = (biasScoreChange: number) => {
-    const absoluteChange = Math.abs(biasScoreChange);
+    const absoluteChange = Math.abs(biasScoreChange)
     if (absoluteChange > 0.3) {
-      return "text-green-600";
+      return 'text-green-600'
     }
     if (absoluteChange > 0.1) {
-      return "text-yellow-600";
+      return 'text-yellow-600'
     }
-    return "text-red-600";
-  };
+    return 'text-red-600'
+  }
 
   // Helper function to format percentage
   const formatPercentage = (value: number) =>
-    `${(Math.abs(value) * 100).toFixed(1)}%`;
+    `${(Math.abs(value) * 100).toFixed(1)}%`
 
   // Helper function to handle keyboard events for clickable buttons
   const handleKeyDown = (
     event: React.KeyboardEvent<HTMLButtonElement>,
     scenario: CounterfactualScenario,
   ) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      setSelectedScenario(selectedScenario === scenario ? null : scenario);
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      setSelectedScenario(selectedScenario === scenario ? null : scenario)
     }
-  };
+  }
 
   return (
     <div className="counterfactual-analysis space-y-6">
@@ -110,7 +110,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
             id="sort-select"
             value={sortBy}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-              setSortBy(e.target.value as "likelihood" | "impact" | "change")
+              setSortBy(e.target.value as 'likelihood' | 'impact' | 'change')
             }
             className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
@@ -131,7 +131,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
         </div>
         <div className="bg-green-50 rounded-lg p-4">
           <div className="text-2xl font-bold text-green-600">
-            {scenarios.filter((s) => s.likelihood === "high").length}
+            {scenarios.filter((s) => s.likelihood === 'high').length}
           </div>
           <div className="text-sm text-green-800">High Likelihood</div>
         </div>
@@ -143,7 +143,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                     ...scenarios.map((s) => Math.abs(s.biasScoreChange)),
                   ),
                 )
-              : "0%"}
+              : '0%'}
           </div>
           <div className="text-sm text-purple-800">Max Change</div>
         </div>
@@ -156,7 +156,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                     0,
                   ) / scenarios.length,
                 )
-              : "0%"}
+              : '0%'}
           </div>
           <div className="text-sm text-orange-800">Avg Change</div>
         </div>
@@ -204,8 +204,8 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
             key={scenario.id}
             className={`w-full text-left border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
               selectedScenario === scenario
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 hover:border-gray-300"
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() =>
               setSelectedScenario(
@@ -239,7 +239,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                   <div
                     className={`text-lg font-bold ${getImpactColor(scenario.biasScoreChange)}`}
                   >
-                    {scenario.biasScoreChange > 0 ? "+" : ""}
+                    {scenario.biasScoreChange > 0 ? '+' : ''}
                     {formatPercentage(scenario.biasScoreChange)}
                   </div>
                   <div className="text-xs text-gray-500">bias change</div>
@@ -261,19 +261,19 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                       <div className="text-sm text-gray-700">
                         {scenario.impact}
                       </div>
-                      {scenario.change.includes("Demographics") && (
+                      {scenario.change.includes('Demographics') && (
                         <div className="mt-2 text-xs text-blue-600">
                           This scenario explores how different demographic
                           characteristics might affect bias detection.
                         </div>
                       )}
-                      {scenario.change.includes("Language") && (
+                      {scenario.change.includes('Language') && (
                         <div className="mt-2 text-xs text-purple-600">
                           This scenario examines the impact of therapeutic
                           language choices on bias patterns.
                         </div>
                       )}
-                      {scenario.change.includes("Cultural") && (
+                      {scenario.change.includes('Cultural') && (
                         <div className="mt-2 text-xs text-green-600">
                           This scenario investigates cultural sensitivity in
                           therapeutic approaches.
@@ -295,7 +295,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                         <span
                           className={`font-semibold ${getImpactColor(scenario.biasScoreChange)}`}
                         >
-                          {scenario.biasScoreChange > 0 ? "+" : ""}
+                          {scenario.biasScoreChange > 0 ? '+' : ''}
                           {formatPercentage(scenario.biasScoreChange)}
                         </span>
                       </div>
@@ -305,10 +305,10 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                         <div
                           className={`h-2 rounded-full ${
                             Math.abs(scenario.biasScoreChange) > 0.3
-                              ? "bg-green-500"
+                              ? 'bg-green-500'
                               : Math.abs(scenario.biasScoreChange) > 0.1
-                                ? "bg-yellow-500"
-                                : "bg-red-500"
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
                           }`}
                           style={{
                             width: `${Math.min(Math.abs(scenario.biasScoreChange) * 100, 100)}%`,
@@ -318,10 +318,10 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
 
                       <div className="text-xs text-gray-500">
                         {Math.abs(scenario.biasScoreChange) > 0.3
-                          ? "High impact expected"
+                          ? 'High impact expected'
                           : Math.abs(scenario.biasScoreChange) > 0.1
-                            ? "Moderate impact expected"
-                            : "Low impact expected"}
+                            ? 'Moderate impact expected'
+                            : 'Low impact expected'}
                       </div>
                     </div>
                   </div>
@@ -345,16 +345,16 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                     </div>
 
                     <div className="mt-2 text-sm text-gray-700">
-                      {scenario.likelihood === "high" &&
-                        "This change is highly feasible and likely to produce the expected results."}
-                      {scenario.likelihood === "medium" &&
-                        "This change is moderately feasible but may require additional considerations."}
-                      {scenario.likelihood === "low" &&
-                        "This change may be challenging to implement or may not produce consistent results."}
+                      {scenario.likelihood === 'high' &&
+                        'This change is highly feasible and likely to produce the expected results.'}
+                      {scenario.likelihood === 'medium' &&
+                        'This change is moderately feasible but may require additional considerations.'}
+                      {scenario.likelihood === 'low' &&
+                        'This change may be challenging to implement or may not produce consistent results.'}
                     </div>
 
                     <div className="mt-2 text-sm text-gray-600">
-                      <strong>Confidence:</strong>{" "}
+                      <strong>Confidence:</strong>{' '}
                       {(scenario.confidence * 100).toFixed(1)}%
                     </div>
                   </div>
@@ -367,7 +367,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                   </h5>
                   <div className="bg-blue-50 rounded border border-blue-200 p-3">
                     <ul className="text-sm text-blue-800 space-y-1">
-                      {scenario.change.includes("Demographics") && (
+                      {scenario.change.includes('Demographics') && (
                         <>
                           <li>
                             • Review demographic assumptions in assessment tools
@@ -378,13 +378,13 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                           </li>
                         </>
                       )}
-                      {scenario.change.includes("Language") && (
+                      {scenario.change.includes('Language') && (
                         <>
                           <li>• Use more inclusive and neutral language</li>
                           <li>• Avoid generalizations about cultural groups</li>
                         </>
                       )}
-                      {scenario.change.includes("Cultural") && (
+                      {scenario.change.includes('Cultural') && (
                         <>
                           <li>• Increase cultural competency training</li>
                           <li>• Develop culturally adapted interventions</li>
@@ -404,7 +404,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
             <div className="flex justify-center mt-3">
               <svg
                 className={`w-5 h-5 text-gray-400 transition-transform ${
-                  selectedScenario === scenario ? "rotate-180" : ""
+                  selectedScenario === scenario ? 'rotate-180' : ''
                 }`}
                 fill="none"
                 stroke="currentColor"
@@ -445,7 +445,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CounterfactualAnalysis;
+export default CounterfactualAnalysis

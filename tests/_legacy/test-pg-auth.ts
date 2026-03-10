@@ -43,6 +43,7 @@ async function testAuth() {
     console.log(`✅ Found ${users.length} users`);
 
     console.log("\n🎉 All tests passed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }

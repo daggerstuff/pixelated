@@ -1,7 +1,7 @@
 ---
-title: "Crisis Planning"
-description: "Comprehensive guide to crisis planning and management"
-author: "Resource Team"
+title: 'Crisis Planning'
+description: 'Comprehensive guide to crisis planning and management'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

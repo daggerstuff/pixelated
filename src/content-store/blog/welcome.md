@@ -1,13 +1,13 @@
 ---
-title: "Breaking the Silence: Our Journey Begins"
-description: "Why we created this space for authentic mental health conversations"
+title: 'Breaking the Silence: Our Journey Begins'
+description: 'Why we created this space for authentic mental health conversations'
 pubDate: 2024-04-11
-author: "Vivi"
-tags: ["mental health", "community", "authentic stories"]
+author: 'Vivi'
+tags: ['mental health', 'community', 'authentic stories']
 featured: true
-category: "Tutorial"
+category: 'Tutorial'
 readingTime: 4
-slug: "welcome"
+slug: 'welcome'
 ---
 
 # Breaking the Silence: Our Journey Begins

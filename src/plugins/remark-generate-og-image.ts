@@ -4,15 +4,15 @@
 
 // Simple type definitions for mdast
 interface Root {
-  type: "root";
-  children: Node[];
+  type: 'root'
+  children: Node[]
 }
 
 interface Node {
-  type: string;
-  children?: Node[];
-  value?: string;
-  depth?: number;
+  type: string
+  children?: Node[]
+  value?: string
+  depth?: number
 }
 
 // Simple chalk implementation for logging
@@ -22,66 +22,66 @@ const chalk = {
   yellow: (text: string) => text,
   red: (text: string) => text,
   bold: (text: string) => text,
-};
+}
 
 export function remarkGenerateOgImage() {
   return (tree: Root, file: any) => {
     // Simple implementation - just log the processing
     console.log(
-      chalk.blue("Processing OG image generation for:"),
-      file?.path || "unknown file",
-    );
+      chalk.blue('Processing OG image generation for:'),
+      file?.path || 'unknown file',
+    )
 
     // Add metadata for OG image generation
     if (file?.data) {
       file.data.ogImage = {
         title: extractTitle(tree),
         description: extractDescription(tree),
-      };
+      }
     }
 
-    return tree;
-  };
+    return tree
+  }
 }
 
 function extractTitle(tree: Root): string {
   // Extract title from heading
-  let title = "Default Title";
+  let title = 'Default Title'
 
   function walk(node: any) {
-    if (node.type === "heading" && node.depth === 1) {
+    if (node.type === 'heading' && node.depth === 1) {
       if (node.children && node.children[0] && node.children[0].value) {
-        title = node.children[0].value;
+        title = node.children[0].value
       }
     }
     if (node.children) {
-      node.children.forEach(walk);
+      node.children.forEach(walk)
     }
   }
 
-  walk(tree);
-  return title;
+  walk(tree)
+  return title
 }
 
 function extractDescription(tree: Root): string {
   // Extract first paragraph as description
-  let description = "Default description";
-  let foundFirstParagraph = false;
+  let description = 'Default description'
+  let foundFirstParagraph = false
 
   function walk(node: any) {
-    if (node.type === "paragraph" && !foundFirstParagraph) {
+    if (node.type === 'paragraph' && !foundFirstParagraph) {
       if (node.children && node.children[0] && node.children[0].value) {
-        description = node.children[0].value.substring(0, 160);
-        foundFirstParagraph = true;
+        description = node.children[0].value.substring(0, 160)
+        foundFirstParagraph = true
       }
     }
     if (node.children) {
-      node.children.forEach(walk);
+      node.children.forEach(walk)
     }
   }
 
-  walk(tree);
-  return description;
+  walk(tree)
+  return description
 }
 
-export default remarkGenerateOgImage;
+export default remarkGenerateOgImage

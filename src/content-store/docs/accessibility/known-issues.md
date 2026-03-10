@@ -1,12 +1,12 @@
 ---
-title: "Known Accessibility Issues"
-description: "Documentation of known accessibility issues and their resolution status"
-pubDate: "2025-01-01"
-author: "Accessibility Team"
+title: 'Known Accessibility Issues'
+description: 'Documentation of known accessibility issues and their resolution status'
+pubDate: '2025-01-01'
+author: 'Accessibility Team'
 draft: false
 toc: true
 share: true
-date: "2025-04-12"
+date: '2025-04-12'
 ---
 
 # Known Accessibility Issues

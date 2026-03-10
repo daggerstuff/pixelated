@@ -1,27 +1,27 @@
-import React from "react";
+import React from 'react'
 
 interface ScrollAreaProps {
-  children: React.ReactNode;
-  className?: string;
-  height?: string | number;
-  maxHeight?: string | number;
+  children: React.ReactNode
+  className?: string
+  height?: string | number
+  maxHeight?: string | number
 }
 
 export const ScrollArea: FC<ScrollAreaProps> = ({
   children,
-  className = "",
+  className = '',
   height,
-  maxHeight = "400px",
+  maxHeight = '400px',
 }) => {
-  const style: React.CSSProperties = {};
+  const style: React.CSSProperties = {}
 
   if (height) {
-    style.height = typeof height === "number" ? `${height}px` : height;
+    style.height = typeof height === 'number' ? `${height}px` : height
   }
 
   if (maxHeight) {
     style.maxHeight =
-      typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight;
+      typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight
   }
 
   return (
@@ -31,7 +31,7 @@ export const ScrollArea: FC<ScrollAreaProps> = ({
     >
       {children}
     </div>
-  );
-};
+  )
+}
 
-export default ScrollArea;
+export default ScrollArea

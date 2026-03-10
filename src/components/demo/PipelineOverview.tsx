@@ -1,35 +1,35 @@
-import { useState } from "react";
+import { useState } from 'react'
 
 export default function PipelineOverview() {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(0)
 
   const steps = [
     {
-      title: "Data Ingestion",
-      description: "Process clinical content and psychological resources",
-      icon: "📥",
-      details: "Handles text, PDFs, research papers, and clinical notes",
+      title: 'Data Ingestion',
+      description: 'Process clinical content and psychological resources',
+      icon: '📥',
+      details: 'Handles text, PDFs, research papers, and clinical notes',
     },
     {
-      title: "Entity Extraction",
+      title: 'Entity Extraction',
       description:
-        "Identify mental health conditions, treatments, and risk factors",
-      icon: "🔍",
-      details: "NLP-powered recognition of clinical entities and concepts",
+        'Identify mental health conditions, treatments, and risk factors',
+      icon: '🔍',
+      details: 'NLP-powered recognition of clinical entities and concepts',
     },
     {
-      title: "Analysis Engine",
-      description: "Apply therapeutic frameworks and diagnostic criteria",
-      icon: "🧠",
-      details: "AI-powered analysis using evidence-based methodologies",
+      title: 'Analysis Engine',
+      description: 'Apply therapeutic frameworks and diagnostic criteria',
+      icon: '🧠',
+      details: 'AI-powered analysis using evidence-based methodologies',
     },
     {
-      title: "Scenario Generation",
-      description: "Create training scenarios and treatment recommendations",
-      icon: "📋",
-      details: "Generate realistic client cases and therapeutic interventions",
+      title: 'Scenario Generation',
+      description: 'Create training scenarios and treatment recommendations',
+      icon: '📋',
+      details: 'Generate realistic client cases and therapeutic interventions',
     },
-  ];
+  ]
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -43,8 +43,8 @@ export default function PipelineOverview() {
                 type="button"
                 className={`text-left p-4 rounded-lg cursor-pointer transition-all ${
                   activeStep === index
-                    ? "bg-blue-600/20 border-2 border-blue-400"
-                    : "bg-slate-700/50 border border-slate-600/50 hover:bg-slate-600/50"
+                    ? 'bg-blue-600/20 border-2 border-blue-400'
+                    : 'bg-slate-700/50 border border-slate-600/50 hover:bg-slate-600/50'
                 }`}
                 onClick={() => setActiveStep(index)}
                 aria-pressed={activeStep === index}
@@ -76,5 +76,5 @@ export default function PipelineOverview() {
         </div>
       </div>
     </div>
-  );
+  )
 }

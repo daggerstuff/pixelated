@@ -1,7 +1,7 @@
 ---
-title: "CPTSD Resources"
-description: "Comprehensive resource guide for Complex PTSD support and information"
-author: "Resource Team"
+title: 'CPTSD Resources'
+description: 'Comprehensive resource guide for Complex PTSD support and information'
+author: 'Resource Team'
 pubDate: 2024-02-28
 ---
 

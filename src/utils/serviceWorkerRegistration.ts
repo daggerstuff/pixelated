@@ -9,39 +9,39 @@ const defaultConfig = {
   debug: {
     enabled: false,
   },
-  scope: "/",
+  scope: '/',
   backgroundSync: {
     enabled: false,
-    queueName: "sync-queue",
+    queueName: 'sync-queue',
   },
   pushNotifications: {
     enabled: false,
     options: {
       userVisibleOnly: true,
     },
-    publicKey: "",
+    publicKey: '',
   },
-};
+}
 
 /**
  * Service Worker Manager class
  * Handles registration, updates, and management of the service worker
  */
 export class ServiceWorkerManager {
-  private registration: ServiceWorkerRegistration | null = null;
-  private debug: boolean;
-  private config: typeof defaultConfig;
+  private registration: ServiceWorkerRegistration | null = null
+  private debug: boolean
+  private config: typeof defaultConfig
 
   constructor(config = defaultConfig) {
-    this.config = config;
-    this.debug = config.debug.enabled;
+    this.config = config
+    this.debug = config.debug.enabled
   }
 
   /**
    * Check if Service Workers are supported in this browser
    */
   public isSupported(): boolean {
-    return "serviceWorker" in navigator;
+    return 'serviceWorker' in navigator
   }
 
   /**
@@ -49,22 +49,22 @@ export class ServiceWorkerManager {
    */
   public async register(): Promise<void> {
     if (!this.config.enabled || !this.isSupported()) {
-      return;
+      return
     }
 
     try {
-      this.registration = await navigator.serviceWorker.register("/sw.js", {
+      this.registration = await navigator.serviceWorker.register('/sw.js', {
         scope: this.config.scope,
-      });
+      })
 
       if (this.debug) {
-        console.warn("Service Worker registered successfully");
+        console.warn('Service Worker registered successfully')
       }
 
-      await this.setupSync();
-      await this.setupPushNotifications();
+      await this.setupSync()
+      await this.setupPushNotifications()
     } catch {
-      this.logError("Service Worker registration failed");
+      this.logError('Service Worker registration failed')
     }
   }
 
@@ -73,17 +73,17 @@ export class ServiceWorkerManager {
    */
   public async update(): Promise<void> {
     if (!this.registration) {
-      await this.register();
-      return;
+      await this.register()
+      return
     }
 
     try {
-      await this.registration.update();
+      await this.registration.update()
       if (this.debug) {
-        console.warn("Service Worker update check completed");
+        console.warn('Service Worker update check completed')
       }
     } catch {
-      this.logError("Service Worker update check failed");
+      this.logError('Service Worker update check failed')
     }
   }
 
@@ -92,22 +92,22 @@ export class ServiceWorkerManager {
    */
   private async setupSync(): Promise<void> {
     if (!this.registration || !this.config.backgroundSync.enabled) {
-      return;
+      return
     }
 
     try {
       const registration = this.registration as ServiceWorkerRegistration & {
-        sync?: { register: (tag: string) => Promise<void> };
-      };
+        sync?: { register: (tag: string) => Promise<void> }
+      }
 
-      if ("sync" in registration && registration.sync) {
-        await registration.sync.register(this.config.backgroundSync.queueName);
+      if ('sync' in registration && registration.sync) {
+        await registration.sync.register(this.config.backgroundSync.queueName)
         if (this.debug) {
-          console.warn("Background sync registered successfully");
+          console.warn('Background sync registered successfully')
         }
       }
     } catch {
-      this.logError("Background sync registration failed");
+      this.logError('Background sync registration failed')
     }
   }
 
@@ -116,20 +116,20 @@ export class ServiceWorkerManager {
    */
   private async setupPushNotifications(): Promise<void> {
     if (!this.registration || !this.config.pushNotifications.enabled) {
-      return;
+      return
     }
 
     try {
       await this.registration.pushManager.subscribe({
         userVisibleOnly: this.config.pushNotifications.options.userVisibleOnly,
         applicationServerKey: this.config.pushNotifications.publicKey,
-      });
+      })
 
       if (this.debug) {
-        console.warn("Push notifications registered successfully");
+        console.warn('Push notifications registered successfully')
       }
     } catch {
-      this.logError("Push notification registration failed");
+      this.logError('Push notification registration failed')
     }
   }
 
@@ -138,10 +138,10 @@ export class ServiceWorkerManager {
    */
   private logError(message: string): void {
     if (this.debug) {
-      console.error(message);
+      console.error(message)
     }
   }
 }
 
 // Export a singleton instance
-export const serviceWorkerManager = new ServiceWorkerManager();
+export const serviceWorkerManager = new ServiceWorkerManager()

@@ -1,46 +1,46 @@
-import React, { useState } from "react";
-import type { Scenario, TherapeuticDomain } from "../types";
+import React, { useState } from 'react'
+import type { Scenario, TherapeuticDomain } from '../types'
 
 interface ScenarioInfoProps {
-  scenario: Scenario;
-  className?: string;
+  scenario: Scenario
+  className?: string
 }
 
 // Map of therapeutic domains to user-friendly names
 const domainLabels: Record<TherapeuticDomain, string> = {
-  [TherapeuticDomain.DEPRESSION]: "Depression",
-  [TherapeuticDomain.ANXIETY]: "Anxiety",
-  [TherapeuticDomain.TRAUMA]: "Trauma",
-  [TherapeuticDomain.SUBSTANCE_USE]: "Substance Use",
-  [TherapeuticDomain.GRIEF]: "Grief",
-  [TherapeuticDomain.RELATIONSHIP]: "Relationship",
-  [TherapeuticDomain.STRESS_MANAGEMENT]: "Stress Management",
-  [TherapeuticDomain.CRISIS_INTERVENTION]: "Crisis Intervention",
-  [TherapeuticDomain.EATING_DISORDERS]: "Eating Disorders",
-  [TherapeuticDomain.SELF_HARM]: "Self Harm",
-  [TherapeuticDomain.PERSONALITY_DISORDERS]: "Personality Disorders",
-  [TherapeuticDomain.DEVELOPMENTAL_DISORDERS]: "Developmental Disorders",
-  [TherapeuticDomain.PSYCHOSIS]: "Psychosis",
-  [TherapeuticDomain.BIPOLAR_DISORDER]: "Bipolar Disorder",
-  [TherapeuticDomain.SOMATIC_DISORDERS]: "Somatic Disorders",
-  [TherapeuticDomain.SLEEP_DISORDERS]: "Sleep Disorders",
-};
+  [TherapeuticDomain.DEPRESSION]: 'Depression',
+  [TherapeuticDomain.ANXIETY]: 'Anxiety',
+  [TherapeuticDomain.TRAUMA]: 'Trauma',
+  [TherapeuticDomain.SUBSTANCE_USE]: 'Substance Use',
+  [TherapeuticDomain.GRIEF]: 'Grief',
+  [TherapeuticDomain.RELATIONSHIP]: 'Relationship',
+  [TherapeuticDomain.STRESS_MANAGEMENT]: 'Stress Management',
+  [TherapeuticDomain.CRISIS_INTERVENTION]: 'Crisis Intervention',
+  [TherapeuticDomain.EATING_DISORDERS]: 'Eating Disorders',
+  [TherapeuticDomain.SELF_HARM]: 'Self Harm',
+  [TherapeuticDomain.PERSONALITY_DISORDERS]: 'Personality Disorders',
+  [TherapeuticDomain.DEVELOPMENTAL_DISORDERS]: 'Developmental Disorders',
+  [TherapeuticDomain.PSYCHOSIS]: 'Psychosis',
+  [TherapeuticDomain.BIPOLAR_DISORDER]: 'Bipolar Disorder',
+  [TherapeuticDomain.SOMATIC_DISORDERS]: 'Somatic Disorders',
+  [TherapeuticDomain.SLEEP_DISORDERS]: 'Sleep Disorders',
+}
 
 // Map of difficulty levels to colors
 const difficultyColors: Record<string, string> = {
-  beginner: "bg-green-100 text-green-800",
-  intermediate: "bg-yellow-100 text-yellow-800",
-  advanced: "bg-red-100 text-red-800",
-};
+  beginner: 'bg-green-100 text-green-800',
+  intermediate: 'bg-yellow-100 text-yellow-800',
+  advanced: 'bg-red-100 text-red-800',
+}
 
 /**
  * Component for displaying information about the current simulation scenario
  */
 const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
   scenario,
-  className = "",
+  className = '',
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   return (
     <div
@@ -68,10 +68,10 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
           onClick={() => setExpanded(!expanded)}
           className="text-gray-400 hover:text-gray-600 focus:outline-none"
         >
-          <span className="sr-only">{expanded ? "Collapse" : "Expand"}</span>
+          <span className="sr-only">{expanded ? 'Collapse' : 'Expand'}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className={`h-5 w-5 transform transition-transform ${expanded ? "rotate-180" : ""}`}
+            className={`h-5 w-5 transform transition-transform ${expanded ? 'rotate-180' : ''}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -87,7 +87,7 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
       </div>
 
       <div
-        className={`transition-all duration-300 ease-in-out ${expanded ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0 overflow-hidden"}`}
+        className={`transition-all duration-300 ease-in-out ${expanded ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0 overflow-hidden'}`}
       >
         <div className="space-y-3 text-sm text-gray-600">
           <p>{scenario.description}</p>
@@ -111,19 +111,18 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
             <p>{scenario.presentingIssue}</p>
           </div>
 
-          {scenario.suggestedApproaches &&
-            scenario.suggestedApproaches.length > 0 && (
-              <div>
-                <div className="font-medium text-gray-700 mb-1">
-                  Suggested Approaches
-                </div>
-                <ul className="list-disc list-inside">
-                  {scenario.suggestedApproaches.map((approach: string) => (
-                    <li key={approach}>{approach}</li>
-                  ))}
-                </ul>
+          {scenario.suggestedApproaches && scenario.suggestedApproaches.length > 0 && (
+            <div>
+              <div className="font-medium text-gray-700 mb-1">
+                Suggested Approaches
               </div>
-            )}
+              <ul className="list-disc list-inside">
+                {scenario.suggestedApproaches.map((approach: string) => (
+                  <li key={approach}>{approach}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div>
             <div className="font-medium text-gray-700 mb-1">Target Skills</div>
@@ -135,12 +134,9 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
                 >
                   {skill
                     .toString()
-                    .split("_")
-                    .map(
-                      (word: string) =>
-                        word.charAt(0).toUpperCase() + word.slice(1),
-                    )
-                    .join(" ")}
+                    .split('_')
+                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ')}
                 </span>
               ))}
             </div>
@@ -157,10 +153,10 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
         </button>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ScenarioInfo;
+export default ScenarioInfo
 
 // Example PHI audit logging - uncomment and customize as needed
 // logger.info('Accessing PHI data', {

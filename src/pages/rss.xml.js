@@ -1,16 +1,16 @@
-import rss from "@astrojs/rss";
-import { getCollection } from "astro:content";
-import { SITE } from "../config";
-import { getUrl } from "../utils/common";
+import rss from '@astrojs/rss'
+import { getCollection } from 'astro:content'
+import { SITE } from '../config'
+import { getUrl } from '../utils/common'
 
 export async function GET() {
-  const blog = await getCollection("blog");
+  const blog = await getCollection('blog')
 
-  const filteredBlogitems = blog.filter((item) => !item.data.draft);
+  const filteredBlogitems = blog.filter((item) => !item.data.draft)
 
   const sortedBlogItems = filteredBlogitems.sort(
     (a, b) => new Date(b.data.pubDate) - new Date(a.data.pubDate),
-  );
+  )
 
   return rss({
     title: SITE.title,
@@ -31,6 +31,6 @@ export async function GET() {
       description: item.data.description,
     })),
 
-    stylesheet: getUrl("/rss-styles.xsl"),
-  });
+    stylesheet: getUrl('/rss-styles.xsl'),
+  })
 }

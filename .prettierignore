@@ -23,7 +23,8 @@ prs.mdx
 Link.astro
 
 # ignore helm templates and large/generated data
-ai/infra/cloud/helm/
+**/helm/
+**/docker/
 ai/infra/monitoring/*.json
 ai/infra/config/*.json
 ai/training/configs/*.json

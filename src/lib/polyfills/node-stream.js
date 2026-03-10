@@ -4,57 +4,57 @@
 
 export class Readable {
   pipe() {
-    return this;
+    return this
   }
   on() {
-    return this;
+    return this
   }
   once() {
-    return this;
+    return this
   }
   read() {
-    return null;
+    return null
   }
   push() {
-    return true;
+    return true
   }
   destroy() {}
 }
 
 export class Writable {
   write() {
-    return true;
+    return true
   }
   end() {}
   on() {
-    return this;
+    return this
   }
   once() {
-    return this;
+    return this
   }
   destroy() {}
 }
 
 export class Duplex extends Readable {
   write() {
-    return true;
+    return true
   }
   end() {}
 }
 
 export class Transform extends Duplex {
   _transform(chunk, encoding, callback) {
-    callback(null, chunk);
+    callback(null, chunk)
   }
 }
 
 export class PassThrough extends Transform {}
 
 export function pipeline() {
-  return Promise.resolve();
+  return Promise.resolve()
 }
 export function finished() {
-  return Promise.resolve();
+  return Promise.resolve()
 }
 
 export default {
@@ -65,4 +65,4 @@ export default {
   PassThrough,
   pipeline,
   finished,
-};
+}

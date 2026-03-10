@@ -56,17 +56,17 @@ Code splitting is most effective for:
 For React components, use React's built-in `lazy` and `Suspense` APIs:
 
 ```tsx
-import { lazy, Suspense } from "react";
+import { lazy, Suspense } from 'react'
 
 // Instead of: import LargeComponent from './LargeComponent'
-const LargeComponent = lazy(() => import("./LargeComponent"));
+const LargeComponent = lazy(() => import('./LargeComponent'))
 
 function MyComponent() {
   return (
     <Suspense fallback={<LoadingSpinner />}>
       <LargeComponent />
     </Suspense>
-  );
+  )
 }
 ```
 
@@ -126,8 +126,8 @@ For utility functions and non-UI code:
 
 async function handleAction() {
   // Only import when needed
-  const { complexFunction } = await import("./utils");
-  const result = complexFunction();
+  const { complexFunction } = await import('./utils')
+  const result = complexFunction()
   // ...
 }
 ```
@@ -138,7 +138,7 @@ async function handleAction() {
 2. **Prefetching**: Consider prefetching important chunks before they're needed
    ```js
    // Prefetch a component when hovering over a button that will show it
-   const prefetchComponent = () => import("./LargeComponent");
+   const prefetchComponent = () => import('./LargeComponent')
    ```
 3. **Chunk Size Monitoring**: Track chunk sizes in build output to identify optimization opportunities
 4. **Bundle Analysis**: Periodically run bundle analysis tools to identify bloated dependencies
@@ -155,33 +155,31 @@ When testing code-split components:
 Add the following to your Vitest tests:
 
 ```js
-import { lazy, Suspense } from "react";
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { lazy, Suspense } from 'react'
+import { render, screen } from '@testing-library/react'
+import { vi } from 'vitest'
 
 // Mock the lazy-loaded component
-vi.mock("./HeavyComponent", () => ({
-  default: () => (
-    <div data-testid="heavy-component">Heavy Component Content</div>
-  ),
-}));
+vi.mock('./HeavyComponent', () => ({
+  default: () => <div data-testid="heavy-component">Heavy Component Content</div>
+}))
 
-const HeavyComponent = lazy(() => import("./HeavyComponent"));
+const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
-test("renders lazy component with loading state", async () => {
+test('renders lazy component with loading state', async () => {
   render(
     <Suspense fallback={<div data-testid="loading">Loading...</div>}>
       <HeavyComponent />
-    </Suspense>,
-  );
+    </Suspense>
+  )
 
   // Should show loading state first
-  expect(screen.getByTestId("loading")).toBeInTheDocument();
+  expect(screen.getByTestId('loading')).toBeInTheDocument()
 
   // Wait for component to load
-  await screen.findByTestId("heavy-component");
-  expect(screen.getByTestId("heavy-component")).toBeInTheDocument();
-});
+  await screen.findByTestId('heavy-component')
+  expect(screen.getByTestId('heavy-component')).toBeInTheDocument()
+})
 ```
 
 ## Examples from Our Codebase
@@ -195,22 +193,20 @@ We lazy load the analytics dashboard since it's data-visualization heavy and not
 // import AnalyticsDashboardReact from './AnalyticsDashboardReact'
 
 // After:
-import { lazy, Suspense } from "react";
-const AnalyticsDashboardReact = lazy(() => import("./AnalyticsDashboardReact"));
+import { lazy, Suspense } from 'react'
+const AnalyticsDashboardReact = lazy(() => import('./AnalyticsDashboardReact'))
 
 // Usage
-{
-  showAnalytics && (
-    <Suspense fallback={<LoadingAnalytics />}>
-      <AnalyticsDashboardReact
-        messages={messages}
-        securityLevel={securityLevel}
-        encryptionEnabled={encryptionEnabled}
-        scenario={scenarioName}
-      />
-    </Suspense>
-  );
-}
+{showAnalytics && (
+  <Suspense fallback={<LoadingAnalytics />}>
+    <AnalyticsDashboardReact
+      messages={messages}
+      securityLevel={securityLevel}
+      encryptionEnabled={encryptionEnabled}
+      scenario={scenarioName}
+    />
+  </Suspense>
+)}
 ```
 
 ### MentalHealthChatDemo

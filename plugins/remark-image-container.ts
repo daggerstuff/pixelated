@@ -4,25 +4,25 @@
  */
 /// <reference types="mdast-util-directive" />
 
-import type { Paragraph, PhrasingContent, Root } from "mdast";
+import type { Paragraph, PhrasingContent, Root } from 'mdast'
 
-import type { VFile } from "vfile";
-import { visit, type Visitor } from "unist-util-visit";
+import type { VFile } from 'vfile'
+import { visit, type Visitor } from 'unist-util-visit'
 
-const IMAGE_DIR_REGEXP = /^image-(.*)/;
+const IMAGE_DIR_REGEXP = /^image-(.*)/
 const VALID_TAGS_FOR_IMG = new Set<string>([
-  "div",
-  "span",
-  "section",
-  "article",
-  "main",
-  "aside",
-  "header",
-  "footer",
-  "nav",
-  "fieldset",
-  "form",
-]);
+  'div',
+  'span',
+  'section',
+  'article',
+  'main',
+  'aside',
+  'header',
+  'footer',
+  'nav',
+  'fieldset',
+  'form',
+])
 
 /**
  * Convert `:::image-*` into container elements for images.
@@ -36,87 +36,87 @@ function remarkImageContainer() {
    */
   return (tree: Root, file: VFile) => {
     visit(tree, (node: Visitor) => {
-      if (node.type !== "containerDirective") {
-        return;
+      if (node.type !== 'containerDirective') {
+        return
       }
 
-      if (node.name === "image-figure") {
+      if (node.name === 'image-figure') {
         /* image-figure */
-        const data = node.data || (node.data = {});
-        const attributes = node.attributes || {};
-        const { children } = node;
+        const data = node.data || (node.data = {})
+        const attributes = node.attributes || {}
+        const { children } = node
 
         // add figure node
-        data.hName = "figure";
+        data.hName = 'figure'
 
         // handle figcaption text
         // priority: content inside [] of `:::image-figure[]{}`、`![]()`
-        let content: PhrasingContent[];
+        let content: PhrasingContent[]
         if (
-          children[0]?.type === "paragraph" &&
+          children[0]?.type === 'paragraph' &&
           children[0]?.data?.directiveLabel &&
-          children[0]?.children[0]?.type === "text"
+          children[0]?.children[0]?.type === 'text'
         ) {
-          content = children[0].children;
-          children.shift();
+          content = children[0].children
+          children.shift()
         } else if (
-          children[0]?.type === "paragraph" &&
-          children[0]?.children[0]?.type === "image" &&
+          children[0]?.type === 'paragraph' &&
+          children[0]?.children[0]?.type === 'image' &&
           children[0]?.children[0]?.alt
         ) {
-          content = [{ type: "text", value: children[0].children[0].alt }];
+          content = [{ type: 'text', value: children[0].children[0].alt }]
         } else {
           file.fail(
-            "The figcaption text is missing in the `image-figure` directive. Specify it in the `[]` of `:::image-figure[]{}` or `![]()`.",
+            'The figcaption text is missing in the `image-figure` directive. Specify it in the `[]` of `:::image-figure[]{}` or `![]()`.',
             node,
-          );
+          )
         }
 
         // add figcaption node
         const figcaptionNode: Paragraph = {
-          type: "paragraph",
+          type: 'paragraph',
           data: {
-            hName: "figcaption",
+            hName: 'figcaption',
             hProperties: attributes,
           },
           children: content,
-        };
-
-        children.push(figcaptionNode);
-      } else if (node.name === "image-a") {
-        /* image-a */
-        if (!node.attributes || !node.attributes["href"]) {
-          file.fail(
-            "Unexpectedly missing `href` in the `image-a` directive.",
-            node,
-          );
         }
 
-        const data = node.data || (node.data = {});
-        const attributes = node.attributes || {};
+        children.push(figcaptionNode)
+      } else if (node.name === 'image-a') {
+        /* image-a */
+        if (!node.attributes || !node.attributes['href']) {
+          file.fail(
+            'Unexpectedly missing `href` in the `image-a` directive.',
+            node,
+          )
+        }
 
-        data.hName = "a";
-        data.hProperties = attributes;
+        const data = node.data || (node.data = {})
+        const attributes = node.attributes || {}
+
+        data.hName = 'a'
+        data.hProperties = attributes
       } else if (node.name.match(IMAGE_DIR_REGEXP)) {
         /* image-* */
-        const match = node.name.match(IMAGE_DIR_REGEXP);
+        const match = node.name.match(IMAGE_DIR_REGEXP)
         if (match && match[1] && VALID_TAGS_FOR_IMG.has(match[1])) {
-          const data = node.data || (node.data = {});
-          const attributes = node.attributes || {};
+          const data = node.data || (node.data = {})
+          const attributes = node.attributes || {}
 
-          data.hName = match[1];
-          data.hProperties = attributes;
+          data.hName = match[1]
+          data.hProperties = attributes
 
           // node.children.splice(0, 1, node.children[0].children[0])
         } else {
           file.fail(
-            "The `image-*` directive failed to match a valid tag.",
+            'The `image-*` directive failed to match a valid tag.',
             node,
-          );
+          )
         }
       }
-    });
-  };
+    })
+  }
 }
 
-export default remarkImageContainer;
+export default remarkImageContainer

@@ -1,5 +1,5 @@
-import React from "react";
-const { createElement: h } = React;
+import React from 'react'
+const { createElement: h } = React
 
 /**
  * Astro passes `children` as a string of HTML, so we need
@@ -10,15 +10,15 @@ const { createElement: h } = React;
  */
 const StaticHtml = ({ value, name, hydrate = true }) => {
   if (!value) {
-    return null;
+    return null
   }
-  const tagName = hydrate ? "astro-slot" : "astro-static-slot";
+  const tagName = hydrate ? 'astro-slot' : 'astro-static-slot'
   return h(tagName, {
     name,
     suppressHydrationWarning: true,
     dangerouslySetInnerHTML: { __html: value },
-  });
-};
+  })
+}
 
 /**
  * This tells React to opt-out of re-rendering this subtree,
@@ -27,6 +27,6 @@ const StaticHtml = ({ value, name, hydrate = true }) => {
  *
  * See https://preactjs.com/guide/v8/external-dom-mutations
  */
-StaticHtml.shouldComponentUpdate = () => false;
+StaticHtml.shouldComponentUpdate = () => false
 
-export default StaticHtml;
+export default StaticHtml

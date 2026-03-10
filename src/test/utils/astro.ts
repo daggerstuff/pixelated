@@ -5,29 +5,22 @@
  * @param slotContent Optional content to pass to the default slot
  * @returns The rendered component
  */
-export async function renderAstro<
-  Props extends Record<string, unknown> = Record<string, unknown>,
->(
-  Component:
-    | { render(props: Record<string, unknown>): Promise<string> }
-    | { (props: Record<string, unknown>): unknown }
-    | ((props: Record<string, unknown>) => unknown),
+export async function renderAstro<Props extends Record<string, unknown> = Record<string, unknown>>(
+  Component: { render(props: Record<string, unknown>): Promise<string> } | { (props: Record<string, unknown>): unknown } | ((props: Record<string, unknown>) => unknown),
   props: Props = {} as Props,
   slotContent?: string,
 ): Promise<{
-  astroContainer: HTMLDivElement;
-  container: HTMLDivElement;
-  html: string;
-  querySelector: (selector: string) => Element | null;
-  querySelectorAll: (selector: string) => NodeListOf<Element>;
+  astroContainer: HTMLDivElement
+  container: HTMLDivElement
+  html: string
+  querySelector: (selector: string) => Element | null
+  querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
-  const renderProps = slotContent ? { ...props, slot: slotContent } : props;
+  const renderProps = slotContent ? { ...props, slot: slotContent } : props
   // Type assertion needed because Astro component types vary at runtime
-  const html = await (
-    Component as { render(props: Record<string, unknown>): Promise<string> }
-  ).render(renderProps);
-  const container = document.createElement("div");
-  container.innerHTML = html;
+  const html = await (Component as { render(props: Record<string, unknown>): Promise<string> }).render(renderProps)
+  const container = document.createElement('div')
+  container.innerHTML = html
 
   // Return a testing-friendly interface
   return {
@@ -37,7 +30,7 @@ export async function renderAstro<
     querySelector: (selector: string) => container.querySelector(selector),
     querySelectorAll: (selector: string) =>
       container.querySelectorAll(selector),
-  };
+  }
 }
 
 /**
@@ -48,25 +41,25 @@ export async function renderAstro<
 export function createMockAstro(props: Record<string, unknown> = {}): void {
   return {
     props,
-    request: new Request("http://localhost:3000"),
-    url: new URL("http://localhost:3000"),
+    request: new Request('http://localhost:3000'),
+    url: new URL('http://localhost:3000'),
     redirect: vi.fn(),
     response: new Response(),
     slots: {},
-    site: new URL("http://localhost:3000"),
-    generator: "Astro v4.0",
+    site: new URL('http://localhost:3000'),
+    generator: 'Astro v4.0',
     ...props,
-  };
+  }
 }
 
 /**
  * Type helper for mocking Astro props
  */
 export type AstroMockProps<T> = T & {
-  "client:load"?: boolean;
-  "client:visible"?: boolean;
-  "client:media"?: string;
-  "client:only"?: boolean;
-  class?: string;
-  className?: string;
-};
+  'client:load'?: boolean
+  'client:visible'?: boolean
+  'client:media'?: string
+  'client:only'?: boolean
+  'class'?: string
+  'className'?: string
+}

@@ -5,7 +5,7 @@
    ================================================ */
 
 /* Import responsive design system */
-@import url("./responsive-design-system.css");
+@import url('./responsive-design-system.css');
 
 /* Base mobile-first styles */
 .corporate-header.unified-header {
@@ -410,14 +410,8 @@
   }
 
   .container-refined {
-    padding-left: max(
-      var(--space-4),
-      env(safe-area-inset-left, var(--space-4))
-    );
-    padding-right: max(
-      var(--space-4),
-      env(safe-area-inset-right, var(--space-4))
-    );
+    padding-left: max(var(--space-4), env(safe-area-inset-left, var(--space-4)));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, var(--space-4)));
   }
 
   .brand-header {
@@ -480,14 +474,8 @@
   }
 
   .container-refined {
-    padding-left: max(
-      var(--space-4),
-      env(safe-area-inset-left, var(--space-4))
-    );
-    padding-right: max(
-      var(--space-4),
-      env(safe-area-inset-right, var(--space-4))
-    );
+    padding-left: max(var(--space-4), env(safe-area-inset-left, var(--space-4)));
+    padding-right: max(var(--space-4), env(safe-area-inset-right, var(--space-4)));
   }
 
   .theme-toggle-unified {

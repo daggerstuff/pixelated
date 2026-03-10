@@ -1,18 +1,13 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card/card";
-import { useIntegrationPlanQuery } from "@/lib/hooks/journal-research";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Code, Download } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/card'
+import { useIntegrationPlanQuery } from '@/lib/hooks/journal-research'
+import { cn } from '@/lib/utils'
+import { format } from 'date-fns'
+import { Code, Download } from 'lucide-react'
 
 export interface IntegrationDetailProps {
-  sessionId: string;
-  planId: string;
-  className?: string;
+  sessionId: string
+  planId: string
+  className?: string
 }
 
 export function IntegrationDetail({
@@ -20,32 +15,32 @@ export function IntegrationDetail({
   planId,
   className,
 }: IntegrationDetailProps) {
-  const { data: plan, isLoading } = useIntegrationPlanQuery(sessionId, planId);
+  const { data: plan, isLoading } = useIntegrationPlanQuery(sessionId, planId)
 
   if (isLoading) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">Loading integration plan...</p>
       </div>
-    );
+    )
   }
 
   if (!plan) {
     return (
-      <div className={cn("text-center py-8", className)}>
+      <div className={cn('text-center py-8', className)}>
         <p className="text-muted-foreground">Integration plan not found</p>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Integration Plan</h1>
           <p className="text-muted-foreground mt-1">
-            Created {format(plan.createdDate, "MMM d, yyyy")} •{" "}
+            Created {format(plan.createdDate, 'MMM d, yyyy')} •{' '}
             <span className="capitalize">{plan.complexity}</span> complexity
           </p>
         </div>
@@ -104,7 +99,7 @@ export function IntegrationDetail({
               <p className="text-sm font-medium text-muted-foreground">
                 Created Date
               </p>
-              <p className="mt-1">{format(plan.createdDate, "PPpp")}</p>
+              <p className="mt-1">{format(plan.createdDate, 'PPpp')}</p>
             </div>
           </div>
         </CardContent>
@@ -188,14 +183,12 @@ def transform_data(source_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     # TODO: Implement transformations
     # Required transformations:
-${plan.requiredTransformations.map((t) => `    # - ${t}`).join("\n")}
+${plan.requiredTransformations.map((t) => `    # - ${t}`).join('\n')}
     
     return transformed_data
 
 # Schema mapping:
-${Object.entries(plan.schemaMapping)
-  .map(([k, v]) => `# ${k} -> ${v}`)
-  .join("\n")}
+${Object.entries(plan.schemaMapping).map(([k, v]) => `# ${k} -> ${v}`).join('\n')}
 `}
             </pre>
           </div>
@@ -210,5 +203,5 @@ ${Object.entries(plan.schemaMapping)
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

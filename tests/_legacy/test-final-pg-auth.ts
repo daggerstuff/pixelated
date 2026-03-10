@@ -38,6 +38,7 @@ async function testFinalAuth() {
     console.log("Session ID:", session.session.id);
 
     console.log("\n🎉 Final auth test completed!");
+
   } catch (error) {
     console.error("❌ Test failed:", error);
   }
