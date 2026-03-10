@@ -29,9 +29,6 @@ predicate hasInputSanitization(CallExpr call) {
     sanitizeCall.getCalleeName().matches("%sanitize%") or
     sanitizeCall.getCalleeName().matches("%escape%") or
     sanitizeCall.getCalleeName().matches("%validate%")
-  ) and
-  exists(int i |
-    call.getArgument(i) = sanitizeCall
   )
 }
 

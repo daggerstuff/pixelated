@@ -20,7 +20,7 @@ predicate isDataTransmissionCall(CallExpr call) {
       name.matches("%http%") or
       name.matches("%fetch%") or
       name.matches("%axios%") or
-      name.matches("%httpRequest%")
+      name.matches("%request%")
     )
   )
 }
@@ -31,9 +31,7 @@ predicate isEHRData(DataFlow::Node node) {
     (
       name.matches("%patient%") or
       name.matches("%health%") or
-      name.matches("%medical_record%") or
-      name.matches("%ehr_record%") or
-      name.matches("%patient_record%") or
+      name.matches("%record%") or
       name.matches("%ehr%") or
       name.matches("%fhir%") or
       name.matches("%clinical%")

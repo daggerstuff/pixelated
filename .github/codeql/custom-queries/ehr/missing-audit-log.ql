@@ -28,8 +28,7 @@ predicate isEHROperation(CallExpr call) {
 predicate hasLogging(CallExpr call) {
   exists(CallExpr logCall |
     logCall.getCalleeName().matches("%log%") or
-    logCall.getCalleeName().matches("%audit%") and
-    logCall.getEnclosingFunction() = call.getEnclosingFunction()
+    logCall.getCalleeName().matches("%audit%")
   )
 }
 
