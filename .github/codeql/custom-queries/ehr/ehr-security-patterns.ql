@@ -33,7 +33,7 @@ class EHREndpoint extends DataFlow::Node {
       (
         url.matches("%/fhir/%") or
         url.matches("%/ehr/%") or
-        url.matches("%/api/v%") or
+        url.matches("%/api/v%/patient%") or
         url.matches("%/epic/%") or
         url.matches("%/cerner/%") or
         url.matches("%/allscripts/%")
