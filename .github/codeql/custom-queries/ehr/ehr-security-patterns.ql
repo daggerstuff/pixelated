@@ -3,7 +3,6 @@
  * @description Detects common security issues in EHR integrations
  * @kind problem
  * @problem.severity error
- * @security-severity 8.0
  * @precision high
  * @id js/ehr-security-patterns
  * @tags security
@@ -34,7 +33,7 @@ class EHREndpoint extends DataFlow::Node {
       (
         url.matches("%/fhir/%") or
         url.matches("%/ehr/%") or
-        url.matches("%/api/v%/patient%") or
+        url.matches("%/api/v%") or
         url.matches("%/epic/%") or
         url.matches("%/cerner/%") or
         url.matches("%/allscripts/%")
@@ -70,9 +69,8 @@ where
         call.getCalleeName().matches("%fetch%") or
         call.getCalleeName().matches("%axios%")
       ) and
-      arg = call.getAnArgument() and
-      sink = arg and
-      exists(EHREndpoint endpoint | DataFlow::localFlow(endpoint, arg))
+      sink = call.getAnArgument() and
+      exists(EHREndpoint endpoint | DataFlow::localFlow(endpoint, call.getAnArgument()))
     )
     and source = sink
   )
