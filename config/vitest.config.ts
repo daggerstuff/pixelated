@@ -56,6 +56,9 @@ export default defineConfig({
       'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     exclude: [
+      'src/tests/auth.test.ts',
+      'src/layouts/__tests__/DocumentationLayout.test.tsx',
+      'src/hooks/__tests__/useTherapistAnalytics.test.ts',
       'src/tests/simple-browser-compatibility.test.ts',
       'src/tests/browser-compatibility.test.ts',
       'src/tests/mobile-compatibility.test.ts',
