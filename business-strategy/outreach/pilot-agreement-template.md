@@ -125,16 +125,16 @@ and
 ## SIGNATURES
 
 **Pixelated Empathy AI:**  
--By: _________________________  
- Name: [Your Name]  
- Title: [Your Title]  
- Date: _________________________
+By: _________________________
+Name: [Your Name]
+Title: [Your Title]
+Date: _________________________
 
 **[INSTITUTION NAME]:**  
--By: _________________________  
- Name: [Primary Contact Name]  
- Title: [Title]  
- Date: _________________________
+By: _________________________
+Name: [Primary Contact Name]
+Title: [Title]
+Date: _________________________
 
 ---
 

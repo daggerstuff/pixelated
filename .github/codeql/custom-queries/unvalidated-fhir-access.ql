@@ -28,14 +28,17 @@ predicate isFHIRResourceAccess(CallExpr call) {
   )
 }
 
-/* Inline validation check */
-from CallExpr resourceCall
-where
-  isFHIRResourceAccess(resourceCall) and
-  not exists(CallExpr validateCall |
+predicate hasValidation(CallExpr call) {
+  exists(CallExpr validateCall |
     validateCall.getCalleeName().matches("%validate%") or
     validateCall.getCalleeName().matches("%check%") or
     validateCall.getCalleeName().matches("%verify%")
   )
+}
+
+from CallExpr resourceCall
+where
+  isFHIRResourceAccess(resourceCall) and
+  not hasValidation(resourceCall)
 select resourceCall,
   "FHIR resource access without validation detected. Ensure proper validation before access."

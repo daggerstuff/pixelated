@@ -13,20 +13,7 @@
 
 import javascript
 
-/**
- * Checks whether a FHIR search operation uses a callee name that indicates a search
- * and is performed within a FHIR context (e.g., a class related to FHIR resources).
- */
 predicate isFHIRSearch(CallExpr call) {
-  // Ensure the call originates from a class that suggests a FHIR context.
-  exists(Class cls |
-    cls = call.getDeclaringClass() and
-    (cls.hasName("%FHIR%") or
-     cls.hasName("%Search%") or
-     cls.hasName("%Find%") or
-     cls.hasName("%Query%"))
-  ) and
-  // Then verify that the callee name looks like a FHIR search operation.
   exists(string name |
     name = call.getCalleeName() and
     (
@@ -37,19 +24,17 @@ predicate isFHIRSearch(CallExpr call) {
   )
 }
 
-/**
- * Checks whether the given call performs input sanitization (e.g., sanitize, escape, validate).
- * The check is now directly tied to the call itself, not to any unrelated call.
- */
-predicate hasSanitization(CallExpr call) {
-  call.getCalleeName().matches("%sanitize%") or
-  call.getCalleeName().matches("%escape%") or
-  call.getCalleeName().matches("%validate%")
+predicate hasInputSanitization(CallExpr call) {
+  exists(CallExpr sanitizeCall |
+    sanitizeCall.getCalleeName().matches("%sanitize%") or
+    sanitizeCall.getCalleeName().matches("%escape%") or
+    sanitizeCall.getCalleeName().matches("%validate%")
+  )
 }
 
 from CallExpr searchOp
 where
   isFHIRSearch(searchOp) and
-  not hasSanitization(searchOp)
+  not hasInputSanitization(searchOp)
 select searchOp,
   "FHIR search operation without input sanitization detected. Ensure proper input validation."

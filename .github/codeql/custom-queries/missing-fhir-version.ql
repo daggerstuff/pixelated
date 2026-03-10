@@ -17,20 +17,24 @@ predicate isFHIRClientInit(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
     (
+      name.matches("%Client%") or
       name.matches("%FHIRClient%") or
       name.matches("%createClient%")
     )
   )
 }
 
+predicate hasVersionCheck(CallExpr call) {
+  exists(CallExpr versionCall |
+    versionCall.getCalleeName().matches("%version%") or
+    versionCall.getCalleeName().matches("%compatibility%") or
+    versionCall.getCalleeName().matches("%checkVersion%")
+  )
+}
+
 from CallExpr clientInit
 where
   isFHIRClientInit(clientInit) and
-  exists(CallExpr versionCheck |
-    (versionCheck.getCalleeName().matches("%version%") or
-     versionCheck.getCalleeName().matches("%compatibility%") or
-     versionCheck.getCalleeName().matches("%checkVersion%")) and
-    clientInit.getAChildCallExpr() = versionCheck
-  )
+  not hasVersionCheck(clientInit)
 select clientInit,
   "FHIR client initialization without version check detected. Ensure version compatibility."
