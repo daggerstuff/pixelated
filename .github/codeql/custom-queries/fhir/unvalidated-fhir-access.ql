@@ -17,25 +17,22 @@ predicate isFHIRResourceAccess(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
     (
-      regexpMatch(name, "%getResource%") or
-      regexpMatch(name, "%searchResource%") or
-      regexpMatch(name, "%createResource%") or
-      regexpMatch(name, "%updateResource%") or
-      name.matches("%readResource%") or
-      regexpMatch(name, "%vread%") or
-      regexpMatch(name, "%search%")
+      name.matches("%getResource%") or
+      name.matches("%searchResource%") or
+      name.matches("%createResource%") or
+      name.matches("%updateResource%") or
+      name.matches("%read%") or
+      name.matches("%vread%") or
+      name.matches("%search%")
     )
-    // Guard against standard library functions that would otherwise be flagged
-    and not regexpMatch(call.getTarget().getQualifiedName(), "%\\.(String|Object|Array|File)$")
   )
 }
 
 predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
-    (validateCall.getCalleeName().matches("%validate%") or
-     validateCall.getCalleeName().matches("%check%") or
-     validateCall.getCalleeName().matches("%verify%")) and
-    validateCall.getEnclosingFunction() = call.getEnclosingFunction()
+    validateCall.getCalleeName().matches("%validate%") or
+    validateCall.getCalleeName().matches("%check%") or
+    validateCall.getCalleeName().matches("%verify%")
   )
 }
 
