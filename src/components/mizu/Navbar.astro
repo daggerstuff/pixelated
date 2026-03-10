@@ -151,34 +151,50 @@ const links = [
       menuCloseIcon?.classList.toggle("hidden");
 
       if (newExpanded) {
-        // Focus first link in menu when opened
-        const firstLink = mobileMenu.querySelector("a");
-        (firstLink as HTMLElement)?.focus();
+        // Focus first focusable element in menu when opened
+        const firstFocusable = mobileMenu.querySelector(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        ) as HTMLElement;
+        firstFocusable?.focus();
         document.body.style.overflow = "hidden"; // Prevent scrolling
       } else {
         document.body.style.overflow = "";
       }
     };
 
-    // Use a named function for the click listener so it's easier to manage if needed
-    // However, since it's on a specific element that's replaced by Astro on page load,
-    // we don't need to worry about accumulation on the button itself.
+    // Click handler for the menu button
     mobileMenuButton.addEventListener("click", toggleMenu);
 
-    // Global listeners for Escape and Click-outside need to be carefully handled.
-    // In Astro, these should be added once or cleaned up.
-    // A simple way is to use a cleanup function or check state.
-
+    // Focus trap handling
     const handleKeydown = (e: KeyboardEvent) => {
-      if (
-        e.key === "Escape" &&
-        mobileMenuButton.getAttribute("aria-expanded") === "true"
-      ) {
+      const isExpanded =
+        mobileMenuButton.getAttribute("aria-expanded") === "true";
+
+      // Escape key: close the menu
+      if (e.key === "Escape" && isExpanded) {
         toggleMenu();
         mobileMenuButton.focus();
+        return;
+      }
+
+      // Tab key: keep focus within the menu
+      if (e.key === "Tab" && isExpanded) {
+        const focusable = mobileMenu.querySelectorAll(
+          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+        ) as HTMLElement[];
+        if (focusable.length === 0) return;
+
+        const currentlyFocused = document.activeElement as HTMLElement;
+        const currentIndex = Array.from(focusable).indexOf(currentlyFocused);
+        const nextIndex = e.shiftKey ? currentIndex - 1 : currentIndex + 1;
+        const nextIndexMod = (nextIndex + focusable.length) % focusable.length;
+        focusable[nextIndexMod].focus();
+        e.preventDefault();
+        return;
       }
     };
 
+    // Outside click handling
     const handleClickOutside = (e: MouseEvent) => {
       const isExpanded =
         mobileMenuButton.getAttribute("aria-expanded") === "true";
@@ -191,6 +207,7 @@ const links = [
       }
     };
 
+    // Add global listeners
     document.addEventListener("keydown", handleKeydown);
     document.addEventListener("click", handleClickOutside);
 

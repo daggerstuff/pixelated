@@ -28,9 +28,12 @@ from CallExpr authCall
 where
   isAuthenticationMethod(authCall) and
   not exists(CallExpr mfaCall |
-    mfaCall.getCalleeName().matches("%mfa%") or
-    mfaCall.getCalleeName().matches("%2fa%") or
-    mfaCall.getCalleeName().matches("%verify%")
+    mfaCall.getEnclosingFunction() = authCall.getEnclosingFunction() and
+    (
+      mfaCall.getCalleeName().matches("%verifyMfa%") or
+      mfaCall.getCalleeName().matches("%verifyOtp%") or
+      mfaCall.getCalleeName().matches("%verifyToken%")
+    )
   )
 select authCall,
   "Potential insecure EHR authentication detected. HIPAA compliance requires strong authentication."
