@@ -144,7 +144,8 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
           # Upload SARIF file to GitHub Security tab
-          upload: false
+-          upload: false
++          upload: true
           # Configure output format
           output: sarif-latest
 
