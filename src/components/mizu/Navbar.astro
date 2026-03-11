@@ -71,8 +71,7 @@ const links = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          ></path>
+            d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
         <svg
           class="w-6 h-6 hidden menu-icon-close"
@@ -84,8 +83,7 @@ const links = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          ></path>
+            d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
@@ -162,7 +160,14 @@ const links = [
       }
     };
 
+    // Use a named function for the click listener so it's easier to manage if needed
+    // However, since it's on a specific element that's replaced by Astro on page load,
+    // we don't need to worry about accumulation on the button itself.
     mobileMenuButton.addEventListener("click", toggleMenu);
+
+    // Global listeners for Escape and Click-outside need to be carefully handled.
+    // In Astro, these should be added once or cleaned up.
+    // A simple way is to use a cleanup function or check state.
 
     const handleKeydown = (e: KeyboardEvent) => {
       if (
@@ -188,8 +193,19 @@ const links = [
 
     document.addEventListener("keydown", handleKeydown);
     document.addEventListener("click", handleClickOutside);
+
+    // Astro cleanup
+    document.addEventListener(
+      "astro:before-preparation",
+      () => {
+        document.removeEventListener("keydown", handleKeydown);
+        document.removeEventListener("click", handleClickOutside);
+        document.body.style.overflow = "";
+      },
+      { once: true },
+    );
   }
 
-  // Initialize the mobile menu on page load
-  initMobileMenu();
+  // Initialize on initial load and after each view transition navigation
+  document.addEventListener("astro:page-load", initMobileMenu);
 </script>
