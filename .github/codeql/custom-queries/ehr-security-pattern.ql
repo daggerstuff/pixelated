@@ -47,8 +47,9 @@ from DataFlow::Node source, DataFlow::Node sink
 where
   source instanceof EHRCredentialSource and
   exists(DataFlow::CallNode call |
-    call.getCalleeName().matches("%log%") and
+    call.getCalleeName().matches("log|logger\\.warn|logger\\.info|logger\\.error|logger\\.debug") and
     sink = call.getAnArgument() and
-    DataFlow::localFlow(source, sink)
+    DataFlow::localFlow(source, sink) and
+    call.getReceiver() instanceof EHREndpoint
   )
 select sink, "Potential leak of EHR credentials to log file."

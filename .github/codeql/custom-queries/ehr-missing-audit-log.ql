@@ -25,16 +25,18 @@ predicate isEHROperation(CallExpr call) {
   )
 }
 
-predicate hasLogging() {
+predicate hasLogging(CallExpr call) {
   exists(CallExpr logCall |
-    logCall.getCalleeName().matches("%log%") or
-    logCall.getCalleeName().matches("%audit%")
+    logCall.getEnclosingFunction() = call.getEnclosingFunction() and
+    logCall.getEnclosingBlock() = call.getEnclosingBlock() and
+    (logCall.getCalleeName().matches("%log%") or
+     logCall.getCalleeName().matches("%audit%"))
   )
 }
 
 from CallExpr ehrOp
 where
   isEHROperation(ehrOp) and
-  not hasLogging()
+  not hasLogging(ehrOp)
 select ehrOp,
   "EHR operation detected without audit logging. HIPAA compliance requires comprehensive audit trails."
