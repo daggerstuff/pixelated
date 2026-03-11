@@ -17,7 +17,6 @@ predicate isFHIRClientInit(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
     (
-      name.matches("%Client%") or
       name.matches("%FHIRClient%") or
       name.matches("%createClient%")
     )
@@ -26,9 +25,10 @@ predicate isFHIRClientInit(CallExpr call) {
 
 predicate hasVersionCheck(CallExpr call) {
   exists(CallExpr versionCall |
-    versionCall.getCalleeName().matches("%version%") or
+    (versionCall.getCalleeName().matches("%version%") or
     versionCall.getCalleeName().matches("%compatibility%") or
-    versionCall.getCalleeName().matches("%checkVersion%")
+    versionCall.getCalleeName().matches("%checkVersion%")) and
+    call.getAChildCallExpr() = versionCall
   )
 }
 
