@@ -1,14 +1,14 @@
 {
-  "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  // Use 80 if migrating from Prettier; 100 is the Oxfmt default!
+  "semi": false,
+  "singleQuote": true,
   "printWidth": 80,
-  "ignorePatterns": [
-    "**/helm/",
-    "**/docker/",
-    "ai/infra/monitoring/*.json",
-    "ai/infra/config/*.json",
-    "ai/training/configs/*.json",
-    "tests/test-results/",
-    "tests/verification_output/"
+  "trailingComma": "all",
+  "overrides": [
+    {
+      "files": ["ai/infra/monitoring/*.json", "ai/infra/config/*.json", "ai/training/configs/*.json"],
+      "options": {
+        "parser": "json"
+      }
+    }
   ]
 }

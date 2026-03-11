@@ -28,7 +28,6 @@ vi.mock('astro:transitions', () => ({
 }))
 
 // Test the DocumentationLayout component
-describe('DocumentationLayout Tests', () => {
 test('DocumentationLayout renders with correct title and content', async () => {
   // Import the component
   const { default: DocumentationLayout } = await import(
@@ -101,5 +100,4 @@ test('DocumentationLayout uses frontmatter props when available', async () => {
   expect(renderedHtml).not.toContain('Fallback Title')
   // expect(renderedHtml).not.toContain('Fallback Description') // Description might only be in Head
   expect(renderedHtml).toContain('<div>Test Content</div>')
-})
 })

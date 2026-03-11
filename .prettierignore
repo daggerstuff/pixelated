@@ -4,7 +4,7 @@ node_modules/
 **/node_modules/**
 dist/
 .astro/
-
+.jules/
 
 # Polyfills and vendor files
 public/polyfills/
@@ -23,10 +23,16 @@ prs.mdx
 Link.astro
 
 # ignore helm templates and large/generated data
-**/helm/
-**/docker/
-ai/infra/monitoring/*.json
-ai/infra/config/*.json
-ai/training/configs/*.json
+**/helm/**
+**/docker/**
+**/monitoring/*.json
+**/config/*.json
+**/training/configs/*.json
 tests/test-results/
 tests/verification_output/
+scripts/testing/test_data/
+
+# Large generated data
+src/lib/ai/datasets/**/*.json
+**/sample_data/**/*.json
+workflow/sample_data/**/*.json

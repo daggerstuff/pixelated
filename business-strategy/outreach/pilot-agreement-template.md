@@ -126,10 +126,9 @@ and
 
 **Pixelated Empathy AI:**  
 By: _________________________  
-
- Name: [Your Name]  
- Title: [Your Title]  
- Date: _________________________
+Name: [Your Name]
+Title: [Your Title]
+Date: _________________________
 
 **[INSTITUTION NAME]:**  
 By: _________________________
