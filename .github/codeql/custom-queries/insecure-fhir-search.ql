@@ -13,6 +13,9 @@
 
 import javascript
 
+/**
+ * Determines whether a call is a FHIR search operation.
+ */
 predicate isFHIRSearch(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -24,11 +27,20 @@ predicate isFHIRSearch(CallExpr call) {
   )
 }
 
+/**
+ * Determines whether the input to a FHIR search operation has been sanitized.
+ * This predicate looks for a preceding call to a sanitization function
+ * (e.g., sanitize, escape, validate) that operates on the same argument
+ * supplied to the search call.
+ */
 predicate hasInputSanitization(CallExpr call) {
   exists(CallExpr sanitizeCall |
-    sanitizeCall.getCalleeName().matches("%sanitize%") or
-    sanitizeCall.getCalleeName().matches("%escape%") or
-    sanitizeCall.getCalleeName().matches("%validate%")
+    sanitizeCall.getParent() = call.getParent() and
+    sanitizeCall.getStartLine() < call.getStartLine() and
+    sanitizeCall.getArgument(0) = call.getArgument(0) and
+    (sanitizeCall.getCalleeName().matches("%sanitize%") or
+     sanitizeCall.getCalleeName().matches("%escape%") or
+     sanitizeCall.getCalleeName().matches("%validate%"))
   )
 }
 

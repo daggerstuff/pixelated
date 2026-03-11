@@ -292,7 +292,8 @@ export class PresidioPHIDetector {
         };
 
         const result = await this.anonymizer.anonymize(anonymizerPayload);
-        return result.text;
+        // Apply type‑specific token mapping to make redaction deterministic
+        return this.fallbackRedaction(result.text, entities);
       } else {
         // Use fallback redaction if Presidio is not available
         return this.fallbackRedaction(text, entities);
@@ -320,7 +321,7 @@ export class PresidioPHIDetector {
         "gi",
       ),
       [PHIEntityType.PHONE_NUMBER]: new RegExp(
-        "(?:\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}",
+        "(?:\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b",
         "g",
       ),
       [PHIEntityType.US_SSN]: new RegExp("\\b\\d{3}-?\\d{2}-?\\d{4}\\b", "g"),
@@ -412,12 +413,7 @@ export class PresidioPHIDetector {
 
     // Replace each entity with appropriate token
     for (const entity of sortedEntities) {
-      let token = "[REDACTED]";
-      if (entity.type === PHIEntityType.EMAIL_ADDRESS) token = "[EMAIL]";
-      else if (entity.type === PHIEntityType.PHONE_NUMBER) token = "[PHONE]";
-      else if (entity.type === PHIEntityType.US_SSN) token = "[ID]";
-      else if (entity.type === PHIEntityType.PERSON) token = "[NAME]";
-
+      const token = this.getRedactionToken(entity.type);
       redactedText =
         redactedText.substring(0, entity.start) +
         token +
@@ -425,6 +421,25 @@ export class PresidioPHIDetector {
     }
 
     return redactedText;
+  }
+
+  /**
+   * Returns the token to use for a given PHI entity type.
+   * Centralizes token mapping so both Presidio and fallback paths behave identically.
+   */
+  private getRedactionToken(entityType: PHIEntityType): string {
+    switch (entityType) {
+      case PHIEntityType.EMAIL_ADDRESS:
+        return "[EMAIL]";
+      case PHIEntityType.PHONE_NUMBER:
+        return "[PHONE]";
+      case PHIEntityType.US_SSN:
+        return "[ID]";
+      case PHIEntityType.PERSON:
+        return "[NAME]";
+      default:
+        return "[REDACTED]";
+    }
   }
 }
 
