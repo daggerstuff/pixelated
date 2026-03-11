@@ -21,7 +21,7 @@ predicate isFHIRResourceAccess(CallExpr call) {
       name.matches("%searchResource%") or
       name.matches("%createResource%") or
       name.matches("%updateResource%") or
-      name.matches("%readResource%") or
+      name.matches("%read%") or
       name.matches("%vread%") or
       name.matches("%search%")
     )
@@ -32,11 +32,8 @@ predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
     validateCall.getCalleeName().matches("%validate%") or
     validateCall.getCalleeName().matches("%check%") or
-    validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
-    validateCall.getLocation().getStartLine() < call.getLocation().getStartLine()
-  ) and
-  validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
-  validateCall.getLocation().getStartLine() < call.getLocation().getStartLine()
+    validateCall.getCalleeName().matches("%verify%")
+  )
 }
 
 from CallExpr resourceCall
