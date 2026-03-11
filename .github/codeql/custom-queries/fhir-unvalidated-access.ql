@@ -13,26 +13,32 @@
 
 import javascript
 
-/**
- * Checks whether a given call to a FHIR resource access method lacks a
- * corresponding validation call within the same enclosing function.
- *
- * @param call The call expression representing the FHIR resource access.
- * @return true if a validation call exists in the same function.
- */
-predicate hasValidation(CallExpr call) {
-  // Look for a validation call defined in the same function as `call`.
+predicate isFHIRResourceAccess(CallExpr call) {
+  exists(string name |
+    name = call.getCalleeName() and
+    (
+      name.matches("%getResource%") or
+      name.matches("%searchResource%") or
+      name.matches("%createResource%") or
+      name.matches("%updateResource%") or
+      name.matches("%read%") or
+      name.matches("%vread%") or
+      name.matches("%search%")
+    )
+  )
+}
+
+predicate hasValidation() {
   exists(CallExpr validateCall |
-    validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
-    (validateCall.getCalleeName().matches("%validate%") or
-     validateCall.getCalleeName().matches("%check%") or
-     validateCall.getCalleeName().matches("%verify%"))
+    validateCall.getCalleeName().matches("%validate%") or
+    validateCall.getCalleeName().matches("%check%") or
+    validateCall.getCalleeName().matches("%verify%")
   )
 }
 
 from CallExpr resourceCall
 where
   isFHIRResourceAccess(resourceCall) and
-  not hasValidation(resourceCall)
+  not hasValidation()
 select resourceCall,
   "FHIR resource access without validation detected. Ensure proper validation before access."

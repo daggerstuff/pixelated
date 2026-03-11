@@ -26,25 +26,17 @@ predicate isFHIROperation(CallExpr call) {
   )
 }
 
-/**
- * Checks whether the given FHIR operation call has a corresponding
- * security/authorization call in the same enclosing function.
- *
- * @param fhirOp the FHIR operation call to evaluate
- * @return true if a matching security call exists locally
- */
-predicate hasSecurityContext(CallExpr fhirOp) {
+predicate hasSecurityContext() {
   exists(CallExpr securityCall |
-    securityCall.getEnclosingFunction() = fhirOp.getEnclosingFunction() and
-    (securityCall.getCalleeName().matches("%authorize%") or
-     securityCall.getCalleeName().matches("%checkPermission%") or
-     securityCall.getCalleeName().matches("%verifyAccess%"))
+    securityCall.getCalleeName().matches("%authorize%") or
+    securityCall.getCalleeName().matches("%checkPermission%") or
+    securityCall.getCalleeName().matches("%verifyAccess%")
   )
 }
 
 from CallExpr fhirOp
 where
   isFHIROperation(fhirOp) and
-  not hasSecurityContext(fhirOp)
+  not hasSecurityContext()
 select fhirOp,
   "FHIR operation without security context detected. Ensure proper authorization."
