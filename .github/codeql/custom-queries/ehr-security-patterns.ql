@@ -38,7 +38,7 @@ private module EHRSecurityConfig implements DataFlow::ConfigSig {
         call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument() and
-      any(EHREndpoint endpoint).getALocalSource().flowsTo(call.getAnArgument())
+      any(EHREndpoint endpoint).flowsTo(call.getAnArgument())
     )
   }
 }

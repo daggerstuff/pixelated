@@ -46,7 +46,7 @@ where
   data = call.getAnArgument() and
   not exists(DataFlow::CallNode encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    data.getALocalSource().flowsTo(encryptCall.getAnArgument())
+    data.flowsTo(encryptCall.getAnArgument())
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
