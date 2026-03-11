@@ -9,7 +9,7 @@
 // In production, you would need to call a Python service
 class Analyzer {
   async loadDefaultPiiRecognizer(): Promise<void> {
-    return Promise.resolve()
+    return Promise.resolve();
   }
 
   async analyze(
@@ -19,50 +19,50 @@ class Analyzer {
     // Use text and options parameters to avoid unused variable warnings
     console.log(
       `Analyzing text with length ${text.length} in language ${options.language}`,
-    )
-    return Promise.resolve([] as AnalyzeResult[])
+    );
+    return Promise.resolve([] as AnalyzeResult[]);
   }
 }
 
 class Anonymizer {
   async anonymize(payload: unknown): Promise<{ text: string }> {
     // Safely extract text if payload is the expected shape
-    if (typeof payload === 'object' && payload !== null && 'text' in payload) {
+    if (typeof payload === "object" && payload !== null && "text" in payload) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const obj = payload as { text?: unknown }
-      if (typeof obj.text === 'string') {
-        return Promise.resolve({ text: obj.text })
+      const obj = payload as { text?: unknown };
+      if (typeof obj.text === "string") {
+        return Promise.resolve({ text: obj.text });
       }
     }
 
     // If payload doesn't match expected shape, return empty text to avoid throwing
-    return Promise.resolve({ text: '' })
+    return Promise.resolve({ text: "" });
   }
 }
 
 // Mock implementation of memoize since the original is not accessible
 function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
-  const cache = new Map<string, ReturnType<T>>()
+  const cache = new Map<string, ReturnType<T>>();
 
   return ((...args: Parameters<T>): ReturnType<T> => {
-    const key = JSON.stringify(args)
+    const key = JSON.stringify(args);
 
     if (cache.has(key)) {
-      return cache.get(key) as ReturnType<T>
+      return cache.get(key) as ReturnType<T>;
     }
 
     // Call the function with unknown args and assert the return type
-    const result = fn(...(args as unknown[])) as ReturnType<T>
-    cache.set(key, result)
-    return result
-  }) as T
+    const result = fn(...(args as unknown[])) as ReturnType<T>;
+    cache.set(key, result);
+    return result;
+  }) as T;
 }
 
 // Mock implementation of createLogger
 function createLogger(name: string): {
-  info: (message: string) => void
-  warn: (message: string, meta?: unknown) => void
-  error: (message: string, meta?: unknown) => void
+  info: (message: string) => void;
+  warn: (message: string, meta?: unknown) => void;
+  error: (message: string, meta?: unknown) => void;
 } {
   return {
     info: (message: string) => console.log(`[INFO] ${name}: ${message}`),
@@ -70,75 +70,75 @@ function createLogger(name: string): {
       console.warn(`[WARN] ${name}: ${message}`, meta),
     error: (message: string, meta?: unknown) =>
       console.error(`[ERROR] ${name}: ${message}`, meta),
-  }
+  };
 }
 
-const logger = createLogger('security:phiDetection')
+const logger = createLogger("security:phiDetection");
 
 /**
  * PHI entity types that can be detected and redacted
  */
 export enum PHIEntityType {
-  PERSON = 'PERSON',
-  EMAIL_ADDRESS = 'EMAIL_ADDRESS',
-  PHONE_NUMBER = 'PHONE_NUMBER',
-  ADDRESS = 'ADDRESS',
-  LOCATION = 'LOCATION',
-  MEDICAL_RECORD_NUMBER = 'MEDICAL_RECORD_NUMBER',
-  US_SSN = 'US_SSN',
-  DATE_TIME = 'DATE_TIME',
-  AGE = 'AGE',
-  IP_ADDRESS = 'IP_ADDRESS',
-  URL = 'URL',
-  US_PASSPORT = 'US_PASSPORT',
-  US_DRIVER_LICENSE = 'US_DRIVER_LICENSE',
-  CREDIT_CARD = 'CREDIT_CARD',
-  US_BANK_NUMBER = 'US_BANK_NUMBER',
-  IBAN_CODE = 'IBAN_CODE',
-  US_ITIN = 'US_ITIN',
-  MEDICAL_LICENSE = 'MEDICAL_LICENSE',
-  ORGANIZATION = 'ORGANIZATION',
+  PERSON = "PERSON",
+  EMAIL_ADDRESS = "EMAIL_ADDRESS",
+  PHONE_NUMBER = "PHONE_NUMBER",
+  ADDRESS = "ADDRESS",
+  LOCATION = "LOCATION",
+  MEDICAL_RECORD_NUMBER = "MEDICAL_RECORD_NUMBER",
+  US_SSN = "US_SSN",
+  DATE_TIME = "DATE_TIME",
+  AGE = "AGE",
+  IP_ADDRESS = "IP_ADDRESS",
+  URL = "URL",
+  US_PASSPORT = "US_PASSPORT",
+  US_DRIVER_LICENSE = "US_DRIVER_LICENSE",
+  CREDIT_CARD = "CREDIT_CARD",
+  US_BANK_NUMBER = "US_BANK_NUMBER",
+  IBAN_CODE = "IBAN_CODE",
+  US_ITIN = "US_ITIN",
+  MEDICAL_LICENSE = "MEDICAL_LICENSE",
+  ORGANIZATION = "ORGANIZATION",
 }
 
 /**
  * PHI entity with type, start and end positions, and value
  */
 export interface PHIEntity {
-  type: PHIEntityType
-  start: number
-  end: number
-  score: number
-  value: string
+  type: PHIEntityType;
+  start: number;
+  end: number;
+  score: number;
+  value: string;
 }
 
 /**
  * Result of PHI detection
  */
 export interface PHIDetectionResult {
-  hasDetectedPHI: boolean
-  entities: PHIEntity[]
-  redactedText?: string
+  hasDetectedPHI: boolean;
+  entities: PHIEntity[];
+  redactedText?: string;
 }
 
 /**
  * Interface for Presidio Analyzer result
  */
 export interface AnalyzeResult {
-  entity_type: string
-  start: number
-  end: number
-  score: number
+  entity_type: string;
+  start: number;
+  end: number;
+  score: number;
 }
 
 /**
  * Presidio PHI detector that uses the Presidio library for PHI detection and redaction
  */
 export class PresidioPHIDetector {
-  private static instance: PresidioPHIDetector
-  private analyzer: Analyzer | null = null
-  private anonymizer: Anonymizer | null = null
-  private initialized = false
-  private initializationError: Error | null = null
+  private static instance: PresidioPHIDetector;
+  private analyzer: Analyzer | null = null;
+  private anonymizer: Anonymizer | null = null;
+  private initialized = false;
+  private initializationError: Error | null = null;
 
   /**
    * Initialize the Presidio library
@@ -146,31 +146,31 @@ export class PresidioPHIDetector {
   async initialize(): Promise<void> {
     try {
       if (this.initialized) {
-        return
+        return;
       }
 
       // Create Presidio Analyzer and Anonymizer instances
-      this.analyzer = new Analyzer()
-      this.anonymizer = new Anonymizer()
+      this.analyzer = new Analyzer();
+      this.anonymizer = new Anonymizer();
 
       // Initialize the analyzer
-      await this.analyzer.loadDefaultPiiRecognizer()
+      await this.analyzer.loadDefaultPiiRecognizer();
 
-      this.initialized = true
-      logger.info('Presidio PHI detector initialized successfully')
+      this.initialized = true;
+      logger.info("Presidio PHI detector initialized successfully");
     } catch (error: unknown) {
       this.initializationError =
         error instanceof Error
           ? error
-          : new Error('Failed to initialize Presidio: ' + String(error))
+          : new Error("Failed to initialize Presidio: " + String(error));
 
-      logger.error('Failed to initialize Presidio PHI detector', {
+      logger.error("Failed to initialize Presidio PHI detector", {
         error: this.initializationError.message,
         stack: this.initializationError.stack,
-      })
+      });
 
       // We'll continue without the Presidio and use fallback detection instead
-      this.initialized = false
+      this.initialized = false;
     }
   }
 
@@ -179,9 +179,9 @@ export class PresidioPHIDetector {
    */
   public static getInstance(): PresidioPHIDetector {
     if (!PresidioPHIDetector.instance) {
-      PresidioPHIDetector.instance = new PresidioPHIDetector()
+      PresidioPHIDetector.instance = new PresidioPHIDetector();
     }
-    return PresidioPHIDetector.instance
+    return PresidioPHIDetector.instance;
   }
 
   /**
@@ -189,17 +189,17 @@ export class PresidioPHIDetector {
    */
   async detectPHI(text: string): Promise<PHIDetectionResult> {
     if (!text) {
-      return { hasDetectedPHI: false, entities: [] }
+      return { hasDetectedPHI: false, entities: [] };
     }
 
     try {
-      await this.initialize()
+      await this.initialize();
 
-      let entities: PHIEntity[]
+      let entities: PHIEntity[];
 
       if (this.initialized && this.analyzer) {
         // Use Presidio for detection
-        const results = await this.analyzer.analyze(text, { language: 'en' })
+        const results = await this.analyzer.analyze(text, { language: "en" });
 
         entities = results.map((entity: AnalyzeResult) => ({
           type: entity.entity_type as PHIEntityType,
@@ -207,56 +207,56 @@ export class PresidioPHIDetector {
           end: entity.end,
           score: entity.score,
           value: text.substring(entity.start, entity.end),
-        }))
+        }));
       } else {
         // Use fallback detection if Presidio is not available
-        entities = this.fallbackDetection(text)
+        entities = this.fallbackDetection(text);
 
         if (this.initializationError) {
           logger.warn(
-            'Using fallback PHI detection due to Presidio initialization error',
+            "Using fallback PHI detection due to Presidio initialization error",
             {
               error: this.initializationError.message,
             },
-          )
+          );
         }
       }
 
       // Check if any PHI has been detected
-      const hasDetectedPHI = entities.length > 0
+      const hasDetectedPHI = entities.length > 0;
 
       // Redact the text if PHI has been detected
-      let redactedText: string | undefined
+      let redactedText: string | undefined;
       if (hasDetectedPHI) {
-        redactedText = await this.redactText(text, entities)
+        redactedText = await this.redactText(text, entities);
       }
 
       return {
         hasDetectedPHI,
         entities,
         redactedText,
-      }
+      };
     } catch (error: unknown) {
-      logger.error('Error detecting PHI', {
+      logger.error("Error detecting PHI", {
         error: error instanceof Error ? String(error) : String(error),
         stack: error instanceof Error ? (error as Error)?.stack : undefined,
-      })
+      });
 
       // Use fallback detection in case of error
-      const entities = this.fallbackDetection(text)
-      const hasDetectedPHI = entities.length > 0
+      const entities = this.fallbackDetection(text);
+      const hasDetectedPHI = entities.length > 0;
 
-      let redactedText: string | undefined
+      let redactedText: string | undefined;
       if (hasDetectedPHI) {
         try {
-          redactedText = await this.redactText(text, entities)
+          redactedText = await this.redactText(text, entities);
         } catch (redactError) {
-          logger.error('Error redacting PHI text', {
+          logger.error("Error redacting PHI text", {
             error:
               redactError instanceof Error
                 ? redactError.message
                 : String(redactError),
-          })
+          });
         }
       }
 
@@ -264,7 +264,7 @@ export class PresidioPHIDetector {
         hasDetectedPHI,
         entities,
         redactedText,
-      }
+      };
     }
   }
 
@@ -281,7 +281,7 @@ export class PresidioPHIDetector {
         const anonymizerPayload = {
           text,
           anonymizers: {
-            DEFAULT: { type: 'replace', newValue: '[REDACTED]' },
+            DEFAULT: { type: "replace", newValue: "[REDACTED]" },
           },
           analyzer_results: entities.map((entity) => ({
             entity_type: entity.type,
@@ -289,21 +289,21 @@ export class PresidioPHIDetector {
             end: entity.end,
             score: entity.score,
           })),
-        }
+        };
 
-        const result = await this.anonymizer.anonymize(anonymizerPayload)
-        return result.text
+        const result = await this.anonymizer.anonymize(anonymizerPayload);
+        return result.text;
       } else {
         // Use fallback redaction if Presidio is not available
-        return this.fallbackRedaction(text, entities)
+        return this.fallbackRedaction(text, entities);
       }
     } catch (error: unknown) {
-      logger.error('Error redacting PHI', {
+      logger.error("Error redacting PHI", {
         error: error instanceof Error ? String(error) : String(error),
-      })
+      });
 
       // Use fallback redaction in case of error
-      return this.fallbackRedaction(text, entities)
+      return this.fallbackRedaction(text, entities);
     }
   }
 
@@ -311,81 +311,81 @@ export class PresidioPHIDetector {
    * Fallback method for detecting PHI entities using regex patterns
    */
   private fallbackDetection = memoize((text: string): PHIEntity[] => {
-    const entities: PHIEntity[] = []
+    const entities: PHIEntity[] = [];
 
     // Common PHI regex patterns
     const patterns: Record<PHIEntityType, RegExp> = {
       [PHIEntityType.EMAIL_ADDRESS]: new RegExp(
-        '\\b[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}\\b',
-        'gi',
+        "\\b[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}\\b",
+        "gi",
       ),
       [PHIEntityType.PHONE_NUMBER]: new RegExp(
-        '\\b(\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}\\b',
-        'g',
+        "(?:\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}",
+        "g",
       ),
-      [PHIEntityType.US_SSN]: new RegExp('\\b\\d{3}-?\\d{2}-?\\d{4}\\b', 'g'),
+      [PHIEntityType.US_SSN]: new RegExp("\\b\\d{3}-?\\d{2}-?\\d{4}\\b", "g"),
       [PHIEntityType.IP_ADDRESS]: new RegExp(
-        '\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b',
-        'g',
+        "\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b",
+        "g",
       ),
       [PHIEntityType.CREDIT_CARD]: new RegExp(
-        '\\b(?:\\d{4}[-\\s]?){3}\\d{4}\\b',
-        'g',
+        "\\b(?:\\d{4}[-\\s]?){3}\\d{4}\\b",
+        "g",
       ),
       [PHIEntityType.DATE_TIME]: new RegExp(
-        '\\b\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4}\\b',
-        'g',
+        "\\b\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4}\\b",
+        "g",
       ),
       [PHIEntityType.AGE]: new RegExp(
-        '\\b\\d{1,3}\\s+(?:years?|yrs?|y)(?:\\s+old)?\\b',
-        'gi',
+        "\\b\\d{1,3}\\s+(?:years?|yrs?|y)(?:\\s+old)?\\b",
+        "gi",
       ),
       // Simplified patterns for other types
       [PHIEntityType.PERSON]: new RegExp(
-        '\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b',
-        'g',
+        "\\b(?!(?:Patient|Dr|Mr|Mrs|Ms|Miss|The|Our|What|After|My|You|Not|This|Raw|Comment|Challenge|Share|Mental|Just|Come)\\b)[A-Z][a-z]+\\s+[A-Z][a-z]+\\b",
+        "g",
       ),
       [PHIEntityType.ADDRESS]: new RegExp(
-        '\\b\\d+\\s+[A-Za-z\\s]+(?:Avenue|Lane|Road|Boulevard|Drive|Street|Ave|Ln|Rd|Blvd|Dr|St)\\.?\\s+(?:#\\w+)?\\b',
-        'gi',
+        "\\b\\d+\\s+[A-Za-z\\s]+(?:Avenue|Lane|Road|Boulevard|Drive|Street|Ave|Ln|Rd|Blvd|Dr|St)\\.?\\s+(?:#\\w+)?\\b",
+        "gi",
       ),
       [PHIEntityType.LOCATION]: new RegExp(
-        '\\b[A-Z][a-z]+(?:,\\s+[A-Z]{2})?\\b',
-        'g',
+        "\\b[A-Z][a-z]+,\\s+[A-Z]{2}\\b",
+        "g",
       ),
       [PHIEntityType.MEDICAL_RECORD_NUMBER]: new RegExp(
-        '\\bMR[N#]?\\s*:?\\s*\\d+\\b',
-        'gi',
+        "\\bMR[N#]?\\s*:?\\s*\\d+\\b",
+        "gi",
       ),
       [PHIEntityType.URL]: new RegExp(
         "\\bhttps?://[\\w.-]+\\.[a-zA-Z]{2,}[\\w\\-._~:/?#[\\]@!$&'()*+,;=]+\\b",
-        'gi',
+        "gi",
       ),
-      [PHIEntityType.US_PASSPORT]: new RegExp('\\b[A-Z]\\d{8}\\b', 'g'),
+      [PHIEntityType.US_PASSPORT]: new RegExp("\\b[A-Z]\\d{8}\\b", "g"),
       [PHIEntityType.US_DRIVER_LICENSE]: new RegExp(
-        '\\b[A-Z]\\d{3}-\\d{3}-\\d{3}\\b',
-        'g',
+        "\\b[A-Z]\\d{3}-\\d{3}-\\d{3}\\b",
+        "g",
       ),
-      [PHIEntityType.US_BANK_NUMBER]: new RegExp('\\b\\d{10,12}\\b', 'g'),
+      [PHIEntityType.US_BANK_NUMBER]: new RegExp("\\b\\d{10,12}\\b", "g"),
       [PHIEntityType.IBAN_CODE]: new RegExp(
-        '\\b[A-Z]{2}\\d{2}[A-Z0-9]{4}\\d{7}[A-Z0-9]{0,16}\\b',
-        'g',
+        "\\b[A-Z]{2}\\d{2}[A-Z0-9]{4}\\d{7}[A-Z0-9]{0,16}\\b",
+        "g",
       ),
-      [PHIEntityType.US_ITIN]: new RegExp('\\b9\\d{2}-?\\d{2}-?\\d{4}\\b', 'g'),
-      [PHIEntityType.MEDICAL_LICENSE]: new RegExp('\\b[A-Z]{2}\\d{6}\\b', 'g'),
+      [PHIEntityType.US_ITIN]: new RegExp("\\b9\\d{2}-?\\d{2}-?\\d{4}\\b", "g"),
+      [PHIEntityType.MEDICAL_LICENSE]: new RegExp("\\b[A-Z]{2}\\d{6}\\b", "g"),
       [PHIEntityType.ORGANIZATION]: new RegExp(
-        '\\b[A-Z][a-z]+\\s+(?:Hospital|Medical Center|Clinic|Healthcare|Health)\\b',
-        'g',
+        "\\b[A-Z][a-z]+\\s+(?:Hospital|Medical Center|Clinic|Healthcare|Health)\\b",
+        "g",
       ),
-    }
+    };
 
     // Check each pattern
     for (const [type, pattern] of Object.entries(patterns)) {
       // Create a fresh regex instance for each iteration to avoid state carryover
       // This is necessary to avoid the RegExp.lastIndex issue when using the 'g' flag
-      const freshPattern = new RegExp(pattern.source, pattern.flags)
+      const freshPattern = new RegExp(pattern.source, pattern.flags);
 
-      let match
+      let match;
       while ((match = freshPattern.exec(text)) !== null) {
         entities.push({
           type: type as PHIEntityType,
@@ -393,37 +393,43 @@ export class PresidioPHIDetector {
           end: match.index + match[0].length,
           score: 0.8, // Arbitrary confidence score for fallback detection
           value: match[0],
-        })
+        });
       }
     }
 
-    return entities
-  })
+    return entities;
+  });
 
   /**
    * Fallback method for redacting PHI entities in text
    */
   private fallbackRedaction(text: string, entities: PHIEntity[]): string {
     // Sort entities by start position in descending order to avoid position shifts
-    const sortedEntities = [...entities].sort((a, b) => b.start - a.start)
+    const sortedEntities = [...entities].sort((a, b) => b.start - a.start);
 
     // Create a copy of the text to modify
-    let redactedText = text
+    let redactedText = text;
 
-    // Replace each entity with [REDACTED]
+    // Replace each entity with appropriate token
     for (const entity of sortedEntities) {
+      let token = "[REDACTED]";
+      if (entity.type === PHIEntityType.EMAIL_ADDRESS) token = "[EMAIL]";
+      else if (entity.type === PHIEntityType.PHONE_NUMBER) token = "[PHONE]";
+      else if (entity.type === PHIEntityType.US_SSN) token = "[ID]";
+      else if (entity.type === PHIEntityType.PERSON) token = "[NAME]";
+
       redactedText =
         redactedText.substring(0, entity.start) +
-        '[REDACTED]' +
-        redactedText.substring(entity.end)
+        token +
+        redactedText.substring(entity.end);
     }
 
-    return redactedText
+    return redactedText;
   }
 }
 
 // Export a singleton instance
-export const phiDetector = PresidioPHIDetector.getInstance()
+export const phiDetector = PresidioPHIDetector.getInstance();
 
 // --- Simple usage example (to be replaced with real tests) ---
 /*
@@ -445,9 +451,9 @@ if (require.main === module) {
  * @returns Text with PHI redacted, or the original text if no PHI is detected
  */
 export async function detectAndRedactPHIAsync(text: string): Promise<string> {
-  const detector = PresidioPHIDetector.getInstance()
-  const result = await detector.detectPHI(text)
-  return result.redactedText || text
+  const detector = PresidioPHIDetector.getInstance();
+  const result = await detector.detectPHI(text);
+  return result.redactedText || text;
 }
 
 /**
@@ -459,18 +465,18 @@ export async function detectAndRedactPHIAsync(text: string): Promise<string> {
 export function detectAndRedactPHI(text: string): string {
   try {
     // For simplicity, we'll fall back to regex-based detection in the sync version
-    const detector = PresidioPHIDetector.getInstance()
-    const entities = detector['fallbackDetection'](text)
+    const detector = PresidioPHIDetector.getInstance();
+    const entities = detector["fallbackDetection"](text);
 
     if (entities.length === 0) {
-      return text
+      return text;
     }
 
-    return detector['fallbackRedaction'](text, entities)
+    return detector["fallbackRedaction"](text, entities);
   } catch (error: unknown) {
-    logger.error('Error in detectAndRedactPHI', {
+    logger.error("Error in detectAndRedactPHI", {
       error: error instanceof Error ? String(error) : String(error),
-    })
-    return text // Return original text if redaction fails
+    });
+    return text; // Return original text if redaction fails
   }
 }

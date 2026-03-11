@@ -92,7 +92,11 @@ export class AuditLoggingService {
   }
 
   private sanitizeEntry(entry: AuditLogEntry): AuditLogEntry {
-    const sanitized = { ...entry }
+    const sanitized = {
+      ...entry,
+      details: entry.details ? { ...entry.details } : {},
+      metadata: entry.metadata ? { ...entry.metadata } : {},
+    }
 
     if (!this.config.includePII) {
       // Hash sensitive identifiers

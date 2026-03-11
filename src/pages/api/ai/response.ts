@@ -2,117 +2,121 @@ import {
   createAuditLog,
   AuditEventType,
   AuditEventStatus,
-} from '../../../lib/audit'
-import type { APIRoute } from 'astro'
-import { getSession } from '../../../lib/auth/session'
-import { aiRepository } from '@/lib/db/ai'
-import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
-import { apiMetrics, countMetric } from '@/lib/sentry/utils'
-import { createTogetherAIService } from '@/lib/ai/together-ai/service'
-import type { AIService, AIServiceOptions, AIMessage, AIStreamChunk, TherapeuticResponse } from '@/lib/ai/types'
-import { ResponseGenerationService } from '@/lib/ai/response-generation/service'
+} from "../../../lib/audit";
+import type { APIRoute } from "astro";
+import { getSession } from "../../../lib/auth/session";
+import { aiRepository } from "@/lib/db/ai";
+import { trackApiRequest, trackApiError } from "@/lib/sentry/api-metrics";
+import { apiMetrics, countMetric } from "@/lib/sentry/utils";
+import { createTogetherAIService } from "@/lib/ai/services/together";
+import type {
+  AIService,
+  AIServiceOptions,
+  AIMessage,
+  AIStreamChunk,
+  TherapeuticResponse,
+} from "@/lib/ai/types";
+import { ResponseGenerationService } from "@/lib/ai/response-generation/service";
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
   user?: {
-    id: string
-    email?: string
-    role?: string
-    name?: string
-  }
+    id: string;
+    email?: string;
+    role?: string;
+    name?: string;
+  };
   session?: {
-    sessionId?: string
-  }
-  expires?: string
+    sessionId?: string;
+  };
+  expires?: string;
 }
 
 /**
  * GET handler - returns information about the AI response endpoint
  */
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request: _request }) => {
   try {
     // Verify session for security
-    const session: Session | null = await getSession()
+    const session: Session | null = await getSession();
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Return endpoint information
     return new Response(
       JSON.stringify({
-        name: 'AI Therapeutic Response API',
-        description: 'Endpoint for generating therapeutic AI responses',
-        methods: ['POST'],
-        version: '1.0.0',
-        status: 'active',
-        authentication: 'required',
+        name: "AI Therapeutic Response API",
+        description: "Endpoint for generating therapeutic AI responses",
+        methods: ["POST"],
+        version: "1.0.0",
+        status: "active",
+        authentication: "required",
         supportedModels: [
-          'mistralai/Mixtral-8x7B-Instruct-v0.2',
-          'gpt-4',
-          'claude-3',
+          "mistralai/Mixtral-8x7B-Instruct-v0.2",
+          "gpt-4",
+          "claude-3",
         ],
         parameters: {
-          required: ['messages or currentMessage'],
+          required: ["messages or currentMessage"],
           optional: [
-            'model',
-            'temperature',
-            'maxResponseTokens',
-            'instructions',
+            "model",
+            "temperature",
+            "maxResponseTokens",
+            "instructions",
           ],
         },
         features: [
-          'therapeutic response generation',
-          'conversation context awareness',
-          'audit logging',
-          'token usage tracking',
+          "therapeutic response generation",
+          "conversation context awareness",
+          "audit logging",
+          "token usage tracking",
         ],
-        defaultModel: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        defaultModel: "mistralai/Mixtral-8x7B-Instruct-v0.2",
         maxTokens: 1024,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   } catch (error: unknown) {
     return new Response(
       JSON.stringify({
-        error: 'Failed to get endpoint information',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to get endpoint information",
+        message: error instanceof Error ? String(error) : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * API route for therapeutic response generation
  */
-export const POST: APIRoute = async ({
-  request,
-}) => {
-  const startTime = Date.now()
-  const endpoint = '/api/ai/response'
-  let session: Session | null = null
+export const POST: APIRoute = async ({ request }) => {
+  const startTime = Date.now();
+  const endpoint = "/api/ai/response";
+  let session: Session | null = null;
 
   try {
     // Verify session
-    session = await getSession()
+    session = await getSession();
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json();
     const {
       messages,
       currentMessage,
@@ -120,31 +124,31 @@ export const POST: APIRoute = async ({
       temperature = 0.7,
       maxResponseTokens = 1024,
       instructions,
-    } = body
+    } = body;
 
     // Validate required fields
     if (!messages && !currentMessage) {
       return new Response(
         JSON.stringify({
-          error: 'Either messages or currentMessage is required',
+          error: "Either messages or currentMessage is required",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     // Create Together AI service
     const togetherService = createTogetherAIService({
-      togetherApiKey: import.meta.env['TOGETHER_API_KEY'] || '',
+      togetherApiKey: import.meta.env["TOGETHER_API_KEY"] || "",
       togetherBaseUrl:
-        import.meta.env['TOGETHER_BASE_URL'] || 'https://api.together.xyz',
-      apiKey: '',
-    })
+        import.meta.env["TOGETHER_BASE_URL"] || "https://api.together.xyz",
+      apiKey: "",
+    });
 
     // Use the model from the request or the default
-    const modelId = model || 'mistralai/Mixtral-8x7B-Instruct-v0.2'
+    const modelId = model || "mistralai/Mixtral-8x7B-Instruct-v0.2";
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {
@@ -155,7 +159,7 @@ export const POST: APIRoute = async ({
         const response = await togetherService.generateCompletion(
           messages,
           options,
-        )
+        );
         return {
           id: `together${Date.now()}`,
           created: Date.now(),
@@ -163,72 +167,72 @@ export const POST: APIRoute = async ({
           choices: [
             {
               message: {
-                role: 'assistant',
+                role: "assistant",
                 content:
-                  typeof response === 'object' &&
-                    response !== null &&
-                    'content' in response
+                  typeof response === "object" &&
+                  response !== null &&
+                  "content" in response
                     ? (response as { content: string }).content
-                    : '',
-                name: 'assistant',
+                    : "",
+                name: "assistant",
               },
-              finishReason: 'stop',
+              finishReason: "stop",
             },
           ],
           usage:
-            typeof response === 'object' &&
-              response !== null &&
-              'usage' in response
+            typeof response === "object" &&
+            response !== null &&
+            "usage" in response
               ? {
-                promptTokens: Number(
-                  (response.usage as { promptTokens: number })
-                    ?.promptTokens || 0,
-                ),
-                completionTokens: Number(
-                  (response.usage as { completionTokens: number })
-                    ?.completionTokens || 0,
-                ),
-                totalTokens: Number(
-                  (response.usage as { totalTokens: number })?.totalTokens ||
-                  0,
-                ),
-              }
+                  promptTokens: Number(
+                    (response.usage as { promptTokens: number })
+                      ?.promptTokens || 0,
+                  ),
+                  completionTokens: Number(
+                    (response.usage as { completionTokens: number })
+                      ?.completionTokens || 0,
+                  ),
+                  totalTokens: Number(
+                    (response.usage as { totalTokens: number })?.totalTokens ||
+                      0,
+                  ),
+                }
               : {
-                promptTokens: 0,
-                completionTokens: 0,
-                totalTokens: 0,
-              },
-          provider: 'together',
+                  promptTokens: 0,
+                  completionTokens: 0,
+                  totalTokens: 0,
+                },
+          provider: "together",
           content:
-            typeof response === 'object' &&
-              response !== null &&
-              'content' in response
+            typeof response === "object" &&
+            response !== null &&
+            "content" in response
               ? (response as { content: string }).content
-              : '',
-        }
+              : "",
+        };
       },
       createStreamingChatCompletion: async (
         _messages: AIMessage[],
         options?: AIServiceOptions,
       ): Promise<AsyncGenerator<AIStreamChunk, void, void>> => {
-        const generator = async function*() {
+        const generator = async function* () {
           // Minimal implementation - streaming not fully supported
           yield {
             id: `together_${Date.now()}`,
             model: options?.model || modelId,
             created: Date.now(),
-            content: '',
+            content: "",
             done: true,
-          } as AIStreamChunk
-          throw new Error('Streaming not supported in this implementation')
-        }
-        return generator()
+          } as AIStreamChunk;
+          throw new Error("Streaming not supported in this implementation");
+        };
+        return generator();
       },
       getModelInfo: (model: string) => ({
         id: model,
         name: model,
-        provider: 'together',
-        capabilities: ['chat'],
+        provider: "together",
+        capabilities: ["chat"],
         contextWindow: 8192,
         maxTokens: 8192,
       }),
@@ -239,7 +243,7 @@ export const POST: APIRoute = async ({
         const response = await togetherService.generateCompletion(
           messages,
           options,
-        )
+        );
         return {
           id: `together${Date.now()}`,
           created: Date.now(),
@@ -247,55 +251,55 @@ export const POST: APIRoute = async ({
           choices: [
             {
               message: {
-                role: 'assistant',
+                role: "assistant",
                 content:
-                  typeof response === 'object' &&
-                    response !== null &&
-                    'content' in response
+                  typeof response === "object" &&
+                  response !== null &&
+                  "content" in response
                     ? (response as { content: string }).content
-                    : '',
-                name: 'assistant',
+                    : "",
+                name: "assistant",
               },
-              finishReason: 'stop',
+              finishReason: "stop",
             },
           ],
           usage:
-            typeof response === 'object' &&
-              response !== null &&
-              'usage' in response
+            typeof response === "object" &&
+            response !== null &&
+            "usage" in response
               ? {
-                promptTokens: Number(
-                  (response.usage as { promptTokens: number })
-                    ?.promptTokens || 0,
-                ),
-                completionTokens: Number(
-                  (response.usage as { completionTokens: number })
-                    ?.completionTokens || 0,
-                ),
-                totalTokens: Number(
-                  (response.usage as { totalTokens: number })?.totalTokens ||
-                  0,
-                ),
-              }
+                  promptTokens: Number(
+                    (response.usage as { promptTokens: number })
+                      ?.promptTokens || 0,
+                  ),
+                  completionTokens: Number(
+                    (response.usage as { completionTokens: number })
+                      ?.completionTokens || 0,
+                  ),
+                  totalTokens: Number(
+                    (response.usage as { totalTokens: number })?.totalTokens ||
+                      0,
+                  ),
+                }
               : {
-                promptTokens: 0,
-                completionTokens: 0,
-                totalTokens: 0,
-              },
-          provider: 'together',
+                  promptTokens: 0,
+                  completionTokens: 0,
+                  totalTokens: 0,
+                },
+          provider: "together",
           content:
-            typeof response === 'object' &&
-              response !== null &&
-              'content' in response
+            typeof response === "object" &&
+            response !== null &&
+            "content" in response
               ? (response as { content: string }).content
-              : '',
-        }
+              : "",
+        };
       },
       // generateCompletion is not required for this adapter in current usage. Omitting to simplify typing.
       dispose: () => {
-        togetherService.dispose()
+        togetherService.dispose();
       },
-    }
+    };
 
     // Create response generation service
     const responseService = new ResponseGenerationService({
@@ -303,60 +307,60 @@ export const POST: APIRoute = async ({
       model: modelId,
       temperature,
       maxResponseTokens,
-    })
+    });
     // Log the request
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.request',
-      session?.user?.id || 'anonymous',
-      'response-generation',
+      "ai.response.request",
+      session?.user?.id || "anonymous",
+      "response-generation",
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId || "mistralai/Mixtral-8x7B-Instruct-v0.2",
         temperature,
         maxResponseTokens,
         messageCount: messages ? messages.length : 1,
       },
-    )
+    );
 
     // Start timer for latency measurement
-    const startTime = Date.now()
+    const startTime = Date.now();
 
     // Process the request
-    let result: TherapeuticResponse
+    let result: TherapeuticResponse;
     if (messages) {
       result = await responseService.generateResponseWithInstructions(
         messages,
         instructions,
-      )
+      );
     } else {
       result = await responseService.generateResponseWithInstructions(
         [currentMessage],
         instructions,
-      )
+      );
     }
 
-    const latencyMs = Date.now() - startTime
+    const latencyMs = Date.now() - startTime;
 
     // Track metrics
-    trackApiRequest(endpoint, 'POST', 200, latencyMs)
-    apiMetrics.responseTime(endpoint, latencyMs, 'POST')
-    countMetric('ai.response.generated', 1, {
-      model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      provider: 'together',
+    trackApiRequest(endpoint, "POST", 200, latencyMs);
+    apiMetrics.responseTime(endpoint, latencyMs, "POST");
+    countMetric("ai.response.generated", 1, {
+      model: modelId || "mistralai/Mixtral-8x7B-Instruct-v0.2",
+      provider: "together",
       success: true,
-    })
+    });
 
     // Store the result in the database
     await aiRepository.storeResponseGeneration({
-      userId: session?.user?.id || 'anonymous',
-      modelId: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      modelProvider: 'together',
+      userId: session?.user?.id || "anonymous",
+      modelId: modelId || "mistralai/Mixtral-8x7B-Instruct-v0.2",
+      modelProvider: "together",
       latencyMs,
       success: true,
       error: null,
-      prompt: currentMessage || (messages ? JSON.stringify(messages) : ''),
+      prompt: currentMessage || (messages ? JSON.stringify(messages) : ""),
       response: result?.content,
-      context: '',
+      context: "",
       instructions,
       temperature,
       maxTokens: maxResponseTokens,
@@ -366,63 +370,64 @@ export const POST: APIRoute = async ({
       metadata: {
         messageCount: messages ? messages.length : 1,
       },
-    })
+    });
 
     // Log the response
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.response',
-      session?.user?.id || 'anonymous',
-      'response-generation',
+      "ai.response.response",
+      session?.user?.id || "anonymous",
+      "response-generation",
       {
-        model: modelId || 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId || "mistralai/Mixtral-8x7B-Instruct-v0.2",
         responseLength: result?.content.length,
         latencyMs,
       },
-    )
+    );
 
     return new Response(JSON.stringify(result), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    const durationMs = Date.now() - startTime
-    const errorType = error instanceof Error ? error.constructor.name : 'UnknownError'
+    const durationMs = Date.now() - startTime;
+    const errorType =
+      error instanceof Error ? error.constructor.name : "UnknownError";
 
-    console.error('Error in response generation API:', error)
+    console.error("Error in response generation API:", error);
 
     // Track error metrics
-    trackApiError(endpoint, errorType, 'POST')
-    apiMetrics.responseTime(endpoint, durationMs, 'POST')
-    countMetric('ai.response.error', 1, {
+    trackApiError(endpoint, errorType, "POST");
+    apiMetrics.responseTime(endpoint, durationMs, "POST");
+    countMetric("ai.response.error", 1, {
       error_type: errorType,
       endpoint,
-    })
+    });
 
     // Create audit log for the error
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.error',
-      session?.user?.id || 'anonymous',
-      'response-generation',
+      "ai.response.error",
+      session?.user?.id || "anonymous",
+      "response-generation",
       {
         error: error instanceof Error ? error?.message : String(error),
         stack: error instanceof Error ? error?.stack : undefined,
-        status: 'error',
+        status: "error",
       },
       AuditEventStatus.FAILURE,
-    )
+    );
 
     return new Response(
       JSON.stringify({
-        error: 'An error occurred during response generation',
+        error: "An error occurred during response generation",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
