@@ -30,10 +30,9 @@ predicate isFHIRResourceAccess(CallExpr call) {
 
 predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
-    (validateCall.getCalleeName().matches("%validate%") or
-     validateCall.getCalleeName().matches("%check%") or
-     validateCall.getCalleeName().matches("%verify%")) and
-    validateCall.getEnclosingFunction() = call.getEnclosingFunction()
+    validateCall.getCalleeName().matches("%validate%") or
+    validateCall.getCalleeName().matches("%check%") or
+    validateCall.getCalleeName().matches("%verify%")
   )
 }
 

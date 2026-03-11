@@ -25,9 +25,11 @@ predicate isFHIRSearch(CallExpr call) {
 }
 
 predicate hasInputSanitization(CallExpr call) {
-  call.getCalleeName().matches("%sanitize%") or
-  call.getCalleeName().matches("%escape%") or
-  call.getCalleeName().matches("%validate%")
+  exists(CallExpr sanitizeCall |
+    sanitizeCall.getCalleeName().matches("%sanitize%") or
+    sanitizeCall.getCalleeName().matches("%escape%") or
+    sanitizeCall.getCalleeName().matches("%validate%")
+  )
 }
 
 from CallExpr searchOp
@@ -36,11 +38,3 @@ where
   not hasInputSanitization(searchOp)
 select searchOp,
   "FHIR search operation without input sanitization detected. Ensure proper input validation."
-
-// Ensure the call originates from a class that suggests a FHIR context.
-exists(Class cls |
-  cls = call.getDeclaringClass() and
-  (cls.getName().matches("%FHIR%") or
-   cls.getName().matches("%Search%") or
-   cls.getName().matches("%Find%") or
-   cls.getName().matches("%Query%"))

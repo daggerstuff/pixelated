@@ -28,10 +28,9 @@ predicate isFHIROperation(CallExpr call) {
 
 predicate hasSecurityContext(CallExpr call) {
   exists(CallExpr securityCall |
-    securityCall.getQualifier() = call.getQualifier() and
-    (securityCall.getCalleeName().matches("%authorize%") or
-     securityCall.getCalleeName().matches("%checkPermission%") or
-     securityCall.getCalleeName().matches("%verifyAccess%"))
+    securityCall.getCalleeName().matches("%authorize%") or
+    securityCall.getCalleeName().matches("%checkPermission%") or
+    securityCall.getCalleeName().matches("%verifyAccess%")
   )
 }
 
