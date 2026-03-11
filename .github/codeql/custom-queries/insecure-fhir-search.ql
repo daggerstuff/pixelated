@@ -26,9 +26,14 @@ predicate isFHIRSearch(CallExpr call) {
 
 predicate hasInputSanitization(CallExpr call) {
   exists(CallExpr sanitizeCall |
-    sanitizeCall.getCalleeName().matches("%sanitize%") or
-    sanitizeCall.getCalleeName().matches("%escape%") or
-    sanitizeCall.getCalleeName().matches("%validate%")
+    sanitizeCall.getParent() = call.getParent() and
+    sanitizeCall.getStartLine() < call.getStartLine() and
+    sanitizeCall.getArgument(0) = call.getArgument(0) and
+    (
+      sanitizeCall.getCalleeName().matches("%sanitize%") or
+      sanitizeCall.getCalleeName().matches("%escape%") or
+      sanitizeCall.getCalleeName().matches("%validate%")
+    )
   )
 }
 

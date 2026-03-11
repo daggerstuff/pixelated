@@ -7,8 +7,13 @@ async function indexPosts() {
   if (isIndexed) {
     return;
   }
+  // Lock indexing to prevent race conditions
+  isIndexed = true;
 
   console.time('⚡ Bolt: search indexing');
+  // Clear the in‑memory post list to avoid duplicates on retry
+  blogSearch._posts = [];
+
   const posts = await getCollection('blog');
   for (const post of posts) {
     // ⚡ Bolt: Use direct body access instead of expensive .render()
@@ -17,7 +22,7 @@ async function indexPosts() {
     blogSearch.addPost(post, content);
   }
   console.timeEnd('⚡ Bolt: search indexing');
-  isIndexed = true;
+  // isIndexed = true; // already set above
 }
 
 export const GET = async ({ url }) => {

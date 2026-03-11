@@ -320,7 +320,7 @@ export class PresidioPHIDetector {
         "gi",
       ),
       [PHIEntityType.PHONE_NUMBER]: new RegExp(
-        "(?:\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}",
+        "(?:\\+\\d{1,3}[-.\\s]?)?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\s]?\\d{4}\\b",
         "g",
       ),
       [PHIEntityType.US_SSN]: new RegExp("\\b\\d{3}-?\\d{2}-?\\d{4}\\b", "g"),
