@@ -87,7 +87,6 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
       <button
         class="lg:hidden p-2 text-neutral-300 hover:text-primary-400 transition-colors"
         id="mobile-menu-toggle"
-        aria-expanded="false"
       >
         <svg
           class="w-6 h-6"
@@ -160,7 +159,6 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
   const mobileMenuToggle = document.getElementById('mobile-menu-toggle')
   const mobileMenu = document.getElementById('mobile-menu')
   let lastScrollY = window.scrollY
-  let isMenuOpen = false // Track the state of the mobile menu
 
   // Scroll behavior
   window.addEventListener('scroll', () => {
@@ -188,12 +186,11 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
   // Mobile menu toggle
   mobileMenuToggle?.addEventListener('click', () => {
     if (!mobileMenu) return
-    const willOpen = !isMenuOpen
+    const isOpen = mobileMenu.classList.contains('hidden')
 
-    if (willOpen) {
+    if (isOpen) {
       mobileMenu.classList.remove('hidden')
-      // Trigger reflow then set height to animate slide down
-      void mobileMenu.offsetWidth
+      mobileMenu.style.maxHeight = '0px'
       mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px'
     } else {
       mobileMenu.style.maxHeight = '0px'
@@ -203,10 +200,6 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
         }
       }, 300)
     }
-
-    // Update ARIA attribute to reflect the new state
-    mobileMenuToggle.setAttribute('aria-expanded', willOpen.toString())
-    isMenuOpen = willOpen
   })
 
   // Smooth scroll for navigation links
@@ -219,32 +212,12 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
         if (target) {
           target.scrollIntoView({ behavior: 'smooth' })
           // Close mobile menu if open
-          if (isMenuOpen) {
-            isMenuOpen = false;
-            if (mobileMenu) {
-              mobileMenu.style.maxHeight = '0px';
-              setTimeout(() => {
-                mobileMenu.classList.add('hidden');
-              }, 300);
-            }
-            mobileMenuToggle.setAttribute('aria-expanded', 'false');
+          if (mobileMenu) {
+            mobileMenu.classList.add('hidden')
           }
         }
       }
     })
-  })
-
-  // Close mobile menu on Escape key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && isMenuOpen && mobileMenu && mobileMenuToggle) {
-      isMenuOpen = false;
-      mobileMenu.style.maxHeight = '0px';
-      setTimeout(() => {
-        if (mobileMenu) {
-          mobileMenu.classList.add('hidden');
-        }
-      }, 300);
-    }
   })
 </script>
 
