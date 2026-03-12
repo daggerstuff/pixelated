@@ -6,6 +6,11 @@
 import * as fs from 'fs'
 
 import { getLogger } from '@/lib/logging'
+import {
+  ALLOWED_DIRECTORIES,
+  safeJoin,
+  validatePath,
+} from '@/utils/path-security'
 
 const logger = getLogger('secrets-manager')
 
@@ -18,7 +23,10 @@ const SECURITY_CONFIG = {
     TAG_LENGTH: 16,
   },
   STORAGE: {
-    SECRETS_DIR: process.env.SECRETS_DIR || './config/secrets',
+    SECRETS_DIR: validatePath(
+      process.env.SECRETS_DIR || './config/secrets',
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
+    ),
     PERMISSIONS: 0o600, // Read/write for owner only
   },
   VALIDATION: {
@@ -76,7 +84,7 @@ export class SecretsManager {
    * Load encryption key from secure storage
    */
   private loadEncryptionKey(): Uint8Array {
-    const keyPath = `${SECURITY_CONFIG.STORAGE.SECRETS_DIR}/.master-key`
+    const keyPath = safeJoin(SECURITY_CONFIG.STORAGE.SECRETS_DIR, '.master-key')
 
     if (fs.existsSync(keyPath)) {
       // Load existing master key
@@ -167,7 +175,7 @@ export class SecretsManager {
     ]
 
     secretFiles.forEach((filename) => {
-      const filePath = `${secretsDir}/${filename}`
+      const filePath = safeJoin(secretsDir, filename)
       if (fs.existsSync(filePath)) {
         try {
           const value = fs.readFileSync(filePath, 'utf-8').trim()
