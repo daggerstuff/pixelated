@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind problem
+ * @kind path-problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -12,6 +12,7 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
+import semmle.dataflow.TaintTracking.PathGraph
 
 // Define the TaintTracking configuration locally following new API style
 module EHRSecurityConfig implements DataFlow::ConfigSig {

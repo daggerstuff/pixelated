@@ -45,9 +45,9 @@ paths-ignore:
 # Include custom queries for HIPAA/FHIR/EHR security
 queries:
   - name: FHIR Security Checks
-    uses: ./.github/codeql/custom-queries/fhir
+    uses: ./.github/codeql/custom-queries
   - name: EHR Security Checks
-    uses: ./.github/codeql/custom-queries/ehr
+    uses: ./.github/codeql/custom-queries
   # Use additional query packs for comprehensive security analysis
   - uses: security-extended
   - uses: security-and-quality

@@ -30,9 +30,19 @@ predicate isFHIRResourceAccess(CallExpr call) {
 
 predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
-    validateCall.getCalleeName().matches("%validate%") or
-    validateCall.getCalleeName().matches("%check%") or
-    validateCall.getCalleeName().matches("%verify%")
+    validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
+    (
+      validateCall.getCalleeName().matches("%validate%") or
+      validateCall.getCalleeName().matches("%check%") or
+      validateCall.getCalleeName().matches("%verify%")
+    ) and
+    // Tie validation to the same resource access by ensuring the validation call
+    // shares at least one argument with the original call, linking them in dataflow
+    exists(int i |
+      i < call.getArgumentCount() and
+      i < validateCall.getArgumentCount() and
+      call.getArgument(i) = validateCall.getArgument(i)
+    )
   )
 }
 
