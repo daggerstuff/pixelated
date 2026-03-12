@@ -13,42 +13,28 @@
 
 import javascript
 
-/**
- * Predicate that identifies FHIR search operations (e.g., search, find, query, bundle-search)
- * that are invoked without proper input sanitization.
- */
 predicate isFHIRSearch(CallExpr call) {
-  // Resolve the callee to a Function object
-  exists(Function callee |
-    callee = call.getResolvedCallee() and
-    callee.getName().regexpMatch("(?i)search$") or
-    callee.getName().regexpMatch("(?i)find$") or
-    callee.getName().regexpMatch("(?i)query$") or
-    callee.getName().regexpMatch("(?i)bundleSearch$")
+  exists(string name |
+    name = call.getCalleeName() and
+    (
+      name.matches("%search%") or
+      name.matches("%find%") or
+      name.matches("%query%")
+    )
   )
 }
 
-/**
- * Predicate that checks whether a call to a FHIR search operation is sanitized.
- * Looks for sanitizing functions such as sanitize, escape, or validate.
- */
 predicate hasInputSanitization(CallExpr call) {
   exists(CallExpr sanitizeCall |
     sanitizeCall.getEnclosingFunction() = call.getEnclosingFunction() and
     (
-      sanitizeCall.getResolvedCallee().getName().regexpMatch("(?i)sanitize$") or
-      sanitizeCall.getResolvedCallee().getName().regexpMatch("(?i)escape$")
-    )
-    and
-    // The sanitization must data‑flow into at least one argument of the search call
-    exists(i : int |
-      i < call.getArgumentCount() and
-      dataFlows(sanitizeCall, call.getArgument(i))
+      sanitizeCall.getCalleeName().matches("%sanitize%") or
+      sanitizeCall.getCalleeName().matches("%escape%") or
+      sanitizeCall.getCalleeName().matches("%validate%")
     )
   )
 }
 
-/** Main query: select all insecure FHIR search calls lacking sanitization. */
 from CallExpr searchOp
 where
   isFHIRSearch(searchOp) and

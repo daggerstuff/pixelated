@@ -16,13 +16,13 @@ import javascript
 predicate isFHIROperation(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
-    // Match whole-word FHIR operation names (batch, transaction, history, delete, patch)
-    name.regexpMatch("(?i).*\\b(batch|transaction|history|delete|patch)\\b.*")
-  ) and
-  // Require the callee to be in a FHIR-related namespace/type
-  exists(Function target |
-    target = call.getTarget() and
-    target.getName().regexpMatch("(?i).*(fhir|hl7).*")
+    (
+      name.matches("%batch%") or
+      name.matches("%transaction%") or
+      name.matches("%history%") or
+      name.matches("%delete%") or
+      name.matches("%patch%")
+    )
   )
 }
 
