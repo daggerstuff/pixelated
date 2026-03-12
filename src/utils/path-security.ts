@@ -8,6 +8,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// eslint-disable-next-line no-control-regex
 const UNSAFE_PATH_CHARS = /[<>:"|?*\u0000-\u001f]/
 const PATH_SEPARATOR = path.sep
 

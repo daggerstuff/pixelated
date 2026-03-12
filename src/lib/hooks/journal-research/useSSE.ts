@@ -64,6 +64,17 @@ const buildSSEUrl = (
   return url.toString()
 }
 
+/**
+ * React hook for managing resilient Server-Sent Events (SSE) connections in journal research sessions.
+ *
+ * Why: Native `EventSource` lacks built-in support for dynamic authentication headers and
+ * configurable reconnection strategies. This hook bridges that gap by injecting the current auth token
+ * via query parameters and providing granular control over the connection lifecycle and exponential backoff,
+ * which is critical for maintaining real-time progress updates during long-running AI research tasks.
+ *
+ * @param options - Configuration options for the SSE connection, including event callbacks and reconnection logic.
+ * @returns An object containing the current connection state, connection status, and methods to manually close or reconnect.
+ */
 export const useJournalResearchSSE = ({
   sessionId,
   endpoint,
