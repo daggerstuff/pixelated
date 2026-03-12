@@ -8,6 +8,45 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+const UNSAFE_PATH_CHARS = /[<>:"|?*\u0000-\u001f]/
+
+function validateUntrustedPathInput(
+  filePath: string,
+  options: { allowAbsolute?: boolean } = {},
+): void {
+  const { allowAbsolute = false } = options
+
+  if (!filePath) {
+    throw new Error('Path is required')
+  }
+
+  if (!allowAbsolute && path.isAbsolute(filePath)) {
+    throw new Error('Absolute paths are not allowed')
+  }
+
+  if (UNSAFE_PATH_CHARS.test(filePath)) {
+    throw new Error('Path contains unsafe characters')
+  }
+
+  const segments = filePath.split(/[\\/]+/).filter(Boolean)
+  if (segments.includes('..')) {
+    throw new Error('Directory traversal sequences (..) are not allowed')
+  }
+}
+
+function isPathEscapingBase(
+  basePath: string,
+  targetPath: string,
+): boolean {
+  const relativePath = path.relative(basePath, targetPath)
+  return (
+    relativePath === '..' ||
+    relativePath.startsWith('..' + path.sep) ||
+    relativePath.startsWith('../') ||
+    relativePath.startsWith('..\\')
+  )
+}
+
 /**
  * Get the project root directory safely
  */
@@ -26,27 +65,33 @@ export function getProjectRoot(): string {
  * @param allowedDir The allowed base directory
  * @returns The normalized absolute path if valid, throws error if invalid
  */
-export function validatePath(filePath: string, allowedDir: string): string {
+export function validatePath(
+  filePath: string,
+  allowedDir: string,
+  options: { allowAbsolutePath?: boolean } = {},
+): string {
+  const { allowAbsolutePath = false } = options
+
+  // Reject unsafe path input before resolution
+  validateUntrustedPathInput(filePath, { allowAbsolute: allowAbsolutePath })
+
   // Normalize the allowed directory to absolute path
   const normalizedAllowedDir = path.resolve(allowedDir)
 
-  // Resolve the file path to absolute
-  const resolvedPath = path.resolve(normalizedAllowedDir, filePath)
+  // Resolve the file path to absolute using the same base policy
+  const resolvedPath = allowAbsolutePath
+    ? path.resolve(filePath)
+    : path.resolve(normalizedAllowedDir, filePath)
 
-  // Normalize to handle any remaining .. or . segments
-  const normalizedPath = path.normalize(resolvedPath)
+  const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath)
 
-  // Check if the resolved path is within the allowed directory
-  if (
-    !normalizedPath.startsWith(normalizedAllowedDir + path.sep) &&
-    normalizedPath !== normalizedAllowedDir
-  ) {
+  if (escapesBase) {
     throw new Error(
       `Path traversal detected: ${filePath} resolves outside allowed directory ${allowedDir}`,
     )
   }
 
-  return normalizedPath
+  return path.normalize(resolvedPath)
 }
 
 /**
@@ -59,8 +104,18 @@ export function safeJoin(
   allowedDir: string,
   ...pathSegments: string[]
 ): string {
-  const joinedPath = path.join(...pathSegments)
-  return validatePath(joinedPath, allowedDir)
+  const hasAbsoluteSegment = pathSegments.some((segment) => path.isAbsolute(segment))
+
+  for (const segment of pathSegments) {
+    validateUntrustedPathInput(segment, { allowAbsolute: hasAbsoluteSegment })
+  }
+
+  const joinedPath = hasAbsoluteSegment
+    ? path.resolve(...pathSegments)
+    : path.join(...pathSegments)
+  return validatePath(joinedPath, allowedDir, {
+    allowAbsolutePath: hasAbsoluteSegment,
+  })
 }
 
 /**

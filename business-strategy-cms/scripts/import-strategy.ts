@@ -5,6 +5,8 @@ import * as dotenv from 'dotenv'
 import matter from 'gray-matter'
 import mongoose from 'mongoose'
 
+import { safeJoin } from '../../src/utils/path-security'
+
 import { DocumentModelMongoose } from '../src/models/DocumentMongoose'
 import { AIStrategyReviewService } from '../src/services/aiStrategyReviewService'
 import { EdgeCaseMappingService } from '../src/services/edgeCaseMappingService'
@@ -12,7 +14,8 @@ import { DocumentCategory, DocumentStatus } from '../src/types/document'
 
 dotenv.config()
 
-const STRATEGY_DIR = path.join(__dirname, '../../business-strategy')
+const STRATEGY_DIR = path.resolve(__dirname, '../../business-strategy')
+const WORKSPACE_DIR = path.resolve(__dirname, '..')
 const MONGO_URI =
   process.env.MONGODB_URI ||
   'mongodb://admin:password@127.0.0.1:27017/business-strategy-cms?authSource=admin'
@@ -26,7 +29,7 @@ function collectMarkdownPaths(
 ): string[] {
   const entries = fs.readdirSync(dir, { withFileTypes: true })
   for (const e of entries) {
-    const full = path.join(dir, e.name)
+    const full = safeJoin(dir, e.name)
     const relative = path.relative(baseDir, full).replace(/\\/g, '/')
     if (e.isDirectory()) {
       collectMarkdownPaths(full, baseDir, acc)
@@ -186,7 +189,7 @@ async function importStrategy() {
     console.log(`Found ${markdownPaths.length} strategy documents to import.`)
 
     for (const relativePath of markdownPaths) {
-      const filePath = path.join(STRATEGY_DIR, relativePath)
+      const filePath = safeJoin(STRATEGY_DIR, relativePath)
       const content = fs.readFileSync(filePath, 'utf8')
       const docData = parseStrategyFile(relativePath, content)
       await persistDocument(docData)
@@ -194,7 +197,7 @@ async function importStrategy() {
 
     console.log('Import completed successfully.')
 
-    const lastImportPath = path.join(__dirname, '..', '.last-strategy-import.json')
+    const lastImportPath = safeJoin(WORKSPACE_DIR, '.last-strategy-import.json')
     fs.writeFileSync(
       lastImportPath,
       JSON.stringify(

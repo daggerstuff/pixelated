@@ -2,6 +2,7 @@
 
 import fs from 'fs'
 import path from 'path'
+import { ALLOWED_DIRECTORIES, safeJoin, validatePath } from '../utils/path-security.js'
 import { fileURLToPath } from 'url'
 
 // Get current file and directory path for ES modules
@@ -9,65 +10,22 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Configuration
-const DIALOGUES_DIR = path.resolve(
-  'ai',
-  'data',
-  'processed',
-  'generated_dialogues',
+const DIALOGUES_DIR = validatePath(
+  'ai/data/processed/generated_dialogues',
+  ALLOWED_DIRECTORIES.PROJECT_ROOT,
 )
-const OUTPUT_REPORT = path.resolve(DIALOGUES_DIR, 'validation_report.md')
+const OUTPUT_REPORT = safeJoin(DIALOGUES_DIR, 'validation_report.md')
 const MIN_TURNS = 20 // Minimum number of "Therapist:" and "Client:" exchanges
 
 // Secure path validation to prevent directory traversal
 function securePathResolve(basePath, userPath) {
-  // Reject absolute paths
-  if (path.isAbsolute(userPath)) {
-    throw new Error('Absolute paths are not allowed')
-  }
-
-  // Reject paths with .. segments (directory traversal)
-  if (
-    userPath.includes('..') ||
-    userPath.includes('../') ||
-    userPath.includes('..\\')
-  ) {
-    throw new Error('Directory traversal sequences (..) are not allowed')
-  }
-
-  // Reject paths with unsafe characters
-  const unsafeVisibleChars = /[<>:"|?*]/
-  // Check for control characters (0x00-0x1f) by character code
-  const hasControlChars = Array.from(userPath).some((char) => {
-    const code = char.charCodeAt(0)
-    return code >= 0 && code <= 31
-  })
-  if (unsafeVisibleChars.test(userPath) || hasControlChars) {
-    throw new Error('Path contains unsafe characters')
-  }
-
-  // Validate filename pattern (only allow safe characters for dialogue files)
   const safeFilenamePattern = /^[a-zA-Z0-9._-]+\.txt$/
   if (!safeFilenamePattern.test(userPath)) {
     throw new Error(
       'Filename does not match expected pattern for dialogue files',
     )
   }
-
-  // Resolve the path and ensure it stays within the base directory
-  const resolvedPath = path.resolve(basePath, userPath)
-  const resolvedBase = path.resolve(basePath)
-
-  // Verify the resolved path starts with the base path
-  if (
-    !resolvedPath.startsWith(resolvedBase + path.sep) &&
-    resolvedPath !== resolvedBase
-  ) {
-    throw new Error(
-      'Path traversal detected: resolved path escapes base directory',
-    )
-  }
-
-  return resolvedPath
+  return safeJoin(basePath, userPath)
 }
 
 // Read all dialogue files in the directory

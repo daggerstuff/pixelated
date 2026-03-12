@@ -5,11 +5,14 @@
 
 import { existsSync, statSync } from 'fs'
 import { readFile, mkdir } from 'fs/promises'
-import { join } from 'path'
 
 import { getLogger } from '@/lib/logging'
 
-import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
+import {
+  ALLOWED_DIRECTORIES,
+  safeJoin,
+  validatePath,
+} from '../../utils/path-security'
 
 const logger = getLogger('image-optimizer')
 
@@ -47,9 +50,9 @@ const IMAGE_CONFIG = {
 
   // Output directories
   OUTPUT_DIRS: {
-    optimized: './public/assets/optimized',
-    webp: './public/assets/webp',
-    avif: './public/assets/avif',
+    optimized: validatePath('public/assets/optimized', ALLOWED_DIRECTORIES.PUBLIC),
+    webp: validatePath('public/assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
+    avif: validatePath('public/assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
   },
 }
 
@@ -113,17 +116,8 @@ export class ImageOptimizer {
     const startTime = Date.now()
 
     try {
-      // Security: Validate path to prevent traversal
-      if (
-        !validatePath(imagePath, [
-          ALLOWED_DIRECTORIES.PUBLIC,
-          ALLOWED_DIRECTORIES.ASSETS,
-        ])
-      ) {
-        throw new Error(
-          `Access denied: Path is outside allowed directories: ${imagePath}`,
-        )
-      }
+      // Security: Validate path is within public assets
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PUBLIC)
 
       // Check if file exists
       if (!existsSync(imagePath)) {
@@ -257,7 +251,7 @@ export class ImageOptimizer {
       // This would use sharp or similar library for actual conversion
       // For now, return a placeholder implementation
 
-      const outputPath = join(
+      const outputPath = safeJoin(
         IMAGE_CONFIG.OUTPUT_DIRS.webp,
         this.getOptimizedFilename(imagePath, 'webp'),
       )
@@ -295,7 +289,7 @@ export class ImageOptimizer {
       // This would use sharp or similar library for actual conversion
       // For now, return a placeholder implementation
 
-      const outputPath = join(
+      const outputPath = safeJoin(
         IMAGE_CONFIG.OUTPUT_DIRS.avif,
         this.getOptimizedFilename(imagePath, 'avif'),
       )
