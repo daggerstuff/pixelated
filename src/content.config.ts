@@ -94,8 +94,7 @@ const i18nSchema = ({
     .passthrough()
     .merge(extend)
 
-// Astro Vitesse loaders
-// Astro Vitesse loaders - Replaced with glob to avoid auto-generation warnings
+// Content collection schema setup (using local content-store data).
 const pages = defineCollection({
   loader: glob({ pattern: '**/*.md', base: `${baseDir}/pages` }),
   schema: pagesSchema(),
