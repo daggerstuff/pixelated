@@ -30,7 +30,7 @@ attrs==25.4.0
     # via aiohttp
 bitsandbytes==0.49.1
     # via -r src/lib/ai/training/requirements.txt
-black==26.1.0
+black==26.3.1
     # via -r src/lib/ai/training/requirements.txt
 blessed==1.27.0
     # via gpustat
@@ -88,7 +88,7 @@ contourpy==1.3.3
     # via matplotlib
 coverage==7.13.2
     # via pytest-cov
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   -r src/lib/ai/training/requirements.txt
     #   mlflow
@@ -134,7 +134,7 @@ filelock==3.20.3
     #   huggingface-hub
     #   torch
     #   transformers
-flask==3.1.2
+flask==3.1.3
     # via
     #   flask-cors
     #   mlflow
@@ -418,7 +418,7 @@ pathspec==1.0.3
     #   mypy
 peft==0.18.1
     # via -r src/lib/ai/training/requirements.txt
-pillow==12.1.0
+pillow==12.1.1
     # via
     #   matplotlib
     #   tensorboard
@@ -726,7 +726,7 @@ weasel==0.4.3
     # via spacy
 websockets==16.0
     # via -r src/lib/ai/training/requirements.txt
-werkzeug==3.1.5
+werkzeug==3.1.6
     # via
     #   flask
     #   flask-cors
