@@ -404,39 +404,105 @@ export class PresidioPHIDetector {
    * Fallback method for redacting PHI entities in text
    */
   private fallbackRedaction(text: string, entities: PHIEntity[]): string {
-    // Sort entities by start position in descending order to avoid position shifts
-    const sortedEntities = [...entities].sort((a, b) => b.start - a.start)
+    // 1. Remove entities that are fully contained within another entity
+    const filtered = this.removeContainedEntities(entities);
 
-    // Create a copy of the text to modify
-    let redactedText = text
+    // 2. Sort by start position ascending for safe sequential replacement
+    const sorted = filtered.sort((a, b) => a.start - b.start);
 
-    // Replace each entity with context-aware redaction
-    for (const entity of sortedEntities) {
-      const type = entity.type
-      let replacement = '[REDACTED]'
-
-      switch (type) {
-        case 'EMAIL_ADDRESS':
-          replacement = '[EMAIL]'
-          break
-        case 'PHONE_NUMBER':
-          replacement = '[PHONE]'
-          break
-        case 'US_SSN':
-          replacement = '[ID]'
-          break
-        case 'PERSON':
-          replacement = '[NAME]'
-          break
-      }
-
-      redactedText =
-        redactedText.substring(0, entity.start) +
+    // 3. Apply redaction while tracking offset caused by previous replacements
+    let result = text;
+    let offset = 0;
+    for (const entity of sorted) {
+      const actualStart = entity.start + offset;
+      const actualEnd = entity.end + offset;
+      const replacement = this.getReplacement(entity.type);
+      result =
+        result.substring(0, actualStart) +
         replacement +
-        redactedText.substring(entity.end)
+        result.substring(actualEnd);
+      // Update offset: new length change = replacement length - original entity length
+      offset += replacement.length - (entity.end - entity.start);
+    }
+    return result;
+  }
+
+  /**
+   * Helper: map PHI entity type to its redaction token
+   */
+  private getReplacement(type: PHIEntityType): string {
+    switch (type) {
+      case PHIEntityType.EMAIL_ADDRESS:
+        return '[EMAIL]';
+      case PHIEntityType.PHONE_NUMBER:
+        return '[PHONE]';
+      case PHIEntityType.US_SSN:
+        return '[ID]';
+      case PHIEntityType.PERSON:
+        return '[NAME]';
+      default:
+        return '[REDACTED]';
+    }
+  }
+
+  /**
+   * Helper: filter out entities that are completely contained within another entity.
+   * When multiple entities share the same start/end, keep the one with higher
+   * specificity (lower priority number).
+   */
+  private removeContainedEntities(entities: PHIEntity[]): PHIEntity[] {
+    // Priority map: lower number = higher priority (more specific)
+    const priority: Record<PHIEntityType, number> = {
+      [PHIEntityType.PERSON]: 1,
+      [PHIEntityType.LOCATION]: 2,
+      [PHIEntityType.ADDRESS]: 3,
+      [PHIEntityType.ORGANIZATION]: 4,
+      [PHIEntityType.EMAIL_ADDRESS]: 5,
+      [PHIEntityType.PHONE_NUMBER]: 6,
+      [PHIEntityType.US_SSN]: 7,
+      [PHIEntityType.IP_ADDRESS]: 8,
+      [PHIEntityType.CREDIT_CARD]: 9,
+      [PHIEntityType.DATE_TIME]: 10,
+      [PHIEntityType.AGE]: 11,
+      [PHIEntityType.MEDICAL_RECORD_NUMBER]: 12,
+      [PHIEntityType.US_PASSPORT]: 13,
+      [PHIEntityType.US_DRIVER_LICENSE]: 14,
+      [PHIEntityType.US_BANK_NUMBER]: 15,
+      [PHIEntityType.IBAN_CODE]: 16,
+      [PHIEntityType.US_ITIN]: 17,
+      [PHIEntityType.MEDICAL_LICENSE]: 18,
+    };
+
+    // Sort by length descending to prioritize larger (more encompassing) entities
+    const sortedByLength = [...entities].sort(
+      (a, b) => (b.end - b.start) - (a.end - a.start)
+    );
+
+    const result: PHIEntity[] = [];
+    for (const e of sortedByLength) {
+      // If e is not fully contained within any entity already selected, keep it
+      const contained = result.some(r => r.start <= e.start && r.end >= e.end);
+      if (!contained) {
+        result.push(e);
+      }
     }
 
-    return redactedText
+    // Re‑group by identical start/end to resolve ties and keep the most specific
+    const final: PHIEntity[] = [];
+    const seen = new Map<string, PHIEntity>();
+    for (const e of result) {
+      const key = `${e.start}|${e.end}`;
+      if (!seen.has(key)) {
+        seen.set(key, e);
+      } else {
+        const existing = seen.get(key)!;
+        // Keep the entity with higher priority (lower number)
+        if (priority[e.type] < priority[existing.type]) {
+          seen.set(key, e);
+        }
+      }
+    }
+    return Array.from(seen.values());
   }
 }
 

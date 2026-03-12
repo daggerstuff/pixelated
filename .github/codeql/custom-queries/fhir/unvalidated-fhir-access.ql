@@ -4,7 +4,7 @@
  * @kind problem
  * @problem.severity error
  * @security-severity 8.5
- * @precision high
+ * @precision medium
  * @id js/unvalidated-fhir-access
  * @tags security
  *       hipaa
@@ -17,13 +17,13 @@ predicate isFHIRResourceAccess(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
     (
-      name.matches("%getResource%") or
-      name.matches("%searchResource%") or
-      name.matches("%createResource%") or
-      name.matches("%updateResource%") or
-      name.matches("%read%") or
-      name.matches("%vread%") or
-      name.matches("%search%")
+      name.regexpMatch(".*getResource.*") or
+      name.regexpMatch(".*searchResource.*") or
+      name.regexpMatch(".*createResource.*") or
+      name.regexpMatch(".*updateResource.*") or
+      name.regexpMatch(".*read.*") or
+      name.regexpMatch(".*vread.*") or
+      name.regexpMatch(".*search.*")
     )
   )
 }
@@ -32,10 +32,11 @@ predicate hasValidation(CallExpr call) {
   exists(CallExpr validateCall |
     validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
     (
-      validateCall.getCalleeName().matches("%validate%") or
-      validateCall.getCalleeName().matches("%check%") or
-      validateCall.getCalleeName().matches("%verify%")
+      validateCall.getCalleeName().regexpMatch(".*validate.*") or
+      validateCall.getCalleeName().regexpMatch(".*check.*") or
+      validateCall.getCalleeName().regexpMatch(".*verify.*")
     )
+    and DataFlow::localFlow(DataFlow::exprNode(validateCall), DataFlow::exprNode(call))
   )
 }
 
