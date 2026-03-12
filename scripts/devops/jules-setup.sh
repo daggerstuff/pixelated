@@ -34,6 +34,7 @@ fi
 echo "🟢 Configuring pnpm..."
 corepack enable pnpm
 pnpm install --frozen-lockfile || pnpm install
+bash scripts/devops/install-git-hooks.sh
 
 # 4. Configure Python with uv (Preinstalled in Jules)
 echo "🟢 Configuring Python environment with uv..."
