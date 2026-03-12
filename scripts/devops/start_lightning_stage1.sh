@@ -8,7 +8,7 @@ Usage: scripts/devops/start_lightning_stage1.sh
 Launch Stage 1 foundation training using the Lightning CLI.
 
 Required:
-  - LIGHTNING_STUDIO=<studio_name>  (to run against a studio), or
+  - LIGHTNING_STUDIO=<studio_name>  (to run against a specific studio), or
   - LIGHTNING_IMAGE=<docker_image>  (to run against a container image)
 
 Optional:
@@ -25,6 +25,7 @@ Examples:
   LIGHTNING_STUDIO=my-studio uv run lightning run ...  # use studio
   LIGHTNING_IMAGE=ghcr.io/org/image:tag LIGHTNING_REPO_URL=https://github.com/org/repo.git uv run ...
   # Secrets (WANDB_API_KEY, OVH_S3_SECRET_KEY, HF_TOKEN, etc.) must be configured in your Lightning workspace/env, not passed on the command line.
+  # If LIGHTNING_STUDIO is omitted, the launcher auto-resolves it from your Lightning credentials.
 USAGE
 }
 
@@ -60,9 +61,41 @@ fi
 LIGHTNING_IMAGE="${LIGHTNING_IMAGE:-}"
 LIGHTNING_STUDIO="${LIGHTNING_STUDIO:-}"
 LIGHTNING_STUDIO_PATH="${LIGHTNING_STUDIO_PATH:-}"
+LIGHTNING_USERNAME="${LIGHTNING_USERNAME:-}"
+LIGHTNING_TEAMSPACE="${LIGHTNING_TEAMSPACE:-}"
+
+if [[ -z "${LIGHTNING_STUDIO}" && -z "${LIGHTNING_IMAGE}" ]]; then
+  echo "⚙️  LIGHTNING_STUDIO not set. Resolving from local Lightning session..."
+  CREDENTIALS_FILE="${HOME}/.lightning/credentials.json"
+  if [[ ! -f "${CREDENTIALS_FILE}" ]]; then
+    echo "ERROR: ~/.lightning/credentials.json not found. Set LIGHTNING_STUDIO manually."
+    exit 1
+  fi
+
+  if ! RESOLVED_CONTEXT="$(uv run python scripts/devops/resolve_lightning_context.py --creds-path "${CREDENTIALS_FILE}")"; then
+    echo "ERROR: Failed to auto-resolve Lightning context. Set LIGHTNING_STUDIO manually."
+    exit 1
+  fi
+
+  RESOLVED_CONTEXT="${RESOLVED_CONTEXT//$'\r'/}"
+  RESOLVED_CONTEXT="${RESOLVED_CONTEXT//$'\n'/}"
+  IFS="|" read -r RESOLVED_USERNAME RESOLVED_TEAMSPACE RESOLVED_STUDIO <<< "${RESOLVED_CONTEXT}"
+  if [[ -z "${RESOLVED_USERNAME}" || -z "${RESOLVED_TEAMSPACE}" || -z "${RESOLVED_STUDIO}" ]]; then
+    echo "ERROR: Auto-resolution returned incomplete context. Set LIGHTNING_STUDIO manually."
+    exit 1
+  fi
+
+  if [[ -z "${LIGHTNING_USERNAME}" ]]; then
+    LIGHTNING_USERNAME="${RESOLVED_USERNAME}"
+  fi
+  if [[ -z "${LIGHTNING_TEAMSPACE}" ]]; then
+    LIGHTNING_TEAMSPACE="${RESOLVED_TEAMSPACE}"
+  fi
+  LIGHTNING_STUDIO="${RESOLVED_STUDIO}"
+fi
 
 if [[ -z "${LIGHTNING_IMAGE}" && -z "${LIGHTNING_STUDIO}" ]]; then
-  echo "ERROR: Set either LIGHTNING_IMAGE (docker image) or LIGHTNING_STUDIO (preconfigured studio) before launch."
+  echo "ERROR: Could not resolve LIGHTNING_STUDIO from session. Set LIGHTNING_STUDIO manually."
   exit 1
 fi
 
@@ -82,7 +115,6 @@ for env_key in \
   WANDB_DISABLED \
   WANDB_NAME \
   S3_BUCKET \
-  OVH_S3_ACCESS_KEY \
   OVH_S3_ENDPOINT \
   OVH_S3_REGION \
   OVH_S3_BUCKET \
@@ -109,6 +141,11 @@ if [[ -n "${LIGHTNING_IMAGE}" ]]; then
   exit 0
 fi
 
+TEAMSPACE_ARGS=()
+if [[ -n "${LIGHTNING_USERNAME}" && -n "${LIGHTNING_TEAMSPACE}" ]]; then
+  TEAMSPACE_ARGS=(--teamspace "${LIGHTNING_USERNAME}/${LIGHTNING_TEAMSPACE}")
+fi
+
 if [[ -n "${LIGHTNING_STUDIO_PATH}" ]]; then
   LAUNCH_COMMAND="cd ${LIGHTNING_STUDIO_PATH} && ${BASE_COMMAND}"
 else
@@ -119,5 +156,6 @@ uv run lightning run job \
   --name "${JOB_NAME}" \
   --machine "${MACHINE}" \
   --studio "${LIGHTNING_STUDIO}" \
+  "${TEAMSPACE_ARGS[@]}" \
   "${LIGHTNING_ENV_ARGS[@]}" \
   --command "${LAUNCH_COMMAND}"
