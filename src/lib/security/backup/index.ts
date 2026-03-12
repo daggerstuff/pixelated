@@ -812,7 +812,7 @@ export class BackupSecurityManager {
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
     // Implementation would collect app data based on backup type
     // For now return dummy data for demonstration
-    // [PIX-44] TODO: No more fucking cop-outs
+    // [PIX-44] TODO: Implement actual data collection logic instead of returning dummy data.
     const dummyData = {
       message: `This is a ${type} backup created at ${new Date().toISOString()}`,
     }
@@ -1008,7 +1008,7 @@ export class BackupSecurityManager {
   private async processRestoredData(data: unknown): Promise<void> {
     // This is where you would implement the actual data restoration logic
     // The implementation would be specific to your application's needs
-    // [PIX-43] TODO: What did I just fucking say?
+    // [PIX-43] TODO: Implement actual data restoration logic.
     logger.info('Processing restored data')
 
     // For now, just log that we received the data

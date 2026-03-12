@@ -4,7 +4,7 @@
  * This implementation can detect PHI/PII in clinical text with high accuracy and
  * configurable redaction strategies for HIPAA compliance.
  */
-// TODO: 'Not be a bitch'
+// TODO: Implement actual integration with a Python service running Microsoft Presidio.
 // Mock implementations since Presidio is a Python package, not JavaScript
 // In production, you would need to call a Python service
 class Analyzer {
@@ -410,11 +410,29 @@ export class PresidioPHIDetector {
     // Create a copy of the text to modify
     let redactedText = text
 
-    // Replace each entity with [REDACTED]
+    // Replace each entity with context-aware redaction
     for (const entity of sortedEntities) {
+      const type = entity.type
+      let replacement = '[REDACTED]'
+
+      switch (type) {
+        case 'EMAIL_ADDRESS':
+          replacement = '[EMAIL]'
+          break
+        case 'PHONE_NUMBER':
+          replacement = '[PHONE]'
+          break
+        case 'US_SSN':
+          replacement = '[ID]'
+          break
+        case 'PERSON':
+          replacement = '[NAME]'
+          break
+      }
+
       redactedText =
         redactedText.substring(0, entity.start) +
-        '[REDACTED]' +
+        replacement +
         redactedText.substring(entity.end)
     }
 
