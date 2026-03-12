@@ -87,6 +87,9 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
       <button
         class="lg:hidden p-2 text-neutral-300 hover:text-primary-400 transition-colors"
         id="mobile-menu-toggle"
+        aria-label="Toggle mobile menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
       >
         <svg
           class="w-6 h-6"
@@ -188,6 +191,8 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
     if (!mobileMenu) return
     const isOpen = mobileMenu.classList.contains('hidden')
 
+    mobileMenuToggle.setAttribute('aria-expanded', String(isOpen))
+
     if (isOpen) {
       mobileMenu.classList.remove('hidden')
       mobileMenu.style.maxHeight = '0px'
@@ -214,6 +219,7 @@ const { title = 'Pixelated Empathy', logo = '/logo.svg' } = Astro.props
           // Close mobile menu if open
           if (mobileMenu) {
             mobileMenu.classList.add('hidden')
+            mobileMenuToggle?.setAttribute('aria-expanded', 'false')
           }
         }
       }
