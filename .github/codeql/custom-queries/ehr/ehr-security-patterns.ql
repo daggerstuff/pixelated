@@ -1,7 +1,7 @@
 /**
  * @name EHR Security Pattern Detection
  * @description Detects common security issues in EHR integrations
- * @kind path-problem
+ * @kind problem
  * @problem.severity error
  * @precision high
  * @id js/ehr-security
@@ -11,7 +11,6 @@
  */
 
 import javascript
-import InsecureEHRFlow::PathGraph
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
@@ -85,8 +84,5 @@ module UnsafeEHRAccessFlow = TaintTracking::Global<UnsafeEHRAccessConfigSig>;
 
 from InsecureEHRFlow::PathNode source, InsecureEHRFlow::PathNode sink
 where InsecureEHRFlow::flowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@."
-
-from UnsafeEHRAccessFlow::PathNode source, UnsafeEHRAccessFlow::PathNode sink
-where UnsafeEHRAccessFlow::flowPath(source, sink)
-select sink.getNode(), source, sink, "Potential unsafe EHR access: $@ flows to $@."
+select sink.getNode(), source, sink, "Potential EHR security issue: $@ flows to $@.",
+  source.getNode(), "Sensitive data", sink.getNode(), "dangerous sink"
