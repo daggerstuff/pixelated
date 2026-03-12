@@ -1,3 +1,4 @@
+// import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 import { getCurrentUser } from '@/lib/auth'
@@ -82,23 +83,10 @@ export const POST = async ({ request }) => {
       })
     }
 
-    // Parse and validate request body, handling malformed JSON separately
-    let body;
-    try {
-      body = await request.json();
-    } catch (parseError) {
-      logger.error('Malformed JSON in request body', parseError);
-      return new Response(
-        JSON.stringify({
-          error: 'Invalid request data',
-          details: 'Malformed JSON payload',
-        }),
-        { status: 400 },
-      );
-    }
+    const body = await request.json()
 
     // Validate the request body
-    const validationResult = treatmentPlanClientSchema.safeParse(body);
+    const validationResult = treatmentPlanClientSchema.safeParse(body)
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
@@ -106,20 +94,20 @@ export const POST = async ({ request }) => {
           details: validationResult.error.errors,
         }),
         { status: 400 },
-      );
+      )
     }
 
-    const planData = validationResult.data;
+    const planData = validationResult.data
 
     logger.info('Creating treatment plan', {
       userId: user.id,
       title: planData.title,
-    });
+    })
 
     // TODO: Replace with actual database implementation
     // For now, return a mock created plan
-    const planId = `plan-${Date.now()}`;
-    const currentTime = new Date().toISOString();
+    const planId = `plan-${Date.now()}`
+    const currentTime = new Date().toISOString()
 
     const newPlan: TreatmentPlan = {
       id: planId,
@@ -134,7 +122,7 @@ export const POST = async ({ request }) => {
       createdAt: currentTime,
       updatedAt: currentTime,
       goals: planData.goals.map((goal, index) => {
-        const goalId = `goal-${Date.now()}-${index}`;
+        const goalId = `goal-${Date.now()}-${index}`
         return {
           id: goalId,
           treatmentPlanId: planId,
@@ -154,19 +142,19 @@ export const POST = async ({ request }) => {
             createdAt: currentTime,
             updatedAt: currentTime,
           })),
-        };
+        }
       }),
-    };
+    }
 
-    return new Response(JSON.stringify(newPlan), { status: 201 });
+    return new Response(JSON.stringify(newPlan), { status: 201 })
   } catch (error: unknown) {
-    logger.error('Error creating treatment plan:', error);
+    logger.error('Error creating treatment plan:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to create treatment plan.',
         details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       { status: 500 },
-    );
+    )
   }
 }

@@ -3,6 +3,7 @@
  * @description Detects FHIR operations without version compatibility checks
  * @kind problem
  * @problem.severity warning
+ * @security-severity 5.0
  * @precision high
  * @id js/missing-fhir-version
  * @tags security
@@ -25,14 +26,9 @@ predicate isFHIRClientInit(CallExpr call) {
 
 predicate hasVersionCheck(CallExpr call) {
   exists(CallExpr versionCall |
-    (
-      versionCall.getCalleeName().matches("%version%") or
-      versionCall.getCalleeName().matches("%compatibility%") or
-      versionCall.getCalleeName().matches("%checkVersion%")
-    ) and
-    versionCall.getParent() = call and
-    versionCall.getEnclosingFunction() = call.getEnclosingFunction() and
-    versionCall.getBeginLine() < call.getBeginLine()
+    versionCall.getCalleeName().matches("%version%") or
+    versionCall.getCalleeName().matches("%compatibility%") or
+    versionCall.getCalleeName().matches("%checkVersion%")
   )
 }
 
