@@ -42,35 +42,8 @@ stages:
     jobs:
       - job: BuildAndDeployHosted
         displayName: Build image and deploy (hosted)
-        continueOnError: true
         pool:
-          vmImage: ubuntu-latest
-        steps:
-          - task: HelmInstaller@1
-            displayName: Install Helm
-            inputs:
-              helmVersionToInstall: v3.15.4
-
-          - task: AzureCLI@2
-            displayName: Build image, push to ACR, deploy to AKS
-            inputs:
-              azureSubscription: $(AZURE_SUBSCRIPTION)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                set -euo pipefail
-                bash scripts/devops/azure_aks_preflight.sh
-                bash scripts/devops/azure_aks_deploy.sh
-            env:
-              APP_ENVIRONMENT: ${{ parameters.environment }}
-              PUSH_LATEST: ${{ parameters.pushLatest }}
-
-      - job: BuildAndDeploySelfHosted
-        displayName: Build image and deploy (self-hosted fallback)
-        dependsOn: BuildAndDeployHosted
-        condition: ne(dependencies.BuildAndDeployHosted.result, 'Succeeded')
-        pool:
-          name: Default
+          vmImage: ubuntu-24.04
         steps:
           - task: HelmInstaller@1
             displayName: Install Helm
