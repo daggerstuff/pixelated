@@ -6,6 +6,11 @@ if ! command -v git >/dev/null 2>&1; then
   exit 0
 fi
 
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Not inside a git repository; skipping git hook installation."
+  exit 0
+fi
+
 if [ ! -d ".beads/hooks" ]; then
   echo "No .beads/hooks directory found; skipping git hook installation."
   exit 0
