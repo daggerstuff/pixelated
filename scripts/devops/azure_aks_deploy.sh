@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ENV="${APP_ENV:-${APP_ENVIRONMENT:-staging}}"
+APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-staging}}"
+APP_ENV="$(printf '%s' "${APP_ENV_RAW}" | tr '[:upper:]' '[:lower:]')"
+case "${APP_ENV}" in
+  production|prod)
+    APP_ENV="production"
+    ;;
+  staging|stage|stg)
+    APP_ENV="staging"
+    ;;
+esac
 STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
 IMAGE_TAG="${BUILD_BUILDID:-}"
@@ -39,6 +48,10 @@ case "${APP_ENV}" in
     APP_HOSTNAME="${APP_HOSTNAME:-${PRODUCTION_HOSTNAME}}"
     ;;
 esac
+
+if [ "${APP_ENV}" = "production" ] && [ ! -f "$ENV_VALUES" ]; then
+  ENV_VALUES="${CHART_DIR}/values.yaml"
+fi
 
 if [ ! -f "$ENV_VALUES" ]; then
   echo "⚠️  No environment values file found at ${ENV_VALUES}, using values.yaml."

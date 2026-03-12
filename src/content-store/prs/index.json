@@ -1,4 +1,7 @@
 {
   "title": "Pull Requests",
-  "description": "Recent and notable pull requests"
+  "description": "Recent and notable pull requests",
+  "projects": {
+    "pull_requests": []
+  }
 }
