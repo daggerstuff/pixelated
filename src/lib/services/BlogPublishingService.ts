@@ -54,7 +54,7 @@ export class BlogPublishingService {
   private posts: Map<string, PostInfo> = new Map()
 
   constructor(contentDir = 'src/content/blog') {
-    this.contentDir = contentDir
+    this.contentDir = validatePath(contentDir, ALLOWED_DIRECTORIES.PROJECT_ROOT)
   }
 
   /**

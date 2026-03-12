@@ -116,12 +116,8 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                echo "✅ Azure authentication successful"
-                echo "Subscription ID: $(az account show --query id -o tsv)"
-                echo "Tenant ID: $(az account show --query tenantId -o tsv)"
-
-                # Set subscription for Terraform
-                az account set --subscription $(az account show --query id -o tsv)
+                set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
 
           # Install Terraform
           - task: TerraformInstaller@0
@@ -264,8 +260,8 @@ stages:
                     scriptType: 'bash'
                     scriptLocation: 'inlineScript'
                     inlineScript: |
-                      echo "✅ Azure authentication successful"
-                      az account set --subscription $(az account show --query id -o tsv)
+                      set -euo pipefail
+                      bash scripts/devops/azure_aks_preflight.sh
 
                 - task: TerraformInstaller@0
                   displayName:
@@ -448,7 +444,8 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az account set --subscription $(az account show --query id -o tsv)
+                set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
 
           - task: TerraformInstaller@0
             displayName: 'Install Terraform ${{ parameters.terraformVersion }}'

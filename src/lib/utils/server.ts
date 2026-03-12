@@ -1,4 +1,5 @@
 import * as path from 'path'
+import { validatePath } from '../../utils/path-security'
 
 /**
  * Server-side path utility functions
@@ -27,26 +28,6 @@ export function securePathJoin(
     maxDepth = 10,
   } = options
 
-  // Reject absolute paths unless explicitly allowed
-  if (!allowAbsolute && path.isAbsolute(userPath)) {
-    throw new Error('Absolute paths are not allowed')
-  }
-
-  // Reject paths with .. segments (directory traversal)
-  if (
-    userPath.includes('..') ||
-    userPath.includes('../') ||
-    userPath.includes('..\\')
-  ) {
-    throw new Error('Directory traversal sequences (..) are not allowed')
-  }
-
-  // Reject paths with unsafe characters (no control characters)
-  const unsafeChars = /[<>:"|?*]/ // Windows forbidden chars only
-  if (unsafeChars.test(userPath)) {
-    throw new Error('Path contains unsafe characters')
-  }
-
   // Check depth limit
   const segments = userPath
     .split(/[/\\]/)
@@ -65,19 +46,9 @@ export function securePathJoin(
     }
   }
 
-  // Resolve the path and ensure it stays within the base directory
-  const resolvedPath = path.resolve(basePath, userPath)
-  const resolvedBase = path.resolve(basePath)
-
-  // Verify the resolved path starts with the base path
-  if (
-    !resolvedPath.startsWith(resolvedBase + path.sep) &&
-    resolvedPath !== resolvedBase
-  ) {
-    throw new Error(
-      'Path traversal detected: resolved path escapes base directory',
-    )
-  }
+  const resolvedPath = allowAbsolute
+    ? validatePath(userPath, basePath, { allowAbsolutePath: true })
+    : validatePath(userPath, basePath)
 
   return resolvedPath
 }

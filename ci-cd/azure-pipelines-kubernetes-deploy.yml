@@ -61,6 +61,8 @@ stages:
               inlineScript: |
                 set -euo pipefail
 
+                bash scripts/devops/azure_aks_preflight.sh
+
                 APP_ENV="${{ parameters.environment }}"
                 STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
                 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
