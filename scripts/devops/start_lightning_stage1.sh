@@ -17,9 +17,6 @@ Optional:
   LIGHTNING_MAX_STEPS=100000     Max training steps (default: 100000)
   LIGHTNING_DRY_RUN=1            Set to 1 for GPU smoke run
   LIGHTNING_MACHINE=<machine>      Machine flavor (default: H100; set A100_X_2 for 2-GPU A100).
-  LIGHTNING_MACHINE_FALLBACK=A100_X_2  Machine fallback if H100 is not provisioned in time. Use A100_X_2 for 2-GPU fallback.
-  LIGHTNING_MACHINE_FALLBACK_TIMEOUT_SECONDS=3600  Max seconds to wait for H100 before fallback
-  LIGHTNING_MACHINE_SEARCH_INTERVAL_SECONDS=60       Poll interval while waiting for H100
   LIGHTNING_JOB_NAME=<name>       Custom job name
   LIGHTNING_REPO_URL=<url>        Git URL to clone when using image mode
   LIGHTNING_REPO_DIR=<dir>        Local clone directory in image mode (default: pixelated-lightning)
@@ -60,9 +57,6 @@ fi
 
 JOB_NAME="${LIGHTNING_JOB_NAME:-pixelated-stage1-foundation-$(date +%Y%m%d-%H%M%S)}"
 MACHINE="${LIGHTNING_MACHINE:-H100}"
-MACHINE_FALLBACK="${LIGHTNING_MACHINE_FALLBACK:-A100_X_2}"
-MACHINE_FALLBACK_TIMEOUT_SECONDS="${LIGHTNING_MACHINE_FALLBACK_TIMEOUT_SECONDS:-3600}"
-MACHINE_SEARCH_INTERVAL_SECONDS="${LIGHTNING_MACHINE_SEARCH_INTERVAL_SECONDS:-60}"
 STAGE="${LIGHTNING_STAGE:-1}"
 DRY_RUN_FLAG="${LIGHTNING_DRY_RUN:-0}"
 MAX_STEPS="${LIGHTNING_MAX_STEPS:-100000}"
@@ -211,16 +205,6 @@ if [[ -n "${LIGHTNING_STUDIO}" && ( -z "${LIGHTNING_TEAMSPACE}" || -z "${LIGHTNI
   fi
 fi
 
-if [[ -n "${MACHINE_FALLBACK}" && -z "${LIGHTNING_PROJECT_ID}" ]]; then
-  if ! RESOLVED_VALUES="$(resolve_lightning_context_values "${CREDENTIALS_FILE}" 0)"; then
-    echo "⚠️  Could not resolve Lightning project ID. Fallback waiting logic will be disabled."
-  else
-    mapfile -t RESOLVED_PARTS <<< "${RESOLVED_VALUES}"
-    RESOLVED_PROJECT_ID="${RESOLVED_PARTS[2]:-}"
-    LIGHTNING_PROJECT_ID="${RESOLVED_PROJECT_ID}"
-  fi
-fi
-
 if [[ -z "${LIGHTNING_IMAGE}" && -z "${LIGHTNING_STUDIO}" ]]; then
   echo "ERROR: Could not resolve LIGHTNING_STUDIO from session. Set LIGHTNING_STUDIO manually."
   exit 1
@@ -234,9 +218,6 @@ fi
 echo "⚡ Launching Stage 1 training via lightning CLI."
 echo "Machine: ${MACHINE}"
 echo "Job name: ${JOB_NAME}"
-if [[ -n "${MACHINE_FALLBACK}" ]]; then
-  echo "Fallback machine: ${MACHINE_FALLBACK} (after ${MACHINE_FALLBACK_TIMEOUT_SECONDS}s)"
-fi
 
 LIGHTNING_ENV_ARGS=()
 for env_key in \
@@ -334,109 +315,7 @@ run_lightning_job() {
     --command "${launch_command}"
 }
 
-get_job_state() {
-  local project_id="$1"
-  local job_name="$2"
-
-  local state
-  local python_code
-python_code=$'import json\nimport os\nimport requests\nfrom pathlib import Path\n\ncredentials_path = os.environ.get("LIGHTNING_CREDENTIALS_PATH")\nif not credentials_path:\n    raise SystemExit(1)\ncreds = json.loads(Path(credentials_path).read_text())\nurl = "https://lightning.ai/v1/projects/%s/jobs?standalone=True" % os.environ["LIGHTNING_PROJECT_ID"]\nresponse = requests.get(url, auth=(creds["user_id"], creds["api_key"]), headers={\"Accept\": \"application/json\"}, timeout=10)\nif response.status_code != 200:\n    raise SystemExit(1)\nfor job in response.json().get("jobs", []):\n    if job.get("name") == os.environ["LIGHTNING_JOB_NAME"]:\n        print(job.get("state") or job.get("status") or "unknown")\n        raise SystemExit(0)\nprint("not_found")\n'
-  if ! state="$(LIGHTNING_CREDENTIALS_PATH="${CREDENTIALS_FILE}" LIGHTNING_PROJECT_ID="${project_id}" LIGHTNING_JOB_NAME="${job_name}" uv run python -c "${python_code}")"; then
-    echo "unknown"
-    return 0
-  fi
-  printf '%s\n' "${state:-not_found}"
-}
-
-wait_for_h100_search_window() {
-  local job_name="$1"
-  local project_id="$2"
-  local timeout_seconds="$3"
-  local poll_seconds="$4"
-
-  local start_ts
-  local current_ts
-  local state
-  local remaining_seconds
-  start_ts="$(date +%s)"
-
-  while true; do
-    state="$(get_job_state "${project_id}" "${job_name}")"
-    current_ts="$(date +%s)"
-    remaining_seconds=$((timeout_seconds - (current_ts - start_ts)))
-
-    case "${state}" in
-      creating|pending|running)
-        if (( remaining_seconds <= 0 )); then
-          echo "Timeout reached while waiting for H100 (${MACHINE_FALLBACK_TIMEOUT_SECONDS}s). Triggering fallback."
-          return 1
-        fi
-        echo "H100 status: ${state}. Waiting ${remaining_seconds}s for allocation."
-        ;;
-      failed|stopped|succeeded|completed|cancelled|canceled)
-        echo "H100 job reached terminal state (${state}); using fallback machine."
-        return 1
-        ;;
-      *)
-        if [[ "${state}" == "not_found" || "${state}" == "unknown" ]]; then
-          if (( remaining_seconds <= 0 )); then
-            echo "Timeout reached while searching for H100 availability. Triggering fallback."
-            return 1
-          fi
-          echo "H100 job not yet visible (${state}). Waiting ${remaining_seconds}s."
-        else
-          echo "H100 state '${state}' does not require fallback waiting."
-          return 0
-        fi
-        ;;
-    esac
-
-    sleep "${poll_seconds}"
-  done
-}
-
-submit_stage1_with_fallback() {
-  local primary_job_name="$1"
-  local command="$2"
-  local fallback_job_name="${primary_job_name}-${MACHINE_FALLBACK,,}-fallback"
-
-  if ! run_lightning_job "${primary_job_name}" "${MACHINE}" "${command}"; then
-    echo "Primary H100 launch failed; aborting fallback sequence."
-    return 1
-  fi
-
-  if [[ -n "${MACHINE_FALLBACK}" && "${MACHINE}" == "H100" ]]; then
-    if [[ -z "${LIGHTNING_PROJECT_ID}" || -z "${LIGHTNING_TEAMSPACE}" ]]; then
-      echo "H100 fallback is configured, but project/teamspace context is unavailable. Skipping fallback."
-      return 0
-    fi
-    if wait_for_h100_search_window "${primary_job_name}" "${LIGHTNING_PROJECT_ID}" "${MACHINE_FALLBACK_TIMEOUT_SECONDS}" "${MACHINE_SEARCH_INTERVAL_SECONDS}"; then
-      return 0
-    fi
-
-  H100_STATE="$(get_job_state "${LIGHTNING_PROJECT_ID}" "${primary_job_name}")"
-  if [[ -n "${H100_STATE}" ]]; then
-      case "${H100_STATE}" in
-        creating|pending|running)
-          echo "Stopping active H100 job ${primary_job_name} and launching fallback on ${MACHINE_FALLBACK}."
-          uv run lightning stop job "${primary_job_name}" --teamspace "${LIGHTNING_TEAMSPACE}" || true
-          ;;
-        *)
-          echo "Primary H100 job ${primary_job_name} is in '${H100_STATE}'. Skipping stop and launching fallback on ${MACHINE_FALLBACK}."
-          ;;
-      esac
-    else
-      echo "Primary H100 job ${primary_job_name} not found; launching fallback on ${MACHINE_FALLBACK}."
-    fi
-
-    run_lightning_job "${fallback_job_name}" "${MACHINE_FALLBACK}" "${command}"
-    return 0
-  fi
-
-  return 0
-}
-
-if ! submit_stage1_with_fallback "${JOB_NAME}" "${LAUNCH_COMMAND}"; then
+if ! run_lightning_job "${JOB_NAME}" "${MACHINE}" "${LAUNCH_COMMAND}"; then
   echo "ERROR: Failed to submit Stage 1 job."
   exit 1
 fi
