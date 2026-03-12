@@ -1,0 +1,14 @@
+[Unit]
+Description=Backup /home/vivi and upload to Google Drive
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+NoNewPrivileges=yes
+PrivateTmp=yes
+Environment=SOURCE_DIR=/home/vivi
+Environment=BACKUP_DIR=%h/.local/share/home_backups
+Environment=RCLONE_TARGET=drive:vivi-home-backups
+Environment=BACKUP_RETENTION_COUNT=2
+ExecStart=/usr/bin/env bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh

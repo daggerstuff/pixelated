@@ -1,0 +1,11 @@
+[Unit]
+Description=Run backup-home-vivi service every 6 hours
+
+[Timer]
+OnCalendar=*-*-* 00/6:00:00
+Persistent=true
+RandomizedDelaySec=300
+Unit=backup-home-vivi.service
+
+[Install]
+WantedBy=timers.target
