@@ -1,7 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
 
-import { i18nSchema, pagesSchema } from 'astro-vitesse/schema'
 import { glob } from 'astro/loaders'
 import { defineCollection, z } from 'astro:content'
 
@@ -12,6 +11,7 @@ import {
   prsSchema,
   releasesSchema,
   streamsSchema,
+  pageSchema,
 } from './lib/schema'
 
 /**
@@ -84,6 +84,15 @@ const techniques = defineCollection({
   loader: glob({ pattern: '**/*.json', base: `${baseDir}/techniques` }),
   schema: techniqueSchema,
 })
+
+const pagesSchema = () => pageSchema
+const i18nSchema = ({
+  extend = z.object({}),
+} = {}) =>
+  z
+    .object({})
+    .passthrough()
+    .merge(extend)
 
 // Astro Vitesse loaders
 // Astro Vitesse loaders - Replaced with glob to avoid auto-generation warnings

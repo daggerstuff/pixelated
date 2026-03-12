@@ -42,8 +42,8 @@ services:
     image: postgres:16.1
     container_name: nemo-postgres
     environment:
-      POSTGRES_USER: nmp
-      POSTGRES_PASSWORD: nmp
+      POSTGRES_USER: ${NEMO_POSTGRES_USER:?NEMO_POSTGRES_USER is required}
+      POSTGRES_PASSWORD: ${NEMO_POSTGRES_PASSWORD:?NEMO_POSTGRES_PASSWORD is required}
     volumes:
       - nemo_postgres_storage:/var/lib/postgresql/data
     networks:
@@ -58,10 +58,11 @@ services:
     image: nvcr.io/nvidia/nemo-microservices/entity-store:25.12
     container_name: nemo-entity-store
     environment:
-      POSTGRES_PASSWORD: nmp
-      POSTGRES_USER: nmp
+      POSTGRES_PASSWORD: ${NEMO_POSTGRES_PASSWORD:?NEMO_POSTGRES_PASSWORD is required}
+      POSTGRES_USER: ${NEMO_POSTGRES_USER:?NEMO_POSTGRES_USER is required}
       POSTGRES_HOST: nemo-postgres
       POSTGRES_DB: entitystore
+      POSTGRES_URI: postgresql://${NEMO_POSTGRES_USER:?NEMO_POSTGRES_USER is required}:${NEMO_POSTGRES_PASSWORD:?NEMO_POSTGRES_PASSWORD is required}@nemo-postgres:5432/entitystore
       BASE_URL_DATASTORE: http://nemo-datastore:3000/v1/hf
     depends_on:
       - nemo-postgres

@@ -8,8 +8,8 @@ services:
     ports:
       - '8080:8000'
     environment:
-      - NGC_API_KEY=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
-      - NIM_API_KEY=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
+      - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
       - NIM_CPU_ONLY=1
       - NVIDIA_CPU_ONLY=1
@@ -40,8 +40,8 @@ services:
     ports:
       - '8081:8000'
     environment:
-      - NGC_API_KEY=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
-      - NIM_API_KEY=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
+      - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
       - NIM_CPU_ONLY=1
       - NVIDIA_CPU_ONLY=1
