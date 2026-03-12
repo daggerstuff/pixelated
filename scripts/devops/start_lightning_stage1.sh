@@ -16,7 +16,7 @@ Optional:
   LIGHTNING_STAGE=1              Training stage (default: 1)
   LIGHTNING_MAX_STEPS=100000     Max training steps (default: 100000)
   LIGHTNING_DRY_RUN=1            Set to 1 for GPU smoke run
-  LIGHTNING_MACHINE=<machine>      Machine flavor (default: H100; set A100_X_2 for 2-GPU A100).
+LIGHTNING_MACHINE=<machine>      Machine flavor (default: A100_X_2; set A100_X_2 for 2-GPU A100).
   LIGHTNING_JOB_NAME=<name>       Custom job name
   LIGHTNING_REPO_URL=<url>        Git URL to clone when using image mode
   LIGHTNING_REPO_DIR=<dir>        Local clone directory in image mode (default: pixelated-lightning)
@@ -56,7 +56,11 @@ if [[ "${UV_PRUNE_CACHE:-0}" == "1" ]]; then
 fi
 
 JOB_NAME="${LIGHTNING_JOB_NAME:-pixelated-stage1-foundation-$(date +%Y%m%d-%H%M%S)}"
-MACHINE="${LIGHTNING_MACHINE:-H100}"
+MACHINE="${LIGHTNING_MACHINE:-A100_X_2}"
+if [[ "${MACHINE^^}" == *"H100"* && "${ALLOW_H100_MACHINES:-0}" != "1" ]]; then
+  echo "ERROR: H100 usage is blocked for this launcher. Set ALLOW_H100_MACHINES=1 and LIGHTNING_MACHINE=H100 to override."
+  exit 1
+fi
 STAGE="${LIGHTNING_STAGE:-1}"
 DRY_RUN_FLAG="${LIGHTNING_DRY_RUN:-0}"
 MAX_STEPS="${LIGHTNING_MAX_STEPS:-100000}"
@@ -256,30 +260,55 @@ if [[ -n "${LIGHTNING_STUDIO_PATH}" ]]; then
 else
   LAUNCH_COMMAND="WORKDIR=\"\$(pwd)\"
 TRAINING_SCRIPT=\"${STAGE1_TRAINING_SCRIPT}\"
-if [ -f \"\${WORKDIR}/\${TRAINING_SCRIPT}\" ]; then
-  :
-elif [ -f \"/home/zeus/pixelated/\${TRAINING_SCRIPT}\" ]; then
-  WORKDIR=\"/home/zeus/pixelated\"
-elif [ -f \"/home/vivi/pixelated/\${TRAINING_SCRIPT}\" ]; then
-  WORKDIR=\"/home/vivi/pixelated\"
-elif [ -f \"/workspace/\${TRAINING_SCRIPT}\" ]; then
-  WORKDIR=\"/workspace\"
-elif [ -f \"/workspace/pixelated/\${TRAINING_SCRIPT}\" ]; then
-  WORKDIR=\"/workspace/pixelated\"
-elif [ -n \"${LIGHTNING_REPO_URL}\" ]; then
-  WORKDIR=\"\$(mktemp -d)\"
-  if ! git clone --depth 1 \"${LIGHTNING_REPO_URL}\" \"\${WORKDIR}\"; then
-    echo \"ERROR: Failed to clone repository from ${LIGHTNING_REPO_URL}\"
+REPO_TMP_DIR=\"\"
+cleanup_repo_dir() {
+  if [ -n \"\${REPO_TMP_DIR}\" ] && [ -d \"\${REPO_TMP_DIR}\" ]; then
+    rm -rf \"\${REPO_TMP_DIR}\"
+  fi
+}
+trap cleanup_repo_dir EXIT
+REPO_URL=\"${LIGHTNING_REPO_URL}\"
+
+resolve_workdir() {
+  for candidate in \"\${WORKDIR}\" \"/home/zeus/pixelated\" \"/home/vivi/pixelated\" \"/workspace\" \"/workspace/pixelated\"; do
+    if [ -f \"\${candidate}/\${TRAINING_SCRIPT}\" ]; then
+      echo \"\${candidate}\"
+      return 0
+    fi
+  done
+  return 1
+}
+
+WORKDIR=\"\$(resolve_workdir || true)\"
+if [ -z \"\${WORKDIR}\" ]; then
+  if [ -z \"\${REPO_URL}\" ]; then
+    echo \"ERROR: Could not locate Stage 1 training script and LIGHTNING_REPO_URL is not set.\"
+    echo \"Set LIGHTNING_STUDIO_PATH to your repo path, or LIGHTNING_REPO_URL for clone fallback.\"
     exit 1
+  fi
+
+  WORKDIR=\"\$(mktemp -d)\"
+  REPO_TMP_DIR=\"\${WORKDIR}\"
+
+  if ! git clone --depth 1 \"\${REPO_URL}\" \"\${WORKDIR}\"; then
+    if [ \"\${REPO_URL#git@github.com:}\" != \"\${REPO_URL}\" ]; then
+      HTTPS_REPO_URL=\"https://github.com/\${REPO_URL#git@github.com:}\"
+      echo \"WARN: SSH clone failed, retrying with HTTPS: \${HTTPS_REPO_URL}\"
+      if ! git clone --depth 1 \"\${HTTPS_REPO_URL}\" \"\${WORKDIR}\"; then
+        echo \"ERROR: Failed to clone repository from both SSH and HTTPS URLs.\"
+        echo \"ERROR: SSH URL: \${REPO_URL}\"
+        echo \"ERROR: HTTPS URL: \${HTTPS_REPO_URL}\"
+        exit 1
+      fi
+    else
+      echo \"ERROR: Failed to clone repository from \${REPO_URL}\"
+      exit 1
+    fi
   fi
   if [ ! -f \"\${WORKDIR}/\${TRAINING_SCRIPT}\" ]; then
     echo \"ERROR: Cloned repository missing \${TRAINING_SCRIPT} at \${WORKDIR}\"
     exit 1
   fi
-else
-  echo \"ERROR: Could not locate Stage 1 training script in this studio.\"
-  echo \"Set LIGHTNING_STUDIO_PATH to your repo path, or LIGHTNING_REPO_URL for clone fallback.\"
-  exit 1
 fi
 cd \"\${WORKDIR}\"
 ${BASE_COMMAND}"
