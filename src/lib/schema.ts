@@ -178,7 +178,7 @@ const projectSchema = z.object({
     .describe('Category of the project for additional organization.'),
 })
 
-const projectGroupsSchema = z.record(z.array(projectSchema))
+const projectGroupsSchema = z.record(z.string(), z.array(projectSchema))
 
 export const projectsSchema = z.object({
   projects: projectGroupsSchema,
@@ -233,7 +233,7 @@ const releaseSchema = z.object({
   publishedAt: z.string().optional(),
 })
 
-const releaseGroupsSchema = z.record(z.array(releaseSchema))
+const releaseGroupsSchema = z.record(z.string(), z.array(releaseSchema))
 
 export const releasesSchema = z.object({
   projects: releaseGroupsSchema,
