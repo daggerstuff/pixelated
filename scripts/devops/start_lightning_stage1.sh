@@ -98,7 +98,7 @@ resolve_lightning_context_values() {
 
   if ! resolved_context="$(uv run python scripts/devops/resolve_lightning_context.py --creds-path "${creds_path}" --format lines $(
     [[ "${require_studio}" == "1" ]] && echo "--require-studio"
-    [[ "${require_studio}" == "1" && -n "${LIGHTNING_MACHINE}" ]] && echo "--machine ${LIGHTNING_MACHINE}"
+    [[ "${require_studio}" == "1" && -n "${LIGHTNING_MACHINE:-$MACHINE}" ]] && echo "--machine ${LIGHTNING_MACHINE:-$MACHINE}"
   ))"; then
     return 1
   fi
