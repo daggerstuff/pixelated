@@ -14,6 +14,7 @@ class LightningStudioContext:
   username: str
   teamspace: str
   studio: str
+  owner_type: str
 
 
 def _read_credentials(path: str) -> tuple[str, str]:
@@ -47,6 +48,7 @@ def resolve_lightning_context(creds_path: str) -> LightningStudioContext:
   project_id = str(default_membership.get("projectId", "")).strip()
   teamspace = str(default_membership.get("name", "")).strip()
   owner_id = str(default_membership.get("ownerId", "")).strip()
+  owner_type = str(default_membership.get("ownerType", "")).strip()
   if not project_id or not teamspace:
     raise RuntimeError("Unable to resolve Lightning teamspace.")
 
@@ -63,7 +65,12 @@ def resolve_lightning_context(creds_path: str) -> LightningStudioContext:
   if not studio_name:
     raise RuntimeError(f"Invalid studio response for teamspace '{teamspace}'.")
 
-  return LightningStudioContext(username=username, teamspace=teamspace, studio=studio_name)
+  return LightningStudioContext(
+    username=username,
+    teamspace=teamspace,
+    studio=studio_name,
+    owner_type=owner_type,
+  )
 
 
 def main() -> None:
@@ -72,7 +79,16 @@ def main() -> None:
   args = parser.parse_args()
 
   context = resolve_lightning_context(args.creds_path)
-  print(f"{context.username}|{context.teamspace}|{context.studio}")
+  print(
+    json.dumps(
+      {
+        "username": context.username,
+        "teamspace": context.teamspace,
+        "studio": context.studio,
+        "owner_type": context.owner_type,
+      },
+    ),
+  )
 
 
 if __name__ == "__main__":
