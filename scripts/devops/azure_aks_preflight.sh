@@ -3,6 +3,7 @@ set -euo pipefail
 
 AZURE_CLI_BIN="${AZURE_CLI_BIN:-/usr/bin/az}"
 AZURE_CLI_MIN_VERSION="${AZURE_CLI_MIN_VERSION:-2.30.0}"
+export AZURE_CORE_ONLY_SHOW_ERRORS="${AZURE_CORE_ONLY_SHOW_ERRORS:-true}"
 if ! command -v "${AZURE_CLI_BIN}" >/dev/null 2>&1; then
   echo "##vso[task.logissue type=error]Azure CLI not found at ${AZURE_CLI_BIN}."
   exit 1

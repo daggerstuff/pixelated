@@ -9,6 +9,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const UNSAFE_PATH_CHARS = /[<>:"|?*\u0000-\u001f]/
+const PATH_SEPARATOR = path.sep
 
 function validateUntrustedPathInput(
   filePath: string,
@@ -38,12 +39,16 @@ function isPathEscapingBase(
   basePath: string,
   targetPath: string,
 ): boolean {
-  const relativePath = path.relative(basePath, targetPath)
+  const normalizedBase = path.resolve(basePath)
+  const normalizedTarget = path.resolve(targetPath)
+
+  const baseWithSeparator = normalizedBase.endsWith(PATH_SEPARATOR)
+    ? normalizedBase
+    : `${normalizedBase}${PATH_SEPARATOR}`
+
   return (
-    relativePath === '..' ||
-    relativePath.startsWith('..' + path.sep) ||
-    relativePath.startsWith('../') ||
-    relativePath.startsWith('..\\')
+    !normalizedTarget.startsWith(baseWithSeparator) &&
+    normalizedTarget !== normalizedBase
   )
 }
 
