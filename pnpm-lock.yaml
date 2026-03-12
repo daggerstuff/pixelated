@@ -30,6 +30,7 @@ overrides:
   cookie: '>=1.0.3'
   devalue: ^5.6.1
   h3: ^1.15.4
+  '@hono/node-server': ^1.19.10
   hono: ^4.12.4
   diff: ^5.2.2
   wrangler: ^4.59.1
@@ -618,7 +619,7 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       hono:
-        specifier: ^4.11.7
+        specifier: ^4.12.7
         version: 4.12.7
       html-entities:
         specifier: ^2.6.0
@@ -1871,13 +1872,7 @@ packages:
     resolution: {integrity: sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: ^4.11.7
-
-  '@hono/node-server@1.19.9':
-    resolution: {integrity: sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw==}
-    engines: {node: '>=18.14.1'}
-    peerDependencies:
-      hono: ^4.11.7
+      hono: ^4.12.4
 
   '@hookform/resolvers@5.2.2':
     resolution: {integrity: sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA==}
@@ -14231,11 +14226,6 @@ snapshots:
     dependencies:
       hono: 4.12.7
 
-  '@hono/node-server@1.19.9(hono@4.12.7)':
-    dependencies:
-      hono: 4.12.7
-    optional: true
-
   '@hookform/resolvers@5.2.2(react-hook-form@7.71.2(react@19.2.4))':
     dependencies:
       '@standard-schema/utils': 0.3.0
@@ -16829,7 +16819,7 @@ snapshots:
       '@electric-sql/pglite': 0.3.15
       '@electric-sql/pglite-socket': 0.0.20(@electric-sql/pglite@0.3.15)
       '@electric-sql/pglite-tools': 0.2.20(@electric-sql/pglite@0.3.15)
-      '@hono/node-server': 1.19.9(hono@4.12.7)
+      '@hono/node-server': 1.19.11(hono@4.12.7)
       '@mrleebo/prisma-ast': 0.13.1
       '@prisma/get-platform': 7.2.0
       '@prisma/query-plan-executor': 7.2.0
