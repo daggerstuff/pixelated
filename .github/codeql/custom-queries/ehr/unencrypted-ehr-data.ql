@@ -43,6 +43,9 @@ from CallExpr call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
   isEHRData(data) and
+  exists(int i |
+    DataFlow::localFlow(data, call.getArgument(i))
+  ) and
   not exists(CallExpr encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
     DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument()))

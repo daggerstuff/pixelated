@@ -17,9 +17,8 @@ predicate isFHIRClientInit(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
     (
-      name.matches("%Client%") or
       name.matches("%FHIRClient%") or
-      name.matches("%createClient%")
+      name.matches("%createFHIRClient%")
     )
   )
 }

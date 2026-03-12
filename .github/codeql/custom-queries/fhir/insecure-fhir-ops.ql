@@ -16,14 +16,11 @@ import javascript
 predicate isFHIROperation(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
-    (
-      name.matches("%batch%") or
-      name.matches("%transaction%") or
-      name.matches("%history%") or
-      name.matches("%delete%") or
-      name.matches("%patch%")
-    )
-  )
+    // Match whole‑word FHIR operation names (batch, transaction, history, delete, patch)
+    name.matches("(?i)\\b(batch|transaction|history|delete|patch)\\b")
+  ) and
+  // Require the callee to be in a FHIR‑related namespace/type
+  call.getTarget().getName().matches("(?i).*(fhir|FHIR|hl7)")
 }
 
 predicate hasSecurityContext(CallExpr call) {

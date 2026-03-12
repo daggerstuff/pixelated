@@ -276,27 +276,8 @@ export class PresidioPHIDetector {
     entities: PHIEntity[],
   ): Promise<string> {
     try {
-      if (this.initialized && this.anonymizer) {
-        // Use Presidio for redaction
-        const anonymizerPayload = {
-          text,
-          anonymizers: {
-            DEFAULT: { type: 'replace', newValue: '[REDACTED]' },
-          },
-          analyzer_results: entities.map((entity) => ({
-            entity_type: entity.type,
-            start: entity.start,
-            end: entity.end,
-            score: entity.score,
-          })),
-        }
-
-        const result = await this.anonymizer.anonymize(anonymizerPayload)
-        return result.text
-      } else {
-        // Use fallback redaction if Presidio is not available
-        return this.fallbackRedaction(text, entities)
-      }
+      // Use fallback redaction consistently, regardless of initialization
+      return this.fallbackRedaction(text, entities);
     } catch (error: unknown) {
       logger.error('Error redacting PHI', {
         error: error instanceof Error ? String(error) : String(error),
@@ -402,6 +383,7 @@ export class PresidioPHIDetector {
 
   /**
    * Fallback method for redacting PHI entities in text
+   * Updated to use a generic [REDACTED] token for consistency with the Presidio path.
    */
   private fallbackRedaction(text: string, entities: PHIEntity[]): string {
     // Sort entities by start position in descending order to avoid position shifts
@@ -410,29 +392,11 @@ export class PresidioPHIDetector {
     // Create a copy of the text to modify
     let redactedText = text
 
-    // Replace each entity with context-aware redaction
+    // Replace each entity with a generic redaction token
     for (const entity of sortedEntities) {
-      const type = entity.type
-      let replacement = '[REDACTED]'
-
-      switch (type) {
-        case 'EMAIL_ADDRESS':
-          replacement = '[EMAIL]'
-          break
-        case 'PHONE_NUMBER':
-          replacement = '[PHONE]'
-          break
-        case 'US_SSN':
-          replacement = '[ID]'
-          break
-        case 'PERSON':
-          replacement = '[NAME]'
-          break
-      }
-
       redactedText =
         redactedText.substring(0, entity.start) +
-        replacement +
+        '[REDACTED]' +
         redactedText.substring(entity.end)
     }
 
