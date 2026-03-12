@@ -63,6 +63,27 @@ Decision protocol:
 
 ---
 
+## 4b) Memory-native instruction activation
+
+This project uses Cursor Memory Bank custom instructions for memory continuity.
+
+When you continue work in this repo:
+
+- Treat `.cursor/rules/007_cursor_memory_custom_instructions.mdc` as the canonical, project-local memory instruction contract.
+- For human onboarding, use `docs/cursor-memory-bank-modern-instructions.md`.
+- Keep command-driven continuity alive through `/memory bootstrap`, `/memory status`, `/memory event`,
+  and explicit mode commands.
+
+At session start or when switching scopes:
+
+1. Run `/memory bootstrap`.
+2. Run `/memory status`.
+3. Confirm mode in Cursor UI and issue `/mode <mode>`.
+4. Validate loaded context with `/context status` or relevant context commands.
+5. Record session start/continuity in memory short-term files as needed.
+
+---
+
 ## 5) Boundaries
 
 ### Do
@@ -101,6 +122,28 @@ Activate as needed by context:
 - Prefer narrow checks first (`pnpm lint`, `pnpm typecheck`, targeted tests, `uv run pytest` for AI module changes).
 - Use full checks (`pnpm check:all`, complete security checks, full integration suites) when scope or risk requires.
 - Prefer explicit executable examples over prose for repeatable actions.
+
+### Memory-aware command defaults
+
+When the task is memory-dependent (handoff, planning, ongoing implementation), prefer:
+
+- `/memory bootstrap`
+- `/memory status`
+- `/memory check`
+- `/context suggest`
+- `/memory event session_start`
+- `/memory event session_end`
+
+When resuming work, use this exact continuity sequence:
+
+1. `/mode resume`
+2. `/memory bootstrap`
+3. `/memory check`
+4. `/context status`
+5. If `status=failed`, `/memory normalize`
+6. `/memory event session_start "Continuing with saved checkpoint"`
+7. `/memory state` to confirm continuity state path and next action
+8. `/mode <MODE>` to proceed in the intended mode
 
 ---
 

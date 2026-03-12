@@ -215,6 +215,7 @@ select = [
 ignore = ["E501", "UP017", "PLR2004"]
 [tool.ruff.lint.per-file-ignores]
 "scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
+"Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true
