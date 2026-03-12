@@ -2,8 +2,29 @@
 set -euo pipefail
 
 AZURE_CLI_BIN="${AZURE_CLI_BIN:-/usr/bin/az}"
+AZURE_CLI_MIN_VERSION="${AZURE_CLI_MIN_VERSION:-2.30.0}"
 if ! command -v "${AZURE_CLI_BIN}" >/dev/null 2>&1; then
   echo "##vso[task.logissue type=error]Azure CLI not found at ${AZURE_CLI_BIN}."
+  exit 1
+fi
+
+version_ge() {
+  local candidate="$1"
+  local minimum="$2"
+
+  [[ "$(printf '%s\n%s\n' "${minimum}" "${candidate}" | sort -V | head -n 1)" == "${minimum}" ]]
+}
+
+echo "Checking Azure CLI runtime compatibility..."
+AZURE_CLI_VERSION_LINE=$("${AZURE_CLI_BIN}" --version | head -n 1)
+AZURE_CLI_VERSION="$("${AZURE_CLI_BIN}" --version | sed -n '1,6p' | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)"
+
+if ! version_ge "${AZURE_CLI_VERSION}" "${AZURE_CLI_MIN_VERSION}"; then
+  echo "##vso[task.logissue type=error]Unsupported Azure CLI version."
+  echo "Found: ${AZURE_CLI_VERSION_LINE}"
+  echo "Minimum required: ${AZURE_CLI_MIN_VERSION}"
+  echo "Reason: AzureCLI@2 task diagnostics can fail or mis-parse CLI output on very old versions."
+  echo "Action: run this job on a modern Microsoft-hosted agent (ubuntu-24.04/ubuntu-latest) or update agent tooling."
   exit 1
 fi
 
