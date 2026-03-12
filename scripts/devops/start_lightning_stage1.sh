@@ -63,6 +63,7 @@ LIGHTNING_STUDIO="${LIGHTNING_STUDIO:-}"
 LIGHTNING_STUDIO_PATH="${LIGHTNING_STUDIO_PATH:-}"
 LIGHTNING_USERNAME="${LIGHTNING_USERNAME:-}"
 LIGHTNING_TEAMSPACE="${LIGHTNING_TEAMSPACE:-}"
+LIGHTNING_OWNER_TYPE="${LIGHTNING_OWNER_TYPE:-}"
 
 if [[ -z "${LIGHTNING_STUDIO}" && -z "${LIGHTNING_IMAGE}" ]]; then
   echo "⚙️  LIGHTNING_STUDIO not set. Resolving from local Lightning session..."
@@ -77,9 +78,24 @@ if [[ -z "${LIGHTNING_STUDIO}" && -z "${LIGHTNING_IMAGE}" ]]; then
     exit 1
   fi
 
-  RESOLVED_CONTEXT="${RESOLVED_CONTEXT//$'\r'/}"
-  RESOLVED_CONTEXT="${RESOLVED_CONTEXT//$'\n'/}"
-  IFS="|" read -r RESOLVED_USERNAME RESOLVED_TEAMSPACE RESOLVED_STUDIO <<< "${RESOLVED_CONTEXT}"
+  IFS=$'\t' read -r RESOLVED_USERNAME RESOLVED_TEAMSPACE RESOLVED_STUDIO RESOLVED_OWNER_TYPE < <(
+    printf '%s' "${RESOLVED_CONTEXT}" | uv run python - <<'PY'
+import json
+import sys
+
+context = json.load(sys.stdin)
+print(
+    "\t".join(
+        [
+            str(context.get("username", "")).strip(),
+            str(context.get("teamspace", "")).strip(),
+            str(context.get("studio", "")).strip(),
+            str(context.get("owner_type", "")).strip(),
+        ]
+    )
+)
+PY
+  )
   if [[ -z "${RESOLVED_USERNAME}" || -z "${RESOLVED_TEAMSPACE}" || -z "${RESOLVED_STUDIO}" ]]; then
     echo "ERROR: Auto-resolution returned incomplete context. Set LIGHTNING_STUDIO manually."
     exit 1
@@ -90,6 +106,9 @@ if [[ -z "${LIGHTNING_STUDIO}" && -z "${LIGHTNING_IMAGE}" ]]; then
   fi
   if [[ -z "${LIGHTNING_TEAMSPACE}" ]]; then
     LIGHTNING_TEAMSPACE="${RESOLVED_TEAMSPACE}"
+  fi
+  if [[ -z "${LIGHTNING_OWNER_TYPE}" ]]; then
+    LIGHTNING_OWNER_TYPE="${RESOLVED_OWNER_TYPE}"
   fi
   LIGHTNING_STUDIO="${RESOLVED_STUDIO}"
 fi
@@ -143,7 +162,12 @@ fi
 
 TEAMSPACE_ARGS=()
 if [[ -n "${LIGHTNING_USERNAME}" && -n "${LIGHTNING_TEAMSPACE}" ]]; then
-  TEAMSPACE_ARGS=(--teamspace "${LIGHTNING_USERNAME}/${LIGHTNING_TEAMSPACE}")
+  TEAMSPACE_ARGS=(--teamspace "${LIGHTNING_TEAMSPACE}")
+  if [[ "${LIGHTNING_OWNER_TYPE}" == "user" ]]; then
+    TEAMSPACE_ARGS+=(--user "${LIGHTNING_USERNAME}")
+  elif [[ "${LIGHTNING_OWNER_TYPE}" == "organization" ]]; then
+    TEAMSPACE_ARGS+=(--org "${LIGHTNING_USERNAME}")
+  fi
 fi
 
 if [[ -n "${LIGHTNING_STUDIO_PATH}" ]]; then
