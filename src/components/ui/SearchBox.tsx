@@ -102,31 +102,26 @@ export default function SearchBox({
       return
     }
 
-    // ⚡ Bolt: Debounce search to prevent expensive lookups on rapid keystrokes
-    const debounceTimer = setTimeout(() => {
-      try {
-        // Use the global search client
-        const searchResults = window.searchClient.search(query)
+    try {
+      // Use the global search client
+      const searchResults = window.searchClient.search(query)
 
-        // Apply filtering after search
-        let limitedResults = searchResults
-        if (maxResults && searchResults.length > maxResults) {
-          limitedResults = searchResults.slice(0, maxResults)
-        }
-
-        setResults(limitedResults)
-
-        // Call onSearch callback if provided
-        if (onSearch) {
-          onSearch(query, limitedResults)
-        }
-      } catch (error: unknown) {
-        console.error('Search error:', error)
-        setResults([])
+      // Apply filtering after search
+      let limitedResults = searchResults
+      if (maxResults && searchResults.length > maxResults) {
+        limitedResults = searchResults.slice(0, maxResults)
       }
-    }, 300)
 
-    return () => clearTimeout(debounceTimer)
+      setResults(limitedResults)
+
+      // Call onSearch callback if provided
+      if (onSearch) {
+        onSearch(query, limitedResults)
+      }
+    } catch (error: unknown) {
+      console.error('Search error:', error)
+      setResults([])
+    }
   }, [query, isSearchReady, maxResults, minQueryLength, onSearch])
 
   // Close results when clicking outside
