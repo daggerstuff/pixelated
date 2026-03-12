@@ -26,20 +26,13 @@ dependencies = [
   "click<9.0",
   "numba>=0.63.1",
   "faiss-cpu>=1.11.0",
-  "pytest-asyncio>=1.0.0",
-  "flake8>=7.3.0",
   "matplotlib>=3.10.3",
-  "mypy>=1.16.1",
   "psutil>=7.0.0",
   "chardet>=5.2.0,<6.0.0",
   "pydub>=0.25.1",
-  "sourcery>=1.37.0; sys_platform == 'darwin'",
   "pyarrow>=21.0.0",
   "hatch>=1.14.1",
   "textstat>=0.7.8",
-  "isort>=6.0.1",
-  "black>=25.12.0", # Updated to latest secure version
-  "pytest-cov>=6.2.1",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
   "wandb>=0.21.1",
@@ -53,12 +46,10 @@ dependencies = [
   "transformers>=4.48.0", # Required for dataset_pipeline training_runner
   "torch>=2.6.0,<3.0.0", # Fixes CVE-2025-32434 affecting versions ≤2.5.1
   "gguf>=0.10.0",
-  "ruff>=0.12.5",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
   "sentry-sdk>=2.44.0",
   "openai>=1.107.2",
-  "pytest>=8.4.2",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
   "authlib>=1.6.6", # Updated to latest secure version
@@ -71,7 +62,6 @@ dependencies = [
   "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
-  "nbqa>=1.9.1",
   "neo4j~=6.1.0",
   # Security: Pin transitive dependencies to secure versions
   "fastmcp>=2.14.0", # Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
@@ -86,7 +76,6 @@ dependencies = [
   "pillow>=12.1.1",
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
-  "checkov>=3.0.34", # Keep compatible version (3.2.495 requires boto3==1.35.49)
   "kaggle>=1.8.2",
   "boto3>=1.40.75", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
@@ -106,13 +95,10 @@ dependencies = [
   "ray>=2.53.0",
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
-  "semgrep>=1.79.0",
-  "pyright>=1.1.408",
   "mem0ai>=1.0.2",
   "pydantic-ai>=1.56.0",
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
-  "ruff-lsp>=0.0.62",
   "e2b>=2.6.1",
   "lancedb>=0.29.2",
   "openai-whisper>=20250625",
@@ -134,7 +120,25 @@ test = [
   "coverage",
   "types-requests",
 ]
-dev = ["black", "isort", "ruff", "mypy", "pyright"]
+dev = [
+  "black",
+  "isort",
+  "mypy",
+  "nbqa",
+  "ruff",
+  "ruff-lsp",
+  "pytest",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-mock",
+  "coverage",
+  "flake8",
+  "semgrep",
+  "checkov",
+  "pyright",
+  "sourcery; sys_platform == 'darwin'",
+  "types-requests",
+]
 [project.scripts]
 process-priority-5 = "ai.scripts.process_priority_5:main"
 [build-system]
@@ -251,4 +255,22 @@ url = "https://download.pytorch.org/whl/cpu"
 # Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
 # After authenticating with your NGC API key
 [dependency-groups]
-dev = ["pip-audit>=2.9.0", "pytest>=8.4.2"]
+dev = [
+  "black>=25.12.0",
+  "checkov>=3.0.34",
+  "coverage>=7.13.4",
+  "flake8>=7.3.0",
+  "isort>=6.0.1",
+  "mypy>=1.16.1",
+  "nbqa>=1.9.1",
+  "pip-audit>=2.9.0",
+  "pytest-asyncio>=1.0.0",
+  "pytest-cov>=6.2.1",
+  "pytest-mock>=3.12.0",
+  "pytest>=8.4.2",
+  "pyright>=1.1.408",
+  "ruff-lsp>=0.0.62",
+  "ruff>=0.12.5",
+  "sourcery>=1.37.0; sys_platform == 'darwin'",
+  "types-requests>=2.32.4.20260107",
+]
