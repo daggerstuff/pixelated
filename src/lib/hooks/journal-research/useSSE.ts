@@ -69,7 +69,7 @@ const buildSSEUrl = (
  *
  * Why: Native `EventSource` lacks built-in support for dynamic authentication headers and
  * configurable reconnection strategies. This hook bridges that gap by injecting the current auth token
- * via query parameters and providing granular control over the connection lifecycle and exponential backoff,
+ * via query parameters and providing granular control over the connection lifecycle and fixed-interval reconnection,
  * which is critical for maintaining real-time progress updates during long-running AI research tasks.
  *
  * @param options - Configuration options for the SSE connection, including event callbacks and reconnection logic.

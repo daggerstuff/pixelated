@@ -43,8 +43,13 @@ from CallExpr call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
   isEHRData(data) and
+  // Link the data node to the call by ensuring it actually flows into the call's argument
+  exists(int i |
+    i < call.getArgumentCount() and
+    data.getASuccessor*() = DataFlow::exprNode(call.getArgument(i))
+  ) and
   not exists(CallExpr encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    data.getASuccessor*() = DataFlow::exprNode(encryptCall.getAnArgument())
+    data.getASuccessor*() = DataFlow::exprNode(encryptCall.getArgument(i))
   )
 select call, "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."
