@@ -1,6 +1,7 @@
 // import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
+import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import type { TreatmentPlan } from '../../../types/treatment'
@@ -45,10 +46,9 @@ const treatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = async ({ locals }) => {
+export const GET = async ({ request }) => {
   try {
-    // TODO: Replace with actual authentication check
-    const { user } = locals
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
@@ -74,10 +74,9 @@ export const GET = async ({ locals }) => {
   }
 }
 
-export const POST = async ({ request, locals }) => {
+export const POST = async ({ request }) => {
   try {
-    // TODO: Replace with actual authentication check
-    const { user } = locals
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
