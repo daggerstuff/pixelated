@@ -7,12 +7,20 @@
  *
  * Solution: This wrapper handles broken pipe errors and exits cleanly
  */
-import { spawn } from 'child_process'
+import { spawn, spawnSync } from 'child_process'
 import fs from 'fs'
 import path from 'path'
 import process from 'process'
 
 import dotenv from 'dotenv'
+
+const verifyCommand = ['node', 'scripts/ci/verify-build-contract.mjs']
+const verify = spawnSync(verifyCommand[0], verifyCommand.slice(1), {
+  stdio: 'inherit',
+})
+if (verify.status !== 0) {
+  process.exit(verify.status ?? 1)
+}
 
 // Try to load .env file manually to ensure variables are available
 try {

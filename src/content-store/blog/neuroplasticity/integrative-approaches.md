@@ -1,6 +1,5 @@
 ---
-title:
-  'Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities'
+title: Integrative Trauma Treatment Across Modern Modalities
 description: >-
   Exploring how combining neuroscience-informed, somatic, psychedelic, and
   technology-enhanced approaches creates more effective trauma healing pathways
@@ -19,7 +18,7 @@ seriesOrder: 5
 category: Research
 ---
 
-# Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities
+## Integrative Approaches to Trauma Treatment: Synthesizing Modern Modalities
 
 ## Introduction
 

@@ -8,7 +8,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const UNSAFE_PATH_CHARS = /[<>:"|?*\u0000-\u001f]/
+const UNSAFE_PATH_CHARS = /[<>:"|?*]/
 const PATH_SEPARATOR = path.sep
 
 function validateUntrustedPathInput(
@@ -25,7 +25,11 @@ function validateUntrustedPathInput(
     throw new Error('Absolute paths are not allowed')
   }
 
-  if (UNSAFE_PATH_CHARS.test(filePath)) {
+  const hasControlCharacters = [...filePath].some(
+    (char) => (char.codePointAt(0) ?? 0) <= 0x1f,
+  )
+
+  if (UNSAFE_PATH_CHARS.test(filePath) || hasControlCharacters) {
     throw new Error('Path contains unsafe characters')
   }
 
