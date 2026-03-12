@@ -3,7 +3,7 @@
 
 services:
   nemo-curator:
-    image: nvcr.io/nvidia/nemo-curator:latest
+    image: ${NEMO_CURATOR_IMAGE:-nvcr.io/nvidia/nemo-curator:25.09}
     container_name: nemo-curator
     entrypoint: /bin/bash
     tty: true

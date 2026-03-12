@@ -10,6 +10,30 @@ fi
 
 IMAGE_TAG="${OVH_AI_REGISTRY}pixelated-training:v14"
 
+# 2. CLI and auth checks
+if ! command -v ovhai >/dev/null 2>&1; then
+    echo "ERROR: ovhai CLI is not installed or not available in PATH."
+    echo "Install it (or add it to PATH) before running this script."
+    echo "Example: https://github.com/ovh/ovhai-cli"
+    exit 1
+fi
+
+OVHAI_ARGS=()
+if [[ -n "${OVH_AI_TOKEN:-}" ]]; then
+  if ! ovhai --token "${OVH_AI_TOKEN}" me >/tmp/ovhai_preflight.log 2>&1; then
+    echo "ERROR: OVH_AI_TOKEN validation failed. Refresh token in OVH AI dashboard or run: ovhai login"
+    cat /tmp/ovhai_preflight.log
+    exit 1
+  fi
+  OVHAI_ARGS+=(--token "${OVH_AI_TOKEN}")
+else
+  if ! ovhai me >/tmp/ovhai_preflight.log 2>&1; then
+    echo "ERROR: ovhai authentication not available. Set OVH_AI_TOKEN or run: ovhai login"
+    cat /tmp/ovhai_preflight.log
+    exit 1
+  fi
+fi
+
 echo "🚀 Launching Stage 1 (Foundation) job..."
 
 # Syntax: ovhai job run [OPTIONS] [IMAGE] [COMMAND]...
@@ -23,7 +47,7 @@ if [[ -z "${HF_TOKEN:-}" ]]; then
     exit 1
 fi
 
-ovhai job run \
+ovhai "${OVHAI_ARGS[@]}" job run \
   --name "pixelated-stage1-foundation-v12" \
   --gpu 1 \
   --flavor "l40s-1-gpu" \

@@ -9,9 +9,11 @@ services:
       - '7331:7331'
     environment:
       MODE: standalone
-      POSTGRES_URI: postgresql://nmp:nmp@nemo-postgres:5432/evaluator
-      DATA_STORE_URL: http://nemo-datastore:3000/v1/hf
+      POSTGRES_URI: postgresql://${NEMO_POSTGRES_USER:?NEMO_POSTGRES_USER is required}:${NEMO_POSTGRES_PASSWORD:?NEMO_POSTGRES_PASSWORD is required}@nemo-postgres:5432/evaluator
+      EVALUATOR_IMAGE: ${NEMO_EVALUATOR_IMAGE:-nvcr.io/nvidia/nemo-microservices/evaluator:25.12}
+      DATA_STORE_URL: ${NEMO_EVALUATOR_DATA_STORE_URL:-http://nemo-datastore:3000/v1/hf}
       ENTITY_STORE_URL: http://nemo-entity-store:8000
+      NAMESPACE: ${NEMO_NAMESPACE:-nemo}
     depends_on:
       - nemo-postgres
       - nemo-datastore
