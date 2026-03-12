@@ -43,7 +43,9 @@ stages:
       - job: BuildAndDeploy
         displayName: Build image and deploy
         pool:
-          vmImage: ubuntu-latest
+          name: Default
+          demands:
+            - Agent.Name -equals pixelated-linux-agent
         steps:
           - task: HelmInstaller@1
             displayName: Install Helm
