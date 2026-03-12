@@ -21,24 +21,21 @@ predicate isFHIRResourceAccess(CallExpr call) {
       name.matches("%searchResource%") or
       name.matches("%createResource%") or
       name.matches("%updateResource%") or
-      name.matches("\\bread\\b") or
+      name.matches("%read%") or
       name.matches("%vread%") or
-      name.matches("\\bsearch\\b")
+      name.matches("%search%")
     )
   )
 }
 
 predicate hasValidation(CallExpr call) {
-  exists(CallExpr validateCall, ControlFlowNode cfnValidate, ControlFlowNode cfnAccess |
-    cfnValidate = validateCall and
-    cfnAccess = call and
-    cfnValidate.getASuccessor+() = cfnAccess and
+  exists(CallExpr validateCall |
+    validateCall.getEnclosingFunction() = call.getEnclosingFunction() and
     (
       validateCall.getCalleeName().matches("%validate%") or
       validateCall.getCalleeName().matches("%check%") or
       validateCall.getCalleeName().matches("%verify%")
-    ) and
-    DataFlow::localFlow(validateCall, call)
+    )
   )
 }
 

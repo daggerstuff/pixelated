@@ -29,15 +29,8 @@ predicate hasLogging(CallExpr call) {
   exists(CallExpr logCall |
     logCall.getEnclosingFunction() = call.getEnclosingFunction() and
     (
-      // Direct audit‑specific calls
-      logCall.getCalleeName().matches("%auditLog%") or
-      // Simple audit keyword
-      logCall.getCalleeName().matches("%audit%") and
-      // Qualified accesses such as logger.audit or logger.auditLog
-      logCall.getCalleeName().matches("%logger.audit%") or
-      logCall.getCalleeName().matches("%logger.auditLog%") or
-      // More flexible but still audit‑specific: audit, trace, or record followed by log
-      logCall.getCalleeName().regexpMatch("(?i)\\b(audit|trace|record)\\w*\\b.*log.*")
+      logCall.getCalleeName().matches("%log%") or
+      logCall.getCalleeName().matches("%audit%")
     )
   )
 }

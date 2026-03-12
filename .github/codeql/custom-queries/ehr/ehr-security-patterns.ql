@@ -19,11 +19,7 @@ import semmle.javascript.security.dataflow.RemoteFlowSources
 
 module EHRConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source instanceof RemoteFlowSource and
-    exists(string path |
-      path = source.getLocation().getFile().getRelativePath() and
-      (path.matches("%ehr%") or path.matches("%fhir%") or path.matches("%patient%"))
-    )
+    source instanceof RemoteFlowSource
   }
 
   predicate isSink(DataFlow::Node sink) {
@@ -31,17 +27,9 @@ module EHRConfig implements DataFlow::ConfigSig {
       (
         call.getCalleeName().matches("%request%") or
         call.getCalleeName().matches("%fetch%") or
-        call.getCalleleName().matches("%axios%")
+        call.getCalleeName().matches("%axios%")
       ) and
       sink = call.getAnArgument()
-    )
-  }
-
-  // Add barrier to exclude already-encrypted or sanitized data
-  predicate isBarrier(DataFlow::Node node) {
-    exists(DataFlow::CallNode call |
-      call.getCalleeName().matches("%encrypt%") and
-      node = call
     )
   }
 }

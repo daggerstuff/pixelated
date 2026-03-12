@@ -13,26 +13,6 @@
 
 import javascript
 
-/**
- * Checks whether the call is made in an EHR‑related context.
- * We consider a context EHR‑specific if the call is inside a class
- * whose name contains “ehr” (case‑insensitive) or if the call is
- * inside a module import that contains “ehr”.
- */
-predicate isEHRContext(CallExpr call) {
-  // 1. Inside a class named like *ehr* (e.g., EHRUser, ehrService)
-  exists(ClassDecl cls |
-    cls.getName().matches("(?i).*ehr.*") and
-    cls.getAChild() = call
-  )
-  or
-  // 2. Inside a module import that mentions “ehr”
-  exists(ImportStmt imp |
-    imp.getModuleName().matches("(?i).*ehr.*") and
-    call.getEnclosingModule() = imp.getModule()
-  )
-}
-
 predicate isAuthenticationMethod(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -47,7 +27,6 @@ predicate isAuthenticationMethod(CallExpr call) {
 from CallExpr authCall
 where
   isAuthenticationMethod(authCall) and
-  isEHRContext(authCall) and
   not exists(CallExpr mfaCall |
     mfaCall.getEnclosingFunction() = authCall.getEnclosingFunction() and
     (
