@@ -5,10 +5,10 @@ set -euo pipefail
 # Usage: ./scripts/build-and-push-azure.sh [--tag TAG] [--latest] [--no-build]
 
 # Configuration
-ACR_NAME="pixelatedregistry"
+ACR_NAME="${ACR_NAME:-pixelatedregistry01}"
 ACR_FQDN="${ACR_NAME}.azurecr.io"
-IMAGE_REPOSITORY="pixelatedempathy"
-DOCKERFILE="docker/Dockerfile"
+IMAGE_REPOSITORY="${ACR_REPO:-pixelatedempathy}"
+DOCKERFILE="${DOCKERFILE:-docker/Dockerfile}"
 
 # Colors for output
 RED='\033[0;31m'

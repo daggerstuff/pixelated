@@ -278,3 +278,10 @@ node_modules
 .beads/dolt-*.port
 
 .jules
+.agent
+.notes/
+.claude/
+.memory/
+.serena/
+.cursor/
+.vscode/

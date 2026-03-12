@@ -10,8 +10,6 @@ public/**/*.js
 **/.memory/**
 **/docker/**
 **/k8s/**
-**/.openskills/**
-**/.openagents/**
 **/scripts/**/*.py
 **/scripts/**/*.sh
 **/scripts/**/*.js
