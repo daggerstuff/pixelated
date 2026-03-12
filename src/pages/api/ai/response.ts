@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro'
 
-import { ResponseGenerationService } from '@/lib/ai/response-generation/service'
-import { createTogetherAIService } from '@/lib/ai/together-ai/service'
+import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
+import { createTogetherAIService } from '@/lib/ai/services/together'
 import type {
   AIService,
   AIServiceOptions,
   AIMessage,
   AIStreamChunk,
   TherapeuticResponse,
-} from '@/lib/ai/types'
+} from '@/lib/ai/models/ai-types'
 import { aiRepository } from '@/lib/db/ai'
 import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
 import { apiMetrics, countMetric } from '@/lib/sentry/utils'

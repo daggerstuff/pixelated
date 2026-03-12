@@ -1,8 +1,8 @@
 ---
-title: AI in the Therapy Room - Promise, Pitfalls, and My Patients' Reality
-description:
-  'What it actually looks like when algorithms enter the most vulnerable human
-  spaces'
+title: "AI in Therapy: Promise, Pitfalls, Reality"
+description: >
+  What it actually looks like when algorithms enter the most vulnerable human
+  spaces
 pubDate: 2025-03-09
 lastModDate: 2025-04-11
 author: 'Vivi'
