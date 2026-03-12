@@ -1,3 +1,4 @@
+// import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 import { getCurrentUser } from '@/lib/auth'
@@ -45,9 +46,9 @@ const treatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = async ({ request, cookies }) => {
+export const GET = async ({ request }) => {
   try {
-    const user = await getCurrentUser(cookies)
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
@@ -73,9 +74,9 @@ export const GET = async ({ request, cookies }) => {
   }
 }
 
-export const POST = async ({ request, cookies }) => {
+export const POST = async ({ request }) => {
   try {
-    const user = await getCurrentUser(cookies)
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,

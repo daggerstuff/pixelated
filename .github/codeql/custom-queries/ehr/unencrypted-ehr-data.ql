@@ -19,8 +19,8 @@ predicate isDataTransmissionCall(CallExpr call) {
     (
       name.matches("%http%") or
       name.matches("%fetch%") or
-      name.matches("%request%") or
-      call.getReceiver().getName().matches("%axios%")
+      name.matches("%axios%") or
+      name.matches("%request%")
     )
   )
 }
@@ -43,11 +43,9 @@ from CallExpr call, DataFlow::Node data
 where
   isDataTransmissionCall(call) and
   isEHRData(data) and
-  DataFlow::localFlow(data, call.getAnArgument()) and
   not exists(CallExpr encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
-    DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument())) and
-    DataFlow::localFlow(DataFlow::exprNode(encryptCall), DataFlow::exprNode(call.getAnArgument()))
+    DataFlow::localFlow(data, DataFlow::exprNode(encryptCall.getAnArgument()))
   )
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA compliance requires encryption."

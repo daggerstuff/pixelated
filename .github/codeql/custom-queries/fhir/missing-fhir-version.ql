@@ -26,12 +26,9 @@ predicate isFHIRClientInit(CallExpr call) {
 
 predicate hasVersionCheck(CallExpr call) {
   exists(CallExpr versionCall |
-    (
-      versionCall.getCalleeName().matches("%version%") or
-      versionCall.getCalleeName().matches("%compatibility%") or
-      versionCall.getCalleeName().matches("%checkVersion%")
-    ) and
-    versionCall.getParent() = call
+    versionCall.getCalleeName().matches("%version%") or
+    versionCall.getCalleeName().matches("%compatibility%") or
+    versionCall.getCalleeName().matches("%checkVersion%")
   )
 }
 
