@@ -68,7 +68,7 @@ Before submitting a PR, verify:
 
 ## PROJECT CONTEXT
 
-**Base Branch**: `staging` (NOT main)
+**Base Branch**: `staging` (NOT master)
 **Tech Stack**: TypeScript, Astro, React, Node.js
 **PR Target**: All PRs must target `staging` branch
 
