@@ -11,8 +11,6 @@ ai/
 .memory/
 docker/
 k8s/
-.openskills/
-.openagents/
 scripts/
 .vercel/
 

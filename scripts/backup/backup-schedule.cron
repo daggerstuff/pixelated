@@ -7,7 +7,7 @@
 
 # 2. Incremental Source Backup (rclone sync of codebase to Google Drive)
 # Runs every 6 hours to capture codebase changes (excludes heavy directories)
-0 */6 * * * /home/vivi/pixelated/scripts/rclone-nightly-backup.sh
+0 */6 * * * /home/vivi/pixelated/scripts/backup/rclone-nightly-backup.sh
 
 # 3. Frequent Local Snapshots (using backup_manager before deployments)
 # Preserves a local copy of the project directory
