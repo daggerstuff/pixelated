@@ -27,7 +27,8 @@ LIGHTNING_MACHINE=<machine>      Machine flavor (default: A100_X_2; set A100_X_2
 Examples:
   LIGHTNING_STUDIO=my-studio uv run lightning run ...  # use studio
   LIGHTNING_IMAGE=ghcr.io/org/image:tag LIGHTNING_REPO_URL=https://github.com/org/repo.git uv run ...
-  # Secrets (WANDB_API_KEY, OVH_S3_SECRET_KEY, HF_TOKEN, etc.) must be configured in your Lightning workspace/env, not passed on the command line.
+  # Secrets (WANDB_API_KEY, OVH_S3_SECRET_KEY, HF_TOKEN/HUGGINGFACE_HUB_TOKEN, etc.)
+  # must be configured in your Lightning workspace/env, not passed on the command line.
   # If LIGHTNING_STUDIO is omitted, the launcher auto-resolves it from your Lightning credentials.
 USAGE
 }
@@ -66,15 +67,37 @@ DRY_RUN_FLAG="${LIGHTNING_DRY_RUN:-0}"
 MAX_STEPS="${LIGHTNING_MAX_STEPS:-100000}"
 TRAIN_WORKERS="${LIGHTNING_TRAIN_WORKERS:-}"
 STAGE1_TRAINING_SCRIPT="ai/orchestrator/targets/lightning_production/train_therapeutic_ai.py"
-BASE_COMMAND="uv run python ${STAGE1_TRAINING_SCRIPT} --stage ${STAGE} --compute-backend gpu --max-steps ${MAX_STEPS}"
-
-if [[ "${DRY_RUN_FLAG}" == "1" ]]; then
-  BASE_COMMAND="${BASE_COMMAND} --dry-run --data-path ai/data/compress/processed/sample_conversations.json --base-model gpt2 --skip-lora"
-fi
-
-if [[ -n "${TRAIN_WORKERS}" ]]; then
-  BASE_COMMAND="${BASE_COMMAND} --num-workers ${TRAIN_WORKERS}"
-fi
+LIGHTNING_REPO_URL="${LIGHTNING_REPO_URL:-}"
+LIGHTNING_ENV_ARGS=()
+for env_key in \
+  WANDB_ENTITY \
+  WANDB_PROJECT \
+  WANDB_API_KEY \
+  WANDB_DISABLED \
+  WANDB_NAME \
+  HF_TOKEN \
+  HUGGINGFACE_HUB_TOKEN \
+  HF_REPO_ID \
+  HF_REPO_NAME \
+  HF_REPO_OWNER \
+  HF_REPO_PRIVATE \
+  HF_PUSH \
+  HF_RUN_NAME \
+  S3_BUCKET \
+  OVH_S3_ENDPOINT \
+  OVH_S3_REGION \
+  OVH_S3_BUCKET \
+  TRAIN_DATA_PATH \
+  CUDA_VISIBLE_DEVICES; do
+  if [[ -n "${!env_key:-}" ]]; then
+    LIGHTNING_ENV_ARGS+=(--env "${env_key}=${!env_key}")
+  fi
+done
+LIGHTNING_ENV_ARGS+=(--env "STAGE1_TRAINING_SCRIPT=${STAGE1_TRAINING_SCRIPT}")
+LIGHTNING_ENV_ARGS+=(--env "STAGE1_STAGE=${STAGE}")
+LIGHTNING_ENV_ARGS+=(--env "STAGE1_MAX_STEPS=${MAX_STEPS}")
+LIGHTNING_ENV_ARGS+=(--env "STAGE1_DRY_RUN=${DRY_RUN_FLAG}")
+LIGHTNING_ENV_ARGS+=(--env "STAGE1_TRAIN_WORKERS=${TRAIN_WORKERS}")
 LIGHTNING_IMAGE="${LIGHTNING_IMAGE:-}"
 LIGHTNING_STUDIO="${LIGHTNING_STUDIO:-}"
 LIGHTNING_STUDIO_PATH="${LIGHTNING_STUDIO_PATH:-}"
@@ -86,6 +109,7 @@ LIGHTNING_AUTO_RESOLVE_STUDIO="${LIGHTNING_AUTO_RESOLVE_STUDIO:-1}"
 if [[ -z "${LIGHTNING_REPO_URL:-}" ]]; then
   LIGHTNING_REPO_URL="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null || true)"
 fi
+LIGHTNING_ENV_ARGS+=(--env "LIGHTNING_REPO_URL=${LIGHTNING_REPO_URL}")
 CREDENTIALS_FILE="${HOME}/.lightning/credentials.json"
 
 resolve_lightning_context_values() {
@@ -223,23 +247,6 @@ echo "⚡ Launching Stage 1 training via lightning CLI."
 echo "Machine: ${MACHINE}"
 echo "Job name: ${JOB_NAME}"
 
-LIGHTNING_ENV_ARGS=()
-for env_key in \
-  WANDB_ENTITY \
-  WANDB_PROJECT \
-  WANDB_DISABLED \
-  WANDB_NAME \
-  S3_BUCKET \
-  OVH_S3_ENDPOINT \
-  OVH_S3_REGION \
-  OVH_S3_BUCKET \
-  TRAIN_DATA_PATH \
-  CUDA_VISIBLE_DEVICES; do
-  if [[ -n "${!env_key:-}" ]]; then
-    LIGHTNING_ENV_ARGS+=(--env "${env_key}=${!env_key}")
-  fi
-done
-
 TEAMSPACE_ARGS=()
 if [[ -n "${LIGHTNING_USERNAME}" && -n "${LIGHTNING_TEAMSPACE}" ]]; then
   TEAMSPACE_ARGS=(--teamspace "${LIGHTNING_TEAMSPACE}")
@@ -249,70 +256,39 @@ if [[ -n "${LIGHTNING_USERNAME}" && -n "${LIGHTNING_TEAMSPACE}" ]]; then
     TEAMSPACE_ARGS+=(--org "${LIGHTNING_USERNAME}")
   fi
 fi
+ENTRYPOINT_SCRIPT="scripts/devops/start_lightning_stage1_entrypoint.sh"
 
-if [[ -n "${LIGHTNING_STUDIO_PATH}" ]]; then
-  LAUNCH_COMMAND="if [ ! -d \"${LIGHTNING_STUDIO_PATH}\" ]; then
-    echo \"ERROR: LIGHTNING_STUDIO_PATH does not exist: ${LIGHTNING_STUDIO_PATH}\"
-    exit 1
-  fi
-  cd ${LIGHTNING_STUDIO_PATH}
-  ${BASE_COMMAND}"
-else
-  LAUNCH_COMMAND="WORKDIR=\"\$(pwd)\"
-TRAINING_SCRIPT=\"${STAGE1_TRAINING_SCRIPT}\"
-REPO_TMP_DIR=\"\"
-cleanup_repo_dir() {
-  if [ -n \"\${REPO_TMP_DIR}\" ] && [ -d \"\${REPO_TMP_DIR}\" ]; then
-    rm -rf \"\${REPO_TMP_DIR}\"
-  fi
-}
-trap cleanup_repo_dir EXIT
-REPO_URL=\"${LIGHTNING_REPO_URL}\"
+LAUNCH_COMMAND=$(cat <<'EOF'
+set -eu
+BOOTSTRAP_SCRIPT=""
 
-resolve_workdir() {
-  for candidate in \"\${WORKDIR}\" \"/home/zeus/pixelated\" \"/home/vivi/pixelated\" \"/workspace\" \"/workspace/pixelated\"; do
-    if [ -f \"\${candidate}/\${TRAINING_SCRIPT}\" ]; then
-      echo \"\${candidate}\"
-      return 0
-    fi
-  done
-  return 1
-}
-
-WORKDIR=\"\$(resolve_workdir || true)\"
-if [ -z \"\${WORKDIR}\" ]; then
-  if [ -z \"\${REPO_URL}\" ]; then
-    echo \"ERROR: Could not locate Stage 1 training script and LIGHTNING_REPO_URL is not set.\"
-    echo \"Set LIGHTNING_STUDIO_PATH to your repo path, or LIGHTNING_REPO_URL for clone fallback.\"
-    exit 1
-  fi
-
-  WORKDIR=\"\$(mktemp -d)\"
-  REPO_TMP_DIR=\"\${WORKDIR}\"
-
-  if ! git clone --depth 1 \"\${REPO_URL}\" \"\${WORKDIR}\"; then
-    if [ \"\${REPO_URL#git@github.com:}\" != \"\${REPO_URL}\" ]; then
-      HTTPS_REPO_URL=\"https://github.com/\${REPO_URL#git@github.com:}\"
-      echo \"WARN: SSH clone failed, retrying with HTTPS: \${HTTPS_REPO_URL}\"
-      if ! git clone --depth 1 \"\${HTTPS_REPO_URL}\" \"\${WORKDIR}\"; then
-        echo \"ERROR: Failed to clone repository from both SSH and HTTPS URLs.\"
-        echo \"ERROR: SSH URL: \${REPO_URL}\"
-        echo \"ERROR: HTTPS URL: \${HTTPS_REPO_URL}\"
-        exit 1
-      fi
-    else
-      echo \"ERROR: Failed to clone repository from \${REPO_URL}\"
-      exit 1
-    fi
-  fi
-  if [ ! -f \"\${WORKDIR}/\${TRAINING_SCRIPT}\" ]; then
-    echo \"ERROR: Cloned repository missing \${TRAINING_SCRIPT} at \${WORKDIR}\"
-    exit 1
+if [ -n "${LIGHTNING_STUDIO_PATH:-}" ]; then
+  CANDIDATE="${LIGHTNING_STUDIO_PATH%/}/scripts/devops/start_lightning_stage1_bootstrap.sh"
+  if [ -f "${CANDIDATE}" ]; then
+    BOOTSTRAP_SCRIPT="${CANDIDATE}"
   fi
 fi
-cd \"\${WORKDIR}\"
-${BASE_COMMAND}"
+
+if [ -z "${BOOTSTRAP_SCRIPT}" ] && [ -f "scripts/devops/start_lightning_stage1_bootstrap.sh" ]; then
+  BOOTSTRAP_SCRIPT="scripts/devops/start_lightning_stage1_bootstrap.sh"
 fi
+
+if [ -z "${BOOTSTRAP_SCRIPT}" ]; then
+  BOOTSTRAP_SCRIPT="$(find /workspace /home /tmp -maxdepth 8 -type f -path '*/scripts/devops/start_lightning_stage1_bootstrap.sh' 2>/dev/null | head -n 1 || true)"
+fi
+
+if [ -n "${BOOTSTRAP_SCRIPT}" ]; then
+  bash "${BOOTSTRAP_SCRIPT}"
+  exit 0
+fi
+
+echo "ERROR: Could not locate scripts/devops/start_lightning_stage1_bootstrap.sh in studio workspace."
+echo "Expected it at: ${LIGHTNING_STUDIO_PATH:-<not set>}/scripts/devops/start_lightning_stage1_bootstrap.sh or ./scripts/devops/start_lightning_stage1_bootstrap.sh"
+echo "Searched workspace roots: /workspace, /home, /tmp"
+echo "This run is now legacy-studio mode only; no inline clone fallback is used."
+exit 1
+EOF
+)
 
 run_lightning_job() {
   local job_name="$1"
@@ -325,7 +301,7 @@ run_lightning_job() {
       return 1
     fi
     local repo_dir="${LIGHTNING_REPO_DIR:-pixelated-lightning}"
-    local image_command="git clone --depth 1 ${LIGHTNING_REPO_URL} ${repo_dir} && cd ${repo_dir} && ${launch_command}"
+    local image_command="git clone --depth 1 --recurse-submodules \"${LIGHTNING_REPO_URL}\" \"${repo_dir}\" && STAGE1_ENTRYPOINT_MODE=image STAGE1_WORKDIR_HINT=\"${repo_dir}\" bash \"${repo_dir}/${ENTRYPOINT_SCRIPT}\""
     uv run lightning run job \
       --name "${job_name}" \
       --machine "${machine}" \
