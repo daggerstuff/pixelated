@@ -206,6 +206,7 @@ scripts/*
 !scripts/build-*.sh
 !scripts/ci/
 !scripts/ci/build-with-pipe-handling.mjs
+!scripts/devops/install-git-hooks.sh
 !scripts/create-prod-package.js
 !scripts/utils/
 !scripts/utils/start-server.mjs
