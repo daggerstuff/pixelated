@@ -1,0 +1,240 @@
+---
+/**
+ * Brutalist Design System Demo
+ * Showcases the new Modern + Minimal + Brutalist aesthetic
+ */
+import BrutalistLayout from '@/layouts/BrutalistLayout.astro';
+import BrutalistHero from '@/components/BrutalistHero.astro';
+---
+
+<BrutalistLayout 
+  title="Design System" 
+  description="Pixelated Brutalism - A unique blend of Modern, Minimalism, and Brutalist design"
+>
+  <BrutalistHero 
+    title="Pixelated Brutalism"
+    subtitle="A unique blend of Modern, Minimalism, and Brutalist design inspired by Antfu's elegant terminal aesthetics"
+    ctaPrimary={{ text: "Explore", href: "#components" }}
+    ctaSecondary={{ text: "View Source", href: "https://github.com/nochadisfaction/pixelated" }}
+  />
+  
+  <!-- Components Section -->
+  <section id="components" class="section">
+    <div class="container">
+      <span class="label-mono">// Components</span>
+      <h2 class="mt-4 mb-8">Design Elements</h2>
+      
+      <div class="grid gap-8" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        <!-- Buttons Card -->
+        <div class="card">
+          <span class="label-mono mb-4 block">Buttons</span>
+          <div class="flex flex-col gap-3">
+            <button class="btn btn-primary">Primary Action</button>
+            <button class="btn btn-secondary">Secondary</button>
+            <button class="btn btn-outline">Outline</button>
+            <button class="btn btn-ghost">Ghost</button>
+            <button class="btn btn-primary btn-terminal">Terminal Style</button>
+          </div>
+        </div>
+        
+        <!-- Badges Card -->
+        <div class="card">
+          <span class="label-mono mb-4 block">Badges</span>
+          <div class="flex flex-wrap gap-2">
+            <span class="badge">Default</span>
+            <span class="badge badge-primary">Primary</span>
+            <span class="badge badge-success">Success</span>
+            <span class="badge badge-warning">Warning</span>
+            <span class="badge badge-danger">Danger</span>
+          </div>
+        </div>
+        
+        <!-- Status Card -->
+        <div class="card">
+          <span class="label-mono mb-4 block">Status</span>
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center gap-3">
+              <span class="status-dot status-dot-active status-pulse"></span>
+              <span class="text-sm">Active</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="status-dot status-dot-warning"></span>
+              <span class="text-sm">Warning</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="status-dot status-dot-danger"></span>
+              <span class="text-sm">Danger</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="status-dot"></span>
+              <span class="text-sm">Inactive</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="card">
+          <span class="label-mono mb-4 block">Forms</span>
+          <div class="flex flex-col gap-4">
+            <div>
+              <label class="label">Email</label>
+              <input type="email" class="input" placeholder="you@example.com" />
+            </div>
+            <div>
+              <label class="label">Message</label>
+              <textarea class="input textarea" placeholder="Type your message..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Metrics Section -->
+  <section class="section" style="background: var(--bg-primary);">
+    <div class="container">
+      <span class="label-mono">// Metrics</span>
+      <h2 class="mt-4 mb-8">By The Numbers</h2>
+      
+      <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="card card-metric">
+          <div class="card-metric-value">10K+</div>
+          <div class="card-metric-label">Training Sessions</div>
+        </div>
+        <div class="card card-metric card-lined">
+          <div class="card-metric-value">95%</div>
+          <div class="card-metric-label">Accuracy Rate</div>
+        </div>
+        <div class="card card-metric">
+          <div class="card-metric-value">24/7</div>
+          <div class="card-metric-label">AI Support</div>
+        </div>
+        <div class="card card-metric card-lined">
+          <div class="card-metric-value">50ms</div>
+          <div class="card-metric-label">Response Time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Typography Section -->
+  <section class="section">
+    <div class="container">
+      <span class="label-mono">// Typography</span>
+      <h2 class="mt-4 mb-8">Type System</h2>
+      
+      <div class="flex flex-col gap-6">
+        <div>
+          <span class="label-mono block mb-2">Display Heading</span>
+          <h1 class="display-heading">Pixelated Empathy</h1>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div>
+          <span class="label-mono block mb-2">H1 - Hero Title</span>
+          <h1>The Future of Mental Health Training</h1>
+        </div>
+        
+        <div>
+          <span class="label-mono block mb-2">H2 - Section Title</span>
+          <h2>AI-Powered Simulations</h2>
+        </div>
+        
+        <div>
+          <span class="label-mono block mb-2">H3 - Card Title</span>
+          <h3>Real-time Feedback</h3>
+        </div>
+        
+        <div>
+          <span class="label-mono block mb-2">Body Text</span>
+          <p>Our platform doesn't just simulate conversations; it embodies them. Through our proprietary Emotional Intelligence Engine, we create AI personas that feel authentic.</p>
+        </div>
+        
+        <div>
+          <span class="label-mono block mb-2">Monospace Label</span>
+          <span class="label-mono">// Section Marker</span>
+        </div>
+        
+        <div>
+          <span class="label-mono block mb-2">Code Block</span>
+          <pre><code>const empathy = await engine.analyze(conversation);
+const insights = await biasDetection.check(empathy);
+return formatResponse(insights);</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Grid Exposure Demo -->
+  <section class="section" style="background: var(--bg-void);">
+    <div class="container-grid" style="padding: var(--space-12) var(--space-6);">
+      <span class="label-mono mb-4 block">Grid Exposure</span>
+      <h2 class="mt-4 mb-8">Brutalist Structure</h2>
+      <p>Our signature design element: the exposed grid. This creates visual rhythm and emphasizes the structural nature of the design.</p>
+    </div>
+  </section>
+  
+  <!-- Navigation Demo -->
+  <section class="section">
+    <div class="container">
+      <span class="label-mono">// Navigation</span>
+      <h2 class="mt-4 mb-8">Nav Elements</h2>
+      
+      <nav class="nav mb-8">
+        <a href="#" class="nav-link nav-link-indicator">Home</a>
+        <a href="#" class="nav-link nav-link-indicator nav-link-active">Training</a>
+        <a href="#" class="nav-link nav-link-indicator">Features</a>
+        <a href="#" class="nav-link nav-link-indicator">Blog</a>
+        <a href="#" class="nav-link nav-link-indicator">Contact</a>
+      </nav>
+      
+      <div class="divider"></div>
+      
+      <h3 class="mb-4">Card Variants</h3>
+      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="card">
+          <h4 class="mb-2">Default Card</h4>
+          <p class="text-sm text-muted">Standard card with subtle border</p>
+        </div>
+        <div class="card card-accent">
+          <h4 class="mb-2">Accent Card</h4>
+          <p class="text-sm text-muted">Card with accent border glow</p>
+        </div>
+        <div class="card card-lined">
+          <h4 class="mb-2">Lined Card</h4>
+          <p class="text-sm text-muted">Card with top accent line</p>
+        </div>
+        <div class="card card-outline">
+          <h4 class="mb-2">Outline Card</h4>
+          <p class="text-sm text-muted">Transparent background</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="section" style="background: var(--bg-primary);">
+    <div class="container text-center">
+      <span class="label-mono block mb-4">// Ready to Start?</span>
+      <h2 class="mb-6">Transform Your Training</h2>
+      <p class="mb-8" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+        Join thousands of mental health professionals who are already using AI-powered simulations to master difficult conversations.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <a href="/signup" class="btn btn-primary btn-terminal">Get Started</a>
+        <a href="/demo" class="btn btn-outline">View Demo</a>
+      </div>
+    </div>
+  </section>
+</BrutalistLayout>
+
+<style>
+  .text-center {
+    text-align: center;
+  }
+  
+  .block {
+    display: block;
+  }
+</style>
