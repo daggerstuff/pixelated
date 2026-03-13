@@ -69,7 +69,7 @@ module UnsafeEHRAccess {
   import TaintTracking::Global<UnsafeEHRAccessSig>
 }
 
-module UnsafeEHRAccessSig implements TaintTracking::ConfigSig {
+module UnsafeEHRAccessSig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source instanceof RemoteFlowSource
   }
