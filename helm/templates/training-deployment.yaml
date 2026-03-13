@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "pixelated-empathy.fullname" . }}-training
-  namespace: {{ .Values.training.namespace | default "pixelated-training" }}
+  namespace: {{ .Values.training.namespace | default .Release.Namespace }}
   labels:
     {{- include "pixelated-empathy.labels" . | nindent 4 }}
     component: training
