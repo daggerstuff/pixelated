@@ -2,7 +2,7 @@
 # CPU-optimized for free-tier VPS
 
 # Core ML/AI
-torch==2.8.0+cpu
+torch==2.10.0
 torchvision==0.23.0+cpu
 torchaudio==2.8.0+cpu
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
