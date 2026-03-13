@@ -4,10 +4,55 @@
 global:
   environment: training
 
+# PostgreSQL configuration - override deprecated Bitnami images
+postgresql:
+  enabled: true
+  image:
+    repository: bitnami/postgresql
+    tag: "16-debian-12"
+    pullPolicy: IfNotPresent
+  auth:
+    postgresPassword: "changeme"
+    database: "pixelated_empathy"
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+
+# Redis configuration - override deprecated Bitnami images
+redis:
+  enabled: true
+  image:
+    repository: bitnami/redis
+    tag: "7.4-debian-12"
+    pullPolicy: IfNotPresent
+  auth:
+    enabled: true
+    password: "changeme"
+  master:
+    persistence:
+      enabled: true
+      size: 20Gi
+
 # Training service configuration
 training:
   enabled: true
   replicaCount: 1
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name: ""
+
+  rbac:
+    create: true
+    rules:
+      - apiGroups: [""]
+        resources: ["pods", "secrets", "configmaps"]
+        verbs: ["get", "list", "watch"]
+      - apiGroups: [""]
+        resources: ["pods/log"]
+        verbs: ["get"]
 
   image:
     repository: ghcr.io/pixelated/training-service
