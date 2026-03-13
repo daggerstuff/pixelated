@@ -216,19 +216,30 @@ export interface OrchestrationConfig {
 
 export interface ResponseStrategy {
   strategyId: string
+  name?: string
+  description?: string
   threatTypes: string[]
   severityLevels: string[]
   responseActions: ResponseAction[]
   conditions: ResponseCondition[]
+  priority: number
+  primaryType?: 'block' | 'isolate' | 'alert' | 'investigate' | 'mitigate' | 'rate_limit'
 }
 
 export interface ResponseAction {
   actionId: string
-  actionType: 'block' | 'isolate' | 'alert' | 'investigate' | 'mitigate'
+  actionType:
+    | 'block'
+    | 'isolate'
+    | 'alert'
+    | 'investigate'
+    | 'mitigate'
+    | 'rate_limit'
   target: string
   parameters: Record<string, unknown>
+  priority: number
   timeout: number
-  rollbackStrategy: string
+  rollbackStrategy?: string
 }
 
 export interface ResponseCondition {
@@ -250,40 +261,86 @@ export interface EscalationRule {
 export interface IntegrationEndpoint {
   endpointId: string
   service: string
-  url: string
-  authentication: {
+  endpoint: string
+  authType: string
+  credentials: Record<string, string>
+  enabled?: boolean
+  timeout?: number
+  retryPolicy: {
+    maxRetries: number
+    backoffStrategy: 'linear' | 'exponential' | 'fixed'
+    retryDelay?: number
+  }
+  url?: string
+  authentication?: {
     method: string
     credentials: Record<string, string>
   }
-  rateLimiting: {
+  rateLimiting?: {
     requestsPerSecond: number
     burstLimit: number
-  }
-  retryPolicy: {
-    maxRetries: number
-    backoffStrategy: string
-    timeout: number
   }
 }
 
 export interface ValidationConfig {
   enabled: boolean
   validationRules: ValidationRule[]
+  validationThreshold?: number
   qualityThresholds: QualityThresholds
   feedbackLoop: FeedbackLoopConfig
 }
 
 export interface ValidationRule {
   ruleId: string
+  name: string
   ruleType:
     | 'accuracy'
     | 'completeness'
     | 'consistency'
     | 'timeliness'
     | 'relevance'
+  conditions: ValidationRuleCondition[]
+  severity?: 'low' | 'medium' | 'high' | 'critical'
   condition: string
-  threshold: number
+  threshold?: number
   action: 'accept' | 'reject' | 'flag' | 'review'
+}
+
+export interface ValidationRuleCondition {
+  type: string
+  field: string
+  operator: string
+  value: unknown
+  required?: boolean
+  weight?: number
+  min?: number
+  max?: number
+  pattern?: string
+  values?: unknown[]
+}
+
+export interface ValidationResult {
+  ruleId: string
+  ruleName: string
+  passed: boolean
+  score: number
+  issues: string[]
+  details: Record<string, unknown>
+}
+
+export interface ThreatValidation {
+  validationId: string
+  threatId: string
+  threatType: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  confidence: number
+  status: 'pending' | 'valid' | 'invalid' | 'reviewed' | 'timeout'
+  overallScore: number
+  isValid: boolean
+  results: ValidationResult[]
+  createdAt: Date
+  completedAt?: Date
+  metadata?: Record<string, unknown>
 }
 
 export interface QualityThresholds {
@@ -305,41 +362,45 @@ export interface FeedbackLoopConfig {
 export interface GlobalThreatIntelligence {
   intelligenceId: string
   threatId: string
-  globalThreatId: string
+  globalThreatId?: string
+  threatType: string
   regions: string[]
   severity: 'low' | 'medium' | 'high' | 'critical'
   confidence: number
   firstSeen: Date
   lastSeen: Date
   expirationDate?: Date
-  indicators: GlobalThreatIndicator[]
+  indicators: ThreatIndicator[]
   attribution?: ThreatAttribution
   impactAssessment: GlobalImpactAssessment
   correlationData: CorrelationData
   validationStatus: ValidationStatus
+  metadata?: Record<string, unknown>
 }
 
-export interface GlobalThreatIndicator {
-  indicatorId: string
+export interface ThreatIndicator {
+  indicatorId?: string
   indicatorType: string
   value: string
   confidence: number
-  sourceRegion: string
+  sourceRegion?: string
   firstSeen: Date
   lastSeen: Date
   expirationDate?: Date
-  metadata: Record<string, unknown>
+  metadata?: Record<string, unknown>
 }
 
+export interface GlobalThreatIndicator extends ThreatIndicator {}
+
 export interface ThreatAttribution {
-  actor: string
+  actor?: string
   campaign: string
-  family: string
-  motivation: string
-  sophistication: string
-  resources: string
+  family?: string
+  motivation?: string
+  sophistication?: string
+  resources?: string
   confidence: number
-  evidence: string[]
+  evidence?: string[]
 }
 
 export interface GlobalImpactAssessment {
@@ -442,10 +503,23 @@ export interface ThreatHunt {
 }
 
 export interface HuntQuery {
-  queryType: 'sql' | 'kql' | 'spl' | 'yaml'
-  query: string
-  parameters: Record<string, unknown>
-  filters: HuntFilter[]
+  huntId: string
+  patternId?: string
+  customQuery?: string
+  queryType?: 'sql' | 'kql' | 'spl' | 'yaml'
+  query?: string
+  parameters?: Record<string, unknown>
+  filters?: HuntFilter[]
+  scope?: string[]
+  regions?: string[]
+  dataSources?: string[]
+  priority?: 'low' | 'medium' | 'high' | 'critical'
+  timeout?: number
+  maxResults?: number
+  timeRange?: {
+    startTime: string
+    endTime: string
+  }
 }
 
 export interface HuntFilter {
@@ -464,17 +538,44 @@ export interface HuntScope {
 
 export interface HuntSchedule {
   frequency: string
-  cronExpression: string
-  timezone: string
-  enabled: boolean
+  cronExpression?: string
+  timezone?: string
+  enabled?: boolean
+  scheduleId: string
+  patternId: string
+  scope?: string[]
+  parameters?: Record<string, unknown>
+  lastExecution?: Date | string
 }
 
 export interface HuntResult {
   resultId: string
   huntId: string
+  executionId?: string
+  patternId?: string
+  startTime?: Date
+  endTime?: Date
   timestamp: Date
+  status?: 'completed' | 'failed' | 'running'
+  threatsDiscovered?: number
+  confidence?: number
   findings: HuntFinding[]
   metadata: HuntMetadata
+}
+
+export interface HuntExecution {
+  executionId: string
+  huntId: string
+  patternId: string
+  startTime: Date
+  completedTime?: Date
+  status: 'preparing' | 'executing' | 'completed' | 'failed' | 'cancelled' | 'timeout'
+  scope: string[]
+  dataSources: string[]
+  regions: string[]
+  parameters: Record<string, unknown>
+  maxResults?: number
+  metadata?: HuntMetadata | Record<string, unknown>
 }
 
 export interface HuntFinding {
@@ -493,6 +594,7 @@ export interface HuntMetadata {
   falsePositives: number
   truePositives: number
   coverage: number
+  [key: string]: unknown
 }
 
 // External feed integration data structures
@@ -543,6 +645,74 @@ export interface FeedQualityMetrics {
   consistency: number
   relevance: number
   lastUpdated: Date
+}
+
+/** Feed subscription configuration (input) */
+export interface FeedConfig {
+  feedId: string
+  provider: string
+  feedType: 'stix' | 'taxii' | 'misp' | 'otx' | 'virustotal' | 'generic'
+  endpoint: string
+  apiKey?: string
+  requiresAuth?: boolean
+  updateFrequency?: 'real-time' | 'hourly' | 'daily' | 'weekly'
+  parameters?: Record<string, unknown>
+  filters?: Record<string, unknown>
+}
+
+/** Single item from an external feed (parsed) */
+export interface FeedItem {
+  itemId: string
+  indicator: string
+  indicatorType: string
+  severity: string
+  confidence: number
+  timestamp: Date
+  description: string
+  source?: string
+  metadata?: Record<string, unknown>
+}
+
+/** Request-building options for feed fetch (optional on subscription config) */
+export interface FeedSubscriptionRequestConfig {
+  method?: string
+  headers?: Record<string, string>
+  authType?: 'api_key' | 'bearer' | 'basic'
+  username?: string
+  queryParams?: Record<string, unknown>
+  requestBody?: unknown
+}
+
+/** Active feed subscription (stored, may include runtime stats) */
+export interface FeedSubscription {
+  subscriptionId: string
+  feedId: string
+  provider: string
+  feedType: string
+  endpoint: string
+  apiKey?: string
+  parameters: Record<string, unknown>
+  filters: Record<string, unknown>
+  updateFrequency: string
+  status: 'active' | 'inactive' | 'error'
+  createdAt: Date
+  lastFetchTime?: Date
+  lastProcessedTime?: Date
+  /** Runtime stats (updated on process) */
+  itemsProcessed?: number
+  errors?: number
+  /** Feed config (optional; may include request options for fetch) */
+  config?: FeedConfig & FeedSubscriptionRequestConfig
+}
+
+/** Result of processing a batch of feed items */
+export interface FeedProcessingResult {
+  subscriptionId: string
+  itemsProcessed: number
+  threatsDiscovered: number
+  errors: number
+  processingTime: number
+  threats: GlobalThreatIntelligence[]
 }
 
 // Utility types

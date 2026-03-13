@@ -162,6 +162,7 @@ export default defineConfig({
             },
           }
         : {},
+      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         // Limit parallel file operations to prevent resource exhaustion
         maxParallelFileOps: 2,
@@ -193,6 +194,11 @@ export default defineConfig({
           'recharts',
           'chart.js',
           '@opentelemetry/api',
+        '@opentelemetry/otlp-exporter-base',
+        '@opentelemetry/exporter-trace-otlp-http',
+        '@opentelemetry/exporter-metrics-otlp-http',
+        '@opentelemetry/otlp-transformer',
+        /^@opentelemetry\//,
         ],
         onwarn(warning, warn) {
           if (
@@ -207,6 +213,9 @@ export default defineConfig({
             (warning.message.includes(
               'externalized for browser compatibility',
             ) ||
+              warning.message.includes('experimentalDisableStreaming') ||
+              (warning.message.includes('dynamically imported') &&
+                warning.message.includes('statically imported')) ||
               warning.message.includes('icon "-"') ||
               warning.message.includes("failed to load icon '-'"))
           ) {
@@ -234,6 +243,10 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
+        stream: 'stream-browserify',
+        zlib: 'browserify-zlib',
+        buffer: 'buffer',
+        util: 'util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
@@ -273,6 +286,12 @@ export default defineConfig({
         'mongodb',
         'recharts',
         'chart.js',
+        '@opentelemetry/api',
+        '@opentelemetry/otlp-exporter-base',
+        '@opentelemetry/exporter-trace-otlp-http',
+        '@opentelemetry/exporter-metrics-otlp-http',
+        '@opentelemetry/otlp-transformer',
+        /^@opentelemetry\//,
       ],
     },
     optimizeDeps: {
