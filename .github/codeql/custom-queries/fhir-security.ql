@@ -1,13 +1,14 @@
 /**
- * @name FHIR Security Pattern Detection
- * @description Detects common security issues in FHIR integrations
+ * @name Unvalidated FHIR Resource Access
+ * @description Detects FHIR resource access without proper validation
  * @kind problem
  * @problem.severity error
+ * @security-severity 8.5
  * @precision high
- * @id js/fhir-security
+ * @id js/unvalidated-fhir-access
  * @tags security
- *       fhir
  *       hipaa
+ *       fhir
  */
 
 import javascript
@@ -35,6 +36,28 @@ predicate hasValidation(CallExpr call) {
   )
 }
 
+from CallExpr resourceCall
+where
+  isFHIRResourceAccess(resourceCall) and
+  not hasValidation(resourceCall)
+select resourceCall,
+  "FHIR resource access without validation detected. Ensure proper validation before access."
+
+/**
+ * @name Insecure FHIR Operations
+ * @description Detects potentially insecure FHIR operations
+ * @kind problem
+ * @problem.severity warning
+ * @security-severity 7.5
+ * @precision high
+ * @id js/insecure-fhir-ops
+ * @tags security
+ *       hipaa
+ *       fhir
+ */
+
+import javascript
+
 predicate isFHIROperation(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -56,6 +79,28 @@ predicate hasSecurityContext(CallExpr call) {
   )
 }
 
+from CallExpr fhirOp
+where
+  isFHIROperation(fhirOp) and
+  not hasSecurityContext(fhirOp)
+select fhirOp,
+  "FHIR operation without security context detected. Ensure proper authorization."
+
+/**
+ * @name Missing FHIR Version Check
+ * @description Detects FHIR operations without version compatibility checks
+ * @kind problem
+ * @problem.severity warning
+ * @security-severity 5.0
+ * @precision high
+ * @id js/missing-fhir-version
+ * @tags security
+ *       hipaa
+ *       fhir
+ */
+
+import javascript
+
 predicate isFHIRClientInit(CallExpr call) {
   exists(string name |
     name = call.getCalleeName() and
@@ -74,6 +119,28 @@ predicate hasVersionCheck(CallExpr call) {
     versionCall.getCalleeName().matches("%checkVersion%")
   )
 }
+
+from CallExpr clientInit
+where
+  isFHIRClientInit(clientInit) and
+  not hasVersionCheck(clientInit)
+select clientInit,
+  "FHIR client initialization without version check detected. Ensure version compatibility."
+
+/**
+ * @name Insecure FHIR Search
+ * @description Detects potentially insecure FHIR search operations
+ * @kind problem
+ * @problem.severity warning
+ * @security-severity 6.5
+ * @precision high
+ * @id js/insecure-fhir-search
+ * @tags security
+ *       hipaa
+ *       fhir
+ */
+
+import javascript
 
 predicate isFHIRSearch(CallExpr call) {
   exists(string name |
@@ -94,13 +161,9 @@ predicate hasInputSanitization(CallExpr call) {
   )
 }
 
-from CallExpr target, string message
+from CallExpr searchOp
 where
-  (isFHIRResourceAccess(target) and not hasValidation(target) and message = "FHIR resource access without validation detected. Ensure proper validation before access.")
-  or
-  (isFHIROperation(target) and not hasSecurityContext(target) and message = "FHIR operation without security context detected. Ensure proper authorization.")
-  or
-  (isFHIRClientInit(target) and not hasVersionCheck(target) and message = "FHIR client initialization without version check detected. Ensure version compatibility.")
-  or
-  (isFHIRSearch(target) and not hasInputSanitization(target) and message = "FHIR search operation without input sanitization detected. Ensure proper input validation.")
-select target, message
+  isFHIRSearch(searchOp) and
+  not hasInputSanitization(searchOp)
+select searchOp,
+  "FHIR search operation without input sanitization detected. Ensure proper input validation."
