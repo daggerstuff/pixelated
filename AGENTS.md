@@ -98,7 +98,7 @@ The repository ships with a modern, cursor-native memory stack under `.cursor/me
   - `.cursor/memory/long_term/patterns.md`
   - `.cursor/memory/long_term/decisions.md`
   - `.cursor/memory/long_term/progress.md`
-- Human-readable onboarding is in `docs/cursor-memory-bank-modern-instructions.md`.
+- Human-readable onboarding is in `.cursor/docs/cursor-memory-bank-modern-instructions.md`.
 - If working with custom instruction behavior, prefer this precedence:
   - `GEMINI.md` and root policy
   - `.cursor/rules/007_cursor_memory_custom_instructions.mdc`

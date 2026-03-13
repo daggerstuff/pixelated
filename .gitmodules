@@ -6,6 +6,5 @@
 
 [submodule "docs"]
 	path = docs
-	url = git@github.com:pixelatedempathy/docs.git
-	branch = .
+	url = git@github.com:daggerstuff/docs.git
 	ignore = all
