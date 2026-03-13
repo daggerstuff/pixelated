@@ -1,0 +1,1 @@
+## 2026-03-13 - Adding a new test | Pattern: Using fake timers for debounce functions | Action: Remember to use vi.useFakeTimers() and vi.advanceTimersByTime() when testing time-dependent utilities like debounce to avoid flaky or slow tests.
