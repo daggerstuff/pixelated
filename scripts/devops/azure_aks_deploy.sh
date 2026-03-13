@@ -154,12 +154,21 @@ kubectl cluster-info
 echo "📦 Deploying Helm chart to ${NAMESPACE}"
 helm dependency update "${CHART_DIR}"
 
+HELM_VALUES_ARGS=(
+  --values "${ENV_VALUES}"
+)
+
+if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
+  HELM_VALUES_ARGS+=(
+    --values "${CHART_DIR}/values-cost-effective.yaml"
+  )
+fi
+
 helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --install \
   --namespace "${NAMESPACE}" \
   --create-namespace \
-  --values "${ENV_VALUES}" \
-  --values "${CHART_DIR}/values-cost-effective.yaml" \
+  "${HELM_VALUES_ARGS[@]}" \
   --set image.repository="${ACR_LOGIN_SERVER}/${ACR_REPO}" \
   --set image.tag="${IMAGE_TAG}" \
   --set ingress.hosts[0].host="${APP_HOSTNAME}" \
