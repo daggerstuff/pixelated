@@ -1,7 +1,7 @@
 [submodule "ai"]
 	path = ai
 	url = git@github.com:daggerstuff/ai.git
-	branch = .
+	branch = staging
 	ignore = all
 
 [submodule "docs"]

@@ -46,14 +46,7 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
-            submodules: recursive
 
-          - bash: |
-              set -euo pipefail
-              git submodule sync --recursive
-              git submodule set-url ai https://github.com/daggerstuff/ai.git
-              git submodule update --init --recursive
-            displayName: Init submodules (ensure ai repo present)
 
           - task: HelmInstaller@1
             displayName: Install Helm
