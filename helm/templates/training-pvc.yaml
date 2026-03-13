@@ -1,0 +1,64 @@
+{{- if .Values.training.enabled }}
+{{- if .Values.storage.trainingData.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: training-data-pvc
+  namespace: {{ .Values.training.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: training
+spec:
+  accessModes:
+    - {{ .Values.storage.trainingData.accessMode | default "ReadOnlyMany" }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.trainingData.size | default "500Gi" }}
+  {{- if .Values.storage.trainingData.storageClass }}
+  storageClassName: {{ .Values.storage.trainingData.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.storage.modelOutput.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-output-pvc
+  namespace: {{ .Values.training.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: training
+spec:
+  accessModes:
+    - {{ .Values.storage.modelOutput.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.modelOutput.size | default "200Gi" }}
+  {{- if .Values.storage.modelOutput.storageClass }}
+  storageClassName: {{ .Values.storage.modelOutput.storageClass }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.storage.checkpoints.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: checkpoints-pvc
+  namespace: {{ .Values.training.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "pixelated-empathy.labels" . | nindent 4 }}
+    component: training
+spec:
+  accessModes:
+    - {{ .Values.storage.checkpoints.accessMode | default "ReadWriteOnce" }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.checkpoints.size | default "100Gi" }}
+  {{- if .Values.storage.checkpoints.storageClass }}
+  storageClassName: {{ .Values.storage.checkpoints.storageClass }}
+  {{- end }}
+{{- end }}
+{{- end }}
