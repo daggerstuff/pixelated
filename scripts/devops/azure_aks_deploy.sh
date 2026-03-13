@@ -11,7 +11,6 @@ case "${APP_ENV}" in
     APP_ENV="staging"
     ;;
 esac
-
 resolve_chart_dir() {
   local configured="${CHART_DIR:-}"
   local repo_root="${BUILD_SOURCESDIRECTORY:-${BUILD_SOURCES_DIR:-${BUILD_SOURCES_DIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-}}}}"
@@ -39,6 +38,46 @@ resolve_chart_dir() {
       printf '%s' "${candidate}"
       return 0
     fi
+  done
+
+  return 1
+}
+
+resolve_values_file() {
+  local chart_dir="$1"
+  local app_env="$2"
+  local candidates=()
+
+  case "${app_env}" in
+    production)
+      candidates+=("${chart_dir}/values-production.yaml")
+      candidates+=("${chart_dir}/values-prod.yaml")
+      ;;
+    staging)
+      candidates+=("${chart_dir}/values-staging.yaml")
+      candidates+=("${chart_dir}/values-stage.yaml")
+      ;;
+    dev|development)
+      candidates+=("${chart_dir}/values-dev.yaml")
+      candidates+=("${chart_dir}/values-development.yaml")
+      ;;
+  esac
+
+  candidates+=("${chart_dir}/values-${app_env}.yaml")
+  candidates+=("${chart_dir}/values.yaml")
+  candidates+=("${chart_dir}/values-training.yaml")
+
+  local values_file
+  for values_file in "${candidates[@]}"; do
+    if [[ -f "${values_file}" ]]; then
+      printf '%s' "${values_file}"
+      return 0
+    fi
+  done
+
+  echo "No Helm values file found in ${chart_dir} for environment ${app_env}. Tried:" >&2
+  for values_file in "${candidates[@]}"; do
+    echo "  - ${values_file}" >&2
   done
 
   return 1
@@ -71,7 +110,10 @@ if ! CHART_DIR="$(resolve_chart_dir)"; then
   exit 1
 fi
 
-ENV_VALUES="${CHART_DIR}/values-${APP_ENV}.yaml"
+if ! ENV_VALUES="$(resolve_values_file "${CHART_DIR}" "${APP_ENV}")"; then
+  echo "##vso[task.logissue type=error]Helm values file not found for environment ${APP_ENV} in chart directory ${CHART_DIR}."
+  exit 1
+fi
 
 if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
   CLUSTER_READY=true
@@ -92,15 +134,6 @@ case "${APP_ENV}" in
     APP_HOSTNAME="${APP_HOSTNAME:-${PRODUCTION_HOSTNAME}}"
     ;;
 esac
-
-if [ "${APP_ENV}" = "production" ] && [ ! -f "$ENV_VALUES" ]; then
-  ENV_VALUES="${CHART_DIR}/values.yaml"
-fi
-
-if [ ! -f "$ENV_VALUES" ]; then
-  echo "⚠️  No environment values file found at ${ENV_VALUES}, using values.yaml."
-  ENV_VALUES="${CHART_DIR}/values.yaml"
-fi
 
 echo "🔐 Logging into Azure and ACR"
 az acr login --name "${ACR_NAME}"
