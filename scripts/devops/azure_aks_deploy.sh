@@ -164,6 +164,7 @@ if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
   )
 fi
 
+set +e
 helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --install \
   --namespace "${NAMESPACE}" \
@@ -175,8 +176,23 @@ helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --set ingress.tls[0].hosts[0]="${APP_HOSTNAME}" \
   --set ingress.tls[0].secretName="pixelated-empathy-${APP_ENV}-tls" \
   --wait \
-  --timeout 15m \
+  --timeout 30m \
   --atomic
+HELM_EXIT_CODE=$?
+set -e
+
+if [ "${HELM_EXIT_CODE}" -ne 0 ]; then
+  echo "❌ Helm upgrade failed with exit code ${HELM_EXIT_CODE}"
+  echo "📄 Helm status:"
+  helm status "${RELEASE_NAME}" --namespace "${NAMESPACE}" || true
+  echo "📄 Pods:"
+  kubectl -n "${NAMESPACE}" get pods -o wide || true
+  echo "📄 Services:"
+  kubectl -n "${NAMESPACE}" get services || true
+  echo "📄 Events:"
+  kubectl -n "${NAMESPACE}" get events --sort-by=.lastTimestamp --field-selector type!=Normal || true
+  exit "${HELM_EXIT_CODE}"
+fi
 
 kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME}"
 
