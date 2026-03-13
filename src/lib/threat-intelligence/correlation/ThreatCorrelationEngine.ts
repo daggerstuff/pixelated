@@ -71,9 +71,9 @@ export class ThreatCorrelationEngineCore
   extends EventEmitter
   implements ThreatCorrelationEngine
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
   private correlationAlgorithms: Map<string, CorrelationAlgorithm> = new Map()
   private activeCorrelations: Map<string, CorrelationData> = new Map()
   private correlationPatterns: Map<string, CorrelationPattern> = new Map()

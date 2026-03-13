@@ -97,9 +97,9 @@ export class ThreatIntelligenceDatabaseCore
   extends EventEmitter
   implements ThreatIntelligenceDatabase
 {
-  private mongoClient: MongoClient
-  private db: Db
-  private redis: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private redis!: Redis
   private stixConfig: STIXConfig
   private taxiiConfig: TAXIIConfig
 

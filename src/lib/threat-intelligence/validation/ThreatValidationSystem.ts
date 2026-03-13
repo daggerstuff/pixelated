@@ -16,7 +16,6 @@ import {
   ThreatValidation,
   GlobalThreatIntelligence,
   ThreatIndicator,
-  ValidationMetrics,
 } from '../global/types'
 
 const logger = createBuildSafeLogger('threat-validation-system')
@@ -60,9 +59,9 @@ export class ThreatValidationSystemCore
   extends EventEmitter
   implements ThreatValidationSystem
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
   private validationRules: Map<string, ValidationRule> = new Map()
   private activeValidations: Map<string, ThreatValidation> = new Map()
   private threatIntelligenceCache: Map<string, GlobalThreatIntelligence> =

@@ -58,9 +58,9 @@ export class ThreatHuntingSystemCore
   extends EventEmitter
   implements ThreatHuntingSystem
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
   private huntPatterns: Map<string, HuntPattern> = new Map()
   private activeHunts: Map<string, HuntExecution> = new Map()
   private scheduledHunts: Map<string, NodeJS.Timeout> = new Map()

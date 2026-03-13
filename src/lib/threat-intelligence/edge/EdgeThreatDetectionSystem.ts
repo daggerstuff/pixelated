@@ -64,7 +64,7 @@ export class EdgeThreatDetectionSystemCore
   extends EventEmitter
   implements EdgeThreatDetectionSystem
 {
-  private redis: Redis
+  private redis!: Redis
   private models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
   private nodeStatus: Map<string, EdgeNodeStatus> = new Map()
   private detectionThresholds: DetectionThresholds

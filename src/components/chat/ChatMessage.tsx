@@ -3,7 +3,7 @@ import { useContext } from 'react'
 import { ThemeContext } from '@/components/theme/ThemeProvider'
 import { Badge } from '@/components/ui/badge'
 import { formatTimestamp } from '@/lib/dates'
-import { markdownToHtml } from '@/lib/markdown'
+import { simpleMarkdownToHtml } from '@/lib/markdown'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
@@ -133,7 +133,7 @@ export function ChatMessage({
             <div
               className='prose prose-sm prose-gray prose-headings:mb-2 prose-p:my-1 max-w-none'
               dangerouslySetInnerHTML={{
-                __html: markdownToHtml(message.content),
+                __html: simpleMarkdownToHtml(message.content),
               }}
             />
           )}

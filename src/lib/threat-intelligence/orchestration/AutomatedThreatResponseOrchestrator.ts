@@ -38,7 +38,13 @@ export interface AutomatedThreatResponseOrchestrator {
 export interface ThreatResponse {
   responseId: string
   threatId: string
-  responseType: 'block' | 'isolate' | 'alert' | 'investigate' | 'mitigate'
+  responseType:
+    | 'block'
+    | 'isolate'
+    | 'alert'
+    | 'investigate'
+    | 'mitigate'
+    | 'rate_limit'
   severity: 'low' | 'medium' | 'high' | 'critical'
   actions: ResponseAction[]
   confidence: number
@@ -70,9 +76,9 @@ export class AutomatedThreatResponseOrchestratorCore
   extends EventEmitter
   implements AutomatedThreatResponseOrchestrator
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
   private responseStrategies: Map<string, ResponseStrategy> = new Map()
   private activeResponses: Map<string, ThreatResponse> = new Map()
   private integrationEndpoints: Map<string, IntegrationEndpoint> = new Map()
@@ -221,7 +227,10 @@ export class AutomatedThreatResponseOrchestratorCore
       const response: ThreatResponse = {
         responseId: this.generateResponseId(),
         threatId: threat.threatId,
-        responseType: strategy.primaryType,
+        responseType:
+          strategy.primaryType ??
+          strategy.responseActions[0]?.actionType ??
+          'alert',
         severity: threat.severity,
         actions: validatedActions,
         confidence: threat.confidence,

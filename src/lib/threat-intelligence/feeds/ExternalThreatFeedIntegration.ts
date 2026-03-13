@@ -14,6 +14,7 @@ import {
   FeedConfig,
   FeedItem,
   FeedSubscription,
+  FeedSubscriptionRequestConfig,
   FeedProcessingResult,
   GlobalThreatIntelligence,
 } from '../global/types'
@@ -73,10 +74,10 @@ export class ExternalThreatFeedIntegrationCore
   extends EventEmitter
   implements ExternalThreatFeedIntegration
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
-  private httpClient: AxiosInstance
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
+  private httpClient!: AxiosInstance
   private subscriptions: Map<string, FeedSubscription> = new Map()
   private feedProcessors: Map<string, FeedProcessor> = new Map()
   private activeTimers: Map<string, NodeJS.Timeout> = new Map()
@@ -204,9 +205,9 @@ export class ExternalThreatFeedIntegrationCore
   private async loadSubscriptions(): Promise<void> {
     try {
       const subscriptionsCollection = this.db.collection('feed_subscriptions')
-      const subscriptions = await subscriptionsCollection
+      const subscriptions = (await subscriptionsCollection
         .find({ status: 'active' })
-        .toArray()
+        .toArray()) as unknown as FeedSubscription[]
 
       for (const subscription of subscriptions) {
         this.subscriptions.set(subscription.subscriptionId, subscription)
@@ -435,10 +436,11 @@ export class ExternalThreatFeedIntegrationCore
 
       // Update subscription statistics
       subscription.lastProcessedTime = new Date()
-      subscription.itemsProcessed += processingResult.itemsProcessed
+      subscription.itemsProcessed =
+        (subscription.itemsProcessed ?? 0) + processingResult.itemsProcessed
 
       if (processingResult.errors > 0) {
-        subscription.errors += processingResult.errors
+        subscription.errors = (subscription.errors ?? 0) + processingResult.errors
       }
 
       // Update subscription in database
@@ -456,7 +458,7 @@ export class ExternalThreatFeedIntegrationCore
         subscriptionId: subscription.subscriptionId,
       })
 
-      subscription.errors++
+      subscription.errors = (subscription.errors ?? 0) + 1
       await this.updateSubscription(subscription)
 
       throw error
@@ -508,17 +510,19 @@ export class ExternalThreatFeedIntegrationCore
   private async buildFeedRequestConfig(
     subscription: FeedSubscription,
   ): Promise<any> {
+    const subConfig: Partial<FeedConfig> & FeedSubscriptionRequestConfig =
+      subscription.config ?? {}
     const config: any = {
-      method: subscription.config.method || 'GET',
+      method: subConfig.method ?? 'GET',
       url: subscription.endpoint,
       headers: {
-        ...subscription.config.headers,
+        ...subConfig.headers,
       },
     }
 
     // Add authentication
     if (subscription.apiKey) {
-      switch (subscription.config.authType) {
+      switch (subConfig.authType) {
         case 'api_key':
           config.headers['X-API-Key'] = subscription.apiKey
           break
@@ -527,7 +531,7 @@ export class ExternalThreatFeedIntegrationCore
           break
         case 'basic':
           config.auth = {
-            username: subscription.config.username || '',
+            username: subConfig.username ?? '',
             password: subscription.apiKey,
           }
           break
@@ -535,13 +539,13 @@ export class ExternalThreatFeedIntegrationCore
     }
 
     // Add query parameters
-    if (subscription.config.queryParams) {
-      config.params = subscription.config.queryParams
+    if (subConfig.queryParams) {
+      config.params = subConfig.queryParams
     }
 
     // Add request body for POST requests
-    if (config.method === 'POST' && subscription.config.requestBody) {
-      config.data = subscription.config.requestBody
+    if (config.method === 'POST' && subConfig.requestBody) {
+      config.data = subConfig.requestBody
     }
 
     return config
@@ -856,8 +860,8 @@ export class ExternalThreatFeedIntegrationCore
         status: subscription.status,
         lastFetchTime: subscription.lastFetchTime,
         lastProcessedTime: subscription.lastProcessedTime,
-        itemsProcessed: subscription.itemsProcessed,
-        errors: subscription.errors,
+        itemsProcessed: subscription.itemsProcessed ?? 0,
+        errors: subscription.errors ?? 0,
         nextFetchTime,
       }
     } catch (error) {
@@ -878,7 +882,9 @@ export class ExternalThreatFeedIntegrationCore
   async getAllSubscriptions(): Promise<FeedSubscription[]> {
     try {
       const subscriptionsCollection = this.db.collection('feed_subscriptions')
-      const subscriptions = await subscriptionsCollection.find({}).toArray()
+      const subscriptions = (await subscriptionsCollection
+        .find({})
+        .toArray()) as unknown as FeedSubscription[]
 
       return subscriptions
     } catch (error) {
@@ -901,10 +907,13 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Update subscription configuration
-      const updatedConfig = { ...subscription.config, ...config }
+      const updatedConfig = {
+        ...subscription.config,
+        ...config,
+      } as FeedConfig & FeedSubscriptionRequestConfig
 
-      // Validate updated configuration
-      this.validateFeedConfig(updatedConfig)
+      // Validate updated configuration (requires required fields to be present)
+      this.validateFeedConfig(updatedConfig as FeedConfig)
 
       subscription.config = updatedConfig
 
@@ -1206,6 +1215,46 @@ interface BatchProcessingResult {
   threats: GlobalThreatIntelligence[]
 }
 
+function defaultGlobalThreatFields(
+  threatId: string,
+  confidence: number,
+): Pick<
+  GlobalThreatIntelligence,
+  'intelligenceId' | 'impactAssessment' | 'correlationData' | 'validationStatus'
+> {
+  const now = new Date()
+  return {
+    intelligenceId: `intel_${threatId}`,
+    impactAssessment: {
+      geographicSpread: 0,
+      affectedRegions: ['global'],
+      affectedSectors: [],
+      potentialImpact: 0,
+    },
+    correlationData: {
+      correlationId: `corr_${threatId}`,
+      correlatedThreats: [],
+      correlationStrength: 0,
+      correlationType: 'feed',
+      confidence,
+      analysisMethod: 'external_feed',
+      timestamp: now,
+    },
+    validationStatus: {
+      validationId: `val_${threatId}`,
+      status: 'pending',
+      accuracy: 0,
+      completeness: 0,
+      consistency: 0,
+      timeliness: 0,
+      relevance: 0,
+      validator: 'external_feed',
+      validationDate: now,
+      feedback: [],
+    },
+  }
+}
+
 // STIX Feed Processor
 class STIXFeedProcessor implements FeedProcessor {
   async parseFeed(
@@ -1267,9 +1316,14 @@ class STIXFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1395,9 +1449,14 @@ class TAXIIFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1523,9 +1582,14 @@ class MISPFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1651,9 +1715,14 @@ class OTXFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1778,9 +1847,14 @@ class VirusTotalFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: 'malware',
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {
@@ -1882,9 +1956,14 @@ class GenericFeedProcessor implements FeedProcessor {
       const threatId = `external_${item.itemId}`
 
       return {
+        ...defaultGlobalThreatFields(threatId, item.confidence),
         threatId,
         threatType: this.mapGenericToThreatType(item.indicatorType),
-        severity: item.severity,
+        severity: item.severity as
+          | 'low'
+          | 'medium'
+          | 'high'
+          | 'critical',
         confidence: item.confidence,
         indicators: [
           {

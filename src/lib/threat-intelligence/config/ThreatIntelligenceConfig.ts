@@ -1111,9 +1111,9 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
 
 export class ThreatIntelligenceConfigManager {
   private config: ThreatIntelligenceConfig
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
 
   constructor(
     config: ThreatIntelligenceConfig = DEFAULT_THREAT_INTELLIGENCE_CONFIG,
