@@ -67,9 +67,9 @@ export class GlobalThreatIntelligenceNetworkCore
   extends EventEmitter
   implements GlobalThreatIntelligenceNetwork
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private db: Db
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private db!: Db
 
   private edgeDetectionSystem: EdgeThreatDetectionSystem
   private correlationEngine: ThreatCorrelationEngine

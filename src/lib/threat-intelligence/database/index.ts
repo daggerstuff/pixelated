@@ -4,5 +4,5 @@
  * Provides comprehensive database operations for threat intelligence with STIX/TAXII compliance
  */
 
-export { ThreatIntelligenceDatabase } from './ThreatIntelligenceDatabase'
+export type { ThreatIntelligenceDatabase } from './ThreatIntelligenceDatabase'
 export { ThreatIntelligenceDatabaseCore } from './ThreatIntelligenceDatabase'
