@@ -1,9 +1,12 @@
 ---
-import CTA from '@/components/mizu/CTA.astro'
+/**
+ * Homepage - Pixelated Brutalism Design
+ * Modern + Minimalist + Brutalist aesthetic
+ */
+import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
+import BrutalistHero from '@/components/BrutalistHero.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
-import Hero from '@/components/mizu/Hero.astro'
-import Logos from '@/components/mizu/Logos.astro'
-import MizuLayout from '@/layouts/MizuLayout.astro'
+import CTA from '@/components/mizu/CTA.astro'
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -29,7 +32,7 @@ const organizationSchema = {
 }
 ---
 
-<MizuLayout
+<BrutalistLayout
   title="Pixelated Empathy | The AI Training Ground for Therapists"
   description="Practice difficult conversations in a safe space. No pressure, just progress."
 >
@@ -37,8 +40,42 @@ const organizationSchema = {
     type="application/ld+json"
     set:html={JSON.stringify(organizationSchema)}
   />
-  <Hero />
-  <Logos />
+  
+  <BrutalistHero 
+    title="The AI Training Ground for Therapists"
+    subtitle="Practice difficult conversations in a safe space. No pressure, just progress."
+    ctaPrimary={{ text: "Start Practice", href: "/auth/signup" }}
+    ctaSecondary={{ text: "Watch Demo", href: "/demo-hub" }}
+    stats={[
+      { value: "10K+", label: "Sessions" },
+      { value: "95%", label: "Accuracy" },
+      { value: "24/7", label: "Available" },
+    ]}
+  />
+  
+  <!-- Features Section -->
+  <section class="section">
+    <div class="container">
+      <span class="label-mono">// Features</span>
+      <h2 class="mt-4 mb-12">Why Professionals Choose Us</h2>
+      
+      <div class="grid gap-8" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        <div class="card card-lined">
+          <h3 class="mb-3">Risk-Free Practice</h3>
+          <p class="text-muted">Master crisis intervention and trauma response in a controlled environment without real-world consequences.</p>
+        </div>
+        <div class="card card-lined">
+          <h3 class="mb-3">Edge-Case Mastery</h3>
+          <p class="text-muted">Encounter rare but critical scenarios that most professionals go years without experiencing.</p>
+        </div>
+        <div class="card card-lined">
+          <h3 class="mb-3">Instant Feedback</h3>
+          <p class="text-muted">Get real-time analysis of your approach, tone, and effectiveness with detailed metrics.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
   <CoreFeatures />
   <CTA />
-</MizuLayout>
+</BrutalistLayout>

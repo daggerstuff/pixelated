@@ -1,6 +1,11 @@
 ---
+/**
+ * Brutalist Button Component
+ * Uses new Pixelated Brutalism design tokens
+ * Monospace labels, terminal feel, hard edges
+ */
 export interface Props {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'terminal'
   size?: 'sm' | 'md' | 'lg'
   href?: string
   type?: 'button' | 'submit' | 'reset'
@@ -18,19 +23,19 @@ const {
   class: className = '',
 } = Astro.props
 
-const baseClasses = 'brutalist-button'
+const baseClasses = 'btn'
 const variantClasses = {
-  primary: 'brutalist-button--primary',
-  secondary: 'brutalist-button--secondary',
-  outline: 'brutalist-button--outline',
-  danger:
-    'bg-red-600 hover:bg-red-700 text-white border-2 border-red-600 hover:border-red-700',
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  outline: 'btn-outline',
+  ghost: 'btn-ghost',
+  terminal: 'btn-primary btn-terminal',
 }
 
 const sizeClasses = {
-  sm: 'text-sm px-3 py-2',
-  md: 'text-base px-4 py-3',
-  lg: 'text-lg px-6 py-4',
+  sm: 'btn-sm',
+  md: '',
+  lg: 'btn-lg',
 }
 
 const classes = [

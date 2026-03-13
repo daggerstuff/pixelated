@@ -1,0 +1,145 @@
+---
+/**
+ * Brutalist Modal Component
+ * Minimal, accessible, brutalist styling
+ */
+export interface Props {
+  id?: string
+  title?: string
+  open?: boolean
+}
+
+const { id = 'modal', title, open = false } = Astro.props
+---
+
+<div 
+  class="modal-overlay" 
+  id={`${id}-overlay`}
+  data-open={open}
+  aria-hidden={!open}
+>
+  <div 
+    class="modal" 
+    id={id}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={title ? `${id}-title` : undefined}
+  >
+    {title && (
+      <div class="modal-header">
+        <span class="label-mono">{title}</span>
+        <button class="modal-close" aria-label="Close modal" data-close={id}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    )}
+    <div class="modal-content">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    padding: var(--space-4);
+  }
+  
+  .modal-overlay[data-open="true"] {
+    display: flex;
+  }
+  
+  .modal {
+    background: var(--bg-primary);
+    border: var(--border-primary);
+    border-radius: var(--radius-sm);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modal-in 0.2s var(--ease-out);
+  }
+  
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+    border-bottom: var(--border-primary);
+  }
+  
+  .modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+  
+  .modal-close:hover {
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+  }
+  
+  .modal-content {
+    padding: var(--space-6);
+  }
+</style>
+
+<script>
+  // Close modal handlers
+  document.querySelectorAll('[data-close]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const modalId = btn.getAttribute('data-close');
+      const overlay = document.getElementById(`${modalId}-overlay`);
+      overlay?.setAttribute('data-open', 'false');
+      overlay?.setAttribute('aria-hidden', 'true');
+    });
+  });
+  
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach((overlay) => {
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) {
+        overlay.setAttribute('data-open', 'false');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+    });
+  });
+  
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay[data-open="true"]').forEach((overlay) => {
+        overlay.setAttribute('data-open', 'false');
+        overlay.setAttribute('aria-hidden', 'true');
+      });
+    }
+  });
+</script>
