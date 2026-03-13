@@ -1,0 +1,12 @@
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.0.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 19.0.0
+- name: caddy-ingress-controller
+  repository: https://caddyserver.github.io/ingress/
+  version: 1.0.1
+digest: sha256:459a83d91c0d145135c4211dd4d79575d54c40e10a8d7b84523ce9eb6a6e5169
+generated: "2026-03-13T17:52:38.218367585Z"
