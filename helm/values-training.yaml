@@ -7,7 +7,6 @@ global:
 # Training service configuration
 training:
   enabled: true
-  namespace: pixelated-training
   replicaCount: 1
 
   image:
