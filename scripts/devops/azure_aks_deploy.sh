@@ -11,6 +11,38 @@ case "${APP_ENV}" in
     APP_ENV="staging"
     ;;
 esac
+
+resolve_chart_dir() {
+  local configured="${CHART_DIR:-}"
+  local repo_root="${BUILD_SOURCESDIRECTORY:-${BUILD_SOURCES_DIR:-${BUILD_SOURCES_DIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-}}}}"
+
+  if [[ -n "${configured}" && -d "${configured}" ]]; then
+    printf '%s' "${configured}"
+    return 0
+  fi
+
+  if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* && -d "${repo_root}/${configured}" ]]; then
+    printf '%s' "${repo_root}/${configured}"
+    return 0
+  fi
+
+  local candidates=()
+  if [[ -n "${repo_root}" ]]; then
+    candidates+=("${repo_root}/ai/infra/cloud/helm/pixelated-empathy")
+    candidates+=("${repo_root}/helm")
+  fi
+  candidates+=("${PWD}/ai/infra/cloud/helm/pixelated-empathy")
+  candidates+=("${PWD}/helm")
+
+  for candidate in "${candidates[@]}"; do
+    if [[ -d "${candidate}" ]]; then
+      printf '%s' "${candidate}"
+      return 0
+    fi
+  done
+
+  return 1
+}
 STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
 IMAGE_TAG="${BUILD_BUILDID:-}"
@@ -26,8 +58,20 @@ NAMESPACE="pixelated-empathy-${APP_ENV}"
 RELEASE_NAME="pixelated-empathy-${APP_ENV}"
 CLUSTER_NAME="${AKS_CLUSTER_NAME}"
 RESOURCE_GROUP="${AKS_RESOURCE_GROUP}"
-ENV_VALUES="${CHART_DIR}/values-${APP_ENV}.yaml"
 PUSH_LATEST="${PUSH_LATEST:-false}"
+
+if ! CHART_DIR="$(resolve_chart_dir)"; then
+  echo "##vso[task.logissue type=error]Helm chart directory not found."
+  echo "CHART_DIR was: ${CHART_DIR:-<unset>}"
+  echo "Working directory: ${PWD}"
+  echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
+  echo "Expected one of:"
+  echo " - ai/infra/cloud/helm/pixelated-empathy"
+  echo " - helm"
+  exit 1
+fi
+
+ENV_VALUES="${CHART_DIR}/values-${APP_ENV}.yaml"
 
 if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
   CLUSTER_READY=true

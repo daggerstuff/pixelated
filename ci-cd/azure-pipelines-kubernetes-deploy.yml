@@ -32,7 +32,7 @@ variables:
   - name: ACR_REPO
     value: pixelatedempathy
   - name: CHART_DIR
-    value: ai/infra/cloud/helm/pixelated-empathy
+    value: $(Build.SourcesDirectory)/ai/infra/cloud/helm/pixelated-empathy
   - name: ACR_LOGIN_SERVER
     value: $(ACR_NAME).azurecr.io
 
@@ -45,6 +45,16 @@ stages:
         pool:
           vmImage: ubuntu-24.04
         steps:
+          - checkout: self
+            submodules: recursive
+
+          - bash: |
+              set -euo pipefail
+              git submodule sync --recursive
+              git submodule set-url ai https://github.com/daggerstuff/ai.git
+              git submodule update --init --recursive
+            displayName: Init submodules (ensure ai repo present)
+
           - task: HelmInstaller@1
             displayName: Install Helm
             inputs:
@@ -56,6 +66,7 @@ stages:
               azureSubscription: $(AZURE_SUBSCRIPTION)
               scriptType: bash
               scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 set -euo pipefail
                 bash scripts/devops/azure_aks_preflight.sh
