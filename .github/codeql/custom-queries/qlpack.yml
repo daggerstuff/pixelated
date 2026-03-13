@@ -14,10 +14,3 @@ dependencies:
 # Extend the JavaScript query pack
 extractor: javascript
 
-# Define the query suites available in this pack
-suites:
-  - name: hipaa-compliance
-    description: HIPAA compliance security checks
-    queries:
-      - fhir-security.ql
-      - ehr-security.ql
