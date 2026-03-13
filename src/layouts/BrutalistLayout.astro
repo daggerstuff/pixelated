@@ -1,0 +1,104 @@
+---
+/**
+ * Brutalist Layout
+ * Modern + Minimalist + Brutalist design system
+ */
+import BrutalistHeader from '@/components/BrutalistHeader.astro';
+import BrutalistFooter from '@/components/BrutalistFooter.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'AI-powered training platform for mental health professionals',
+} = Astro.props;
+
+const { cspNonce } = Astro.locals;
+---
+
+<!doctype html>
+<html lang="en" class="dark scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    
+    <title>{title} | Pixelated Empathy</title>
+    <meta name="description" content={description} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Social -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Design System -->
+    <link rel="stylesheet" href="/css/brutalist-minimal.css" />
+  </head>
+  <body>
+    <!-- Skip Link -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    
+    <!-- Header -->
+    <BrutalistHeader />
+    
+    <!-- Main Content -->
+    <main id="main-content" class="main">
+      <slot />
+    </main>
+    
+    <!-- Footer -->
+    <BrutalistFooter />
+    
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+  </body>
+</html>
+
+<style is:global>
+  /* Base body styles handled by design system */
+  .main {
+    min-height: 100vh;
+    padding-top: 80px;
+  }
+  
+  /* Scroll Progress Bar */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 1px;
+    background: var(--accent-primary);
+    width: 0%;
+    z-index: var(--z-modal);
+    transition: width 0.1s linear;
+  }
+</style>
+
+<script>
+  // Scroll progress indicator
+  const progressBar = document.querySelector('.scroll-progress');
+  
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = (scrollTop / docHeight) * 100;
+    progressBar?.style.setProperty('width', `${progress}%`);
+  }
+  
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+</script>

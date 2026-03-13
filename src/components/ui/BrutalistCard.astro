@@ -1,23 +1,25 @@
 ---
+/**
+ * Brutalist Card Component
+ * Uses new Pixelated Brutalism design tokens
+ */
 export interface Props {
-  variant?: 'default' | 'elevated' | 'therapy' | 'security'
+  variant?: 'default' | 'accent' | 'lined' | 'outline' | 'metric'
   class?: string
-  hover?: boolean
 }
 
-const { variant = 'default', class: className = '', hover = true } = Astro.props
+const { variant = 'default', class: className = '' } = Astro.props
 
-const baseClasses = 'brutalist-card'
+const baseClasses = 'card'
 const variantClasses = {
   default: '',
-  elevated: 'bg-gray-800 border-gray-600',
-  therapy: 'therapy-session-card',
-  security: 'bg-blue-900/20 border-blue-700',
+  accent: 'card-accent',
+  lined: 'card-lined',
+  outline: 'card-outline',
+  metric: 'card-metric',
 }
 
-const hoverClasses = hover ? 'hover-lift' : ''
-
-const classes = [baseClasses, variantClasses[variant], hoverClasses, className]
+const classes = [baseClasses, variantClasses[variant], className]
   .filter(Boolean)
   .join(' ')
 ---
