@@ -4,6 +4,37 @@ import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
 
+function sanitizeHtml(html: string): string {
+  if (typeof window === 'undefined') {
+    // Basic regex sanitization for SSR fallback, strips all script tags and on* handlers
+    return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/on\w+\s*=/gi, '')
+      .replace(/javascript:/gi, '')
+  }
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  const scripts = doc.querySelectorAll('script, iframe, object, embed, applet, base')
+  scripts.forEach((s) => s.remove())
+
+  const allElements = doc.querySelectorAll('*')
+  for (let i = 0; i < allElements.length; i++) {
+    const el = allElements[i]
+    for (let j = el.attributes.length - 1; j >= 0; j--) {
+      const attr = el.attributes[j]
+      if (
+        attr.name.toLowerCase().startsWith('on') ||
+        attr.value.toLowerCase().includes('javascript:') ||
+        attr.value.toLowerCase().includes('data:text/html') ||
+        attr.value.toLowerCase().includes('vbscript:')
+      ) {
+        el.removeAttribute(attr.name)
+      }
+    }
+  }
+  return doc.body.innerHTML
+}
+
 interface ResearchConsentFormProps {
   onConsentChanged?: (hasConsent: boolean) => void
   showSummaryOnly?: boolean
@@ -279,7 +310,7 @@ export function ResearchConsentForm({
               <div className='bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm'>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: consentStatus.currentVersion.documentText,
+                    __html: sanitizeHtml(consentStatus.currentVersion.documentText),
                   }}
                 ></div>
               </div>
