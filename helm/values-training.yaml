@@ -7,10 +7,6 @@ global:
 # PostgreSQL configuration - override deprecated Bitnami images
 postgresql:
   enabled: true
-  image:
-    repository: bitnami/postgresql
-    tag: "17-debian-12"
-    pullPolicy: IfNotPresent
   auth:
     postgresPassword: "changeme"
     database: "pixelated_empathy"
@@ -21,10 +17,6 @@ postgresql:
 
 redis:
   enabled: true
-  image:
-    repository: bitnami/redis
-    tag: "7.2-debian-12"
-    pullPolicy: IfNotPresent
   auth:
     enabled: true
     password: "changeme"
@@ -248,19 +240,19 @@ storage:
     enabled: true
     accessMode: ReadOnlyMany
     size: 500Gi
-    storageClass: ssd-retain
+    storageClass: managed-premium
 
   modelOutput:
     enabled: true
     accessMode: ReadWriteOnce
     size: 200Gi
-    storageClass: ssd-retain
+    storageClass: managed-premium
 
   checkpoints:
     enabled: true
     accessMode: ReadWriteOnce
     size: 100Gi
-    storageClass: ssd-retain
+    storageClass: managed-premium
 
 # Network policies for security
 networkPolicy:
