@@ -1,0 +1,83 @@
+---
+/**
+ * Brutalist Form Components
+ * Minimal, accessible, brutalist styling
+ */
+
+export interface InputProps {
+  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url'
+  name: string
+  label: string
+  placeholder?: string
+  required?: boolean
+  disabled?: boolean
+  error?: string
+  id?: string
+}
+
+export interface TextareaProps {
+  name: string
+  label: string
+  placeholder?: string
+  required?: boolean
+  disabled?: boolean
+  error?: string
+  rows?: number
+  id?: string
+}
+
+export interface SelectProps {
+  name: string
+  label: string
+  options: Array<{ value: string; label: string }>
+  required?: boolean
+  disabled?: boolean
+  error?: string
+  id?: string
+}
+---
+
+<!-- Input Component -->
+<fragment>
+  <div class="form-group">
+    <label class="label" for={Astro.props.id || Astro.props.name}>
+      {Astro.props.label}
+      {Astro.props.required && <span class="text-accent ml-1">*</span>}
+    </label>
+    <input
+      type={Astro.props.type || 'text'}
+      name={Astro.props.name}
+      id={Astro.props.id || Astro.props.name}
+      placeholder={Astro.props.placeholder}
+      required={Astro.props.required}
+      disabled={Astro.props.disabled}
+      class:list={['input', Astro.props.error && 'input-error']}
+    />
+    {Astro.props.error && (
+      <span class="form-error">{Astro.props.error}</span>
+    )}
+  </div>
+</fragment>
+
+<style>
+  .form-group {
+    margin-bottom: var(--space-5);
+  }
+  
+  .input-error {
+    border-color: var(--color-danger);
+  }
+  
+  .input-error:focus {
+    border-color: var(--color-danger);
+    box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.1);
+  }
+  
+  .form-error {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-danger);
+    margin-top: var(--space-2);
+  }
+</style>
