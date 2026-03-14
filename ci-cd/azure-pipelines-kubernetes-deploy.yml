@@ -3,13 +3,13 @@ name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
 trigger:
   branches:
     include:
-      - main
+      - master
       - staging
 
 pr:
   branches:
     include:
-      - main
+      - master
       - staging
 
 parameters:
