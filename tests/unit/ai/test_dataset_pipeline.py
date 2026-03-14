@@ -3,8 +3,24 @@ Unit tests for AI dataset pipeline
 """
 
 import json
+from pathlib import Path
 
 import pytest
+
+
+@pytest.fixture
+def temp_dir(tmp_path):
+    return tmp_path
+
+
+@pytest.fixture
+def sample_dataset():
+    return [
+        {"input": "Hello", "output": "Hi there!", "label": "greeting"},
+        {"input": "How are you?", "output": "I'm doing well!", "label": "greeting"},
+        {"input": "Goodbye", "output": "See you later!", "label": "farewell"},
+    ]
+
 
 class TestDatasetPipeline:
     """Test dataset pipeline functionality"""
@@ -13,12 +29,12 @@ class TestDatasetPipeline:
         """Test dataset loading functionality"""
         # Create sample dataset file
         dataset_file = temp_dir / "test_dataset.json"
-        with open(dataset_file, 'w') as f:
+        with open(dataset_file, "w") as f:
             json.dump(sample_dataset, f)
 
         # Test loading
         assert dataset_file.exists()
-        with open(dataset_file, 'r') as f:
+        with open(dataset_file, "r") as f:
             loaded_data = json.load(f)
 
         assert len(loaded_data) == 3
@@ -36,6 +52,7 @@ class TestDatasetPipeline:
 
     def test_data_preprocessing(self, sample_dataset):
         """Test data preprocessing"""
+
         # Mock preprocessing function
         def preprocess_text(text):
             return text.lower().strip()
@@ -45,7 +62,7 @@ class TestDatasetPipeline:
             processed_item = {
                 "input": preprocess_text(item["input"]),
                 "output": preprocess_text(item["output"]),
-                "label": item["label"]
+                "label": item["label"],
             }
             processed_data.append(processed_item)
 
@@ -56,11 +73,11 @@ class TestDatasetPipeline:
     def test_large_dataset_processing(self):
         """Test processing of large datasets"""
         # Simulate large dataset
-        large_dataset = [{"input": f"text_{i}", "output": f"response_{i}", "label": "test"}
-                        for i in range(1000)]
+        large_dataset = [
+            {"input": f"text_{i}", "output": f"response_{i}", "label": "test"} for i in range(1000)
+        ]
 
-        processed_count = sum(bool(item["input"] and item["output"])
-                          for item in large_dataset)
+        processed_count = sum(bool(item["input"] and item["output"]) for item in large_dataset)
         assert processed_count == 1000
 
     def test_error_handling(self):
