@@ -1,0 +1,16 @@
+# Staging environment values for AKS deployment
+environment: "staging"
+
+# Keep training disabled in AKS staging environments unless explicitly enabled.
+training:
+  enabled: false
+
+postgresql:
+  enabled: true
+  image:
+    pullPolicy: IfNotPresent
+
+redis:
+  enabled: true
+  image:
+    pullPolicy: IfNotPresent

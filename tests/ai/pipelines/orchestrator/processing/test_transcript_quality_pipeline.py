@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ai.pipelines.orchestrator.processing.transcript_quality_pipeline import (
+from ai.core.pipelines.processing.transcript_quality_pipeline import (
     TranscriptQualityPipeline,
 )
 
@@ -12,16 +12,16 @@ from ai.pipelines.orchestrator.processing.transcript_quality_pipeline import (
 def mock_dependencies():
     with (
         patch(
-            "ai.pipelines.orchestrator.processing.transcript_quality_pipeline.VoiceTranscriber"
+            "ai.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber"
         ) as mock_whisper,
         patch(
-            "ai.pipelines.orchestrator.processing.transcript_quality_pipeline.NemoCuratorClient"
+            "ai.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient"
         ) as mock_curator,
         patch(
-            "ai.pipelines.orchestrator.processing.transcript_quality_pipeline.NemoEvaluatorClient"
+            "ai.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient"
         ) as mock_evaluator,
         patch(
-            "ai.pipelines.orchestrator.processing.transcript_quality_pipeline.TranscriptCorrector"
+            "ai.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector"
         ) as mock_corrector,
     ):
         # Setup mock instances
@@ -96,19 +96,25 @@ def test_process_audio_flow(mock_dependencies):
 
 
 def test_process_audio_failure():
-    pipeline = TranscriptQualityPipeline()
-    audio_path = Path("test.wav")
+    with (
+        patch(
+            "ai.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber"
+        ) as mock_whisper,
+        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient"),
+        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient"),
+        patch("ai.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector"),
+    ):
+        mock_transcriber = mock_whisper.return_value
+        pipeline = TranscriptQualityPipeline()
+        audio_path = Path("test.wav")
 
-    # Simulate transcription failure (VoiceTranscriber returns success=False, doesn't raise usually)
-    mock_result = MagicMock()
-    mock_result.success = False
-    mock_result.error_message = "Transcription failed"
-    pipeline.transcriber.transcribe_audio.return_value = mock_result
+        mock_result = MagicMock()
+        mock_result.success = False
+        mock_result.error_message = "Transcription failed"
+        mock_transcriber.transcribe_audio.return_value = mock_result
 
-    # Run pipeline
-    result = pipeline.process_audio(audio_path)
+        result = pipeline.process_audio(audio_path)
 
-    # Verify failure handling
-    assert result["success"] is False
-    assert "error" in result
-    assert "Pass 1 failed" in result["error"]
+        assert result["success"] is False
+        assert "error" in result
+        assert "Pass 1 failed" in result["error"]

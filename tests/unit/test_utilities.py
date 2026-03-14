@@ -4,7 +4,20 @@ Unit tests for utility functions
 
 import json
 import os
+from pathlib import Path
 from unittest.mock import patch
+
+import pytest
+
+
+@pytest.fixture
+def temp_dir(tmp_path):
+    return tmp_path
+
+
+@pytest.fixture
+def mock_config():
+    return {"model": {"name": "test_model", "version": "1.0"}}
 
 
 class TestUtilities:
@@ -43,13 +56,14 @@ class TestUtilities:
 
     def test_string_utilities(self):
         """Test string utility functions"""
+
         def clean_text(text):
             return text.strip().lower()
 
         test_cases = [
             ("  Hello World  ", "hello world"),
             ("UPPERCASE", "uppercase"),
-            ("Mixed Case", "mixed case")
+            ("Mixed Case", "mixed case"),
         ]
 
         for input_text, expected in test_cases:
@@ -58,6 +72,7 @@ class TestUtilities:
 
     def test_validation_functions(self):
         """Test validation utility functions"""
+
         def validate_email(email):
             return "@" in email and "." in email
 

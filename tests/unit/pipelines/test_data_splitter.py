@@ -1,4 +1,4 @@
-from ai.pipelines.orchestrator.data_splitter import DataSplitter
+from ai.core.pipelines.data_splitter import DataSplitter
 
 
 def test_split_ratios():
