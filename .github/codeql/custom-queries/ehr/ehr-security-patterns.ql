@@ -12,7 +12,6 @@
 
 import javascript
 import semmle.javascript.security.dataflow.RemoteFlowSources
-import DataFlow::PathGraph
 
 class EHRCredentialSource extends DataFlow::Node {
   EHRCredentialSource() {
@@ -70,7 +69,7 @@ module UnsafeEHRAccess {
   import TaintTracking::Global<UnsafeEHRAccessSig>
 }
 
-module UnsafeEHRAccessSig implements TaintTracking::ConfigSig {
+module UnsafeEHRAccessSig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source instanceof RemoteFlowSource
   }
@@ -88,8 +87,8 @@ module UnsafeEHRAccessSig implements TaintTracking::ConfigSig {
   }
 }
 
-from DataFlow::PathNode source, DataFlow::PathNode sink
+from DataFlow::Node source, DataFlow::Node sink
 where
-  InsecureEHRConfig::flowPath(source, sink) or
-  UnsafeEHRAccess::flowPath(source, sink)
-select sink.getNode(), source, sink, "Potential EHR security issue: sensitive data flows to a dangerous sink."
+  InsecureEHRConfig::flow(source, sink) or
+  UnsafeEHRAccess::flow(source, sink)
+select sink, "Potential EHR security issue: sensitive data flows from $@ to a dangerous sink.", source, "this source"
