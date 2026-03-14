@@ -91,4 +91,4 @@ from DataFlow::Node source, DataFlow::Node sink
 where
   InsecureEHRConfig::flow(source, sink) or
   UnsafeEHRAccess::flow(source, sink)
-select sink, "Potential EHR security issue: sensitive data flows from $@.", source, "this source"
+select sink, "Potential EHR security issue: sensitive data from $@ flows to a dangerous sink.", source, "this source"
