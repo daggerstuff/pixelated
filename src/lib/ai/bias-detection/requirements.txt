@@ -48,7 +48,7 @@ attrs==25.4.0
     #   jsonlines
     #   jsonschema
     #   referencing
-black==26.1.0
+black==26.3.1
     # via -r requirements.txt
 blinker==1.9.0
     # via
