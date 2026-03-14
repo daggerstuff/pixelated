@@ -162,7 +162,6 @@ export default defineConfig({
             },
           }
         : {},
-      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         // Limit parallel file operations to prevent resource exhaustion
         maxParallelFileOps: 2,
