@@ -36,6 +36,9 @@ export interface GestaltAnalysisResponse {
   behavioral_prediction: string
   persona_directive: string
   breakthrough_score: number
+  behavioral_pattern?: string
+  behavioral_pattern_confidence?: number
+  raw_metadata?: Record<string, unknown>
 }
 
 const PIXEL_API_URL = process.env.PIX_API_URL || 'http://localhost:8001'
