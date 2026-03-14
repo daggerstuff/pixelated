@@ -30,7 +30,7 @@ attrs==25.4.0
     # via aiohttp
 bitsandbytes==0.49.1
     # via -r src/lib/ai/training/requirements.txt
-black==26.1.0
+black==26.3.1
     # via -r src/lib/ai/training/requirements.txt
 blessed==1.27.0
     # via gpustat
