@@ -35,6 +35,8 @@ export function PixelMultimodalChat({
     conflictDetected,
     lastResponse,
     latencyMs,
+    behavioralPattern,
+    behavioralPatternConfidence,
     connectStream,
     disconnectStream,
     finalizeStream,
@@ -342,6 +344,26 @@ export function PixelMultimodalChat({
             </div>
           ) : null}
         </div>
+
+        {behavioralPattern ? (
+          <div className='border-slate-100 bg-white rounded-lg border p-3'>
+            <div className='text-slate-800 text-sm font-medium'>
+              Behavioral Pattern
+            </div>
+            <div
+              className='text-slate-700 mt-2 text-sm'
+              data-testid='multimodal-behavioral-pattern'
+            >
+              {behavioralPattern}
+            </div>
+            {behavioralPatternConfidence !== null ? (
+              <div className='text-slate-600 mt-1 text-xs'>
+                {(behavioralPatternConfidence * 100).toFixed(0)}%
+                confidence
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </div>
   )

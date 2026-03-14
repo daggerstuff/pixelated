@@ -43,7 +43,7 @@ export function PixelEnhancedChat({
     eqMetrics,
     crisisStatus,
     biasFlags,
-    lastAnalysis: _lastAnalysis,
+    lastAnalysis,
     isAnalyzing,
     error,
     clearBiasFlags,
@@ -184,6 +184,28 @@ export function PixelEnhancedChat({
       {/* Metrics Sidebar */}
       {showMetrics && (
         <div className='w-80 space-y-4 overflow-y-auto'>
+          {lastAnalysis?.behavioral_pattern && (
+            <Card>
+              <CardHeader>
+                <CardTitle className='flex items-center gap-2'>
+                  <span className='text-blue-700 h-4 w-4'>🧠</span>
+                  <span>Behavioral Pattern</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className='space-y-2'>
+                <p className='text-sm font-medium'>
+                  {lastAnalysis.behavioral_pattern}
+                </p>
+                {lastAnalysis.behavioral_pattern_confidence !== undefined && (
+                  <p className='text-sm text-gray-600'>
+                    Confidence:{' '}
+                    {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(0)}%
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* EQ Metrics */}
           {eqMetrics && eqMetrics.turnsAnalyzed > 0 && (
             <Card>
@@ -385,6 +407,19 @@ function MessageBubble({
                 <p className='font-semibold opacity-75'>
                   Overall EQ: {pixelMetrics.eq_scores.overall_eq.toFixed(2)}
                 </p>
+              </div>
+            )}
+            {pixelMetrics.behavioral_pattern && (
+              <div>
+                <p className='font-semibold opacity-75'>
+                  Pattern: {pixelMetrics.behavioral_pattern}
+                </p>
+                {pixelMetrics.behavioral_pattern_confidence !== undefined && (
+                  <p className='opacity-75'>
+                    Confidence:{' '}
+                    {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(0)}%
+                  </p>
+                )}
               </div>
             )}
             {pixelMetrics.conversation_metadata && (

@@ -35,6 +35,20 @@ interface ClientState {
   totalBytes: number
 }
 
+interface MultimodalResultPayload {
+  response?: string
+  transcription?: string
+  text_emotion?: Record<string, unknown>
+  audio_emotion?: Record<string, unknown>
+  fused_emotion?: Record<string, unknown>
+  conflict_detected?: boolean
+  behavioral_pattern?: string
+  behavioral_pattern_confidence?: number
+  latency_ms?: number
+  audio_url?: string
+  warning?: string
+}
+
 let wss: WebSocketServer | null = null
 
 function ensureServer(): WebSocketServer {
@@ -187,7 +201,7 @@ async function handleComplete(
     }
 
     const start = performance.now()
-    const pixelResponse = await forwardToPixel(form)
+    const pixelResponse = (await forwardToPixel(form)) as MultimodalResultPayload
     const latencyMs = performance.now() - start
 
     ws.send(
