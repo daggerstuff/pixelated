@@ -99,12 +99,17 @@ export default function ExportPanel({
       <div className='bg-slate-900 border-slate-700 animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l shadow-2xl'>
         <div className='border-slate-800 flex items-center justify-between border-b p-6'>
           <h2 className='text-white text-xl font-bold'>Export Results</h2>
-          <button onClick={onClose} className='text-slate-400 hover:text-white'>
+          <button
+            onClick={onClose}
+            aria-label='Close export panel'
+            className='text-slate-400 hover:text-white'
+          >
             <svg
               className='h-6 w-6'
               fill='none'
               viewBox='0 0 24 24'
               stroke='currentColor'
+              aria-hidden='true'
             >
               <path
                 strokeLinecap='round'
@@ -135,6 +140,7 @@ export default function ExportPanel({
                 <button
                   key={f}
                   onClick={() => setFormat(f)}
+                  aria-pressed={format === f}
                   className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
                     format === f
                       ? 'bg-pink-600/20 border-pink-500 text-pink-300'
@@ -200,6 +206,7 @@ export default function ExportPanel({
               fill='none'
               viewBox='0 0 24 24'
               stroke='currentColor'
+              aria-hidden='true'
             >
               <path
                 strokeLinecap='round'
