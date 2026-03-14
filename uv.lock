@@ -5869,7 +5869,7 @@ requires-dist = [
     { name = "bitsandbytes", specifier = ">=0.43.0" },
     { name = "black", marker = "extra == 'dev'" },
     { name = "boto3", specifier = ">=1.40.75" },
-    { name = "chardet", specifier = ">=5.2.0,<6.0.0" },
+    { name = "chardet", specifier = ">=5.2.0,<8.0.0" },
     { name = "checkov", marker = "extra == 'dev'" },
     { name = "click", specifier = "<9.0" },
     { name = "clickhouse-driver", specifier = ">=0.2.10" },
