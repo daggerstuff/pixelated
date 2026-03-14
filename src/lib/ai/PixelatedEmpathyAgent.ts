@@ -1,6 +1,8 @@
 import { SpanStatusCode } from '@opentelemetry/api'
 
 import { getArizeTracer } from './tracing/arize-setup'
+import { recordAgentActivity } from '../agent-note-collab/integration'
+import { AgentRole, TurnPhase, RequestedAction } from '../agent-note-collab/turn-log'
 
 /**
  * Azure AI Agent Service for Pixelated Empathy
@@ -244,6 +246,38 @@ export class PixelatedEmpathyAgent {
     } finally {
       span.end()
     }
+  }
+
+  /**
+   * Record a collaboration turn in the Agent-Note Collab system
+   */
+  async recordCollaborativeTurn(params: {
+    artifactId: string;
+    phase: TurnPhase;
+    role: AgentRole;
+    decision: string;
+    confidence: number;
+    assumptions?: string[];
+    openQuestions?: string[];
+    evidence?: string[];
+    suggestedAction?: RequestedAction;
+  }) {
+    return recordAgentActivity(
+      {
+        artifactId: params.artifactId,
+        agentId: this.agentId,
+        role: params.role,
+        phase: params.phase,
+      },
+      {
+        decision: params.decision,
+        confidence: params.confidence,
+        assumptions: params.assumptions,
+        openQuestions: params.openQuestions,
+        evidence: params.evidence,
+        suggestedAction: params.suggestedAction,
+      }
+    );
   }
 }
 
