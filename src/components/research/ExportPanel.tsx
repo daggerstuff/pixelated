@@ -99,7 +99,11 @@ export default function ExportPanel({
       <div className='bg-slate-900 border-slate-700 animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l shadow-2xl'>
         <div className='border-slate-800 flex items-center justify-between border-b p-6'>
           <h2 className='text-white text-xl font-bold'>Export Results</h2>
-          <button onClick={onClose} className='text-slate-400 hover:text-white'>
+          <button
+            onClick={onClose}
+            className='text-slate-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-md'
+            aria-label='Close export panel'
+          >
             <svg
               className='h-6 w-6'
               fill='none'
@@ -135,7 +139,8 @@ export default function ExportPanel({
                 <button
                   key={f}
                   onClick={() => setFormat(f)}
-                  className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all ${
+                  aria-pressed={format === f}
+                  className={`rounded-lg border px-4 py-3 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-pink-500 ${
                     format === f
                       ? 'bg-pink-600/20 border-pink-500 text-pink-300'
                       : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
@@ -156,14 +161,14 @@ export default function ExportPanel({
               <div className='flex items-center'>
                 <input
                   type='checkbox'
-                  id='filename'
+                  id='include-abstract'
                   className='border-slate-600 bg-slate-800 text-pink-600 focus:ring-pink-500 h-4 w-4 rounded'
                   checked={includeAbstract}
                   onChange={(e) => setIncludeAbstract(e.target.checked)}
                 />
                 <label
-                  htmlFor='filename'
-                  className='text-slate-300 ml-2 text-sm'
+                  htmlFor='include-abstract'
+                  className='text-slate-300 ml-2 text-sm cursor-pointer'
                 >
                   Include Abstracts (if available)
                 </label>
@@ -173,15 +178,16 @@ export default function ExportPanel({
 
           {/* Filename */}
           <div>
-            <label className='text-slate-300 mb-2 block text-sm font-medium'>
+            <label htmlFor='export-filename' className='text-slate-300 mb-2 block text-sm font-medium'>
               Filename
             </label>
-            <div className='bg-slate-800 border-slate-700 flex overflow-hidden rounded-lg border'>
+            <div className='bg-slate-800 border-slate-700 flex overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-pink-500'>
               <input
+                id='export-filename'
                 type='text'
                 value={filename}
                 onChange={(e) => setFilename(e.target.value)}
-                className='bg-transparent text-white w-full border-none px-3 py-2 focus:ring-0'
+                className='bg-transparent text-white w-full border-none px-3 py-2 focus:ring-0 outline-none'
               />
               <span className='text-slate-500 bg-slate-900 border-slate-700 border-l px-3 py-2'>
                 .{format === 'bibtex' ? 'bib' : format}
@@ -193,7 +199,7 @@ export default function ExportPanel({
         <div className='border-slate-800 bg-slate-900 border-t p-6'>
           <button
             onClick={handleExport}
-            className='bg-pink-600 hover:bg-pink-700 text-white flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors'
+            className='bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900'
           >
             <svg
               className='h-5 w-5'
