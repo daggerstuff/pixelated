@@ -62,9 +62,33 @@ export const MemoryObjectSchema = z.object({
   gist: z.string().max(100).optional(), // 10-word summary for Ghost Nodes
 });
 
+/**
+ * Stance Shift: Represents a detected change in user/persona behavior.
+ */
+export const StanceShiftSchema = z.object({
+  attribute: z.string(), // e.g., 'openness', 'defensiveness'
+  old_value: z.number(),
+  new_value: z.number(),
+  delta: z.number(),
+  evidence_ids: z.array(z.string()), // IDs of memories showing the shift
+  confidence: z.number(),
+});
+
+/**
+ * Synthesis Result: The output of a reconciliation pass.
+ */
+export const SynthesisResultSchema = z.object({
+  merged_ids: z.array(z.string()),
+  new_memory_id: z.string(),
+  stance_shifts: z.array(StanceShiftSchema),
+  compression_ratio: z.number(),
+});
+
 export type MemoryObject = z.infer<typeof MemoryObjectSchema>;
 export type EmotionalMetadata = z.infer<typeof EmotionalMetadataSchema>;
 export type EmpathyMetrics = z.infer<typeof EmpathyMetricsSchema>;
+export type StanceShift = z.infer<typeof StanceShiftSchema>;
+export type SynthesisResult = z.infer<typeof SynthesisResultSchema>;
 
 /**
  * Socratic Gate Decision Levels
