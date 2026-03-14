@@ -110,6 +110,12 @@ export interface PixelInferenceResponse {
   /** Confidence in response (0-1) */
   confidence: number
 
+  /** Gestalt behavioral pattern classification */
+  behavioral_pattern?: string
+
+  /** Confidence for gestalt behavioral pattern classification */
+  behavioral_pattern_confidence?: number
+
   /** Warning if response exceeded latency targets */
   warning?: string
 

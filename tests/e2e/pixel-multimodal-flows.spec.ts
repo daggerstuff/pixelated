@@ -49,6 +49,47 @@ test.describe('Pixel Multimodal Chat - Core Flows', () => {
       const errorMsg = await chatPage.getErrorMessage()
       expect(errorMsg).toContain('error')
     })
+
+    test('should propagate behavioral pattern from /api/ai/pixel/infer payload', async () => {
+      let mockedResponse: {
+        behavioral_pattern?: string
+        behavioral_pattern_confidence?: number
+      } | null = null
+
+      await chatPage.page.route('**/api/ai/pixel/infer', (route) => {
+        const payload = {
+          response: 'I can help you work through this.',
+          eq_scores: {
+            emotional_awareness: 0.88,
+            empathy_recognition: 0.84,
+            emotional_regulation: 0.79,
+            social_cognition: 0.77,
+            interpersonal_skills: 0.83,
+            overall_eq: 0.82,
+          },
+          confidence: 0.93,
+          persona_mode: 'therapy',
+          behavioral_pattern: 'adaptive_reflection',
+          behavioral_pattern_confidence: 0.91,
+          latency_ms: 145,
+        }
+        mockedResponse = payload
+        route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(payload),
+        })
+      })
+
+      await chatPage.sendTextMessage('I need to process what happened today.')
+
+      await expect(
+        chatPage.page.locator('[data-testid="multimodal-behavioral-pattern"]'),
+      ).toHaveText('adaptive_reflection')
+
+      expect(mockedResponse?.behavioral_pattern).toBe('adaptive_reflection')
+      expect(mockedResponse?.behavioral_pattern_confidence).toBeGreaterThan(0.9)
+    })
   })
 
   test.describe('Streaming Communication', () => {

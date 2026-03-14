@@ -85,6 +85,8 @@ resolve_values_file() {
 STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
 IMAGE_TAG="${BUILD_BUILDID:-}"
+POSTGRESQL_IMAGE_TAG="${POSTGRESQL_IMAGE_TAG:-latest}"
+REDIS_IMAGE_TAG="${REDIS_IMAGE_TAG:-latest}"
 if [ -n "${BUILD_SOURCEVERSION:-}" ]; then
   IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
 fi
@@ -98,6 +100,17 @@ RELEASE_NAME="pixelated-empathy-${APP_ENV}"
 CLUSTER_NAME="${AKS_CLUSTER_NAME}"
 RESOURCE_GROUP="${AKS_RESOURCE_GROUP}"
 PUSH_LATEST="${PUSH_LATEST:-false}"
+verify_remote_image() {
+  local repository="$1"
+  local tag="$2"
+  local image_ref="${repository}:${tag}"
+
+  if ! docker manifest inspect "${image_ref}" >/dev/null 2>&1; then
+    echo "##vso[task.logissue type=error]Image not found or inaccessible: ${image_ref}"
+    echo "Verify the repository and tag exist, and that Azure DevOps agents can reach docker.io."
+    return 1
+  fi
+}
 
 if ! CHART_DIR="$(resolve_chart_dir)"; then
   echo "##vso[task.logissue type=error]Helm chart directory not found."
@@ -156,6 +169,7 @@ helm dependency update "${CHART_DIR}"
 
 echo "📄 Using chart directory: ${CHART_DIR}"
 echo "📄 Using values file: ${ENV_VALUES}"
+echo "📄 Database image pinning: postgres=${POSTGRESQL_IMAGE_TAG}, redis=${REDIS_IMAGE_TAG}"
 
 HELM_VALUES_ARGS=(
   --values "${ENV_VALUES}"
@@ -164,13 +178,17 @@ HELM_VALUES_ARGS=(
 if [ "${APP_ENV}" != "training" ]; then
   HELM_VALUES_ARGS+=(
     --set "training.enabled=false"
+    --set "postgresql.image.repository=bitnami/postgresql"
+    --set "postgresql.image.tag=${POSTGRESQL_IMAGE_TAG}"
+    --set "postgresql.image.pullPolicy=IfNotPresent"
+    --set "redis.image.repository=bitnami/redis"
+    --set "redis.image.tag=${REDIS_IMAGE_TAG}"
+    --set "redis.image.pullPolicy=IfNotPresent"
   )
-fi
 
-HELM_VALUES_ARGS+=(
-  --set "postgresql.image.pullPolicy=IfNotPresent"
-  --set "redis.image.pullPolicy=IfNotPresent"
-)
+  verify_remote_image "docker.io/bitnami/postgresql" "${POSTGRESQL_IMAGE_TAG}"
+  verify_remote_image "docker.io/bitnami/redis" "${REDIS_IMAGE_TAG}"
+fi
 
 if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
   HELM_VALUES_ARGS+=(

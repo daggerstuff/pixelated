@@ -36,6 +36,8 @@ export interface MultimodalInferenceResponse {
   audio_emotion?: AudioEmotion
   fused_emotion?: FusedEmotion
   conflict_detected?: boolean
+  behavioral_pattern?: string
+  behavioral_pattern_confidence?: number
   latency_ms?: number
   audio_url?: string
   warning?: string
@@ -58,6 +60,8 @@ export interface UseMultimodalPixelState {
   fusedEmotion: FusedEmotion | null
   conflictDetected: boolean
   latencyMs: number | null
+  behavioralPattern: string | null
+  behavioralPatternConfidence: number | null
 
   // Streaming
   streaming: boolean
@@ -109,6 +113,8 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
     fusedEmotion: null,
     conflictDetected: false,
     latencyMs: null,
+    behavioralPattern: null,
+    behavioralPatternConfidence: null,
     streaming: false,
     streamStatus: null,
     streamError: null,
@@ -138,6 +144,8 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
       fusedEmotion: null,
       conflictDetected: false,
       latencyMs: null,
+      behavioralPattern: null,
+      behavioralPatternConfidence: null,
       streaming: false,
       streamStatus: null,
       streamError: null,
@@ -225,6 +233,9 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
                 textEmotion: data?.text_emotion || null,
                 audioEmotion: data?.audio_emotion || null,
                 fusedEmotion: data?.fused_emotion || null,
+                behavioralPattern: data?.behavioral_pattern || null,
+                behavioralPatternConfidence:
+                  data?.behavioral_pattern_confidence ?? null,
                 conflictDetected: Boolean(
                   data?.conflict_detected ||
                   (data?.fused_emotion?.conflict_score &&
@@ -375,6 +386,9 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
             textEmotion: json.text_emotion || null,
             audioEmotion: json.audio_emotion || null,
             fusedEmotion: json.fused_emotion || null,
+            behavioralPattern: json.behavioral_pattern || null,
+            behavioralPatternConfidence:
+              json.behavioral_pattern_confidence ?? null,
             conflictDetected: Boolean(
               json.conflict_detected ||
               (json.fused_emotion?.conflict_score &&
@@ -415,6 +429,9 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           textEmotion: json.text_emotion || null,
           audioEmotion: json.audio_emotion || null,
           fusedEmotion: json.fused_emotion || null,
+            behavioralPattern: json.behavioral_pattern || null,
+            behavioralPatternConfidence:
+              json.behavioral_pattern_confidence ?? null,
           conflictDetected: Boolean(
             json.conflict_detected ||
             (json.fused_emotion?.conflict_score &&

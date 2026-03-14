@@ -56,6 +56,10 @@ interface PixelInferenceResponse {
   conversation_metadata?: ConversationMetadata
   persona_mode: 'therapy' | 'assistant'
   confidence: number
+  gestalt_directive?: string
+  breakthrough_score?: number
+  behavioral_pattern?: string
+  behavioral_pattern_confidence?: number
   warning?: string
 }
 
@@ -338,6 +342,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         inference_time_ms: response.inference_time_ms,
         eq_overall: response.eq_scores?.overall_eq,
         persona_mode: response.persona_mode,
+        behavioral_pattern: response.behavioral_pattern,
+        behavioral_pattern_confidence: response.behavioral_pattern_confidence,
         crisis_detected: crisisDetected,
       },
     })
