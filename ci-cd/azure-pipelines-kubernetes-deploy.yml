@@ -3,7 +3,6 @@ name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
 trigger:
   branches:
     include:
-      - master
       - staging
 
 pr:
@@ -14,14 +13,14 @@ pr:
 
 parameters:
   - name: environment
-    displayName: "Environment"
+    displayName: 'Environment'
     type: string
     default: staging
     values:
       - staging
       - production
   - name: pushLatest
-    displayName: "Push :latest tag"
+    displayName: 'Push :latest tag'
     type: boolean
     default: true
 
@@ -46,7 +45,6 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
-
 
           - task: HelmInstaller@1
             displayName: Install Helm
