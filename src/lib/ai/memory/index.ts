@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
-import type { MemoryObject, MemoryScope, RetentionPolicy, GateResult } from './types';
+import type { MemoryObject, MemoryScope, RetentionPolicy, GateResult, SynthesisResult } from './types';
 import { SocraticGate } from './gate';
 import { MemoryCrisisTagger } from './tagger';
+import { MemorySynthesizer } from './synthesizer';
 import { CrisisDetectionService } from '../services/crisis-detection';
 
 const appLogger = createBuildSafeLogger('memory-system');
@@ -14,10 +15,12 @@ const appLogger = createBuildSafeLogger('memory-system');
 export class MemorySystem {
   private gate: SocraticGate;
   private tagger: MemoryCrisisTagger;
+  private synthesizer: MemorySynthesizer;
 
   constructor(crisisDetectionService: CrisisDetectionService) {
     this.tagger = new MemoryCrisisTagger(crisisDetectionService);
     this.gate = new SocraticGate(this.tagger);
+    this.synthesizer = new MemorySynthesizer();
   }
 
   /**
@@ -53,5 +56,12 @@ export class MemorySystem {
     });
 
     return { memory, gateResult };
+  }
+
+  /**
+   * Reconciles and synthesizes memories to detect shifts and manage context volume.
+   */
+  async reconcile(memories: MemoryObject[]): Promise<SynthesisResult | null> {
+    return this.synthesizer.synthesize(memories);
   }
 }
