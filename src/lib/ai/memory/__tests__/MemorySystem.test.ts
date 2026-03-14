@@ -94,4 +94,70 @@ describe('MemorySystem', () => {
     expect(result.gateResult.decision).toBe('passive');
     expect(result.gateResult.reason).toContain('Large data volume');
   });
+
+  describe('Reconciliation & Synthesis', () => {
+    it('should detect a stance shift when metrics deviate significantly', async () => {
+      const historicMemories = Array(8).fill(null).map((_, i) => ({
+        id: `00000000-0000-4000-a000-00000000000${i}`,
+        timestamp: new Date(Date.now() - 1000000 - i * 1000).toISOString(),
+        content: 'Good baseline.',
+        scope: 'session' as any,
+        retention: 'short_term' as any,
+        tags: [],
+        synthesized_from: [],
+        is_ghost: false,
+        metrics: { reciprocity: 0.8, validation_accuracy: 0.8, resistance_level: 0.1 }
+      }));
+
+      const recentMemories = Array(2).fill(null).map((_, i) => ({
+        id: `00000000-0000-4000-b000-00000000000${i}`,
+        timestamp: new Date().toISOString(),
+        content: 'Drop in empathy.',
+        scope: 'session' as any,
+        retention: 'short_term' as any,
+        tags: [],
+        synthesized_from: [],
+        is_ghost: false,
+        metrics: { reciprocity: 0.2, validation_accuracy: 0.2, resistance_level: 0.9 }
+      }));
+
+      const synthesis = await memorySystem.reconcile([...historicMemories, ...recentMemories]);
+
+      expect(synthesis?.stance_shifts.length).toBeGreaterThan(0);
+      const reciprocityShift = synthesis?.stance_shifts.find(s => s.attribute === 'reciprocity');
+      expect(reciprocityShift?.delta).toBeLessThan(-0.5);
+    });
+
+    it('should identify candidates for merging based on importance/decay', async () => {
+      const oldMemories = Array(5).fill(null).map((_, i) => ({
+        id: `00000000-0000-4000-c000-00000000000${i}`,
+        timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days old
+        content: 'Vague old memory.',
+        scope: 'session' as any,
+        retention: 'short_term' as any,
+        tags: [],
+        synthesized_from: [],
+        is_ghost: false,
+        emotional_context: { intensity: 0.1, valence: 0, arousal: 0, dominance: 0.5, primary_emotion: 'none' }
+      }));
+
+      const newImportantMemory = {
+        id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d', // Valid UUID
+        timestamp: new Date().toISOString(),
+        content: 'Very important and intense!',
+        scope: 'session' as any,
+        retention: 'short_term' as any,
+        tags: ['CRISIS_SIGNAL'],
+        synthesized_from: [],
+        is_ghost: false,
+        emotional_context: { intensity: 1.0, valence: -1, arousal: 1, dominance: 0.8, primary_emotion: 'panic' }
+      };
+
+      const synthesis = await memorySystem.reconcile([...oldMemories, newImportantMemory]);
+
+      expect(synthesis?.merged_ids.length).toBe(5);
+      expect(synthesis?.merged_ids).not.toContain('new1');
+      expect(synthesis?.compression_ratio).toBeGreaterThan(1);
+    });
+  });
 });
