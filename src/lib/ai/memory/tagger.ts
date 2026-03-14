@@ -17,14 +17,18 @@ export class MemoryCrisisTagger {
 
   /**
    * Analyzes a memory object's content and returns a list of high-risk tags.
+   * @param memory - The memory object to analyze
+   * @param userId - The user ID associated with this memory (required for crisis tracking)
    */
-  async tagMemory(memory: MemoryObject): Promise<string[]> {
+  async tagMemory(memory: MemoryObject, userId: string): Promise<string[]> {
     const tags: string[] = [];
 
     try {
       // Use existing CrisisDetectionService for analysis
       const result = await this.crisisService.detectCrisis(memory.content, {
-        includeAnalysis: true,
+        sensitivityLevel: 'high',
+        userId,
+        source: 'memory_tagger',
       });
 
       if (result.isCrisis) {
