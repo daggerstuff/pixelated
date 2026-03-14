@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from ai.evals.therapy_bench.therapy_bench import TherapyBench
+from ai.lab.evals.therapy_bench.therapy_bench import TherapyBench
 
 
 class DummyModel:
@@ -54,11 +54,10 @@ def test_persist_results_creates_file(tmp_path: Path):
 
 
 def test_golden_questions_schema_and_count():
-    data_path = Path("ai/evals/therapy_bench/data/golden_questions.json")
+    data_path = Path("ai/lab/evals/therapy_bench/data/golden_questions.json")
     data = json.loads(data_path.read_text())
 
     assert len(data) == 500
     assert all(
-        {"id", "category", "prompt", "expected_behavior"}.issubset(item.keys())
-        for item in data
+        {"id", "category", "prompt", "expected_behavior"}.issubset(item.keys()) for item in data
     )

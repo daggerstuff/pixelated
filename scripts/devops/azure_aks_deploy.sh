@@ -154,8 +154,22 @@ kubectl cluster-info
 echo "📦 Deploying Helm chart to ${NAMESPACE}"
 helm dependency update "${CHART_DIR}"
 
+echo "📄 Using chart directory: ${CHART_DIR}"
+echo "📄 Using values file: ${ENV_VALUES}"
+
 HELM_VALUES_ARGS=(
   --values "${ENV_VALUES}"
+)
+
+if [ "${APP_ENV}" != "training" ]; then
+  HELM_VALUES_ARGS+=(
+    --set "training.enabled=false"
+  )
+fi
+
+HELM_VALUES_ARGS+=(
+  --set "postgresql.image.pullPolicy=IfNotPresent"
+  --set "redis.image.pullPolicy=IfNotPresent"
 )
 
 if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
