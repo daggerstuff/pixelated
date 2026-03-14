@@ -69,7 +69,7 @@ module UnsafeEHRAccess {
   import TaintTracking::Global<UnsafeEHRAccessSig>
 }
 
-module UnsafeEHRAccessSig implements TaintTracking::ConfigSig {
+module UnsafeEHRAccessSig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source instanceof RemoteFlowSource
   }
@@ -91,4 +91,4 @@ from DataFlow::Node source, DataFlow::Node sink
 where
   InsecureEHRConfig::flow(source, sink) or
   UnsafeEHRAccess::flow(source, sink)
-select sink, source, sink, "Potential EHR security issue: sensitive data flows to a dangerous sink."
+select sink, "Potential EHR security issue: sensitive data flows from $@.", source, "this source"
