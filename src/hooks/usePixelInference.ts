@@ -38,6 +38,10 @@ interface PixelInferenceResponse {
   conversation_metadata?: ConversationMetadata
   persona_mode: 'therapy' | 'assistant'
   confidence: number
+  gestalt_directive?: string
+  breakthrough_score?: number
+  behavioral_pattern?: string
+  behavioral_pattern_confidence?: number
   warning?: string
 }
 

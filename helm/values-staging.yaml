@@ -8,9 +8,13 @@ training:
 postgresql:
   enabled: true
   image:
+    repository: bitnami/postgresql
+    tag: "latest"
     pullPolicy: IfNotPresent
 
 redis:
   enabled: true
   image:
+    repository: bitnami/redis
+    tag: "latest"
     pullPolicy: IfNotPresent
