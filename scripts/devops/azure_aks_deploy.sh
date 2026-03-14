@@ -96,7 +96,8 @@ resolve_values_file() {
 
   return 1
 }
-STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
+# TEMPORARY: Using production hostname for staging while master is not ready
+STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-pixelatedempathy.com}"
 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
 IMAGE_TAG="${BUILD_BUILDID:-}"
 POSTGRESQL_IMAGE_TAG="${POSTGRESQL_IMAGE_TAG:-latest}"
