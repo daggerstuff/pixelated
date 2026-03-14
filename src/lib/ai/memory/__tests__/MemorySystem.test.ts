@@ -35,7 +35,7 @@ describe('MemorySystem', () => {
     });
 
     const content = 'The trainee is showing progress in empathetic listening.';
-    const result = await memorySystem.ingest(content);
+    const result = await memorySystem.ingest(content, 'session', 'short_term', 'test-user-123');
 
     expect(result.gateResult.decision).toBe('auto');
     expect(result.memory.content).toBe(content);
@@ -53,7 +53,7 @@ describe('MemorySystem', () => {
     });
 
     const content = 'The client mentioned they want to end it all.';
-    const result = await memorySystem.ingest(content);
+    const result = await memorySystem.ingest(content, 'session', 'short_term', 'test-user-123');
 
     expect(result.gateResult.decision).toBe('active');
     expect(result.gateResult.crisis_detected).toBe(true);
@@ -72,7 +72,7 @@ describe('MemorySystem', () => {
     });
 
     const content = 'Update: Client is now more open to shadow work.';
-    const result = await memorySystem.ingest(content, 'trait');
+    const result = await memorySystem.ingest(content, 'trait', 'short_term', 'test-user-123');
 
     expect(result.gateResult.decision).toBe('active');
     expect(result.gateResult.reason).toContain('Permanent trait modification');
@@ -89,7 +89,7 @@ describe('MemorySystem', () => {
     });
 
     const longContent = 'A'.repeat(501);
-    const result = await memorySystem.ingest(longContent);
+    const result = await memorySystem.ingest(longContent, 'session', 'short_term', 'test-user-123');
 
     expect(result.gateResult.decision).toBe('passive');
     expect(result.gateResult.reason).toContain('Large data volume');
@@ -154,10 +154,22 @@ describe('MemorySystem', () => {
       };
 
       const synthesis = await memorySystem.reconcile([...oldMemories, newImportantMemory]);
+      if (!synthesis) throw new Error('Synthesis failed');
 
-      expect(synthesis?.merged_ids.length).toBe(5);
-      expect(synthesis?.merged_ids).not.toContain('new1');
-      expect(synthesis?.compression_ratio).toBeGreaterThan(1);
+      expect(synthesis.merged_ids.length).toBe(5);
+      expect(synthesis.merged_ids).not.toContain(newImportantMemory.id);
+      expect(synthesis.compression_ratio).toBeGreaterThan(1);
+    });
+
+    it('should link vector IDs and archive ghost nodes', async () => {
+      const { memory } = await memorySystem.ingest('Highly sensitive discovery.', 'trait', 'long_term', 'user1');
+      
+      const linkedMemory = memorySystem.link(memory, 'v-id-123');
+      expect(linkedMemory.vector_id).toBe('v-id-123');
+
+      const archived = memorySystem.archive([linkedMemory]);
+      expect(archived[0].is_ghost).toBe(true);
+      expect(archived[0].content).toBe('[ARCHIVED_GHOST_NODE]');
     });
   });
 });
