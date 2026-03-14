@@ -411,8 +411,16 @@ export function getTherapeuticPrompts(
 }
 
 /**
- * Analyzes a response for therapeutic techniques
- * Returns detected techniques and their confidence scores
+ * Analyzes a response for therapeutic techniques using a heuristic pattern-matching approach.
+ *
+ * Why this scoring model: Rather than simple binary presence, this algorithm calculates a
+ * blended confidence score (0.0 to 1.0). A base score of 0.7 acknowledges that matching
+ * even a single pattern strongly suggests the technique is present. The remaining 0.3 acts
+ * as a proportional bonus based on how many additional distinct semantic patterns match,
+ * rewarding responses that use a multi-faceted approach to the technique.
+ *
+ * @param text The recognized speech text to analyze
+ * @returns A map of detected techniques and their computed confidence scores (0.7 - 1.0)
  */
 export function analyzeTherapeuticTechniques(
   text: string,
