@@ -1,0 +1,69 @@
+name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
+
+trigger:
+  branches:
+    include:
+      - master
+      - staging
+
+pr:
+  branches:
+    include:
+      - master
+      - staging
+
+parameters:
+  - name: environment
+    displayName: "Environment"
+    type: string
+    default: staging
+    values:
+      - staging
+      - production
+  - name: pushLatest
+    displayName: "Push :latest tag"
+    type: boolean
+    default: true
+
+variables:
+  - group: pixelated-pipeline-variables
+  - name: ACR_NAME
+    value: pixelatedregistry01
+  - name: ACR_REPO
+    value: pixelatedempathy
+  - name: CHART_DIR
+    value: $(Build.SourcesDirectory)/ai/infra/cloud/helm/pixelated-empathy
+  - name: ACR_LOGIN_SERVER
+    value: $(ACR_NAME).azurecr.io
+
+stages:
+  - stage: BuildAndDeploy
+    displayName: Build and deploy to AKS
+    jobs:
+      - job: BuildAndDeployHosted
+        displayName: Build image and deploy (hosted)
+        pool:
+          vmImage: ubuntu-24.04
+        steps:
+          - checkout: self
+
+
+          - task: HelmInstaller@1
+            displayName: Install Helm
+            inputs:
+              helmVersionToInstall: v3.15.4
+
+          - task: AzureCLI@2
+            displayName: Build image, push to ACR, deploy to AKS
+            inputs:
+              azureSubscription: $(AZURE_SUBSCRIPTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
+                bash scripts/devops/azure_aks_deploy.sh
+            env:
+              APP_ENVIRONMENT: ${{ parameters.environment }}
+              PUSH_LATEST: ${{ parameters.pushLatest }}
