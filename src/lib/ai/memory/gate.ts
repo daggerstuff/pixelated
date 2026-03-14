@@ -17,11 +17,13 @@ export class SocraticGate {
 
   /**
    * Evaluates if a memory chunk should be ingested and with what level of confirmation.
+   * @param memory - The memory object to evaluate
+   * @param userId - The user ID associated with this memory (required for crisis tracking)
    */
-  async evaluate(memory: MemoryObject): Promise<GateResult> {
+  async evaluate(memory: MemoryObject, userId: string): Promise<GateResult> {
     try {
       // 1. Tag for crisis and context
-      const tags = await this.tagger.tagMemory(memory);
+      const tags = await this.tagger.tagMemory(memory, userId);
       const isCrisis = tags.includes('CRISIS_SIGNAL');
 
       // 2. Determine Decision Level

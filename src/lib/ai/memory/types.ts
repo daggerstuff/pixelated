@@ -59,6 +59,7 @@ export const MemoryObjectSchema = z.object({
   tags: z.array(z.string()).default([]),
   synthesized_from: z.array(z.string()).default([]), // IDs of source memories
   is_ghost: z.boolean().default(false),
+  vector_id: z.string().optional(), // ID in the vector database
   gist: z.string().max(100).optional(), // 10-word summary for Ghost Nodes
 });
 
