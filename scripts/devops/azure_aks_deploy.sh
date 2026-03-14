@@ -1,7 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-staging}}"
+APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-}}"
+if [ -z "${APP_ENV_RAW}" ]; then
+  BRANCH_NAME="${BUILD_SOURCEBRANCHNAME:-${BUILD_SOURCEBRANCH##*/}}"
+  case "${BRANCH_NAME}" in
+    master|main)
+      APP_ENV_RAW="production"
+      ;;
+    staging|stg|stage)
+      APP_ENV_RAW="staging"
+      ;;
+    *)
+      APP_ENV_RAW="staging"
+      ;;
+  esac
+fi
 APP_ENV="$(printf '%s' "${APP_ENV_RAW}" | tr '[:upper:]' '[:lower:]')"
 case "${APP_ENV}" in
   production|prod)
@@ -227,4 +241,29 @@ if [ "${HELM_EXIT_CODE}" -ne 0 ]; then
 fi
 
 kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME}"
+
+echo "📄 DNS target info:"
+if [ "${APP_ENV}" = "production" ]; then
+  INGRESS_NGINX_IP="$(kubectl -n ingress-nginx get svc ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+  if [ -n "${INGRESS_NGINX_IP}" ]; then
+    echo "Pixelated production ingress (DNS for pixelatedempathy.com): ${INGRESS_NGINX_IP}"
+  fi
+
+  PROD_INGRESS_HOST="$(kubectl -n "${NAMESPACE}" get ingress "${RELEASE_NAME}" -o jsonpath='{.spec.rules[0].host}' 2>/dev/null || true)"
+  if [ -z "${PROD_INGRESS_HOST}" ]; then
+    echo "##vso[task.logissue type=error]Production ingress object was not created or has no hostname rule."
+    echo "Run an explicit production deploy and verify the release chart templates include ingress resources."
+    exit 1
+  fi
+  echo "Production ingress host in namespace ${NAMESPACE}: ${PROD_INGRESS_HOST}"
+
+  if [ -z "${INGRESS_NGINX_IP}" ]; then
+    echo "##vso[task.logissue type=error]No public IP found on ingress-nginx controller in ingress-nginx namespace."
+    exit 1
+  fi
+fi
+INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ingress-controller" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+if [ -n "${INGRESS_CADDY_IP}" ]; then
+  echo "Namespace ${NAMESPACE} caddy ingress controller IP: ${INGRESS_CADDY_IP}"
+fi
 
