@@ -246,7 +246,7 @@ export default defineConfig({
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
       mainFields: ['module', 'main'],
-      conditions: ['import', 'module', 'browser', 'default'],
+      conditions: ['import', 'module', 'default'],
     },
     ssr: {
       external: [
@@ -287,6 +287,11 @@ export default defineConfig({
         '@opentelemetry/exporter-metrics-otlp-http',
         '@opentelemetry/otlp-transformer',
         /^@opentelemetry\//,
+        // Browser-only polyfills: never bundle into SSR/server output
+        'stream-browserify',
+        'path-browserify',
+        'buffer',
+        'events',
       ],
     },
     optimizeDeps: {
