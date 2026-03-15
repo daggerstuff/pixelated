@@ -24,6 +24,7 @@ export default function SearchBox({
   onResultClick,
 }: SearchBoxProps) {
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isSearchReady, setIsSearchReady] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -31,6 +32,14 @@ export default function SearchBox({
   const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+
+  // ⚡ Bolt: Debounce query to prevent synchronous main thread blocking during rapid typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [query])
 
   // Track if the search is actually showing results
   const hasResults = useMemo(() => results.length > 0, [results])
@@ -97,14 +106,14 @@ export default function SearchBox({
 
   // Handle searching when query changes
   useEffect(() => {
-    if (!isSearchReady || query.length < minQueryLength) {
+    if (!isSearchReady || debouncedQuery.length < minQueryLength) {
       setResults([])
       return
     }
 
     try {
       // Use the global search client
-      const searchResults = window.searchClient.search(query)
+      const searchResults = window.searchClient.search(debouncedQuery)
 
       // Apply filtering after search
       let limitedResults = searchResults
@@ -116,13 +125,13 @@ export default function SearchBox({
 
       // Call onSearch callback if provided
       if (onSearch) {
-        onSearch(query, limitedResults)
+        onSearch(debouncedQuery, limitedResults)
       }
     } catch (error: unknown) {
       console.error('Search error:', error)
       setResults([])
     }
-  }, [query, isSearchReady, maxResults, minQueryLength, onSearch])
+  }, [debouncedQuery, isSearchReady, maxResults, minQueryLength, onSearch])
 
   // Close results when clicking outside
   useEffect(() => {
