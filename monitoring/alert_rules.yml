@@ -1,5 +1,5 @@
 groups:
-  - name: business-strategy-cms-alerts
+  - name: pixelated-empathy-alerts
     rules:
       - alert: HighErrorRate
         expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
@@ -61,33 +61,20 @@ groups:
           summary: 'High CPU usage'
           description: 'CPU usage is {{ $value }}%'
 
-      - alert: BusinessIntelligenceAPIError
-        expr:
-          rate(business_intelligence_api_requests_total{status="error"}[5m]) >
-          0.05
+      - alert: EmotionalAnalysisError
+        expr: rate(emotional_analysis_errors_total[5m]) > 0.05
         for: 5m
         labels:
-          severity: warning
+          severity: critical
         annotations:
-          summary: 'Business Intelligence API errors'
-          description: 'BI API error rate is {{ $value }} errors per second'
+          summary: 'Emotional analysis errors detected'
+          description: 'EI Engine error rate is {{ $value }} errors per second'
 
-      - alert: FileUploadFailures
-        expr: rate(file_upload_failures_total[5m]) > 0.1
+      - alert: AIInferenceLatencyHigh
+        expr: rate(ai_inference_duration_seconds_sum[5m]) / rate(ai_inference_duration_seconds_count[5m]) > 2.0
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: 'File upload failures'
-          description:
-            'File upload failure rate is {{ $value }} failures per second'
-
-      - alert: CollaborationSessionErrors
-        expr: rate(collaboration_session_errors_total[5m]) > 0.1
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: 'Collaboration session errors'
-          description:
-            'Collaboration error rate is {{ $value }} errors per second'
+          summary: 'High AI inference latency'
+          description: 'Average inference latency is {{ $value }}s'

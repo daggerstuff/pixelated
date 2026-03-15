@@ -9,6 +9,7 @@ import {
   getAvailableProviders,
   initializeProviders,
 } from '../providers'
+import type { AIProviderType } from '../providers'
 
 // IMPORTANT: Import Sentry instrumentation at the very top
 import '../../../../config/instrument.mjs'
@@ -44,6 +45,15 @@ class AIServer {
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     })
     res.end(JSON.stringify(data))
+  }
+
+  private getProviderPreference(): AIProviderType[] {
+    const preference = process.env['AI_PROVIDER_PREFERENCE']
+    if (preference) {
+      return preference.split(',').map((p) => p.trim() as AIProviderType)
+    }
+    // Default fallback order
+    return ['local', 'together', 'openai', 'anthropic', 'huggingface']
   }
 
   private async handleHealthCheck(res: any): Promise<void> {
@@ -110,7 +120,7 @@ class AIServer {
         }
       } else {
         // Try providers in order of preference
-        const providers = ['together', 'openai', 'anthropic', 'huggingface']
+        const providers = this.getProviderPreference()
         for (const name of providers) {
           service = getAIServiceByProvider(name as any)
           if (service) {
@@ -187,7 +197,7 @@ class AIServer {
         }
       } else {
         // Try providers in order of preference
-        const providers = ['together', 'openai', 'anthropic', 'huggingface']
+        const providers = this.getProviderPreference()
         for (const name of providers) {
           service = getAIServiceByProvider(name as any)
           if (service) {
@@ -293,7 +303,7 @@ Respond in JSON format with the following structure:
         }
       } else {
         // Try providers in order of preference
-        const providers = ['together', 'openai', 'anthropic', 'huggingface']
+        const providers = this.getProviderPreference()
         for (const name of providers) {
           service = getAIServiceByProvider(name as any)
           if (service) {

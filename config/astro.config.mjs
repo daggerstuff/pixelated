@@ -162,7 +162,6 @@ export default defineConfig({
             },
           }
         : {},
-      chunkSizeWarningLimit: 2000,
       rollupOptions: {
         // Limit parallel file operations to prevent resource exhaustion
         maxParallelFileOps: 2,
@@ -243,10 +242,6 @@ export default defineConfig({
         '@layouts': path.resolve('./src/layouts'),
         '@utils': path.resolve('./src/utils'),
         '@lib': path.resolve('./src/lib'),
-        stream: 'stream-browserify',
-        zlib: 'browserify-zlib',
-        buffer: 'buffer',
-        util: 'util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,

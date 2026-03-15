@@ -1,7 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: business-strategy-cms-prometheus
+    container_name: pixelated-empathy-prometheus
     ports:
       - '9090:9090'
     volumes:
@@ -19,11 +19,11 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: business-strategy-cms-grafana
+    container_name: pixelated-empathy-grafana
     ports:
       - '3001:3000'
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_SECURITY_ADMIN_PASSWORD=\${GF_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
@@ -35,7 +35,7 @@ services:
 
   alertmanager:
     image: prom/alertmanager:latest
-    container_name: business-strategy-cms-alertmanager
+    container_name: pixelated-empathy-alertmanager
     ports:
       - '9093:9093'
     volumes:
@@ -48,7 +48,7 @@ services:
 
   node-exporter:
     image: prom/node-exporter:latest
-    container_name: business-strategy-cms-node-exporter
+    container_name: pixelated-empathy-node-exporter
     ports:
       - '9100:9100'
     volumes:
@@ -64,11 +64,11 @@ services:
 
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: business-strategy-cms-postgres-exporter
+    container_name: pixelated-empathy-postgres-exporter
     ports:
       - '9187:9187'
     environment:
-      - DATA_SOURCE_NAME=postgresql://username:password@localhost:5432/business_strategy_cms?sslmode=disable
+      - DATA_SOURCE_NAME=postgresql://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@pixelated-postgres:5432/\${POSTGRES_DB}?sslmode=disable
     restart: unless-stopped
 
 volumes:
