@@ -11,6 +11,7 @@ export type AIProviderType =
   | 'azure-openai'
   | 'together'
   | 'huggingface'
+  | 'local'
 
 // Provider configuration interface
 export interface AIProviderConfig {
@@ -23,6 +24,7 @@ export interface AIProviderConfig {
 
 // Provider registry
 const providers = new Map<AIProviderType, AIProviderConfig>()
+const serviceCache = new Map<AIProviderType, AIService>()
 
 /**
  * Helper to fetch environment variables from either process.env (SSR)
@@ -65,6 +67,12 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
     baseUrl: 'https://api-inference.huggingface.co',
     defaultModel: 'microsoft/DialoGPT-medium',
     capabilities: ['chat'],
+  },
+  local: {
+    name: 'Local Wayfarer (GGUF)',
+    baseUrl: 'http://localhost:8000/v1',
+    defaultModel: 'pixelated-v1-wayfarer',
+    capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
 }
 
@@ -120,6 +128,14 @@ export function initializeProviders() {
       } as AIProviderConfig)
     }
 
+    // Local GGUF Inference
+    const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') || 'http://localhost:8000/v1'
+    providers.set('local', {
+      ...defaultConfigs.local,
+      apiKey: 'local-no-key',
+      baseUrl: localAiBaseUrl,
+    } as AIProviderConfig)
+
     appLogger.info(`Initialized ${providers.size} AI providers`)
   } catch (error: unknown) {
     appLogger.error('Failed to initialize AI providers:', {
@@ -135,25 +151,43 @@ export function getAIServiceByProvider(
   providerType: AIProviderType,
 ): AIService | null {
   try {
+    const cachedService = serviceCache.get(providerType)
+    if (cachedService) {
+      return cachedService
+    }
+
     const config = providers.get(providerType)
     if (!config) {
       appLogger.warn(`Provider ${providerType} not configured`)
       return null
     }
 
+    let service: AIService | null = null
     switch (providerType) {
       case 'together':
-        return createTogetherServiceAdapter(config)
+        service = createTogetherServiceAdapter(config)
+        break
       case 'anthropic':
-        return createAnthropicServiceAdapter(config)
+        service = createAnthropicServiceAdapter(config)
+        break
       case 'openai':
-        return createOpenAIServiceAdapter(config)
+        service = createOpenAIServiceAdapter(config)
+        break
       case 'huggingface':
-        return createHuggingFaceServiceAdapter(config)
+        service = createHuggingFaceServiceAdapter(config)
+        break
+      case 'local':
+        service = createLocalServiceAdapter(config)
+        break
       default:
         appLogger.warn(`Unsupported provider type: ${providerType}`)
         return null
     }
+
+    if (service) {
+      serviceCache.set(providerType, service)
+    }
+    return service
   } catch (error: unknown) {
     appLogger.error(
       `Failed to create AI service for provider ${providerType}:`,
@@ -287,6 +321,53 @@ function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
     dispose: () => {
       // Cleanup if needed
     },
+  }
+}
+
+function createLocalServiceAdapter(config: AIProviderConfig): AIService {
+  return {
+    createChatCompletion: async (messages, options) => {
+      const response = await fetch(`${config.baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          ...options,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Local AI service failed: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      const content = data?.choices?.[0]?.message?.content
+      if (content === undefined) {
+        throw new Error('Local AI service returned an empty or malformed response')
+      }
+
+      return {
+        id: data.id || 'local-id',
+        content,
+        model: config.defaultModel,
+        usage: data.usage || { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+      } as AICompletion
+    },
+    createStreamingChatCompletion: async (_messages, _options) =>
+      Promise.reject(
+        new Error('Local streaming not yet implemented'),
+      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+    getModelInfo: (model: string) => ({
+      id: model,
+      name: model,
+      provider: 'local',
+      capabilities: config.capabilities,
+      contextWindow: 4096,
+      maxTokens: 4096,
+    }),
+    dispose: () => {},
   }
 }
 
