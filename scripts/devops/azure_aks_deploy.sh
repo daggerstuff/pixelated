@@ -170,6 +170,9 @@ esac
 
 echo "🔐 Logging into Azure and ACR"
 az acr login --name "${ACR_NAME}"
+export HELM_EXPERIMENTAL_OCI=1
+ACR_TOKEN=$(az acr login --name "${ACR_NAME}" --expose-token --output tsv --query accessToken)
+echo "${ACR_TOKEN}" | helm registry login "${ACR_LOGIN_SERVER}" --username "00000000-0000-0000-0000-000000000000" --password-stdin
 
 if [[ "${SKIP_BUILD:-false}" != "true" ]]; then
   echo "📦 Building and pushing ${IMAGE_FULL}"
