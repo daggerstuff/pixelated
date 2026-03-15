@@ -105,7 +105,12 @@ REDIS_IMAGE_TAG="${REDIS_IMAGE_TAG:-latest}"
 if [ -n "${BUILD_SOURCEVERSION:-}" ]; then
   IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
 fi
+
 if [ -z "${IMAGE_TAG}" ]; then
+  if [[ "${SKIP_BUILD:-false}" == "true" ]]; then
+    echo "##vso[task.logissue type=error]IMAGE_TAG is missing but SKIP_BUILD=true. A valid image tag from a previous build stage is required."
+    exit 1
+  fi
   IMAGE_TAG="manual-$(date +%Y%m%d%H%M%S)"
 fi
 IMAGE_FULL="${ACR_LOGIN_SERVER}/${ACR_REPO}:${IMAGE_TAG}"
@@ -166,20 +171,25 @@ esac
 echo "🔐 Logging into Azure and ACR"
 az acr login --name "${ACR_NAME}"
 
-echo "📦 Building and pushing ${IMAGE_FULL}"
-docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
-docker push "${IMAGE_FULL}"
+if [[ "${SKIP_BUILD:-false}" != "true" ]]; then
+  echo "📦 Building and pushing ${IMAGE_FULL}"
+  docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
+  docker push "${IMAGE_FULL}"
 
-if [ "${PUSH_LATEST}" = "True" ] || [ "${PUSH_LATEST}" = "true" ] || [ "${PUSH_LATEST}" = "1" ]; then
-  docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
-  docker push "${IMAGE_LATEST}"
+  if [ "${PUSH_LATEST}" = "True" ] || [ "${PUSH_LATEST}" = "true" ] || [ "${PUSH_LATEST}" = "1" ]; then
+    docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
+    docker push "${IMAGE_LATEST}"
+  fi
+else
+  echo "⏭️  SKIP_BUILD=true, skipping docker build and push."
 fi
 
 echo "🔐 Loading AKS kubeconfig"
 az aks get-credentials --resource-group "${RESOURCE_GROUP}" --name "${CLUSTER_NAME}" --overwrite-existing
 kubectl cluster-info
 
-echo "📦 Deploying Helm chart to ${NAMESPACE}"
+echo "📦 Preparing Helm chart for ${NAMESPACE}"
+# Moved after context loading to ensure private registry access if needed
 helm dependency update "${CHART_DIR}"
 
 echo "📄 Using chart directory: ${CHART_DIR}"
