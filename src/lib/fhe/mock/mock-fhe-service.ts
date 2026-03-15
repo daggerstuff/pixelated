@@ -35,6 +35,7 @@ export class MockFHEScheme implements FHEScheme {
       FHEOperation.Negation,
       FHEOperation.SENTIMENT,
       FHEOperation.CATEGORIZE,
+      FHEOperation.ANALYZE,
     ]
   }
 
@@ -234,10 +235,70 @@ export class MockFHEService implements FHEService {
       case FHEOperation.CATEGORIZE:
         return this.mockCategorization(data, params)
 
+      case FHEOperation.ANALYZE:
+        return this.mockPIIDetection(data, params)
+
       default:
         throw new Error(
           `Operation ${operation} not implemented in mock service`,
         )
+    }
+  }
+
+  /**
+   * Mock PII detection (ANALYZE operation)
+   */
+  private async mockPIIDetection(
+    data: MockEncryptedData,
+    params?: Record<string, unknown>,
+  ): Promise<FHEOperationResult<string>> {
+    // Simulate processing delay
+    await new Promise((resolve) => setTimeout(resolve, 250))
+
+    try {
+      const originalText = JSON.parse(data.originalValue) as unknown
+      if (typeof originalText === 'string') {
+        const text = originalText.toLowerCase()
+        
+        // Simple PII detection simulation
+        const piiTypes: string[] = []
+        if (text.includes('@')) piiTypes.push('email')
+        if (/\d{3}-\d{2}-\d{4}/.test(text)) piiTypes.push('ssn')
+        if (/\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/.test(text)) piiTypes.push('phone')
+        
+        const hasPII = piiTypes.length > 0
+        const confidence = hasPII ? 0.95 : 0.1
+
+        return {
+          success: true,
+          result: JSON.stringify({
+            hasPII: String(hasPII),
+            confidence: String(confidence),
+            types: piiTypes.join(','),
+            processed: true
+          }),
+          operation: FHEOperation.ANALYZE,
+          metadata: {
+            timestamp: Date.now()
+          }
+        }
+      }
+    } catch {
+      // Fall through
+    }
+
+    return {
+      success: true,
+      result: JSON.stringify({
+        hasPII: 'false',
+        confidence: '0',
+        types: '',
+        processed: true
+      }),
+      operation: FHEOperation.ANALYZE,
+      metadata: {
+        timestamp: Date.now()
+      }
     }
   }
 
