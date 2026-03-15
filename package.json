@@ -277,7 +277,12 @@
     "vue": "^3.5.30",
     "ws": "^8.19.0",
     "zod": "^4.3.6",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "stream-browserify": "^3.0.0",
+    "path-browserify": "^1.0.1",
+    "util": "^0.12.5",
+    "browserify-zlib": "^0.2.0",
+    "events": "^3.3.0"
   },
   "devDependencies": {
     "@astrojs/rss": "^4.0.17",
@@ -316,7 +321,6 @@
     "astro-robots-txt": "^1.0.0",
     "autoprefixer": "^10.4.27",
     "axe-core": "^4.11.1",
-    "browserify-zlib": "^0.2.0",
     "chalk": "^5.6.2",
     "cheerio": "^1.2.0",
     "class-transformer": "^0.5.1",
@@ -359,7 +363,6 @@
     "oxfmt": "^0.35.0",
     "oxlint": "^1.53.0",
     "oxlint-tsgolint": "^0.15.0",
-    "path-browserify": "^1.0.1",
     "path-to-regexp": "8.3.0",
     "postcss": "^8.5.8",
     "postcss-import": "^16.1.1",
@@ -382,7 +385,6 @@
     "scheduler": "^0.27.0",
     "sharp": "^0.34.5",
     "shiki": "^3.23.0",
-    "stream-browserify": "^3.0.0",
     "supertest": "^7.2.2",
     "terser": "^5.46.0",
     "tsconfig": "^7.0.0",

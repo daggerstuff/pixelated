@@ -261,6 +261,9 @@ importers:
       better-sqlite3:
         specifier: ^12.6.2
         version: 12.6.2
+      browserify-zlib:
+        specifier: ^0.2.0
+        version: 0.2.0
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
@@ -294,6 +297,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@cloudflare/workers-types@4.20260312.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.0)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.6.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.18.0)(@upstash/redis@1.36.4)(better-sqlite3@12.6.2)(kysely@0.28.11)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.6.2)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
+      events:
+        specifier: ^3.3.0
+        version: 3.3.0
       express:
         specifier: ^5.2.1
         version: 5.2.1
@@ -348,6 +354,9 @@ importers:
       p5:
         specifier: ^2.2.2
         version: 2.2.2
+      path-browserify:
+        specifier: ^1.0.1
+        version: 1.0.1
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -414,6 +423,9 @@ importers:
       sonner:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      stream-browserify:
+        specifier: ^3.0.0
+        version: 3.0.0
       swiper:
         specifier: ^12.1.2
         version: 12.1.2
@@ -435,6 +447,9 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      util:
+        specifier: ^0.12.5
+        version: 0.12.5
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -562,9 +577,6 @@ importers:
       axe-core:
         specifier: ^4.11.1
         version: 4.11.1
-      browserify-zlib:
-        specifier: ^0.2.0
-        version: 0.2.0
       chalk:
         specifier: ^5.6.2
         version: 5.6.2
@@ -691,9 +703,6 @@ importers:
       oxlint-tsgolint:
         specifier: ^0.15.0
         version: 0.15.0
-      path-browserify:
-        specifier: ^1.0.1
-        version: 1.0.1
       path-to-regexp:
         specifier: 8.3.0
         version: 8.3.0
@@ -760,9 +769,6 @@ importers:
       shiki:
         specifier: ^3.23.0
         version: 3.23.0
-      stream-browserify:
-        specifier: ^3.0.0
-        version: 3.0.0
       supertest:
         specifier: ^7.2.2
         version: 7.2.2
@@ -790,9 +796,6 @@ importers:
       url-polyfill:
         specifier: ^1.1.14
         version: 1.1.14
-      util:
-        specifier: ^0.12.5
-        version: 0.12.5
       vfile:
         specifier: ^6.0.3
         version: 6.0.3
