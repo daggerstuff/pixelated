@@ -222,6 +222,8 @@ if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
 fi
 
 set +e
+# Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed
+kubectl delete statefulset "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas" -n "${NAMESPACE}" --cascade=orphan 2>/dev/null || true
 helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --install \
   --namespace "${NAMESPACE}" \
