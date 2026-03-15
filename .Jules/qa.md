@@ -1,2 +1,0 @@
-## 2026-03-13 - Adding a new test | Pattern: Using fake timers for debounce functions | Action: Remember to use vi.useFakeTimers() and vi.advanceTimersByTime() when testing time-dependent utilities like debounce to avoid flaky or slow tests.
-## 2026-03-14 - Add date utilities test | Pattern: Use vi.useFakeTimers() for testing date utilities in vitest | Action: Always configure fake timers in Vitest for any function calculating relative dates to avoid flakiness.

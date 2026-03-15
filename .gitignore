@@ -272,15 +272,10 @@ node_modules
 .dolt/
 *.db
 
-# Beads issue tracker runtime files
-.beads/dolt-*.pid
-.beads/dolt-*.activity
-.beads/dolt-*.port
-.beads/
 
-.jules
-.Jules
-.agent
+.jules/
+.Jules/
+.agent/
 .notes/
 .claude/
 .memory/
