@@ -12,6 +12,17 @@ interface RateLimitInfo {
   success: boolean
 }
 
+/**
+ * Redis-backed sliding window rate limiter.
+ *
+ * WHY IT EXISTS: Unlike fixed-window limiters that allow burst traffic at window edges (e.g., 20 requests at 0:59,
+ * 20 more at 1:00), this uses Redis Sorted Sets to maintain an exact sliding window of request timestamps.
+ * By dropping requests older than `now - windowMs`, it strictly guarantees no more than `max` requests
+ * occur within ANY continuous `windowMs` period, protecting downstream APIs from traffic spikes.
+ *
+ * HOW IT WORKS: Request timestamps are stored as scores in a ZSET (`ratelimit:<ip>`). On every check,
+ * outdated scores are removed (zremrangebyscore) before counting the current size of the set (zcard).
+ */
 export class RateLimiter {
   private redis: Redis
   private options: RateLimiterOptions
