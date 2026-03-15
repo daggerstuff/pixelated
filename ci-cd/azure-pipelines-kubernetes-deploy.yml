@@ -31,16 +31,68 @@ variables:
   - name: ACR_REPO
     value: pixelatedempathy
   - name: CHART_DIR
-    value: $(Build.SourcesDirectory)/ai/infra/cloud/helm/pixelated-empathy
+    value: ai/infra/cloud/helm/pixelated-empathy
   - name: ACR_LOGIN_SERVER
     value: $(ACR_NAME).azurecr.io
 
 stages:
-  - stage: BuildAndDeploy
-    displayName: Build and deploy to AKS
+  # Stage 1: Build the Docker image once and push to ACR.
+  # Runs on a Microsoft-hosted agent so no self-hosted runner availability is required.
+  - stage: Build
+    displayName: Build and push image to ACR
     jobs:
-      - job: BuildAndDeployHosted
-        displayName: Build image and deploy (hosted)
+      - job: BuildImage
+        displayName: Build image and push to ACR
+        pool:
+          vmImage: ubuntu-24.04
+        steps:
+          - checkout: self
+
+          - task: AzureCLI@2
+            displayName: Build and push image to ACR
+            inputs:
+              azureSubscription: $(AZURE_SUBSCRIPTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
+
+                IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
+                IMAGE_FULL="$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}"
+                IMAGE_LATEST="$(ACR_LOGIN_SERVER)/$(ACR_REPO):latest"
+
+                echo "🔐 Logging into ACR"
+                az acr login --name "$(ACR_NAME)"
+
+                echo "📦 Building ${IMAGE_FULL}"
+                docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
+                docker push "${IMAGE_FULL}"
+
+                if [ "${{ parameters.pushLatest }}" = "True" ] || [ "${{ parameters.pushLatest }}" = "true" ]; then
+                  docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
+                  docker push "${IMAGE_LATEST}"
+                fi
+
+                # Export the computed tag for downstream stages
+                echo "##vso[task.setvariable variable=IMAGE_TAG;isOutput=true]${IMAGE_TAG}"
+            name: build_step
+            env:
+              APP_ENVIRONMENT: ${{ parameters.environment }}
+              PUSH_LATEST: ${{ parameters.pushLatest }}
+
+  # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
+  # Uses the image tag produced in the Build stage.
+  - stage: DeployHosted
+    displayName: Deploy to AKS (hosted agent)
+    dependsOn: Build
+    condition: succeeded()
+    variables:
+      IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
+    jobs:
+      - job: DeployHosted
+        displayName: Helm deploy (hosted)
         pool:
           vmImage: ubuntu-24.04
         steps:
@@ -52,7 +104,7 @@ stages:
               helmVersionToInstall: v3.15.4
 
           - task: AzureCLI@2
-            displayName: Build image, push to ACR, deploy to AKS
+            displayName: Deploy Helm chart to AKS
             inputs:
               azureSubscription: $(AZURE_SUBSCRIPTION)
               scriptType: bash
@@ -60,8 +112,48 @@ stages:
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 set -euo pipefail
-                bash scripts/devops/azure_aks_preflight.sh
+                export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
                 bash scripts/devops/azure_aks_deploy.sh
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
               PUSH_LATEST: ${{ parameters.pushLatest }}
+              CHART_DIR: $(Build.SourcesDirectory)/$(CHART_DIR)
+
+  # Stage 3: Self-hosted fallback — runs only if the hosted deploy stage fails.
+  # Useful when the Microsoft-hosted agent can't reach the private AKS endpoint.
+  - stage: DeploySelfHosted
+    displayName: Deploy to AKS (self-hosted fallback)
+    dependsOn:
+      - Build
+      - DeployHosted
+    condition: and(succeeded('Build'), failed('DeployHosted'))
+    variables:
+      IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
+    jobs:
+      - job: DeploySelfHosted
+        displayName: Helm deploy (self-hosted fallback)
+        pool:
+          name: Default
+        steps:
+          - checkout: self
+
+          - task: HelmInstaller@1
+            displayName: Install Helm
+            inputs:
+              helmVersionToInstall: v3.15.4
+
+          - task: AzureCLI@2
+            displayName: Deploy Helm chart to AKS
+            inputs:
+              azureSubscription: $(AZURE_SUBSCRIPTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                set -euo pipefail
+                export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
+                bash scripts/devops/azure_aks_deploy.sh
+            env:
+              APP_ENVIRONMENT: ${{ parameters.environment }}
+              PUSH_LATEST: ${{ parameters.pushLatest }}
+              CHART_DIR: $(Build.SourcesDirectory)/$(CHART_DIR)
