@@ -19,6 +19,7 @@ Features:
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import os
@@ -30,9 +31,12 @@ from typing import Any, Dict, List, Optional, Set, Callable
 from pathlib import Path
 import hashlib
 import git
+import threading
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import schedule
+import uuid
+import queue
 
 # Import existing components
 from bias_detection.sentry_metrics import memory_metrics, track_latency
@@ -47,6 +51,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class MemoryUpdateConfig:
     """Configuration for automated memory updates"""
+
     enabled: bool = True
     update_interval_minutes: int = 30
     git_webhook_enabled: bool = True
@@ -64,6 +69,7 @@ class MemoryUpdateConfig:
 @dataclass
 class MemoryUpdateEvent:
     """Memory update event"""
+
     event_id: str
     event_type: str  # git_commit, file_change, training_complete, bias_detected, research_found
     source: str
@@ -76,6 +82,7 @@ class MemoryUpdateEvent:
 @dataclass
 class MemoryEntry:
     """Memory entry with metadata"""
+
     memory_id: str
     title: str
     content: str
@@ -92,67 +99,117 @@ class MemoryEntry:
 
 
 class MemoryConflictResolver:
-    """Handles conflicts in memory updates"""
-    
-    def __init__(self, strategy: str = "merge"):
+    """Handles conflicts in memory updates using a decay-weighted reconciliation model.
+    More recent/relevant data takes precedence while preserving historical context.
+    """
+
+    def __init__(self, strategy: str = "decay_weighted_merge"):
         self.strategy = strategy
-        
+        self.half_life_days = 7.0  # Time required for a memory's weight to halve
+
     def resolve_conflict(
-        self,
-        existing_memory: MemoryEntry,
-        new_memory: MemoryEntry
+        self, existing_memory: MemoryEntry, new_memory: MemoryEntry
     ) -> MemoryEntry:
-        """Resolve conflict between existing and new memory"""
-        
+        """Resolve conflict between existing and new memory using decay weights."""
+
         if self.strategy == "replace":
             return new_memory
-            
-        elif self.strategy == "merge":
-            # Merge content intelligently
-            merged_content = self._merge_content(
-                existing_memory.content,
-                new_memory.content
-            )
-            
-            # Merge tags
-            merged_tags = list(set(existing_memory.tags + new_memory.tags))
-            
-            # Update metadata
-            merged_metadata = {**existing_memory.metadata, **new_memory.metadata}
-            merged_metadata['merged_from'] = [existing_memory.memory_id, new_memory.memory_id]
-            merged_metadata['merge_timestamp'] = datetime.now(timezone.utc).isoformat()
-            
-            return MemoryEntry(
-                memory_id=existing_memory.memory_id,
-                title=new_memory.title or existing_memory.title,
-                content=merged_content,
-                memory_type=new_memory.memory_type or existing_memory.memory_type,
-                project_id=new_memory.project_id or existing_memory.project_id,
-                user_preference=new_memory.user_preference or existing_memory.user_preference,
-                namespace=new_memory.namespace or existing_memory.namespace,
-                tags=merged_tags,
-                created_at=existing_memory.created_at,
-                updated_at=datetime.now(timezone.utc),
-                version=existing_memory.version + 1,
-                hash=self._calculate_hash(merged_content),
-                metadata=merged_metadata
-            )
-            
+
+        elif self.strategy in ("merge", "decay_weighted_merge"):
+            return self._merge_memories(existing_memory, new_memory)
+
         else:  # manual
             # Flag for manual review
-            new_memory.metadata['conflict_flagged'] = True
-            new_memory.metadata['conflict_with'] = existing_memory.memory_id
+            new_memory.metadata["conflict_flagged"] = True
+            new_memory.metadata["conflict_with"] = existing_memory.memory_id
             return new_memory
-    
-    def _merge_content(self, existing: str, new: str) -> str:
-        """Intelligently merge content"""
+
+    def _merge_memories(
+        self, existing_memory: MemoryEntry, new_memory: MemoryEntry
+    ) -> MemoryEntry:
+        """Merge memory entries using decay weights."""
+        now = datetime.now(timezone.utc)
+        
+        # Age in days (preventing negative age just in case)
+        existing_age_days = max(0.0, (now - existing_memory.created_at).total_seconds() / 86400.0)
+        new_age_days = max(0.0, (now - new_memory.created_at).total_seconds() / 86400.0)
+        
+        # Calculate decay-based relevance (1.0 at creation, halves every 7 days)
+        existing_weight = 0.5 ** (existing_age_days / self.half_life_days)
+        new_weight = 0.5 ** (new_age_days / self.half_life_days)
+        
+        # Boost weight based on metadata-defined intensity if available (fallback to 0.2 for generic text)
+        existing_intensity = existing_memory.metadata.get("emotional_intensity", 0.2)
+        new_intensity = new_memory.metadata.get("emotional_intensity", 0.2)
+        
+        # Compute final affective weight
+        effective_existing_weight = (existing_weight * 0.7) + (existing_intensity * 0.3)
+        effective_new_weight = (new_weight * 0.7) + (new_intensity * 0.3)
+
+        merged_content = self._decay_weighted_merge(
+            existing_memory.content, 
+            new_memory.content, 
+            effective_existing_weight, 
+            effective_new_weight
+        )
+
+        # Merge tags intelligently
+        merged_tags = list(set(existing_memory.tags + new_memory.tags))
+
+        # Update structured metadata
+        merged_metadata = {
+            **existing_memory.metadata,
+            **new_memory.metadata,
+            "merged_from": [existing_memory.memory_id, new_memory.memory_id],
+            "merge_timestamp": now.isoformat(),
+            "conflict_resolution": "decay_weighted",
+            "weights": {
+                "existing_effective": round(effective_existing_weight, 4),
+                "new_effective": round(effective_new_weight, 4)
+            }
+        }
+
+        return MemoryEntry(
+            memory_id=existing_memory.memory_id,
+            title=new_memory.title or existing_memory.title,
+            content=merged_content,
+            memory_type=new_memory.memory_type or existing_memory.memory_type,
+            project_id=new_memory.project_id or existing_memory.project_id,
+            user_preference=new_memory.user_preference or existing_memory.user_preference,
+            namespace=new_memory.namespace or existing_memory.namespace,
+            tags=merged_tags,
+            created_at=existing_memory.created_at,  # preserve original timeline genesis
+            updated_at=now,
+            version=existing_memory.version + 1,
+            hash=self._calculate_hash(merged_content),
+            metadata=merged_metadata,
+        )
+
+    def _decay_weighted_merge(self, existing: str, new: str, existing_w: float, new_w: float) -> str:
+        """Intelligently merge content based on decay weights.
+        Prioritizes high-weight relevance as the current state and preserves the lower-weight 
+        information as historical context.
+        """
         if existing == new:
             return existing
-            
-        # Simple merge strategy - append with separator
-        separator = "\n\n--- Updated Content ---\n\n"
-        return f"{existing}{separator}{new}"
-    
+
+        # Determine structural precedence
+        if new_w >= existing_w:
+            primary_content = new
+            secondary_content = existing
+            primary_label = "Current Relevant State"
+            secondary_label = "Historical Context"
+        else:
+            primary_content = existing
+            secondary_content = new
+            primary_label = "Preserved High-Relevance Context"
+            secondary_label = "Secondary Recent Context"
+
+        return (
+            f"=== [ {primary_label} ] ===\n{primary_content}\n\n"
+            f"--- [ {secondary_label} ] ---\n{secondary_content}"
+        )
+
     def _calculate_hash(self, content: str) -> str:
         """Calculate content hash"""
         return hashlib.sha256(content.encode()).hexdigest()[:16]
@@ -160,23 +217,23 @@ class MemoryConflictResolver:
 
 class GitWebhookHandler:
     """Handles Git webhook events for memory updates"""
-    
+
     def __init__(self, config: MemoryUpdateConfig):
         self.config = config
         self.repo_path = Path.cwd()
-        
+
     async def handle_commit(self, commit_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
         """Handle Git commit event"""
-        
+
         events = []
-        
+
         try:
             # Extract commit information
-            commit_hash = commit_data.get('hash', '')
-            commit_message = commit_data.get('message', '')
-            author = commit_data.get('author', {})
-            files_changed = commit_data.get('files', [])
-            
+            commit_hash = commit_data.get("hash", "")
+            commit_message = commit_data.get("message", "")
+            author = commit_data.get("author", {})
+            files_changed = commit_data.get("files", [])
+
             # Analyze commit for memory-worthy content
             if self._is_memory_worthy_commit(commit_message, files_changed):
                 event = MemoryUpdateEvent(
@@ -185,138 +242,150 @@ class GitWebhookHandler:
                     source="git_webhook",
                     timestamp=datetime.now(timezone.utc),
                     data={
-                        'commit_hash': commit_hash,
-                        'commit_message': commit_message,
-                        'author': author,
-                        'files_changed': files_changed,
-                        'repository': str(self.repo_path)
+                        "commit_hash": commit_hash,
+                        "commit_message": commit_message,
+                        "author": author,
+                        "files_changed": files_changed,
+                        "repository": str(self.repo_path),
                     },
-                    priority=2
+                    priority=2,
                 )
                 events.append(event)
-                
+
                 # Create specific memory entries based on commit content
                 events.extend(await self._create_commit_memories(commit_data))
-                
+
         except Exception as e:
             logger.error(f"Error handling Git commit: {e}")
-            
+
         return events
-    
+
     def _is_memory_worthy_commit(self, message: str, files: List[str]) -> bool:
         """Determine if commit is worth creating memory for"""
-        
+
         # Check for significant changes
         significant_keywords = [
-            'implement', 'add', 'create', 'feature', 'enhancement',
-            'fix', 'resolve', 'bug', 'issue', 'problem',
-            'refactor', 'optimize', 'improve', 'performance',
-            'architecture', 'design', 'structure'
+            "implement",
+            "add",
+            "create",
+            "feature",
+            "enhancement",
+            "fix",
+            "resolve",
+            "bug",
+            "issue",
+            "problem",
+            "refactor",
+            "optimize",
+            "improve",
+            "performance",
+            "architecture",
+            "design",
+            "structure",
         ]
-        
+
         message_lower = message.lower()
         has_significant_keyword = any(keyword in message_lower for keyword in significant_keywords)
-        
+
         # Check for important file changes
         important_files = any(
-            any(pattern in file for pattern in ['src/', 'lib/', 'core/', 'main.'])
-            for file in files
+            any(pattern in file for pattern in ["src/", "lib/", "core/", "main."]) for file in files
         )
-        
+
         return has_significant_keyword and important_files
-    
+
     async def _create_commit_memories(self, commit_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
         """Create specific memory entries from commit data"""
-        
+
         events = []
-        message = commit_data.get('message', '')
-        files = commit_data.get('files', [])
-        
+        message = commit_data.get("message", "")
+        files = commit_data.get("files", [])
+
         # Implementation memory
-        if any(impl in message.lower() for impl in ['implement', 'add feature', 'create']):
+        if any(impl in message.lower() for impl in ["implement", "add feature", "create"]):
             event = MemoryUpdateEvent(
                 event_id=f"impl_{int(time.time())}",
                 event_type="implementation_created",
                 source="git_analysis",
                 timestamp=datetime.now(timezone.utc),
                 data={
-                    'type': 'implementation',
-                    'title': f"Implementation: {message.split('\\n')[0]}",
-                    'content': self._generate_implementation_content(commit_data),
-                    'files': files,
-                    'commit_hash': commit_data.get('hash', '')
+                    "type": "implementation",
+                    "title": f"Implementation: {message.splitlines()[0]}",
+                    "content": self._generate_implementation_content(commit_data),
+                    "files": files,
+                    "commit_hash": commit_data.get("hash", ""),
                 },
-                priority=1
+                priority=1,
             )
             events.append(event)
-        
+
         # Bug fix memory
-        if any(bug in message.lower() for bug in ['fix', 'resolve', 'bug']):
+        if any(bug in message.lower() for bug in ["fix", "resolve", "bug"]):
             event = MemoryUpdateEvent(
                 event_id=f"bug_{int(time.time())}",
                 event_type="bug_fixed",
                 source="git_analysis",
                 timestamp=datetime.now(timezone.utc),
                 data={
-                    'type': 'debug',
-                    'title': f"Fix: {message.split('\\n')[0]}",
-                    'content': self._generate_debug_content(commit_data),
-                    'files': files,
-                    'commit_hash': commit_data.get('hash', '')
+                    "type": "debug",
+                    "title": f"Fix: {message.splitlines()[0]}",
+                    "content": self._generate_debug_content(commit_data),
+                    "files": files,
+                    "commit_hash": commit_data.get("hash", ""),
                 },
-                priority=1
+                priority=1,
             )
             events.append(event)
-        
+
         return events
-    
+
     def _generate_implementation_content(self, commit_data: Dict[str, Any]) -> str:
         """Generate implementation memory content"""
-        message = commit_data.get('message', '')
-        files = commit_data.get('files', [])
-        
+        message = commit_data.get("message", "")
+        files = commit_data.get("files", [])
+
         content = f"Implementation completed: {message}\n\n"
         content += f"Files modified: {', '.join(files[:5])}\n"
         if len(files) > 5:
             content += f"... and {len(files) - 5} more files\n"
-        
+
         return content
-    
+
     def _generate_debug_content(self, commit_data: Dict[str, Any]) -> str:
         """Generate debug memory content"""
-        message = commit_data.get('message', '')
-        
+        message = commit_data.get("message", "")
+
         content = f"Issue resolved: {message}\n\n"
         content += "Resolution approach extracted from commit analysis\n"
-        
+
         return content
 
 
 class FileChangeHandler(FileSystemEventHandler):
     """Handles file system changes for memory updates"""
-    
+
     def __init__(self, callback: Callable):
         self.callback = callback
         self.last_event_time = defaultdict(float)
-        
+
     def on_modified(self, event):
         """Handle file modification"""
         if event.is_directory:
             return
-            
+
         # Debounce events
         current_time = time.time()
         if current_time - self.last_event_time[event.src_path] < 1.0:
             return
-            
+
         self.last_event_time[event.src_path] = current_time
-        
+
         # Create memory update event
         asyncio.create_task(self._handle_file_change(event))
-        
+
     async def _handle_file_change(self, event):
         """Process file change event"""
-        
+
         # Check if file is memory-worthy
         if self._is_memory_worthy_file(event.src_path):
             memory_event = MemoryUpdateEvent(
@@ -325,51 +394,53 @@ class FileChangeHandler(FileSystemEventHandler):
                 source="file_monitor",
                 timestamp=datetime.now(timezone.utc),
                 data={
-                    'file_path': event.src_path,
-                    'event_type': 'modified',
-                    'file_size': os.path.getsize(event.src_path) if os.path.exists(event.src_path) else 0
+                    "file_path": event.src_path,
+                    "event_type": "modified",
+                    "file_size": os.path.getsize(event.src_path)
+                    if os.path.exists(event.src_path)
+                    else 0,
                 },
-                priority=3
+                priority=3,
             )
-            
+
             await self.callback(memory_event)
-    
+
     def _is_memory_worthy_file(self, file_path: str) -> bool:
         """Check if file change is worth creating memory for"""
-        
+
         # Skip temporary and hidden files
-        if any(part.startswith('.') for part in Path(file_path).parts):
+        if any(part.startswith(".") for part in Path(file_path).parts):
             return False
-            
+
         # Check file extension
-        memory_worthy_extensions = {'.py', '.js', '.ts', '.md', '.json', '.yaml', '.yml'}
+        memory_worthy_extensions = {".py", ".js", ".ts", ".md", ".json", ".yaml", ".yml"}
         if Path(file_path).suffix not in memory_worthy_extensions:
             return False
-            
+
         # Check file size (not too large)
         try:
             if os.path.getsize(file_path) > 1024 * 1024:  # 1MB limit
                 return False
         except OSError:
             return False
-            
+
         return True
 
 
 class TrainingOutcomeProcessor:
     """Processes training outcomes for memory updates"""
-    
-    async def process_training_completion(self, training_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
+
+    async def process_training_completion(
+        self, training_data: Dict[str, Any]
+    ) -> List[MemoryUpdateEvent]:
         """Process completed training session"""
-        
-        events = []
-        
+
         # Extract training insights
-        scenario_type = training_data.get('scenario_type', '')
-        final_score = training_data.get('final_assessment', {}).get('overall_score', 0)
-        strengths = training_data.get('final_assessment', {}).get('strengths', [])
-        improvements = training_data.get('final_assessment', {}).get('areas_for_improvement', [])
-        
+        scenario_type = training_data.get("scenario_type", "")
+        final_score = training_data.get("final_assessment", {}).get("overall_score", 0)
+        strengths = training_data.get("final_assessment", {}).get("strengths", [])
+        improvements = training_data.get("final_assessment", {}).get("areas_for_improvement", [])
+
         # Create training memory
         event = MemoryUpdateEvent(
             event_id=f"training_{training_data.get('session_id', 'unknown')}",
@@ -377,50 +448,47 @@ class TrainingOutcomeProcessor:
             source="training_pipeline",
             timestamp=datetime.now(timezone.utc),
             data={
-                'type': 'user_preference',
-                'title': f"Training Outcome: {scenario_type}",
-                'content': self._generate_training_content(training_data),
-                'score': final_score,
-                'strengths': strengths,
-                'improvements': improvements,
-                'session_id': training_data.get('session_id')
+                "type": "user_preference",
+                "title": f"Training Outcome: {scenario_type}",
+                "content": self._generate_training_content(training_data),
+                "score": final_score,
+                "strengths": strengths,
+                "improvements": improvements,
+                "session_id": training_data.get("session_id"),
             },
-            priority=2
+            priority=2,
         )
-        events.append(event)
-        
-        return events
-    
+
+        return [event]
+
     def _generate_training_content(self, training_data: Dict[str, Any]) -> str:
         """Generate training outcome content"""
-        
+
         content = f"Training session completed with score: {training_data.get('final_assessment', {}).get('overall_score', 0):.2f}\n\n"
-        
-        strengths = training_data.get('final_assessment', {}).get('strengths', [])
-        if strengths:
+
+        if strengths := training_data.get("final_assessment", {}).get("strengths", []):
             content += f"Strengths demonstrated: {', '.join(strengths)}\n"
-        
-        improvements = training_data.get('final_assessment', {}).get('areas_for_improvement', [])
-        if improvements:
+
+        if improvements := training_data.get("final_assessment", {}).get(
+            "areas_for_improvement", []
+        ):
             content += f"Areas for improvement: {', '.join(improvements)}\n"
-        
+
         return content
 
 
 class BiasDetectionProcessor:
     """Processes bias detection results for memory updates"""
-    
+
     async def process_bias_detection(self, bias_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
         """Process bias detection results"""
-        
-        events = []
-        
+
         # Extract bias insights
-        bias_score = bias_data.get('bias_score', 0)
-        confidence = bias_data.get('confidence', 0)
-        bias_type = bias_data.get('bias_type', 'unknown')
-        context = bias_data.get('context', {})
-        
+        bias_score = bias_data.get("bias_score", 0)
+        confidence = bias_data.get("confidence", 0)
+        bias_type = bias_data.get("bias_type", "unknown")
+        context = bias_data.get("context", {})
+
         # Create bias detection memory
         event = MemoryUpdateEvent(
             event_id=f"bias_{int(time.time())}_{hash(str(bias_data)) % 1000}",
@@ -428,46 +496,45 @@ class BiasDetectionProcessor:
             source="bias_detection",
             timestamp=datetime.now(timezone.utc),
             data={
-                'type': 'project_info',
-                'title': f"Bias Detection: {bias_type}",
-                'content': self._generate_bias_content(bias_data),
-                'bias_score': bias_score,
-                'confidence': confidence,
-                'bias_type': bias_type,
-                'context': context
+                "type": "project_info",
+                "title": f"Bias Detection: {bias_type}",
+                "content": self._generate_bias_content(bias_data),
+                "bias_score": bias_score,
+                "confidence": confidence,
+                "bias_type": bias_type,
+                "context": context,
             },
-            priority=1
+            priority=1,
         )
-        events.append(event)
-        
-        return events
-    
+
+        return [event]
+
     def _generate_bias_content(self, bias_data: Dict[str, Any]) -> str:
         """Generate bias detection content"""
-        
+
         content = f"Bias detected with score {bias_data.get('bias_score', 0):.2f} and confidence {bias_data.get('confidence', 0):.2f}\n"
         content += f"Bias type: {bias_data.get('bias_type', 'unknown')}\n"
-        
-        if 'context' in bias_data:
+
+        if "context" in bias_data:
             content += f"Context: {bias_data['context']}\n"
-        
+
         return content
 
 
 class ResearchDiscoveryProcessor:
     """Processes research discoveries for memory updates"""
-    
-    async def process_research_discovery(self, research_data: Dict[str, Any]) -> List[MemoryUpdateEvent]:
+
+    async def process_research_discovery(
+        self, research_data: Dict[str, Any]
+    ) -> List[MemoryUpdateEvent]:
         """Process new research discovery"""
-        
-        events = []
-        
+
         # Extract research insights
-        paper_title = research_data.get('metadata', {}).get('title', '')
-        relevance_score = research_data.get('quality_score', 0)
-        bias_relevance = research_data.get('bias_analysis', {}).get('relevance_score', 0)
-        source = research_data.get('source', 'unknown')
-        
+        paper_title = research_data.get("metadata", {}).get("title", "")
+        relevance_score = research_data.get("quality_score", 0)
+        bias_relevance = research_data.get("bias_analysis", {}).get("relevance_score", 0)
+        source = research_data.get("source", "unknown")
+
         # Create research memory
         event = MemoryUpdateEvent(
             event_id=f"research_{int(time.time())}_{hash(paper_title) % 1000}",
@@ -475,34 +542,35 @@ class ResearchDiscoveryProcessor:
             source="research_pipeline",
             timestamp=datetime.now(timezone.utc),
             data={
-                'type': 'project_info',
-                'title': f"Research Discovery: {paper_title[:50]}...",
-                'content': self._generate_research_content(research_data),
-                'relevance_score': relevance_score,
-                'bias_relevance': bias_relevance,
-                'source': source,
-                'paper_title': paper_title
+                "type": "project_info",
+                "title": f"Research Discovery: {paper_title[:50]}...",
+                "content": self._generate_research_content(research_data),
+                "relevance_score": relevance_score,
+                "bias_relevance": bias_relevance,
+                "source": source,
+                "paper_title": paper_title,
             },
-            priority=2
+            priority=2,
         )
-        events.append(event)
-        
-        return events
-    
+
+        return [event]
+
     def _generate_research_content(self, research_data: Dict[str, Any]) -> str:
         """Generate research discovery content"""
-        
-        content = f"New research paper discovered: {research_data.get('metadata', {}).get('title', '')}\n"
+
+        content = (
+            f"New research paper discovered: {research_data.get('metadata', {}).get('title', '')}\n"
+        )
         content += f"Relevance score: {research_data.get('quality_score', 0):.2f}\n"
         content += f"Bias relevance: {research_data.get('bias_analysis', {}).get('relevance_score', 0):.2f}\n"
         content += f"Source: {research_data.get('source', 'unknown')}\n"
-        
+
         return content
 
 
 class AutomatedMemoryUpdater:
     """Main automated memory update system"""
-    
+
     def __init__(self, config: Optional[MemoryUpdateConfig] = None):
         self.config = config or MemoryUpdateConfig()
         self.conflict_resolver = MemoryConflictResolver(self.config.conflict_resolution_strategy)
@@ -510,232 +578,361 @@ class AutomatedMemoryUpdater:
         self.training_processor = TrainingOutcomeProcessor()
         self.bias_processor = BiasDetectionProcessor()
         self.research_processor = ResearchDiscoveryProcessor()
-        
+
         self.pending_events: List[MemoryUpdateEvent] = []
         self.processed_events: Set[str] = set()
         self.memory_cache: Dict[str, MemoryEntry] = {}
-        
+
+        # Locks
+        self._worker_lock = threading.Lock()
+
         # File monitoring
         self.file_observer: Optional[Observer] = None
         self.file_handler: Optional[FileChangeHandler] = None
-        
+
+        # Background worker for sync integration
+        self._event_queue = queue.Queue()
+        self._worker_thread: Optional[threading.Thread] = None
+        self._worker_stop_event = threading.Event()
+
         logger.info("Automated memory updater initialized")
-    
+
     async def start(self) -> None:
         """Start automated memory update system"""
-        
+
         if not self.config.enabled:
             logger.info("Automated memory updates disabled")
             return
-        
+
+        # Start background worker thread
+        self._start_background_worker()
+
         # Start file monitoring
         if self.config.file_monitoring_enabled:
             await self._start_file_monitoring()
-        
+
         # Start scheduled sync
         if self.config.scheduled_sync_enabled:
             await self._start_scheduled_sync()
-        
+
         logger.info("Automated memory updater started")
-    
+
     async def stop(self) -> None:
         """Stop automated memory update system"""
-        
+
         # Stop file monitoring
         if self.file_observer:
             self.file_observer.stop()
             self.file_observer.join()
-        
+
+        # Stop background worker
+        self._stop_background_worker()
+
         logger.info("Automated memory updater stopped")
-    
+
     async def _start_file_monitoring(self) -> None:
         """Start file system monitoring"""
-        
+
         self.file_handler = FileChangeHandler(self._handle_memory_event)
         self.file_observer = Observer()
-        self.file_observer.schedule(
-            self.file_handler,
-            path=str(Path.cwd() / 'src'),
-            recursive=True
-        )
+        self.file_observer.schedule(self.file_handler, path=str(Path.cwd() / "src"), recursive=True)
         self.file_observer.start()
-        
+
         logger.info("File monitoring started")
-    
+
     async def _start_scheduled_sync(self) -> None:
         """Start scheduled memory synchronization"""
-        
+
         schedule.every(self.config.update_interval_minutes).minutes.do(
             lambda: asyncio.create_task(self._scheduled_sync())
         )
-        
-        logger.info(f"Scheduled sync started (interval: {self.config.update_interval_minutes} minutes)")
-    
+
+        logger.info(
+            f"Scheduled sync started (interval: {self.config.update_interval_minutes} minutes)"
+        )
+
     async def _scheduled_sync(self) -> None:
         """Perform scheduled memory synchronization"""
-        
+
         logger.info("Performing scheduled memory sync")
-        
+
         # Process pending events
         await self._process_pending_events()
-        
+
         # Cleanup old memories
         await self._cleanup_old_memories()
-        
+
         # Backup if needed
         if self.config.backup_enabled:
             await self._perform_backup()
-    
+
+    def _start_background_worker(self) -> None:
+        """Start dedicated background worker for memory events"""
+        self._worker_stop_event.clear()
+        self._worker_thread = threading.Thread(
+            target=self._worker_loop, name="MemoryUpdateWorker", daemon=True
+        )
+        self._worker_thread.start()
+        logger.info("Memory update background worker started")
+
+    def _stop_background_worker(self) -> None:
+        """Stop background worker thread"""
+        self._worker_stop_event.set()
+        if self._worker_thread and self._worker_thread.is_alive():
+            # Trigger queue unlock
+            self._event_queue.put(None)
+            self._worker_thread.join(timeout=2.0)
+        logger.info("Memory update background worker stopped")
+
+    async def _async_worker_loop(self) -> None:
+        """Asynchronous loop for processing queue events."""
+        loop = asyncio.get_running_loop()
+        while not self._worker_stop_event.is_set():
+            try:
+                event = await loop.run_in_executor(None, self._event_queue.get, 1.0)
+                if event is None:  # Exit signal
+                    break
+
+                await self._process_event_entry(event)
+
+            except queue.Empty:
+                continue
+            except Exception as e:
+                logger.error(f"Error in memory worker loop: {e}")
+
+    def _worker_loop(self) -> None:
+        """Background worker loop to process event queue with a persistent loop"""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        try:
+            loop.run_until_complete(self._async_worker_loop())
+        finally:
+            # Clean up loop
+            with contextlib.suppress(Exception):
+                # Run remaining tasks in loop if any
+                if pending := asyncio.all_tasks(loop):
+                    loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+            loop.close()
+            logger.info("Memory update background worker loop closed")
+
+    async def _process_event_entry(self, event: MemoryUpdateEvent) -> None:
+        """Entry point for processing an event in the background loop"""
+        # This can handle expansion and then the actual storage
+        processed_events = await self._expand_event(event)
+        for e in processed_events:
+            await self._handle_memory_event(e)
+
+    async def _expand_event(self, event: MemoryUpdateEvent) -> List[MemoryUpdateEvent]:
+        """Expand complex events into simple memory update events"""
+        if event.event_type == "training_complete" and not event.data.get("_is_processed"):
+            try:
+                # Clone data to avoid side effects and mark as processed
+                training_data = event.data.copy()
+                training_data["_is_processed"] = True
+
+                # Expand raw training data into formatted memory events
+                expanded_events = await self.training_processor.process_training_completion(
+                    training_data
+                )
+
+                # Inherit some fields from parent
+                for expanded_event in expanded_events:
+                    expanded_event.priority = max(event.priority, expanded_event.priority)
+
+                return expanded_events
+            except Exception as e:
+                logger.error(f"Error expanding training event {event.event_id}: {e}")
+                return []
+
+        return [event]
+
     async def handle_git_webhook(self, webhook_data: Dict[str, Any]) -> Dict[str, Any]:
         """Handle Git webhook event"""
-        
+
         if not self.config.git_webhook_enabled:
-            return {'status': 'disabled'}
-        
+            return {"status": "disabled"}
+
         try:
             # Extract commit data
-            commits = webhook_data.get('commits', [])
-            
+            commits = webhook_data.get("commits", [])
+
             for commit in commits:
                 events = await self.git_handler.handle_commit(commit)
                 for event in events:
                     await self._handle_memory_event(event)
-            
+
             return {
-                'status': 'processed',
-                'commits_processed': len(commits),
-                'events_created': len(events) if commits else 0
+                "status": "processed",
+                "commits_processed": len(commits),
+                "events_created": len(events) if commits else 0,
             }
-            
+
         except Exception as e:
             logger.error(f"Error handling Git webhook: {e}")
-            return {'status': 'error', 'message': str(e)}
-    
+            return {"status": "error", "message": str(e)}
+
+    def process_event(self, event: MemoryUpdateEvent) -> None:
+        """Synchronous non-blocking entry point for memory update events"""
+        if not self.config.enabled:
+            return
+
+        # Ensure worker is running (thread-safe lazy initialization)
+        if self._worker_thread is None or not self._worker_thread.is_alive():
+            with self._worker_lock:
+                if self._worker_thread is None or not self._worker_thread.is_alive():
+                    self._start_background_worker()
+
+        self._event_queue.put(event)
+
+    def push_training_outcome(self, execution_id: str, outcome_data: Dict[str, Any], source: str):
+        """Unified method to push training outcomes to memory from sync code"""
+        if not self.config.enabled:
+            return
+
+        event = MemoryUpdateEvent(
+            event_id=f"train_{execution_id}_{uuid.uuid4().hex[:8]}",
+            event_type="training_complete",
+            source=source,
+            timestamp=datetime.now(timezone.utc),
+            data=outcome_data,
+            priority=2,
+        )
+        self.process_event(event)
+
+    async def push_training_outcome_async(
+        self, execution_id: str, outcome_data: Dict[str, Any], source: str
+    ):
+        """Unified async method to push training outcomes to memory"""
+        event = MemoryUpdateEvent(
+            event_id=f"train_async_{execution_id}_{uuid.uuid4().hex[:8]}",
+            event_type="training_complete",
+            source=source,
+            timestamp=datetime.now(timezone.utc),
+            data=outcome_data,
+            priority=2,
+        )
+        await self._handle_memory_event(event)
+
     async def handle_training_completion(self, training_data: Dict[str, Any]) -> Dict[str, Any]:
         """Handle training completion event"""
-        
+
         try:
             events = await self.training_processor.process_training_completion(training_data)
-            
+
             for event in events:
                 await self._handle_memory_event(event)
-            
-            return {
-                'status': 'processed',
-                'events_created': len(events)
-            }
-            
+
+            return {"status": "processed", "events_created": len(events)}
+
         except Exception as e:
             logger.error(f"Error handling training completion: {e}")
-            return {'status': 'error', 'message': str(e)}
-    
+            return {"status": "error", "message": str(e)}
+
     async def handle_bias_detection(self, bias_data: Dict[str, Any]) -> Dict[str, Any]:
         """Handle bias detection event"""
-        
+
         try:
             events = await self.bias_processor.process_bias_detection(bias_data)
-            
+
             for event in events:
                 await self._handle_memory_event(event)
-            
-            return {
-                'status': 'processed',
-                'events_created': len(events)
-            }
-            
+
+            return {"status": "processed", "events_created": len(events)}
+
         except Exception as e:
             logger.error(f"Error handling bias detection: {e}")
-            return {'status': 'error', 'message': str(e)}
-    
+            return {"status": "error", "message": str(e)}
+
     async def handle_research_discovery(self, research_data: Dict[str, Any]) -> Dict[str, Any]:
         """Handle research discovery event"""
-        
+
         try:
             events = await self.research_processor.process_research_discovery(research_data)
-            
+
             for event in events:
                 await self._handle_memory_event(event)
-            
-            return {
-                'status': 'processed',
-                'events_created': len(events)
-            }
-            
+
+            return {"status": "processed", "events_created": len(events)}
+
         except Exception as e:
             logger.error(f"Error handling research discovery: {e}")
-            return {'status': 'error', 'message': str(e)}
-    
+            return {"status": "error", "message": str(e)}
+
     async def _handle_memory_event(self, event: MemoryUpdateEvent) -> None:
-        """Handle memory update event"""
-        
+        """Actual logic for handling a simple memory event (no expansion)"""
+
         # Check for duplicates
         if event.event_id in self.processed_events:
             return
-        
-        # Add to pending events
-        self.pending_events.append(event)
+
+        # Add to pending events for scheduled sync if not high priority
+        if event.priority > 2:
+            self.pending_events.append(event)
+            self.processed_events.add(event.event_id)
+            return
+
+        # Process high priority events or expanded events immediately
+        await self._process_event(event)
         self.processed_events.add(event.event_id)
-        
-        # Process high priority events immediately
-        if event.priority <= 2:
-            await self._process_event(event)
-    
+
     async def _process_pending_events(self) -> None:
         """Process all pending events"""
-        
+
         events_to_process = self.pending_events.copy()
         self.pending_events.clear()
-        
+
         for event in events_to_process:
             await self._process_event(event)
-    
+
     async def _process_event(self, event: MemoryUpdateEvent) -> None:
         """Process individual memory event"""
-        
+
         try:
             # Extract memory data
             memory_data = event.data
-            
+
             # Create memory entry
             memory_entry = self._create_memory_entry(memory_data, event)
-            
+
             # Check for conflicts
             existing_memory = await self._find_existing_memory(memory_entry)
-            
+
             if existing_memory:
                 # Resolve conflict
                 resolved_memory = self.conflict_resolver.resolve_conflict(
-                    existing_memory,
-                    memory_entry
+                    existing_memory, memory_entry
                 )
                 await self._update_memory(resolved_memory)
             else:
                 # Create new memory
                 await self._create_memory(memory_entry)
-            
+
             # Mark as processed
             event.processed = True
-            
+
             logger.info(f"Memory event processed: {event.event_id}")
-            
+
         except Exception as e:
             logger.error(f"Error processing memory event {event.event_id}: {e}")
-    
-    def _create_memory_entry(self, memory_data: Dict[str, Any], event: MemoryUpdateEvent) -> MemoryEntry:
+
+    def _create_memory_entry(
+        self, memory_data: Dict[str, Any], event: MemoryUpdateEvent
+    ) -> MemoryEntry:
         """Create memory entry from event data"""
-        
+
         memory_id = f"auto_{event.event_id}"
-        title = memory_data.get('title', f"Auto-generated: {event.event_type}")
-        content = memory_data.get('content', '')
-        memory_type = memory_data.get('type', 'project_info')
-        project_id = memory_data.get('project_id', 'pixelatedempathy/pixelated')
-        user_preference = memory_data.get('user_preference', False)
-        namespace = memory_data.get('namespace')
-        tags = memory_data.get('tags', [])
-        
+        title = memory_data.get("title", f"Auto-generated: {event.event_type}")
+        content = memory_data.get("content", "")
+        memory_type = memory_data.get("type", "project_info")
+        project_id = memory_data.get("project_id", "pixelatedempathy/pixelated")
+        user_preference = memory_data.get("user_preference", False)
+        namespace = memory_data.get("namespace")
+        tags = memory_data.get("tags", [])
+
         # Add event-specific tags
-        tags.extend([event.event_type, 'automated'])
-        
+        tags.extend([event.event_type, "automated"])
+
         return MemoryEntry(
             memory_id=memory_id,
             title=title,
@@ -747,140 +944,146 @@ class AutomatedMemoryUpdater:
             tags=tags,
             hash=self._calculate_hash(content),
             metadata={
-                'source_event': event.event_id,
-                'event_type': event.event_type,
-                'source': event.source,
-                'original_data': memory_data
-            }
+                "source_event": event.event_id,
+                "event_type": event.event_type,
+                "source": event.source,
+                "original_data": memory_data,
+            },
         )
-    
+
     async def _find_existing_memory(self, memory_entry: MemoryEntry) -> Optional[MemoryEntry]:
         """Find existing memory that might conflict"""
-        
+
         # Simple conflict detection based on title similarity
         # In a real implementation, this would query the memory system
-        
+
         # For now, check cache
-        for existing_id, existing in self.memory_cache.items():
-            if existing.title == memory_entry.title:
-                return existing
-                
-        return None
-    
+        return next(
+            (
+                existing
+                for existing in self.memory_cache.values()
+                if existing.title == memory_entry.title
+            ),
+            None,
+        )
+
     async def _create_memory(self, memory_entry: MemoryEntry) -> None:
         """Create new memory entry"""
-        
+
         # Add to cache
         self.memory_cache[memory_entry.memory_id] = memory_entry
-        
+
         # In a real implementation, this would save to the memory system
         logger.info(f"Created new memory: {memory_entry.title}")
-        
+
         # Track metrics
         memory_metrics.memory_created()
-    
+
     async def _update_memory(self, memory_entry: MemoryEntry) -> None:
         """Update existing memory entry"""
-        
+
         # Update in cache
         self.memory_cache[memory_entry.memory_id] = memory_entry
-        
+
         # In a real implementation, this would update the memory system
         logger.info(f"Updated memory: {memory_entry.title}")
-        
+
         # Track metrics
         memory_metrics.memory_updated()
-    
+
     def _calculate_hash(self, content: str) -> str:
         """Calculate content hash"""
         return hashlib.sha256(content.encode()).hexdigest()[:16]
-    
+
     async def _cleanup_old_memories(self) -> None:
         """Clean up old or redundant memories"""
-        
+
         if not self.config.cleanup_threshold_days:
             return
-        
-        cutoff_date = datetime.now(timezone.utc).timestamp() - (self.config.cleanup_threshold_days * 24 * 3600)
-        
+
+        cutoff_date = datetime.now(timezone.utc).timestamp() - (
+            self.config.cleanup_threshold_days * 24 * 3600
+        )
+
         # Remove old memories from cache
         old_memories = [
-            memory_id for memory_id, memory in self.memory_cache.items()
+            memory_id
+            for memory_id, memory in self.memory_cache.items()
             if memory.created_at.timestamp() < cutoff_date
         ]
-        
+
         for memory_id in old_memories:
             del self.memory_cache[memory_id]
             logger.info(f"Cleaned up old memory: {memory_id}")
-        
+
         # Track metrics
         memory_metrics.memory_cleaned(len(old_memories))
-    
+
     async def _perform_backup(self) -> None:
         """Perform memory backup"""
-        
+
         if not self.config.backup_enabled:
             return
-        
+
         backup_data = {
-            'timestamp': datetime.now(timezone.utc).isoformat(),
-            'memory_count': len(self.memory_cache),
-            'memories': [
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "memory_count": len(self.memory_cache),
+            "memories": [
                 {
-                    'memory_id': memory.memory_id,
-                    'title': memory.title,
-                    'content': memory.content,
-                    'memory_type': memory.memory_type,
-                    'project_id': memory.project_id,
-                    'user_preference': memory.user_preference,
-                    'namespace': memory.namespace,
-                    'tags': memory.tags,
-                    'created_at': memory.created_at.isoformat(),
-                    'updated_at': memory.updated_at.isoformat(),
-                    'version': memory.version,
-                    'hash': memory.hash,
-                    'metadata': memory.metadata
+                    "memory_id": memory.memory_id,
+                    "title": memory.title,
+                    "content": memory.content,
+                    "memory_type": memory.memory_type,
+                    "project_id": memory.project_id,
+                    "user_preference": memory.user_preference,
+                    "namespace": memory.namespace,
+                    "tags": memory.tags,
+                    "created_at": memory.created_at.isoformat(),
+                    "updated_at": memory.updated_at.isoformat(),
+                    "version": memory.version,
+                    "hash": memory.hash,
+                    "metadata": memory.metadata,
                 }
                 for memory in self.memory_cache.values()
-            ]
+            ],
         }
-        
+
         # Save backup (in real implementation, this would save to persistent storage)
         backup_file = f"memory_backup_{int(time.time())}.json"
-        
+
         logger.info(f"Memory backup completed: {len(self.memory_cache)} memories backed up")
-        
+
         # Track metrics
         memory_metrics.backup_completed(len(self.memory_cache))
-    
+
     def get_memory_stats(self) -> Dict[str, Any]:
         """Get memory update statistics"""
-        
+
         return {
-            'total_memories': len(self.memory_cache),
-            'pending_events': len(self.pending_events),
-            'processed_events': len(self.processed_events),
-            'memory_types': self._get_memory_type_counts(),
-            'event_types': self._get_event_type_counts(),
-            'config': {
-                'enabled': self.config.enabled,
-                'update_interval_minutes': self.config.update_interval_minutes,
-                'git_webhook_enabled': self.config.git_webhook_enabled,
-                'file_monitoring_enabled': self.config.file_monitoring_enabled
-            }
+            "total_memories": len(self.memory_cache),
+            "pending_events": len(self.pending_events),
+            "processed_events": len(self.processed_events),
+            "memory_types": self._get_memory_type_counts(),
+            "event_types": self._get_event_type_counts(),
+            "config": {
+                "enabled": self.config.enabled,
+                "update_interval_minutes": self.config.update_interval_minutes,
+                "git_webhook_enabled": self.config.git_webhook_enabled,
+                "file_monitoring_enabled": self.config.file_monitoring_enabled,
+            },
         }
-    
+
     def _get_memory_type_counts(self) -> Dict[str, int]:
         """Get counts by memory type"""
-        
+
         counts = defaultdict(int)
         for memory in self.memory_cache.values():
             counts[memory.memory_type] += 1
         return dict(counts)
-    
+
     def _get_event_type_counts(self) -> Dict[str, int]:
         """Get counts by event type"""
-        
+
         counts = defaultdict(int)
         for event in self.pending_events:
             counts[event.event_type] += 1
@@ -891,15 +1094,17 @@ class AutomatedMemoryUpdater:
 memory_updater: Optional[AutomatedMemoryUpdater] = None
 
 
-async def initialize_memory_updater(config: Optional[MemoryUpdateConfig] = None) -> AutomatedMemoryUpdater:
+async def initialize_memory_updater(
+    config: Optional[MemoryUpdateConfig] = None,
+) -> AutomatedMemoryUpdater:
     """Initialize global memory updater"""
     global memory_updater
-    
+
     if memory_updater is None:
         memory_updater = AutomatedMemoryUpdater(config)
         await memory_updater.start()
         logger.info("Global memory updater initialized")
-    
+
     return memory_updater
 
 
@@ -945,26 +1150,26 @@ if __name__ == "__main__":
     # Example usage
     async def example():
         updater = await initialize_memory_updater()
-        
+
         # Simulate training completion
         training_data = {
-            'session_id': 'test_session_001',
-            'user_id': 'test_user',
-            'scenario_type': 'cultural_competency',
-            'final_assessment': {
-                'overall_score': 0.85,
-                'strengths': ['cultural_sensitivity', 'communication'],
-                'areas_for_improvement': ['bias_awareness']
-            }
+            "session_id": "test_session_001",
+            "user_id": "test_user",
+            "scenario_type": "cultural_competency",
+            "final_assessment": {
+                "overall_score": 0.85,
+                "strengths": ["cultural_sensitivity", "communication"],
+                "areas_for_improvement": ["bias_awareness"],
+            },
         }
-        
+
         result = await updater.handle_training_completion(training_data)
         print(f"Training completion handled: {result}")
-        
+
         # Get stats
         stats = updater.get_memory_stats()
         print(f"Memory stats: {stats}")
-        
+
         # Stop updater
         await updater.stop()
 

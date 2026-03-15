@@ -41,6 +41,15 @@ export type AuthenticationEvent =
   | 'hipaa_violation_detected'
   | 'compliance_audit_passed'
   | 'compliance_audit_failed'
+  | 'csrf_violation'
+  | 'authentication_success'
+  | 'authorization_failed'
+  | `mfa_enrollment_started_${string}`
+  | `mfa_enrollment_completed_${string}`
+  | `mfa_challenge_sent_${string}`
+  | `mfa_verification_completed_${string}`
+  | `mfa_factor_deleted_${string}`
+  | `mfa_preferred_factor_set_${string}`
 
 /**
  * Update Phase 6 authentication progress

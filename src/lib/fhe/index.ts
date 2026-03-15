@@ -84,7 +84,6 @@ export function createFHESystem(options: FHEOptions = {}): FHESystem {
   }
 }
 
-export default { createFHESystem }
-
-// Create and export the main FHE service instance for use throughout the application
-export const fheService = createFHESystem()
+export type { FHEService, FHEOperationResult, EncryptedData } from './types'
+export { FHEOperation } from './types'
+export { RealFHEService, realFHEService as fheService } from './fhe-service'

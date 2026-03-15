@@ -13,6 +13,8 @@ import { SealSchemeType } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type { HomomorphicOperationResult } from './types'
+import { SealService } from './seal-service'
+import { SealResourceScope } from './seal-memory'
 
 // Get logger
 const logger = createBuildSafeLogger('homomorphic-ops')
@@ -230,21 +232,38 @@ export class HomomorphicOperations {
         const serializedCiphertext =
           parsedData.serializedCiphertext || encryptedData
 
+        // Create a memory scope for cleanup
+        const scope = new SealResourceScope()
+        const sealService = SealService.getInstance()
+        const seal = sealService.getSeal()
+        const context = sealService.getContext()
+
+        // Load the serialized ciphertext into a SEAL object
+        const inputCiphertext = scope.track(seal.CipherText())
+        inputCiphertext.load(context, serializedCiphertext)
+
         // Perform the operation using SEAL
         switch (operation) {
           case FHEOperation.SENTIMENT:
             // For sentiment analysis, we apply a polynomial approximation of a sigmoid function
             // to estimate sentiment from the encrypted data
             sentimentResult = await this.sealOps.polynomial(
-              serializedCiphertext,
+              inputCiphertext,
               [0.5, 0.2, 0.1, 0.05], // Simple polynomial coefficients for demo purposes
             )
 
-            result = JSON.stringify({
-              serializedCiphertext: sentimentResult.result,
-              operation: 'sentiment',
-              timestamp: Date.now(),
-            })
+            if (sentimentResult.success && sentimentResult.result) {
+              const serializedResult = (sentimentResult.result as any).save()
+              result = JSON.stringify({
+                serializedCiphertext: serializedResult,
+                operation: 'sentiment',
+                timestamp: Date.now(),
+              })
+              // Cleanup the temporary result object
+              ;(sentimentResult.result as any).delete()
+            } else {
+              throw new Error(`Sentiment analysis failed: ${sentimentResult.error}`)
+            }
             metadata.confidence = 0.85
             break
 
@@ -273,15 +292,20 @@ export class HomomorphicOperations {
             // These are native SEAL operations that can be performed directly
             opResult = await this.performNativeSealOperation(
               operation,
-              serializedCiphertext,
+              inputCiphertext,
               params,
             )
-
-            result = JSON.stringify({
-              serializedCiphertext: opResult.result,
-              operation,
-              timestamp: Date.now(),
-            })
+            
+            if (opResult.success && opResult.result) {
+              const serializedResult = opResult.result
+              result = JSON.stringify({
+                serializedCiphertext: serializedResult,
+                operation: operation.toLowerCase(),
+                timestamp: Date.now(),
+              })
+            } else {
+              throw new Error(`Operation ${operation} failed: ${opResult.error}`)
+            }
             break
 
           default:
@@ -331,9 +355,9 @@ export class HomomorphicOperations {
    */
   private async performNativeSealOperation(
     operation: FHEOperation,
-    serializedCiphertext: string,
+    inputCiphertext: SealCipherText,
     params?: Record<string, unknown>,
-  ): Promise<{ result: string; success: boolean }> {
+  ): Promise<{ result: string; success: boolean; error?: string }> {
     if (!this.sealOps) {
       throw new Error('SEAL operations not initialized')
     }
@@ -354,46 +378,76 @@ export class HomomorphicOperations {
       case FHEOperation.Addition:
         // Add a constant or another ciphertext
         addend = (params?.['addend'] as number[]) || [1]
-        addResult = await this.sealOps.add(serializedCiphertext, addend)
-        return { result: addResult['result'], success: addResult['success'] }
+        addResult = await this.sealOps.add(
+          inputCiphertext,
+          addend,
+        )
+        if (addResult.success && addResult.result) {
+          const res = (addResult.result as any).save();
+          (addResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: addResult.error }
 
       case FHEOperation.Subtraction:
         // Subtract a constant or another ciphertext
         subtrahend = (params?.['subtrahend'] as number[]) || [1]
         subResult = await this.sealOps.subtract(
-          serializedCiphertext,
+          inputCiphertext,
           subtrahend,
         )
-        return { result: subResult['result'], success: subResult['success'] }
+        if (subResult.success && subResult.result) {
+          const res = (subResult.result as any).save();
+          (subResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: subResult.error }
 
       case FHEOperation.Multiplication:
         // Multiply by a constant or another ciphertext
         multiplier = (params?.['multiplier'] as number[]) || [2]
         multResult = await this.sealOps.multiply(
-          serializedCiphertext,
+          inputCiphertext,
           multiplier,
         )
-        return { result: multResult['result'], success: multResult['success'] }
+        if (multResult.success && multResult.result) {
+          const res = (multResult.result as any).save();
+          (multResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: multResult.error }
 
       case FHEOperation.Negation:
         // Negate the value
-        negResult = await this.sealOps.negate(serializedCiphertext)
-        return { result: negResult['result'], success: negResult['success'] }
+        negResult = await this.sealOps.negate(inputCiphertext)
+        if (negResult.success && negResult.result) {
+          const res = (negResult.result as any).save();
+          (negResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: negResult.error }
 
       case FHEOperation.Polynomial:
         // Apply a polynomial function
         coefficients = (params?.['coefficients'] as number[]) || [0, 1]
-        polyResult = await this.sealOps.polynomial(
-          serializedCiphertext,
-          coefficients,
-        )
-        return { result: polyResult['result'], success: polyResult['success'] }
+        polyResult = await this.sealOps.polynomial(inputCiphertext, coefficients)
+        if (polyResult.success && polyResult.result) {
+          const res = (polyResult.result as any).save();
+          (polyResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: polyResult.error }
 
       case FHEOperation.Rotation:
-        // Rotate elements in a vector
+        // Rotate the ciphertext
         steps = (params?.['steps'] as number) || 1
-        rotResult = await this.sealOps.rotate(serializedCiphertext, steps)
-        return { result: rotResult['result'], success: rotResult['success'] }
+        rotResult = await this.sealOps.rotate(inputCiphertext, steps)
+        if (rotResult.success && rotResult.result) {
+          const res = (rotResult.result as any).save();
+          (rotResult.result as any).delete();
+          return { result: res, success: true }
+        }
+        return { result: '', success: false, error: rotResult.error }
 
       default:
         throw new Error(`Unsupported SEAL operation: ${operation}`)
@@ -430,9 +484,9 @@ export class HomomorphicOperations {
       if (encryptedData.startsWith('eyJ')) {
         // Base64 JSON format
         const decoded = atob(encryptedData)
-        const parsed = JSON.parse(decoded) as unknown
+        const parsed = JSON.parse(decoded) as any
 
-        if (parsed.data && typeof parsed.data === 'string') {
+        if (parsed && typeof parsed === 'object' && 'data' in parsed && typeof parsed.data === 'string') {
           decodedData = parsed.data
         } else {
           decodedData = 'Unknown encoded format'
