@@ -5,7 +5,7 @@
  * previous MongoDB-based authentication system.
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
 import type { Db } from 'mongodb'
 
 import { mongodb } from '../config/mongodb.config'
@@ -26,6 +26,7 @@ import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 // Initialize Auth0 clients
 let auth0Management: ManagementClient | null = null
 let auth0Authentication: AuthenticationClient | null = null
+let auth0UserInfo: UserInfoClient | null = null
 
 /**
  * Initialize Auth0 clients
@@ -62,8 +63,6 @@ function initializeAuth0Clients() {
         domain: config.domain,
         clientId: config.managementClientId,
         clientSecret: config.managementClientSecret,
-        audience: `https://${config.domain}/api/v2/`,
-        scope: 'read:users update:users create:users delete:users',
       })
     }
   } else {
@@ -81,13 +80,14 @@ function initializeAuth0Clients() {
         clientSecret: config.clientSecret,
       })
     }
+    if (!auth0UserInfo) {
+      auth0UserInfo = new UserInfoClient({ domain: config.domain })
+    }
   } else {
     console.warn(
       'Auth0 Authentication configuration is incomplete. Login features will not work.',
     )
   }
-
-  return config
 
   return config
 }
@@ -140,27 +140,25 @@ export class Auth0UserService {
       // Wait, initializeAuth0Clients returns config, but vars are module-level.
       // We need to make sure auth0UserInfo is initialized in initializeAuth0Clients in this file too.
 
-      let userResponse: any
-      if (auth0UserInfo) {
-        try {
-          // In v5, getUserInfo takes the access token
-          const userInfoRes = await auth0UserInfo.getUserInfo(
-            tokenResponse.access_token,
-          )
-          userResponse = userInfoRes.data
-          // normalized to match old structure expected below
-          userResponse.user_id = userResponse.sub
-        } catch (e) {
-          console.warn(
-            'Failed to fetch user info, falling back to token decode if possible or error',
-            e,
-          )
-          // If we can't get user info, we might not be able to return full user object
-          throw e
-        }
-      } else {
-        // Should have been initialized
+      if (!auth0UserInfo) {
         throw new Error('Auth0 UserInfo client not initialized')
+      }
+
+      let userResponse: any
+      try {
+        // In v5, getUserInfo takes the access token
+        const userInfoRes = await auth0UserInfo.getUserInfo(
+          tokenResponse.access_token,
+        )
+        userResponse = userInfoRes.data
+        // normalized to match old structure expected below
+        userResponse.user_id = userResponse.sub
+      } catch (e) {
+        console.warn(
+          'Failed to fetch user info, falling back to token decode if possible or error',
+          e,
+        )
+        throw e
       }
 
       // Log security event
@@ -208,7 +206,7 @@ export class Auth0UserService {
 
     try {
       // Create user in Auth0
-      const auth0User = await auth0Management.createUser({
+      const createRes = await auth0Management.users.create({
         email,
         password,
         connection: 'Username-Password-Authentication',
@@ -222,6 +220,7 @@ export class Auth0UserService {
           created_at: new Date().toISOString(),
         },
       })
+      const auth0User = createRes.data
 
       return {
         id: auth0User.user_id,
@@ -251,7 +250,8 @@ export class Auth0UserService {
     }
 
     try {
-      const auth0User = await auth0Management.getUser({ id: userId })
+      const getUserRes = await auth0Management.users.get(userId)
+      const auth0User = getUserRes.data
 
       return {
         id: auth0User.user_id,
@@ -281,7 +281,8 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers()
+      const usersPage = await auth0Management.users.list({})
+      const users = usersPage.data
       return users.map((user) => ({
         id: user.user_id,
         email: user.email,
@@ -311,10 +312,10 @@ export class Auth0UserService {
     }
 
     try {
-      const users = await auth0Management.getUsers({
-        q: `email:"${email}"`,
-        search_engine: 'v3',
+      const usersRes = await auth0Management.users.listUsersByEmail({
+        email,
       })
+      const users = usersRes.data ?? []
 
       if (users.length === 0) {
         return null
@@ -394,10 +395,11 @@ export class Auth0UserService {
         updateParams.app_metadata = appMetadataUpdates
       }
 
-      const auth0User = await auth0Management.updateUser(
-        { id: userId },
+      const updateRes = await auth0Management.users.update(
+        userId,
         updateParams,
       )
+      const auth0User = updateRes.data
 
       return {
         id: auth0User.user_id,
@@ -428,8 +430,8 @@ export class Auth0UserService {
     }
 
     try {
-      await auth0Management.updateUser(
-        { id: userId },
+      await auth0Management.users.update(
+        userId,
         { password: newPassword },
       )
     } catch (error) {
@@ -449,7 +451,7 @@ export class Auth0UserService {
 
     try {
       // Revoke refresh token
-      await auth0Authentication.revokeRefreshToken({
+      await auth0Authentication.oauth.revokeRefreshToken({
         token: refreshToken,
       })
     } catch (error) {
@@ -470,14 +472,19 @@ export class Auth0UserService {
 
     try {
       // Exchange refresh token for new access token
-      const tokenResponse = await auth0Authentication.refreshToken({
+      const tokenRes = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
+      const tokenResponse = tokenRes.data
 
       // Get user info
-      const userResponse = await auth0Authentication.getProfile(
+      if (!auth0UserInfo) {
+        throw new Error('Auth0 UserInfo client not initialized')
+      }
+      const userInfoRes = await auth0UserInfo.getUserInfo(
         tokenResponse.access_token,
       )
+      const userResponse: any = { ...userInfoRes.data, user_id: userInfoRes.data.sub }
 
       return {
         user: {
@@ -517,7 +524,11 @@ export class Auth0UserService {
 
     try {
       // Decode token to get user info
-      const decodedToken = await auth0Authentication.getProfile(token)
+      if (!auth0UserInfo) {
+        throw new Error('Auth0 UserInfo client not initialized')
+      }
+      const userInfoRes = await auth0UserInfo.getUserInfo(token)
+      const decodedToken: any = { ...userInfoRes.data, user_id: userInfoRes.data.sub }
 
       return {
         userId: decodedToken.user_id,
@@ -542,13 +553,14 @@ export class Auth0UserService {
     }
 
     try {
-      const ticket = await auth0Management.createPasswordChangeTicket({
+      const ticketRes = await auth0Management.tickets.changePassword({
         user_id: userId,
         result_url: returnUrl,
         ttl_sec: 3600, // 1 hour
       })
+      const ticket = ticketRes.data
 
-      return ticket.ticket
+      return ticket.ticket ?? null
     } catch (error) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')

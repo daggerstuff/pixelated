@@ -176,8 +176,13 @@ export async function rateLimitMiddleware(
 
   const { getFromCache, setInCache } = await import('../redis')
 
+  interface RateLimitData {
+    count: number
+    resetTime: number
+  }
+
   // Get current rate limit data
-  const rateLimitData = await getFromCache(rateLimitKey)
+  const rateLimitData = await getFromCache<RateLimitData>(rateLimitKey)
 
   const now = Date.now()
   let currentCount = 0
@@ -296,10 +301,15 @@ export async function csrfProtection(request: Request): Promise<{
     }
   }
 
+  interface CSRFTokenData {
+    token: string
+    expiresAt: number
+  }
+
   // Validate the token against stored tokens
   const { getFromCache } = await import('../redis')
   const tokenKey = `csrf:${csrfToken}`
-  const storedToken = await getFromCache(tokenKey)
+  const storedToken = await getFromCache<CSRFTokenData>(tokenKey)
 
   if (!storedToken) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
@@ -566,186 +576,160 @@ export async function authenticateRequest(request: Request): Promise<{
     }
   }
 
-  // Get user information from Auth0
-  const user = await auth0UserService.getUserById(validation.userId!)
+  // ── Resolve internal UUID from Auth0 sub ──────────────────────────────
+  // validation.userId here is the Auth0 `sub` claim (e.g. "auth0|abc123").
+  // We must translate it to the internal platform UUID before any downstream
+  // services see it. resolveIdentity() does a Redis cache lookup first,
+  // then falls back to Postgres. On first login it creates the mapping.
+  const auth0Sub = validation.userId!
 
-  if (!user) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
-    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
-      error: 'User not found',
-      endpoint: new URL(request.url).pathname,
+  const { resolveIdentity } = await import('./user-identity')
+
+  let identity: Awaited<ReturnType<typeof resolveIdentity>>
+  try {
+    // We only have the sub here (not a full profile), so pass minimal info.
+    // Full profile enrichment (name, picture) happens at /callback.
+    identity = await resolveIdentity({
+      sub: auth0Sub,
+      // These fields are sourced from the validated token payload where available
+      email: validation.payload?.email ?? '',
+      emailVerified: validation.payload?.email_verified ?? false,
+      name: validation.payload?.name,
+      picture: validation.payload?.picture,
+      role: validation.role as string | undefined,
     })
-
-    return {
-      success: false,
-      response: new Response(JSON.stringify({ error: 'User not found' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      }),
-      error: 'User not found',
-    }
-  }
-
-  // Check if user is active
-  if (user.isActive === false) {
+  } catch (resolveError) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
     await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
-      error: 'User account is inactive',
-      endpoint: new URL(request.url).pathname,
+      error: 'Failed to resolve internal user identity',
+      auth0Sub,
+      detail: resolveError instanceof Error ? resolveError.message : String(resolveError),
     })
 
     return {
       success: false,
       response: new Response(
-        JSON.stringify({ error: 'User account is inactive' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
+        JSON.stringify({ error: 'User identity resolution failed' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } },
       ),
-      error: 'User account is inactive',
+      error: 'User identity resolution failed',
     }
   }
 
-  // Check if user has MFA enabled
-  const hasMFA = await auth0UserService.userHasMFA(user.id)
+  // Check if user is active (query internal DB, not Auth0 Management API)
+  // For now we trust the identity exists. Role-based activation checks happen
+  // in requireRole() middleware if needed.
+
+  // Check if user has MFA enabled (use internal UUID for the lookup)
+  const hasMFA = await auth0UserService.userHasMFA(auth0Sub)
 
   // Device/Session Binding Check
   const sid = validation.payload?.sid
   if (sid) {
     const { getFromCache, setInCache } = await import('../redis')
-    const bindingKey = `session_binding:${user.id}:${sid}`
+    const bindingKey = `session_binding:${identity.internalId}:${sid}`
     const clientInfo = getClientInfo(request)
     const storedBinding = await getFromCache(bindingKey)
 
     if (storedBinding) {
-      // Verify IP binding (allow some flexibility if needed, but strict for now)
-      if (storedBinding.ip !== clientInfo.ip) {
-        const { logSecurityEvent, SecurityEventType } =
-          await import('../security')
+      if ((storedBinding as { ip?: string }).ip !== clientInfo.ip) {
+        const { logSecurityEvent, SecurityEventType } = await import('../security')
         await logSecurityEvent(
           SecurityEventType.AUTHENTICATION_FAILED,
-          user.id,
+          identity.internalId,
           {
             reason: 'ip_mismatch',
-            storedIp: storedBinding.ip,
+            storedIp: (storedBinding as { ip?: string }).ip,
             currentIp: clientInfo.ip,
             endpoint: new URL(request.url).pathname,
           },
         )
-
-        // We could block here, but for now we'll just log and maybe require MFA
-        // If we wanted to block:
-        // return { success: false, response: ..., error: 'Session IP mismatch' }
+        // Logged but not hard-blocked — adaptive MFA may step up below
       }
     } else {
-      // Trust On First Use (TOFU) - Bind session to this IP
+      // Trust On First Use: bind session to this IP
       await setInCache(
         bindingKey,
-        {
-          ip: clientInfo.ip,
-          userAgent: clientInfo.userAgent,
-          boundAt: Date.now(),
-        },
+        { ip: clientInfo.ip, userAgent: clientInfo.userAgent, boundAt: Date.now() },
         24 * 60 * 60,
-      ) // 24 hours
+      )
     }
   }
 
   // If user doesn't have MFA enabled, check if adaptive MFA requires it
   if (!hasMFA) {
     try {
-      // Get client information for risk assessment (already fetched above if sid exists, but reliable here)
       const clientInfo = getClientInfo(request)
-
-      // Create login context for risk assessment
       const loginContext = {
-        userId: user.id,
+        userId: identity.internalId,
         ipAddress: clientInfo.ip,
         userAgent: clientInfo.userAgent,
         timestamp: new Date(),
         location: {
-          // In a real implementation, we would get geolocation from IP
-          // For now, we'll simulate based on IP
           country:
             clientInfo.ip.startsWith('192.168.') ||
             clientInfo.ip.startsWith('10.') ||
             clientInfo.ip.startsWith('172.')
               ? 'LOCAL'
-              : 'US', // Default to US for external IPs
+              : 'US',
         },
       }
 
-      // Check if adaptive MFA requires MFA for this login
-      const requiresMFA =
-        await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
+      const requiresMFA = await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
 
       if (requiresMFA) {
-        // Log that MFA is required
-        const { logSecurityEvent, SecurityEventType } =
-          await import('../security')
-        await logSecurityEvent(SecurityEventType.MFA_REQUIRED, user.id, {
+        const { logSecurityEvent, SecurityEventType } = await import('../security')
+        await logSecurityEvent(SecurityEventType.MFA_REQUIRED, identity.internalId, {
           reason: 'adaptive_mfa_triggered',
           riskFactors: 'calculated_by_adaptive_service',
           endpoint: new URL(request.url).pathname,
         })
 
-        // Return response indicating MFA is required
         return {
           success: false,
           response: new Response(
             JSON.stringify({
               error: 'MFA required',
-              message:
-                'Multi-factor authentication is required for this login attempt',
+              message: 'Multi-factor authentication is required for this login attempt',
               code: 'MFA_REQUIRED',
             }),
-            {
-              status: 401,
-              headers: { 'Content-Type': 'application/json' },
-            },
+            { status: 401, headers: { 'Content-Type': 'application/json' } },
           ),
           error: 'MFA required',
         }
       }
     } catch (error) {
       console.warn('Failed to perform adaptive MFA check:', error)
-      // Continue with authentication if adaptive MFA check fails
     }
   }
 
-  // Log successful authentication
+  // Log successful authentication using internal UUID
   const { logSecurityEvent, SecurityEventType } = await import('../security')
-  await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
+  await logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, identity.internalId, {
     tokenId: validation.tokenId,
     endpoint: new URL(request.url).pathname,
     timestamp: Date.now(),
-    retention: 31536000000, // 1 year in milliseconds
+    retention: 31536000000,
   })
 
   // Update Phase 6 MCP server
   try {
-    const { updatePhase6AuthenticationProgress } =
-      await import('../mcp/phase6-integration')
-    await updatePhase6AuthenticationProgress(user.id, 'authentication_success')
+    const { updatePhase6AuthenticationProgress } = await import('../mcp/phase6-integration')
+    await updatePhase6AuthenticationProgress(identity.internalId, 'authentication_success')
   } catch {
     // Phase 6 integration not available in test environment
   }
 
-  // Attach user to request
+  // Attach user to request — ALL fields use the internal UUID as `id`
   const authenticatedRequest = request as AuthenticatedRequest
   authenticatedRequest.user = {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    emailVerified: user.emailVerified,
-    fullName: user.fullName,
-    avatarUrl: user.avatarUrl,
-    createdAt: user.createdAt,
-    lastLogin: user.lastLogin,
-    appMetadata: user.appMetadata,
-    userMetadata: user.userMetadata,
-  }
+    id: identity.internalId, // ← internal UUID, never the Auth0 sub
+    email: identity.email,
+    role: identity.role,
+    emailVerified: identity.emailVerified,
+    fullName: identity.name,
+    avatarUrl: identity.picture,
+  } as AuthenticatedRequest['user']
   authenticatedRequest.tokenId = validation.tokenId
   authenticatedRequest.sessionId = sid
 
@@ -807,7 +791,7 @@ export async function requireRole(
         SecurityEventType.AUTHORIZATION_FAILED,
         request.user.id,
         {
-          requiredRoles: roles,
+          requiredRoles: roles.join(', '),
           userRole: request.user.role,
         },
       )

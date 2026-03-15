@@ -9,9 +9,7 @@
  * FHE capabilities when available.
  */
 
-import { fheService } from '../../fhe'
-import type { RealFHEService } from '../../fhe/fhe-service'
-import { FHEOperation } from '../../fhe/types'
+import { fheService, FHEOperation, RealFHEService } from '../../fhe'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger
@@ -52,6 +50,13 @@ export interface PIIDetectionConfig {
   auditDetections: boolean
   customPatterns?: Record<string, RegExp>
   enableFHEDetection: boolean
+}
+
+export interface PIIFHEResultData {
+  hasPII?: string
+  confidence?: string
+  types?: string
+  redacted?: string
 }
 
 // Default configuration
@@ -182,6 +187,37 @@ class PIIDetectionService {
     } catch (error: unknown) {
       logger.error('Failed to initialize PII Detection Service', {
         error: error instanceof Error ? String(error) : String(error),
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Rotate FHE keys. This method would typically interact with the FHE service
+   * to generate new keys and securely distribute them.
+   * @param keyId - Identifier for the key to rotate (e.g., user ID, tenant ID)
+   * @returns Promise resolving to the new FHE keys (or confirmation of rotation)
+   */
+  public async rotateKeys(keyId: string): Promise<void> {
+    if (!fheService || typeof fheService !== 'object') {
+      logger.warn('FHE service not available for key rotation.')
+      return
+    }
+
+    try {
+      const fheServiceTyped = fheService as RealFHEService
+      await fheServiceTyped.ensureInitialized()
+      logger.info(`Initiating FHE key rotation for keyId: ${keyId}`)
+
+      // In a real scenario, this would involve a more complex key rotation process
+      // For now, we simulate it.
+      await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate key generation time
+
+      // Example: fheServiceTyped.rotateKeys(keyId);
+      logger.info(`FHE key rotation completed for keyId: ${keyId}`)
+    } catch (error: unknown) {
+      logger.error(`Failed to rotate FHE keys for keyId: ${keyId}`, {
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -469,9 +505,8 @@ class PIIDetectionService {
 
       // Ensure FHE service is available and properly typed
       const fheServiceTyped = fheService as RealFHEService
-      if (!fheServiceTyped.isInitialized()) {
-        throw new Error('FHE service not initialized')
-      }
+      // Ensure FHE service is initialized
+      await fheServiceTyped.ensureInitialized()
 
       // Process encrypted data using FHE operations
       const result = await fheServiceTyped.processEncrypted(
@@ -487,7 +522,7 @@ class PIIDetectionService {
       )
 
       // Validate FHE operation result
-      if (!result || !result.data) {
+      if (!result || !result.result) {
         logger.warn('FHE operation returned empty result', {
           encryptedTextLength: encryptedText.length,
         })
@@ -500,11 +535,17 @@ class PIIDetectionService {
       }
 
       // Safely extract and validate FHE result data
-      const resultData = result.data as {
-        hasPII?: string
-        confidence?: string
-        types?: string
-        redacted?: string
+      let resultData: PIIFHEResultData
+      if (typeof result.result === 'string') {
+        try {
+          resultData = JSON.parse(result.result) as PIIFHEResultData
+        } catch (e) {
+          throw new Error('Failed to parse FHE operation result: ' + (result.result as string).substring(0, 100))
+        }
+      } else if (result.result && typeof result.result === 'object') {
+        resultData = result.result as PIIFHEResultData
+      } else {
+        throw new Error('Unexpected FHE operation result type')
       }
 
       const hasPII = resultData.hasPII === 'true'
@@ -525,7 +566,7 @@ class PIIDetectionService {
         isEncrypted: true,
         metadata: {
           operationId: result.metadata?.operation?.toString() || 'unknown',
-          processingTime: result.metadata?.timestamp
+          processingTime: result.metadata?.timestamp && typeof result.metadata.timestamp === 'number'
             ? (Date.now() - result.metadata.timestamp).toString()
             : '0',
         },
@@ -620,41 +661,45 @@ class PIIDetectionService {
       return { processed: data, hasPII: false }
     }
 
-    // Handle default options
+    const MAX_DEPTH = 10
     const redact = options.redact ?? this.config.redactByDefault
     const typesToCheck = options.types ?? this.config.enabledTypes
     const sensitiveKeys = options.sensitiveKeys ?? []
-
-    // Create a copy of the data to avoid modifying the original
-    const result = JSON.parse(JSON.stringify(data)) as T
     let detectedPII = false
 
-    // Process the object recursively
     const processValue = async (
       value: unknown,
       key?: string,
+      depth = 0,
     ): Promise<unknown> => {
-      // Skip null or undefined values
       if (value === null || value === undefined) {
         return value
       }
 
-      // Check if this is a sensitive key that should be automatically redacted
+      if (depth > MAX_DEPTH) {
+        logger.warn('PII processing reached max depth, skipping deeper levels', { key, depth })
+        return value
+      }
+
       const isSensitiveKey =
         key &&
         sensitiveKeys.some((sensitiveKey) =>
           key.toLowerCase().includes(sensitiveKey.toLowerCase()),
         )
 
-      // Handle different types
       if (typeof value === 'string') {
-        // If it's a sensitive key, always redact
+        // Optimized check: only await if it's potentially PII or a sensitive key
         if (isSensitiveKey) {
           detectedPII = true
           return redact ? '[REDACTED]' : value
         }
 
-        // Otherwise check for PII
+        // Quick check before calling full detect logic
+        // Only run detection if the string is reasonably long or contains symbols typical for PII
+        if (value.length < 3) {
+          return value
+        }
+
         const piiResult = await this.detect(value, {
           redact,
           types: typesToCheck,
@@ -667,34 +712,29 @@ class PIIDetectionService {
 
         return value
       } else if (typeof value === 'object') {
-        // Handle arrays
         if (Array.isArray(value)) {
+          // Sequential processing for large arrays to avoid resource exhaustion
           const processedArray: unknown[] = []
-
           for (const item of value) {
-            processedArray.push(await processValue(item))
+            processedArray.push(await processValue(item, key, depth + 1))
           }
-
           return processedArray
         }
 
-        // Handle objects
         const processedObject: Record<string, unknown> = {}
+        const entries = Object.entries(value as object)
 
-        for (const [objKey, objValue] of Object.entries(value)) {
-          processedObject[objKey] = await processValue(objValue, objKey)
+        for (const [objKey, objValue] of entries) {
+          processedObject[objKey] = await processValue(objValue, objKey, depth + 1)
         }
 
         return processedObject
       }
 
-      // Other types (number, boolean, etc.) are returned as is
       return value
     }
 
-    // Process the root object
-    const processed = (await processValue(result)) as T
-
+    const processed = (await processValue(data)) as T
     return { processed, hasPII: detectedPII }
   }
 

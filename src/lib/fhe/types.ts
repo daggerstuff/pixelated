@@ -574,6 +574,7 @@ export interface FHEOperationResult<T = unknown> {
   result?: T
   error?: string
   operation: FHEOperation
+  timestamp?: number
   metadata?: Record<string, unknown>
 }
 
