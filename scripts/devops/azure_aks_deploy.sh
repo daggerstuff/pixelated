@@ -234,7 +234,8 @@ helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --set ingress.tls[0].secretName="pixelated-empathy-${APP_ENV}-tls" \
   --wait \
   --timeout 30m \
-  --atomic
+  --atomic \
+  --force
 HELM_EXIT_CODE=$?
 set -e
 
