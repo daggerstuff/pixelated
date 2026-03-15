@@ -286,3 +286,4 @@ node_modules
 Stage1_Training_Notebook.ipynb
 pixelated_empathy_final_model_logs.csv
 Stage1_data_utils.py
+/ai/lab/evals/golden_questions.json
