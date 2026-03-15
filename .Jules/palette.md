@@ -1,1 +1,0 @@
-## 2026-03-13 - Accessibility improvements in ExportPanel | Learning: Added aria-label, aria-pressed, and proper label association for better keyboard navigation and screen reader support | Action: Reused standard Tailwind focus-ring styles.

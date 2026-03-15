@@ -53,10 +53,9 @@ if [ -d "ai" ] && [ -f "ai/pyproject.toml" ]; then
     cd ..
 fi
 
-# 5. Global Tool Discovery (Byterover, Beads)
+# 5. Global Tool Discovery (Byterover)
 echo "🟢 Discovering local agent tools..."
 command -v brv &> /dev/null && echo "✅ Byterover (brv) detected." || echo "⚠️ Byterover (brv) not in PATH."
-command -v bd &> /dev/null && echo "✅ Beads (bd) detected." || echo "⚠️ Beads (bd) not in PATH."
 
 # 6. Final Verification and Sanity Check
 echo "🟢 Running basic diagnostics..."
