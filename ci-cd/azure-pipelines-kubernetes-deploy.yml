@@ -81,6 +81,9 @@ stages:
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
               PUSH_LATEST: ${{ parameters.pushLatest }}
+              ACR_NAME: $(ACR_NAME)
+              ACR_REPO: $(ACR_REPO)
+              ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
 
   # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
   # Uses the image tag produced in the Build stage.
@@ -117,7 +120,13 @@ stages:
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
               PUSH_LATEST: ${{ parameters.pushLatest }}
-              CHART_DIR: $(Build.SourcesDirectory)/$(CHART_DIR)
+              CHART_DIR: $(CHART_DIR)
+              ACR_NAME: $(ACR_NAME)
+              ACR_REPO: $(ACR_REPO)
+              ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+              AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              SKIP_BUILD: 'true'
 
   # Stage 3: Self-hosted fallback — runs only if the hosted deploy stage fails.
   # Useful when the Microsoft-hosted agent can't reach the private AKS endpoint.
@@ -156,4 +165,10 @@ stages:
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
               PUSH_LATEST: ${{ parameters.pushLatest }}
-              CHART_DIR: $(Build.SourcesDirectory)/$(CHART_DIR)
+              CHART_DIR: $(CHART_DIR)
+              ACR_NAME: $(ACR_NAME)
+              ACR_REPO: $(ACR_REPO)
+              ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+              AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              SKIP_BUILD: 'true'
