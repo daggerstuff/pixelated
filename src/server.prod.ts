@@ -138,12 +138,20 @@ app.use((req, res) => {
   })
 })
 
-server.listen(PORT, () => {
-  console.log(`🚀 Business Strategy CMS running on port ${PORT}`)
-  console.log(`📊 Environment: ${productionConfig.environment}`)
-  console.log(
-    `🔧 Health check: http${isProduction ? 's' : ''}://localhost:${PORT}/health`,
-  )
-})
+const startServer = () => {
+  server.listen(PORT, () => {
+    console.log(`🚀 Business Strategy CMS running on port ${PORT}`)
+    console.log(`📊 Environment: ${productionConfig.environment}`)
+    console.log(
+      `🔧 Health check: http${isProduction ? 's' : ''}://localhost:${PORT}/health`,
+    )
+  })
+}
 
-export { server, db, redis, socketService }
+// Only start the server if this file is run directly
+const isMain = process.argv[1]?.includes('server.prod.js') || process.argv[1]?.includes('server.prod.ts')
+if (isMain) {
+  startServer()
+}
+
+export { server, db, redis, socketService, startServer }

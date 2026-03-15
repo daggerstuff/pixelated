@@ -1,6 +1,7 @@
 export const productionConfig = {
   // Server Configuration
-  port: process.env.PORT || 3000,
+  // Business Strategy CMS port - use separate port to avoid conflict with main app
+  port: process.env.CMS_PORT || 5001,
   environment: 'production',
 
   // Database Configuration
