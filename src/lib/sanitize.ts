@@ -19,6 +19,10 @@ export function sanitizeUrl(url: string): string {
 	if (SAFE_URL_PATTERN.test(trimmed)) {
 		return trimmed
 	}
+	// Prevent protocol-relative URLs
+	if (trimmed.startsWith('//')) {
+		return '#'
+	}
 	// Allow relative URLs (starting with /, ./, ../, or #)
 	if (/^[/.#]/.test(trimmed)) {
 		return trimmed
