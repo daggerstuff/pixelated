@@ -5,7 +5,7 @@
 
 import { createHash } from 'crypto'
 
-import { Pool, PoolClient, QueryResult } from 'pg'
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg'
 
 // Database configuration
 export interface DatabaseConfig {
@@ -80,13 +80,13 @@ export function getPool(): Pool {
 /**
  * Execute a query with automatic connection management
  */
-export async function query<T = unknown>(
+export async function query<T extends QueryResultRow = QueryResultRow>(
   text: string,
   params?: unknown[],
 ): Promise<QueryResult<T>> {
   const client = await getPool().connect()
   try {
-    return await client.query(text, params)
+    return await client.query<T>(text, params)
   } finally {
     client.release()
   }
@@ -98,6 +98,8 @@ export async function query<T = unknown>(
 export async function transaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
+  // Ensure the pool is initialised before acquiring a connection.
+  initializeDatabase()
   const client = await getPool().connect()
   try {
     await client.query('BEGIN')
@@ -233,7 +235,7 @@ export class DatabaseMigration {
    * Get list of executed migrations
    */
   async getExecutedMigrations(): Promise<string[]> {
-    const result = await query(
+    const result = await query<{ name: string }>(
       'SELECT name FROM schema_migrations ORDER BY executed_at',
     )
     return result.rows.map((row) => row.name)
@@ -286,7 +288,7 @@ export class UserManager {
       ],
     )
 
-    return result.rows[0].id
+    return (result.rows[0] as { id: string }).id
   }
 
   /**
@@ -358,7 +360,7 @@ export class UserManager {
         userId,
         profileData.bio,
         profileData.specializations,
-        profileData.yearsExperience,
+        profileData.years_experience,
         profileData.certifications,
         profileData.languages || ['en'],
         profileData.timezone || 'UTC',
@@ -396,7 +398,7 @@ export class SessionManager {
       ],
     )
 
-    return result.rows[0].id
+    return (result.rows[0] as { id: string }).id
   }
 
   /**
@@ -468,6 +470,7 @@ export class BiasAnalysisManager {
     confidence: number
     layerResults: Record<string, unknown>
     detectedBiases: string[]
+    recommendations: string[]
     demographics: Record<string, unknown>
     contentHash: string
     processingTimeMs: number
@@ -476,10 +479,10 @@ export class BiasAnalysisManager {
       `
       INSERT INTO bias_analyses (
         session_id, therapist_id, overall_bias_score, alert_level,
-        confidence, layer_results, recommendations, demographics,
+        confidence, layer_results, detected_biases, recommendations, demographics,
         content_hash, processing_time_ms
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING id
     `,
       [
@@ -489,6 +492,7 @@ export class BiasAnalysisManager {
         analysisData.alertLevel,
         analysisData.confidence,
         JSON.stringify(analysisData.layerResults),
+        analysisData.detectedBiases,
         analysisData.recommendations,
         JSON.stringify(analysisData.demographics),
         analysisData.contentHash,
@@ -496,7 +500,7 @@ export class BiasAnalysisManager {
       ],
     )
 
-    return result.rows[0].id
+    return (result.rows[0] as { id: string }).id
   }
 
   /**
@@ -505,7 +509,21 @@ export class BiasAnalysisManager {
   async getCachedAnalysis(contentHash: string): Promise<any> {
     const result = await query(
       `
-      SELECT * FROM bias_analyses
+      SELECT
+        id,
+        session_id          AS "sessionId",
+        therapist_id        AS "therapistId",
+        overall_bias_score  AS "overallBiasScore",
+        alert_level         AS "alertLevel",
+        confidence,
+        layer_results       AS "layerResults",
+        detected_biases     AS "detectedBiases",
+        recommendations,
+        demographics,
+        content_hash        AS "contentHash",
+        processing_time_ms  AS "processingTimeMs",
+        created_at          AS "createdAt"
+      FROM bias_analyses
       WHERE content_hash = $1
       ORDER BY created_at DESC
       LIMIT 1
@@ -525,7 +543,21 @@ export class BiasAnalysisManager {
   ): Promise<any[]> {
     const result = await query(
       `
-      SELECT ba.*, s.started_at as session_date
+      SELECT
+        ba.id,
+        ba.session_id        AS "sessionId",
+        ba.therapist_id      AS "therapistId",
+        ba.overall_bias_score AS "overallBiasScore",
+        ba.alert_level       AS "alertLevel",
+        ba.confidence,
+        ba.layer_results     AS "layerResults",
+        ba.detected_biases   AS "detectedBiases",
+        ba.recommendations,
+        ba.demographics,
+        ba.content_hash      AS "contentHash",
+        ba.processing_time_ms AS "processingTimeMs",
+        ba.created_at        AS "createdAt",
+        s.started_at         AS "sessionDate"
       FROM bias_analyses ba
       JOIN sessions s ON ba.session_id = s.id
       WHERE ba.therapist_id = $1
@@ -552,9 +584,9 @@ export class BiasAnalysisManager {
         MAX(created_at) as last_analysis
       FROM bias_analyses
       WHERE therapist_id = $1
-        AND created_at >= NOW() - INTERVAL '${days} days'
+        AND created_at >= NOW() - make_interval(days => $2::int)
     `,
-      [therapistId],
+      [therapistId, days],
     )
 
     return (
