@@ -2,12 +2,20 @@
 # Optimized for Ollama Exposure and Staging Subdomains
 
 {
-    email {$SSL_EMAIL:admin@pixelatedempathy.com}
+    email support@pixelatedempathy.com
     admin off
+    
+    # Enable automatic HTTPS redirects for Full SSL
+    auto_https on
+
+    # Trust Cloudflare Proxies for real IP and protocol detection
+    servers {
+        trusted_proxies static 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+    }
 }
 
 # Ollama API Subdomain
-ollama.pixelatedempathy.tech {
+https://ollama.pixelatedempathy.tech {
     # Security: Enforce OLLAMA API key
     @unauthorized {
         not header Authorization "Bearer {$OLLAMA_API_KEY}"
@@ -33,7 +41,6 @@ ollama.pixelatedempathy.tech {
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
     }
 
     # Security Headers
@@ -41,7 +48,6 @@ ollama.pixelatedempathy.tech {
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
         Referrer-Policy strict-origin-when-cross-origin
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     }
 
     log {
@@ -51,7 +57,7 @@ ollama.pixelatedempathy.tech {
 }
 
 # MCP Server Subdomain
-mcp.pixelatedempathy.tech {
+https://mcp.pixelatedempathy.tech {
     # Allow unrestricted API access (secured by API key in future if needed, or open for now as public facing)
     # Since this is a public facing request, we'll keep it open but logged.
     
@@ -59,7 +65,6 @@ mcp.pixelatedempathy.tech {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
     }
 
     # Security Headers
@@ -67,7 +72,6 @@ mcp.pixelatedempathy.tech {
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
         Referrer-Policy strict-origin-when-cross-origin
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
         # CORS for web clients
         Access-Control-Allow-Origin *
         Access-Control-Allow-Methods "GET, POST, OPTIONS, PATCH, DELETE"
@@ -89,24 +93,19 @@ mcp.pixelatedempathy.tech {
 }
 
 # Main Application & Staging Subdomain
-staging.pixelatedempathy.tech, pixelatedempathy.tech, pixelatedempathy.com {
+https://staging.pixelatedempathy.tech, https://pixelatedempathy.tech, https://pixelatedempathy.com {
     # Proxy to the main Astro/React application
     reverse_proxy app:4321 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
     }
-
-    # API routes from native caddyfile - bias detection (backend not found in docker-compose.yml)
-    # handle /api/bias-detection/* {
-    #     reverse_proxy bias-detection-service:5001
-    # }
 
     # Security Headers
     header {
         X-Content-Type-Options nosniff
-        X-Frame-Options SAMEORIGIN
+        X-Frame-Options "DENY"
         Referrer-Policy strict-origin-when-cross-origin
-        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     }
 
     log {
@@ -116,7 +115,7 @@ staging.pixelatedempathy.tech, pixelatedempathy.tech, pixelatedempathy.com {
 }
 
 # NVIDIA NeMo services
-nemo.pixelatedempathy.com {
+https://nemo.pixelatedempathy.com {
     reverse_proxy nemo-envoy-gateway:8080
 
     log {
@@ -130,7 +129,7 @@ nemo.pixelatedempathy.com {
 }
 
 # NVIDIA NeMo services - Dashboard
-dash.pixelatedempathy.tech {
+https://dash.pixelatedempathy.tech {
     reverse_proxy nemo-envoy-gateway:4040
 
     log {
@@ -144,10 +143,11 @@ dash.pixelatedempathy.tech {
 }
 
 # ThotBot Frontend (Link-in-Bio)
-thot.pixelated.love {
+https://thot.pixelated.love {
     reverse_proxy 172.17.0.1:5174 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
     }
 
     log {
@@ -156,15 +156,10 @@ thot.pixelated.love {
     }
 }
 
-# Default catch-all for port 80 (Redirect to HTTPS)
+# Port 80 handles health checks
 :80 {
     # Health check for the server itself
     handle /health {
         respond "OK" 200
-    }
-
-    # Redirect everything else to HTTPS
-    handle {
-        redir https://{host}{uri}
     }
 }

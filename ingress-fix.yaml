@@ -6,6 +6,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: caddy
     caddy.ingress.kubernetes.io/disable-http-redirect: "true"
+    # Trust Cloudflare proxy to handle X-Forwarded-* headers correctly
+    caddy.ingress.kubernetes.io/trusted-proxies: "cloudflare"
 spec:
   rules:
   - host: pixelatedempathy.com
@@ -16,5 +18,6 @@ spec:
         backend:
           service:
             name: pixelated-empathy-staging
+            # Ensure this matches the actual service port (from values.yaml)
             port:
-              number: 80
+              number: 8000
