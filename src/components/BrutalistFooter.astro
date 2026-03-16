@@ -46,15 +46,20 @@ const social = [
     <div class="footer-grid">
       {/* Brand Column */}
       <div class="footer-brand">
-        <a href="/" class="footer-logo">
-          <span class="footer-logo-text">Pixelated Empathy</span>
+        <a href="/" class="footer-logo group no-underline">
+          <span class="footer-logo-text font-display font-bold text-xl text-white">
+            Pixelated <span class="text-accent-primary">Empathy</span>
+          </span>
         </a>
-        <p class="footer-tagline">
-          AI-powered training for mental health professionals.
+        <p class="footer-tagline text-sm text-secondary mt-4 leading-relaxed italic opacity-80">
+          "Beyond the screen, lies a deeper connection."
+        </p>
+        <p class="text-[11px] font-mono text-muted uppercase tracking-widest mt-2">
+          Forging high-fidelity human understanding.
         </p>
         
         {/* Social Links */}
-        <div class="footer-social">
+        <div class="footer-social mt-6">
           {social.map((item) => (
             <a 
               href={item.href} 
@@ -64,12 +69,12 @@ const social = [
               aria-label={item.label}
             >
               {item.icon === "github" && (
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                   <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.09.682-.22.682-.48 0-.24-.009-.87-.013-1.71-2.782.6-3.369-1.34-3.369-1.34-.454-1.16-1.11-1.47-1.11-1.47-.908-.62.069-.61.069-.61 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.09 2.91.83.092-.65.35-1.09.636-1.34-2.22-.25-4.555-1.11-4.555-4.94 0-1.09.39-1.98 1.029-2.68-.103-.25-.446-1.27.098-2.64 0 0 .84-.27 2.75 1.02A9.578 9.578 0 0112 6.84c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.546 1.37.202 2.39.1 2.64.64.7 1.028 1.59 1.028 2.68 0 3.84-2.339 4.68-4.566 4.94.359.31.678.92.678 1.85 0 1.34-.012 2.42-.012 2.75 0 .27.18.58.688.48A10.019 10.019 0 0022 12c0-5.523-4.477-10-10-10z" />
                 </svg>
               )}
               {item.icon === "twitter" && (
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               )}
@@ -80,42 +85,44 @@ const social = [
       
       {/* Links Columns */}
       <div class="footer-links">
-        <span class="footer-links-label">Product</span>
+        <span class="footer-links-label">Ecosystem</span>
         <ul class="footer-links-list">
           {links.product.map((link) => (
-            <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
           ))}
         </ul>
       </div>
       
       <div class="footer-links">
-        <span class="footer-links-label">Company</span>
+        <span class="footer-links-label">Intelligence</span>
         <ul class="footer-links-list">
           {links.company.map((link) => (
-            <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
           ))}
         </ul>
       </div>
       
       <div class="footer-links">
-        <span class="footer-links-label">Legal</span>
+        <span class="footer-links-label">Security</span>
         <ul class="footer-links-list">
           {links.legal.map((link) => (
-            <li><a href={link.href} class="footer-link">{link.label}</a></li>
+            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
           ))}
         </ul>
       </div>
     </div>
     
     {/* Bottom Bar */}
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        &copy; {currentYear} Pixelated Empathy. All rights reserved.
+    <div class="footer-bottom border-t border-white/5 pt-8 mt-12">
+      <p class="footer-copyright font-mono text-[10px] text-muted uppercase tracking-widest">
+        &copy; {currentYear} Pixelated Empathy // Engineered with Purpose.
       </p>
-      <p class="footer-built">
-        Built with <span class="text-accent">purpose</span>
+      <p class="footer-built font-mono text-[10px] text-muted uppercase tracking-widest flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse"></span>
+        Zero-Leak Policy Active
       </p>
     </div>
+
   </div>
 </footer>
 

@@ -8,7 +8,7 @@ export interface Props {
   title?: string
 }
 
-const { logo = "/logo.svg", title = "Pixelated Empathy" } = Astro.props
+const { logo = "/assets/logo.png", title = "Pixelated Empathy" } = Astro.props;
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -19,15 +19,19 @@ const navItems = [
 ]
 ---
 
-<header class="header" data-component="brutalist-header">
-  <div class="header-container">
+<header class="header bg-void border-b border-primary py-4 sticky top-0 z-sticky glass">
+  <div class="header-container flex justify-between items-center">
     <!-- Logo Section -->
-    <a href="/" class="header-logo">
-      {logo && (
-        <img src={logo} alt={title} class="header-logo-img" width="32" height="32" />
-      )}
-      <span class="header-logo-text">{title}</span>
+    <a href="/" class="flex items-center gap-3 group no-underline">
+      <div class="logo-container relative">
+        <img src={logo} alt={title} class="h-10 w-auto filter-bright animate-float" />
+        <div class="absolute -inset-1 bg-accent-primary opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-normal"></div>
+      </div>
+      <span class="font-display font-bold text-xl tracking-tight text-white group-hover:text-accent-primary transition-colors">
+        {title.split(' ')[0]}<span class="text-accent-primary">{title.split(' ')[1]}</span>
+      </span>
     </a>
+
     
     <!-- Navigation -->
     <nav class="header-nav" aria-label="Main navigation">

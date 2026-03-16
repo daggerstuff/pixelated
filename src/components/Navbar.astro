@@ -4,84 +4,55 @@ import ThemeSwitcher from './ThemeSwitcher.astro'
 
 // Define navigation items
 const navItems = [
+  { href: '/training', label: 'Empathy Gym' },
   { href: '/features', label: 'Features' },
-  { href: '/about', label: 'About' },
-  { href: '/pricing', label: 'Pricing' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/pricing', label: 'Ecosystem' },
+  { href: '/about', label: 'Intelligence' },
   { href: '/therapy-chat', label: 'Demo' },
 ]
 
-// Get the current URL path
-const currentPath = Astro.url.pathname
-
-// Function to determine if a nav item is active
-const isActive = (href: string) => {
-  // For the homepage
-  if (href === '/' && currentPath === '/') {
-    return true
-  }
-  // For other pages
-  if (href !== '/' && currentPath.startsWith(href)) {
-    return true
-  }
-  return false
-}
----
-
-<!-- Skip to main content link for keyboard users -->
-<a
-  href="#main-content"
-  class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-white dark:bg-gray-950 p-4 z-50 rounded shadow"
->
-  Skip to main content
-</a>
+// ... (isActive logic) ...
 
 <header
-  class="sticky top-0 z-40 bg-white/50 dark:bg-gray-950/50 backdrop-blur-xl w-full border-b border-gray-200 dark:border-gray-800"
+  class="sticky top-0 z-50 bg-void/80 backdrop-blur-2xl w-full border-b border-white/5"
   role="banner"
 >
-  <div class="flex items-center justify-between h-16 px-6 sm:px-8 lg:px-12">
-    <div class="flex items-center ml-2 sm:ml-4">
-      <a href="/" class="flex items-center" aria-label="Go to homepage">
-        <div class="w-8 h-8 mr-3">
-          <!-- Logo SVG with proper ARIA -->
+  <div class="flex items-center justify-between h-20 px-6 sm:px-8 lg:px-12">
+    <div class="flex items-center">
+      <a href="/" class="flex items-center group no-underline" aria-label="Go to homepage">
+        <div class="w-10 h-10 mr-3 relative overflow-hidden rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            class="w-8 h-8"
+            class="w-6 h-6 text-accent-primary transform group-hover:scale-110 transition-transform duration-500"
             aria-hidden="true"
             focusable="false"
           >
             <path
               d="M12 2L4 6v12l8 4 8-4V6l-8-4z"
               stroke="currentColor"
-              stroke-width="2"
+              stroke-width="1.5"
               stroke-linecap="round"
               stroke-linejoin="round"></path>
             <path
               d="M12 6v4m0 4v4"
               stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></path>
-            <path
-              d="M8 8v8m8-8v8"
-              stroke="currentColor"
-              stroke-width="2"
+              stroke-width="1.5"
               stroke-linecap="round"
               stroke-linejoin="round"></path>
           </svg>
+          <div class="absolute inset-0 bg-accent-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
-        <span class="text-lg font-bold tracking-wide navbar-brand brand-title"
-          >PIXELATED EMPATHY</span
+        <span class="text-xl font-display font-bold tracking-tight text-white group-hover:text-accent-primary transition-colors duration-300"
+          >Pixelated <span class="text-accent-primary group-hover:text-white transition-colors duration-300">Empathy</span></span
         >
       </a>
     </div>
 
-    <div class="hidden md:flex md:items-center md:space-x-6">
+    <div class="hidden md:flex md:items-center md:space-x-10">
       <nav aria-label="Main navigation">
-        <ul class="flex items-center space-x-8" role="menubar">
+        <ul class="flex items-center space-x-10" role="menubar">
           {
             navItems.map((item) => {
               const active = isActive(item.href)
@@ -90,21 +61,22 @@ const isActive = (href: string) => {
                   <a
                     href={item.href}
                     class:list={[
-                      'relative py-2 transition-colors',
+                      'relative py-2 text-sm font-mono uppercase tracking-widest transition-all duration-300',
                       active
-                        ? 'text-teal-600 font-medium'
-                        : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white',
+                        ? 'text-accent-primary'
+                        : 'text-secondary hover:text-white',
                     ]}
                     aria-current={active ? 'page' : undefined}
                     role="menuitem"
                   >
                     {item.label}
-                    {active && (
-                      <span
-                        class="absolute -bottom-1.5 left-0 w-full h-0.5 bg-teal-600 rounded-full"
-                        aria-hidden="true"
-                      />
-                    )}
+                    <span
+                      class:list={[
+                        'absolute -bottom-1 left-0 h-px bg-accent-primary transition-all duration-500',
+                        active ? 'w-full' : 'w-0 group-hover:w-full',
+                      ]}
+                      aria-hidden="true"
+                    />
                   </a>
                 </li>
               )
@@ -112,34 +84,18 @@ const isActive = (href: string) => {
           }
         </ul>
       </nav>
-      <div class="flex items-center space-x-3">
+      <div class="flex items-center space-x-6 border-l border-white/10 pl-6 ml-6">
         <ThemeSwitcher />
         <a
-          href="/login"
-          class:list={[
-            'inline-flex items-center justify-center rounded-md text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500',
-            isActive('/login')
-              ? 'text-teal-600 font-medium'
-              : 'text-gray-700 dark:text-gray-300 dark:hover:text-white hover:text-gray-900',
-          ]}
-          aria-current={isActive('/login') ? 'page' : undefined}
-        >
-          Log in
-        </a>
-        <a
           href="/signup"
-          class:list={[
-            'inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium text-white shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2',
-            isActive('/signup')
-              ? 'bg-teal-700'
-              : 'bg-teal-600 hover:bg-teal-700',
-          ]}
-          aria-current={isActive('/signup') ? 'page' : undefined}
+          class="relative group px-5 py-2 overflow-hidden rounded-md bg-white font-display font-bold text-sm text-void transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-          Sign up
+          <span class="relative z-10">Launch App</span>
+          <div class="absolute inset-0 bg-accent-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
         </a>
       </div>
     </div>
+
 
     <div class="flex md:hidden">
       <ThemeSwitcher />

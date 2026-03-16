@@ -1,271 +1,98 @@
 ---
 /**
  * Brutalist Hero Component
- * Modern + Minimalist + Brutalist aesthetic
- * Inspired by Antfu's terminal-like precision
+ * High-impact mission statement
  */
 export interface Props {
-  title?: string
-  subtitle?: string
-  ctaPrimary?: { text: string; href: string }
-  ctaSecondary?: { text: string; href: string }
-  stats?: Array<{ value: string; label: string }>
+  title?: string;
+  subtitle?: string;
+  primaryCTA?: { text: string; href: string };
+  secondaryCTA?: { text: string; href: string };
 }
 
 const {
-  title = "Pixelated Empathy",
-  subtitle = "Master mental health training with AI-powered simulations",
-  ctaPrimary = { text: "Start Training", href: "/training" },
-  ctaSecondary = { text: "View Demo", href: "/demo" },
-  stats = [
-    { value: "10K+", label: "Sessions" },
-    { value: "95%", label: "Accuracy" },
-    { value: "24/7", label: "Available" },
-  ],
-} = Astro.props
+  title = "Where Emotional Intelligence Meets Artificial Precision",
+  subtitle = "Master complex therapeutic dialogues in high-fidelity, risk-free simulations. Transform difficult conversations into clinical mastery with the Empathy Gym™.",
+  primaryCTA = { text: "Enter the Gym", href: "/training" },
+  secondaryCTA = { text: "Explore Intelligence", href: "/ai-engine" },
+} = Astro.props;
 ---
 
-<section class="hero" data-component="brutalist-hero">
-  <!-- Grid Background -->
-  <div class="hero-grid" aria-hidden="true"></div>
-  
-  <!-- Accent Line Top -->
-  <div class="hero-accent-line" aria-hidden="true"></div>
-  
-  <div class="hero-container">
-    <!-- Section Label -->
-    <div class="hero-label">
-      <span class="label-mono">// AI Training Platform</span>
+<section class="hero relative min-h-screen flex items-center pt-20 overflow-hidden" data-component="brutalist-hero">
+  <!-- Background Layer -->
+  <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 bg-void"></div>
+    <div class="absolute inset-0 opacity-40 mix-blend-screen grayscale hover:grayscale-0 transition-all duration-ultra brightness-50">
+      <img src="/assets/hero-bg.png" alt="Empathy Gym Background" class="w-full h-full object-cover" />
     </div>
-    
-    <!-- Main Title -->
-    <h1 class="hero-title">
-      <span class="hero-title-text">{title}</span>
-    </h1>
-    
-    <!-- Subtitle -->
-    <p class="hero-subtitle">{subtitle}</p>
-    
-    <!-- CTA Buttons -->
-    <div class="hero-actions">
-      <a href={ctaPrimary.href} class="btn btn-primary btn-terminal">
-        {ctaPrimary.text}
-      </a>
-      <a href={ctaSecondary.href} class="btn btn-outline">
-        {ctaSecondary.text}
-      </a>
-    </div>
-    
-    <!-- Stats Grid -->
-    {stats.length > 0 && (
-      <div class="hero-stats">
-        {stats.map((stat, index) => (
-          <div class="hero-stat" data-index={index}>
-            <span class="hero-stat-value">{stat.value}</span>
-            <span class="hero-stat-label">{stat.label}</span>
-          </div>
-        ))}
+    <!-- Grain/Noise Overlay -->
+    <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none"></div>
+    <!-- Radial Focal Glow -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"></div>
+  </div>
+
+  <div class="container relative z-10">
+    <div class="max-w-4xl">
+      <!-- Tag/Status -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft">
+        <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
+        <span class="text-[10px] font-mono uppercase tracking-widest text-accent-primary">Intelligence Engine Active // v2.4.0</span>
       </div>
-    )}
+
+      <h1 class="font-display font-black text-6xl md:text-8xl leading-tight mb-8 tracking-tighter text-white">
+        Architecting <span class="text-accent-primary">Empathy</span><br />
+        in the <span class="stark-outline">Code.</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-secondary max-w-2xl mb-12 leading-relaxed font-light">
+        {subtitle}
+      </p>
+
+      <div class="flex flex-wrap gap-6 items-center">
+        <a href={primaryCTA.href} class="btn-premium group">
+          <span class="relative z-10">{primaryCTA.text}</span>
+          <div class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"></div>
+        </a>
+        
+        <a href={secondaryCTA.href} class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline">
+          <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryCTA.text}</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="transform group-hover:translate-x-2 transition-transform">
+            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+          </svg>
+        </a>
+      </div>
+    </div>
   </div>
-  
-  <!-- Scroll Indicator -->
-  <div class="hero-scroll" aria-hidden="true">
-    <div class="hero-scroll-line"></div>
-  </div>
+
+  <!-- Perspective Grid Footer -->
+  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"></div>
 </section>
 
 <style>
-  .hero {
+  .stark-outline {
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
+    color: transparent;
+  }
+  
+  .btn-premium {
     position: relative;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: var(--space-20) var(--space-6);
-    background: var(--bg-void);
-    overflow: hidden;
-  }
-  
-  /* Grid Background */
-  .hero-grid {
-    position: absolute;
-    inset: 0;
-    background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-  }
-  
-  /* Accent Line */
-  .hero-accent-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--accent-primary) 50%,
-      transparent 100%
-    );
-    opacity: 0.5;
-  }
-  
-  /* Container */
-  .hero-container {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    width: 100%;
-    text-align: left;
-  }
-  
-  /* Label */
-  .hero-label {
-    margin-bottom: var(--space-4);
-    opacity: 0;
-    animation: slide-up 0.6s var(--ease-out) 0.1s forwards;
-  }
-  
-  /* Title */
-  .hero-title {
-    margin-bottom: var(--space-6);
-    opacity: 0;
-    animation: slide-up 0.6s var(--ease-out) 0.2s forwards;
-  }
-  
-  .hero-title-text {
-    display: block;
+    padding: 1.25rem 2.5rem;
+    background: transparent;
+    border: 1px solid var(--accent-primary);
+    color: white;
     font-family: var(--font-mono);
-    font-size: var(--text-6xl);
-    font-weight: 800;
-    line-height: var(--leading-none);
-    letter-spacing: var(--tracking-tighter);
-    color: var(--text-primary);
-  }
-  
-  /* Subtitle */
-  .hero-subtitle {
-    font-family: var(--font-sans);
-    font-size: var(--text-xl);
-    line-height: var(--leading-relaxed);
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin-bottom: var(--space-10);
-    opacity: 0;
-    animation: slide-up 0.6s var(--ease-out) 0.3s forwards;
-  }
-  
-  /* Actions */
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-4);
-    margin-bottom: var(--space-16);
-    opacity: 0;
-    animation: slide-up 0.6s var(--ease-out) 0.4s forwards;
-  }
-  
-  /* Stats Grid */
-  .hero-stats {
-    display: flex;
-    gap: var(--space-12);
-    padding-top: var(--space-8);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    opacity: 0;
-    animation: slide-up 0.6s var(--ease-out) 0.5s forwards;
-  }
-  
-  .hero-stat {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
-  }
-  
-  .hero-stat-value {
-    font-family: var(--font-mono);
-    font-size: var(--text-3xl);
+    font-size: 0.875rem;
     font-weight: 700;
-    color: var(--accent-primary);
-    line-height: var(--leading-none);
-  }
-  
-  .hero-stat-label {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: 500;
-    letter-spacing: var(--tracking-wider);
     text-transform: uppercase;
-    color: var(--text-muted);
+    letter-spacing: 0.2em;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.3s ease;
   }
   
-  /* Scroll Indicator */
-  .hero-scroll {
-    position: absolute;
-    bottom: var(--space-8);
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  .hero-scroll-line {
-    width: 1px;
-    height: 40px;
-    background: linear-gradient(
-      to bottom,
-      var(--accent-primary) 0%,
-      transparent 100%
-    );
-    opacity: 0.3;
-    animation: scroll-pulse 2s infinite;
-  }
-  
-  @keyframes scroll-pulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-  }
-  
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .hero {
-      padding: var(--space-16) var(--space-4);
-      min-height: auto;
-    }
-    
-    .hero-title-text {
-      font-size: var(--text-4xl);
-    }
-    
-    .hero-subtitle {
-      font-size: var(--text-lg);
-    }
-    
-    .hero-stats {
-      flex-direction: column;
-      gap: var(--space-6);
-    }
-    
-    .hero-actions {
-      flex-direction: column;
-    }
-    
-    .hero-actions .btn {
-      width: 100%;
-      justify-content: center;
-    }
+  .btn-premium:hover {
+    color: black;
   }
 </style>
+

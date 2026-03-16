@@ -12,9 +12,10 @@
    ================================================ */
 
 /* === FONTS === */
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
+  /* ... existing colors ... */
   /* === DEEP VOID PALETTE === */
   /* Pure blacks with purpose */
   --bg-void: #000000;
@@ -59,16 +60,24 @@
   --grid-line: 1px solid rgba(255, 255, 255, 0.03);
   --grid-line-accent: 1px solid rgba(0, 255, 136, 0.1);
 
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: JetBrains Mono - terminal precision */
+  /* Headings: Outfit - Premium, modern */
+  --font-display: "Outfit", sans-serif;
+  
+  /* Body: Outfit - consistent and clean */
+  --font-sans: "Outfit", sans-serif;
+
+  /* Technical: JetBrains Mono - terminal precision */
   --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, monospace;
 
-  /* Body: Geist Sans - clean, readable */
-  --font-sans:
-    "Geist Sans", "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Display: Outfit for that Premium feel */
+  --font-heading: var(--font-display);
 
-  /* Display: Monospace for that Antfu feel */
-  --font-display: var(--font-mono);
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.75rem);
@@ -771,32 +780,45 @@ pre {
   border: var(--border-glow);
 }
 
-/* Spacing utilities */
-.section {
-  padding: var(--space-20) 0;
-}
-.section-lg {
-  padding: var(--space-32) 0;
+/* Glassmorphism utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 }
 
-/* Display utilities */
-.hidden {
-  display: none;
+.glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 }
-.block {
-  display: block;
+
+.glass-accent {
+  background: var(--accent-primary-glow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--accent-primary-glow);
 }
-.inline-block {
-  display: inline-block;
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
-.flex {
-  display: flex;
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
-.inline-flex {
-  display: inline-flex;
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
 }
-.grid {
-  display: grid;
+
+.animate-pulse-soft {
+  animation: pulse-soft 4s ease-in-out infinite;
 }
 
 /* Flex utilities */
