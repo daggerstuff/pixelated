@@ -253,6 +253,14 @@ export default defineConfig({
       conditions: ['import', 'module', 'browser', 'default'],
     },
     ssr: {
+      noExternal: [
+        'stream-browserify',
+        'browserify-zlib',
+        'buffer',
+        'util',
+        'path-browserify',
+        'events',
+      ],
       external: [
         '@google-cloud/storage',
         '@aws-sdk/client-s3',
