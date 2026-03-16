@@ -1,3 +1,4 @@
+import type { APIRoute, APIContext } from 'astro'
 export const prerender = false
 
 export interface ChatRequest {
@@ -328,7 +329,7 @@ const CRISIS_RESOURCES = {
   ],
 }
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 function generateSessionId(): string {
   // Use cryptographically secure random bytes for session ID
@@ -390,24 +391,13 @@ function assessRisk(
   const lowerSafeMessage = safeMessage.toLowerCase()
 
   // Check for suicidal ideation (ReDoS-safe: use includes)
-  if (
-    CRISIS_PATTERNS.suicidal.some((pattern) => {
-      // Convert regex to string and match as phrase
-      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase()
-      return lowerSafeMessage.includes(phrase)
-    })
-  ) {
+  if (CRISIS_PATTERNS.suicidal.some((pattern) => pattern.test(lowerSafeMessage))) {
     suicidalIdeation = true
     crisisLevel = 'high'
   }
 
   // Check for self-harm indicators (ReDoS-safe: use includes)
-  if (
-    CRISIS_PATTERNS.selfHarm.some((pattern) => {
-      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase()
-      return lowerSafeMessage.includes(phrase)
-    })
-  ) {
+  if (CRISIS_PATTERNS.selfHarm.some((pattern) => pattern.test(lowerSafeMessage))) {
     selfHarmIndicators = true
     if (crisisLevel === 'none') {
       crisisLevel = 'moderate'
@@ -416,10 +406,7 @@ function assessRisk(
 
   // Check for immediate intent (ReDoS-safe: use includes)
   if (
-    CRISIS_PATTERNS.immediate.some((pattern) => {
-      const phrase = pattern.source.replace(/\\\w\b|\W/g, '').toLowerCase()
-      return lowerSafeMessage.includes(phrase)
-    }) &&
+    CRISIS_PATTERNS.immediate.some((pattern) => pattern.test(lowerSafeMessage)) &&
     (suicidalIdeation || selfHarmIndicators)
   ) {
     crisisLevel = 'imminent'
@@ -552,7 +539,7 @@ function extractKeyTopics(message: string): string[] {
   return topics
 }
 
-export const POST = async ({ request }: APIContext) => {
+export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now()
 
   try {

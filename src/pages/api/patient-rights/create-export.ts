@@ -1,12 +1,46 @@
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
-import { auth } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
+import type { AuthUser } from '@/lib/auth/types'
+import { query, initializeDatabase } from '@/lib/db'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 // Create a logger instance
 const logger = createBuildSafeLogger('patient-rights-export')
+
+/**
+ * Check whether a therapist/provider has an existing session with the target patient.
+ * This is the database-backed IDOR guard that replaces the stub.
+ */
+async function therapistHasSessionWithPatient(
+  therapistId: string,
+  patientId: string,
+): Promise<boolean> {
+  try {
+    await initializeDatabase()
+    const result = await query<{ exists: boolean }>(
+      `SELECT EXISTS (
+        SELECT 1 FROM sessions
+        WHERE therapist_id = $1
+          AND client_id = $2
+          AND state != 'cancelled'
+      ) AS exists`,
+      [therapistId, patientId],
+    )
+    return result.rows[0]?.exists === true
+  } catch (err) {
+    // If DB is unavailable we fail closed — deny access
+    logger.error('Failed to verify therapist-patient assignment', {
+      therapistId,
+      patientId,
+      error: err instanceof Error ? err.message : String(err),
+    })
+    return false
+  }
+}
 
 // Schema for validating the request body
 const createExportSchema = z.object({
@@ -22,23 +56,24 @@ const createExportSchema = z.object({
   includeEncryptionKey: z.boolean().optional().default(true),
 })
 
-export const POST = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     // Verify user is authenticated and authorized
-    const session = await auth.verifySession(request)
-    if (!session) {
+    const currentUser = await getCurrentUser(request)
+    if (!currentUser) {
       return new Response(
         JSON.stringify({ success: false, message: 'Unauthorized' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
+    // Resolve the full user object to check permissions
+    // currentUser from getCurrentUser only has id and role – we need permissions
+    // so we model a minimal AuthUser from the JWT claims available
+    const sessionUser = currentUser as unknown as AuthUser
+
     // Check if user has permission to create export requests
-    if (
-      !(session as unknown as AuthUser).permissions?.includes(
-        'create:data_exports',
-      )
-    ) {
+    if (!sessionUser.permissions?.includes('create:data_exports')) {
       return new Response(
         JSON.stringify({ success: false, message: 'Insufficient permissions' }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
@@ -50,16 +85,17 @@ export const POST = async ({ request }) => {
     const validationResult = createExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
+      const {fieldErrors} = validationResult.error.flatten()
       logger.warn('Invalid export request data', {
-        errors: validationResult.error.errors,
-        userId: session.userId,
+        errors: fieldErrors,
+        userId: currentUser.id,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: validationResult.error.errors,
+          errors: fieldErrors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
@@ -67,11 +103,41 @@ export const POST = async ({ request }) => {
 
     const validatedData = validationResult.data
 
+    // IDOR guard: verify the requesting user is authorized for this specific patient.
+    // Role alone is insufficient — we enforce resource-level ownership.
+    const isAdmin = currentUser.role === 'admin' || currentUser.role === 'superadmin'
+    const isSelf = currentUser.id === validatedData.patientId
+
+    // Therapists and providers must have an existing session with the patient in the DB.
+    const isTherapistOrProvider =
+      currentUser.role === 'therapist' || currentUser.role === 'provider'
+    const hasAssignedSession =
+      isTherapistOrProvider &&
+      (await therapistHasSessionWithPatient(
+        currentUser.id,
+        validatedData.patientId,
+      ))
+
+    if (!isAdmin && !isSelf && !hasAssignedSession) {
+      logger.warn('IDOR attempt blocked on export creation', {
+        requestingUserId: currentUser.id,
+        requestingRole: currentUser.role,
+        targetPatientId: validatedData.patientId,
+      })
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'You do not have permission to export data for this patient.',
+        }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+
     // Create a new export request
     const exportRequest = {
       id: randomUUID(),
       patientId: validatedData.patientId,
-      initiatedBy: session.userId,
+      initiatedBy: currentUser.id,
       initiatedDate: new Date().toISOString(),
       recipientType: validatedData.recipientType,
       recipientName: validatedData.recipientName,
@@ -91,7 +157,7 @@ export const POST = async ({ request }) => {
     logger.info('Export request created', {
       exportId: exportRequest.id,
       patientId: exportRequest.patientId,
-      userId: session.userId,
+      userId: currentUser.id,
       recipientType: exportRequest.recipientType,
       recipientEmail: exportRequest.recipientEmail,
       dataFormat: exportRequest.dataFormat,
