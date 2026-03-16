@@ -1,40 +1,107 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${GREEN}🔍 Starting Security Scan...${NC}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+AI_DIR="$ROOT_DIR/ai"
 
-# Check for pnpm
-if ! command -v pnpm &> /dev/null; then
-    echo -e "${RED}❌ pnpm is not installed. Please install pnpm.${NC}"
+echo -e "${GREEN}🔍 Starting Security Scan...${NC}"
+echo -e "${BLUE}Root: $ROOT_DIR${NC}"
+
+EXIT_CODE=0
+
+# ──────────────────────────────────────────
+# 1. Node.js / pnpm audit
+# ──────────────────────────────────────────
+echo -e "\n${YELLOW}📦 [1/3] Running pnpm audit...${NC}"
+if ! command -v pnpm &>/dev/null; then
+    echo -e "${RED}❌ pnpm is not installed.${NC}"
     exit 1
 fi
-
-echo -e "\n${YELLOW}📦 Running pnpm audit...${NC}"
-# pnpm audit failing is expected if there are vulnerabilities, but we don't want to stop the script immediately
-# unless it's critical. For now, we just report it.
-pnpm audit --prod || echo -e "${YELLOW}⚠️ Vulnerabilities found in dependencies.${NC}"
-
-echo -e "\n${YELLOW}🕵️ Checking for potential secrets in code...${NC}"
-# Simple grep to find potential secrets (API keys, tokens)
-# Exclude dist, node_modules, .git, and specific lock files
-# This is a basic check, a dedicated tool like trufflehog or git-secrets is better for prod.
-GREP_RESULTS=$(grep -rE "API_KEY|SECRET|TOKEN|PASSWORD" . \
-    --exclude-dir={node_modules,dist,.git,coverage,venv,__pycache__} \
-    --exclude={pnpm-lock.yaml,package-lock.json,yarn.lock,*.env,*.env.*} \
-    --include="*.ts" --include="*.tsx" --include="*.js" --include="*.py" \
-    | grep -v "process.env" | grep -v "os.environ" | grep -v "config" | head -n 10)
-
-if [ -n "$GREP_RESULTS" ]; then
-    echo -e "${RED}⚠️ Potential hardcoded secrets found (verifty manually):${NC}"
-    echo "$GREP_RESULTS"
+cd "$ROOT_DIR"
+if pnpm audit --prod 2>&1; then
+    echo -e "${GREEN}✅ No Node.js vulnerabilities found.${NC}"
 else
-    echo -e "${GREEN}✅ No obvious hardcoded secrets found in source files.${NC}"
+    echo -e "${RED}⚠️  Node.js vulnerabilities detected above.${NC}"
+    EXIT_CODE=1
 fi
 
-echo -e "\n${GREEN}✅ Security scan completed.${NC}"
+# ──────────────────────────────────────────
+# 2. Python audit (ai submodule)
+# ──────────────────────────────────────────
+echo -e "\n${YELLOW}🐍 [2/3] Running Python pip-audit...${NC}"
+if [ -d "$AI_DIR" ] && command -v uv &>/dev/null; then
+    cd "$AI_DIR"
+    if uv run pip-audit 2>&1; then
+        echo -e "${GREEN}✅ No Python vulnerabilities found.${NC}"
+    else
+        echo -e "${RED}⚠️  Python vulnerabilities detected above.${NC}"
+        EXIT_CODE=1
+    fi
+    cd "$ROOT_DIR"
+else
+    echo -e "${YELLOW}⚠️  ai/ dir or uv not found — skipping Python audit.${NC}"
+fi
+
+# ──────────────────────────────────────────
+# 3. Hardcoded secrets grep
+# Scans: .ts .tsx .js .mjs .cjs .py files only
+# Excludes:
+#   - GitHub Actions ${{ secrets.X }} references (safe — CI managed)
+#   - CI test env var values (pattern: *test-* or *testing*)
+#   - process.env / os.environ references (safe — runtime injected)
+#   - config/settings files
+#   - lock files / generated files
+# ──────────────────────────────────────────
+echo -e "\n${YELLOW}🕵️  [3/3] Scanning source files for hardcoded secrets...${NC}"
+cd "$ROOT_DIR"
+
+GREP_RESULTS=$(grep -rEn \
+    "(API_KEY|SECRET_KEY|ACCESS_KEY|ACCESS_TOKEN|PASSWORD|PRIVATE_KEY|AUTH_TOKEN)\s*[=:]\s*['\"][a-zA-Z0-9+/=_\-]{16,}['\"]" \
+    . \
+    --include="*.ts" \
+    --include="*.tsx" \
+    --include="*.js" \
+    --include="*.mjs" \
+    --include="*.cjs" \
+    --include="*.py" \
+    --exclude-dir=node_modules \
+    --exclude-dir=dist \
+    --exclude-dir=.git \
+    --exclude-dir=coverage \
+    --exclude-dir=__pycache__ \
+    --exclude-dir=.venv \
+    | grep -v "process\.env" \
+    | grep -v "os\.environ" \
+    | grep -v "os\.getenv" \
+    | grep -v "\${{" \
+    | grep -vE "(test|TEST|testing|TESTING|example|placeholder|your[-_]|dummy|fake|mock)" \
+    | grep -vE "^\s*(//|#|\*)" \
+    | head -n 20 || true)
+
+if [ -n "$GREP_RESULTS" ]; then
+    echo -e "${RED}🚨 Potential hardcoded secrets found — verify manually:${NC}"
+    echo "$GREP_RESULTS"
+    EXIT_CODE=1
+else
+    echo -e "${GREEN}✅ No hardcoded secrets detected in source files.${NC}"
+fi
+
+# ──────────────────────────────────────────
+# Summary
+# ──────────────────────────────────────────
+echo ""
+if [ "$EXIT_CODE" -eq 0 ]; then
+    echo -e "${GREEN}✅ All security checks passed.${NC}"
+else
+    echo -e "${RED}❌ Security scan completed with issues. Review above output.${NC}"
+fi
+
+exit "$EXIT_CODE"

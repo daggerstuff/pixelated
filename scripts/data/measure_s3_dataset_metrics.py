@@ -16,8 +16,8 @@ from botocore.exceptions import ClientError
 S3_ENDPOINT = os.getenv('OVH_S3_ENDPOINT', 'https://s3.us-east-va.io.cloud.ovh.us')
 S3_REGION = os.getenv('OVH_S3_REGION', 'us-east-va')
 S3_BUCKET = os.getenv('OVH_S3_BUCKET', 'pixel-data')
-S3_ACCESS_KEY = os.getenv('OVH_S3_ACCESS_KEY', 'b6939e6b65ef4252b20338499421a5f0')
-S3_SECRET_KEY = os.getenv('OVH_S3_SECRET_KEY', '4a7e939381c6467c88f81a5024672a96')
+S3_ACCESS_KEY = os.environ['OVH_S3_ACCESS_KEY']
+S3_SECRET_KEY = os.environ['OVH_S3_SECRET_KEY']
 
 def create_s3_client():
     """Create S3 client with OVH credentials"""

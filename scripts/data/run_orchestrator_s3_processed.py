@@ -9,8 +9,15 @@ import sys
 from pathlib import Path
 
 # Set up environment
-os.environ.setdefault('AWS_ACCESS_KEY_ID', 'b6939e6b65ef4252b20338499421a5f0')
-os.environ.setdefault('AWS_SECRET_ACCESS_KEY', '4a7e939381c6467c88f81a5024672a96')
+_ovh_access = os.getenv('OVH_S3_ACCESS_KEY')
+_ovh_secret = os.getenv('OVH_S3_SECRET_KEY')
+if not _ovh_access or not _ovh_secret:
+    raise EnvironmentError(
+        "OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY must be set in the environment. "
+        "Export them from your .env file before running this script."
+    )
+os.environ.setdefault('AWS_ACCESS_KEY_ID', _ovh_access)
+os.environ.setdefault('AWS_SECRET_ACCESS_KEY', _ovh_secret)
 os.environ.setdefault('OVH_S3_ENDPOINT', 'https://s3.us-east-va.io.cloud.ovh.us')
 os.environ.setdefault('OVH_S3_BUCKET', 'pixel-data')
 
