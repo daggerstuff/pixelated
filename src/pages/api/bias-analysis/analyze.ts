@@ -1,362 +1,149 @@
-import { randomUUID } from 'crypto'
-
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
+import { z } from 'zod'
+import {
+  initializeDatabase,
+  sessionManager,
+  biasAnalysisManager,
+  transaction,
+  createContentHash
+} from '@/lib/db'
+import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
 
-import { securityMiddleware } from '@/middleware/security'
-
-// Database connection
-const pool = new Pool({
-  host: process.env['DATABASE_HOST'] || 'localhost',
-  port: parseInt(process.env['DATABASE_PORT'] || '5432'),
-  database: process.env['DATABASE_NAME'] || 'pixelated',
-  user: process.env['DATABASE_USER'] || 'pixelated_user',
-  password: process.env['DATABASE_PASSWORD'] || 'pixelated_pass',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-})
-
-// Simple bias detection algorithm (placeholder for real ML model)
-function simpleBiasDetection(text: string): {
+/**
+ * Interface for bias results
+ */
+interface BiasAnalysisResult {
   overallBiasScore: number
   alertLevel: 'low' | 'medium' | 'high' | 'critical'
   confidence: number
-  layerResults: any
+  layerResults: Record<string, any>
+  detectedBiases: string[]
   recommendations: string[]
-} {
-  // Simple keyword-based analysis (placeholder)
-  const biasKeywords = {
-    high: ['racist', 'sexist', 'homophobic', 'transphobic', 'discriminatory'],
-    medium: ['biased', 'unfair', 'prejudiced', 'stereotypical', 'offensive'],
-    low: ['concerning', 'questionable', 'inappropriate', 'problematic'],
-  }
-
-  const textLower = text.toLowerCase()
-  let biasScore = 0
-  let foundKeywords: string[] = []
-
-  // Check for high-bias keywords
-  biasKeywords.high.forEach((keyword) => {
-    if (textLower.includes(keyword)) {
-      biasScore += 0.8
-      foundKeywords.push(keyword)
-    }
-  })
-
-  // Check for medium-bias keywords
-  biasKeywords.medium.forEach((keyword) => {
-    if (textLower.includes(keyword)) {
-      biasScore += 0.4
-      foundKeywords.push(keyword)
-    }
-  })
-
-  // Check for low-bias keywords
-  biasKeywords.low.forEach((keyword) => {
-    if (textLower.includes(keyword)) {
-      biasScore += 0.2
-      foundKeywords.push(keyword)
-    }
-  })
-
-  // Normalize score
-  biasScore = Math.min(biasScore, 1.0)
-
-  // Determine alert level
-  let alertLevel: 'low' | 'medium' | 'high' | 'critical'
-  if (biasScore >= 0.8) {
-    alertLevel = 'critical'
-  } else if (biasScore >= 0.6) {
-    alertLevel = 'high'
-  } else if (biasScore >= 0.3) {
-    alertLevel = 'medium'
-  } else {
-    alertLevel = 'low'
-  }
-
-  // Generate recommendations
-  const recommendations: string[] = []
-  if (biasScore > 0.5) {
-    recommendations.push(
-      'Consider reviewing language patterns for potential bias',
-    )
-    recommendations.push('Consult with a cultural competency expert')
-  } else if (biasScore > 0.2) {
-    recommendations.push('Monitor communication patterns in future sessions')
-    recommendations.push('Consider additional training in cultural sensitivity')
-  }
-
-  return {
-    overallBiasScore: biasScore,
-    alertLevel,
-    confidence: 0.7 + Math.random() * 0.2, // 70-90% confidence
-    layerResults: {
-      keyword_analysis: {
-        bias_score: biasScore,
-        layer: 'keyword_analysis',
-        confidence: 0.8,
-        keywords_found: foundKeywords,
-      },
-      sentiment_analysis: {
-        bias_score: Math.random() * 0.3,
-        layer: 'sentiment_analysis',
-        confidence: 0.6,
-      },
-      contextual_analysis: {
-        bias_score: Math.random() * 0.4,
-        layer: 'contextual_analysis',
-        confidence: 0.5,
-      },
-    },
-    recommendations,
-  }
 }
 
-// Add: production flag, safe headers, and error scrubbing helpers
-const isProduction = process.env.NODE_ENV === 'production'
-const SAFE_HEADERS = {
-  'Content-Type': 'application/json',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-}
+/**
+ * Validation schema for analysis request
+ */
+const AnalyzeRequestSchema = z.object({
+  text: z.string().min(1),
+  sessionId: z.string().optional(),
+  therapistId: z.string(),
+  clientId: z.string().optional(),
+  context: z.string().optional(),
+  demographics: z.record(z.string(), z.any()).optional(),
+  sessionType: z.string().optional(),
+  therapistNotes: z.string().optional()
+})
 
-function safeErrorForLogging(err: unknown) {
-  return {
-    message: err instanceof Error ? err.message : String(err),
-    stack: err instanceof Error ? err.stack : undefined,
-  }
-}
-
-// Basic scrubber: remove stack/trace-like fields from objects sent to clients
-function scrubForClient(input: unknown): unknown {
-  if (input instanceof Error) {
-    return { error: input.message }
-  }
-  if (input === null || typeof input !== 'object') return input
-  try {
-    // JSON round-trip with replacer to drop stack/trace-like keys
-    return JSON.parse(
-      JSON.stringify(input, (_key, value) => {
-        if (
-          typeof _key === 'string' &&
-          (_key.toLowerCase().includes('stack') ||
-            _key.toLowerCase().includes('trace') ||
-            _key.toLowerCase().includes('password') ||
-            _key.toLowerCase().includes('secret') ||
-            _key.toLowerCase().includes('token'))
-        ) {
-          return undefined
-        }
-        return value
-      }),
-    )
-  } catch {
-    return { error: 'An error occurred' }
-  }
-}
-
+/**
+ * POST /api/bias-analysis/analyze
+ */
 export const POST: APIRoute = async ({ request }) => {
-  // Generate unique UUIDs first
-  const analysisId = randomUUID()
-  const sessionId = randomUUID()
-  // New: per-request id for safe correlation
-  const requestId = randomUUID()
-  // Use null for therapist and client IDs since no users exist yet
-  const therapistId = null
-  const clientId = null
+  const startTime = Date.now()
 
   try {
-    // Apply security middleware
-    const securityResult = await securityMiddleware(request, {})
-    if (securityResult) {
-      return securityResult
+    // 1. Initialize and get connection
+    await initializeDatabase()
+
+    // 2. Parse request
+    const body = await request.json() as unknown
+    const validated = AnalyzeRequestSchema.safeParse(body)
+
+    if (!validated.success) {
+      return new Response(JSON.stringify({
+        error: 'Invalid request',
+        details: validated.error.format()
+      }), { status: 400 })
     }
 
-    // Parse request body
-    const body = await request.json()
-    const { text, context, demographics, sessionType, therapistNotes } = body
+    const { text, sessionId, therapistId, demographics, context, therapistNotes, clientId, sessionType } = validated.data
 
-    // Validate required fields
-    if (!text || typeof text !== 'string' || text.trim().length < 50) {
-      return new Response(
-        JSON.stringify({
-          error: 'Text is required and must be at least 50 characters',
-        }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-    }
+    // 3. Perform analysis using the real AI engine
+    const service = getOptimizedBiasDetectionService()
+    const result = await service.analyzeBias({
+      text,
+      context,
+      demographics,
+      sessionType,
+      therapistNotes,
+      therapistId,
+      clientId,
+    })
 
-    // Perform bias analysis
-    const analysisResult = simpleBiasDetection(text)
+    const contentHash = createContentHash(text, demographics ?? {})
 
-    // Store in database
-    const client = await pool.connect()
-    try {
-      await client.query('BEGIN')
-
-      // Insert session
-      await client.query(
-        `INSERT INTO sessions (
-          id, therapist_id, client_id, session_type, context,
-          started_at, state, summary
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [
-          sessionId,
+    // 4. Save to database using a transaction
+    const resultId = await transaction(async (_client) => {
+      // Create session if not provided
+      let finalSessionId = sessionId
+      if (!finalSessionId) {
+        finalSessionId = await sessionManager.createSession({
           therapistId,
           clientId,
-          sessionType || 'individual',
-          JSON.stringify({ description: context || '' }),
-          new Date(),
-          'completed',
-          therapistNotes || '',
-        ],
-      )
+          sessionType: sessionType ?? 'individual',
+          context: { description: context ?? '', therapistNotes }
+        })
+      }
 
-      // Insert bias analysis
-      await client.query(
-        `INSERT INTO bias_analyses (
-          id, session_id, therapist_id, overall_bias_score,
-          alert_level, confidence, layer_results, recommendations,
-          demographics, content_hash, processing_time_ms, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-        [
-          analysisId,
-          sessionId,
-          therapistId,
-          analysisResult.overallBiasScore,
-          analysisResult.alertLevel,
-          analysisResult.confidence,
-          JSON.stringify(analysisResult.layerResults),
-          analysisResult.recommendations, // Pass array directly for TEXT[]
-          JSON.stringify(demographics || {}),
-          `hash_${Date.now()}`, // Simple hash placeholder
-          Math.floor(Math.random() * 1000) + 500, // 500-1500ms processing time
-          new Date(),
-        ],
-      )
+      // Save analysis
+      return biasAnalysisManager.saveAnalysis({
+        sessionId: finalSessionId,
+        therapistId,
+        overallBiasScore: result.overallBiasScore,
+        alertLevel: result.alertLevel,
+        confidence: result.confidence,
+        layerResults: result.layerResults as Record<string, unknown>,
+        detectedBiases: result.detectedBiases,
+        recommendations: result.recommendations,
+        demographics: (demographics ?? {}) as Record<string, unknown>,
+        contentHash,
+        processingTimeMs: Date.now() - startTime
+      })
+    })
 
-      await client.query('COMMIT')
+    return new Response(JSON.stringify({
+      success: true,
+      data: {
+        id: resultId,
+        overallBiasScore: result.overallBiasScore,
+        alertLevel: result.alertLevel,
+        confidence: result.confidence,
+        layerResults: result.layerResults,
+        detectedBiases: result.detectedBiases,
+        recommendations: result.recommendations,
+        processingTimeMs: Date.now() - startTime
+      }
+    }), { status: 200 })
 
-      // Return successful response
-      return new Response(
-        JSON.stringify({
-          success: true,
-          analysis: {
-            id: analysisId,
-            sessionId,
-            ...analysisResult,
-            demographics: demographics || {},
-            sessionType: sessionType || 'individual',
-            processingTimeMs: Math.floor(Math.random() * 1000) + 500,
-            createdAt: new Date().toISOString(),
-          },
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-    } catch (dbError) {
-      await client.query('ROLLBACK')
-      throw dbError
-    } finally {
-      client.release()
-    }
-  } catch (error) {
-    // Log safe error server-side (includes stack for internal debugging)
-    console.error(
-      `Bias analysis POST error - requestId=${requestId}`,
-      safeErrorForLogging(error),
-    )
-
-    const clientMessage = isProduction
-      ? 'An internal error occurred. Provide the requestId to support for details.'
-      : error instanceof Error
-        ? error.message
-        : String(error)
-
-    return new Response(
-      JSON.stringify(
-        scrubForClient({
-          error: 'Internal server error',
-          message: clientMessage,
-          requestId,
-        }),
-      ),
-      {
-        status: 500,
-        headers: SAFE_HEADERS,
-      },
-    )
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Bias analysis failed:', error)
+    return new Response(JSON.stringify({
+      error: 'Analysis failed',
+      message
+    }), { status: 500 })
   }
 }
 
-export const GET: APIRoute = async ({ request }) => {
-  // New: per-request id for safe correlation
-  const requestId = randomUUID()
+/**
+ * GET summary of results
+ */
+export const GET: APIRoute = async ({ url }) => {
+  const therapistId = url.searchParams.get('therapistId')
+  
+  if (!therapistId) {
+    return new Response(JSON.stringify({ error: 'therapistId required' }), { status: 400 })
+  }
 
   try {
-    // Apply security middleware
-    const securityResult = await securityMiddleware(request, {})
-    if (securityResult) {
-      return securityResult
-    }
-
-    // Test database connection
-    const client = await pool.connect()
-    try {
-      const result = await client.query(
-        'SELECT COUNT(*) as analysis_count FROM bias_analyses',
-      )
-      const analysisCount = result.rows[0].analysis_count
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: 'Bias analysis API is operational',
-          stats: {
-            totalAnalyses: parseInt(analysisCount),
-            databaseStatus: 'connected',
-          },
-        }),
-        {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-    } finally {
-      client.release()
-    }
-  } catch (error) {
-    // Log safe error server-side (includes stack for internal debugging)
-    console.error(
-      `API status check error - requestId=${requestId}`,
-      safeErrorForLogging(error),
-    )
-
-    const clientMessage = isProduction
-      ? 'An internal error occurred. Provide the requestId to support for details.'
-      : error instanceof Error
-        ? error.message
-        : String(error)
-
-    return new Response(
-      JSON.stringify(
-        scrubForClient({
-          error: 'Service unavailable',
-          message: clientMessage,
-          requestId,
-        }),
-      ),
-      {
-        status: 503,
-        headers: SAFE_HEADERS,
-      },
-    )
+    await initializeDatabase()
+    const summary = await biasAnalysisManager.getBiasSummary(therapistId)
+    
+    return new Response(JSON.stringify({
+      success: true,
+      data: summary
+    }), { status: 200 })
+  } catch (error: any) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
   }
 }
