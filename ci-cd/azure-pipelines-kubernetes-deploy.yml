@@ -31,7 +31,7 @@ variables:
   - name: ACR_REPO
     value: pixelatedempathy
   - name: CHART_DIR
-    value: ai/infra/cloud/helm/pixelated-empathy
+    value: ai/infrastructure/helm/pixelated-empathy
   - name: ACR_LOGIN_SERVER
     value: $(ACR_NAME).azurecr.io
 
