@@ -3,7 +3,7 @@
  * High-performance API with caching, connection pooling, and response optimization
  */
 
-import { randomUUID } from 'crypto'
+import { randomUUID } from 'node:crypto'
 
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
@@ -12,7 +12,7 @@ import { getLogger } from '@/lib/logging'
 import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
 import { securityMiddleware } from '@/middleware/security'
 
-const logger = getLogger('bias-analysis-api')
+const logger = getLogger({ prefix: 'bias-analysis-api' })
 
 // Request validation schema
 const AnalyzeBiasRequestSchema = z.object({
@@ -68,7 +68,7 @@ function safeErrorForLogging(err: unknown) {
 // Add: scrub responses before sending to clients to avoid exposing stack traces or sensitive fields
 function scrubForClient(input: unknown): unknown {
   const seen = new WeakSet()
-  function scrub(value: any): any {
+  const scrub = (value: any): any => {
     if (value === null || typeof value !== 'object') {
       return value
     }
@@ -76,7 +76,9 @@ function scrubForClient(input: unknown): unknown {
     seen.add(value)
 
     if (Array.isArray(value)) {
-      return value.map(scrub)
+      return value
+        .map((v) => scrub(v))
+        .filter((v) => v !== undefined)
     }
 
     const out: Record<string, unknown> = {}
@@ -102,7 +104,10 @@ function scrubForClient(input: unknown): unknown {
         // Truncate very long strings to avoid leaking data
         out[key] = val.length > 1000 ? val.slice(0, 1000) + '...' : val
       } else {
-        out[key] = scrub(val)
+        const scrubbed = scrub(val)
+        if (scrubbed !== undefined) {
+          out[key] = scrubbed
+        }
       }
     }
     return out
@@ -111,9 +116,24 @@ function scrubForClient(input: unknown): unknown {
   return scrub(input)
 }
 
+// Required environment variables for the service
+const REQUIRED_ENV_VARS = ['DB_HOST', 'REDIS_HOST']
+
 export const POST: APIRoute = async ({ request }) => {
   const requestId = randomUUID()
   const startTime = Date.now()
+
+  // Validate environment configuration
+  const missingVars = REQUIRED_ENV_VARS.filter(v => !process.env[v])
+  if (missingVars.length > 0) {
+    logger.error('Missing critical environment variables', { requestId, missingVars })
+    if (isProduction) {
+      return new Response(
+        JSON.stringify({ error: 'Service configuration error', requestId }),
+        { status: 500, headers: CACHE_HEADERS }
+      )
+    }
+  }
 
   const metrics: PerformanceMetrics = {
     requestId,
@@ -161,6 +181,7 @@ export const POST: APIRoute = async ({ request }) => {
               })),
             }),
           ),
+          { status: 400, headers: CACHE_HEADERS },
         )
       }
 
@@ -455,6 +476,7 @@ export const PUT: APIRoute = async ({ request }) => {
               })),
             }),
           ),
+          { status: 400, headers: CACHE_HEADERS },
         )
       }
 

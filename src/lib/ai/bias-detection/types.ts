@@ -302,6 +302,9 @@ export interface PreprocessingLayerResult {
   }
   dataQualityMetrics: DataQualityMetrics
   recommendations: string[]
+  detectedBiases: string[]
+  fallbackMode?: boolean
+  serviceError?: string
 }
 
 export interface ModelLevelLayerResult {
@@ -310,6 +313,9 @@ export interface ModelLevelLayerResult {
   performanceMetrics: ModelPerformanceMetrics
   groupPerformanceComparison: GroupPerformanceComparison[]
   recommendations: string[]
+  detectedBiases: string[]
+  fallbackMode?: boolean
+  serviceError?: string
 }
 
 export interface InteractiveLayerResult {
@@ -323,6 +329,9 @@ export interface InteractiveLayerResult {
   featureImportance: any[]
   whatIfScenarios: any[]
   recommendations: string[]
+  detectedBiases: string[]
+  fallbackMode?: boolean
+  serviceError?: string
 }
 
 export interface EvaluationLayerResult {
@@ -347,6 +356,9 @@ export interface EvaluationLayerResult {
     interventionEffectiveness: any[]
   }
   recommendations: string[]
+  detectedBiases: string[]
+  fallbackMode?: boolean
+  serviceError?: string
 }
 
 export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>

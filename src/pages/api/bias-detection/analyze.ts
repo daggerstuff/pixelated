@@ -1,28 +1,8 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+import { OptimizedBiasDetectionService } from '../../../lib/services/bias-detection-optimized'
 
 const logger = createBuildSafeLogger('bias-detection-api')
-
-// Mock analysis result matching test expectations
-const mockAnalysisResult = {
-  sessionId: '123e4567-e89b-12d3-a456-426614174000',
-  overallScore: 0.75,
-  riskLevel: 'medium',
-  demographicAnalysis: {},
-  layerAnalysis: [],
-  recommendations: [
-    'Consider cultural sensitivity in diagnostic approach',
-    'Review intervention selection for demographic appropriateness',
-  ],
-}
-
-const mockGetAnalysisResult = {
-  sessionId: '123e4567-e89b-12d3-a456-426614174000',
-  overallScore: 0.65,
-  riskLevel: 'medium',
-  demographicAnalysis: {},
-  layerAnalysis: [],
-  recommendations: ['Review cultural considerations'],
-}
+const biasDetectionService = OptimizedBiasDetectionService.getInstance()
 
 const buildHeadersMap = (headers?: HeadersInit): Map<string, string> => {
   const headerMap = new Map<string, string>()
@@ -123,41 +103,18 @@ export const POST = async ({
   const startTime = Date.now()
 
   try {
-    // Parse request body (be permissive for tests)
-    let body
-    try {
-      body = await request.json()
-    } catch {
-      // If JSON parsing fails, return error
-      const processingTime = Math.max(Date.now() - startTime, 1)
+    // Parse request body
+    const body = await request.json()
 
-      return createResponse(
-        JSON.stringify({
-          success: false,
-          error: 'Analysis Failed',
-          message: 'Invalid JSON',
-          processingTime,
-        }),
-        {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Processing-Time': processingTime.toString(),
-            'X-Cache': 'MISS',
-          },
-        },
-      )
-    }
-
-    // Basic validation (only check for completely empty body)
-    if (!body || Object.keys(body).length === 0) {
+    // Validation
+    if (!body || (!body.content && !body.text)) {
       const processingTime = Math.max(Date.now() - startTime, 1)
 
       return createResponse(
         JSON.stringify({
           success: false,
           error: 'Bad Request',
-          message: 'Invalid request format',
+          message: 'Content is required',
           processingTime,
         }),
         {
@@ -171,13 +128,32 @@ export const POST = async ({
       )
     }
 
+    const text = body.content || body.text
+    const therapistId = body.therapistId || 'default-therapist'
+    const sessionId = body.sessionId || 'default-session'
+
+    // Perform real analysis — forward sessionId so a caller's existing
+    // session is honoured rather than silently replaced with a new UUID.
+    const result = await biasDetectionService.analyzeBias({
+      text,
+      therapistId,
+      sessionId: sessionId !== 'default-session' ? sessionId : undefined,
+    })
+
     const processingTime = Math.max(Date.now() - startTime, 1)
 
     return createResponse(
       JSON.stringify({
         success: true,
-        data: mockAnalysisResult,
-        cacheHit: false, // Match test expectations
+        data: {
+          sessionId: result.sessionId,
+          overallScore: result.overallBiasScore,
+          riskLevel: result.alertLevel,
+          demographicAnalysis: {},
+          layerAnalysis: result.layerResults,
+          recommendations: result.recommendations,
+        },
+        cacheHit: result.cached,
         processingTime,
       }),
       {
@@ -185,7 +161,7 @@ export const POST = async ({
         headers: {
           'Content-Type': 'application/json',
           'X-Processing-Time': processingTime.toString(),
-          'X-Cache': 'MISS',
+          'X-Cache': result.cached ? 'HIT' : 'MISS',
         },
       },
     )
@@ -222,21 +198,39 @@ export const GET = async ({
 
   try {
     const url = new URL(request.url)
-    const sessionId = url.searchParams.get('sessionId')
+    const therapistId = url.searchParams.get('therapistId')
 
-    // Use the provided sessionId or default
-    const result = {
-      ...mockGetAnalysisResult,
-      sessionId: sessionId || mockGetAnalysisResult.sessionId,
+    if (!therapistId) {
+      return createResponse(
+        JSON.stringify({
+          success: false,
+          error: 'Bad Request',
+          message: 'therapistId is required',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
     }
+
+    const days = parseInt(url.searchParams.get('days') || '30', 10)
+
+    // Get real summary
+    const summary = await biasDetectionService.getBiasSummary(
+      therapistId,
+      days,
+    )
 
     const processingTime = Math.max(Date.now() - startTime, 1)
 
     return createResponse(
       JSON.stringify({
         success: true,
-        data: result,
-        cacheHit: true, // Mock always returns cache hit
+        data: summary,
+        cacheHit: true,
         processingTime,
       }),
       {
@@ -271,3 +265,4 @@ export const GET = async ({
     )
   }
 }
+
