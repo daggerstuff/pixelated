@@ -3,14 +3,15 @@
  * High-performance bias analysis with caching, connection pooling, and ML model optimization
  */
 
-import { randomUUID } from 'crypto'
-import { performance } from 'perf_hooks'
+import { randomUUID } from 'node:crypto'
+import { performance } from 'node:perf_hooks'
 
-import { getCache } from '@/lib/cache/redis-cache'
-import { getPool, createContentHash, BiasAnalysisManager } from '@/lib/db'
-import { getLogger } from '@/lib/logging'
+import { BiasDetectionEngine } from '../ai/bias-detection/BiasDetectionEngine'
+import { getCache } from '../cache/redis-cache'
+import { getPool, createContentHash, biasAnalysisManager, initializeDatabase } from '../db'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
-const logger = getLogger('bias-detection')
+const logger = createBuildSafeLogger('bias-detection-service')
 
 // Performance configuration
 const PERFORMANCE_CONFIG = {
@@ -24,29 +25,39 @@ const PERFORMANCE_CONFIG = {
 
   // Database query timeouts
   QUERY_TIMEOUTS: {
-    ANALYSIS_INSERT: 5000, // 5 seconds
-    CACHE_LOOKUP: 1000, // 1 second
-    SUMMARY_QUERY: 3000, // 3 seconds
+    ANALYSIS_INSERT: 5000, 
+    CACHE_LOOKUP: 1000,
+    SUMMARY_QUERY: 3000,
   },
 
   // ML model optimization
   ML_CONFIG: {
     BATCH_SIZE: 10,
     MAX_CONCURRENT: 5,
-    TIMEOUT_MS: 30000, // 30 seconds
+    TIMEOUT_MS: 30000,
   },
 }
 
 // Optimized bias detection with caching and connection pooling
 export class OptimizedBiasDetectionService {
+  private static instance: OptimizedBiasDetectionService
   private cache = getCache()
-  private biasManager = new BiasAnalysisManager()
+
+  private constructor() {}
+
+  public static getInstance(): OptimizedBiasDetectionService {
+    if (!OptimizedBiasDetectionService.instance) {
+      OptimizedBiasDetectionService.instance = new OptimizedBiasDetectionService()
+    }
+    return OptimizedBiasDetectionService.instance
+  }
 
   /**
    * Perform high-performance bias analysis with intelligent caching
    */
   async analyzeBias(params: {
     text: string
+    sessionId?: string
     context?: string
     demographics?: any
     sessionType?: string
@@ -60,6 +71,7 @@ export class OptimizedBiasDetectionService {
     alertLevel: 'low' | 'medium' | 'high' | 'critical'
     confidence: number
     layerResults: any
+    detectedBiases: string[]
     recommendations: string[]
     demographics: any
     sessionType: string
@@ -69,7 +81,9 @@ export class OptimizedBiasDetectionService {
   }> {
     const startTime = performance.now()
     const analysisId = randomUUID()
-    const sessionId = randomUUID()
+    // Honour a caller-provided sessionId (e.g. from an existing session),
+    // fall back to a fresh UUID only when none was supplied.
+    const sessionId = params.sessionId ?? randomUUID()
 
     try {
       // Generate content hash for caching
@@ -135,7 +149,12 @@ export class OptimizedBiasDetectionService {
       return {
         id: analysisId,
         sessionId,
-        ...analysisResult,
+        overallBiasScore: analysisResult.overallBiasScore,
+        alertLevel: analysisResult.alertLevel,
+        confidence: analysisResult.confidence,
+        layerResults: analysisResult.layerResults,
+        detectedBiases: analysisResult.detectedBiases,
+        recommendations: analysisResult.recommendations,
         demographics: params.demographics || {},
         sessionType: params.sessionType || 'individual',
         processingTimeMs: totalProcessingTime,
@@ -173,187 +192,153 @@ export class OptimizedBiasDetectionService {
     }
   }
 
+  private engine = new BiasDetectionEngine()
+
   /**
-   * High-performance bias analysis with optimized algorithms
+   * High-performance bias analysis using the real AI engine
    */
   private async performOptimizedAnalysis(text: string): Promise<{
     overallBiasScore: number
     alertLevel: 'low' | 'medium' | 'high' | 'critical'
     confidence: number
     layerResults: any
+    detectedBiases: string[]
     recommendations: string[]
   }> {
-    // Use optimized keyword matching with pre-compiled patterns
-    const biasPatterns = this.getOptimizedBiasPatterns()
+    if (!this.engine) {
+      this.engine = new BiasDetectionEngine()
+    }
 
-    const textLower = text.toLowerCase()
-    let biasScore = 0
-    let foundPatterns: string[] = []
-    let confidence = 0.7
+    try {
+      // Build a minimal TherapeuticSession for the engine
+      const session = {
+        sessionId: randomUUID(),
+        sessionDate: new Date().toISOString(),
+        participantDemographics: {
+          age: 'unknown',
+          gender: 'unknown',
+          ethnicity: 'unknown',
+          primaryLanguage: 'en',
+        },
+        scenario: { scenarioId: 'ad-hoc', type: 'general-wellness' as const },
+        content: { transcript: text, aiResponses: [], userInputs: [text] },
+        aiResponses: [],
+        expectedOutcomes: [],
+        transcripts: [],
+        userInputs: [text],
+        metadata: {
+          sessionType: 'individual' as const,
+          platform: 'web',
+          modelVersion: '1.0',
+          evaluationMode: false,
+          sessionStartTime: new Date(),
+          sessionEndTime: new Date(),
+        },
+        timestamp: new Date(),
+      }
 
-    // Parallel pattern matching for better performance
-    const patternPromises = biasPatterns.map(async (pattern) => {
-      const matches = textLower.match(pattern.regex)
-      if (matches) {
-        return {
-          pattern: pattern.name,
-          score:
-            pattern.weight * (matches.length / Math.max(text.length / 100, 1)),
-          matches: matches.length,
+      const result = await this.engine.analyzeSession(session)
+
+      // Extract detected biases from layer results (not a top-level field on AnalysisResult)
+      const detectedBiases: string[] = []
+      const lr = result.layerResults as Record<string, any> | null | undefined
+      if (lr != null) {
+        for (const layer of Object.values(lr)) {
+          if (layer && Array.isArray(layer.detectedBiases)) {
+            detectedBiases.push(...(layer.detectedBiases as string[]))
+          }
         }
       }
-      return null
-    })
 
-    const patternResults = await Promise.all(patternPromises)
-
-    // Aggregate results
-    patternResults.forEach((result) => {
-      if (result) {
-        biasScore += result.score
-        foundPatterns.push(result.pattern)
+      return {
+        overallBiasScore: result.overallBiasScore,
+        alertLevel: result.alertLevel as 'low' | 'medium' | 'high' | 'critical',
+        confidence: result.confidence,
+        layerResults: result.layerResults,
+        detectedBiases: [...new Set(detectedBiases)],
+        recommendations: result.recommendations,
       }
-    })
-
-    // Normalize score
-    biasScore = Math.min(biasScore, 1.0)
-
-    // Determine alert level
-    let alertLevel: 'low' | 'medium' | 'high' | 'critical'
-    if (biasScore >= 0.8) {
-      alertLevel = 'critical'
-      confidence = 0.9
-    } else if (biasScore >= 0.6) {
-      alertLevel = 'high'
-      confidence = 0.85
-    } else if (biasScore >= 0.3) {
-      alertLevel = 'medium'
-      confidence = 0.75
-    } else {
-      alertLevel = 'low'
-      confidence = 0.8
+    } catch (error) {
+      logger.error('Engine analysis failed', {
+        error: error instanceof Error ? error.message : String(error),
+      })
+      throw error
     }
+  }
 
-    // Generate recommendations
-    const recommendations = this.generateOptimizedRecommendations(
-      biasScore,
-      foundPatterns,
+
+  /**
+   * Insert (or skip) the session row for this analysis.
+   * Uses ON CONFLICT DO NOTHING so repeated calls with the same session ID are idempotent.
+   */
+  private async insertSessionRecord(
+    client: import('pg').PoolClient,
+    data: Pick<
+      Parameters<OptimizedBiasDetectionService['storeAnalysisResults']>[0],
+      'sessionId' | 'therapistId' | 'clientId' | 'sessionType'
+    >,
+  ): Promise<void> {
+    // therapist_id is NOT NULL in the schema; skip the row when we have no therapist.
+    if (!data.therapistId) return
+
+    await client.query(
+      `INSERT INTO sessions (
+        id, therapist_id, client_id, session_type, context,
+        started_at, state, summary
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (id) DO NOTHING`,
+      [
+        data.sessionId,
+        data.therapistId,
+        data.clientId,
+        data.sessionType,
+        JSON.stringify({ description: '' }),
+        new Date(),
+        'completed',
+        '',
+      ],
     )
-
-    return {
-      overallBiasScore: Math.round(biasScore * 1000) / 1000, // 3 decimal places
-      alertLevel,
-      confidence: Math.round(confidence * 100) / 100, // 2 decimal places
-      layerResults: {
-        pattern_analysis: {
-          bias_score: biasScore,
-          layer: 'pattern_analysis',
-          confidence: confidence,
-          patterns_found: foundPatterns,
-          processing_time_ms: Math.random() * 50 + 10, // 10-60ms
-        },
-        semantic_analysis: {
-          bias_score: Math.random() * 0.3,
-          layer: 'semantic_analysis',
-          confidence: 0.6,
-          processing_time_ms: Math.random() * 30 + 20, // 20-50ms
-        },
-        contextual_analysis: {
-          bias_score: Math.random() * 0.4,
-          layer: 'contextual_analysis',
-          confidence: 0.5,
-          processing_time_ms: Math.random() * 40 + 15, // 15-55ms
-        },
-      },
-      recommendations,
-    }
   }
 
   /**
-   * Optimized bias patterns with pre-compiled regex
+   * Insert the bias analysis row.
    */
-  private getOptimizedBiasPatterns(): Array<{
-    name: string
-    regex: RegExp
-    weight: number
-  }> {
-    return [
-      // High-bias patterns
-      {
-        name: 'racist_language',
-        regex: /\b(racist|racism|discrimination|racial)\b/gi,
-        weight: 0.8,
-      },
-      {
-        name: 'sexist_language',
-        regex: /\b(sexist|sexism|misogyny|chauvinist)\b/gi,
-        weight: 0.8,
-      },
-      {
-        name: 'homophobic_language',
-        regex: /\b(homophobic|homophobia|anti-gay)\b/gi,
-        weight: 0.8,
-      },
-
-      // Medium-bias patterns
-      {
-        name: 'biased_language',
-        regex: /\b(biased|prejudiced|stereotypical|offensive)\b/gi,
-        weight: 0.4,
-      },
-      {
-        name: 'unfair_language',
-        regex: /\b(unfair|unjust|discriminatory)\b/gi,
-        weight: 0.4,
-      },
-
-      // Low-bias patterns
-      {
-        name: 'concerning_language',
-        regex: /\b(concerning|questionable|inappropriate|problematic)\b/gi,
-        weight: 0.2,
-      },
-    ]
+  private async insertAnalysisRecord(
+    client: import('pg').PoolClient,
+    data: Omit<
+      Parameters<OptimizedBiasDetectionService['storeAnalysisResults']>[0],
+      'sessionType'
+    >,
+  ): Promise<void> {
+    await client.query(
+      `INSERT INTO bias_analyses (
+        id, session_id, therapist_id, overall_bias_score,
+        alert_level, confidence, layer_results, detected_biases, recommendations,
+        demographics, content_hash, processing_time_ms, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+      [
+        data.analysisId,
+        data.sessionId,
+        data.therapistId,
+        data.overallBiasScore,
+        data.alertLevel,
+        data.confidence,
+        JSON.stringify(data.layerResults),
+        data.detectedBiases,
+        data.recommendations,
+        JSON.stringify(data.demographics),
+        data.contentHash,
+        data.processingTimeMs,
+        new Date(),
+      ],
+    )
   }
 
   /**
-   * Generate optimized recommendations based on bias score
-   */
-  private generateOptimizedRecommendations(
-    biasScore: number,
-    patterns: string[],
-  ): string[] {
-    const recommendations: string[] = []
-
-    if (biasScore > 0.7) {
-      recommendations.push('Immediate review recommended: High bias detected')
-      recommendations.push('Consult with cultural competency specialist')
-      recommendations.push('Consider additional bias training')
-    } else if (biasScore > 0.4) {
-      recommendations.push('Monitor communication patterns')
-      recommendations.push('Review language for potential bias')
-      recommendations.push('Consider cultural sensitivity training')
-    } else if (biasScore > 0.2) {
-      recommendations.push('Continue monitoring for patterns')
-      recommendations.push('Maintain awareness of cultural differences')
-    }
-
-    // Add pattern-specific recommendations
-    if (patterns.includes('racist_language')) {
-      recommendations.push('Review racial sensitivity guidelines')
-    }
-    if (patterns.includes('sexist_language')) {
-      recommendations.push('Review gender equality principles')
-    }
-    if (patterns.includes('homophobic_language')) {
-      recommendations.push('Review LGBTQ+ inclusion guidelines')
-    }
-
-    return recommendations.slice(0, 3) // Limit to 3 recommendations
-  }
-
-  /**
-   * Store analysis results with optimized database operations
+   * Store analysis results with optimized database operations.
+   * Orchestrates session + analysis inserts inside a single transaction
+   * with a hard timeout; destroys the connection on timeout rather than
+   * recycling it to prevent pool corruption.
    */
   private async storeAnalysisResults(data: {
     analysisId: string
@@ -364,78 +349,52 @@ export class OptimizedBiasDetectionService {
     alertLevel: string
     confidence: number
     layerResults: any
+    detectedBiases: string[]
     recommendations: string[]
     demographics: any
     sessionType: string
     contentHash: string
     processingTimeMs: number
   }): Promise<void> {
+    await initializeDatabase()
     const pool = getPool()
     const client = await pool.connect()
-
+    let timeoutHandle: NodeJS.Timeout | undefined
+    let timedOut = false
     try {
       await client.query('BEGIN')
 
-      // Insert session with timeout
-      const sessionPromise = client.query(
-        `INSERT INTO sessions (
-          id, therapist_id, client_id, session_type, context,
-          started_at, state, summary
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-        [
-          data.sessionId,
-          data.therapistId,
-          data.clientId,
-          data.sessionType,
-          JSON.stringify({ description: '' }),
-          new Date(),
-          'completed',
-          '',
-        ],
-      )
-
-      // Insert bias analysis with timeout
-      const analysisPromise = client.query(
-        `INSERT INTO bias_analyses (
-          id, session_id, therapist_id, overall_bias_score,
-          alert_level, confidence, layer_results, recommendations,
-          demographics, content_hash, processing_time_ms, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
-        [
-          data.analysisId,
-          data.sessionId,
-          data.therapistId,
-          data.overallBiasScore,
-          data.alertLevel,
-          data.confidence,
-          JSON.stringify(data.layerResults),
-          data.recommendations,
-          JSON.stringify(data.demographics),
-          data.contentHash,
-          data.processingTimeMs,
-          new Date(),
-        ],
-      )
-
-      // Race both operations with timeout
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(
           () => reject(new Error('Database operation timeout')),
           PERFORMANCE_CONFIG.QUERY_TIMEOUTS.ANALYSIS_INSERT,
-        ),
-      )
+        )
+      })
 
-      await Promise.race([
-        Promise.all([sessionPromise, analysisPromise]),
-        timeoutPromise,
-      ])
-
-      await client.query('COMMIT')
-    } catch (error) {
-      await client.query('ROLLBACK')
-      throw error
+      try {
+        await Promise.race([
+          Promise.all([
+            this.insertSessionRecord(client, data),
+            this.insertAnalysisRecord(client, data),
+          ]),
+          timeoutPromise,
+        ])
+        await client.query('COMMIT')
+      } catch (error) {
+        if ((error as Error).message === 'Database operation timeout') {
+          // In-flight queries are still running on this connection — do not
+          // attempt ROLLBACK (would cause pg sync errors). Mark for destruction.
+          timedOut = true
+        } else {
+          try { await client.query('ROLLBACK') } catch { /* best-effort */ }
+        }
+        throw error
+      } finally {
+        if (timeoutHandle !== undefined) clearTimeout(timeoutHandle)
+      }
     } finally {
-      client.release()
+      // Destroy connection on timeout; recycle normally otherwise.
+      client.release(timedOut)
     }
   }
 
@@ -477,13 +436,18 @@ export class OptimizedBiasDetectionService {
 
     try {
       // Check cache first
-      const cached = await this.cache.get(cacheKey)
-      if (cached) {
+      const cached = (await this.cache.get(cacheKey)) as any
+      if (
+        cached &&
+        typeof cached === 'object' &&
+        'total_analyses' in cached &&
+        'avg_bias_score' in cached
+      ) {
         return cached
       }
 
       // Get from database with timeout
-      const summaryPromise = this.biasManager.getBiasSummary(therapistId, days)
+      const summaryPromise = biasAnalysisManager.getBiasSummary(therapistId, days)
       const timeoutPromise = new Promise<null>((resolve) =>
         setTimeout(
           () => resolve(null),
@@ -601,16 +565,10 @@ export class OptimizedBiasDetectionService {
   }
 }
 
-// Singleton instance
-let biasDetectionService: OptimizedBiasDetectionService | null = null
-
 export function getOptimizedBiasDetectionService(): OptimizedBiasDetectionService {
-  if (!biasDetectionService) {
-    biasDetectionService = new OptimizedBiasDetectionService()
-  }
-  return biasDetectionService
+  return OptimizedBiasDetectionService.getInstance()
 }
 
 export function createOptimizedBiasDetectionService(): OptimizedBiasDetectionService {
-  return new OptimizedBiasDetectionService()
+  return OptimizedBiasDetectionService.getInstance()
 }
