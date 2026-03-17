@@ -67,6 +67,7 @@ export interface AuthEnvironmentVariables {
 export interface AIEnvironmentVariables {
   readonly OPENAI_API_KEY?: ApiKey | undefined
   readonly ANTHROPIC_API_KEY?: ApiKey | undefined
+  readonly JIGSAWSTACK_API_KEY?: ApiKey | undefined
   readonly GOOGLE_AI_API_KEY?: ApiKey | undefined
   readonly HUGGING_FACE_API_KEY?: ApiKey | undefined
 }
