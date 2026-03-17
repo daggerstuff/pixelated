@@ -4,7 +4,6 @@ import json from '@eslint/json'
 import markdown from '@eslint/markdown'
 import pluginAstro from 'eslint-plugin-astro'
 import pluginJsxA11y from 'eslint-plugin-jsx-a11y'
-import pluginNode from 'eslint-plugin-node'
 import pluginReact from 'eslint-plugin-react'
 import pluginReactHooks from 'eslint-plugin-react-hooks'
 import pluginVitest from 'eslint-plugin-vitest'
@@ -243,16 +242,6 @@ export default tseslint.config(
     },
   },
 
-  // Node.js configuration
-  {
-    files: ['**/*.{js,mjs,cjs}'],
-    plugins: {
-      node: pluginNode,
-    },
-    rules: {
-      ...pluginNode.configs.recommended.rules,
-    },
-  },
 
   // Vitest configuration
   {
