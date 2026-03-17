@@ -52,6 +52,7 @@ const envSchema = z.object({
   OPENAI_BASE_URL: z.string().url().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   TOGETHER_API_KEY: z.string().optional(),
+  JIGSAWSTACK_API_KEY: z.string().optional(),
   GOOGLE_API_KEY: z.string().optional(),
   REPLICATE_API_TOKEN: z.string().optional(),
 
@@ -181,6 +182,7 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
     'JWT_SECRET',
     'OPENAI_API_KEY',
     'TOGETHER_API_KEY',
+    'JIGSAWSTACK_API_KEY',
     'GOOGLE_API_KEY',
     'REPLICATE_API_TOKEN',
     'AXIOM_TOKEN',
@@ -299,6 +301,7 @@ export const config = {
     openAiBaseUrl: (): string | undefined => env().OPENAI_BASE_URL,
     anthropicApiKey: (): string | undefined => env().ANTHROPIC_API_KEY,
     togetherApiKey: (): string | undefined => env().TOGETHER_API_KEY,
+    jigsawstackApiKey: (): string | undefined => env().JIGSAWSTACK_API_KEY,
     googleApiKey: (): string | undefined => env().GOOGLE_API_KEY,
     replicateToken: (): string | undefined => env().REPLICATE_API_TOKEN,
 

@@ -17,6 +17,9 @@ export * from './bias-detection/performance-monitor'
 export * from './datasets/prepare-fine-tuning'
 export * from './datasets/merge-datasets'
 
+// Web Scraping
+export * from './services/jigsawstack-web-scraper'
+
 // Mental Health AI
 export type { AIMessage } from './types'
 export type { CrisisDetectionResult } from './crisis/types'
