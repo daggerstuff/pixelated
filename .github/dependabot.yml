@@ -14,7 +14,7 @@ updates:
     pull-request-branch-name:
       separator: '/'
     ignore:
-      - dependency-name: 'CopilotC-Nigam/copilot-review-action'
+      - dependency-name: 'copilotc-nigam/copilot-pr-review'
     groups:
       github-actions:
         patterns:
