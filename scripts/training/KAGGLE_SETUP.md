@@ -85,7 +85,7 @@ python scripts/training/merge_lora.py \
   --output ./merged-pixelated-v2
 
 # Run evaluation
-modal run ai/modal_app.py
+modal run ai/deployment/modal_app.py
 ```
 
 ---
