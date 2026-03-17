@@ -4,7 +4,9 @@ Configuration management for multi-modal bias detection service
 
 from functools import lru_cache
 
-from pydantic import BaseSettings, Field, validator
+from pydantic_settings import BaseSettings
+from pydantic import Field
+from pydantic import field_validator
 from pydantic.networks import RedisDsn, PostgresDsn
 
 
@@ -106,7 +108,7 @@ class Settings(BaseSettings):
     enable_async_processing: bool = Field(default=True, env="ENABLE_ASYNC_PROCESSING")
     enable_gpu_acceleration: bool = Field(default=True, env="ENABLE_GPU_ACCELERATION")
 
-    @validator("environment")
+    @field_validator("environment")
     def validate_environment(cls, v: str) -> str:
         """Validate environment setting"""
         valid_environments = {"development", "staging", "production"}
@@ -114,7 +116,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Environment must be one of: {valid_environments}")
         return v
 
-    @validator("log_level")
+    @field_validator("log_level")
     def validate_log_level(cls, v: str) -> str:
         """Validate log level setting"""
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
@@ -122,7 +124,7 @@ class Settings(BaseSettings):
             raise ValueError(f"Log level must be one of: {valid_levels}")
         return v.upper()
 
-    @validator("log_format")
+    @field_validator("log_format")
     def validate_log_format(cls, v: str) -> str:
         """Validate log format setting"""
         valid_formats = {"json", "text"}

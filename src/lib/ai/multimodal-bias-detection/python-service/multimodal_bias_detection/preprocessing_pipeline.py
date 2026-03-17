@@ -11,7 +11,7 @@ import io
 import logging
 import tempfile
 from pathlib import Path
-from typing import Any, Union
+from typing import Any, Union, Dict
 
 import librosa
 import numpy as np
