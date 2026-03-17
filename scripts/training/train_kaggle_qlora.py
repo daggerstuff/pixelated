@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""
+QLoRA Training Script for Kaggle T4 (16GB VRAM)
+Retrains with anti-repetition config using 4-bit quantization
+
+Usage:
+1. Upload this script to Kaggle Notebook
+2. Attach training data as Kaggle Dataset
+3. Enable GPU accelerator (T4)
+4. Run all cells
+"""
+
+import json
+import os
+from pathlib import Path
+
+import torch
+from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    TrainingArguments,
+    Trainer,
+    DataCollatorForLanguageModeling,
+)
+
+# ============================================================================
+# Configuration - FIXED ANTI-REPETITION PARAMS
+# ============================================================================
+CONFIG = {
+    "base_model": "LatitudeGames/Wayfarer-2-12B",
+    "output_dir": "./checkpoints/pixelated-v2-qlora",
+    "data_path": "/kaggle/input/pixelated-training-data",  # Update with your dataset path
+    # QLoRA Config
+    "qlora": {
+        "bits": 4,
+        "quant_type": "nf4",
+        "double_quant": True,
+    },
+    # LoRA Config - FIXED from v1 issues
+    "lora": {
+        "r": 16,
+        "lora_alpha": 16,  # FIXED: was 32 (scale 2.0x), now 16 (scale 1.0x)
+        "lora_dropout": 0.1,  # FIXED: was 0, now 0.1
+        "target_modules": [
+            "q_proj",
+            "v_proj",
+            "k_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+    },
+    # Training Config - FIXED for stability
+    "training": {
+        "num_train_epochs": 3,
+        "per_device_train_batch_size": 1,  # Small for 12B on 16GB
+        "gradient_accumulation_steps": 16,  # Effective batch = 16
+        "learning_rate": 5e-6,  # FIXED: was 2e-4 (40x too high)
+        "weight_decay": 0.01,  # FIXED: was 0.001 (10x too low)
+        "warmup_ratio": 0.1,  # FIXED: was 0.03
+        "lr_scheduler_type": "cosine",
+        "max_seq_length": 2048,
+        "logging_steps": 10,
+        "save_steps": 250,
+        "save_total_limit": 2,
+    },
+}
+
+
+def load_model_and_tokenizer():
+    """Load model with 4-bit quantization for QLoRA"""
+
+    print(f"Loading base model: {CONFIG['base_model']}")
+
+    # BitsAndBytes config for 4-bit
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type=CONFIG["qlora"]["quant_type"],
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=CONFIG["qlora"]["double_quant"],
+    )
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(CONFIG["base_model"])
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+
+    # Load model with 4-bit quantization
+    model = AutoModelForCausalLM.from_pretrained(
+        CONFIG["base_model"],
+        quantization_config=bnb_config,
+        device_map="auto",
+        trust_remote_code=True,
+    )
+
+    # Prepare for k-bit training
+    model = prepare_model_for_kbit_training(model)
+
+    # Apply LoRA with FIXED config
+    lora_config = LoraConfig(
+        task_type=TaskType.CAUSAL_LM,
+        r=CONFIG["lora"]["r"],
+        lora_alpha=CONFIG["lora"]["lora_alpha"],
+        lora_dropout=CONFIG["lora"]["lora_dropout"],
+        target_modules=CONFIG["lora"]["target_modules"],
+    )
+
+    model = get_peft_model(model, lora_config)
+    model.print_trainable_parameters()
+
+    return model, tokenizer
+
+
+def load_training_data(data_path: str):
+    """Load and prepare training data"""
+
+    print(f"Loading training data from: {data_path}")
+
+    all_data = []
+
+    # Handle directory with multiple jsonl files
+    data_path = Path(data_path)
+    if data_path.is_dir():
+        jsonl_files = list(data_path.glob("*.jsonl"))
+    else:
+        jsonl_files = [data_path]
+
+    for jsonl_file in jsonl_files:
+        with open(jsonl_file) as f:
+            for line in f:
+                if line.strip():
+                    all_data.append(json.loads(line))
+
+    print(f"Loaded {len(all_data)} training samples")
+    return all_data
+
+
+def tokenize_data(examples, tokenizer, max_length=2048):
+    """Tokenize training examples"""
+
+    texts = []
+    for item in examples:
+        if "text" in item:
+            texts.append(item["text"])
+        elif "conversations" in item:
+            conv_text = ""
+            for turn in item["conversations"]:
+                role = turn.get("role", "user")
+                content = turn.get("content", "")
+                conv_text += f"<|{role}|>{content}</|{role}|>\n"
+            texts.append(conv_text)
+        elif "prompt" in item and "response" in item:
+            texts.append(
+                f"<|user|>{item['prompt']}</|user|>\n<|assistant|>{item['response']}</|assistant|>"
+            )
+        else:
+            texts.append(str(item))
+
+    return tokenizer(
+        texts,
+        truncation=True,
+        max_length=max_length,
+        padding="max_length",
+        return_tensors=None,
+    )
+
+
+def main():
+    """Main training function"""
+
+    print("=" * 60)
+    print("PIXELATED V2 - QLORA ANTI-REPETITION TRAINING")
+    print("=" * 60)
+    print(f"Base model: {CONFIG['base_model']}")
+    print(f"LoRA r={CONFIG['lora']['r']}, alpha={CONFIG['lora']['lora_alpha']}")
+    print(f"Learning rate: {CONFIG['training']['learning_rate']}")
+    print(f"Weight decay: {CONFIG['training']['weight_decay']}")
+    print("=" * 60)
+
+    # Load model
+    model, tokenizer = load_model_and_tokenizer()
+
+    # Load data
+    raw_data = load_training_data(CONFIG["data_path"])
+
+    # Create dataset
+    dataset = Dataset.from_list(raw_data)
+
+    # Tokenize
+    def tokenize_fn(batch):
+        return tokenize_data([batch], tokenizer, CONFIG["training"]["max_seq_length"])
+
+    tokenized_dataset = dataset.map(
+        tokenize_fn,
+        batched=False,
+        remove_columns=dataset.column_names,
+    )
+
+    # Split for validation
+    split_dataset = tokenized_dataset.train_test_split(test_size=0.05)
+    train_dataset = split_dataset["train"]
+    eval_dataset = split_dataset["test"]
+
+    print(f"Train: {len(train_dataset)}, Eval: {len(eval_dataset)}")
+
+    # Training arguments
+    training_args = TrainingArguments(
+        output_dir=CONFIG["output_dir"],
+        num_train_epochs=CONFIG["training"]["num_train_epochs"],
+        per_device_train_batch_size=CONFIG["training"]["per_device_train_batch_size"],
+        gradient_accumulation_steps=CONFIG["training"]["gradient_accumulation_steps"],
+        learning_rate=CONFIG["training"]["learning_rate"],
+        weight_decay=CONFIG["training"]["weight_decay"],
+        warmup_ratio=CONFIG["training"]["warmup_ratio"],
+        lr_scheduler_type=CONFIG["training"]["lr_scheduler_type"],
+        logging_steps=CONFIG["training"]["logging_steps"],
+        save_steps=CONFIG["training"]["save_steps"],
+        save_total_limit=CONFIG["training"]["save_total_limit"],
+        bf16=True,
+        gradient_checkpointing=True,
+        optim="paged_adamw_8bit",
+        report_to="none",
+        run_name="pixelated-v2-qlora",
+    )
+
+    # Data collator
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm=False,
+    )
+
+    # Trainer
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        data_collator=data_collator,
+    )
+
+    # Train
+    print("Starting training...")
+    train_result = trainer.train()
+
+    # Save model
+    output_dir = Path(CONFIG["output_dir"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    trainer.save_model(str(output_dir))
+    tokenizer.save_pretrained(str(output_dir))
+
+    # Save config for reference
+    with open(output_dir / "training_config_used.json", "w") as f:
+        json.dump(CONFIG, f, indent=2)
+
+    print(f"\n{'=' * 60}")
+    print("TRAINING COMPLETE")
+    print(f"{'=' * 60}")
+    print(f"Final loss: {train_result.training_loss}")
+    print(f"Model saved to: {output_dir}")
+
+    # Print next steps
+    print(f"\n{'=' * 60}")
+    print("NEXT STEPS")
+    print(f"{'=' * 60}")
+    print("1. Download the adapter from:", output_dir)
+    print("2. Merge with base model using scripts/training/merge_lora.py")
+    print("3. Run evaluation with modal run ai/modal_app.py")
+    print("4. Verify repetition rate < 5%")
+
+
+if __name__ == "__main__":
+    main()
