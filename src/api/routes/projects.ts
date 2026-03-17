@@ -57,8 +57,8 @@ router.get(
     const result = await listProjects(user.id, {
       page: page ? parseInt(page as string) : 1,
       limit: limit ? parseInt(limit as string) : 50,
-      category: category as string,
-      status: status as string,
+      category: typeof category === 'string' ? category : undefined,
+      status: typeof status === 'string' ? status : undefined,
     })
 
     res.json({
