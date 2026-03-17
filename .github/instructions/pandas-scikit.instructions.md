@@ -1,6 +1,6 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/*.py', '**/*.ipynb', '**/ai/**/*', '**/dataset_pipeline/**/*', '**/models/**/*']
+name: Pandas and Scikit Guidelines
+applyTo: '**/*.py,**/*.ipynb,**/ai/**/*,**/dataset_pipeline/**/*,**/models/**/*'
 ---
 
 # Data Analysis & ML Guidelines for Pixelated Empathy
@@ -19,7 +19,7 @@ fileMatchPattern: ['**/*.py', '**/*.ipynb', '**/ai/**/*', '**/dataset_pipeline/*
 # Follow established project structure
 ai/
 ├── dataset_pipeline/     # Data processing and preparation
-├── models/              # ML model definitions and training  
+├── models/              # ML model definitions and training
 ├── inference/           # Model inference services
 ├── monitoring/          # Quality and performance monitoring
 ├── safety/              # Safety validation and compliance
@@ -29,40 +29,42 @@ ai/
 ## Data Handling Standards
 
 ### Therapeutic Data Processing
+
 ```python
 # Always validate therapeutic data integrity
 def validate_therapeutic_data(df: pd.DataFrame) -> pd.DataFrame:
     """Validate therapeutic session data with privacy checks."""
     required_cols = ['session_id', 'timestamp', 'interaction_type']
     assert all(col in df.columns for col in required_cols)
-    
+
     # Remove any PII that shouldn't be present
     df = df.drop(columns=[col for col in df.columns if 'pii' in col.lower()])
-    
+
     # Validate data types and ranges
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df[df['timestamp'] > '2020-01-01']  # Reasonable date range
-    
+
     return df
 ```
 
 ### Bias Detection Integration
+
 ```python
 from ai.safety.bias_detection import BiasDetectionEngine
 
 def analyze_with_bias_monitoring(df: pd.DataFrame, analysis_func: callable) -> dict:
     """Wrap analysis functions with bias detection."""
     bias_detector = BiasDetectionEngine()
-    
+
     # Pre-analysis bias check
     bias_detector.check_input_bias(df)
-    
+
     # Perform analysis
     results = analysis_func(df)
-    
+
     # Post-analysis bias validation
     bias_report = bias_detector.validate_results(results)
-    
+
     return {
         'analysis_results': results,
         'bias_report': bias_report,
@@ -73,35 +75,37 @@ def analyze_with_bias_monitoring(df: pd.DataFrame, analysis_func: callable) -> d
 ## ML Model Development
 
 ### Model Architecture Patterns
+
 ```python
 # Use consistent model interfaces
 class TherapeuticMLModel:
     def __init__(self, config: dict):
         self.config = config
         self.bias_detector = BiasDetectionEngine()
-        
+
     def preprocess(self, data: pd.DataFrame) -> np.ndarray:
         """Standardized preprocessing with bias checks."""
         # Implement FHE-compatible preprocessing
         pass
-        
+
     def train(self, X: np.ndarray, y: np.ndarray) -> None:
         """Training with bias monitoring."""
         # Monitor for bias during training
         self.bias_detector.monitor_training(X, y)
-        
+
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Inference with <50ms latency requirement."""
         start_time = time.time()
         predictions = self._predict_impl(X)
-        
+
         inference_time = (time.time() - start_time) * 1000
         assert inference_time < 50, f"Inference too slow: {inference_time}ms"
-        
+
         return predictions
 ```
 
 ### Performance Optimization
+
 ```python
 # Use efficient data structures for large datasets
 def optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -110,17 +114,18 @@ def optimize_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.select_dtypes(include=['object']):
         if df[col].nunique() / len(df) < 0.5:  # Less than 50% unique values
             df[col] = df[col].astype('category')
-    
+
     # Downcast numeric types
     df = df.select_dtypes(include=['int']).apply(pd.to_numeric, downcast='integer')
     df = df.select_dtypes(include=['float']).apply(pd.to_numeric, downcast='float')
-    
+
     return df
 ```
 
 ## Visualization & Reporting
 
 ### Therapeutic Data Visualization
+
 ```python
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -129,17 +134,17 @@ def create_therapeutic_dashboard(df: pd.DataFrame) -> None:
     """Create HIPAA-compliant therapeutic data visualizations."""
     # Use accessible color schemes
     sns.set_palette("colorblind")
-    
+
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
-    
+
     # Session distribution (anonymized)
     df.groupby('session_type').size().plot(kind='bar', ax=axes[0,0])
     axes[0,0].set_title('Session Type Distribution')
-    
+
     # Temporal patterns
     df.set_index('timestamp').resample('D').size().plot(ax=axes[0,1])
     axes[0,1].set_title('Daily Session Volume')
-    
+
     # Ensure no PII in visualizations
     plt.suptitle('Therapeutic Data Analysis (Anonymized)')
     plt.tight_layout()
@@ -148,6 +153,7 @@ def create_therapeutic_dashboard(df: pd.DataFrame) -> None:
 ## Quality Assurance
 
 ### Data Validation Pipeline
+
 ```python
 def comprehensive_data_validation(df: pd.DataFrame) -> dict:
     """Comprehensive validation for therapeutic datasets."""
@@ -159,23 +165,24 @@ def comprehensive_data_validation(df: pd.DataFrame) -> dict:
         'bias_metrics': {},  # Implement bias detection
         'quality_score': 0.0
     }
-    
+
     # Check for PII leakage
     pii_patterns = ['email', 'phone', 'ssn', 'name']
     for col in df.columns:
         if any(pattern in col.lower() for pattern in pii_patterns):
             validation_report['privacy_compliance'] = False
-            
+
     # Calculate quality score
     missing_ratio = df.isnull().sum().sum() / (df.shape[0] * df.shape[1])
     validation_report['quality_score'] = 1.0 - missing_ratio
-    
+
     return validation_report
 ```
 
 ## Environment & Dependencies
 
 ### Required Packages
+
 ```python
 # Core data science stack
 pandas>=2.0.0
@@ -198,6 +205,7 @@ aif360>=0.5.0
 ```
 
 ### Development Workflow
+
 1. **Data Ingestion**: Validate and encrypt all incoming therapeutic data
 2. **Exploratory Analysis**: Use bias-aware analysis functions
 3. **Model Development**: Implement with privacy-preserving techniques
