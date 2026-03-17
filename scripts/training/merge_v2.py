@@ -27,6 +27,7 @@ def merge_v2_adapter():
     import time
 
     base_model_name = "LatitudeGames/Wayfarer-2-12B"
+    # Use correct adapter path from train_modal_v2.py
     adapter_path = "/models/pixelated-v2-adapter"
     output_path = "/models/merged-v2"
 

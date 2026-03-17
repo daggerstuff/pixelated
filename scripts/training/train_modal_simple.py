@@ -1,27 +1,143 @@
 #!/usr/bin/env python3
 """
 Simplified Modal Training - No external secrets needed
-Uses local config and runs training on A100
+Uses local config and runs training on A100 without external secrets.
 """
 
+import json
+import logging
+from pathlib import Path
+
 import modal
+import torch
+from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+logger = logging.getLogger(__name__)
 
 app = modal.App("pixelated-retrain-simple")
 
 # Minimal image with torch + transformers
-IMAGE = (
-    modal.Image.from_registry("pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel")
-    .pip_install(
-        "transformers>=4.36.0",
-        "peft>=0.7.0",
-        "bitsandbytes>=0.41.0",
-        "accelerate>=0.25.0",
-        "datasets>=2.15.0",
-        "scipy",
-    )
+IMAGE = modal.Image.from_registry("pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel").pip_install(
+    "transformers>=4.36.0",
+    "peft>=0.7.0",
+    "bitsandbytes>=0.41.0",
+    "accelerate>=0.25.0",
+    "datasets>=2.15.0",
+    "scipy",
 )
 
 MODELS_VOLUME = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
+
+
+def _extract_training_text(item: dict) -> str | None:
+    """Convert supported dataset formats into a single training string."""
+    if "text" in item:
+        text = item["text"]
+        return text if isinstance(text, str) and text.strip() else None
+
+    if "messages" in item and isinstance(item["messages"], list):
+        parts = []
+        for message in item["messages"]:
+            if not isinstance(message, dict):
+                continue
+            role = message.get("role", "user")
+            content = message.get("content", "")
+            if isinstance(content, str) and content.strip():
+                parts.append(f"<|{role}|>{content}</|{role}|>")
+        return "\n".join(parts) if parts else None
+
+    if "conversations" in item and isinstance(item["conversations"], list):
+        parts = []
+        for turn in item["conversations"]:
+            if not isinstance(turn, dict):
+                continue
+            role = turn.get("role", "user")
+            content = turn.get("content", "")
+            if isinstance(content, str) and content.strip():
+                parts.append(f"<|{role}|>{content}</|{role}|>")
+        return "\n".join(parts) if parts else None
+
+    if "prompt" in item and "response" in item:
+        prompt = item["prompt"]
+        response = item["response"]
+        if isinstance(prompt, str) and isinstance(response, str):
+            return f"<|user|>{prompt}</|user|>\n<|assistant|>{response}</|assistant|>"
+
+    return None
+
+
+def _load_training_samples(data_path: str) -> list[dict]:
+    """Load JSONL samples from a file or directory with validation."""
+    path = Path(data_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Training data path not found: {path}")
+
+    if path.is_dir():
+        jsonl_files = sorted(path.glob("*.jsonl"))
+        if not jsonl_files:
+            raise ValueError(f"No .jsonl files found in {path}")
+    else:
+        if path.suffix != ".jsonl":
+            raise ValueError(f"Expected a .jsonl file, got {path}")
+        jsonl_files = [path]
+
+    samples: list[dict] = []
+    parse_errors = 0
+    for jsonl_file in jsonl_files:
+        with open(jsonl_file) as handle:
+            for line_num, line in enumerate(handle, 1):
+                if not line.strip():
+                    continue
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    parse_errors += 1
+                    if parse_errors <= 3:
+                        logger.warning(f"  ⚠️  {jsonl_file.name}:{line_num}: {exc}")
+                    continue
+
+                if isinstance(item, dict):
+                    samples.append(item)
+
+    if not samples:
+        raise ValueError("No valid training samples loaded")
+
+    return samples
+
+
+def _build_tokenize_function(tokenizer, max_seq_length: int):
+    """Create a tokenizer wrapper for Hugging Face datasets.map."""
+
+    def tokenize(batch: dict) -> dict:
+        texts = []
+        for item in batch.get("_raw_item", []):
+            if not isinstance(item, dict):
+                continue
+            text = _extract_training_text(item)
+            if text:
+                texts.append(text)
+
+        if not texts:
+            return {"input_ids": [], "attention_mask": []}
+
+        return tokenizer(
+            texts,
+            truncation=True,
+            max_length=max_seq_length,
+            padding="max_length",
+        )
+
+    return tokenize
+
 
 @app.function(
     image=IMAGE,
@@ -30,64 +146,34 @@ MODELS_VOLUME = modal.Volume.from_name("pixel-merged-models", create_if_missing=
     volumes={"/models": MODELS_VOLUME},
     memory=32768,  # 32GB RAM
 )
-def train():
-    import json
-    import os
-    import torch
-    from datasets import Dataset
-    from peft import LoraConfig, TaskType, get_peft_model
-    from transformers import (
-        AutoModelForCausalLM,
-        AutoTokenizer,
-        DataCollatorForLanguageModeling,
-        Trainer,
-        TrainingArguments,
-    )
-    
-    # Anti-repetition config (FIXED from v1)
-    config = {
-        "base_model": "LatitudeGames/Wayfarer-2-12B",
-        "output_dir": "/models/pixelated-v2-adapter",
-        "lora": {
-            "r": 16,
-            "lora_alpha": 16,  # FIXED: was 32 (scale 2.0x)
-            "lora_dropout": 0.1,  # FIXED: was 0
-            "target_modules": ["q_proj", "v_proj", "k_proj", "o_proj"],
-        },
-        "training": {
-            "num_train_epochs": 3,
-            "per_device_train_batch_size": 1,
-            "gradient_accumulation_steps": 16,
-            "learning_rate": 5e-6,  # FIXED: was 2e-4 (40x too high)
-            "weight_decay": 0.01,  # FIXED: was 0.001
-            "warmup_ratio": 0.1,
-            "max_seq_length": 1024,  # Reduced for memory
-        }
-    }
-    
-    print("=" * 60)
-    print("PIXELATED V2 - ANTI-REPETITION TRAINING")
-    print("=" * 60)
-    print(f"Base model: {config['base_model']}")
-    print(f"LoRA: r={config['lora']['r']}, alpha={config['lora']['lora_alpha']}")
-    print(f"LR: {config['training']['learning_rate']}")
-    print("=" * 60)
-    
-    # Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(config["base_model"])
+def train(config_path: str = "ai/config/training_config_v2_antirepetition.json"):
+    """Train a LoRA adapter on Modal without external secrets."""
+    if not Path(config_path).exists():
+        raise FileNotFoundError(f"Config file not found: {config_path}")
+
+    with open(config_path) as handle:
+        config = json.load(handle)
+
+    logger.info("=" * 60)
+    logger.info("PIXELATED V2 - SIMPLE MODAL TRAINING")
+    logger.info("=" * 60)
+    logger.info(f"Base model: {config['model']['base_model']}")
+    logger.info(f"LoRA: r={config['lora']['r']}, alpha={config['lora']['lora_alpha']}")
+    logger.info(f"LR: {config['training']['learning_rate']}")
+    logger.info("=" * 60)
+
+    tokenizer = AutoTokenizer.from_pretrained(config["model"]["base_model"])
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-    
-    # Load model
-    print("Loading model...")
+
+    logger.info("Loading model...")
     model = AutoModelForCausalLM.from_pretrained(
-        config["base_model"],
+        config["model"]["base_model"],
         torch_dtype=torch.bfloat16,
         device_map="auto",
         trust_remote_code=True,
     )
-    
-    # Apply LoRA
+
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         r=config["lora"]["r"],
@@ -97,67 +183,71 @@ def train():
     )
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
-    
-    # Create dummy training data (therapeutic prompts)
-    print("Creating training data...")
-    training_samples = [
-        {"text": "User: I'm feeling anxious today.\nAssistant: I understand anxiety can feel overwhelming. Let's explore what might be triggering these feelings and work through some coping strategies together."},
-        {"text": "User: I don't know how to deal with my emotions.\nAssistant: Emotional awareness is a skill that can be developed. Let's start by identifying what you're feeling right now and where you notice it in your body."},
-        {"text": "User: I feel like nobody understands me.\nAssistant: That sense of isolation can be really painful. I'm here to listen without judgment. Would you like to share more about what's making you feel this way?"},
-        {"text": "User: I'm struggling with sleep.\nAssistant: Sleep difficulties often connect to our thoughts and feelings. Let's explore your bedtime routine and what might be keeping your mind active at night."},
-        {"text": "User: I feel overwhelmed by everything.\nAssistant: When everything feels like too much, it helps to break things down. What feels most urgent right now? We can tackle one thing at a time."},
-    ] * 100  # Repeat for 500 samples
-    
-    dataset = Dataset.from_list(training_samples)
-    
-    def tokenize(examples):
-        return tokenizer(
-            examples["text"],
-            truncation=True,
-            max_length=config["training"]["max_seq_length"],
-            padding="max_length",
-        )
-    
-    tokenized = dataset.map(tokenize, batched=True, remove_columns=["text"])
-    
-    # Training arguments
+
+    logger.info("Loading real training data...")
+    training_samples = _load_training_samples(config["data"]["train_file"])
+    dataset = Dataset.from_list([{"_raw_item": item} for item in training_samples])
+    tokenized = dataset.map(
+        _build_tokenize_function(tokenizer, config["data"]["max_seq_length"]),
+        batched=True,
+        remove_columns=dataset.column_names,
+    )
+
+    if len(tokenized) == 0:
+        raise ValueError("Tokenization produced no training rows")
+
     training_args = TrainingArguments(
-        output_dir=config["output_dir"],
+        output_dir="/tmp/pixelated-v2-simple-output",
         num_train_epochs=config["training"]["num_train_epochs"],
-        per_device_train_batch_size=config["training"]["per_device_train_batch_size"],
-        gradient_accumulation_steps=config["training"]["gradient_accumulation_steps"],
+        per_device_train_batch_size=min(1, config["training"]["per_device_train_batch_size"]),
+        gradient_accumulation_steps=max(16, config["training"]["gradient_accumulation_steps"]),
         learning_rate=config["training"]["learning_rate"],
         weight_decay=config["training"]["weight_decay"],
         warmup_ratio=config["training"]["warmup_ratio"],
+        lr_scheduler_type=config["training"]["lr_scheduler_type"],
         bf16=True,
-        logging_steps=10,
-        save_steps=100,
+        gradient_checkpointing=config["system"]["gradient_checkpointing"],
+        logging_steps=config["training"]["logging_steps"],
+        save_steps=config["training"]["save_steps"],
         save_total_limit=2,
         report_to="none",
     )
-    
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized,
         data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
     )
-    
-    print("Starting training...")
-    trainer.train()
-    
-    # Save adapter
-    print(f"Saving adapter to {config['output_dir']}...")
-    model.save_pretrained(config["output_dir"])
-    tokenizer.save_pretrained(config["output_dir"])
-    
-    print("=" * 60)
-    print("TRAINING COMPLETE!")
-    print("=" * 60)
-    
-    return {"status": "success", "output_dir": config["output_dir"]}
+
+    logger.info("Starting training...")
+    train_result = trainer.train()
+
+    adapter_path = Path("/models/pixelated-v2-simple-adapter")
+    adapter_path.mkdir(parents=True, exist_ok=True)
+
+    logger.info(f"Saving adapter to {adapter_path}...")
+    model.save_pretrained(str(adapter_path))
+    tokenizer.save_pretrained(str(adapter_path))
+    with open(adapter_path / "training_config_used.json", "w") as handle:
+        json.dump(config, handle, indent=2)
+
+    MODELS_VOLUME.commit()
+
+    logger.info("=" * 60)
+    logger.info("TRAINING COMPLETE!")
+    logger.info("=" * 60)
+
+    return {
+        "status": "success",
+        "adapter_path": str(adapter_path),
+        "final_loss": train_result.training_loss,
+        "samples_trained": len(tokenized),
+    }
+
 
 @app.local_entrypoint()
-def main():
-    result = train.remote()
-    print(f"Result: {result}")
+def main(config_path: str = "ai/config/training_config_v2_antirepetition.json"):
+    """Run the simplified Modal trainer from the local machine."""
+    result = train.remote(config_path)
+    logger.info(f"Result: {result}")

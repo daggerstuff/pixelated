@@ -138,7 +138,7 @@ dev = [
   "pytest-mock",
   "coverage",
   "flake8",
-  "semgrep",
+  "semgrep>=1.60.0",
   "checkov",
   "pyright",
   "sourcery; sys_platform == 'darwin'",
@@ -170,7 +170,8 @@ exclude = [
   "dist",
   ".coveragerc",
   ".git",
-  "dist",
+  "**/__pycache__",
+  "**/.*"
 ]
 extraPaths = ["stubs"]
 typeCheckingMode = "basic"
@@ -193,6 +194,8 @@ exclude = [
   ".coveragerc",
   ".git",
   "dist",
+  "**/__pycache__",
+  "**/.*"
 ]
 [tool.ruff.lint]
 select = [
@@ -256,6 +259,7 @@ show_missing = true
 skip_covered = true
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
+exclude = ["ai"]
 [tool.uv]
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
