@@ -131,7 +131,7 @@ describe('Alert', () => {
     })
 
     expect(
-      container.querySelector('button[aria-label="Dismiss"]'),
+      container.querySelector('button[aria-label="Dismiss alert"]'),
     ).toBeInTheDocument()
   })
 })
