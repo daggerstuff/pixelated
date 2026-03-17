@@ -1,6 +1,7 @@
-// import type { APIRoute } from 'astro'
+import type { APIContext } from 'astro'
 import { z } from 'zod'
 
+import { isAuthenticated } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import type { TreatmentPlan } from '../../../types/treatment'
@@ -45,17 +46,16 @@ const treatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = async ({ locals }) => {
+export const GET = async ({ request }: APIContext) => {
   try {
-    // TODO: Replace with actual authentication check
-    const { user } = locals
-    if (!user) {
+    const authResult = await isAuthenticated(request)
+    if (!authResult?.authenticated) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
       })
     }
 
-    logger.info('Fetching treatment plans', { userId: user.id })
+    logger.info('Fetching treatment plans', { userId: authResult.user?.id })
 
     // TODO: Replace with actual database implementation
     // For now, return empty array to prevent build errors
@@ -74,11 +74,10 @@ export const GET = async ({ locals }) => {
   }
 }
 
-export const POST = async ({ request, locals }) => {
+export const POST = async ({ request }: APIContext) => {
   try {
-    // TODO: Replace with actual authentication check
-    const { user } = locals
-    if (!user) {
+    const authResult = await isAuthenticated(request)
+    if (!authResult?.authenticated) {
       return new Response(JSON.stringify({ error: 'Not authenticated' }), {
         status: 401,
       })
@@ -101,7 +100,7 @@ export const POST = async ({ request, locals }) => {
     const planData = validationResult.data
 
     logger.info('Creating treatment plan', {
-      userId: user.id,
+      userId: authResult.user?.id,
       title: planData.title,
     })
 
@@ -112,8 +111,8 @@ export const POST = async ({ request, locals }) => {
 
     const newPlan: TreatmentPlan = {
       id: planId,
-      clientId: user.id,
-      therapistId: user.id,
+      clientId: authResult.user?.id || '',
+      therapistId: authResult.user?.id || '',
       title: planData.title,
       diagnosis: planData.diagnosis || null,
       startDate: planData.startDate || currentTime,
