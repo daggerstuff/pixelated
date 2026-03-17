@@ -51,6 +51,6 @@ jobs:
         fi
 
     - name: GitHub Copilot Code Review
-      uses: github/copilot-review-action@v1
+      uses: actions/copilot-code-review@v1
       with:
         github-token: ${{ secrets.G_TOKEN }}
