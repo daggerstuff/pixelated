@@ -38,7 +38,7 @@ class TestBiasDetectionConfig(unittest.TestCase):
         """Test default configuration values"""
         config = BiasDetectionConfig()
 
-        self._extracted_from_test_custom_config_5(config, 0.3, 0.6, 0.8)
+        self.assert_thresholds(config, 0.3, 0.6, 0.8)
         assert config.enable_hipaa_compliance
         assert config.enable_audit_logging
         assert config.enable_encryption
@@ -71,12 +71,11 @@ class TestBiasDetectionConfig(unittest.TestCase):
             enable_hipaa_compliance=False,
         )
 
-        self._extracted_from_test_custom_config_5(config, 0.4, 0.7, 0.9)
+        self.assert_thresholds(config, 0.4, 0.7, 0.9)
         assert config.layer_weights == custom_weights
         assert not config.enable_hipaa_compliance
 
-    # TODO Rename this here and in `test_default_config` and `test_custom_config`
-    def _extracted_from_test_custom_config_5(self, config, arg1, arg2, arg3):
+    def assert_thresholds(self, config, arg1, arg2, arg3):
         assert config.warning_threshold == arg1
         assert config.high_threshold == arg2
         assert config.critical_threshold == arg3
@@ -204,7 +203,7 @@ class TestAuditLogger(unittest.TestCase):
         # Verify log file was created and contains entry
         assert os.path.exists(self.audit_logger.audit_file)
 
-        log_entry = self._extracted_from_test_log_event_sensitive_18(
+        log_entry = self.assert_audit_log_contents(
             "event_type", "analysis_started", "user_id", "test_user"
         )
         assert log_entry["details"]["analysis_type"] == "comprehensive"
@@ -223,13 +222,12 @@ class TestAuditLogger(unittest.TestCase):
             )
         )
 
-        self._extracted_from_test_log_event_sensitive_18(
+        self.assert_audit_log_contents(
             "details", "ENCRYPTED", "encrypted_details", "encrypted_data"
         )
         self.security_manager.encrypt_data.assert_called_once()
 
-    # TODO Rename this here and in `test_log_event_non_sensitive` and `test_log_event_sensitive`
-    def _extracted_from_test_log_event_sensitive_18(self, arg0, arg1, arg2, arg3):
+    def assert_audit_log_contents(self, arg0, arg1, arg2, arg3):
         with open(self.audit_logger.audit_file) as f:
             result = json.loads(f.read().strip())
         assert result[arg0] == arg1
@@ -369,11 +367,10 @@ class TestBiasDetectionService(unittest.TestCase):
 
     def test_calculate_confidence(self):
         """Test confidence calculation"""
-        self._extracted_from_test_calculate_confidence_4("bias_score", 0.5, 0.8)
-        self._extracted_from_test_calculate_confidence_4("error", "Failed to analyze", 0.5)
+        self.assert_confidence_score("bias_score", 0.5, 0.8)
+        self.assert_confidence_score("error", "Failed to analyze", 0.5)
 
-    # TODO Rename this here and in `test_calculate_confidence`
-    def _extracted_from_test_calculate_confidence_4(self, arg0, arg1, arg2):
+    def assert_confidence_score(self, arg0, arg1, arg2):
         # All layers successful
         successful_results = [
             {"layer": "preprocessing", "bias_score": 0.3},
@@ -473,9 +470,9 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_health_check(self):
         """Test health check endpoint"""
-        data = self._extracted_from_test_404_endpoint_3("/health", 200)
+        data = self.assert_get_endpoint_status("/health", 200)
         assert data["status"] == "healthy"
-        self._extracted_from_test_dashboard_endpoint_8("components", data, "timestamp", "version")
+        self.assert_keys_in_data("components", data, "timestamp", "version")
 
     def test_analyze_endpoint_valid_data(self):
         """Test analyze endpoint with valid data"""
@@ -525,8 +522,8 @@ class TestFlaskEndpoints(unittest.TestCase):
 
     def test_dashboard_endpoint(self):
         """Test dashboard data endpoint"""
-        data = self._extracted_from_test_404_endpoint_3("/dashboard", 200)
-        self._extracted_from_test_dashboard_endpoint_8("summary", data, "trends", "demographics")
+        data = self.assert_get_endpoint_status("/dashboard", 200)
+        self.assert_keys_in_data("summary", data, "trends", "demographics")
 
     def test_export_endpoint_json(self):
         """Test export endpoint with JSON format"""
@@ -553,20 +550,18 @@ class TestFlaskEndpoints(unittest.TestCase):
         assert response.status_code == 200
         assert response.mimetype == "text/csv"
 
-    def _extracted_from_test_dashboard_endpoint_8(self, arg0, data, arg2, arg3):
+    def assert_keys_in_data(self, arg0, data, arg2, arg3):
         assert arg0 in data
         assert arg2 in data
         assert arg3 in data
 
-    # TODO Rename this here and in `test_health_check`, `test_dashboard_endpoint` and `test_404_endpoint`
     def test_404_endpoint(self):
         """Test 404 error handling"""
-        data = self._extracted_from_test_404_endpoint_3("/nonexistent", 404)
+        data = self.assert_get_endpoint_status("/nonexistent", 404)
         assert "error" in data
         assert data["error"] == "Endpoint not found"
 
-    # TODO Rename this here and in `test_health_check`, `test_dashboard_endpoint` and `test_404_endpoint`
-    def _extracted_from_test_404_endpoint_3(self, arg0, arg1):
+    def assert_get_endpoint_status(self, arg0, arg1):
         response = self.client.get(arg0)
         assert response.status_code == arg1
         return response.get_json()
