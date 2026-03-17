@@ -225,6 +225,7 @@ const recipientTypes = [
       <!-- Recipient Type -->
       <div>
         <label
+          for="recipient-type"
           class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
         >
           Recipient Type
@@ -253,6 +254,7 @@ const recipientTypes = [
         <input
           type="text"
           id="recipient-name"
+          aria-label="Recipient Name or Organization"
           autocomplete="name"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient name or organization"
@@ -261,6 +263,7 @@ const recipientTypes = [
         <input
           type="email"
           id="recipient-email"
+          aria-label="Recipient Email"
           autocomplete="email"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient email"
