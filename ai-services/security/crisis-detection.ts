@@ -122,6 +122,18 @@ export function detectCrisisSignals(text: string): CrisisAnalysisResult {
   return result
 }
 
+/**
+ * Calculates a quantitative severity score based on standard psychiatric risk assessment vectors:
+ * Ideation, Plan, Means, and Intent (Immediacy).
+ *
+ * Why this matters: A baseline score (0.5) indicates ideation. The presence of a concrete plan
+ * (specificity), access to lethal means, or temporal immediacy compound the risk exponentially
+ * and mandate rapid automated escalation protocols in production environments.
+ *
+ * @param category - The type of crisis detected (e.g., self_harm, violence)
+ * @param text - The raw text containing the detected signal for contextual analysis
+ * @returns A normalized severity float between 0.0 and 1.0
+ */
 function calculateSeverity(
   category: CrisisSignal['category'],
   text: string,
