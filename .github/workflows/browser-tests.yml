@@ -26,10 +26,10 @@ jobs:
     timeout-minutes: 60
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Setup Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ env.NODE_VERSION }}
 
@@ -39,7 +39,7 @@ jobs:
         version: 10.17.1
 
     - name: Setup pnpm cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.pnpm-store
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -71,7 +71,7 @@ jobs:
 
     - name: Upload test results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: browser-test-results-${{ github.run_id }}
         path: |
@@ -88,10 +88,10 @@ jobs:
     if: always()
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Download all test artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v8
       with:
         path: all-test-results
         pattern: '*-test-results-*'
@@ -198,7 +198,7 @@ jobs:
         echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
 
     - name: Upload consolidated report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: browser-compatibility-report-${{ github.run_id }}
         path: report.html
