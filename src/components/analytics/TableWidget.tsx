@@ -87,10 +87,20 @@ export function TableWidget({
   const [data, setData] = useState<TableRowData[]>(initialData)
   const [isLoading, setIsLoading] = useState(initialLoading)
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [sortConfig, setSortConfig] = useState<{
     key: string
     direction: 'asc' | 'desc'
   } | null>(null)
+
+  // ⚡ Bolt: Debounce search to prevent main thread blocking during rapid typing on large tables
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
   // Handle data fetching if fetchData is provided
   useEffect(() => {
     if (fetchData === undefined) {
@@ -144,8 +154,8 @@ export function TableWidget({
     let result = [...data]
 
     // Apply search filter
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase()
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase()
       result = result.filter((row) =>
         columns.some((column) => {
           const value = String(row[column.key] || '').toLowerCase()
@@ -181,7 +191,7 @@ export function TableWidget({
     void pagination
 
     return result
-  }, [data, searchTerm, sortConfig, columns, pagination])
+  }, [data, debouncedSearchTerm, sortConfig, columns, pagination])
   // Handle export
   const handleExport = useCallback(() => {
     try {
