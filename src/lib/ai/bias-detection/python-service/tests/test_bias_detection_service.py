@@ -204,7 +204,7 @@ class TestAuditLogger(unittest.TestCase):
         # Verify log file was created and contains entry
         assert os.path.exists(self.audit_logger.audit_file)
 
-        log_entry = self._extracted_from_test_log_event_sensitive_18(
+        log_entry = self._verify_audit_log_entry(
             "event_type", "analysis_started", "user_id", "test_user"
         )
         assert log_entry["details"]["analysis_type"] == "comprehensive"
@@ -223,17 +223,16 @@ class TestAuditLogger(unittest.TestCase):
             )
         )
 
-        self._extracted_from_test_log_event_sensitive_18(
+        self._verify_audit_log_entry(
             "details", "ENCRYPTED", "encrypted_details", "encrypted_data"
         )
         self.security_manager.encrypt_data.assert_called_once()
 
-    # TODO Rename this here and in `test_log_event_non_sensitive` and `test_log_event_sensitive`
-    def _extracted_from_test_log_event_sensitive_18(self, arg0, arg1, arg2, arg3):
+    def _verify_audit_log_entry(self, key1, expected_val1, key2, expected_val2):
         with open(self.audit_logger.audit_file) as f:
             result = json.loads(f.read().strip())
-        assert result[arg0] == arg1
-        assert result[arg2] == arg3
+        assert result[key1] == expected_val1
+        assert result[key2] == expected_val2
         return result
 
 
