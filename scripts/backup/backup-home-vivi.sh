@@ -42,7 +42,22 @@ cleanup_staging() {
   fi
 }
 
+# Prune orphaned tarballs at startup (regardless of previous upload status)
+prune_orphaned_backups() {
+  local count
+  count=$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'home-vivi-*.tar.gz' 2>/dev/null | wc -l)
+  if [ "$count" -gt "$RETENTION_COUNT" ]; then
+    log "Found $count local backups (retention: $RETENTION_COUNT). Pruning orphaned tarballs..."
+    mapfile -t old_backups < <(ls -1t "$BACKUP_DIR"/home-vivi-*.tar.gz 2>/dev/null || true)
+    for ((i = RETENTION_COUNT; i < ${#old_backups[@]}; i++)); do
+      rm -f "${old_backups[$i]}"
+      log "Removed orphaned backup: ${old_backups[$i]}"
+    done
+  fi
+}
+
 cleanup_local_debris
+prune_orphaned_backups
 
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
