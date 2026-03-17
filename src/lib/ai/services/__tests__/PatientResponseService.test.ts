@@ -293,10 +293,122 @@ describe('PatientResponseService', () => {
     })
   })
 
-  // TODO: Add tests for generatePatientPrompt to check if new alliance metrics are in the prompt.
-  // TODO: Add tests for createResponseContext if any logic was added there (currently it's straightforward).
+  describe('createResponseContext', () => {
+    const styleConfig: PatientResponseStyleConfig = {
+      openness: 7,
+      coherence: 8,
+      defenseLevel: 2,
+      disclosureStyle: 'open',
+      challengeResponses: 'curious',
+      emotionalNuance: 'overt',
+      emotionalIntensity: 0.7,
+      nonVerbalIndicatorStyle: 'minimal',
+      activeDefensiveMechanism: 'none',
+      resistanceLevel: 3,
+    }
+
+    it('should return null if profile is not found', async () => {
+      mockPatientProfileService.getProfileById = vi.fn().mockResolvedValue(null)
+      const context = await patientResponseService.createResponseContext(
+        'unknown-id',
+        styleConfig,
+      )
+      expect(context).toBeNull()
+    })
+
+    it('should create context with provided session number', async () => {
+      mockPatientProfileService.getProfileById = vi
+        .fn()
+        .mockResolvedValue(sampleProfile)
+      const context = await patientResponseService.createResponseContext(
+        sampleProfile.id,
+        styleConfig,
+        ['anxiety'],
+        5,
+      )
+      expect(context).not.toBeNull()
+      expect(context?.profile).toEqual(sampleProfile)
+      expect(context?.styleConfig).toEqual(styleConfig)
+      expect(context?.therapeuticFocus).toEqual(['anxiety'])
+      expect(context?.sessionNumber).toBe(5)
+    })
+
+    it('should derive session number from progress log if not provided', async () => {
+      const profileWithLogs = JSON.parse(JSON.stringify(sampleProfile))
+      profileWithLogs.cognitiveModel.therapeuticProgress.sessionProgressLog = [
+        { id: '1', date: '2023-01-01', notes: 'Session 1' },
+        { id: '2', date: '2023-01-08', notes: 'Session 2' },
+      ]
+      mockPatientProfileService.getProfileById = vi
+        .fn()
+        .mockResolvedValue(profileWithLogs)
+
+      const context = await patientResponseService.createResponseContext(
+        profileWithLogs.id,
+        styleConfig,
+      )
+      expect(context?.sessionNumber).toBe(2)
+    })
+
+    it('should default to session number 1 if progress log is empty and not provided', async () => {
+      const profileWithoutLogs = JSON.parse(JSON.stringify(sampleProfile))
+      profileWithoutLogs.cognitiveModel.therapeuticProgress.sessionProgressLog = []
+      mockPatientProfileService.getProfileById = vi
+        .fn()
+        .mockResolvedValue(profileWithoutLogs)
+
+      const context = await patientResponseService.createResponseContext(
+        profileWithoutLogs.id,
+        styleConfig,
+      )
+      expect(context?.sessionNumber).toBe(1)
+    })
+  })
 
   describe('generatePatientPrompt', () => {
+    it('should include defensive mechanism behaviors in the prompt', async () => {
+      const styleConfig: PatientResponseStyleConfig = {
+        openness: 7,
+        coherence: 8,
+        defenseLevel: 8,
+        disclosureStyle: 'guarded',
+        challengeResponses: 'defensive',
+        emotionalNuance: 'suppressed',
+        emotionalIntensity: 0.3,
+        nonVerbalIndicatorStyle: 'frequent',
+        activeDefensiveMechanism: 'deflection',
+        resistanceLevel: 8,
+      }
+
+      const responseContext = {
+        profile: sampleProfile,
+        styleConfig,
+        sessionNumber: 5,
+      }
+
+      const prompt =
+        await patientResponseService.generatePatientPrompt(responseContext)
+
+      expect(prompt).toContain(
+        'You are currently employing deflection as a defensive mechanism.',
+      )
+      expect(prompt).toContain(
+        'Try to subtly change the subject or avoid direct answers if the topic feels uncomfortable.',
+      )
+
+      responseContext.styleConfig.activeDefensiveMechanism = 'intellectualization'
+      const promptIntellectualization =
+        await patientResponseService.generatePatientPrompt(responseContext)
+      expect(promptIntellectualization).toContain(
+        'Focus on abstract concepts and avoid expressing direct feelings.',
+      )
+
+      expect(promptIntellectualization).toContain(
+        'Include textual descriptions of non-verbal cues',
+      )
+      expect(promptIntellectualization).toContain('style that is frequent')
+    })
+
     it('should include trustLevel, rapportScore, therapistPerception, and transferenceState in the prompt', async () => {
       sampleProfile.cognitiveModel.therapeuticProgress.trustLevel = 7
       sampleProfile.cognitiveModel.therapeuticProgress.rapportScore = 8
