@@ -47,12 +47,14 @@ jobs:
           # Token payload: { purpose: 'ai-validation', scope: 'validation:read' }
           TOKEN_PAYLOAD=$(echo -n '{"purpose":"ai-validation","scope":"validation:read"}' | base64)
           # Use a consistent secret - in production, use SECRET_KEY env var
-          SIGNING_KEY=${SECRET_KEY:-default-secret-key}
+          # Set default if not provided via env
+          : "${SECRET_KEY:=1828b86c07103d4da490d5e15f2eab}"
+          SIGNING_KEY="${SECRET_KEY}"
           SIGNATURE=$(echo -n "${TOKEN_PAYLOAD}${SIGNING_KEY}" | base64)
           VALIDATION_TOKEN="${TOKEN_PAYLOAD}.${SIGNATURE}"
           echo "token=${VALIDATION_TOKEN}" >> $GITHUB_OUTPUT
         env:
-          SECRET_KEY: ${{ vars.SECRET_KEY || 'default-secret-key' }}
+          SECRET_KEY: ${{ vars.SECRET_KEY }}
 
       - name: Enable Corepack
         run: corepack enable

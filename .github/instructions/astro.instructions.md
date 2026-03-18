@@ -1,270 +1,182 @@
 ---
-inclusion: fileMatch
-fileMatchPattern: ['**/*.astro', '**/astro.config.*', '**/pages/**/*', '**/components/**/*', '**/layouts/**/*']
+description: 'Astro development standards and best practices for content-driven websites'
+applyTo: '**/*.astro, **/*.ts, **/*.js, **/*.md, **/*.mdx'
 ---
 
-# Astro Development Guidelines
+# Astro Development Instructions
 
-Expert guidance for Astro 5.x development with TypeScript, React integration, and SSR/SSG optimization.
+Instructions for building high-quality Astro applications following the content-driven, server-first architecture with modern best practices.
 
-## Architecture Principles
+## Project Context
+- Astro 5.x with Islands Architecture and Content Layer API
+- TypeScript for type safety and better DX with auto-generated types
+- Content-driven websites (blogs, marketing, e-commerce, documentation)
+- Server-first rendering with selective client-side hydration
+- Support for multiple UI frameworks (React, Vue, Svelte, Solid, etc.)
+- Static site generation (SSG) by default with optional server-side rendering (SSR)
+- Enhanced performance with modern content loading and build optimizations
 
-- **Islands Architecture**: Use client:* directives sparingly - prefer static generation
-- **Component Hierarchy**: `.astro` for static content, React/framework components for interactivity
-- **TypeScript First**: Strict typing with proper interfaces, avoid `any` types
-- **Performance Priority**: Target Core Web Vitals, minimize client-side JavaScript
-- **Security by Design**: Input validation, XSS prevention, secure authentication patterns
+## Development Standards
 
-## File Organization
+### Architecture
+- Embrace the Islands Architecture: server-render by default, hydrate selectively
+- Organize content with Content Collections for type-safe Markdown/MDX management
+- Structure projects by feature or content type for scalability
+- Use component-based architecture with clear separation of concerns
+- Implement progressive enhancement patterns
+- Follow Multi-Page App (MPA) approach over Single-Page App (SPA) patterns
 
-```
-src/
-├── components/
-│   ├── ui/           # Reusable UI components (Button, Card, Badge)
-│   ├── admin/        # Admin-specific components
-│   ├── chat/         # Chat interface components
-│   └── dashboard/    # Dashboard components
-├── layouts/          # Page layouts and templates
-├── pages/
-│   ├── api/          # API endpoints (.ts files)
-│   └── [dynamic]/    # Dynamic routes
-├── content/          # Content collections (markdown/MDX)
-├── lib/              # Utilities and shared logic
-└── styles/           # Global styles and theme system
-```
-
-## Component Patterns
-
-### Astro Component Structure
-```astro
----
-// 1. Imports (types first, then components)
-import type { ComponentProps } from '../types';
-import Layout from '../layouts/Layout.astro';
-
-// 2. Props interface and validation
-interface Props {
-  title: string;
-  items?: string[];
+### TypeScript Integration
+- Configure `tsconfig.json` with recommended v5.0 settings:
+```json
+{
+  "extends": "astro/tsconfigs/base",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
 }
-const { title, items = [] } = Astro.props;
-
-// 3. Data fetching and logic
-const processedData = await fetchData();
----
-
-<Layout title={title}>
-  <main>
-    <h1>{title}</h1>
-    {items.map(item => <p>{item}</p>)}
-  </main>
-</Layout>
-
-<style>
-  h1 { color: var(--heading-color); }
-</style>
 ```
+- Types auto-generated in `.astro/types.d.ts` (replaces `src/env.d.ts`)
+- Run `astro sync` to generate/update type definitions
+- Define component props with TypeScript interfaces
+- Leverage auto-generated types for content collections and Content Layer API
 
-### Client Directive Strategy
-- `client:load` - Critical interactivity (auth forms, navigation)
-- `client:idle` - Secondary features (analytics, non-essential widgets)  
-- `client:visible` - Below-fold content (lazy-loaded components)
-- `client:only` - Framework-specific components that can't SSR
-
-## API Routes & Data Fetching
-
-### API Endpoint Pattern
-> **⚠️ Critical Warning – Do NOT import `APIRoute` or `APIContext` from `'astro'` in Astro 5.x+**
->
-> As established by Byterover memory and OpenMemory analysis, importing `APIRoute` (or `APIContext`) from `'astro'` is prohibited in Astro 5.x+.
->
-> **Reason:** These types are *not exported* by the Astro core library—any attempt to import them will result in runtime errors or TypeScript failures, and can break production builds or dev environments.
->
-> **Fix:** Remove all direct imports and type annotations referencing `APIRoute` or `APIContext` in API route files. Export handlers without explicit type annotations—TypeScript will infer them correctly, or use a project-local type if you need stricter typing. Example:
->
-> ```typescript
-> // BAD (do NOT do this):
-> import type { APIRoute } from 'astro';
-> export const GET: APIRoute = async ({ request, cookies }) => { ... }
->
-> // GOOD (Astro 5.x+):
-> export const GET = async ({ request, cookies }) => { ... }
-> ```
->
-> For details, see reasoning in Byterover and OpenMemory.
-
-  
-```typescript
-// src/pages/api/data.ts
-import type { APIRoute } from 'astro';
-
-export const GET: APIRoute = async ({ request, cookies }) => {
-  try {
-    // Use AstroCookies for authentication
-    const token = cookies.get('auth-token')?.value;
-    if (!token) {
-      return new Response('Unauthorized', { status: 401 });
-    }
-    
-    const data = await fetchSecureData(token);
-    return Response.json(data);
-  } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-};
-```
+### Component Design
+- Use `.astro` components for static, server-rendered content
+- Import framework components (React, Vue, Svelte) only when interactivity is needed
+- Follow Astro's component script structure: frontmatter at top, template below
+- Use meaningful component names following PascalCase convention
+- Keep components focused and composable
+- Implement proper prop validation and default values
 
 ### Content Collections
-- Define schemas in `src/content/config.ts`
-- Use `getCollection()` for type-safe content queries
-- Implement proper error handling for missing content
 
-## Styling System
-
-### Theme Architecture
-```css
-/* src/styles/pixelated-theme.css */
-:root {
-  --primary: 221.2 83.2% 53.3%;
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-}
-
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-}
-```
-
-### Component Styling Rules
-- Scoped `<style>` tags in `.astro` files for component-specific styles
-- Tailwind classes for utility-first styling (NO `@apply` directive)
-- CSS variables for consistent theming across components
-- Centralized theme system in `src/styles/` directory
-
-## Security Requirements
-
-### Input Sanitization
-```astro
----
-import { sanitizeHtml } from 'sanitize-html';
-
-const userInput = Astro.request.url.searchParams.get('query') || '';
-const safeInput = encodeURIComponent(userInput);
-const richContent = sanitizeHtml(userContent, { allowedTags: ['p', 'strong'] });
----
-```
-
-### Authentication Patterns
-- Use `AstroCookies` for secure session management
-- Implement role-based access with TypeScript enums
-- Validate authentication in API routes before processing
-- Store sensitive data in environment variables only
-
-## Performance Optimization
-
-### View Transitions
-```astro
----
-import { ViewTransitions } from 'astro:transitions';
----
-<head>
-  <ViewTransitions />
-</head>
-
-<!-- Persistent elements across navigation -->
-<header transition:persist>Navigation</header>
-
-<!-- Named transitions for specific elements -->
-<img transition:name={`hero-${id}`} src={image} alt={title} />
-```
-
-### Core Web Vitals
-- Target <50ms response times for AI interactions
-- Minimize JavaScript bundles with strategic hydration
-- Use `loading="lazy"` for below-fold images
-- Implement proper caching strategies for API responses
-
-## TypeScript Patterns
-
-### Component Props
+#### Modern Content Layer API (v5.0+)
+- Define collections in `src/content.config.ts` using the new Content Layer API
+- Use built-in loaders: `glob()` for file-based content, `file()` for single files
+- Leverage enhanced performance and scalability with the new loading system
+- Example with Content Layer API:
 ```typescript
-interface ComponentProps {
-  title: string;
-  variant?: 'primary' | 'secondary';
-  items?: readonly string[];
-}
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
-// Use satisfies for better inference
-const config = {
-  theme: 'dark',
-  features: ['auth', 'chat']
-} satisfies AppConfig;
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({
+    title: z.string(),
+    pubDate: z.date(),
+    tags: z.array(z.string()).optional()
+  })
+});
 ```
 
-### Type Guards & Validation
+#### Legacy Collections (backward compatible)
+- Legacy `type: 'content'` collections still supported via automatic glob() implementation
+- Migrate existing collections by adding explicit `loader` configuration
+- Use type-safe queries with `getCollection()` and `getEntry()`
+- Structure content with frontmatter validation and auto-generated types
+
+### View Transitions & Client-Side Routing
+- Enable with `<ClientRouter />` component in layout head (renamed from `<ViewTransitions />` in v5.0)
+- Import from `astro:transitions`: `import { ClientRouter } from 'astro:transitions'`
+- Provides SPA-like navigation without full page reloads
+- Customize transition animations with CSS and view-transition-name
+- Maintain state across page navigations with persistent islands
+- Use `transition:persist` directive to preserve component state
+
+### Performance Optimization
+- Default to zero JavaScript - only add interactivity where needed
+- Use client directives strategically (`client:load`, `client:idle`, `client:visible`)
+- Implement lazy loading for images and components
+- Optimize static assets with Astro's built-in optimization
+- Leverage Content Layer API for faster content loading and builds
+- Minimize bundle size by avoiding unnecessary client-side JavaScript
+
+### Styling
+- Use scoped styles in `.astro` components by default
+- Implement CSS preprocessing (Sass, Less) when needed
+- Use CSS custom properties for theming and design systems
+- Follow mobile-first responsive design principles
+- Ensure accessibility with semantic HTML and proper ARIA attributes
+- Consider utility-first frameworks (Tailwind CSS) for rapid development
+
+### Client-Side Interactivity
+- Use framework components (React, Vue, Svelte) for interactive elements
+- Choose the right hydration strategy based on user interaction patterns
+- Implement state management within framework boundaries
+- Handle client-side routing carefully to maintain MPA benefits
+- Use Web Components for framework-agnostic interactivity
+- Share state between islands using stores or custom events
+
+### API Routes and SSR
+- Create API routes in `src/pages/api/` for dynamic functionality
+- Use proper HTTP methods and status codes
+- Implement request validation and error handling
+- Enable SSR mode for dynamic content requirements
+- Use middleware for authentication and request processing
+- Handle environment variables securely
+
+### SEO and Meta Management
+- Use Astro's built-in SEO components and meta tag management
+- Implement proper Open Graph and Twitter Card metadata
+- Generate sitemaps automatically for better search indexing
+- Use semantic HTML structure for better accessibility and SEO
+- Implement structured data (JSON-LD) for rich snippets
+- Optimize page titles and descriptions for search engines
+
+### Image Optimization
+- Use Astro's `<Image />` component for automatic optimization
+- Implement responsive images with proper srcset generation
+- Use WebP and AVIF formats for modern browsers
+- Lazy load images below the fold
+- Provide proper alt text for accessibility
+- Optimize images at build time for better performance
+
+### Data Fetching
+- Fetch data at build time in component frontmatter
+- Use dynamic imports for conditional data loading
+- Implement proper error handling for external API calls
+- Cache expensive operations during build process
+- Use Astro's built-in fetch with automatic TypeScript inference
+- Handle loading states and fallbacks appropriately
+
+### Build & Deployment
+- Optimize static assets with Astro's built-in optimizations
+- Configure deployment for static (SSG) or hybrid (SSR) rendering
+- Use environment variables for configuration management
+- Enable compression and caching for production builds
+
+## Key Astro v5.0 Updates
+
+### Breaking Changes
+- **ClientRouter**: Use `<ClientRouter />` instead of `<ViewTransitions />`
+- **TypeScript**: Auto-generated types in `.astro/types.d.ts` (run `astro sync`)
+- **Content Layer API**: New `glob()` and `file()` loaders for enhanced performance
+
+### Migration Example
 ```typescript
-function isValidUser(data: unknown): data is User {
-  return typeof data === 'object' && 
-         data !== null && 
-         'id' in data && 
-         'email' in data;
-}
+// Modern Content Layer API
+import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
+
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  schema: z.object({ title: z.string(), pubDate: z.date() })
+});
 ```
 
-## Error Handling Strategy
-
-### API Route Errors
-```typescript
-export const GET: APIRoute = async ({ request }) => {
-  try {
-    const data = await riskyOperation();
-    return Response.json(data);
-  } catch (error) {
-    console.error('API Error:', error);
-    return Response.json(
-      { error: 'Internal server error' }, 
-      { status: 500 }
-    );
-  }
-};
-```
-
-### Component Error Boundaries
-- Use early returns for invalid props
-- Provide fallback UI for missing data
-- Log errors appropriately without exposing sensitive information
-
-## Rendering Strategy
-
-### SSG vs SSR Decision Matrix
-- **SSG**: Marketing pages, documentation, blog posts
-- **SSR**: User dashboards, personalized content, real-time data
-- **Hybrid**: Use `output: 'hybrid'` with per-page `export const prerender = false`
+## Implementation Guidelines
 
 ### Development Workflow
-```bash
-# Development with verbose logging
-ASTRO_VERBOSE=1 pnpm dev
+1. Use `npm create astro@latest` with TypeScript template
+2. Configure Content Layer API with appropriate loaders
+3. Set up TypeScript with `astro sync` for type generation
+4. Create layout components with Islands Architecture
+5. Implement content pages with SEO and performance optimization
 
-# Debug server-side code
-node --inspect node_modules/.bin/astro dev
-
-# Performance profiling
-pnpm build:analyze
-```
-
-## Project-Specific Patterns
-
-### Pixelated Empathy Requirements
-- Maintain <50ms response times for AI chat interactions
-- Implement HIPAA-compliant data handling in all components
-- Use centralized theme system for consistent UI across admin/user interfaces
-- Apply bias detection monitoring in AI-related components
-- Ensure accessibility compliance (WCAG AA) for all interactive elements
-
-### Component Reusability
-- Use shared UI components (Badge, Button, Card) from `components/ui/`
-- Maintain consistent styling through centralized theme variables
-- Implement proper TypeScript interfaces for all component props
-- Follow domain-driven organization in component folders
+### Astro-Specific Best Practices
+- **Islands Architecture**: Server-first with selective hydration using client directives
+- **Content Layer API**: Use `glob()` and `file()` loaders for scalable content management
+- **Zero JavaScript**: Default to static rendering, add interactivity only when needed
+- **View Transitions**: Enable SPA-like navigation with `<ClientRouter />`
+- **Type Safety**: Leverage auto-generated types from Content Collections
+- **Performance**: Optimize with built-in image optimization and minimal client bundles

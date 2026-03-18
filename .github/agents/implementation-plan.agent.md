@@ -1,7 +1,9 @@
 ---
-description: 'Generate an implementation plan for new features or refactoring existing code.'
-tools: ['codebase', 'usages', 'vscodeAPI', 'think', 'problems', 'changes', 'testFailure', 'terminalSelection', 'terminalLastCommand', 'fetch', 'findTestFiles', 'searchResults', 'githubRepo', 'extensions', 'todos', 'runTests', 'editFiles', 'search', 'runCommands', 'runTasks', 'byterover-mcp', 'assign_copilot_to_issue', 'create_branch', 'create_issue', 'create_pending_pull_request_review', 'create_pull_request', 'create_pull_request_with_copilot', 'delete_pending_pull_request_review', 'get_commit', 'get_dependabot_alert', 'get_file_contents', 'get_pull_request', 'get_pull_request_comments', 'get_pull_request_diff', 'get_pull_request_files', 'get_pull_request_reviews', 'list_branches', 'list_commits', 'sentry', 'context7', 'serena', 'copilotCodingAgent', 'activePullRequest']
+description: "Generate an implementation plan for new features or refactoring existing code."
+name: "Implementation Plan Generation Mode"
+tools: ["search/codebase", "search/usages", "vscode/vscodeAPI", "think", "read/problems", "search/changes", "execute/testFailure", "read/terminalSelection", "read/terminalLastCommand", "vscode/openSimpleBrowser", "web/fetch", "findTestFiles", "search/searchResults", "web/githubRepo", "vscode/extensions", "edit/editFiles", "execute/runNotebookCell", "read/getNotebookSummary", "read/readNotebookCellOutput", "search", "vscode/getProjectSetupInfo", "vscode/installExtension", "vscode/newWorkspace", "vscode/runCommand", "execute/getTerminalOutput", "execute/runInTerminal", "execute/createAndRunTask", "execute/getTaskOutput", "execute/runTask"]
 ---
+
 # Implementation Plan Generation Mode
 
 ## Primary Directive
@@ -101,21 +103,21 @@ tags: [Optional: List of relevant tags or categories, e.g., `feature`, `upgrade`
 
 - GOAL-001: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
 
-| Task | Description | Completed | Date |
-|------|-------------|-----------|------|
-| TASK-001 | Description of task 1 | ✅ | 2025-04-25 |
-| TASK-002 | Description of task 2 | |  |
-| TASK-003 | Description of task 3 | |  |
+| Task     | Description           | Completed | Date       |
+| -------- | --------------------- | --------- | ---------- |
+| TASK-001 | Description of task 1 | ✅        | 2025-04-25 |
+| TASK-002 | Description of task 2 |           |            |
+| TASK-003 | Description of task 3 |           |            |
 
 ### Implementation Phase 2
 
 - GOAL-002: [Describe the goal of this phase, e.g., "Implement feature X", "Refactor module Y", etc.]
 
-| Task | Description | Completed | Date |
-|------|-------------|-----------|------|
-| TASK-004 | Description of task 4 | |  |
-| TASK-005 | Description of task 5 | |  |
-| TASK-006 | Description of task 6 | |  |
+| Task     | Description           | Completed | Date |
+| -------- | --------------------- | --------- | ---- |
+| TASK-004 | Description of task 4 |           |      |
+| TASK-005 | Description of task 5 |           |      |
+| TASK-006 | Description of task 6 |           |      |
 
 ## 3. Alternatives
 
