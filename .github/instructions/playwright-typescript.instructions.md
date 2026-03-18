@@ -1,6 +1,6 @@
 ---
 description: 'Playwright test generation instructions'
-applyTo: 'none'
+applyTo: '**'
 ---
 
 ## Test Writing Guidelines
