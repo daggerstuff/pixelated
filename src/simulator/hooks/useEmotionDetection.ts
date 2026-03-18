@@ -9,6 +9,17 @@ import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 
+/**
+ * Custom hook to detect emotions from text and update the simulator's emotion state.
+ *
+ * Initializes the `EmotionLlamaProvider` to extract categorical emotions (e.g., joy, anger).
+ * It maps these categorical emotions to continuous dimensional coordinates using the
+ * PAD (Pleasure-Arousal-Dominance) emotional state model. The resulting `valence`
+ * (pleasure/sentiment), `energy` (arousal), and `dominance` values are calculated as a
+ * weighted average of the detected emotions and used to update the global simulator context.
+ *
+ * @returns An object containing the `detectEmotions` function to analyze text inputs.
+ */
 export const useEmotionDetection = () => {
   const providerRef = useRef<EmotionLlamaProvider | null>(null)
   const { updateEmotionState } = useSimulatorContext()
