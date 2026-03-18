@@ -20,6 +20,10 @@ export function sanitizeUrl(url: string): string {
 		return trimmed
 	}
 	// Allow relative URLs (starting with /, ./, ../, or #)
+	// But reject protocol-relative URLs (starting with //)
+	if (/^\/\//.test(trimmed)) {
+		return '#'
+	}
 	if (/^[/.#]/.test(trimmed)) {
 		return trimmed
 	}
