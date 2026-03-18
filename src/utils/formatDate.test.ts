@@ -1,5 +1,31 @@
-import { describe, it, expect } from 'vitest'
-import { formatDuration } from './formatDate'
+import { describe, it, expect, vi } from 'vitest'
+import { formatDuration, formatDate } from './formatDate'
+
+describe('formatDate', () => {
+  it('throws an error for an invalid date string', () => {
+    expect(() => formatDate('invalid-date')).toThrow(
+      'Failed to format date: Error: Invalid date string',
+    )
+  })
+
+  it('formats custom date string correctly', () => {
+    expect(
+      formatDate('2023-01-01T12:00:00Z', { formatString: 'YYYY-MM-DD' }),
+    ).toBe('2023-01-01')
+  })
+
+  it('formats relative date correctly', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2023-01-01T12:00:00Z'))
+
+    // 1 minute ago
+    expect(
+      formatDate('2023-01-01T11:59:00Z', { relative: true }),
+    ).toBe('1 minute ago')
+
+    vi.useRealTimers()
+  })
+})
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
