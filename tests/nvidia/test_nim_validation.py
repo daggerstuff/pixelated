@@ -64,7 +64,7 @@ class TestNIMValidation:
     async def test_basic_inference_nemotron_nano(self, nim_client):
         """Test basic chat completion with Nemotron-Nano-12B (fast model)."""
         response = await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=[{"role": "user", "content": "Quick test"}],
             max_tokens=50,
             temperature=0.7
@@ -79,7 +79,7 @@ class TestNIMValidation:
         start = time.time()
 
         await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=[{"role": "user", "content": "Quick test"}],
             max_tokens=50
         )
@@ -221,7 +221,7 @@ Respond with a JSON object containing:
     async def test_streaming_response(self, nim_client):
         """Test streaming response functionality."""
         stream = await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=[{"role": "user", "content": "Tell me about managing stress"}],
             stream=True,
             max_tokens=100
@@ -248,7 +248,7 @@ Respond with a JSON object containing:
         ]
 
         response = await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=context_messages,
             max_tokens=100
         )
@@ -301,7 +301,7 @@ class TestNIMModelComparison:
     async def test_model_comparison_latency(self, nim_client):
         """Compare latency across different models."""
         models = [
-            "nvidia/nemotron-nano-12b-v2",
+            "nvidia/llama-3.1-nemotron-nano-8b-v1",
             "nvidia/llama-3.3-nemotron-super-49b-v1.5"
         ]
 
@@ -318,7 +318,7 @@ class TestNIMModelComparison:
             results[model] = time.time() - start
 
         # Nano should be faster than Super
-        assert results["nvidia/nemotron-nano-12b-v2"] < results["nvidia/llama-3.3-nemotron-super-49b-v1.5"]
+        assert results["nvidia/llama-3.1-nemotron-nano-8b-v1"] < results["nvidia/llama-3.3-nemotron-super-49b-v1.5"]
 
     @requires_nvidia_api_key
     async def test_model_selection_by_complexity(self, nim_client):
@@ -326,7 +326,7 @@ class TestNIMModelComparison:
         # Simple task - should work well with Nano
         simple_prompt = "Hello"
         response_nano = await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=[{"role": "user", "content": simple_prompt}],
             max_tokens=50
         )
@@ -396,7 +396,7 @@ class TestNIMPerformance:
 
         tasks = [
             nim_client.chat.completions.create(
-                model="nvidia/nemotron-nano-12b-v2",
+                model="nvidia/llama-3.1-nemotron-nano-8b-v1",
                 messages=[{"role": "user", "content": f"Test {i}"}],
                 max_tokens=20
             )
@@ -418,7 +418,7 @@ class TestNIMPerformance:
         first_token_time = None
 
         stream = await nim_client.chat.completions.create(
-            model="nvidia/nemotron-nano-12b-v2",
+            model="nvidia/llama-3.1-nemotron-nano-8b-v1",
             messages=[{"role": "user", "content": "Hello"}],
             stream=True,
             max_tokens=50

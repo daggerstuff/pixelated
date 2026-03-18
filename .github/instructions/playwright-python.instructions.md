@@ -1,6 +1,6 @@
 ---
 description: 'Playwright Python AI test generation instructions based on official documentation.'
-applyTo: 'none'
+applyTo: '**'
 ---
 
 # Playwright Python Test Generation Instructions
