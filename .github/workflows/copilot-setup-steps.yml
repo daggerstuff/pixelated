@@ -49,8 +49,3 @@ jobs:
         else
           echo "No supported test runner found (vitest/jest)."
         fi
-
-    - name: GitHub Copilot Code Review
-      uses: github/copilot-review-action@v1
-      with:
-        github-token: ${{ secrets.G_TOKEN }}
