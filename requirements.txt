@@ -941,7 +941,7 @@ opentelemetry-instrumentation-pinecone==0.53.2
     # via traceloop-sdk
 opentelemetry-instrumentation-qdrant==0.53.2
     # via traceloop-sdk
-opentelemetry-instrumentation-redis==0.60b1
+opentelemetry-instrumentation-redis==0.61b0
     # via traceloop-sdk
 opentelemetry-instrumentation-replicate==0.53.2
     # via traceloop-sdk
