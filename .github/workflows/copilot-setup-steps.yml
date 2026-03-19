@@ -1,5 +1,4 @@
 name: "Code Quality Checks"
-
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -8,19 +7,18 @@ on:
 jobs:
   copilot-code-review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       pull-requests: write
-
     environment: copilot
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
@@ -35,7 +33,7 @@ jobs:
         run: pnpm lint
 
       - name: Format check (Prettier)
-        run: pnpm exec prettier --check . || true
+        run: pnpm exec prettier --check .
 
       - name: Run tests
         run: |
@@ -53,7 +51,7 @@ jobs:
       - name: Summary
         run: |
           echo "=== Code Quality Check Summary ==="
-          echo "Lint: ESLint completed"
+          echo "Lint: Oxlint completed"
           echo "Format: Prettier check completed"
           echo "Tests: Unit tests completed"
           echo "Type Check: TypeScript validation completed"
