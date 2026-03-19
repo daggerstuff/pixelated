@@ -969,7 +969,7 @@ opentelemetry-instrumentation-weaviate==0.53.2
     # via traceloop-sdk
 opentelemetry-instrumentation-writer==0.53.2
     # via traceloop-sdk
-opentelemetry-proto==1.39.1
+opentelemetry-proto==1.40.0
     # via
     #   opentelemetry-exporter-otlp-proto-common
     #   opentelemetry-exporter-otlp-proto-grpc
