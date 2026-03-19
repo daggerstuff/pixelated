@@ -9,6 +9,13 @@ import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 
+/**
+ * Hook for detecting and tracking user emotions within the simulator.
+ *
+ * It utilizes the PAD (Pleasure-Arousal-Dominance) emotional state model to translate
+ * categorical emotions (e.g., joy, anger) identified by the LLM into continuous
+ * dimensional coordinates (valence, energy, dominance) for real-time simulator state tracking.
+ */
 export const useEmotionDetection = () => {
   const providerRef = useRef<EmotionLlamaProvider | null>(null)
   const { updateEmotionState } = useSimulatorContext()
