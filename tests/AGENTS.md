@@ -50,7 +50,7 @@ Suites: `test:unit`, `test:integration`, `test:e2e:critical`, `test:accessibilit
 ## EXAMPLES
 
 **Component test (Vitest)**:
-```typescript
+```tsx
 import { render, screen } from '@testing-library/react'
 import Button from '@/components/Button'
 test('renders', () => {
