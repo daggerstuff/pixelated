@@ -1,14 +1,26 @@
 #!/usr/bin/env node
 import { readdir, readFile, writeFile } from "fs/promises";
-import { extname, join, dirname } from "path";
+import { extname, join, dirname, resolve, sep, isAbsolute } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const REPO_DIR = join(__dirname, "..");
 const DOCS_DIR = join(REPO_DIR, "docs");
+const DOCS_ROOT = resolve(DOCS_DIR);
 
 let totalFiles = 0, filesModified = 0, fixesByRule = {};
+
+function safeChildPath(parentDir, childName) {
+  if (!childName || isAbsolute(childName) || childName.includes("..") || childName.includes("/") || childName.includes("\\")) {
+    throw new Error(`Unsafe directory entry: ${childName}`);
+  }
+  const candidate = resolve(parentDir, childName);
+  if (candidate !== DOCS_ROOT && !candidate.startsWith(DOCS_ROOT + sep)) {
+    throw new Error(`Path escapes docs root: ${childName}`);
+  }
+  return candidate;
+}
 
 function trackFix(rule) { fixesByRule[rule] = (fixesByRule[rule] || 0) + 1; }
 
@@ -97,7 +109,16 @@ function fixMD040(c) {
         if (sample.startsWith("$") || sample.startsWith("#") || sample.includes("curl ") || sample.includes("apt-") || sample.includes("docker ") || sample.includes("npm ") || sample.includes("pnpm ") || sample.includes("yarn ") || sample.includes("make ") || sample.startsWith("export ") || sample.startsWith("source ")) { lang = "bash"; break; }
         if (sample.includes("def ") || sample.includes("import ") || sample.includes("from ") || sample.includes("class ") || sample.includes("python")) { lang = "python"; break; }
         if (sample.includes("function ") || sample.includes("const ") || sample.includes("let ") || sample.includes("var ") || sample.includes("import ") || sample.includes("export ") || sample.includes("interface ") || sample.includes("type ")) { lang = "typescript"; break; }
-        if (sample.includes("<") && sample.includes(">") && !sample.includes("</")) { if (sample.includes("=") && (sample.includes('"') || sample.includes("'"))) { lang = "html"; break; } }
+        if (
+          sample.includes("<")
+          && sample.includes(">")
+          && !sample.includes("</")
+          && sample.includes("=")
+          && (sample.includes('"') || sample.includes("'"))
+        ) {
+          lang = "html";
+          break;
+        }
       }
       if (found && !t.includes(" ")) { l[i] = t + " " + lang; m = true; trackFix("MD040"); }
     }
@@ -161,7 +182,12 @@ async function processFile(fp) {
 async function getAllMarkdownFiles(dir, files = []) {
   const entries = await readdir(dir, { withFileTypes: true });
   for (const entry of entries) {
-    const fp = join(dir, entry.name);
+    let fp;
+    try {
+      fp = safeChildPath(dir, entry.name);
+    } catch {
+      continue;
+    }
     if (entry.isDirectory()) {
       if (entry.name === ".git" || entry.name === "node_modules") continue;
       await getAllMarkdownFiles(fp, files);
