@@ -1,9 +1,0 @@
---- src/components/ui/Alert.astro
-+++ src/components/ui/Alert.astro
-@@ -67,6 +67,7 @@
-   <div class="flex-1">
-     {title && <h3 class="text-sm font-medium">{title}</h3>}
-     {description && <div class="text-sm mt-1">{description}</div>}
-+    <slot />
-     {actions && <div class="mt-3">{actions}</div>}
-   </div>

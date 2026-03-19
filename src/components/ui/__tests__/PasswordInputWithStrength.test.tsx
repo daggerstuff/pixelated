@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { PasswordInputWithStrength } from '../PasswordInputWithStrength'
 import React from 'react'
 
@@ -60,7 +60,7 @@ describe('PasswordInputWithStrength', () => {
     expect(progressbar.getAttribute('aria-valuetext')).toBe('fair')
   })
 
-  it('has aria-live="polite" on feedback text', async () => {
+  it('has aria-live="polite" on feedback text', () => {
     render(
       <PasswordInputWithStrength
         label="Password"
@@ -71,10 +71,8 @@ describe('PasswordInputWithStrength', () => {
     )
 
     // Check for aria-live="polite" on the element containing the feedback
-    await waitFor(() => {
-        const feedback = screen.getByText(/Fair - could be stronger/i)
-        expect(feedback.getAttribute('aria-live')).toBe('polite')
-    })
+    const feedback = screen.getByText(/Fair - could be stronger/i)
+    expect(feedback.getAttribute('aria-live')).toBe('polite')
   })
 
   it('includes error in aria-describedby when error exists', () => {
