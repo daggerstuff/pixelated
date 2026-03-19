@@ -1,15 +1,5 @@
-import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { formatDuration, formatDate } from './formatDate'
-
-beforeEach(() => {
-  vi.useFakeTimers()
-  vi.setSystemTime(new Date('2023-01-01T12:00:00Z'))
-  process.env.TZ = 'UTC'
-})
-
-afterEach(() => {
-  vi.useRealTimers()
-})
 
 describe('formatDate', () => {
   it('throws an error for an invalid date string', () => {
@@ -25,10 +15,15 @@ describe('formatDate', () => {
   })
 
   it('formats relative date correctly', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2023-01-01T12:00:00Z'))
+
     // 1 minute ago
     expect(
       formatDate('2023-01-01T11:59:00Z', { relative: true }),
     ).toBe('1 minute ago')
+
+    vi.useRealTimers()
   })
 })
 
