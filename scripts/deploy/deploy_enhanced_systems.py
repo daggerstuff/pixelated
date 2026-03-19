@@ -16,7 +16,6 @@ from typing import Any
 
 import redis
 from sqlalchemy import create_engine, text
-from sqlalchemy.exc import SQLAlchemyError
 
 # Configure logging
 logging.basicConfig(
@@ -193,9 +192,6 @@ class EnhancedSystemDeployer:
             self.log_deployment_step("Database Setup", "completed", "Schema created successfully")
             return True
 
-        except SQLAlchemyError as e:
-            self.log_deployment_step("Database Setup", "failed", str(e))
-            return False
         except Exception as e:
             self.log_deployment_step("Database Setup", "failed", str(e))
             return False
@@ -462,7 +458,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["
                     text=True,
                     timeout=300,  # 5 minutes timeout
                     shell=False,
-                    check=False,
+                    check=True,
                 )
 
                 if result.returncode == 0:
@@ -490,7 +486,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["
         # Calculate success rate
         total_steps = len(self.deployment_log)
         successful_steps = sum(
-            1 for log in self.deployment_log if log["status"] in ["passed", "completed"]
+            log["status"] in {"passed", "completed"} for log in self.deployment_log
         )
         report["success_rate"] = successful_steps / total_steps if total_steps > 0 else 0
 

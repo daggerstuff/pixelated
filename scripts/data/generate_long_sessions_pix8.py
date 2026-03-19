@@ -109,7 +109,7 @@ class PIX8LongSessionGenerator:
             }
 
     def _run_extraction_process(self, cmd, output_file):
-        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True, shell=False)
 
         logger.info("Extraction complete!")
         logger.info(result.stdout)

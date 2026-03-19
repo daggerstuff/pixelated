@@ -1,10 +1,22 @@
 import { readFile, writeFile, readdir } from "fs/promises";
-import { join, dirname } from "path";
+import { join, dirname, resolve, sep, isAbsolute } from "path";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const DOCS_DIR = join(__dirname, "..", "docs");
+const DOCS_ROOT = resolve(DOCS_DIR);
+
+function safeChildPath(parentDir, childName) {
+  if (!childName || isAbsolute(childName) || childName.includes("..") || childName.includes("/") || childName.includes("\\")) {
+    throw new Error(`Unsafe directory entry: ${childName}`);
+  }
+  const candidate = resolve(parentDir, childName);
+  if (candidate !== DOCS_ROOT && !candidate.startsWith(DOCS_ROOT + sep)) {
+    throw new Error(`Path escapes docs root: ${childName}`);
+  }
+  return candidate;
+}
 
 async function fixFile(filepath) {
   const content = await readFile(filepath, "utf-8");
@@ -40,7 +52,12 @@ async function fixFile(filepath) {
 async function walk(dir, files = []) {
   const entries = await readdir(dir, { withFileTypes: true });
   for (const e of entries) {
-    const p = join(dir, e.name);
+    let p;
+    try {
+      p = safeChildPath(dir, e.name);
+    } catch {
+      continue;
+    }
     if (e.isDirectory()) {
       if (e.name === ".git" || e.name === "node_modules") continue;
       await walk(p, files);
