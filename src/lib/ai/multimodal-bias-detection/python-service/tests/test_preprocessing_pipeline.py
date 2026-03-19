@@ -1,27 +1,27 @@
-from multimodal_bias_detection.config import settings
 from multimodal_bias_detection.preprocessing_pipeline import validate_audio_format
 
 
 def test_validate_audio_format_valid():
     """Test valid audio extensions from config"""
-    for ext in settings.allowed_audio_formats:
-        assert validate_audio_format(f"test_file.{ext}") is True
-
+    assert validate_audio_format("test_file.mp3") is True
+    assert validate_audio_format("audio.wav") is True
+    assert validate_audio_format("/path/to/file.flac") is True
+    assert validate_audio_format("m4a_audio.m4a") is True
+    assert validate_audio_format("sound.ogg") is True
 
 def test_validate_audio_format_invalid():
     """Test invalid audio extensions"""
-    known_invalid = {"txt", "pdf", "mp4"} - set(settings.allowed_audio_formats)
-    for ext in known_invalid:
-        assert validate_audio_format(f"document.{ext}") is False
-
+    assert validate_audio_format("document.txt") is False
+    assert validate_audio_format("image.pdf") is False
+    assert validate_audio_format("video.mp4") is False
     assert validate_audio_format("no_extension") is False
-
 
 def test_validate_audio_format_case_insensitive():
     """Test extensions with mixed case"""
-    for ext in settings.allowed_audio_formats:
-        assert validate_audio_format(f"AUDIO.{ext.upper()}") is True
-
+    assert validate_audio_format("AUDIO.MP3") is True
+    assert validate_audio_format("sound.Wav") is True
+    assert validate_audio_format("test.Flac") is True
+    assert validate_audio_format("music.M4a") is True
 
 def test_validate_audio_format_exceptions():
     """Test exception handling for invalid inputs"""
