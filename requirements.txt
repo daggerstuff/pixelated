@@ -982,7 +982,7 @@ opentelemetry-sdk==1.39.1
     #   opentelemetry-semantic-conventions-ai
     #   traceloop-sdk
     #   xai-sdk
-opentelemetry-semantic-conventions==0.60b1
+opentelemetry-semantic-conventions==0.61b0
     # via
     #   mistralai
     #   opentelemetry-instrumentation
