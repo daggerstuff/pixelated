@@ -64,7 +64,7 @@ jobs:
         id: get-tag
         run: |
           # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.cjs validate staging; then
+          if node scripts/utils/tag-manager.cjs validate staging; then
             TAGS=$(git tag -l "staging-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
             echo "tag=$TAG" >> $GITHUB_OUTPUT
@@ -73,7 +73,7 @@ jobs:
           else
             echo "::warning::Cannot rollback - insufficient staging tags"
             echo "::notice::Creating initial staging tags for future rollbacks"
-            node scripts/tag-manager.cjs create staging --message="Initial staging tag for rollback capability" --push
+            node scripts/utils/tag-manager.cjs create staging --message="Initial staging tag for rollback capability" --push
             echo "::error::Rollback not possible - this appears to be the first deployment"
             exit 1
           fi
@@ -84,7 +84,7 @@ jobs:
       - name: Debug Token Permissions
         run: |
           echo "Checking token permissions..."
-          curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+          curl -H "Authorization: token ${{ github.token }}" https://api.github.com/user
 
       - name: Compute unique rollback tag for staging
         id: compute-tag-staging
@@ -111,8 +111,6 @@ jobs:
           echo "Computed tag: ${TAG_NAME}"
 
       - name: Dry Run Git Push
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           # Use the computed tag from the previous step
           git config --global user.email "action@github.com"
@@ -120,11 +118,9 @@ jobs:
           TAG_NAME=${{ steps.compute-tag-staging.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run https://x-access-token:${{ github.token }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
       - name: Create rollback tag
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           # Push the previously computed tag, but ensure uniqueness by checking local and remote
           git config --global user.email "action@github.com"
@@ -132,7 +128,7 @@ jobs:
           TAG_BASE=${{ steps.compute-tag-staging.outputs.tag }}
           TAG_NAME="$TAG_BASE"
           # Ensure the remote URL is set to use token auth for push checks
-          git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/pixelatedempathy/pixelated.git
           # Fetch remote tags for accurate checks
           git fetch --tags --force
           COUNT=0
@@ -202,7 +198,7 @@ jobs:
         id: get-tag
         run: |
           # Use the tag manager to validate and get rollback tag
-          if node scripts/tag-manager.cjs validate production; then
+          if node scripts/utils/tag-manager.cjs validate production; then
             TAGS=$(git tag -l "production-*" --sort=-committerdate)
             TAG=$(echo "$TAGS" | sed -n '2p')
             echo "tag=$TAG" >> $GITHUB_OUTPUT
@@ -211,7 +207,7 @@ jobs:
           else
             echo "::warning::Cannot rollback - insufficient production tags"
             echo "::notice::Creating initial production tags for future rollbacks"
-            node scripts/tag-manager.cjs create production --message="Initial production tag for rollback capability" --push
+            node scripts/utils/tag-manager.cjs create production --message="Initial production tag for rollback capability" --push
             echo "::error::Rollback not possible - this appears to be the first deployment"
             exit 1
           fi
@@ -222,7 +218,7 @@ jobs:
       - name: Debug Token Permissions
         run: |
           echo "Checking token permissions..."
-          curl -H "Authorization: token ${{ secrets.G_TOKEN }}" https://api.github.com/user
+          curl -H "Authorization: token ${{ github.token }}" https://api.github.com/user
       - name: Compute unique rollback tag for production
         id: compute-tag-prod
         shell: bash
@@ -248,25 +244,21 @@ jobs:
           echo "Computed tag: ${TAG_NAME}"
 
       - name: Dry Run Git Push
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_NAME=${{ steps.compute-tag-prod.outputs.tag }}
           echo "Dry run for git push using tag: $TAG_NAME"
           git tag "$TAG_NAME"
-          git push --dry-run https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
+          git push --dry-run https://x-access-token:${{ github.token }}@github.com/pixelatedempathy/pixelated.git "$TAG_NAME"
 
       - name: Create rollback tag
-        env:
-          G_TOKEN: ${{ secrets.G_TOKEN }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           TAG_BASE=${{ steps.compute-tag-prod.outputs.tag }}
           TAG_NAME="$TAG_BASE"
-          git remote set-url origin https://x-access-token:${{ secrets.G_TOKEN }}@github.com/pixelatedempathy/pixelated.git
+          git remote set-url origin https://x-access-token:${{ github.token }}@github.com/pixelatedempathy/pixelated.git
           git fetch --tags --force
           COUNT=0
           # Try up to 100 suffix increments to find a unique tag for production
