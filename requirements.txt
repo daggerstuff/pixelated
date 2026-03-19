@@ -852,7 +852,7 @@ opentelemetry-exporter-otlp-proto-http==1.39.1
     # via
     #   logfire
     #   traceloop-sdk
-opentelemetry-instrumentation==0.60b1
+opentelemetry-instrumentation==0.61b0
     # via
     #   logfire
     #   opentelemetry-instrumentation-agno
