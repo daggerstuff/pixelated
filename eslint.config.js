@@ -68,6 +68,7 @@ export default tseslint.config(
     rules: {
       // Disable base no-unused-vars for TypeScript files
       'no-unused-vars': 'off',
+
       // TypeScript ESLint unused vars with OXC-like configuration
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -78,6 +79,7 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+
       // TypeScript correctness rules (matching OXC)
       '@typescript-eslint/ban-ts-comment': 'error',
       '@typescript-eslint/no-duplicate-enum-values': 'error',
@@ -193,6 +195,7 @@ export default tseslint.config(
       ...pluginReact.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/jsx-uses-react': 'off',
+
       // React rules (matching OXC)
       'react/jsx-key': 'warn',
       'react/jsx-no-comment-textnodes': 'warn',
@@ -222,6 +225,7 @@ export default tseslint.config(
         },
       ],
       'react/no-array-index-key': 'warn',
+
       // React Hooks rules
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
@@ -285,6 +289,7 @@ export default tseslint.config(
     files: ['**/*.json'],
     plugins: { json },
     language: 'json/json',
+    rules: { 'no-irregular-whitespace': 'off' }
   },
   {
     files: ['**/*.jsonc'],
@@ -329,6 +334,7 @@ export default tseslint.config(
       // but used in the template
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+
       // Use Astro-specific recommended rules
       ...pluginAstro.configs.recommended.rules,
     },
