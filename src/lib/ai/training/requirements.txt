@@ -261,7 +261,7 @@ memory-profiler==0.61.0
     # via -r src/lib/ai/training/requirements.txt
 minio==7.2.20
     # via -r src/lib/ai/training/requirements.txt
-mlflow==3.8.1
+mlflow==3.9.0rc0
     # via -r src/lib/ai/training/requirements.txt
 mlflow-skinny==3.8.1
     # via mlflow
@@ -463,7 +463,7 @@ pyarrow==22.0.0
     # via
     #   datasets
     #   mlflow
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   pyasn1-modules
     #   rsa
