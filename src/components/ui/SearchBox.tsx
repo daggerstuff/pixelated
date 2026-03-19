@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-
 import type { SearchResult } from '../../lib/search'
 
 interface SearchBoxProps {
@@ -30,6 +29,7 @@ export default function SearchBox({
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
+
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
@@ -43,6 +43,7 @@ export default function SearchBox({
 
   // Track if the search is actually showing results
   const hasResults = useMemo(() => results.length > 0, [results])
+
   const showResults = useMemo(
     () => isOpen && query.length >= minQueryLength,
     [isOpen, query, minQueryLength],
@@ -94,6 +95,7 @@ export default function SearchBox({
     }
 
     document.addEventListener('keydown', handleGlobalKeyDown)
+
     return () => {
       document.removeEventListener('keydown', handleGlobalKeyDown)
     }
@@ -140,6 +142,7 @@ export default function SearchBox({
       if (!(target instanceof Node)) {
         return
       }
+
       if (
         resultsRef.current &&
         !resultsRef.current.contains(target) &&
@@ -202,7 +205,6 @@ export default function SearchBox({
   const handleResultClick = (result: SearchResult) => {
     setIsOpen(false)
     setQuery('')
-
     if (onResultClick) {
       onResultClick(result)
     } else {
@@ -239,7 +241,6 @@ export default function SearchBox({
           }
           autoComplete='off'
         />
-
         {query.length === 0 && (
           <div className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2'>
             <kbd className='border-gray-200 bg-gray-100 text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 hidden h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 sm:inline-flex'>
@@ -247,7 +248,6 @@ export default function SearchBox({
             </kbd>
           </div>
         )}
-
         {query.length > 0 && (
           <button
             type='button'
@@ -258,7 +258,6 @@ export default function SearchBox({
               inputRef.current?.focus()
             }}
             aria-label='Clear search'
-            tabIndex={-1}
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
