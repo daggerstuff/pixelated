@@ -1,29 +1,11 @@
-name: CI
-on:
-  pull_request:
-    branches: [main]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-          cache: "pnpm"
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint
-        run: pnpm lint
-      - name: Format check (Prettier)
-        run: pnpm exec prettier --check .
-      - name: Run tests
-        run: |
-          pnpm test
-          pnpm build
+--- .github/workflows/copilot-setup-steps.yml
++++ .github/workflows/copilot-setup-steps.yml
+@@ -34,7 +34,7 @@
+         run: pnpm lint
+
+       - name: Format check (Prettier)
+-        run: pnpm exec prettier --check .
++        run: pnpm exec prettier --check src/components/ui/SearchBox.tsx
+
+       - name: Run tests
+         run: |

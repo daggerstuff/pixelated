@@ -17,7 +17,10 @@ vi.mock('../../hooks/usePasswordStrength', () => ({
 describe('PasswordInputWithStrength', () => {
   it('renders label and input', () => {
     render(
-      <PasswordInputWithStrength label="Password" name="password" />
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+      />
     )
     // Use selector to avoid matching the button title
     expect(screen.getByLabelText('Password', { selector: 'input' })).toBeInTheDocument()
@@ -25,21 +28,33 @@ describe('PasswordInputWithStrength', () => {
 
   it('shows error even when focused', () => {
     const { container } = render(
-      <PasswordInputWithStrength label="Password" name="password" error="Invalid password" />
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+        error="Invalid password"
+      />
     )
+
     const input = screen.getByLabelText('Password', { selector: 'input' })
     fireEvent.focus(input)
+
     // Error label should be present and announced as an alert
     const errorAlert = screen.getByRole('alert')
     expect(errorAlert).toHaveTextContent('Invalid password')
+
     // aria-invalid should be true
     expect(input.getAttribute('aria-invalid')).toBe('true')
   })
 
   it('has correct ARIA attributes for strength meter', () => {
     render(
-      <PasswordInputWithStrength label="Password" name="password" value="password123" />
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+        value="password123"
+      />
     )
+
     const progressbar = screen.getByRole('progressbar')
     expect(progressbar.getAttribute('aria-label')).toBe('Password strength')
     expect(progressbar.getAttribute('aria-valuetext')).toBe('fair')
@@ -47,8 +62,14 @@ describe('PasswordInputWithStrength', () => {
 
   it('has aria-live="polite" on feedback text', () => {
     render(
-      <PasswordInputWithStrength label="Password" name="password" value="password123" showStrengthText={true} />
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+        value="password123"
+        showStrengthText={true}
+      />
     )
+
     // Check for aria-live="polite" on the element containing the feedback
     const feedback = screen.getByText(/Fair - could be stronger/i)
     expect(feedback.getAttribute('aria-live')).toBe('polite')
@@ -56,8 +77,14 @@ describe('PasswordInputWithStrength', () => {
 
   it('includes error in aria-describedby when error exists', () => {
     render(
-      <PasswordInputWithStrength label="Password" name="password" error="Required" helperText="Enter your password" />
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+        error="Required"
+        helperText="Enter your password"
+      />
     )
+
     const input = screen.getByLabelText('Password', { selector: 'input' })
     const describedBy = input.getAttribute('aria-describedby')
     expect(describedBy).toContain('password-error')
