@@ -180,8 +180,8 @@ docs3
 .autoswitch_venv
 .windsurf
 
-docs/plans
-docs/tracking
+.agent/internal/plans
+.agent/internal/tracking
 docs/next-task-plan.md
 docs/ngc-therapeutic-enhancement-checklist.md
 docs/PIX-5-Audit.md
@@ -282,3 +282,4 @@ node_modules
 worktrees/
 
 .sisyphus/run-continuation
+.planning/

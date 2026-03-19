@@ -31,14 +31,14 @@ import sys
 import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
-class TaskStatus(str, Enum):
+class TaskStatus(StrEnum):
     """Status of a PIX-8 task."""
 
     PENDING = "pending"
@@ -104,6 +104,40 @@ class PIX8Orchestrator:
 
         logger.info(f"Initialized PIX-8 Orchestrator (test_mode: {test_mode})")
 
+    def _stream_process_output(self, process: subprocess.Popen[str]) -> list[str]:
+        """Stream and capture process stdout lines."""
+        output_lines: list[str] = []
+        if stdout := process.stdout:
+            for line in stdout:
+                stripped_line = line.rstrip()
+                output_lines.append(stripped_line)
+                logger.info(f"  {stripped_line}")
+        return output_lines
+
+    def _store_task_result(self, task_key: str, result: TaskResult) -> TaskResult:
+        """Store task result and return it for call chaining."""
+        self.results[task_key] = result
+        return result
+
+    def _start_process(self, cmd: list[str]) -> subprocess.Popen[str]:
+        """Start a subprocess for a task script."""
+        return subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            universal_newlines=True,
+            cwd=str(self.project_root),
+            shell=False,
+        )
+
+    def _log_section_header(self, title: str):
+        """Log a standardized section header."""
+        logger.info("\n" + "=" * 80)
+        logger.info(title)
+        logger.info("=" * 80)
+
     def _run_script(self, script_name: str, args: list[str], task_name: str) -> TaskResult:
         """
         Run a Python script using uv.
@@ -138,37 +172,20 @@ class PIX8Orchestrator:
 
         try:
             # Run with real-time output
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                bufsize=1,
-                universal_newlines=True,
-                cwd=str(self.project_root),
-            )
+            process = self._start_process(cmd)
 
             # Stream output
-            output_lines = []
-            if process.stdout:
-                for line in process.stdout:
-                    stripped_line = line.rstrip()
-                    output_lines.append(stripped_line)
-                    logger.info(f"  {stripped_line}")
-
-            # Wait for completion
-            return_code = process.wait()
+            output_lines = self._stream_process_output(process)
 
             result.end_time = datetime.now(timezone.utc).isoformat()
             result.duration_seconds = time.time() - start_time
 
-            if return_code == 0:
+            if (return_code := process.wait()) == 0:
                 result.status = TaskStatus.COMPLETED
                 logger.info(f"✅ Completed: {task_name} ({result.duration_seconds:.1f}s)")
 
                 # Try to extract statistics from output
-                stats = self._parse_output_stats(output_lines)
-                if stats:
+                if stats := self._parse_output_stats(output_lines):
                     result.details = stats
                     result.records_generated = stats.get("total_generated", 0) or stats.get(
                         "total_records", 0
@@ -201,15 +218,14 @@ class PIX8Orchestrator:
 
         # Look for JSON stats in output
         for line in output_lines:
-            if "total_generated" in line.lower() or "total_records" in line.lower():
+            if ("total_generated" in line.lower() or "total_records" in line.lower()) and (
+                numbers := re.findall(r"(\d+(?:,\d+)*)", line)
+            ):
                 # Try to extract numbers
-
-                numbers = re.findall(r"(\d+(?:,\d+)*)", line)
-                if numbers:
-                    # Remove commas and convert to int
-                    value = int(numbers[0].replace(",", ""))
-                    if "total" in line.lower():
-                        stats["total_generated"] = value
+                # Remove commas and convert to int
+                value = int(numbers[0].replace(",", ""))
+                if "total" in line.lower():
+                    stats["total_generated"] = value
 
         return stats
 
@@ -226,9 +242,7 @@ class PIX8Orchestrator:
             args.extend(["--limit", "5"])
 
         result = self._run_script("recategorize_s3_files.py", args, "Recategorization")
-
-        self.results["recategorization"] = result
-        return result
+        return self._store_task_result("recategorization", result)
 
     def run_edge_case_generation(self) -> TaskResult:
         """
@@ -244,9 +258,7 @@ class PIX8Orchestrator:
             args.append("--nightmare-only")
 
         result = self._run_script("generate_edge_cases_pix8.py", args, "Edge Case Generation")
-
-        self.results["edge_cases"] = result
-        return result
+        return self._store_task_result("edge_cases", result)
 
     def run_long_session_generation(self) -> TaskResult:
         """
@@ -265,9 +277,7 @@ class PIX8Orchestrator:
             args.extend(["--extraction-target", "100000", "--synthesis-target", "100000"])
 
         result = self._run_script("generate_long_sessions_pix8.py", args, "Long Session Generation")
-
-        self.results["long_sessions"] = result
-        return result
+        return self._store_task_result("long_sessions", result)
 
     def run_all(self) -> dict[str, TaskResult]:
         """
@@ -276,9 +286,7 @@ class PIX8Orchestrator:
         Returns:
             Dictionary of task results
         """
-        logger.info("\n" + "=" * 80)
-        logger.info("🚀 STARTING PIX-8 DATASET ENHANCEMENT")
-        logger.info("=" * 80)
+        self._log_section_header("🚀 STARTING PIX-8 DATASET ENHANCEMENT")
 
         if self.test_mode:
             logger.info("⚠️  TEST MODE: Running small batches for validation")
@@ -335,11 +343,9 @@ class PIX8Orchestrator:
 
         if all(s == TaskStatus.COMPLETED for s in statuses):
             return "completed"
-        if any(s == TaskStatus.FAILED for s in statuses):
+        if TaskStatus.FAILED in statuses:
             return "partial_failure"
-        if any(s == TaskStatus.IN_PROGRESS for s in statuses):
-            return "in_progress"
-        return "unknown"
+        return "in_progress" if TaskStatus.IN_PROGRESS in statuses else "unknown"
 
     def save_report(self, filename: str = "pix8_completion_report.json"):
         """
@@ -362,9 +368,7 @@ class PIX8Orchestrator:
         report = self.generate_report()
         summary = report["pix8_dataset_enhancement"]["summary"]
 
-        logger.info("\n" + "=" * 80)
-        logger.info("📊 PIX-8 DATASET ENHANCEMENT SUMMARY")
-        logger.info("=" * 80)
+        self._log_section_header("📊 PIX-8 DATASET ENHANCEMENT SUMMARY")
         logger.info(f"Overall Status:    {report['pix8_dataset_enhancement']['overall_status']}")
         logger.info(f"Test Mode:         {self.test_mode}")
         logger.info(f"Total Tasks:       {summary['total_tasks']}")
