@@ -111,7 +111,6 @@ const buildTurnGroups = (turns: NoteTurnSummary[]): Map<string, TurnGroup> => {
 export default function AgentNoteCollabDashboard() {
   const [turns, setTurns] = useState<NoteTurnSummary[]>([])
   const [artifactFilter, setArtifactFilter] = useState('')
-  const [debouncedFilter, setDebouncedFilter] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>()
   const [synthesisByArtifact, setSynthesisByArtifact] = useState<
@@ -145,16 +144,10 @@ export default function AgentNoteCollabDashboard() {
     void loadTurns()
   }, [])
 
-  // ⚡ Bolt: Debounce filter to prevent synchronous main thread blocking during rapid typing
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedFilter(artifactFilter), 300)
-    return () => clearTimeout(timer)
-  }, [artifactFilter])
-
   const groups = useMemo(() => {
     const filtered = turns.filter((turn) =>
-      debouncedFilter
-        ? turn.artifactId.toLowerCase().includes(debouncedFilter.toLowerCase())
+      artifactFilter
+        ? turn.artifactId.toLowerCase().includes(artifactFilter.toLowerCase())
         : true,
     )
 
@@ -164,7 +157,7 @@ export default function AgentNoteCollabDashboard() {
     )
 
     return rows
-  }, [debouncedFilter, turns])
+  }, [artifactFilter, turns])
 
   const unresolvedCount = groups.filter((group) => group.openQuestions.length > 0).length
 
