@@ -945,7 +945,7 @@ opentelemetry-instrumentation-redis==0.60b1
     # via traceloop-sdk
 opentelemetry-instrumentation-replicate==0.53.2
     # via traceloop-sdk
-opentelemetry-instrumentation-requests==0.60b1
+opentelemetry-instrumentation-requests==0.61b0
     # via traceloop-sdk
 opentelemetry-instrumentation-sagemaker==0.53.2
     # via traceloop-sdk
