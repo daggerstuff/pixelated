@@ -31,8 +31,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Lint (ESLint)
-        run: pnpm exec eslint . --ext .js,.ts,.tsx,.astro
+      - name: Lint (Oxlint)
+        run: pnpm lint
 
       - name: Format check (Prettier)
         run: pnpm exec prettier --check .
