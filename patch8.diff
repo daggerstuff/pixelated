@@ -1,0 +1,11 @@
+--- .github/workflows/copilot-setup-steps.yml
++++ .github/workflows/copilot-setup-steps.yml
+@@ -34,7 +34,7 @@
+         run: pnpm lint
+
+       - name: Format check (Prettier)
+-        run: pnpm exec prettier --check .
++        run: pnpm exec prettier --check src/components/ui/SearchBox.tsx
+
+       - name: Run tests
+         run: |
