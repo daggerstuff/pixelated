@@ -11,26 +11,70 @@ const { title = 'Data Portability System' } = Astro.props
 
 // Data format options for export
 const dataFormats = [
-  { id: 'json', name: 'JSON', description: 'Standard JSON format for maximum compatibility' },
-  { id: 'csv', name: 'CSV', description: 'Comma-separated values for spreadsheet applications' },
-  { id: 'fhir', name: 'FHIR', description: 'Fast Healthcare Interoperability Resources standard' },
+  {
+    id: 'json',
+    name: 'JSON',
+    description: 'Standard JSON format for maximum compatibility',
+  },
+  {
+    id: 'csv',
+    name: 'CSV',
+    description: 'Comma-separated values for spreadsheet applications',
+  },
+  {
+    id: 'fhir',
+    name: 'FHIR',
+    description: 'Fast Healthcare Interoperability Resources standard',
+  },
   { id: 'ccd', name: 'CCD', description: 'Continuity of Care Document format' },
-  { id: 'hl7', name: 'HL7', description: 'Health Level Seven messaging standard' },
+  {
+    id: 'hl7',
+    name: 'HL7',
+    description: 'Health Level Seven messaging standard',
+  },
 ]
 
 // Sample data sections that can be exported
 const dataSections = [
-  { id: 'profile', name: 'Patient Profile', description: 'Basic demographic information' },
-  { id: 'mental-health', name: 'Mental Health Data', description: 'Assessments, notes, and emotional analysis' },
-  { id: 'chat-history', name: 'Chat History', description: 'Conversation logs and interactions' },
-  { id: 'consent', name: 'Consent Records', description: 'History of consent grants and withdrawals' },
+  {
+    id: 'profile',
+    name: 'Patient Profile',
+    description: 'Basic demographic information',
+  },
+  {
+    id: 'mental-health',
+    name: 'Mental Health Data',
+    description: 'Assessments, notes, and emotional analysis',
+  },
+  {
+    id: 'chat-history',
+    name: 'Chat History',
+    description: 'Conversation logs and interactions',
+  },
+  {
+    id: 'consent',
+    name: 'Consent Records',
+    description: 'History of consent grants and withdrawals',
+  },
 ]
 
 // Sample recipient types for data transfer
 const recipientTypes = [
-  { id: 'provider', name: 'Healthcare Provider', description: 'Other mental health professionals' },
-  { id: 'patient', name: 'Patient Direct Access', description: 'Direct access for the patient' },
-  { id: 'research', name: 'Research Institution', description: 'Approved research organizations with consent' },
+  {
+    id: 'provider',
+    name: 'Healthcare Provider',
+    description: 'Other mental health professionals',
+  },
+  {
+    id: 'patient',
+    name: 'Patient Direct Access',
+    description: 'Direct access for the patient',
+  },
+  {
+    id: 'research',
+    name: 'Research Institution',
+    description: 'Approved research organizations with consent',
+  },
 ]
 ---
 
@@ -39,31 +83,46 @@ const recipientTypes = [
     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
       {title}
     </h2>
+
     <div class="mb-8">
       <p class="text-gray-600 dark:text-gray-300 mb-4">
-        This system allows for standardized, secure transfer of patient data in compliance with HIPAA regulations. All transfers are fully encrypted, logged, and require appropriate authorization.
+        This system allows for standardized, secure transfer of patient data in
+        compliance with HIPAA regulations. All transfers are fully encrypted,
+        logged, and require appropriate authorization.
       </p>
+
       <div class="flex flex-wrap gap-4 mb-6">
         <div
           class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon name="shield-check" class="w-5 h-5 text-green-600 dark:text-green-400 mr-2" />
+          <Icon
+            name="shield-check"
+            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
+          />
           <span class="text-green-700 dark:text-green-300 text-sm"
             >End-to-end encryption</span
           >
         </div>
+
         <div
           class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon name="clipboard-check" class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
+          <Icon
+            name="clipboard-check"
+            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
+          />
           <span class="text-blue-700 dark:text-blue-300 text-sm"
             >Comprehensive audit logging</span
           >
         </div>
+
         <div
           class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
         >
-          <Icon name="document-check" class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2" />
+          <Icon
+            name="document-check"
+            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
+          />
           <span class="text-purple-700 dark:text-purple-300 text-sm"
             >Consent verification</span
           >
@@ -84,7 +143,6 @@ const recipientTypes = [
         <input
           type="text"
           id="patient-id"
-          name="patient-id"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Enter patient identifier"
           required
@@ -99,29 +157,31 @@ const recipientTypes = [
           Export Format
         </label>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {dataFormats.map((format) => (
-            <div class="relative">
-              <input
-                type="radio"
-                id={`format-${format.id}`}
-                name="data-format"
-                value={format.id}
-                class="peer sr-only"
-                required
-              />
-              <label
-                for={`format-${format.id}`}
-                class="flex p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-400 dark:text-white"
-              >
-                <div>
-                  <h3 class="font-medium">{format.name}</h3>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {format.description}
-                  </p>
-                </div>
-              </label>
-            </div>
-          ))}
+          {
+            dataFormats.map((format) => (
+              <div class="relative">
+                <input
+                  type="radio"
+                  id={`format-${format.id}`}
+                  name="data-format"
+                  value={format.id}
+                  class="peer sr-only"
+                  required
+                />
+                <label
+                  for={`format-${format.id}`}
+                  class="flex p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-400 dark:text-white"
+                >
+                  <div>
+                    <h3 class="font-medium">{format.name}</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {format.description}
+                    </p>
+                  </div>
+                </label>
+              </div>
+            ))
+          }
         </div>
       </div>
 
@@ -133,30 +193,32 @@ const recipientTypes = [
           Data Sections to Include
         </label>
         <div class="space-y-2">
-          {dataSections.map((section) => (
-            <div class="flex items-start">
-              <div class="flex items-center h-5">
-                <input
-                  id={`section-${section.id}`}
-                  name="data-sections"
-                  type="checkbox"
-                  value={section.id}
-                  class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
-                />
+          {
+            dataSections.map((section) => (
+              <div class="flex items-start">
+                <div class="flex items-center h-5">
+                  <input
+                    id={`section-${section.id}`}
+                    name="data-sections"
+                    type="checkbox"
+                    value={section.id}
+                    class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+                  />
+                </div>
+                <div class="ml-3 text-sm">
+                  <label
+                    for={`section-${section.id}`}
+                    class="font-medium text-gray-700 dark:text-white"
+                  >
+                    {section.name}
+                  </label>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {section.description}
+                  </p>
+                </div>
               </div>
-              <div class="ml-3 text-sm">
-                <label
-                  for={`section-${section.id}`}
-                  class="font-medium text-gray-700 dark:text-white"
-                >
-                  {section.name}
-                </label>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  {section.description}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
       </div>
 
@@ -169,14 +231,15 @@ const recipientTypes = [
         </label>
         <select
           id="recipient-type"
-          name="recipient-type"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           required
         >
           <option value="">Select recipient type</option>
-          {recipientTypes.map((type) => (
-            <option value={type.id}>{type.name}</option>
-          ))}
+          {
+            recipientTypes.map((type) => (
+              <option value={type.id}>{type.name}</option>
+            ))
+          }
         </select>
       </div>
 
@@ -190,7 +253,6 @@ const recipientTypes = [
         <input
           type="text"
           id="recipient-name"
-          name="recipient-name"
           autocomplete="name"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient name or organization"
@@ -199,7 +261,6 @@ const recipientTypes = [
         <input
           type="email"
           id="recipient-email"
-          name="recipient-email"
           autocomplete="email"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient email"
@@ -213,7 +274,6 @@ const recipientTypes = [
           <div class="flex items-center h-5">
             <input
               id="authorization-checkbox"
-              name="authorization-checkbox"
               type="checkbox"
               required
               class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
@@ -226,7 +286,8 @@ const recipientTypes = [
               >Authorization Required</label
             >
             <p class="text-yellow-700 dark:text-yellow-400">
-              I confirm I have proper authorization to transfer this patient data, and that appropriate consent has been verified.
+              I confirm I have proper authorization to transfer this patient
+              data, and that appropriate consent has been verified.
             </p>
           </div>
         </div>
@@ -236,7 +297,7 @@ const recipientTypes = [
       <div class="flex gap-3">
         <button
           type="submit"
-          id="generate-transfer-btn"
+          id="submit-transfer"
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center disabled:opacity-70 disabled:cursor-not-allowed"
         >
           Generate Transfer
@@ -253,109 +314,42 @@ const recipientTypes = [
 </div>
 
 <script>
-  // Helper function to create the loading spinner SVG element
-  function createLoadingSpinner(): SVGElement {
-    const svgNamespace = 'http://www.w3.org/2000/svg'
-    const svg = document.createElementNS(svgNamespace, 'svg')
-    svg.setAttribute('class', 'animate-spin -ml-1 mr-2 h-4 w-4 text-white')
-    svg.setAttribute('xmlns', svgNamespace)
-    svg.setAttribute('fill', 'none')
-    svg.setAttribute('viewBox', '0 0 24 24')
-    // Mark as decorative for screen readers
-    svg.setAttribute('aria-hidden', 'true')
-    svg.setAttribute('focusable', 'false')
-
-    const circle = document.createElementNS(svgNamespace, 'circle')
-    circle.setAttribute('class', 'opacity-25')
-    circle.setAttribute('cx', '12')
-    circle.setAttribute('cy', '12')
-    circle.setAttribute('r', '10')
-    circle.setAttribute('stroke', 'currentColor')
-    circle.setAttribute('stroke-width', '4')
-
-    const path = document.createElementNS(svgNamespace, 'path')
-    path.setAttribute('class', 'opacity-75')
-    path.setAttribute('fill', 'currentColor')
-    path.setAttribute(
-      'd',
-      'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-    )
-
-    svg.appendChild(circle)
-    svg.appendChild(path)
-
-    return svg
-  }
-
   // Initialize the data portability form
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const form = document.getElementById('data-portability-form')
-    const submitBtn = document.getElementById('generate-transfer-btn')
-
-    // Workaround: Prevent parent page click handlers from interfering with form submission
-    // The parent page may have a generic click handler that calls e.preventDefault() on submit buttons,
-    // which would prevent the form's submit event from firing. This handler stops propagation
-    // and prevents default to ensure the form submission works correctly.
-    if (submitBtn) {
-      submitBtn.addEventListener('click', (e: MouseEvent) => {
-        e.stopPropagation()
-        e.preventDefault()
-        // Programmatically submit the form to trigger the submit event listener
-        if (form) {
-          form.requestSubmit()
-        }
-      })
-    }
 
     if (form) {
-      form.addEventListener('submit', async (e: SubmitEvent) => {
+      form.addEventListener('submit', (e: Event) => {
         e.preventDefault()
 
-        const submitButton = (e.submitter as HTMLButtonElement | null) ?? (e.target instanceof HTMLFormElement ? (e.target.querySelector('button[type="submit"]') as HTMLButtonElement | null) : null)
-        const originalText = submitButton ? submitButton.innerHTML : 'Generate Transfer'
-
-        if (!submitButton) {
-          // If we can't find the button, just proceed without UI state management
-          return
+        const submitBtn = document.getElementById('submit-transfer') as HTMLButtonElement | null
+        const originalText = submitBtn ? submitBtn.innerHTML : 'Generate Transfer'
+        if (submitBtn) {
+          submitBtn.disabled = true
+          submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...'
         }
 
-        try {
-          // Disable button and show loading state
-          submitButton.disabled = true
-          submitButton.setAttribute('aria-busy', 'true')
+        // In a real implementation, we would collect form data and process it
+        const formData = new FormData(e.target as HTMLFormElement)
 
-          // Build the button content using DOM nodes instead of innerHTML
-          submitButton.innerHTML = ''
-          submitButton.appendChild(createLoadingSpinner())
-
-          const processingText = document.createTextNode(' Processing...')
-          submitButton.appendChild(processingText)
-
-          // In a real implementation, we would collect form data and process it
-          const formData = new FormData(e.target as HTMLFormElement)
-
-          // Simulate network request
-          await new Promise((resolve) => setTimeout(resolve, 1500))
-
+        // Simulate network request
+        setTimeout(() => {
           // For demonstration purposes, just show an alert
           alert(
-            'Data transfer request submitted. In a production environment, this would generate a secure transfer package.'
+            'Data transfer request submitted. In a production environment, this would generate a secure transfer package.',
           )
 
           // In production, this would trigger the actual data export and transfer process
-          console.log('Form submitted successfully (data redacted for HIPAA compliance)')
-        } catch (error) {
-          // Log error for debugging (in production, use proper error handling)
-          console.error('Data transfer failed:', error)
+          console.log(
+            'Form submitted with data:',
+            Object.fromEntries(formData.entries()),
+          )
 
-          // Show error alert to user
-          alert('An error occurred while processing your request. Please try again.')
-        } finally {
-          // Always restore button state, even on errors or early returns
-          submitButton.disabled = false
-          submitButton.removeAttribute('aria-busy')
-          submitButton.innerHTML = originalText
-        }
+          if (submitBtn) {
+            submitBtn.disabled = false
+            submitBtn.innerHTML = originalText
+          }
+        }, 1500)
       })
     }
   })
