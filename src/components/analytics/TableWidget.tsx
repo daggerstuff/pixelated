@@ -1,143 +1,328 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { TableWidget } from './TableWidget'
-import type { Column, TableRowData } from './TableWidget'
-import { useDebounce } from '../hooks/useDebounce'
+import { Download, Search, ArrowUp, ArrowDown } from 'lucide-react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-// Mock data for testing
-const mockColumns: Column[] = [
-  { key: 'name', label: 'Name', sortable: true, filterable: true },
-  { key: 'email', label: 'Email', sortable: true, filterable: true },
-]
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
-const mockData: TableRowData[] = [
-  { id: 1, name: 'John Doe', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', email: 'bob@example.com' },
-]
+import { DashboardWidget } from './DashboardWidget'
+import type { DashboardWidgetProps as WidgetProps } from './DashboardWidget'
+// TableState type is not currently used in this component
 
-// Get the default debounce delay from the shared hook
-const DEBOUNCE_DELAY = useDebounce(undefined, 300).delay
+// Define a generic type for table row data
+export type TableRowData = Record<string, unknown> & {
+  id?: string | number
+  [key: string]: unknown
+}
 
-describe('TableWidget', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
+export interface Column {
+  key: string
+  label: string
+  render?: (value: unknown, row: TableRowData) => React.ReactNode
+  sortable?: boolean
+  filterable?: boolean
+}
 
-  afterEach(() => {
-    vi.useRealTimers()
-  })
+export interface TableWidgetProps extends Omit<
+  WidgetProps,
+  'children' | 'title' | 'description' | 'isLoading'
+> {
+  /** The title of the table widget */
+  title: string
 
-  it('debounces search input and filters data after delay', async () => {
-    render(
-      <TableWidget
-        title="Test Table"
-        columns={mockColumns}
-        data={mockData}
-        enableSearch={true}
-      />
-    )
+  /** Optional description for the table */
+  description?: string
 
-    // All rows should be visible initially
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('Bob Johnson')).toBeInTheDocument()
+  /** Array of column definitions */
+  columns: Column[]
 
-    // Get the search input and type a search term
-    const searchInput = screen.getByPlaceholderText('Search...')
-    fireEvent.change(searchInput, { target: { value: 'John' } })
+  /** Array of row data */
+  data: TableRowData[]
 
-    // Before debounce completes, all rows should still be visible
-    // because the debouncedSearchTerm hasn't been updated yet
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('Bob Johnson')).toBeInTheDocument()
+  /** Whether the table is in a loading state */
+  isLoading?: boolean
 
-    // Advance timers by less than the debounce delay - filtering should NOT happen yet
-    vi.advanceTimersByTime(DEBOUNCE_DELAY - 100)
+  /** Optional class name for the root element */
+  className?: string
 
-    // Still all visible because we haven't reached the debounce delay
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('Bob Johnson')).toBeInTheDocument()
+  /** Refresh interval in milliseconds */
+  refreshInterval?: number
 
-    // Advance timers past the debounce delay
-    vi.advanceTimersByTime(100)
+  /** Whether to show the search input */
+  enableSearch?: boolean
 
-    // After debounce completes, only matching rows should be visible
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
+  /** Whether to show the export button */
+  enableExport?: boolean
+
+  /** Function to fetch data asynchronously */
+  fetchData?: () => Promise<TableRowData[]>
+
+  /** Pagination configuration */
+  pagination?: {
+    pageSize: number
+    initialPage?: number
+  }
+}
+
+export function TableWidget({
+  title,
+  description,
+  columns,
+  data: initialData,
+  isLoading: initialLoading = false,
+  className = '',
+  refreshInterval,
+  enableSearch = true,
+  enableExport = true,
+  fetchData,
+  pagination,
+  ...props
+}: TableWidgetProps): React.ReactElement {
+  const [data, setData] = useState<TableRowData[]>(initialData)
+  const [isLoading, setIsLoading] = useState(initialLoading)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const [sortConfig, setSortConfig] = useState<{
+    key: string
+    direction: 'asc' | 'desc'
+  } | null>(null)
+
+  // ⚡ Bolt: Debounce search query to prevent synchronous main thread blocking during rapid typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Handle data fetching if fetchData is provided
+  useEffect(() => {
+    if (fetchData === undefined) {
+      return
+    }
+
+    const loadData = async () => {
+      try {
+        setIsLoading(true)
+        const result = await fetchData()
+        setData(result)
+      } catch (error: unknown) {
+        console.error('Error fetching table data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void loadData()
+
+    // Set up refresh interval if provided
+    let intervalId: NodeJS.Timeout | null = null
+    if (refreshInterval && refreshInterval > 0) {
+      intervalId = setInterval(loadData, refreshInterval)
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [fetchData, refreshInterval, setIsLoading, setData])
+
+  // Handle sort
+  const handleSort = useCallback((key: string) => {
+    setSortConfig((prevConfig) => {
+      // If the same key is clicked, toggle the direction
+      if (prevConfig?.key === key) {
+        return {
+          key,
+          direction: prevConfig.direction === 'asc' ? 'desc' : 'asc',
+        }
+      }
+      // Default to ascending for a new key
+      return { key, direction: 'asc' }
     })
+  }, [])
 
-    // Jane and Bob should be filtered out (no longer in the document)
-    expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument()
-    expect(screen.queryByText('Bob Johnson')).not.toBeInTheDocument()
-  })
+  // Apply sorting and filtering
+  const filteredAndSortedData = useMemo<TableRowData[]>(() => {
+    let result = [...data]
 
-  it('shows all data when search is cleared after debounce', async () => {
-    render(
-      <TableWidget
-        title="Test Table"
-        columns={mockColumns}
-        data={mockData}
-        enableSearch={true}
-      />
-    )
+    // Apply search filter
+    if (debouncedSearchTerm) {
+      const searchLower = debouncedSearchTerm.toLowerCase()
+      result = result.filter((row) =>
+        columns.some((column) => {
+          const value = String(row[column.key] || '').toLowerCase()
+          return value.includes(searchLower)
+        }),
+      )
+    }
 
-    const searchInput = screen.getByPlaceholderText('Search...')
+    // Apply sorting
+    if (sortConfig) {
+      const { key, direction } = sortConfig
+      result.sort((a, b) => {
+        const aValue = a[key]
+        const bValue = b[key]
 
-    // Type to filter
-    fireEvent.change(searchInput, { target: { value: 'John' } })
-    vi.advanceTimersByTime(DEBOUNCE_DELAY)
+        if (aValue === bValue) {
+          return 0
+        }
+        if (aValue == null) {
+          return direction === 'asc' ? -1 : 1
+        }
+        if (bValue == null) {
+          return direction === 'asc' ? 1 : -1
+        }
 
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-    })
-    expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument()
+        const comparison = String(aValue).localeCompare(String(bValue))
+        return direction === 'asc' ? comparison : -comparison
+      })
+    }
 
-    // Clear the search
-    fireEvent.change(searchInput, { target: { value: '' } })
-    vi.advanceTimersByTime(DEBOUNCE_DELAY)
+    // Pagination is not currently implemented
+    // The pagination object is intentionally unused for now
+    void pagination
 
-    // All rows should be visible again after debounce
-    await waitFor(() => {
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-      expect(screen.getByText('Bob Johnson')).toBeInTheDocument()
-    })
-  })
+    return result
+  }, [data, debouncedSearchTerm, sortConfig, columns, pagination])
+  // Handle export
+  const handleExport = useCallback(() => {
+    try {
+      // Simple CSV export implementation
+      const headers = columns.map((col) => `"${col.label}"`).join(',')
+      const rows = filteredAndSortedData
+        .map((row) =>
+          columns
+            .map((col) => {
+              const value = row[col.key]
+              // Escape quotes and wrap in quotes
+              const escaped = String(value || '').replace(/"/g, '""')
+              return `"${escaped}"`
+            })
+            .join(','),
+        )
+        .join('\n')
 
-  it('does not filter until debounce delay elapses (exact timing test)', async () => {
-    render(
-      <TableWidget
-        title="Test Table"
-        columns={mockColumns}
-        data={mockData}
-        enableSearch={true}
-      />
-    )
+      const csvContent = `${headers}\n${rows}`
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-export-${new Date().toISOString().slice(0, 10)}.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch (error: unknown) {
+      console.error('Error exporting data:', error)
+    }
+  }, [columns, title, filteredAndSortedData])
 
-    const searchInput = screen.getByPlaceholderText('Search...')
+  return (
+    <DashboardWidget
+      title={title}
+      description={description}
+      className={className}
+      isLoading={isLoading}
+      {...props}
+    >
+      <div className='space-y-4'>
+        {/* Search and export controls */}
+        <div className='flex justify-between'>
+          {enableSearch && (
+            <div className='relative w-64'>
+              <Search className='text-muted-foreground absolute left-2 top-2.5 h-4 w-4' />
+              <Input
+                placeholder='Search...'
+                className='pl-8'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          )}
 
-    // Type a search term
-    fireEvent.change(searchInput, { target: { value: 'Jane' } })
+          {enableExport && (
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={handleExport}
+              disabled={data.length === 0}
+            >
+              <Download className='mr-2 h-4 w-4' />
+              Export
+            </Button>
+          )}
+        </div>
 
-    // Advance exactly to just before the debounce time
-    vi.advanceTimersByTime(DEBOUNCE_DELAY - 1)
+        {/* Table */}
+        <div className='rounded-md border'>
+          <table className='w-full'>
+            <TableHeader>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableHead key={column.key}>
+                    {column.sortable ? (
+                      <button
+                        className='flex items-center space-x-1'
+                        onClick={() => {
+                          if (column.sortable) {
+                            handleSort(column.key)
+                          }
+                        }}
+                        disabled={!column.sortable}
+                        aria-label={`Sort by ${column.label}`}
+                      >
+                        <span>{column.label}</span>
+                        {sortConfig?.key === column.key &&
+                          (sortConfig.direction === 'asc' ? (
+                            <ArrowUp className='h-4 w-4' />
+                          ) : (
+                            <ArrowDown className='h-4 w-4' />
+                          ))}
+                      </button>
+                    ) : (
+                      column.label
+                    )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className='py-8 text-center'
+                  >
+                    No data available
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredAndSortedData.map((row, rowIndex) => (
+                  <TableRow key={row.id || `row-${rowIndex}`}>
+                    {columns.map((column) => (
+                      <TableCell key={`${rowIndex}-${column.key}`}>
+                        {column.render
+                          ? column.render(row[column.key], row)
+                          : String(row[column.key] || '')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </table>
+        </div>
 
-    // Should still show all data (filtering hasn't happened yet)
-    expect(screen.getByText('John Doe')).toBeInTheDocument()
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    expect(screen.getByText('Bob Johnson')).toBeInTheDocument()
-
-    // Advance one more millisecond to cross the threshold
-    vi.advanceTimersByTime(1)
-
-    // Now filtering should have applied
-    await waitFor(() => {
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-      expect(screen.queryByText('Bob Johnson')).not.toBeInTheDocument()
-    })
-  })
-})
+        {/* Pagination would go here */}
+      </div>
+    </DashboardWidget>
+  )
+}
