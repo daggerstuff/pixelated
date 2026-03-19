@@ -1,49 +1,44 @@
 name: "Copilot Code Review"
-
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
-
 
 jobs:
   copilot-code-review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
-      pull-requests: write
-
     environment: copilot
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v5
-      with:
-        node-version: "24"
-        cache: "pnpm"
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: "pnpm"
 
-    - name: Install dependencies
-      run: pnpm install --no-frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    - name: Lint (ESLint)
-      run: pnpm lint
+      - name: Lint (ESLint)
+        run: pnpm lint
 
-    - name: Format check (Prettier)
-      run: pnpm exec prettier --check .
+      - name: Format check (Prettier)
+        run: pnpm exec prettier --check .
 
-    - name: Run tests
-      run: |
-        if pnpm exec vitest --version 2>/dev/null; then
-          pnpm exec vitest run --reporter=dot
-        elif pnpm exec jest --version 2>/dev/null; then
-          pnpm exec jest --ci
-        else
-          echo "No supported test runner found (vitest/jest)."
-        fi
+      - name: Run tests
+        run: |
+          if pnpm exec vitest --version 2>/dev/null; then
+            pnpm exec vitest run --reporter=dot
+          elif pnpm exec jest --version 2>/dev/null; then
+            pnpm exec jest --ci
+          else
+            echo "No supported test runner found (vitest/jest)."
+            exit 1
+          fi
