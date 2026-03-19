@@ -37,7 +37,7 @@ jobs:
         run: pnpm lint
 
       - name: Format check (Prettier)
-        run: pnpm exec prettier --check . || true
+        run: pnpm exec prettier --check .
 
       - name: Run tests
         run: |
