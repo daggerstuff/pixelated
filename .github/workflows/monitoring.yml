@@ -1,11 +1,11 @@
 name: Monitoring
-
 on:
   schedule:
     - cron: "0 12 * * *"
   workflow_dispatch:
 
-permissions: read-all
+permissions:
+  read-all
 
 env:
   NODE_VERSION: 24.14.0
@@ -69,7 +69,7 @@ jobs:
         id: health-check
         run: |
           echo "🏥 Running PRODUCTION health checks against $BASE_URL"
-          echo "ℹ️  Production failures will trigger alerts and notifications"
+          echo "ℹ️ Production failures will trigger alerts and notifications"
 
           # Function to perform robust HTTP check with retries
           check_endpoint() {
@@ -95,9 +95,9 @@ jobs:
                 echo "✅ $endpoint_name check successful"
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+                echo "⚠️ $endpoint_name check failed - connection timeout or network error"
               else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+                echo "⚠️ $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
               if [[ $attempt -lt $max_retries ]]; then
@@ -128,7 +128,8 @@ jobs:
             echo "status=failing" >> $GITHUB_OUTPUT
             exit 1
           fi
-          # API health check with retries (non-blocking)
+
+      # API health check with retries (non-blocking)
       - name: Create temporary config
         if: steps.health-check.outputs.status == 'passing'
         run: |
@@ -151,17 +152,16 @@ jobs:
             retries: 1,
           };
           EOF
+
       - name: Run Playwright tests
         id: run-tests
         if: steps.health-check.outputs.status == 'passing'
         run: |
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against PRODUCTION: $BASE_URL"
-
           # Run tests and propagate failure
           NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js
-
+          pnpm exec playwright test --config=temp-playwright.config.js
           TEST_EXIT=$?
           if [ $TEST_EXIT -eq 0 ]; then
             echo "✅ PRODUCTION monitoring tests completed"
@@ -171,11 +171,11 @@ jobs:
             echo "status=failure" >> $GITHUB_OUTPUT
             exit $TEST_EXIT
           fi
-          echo "Running Playwright tests against PRODUCTION: $BASE_URL"
 
+          echo "Running Playwright tests against PRODUCTION: $BASE_URL"
           # Run tests and store exit code to determine if any tests failed
           NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
+          pnpm exec playwright test --config=temp-playwright.config.js || true
 
           echo "✅ PRODUCTION monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
@@ -201,9 +201,9 @@ jobs:
       - name: Notify failure
         if: failure() && steps.set-slack-enabled-prod.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v3.0.1
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "text": "🚨 *PRODUCTION MONITORING FAILED*",
@@ -262,6 +262,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+
       - name: Resolve APP_URL (Staging)
         id: resolve-app-url-staging
         run: |
@@ -280,15 +281,15 @@ jobs:
         id: health-check
         run: |
           echo "🏥 Running STAGING health checks against $BASE_URL"
-          echo "ℹ️  Staging failures will warn but not trigger critical alerts"
+          echo "ℹ️ Staging failures will warn but not trigger critical alerts"
 
           # Function to perform robust HTTP check with retries
           check_endpoint() {
             local url="$1"
             local endpoint_name="$2"
-            local max_retries=2  # Fewer retries for staging
-            local timeout=20     # Shorter timeout for staging
-            local retry_delay=5  # Shorter delay for staging
+            local max_retries=2 # Fewer retries for staging
+            local timeout=20 # Shorter timeout for staging
+            local retry_delay=5 # Shorter delay for staging
 
             for attempt in $(seq 1 $max_retries); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
@@ -306,9 +307,9 @@ jobs:
                 echo "✅ $endpoint_name check successful"
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+                echo "⚠️ $endpoint_name check failed - connection timeout or network error"
               else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+                echo "⚠️ $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
               if [[ $attempt -lt $max_retries ]]; then
@@ -340,7 +341,7 @@ jobs:
           fi
 
           if [[ "$MAIN_STATUS" == "warning" ]]; then
-            echo "⚠️  STAGING health checks completed with warnings"
+            echo "⚠️ STAGING health checks completed with warnings"
           else
             echo "✅ STAGING health checks passed"
           fi
@@ -374,10 +375,9 @@ jobs:
         run: |
           pnpm exec playwright install --with-deps chromium
           echo "Running Playwright tests against STAGING: $BASE_URL"
-
           # Run tests and store exit code to determine if any tests failed
           NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js || true
+          pnpm exec playwright test --config=temp-playwright.config.js || true
 
           echo "✅ STAGING monitoring tests completed"
           echo "status=success" >> $GITHUB_OUTPUT
@@ -447,16 +447,16 @@ jobs:
         id: health-check
         run: |
           echo "🏥 Running PREVIEW health checks against $BASE_URL"
-          echo "ℹ️  Preview failures will warn but not trigger alerts - this is expected for preview builds"
-          echo "ℹ️  Preview sites may be temporarily unavailable during deployments or restarts"
+          echo "ℹ️ Preview failures will warn but not trigger alerts - this is expected for preview builds"
+          echo "ℹ️ Preview sites may be temporarily unavailable during deployments or restarts"
 
           # Function to perform robust HTTP check with retries
           check_endpoint() {
             local url="$1"
             local endpoint_name="$2"
-            local max_retries=1  # Single retry for preview
-            local timeout=15     # Short timeout for preview
-            local retry_delay=3  # Very short delay for preview
+            local max_retries=1 # Single retry for preview
+            local timeout=15 # Short timeout for preview
+            local retry_delay=3 # Very short delay for preview
 
             for attempt in $(seq 1 $max_retries); do
               echo "🔄 Checking $endpoint_name (attempt $attempt/$max_retries): $url"
@@ -474,9 +474,9 @@ jobs:
                 echo "✅ $endpoint_name check successful"
                 return 0
               elif [[ "$HTTP_STATUS" == "000" ]]; then
-                echo "⚠️  $endpoint_name check failed - connection timeout or network error"
+                echo "⚠️ $endpoint_name check failed - connection timeout or network error"
               else
-                echo "⚠️  $endpoint_name returned HTTP $HTTP_STATUS"
+                echo "⚠️ $endpoint_name returned HTTP $HTTP_STATUS"
               fi
 
               if [[ $attempt -lt $max_retries ]]; then
@@ -537,7 +537,7 @@ jobs:
           # Run tests and store exit code to determine if any tests failed
           TEST_EXIT_CODE=0
           if ! NODE_OPTIONS="--no-warnings --experimental-specifier-resolution=node" BASE_URL="$BASE_URL" \
-            pnpm exec playwright test --config=temp-playwright.config.js > playwright-output.log 2>&1; then
+          pnpm exec playwright test --config=temp-playwright.config.js > playwright-output.log 2>&1; then
             TEST_EXIT_CODE=$?
           fi
 
@@ -679,7 +679,8 @@ jobs:
 
       - name: Check for critical performance issues
         if: steps.resolve-perf.outputs.skip_lhci == 'false' && steps.build-urls.outputs.skip_lhci_urls == 'false'
-        run: echo "Analyzing performance metrics for PRODUCTION..."
+        run: |
+          echo "Analyzing performance metrics for PRODUCTION..."
 
       - name: Set Slack enabled output (performance)
         id: set-slack-enabled-perf
@@ -697,9 +698,9 @@ jobs:
       - name: Notify performance issues
         if: failure() && steps.set-slack-enabled-perf.outputs.slack_enabled == 'true'
         uses: slackapi/slack-github-action@v3.0.1
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "text": "⚠️ *Performance Issues Detected in PRODUCTION*",
