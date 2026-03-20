@@ -6,9 +6,9 @@ permissions:
 
 on:
   push:
-    branches: [master]
+    branches: [main, staging]
   pull_request:
-    branches: [master]
+    branches: [main, staging]
   workflow_dispatch:
 
 env:
@@ -16,7 +16,6 @@ env:
   PNPM_VERSION: 10.32.1
   NODE_ENV: test
   DISABLE_AUTH: "true"
-  BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
 
 jobs:
   browser-tests:
@@ -59,7 +58,6 @@ jobs:
           # Set test environment variables
           export NODE_ENV=test
           export DISABLE_AUTH=true
-          export BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
 
