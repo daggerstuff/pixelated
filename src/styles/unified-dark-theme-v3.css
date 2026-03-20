@@ -1089,7 +1089,6 @@ select:focus-visible {
 
 /* Mobile Navigation Enhancements */
 .mobile-nav-toggle {
-  display: none;
   position: fixed;
   top: var(--space-4);
   right: var(--space-4);
