@@ -1,17 +1,40 @@
-import { sanitizeUrl } from './sanitize';
-import { CODE_REGEX, HEADING_REGEX, LINK_REGEX } from './constants';
+import { JSDOM } from 'jsdom';
 
-export function simpleMarkdownToHtml(text: string): string {
-  // Escape HTML entities to prevent XSS before parsing markdown
-  const escapedText = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+export function simpleMarkdownToHtml(markdown: string): string {
+  const lines = markdown.split('\n');
+  const htmlLines: string[] = [];
 
-  return escapedText
-    .replace(HEADING_REGEX, (match, level) => `<h${level.length}>` + match.slice(level.length + 1) + `</h${level.length}>`)
-    .replace(CODE_REGEX, '<code>$1</code>')
-    .replace(LINK_REGEX, (match, textContent, url) => `<a href="${sanitizeUrl(url)}">${textContent}</a>`);
-}
+  for (const line of lines) {
+    // Check for headings (1-6 # markers)
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const text = headingMatch[2];
+      htmlLines.push(`<h${level}>${text}</h${level}>`);
+      continue;
+    }
+
+    // Check for bold
+    const boldMatch = line.match(/\*\*(.+?)\*\*/);
+    if (boldMatch) {
+      htmlLines.push(`<strong>${boldMatch[1]}</strong>`);
+      continue;
+    }
+
+    // Check for italic
+    const italicMatch = line.match(/\*(.+?)\*/);
+    if (italicMatch) {
+      htmlLines.push(`<em>${italicMatch[1]}</em>`);
+      continue;
+    }
+
+    // Check for code block
+    if (line.startsWith('```')) {
+      htmlLines.push('<pre><code>');
+      continue;
+    }
+
+    // Check for inline code
+    const codeMatch = line.match(/`(.+?)`/);
+    if (codeMatch) {
+      htmlLines.push(`<code>${codeMatch[1]}

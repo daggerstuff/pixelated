@@ -1,5 +1,4 @@
 name: 'CodeQL'
-
 permissions:
   contents: read
   security-events: write
@@ -116,6 +115,7 @@ jobs:
         if: matrix.language == 'python'
         run: |
           # Install Python dependencies for CodeQL analysis
+
           # Check if bias-detection service exists
           if [ -d "src/lib/ai/bias-detection/python-service" ]; then
             cd src/lib/ai/bias-detection/python-service

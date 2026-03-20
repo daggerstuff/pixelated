@@ -1,5 +1,4 @@
 name: Security Scanning
-
 permissions:
   contents: read
   security-events: write
@@ -18,8 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
+          # fetch-depth: 0 enables full Git history scanning for comprehensive secret detection
           fetch-depth: 0
 
       - name: Install UV and pip (secure versions)
@@ -36,6 +36,7 @@ jobs:
           scanners: 'vuln,secret,misconfig'
           format: 'sarif'
           output: 'trivy-results.sarif'
+
       - name: Run Checkov scan
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
@@ -130,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -138,7 +139,9 @@ jobs:
           node-version: '24'
 
       - name: Install pnpm
-        run: npm install -g pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
 
       - name: Validate package.json
         run: |
@@ -146,7 +149,7 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" && echo "✅ package.json is valid JSON" || (echo "❌ package.json has JSON syntax errors" && exit 1)
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install
 
       - name: Run security audit
         run: pnpm audit --audit-level moderate
