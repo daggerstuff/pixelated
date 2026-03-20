@@ -26,7 +26,11 @@ const dataFormats = [
     name: 'FHIR',
     description: 'Fast Healthcare Interoperability Resources standard',
   },
-  { id: 'ccd', name: 'CCD', description: 'Continuity of Care Document format' },
+  {
+    id: 'ccd',
+    name: 'CCD',
+    description: 'Continuity of Care Document format'
+  },
   {
     id: 'hl7',
     name: 'HL7',
@@ -83,14 +87,10 @@ const recipientTypes = [
     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
       {title}
     </h2>
-
     <div class="mb-8">
       <p class="text-gray-600 dark:text-gray-300 mb-4">
-        This system allows for standardized, secure transfer of patient data in
-        compliance with HIPAA regulations. All transfers are fully encrypted,
-        logged, and require appropriate authorization.
+        This system allows for standardized, secure transfer of patient data in compliance with HIPAA regulations. All transfers are fully encrypted, logged, and require appropriate authorization.
       </p>
-
       <div class="flex flex-wrap gap-4 mb-6">
         <div
           class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
@@ -103,7 +103,6 @@ const recipientTypes = [
             >End-to-end encryption</span
           >
         </div>
-
         <div
           class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
         >
@@ -115,7 +114,6 @@ const recipientTypes = [
             >Comprehensive audit logging</span
           >
         </div>
-
         <div
           class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
         >
@@ -157,31 +155,29 @@ const recipientTypes = [
           Export Format
         </label>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {
-            dataFormats.map((format) => (
-              <div class="relative">
-                <input
-                  type="radio"
-                  id={`format-${format.id}`}
-                  name="data-format"
-                  value={format.id}
-                  class="peer sr-only"
-                  required
-                />
-                <label
-                  for={`format-${format.id}`}
-                  class="flex p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-400 dark:text-white"
-                >
-                  <div>
-                    <h3 class="font-medium">{format.name}</h3>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                      {format.description}
-                    </p>
-                  </div>
-                </label>
-              </div>
-            ))
-          }
+          {dataFormats.map((format) => (
+            <div class="relative">
+              <input
+                type="radio"
+                id={`format-${format.id}`}
+                name="data-format"
+                value={format.id}
+                class="peer sr-only"
+                required
+              />
+              <label
+                for={`format-${format.id}`}
+                class="flex p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-blue-400 dark:peer-checked:bg-blue-900/30 dark:peer-checked:text-blue-400 dark:text-white"
+              >
+                <div>
+                  <h3 class="font-medium">{format.name}</h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {format.description}
+                  </p>
+                </div>
+              </label>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -193,32 +189,30 @@ const recipientTypes = [
           Data Sections to Include
         </label>
         <div class="space-y-2">
-          {
-            dataSections.map((section) => (
-              <div class="flex items-start">
-                <div class="flex items-center h-5">
-                  <input
-                    id={`section-${section.id}`}
-                    name="data-sections"
-                    type="checkbox"
-                    value={section.id}
-                    class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
-                  />
-                </div>
-                <div class="ml-3 text-sm">
-                  <label
-                    for={`section-${section.id}`}
-                    class="font-medium text-gray-700 dark:text-white"
-                  >
-                    {section.name}
-                  </label>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {section.description}
-                  </p>
-                </div>
+          {dataSections.map((section) => (
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  id={`section-${section.id}`}
+                  name="data-sections"
+                  type="checkbox"
+                  value={section.id}
+                  class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600"
+                />
               </div>
-            ))
-          }
+              <div class="ml-3 text-sm">
+                <label
+                  for={`section-${section.id}`}
+                  class="font-medium text-gray-700 dark:text-white"
+                >
+                  {section.name}
+                </label>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {section.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -236,40 +230,40 @@ const recipientTypes = [
           required
         >
           <option value="">Select recipient type</option>
-          {
-            recipientTypes.map((type) => (
-              <option value={type.id}>{type.name}</option>
-            ))
-          }
+          {recipientTypes.map((type) => (
+            <option value={type.id}>{type.name}</option>
+          ))}
         </select>
       </div>
 
       <!-- Recipient Information -->
-      <div id="recipient-details" class="space-y-3">
-        <label
-          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-        >
+      <fieldset id="recipient-details" class="space-y-3">
+        <legend class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Recipient Details
+        </legend>
+        <label for="recipient-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Recipient Name or Organization
         </label>
         <input
           type="text"
           id="recipient-name"
-          aria-label="Recipient Name or Organization"
           autocomplete="name"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient name or organization"
           required
         />
+        <label for="recipient-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          Recipient Email
+        </label>
         <input
           type="email"
           id="recipient-email"
-          aria-label="Recipient Email"
           autocomplete="email"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient email"
           required
         />
-      </div>
+      </fieldset>
 
       <!-- Data Transfer Authorization -->
       <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
@@ -289,8 +283,7 @@ const recipientTypes = [
               >Authorization Required</label
             >
             <p class="text-yellow-700 dark:text-yellow-400">
-              I confirm I have proper authorization to transfer this patient
-              data, and that appropriate consent has been verified.
+              I confirm I have proper authorization to transfer this patient data, and that appropriate consent has been verified.
             </p>
           </div>
         </div>
@@ -319,7 +312,6 @@ const recipientTypes = [
   // Initialize the data portability form
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const form = document.getElementById('data-portability-form')
-
     if (form) {
       form.addEventListener('submit', (e: Event) => {
         e.preventDefault()
