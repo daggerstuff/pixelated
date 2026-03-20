@@ -218,8 +218,13 @@ def analyze_conversation_endpoint():
 
 
 if __name__ == "__main__":
+    import os
+    # Control debug mode via environment variable for security
+    # Set FLASK_DEBUG=1 or DEBUG=1 to enable debug mode in development
+    debug_mode = os.environ.get("FLASK_DEBUG", "").lower() in ("1", "true", "yes") or os.environ.get("DEBUG", "").lower() in ("1", "true", "yes")
+    
     logger.info("Starting Pixelated Empathy Therapeutic AI API")
-    logger.info("Mode: CPU-only")
+    logger.info(f"Mode: {'DEBUG' if debug_mode else 'PRODUCTION'}")
     logger.info("Listening on http://0.0.0.0:5000")
 
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)

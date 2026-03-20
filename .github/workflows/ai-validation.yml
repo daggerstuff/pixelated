@@ -11,11 +11,6 @@ permissions:
 on:
   schedule:
     - cron: 0 0 * * *
-    - cron: 0 0 * * *
-  workflow_run:
-    workflows: [Deploy to Staging, Deploy to Production]
-    types:
-      - completed
   workflow_dispatch:
     inputs:
       ENV_NAME:
@@ -27,9 +22,8 @@ jobs:
   validate-ai-models:
     name: AI Model Validation
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     env:
-      ENV_NAME: ${{ inputs.ENV_NAME }}
+      ENV_NAME: ${{ inputs.ENV_NAME || 'staging' }}
 
     steps:
       - name: Checkout code
@@ -46,15 +40,16 @@ jobs:
           # Generate a valid secure token for API authentication
           # Token payload: { purpose: 'ai-validation', scope: 'validation:read' }
           TOKEN_PAYLOAD=$(echo -n '{"purpose":"ai-validation","scope":"validation:read"}' | base64)
-          # Use a consistent secret - in production, use SECRET_KEY env var
-          # Set default if not provided via env
-          : "${SECRET_KEY:=1828b86c07103d4da490d5e15f2eab}"
-          SIGNING_KEY="${SECRET_KEY}"
+          if [[ -z "${AI_VALIDATION_SECRET}" ]]; then
+            echo "::error::secrets.AI_VALIDATION_SECRET is required for AI validation token generation"
+            exit 1
+          fi
+          SIGNING_KEY="${AI_VALIDATION_SECRET}"
           SIGNATURE=$(echo -n "${TOKEN_PAYLOAD}${SIGNING_KEY}" | base64)
           VALIDATION_TOKEN="${TOKEN_PAYLOAD}.${SIGNATURE}"
           echo "token=${VALIDATION_TOKEN}" >> $GITHUB_OUTPUT
         env:
-          SECRET_KEY: ${{ vars.SECRET_KEY }}
+          AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
 
       - name: Enable Corepack
         run: corepack enable
@@ -96,15 +91,12 @@ jobs:
             echo "ENV_NAME=staging" >> $GITHUB_ENV
           fi
 
-          # Set environment-specific URLs (add more as needed)
-          if [[ "$ENV_NAME" == "production" ]]; then
-            echo "APP_URL=https://pixelatedempathy.com" >> $GITHUB_ENV
-          elif [[ "$ENV_NAME" == "staging" ]]; then
-            echo "APP_URL=https://pixelatedempathy.com" >> $GITHUB_ENV
-          else
-            echo "Error: Unknown environment '$ENV_NAME'. Supported environments are: production, staging."
-            exit 1
+          APP_URL="${{ secrets.APP_URL }}"
+          if [[ -z "${APP_URL}" ]]; then
+            APP_URL="https://pixelatedempathy.com"
+            echo "::notice::APP_URL not configured; defaulting to ${APP_URL}"
           fi
+          echo "APP_URL=${APP_URL}" >> $GITHUB_ENV
 
       - name: Run model validation
         id: validation
@@ -118,7 +110,7 @@ jobs:
           # Disable 'exit on error' just for this call to capture curl failures without aborting the step
           set +e
           STATUS_CODE=$(
-            curl --insecure --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
+            curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
               -o response.json -w "%{http_code}" \
               -X POST "${APP_URL}/api/ai/validation/webhook" \
               -H "Content-Type: application/json" \
@@ -136,13 +128,13 @@ jobs:
             set +e
             # Run verbose diagnostics without sending any authentication headers or secret values.
             # This helps debug TLS/connection issues while avoiding hardcoded secrets in the workflow.
-            curl --insecure --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
+            curl --http1.1 -4 --tlsv1.2 --max-time 15 -v -o /dev/null \
               -X POST "${APP_URL}/api/ai/validation/webhook" \
               -H "Content-Type: application/json" \
               -H "x-github-event: workflow_dispatch" \
               --data '{}' || true
             echo "Attempting TLS 1.3 as fallback (verbosity, no auth headers)..."
-            curl --insecure --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
+            curl --http1.1 -4 --tlsv1.3 --max-time 15 -v -o /dev/null \
               -X POST "${APP_URL}/api/ai/validation/webhook" \
               -H "Content-Type: application/json" \
               -H "x-github-event: workflow_dispatch" \

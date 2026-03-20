@@ -1,15 +1,45 @@
 name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
 
 trigger:
+  batch: true
   branches:
     include:
       - staging
+  paths:
+    include:
+      - src/**
+      - ai/**
+      - docker/**
+      - scripts/devops/**
+      - ci-cd/azure-pipelines-kubernetes-deploy.yml
+      - ai/infrastructure/helm/**
+      - k8s/**
+      - package.json
+      - pnpm-lock.yaml
+    exclude:
+      - docs/**
+      - '**/*.md'
 
 pr:
+  autoCancel: true
   branches:
     include:
       - master
       - staging
+  paths:
+    include:
+      - src/**
+      - ai/**
+      - docker/**
+      - scripts/devops/**
+      - ci-cd/azure-pipelines-kubernetes-deploy.yml
+      - ai/infrastructure/helm/**
+      - k8s/**
+      - package.json
+      - pnpm-lock.yaml
+    exclude:
+      - docs/**
+      - '**/*.md'
 
 parameters:
   - name: environment
@@ -22,7 +52,7 @@ parameters:
   - name: pushLatest
     displayName: 'Push :latest tag'
     type: boolean
-    default: true
+    default: false
 
 variables:
   - group: pixelated-pipeline-variables
@@ -47,6 +77,7 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
+            fetchDepth: 1
 
           - task: AzureCLI@2
             displayName: Build and push image to ACR
@@ -90,7 +121,20 @@ stages:
   - stage: DeployHosted
     displayName: Deploy to AKS (hosted agent)
     dependsOn: Build
-    condition: succeeded()
+    condition: |
+      and(
+        succeeded(),
+        or(
+          and(
+            eq('${{ parameters.environment }}', 'staging'),
+            eq(variables['Build.SourceBranch'], 'refs/heads/staging')
+          ),
+          and(
+            eq('${{ parameters.environment }}', 'production'),
+            eq(variables['Build.SourceBranch'], 'refs/heads/master')
+          )
+        )
+      )
     variables:
       IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
@@ -100,6 +144,7 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
+            fetchDepth: 1
 
           - task: HelmInstaller@1
             displayName: Install Helm
@@ -127,4 +172,3 @@ stages:
               AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
               AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
               SKIP_BUILD: 'true'
-
