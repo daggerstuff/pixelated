@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react'
-
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
 import { EmotionLlamaProvider } from '../../lib/ai/providers/EmotionLlamaProvider'
-import { fheService } from '../../lib/fhe'
+import { fheService } from '@/lib/fhe'
 import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
@@ -40,6 +38,14 @@ export const useEmotionDetection = () => {
     void initProvider()
   }, [])
 
+  /**
+   * Analyzes text for emotional content and updates the simulator context with a dimensional emotional state.
+   * Uses the pre-computed PAD (Pleasure-Arousal-Dominance) values from the EmotionLlamaProvider's
+   * dimensional analysis, which maps categorical emotions to continuous PAD scale values.
+   *
+   * @param text - The user input or transcript text to analyze.
+   * @returns A promise that resolves to the emotion analysis payload from the provider, or null if the provider is not initialized or if the analysis fails.
+   */
   const detectEmotions = useCallback(
     async (text: string): Promise<EmotionAnalysis | null> => {
       try {
@@ -50,70 +56,9 @@ export const useEmotionDetection = () => {
 
         const analysis = await providerRef.current.analyzeEmotions(text)
 
-        // Update the simulator context with the new emotion state
-        if (analysis.emotions.length > 0) {
-          // Calculate valence (positive/negative sentiment)
-          const valence =
-            analysis.emotions.reduce((sum, emotion) => {
-              const valenceMap: Record<string, number> = {
-                joy: 1,
-                happiness: 1,
-                excitement: 0.8,
-                contentment: 0.6,
-                neutral: 0,
-                anxiety: -0.6,
-                fear: -0.8,
-                sadness: -1,
-                anger: -0.9,
-              }
-              return (
-                sum +
-                (valenceMap[emotion.type.toLowerCase()] || 0) *
-                  emotion.intensity
-              )
-            }, 0) / analysis.emotions.length
-
-          // Calculate energy/arousal level
-          const energy =
-            analysis.emotions.reduce((sum, emotion) => {
-              const energyMap: Record<string, number> = {
-                excitement: 1,
-                anger: 0.9,
-                joy: 0.8,
-                anxiety: 0.7,
-                fear: 0.6,
-                happiness: 0.5,
-                sadness: 0.3,
-                contentment: 0.2,
-                neutral: 0.5,
-              }
-              return (
-                sum +
-                (energyMap[emotion.type.toLowerCase()] || 0.5) *
-                  emotion.intensity
-              )
-            }, 0) / analysis.emotions.length
-
-          // Calculate dominance
-          const dominance =
-            analysis.emotions.reduce((sum, emotion) => {
-              const dominanceMap: Record<string, number> = {
-                anger: 0.9,
-                joy: 0.8,
-                excitement: 0.7,
-                happiness: 0.6,
-                neutral: 0.5,
-                anxiety: 0.4,
-                fear: 0.3,
-                sadness: 0.2,
-              }
-              return (
-                sum +
-                (dominanceMap[emotion.type.toLowerCase()] || 0.5) *
-                  emotion.intensity
-              )
-            }, 0) / analysis.emotions.length
-
+        // Update the simulator context with the pre-computed PAD emotion state from dimensions
+        if (analysis.dimensions) {
+          const { valence, energy, dominance } = analysis.dimensions
           updateEmotionState({
             valence,
             energy,
@@ -131,5 +76,7 @@ export const useEmotionDetection = () => {
     [updateEmotionState],
   )
 
-  return { detectEmotions }
+  return {
+    detectEmotions,
+  }
 }
