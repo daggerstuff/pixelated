@@ -6,6 +6,9 @@ interface ResponsiveUtilsProps {
   className?: string
 }
 
+// Debounce delay for resize event handler (in milliseconds)
+const RESIZE_DEBOUNCE_DELAY = 150
+
 /**
  * Enhanced responsive utility components for consistent responsive behavior
  * Provides responsive visibility, spacing, and layout utilities
@@ -15,33 +18,26 @@ interface ResponsiveUtilsProps {
 export const ShowOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
   <div className='block sm:hidden'>{children}</div>
 )
-
 export const HideOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
   <div className='hidden sm:block'>{children}</div>
 )
-
 export const ShowOnTablet: FC<{ children: ReactNode }> = ({ children }) => (
   <div className='hidden md:block lg:hidden'>{children}</div>
 )
-
 export const ShowOnDesktop: FC<{ children: ReactNode }> = ({ children }) => (
   <div className='hidden lg:block'>{children}</div>
 )
 
 // Responsive spacing utilities
-export const ResponsivePadding: FC<{
-  children: ReactNode
-  className?: string
-}> = ({ children, className = '' }) => (
-  <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>{children}</div>
-)
+export const ResponsivePadding: FC<{ children: ReactNode; className?: string }> = ({
+  children,
+  className = '',
+}) => <div className={`p-4 sm:p-6 lg:p-8 ${className}`}>{children}</div>
 
-export const ResponsiveMargin: FC<{
-  children: ReactNode
-  className?: string
-}> = ({ children, className = '' }) => (
-  <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>{children}</div>
-)
+export const ResponsiveMargin: FC<{ children: ReactNode; className?: string }> = ({
+  children,
+  className = '',
+}) => <div className={`m-2 sm:m-4 lg:m-6 ${className}`}>{children}</div>
 
 // Responsive container with max-width constraints
 export const ResponsiveContainer: FC<{
@@ -55,7 +51,6 @@ export const ResponsiveContainer: FC<{
     xl: 'max-w-6xl mx-auto',
     full: 'w-full',
   }
-
   return <div className={`${sizeClasses[size]} w-full`}>{children}</div>
 }
 
@@ -64,9 +59,7 @@ export const TouchTarget: FC<{ children: ReactNode; className?: string }> = ({
   children,
   className = '',
 }) => (
-  <div
-    className={`flex min-h-[44px] min-w-[44px] items-center justify-center ${className}`}
-  >
+  <div className={`flex min-h-[44px] min-w-[44px] items-center justify-center ${className}`}>
     {children}
   </div>
 )
@@ -84,7 +77,6 @@ export const ResponsiveText: FC<{
     lg: 'text-lg sm:text-xl',
     xl: 'text-xl sm:text-2xl',
   }
-
   return <div className={`${sizeClasses[size]} ${className}`}>{children}</div>
 }
 
@@ -95,16 +87,25 @@ export const useResponsive = () => {
     height: typeof window !== 'undefined' ? window.innerHeight : 768,
   })
 
+  // ⚡ Bolt: Debounce resize event to reduce main thread blocking
   React.useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
     const handleResize = () => {
-      setWindowSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      })
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setWindowSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        })
+      }, RESIZE_DEBOUNCE_DELAY)
     }
 
     window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
+    return () => {
+      clearTimeout(timeoutId)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   return {
