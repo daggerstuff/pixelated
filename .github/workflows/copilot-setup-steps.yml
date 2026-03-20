@@ -19,22 +19,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
-
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "24.14.0"
           cache: "pnpm"
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint (ESLint)
-        run: pnpm lint
+        run: pnpm exec eslint . --ext .js,.ts,.tsx,.astro
 
       - name: Format check (Prettier)
         run: pnpm exec prettier --check .
