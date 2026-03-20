@@ -19,6 +19,11 @@ scripts/
 public/polyfills/
 *.min.js
 
+# ignore large markdown content stores that fail formatting
+src/content-store/
+tests/AGENTS.md
+tests/test-results/
+
 # avoid error due to incorrect processing
 SearchSwitch.astro
 GroupView.astro
