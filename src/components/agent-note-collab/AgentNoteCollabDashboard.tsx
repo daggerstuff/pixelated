@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useDebounce } from '../hooks/useDebounce'
+import { useDebounce } from '../../hooks/useDebounce'
 
 const phaseOrder = [
   'Observe',
@@ -166,6 +166,7 @@ export default function AgentNoteCollabDashboard() {
     )
 
     const grouped = buildTurnGroups(filtered)
+
     const rows = [...grouped.values()].sort((left, right) =>
       sortByTimestamp(left.latestTurn!, right.latestTurn!),
     )
@@ -302,6 +303,7 @@ export default function AgentNoteCollabDashboard() {
                       {group.latestPhase}
                     </p>
                   </div>
+
                   <button
                     type='button'
                     onClick={() => {

@@ -1,8 +1,8 @@
 name: "Code Quality Checks"
-on: pull_request:
-  types: [opened, synchronize, reopened]
-workflow_dispatch:
-
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 jobs:
   copilot-code-review:
     runs-on: ubuntu-latest
