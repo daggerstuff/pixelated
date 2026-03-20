@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useDebounce } from '../hooks/useDebounce'
 
 const phaseOrder = [
   'Observe',
@@ -72,7 +73,6 @@ const getPhaseProgress = (phase: string): number => {
   if (index < 0) {
     return 0
   }
-
   return Math.round(((index + 1) / phaseOrder.length) * 100)
 }
 
@@ -84,6 +84,7 @@ const buildTurnGroups = (turns: NoteTurnSummary[]): Map<string, TurnGroup> => {
 
   for (const turn of turns) {
     const existing = groupedTurns.get(turn.artifactId)
+
     if (!existing) {
       groupedTurns.set(turn.artifactId, {
         artifactId: turn.artifactId,
@@ -98,7 +99,11 @@ const buildTurnGroups = (turns: NoteTurnSummary[]): Map<string, TurnGroup> => {
 
     existing.turns.push(turn)
     existing.totalTurns += 1
-    if (new Date(turn.updatedAt).getTime() > new Date(existing.latestTurn?.updatedAt ?? 0).getTime()) {
+
+    if (
+      new Date(turn.updatedAt).getTime() >
+      new Date(existing.latestTurn?.updatedAt ?? 0).getTime()
+    ) {
       existing.latestTurn = turn
       existing.latestPhase = turn.phase
       existing.openQuestions = [...turn.openQuestions]
@@ -117,6 +122,9 @@ export default function AgentNoteCollabDashboard() {
     Record<string, SynthesisState>
   >({})
 
+  // ⚡ Bolt: Debounce filter updates to reduce expensive recomputation during rapid typing (still runs on the main thread, just less often)
+  const debouncedFilter = useDebounce(artifactFilter, 300)
+
   useEffect(() => {
     const loadTurns = async () => {
       setLoading(true)
@@ -134,7 +142,11 @@ export default function AgentNoteCollabDashboard() {
 
         setTurns(body.data?.turns ?? [])
       } catch (requestError: unknown) {
-        setError(requestError instanceof Error ? requestError.message : 'An unexpected error occurred.')
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'An unexpected error occurred.',
+        )
         setTurns([])
       } finally {
         setLoading(false)
@@ -146,8 +158,10 @@ export default function AgentNoteCollabDashboard() {
 
   const groups = useMemo(() => {
     const filtered = turns.filter((turn) =>
-      artifactFilter
-        ? turn.artifactId.toLowerCase().includes(artifactFilter.toLowerCase())
+      debouncedFilter
+        ? turn.artifactId
+            .toLowerCase()
+            .includes(debouncedFilter.toLowerCase())
         : true,
     )
 
@@ -157,9 +171,11 @@ export default function AgentNoteCollabDashboard() {
     )
 
     return rows
-  }, [artifactFilter, turns])
+  }, [debouncedFilter, turns])
 
-  const unresolvedCount = groups.filter((group) => group.openQuestions.length > 0).length
+  const unresolvedCount = groups.filter(
+    (group) => group.openQuestions.length > 0,
+  ).length
 
   const handleLoadSynthesis = async (artifactId: string) => {
     setSynthesisByArtifact((prev) => ({
@@ -181,6 +197,7 @@ export default function AgentNoteCollabDashboard() {
       })
 
       const body = (await response.json()) as ApiSynthesisResponse
+
       if (!response.ok || !body.ok || !body.data) {
         setSynthesisByArtifact((prev) => ({
           ...prev,
@@ -194,10 +211,7 @@ export default function AgentNoteCollabDashboard() {
 
       setSynthesisByArtifact((prev) => ({
         ...prev,
-        [artifactId]: {
-          loading: false,
-          data: body.data,
-        },
+        [artifactId]: { loading: false, data: body.data },
       }))
     } catch (requestError: unknown) {
       setSynthesisByArtifact((prev) => ({
@@ -218,7 +232,8 @@ export default function AgentNoteCollabDashboard() {
       <section className='rounded-lg border p-4'>
         <h1 className='text-2xl font-bold'>Agent Note Collaboration</h1>
         <p className='text-sm text-muted-foreground mt-1'>
-          Review unresolved questions, phase progression, and turn summaries before handoff.
+          Review unresolved questions, phase progression, and turn summaries
+          before handoff.
         </p>
       </section>
 
@@ -253,7 +268,11 @@ export default function AgentNoteCollabDashboard() {
         />
       </section>
 
-      {loading && <p className='text-sm text-muted-foreground'>Loading collaboration state...</p>}
+      {loading && (
+        <p className='text-sm text-muted-foreground'>
+          Loading collaboration state...
+        </p>
+      )}
 
       {error && (
         <p className='text-sm rounded border border-red-500/50 bg-red-950/20 p-3 text-red-300'>
@@ -273,16 +292,14 @@ export default function AgentNoteCollabDashboard() {
           const progress = getPhaseProgress(group.latestPhase)
 
           return (
-            <article
-              key={group.artifactId}
-              className='rounded-lg border p-4'
-            >
+            <article key={group.artifactId} className='rounded-lg border p-4'>
               <div className='flex flex-col gap-2'>
                 <div className='flex items-start justify-between gap-3'>
                   <div>
                     <h2 className='text-lg font-semibold'>{group.artifactId}</h2>
                     <p className='text-sm text-muted-foreground'>
-                      {group.totalTurns} total turns · latest phase: {group.latestPhase}
+                      {group.totalTurns} total turns · latest phase:{' '}
+                      {group.latestPhase}
                     </p>
                   </div>
                   <button
@@ -317,7 +334,9 @@ export default function AgentNoteCollabDashboard() {
                 {group.openQuestions.length > 0 && (
                   <ul className='list-disc space-y-1 pl-6 text-sm'>
                     {group.openQuestions.slice(0, 3).map((question) => (
-                      <li key={`${group.artifactId}-${question}`}>{question}</li>
+                      <li key={`${group.artifactId}-${question}`}>
+                        {question}
+                      </li>
                     ))}
                   </ul>
                 )}
@@ -335,7 +354,10 @@ export default function AgentNoteCollabDashboard() {
                 {state?.data && (
                   <div className='rounded bg-card p-3 text-sm'>
                     <p className='font-semibold'>Synthesis</p>
-                    <p>{state.data.synthesis?.summaryText ?? 'No summary text returned.'}</p>
+                    <p>
+                      {state.data.synthesis?.summaryText ??
+                        'No summary text returned.'}
+                    </p>
                     <p className='text-muted-foreground mt-2'>
                       Turn window: {state.data.turnCount ?? 0}
                     </p>
