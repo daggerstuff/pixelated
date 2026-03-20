@@ -168,7 +168,7 @@ langsmith-fetch==0.3.1 # via pixelated (pyproject.toml)
 lazy-loader==0.5 # via # librosa # scikit-image
 librosa==0.11.0 # via pixelated (pyproject.toml)
 lightning==2.6.1 # via pixelated (pyproject.toml)
-lightning-sdk==2025.12.2 # via pixelated (pyproject.toml)
+lightning-sdk==2026.3.17.post0 # via pixelated (pyproject.toml)
 lightning-utilities==0.15.3 # via # lightning # pytorch-lightning # torchmetrics
 lime==0.2.0.1 # via pixelated (pyproject.toml)
 litellm==1.82.4 # via realign
