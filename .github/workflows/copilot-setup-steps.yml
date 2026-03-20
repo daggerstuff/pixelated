@@ -1,5 +1,4 @@
 name: "Code Quality Checks"
-
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -8,13 +7,10 @@ on:
 jobs:
   copilot-code-review:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       pull-requests: write
-
     environment: copilot
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -37,7 +33,7 @@ jobs:
         run: pnpm lint
 
       - name: Format check (Prettier)
-        run: pnpm exec prettier --check src/simulator/hooks/useEmotionDetection.ts || true
+        run: pnpm exec prettier --check .
 
       - name: Run tests
         run: |
