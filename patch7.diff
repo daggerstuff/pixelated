@@ -1,30 +1,11 @@
-name: Copilot Setup
+--- .github/workflows/copilot-setup-steps.yml
++++ .github/workflows/copilot-setup-steps.yml
+@@ -31,7 +31,7 @@
+         run: pnpm install --no-frozen-lockfile
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+       - name: Lint (ESLint)
+-        run: pnpm exec eslint . --ext .js,.ts,.tsx,.astro
++        run: pnpm lint
 
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Lint (ESLint)
-        run: pnpm lint
-
-      - name: Format check (Prettier)
-        run: pnpm exec prettier --check .
+       - name: Format check (Prettier)
+         run: pnpm exec prettier --check .
