@@ -9,20 +9,21 @@ describe('formatDate', () => {
   })
 
   it('formats custom date string correctly', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2023-01-01T12:00:00Z'))
     expect(
       formatDate('2023-01-01T12:00:00Z', { formatString: 'YYYY-MM-DD' }),
     ).toBe('2023-01-01')
+    vi.useRealTimers()
   })
 
   it('formats relative date correctly', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2023-01-01T12:00:00Z'))
-
     // 1 minute ago
     expect(
       formatDate('2023-01-01T11:59:00Z', { relative: true }),
     ).toBe('1 minute ago')
-
     vi.useRealTimers()
   })
 })
