@@ -303,7 +303,7 @@ const recipientTypes = [
         </button>
         <button
           type="button"
-          id="cancel-button"
+          id="data-portability-cancel-btn"
           class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
         >
           Cancel
@@ -317,7 +317,7 @@ const recipientTypes = [
   // Initialize the data portability form
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
     const form = document.getElementById('data-portability-form')
-    const cancelBtn = document.getElementById('cancel-button')
+    const cancelBtn = document.getElementById('data-portability-cancel-btn')
 
     if (cancelBtn && form) {
       cancelBtn.addEventListener('click', () => {
