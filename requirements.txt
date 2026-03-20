@@ -248,7 +248,7 @@ opentelemetry-instrumentation-httpx==0.60b1 # via logfire
 opentelemetry-instrumentation-lancedb==0.53.2 # via traceloop-sdk
 opentelemetry-instrumentation-langchain==0.53.2 # via traceloop-sdk
 opentelemetry-instrumentation-llamaindex==0.53.2 # via traceloop-sdk
-opentelemetry-instrumentation-logging==0.60b1 # via traceloop-sdk
+opentelemetry-instrumentation-logging==0.61b0 # via traceloop-sdk
 opentelemetry-instrumentation-marqo==0.53.2 # via traceloop-sdk
 opentelemetry-instrumentation-mcp==0.53.2 # via traceloop-sdk
 opentelemetry-instrumentation-milvus==0.53.2 # via traceloop-sdk
