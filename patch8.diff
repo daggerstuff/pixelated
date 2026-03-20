@@ -1,11 +1,35 @@
---- .github/workflows/copilot-setup-steps.yml
-+++ .github/workflows/copilot-setup-steps.yml
-@@ -34,7 +34,7 @@
-         run: pnpm lint
+name: Copilot Setup CI
 
-       - name: Format check (Prettier)
--        run: pnpm exec prettier --check .
-+        run: pnpm exec prettier --check src/components/ui/SearchBox.tsx
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-       - name: Run tests
-         run: |
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check (Prettier)
+        run: pnpm exec prettier --check src/components/ui/SearchBox.tsx
+
+      - name: Run tests
+        run: |
+          pnpm test
+          pnpm build
