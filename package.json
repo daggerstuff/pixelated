@@ -455,7 +455,9 @@
       "langsmith": ">=0.4.6",
       "node-gyp": "^10.0.0",
       "react": "^19.2.4",
-      "react-dom": "^19.2.4"
+      "react-dom": "^19.2.4",
+      "socket.io-parser": ">=4.2.6",
+      "effect": ">=3.20.0"
     },
     "peerDependencyRules": {
       "ignoreMissing": [
