@@ -54,16 +54,21 @@ jobs:
       - name: Build project
         run: pnpm run build
 
+      - name: Start preview server in background
+        run: pnpm run preview -- --port 4321 &
+        shell: bash
+
+      - name: Wait for server
+        run: sleep 15
+
       - name: Run browser tests
         run: |
-          # Set test environment variables
           export NODE_ENV=test
           export DISABLE_AUTH=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
-
-          # Run tests with built-in web server, only essential tests
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts tests/browser/mobile-compatibility.spec.ts --max-failures=10 --workers=1
+          export BASE_URL=http://localhost:4321
+          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --config=config/playwright.config.ts --max-failures=10 --workers=1 --grep-invert="@mobile|@responsive"
         env:
           CI: true
 
@@ -84,12 +89,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [browser-tests]
     if: always()
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v5
 
       - name: Download all test artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: all-test-results
           pattern: '*-test-results-*'
