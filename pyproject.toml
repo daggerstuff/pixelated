@@ -257,7 +257,6 @@ show_missing = true
 skip_covered = true
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
-exclude = ["ai"]
 [tool.uv]
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
@@ -266,14 +265,6 @@ concurrent-downloads = 1 # Download one package at a time for slower connections
 # Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
 # After authenticating with your NGC API key
 
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-
-[tool.uv.sources]
-torch = { index = "pytorch-cpu", marker = "python_version >= '3.11'" }
-torchvision = { index = "pytorch-cpu", marker = "python_version >= '3.11'" }
-torchaudio = { index = "pytorch-cpu", marker = "python_version >= '3.11'" }
 [dependency-groups]
 dev = [
   "black>=25.12.0",
