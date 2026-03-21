@@ -62,7 +62,7 @@ jobs:
           check_endpoint "$BASE_URL/api/health" "API health"
 
       - name: Setup Node
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
