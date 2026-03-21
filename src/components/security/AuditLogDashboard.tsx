@@ -153,8 +153,12 @@ export function AuditLogDashboard() {
     }
   }, [filters])
 
+  // ⚡ Bolt: Debounce the fetchLogs call to prevent excessive network requests when typing in filter inputs
   useEffect(() => {
-    void fetchLogs()
+    const timer = setTimeout(() => {
+      void fetchLogs()
+    }, 300)
+    return () => clearTimeout(timer)
   }, [fetchLogs])
 
   const getEventTypeStats = () => {
