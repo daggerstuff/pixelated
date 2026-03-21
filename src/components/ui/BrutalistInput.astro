@@ -52,10 +52,22 @@ export interface SelectProps {
       required={Astro.props.required}
       disabled={Astro.props.disabled}
       class:list={['input', Astro.props.error && 'input-error']}
+      aria-invalid={Astro.props.error ? 'true' : undefined}
+      aria-describedby={Astro.props.error
+        ? `${Astro.props.id || Astro.props.name}-error`
+        : undefined}
     />
-    {Astro.props.error && (
-      <span class="form-error">{Astro.props.error}</span>
-    )}
+    {
+      Astro.props.error && (
+        <span
+          class="form-error"
+          id={`${Astro.props.id || Astro.props.name}-error`}
+          role="alert"
+        >
+          {Astro.props.error}
+        </span>
+      )
+    }
   </div>
 </fragment>
 
@@ -63,16 +75,16 @@ export interface SelectProps {
   .form-group {
     margin-bottom: var(--space-5);
   }
-  
+
   .input-error {
     border-color: var(--color-danger);
   }
-  
+
   .input-error:focus {
     border-color: var(--color-danger);
     box-shadow: 0 0 0 2px rgba(255, 68, 68, 0.1);
   }
-  
+
   .form-error {
     display: block;
     font-family: var(--font-mono);
