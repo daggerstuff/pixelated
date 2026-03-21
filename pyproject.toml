@@ -257,6 +257,7 @@ show_missing = true
 skip_covered = true
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
+exclude = ["ai"]
 [tool.uv]
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
