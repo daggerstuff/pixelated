@@ -57,7 +57,7 @@ jobs:
           curl -sL https://sentry.io/get-cli/ | bash
           sentry-cli --version
           sentry-cli releases new ${SENTRY_RELEASE}
-          sentry-cli releases upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix --release ${SENTRY_RELEASE}
+          sentry-cli sourcemaps upload ./dist --rewrite --strip-prefix ./ --strip-common-prefix --release ${SENTRY_RELEASE}
           sentry-cli releases finalize ${SENTRY_RELEASE}
 
       - name: Build Docker image (optional)
