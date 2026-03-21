@@ -14,6 +14,7 @@
 #   - Note: Application deployments are handled by azure-pipelines.yml
 
 trigger:
+  batch: true
   branches:
     include:
       - master
@@ -22,9 +23,10 @@ trigger:
   paths:
     include:
       - terraform/*
-      - azure-pipelines-terraform.yml
+      - ci-cd/azure-pipelines-terraform.yml
 
 pr:
+  autoCancel: true
   branches:
     include:
       - master
@@ -59,6 +61,14 @@ parameters:
       - '1.9.0'
       - '1.8.0'
       - '1.7.0'
+  - name: certManagerVersion
+    displayName: 'cert-manager Version'
+    type: string
+    default: 'v1.15.0'
+  - name: runClusterBootstrap
+    displayName: 'Run optional AKS bootstrap (cert-manager/namespaces)'
+    type: boolean
+    default: false
 
 variables:
   # Reference variable groups from Azure DevOps Library
@@ -93,20 +103,7 @@ stages:
           # Checkout code with credentials for pulling Terraform state
           - checkout: self
             persistCredentials: true
-
-          # Configure Git for SSH authentication
-          - task: Bash@3
-            displayName: 'Configure Git for SSH'
-            inputs:
-              targetType: 'inline'
-              script: |
-                # Configure Git to use system credential helper for Azure DevOps
-                git config --global credential.helper store
-                git config --global user.name "Azure DevOps"
-                git config --global user.email "azure-pipelines@devops.com"
-                # Ensure SSH is properly configured
-                mkdir -p ~/.ssh
-                chmod 700 ~/.ssh
+            fetchDepth: 1
 
           # Configure Azure CLI and authenticate
           - task: AzureCLI@2
@@ -207,13 +204,12 @@ stages:
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
               TF_IN_AUTOMATION: 'true'
-              TF_LOG: 'INFO'
+              TF_LOG: 'WARN'
 
           # Pretty print the plan (suppress color for Azure DevOps logs)
           - task: Bash@3
             displayName: 'Display Terraform Plan Summary'
-            condition:
-              and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
             inputs:
               targetType: 'inline'
               script: |
@@ -226,8 +222,7 @@ stages:
           # Save terraform plan as artifact
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Terraform Plan'
-            condition:
-              and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
+            condition: and(succeeded(), eq('${{ parameters.terraformAction }}', 'plan'))
             inputs:
               targetPath: '$(terraformDirectory)/tfplan'
               artifactName: '$(artifactName)-plan-${{ parameters.environment }}'
@@ -237,8 +232,7 @@ stages:
   - stage: TerraformApply
     displayName: 'Terraform Apply (Manual Approval)'
     dependsOn: TerraformValidate
-    condition:
-      and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
       parameters.terraformAction }}', 'apply'))
     jobs:
       - deployment: ApplyChanges
@@ -252,6 +246,7 @@ stages:
               steps:
                 - checkout: self
                   persistCredentials: true
+                  fetchDepth: 1
 
                 - task: AzureCLI@2
                   displayName: 'Login to Azure'
@@ -264,8 +259,7 @@ stages:
                       bash scripts/devops/azure_aks_preflight.sh
 
                 - task: TerraformInstaller@0
-                  displayName:
-                    'Install Terraform ${{ parameters.terraformVersion }}'
+                  displayName: 'Install Terraform ${{ parameters.terraformVersion }}'
                   inputs:
                     terraformVersion: '${{ parameters.terraformVersion }}'
 
@@ -291,8 +285,7 @@ stages:
                 - task: DownloadPipelineArtifact@2
                   displayName: 'Download Terraform Plan'
                   inputs:
-                    artifactName:
-                      '$(artifactName)-plan-${{ parameters.environment }}'
+                    artifactName: '$(artifactName)-plan-${{ parameters.environment }}'
                     targetPath: '$(terraformDirectory)'
 
                 - task: Bash@3
@@ -350,9 +343,11 @@ stages:
                 # Post-deployment: Setup Kubernetes cluster with cert-manager and initial resources
                 - task: Bash@3
                   displayName: 'Setup Kubernetes Cluster (Optional)'
-                  condition:
-                    and(succeeded(), eq('${{ parameters.environment }}',
-                    'staging'))
+                  condition: and(
+                    succeeded(),
+                    eq('${{ parameters.environment }}', 'staging'),
+                    eq('${{ parameters.runClusterBootstrap }}', true)
+                    )
                   inputs:
                     targetType: 'inline'
                     script: |
@@ -387,7 +382,7 @@ stages:
                       # Install cert-manager if not already installed
                       if ! kubectl get namespace cert-manager &>/dev/null; then
                         echo "🔐 Installing cert-manager..."
-                        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+                          kubectl apply -f "https://github.com/cert-manager/cert-manager/releases/download/${{ parameters.certManagerVersion }}/cert-manager.yaml"
                         # Wait for cert-manager to be ready
                         echo "⏳ Waiting for cert-manager pods..."
                         kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s || true
@@ -426,8 +421,7 @@ stages:
   - stage: TerraformRefresh
     displayName: 'Terraform State Refresh'
     dependsOn: []
-    condition:
-      and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'Manual'), eq('${{
       parameters.terraformAction }}', 'refresh'))
     jobs:
       - job: RefreshState
@@ -469,28 +463,67 @@ stages:
               TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
 
           - task: Bash@3
-            displayName: 'Terraform Refresh'
+            displayName: 'Terraform Refresh-Only Plan'
             inputs:
               targetType: 'inline'
               script: |
+                set -euo pipefail
                 cd $(terraformDirectory)
-                terraform refresh -var-file=$(tfvarsFile)
+
+                terraform plan \
+                  -refresh-only \
+                  -var-file=$(tfvarsFile) \
+                  -out=tfrefresh \
+                  -detailed-exitcode
+
+                REFRESH_EXITCODE=$?
+                echo "⭐ Terraform refresh-only plan exit code: $REFRESH_EXITCODE"
+
+                case $REFRESH_EXITCODE in
+                  0)
+                    echo "✅ No drift detected"
+                    ;;
+                  1)
+                    echo "❌ Refresh-only plan failed"
+                    exit 1
+                    ;;
+                  2)
+                    echo "⚠️ Drift detected"
+                    terraform show -no-color tfrefresh | head -150
+                    ;;
+                esac
             env:
               TF_HTTP_PASSWORD: $(TF_HTTP_PASSWORD)
               ARM_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               ARM_TENANT_ID: $(AZURE_TENANT_ID)
 
-# Post-deployment scripts
-postDeployment:
-  onSuccess:
-    - script: |
-        echo "✅ Terraform pipeline completed successfully"
-        echo "Environment: ${{ parameters.environment }}"
-        echo "Action: ${{ parameters.terraformAction }}"
-      displayName: 'Post-deployment Success'
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Terraform Refresh Plan'
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(terraformDirectory)/tfrefresh'
+              artifactName: 'terraform-refresh-${{ parameters.environment }}'
+              artifactType: 'pipeline'
 
-  onFailure:
-    - script: |
-        echo "❌ Terraform pipeline completed with failures"
-        echo "Check the logs above for details"
-      displayName: 'Post-deployment Failure'
+  - stage: PipelineSummary
+    displayName: 'Pipeline Summary'
+    dependsOn:
+      - TerraformValidate
+      - TerraformApply
+      - TerraformRefresh
+    condition: always()
+    jobs:
+      - job: Summary
+        displayName: 'Emit final status'
+        pool:
+          vmImage: 'ubuntu-24.04'
+        steps:
+          - task: Bash@3
+            displayName: 'Print stage outcomes'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "Terraform pipeline completed"
+                echo "Environment: ${{ parameters.environment }}"
+                echo "Action: ${{ parameters.terraformAction }}"
+                echo "Validate stage result: $(Agent.JobStatus)"

@@ -6,9 +6,9 @@ permissions:
 
 on:
   push:
-    branches: [ master, development ]
+    branches: [ main, staging ]
   pull_request:
-    branches: [ master, development ]
+    branches: [ main, staging ]
   schedule:
   - cron: '0 0 * * *'
 
@@ -29,7 +29,7 @@ jobs:
         python3 -m pip install --no-cache-dir uv || true
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.16.1
+      uses: aquasecurity/trivy-action@0.30.0
       continue-on-error: true
       with:
         scan-type: 'fs'

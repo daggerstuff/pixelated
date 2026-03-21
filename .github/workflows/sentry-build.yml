@@ -4,7 +4,7 @@ permissions:
   contents: read
 on:
   push:
-    branches: [ master ]
+    branches: [ main, staging ]
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
     - name: Build (with Sentry envs if provided)
       env:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+        PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
         SENTRY_RELEASE: ${{ github.sha }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       run: |
@@ -62,7 +62,7 @@ jobs:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_RELEASE: ${{ github.sha }}
-        PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+        PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
       run: |
         IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
         docker build \

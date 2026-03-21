@@ -12,7 +12,7 @@ name: Training Artifact Verification
   push:
     branches:
       - main
-      - develop
+      - staging
     paths:
       - ai/pipelines/orchestrator/orchestration/integrated_training_pipeline.py
       - ai/pipelines/orchestrator/scripts/verify_stage_manifest_and_splits.py
