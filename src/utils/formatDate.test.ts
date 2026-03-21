@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDuration } from './formatDate'
+import { formatDuration, isValidDate } from './formatDate'
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
@@ -28,5 +28,18 @@ describe('formatDuration', () => {
     expect(formatDuration(2 * 86400000 + 4 * 3600000)).toBe('2d 4h')
     // exactly 1 day
     expect(formatDuration(86400000)).toBe('1d 0h')
+  })
+})
+
+
+describe('isValidDate', () => {
+  it('returns true for a valid date string', () => {
+    expect(isValidDate('2023-01-01')).toBe(true)
+    expect(isValidDate('2023-12-31T23:59:59Z')).toBe(true)
+  })
+
+  it('returns false for an invalid date string', () => {
+    expect(isValidDate('invalid-date')).toBe(false)
+    expect(isValidDate('')).toBe(false)
   })
 })
