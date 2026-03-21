@@ -63,7 +63,7 @@ jobs:
           export SKIP_MSW=true
 
           # Run tests with built-in web server, only essential tests
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts tests/browser/mobile-compatibility.spec.ts --config=playwright.config.ci.ts --max-failures=10 --workers=1
+          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts tests/browser/mobile-compatibility.spec.ts --max-failures=10 --workers=1
         env:
           CI: true
 
