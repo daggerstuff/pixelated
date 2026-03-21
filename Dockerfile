@@ -183,7 +183,6 @@ RUN ( \
 # Copy built output and public assets from builder
 COPY --from=builder --chown=astro:astro /app/dist ./dist
 COPY --from=builder --chown=astro:astro /app/public ./public
-COPY --from=builder --chown=astro:astro /app/templates ./templates
 COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
 COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
 USER astro
