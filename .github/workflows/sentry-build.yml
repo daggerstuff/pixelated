@@ -54,11 +54,10 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
           SENTRY_RELEASE: ${{ github.sha }}
         run: |
-          # Install sentry-cli if not available and then create a release and upload source maps
           curl -sL https://sentry.io/get-cli/ | bash
           sentry-cli --version
           sentry-cli releases new ${SENTRY_RELEASE}
-          sentry-cli releases files ${SENTRY_RELEASE} upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix
+          sentry-cli releases upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix --release ${SENTRY_RELEASE}
           sentry-cli releases finalize ${SENTRY_RELEASE}
 
       - name: Build Docker image (optional)
