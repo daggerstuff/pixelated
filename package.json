@@ -399,7 +399,7 @@
     "util": "^0.12.5",
     "vfile": "^6.0.3",
     "viewerjs": "^1.11.7",
-    "vite": "^8.0.1",
+    "vite": "7.3.1",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.0",
     "wait-on": "^9.0.4"
@@ -426,7 +426,7 @@
       "node-domexception": "^2.0.1",
       "sitemap": "^9.0.0",
       "jws": ">=4.0.1",
-      "vite": "^8.0.1",
+      "vite": "7.3.1",
       "unocss": "^66.5.12",
       "@unocss/reset": "^66.5.12",
       "@unocss/core": "^66.5.12",
