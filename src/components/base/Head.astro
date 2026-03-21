@@ -163,3 +163,12 @@ const webPageData = {
 <SpeedInsights />
 
 <ClientRouter />
+
+<!-- Rybbit View Transitions Support -->
+<script is:inline>
+  document.addEventListener('astro:after-swap', () => {
+    if (window.rybbit) {
+      window.rybbit.pageview();
+    }
+  });
+</script>
