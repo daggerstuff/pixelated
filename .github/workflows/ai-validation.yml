@@ -3,6 +3,9 @@ name: AI Model Validation Pipeline
 permissions:
   contents: read
   actions: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   checks: read
   pull-requests: read
   security-events: write
@@ -14,9 +17,9 @@ on:
   workflow_dispatch:
     inputs:
       ENV_NAME:
-        description: "Environment name (staging, production, etc)"
+        description: 'Environment name (staging, production, etc)'
         required: false
-        default: "staging"
+        default: 'staging'
 
 jobs:
   validate-ai-models:
@@ -27,10 +30,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v6
         with:
           node-version: 24.14.0
 
@@ -67,7 +70,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@v5
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
