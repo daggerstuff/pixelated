@@ -17,6 +17,25 @@ interface ResearchConsentFormProps {
  * Displays the current consent document and options
  * Provides audit-compliant consent tracking
  */
+
+// Basic HTML sanitizer to prevent XSS
+const sanitizeHtml = (html: string) => {
+  if (typeof window === 'undefined') return html;
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const elementsToRemove = doc.querySelectorAll('script, style, object, iframe, embed, applet, link, meta, form');
+  elementsToRemove.forEach(el => el.remove());
+  const allElements = doc.querySelectorAll('*');
+  allElements.forEach(el => {
+    for (let i = el.attributes.length - 1; i >= 0; i--) {
+      const attr = el.attributes[i];
+      if (attr.name.toLowerCase().startsWith('on') || attr.value.toLowerCase().includes('javascript:')) {
+        el.removeAttribute(attr.name);
+      }
+    }
+  });
+  return doc.body.innerHTML;
+};
+
 export function ResearchConsentForm({
   onConsentChanged,
   showSummaryOnly = false,
@@ -279,7 +298,7 @@ export function ResearchConsentForm({
               <div className='bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm'>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: consentStatus.currentVersion.documentText,
+                    __html: sanitizeHtml(consentStatus.currentVersion.documentText),
                   }}
                 ></div>
               </div>
