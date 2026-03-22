@@ -283,3 +283,6 @@ worktrees/
 
 .sisyphus/run-continuation
 .planning/
+
+# Ignore codemaps
+codemap.md
