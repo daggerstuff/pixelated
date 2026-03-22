@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y curl=7.88.1-10+
 FROM build-base AS prod-deps
 COPY package.json pnpm-lock.yaml ./
 COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod
 
 # Build dependencies stage
 FROM build-base AS build-deps
