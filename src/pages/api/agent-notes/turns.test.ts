@@ -22,7 +22,7 @@ const asActor = (actorId: string) => ({
   },
 })
 
-describe.skip('Agent note turns API', () => {
+describe('Agent note turns API', () => {
   const makeTempPath = () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'agent-note-collab-api-'))
     return join(tempDir, 'turns.json')

@@ -58,7 +58,7 @@ vi.mock('../../redis', () => ({
   removeFromCache: vi.fn(),
 }))
 
-describe.skip('Authentication Middleware', () => {
+describe('Authentication Middleware', () => {
   let mockRequest: Request
   let _mockResponse: Response
 

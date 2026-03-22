@@ -22,7 +22,7 @@ const filledFilters: SearchFiltersState = {
   sortBy: 'year_desc',
 }
 
-describe.skip('SearchFilters', () => {
+describe('SearchFilters', () => {
   it('renders all filter sections', () => {
     render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} />)
 

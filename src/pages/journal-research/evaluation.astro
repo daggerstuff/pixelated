@@ -5,7 +5,7 @@ import { LazyEvaluationPage } from '@/components/journal-research/lazy'
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
 // @ts-ignore Astro.props is injected at runtime
-const { } = Astro.props as { user: any }
+const { user } = Astro.props as { user: any }
 
 const sessionId = Astro.url.searchParams.get('sessionId')
 ---

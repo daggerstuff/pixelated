@@ -22,7 +22,7 @@ const mockWebSocket = {
 
 // global.WebSocket will be mocked in beforeEach
 
-describe.skip('WebSocketProgressBar', () => {
+describe('WebSocketProgressBar', () => {
   const mockProps = {
     executionId: 'test-execution-123',
     webSocket: null,
@@ -654,7 +654,7 @@ describe.skip('WebSocketProgressBar', () => {
   })
 })
 
-describe.skip('WebSocketConnectionManager', () => {
+describe('WebSocketConnectionManager', () => {
   const mockProps = {
     url: 'ws://localhost:8080',
     onConnect: vi.fn(),
@@ -730,7 +730,7 @@ describe.skip('WebSocketConnectionManager', () => {
   })
 })
 
-describe.skip('WebSocketMessageLogger', () => {
+describe('WebSocketMessageLogger', () => {
   const mockMessages = [
     {
       id: '1',

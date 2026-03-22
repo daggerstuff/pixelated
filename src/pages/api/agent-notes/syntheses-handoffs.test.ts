@@ -23,7 +23,7 @@ const asActor = (actorId: string) => ({
   },
 })
 
-describe.skip('Agent note syntheses and handoffs APIs', () => {
+describe('Agent note syntheses and handoffs APIs', () => {
   it('creates synthesis summary from replayed turns', async () => {
     const tempPath = makeTempPath()
     try {

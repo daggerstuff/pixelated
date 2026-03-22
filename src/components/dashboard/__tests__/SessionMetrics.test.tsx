@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { SessionMetrics } from '../SessionMetrics'
 
-describe.skip('SessionMetrics', () => {
+describe('SessionMetrics', () => {
   const mockMetrics = [
     { label: 'Total Sessions', value: 25 },
     { label: 'Avg Progress', value: '78%' },

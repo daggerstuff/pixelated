@@ -1,5 +1,4 @@
-/** @vitest-environment jsdom */
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PasswordInputWithStrength } from '../PasswordInputWithStrength'
 import React from 'react'
@@ -15,8 +14,7 @@ vi.mock('../../hooks/usePasswordStrength', () => ({
   }),
 }))
 
-describe.skip('PasswordInputWithStrength', () => {
-  afterEach(() => cleanup())
+describe('PasswordInputWithStrength', () => {
   it('renders label and input', () => {
     render(
       <PasswordInputWithStrength
@@ -62,7 +60,7 @@ describe.skip('PasswordInputWithStrength', () => {
     expect(progressbar.getAttribute('aria-valuetext')).toBe('fair')
   })
 
-  it('has aria-live="polite" on feedback text', async () => {
+  it('has aria-live="polite" on feedback text', () => {
     render(
       <PasswordInputWithStrength
         label="Password"
@@ -73,7 +71,7 @@ describe.skip('PasswordInputWithStrength', () => {
     )
 
     // Check for aria-live="polite" on the element containing the feedback
-    const feedback = await waitFor(() => screen.getByText(/Fair - could be stronger/i))
+    const feedback = screen.getByText(/Fair - could be stronger/i)
     expect(feedback.getAttribute('aria-live')).toBe('polite')
   })
 

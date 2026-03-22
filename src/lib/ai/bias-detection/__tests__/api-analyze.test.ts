@@ -37,80 +37,7 @@ const mockPerformanceMonitor = {
 const mockValidateTherapeuticSession = vi.fn()
 const mockGenerateAnonymizedId = vi.fn()
 
-const mockBiasDetectionServiceInstance = {
-  analyzeBias: vi.fn().mockResolvedValue({
-    sessionId: '123e4567-e89b-12d3-a456-426614174000',
-    overallBiasScore: 0.75,
-    alertLevel: 'medium',
-    layerResults: [],
-    recommendations: ['Consider cultural sensitivity in diagnostic approach', 'Review intervention selection for demographic appropriateness'],
-    cached: false
-  }),
-  getBiasSummary: vi.fn().mockResolvedValue({
-    therapistId: 'test-therapist',
-    periodDays: 30,
-    averageBiasScore: 0.6,
-    sessionsAnalyzed: 10,
-    trend: 'improving',
-    riskAreas: []
-  })
-};
-
-vi.mock('../../../lib/services/bias-detection-optimized', () => ({
-  OptimizedBiasDetectionService: {
-    getInstance: vi.fn(() => ({
-      analyzeBias: vi.fn().mockResolvedValue({
-        sessionId: '123e4567-e89b-12d3-a456-426614174000',
-        overallBiasScore: 0.75,
-        alertLevel: 'medium',
-        layerResults: [],
-        recommendations: ['Consider cultural sensitivity in diagnostic approach', 'Review intervention selection for demographic appropriateness'],
-        cached: false
-      }),
-      getBiasSummary: vi.fn().mockResolvedValue({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
-    }))
-  }
-}));
-
-
 // Mock all dependencies
-
-vi.mock('../../../services/bias-detection-optimized', () => {
-  let analyzeCalls = 0;
-  return {
-    OptimizedBiasDetectionService: {
-      getInstance: vi.fn(() => ({
-        analyzeBias: vi.fn().mockImplementation(() => {
-          analyzeCalls++;
-          return Promise.resolve({
-            sessionId: '123e4567-e89b-12d3-a456-426614174000',
-            overallBiasScore: 0.75,
-            alertLevel: 'medium',
-            layerResults: [],
-            recommendations: ['Consider cultural sensitivity in diagnostic approach', 'Review intervention selection for demographic appropriateness'],
-            cached: analyzeCalls === 2
-          });
-        }),
-        getBiasSummary: vi.fn().mockResolvedValue({
-          therapistId: 'test-therapist',
-          periodDays: 30,
-          averageBiasScore: 0.6,
-          sessionsAnalyzed: 10,
-          trend: 'improving',
-          riskAreas: []
-        })
-      }))
-    }
-  };
-});
-
 vi.mock('../index', () => ({
   BiasDetectionEngine: vi.fn(() => mockBiasDetectionEngine),
   validateTherapeuticSession: mockValidateTherapeuticSession,
@@ -188,8 +115,7 @@ function serializeForComparison(obj: unknown): unknown {
   return JSON.parse(JSON.stringify(obj) as unknown)
 }
 
-describe.skip('Session Analysis API Endpoint', () => {
-
+describe('Session Analysis API Endpoint', () => {
   const mockSession: TherapeuticSession = {
     sessionId: '123e4567-e89b-12d3-a456-426614174000',
     timestamp: new Date('2024-01-15T10:00:00.000Z'),
@@ -320,9 +246,8 @@ describe.skip('Session Analysis API Endpoint', () => {
           ['X-Processing-Time', '100'],
         ])
 
-        if (init?.status === 500) console.log('500 ERROR:', body);
-          return {
-            status: init?.status || 200,
+        return {
+          status: init?.status || 200,
           json: vi.fn().mockResolvedValue(responseData),
           headers: {
             get: vi.fn((key: string) => defaultHeaders.get(key) || null),
@@ -400,7 +325,6 @@ describe.skip('Session Analysis API Endpoint', () => {
       const requestBody = {
         session: mockSessionForRequest,
         options: { includeExplanation: true },
-        content: 'test content',
       }
 
       const request = createMockRequest(requestBody)
@@ -434,7 +358,9 @@ describe.skip('Session Analysis API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual(serializeForComparison(mockAnalysisResult))
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockAnalysisResult),
+      )
       expect(responseData.cacheHit).toBe(false)
       expect(typeof responseData.processingTime).toBe('number')
 
@@ -446,8 +372,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       // expect(mockAuditLogger.logBiasAnalysis).toHaveBeenCalled()
     })
 
-    it.skip('should return cached result when available', async () => {
-      mockBiasDetectionServiceInstance.analyzeBias.mockResolvedValueOnce({ ...mockAnalysisResult, cached: true })
+    it('should return cached result when available', async () => {
       // Note: Current API implementation doesn't use cache, so cacheHit is always false
       const requestBody = { session: mockSessionForRequest }
       const request = createMockRequest(requestBody)
@@ -468,11 +393,10 @@ describe.skip('Session Analysis API Endpoint', () => {
       // expect(mockBiasDetectionEngine.analyzeSession).not.toHaveBeenCalled()
     })
 
-    it.skip('should skip cache when skipCache option is true', async () => {
+    it('should skip cache when skipCache option is true', async () => {
       const requestBody = {
         session: mockSessionForRequest,
         options: { skipCache: true },
-        content: 'test content',
       }
 
       const request = createMockRequest(requestBody)
@@ -541,7 +465,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       // expect(responseData.error).toBe('Unauthorized')
     })
 
-    it.skip('should return 400 for invalid content type', async () => {
+    it('should return 400 for invalid content type', async () => {
       const requestBody = { session: mockSessionForRequest }
       const request = createMockRequest(requestBody, {
         'content-type': 'text/plain',
@@ -714,7 +638,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       searchParams: Record<string, string> = {},
       headers: Record<string, string> = {},
     ): MockRequest => {
-      const url = new URL('http://localhost:3000/api/bias-detection/analyze?therapistId=test-therapist')
+      const url = new URL('http://localhost:3000/api/bias-detection/analyze')
       Object.entries(searchParams).forEach(([key, value]) => {
         url.searchParams.set(key, value)
       })
@@ -741,7 +665,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
       )
 
       const response = await GET({ request, url })
@@ -750,14 +674,9 @@ describe.skip('Session Analysis API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockGetAnalysisResult),
+      )
       expect(responseData.cacheHit).toBe(true) // GET endpoint hardcodes cacheHit to true
 
       // API doesn't use audit logger or bias engine - expectations commented out
@@ -781,15 +700,10 @@ describe.skip('Session Analysis API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.cacheHit).toBe(true)
-      expect(responseData.data).toEqual({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
+      expect(responseData.cacheHit).toBe(true) // Always true in GET endpoint
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockGetAnalysisResult),
+      )
 
       // API doesn't use cache manager or bias engine - expectations commented out
       // expect(mockCacheManager.analysisCache.getAnalysisResult).toHaveBeenCalledWith(mockSession.sessionId)
@@ -804,7 +718,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist&anonymize=true`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&anonymize=true`,
       )
 
       const response = await GET({ request, url })
@@ -814,14 +728,9 @@ describe.skip('Session Analysis API Endpoint', () => {
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
       // API returns hardcoded result without anonymization logic
-      expect(responseData.data).toEqual({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockGetAnalysisResult),
+      )
     })
 
     it('should return 401 for missing authorization', async () => {
@@ -831,7 +740,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       )
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
       )
 
       const response = await GET({ request, url })
@@ -849,7 +758,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?therapistId=invalid-uuid&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=invalid-uuid`,
       )
 
       const response = await GET({ request, url })
@@ -859,8 +768,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
       // API returns result with the provided sessionId (even if invalid format)
-      // Not expecting sessionId anymore
-      // expect(responseData.data.therapistId).toBe('invalid-uuid')
+      expect(responseData.data.sessionId).toBe('invalid-uuid')
     })
 
     it('should return 404 when analysis not found', async () => {
@@ -870,7 +778,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
       )
 
       const response = await GET({ request, url })
@@ -879,14 +787,9 @@ describe.skip('Session Analysis API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockGetAnalysisResult),
+      )
     })
 
     it('should handle bias detection engine errors in GET', async () => {
@@ -896,7 +799,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
       )
 
       const response = await GET({ request, url })
@@ -905,14 +808,9 @@ describe.skip('Session Analysis API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual({
-        therapistId: 'test-therapist',
-        periodDays: 30,
-        averageBiasScore: 0.6,
-        sessionsAnalyzed: 10,
-        trend: 'improving',
-        riskAreas: []
-      })
+      expect(responseData.data).toEqual(
+        serializeForComparison(mockGetAnalysisResult),
+      )
 
       // API doesn't use bias engine - expectation commented out
       // expect(mockBiasDetectionEngine.getSessionAnalysis).toHaveBeenCalledWith(mockSession.sessionId)
@@ -925,7 +823,7 @@ describe.skip('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
       )
 
       const response = await GET({ request, url })

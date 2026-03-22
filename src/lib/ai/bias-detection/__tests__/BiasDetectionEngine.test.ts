@@ -140,7 +140,7 @@ const createPartialFailingPythonService = () =>
     }
   }
 
-describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
+describe('BiasDetectionEngine', { timeout: 20000 }, () => {
   let biasEngine: BiasDetectionEngine
   let mockConfig: EngineConfig
   let mockSessionData: SessionData
@@ -497,7 +497,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     vi.clearAllMocks()
   })
 
-  describe.skip('Initialization', () => {
+  describe('Initialization', () => {
     it('should initialize with default configuration', async () => {
       const defaultEngine = new BiasDetectionEngine()
       expect(defaultEngine).toBeDefined()
@@ -525,7 +525,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Session Analysis', () => {
+  describe('Session Analysis', () => {
     it('should analyze session and return bias results', async () => {
       await biasEngine.initialize()
       const result = await biasEngine.analyzeSession(
@@ -722,7 +722,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Multi-Layer Analysis', () => {
+  describe('Multi-Layer Analysis', () => {
     it('should perform preprocessing layer analysis', async () => {
       await biasEngine.initialize()
       const result = await biasEngine.analyzeSession(
@@ -767,7 +767,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Dashboard Data', () => {
+  describe('Dashboard Data', () => {
     it('should generate dashboard data', async () => {
       await biasEngine.initialize()
       const dashboardData = await biasEngine.getDashboardData({
@@ -802,7 +802,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Real-time Monitoring', () => {
+  describe('Real-time Monitoring', () => {
     it('should start monitoring', async () => {
       await biasEngine.initialize()
       const mockCallback = vi.fn()
@@ -894,7 +894,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Performance Requirements', () => {
+  describe('Performance Requirements', () => {
     it('should complete analysis within 10 seconds for simple sessions', async () => {
       await biasEngine.initialize()
       const startTime = Date.now()
@@ -926,7 +926,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Error Handling', () => {
+  describe('Error Handling', () => {
     it('should handle Python service errors gracefully', async () => {
       await biasEngine.initialize()
 
@@ -1393,7 +1393,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Resource Management and Cleanup', () => {
+  describe('Resource Management and Cleanup', () => {
     it('should handle cleanup failures gracefully', async () => {
       await biasEngine.initialize()
       // Mock cleanup failures - access private properties for testing
@@ -1455,7 +1455,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Configuration Edge Cases', () => {
+  describe('Configuration Edge Cases', () => {
     it('should handle zero layer weights', async () => {
       const zeroWeightConfig = {
         ...mockConfig,
@@ -1629,7 +1629,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Data Privacy and Security', () => {
+  describe('Data Privacy and Security', () => {
     it('should mask sensitive demographic data', async () => {
       await biasEngine.initialize()
       const result = await biasEngine.analyzeSession(
@@ -1682,7 +1682,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Integration with Existing Systems', () => {
+  describe('Integration with Existing Systems', () => {
     it('should integrate with session management system', async () => {
       await biasEngine.initialize()
       // Mock session retrieval
@@ -1712,7 +1712,7 @@ describe.skip('BiasDetectionEngine', { timeout: 20000 }, () => {
     })
   })
 
-  describe.skip('Realistic Bias Detection Scenarios (Using Test Fixtures)', () => {
+  describe('Realistic Bias Detection Scenarios (Using Test Fixtures)', () => {
     let fixtureScenarios: {
       baseline: SessionData
       youngPatient: SessionData

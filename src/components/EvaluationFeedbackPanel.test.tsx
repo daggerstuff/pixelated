@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 import { EvaluationFeedbackPanel } from './EvaluationFeedbackPanel'
 
-describe.skip('EvaluationFeedbackPanel', () => {
+describe('EvaluationFeedbackPanel', () => {
   it('renders feedback input and submits', () => {
     const handleSubmit = vi.fn()
     render(<EvaluationFeedbackPanel feedback='' onSubmit={handleSubmit} />)

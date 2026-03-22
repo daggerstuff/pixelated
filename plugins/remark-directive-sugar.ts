@@ -5,7 +5,7 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Root } from 'mdast'
-import { visit } from 'unist-util-visit'
+import { visit, type Visitor } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
 type BadgePreset = Record<string, { text: string; color: string }>
@@ -171,6 +171,8 @@ function remarkDirectiveSugar() {
           let _resolvedText = ''
           let _resolvedStyle = ''
           // Reserved for potential future use in link processing
+          let _resolvedTab = ''
+          let _isOrg = false
 
           const { id, link, tab, style } = attributes
 

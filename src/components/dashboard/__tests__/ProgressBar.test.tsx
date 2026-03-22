@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { ProgressBar } from '../ProgressBar'
 
-describe.skip('ProgressBar', () => {
+describe('ProgressBar', () => {
   it('renders progress bar with correct value and label', () => {
     render(<ProgressBar value={75} label='Test Progress' />)
 

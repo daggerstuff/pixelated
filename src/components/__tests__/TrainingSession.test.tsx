@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import TrainingSession from '../TrainingSession'
 
-describe.skip('TrainingSession', () => {
+describe('TrainingSession', () => {
   it('renders training session component', () => {
     render(<TrainingSession />)
 

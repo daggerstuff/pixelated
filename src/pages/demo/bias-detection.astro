@@ -282,7 +282,7 @@ export const prerender = false
           </div>
 
           <!-- Results Panel -->
-          <BrutalistCard variant="outline">
+          <BrutalistCard variant="elevated">
             <div class="space-y-6">
               <div class="border-b border-gray-700 pb-4">
                 <h3 class="brutalist-subheading text-xl mb-2">
@@ -365,7 +365,7 @@ export const prerender = false
         </div>
 
         <div class="brutalist-grid brutalist-grid--3">
-          <BrutalistCard >
+          <BrutalistCard hover={true}>
             <div class="text-center">
               <div class="text-4xl mb-4">🔍</div>
               <h3 class="brutalist-subheading text-lg mb-3">
@@ -392,7 +392,7 @@ export const prerender = false
             </div>
           </BrutalistCard>
 
-          <BrutalistCard >
+          <BrutalistCard hover={true}>
             <div class="text-center">
               <div class="text-4xl mb-4">⚡</div>
               <h3 class="brutalist-subheading text-lg mb-3">
@@ -419,7 +419,7 @@ export const prerender = false
             </div>
           </BrutalistCard>
 
-          <BrutalistCard >
+          <BrutalistCard hover={true}>
             <div class="text-center">
               <div class="text-4xl mb-4">🛡️</div>
               <h3 class="brutalist-subheading text-lg mb-3">HIPAA COMPLIANT</h3>
@@ -500,7 +500,7 @@ export const prerender = false
 
       generateSessionId() {
         return (
-          'demo_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11)
+          'demo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
         )
       }
 

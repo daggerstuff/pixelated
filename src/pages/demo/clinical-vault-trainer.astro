@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-//
+// import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
 
@@ -156,7 +156,7 @@ const universityResults = [
   <!-- Interactive Demo Section -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <BrutalistCard variant="outline" class="max-w-4xl mx-auto">
+      <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
         <div class="space-y-6">
           <div class="border-b border-gray-700 pb-4">
             <div class="flex justify-between items-start">
@@ -251,7 +251,7 @@ const universityResults = [
       <div class="brutalist-grid brutalist-grid--2">
         {
           impossibleScenarios.map((scenario) => (
-            <BrutalistCard >
+            <BrutalistCard hover={true}>
               <div class="space-y-4">
                 <div class="text-5xl text-center">{scenario.icon}</div>
                 <div class="brutalist-badge brutalist-badge--danger text-center">
@@ -287,7 +287,7 @@ const universityResults = [
       <div class="brutalist-grid brutalist-grid--3">
         {
           universityResults.map((result) => (
-            <BrutalistCard >
+            <BrutalistCard hover={true}>
               <div class="text-center space-y-4">
                 <div class="text-5xl">🏛️</div>
                 <h3 class="brutalist-subheading text-lg">
@@ -310,7 +310,7 @@ const universityResults = [
   <!-- Security Guarantee -->
   <section class="brutalist-section bg-gray-900/50">
     <div class="brutalist-container">
-      <BrutalistCard variant="outline" class="max-w-4xl mx-auto">
+      <BrutalistCard variant="security" class="max-w-4xl mx-auto">
         <div class="text-center space-y-6">
           <div class="text-6xl">🛡️</div>
           <h3 class="brutalist-subheading text-2xl">
@@ -430,7 +430,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -443,7 +443,7 @@ const universityResults = [
             demo_type: 'clinical_vault_trainer',
             interaction_type: action,
             ab_variant:
-              (document.querySelector('[data-variant]') as HTMLElement)?.dataset.variant ||
+              document.querySelector('[data-variant]')?.dataset.variant ||
               'unknown',
           })
         }
@@ -468,7 +468,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e: Event) => {
+      button.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 

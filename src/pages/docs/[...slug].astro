@@ -23,7 +23,7 @@ interface Props {
 const { slug } = Astro.params
 const docs = await getCollection('docs')
 const entry = docs.find(
-  (doc: any) => !doc.data.draft && (doc.data.slug || doc.slug) === slug,
+  (doc) => !doc.data.draft && (doc.data.slug || doc.slug) === slug,
 )
 
 if (!entry) {
