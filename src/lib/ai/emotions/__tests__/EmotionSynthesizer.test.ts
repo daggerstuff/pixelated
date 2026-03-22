@@ -1,3 +1,5 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import {
   EmotionSynthesizer,
   type EnhancedSynthesisOptions,
@@ -13,7 +15,8 @@ describe('EmotionSynthesizer', () => {
 
   describe('synthesizeEmotion (Enhanced)', () => {
     it('should return a default neutral profile if no options are provided', async () => {
-      const result = await synthesizer.synthesizeEmotion({})
+      // Pass randomFluctuation = 0 to make test deterministic since default adds noise
+      const result = await synthesizer.synthesizeEmotion({ randomFluctuation: 0 })
       expect(result.success).toBe(true)
       expect(result.profile.emotions['neutral']).toBeCloseTo(1.0 * 0.85, 2) // Default decay from default neutral
     })
