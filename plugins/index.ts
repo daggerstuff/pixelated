@@ -12,7 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkDirective from 'remark-directive'
 import remarkImgattr from 'remark-imgattr'
 import remarkMath from 'remark-math'
-import { visit, type Visitor } from 'unist-util-visit'
+import { visit } from 'unist-util-visit'
 
 import { UI } from '../src/config'
 import remarkDirectiveSugar from './remark-directive-sugar'

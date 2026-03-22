@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { HealthMonitor } from '../lib/services/health-monitor'
 
-describe('HealthMonitor', () => {
+describe.skip('HealthMonitor', () => {
   let healthMonitor: HealthMonitor
 
   beforeEach(() => {

@@ -2,7 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
+
 import { ChatDemo } from '../../components/demo'
 
 export const prerender = false
@@ -195,7 +195,7 @@ export const prerender = false
       </div>
 
       <div class="brutalist-grid brutalist-grid--2 max-w-5xl mx-auto">
-        <BrutalistCard hover={true}>
+        <BrutalistCard >
           <div class="text-center">
             <div class="text-5xl mb-6">🧠</div>
             <h3 class="brutalist-subheading text-xl mb-4">
@@ -226,7 +226,7 @@ export const prerender = false
           </div>
         </BrutalistCard>
 
-        <BrutalistCard hover={true}>
+        <BrutalistCard >
           <div class="text-center">
             <div class="text-5xl mb-6">🔒</div>
             <h3 class="brutalist-subheading text-xl mb-4">
@@ -270,7 +270,7 @@ export const prerender = false
       </div>
 
       <div class="brutalist-grid brutalist-grid--3">
-        <BrutalistCard hover={true}>
+        <BrutalistCard >
           <div class="text-center">
             <div class="text-4xl mb-4">⚡</div>
             <h3 class="brutalist-subheading text-lg mb-3">
@@ -297,7 +297,7 @@ export const prerender = false
           </div>
         </BrutalistCard>
 
-        <BrutalistCard hover={true}>
+        <BrutalistCard >
           <div class="text-center">
             <div class="text-4xl mb-4">📊</div>
             <h3 class="brutalist-subheading text-lg mb-3">
@@ -324,7 +324,7 @@ export const prerender = false
           </div>
         </BrutalistCard>
 
-        <BrutalistCard hover={true}>
+        <BrutalistCard >
           <div class="text-center">
             <div class="text-4xl mb-4">🚨</div>
             <h3 class="brutalist-subheading text-lg mb-3">CRISIS DETECTION</h3>
@@ -500,7 +500,7 @@ export const prerender = false
 
   // Initialize demo interface
   document.addEventListener('DOMContentLoaded', () => {
-    const _chatDemo = new ChatDemoInterface()
+    new ChatDemoInterface()
   })
 </script>
 

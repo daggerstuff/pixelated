@@ -399,7 +399,7 @@ export const prerender = false
     setupTimeRangeButtons() {
       const buttons = document.querySelectorAll('.time-range-btn')
       buttons.forEach((button) => {
-        button.addEventListener('click', async (e) => {
+        button.addEventListener('click', async (e: Event) => {
           const target = e.target as HTMLElement
           const days = parseInt(target.dataset.days || '30')
 
@@ -430,36 +430,36 @@ export const prerender = false
 
       // Calculate metrics
       const totalAnalyses = historical.reduce(
-        (sum, day) => sum + day.sessionCount,
+        (sum: number, day: any) => sum + day.sessionCount,
         0,
       )
       const avgBiasScore =
         historical.length > 0
           ? (
-              (historical.reduce((sum, day) => sum + day.biasScore, 0) /
+              (historical.reduce((sum: number, day: any) => sum + day.biasScore, 0) /
                 historical.length) *
               100
             ).toFixed(1)
           : '0.0'
       const highAlerts = historical.reduce(
-        (sum, day) => sum + day.alertCount,
+        (sum: number, day: any) => sum + day.alertCount,
         0,
       )
       const uniqueDemographics = demographics.length
 
       // Update DOM
-      document.getElementById('total-analyses').textContent =
+      document.getElementById('total-analyses')!.textContent =
         totalAnalyses.toString()
-      document.getElementById('avg-bias-score').textContent = avgBiasScore + '%'
-      document.getElementById('high-alerts').textContent = highAlerts.toString()
-      document.getElementById('unique-demographics').textContent =
+      document.getElementById('avg-bias-score')!.textContent = avgBiasScore + '%'
+      document.getElementById('high-alerts')!.textContent = highAlerts.toString()
+      document.getElementById('unique-demographics')!.textContent =
         uniqueDemographics.toString()
 
       // Update trends (simplified)
-      document.getElementById('analysis-trend').textContent =
+      document.getElementById('analysis-trend')!.textContent =
         '+12% from last period'
-      document.getElementById('bias-trend').textContent = '-5% improvement'
-      document.getElementById('alert-trend').textContent = '+8% this period'
+      document.getElementById('bias-trend')!.textContent = '-5% improvement'
+      document.getElementById('alert-trend')!.textContent = '+8% this period'
       document.getElementById('demo-trend').textContent = '3 new groups'
     }
 
@@ -516,7 +516,7 @@ export const prerender = false
       ctx.lineWidth = 3
       ctx.beginPath()
 
-      historical.forEach((point, index) => {
+      historical.forEach((point: any, index: number) => {
         const x = padding + (chartWidth * index) / (historical.length - 1)
         const y = padding + chartHeight - chartHeight * point.biasScore
 
@@ -533,14 +533,14 @@ export const prerender = false
       const barWidth = (chartWidth / historical.length) * 0.3
       ctx.fillStyle = '#3B82F6'
 
-      historical.forEach((point, index) => {
+      historical.forEach((point: any, index: number) => {
         const x =
           padding +
           (chartWidth * index) / (historical.length - 1) -
           barWidth / 2
         const barHeight =
           (chartHeight * point.sessionCount) /
-          Math.max(...historical.map((d) => d.sessionCount))
+          Math.max(...historical.map((d: any) => d.sessionCount))
         const y = padding + chartHeight - barHeight
 
         ctx.fillRect(x, y, barWidth, barHeight)
@@ -552,13 +552,13 @@ export const prerender = false
       ctx.setLineDash([5, 5])
       ctx.beginPath()
 
-      historical.forEach((point, index) => {
+      historical.forEach((point: any, index: number) => {
         const x = padding + (chartWidth * index) / (historical.length - 1)
         const y =
           padding +
           chartHeight -
           (chartHeight * point.alertCount) /
-            Math.max(...historical.map((d) => d.alertCount), 1)
+            Math.max(...historical.map((d: any) => d.alertCount), 1)
 
         if (index === 0) {
           ctx.moveTo(x, y)
@@ -576,11 +576,11 @@ export const prerender = false
       if (!container || !this.analyticsData.distribution) return
 
       const { distribution } = this.analyticsData
-      const maxCount = Math.max(...distribution.map((d) => d.count))
+      const maxCount = Math.max(...distribution.map((d: any) => d.count))
 
       container.innerHTML = distribution
         .map(
-          (item) => `
+          (item: any) => `
         <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
           <div class="flex items-center gap-3">
             <div class="w-3 h-3 rounded-full ${
@@ -617,7 +617,7 @@ export const prerender = false
       container.innerHTML = demographics
         .slice(0, 5)
         .map(
-          (item) => `
+          (item: any) => `
         <div class="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg">
           <div>
             <div class="text-gray-200 font-medium">${item.gender} • ${item.ethnicity}</div>
@@ -643,7 +643,7 @@ export const prerender = false
 
       container.innerHTML = patterns
         .map(
-          (pattern) => `
+          (pattern: any) => `
         <div class="flex items-center justify-between p-4 bg-gray-800/30 rounded-lg">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">

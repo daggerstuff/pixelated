@@ -716,7 +716,7 @@ const universityResults = [
 
     // Track demo interactions
     document.querySelectorAll('[data-demo-action]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 
@@ -750,7 +750,7 @@ const universityResults = [
 
     // Track CTA clicks
     document.querySelectorAll('[data-demo-cta]').forEach((button) => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', (e: Event) => {
         const target = e.target as HTMLElement | null
         if (!target) return
 

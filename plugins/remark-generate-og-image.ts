@@ -7,7 +7,7 @@ import type { ReactNode } from 'react'
 import type { SatoriOptions } from 'satori'
 import satori from 'satori'
 import type { VFile } from 'vfile'
-import type { VNode, RendererNode, RendererElement } from 'vue'
+import type { VNode } from 'vue'
 
 import { FEATURES } from '../src/config'
 import type { BgType } from '../src/types'
@@ -59,7 +59,7 @@ async function generateOgImage(
 
   try {
     const node = ogImageMarkup(authorOrBrand, title, bgType) as VNode
-    const unescapedNode = unescapeHTML(node) as ReactNode
+    const unescapedNode = unescapeHTML(node) as any
     const svg = await satori(unescapedNode, satoriOptions)
 
     const compressedPngBuffer = Buffer.from(svg)
