@@ -46,12 +46,6 @@ jobs:
           # Increase RAM allocation for analysis
           ram: 16384
 
-      - name: Setup pnpm
-        if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
       - name: Setup Node.js
         if: matrix.language == 'javascript'
         uses: actions/setup-node@v6
@@ -61,6 +55,13 @@ jobs:
       - name: Enable Corepack
         if: matrix.language == 'javascript'
         run: corepack enable
+
+      - name: Setup pnpm
+        if: matrix.language == 'javascript'
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Get pnpm store directory
         if: matrix.language == 'javascript'
@@ -107,12 +108,9 @@ jobs:
       - name: Prepare uv venv
         if: matrix.language == 'python'
         id: prepare-uv
-        run: |
-          if uv python find 3.11 >/dev/null 2>&1; then
-            echo "use-system=" >> $GITHUB_OUTPUT
-          else
-            echo "use-system=--system" >> $GITHUB_OUTPUT
-          fi
+        uses: ./.github/actions/prepare-uv-venv
+        with:
+          service-dir: src/lib/ai/bias-detection/python-service
 
       - name: Install Python dependencies
         if: matrix.language == 'python'
