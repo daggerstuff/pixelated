@@ -13,8 +13,6 @@ updates:
     open-pull-requests-limit: 5
     pull-request-branch-name:
       separator: '/'
-    ignore:
-      - dependency-name: 'github/copilot-review-action'
     groups:
       github-actions:
         patterns:
