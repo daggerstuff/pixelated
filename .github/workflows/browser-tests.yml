@@ -68,7 +68,7 @@ jobs:
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
           export BASE_URL=http://localhost:4323
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
+          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --config=config/playwright.config.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 
