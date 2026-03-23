@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "pixelated",
+  "project_id": "07fc16a0-ccb4-4724-8e7a-c7b2109d10b5"
+}
