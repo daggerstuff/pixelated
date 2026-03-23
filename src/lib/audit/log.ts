@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { AuditLogger } from './logger'
-import { AuditAction } from './events'
+import { AuditAction, AuditEventType, AuditSeverity } from './events'
 
 const logger = createBuildSafeLogger('audit-log')
 
@@ -28,10 +28,24 @@ export async function getUserAuditLogs(
 ): Promise<AuditLogEntry[]> {
   try {
     logger.info('Getting user audit logs', { userId, limit, offset })
-    
-    // TODO: Implement retrieval in AuditLogger
-    // For now, return empty array as the underlying persistence is not yet complete
-    return []
+
+    const events = await AuditLogger.getInstance().getUserEvents(
+      userId,
+      limit,
+      offset,
+    )
+
+    return events.map((event) => ({
+      id: event.id,
+      userId: event.userId,
+      action: String(event.action),
+      resource: {
+        id: event.resourceId ?? '',
+        type: event.resourceType,
+      },
+      metadata: event.metadata ?? {},
+      timestamp: event.timestamp,
+    }))
   } catch (error: unknown) {
     logger.error('Error getting user audit logs:', error)
     return []
@@ -48,18 +62,9 @@ export async function logAuditEvent(
   resourceType?: string,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const auditLogger = AuditLogger.getInstance()
-  
-  await auditLogger.logEvent({
-    userId,
-    action,
-    resourceId,
-    resourceType,
-    metadata,
-    severity: 'info' as any, // Default to info for legacy calls
-    type: 'therapeutic' as any, // Default for legacy therapeutic logs
-    status: 'success'
-  })
+  await AuditLogger.getInstance().logEvent(
+    toLegacyAuditEvent(userId, action, resourceId, resourceType, metadata),
+  )
 }
 
 /**
@@ -86,4 +91,44 @@ export async function createResourceAuditLog(
   metadata?: Record<string, unknown>,
 ): Promise<void> {
   return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+}
+
+function toLegacyAuditEvent(
+  userId: string,
+  action: string,
+  resourceId: string,
+  resourceType?: string,
+  metadata?: Record<string, unknown>,
+) {
+  return {
+    userId,
+    action,
+    resourceId,
+    resourceType,
+    metadata,
+    severity: AuditSeverity.INFO,
+    type: inferAuditEventType(action),
+    status: 'success' as const,
+  }
+}
+
+function inferAuditEventType(action: string): AuditEventType {
+  switch (action) {
+    case AuditAction.LOGIN:
+    case AuditAction.LOGOUT:
+    case AuditAction.PASSWORD_CHANGE:
+    case AuditAction.PERMISSIONS_MODIFIED:
+    case AuditAction.THREAT_DETECTED:
+      return AuditEventType.SECURITY
+    case AuditAction.BACKUP_CREATED:
+    case AuditAction.RESTORE_INITIATED:
+      return AuditEventType.SYSTEM
+    case AuditAction.VIEW_PATIENT:
+    case AuditAction.UPDATE_PATIENT:
+    case AuditAction.START_SESSION:
+    case AuditAction.END_SESSION:
+      return AuditEventType.THERAPEUTIC
+    default:
+      return AuditEventType.THERAPEUTIC
+  }
 }
