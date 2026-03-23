@@ -6,6 +6,7 @@ interface Props {
 }
 
 const { title = 'Admin Dashboard', activeItem = 'dashboard' } = Astro.props
+const { cspNonce } = Astro.locals
 
 // Define navigation items
 const navItems = [
@@ -33,9 +34,10 @@ const hasPermission = (_item: string) => true // In a real app, this would check
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
 
   <!-- Rybbit Analytics -->
-  <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
+  <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
 </head>
 
 <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
