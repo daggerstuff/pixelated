@@ -32,6 +32,8 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
   month: 'long',
   day: 'numeric',
 })
+
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
@@ -56,7 +58,7 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
     <script src="/js/background-loader.js" defer is:inline></script>
 
     <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
 
     <!-- Structured data for blog post -->
     {
