@@ -7,7 +7,7 @@ import modal
 app = modal.App("merge-v2")
 volume = modal.Volume.from_name("pixel-merged-models")
 
-image = modal.Image.debian_slim(python_version="3.11").pip_install(
+image = modal.Image.debian_slim(python_version="3.13").pip_install(
     "torch", "transformers", "peft", "accelerate", "safetensors"
 )
 
