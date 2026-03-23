@@ -1,0 +1,22 @@
+name: 'Prepare UV Virtual Environment'
+description: 'Sets up a uv virtual environment and handles system python detection'
+inputs:
+  service-dir:
+    description: 'Directory containing the python service'
+    required: true
+    default: '.'
+outputs:
+  use-system:
+    description: 'Flag indicating whether to use system python'
+    value: ${{ steps.check-pyenv.outputs.use_system }}
+runs:
+  using: "composite"
+  steps:
+    - name: Check system python
+      id: check-pyenv
+      shell: bash
+      run: |
+        echo "use_system=" >> $GITHUB_OUTPUT
+        if command -v pyenv &> /dev/null && ! pyenv versions --bare | grep -q "^$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"; then
+            echo "use_system=--system" >> $GITHUB_OUTPUT
+        fi

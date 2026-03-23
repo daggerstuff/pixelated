@@ -60,7 +60,6 @@ jobs:
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
       - name: Get pnpm store directory
@@ -150,6 +149,8 @@ jobs:
 
       - name: Upload SARIF results as artifact
         uses: actions/upload-artifact@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         if: always()
         with:
           name: codeql-sarif-${{ matrix.language }}
@@ -158,6 +159,8 @@ jobs:
 
       - name: Upload CodeQL database (for advanced analysis)
         uses: actions/upload-artifact@v4
+        env:
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
