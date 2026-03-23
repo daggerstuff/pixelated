@@ -260,3 +260,9 @@ workspace/
 worktrees/
 y-router/
 yt-downloader
+
+# Beads / Dolt files (added by bd init)
+.beads-credential-key
+.beads/
+
+.swarm/

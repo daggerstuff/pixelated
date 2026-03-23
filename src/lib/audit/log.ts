@@ -1,8 +1,11 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { AuditLogger } from './logger'
+import { AuditAction } from './events'
 
 const logger = createBuildSafeLogger('audit-log')
 
 // Define the structure for the audit log entry
+// (Keeping for backward compatibility with existing imports)
 export interface AuditLogEntry {
   id: string
   userId: string
@@ -15,6 +18,9 @@ export interface AuditLogEntry {
   timestamp: Date
 }
 
+/**
+ * Get user audit logs (Forwarding to new system)
+ */
 export async function getUserAuditLogs(
   userId: string,
   limit = 100,
@@ -22,9 +28,9 @@ export async function getUserAuditLogs(
 ): Promise<AuditLogEntry[]> {
   try {
     logger.info('Getting user audit logs', { userId, limit, offset })
-
-    // TODO: Replace with actual database implementation
-    // For now, return empty array to prevent build errors
+    
+    // TODO: Implement retrieval in AuditLogger
+    // For now, return empty array as the underlying persistence is not yet complete
     return []
   } catch (error: unknown) {
     logger.error('Error getting user audit logs:', error)
@@ -32,6 +38,9 @@ export async function getUserAuditLogs(
   }
 }
 
+/**
+ * Log an audit event (Integrated with AuditLogger)
+ */
 export async function logAuditEvent(
   userId: string,
   action: string,
@@ -39,20 +48,18 @@ export async function logAuditEvent(
   resourceType?: string,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  try {
-    logger.info('Logging audit event', {
-      userId,
-      action,
-      resourceId,
-      resourceType,
-      metadata,
-    })
-
-    // TODO: Replace with actual database implementation
-    // For now, just log to console to prevent build errors
-  } catch (error: unknown) {
-    logger.error('Error logging audit event:', error)
-  }
+  const auditLogger = AuditLogger.getInstance()
+  
+  await auditLogger.logEvent({
+    userId,
+    action,
+    resourceId,
+    resourceType,
+    metadata,
+    severity: 'info' as any, // Default to info for legacy calls
+    type: 'therapeutic' as any, // Default for legacy therapeutic logs
+    status: 'success'
+  })
 }
 
 /**

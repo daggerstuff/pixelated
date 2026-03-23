@@ -12,7 +12,7 @@ app = modal.App("pixelated-gguf-quantize")
 # Define the image with llama-cpp dependencies
 # We'll clone llama.cpp to get the conversion scripts
 image = (
-    modal.Image.debian_slim(python_version="3.11")
+    modal.Image.debian_slim(python_version="3.13")
     .apt_install("git", "build-essential", "cmake")
     .pip_install("numpy", "sentencepiece", "gguf", "transformers", "torch")
     .run_commands(

@@ -119,6 +119,13 @@ def rough_unused(deps: set[str], imports: set[str]) -> list[str]:
     return result
 
 
+def python_version_key(path: Path) -> tuple[int, int]:
+    match = re.search(r"python(\d+)\.(\d+)", str(path))
+    if match:
+        return int(match.group(1)), int(match.group(2))
+    return (0, 0)
+
+
 manifest_files = gather_pyproject_files()
 manifests = {str(p): manifest_deps(p) for p in manifest_files}
 
@@ -161,9 +168,17 @@ for path in ["pyproject.toml", "ai/pyproject.toml"]:
     print()
 
 print("== venv crossover check ==")
-root_venv = root / ".venv" / "lib" / "python3.11" / "site-packages"
-ai_venv = root / "ai" / ".venv" / "lib" / "python3.11" / "site-packages"
-if root_venv.exists() and ai_venv.exists():
+root_venv_candidates = sorted(
+    (root / ".venv" / "lib").glob("python*/site-packages"),
+    key=python_version_key,
+)
+ai_venv_candidates = sorted(
+    (root / "ai" / ".venv" / "lib").glob("python*/site-packages"),
+    key=python_version_key,
+)
+if root_venv_candidates and ai_venv_candidates:
+    root_venv = root_venv_candidates[-1]
+    ai_venv = ai_venv_candidates[-1]
     shared = {p.name for p in root_venv.iterdir() if p.is_dir()} & {p.name for p in ai_venv.iterdir() if p.is_dir()}
     print(f"Shared package directories: {len(shared)}")
     names = sorted(shared)
