@@ -1,0 +1,10 @@
+#!/bin/sh
+# KLUSTER_HOOK_START - do not remove this line
+# Installed by: kluster hooks install pre-commit
+# Configuration: --block-on high
+kluster hooks run pre-commit --block-on high
+KLUSTER_EXIT_CODE=$?
+if [ $KLUSTER_EXIT_CODE -ne 0 ]; then
+    exit $KLUSTER_EXIT_CODE
+fi
+# KLUSTER_HOOK_END - do not remove this line
