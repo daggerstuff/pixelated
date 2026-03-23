@@ -31,6 +31,7 @@ const {
 const title = frontmatter?.title || propTitle
 const description = frontmatter?.description || propDescription
 const image = frontmatter?.image || propImage
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
@@ -55,7 +56,7 @@ const image = frontmatter?.image || propImage
     <script src="/js/background-loader.js" defer is:inline></script>
 
     <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
 
     <!-- Documentation-specific styles -->
     <style is:global>

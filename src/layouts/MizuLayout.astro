@@ -13,6 +13,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
@@ -44,7 +45,7 @@ const { title, description } = Astro.props
     <script src="/js/background-loader.js" defer is:inline></script>
 
     <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
 
     <style is:global>
       /* Ensure dark mode styles are applied */
