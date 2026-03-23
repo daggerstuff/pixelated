@@ -11,7 +11,7 @@ app = modal.App("pixelated-remerge")
 
 # Image with adapter included
 image = (
-    modal.Image.debian_slim(python_version="3.11")
+    modal.Image.debian_slim(python_version="3.13")
     .pip_install(
         "torch",
         "transformers",
