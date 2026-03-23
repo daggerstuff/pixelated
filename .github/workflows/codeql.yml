@@ -102,14 +102,6 @@ jobs:
             echo "uv already installed - verifying version"
             python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
           fi
-
-      - name: Prepare uv venv
-        if: matrix.language == 'python'
-        id: prepare-uv
-        uses: ./.github/actions/prepare-uv-venv
-        with:
-          service-dir: src/lib/ai/bias-detection/python-service
-
       - name: Install Python dependencies
         if: matrix.language == 'python'
         run: |
