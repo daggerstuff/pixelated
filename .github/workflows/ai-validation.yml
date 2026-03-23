@@ -58,7 +58,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
+        uses: pnpm/action-setup@v5
         with:
           version: 10.32.1
           run_install: false
@@ -232,7 +232,7 @@ jobs:
 
       - name: Send notification on validation issues
         if: ${{ steps.results.outputs.needs_alert == 'true' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
