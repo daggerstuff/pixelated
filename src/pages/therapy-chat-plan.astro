@@ -1,7 +1,8 @@
 ---
-'../layouts/MarkdownLayout.astro'
-'Therapy Chat System Plan'
+import MarkdownLayout from '../layouts/MarkdownLayout.astro';
+const title = 'Therapy Chat System Plan';
 ---
+<MarkdownLayout title={title}>
 
 # Therapy Chat System Plan The therapy chat interface provides AI-based therapy
 interaction with strict security and compliance measures. Security will exceed
@@ -43,3 +44,5 @@ documentation - Compliance checklist - Deployment procedures - Ensure all FHE
 implementations are verified ## Next Steps 1. Set up development environment 2.
 Implement Fully Homomorphic Encryption system 3. Create base UI components 4.
 Implement core security services 5. Begin frontend development
+
+</MarkdownLayout>
