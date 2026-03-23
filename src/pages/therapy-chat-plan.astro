@@ -1,48 +1,148 @@
 ---
-import MarkdownLayout from '../layouts/MarkdownLayout.astro';
-const title = 'Therapy Chat System Plan';
+import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
+
+const title = 'Therapy Chat System Plan'
+const description = 'Comprehensive architectural and implementation plan for the AI-powered Therapy Chat System.'
 ---
-<MarkdownLayout title={title}>
 
-# Therapy Chat System Plan The therapy chat interface provides AI-based therapy
-interaction with strict security and compliance measures. Security will exceed
-HIPAA requirements using Fully Homomorphic Encryption (FHE) protocols. ## Core
-Features ### Client Experience - Intuitive chat interface - Mobile-responsive
-design - Secure message delivery - Encrypted storage of sensitive data - Session
-state preservation - Offline capabilities with sync ### Therapist Dashboard -
-Session monitoring - Intervention flags - Progress tracking - Encrypted
-note-taking - FHE-based session validation - Secure export of session data ###
-Security & Compliance - End-to-end encryption - Secure authentication -
-HIPAA-compliant data handling - Audit logging - Fully Homomorphic Encryption
-implementation - Secure key management ## Technical Architecture ### Frontend
-Components - **Chat UI**: React with TailwindCSS - **State Management**: React
-Context + Hooks - **FHE Client**: TFHE-rs/concrete integration - **Storage**:
-IndexedDB with encryption - **Network**: Fetch API with retry/offline suppor ###
-Backend Services - **Authentication**: JWT with FHE extensions - **Message
-Processing**: Node.js with streaming - **Storage**: PostgreSQL with encrypted
-fields - **Analytics**: Secure aggregation with FHE ## Implementation Phases 1.
-**Fully Homomorphic Encryption Authentication** - Set up secure key managemen
-system - Implement session_validator for FHE operations - Create session
-management with secure token storage - Verify FHE implementation with security
-audit 2. **Core Chat Functionality** - Implement basic chat UI components - Se
-up message delivery system - Create typing indicators and presence awareness -
-Implement basic sentiment analysis - Add message persistence with encryption 3.
-**Therapeutic Features** - Implement therapy-specific prompts - Add crisis
-detection algorithms - Create intervention system for high-risk cases -
-Implement progress tracking - Add secure note system for therapists 4.
-**Compliance & Production Readiness** - Complete audit logging system -
-Implement HIPAA compliance checks - Create authentication system with FHE
-foundations - Set up comprehensive test suite - Perform security penetration
-testing ## Technical Specifications ### FHE Implementation - All sensitive
-operations performed on encrypted data - Key partitioning for enhanced security
-- Session-based key management - Threshold encryption for critical operations -
-Secure bootstrapping protocol ### Security Measures - Key rotation every 24
-hours - Rate limiting and abuse prevention - IP and device fingerprinting -
-Anomaly detection in usage patterns - Comprehensive access logs ###
-Documentation - FHE Circuit implementation examples - Security model
-documentation - Compliance checklist - Deployment procedures - Ensure all FHE
-implementations are verified ## Next Steps 1. Set up development environment 2.
-Implement Fully Homomorphic Encryption system 3. Create base UI components 4.
-Implement core security services 5. Begin frontend development
+<BrutalistLayout {title} {description}>
+  <div class="max-w-4xl mx-auto px-4 py-8 prose prose-slate lg:prose-lg dark:prose-invert">
+    <h1>Therapy Chat System Plan</h1>
+    <p>
+      The therapy chat interface provides AI-based therapy interaction with strict security and compliance measures. 
+      Security will exceed HIPAA requirements using Fully Homomorphic Encryption (FHE) protocols.
+    </p>
 
-</MarkdownLayout>
+    <h2>Core Features</h2>
+    
+    <h3>Client Experience</h3>
+    <ul>
+      <li>Intuitive chat interface</li>
+      <li>Mobile-responsive design</li>
+      <li>Secure message delivery</li>
+      <li>Encrypted storage of sensitive data</li>
+      <li>Session state preservation</li>
+      <li>Offline capabilities with sync</li>
+    </ul>
+
+    <h3>Therapist Dashboard</h3>
+    <ul>
+      <li>Session monitoring</li>
+      <li>Intervention flags</li>
+      <li>Progress tracking</li>
+      <li>Encrypted note-taking</li>
+      <li>FHE-based session validation</li>
+      <li>Secure export of session data</li>
+    </ul>
+
+    <h3>Security & Compliance</h3>
+    <ul>
+      <li>End-to-end encryption</li>
+      <li>Secure authentication</li>
+      <li>HIPAA-compliant data handling</li>
+      <li>Audit logging</li>
+      <li>Fully Homomorphic Encryption implementation</li>
+      <li>Secure key management</li>
+    </ul>
+
+    <h2>Technical Architecture</h2>
+
+    <h3>Frontend Components</h3>
+    <ul>
+      <li><strong>Chat UI</strong>: React with TailwindCSS</li>
+      <li><strong>State Management</strong>: React Context + Hooks</li>
+      <li><strong>FHE Client</strong>: TFHE-rs/concrete integration</li>
+      <li><strong>Storage</strong>: IndexedDB with encryption</li>
+      <li><strong>Network</strong>: Fetch API with retry/offline support</li>
+    </ul>
+
+    <h3>Backend Services</h3>
+    <ul>
+      <li><strong>Authentication</strong>: JWT with FHE extensions</li>
+      <li><strong>Message Processing</strong>: Node.js with streaming</li>
+      <li><strong>Storage</strong>: PostgreSQL with encrypted fields</li>
+      <li><strong>Analytics</strong>: Secure aggregation with FHE</li>
+    </ul>
+
+    <h2>Implementation Phases</h2>
+    <ol>
+      <li>
+        <strong>Fully Homomorphic Encryption Authentication</strong>
+        <ul>
+          <li>Set up secure key management system</li>
+          <li>Implement session_validator for FHE operations</li>
+          <li>Create session management with secure token storage</li>
+          <li>Verify FHE implementation with security audit</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Core Chat Functionality</strong>
+        <ul>
+          <li>Implement basic chat UI components</li>
+          <li>Set up message delivery system</li>
+          <li>Create typing indicators and presence awareness</li>
+          <li>Implement basic sentiment analysis</li>
+          <li>Add message persistence with encryption</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Therapeutic Features</strong>
+        <ul>
+          <li>Implement therapy-specific prompts</li>
+          <li>Add crisis detection algorithms</li>
+          <li>Create intervention system for high-risk cases</li>
+          <li>Implement progress tracking</li>
+          <li>Add secure note system for therapists</li>
+        </ul>
+      </li>
+      <li>
+        <strong>Compliance & Production Readiness</strong>
+        <ul>
+          <li>Complete audit logging system</li>
+          <li>Implement HIPAA compliance checks</li>
+          <li>Create authentication system with FHE foundations</li>
+          <li>Set up comprehensive test suite</li>
+          <li>Perform security penetration testing</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h2>Technical Specifications</h2>
+
+    <h3>FHE Implementation</h3>
+    <ul>
+      <li>All sensitive operations performed on encrypted data</li>
+      <li>Key partitioning for enhanced security</li>
+      <li>Session-based key management</li>
+      <li>Threshold encryption for critical operations</li>
+      <li>Secure bootstrapping protocol</li>
+    </ul>
+
+    <h3>Security Measures</h3>
+    <ul>
+      <li>Key rotation every 24 hours</li>
+      <li>Rate limiting and abuse prevention</li>
+      <li>IP and device fingerprinting</li>
+      <li>Anomaly detection in usage patterns</li>
+      <li>Comprehensive access logs</li>
+    </ul>
+
+    <h3>Documentation</h3>
+    <ul>
+      <li>FHE Circuit implementation examples</li>
+      <li>Security model documentation</li>
+      <li>Compliance checklist</li>
+      <li>Deployment procedures</li>
+      <li>Ensure all FHE implementations are verified</li>
+    </ul>
+
+    <h2>Next Steps</h2>
+    <ol>
+      <li>Set up development environment</li>
+      <li>Implement Fully Homomorphic Encryption system</li>
+      <li>Create base UI components</li>
+      <li>Implement core security services</li>
+      <li>Begin frontend development</li>
+    </ol>
+  </div>
+</BrutalistLayout>
