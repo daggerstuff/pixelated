@@ -70,7 +70,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
 <!doctype html>
 <html lang={SITE.lang} class="dark scroll-smooth">
   <head>
-    <Head {title} {description} {ogImage} {pubDate} {lastModDate} />
+    <Head {title} {description} {ogImage} {pubDate} {lastModDate} {cspNonce} />
 
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0f172a" />
@@ -88,8 +88,6 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
 
-    <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
     <style is:global>
       /* Mizu theme dark colors - default for all pages */
       :root {
@@ -184,13 +182,5 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <SpeedInsights />
     <Analytics />
 
-    <!-- Rybbit View Transitions Support -->
-    <script is:inline nonce={cspNonce}>
-      document.addEventListener('astro:after-swap', () => {
-        if (window.rybbit) {
-          window.rybbit.pageview();
-        }
-      });
-    </script>
   </body>
 </html>

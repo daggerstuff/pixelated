@@ -58,6 +58,8 @@ interface ImportMetaEnv {
   readonly MONITORING_EMAIL_RECIPIENTS: string
   readonly APP_VERSION: string
   readonly PUBLIC_TRAINING_WS_URL?: string
+  readonly PUBLIC_RYBBIT_SCRIPT_URL?: string
+  readonly PUBLIC_RYBBIT_SITE_ID?: string
 }
 
 interface ImportMeta {
