@@ -26,7 +26,7 @@ export interface PolicyCondition {
   /** The field to check in the context */
   field: string;
   /** The operator to use: 'equals' | 'contains' | 'regex' */
-  operator: 'equals' | 'contains' | 'regex';
+  operator: "equals" | "contains" | "regex";
   /** The value to compare against */
   value: string;
 }
@@ -36,7 +36,7 @@ export interface PolicyCondition {
  */
 export interface PolicyAction {
   /** The type of action: 'allow' | 'deny' */
-  type: 'allow' | 'deny';
+  type: "allow" | "deny";
 }
 
 /**
@@ -71,13 +71,56 @@ export type PolicyContext = Record<string, string>;
  */
 export class PolicyEngine {
   private policies: Map<string, Policy> = new Map();
+  private loadedVersion: string | null = null;
 
   /**
    * Load a policy into the engine
    * @param policy The policy to load
+   * @param version Optional version string for tracking
    */
-  loadPolicy(policy: Policy): void {
+  loadPolicy(policy: Policy, version?: string): void {
     this.policies.set(policy.policyId, policy);
+    if (version) {
+      this.loadedVersion = version;
+    }
+  }
+
+  /**
+   * Get the currently loaded policy version
+   * @returns The version string or null if no policies loaded
+   */
+  getVersion(): string | null {
+    return this.loadedVersion;
+  }
+
+  /**
+   * Reload policies from PolicyStore
+   * @param policyStore The PolicyStore instance to load from
+   * @param policyId The policy ID to load
+   */
+  async reloadPolicies(
+    policyStore: { getPolicy: (policyId: string) => Promise<any> },
+    policyId: string,
+  ): Promise<void> {
+    const policy = await policyStore.getPolicy(policyId);
+    if (policy) {
+      // Convert GovernancePolicy to Policy format
+      const convertedPolicy: Policy = {
+        policyId: policy.id,
+        rules: policy.rules.map((rule: any) => ({
+          ruleId: rule.id || rule.ruleId,
+          conditions: rule.conditions || [],
+          action: {
+            type:
+              rule.action === "allow" || rule.action === "deny"
+                ? (rule.action as "allow" | "deny")
+                : ("allow" as const),
+          },
+        })),
+      };
+      this.loadPolicy(convertedPolicy, policy.version);
+    }
+    console.info(`Policy reload triggered for: ${policyId}`);
   }
 
   /**
@@ -94,8 +137,8 @@ export class PolicyEngine {
         if (matches) {
           // Conditions matched - return the action
           return {
-            allowed: rule.action.type === 'allow',
-            reason: `Policy ${policy.policyId} rule ${rule.ruleId} ${rule.action.type === 'allow' ? 'allowed' : 'denied'}`,
+            allowed: rule.action.type === "allow",
+            reason: `Policy ${policy.policyId} rule ${rule.ruleId} ${rule.action.type === "allow" ? "allowed" : "denied"}`,
             policyId: policy.policyId,
             ruleId: rule.ruleId,
           };
@@ -107,9 +150,9 @@ export class PolicyEngine {
     const firstPolicy = this.policies.values().next().value;
     return {
       allowed: false,
-      reason: 'No matching policy rules found',
-      policyId: firstPolicy?.policyId || 'unknown',
-      ruleId: 'none',
+      reason: "No matching policy rules found",
+      policyId: firstPolicy?.policyId || "unknown",
+      ruleId: "none",
     };
   }
 
@@ -128,13 +171,14 @@ export class PolicyEngine {
       }
 
       switch (condition.operator) {
-        case 'equals':
+        case "equals":
           return contextValue === condition.value;
-        case 'contains':
+        case "contains":
           return contextValue.includes(condition.value);
-        case 'regex':
+        case "regex": {
           const regex = new RegExp(condition.value);
           return regex.test(contextValue);
+        }
         default:
           return false;
       }
