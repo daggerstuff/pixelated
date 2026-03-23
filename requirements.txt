@@ -384,7 +384,7 @@ spacy-loggers==1.0.5 # via spacy
 sqlalchemy==2.0.48 # via mem0ai
 srsly==2.5.2 # via # confection # spacy # thinc # weasel
 sse-starlette==3.3.3 # via mcp
-starlette==0.52.1 # via # pixelated (pyproject.toml) # fastapi # mcp # pydantic-ai-slim # smithery # sse-starlette
+starlette==1.0.0 # via # pixelated (pyproject.toml) # fastapi # mcp # pydantic-ai-slim # smithery # sse-starlette
 structlog==25.5.0 # via # pixelated (pyproject.toml) # gradient-adk
 sympy==1.14.0 # via # onnx-ir # onnxruntime # torch
 synchronicity==0.11.1 # via modal
