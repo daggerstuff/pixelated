@@ -66,15 +66,6 @@ const iconPaths: Record<string, string> = {
                     { 'nav-link-refined--active': isActive },
                   ]
             }
-            style={
-              isPortal
-                ? undefined
-                : `display: flex; ${
-                    isActive
-                      ? 'background: rgba(16, 185, 129, 0.1); color: var(--accent-primary);'
-                      : ''
-                  }`
-            }
           >
             {
               showIcons && item.icon && iconPaths[item.icon] && (
