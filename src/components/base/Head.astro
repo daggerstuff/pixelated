@@ -3,6 +3,7 @@ import SpeedInsights from '@vercel/speed-insights/astro'
 import { ClientRouter } from 'astro:transitions'
 import { basename } from 'node:path'
 
+import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
 import { SITE } from '@/config'
 import { withBasePath } from '@/utils/path'
 
@@ -12,9 +13,11 @@ interface Props {
   ogImage?: string | boolean
   pubDate?: string
   lastModDate?: string
+  cspNonce?: string
 }
 
-const { title, description, ogImage, pubDate, lastModDate } = Astro.props
+const { title, description, ogImage, pubDate, lastModDate, cspNonce } =
+  Astro.props
 
 const siteName = new URL(SITE.website).hostname
 
@@ -164,14 +167,4 @@ const webPageData = {
 
 <ClientRouter />
 
-<!-- Rybbit Analytics -->
-<script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
-
-<!-- Rybbit View Transitions Support -->
-<script is:inline>
-  document.addEventListener('astro:after-swap', () => {
-    if (window.rybbit) {
-      window.rybbit.pageview();
-    }
-  });
-</script>
+<RybbitAnalytics nonce={cspNonce} trackPageTransitions />
