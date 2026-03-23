@@ -416,7 +416,7 @@ types-requests==2.32.4.20260107 # via cohere
 types-toml==0.10.8.20240310 # via modal
 typing-extensions==4.15.0 # via # aiosignal # anthropic # anyio # cohere # e2b # exceptiongroup # fastapi # google-genai # gradient # gradient-adk # groq # grpcio # huggingface-hub # lance-namespace-urllib3-client # langchain-core # librosa # lightning # lightning-utilities # logfire # mcp # minio # modal # nemo-microservices # nexus-rpc # onnx # onnx-ir # onnxscript # openai # opentelemetry-api # opentelemetry-exporter-otlp-proto-grpc # opentelemetry-exporter-otlp-proto-http # opentelemetry-sdk # opentelemetry-semantic-conventions # optree # posthog # py-key-value-aio # pydantic # pydantic-core # pytest-asyncio # pytorch-lightning # referencing # sentence-transformers # shap # sqlalchemy # starlette # synchronicity # temporalio # torch # typing-inspect # typing-inspect # wandb
 typing-inspect==0.9.0 # via # dataclasses-json # honeyhive
-typing-inspect==0.4.2 # via # fastapi # mcp # mistralai # pydantic # pydantic-ai-slim # pydantic-graph # pydantic-settings
+typing-inspect==0.9.0 # via # fastapi # mcp # mistralai # pydantic # pydantic-ai-slim # pydantic-graph # pydantic-settings
 tzlocal==5.3.1 # via clickhouse-driver
 uncalled-for==0.2.0 # via fastmcp
 uplink==0.10.0 # via honeyhive
