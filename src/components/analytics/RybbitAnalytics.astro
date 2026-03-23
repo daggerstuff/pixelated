@@ -1,0 +1,52 @@
+---
+import { config } from '@/config/env.config'
+
+interface Props {
+  nonce?: string
+  trackPageTransitions?: boolean
+}
+
+const { nonce, trackPageTransitions = true } = Astro.props
+const scriptUrl =
+  config.client.rybbitScriptUrl() ?? 'https://app.rybbit.io/api/script.js'
+const siteId = config.client.rybbitSiteId() ?? '9ee28b13ba40'
+const shouldRender = Boolean(scriptUrl && siteId)
+---
+
+{
+  shouldRender && (
+    <>
+      <!-- Rybbit Analytics -->
+      <script
+        src={scriptUrl}
+        data-site-id={siteId}
+        defer
+        nonce={nonce}
+      ></script>
+      {
+        trackPageTransitions && (
+          <script is:inline nonce={nonce}>
+            const triggerRybbitPageview = (attempt = 0) => {
+              if (typeof window === 'undefined') return
+
+              if (typeof window.rybbit?.pageview === 'function') {
+                window.rybbit.pageview()
+                return
+              }
+
+              if (attempt < 5) {
+                window.setTimeout(() => {
+                  triggerRybbitPageview(attempt + 1)
+                }, 150)
+              }
+            }
+
+            document.addEventListener('astro:after-swap', () => {
+              triggerRybbitPageview()
+            })
+          </script>
+        )
+      }
+    </>
+  )
+}
