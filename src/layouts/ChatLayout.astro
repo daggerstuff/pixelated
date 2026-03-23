@@ -1,4 +1,6 @@
 ---
+import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+
 export interface Props {
   title?: string
 }
@@ -27,8 +29,7 @@ const { cspNonce } = Astro.locals
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
 
-    <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
+    <RybbitAnalytics nonce={cspNonce} />
   </head>
   <body
     class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"

@@ -19,7 +19,7 @@ const { cspNonce } = Astro.locals
 <!doctype html>
 <html lang="en" class="dark scroll-smooth">
   <head>
-    <Head {title} {description} />
+    <Head {title} {description} cspNonce={cspNonce} />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0f172a" />
 
@@ -43,9 +43,6 @@ const { cspNonce } = Astro.locals
 
     <!-- Background and font loader -->
     <script src="/js/background-loader.js" defer is:inline></script>
-
-    <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
 
     <style is:global>
       /* Ensure dark mode styles are applied */
