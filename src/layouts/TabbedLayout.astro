@@ -11,20 +11,13 @@ interface Props {
 
 const { subtitle } = Astro.props
 
-let tabs: Tabs
-if (
-  !UI.tabbedLayoutTabs ||
-  (Array.isArray(UI.tabbedLayoutTabs) && UI.tabbedLayoutTabs.length === 0)
-) {
-  throw new Error('`UI.tabbedLayoutTabs`` is not configured.')
-} else {
-  tabs = UI.tabbedLayoutTabs
-}
+let tabs: Tabs = Array.isArray(UI.tabbedLayoutTabs) ? UI.tabbedLayoutTabs : []
 
 const currentPath = ensureTrailingSlash(Astro.url.pathname)
 const isActive = (href: string) => currentPath === resolvePath(href)
 ---
 
+{tabs.length > 0 && (
 <nav id="nav-tabs" class="prose mx-auto mb-8" aria-label="Page sections">
   <div
     u-flex="~ gap-3 lt-sm:(col wrap gap-1)"
@@ -52,6 +45,7 @@ const isActive = (href: string) => currentPath === resolvePath(href)
   </div>
   {subtitle && <p class="mt-4! op-50 italic">{subtitle}</p>}
 </nav>
+)}
 <div class="prose mx-auto">
   <slot />
 </div>

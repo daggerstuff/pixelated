@@ -89,7 +89,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <script src="/js/background-loader.js" defer is:inline></script>
 
     <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
+    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer nonce={cspNonce}></script>
     <style is:global>
       /* Mizu theme dark colors - default for all pages */
       :root {
@@ -185,7 +185,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <Analytics />
 
     <!-- Rybbit View Transitions Support -->
-    <script is:inline>
+    <script is:inline nonce={cspNonce}>
       document.addEventListener('astro:after-swap', () => {
         if (window.rybbit) {
           window.rybbit.pageview();
