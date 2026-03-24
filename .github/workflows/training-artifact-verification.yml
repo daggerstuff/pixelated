@@ -22,7 +22,7 @@ name: Training Artifact Verification
 
 jobs:
   verify-stage-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
