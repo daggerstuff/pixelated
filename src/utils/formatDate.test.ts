@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDuration } from './formatDate'
+import { formatDuration, formatDate } from './formatDate'
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
@@ -30,3 +30,16 @@ describe('formatDuration', () => {
     expect(formatDuration(86400000)).toBe('1d 0h')
   })
 })
+
+describe('formatDate', () => {
+  it('throws an error for invalid date strings', () => {
+    expect(() => formatDate('invalid date')).toThrow('Invalid date string');
+  });
+
+  it('formats valid date string with default options', () => {
+    // We use a date like "2023-01-15T12:00:00.000Z" to avoid edge cases
+    // with local time zone shifts causing it to be January 14 or January 16
+    const dateString = '2023-01-15T12:00:00.000Z';
+    expect(formatDate(dateString)).toContain('January 15, 2023');
+  });
+});
