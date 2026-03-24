@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
 
 env:
-  ACT: "false"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GHA_LOCAL_RUN: "false"
+  FORCE_JS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.32.1
   NODE_ENV: test
@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright browsers
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         run: pnpm exec playwright install --with-deps
 
       - name: Build project
@@ -92,7 +92,7 @@ jobs:
     needs: [browser-tests]
     if: always()
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      FORCE_JS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v5
