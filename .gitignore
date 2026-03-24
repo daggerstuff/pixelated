@@ -269,3 +269,8 @@ yt-downloader
 security-audit-report.md
 TEST-COVERAGE-ANALYSIS.md
 .scannerwork
+
+# OpenMemory - IDE/Assistant specific rules
+AGENTS.md
+CLAUDE.md
+AGENTS.md
