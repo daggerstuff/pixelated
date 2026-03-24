@@ -1,17 +1,18 @@
 # Foundation Model Training Service - GPU Enabled
-FROM nvidia/cuda:12.1-devel-ubuntu22.04 AS base
+# OVH Golden Image Strategy: Datasets baked into image to avoid DATASYNC errors
+FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS base
 
 # Install Python 3.11 and system dependencies
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    python3.11=3.11.0~rc1-1~22.04 \
-    python3.11-venv=3.11.0~rc1-1~22.04 \
-    python3.11-dev=3.11.0~rc1-1~22.04 \
-    python3-pip=22.0.2+dfsg-1ubuntu0.4 \
-    curl=7.81.0-1ubuntu1.15 \
-    git=1:2.34.1-1ubuntu1.10 \
-    build-essential=12.9ubuntu3 \
-    ca-certificates=20230311ubuntu0.22.04.1 && \
+RUN apt-get update && \
+    apt-get install -y \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
+    python3-pip \
+    curl \
+    git \
+    build-essential \
+    ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -23,10 +24,10 @@ WORKDIR /app
 # Create virtual environment with Python 3.11
 RUN python3.11 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-ENV PYTHONPATH="/app:$PYTHONPATH"
+ENV PYTHONPATH="/app"
 
-# Copy requirements for training service
-COPY src/lib/ai/training/requirements.txt ./requirements.txt
+# Copy requirements for training service (from actual location)
+COPY ai/training/requirements.txt ./requirements.txt
 RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
 
 # Install PyTorch with CUDA support
@@ -44,7 +45,8 @@ RUN uv pip install --python /opt/venv/bin/python --no-cache-dir \
     peft==0.6.0 \
     bitsandbytes==0.41.0 \
     accelerate==0.24.0 \
-    wandb==0.16.0
+    wandb==0.16.0 \
+    unsloth
 
 FROM base AS production
 
@@ -56,9 +58,15 @@ RUN groupadd -g 1001 training || true && \
 RUN mkdir -p /app/data /app/models /app/checkpoints /app/logs && \
     chown -R training:training /app
 
-# Copy training code
-COPY --chown=training:training src/lib/ai/training ./src/lib/ai/training
-COPY --chown=training:training .kiro/specs/foundation-model-training ./specs
+# Copy training code (from actual location)
+COPY --chown=training:training ai/training ./ai/training
+
+#DATASYNC_FIX: Download datasets from S3 at runtime instead of baking in
+# This prevents 8GB+ context transfer and DATASYNC_RETRY_ERROR
+RUN mkdir -p /app/data/compiled_dataset /app/data/stage2
+
+# Create placeholder to indicate data will be downloaded at runtime
+RUN echo "Datasets will be downloaded from S3 at runtime" > /app/data/README.txt
 
 USER training
 
@@ -68,5 +76,6 @@ EXPOSE 8003
 HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=3 \
     CMD curl -f http://localhost:8003/health || exit 1
 
-# Default command for training service
-CMD ["python", "src/lib/ai/training/server.py"]
+# Default command - run Stage 1 training
+# Override with: --stage stage2 or --stage stage3
+CMD ["python", "/app/ai/training/ready_packages/platforms/ovh/train_ovh.py", "--stage", "stage1"]
