@@ -23,7 +23,13 @@ export interface AlignmentContext {
   conversationHistory?: string[]
   detectedContext: ContextType
   userProfile?: UserProfile
-  sessionMetadata?: Record<string, unknown>
+  sessionMetadata?: {
+    confidence?: number
+    urgency?: string
+    needsSpecialHandling?: boolean
+    contextualIndicators?: any[]
+    [key: string]: any
+  }
 }
 
 export interface UserProfile {

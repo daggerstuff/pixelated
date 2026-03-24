@@ -32,6 +32,7 @@ jobs:
           python3 -m pip install --no-cache-dir uv || true
 
       - name: Run Trivy vulnerability scanner
+        if: ${{ !env.ACT }}
         uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
@@ -41,6 +42,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Run Checkov scan
+        if: ${{ !env.ACT }}
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
         with:

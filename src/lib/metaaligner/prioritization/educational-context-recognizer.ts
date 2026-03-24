@@ -22,6 +22,7 @@ export interface EducationalContextResult {
     practicalApplications: string[]
     relatedTopics: string[]
     ageAppropriateness?: 'child' | 'adolescent' | 'adult' | 'all'
+    [key: string]: any
   }
 }
 
@@ -551,7 +552,7 @@ Adapt complexity and resource recommendations accordingly.`
       queryWithContext = `Previous context: ${conversationHistory.slice(-3).join(' ')}\n\nCurrent query: ${userQuery}`
     }
 
-    const messages: Array<{ role: string; content: string }> = [
+    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
       { role: 'system', content: contextualPrompt },
       { role: 'user', content: queryWithContext },
     ]
@@ -611,7 +612,7 @@ Adapt complexity and resource recommendations accordingly.`
         jsonStr = content
       }
       logger.info('Extracted JSON string from AI response', { jsonStr })
-      const parsed = JSON.parse(jsonStr) as unknown
+      const parsed = JSON.parse(jsonStr) as any
       logger.info('Parsed AI response JSON', { parsed })
 
       return {
