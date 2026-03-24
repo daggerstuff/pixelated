@@ -58,7 +58,7 @@ jobs:
         run: corepack enable
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v5
         with:
           version: 10.32.1
           run_install: false
