@@ -80,7 +80,17 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
-            fetchDepth: 1
+            fetchDepth: 0
+
+          - task: SonarCloudPrepare@2
+            displayName: 'Prepare Analysis Configuration'
+            inputs:
+              SonarCloud: 'SonarQube Cloud'
+              organization: 'slimshadyme'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'slimshadyme_pixelated'
+              cliProjectName: 'pixelated'
 
           - task: AzureCLI@2
             displayName: Build and push image to ACR
@@ -118,6 +128,14 @@ stages:
               ACR_NAME: $(ACR_NAME)
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+
+          - task: SonarCloudAnalyze@2
+            displayName: 'Run Code Analysis'
+
+          - task: SonarCloudPublish@2
+            displayName: 'Publish Quality Gate Result'
+            inputs:
+              pollingTimeoutSec: '300'
 
   # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
   # Uses the image tag produced in the Build stage.
