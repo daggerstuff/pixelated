@@ -58,7 +58,7 @@ jobs:
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v5.0.0
+        uses: pnpm/action-setup@v5
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -149,7 +149,7 @@ jobs:
           output: sarif-latest
 
       - name: Upload SARIF results as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: codeql-sarif-${{ matrix.language }}
@@ -157,7 +157,7 @@ jobs:
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}
