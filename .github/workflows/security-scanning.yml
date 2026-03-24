@@ -5,8 +5,8 @@ permissions:
   security-events: write
 
 env:
-  ACT: "false"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GHA_LOCAL_RUN: "false"
+  FORCE_JS_TO_NODE24: true
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
           python3 -m pip install --no-cache-dir uv
 
       - name: Run Trivy vulnerability scanner
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
@@ -47,7 +47,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Run Checkov scan
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
         with:
