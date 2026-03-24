@@ -1,39 +1,8 @@
 /**
- * AI Models Types - Phase 5.0 Reconstruction Stub
- * TODO: Replace with actual AI infrastructure types
+ * AI Models Types - Bridge to AI Infrastructure Types
  */
 
-export interface AIService {
-  getModelInfo: (...args: unknown[]) => unknown
-  createChatCompletion: (...args: unknown[]) => unknown
-  createChatStream: (...args: unknown[]) => unknown
-}
+export * from './ai-types'
 
-export interface AIModel {
-  id: string
-  name: string
-  provider: string
-  capabilities: string[]
-  maxTokens: number
-  costPerToken?: number
-  available: boolean
-}
-
-export interface ModelCapability {
-  name: string
-  description: string
-}
-
-export interface ModelProvider {
-  id: string
-  name: string
-  models: string[]
-}
-
-export type ModelCapabilityType =
-  | 'text-generation'
-  | 'conversation'
-  | 'analysis'
-  | 'vision'
-  | 'code-generation'
-  | 'translation'
+// Re-export specific types if needed or add fallback stubs for legacy compatibility
+// But preferring the real types from ai-types.ts

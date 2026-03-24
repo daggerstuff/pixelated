@@ -265,3 +265,6 @@ yt-downloader
 .beads/
 
 .swarm/
+
+security-audit-report.md
+TEST-COVERAGE-ANALYSIS.md
