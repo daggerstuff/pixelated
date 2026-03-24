@@ -5,6 +5,7 @@ permissions:
   security-events: write
 
 env:
+  ACT: "false"
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 on:
@@ -25,14 +26,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Install UV (preferred Python installer)
         run: |
-          # Ensure pip is available, then install uv; non-fatal if install fails
-          python3 -m pip install --upgrade pip || true
-          python3 -m pip install --no-cache-dir uv || true
+          # Install uv for Python tooling
+          python3 -m pip install --no-cache-dir uv
 
       - name: Run Trivy vulnerability scanner
-        if: ${{ !env.ACT }}
+        if: ${{ env.ACT != 'true' }}
         uses: aquasecurity/trivy-action@v0.35.0
         continue-on-error: true
         with:
@@ -42,7 +47,7 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Run Checkov scan
-        if: ${{ !env.ACT }}
+        if: ${{ env.ACT != 'true' }}
         uses: bridgecrewio/checkov-action@v12
         continue-on-error: true
         with:
