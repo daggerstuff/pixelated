@@ -33,7 +33,7 @@ describe('formatDuration', () => {
 
 describe('formatDate', () => {
   it('throws an error for invalid date strings', () => {
-    expect(() => formatDate('invalid date')).toThrow('Invalid date string');
+    expect(() => formatDate('invalid date')).toThrow('Failed to format date: Error: Invalid date string');
   });
 
   it('formats valid date string with default options', () => {
