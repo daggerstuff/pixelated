@@ -1,0 +1,16 @@
+name: Setup uv
+description: Ensure uv package manager is installed
+
+runs:
+  using: composite
+  steps:
+    - name: Install uv if missing
+      shell: bash
+      run: |
+        if ! command -v uv >/dev/null 2>&1; then
+          echo "uv not found - installing via pip"
+          python -m pip install --upgrade pip
+          python -m pip install uv
+        else
+          echo "uv already installed"
+        fi

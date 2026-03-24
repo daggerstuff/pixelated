@@ -1,5 +1,4 @@
 /// <reference types="vitest" />
-/* eslint-env vitest */
 /* global vi describe it expect beforeEach */
 
 import type { DLPRule } from '../dlp'

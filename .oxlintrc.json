@@ -47,6 +47,14 @@
     "jest/no-export": "off",
     "jest/no-disabled-tests": "off",
     "jest/no-standalone-expect": "off",
-    "preserve-caught-error": "off"
+    "preserve-caught-error": "off",
+    "@typescript-eslint/restrict-template-expressions": "warn",
+    "@typescript-eslint/no-base-to-string": "warn",
+    "@typescript-eslint/no-floating-promises": "warn",
+    "@typescript-eslint/no-redundant-type-constituents": "warn",
+    "@typescript-eslint/unbound-method": "warn",
+    "@typescript-eslint/no-misused-spread": "warn",
+    "@typescript-eslint/require-array-sort-compare": "warn",
+    "@typescript-eslint/await-thenable": "warn"
   }
 }
