@@ -16,8 +16,8 @@ export const securityHeaders = async (
     // Core restrictions
     "default-src 'self'",
     nonce
-      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
-      : "script-src 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
+      ? `script-src 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io`
+      : "script-src 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
     // Keep inline styles only if necessary; replace with nonce/hashes when possible
     "object-src 'none'",
     // Do not allow this site to be embedded in frames
@@ -26,7 +26,7 @@ export const securityHeaders = async (
     "base-uri 'self'",
     "form-action 'self'",
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
-    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net",
+    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net https://app.rybbit.io",
     // Mixed content protections
     "block-all-mixed-content",
     // Additional CSP3 hardening (widely supported)
@@ -46,15 +46,15 @@ export const securityHeaders = async (
       ...csp.filter((rule) => !rule.startsWith('default-src') && !rule.startsWith('connect-src')),
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "connect-src *", // Allow any connection in dev
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
     ]
   } else {
     // Production CSP
     csp.push(
       nonce
-        ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app`
-        : "script-src-elem 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app",
+        ? `script-src-elem 'self' 'nonce-${nonce}' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io`
+        : "script-src-elem 'self' 'unsafe-inline' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
       "frame-src 'self' https://giscus.app",
       "worker-src 'self' blob:",
