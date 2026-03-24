@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Install Playwright browsers
-        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         run: pnpm exec playwright install --with-deps
 
       - name: Build project
