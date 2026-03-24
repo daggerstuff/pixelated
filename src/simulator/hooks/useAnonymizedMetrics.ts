@@ -22,8 +22,10 @@ export interface SimpleMetrics {
 }
 
 /**
- * Simplified hook for anonymized metrics that provides data for the MetricsDialog
- * This implementation is focused on the UI needs rather than the full data model
+ * Simplified hook for anonymized metrics that provides data for the MetricsDialog.
+ * This implementation is focused on the UI needs rather than the full data model.
+ * Uses localStorage for privacy and a local-first design in the demo, generating
+ * sample data for first-time users instead of calling an external API.
  */
 export function useAnonymizedMetrics(): SimpleMetrics {
   const [metrics, setMetrics] = useState<Omit<SimpleMetrics, 'updateMetrics'>>({
@@ -93,8 +95,11 @@ export function useAnonymizedMetrics(): SimpleMetrics {
 }
 
 /**
- * Format technique enum values to readable text
- * Converts snake_case to Title Case with spaces
+ * Format therapeutic technique enum values for UI display.
+ * Converts snake_case to Title Case with spaces (e.g., OPEN_ENDED_QUESTIONS -> Open Ended Questions).
+ *
+ * @param technique - The raw string technique from the TherapeuticTechnique enum
+ * @returns The formatted string for display
  */
 function formatTechniqueName(technique: string): string {
   return technique
