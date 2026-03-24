@@ -13,7 +13,7 @@ on:
 
 env:
   GHA_LOCAL_RUN: "false"
-  FORCE_JS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.32.1
   NODE_ENV: test
@@ -92,7 +92,7 @@ jobs:
     needs: [browser-tests]
     if: always()
     env:
-      FORCE_JS_TO_NODE24: true
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v5
