@@ -18,7 +18,23 @@ export interface ContextDetectionResult {
   contextualIndicators: ContextualIndicator[]
   needsSpecialHandling: boolean
   urgency: 'low' | 'medium' | 'high' | 'critical'
-  metadata: Record<string, unknown>
+  metadata: {
+    transition?: {
+      from: ContextType
+      to: ContextType
+    }
+    crisisAnalysis?: {
+      confidence: number
+      riskLevel: string
+    }
+    educationalAnalysis?: {
+      confidence: number
+      type: string
+      complexity: string
+      topicArea: string
+    }
+    [key: string]: any
+  }
 }
 
 export interface ContextualIndicator {
@@ -189,7 +205,7 @@ export class ContextDetector {
         }
       }
 
-      const messages: Array<{ role: string; content: string }> = [
+      const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
         {
           role: 'system',
           content: CONTEXT_DETECTION_PROMPT,
@@ -473,7 +489,7 @@ export class ContextDetector {
 
     try {
       const jsonText = extractJson(content) ?? ''
-      const parsed = JSON.parse(jsonText) as Record<string, unknown>
+      const parsed = JSON.parse(jsonText) as any
 
       return {
         detectedContext: normalizeContext(parsed['detectedContext']),
