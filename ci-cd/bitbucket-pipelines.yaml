@@ -35,8 +35,8 @@ definitions:
           - python --version
           - pip install --no-input --quiet uv pytest
           - uv run pytest -q tests/python/test_quality_scoring_stub.py
-    - step: &lint-typecheck
-        name: Lint & Typecheck
+    - step: &lint-oxlint
+        name: Lint & Oxlint
         image: node:24-bullseye-slim
         caches:
           - pnpm
@@ -45,7 +45,7 @@ definitions:
           - corepack prepare pnpm@latest --activate
           - pnpm install --frozen-lockfile
           - pnpm lint
-          - pnpm typecheck
+          - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
         name: Security Scan
         image: node:24-bullseye-slim
@@ -98,7 +98,7 @@ pipelines:
       - step: *governance-validate
       - step: *ingestion-stub-check
       - step: *quality-scoring-test
-      - step: *lint-typecheck
+      - step: *lint-oxlint
       - step: *security-scan
       - step: *playwright-e2e
       - step: *build-test-sonarcloud
@@ -108,7 +108,7 @@ pipelines:
       - step: *governance-validate
       - step: *ingestion-stub-check
       - step: *quality-scoring-test
-      - step: *lint-typecheck
+      - step: *lint-oxlint
       - step: *security-scan
       - step: *playwright-e2e
       - step: *build-test-sonarcloud

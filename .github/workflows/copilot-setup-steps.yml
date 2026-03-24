@@ -42,8 +42,8 @@ jobs:
             echo "No supported test runner found (vitest/jest)."
           fi
 
-      - name: Run TypeScript type check
-        run: pnpm run typecheck || true
+      - name: Run oxlint type-aware
+        run: pnpm exec oxlint --type-aware -c .oxlintrc.json . || true
 
       - name: Summary
         run: |
