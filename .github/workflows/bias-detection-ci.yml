@@ -142,8 +142,8 @@ jobs:
       - name: Run ESLint
         run: pnpm lint
 
-      - name: Run TypeScript compiler
-        run: pnpm typecheck
+      - name: Run oxlint type-aware
+        run: pnpm exec oxlint --type-aware -c .oxlintrc.json .
 
       - name: Check formatting
         run: pnpm format:check
