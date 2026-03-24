@@ -82,7 +82,7 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - task: SonarCloudPrepare@1
+          - task: SonarCloudPrepare@3
             displayName: 'Prepare Analysis Configuration'
             inputs:
               SonarCloud: 'SonarQube Cloud'
@@ -129,10 +129,10 @@ stages:
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
 
-          - task: SonarCloudAnalyze@1
+          - task: SonarCloudAnalyze@3
             displayName: 'Run Code Analysis'
 
-          - task: SonarCloudPublish@1
+          - task: SonarCloudPublish@3
             displayName: 'Publish Quality Gate Result'
             inputs:
               pollingTimeoutSec: '300'
