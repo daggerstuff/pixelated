@@ -21,7 +21,7 @@ env:
 jobs:
   browser-tests:
     name: Run Browser Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
 
     steps:
@@ -86,7 +86,7 @@ jobs:
 
   generate-report:
     name: Generate Test Report
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [browser-tests]
     if: always()
     env:

@@ -24,7 +24,7 @@ on:
 jobs:
   validate-ai-models:
     name: AI Model Validation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       ENV_NAME: ${{ inputs.ENV_NAME || 'staging' }}
 
