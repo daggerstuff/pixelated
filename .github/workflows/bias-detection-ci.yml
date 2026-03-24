@@ -27,8 +27,8 @@ on:
       - .github/workflows/bias-detection-ci.yml
 
 env:
-  ACT: "false"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GHA_LOCAL_RUN: "false"
+  FORCE_JS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.13
   PNPM_VERSION: 10.32.1
@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Run Trivy vulnerability scanner
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         uses: aquasecurity/trivy-action@0.35.0
         with:
           scan-type: fs
@@ -57,7 +57,7 @@ jobs:
           sarif_file: trivy-results.sarif
 
       - name: Initialize CodeQL
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         uses: github/codeql-action/init@v4
         with:
           languages: javascript,typescript
@@ -97,7 +97,7 @@ jobs:
         run: pnpm build
 
       - name: Perform CodeQL Analysis
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         uses: github/codeql-action/analyze@v4
 
   # Code quality and linting
@@ -418,7 +418,7 @@ jobs:
         run: mkdir -p playwright-report-browser-compat
 
       - name: Install Playwright browsers
-        if: ${{ env.ACT != 'true' }}
+        if: ${{ env.GHA_LOCAL_RUN != 'true' }}
         run: pnpm exec playwright install --with-deps
 
       - name: Start Python ML service
