@@ -1,176 +1,27 @@
 import { z } from 'zod'
+import { serverEnvSchema } from './schemas/server.schema'
+import { databaseEnvSchema } from './schemas/database.schema'
+import { authEnvSchema } from './schemas/auth.schema'
+import { aiEnvSchema } from './schemas/ai.schema'
+import { monitoringEnvSchema } from './schemas/monitoring.schema'
+import { securityEnvSchema } from './schemas/security.schema'
+import { notificationEnvSchema } from './schemas/notification.schema'
+import { clientEnvSchema } from './schemas/client.schema'
+import { azureEnvSchema } from './schemas/azure.schema'
 
 /**
  * Environment variable schema with validation
+ * Merged from modular domain schemas
  */
-export const envSchema = z.object({
-  // Node environment
-  NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
-
-  // Server configuration
-  PORT: z.string().transform(Number).default(3000),
-  LOG_LEVEL: z
-    .enum(['error', 'warn', 'info', 'verbose', 'debug'])
-    .default('info'),
-  ENABLE_RATE_LIMITING: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Analytics worker configuration
-  ANALYTICS_WS_PORT: z.string().transform(Number).default(8083),
-
-  // Notification worker configuration
-  NOTIFICATION_WS_PORT: z.string().transform(Number).default(8082),
-
-  // Database - MongoDB Atlas
-  MONGODB_URI: z.string().optional(),
-  MONGODB_DB_NAME: z.string().optional(),
-  MONGODB_USERNAME: z.string().optional(),
-  MONGODB_PASSWORD: z.string().optional(),
-  MONGODB_CLUSTER: z.string().optional(),
-
-  // Legacy database (PostgreSQL) - kept for migration purposes
-  POSTGRES_URL: z.string().optional(),
-  POSTGRES_PRISMA_URL: z.string().optional(),
-  POSTGRES_URL_NON_POOLING: z.string().optional(),
-
-  // Redis configuration
-  UPSTASH_REDIS_REST_URL: z.string().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-  REDIS_URL: z.string().optional(),
-  REDIS_TOKEN: z.string().optional(),
-
-  // Authentication - JWT based
-  JWT_SECRET: z.string().optional(),
-  JWT_EXPIRES_IN: z.string().default('24h'),
-
-  // APIs
-  OPENAI_API_KEY: z.string().optional(),
-  OPENAI_BASE_URL: z.string().url().optional(),
-  ANTHROPIC_API_KEY: z.string().optional(),
-  TOGETHER_API_KEY: z.string().optional(),
-  JIGSAWSTACK_API_KEY: z.string().optional(),
-  GOOGLE_API_KEY: z.string().optional(),
-  REPLICATE_API_TOKEN: z.string().optional(),
-
-  // Azure OpenAI
-  AZURE_OPENAI_API_KEY: z.string().optional(),
-  AZURE_OPENAI_ENDPOINT: z.string().url().optional(),
-  AZURE_OPENAI_API_VERSION: z.string().optional(),
-  AZURE_OPENAI_DEPLOYMENT_NAME: z.string().optional(),
-
-  // Azure Services
-  AZURE_STORAGE_CONNECTION_STRING: z.string().optional(),
-  AZURE_STORAGE_ACCOUNT_NAME: z.string().optional(),
-  AZURE_STORAGE_ACCOUNT_KEY: z.string().optional(),
-  AZURE_STORAGE_CONTAINER_NAME: z.string().optional(),
-
-  // Azure Authentication
-  AZURE_AD_CLIENT_ID: z.string().optional(),
-  AZURE_AD_CLIENT_SECRET: z.string().optional(),
-  AZURE_AD_TENANT_ID: z.string().optional(),
-
-  // Monitoring and analytics
-  SENTRY_DSN: z.string().url().optional(),
-  AXIOM_DATASET: z.string().optional(),
-  AXIOM_TOKEN: z.string().optional(),
-  VITE_LITLYX_PROJECT_ID: z.string().optional(),
-  VITE_LITLYX_API_KEY: z.string().optional(),
-
-  // Email
-  EMAIL_FROM: z.string().email().optional(),
-  RESEND_API_KEY: z.string().optional(),
-  SITE_URL: z.string().url().optional(),
-
-  // Rybbit Analytics
-  PUBLIC_RYBBIT_SCRIPT_URL: z.string().url().optional(),
-  PUBLIC_RYBBIT_SITE_ID: z.string().optional(),
-
-  // Security
-  SECURITY_ENABLE_BRUTE_FORCE_PROTECTION: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default(5),
-  SECURITY_ACCOUNT_LOCKOUT_DURATION: z.string().transform(Number).default(1800),
-  SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default(100),
-  SECURITY_ENABLE_ALERTS: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Rate limiting
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default(100),
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default(900000),
-
-  // Logging
-  LOG_CONSOLE: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  LOG_AUDIT: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Security Implementation
-  ENABLE_AUDIT_LOGGING: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  AUDIT_LOG_RETENTION_DAYS: z.string().transform(Number).default(2555),
-  ENCRYPTION_ALGORITHM: z.enum(['aes-256-gcm']).default('aes-256-gcm'),
-  ENCRYPTION_KEY: z.string().min(32).optional(),
-
-  // Client-side variables (exposed to the browser)
-  VITE_API_URL: z.string().url().optional(),
-  VITE_MONGODB_CLUSTER: z.string().optional(),
-  PUBLIC_TRAINING_WS_URL: z
-    .string()
-    .refine(
-      (val) => {
-        if (!val) return true
-        try {
-          const url = new URL(val)
-          return ['ws:', 'wss:', 'http:', 'https:'].includes(url.protocol)
-        } catch {
-          return false
-        }
-      },
-      {
-        message:
-          'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
-      },
-    )
-    .optional(),
-
-  // Notification configuration
-  VAPID_PUBLIC_KEY: z.string().optional(),
-  VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_SUBJECT: z.string().url().optional(),
-
-  // Twilio configuration
-  TWILIO_ACCOUNT_SID: z.string().optional(),
-  TWILIO_AUTH_TOKEN: z.string().optional(),
-  TWILIO_PHONE_NUMBER: z.string().optional(),
-
-  // Slack (for notifications)
-  SLACK_WEBHOOK_URL: z.string().url().optional(),
-
-  // MentalLLaMA configuration
-  MENTALLAMA_API_KEY: z.string().optional(),
-  MENTALLAMA_ENDPOINT_URL_7B: z.string().url().optional(),
-  MENTALLAMA_ENDPOINT_URL_13B: z.string().url().optional(),
-  MENTALLAMA_DEFAULT_MODEL_TIER: z.enum(['7B', '13B']).optional(),
-  MENTALLAMA_ENABLE_PYTHON_BRIDGE: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .optional(),
-  MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
-})
+export const envSchema = serverEnvSchema
+  .merge(databaseEnvSchema)
+  .merge(authEnvSchema)
+  .merge(aiEnvSchema)
+  .merge(monitoringEnvSchema)
+  .merge(securityEnvSchema)
+  .merge(notificationEnvSchema)
+  .merge(clientEnvSchema)
+  .merge(azureEnvSchema)
 
 /**
  * Cache the validated environment variables
