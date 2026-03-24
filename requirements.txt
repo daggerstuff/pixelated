@@ -36,7 +36,7 @@ bracex==2.6 # via wcmatch
 cachetools==7.0.5 # via py-key-value-aio
 caio==0.9.25 # via aiofile
 catalogue==2.0.10 # via # spacy # srsly # thinc
-cbor2==5.8.0 # via modal
+cbor2==5.9.0 # via modal
 certifi==2026.2.25 # via # httpcore # httpx # minio # modal # ngcsdk # requests # sentry-sdk
 cffi==2.0.0 # via # argon2-cffi-bindings # cryptography # soundfile
 chardet==7.2.0 # via pixelated (pyproject.toml)
