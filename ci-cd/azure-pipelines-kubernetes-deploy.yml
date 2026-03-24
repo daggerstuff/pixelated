@@ -4,6 +4,8 @@ trigger:
   batch: true
   branches:
     include:
+      - main
+      - master
       - staging
   paths:
     include:
@@ -24,6 +26,7 @@ pr:
   autoCancel: true
   branches:
     include:
+      - main
       - master
       - staging
   paths:
@@ -131,7 +134,10 @@ stages:
           ),
           and(
             eq('${{ parameters.environment }}', 'production'),
-            eq(variables['Build.SourceBranch'], 'refs/heads/master')
+            or(
+              eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+              eq(variables['Build.SourceBranch'], 'refs/heads/main')
+            )
           )
         )
       )

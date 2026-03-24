@@ -17,6 +17,7 @@ trigger:
   batch: true
   branches:
     include:
+      - staging
       - master
       - main
       - terraform/*
@@ -29,6 +30,7 @@ pr:
   autoCancel: true
   branches:
     include:
+      - staging
       - master
       - main
       - terraform/*
@@ -98,7 +100,7 @@ stages:
       - job: ValidateAndPlan
         displayName: 'Terraform Validation & Planning'
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'ubuntu-24.04'
         steps:
           # Checkout code with credentials for pulling Terraform state
           - checkout: self
@@ -239,7 +241,7 @@ stages:
         displayName: 'Apply Infrastructure Changes'
         environment: ${{ parameters.environment }}
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'ubuntu-24.04'
         strategy:
           runOnce:
             deploy:
@@ -427,9 +429,10 @@ stages:
       - job: RefreshState
         displayName: 'Refresh Terraform State'
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'ubuntu-24.04'
         steps:
           - checkout: self
+            fetchDepth: 1
 
           - task: AzureCLI@2
             displayName: 'Login to Azure'
