@@ -147,11 +147,11 @@ stages:
         succeeded(),
         or(
           and(
-            eq('${{ parameters.environment }}', 'staging'),
+            eq(${{ parameters.environment }}, 'staging'),
             eq(variables['Build.SourceBranch'], 'refs/heads/staging')
           ),
           and(
-            eq('${{ parameters.environment }}', 'production'),
+            eq(${{ parameters.environment }}, 'production'),
             or(
               eq(variables['Build.SourceBranch'], 'refs/heads/master'),
               eq(variables['Build.SourceBranch'], 'refs/heads/main')
