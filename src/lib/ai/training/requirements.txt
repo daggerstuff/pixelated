@@ -7,7 +7,6 @@ accelerate==1.12.0 # via
 aiohappyeyeballs==2.6.1 # via aiohttp
 aiohttp==3.13.3 # via fsspec
 aiosignal==1.4.0 # via aiohttp
-alembic==1.18.1 # via mlflow
 annotated-doc==0.0.4 # via fastapi
 annotated-types==0.7.0 # via pydantic
 anyio==4.12.1 # via
@@ -26,8 +25,6 @@ botocore==1.42.34 # via
 # boto3
 # s3transfer
 cachetools==6.2.5 # via
-# mlflow-skinny
-# mlflow-tracing
 catalogue==2.0.10 # via
 # spacy
 # srsly
@@ -46,13 +43,11 @@ click==8.3.1 # via
 # -r src/lib/ai/training/requirements.txt
 # black
 # flask
-# mlflow-skinny
 # nltk
 # typer-slim
 # uvicorn
 # wandb
 cloudpathlib==0.23.0 # via weasel
-cloudpickle==3.1.2 # via mlflow-skinny
 confection==0.1.5 # via
 # thinc
 # weasel
@@ -69,8 +64,6 @@ cymem==2.0.13 # via
 # spacy
 # thinc
 databricks-sdk==0.80.0 # via
-# mlflow-skinny
-# mlflow-tracing
 datasets==4.5.0 # via
 # -r src/lib/ai/training/requirements.txt
 # evaluate
@@ -79,12 +72,10 @@ dill==0.4.0 # via
 # datasets
 # evaluate
 # multiprocess
-docker==7.1.0 # via mlflow
 einops==0.8.2 # via deepspeed
 evaluate==0.4.6 # via -r src/lib/ai/training/requirements.txt
 fastapi==0.128.0 # via
 # -r src/lib/ai/training/requirements.txt
-# mlflow-skinny
 filelock==3.20.3 # via
 # datasets
 # huggingface-hub
@@ -93,7 +84,6 @@ filelock==3.20.3 # via
 flask==3.1.3 # via
 # flask-cors
 # mlflow
-flask-cors==6.0.2 # via mlflow
 fonttools==4.61.1 # via matplotlib
 frozenlist==1.8.0 # via
 # aiohttp
@@ -107,18 +97,15 @@ fsspec==2025.10.0 # via
 # torch
 gitdb==4.0.12 # via gitpython
 gitpython==3.1.46 # via
-# mlflow-skinny
 # wandb
 google-auth==2.47.0 # via databricks-sdk
 gpustat==1.1.1 # via -r src/lib/ai/training/requirements.txt
-graphene==3.4.3 # via mlflow
 graphql-core==3.2.7 # via
 # graphene
 # graphql-relay
 graphql-relay==3.2.0 # via graphene
 greenlet==3.3.1 # via sqlalchemy
 grpcio==1.76.0 # via tensorboard
-gunicorn==23.0.0 # via mlflow
 h11==0.16.0 # via
 # httpcore
 # uvicorn
@@ -130,7 +117,6 @@ httpx==0.28.1 # via
 # -r src/lib/ai/training/requirements.txt
 # datasets
 # huggingface-hub
-huey==2.6.0 # via mlflow
 huggingface-hub==1.3.3 # via
 # accelerate
 # datasets
@@ -144,7 +130,6 @@ idna==3.11 # via
 # requests
 # yarl
 importlib-metadata==8.7.1 # via
-# mlflow-skinny
 # opentelemetry-api
 iniconfig==2.3.0 # via pytest
 isort==7.0.0 # via -r src/lib/ai/training/requirements.txt
@@ -173,12 +158,8 @@ markupsafe==3.0.3 # via
 # jinja2
 # mako
 # werkzeug
-matplotlib==3.10.8 # via mlflow
 memory-profiler==0.61.0 # via -r src/lib/ai/training/requirements.txt
 minio==7.2.20 # via -r src/lib/ai/training/requirements.txt
-mlflow==3.9.0rc0 # via -r src/lib/ai/training/requirements.txt
-mlflow-skinny==3.9.0rc0 # via mlflow
-mlflow-tracing==3.9.0rc0 # via mlflow
 mpmath==1.3.0 # via sympy
 msgpack==1.1.2 # via deepspeed
 multidict==6.7.1 # via
@@ -251,16 +232,10 @@ nvidia-nvjitlink-cu12==12.8.93 # via
 nvidia-nvshmem-cu12==3.4.5 # via torch
 nvidia-nvtx-cu12==12.8.90 # via torch
 opentelemetry-api==1.39.1 # via
-# mlflow-skinny
-# mlflow-tracing
 # opentelemetry-sdk
 # opentelemetry-semantic-conventions
 opentelemetry-proto==1.39.1 # via
-# mlflow-skinny
-# mlflow-tracing
 opentelemetry-sdk==1.39.1 # via
-# mlflow-skinny
-# mlflow-tracing
 opentelemetry-semantic-conventions==0.60b1 # via opentelemetry-sdk
 packaging==25.0 # via
 # accelerate
@@ -274,8 +249,6 @@ packaging==25.0 # via
 # lightning
 # lightning-utilities
 # matplotlib
-# mlflow-skinny
-# mlflow-tracing
 # peft
 # pytest
 # pytorch-lightning
@@ -287,7 +260,7 @@ packaging==25.0 # via
 # wandb
 # weasel
 # wheel
-pandas==3.0.0 # via
+pandas==2.2.3 # via
 # -r src/lib/ai/training/requirements.txt
 # datasets
 # evaluate
@@ -314,8 +287,6 @@ propcache==0.4.1 # via
 # yarl
 protobuf==6.33.5 # via
 # databricks-sdk
-# mlflow-skinny
-# mlflow-tracing
 # opentelemetry-proto
 # tensorboard
 # wandb
@@ -344,8 +315,6 @@ pydantic==2.12.5 # via
 # confection
 # deepspeed
 # fastapi
-# mlflow-skinny
-# mlflow-tracing
 # spacy
 # thinc
 # wandb
@@ -369,7 +338,6 @@ python-dateutil==2.9.0.post0 # via
 # pandas
 python-dotenv==1.2.1 # via
 # -r src/lib/ai/training/requirements.txt
-# mlflow-skinny
 pytokens==0.4.0 # via black
 pytorch-lightning==2.6.0 # via
 # -r src/lib/ai/training/requirements.txt
@@ -380,7 +348,6 @@ pyyaml==6.0.3 # via
 # datasets
 # huggingface-hub
 # lightning
-# mlflow-skinny
 # peft
 # pytorch-lightning
 # transformers
@@ -395,7 +362,6 @@ requests==2.32.5 # via
 # datasets
 # docker
 # evaluate
-# mlflow-skinny
 # spacy
 # wandb
 # weasel
@@ -429,7 +395,6 @@ spacy-loggers==1.0.5 # via spacy
 sqlalchemy==2.0.46 # via
 # alembic
 # mlflow
-sqlparse==0.5.5 # via mlflow-skinny
 srsly==2.5.2 # via
 # confection
 # spacy
@@ -493,7 +458,6 @@ typing-extensions==4.15.0 # via
 # lightning
 # lightning-utilities
 # minio
-# mlflow-skinny
 # mypy
 # opentelemetry-api
 # opentelemetry-sdk
@@ -519,7 +483,6 @@ urllib3==2.6.3 # via
 # sentry-sdk
 uvicorn==0.40.0 # via
 # -r src/lib/ai/training/requirements.txt
-# mlflow-skinny
 wandb==0.24.0 # via -r src/lib/ai/training/requirements.txt
 wasabi==1.1.3 # via
 # spacy
