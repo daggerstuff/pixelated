@@ -67,6 +67,11 @@ variables:
     value: ai/infrastructure/helm/pixelated-empathy
   - name: ACR_LOGIN_SERVER
     value: $(ACR_NAME).azurecr.io
+  # Runtime variables for branch-based deployment conditions
+  - name: isStagingBranch
+    value: $[eq(variables['Build.SourceBranch'], 'refs/heads/staging')]
+  - name: isProductionBranch
+    value: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))]
 
 stages:
   # Stage 1: Build the Docker image once and push to ACR.
@@ -142,23 +147,20 @@ stages:
   - stage: DeployHosted
     displayName: Deploy to AKS (hosted agent)
     dependsOn: Build
-    condition: |
-      and(
-        succeeded(),
-        or(
-          and(
-            eq('${{ parameters.environment }}', 'staging'),
-            eq(variables['Build.SourceBranch'], 'refs/heads/staging')
-          ),
-          and(
-            eq('${{ parameters.environment }}', 'production'),
-            or(
-              eq(variables['Build.SourceBranch'], 'refs/heads/master'),
-              eq(variables['Build.SourceBranch'], 'refs/heads/main')
-            )
-          )
+  condition: |
+    and(
+      succeeded(),
+      or(
+        and(
+          eq(${{ parameters.environment }}, 'staging'),
+          eq(variables.isStagingBranch, true)
+        ),
+        and(
+          eq(${{ parameters.environment }}, 'production'),
+          eq(variables.isProductionBranch, true)
         )
       )
+    )
     variables:
       IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
