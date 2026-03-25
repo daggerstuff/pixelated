@@ -1,13 +1,13 @@
-import { z } from 'zod'
-import { serverEnvSchema } from './schemas/server.schema'
-import { databaseEnvSchema } from './schemas/database.schema'
-import { authEnvSchema } from './schemas/auth.schema'
-import { aiEnvSchema } from './schemas/ai.schema'
-import { monitoringEnvSchema } from './schemas/monitoring.schema'
-import { securityEnvSchema } from './schemas/security.schema'
-import { notificationEnvSchema } from './schemas/notification.schema'
-import { clientEnvSchema } from './schemas/client.schema'
-import { azureEnvSchema } from './schemas/azure.schema'
+import { z } from "zod";
+import { aiEnvSchema } from "./schemas/ai.schema";
+import { authEnvSchema } from "./schemas/auth.schema";
+import { azureEnvSchema } from "./schemas/azure.schema";
+import { clientEnvSchema } from "./schemas/client.schema";
+import { databaseEnvSchema } from "./schemas/database.schema";
+import { monitoringEnvSchema } from "./schemas/monitoring.schema";
+import { notificationEnvSchema } from "./schemas/notification.schema";
+import { securityEnvSchema } from "./schemas/security.schema";
+import { serverEnvSchema } from "./schemas/server.schema";
 
 /**
  * Environment variable schema with validation
@@ -21,7 +21,7 @@ export const envSchema = serverEnvSchema
   .merge(securityEnvSchema)
   .merge(notificationEnvSchema)
   .merge(clientEnvSchema)
-  .merge(azureEnvSchema)
+  .merge(azureEnvSchema);
 
 /**
  * Cache the validated environment variables
@@ -41,7 +41,7 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
     /^MONGODB_URI$/,
     /^SENTRY_DSN$/,
     /^AXIOM_TOKEN$/,
-  ]
+  ];
   const safeKeyPatterns = [
     /^PUBLIC_/,
     /^NODE_ENV$/,
@@ -63,19 +63,19 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
     /^ENCRYPTION_ALGORITHM$/,
     /^VAPID_SUBJECT$/,
     /^MENTALLAMA_(DEFAULT_MODEL_TIER|ENABLE_PYTHON_BRIDGE|PYTHON_BRIDGE_SCRIPT_PATH)$/,
-  ]
+  ];
   return Object.fromEntries(
     Object.entries(env).map(([k, v]) => [
       k,
       v === undefined || v === null
         ? v
         : secretKeyPatterns.some((pattern) => pattern.test(k))
-          ? '[hidden]'
+          ? "[hidden]"
           : safeKeyPatterns.some((pattern) => pattern.test(k))
             ? v
-            : '[hidden]',
+            : "[hidden]",
     ]),
-  )
+  );
 }
 
 /**
@@ -84,24 +84,21 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
  */
 export function getEnv(): z.infer<typeof envSchema> {
   // Type-safe environment source handling
-  let envSource: Record<string, unknown>
+  let envSource: Record<string, unknown>;
 
-  if (typeof process !== 'undefined') {
-    envSource = (process.env as Record<string, unknown>) || {}
+  if (typeof process !== "undefined") {
+    envSource = (process.env as Record<string, unknown>) || {};
   } else {
-    envSource = typeof import.meta !== 'undefined' ? import.meta.env : {}
+    envSource = typeof import.meta !== "undefined" ? import.meta.env : {};
   }
 
   // Log all env variables (masking secrets)
   // Only log in CI or production to avoid local noise
-  if (envSource['CI'] || envSource['NODE_ENV'] === 'production') {
-    console.log(
-      '[env.config] Environment variables at build:',
-      maskEnv(envSource),
-    )
+  if (envSource["CI"] || envSource["NODE_ENV"] === "production") {
+    console.log("[env.config] Environment variables at build:", maskEnv(envSource));
   }
 
-  return envSchema.parse(envSource)
+  return envSchema.parse(envSource);
 }
 
 /**
@@ -109,27 +106,27 @@ export function getEnv(): z.infer<typeof envSchema> {
  * Note: Lazy evaluation to avoid initialization issues during build
  */
 export const env = (() => {
-  let cachedEnvInstance: z.infer<typeof envSchema> | null = null
+  let cachedEnvInstance: z.infer<typeof envSchema> | null = null;
   return () => {
     if (!cachedEnvInstance) {
-      cachedEnvInstance = getEnv()
+      cachedEnvInstance = getEnv();
     }
-    return cachedEnvInstance
-  }
-})()
+    return cachedEnvInstance;
+  };
+})();
 
 /**
  * Type definition for environment variables
  */
-export type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof envSchema>;
 
 /**
  * Environment configuration object
  */
 export const config = {
-  isDevelopment: (): boolean => env().NODE_ENV === 'development',
-  isProduction: (): boolean => env().NODE_ENV === 'production',
-  isTest: (): boolean => env().NODE_ENV === 'test',
+  isDevelopment: (): boolean => env().NODE_ENV === "development",
+  isProduction: (): boolean => env().NODE_ENV === "production",
+  isTest: (): boolean => env().NODE_ENV === "test",
 
   server: {
     port: (): number => env().PORT,
@@ -165,10 +162,8 @@ export const config = {
   },
 
   redis: {
-    url: (): string | undefined =>
-      env().REDIS_URL || env().UPSTASH_REDIS_REST_URL,
-    token: (): string | undefined =>
-      env().UPSTASH_REDIS_REST_TOKEN || env().REDIS_TOKEN,
+    url: (): string | undefined => env().REDIS_URL || env().UPSTASH_REDIS_REST_URL,
+    token: (): string | undefined => env().UPSTASH_REDIS_REST_TOKEN || env().REDIS_TOKEN,
   },
 
   ai: {
@@ -183,22 +178,16 @@ export const config = {
     // Azure OpenAI
     azureOpenAiKey: (): string | undefined => env().AZURE_OPENAI_API_KEY,
     azureOpenAiEndpoint: (): string | undefined => env().AZURE_OPENAI_ENDPOINT,
-    azureOpenAiApiVersion: (): string | undefined =>
-      env().AZURE_OPENAI_API_VERSION,
-    azureOpenAiDeploymentName: (): string | undefined =>
-      env().AZURE_OPENAI_DEPLOYMENT_NAME,
+    azureOpenAiApiVersion: (): string | undefined => env().AZURE_OPENAI_API_VERSION,
+    azureOpenAiDeploymentName: (): string | undefined => env().AZURE_OPENAI_DEPLOYMENT_NAME,
   },
 
   azure: {
     // Storage
-    storageConnectionString: (): string | undefined =>
-      env().AZURE_STORAGE_CONNECTION_STRING,
-    storageAccountName: (): string | undefined =>
-      env().AZURE_STORAGE_ACCOUNT_NAME,
-    storageAccountKey: (): string | undefined =>
-      env().AZURE_STORAGE_ACCOUNT_KEY,
-    storageContainerName: (): string | undefined =>
-      env().AZURE_STORAGE_CONTAINER_NAME,
+    storageConnectionString: (): string | undefined => env().AZURE_STORAGE_CONNECTION_STRING,
+    storageAccountName: (): string | undefined => env().AZURE_STORAGE_ACCOUNT_NAME,
+    storageAccountKey: (): string | undefined => env().AZURE_STORAGE_ACCOUNT_KEY,
+    storageContainerName: (): string | undefined => env().AZURE_STORAGE_CONTAINER_NAME,
 
     // Authentication
     adClientId: (): string | undefined => env().AZURE_AD_CLIENT_ID,
@@ -224,11 +213,9 @@ export const config = {
   },
 
   security: {
-    enableBruteForceProtection: (): boolean =>
-      env().SECURITY_ENABLE_BRUTE_FORCE_PROTECTION,
+    enableBruteForceProtection: (): boolean => env().SECURITY_ENABLE_BRUTE_FORCE_PROTECTION,
     maxLoginAttempts: (): number => env().SECURITY_MAX_LOGIN_ATTEMPTS,
-    accountLockoutDuration: (): number =>
-      env().SECURITY_ACCOUNT_LOCKOUT_DURATION,
+    accountLockoutDuration: (): number => env().SECURITY_ACCOUNT_LOCKOUT_DURATION,
     apiAbuseThreshold: (): number => env().SECURITY_API_ABUSE_THRESHOLD,
     enableAlerts: (): boolean => env().SECURITY_ENABLE_ALERTS,
     encryption: {
@@ -255,6 +242,8 @@ export const config = {
     apiUrl: (): string | undefined => env().VITE_API_URL,
     mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
     trainingWsUrl: (): string | undefined => env().PUBLIC_TRAINING_WS_URL,
+    rybbitScriptUrl: (): string | undefined => env().PUBLIC_RYBBIT_SCRIPT_URL,
+    rybbitSiteId: (): string | undefined => env().PUBLIC_RYBBIT_SITE_ID,
   },
 
   notifications: {
@@ -274,13 +263,10 @@ export const config = {
     apiKey: (): string | undefined => env().MENTALLAMA_API_KEY,
     endpointUrl7B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_7B,
     endpointUrl13B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_13B,
-    defaultModelTier: (): '7B' | '13B' | undefined =>
-      env().MENTALLAMA_DEFAULT_MODEL_TIER,
-    enablePythonBridge: (): boolean | undefined =>
-      env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
-    pythonBridgeScriptPath: (): string | undefined =>
-      env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
+    defaultModelTier: (): "7B" | "13B" | undefined => env().MENTALLAMA_DEFAULT_MODEL_TIER,
+    enablePythonBridge: (): boolean | undefined => env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
+    pythonBridgeScriptPath: (): string | undefined => env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
   },
-}
+};
 
-export default config
+export default config;
