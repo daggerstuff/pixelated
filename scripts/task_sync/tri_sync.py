@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 import hashlib
 import json
 import os
 import re
 import subprocess
+import sys
+from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
@@ -567,20 +569,14 @@ def plan_from_sources(
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = list(argv or os.sys.argv[1:])
+    args = list(argv or sys.argv[1:])
     mode = args[0] if args else "plan"
 
     if mode not in {"plan", "dry-run"}:
         raise SystemExit("Usage: tri_sync.py [plan|dry-run]")
 
     plan = plan_from_sources()
-    summary = summarize_plan(plan)
-    print(
-        json.dumps(
-            {"summary": summary, "actions": [dataclass_to_dict(action) for action in plan]},
-            indent=2,
-        )
-    )
+    summarize_plan(plan)
     return 0
 
 
