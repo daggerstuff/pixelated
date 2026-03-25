@@ -28,27 +28,35 @@ esac
 resolve_chart_dir() {
   local configured="${CHART_DIR:-}"
   local repo_root="${BUILD_SOURCESDIRECTORY:-${BUILD_SOURCES_DIR:-${BUILD_SOURCES_DIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-}}}}"
+  local candidate
 
-  if [[ -n "${configured}" && -d "${configured}" ]]; then
+  is_chart_dir() {
+    local dir="$1"
+    [[ -n "${dir}" && -d "${dir}" && -f "${dir}/Chart.yaml" ]]
+  }
+
+  if is_chart_dir "${configured}"; then
     printf '%s' "${configured}"
     return 0
   fi
 
-  if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* && -d "${repo_root}/${configured}" ]]; then
+  if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* ]] && is_chart_dir "${repo_root}/${configured}"; then
     printf '%s' "${repo_root}/${configured}"
     return 0
   fi
 
   local candidates=()
   if [[ -n "${repo_root}" ]]; then
+    candidates+=("${repo_root}/ai/infrastructure/helm/pixelated-empathy")
     candidates+=("${repo_root}/ai/infra/cloud/helm/pixelated-empathy")
     candidates+=("${repo_root}/helm")
   fi
+  candidates+=("${PWD}/ai/infrastructure/helm/pixelated-empathy")
   candidates+=("${PWD}/ai/infra/cloud/helm/pixelated-empathy")
   candidates+=("${PWD}/helm")
 
   for candidate in "${candidates[@]}"; do
-    if [[ -d "${candidate}" ]]; then
+    if is_chart_dir "${candidate}"; then
       printf '%s' "${candidate}"
       return 0
     fi
@@ -137,6 +145,7 @@ if ! CHART_DIR="$(resolve_chart_dir)"; then
   echo "Working directory: ${PWD}"
   echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
   echo "Expected one of:"
+  echo " - ai/infrastructure/helm/pixelated-empathy"
   echo " - ai/infra/cloud/helm/pixelated-empathy"
   echo " - helm"
   exit 1
@@ -282,4 +291,3 @@ INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ing
 if [ -n "${INGRESS_CADDY_IP}" ]; then
   echo "Namespace ${NAMESPACE} caddy ingress controller IP: ${INGRESS_CADDY_IP}"
 fi
-
