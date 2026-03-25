@@ -142,15 +142,17 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-  # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
-  # Uses the image tag produced in the Build stage.
+# Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
+# Uses the image tag produced in the Build stage.
 - stage: DeployHosted
   displayName: Deploy to AKS (hosted agent)
   dependsOn: Build
-  ${{ if eq(parameters.environment, 'staging') }}:
-    condition: and(succeeded(), eq(variables.isStagingBranch, true))
-  ${{ if eq(parameters.environment, 'production') }}:
-    condition: and(succeeded(), eq(variables.isProductionBranch, true))
+  condition: >-
+    and(succeeded(),
+    or(
+    and(eq('${{ parameters.environment }}', 'staging'), eq(variables.isStagingBranch, true)),
+    and(eq('${{ parameters.environment }}', 'production'), eq(variables.isProductionBranch, true))
+    ))
     variables:
       IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
