@@ -1196,7 +1196,7 @@ propcache==0.4.1
     #   yarl
 proto-plus==1.27.1
     # via google-api-core
-protobuf==6.33.6
+protobuf==7.34.1
     # via
     #   e2b
     #   google-api-core
