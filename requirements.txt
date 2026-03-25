@@ -649,7 +649,7 @@ more-itertools==10.8.0
     #   openai-whisper
 motor==3.7.1
     # via pixelated (pyproject.toml)
-mpmath==1.3.0
+mpmath==1.4.1
     # via sympy
 msgpack==1.1.2
     # via
