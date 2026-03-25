@@ -15,8 +15,13 @@ from typing import Any, Iterable, Mapping, Sequence
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER = ("beads", "asana", "jira", "linear")
-SYNC_STATE_PATH = Path(".planning/task-sync-state.json")
+DEFAULT_PROVIDER_ORDER = ("beads", "asana", "jira")
+SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
+PROVIDER_EXPORT_ENV_VARS = {
+    "asana": "PIXELATED_ASANA_EXPORT_PATH",
+    "jira": "PIXELATED_JIRA_EXPORT_PATH",
+    "linear": "PIXELATED_LINEAR_EXPORT_PATH",
+}
 
 STATUS_ALIASES = {
     "done": "closed",
@@ -106,6 +111,46 @@ def parse_iso8601(value: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
+def _string_or_empty(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    return str(value)
+
+
+def _nested_value(payload: Mapping[str, Any], *path: str) -> Any:
+    current: Any = payload
+    for key in path:
+        if not isinstance(current, Mapping) or key not in current:
+            return None
+        current = current[key]
+    return current
+
+
+def _first_present(payload: Mapping[str, Any], *paths: str) -> Any:
+    for path in paths:
+        value = _nested_value(payload, *path.split("."))
+        if value is not None:
+            return value
+    return None
+
+
+def _parse_updated_at(payload: Mapping[str, Any], *paths: str) -> datetime:
+    updated_at = _first_present(payload, *paths)
+    if isinstance(updated_at, str) and updated_at.strip():
+        return parse_iso8601(updated_at)
+    return datetime.now(timezone.utc)
+
+
+def _parse_provider_ids(metadata: Mapping[str, str]) -> dict[str, str]:
+    return {
+        provider: external_id
+        for provider, external_id in metadata.items()
+        if provider in DEFAULT_PROVIDER_ORDER
+    }
+
+
 def task_body_without_sync_block(body: str) -> str:
     if SYNC_BLOCK_START not in body:
         return body.strip()
@@ -186,20 +231,18 @@ def record_fingerprint(record: TaskRecord) -> str:
 
 
 def provider_ids_match(existing: Mapping[str, str], expected: Mapping[str, str]) -> bool:
-    return {
-        provider: external_id
-        for provider, external_id in existing.items()
-        if external_id
-    } == {
-        provider: external_id
-        for provider, external_id in expected.items()
-        if external_id
+    return {provider: external_id for provider, external_id in existing.items() if external_id} == {
+        provider: external_id for provider, external_id in expected.items() if external_id
     }
 
 
-def records_are_in_sync(existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]) -> bool:
+def records_are_in_sync(
+    existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]
+) -> bool:
     same_title = existing.title.strip() == canonical.title.strip()
-    same_body = task_body_without_sync_block(existing.body) == task_body_without_sync_block(canonical.body)
+    same_body = task_body_without_sync_block(existing.body) == task_body_without_sync_block(
+        canonical.body
+    )
     same_status = normalize_status(existing.status) == normalize_status(canonical.status)
     same_links = provider_ids_match(existing.provider_ids, provider_ids)
     return same_title and same_body and same_status and same_links
@@ -215,7 +258,9 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     return max(records, key=sort_key)
 
 
-def group_records_by_key(records_by_provider: Mapping[str, Sequence[TaskRecord]]) -> dict[str, list[TaskRecord]]:
+def group_records_by_key(
+    records_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[str, list[TaskRecord]]:
     grouped: dict[str, list[TaskRecord]] = {}
     for provider, records in records_by_provider.items():
         for record in records:
@@ -247,6 +292,24 @@ def build_sync_action(
     if existing is not None and records_are_in_sync(existing, canonical, provider_ids):
         return None
 
+    known_provider_ids = dict(provider_ids)
+    if existing is not None:
+        known_provider_ids[provider] = existing.external_id
+
+    merged_body = merge_body_with_sync_metadata(
+        task_body_without_sync_block(canonical.body),
+        SyncMetadata(
+            key=sync_key,
+            status=normalize_status(canonical.status),
+            source_provider=canonical.provider,
+            source_id=canonical.external_id,
+            provider_ids=known_provider_ids,
+            updated_at=canonical.updated_at.astimezone(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+        ),
+    )
+
     return SyncAction(
         provider=provider,
         action="create" if existing is None else "update",
@@ -255,9 +318,9 @@ def build_sync_action(
         source_id=canonical.external_id,
         target_id=existing.external_id if existing else None,
         title=canonical.title,
-        body=task_body_without_sync_block(canonical.body),
+        body=merged_body,
         status=normalize_status(canonical.status),
-        provider_ids=provider_ids,
+        provider_ids=known_provider_ids,
     )
 
 
@@ -286,7 +349,9 @@ def build_sync_plan(
             if action is not None:
                 plan.append(action)
 
-    plan.sort(key=lambda action: (action.sync_key, provider_index.get(action.provider, 99), action.action))
+    plan.sort(
+        key=lambda action: (action.sync_key, provider_index.get(action.provider, 99), action.action)
+    )
     return plan
 
 
@@ -307,22 +372,78 @@ def normalize_beads_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
 
     body = str(payload.get("description") or payload.get("notes") or "")
     _, metadata = parse_sync_metadata(body)
-    updated_at = payload.get("updated_at") or payload.get("updatedAt") or payload.get("created_at") or payload.get("createdAt")
-    if isinstance(updated_at, str):
-        parsed_updated_at = parse_iso8601(updated_at)
-    else:
-        parsed_updated_at = datetime.now(timezone.utc)
-
     return TaskRecord(
         provider="beads",
         external_id=str(payload.get("id")),
         title=str(payload.get("title") or payload.get("name") or ""),
         body=body,
         status=normalize_status(str(payload.get("status") or payload.get("state") or "open")),
-        updated_at=parsed_updated_at,
+        updated_at=_parse_updated_at(payload, "updated_at", "updatedAt", "created_at", "createdAt"),
         sync_key=metadata.get("key"),
-        provider_ids={k: v for k, v in metadata.items() if k in DEFAULT_PROVIDER_ORDER},
+        provider_ids=_parse_provider_ids(metadata),
         raw=payload,
+    )
+
+
+def normalize_asana_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    body = _string_or_empty(_first_present(payload, "notes", "description", "body", "html_notes"))
+    _, metadata = parse_sync_metadata(body)
+    completed = _first_present(payload, "completed", "is_completed")
+    raw_status = _first_present(
+        payload,
+        "status",
+        "status.name",
+        "custom_fields.status",
+        "resource_subtype",
+    )
+    status = (
+        "closed" if completed is True else normalize_status(_string_or_empty(raw_status) or "open")
+    )
+
+    return TaskRecord(
+        provider="asana",
+        external_id=_string_or_empty(_first_present(payload, "gid", "id")),
+        title=_string_or_empty(_first_present(payload, "name", "title")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(
+            payload,
+            "modified_at",
+            "updated_at",
+            "completed_at",
+            "created_at",
+        ),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        raw=payload,
+    )
+
+
+def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
+    fields = _first_present(payload, "fields")
+    body = _string_or_empty(_first_present(payload, "description", "fields.description", "body"))
+    _, metadata = parse_sync_metadata(body)
+    raw_status = _first_present(payload, "status", "fields.status.name", "fields.status")
+    status = normalize_status(_string_or_empty(raw_status) or "open")
+
+    return TaskRecord(
+        provider="jira",
+        external_id=_string_or_empty(_first_present(payload, "key", "id", "issueKey")),
+        title=_string_or_empty(_first_present(payload, "title", "fields.summary", "summary")),
+        body=body,
+        status=status,
+        updated_at=_parse_updated_at(
+            payload,
+            "updated",
+            "updated_at",
+            "fields.updated",
+            "created",
+            "fields.created",
+        ),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key", "external_ref"))
+        or metadata.get("key"),
+        provider_ids=_parse_provider_ids(metadata),
+        raw=fields if isinstance(fields, Mapping) else payload,
     )
 
 
@@ -337,6 +458,79 @@ def beads_export() -> list[TaskRecord]:
         if record is not None:
             records.append(record)
     return records
+
+
+def _iter_export_payloads(path: Path) -> Iterable[Mapping[str, Any]]:
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        return []
+
+    if path.suffix == ".jsonl":
+        payloads: list[Mapping[str, Any]] = []
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            decoded = json.loads(line)
+            if isinstance(decoded, Mapping):
+                payloads.append(decoded)
+        return payloads
+
+    decoded = json.loads(text)
+    if isinstance(decoded, list):
+        return [item for item in decoded if isinstance(item, Mapping)]
+    if isinstance(decoded, Mapping):
+        for key in ("data", "items", "issues", "tasks", "results"):
+            value = decoded.get(key)
+            if isinstance(value, list):
+                return [item for item in value if isinstance(item, Mapping)]
+        return [decoded]
+    return []
+
+
+def export_records_from_path(provider: str, path: Path) -> list[TaskRecord]:
+    normalizers = {
+        "asana": normalize_asana_payload,
+        "jira": normalize_jira_payload,
+        "beads": normalize_beads_payload,
+    }
+    try:
+        normalize_payload = normalizers[provider]
+    except KeyError as exc:
+        raise ValueError(f"Unsupported provider export: {provider}") from exc
+
+    records: list[TaskRecord] = []
+    for payload in _iter_export_payloads(path):
+        record = normalize_payload(payload)
+        if record is not None:
+            records.append(record)
+    return records
+
+
+def collect_records(
+    enabled_providers: Sequence[str] = DEFAULT_PROVIDER_ORDER,
+    export_paths: Mapping[str, Path | str] | None = None,
+) -> dict[str, list[TaskRecord]]:
+    export_paths = export_paths or {}
+    records_by_provider: dict[str, list[TaskRecord]] = {}
+
+    for provider in enabled_providers:
+        if provider == "beads":
+            records_by_provider[provider] = beads_export()
+            continue
+
+        explicit_path = export_paths.get(provider)
+        configured_path = (
+            explicit_path or os.getenv(PROVIDER_EXPORT_ENV_VARS.get(provider, ""), "").strip()
+        )
+        if not configured_path:
+            continue
+
+        path = Path(configured_path)
+        if not path.exists():
+            raise FileNotFoundError(f"{provider} export path does not exist: {path}")
+        records_by_provider[provider] = export_records_from_path(provider, path)
+
+    return records_by_provider
 
 
 def load_sync_state(path: Path = SYNC_STATE_PATH) -> dict[str, Any]:
@@ -361,6 +555,17 @@ def plan_from_beads_only() -> list[SyncAction]:
     return build_sync_plan({"beads": beads_export()})
 
 
+def plan_from_sources(
+    *,
+    enabled_providers: Sequence[str] = DEFAULT_PROVIDER_ORDER,
+    export_paths: Mapping[str, Path | str] | None = None,
+) -> list[SyncAction]:
+    return build_sync_plan(
+        collect_records(enabled_providers=enabled_providers, export_paths=export_paths),
+        enabled_providers=enabled_providers,
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(argv or os.sys.argv[1:])
     mode = args[0] if args else "plan"
@@ -368,15 +573,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     if mode not in {"plan", "dry-run"}:
         raise SystemExit("Usage: tri_sync.py [plan|dry-run]")
 
-    plan = plan_from_beads_only()
+    plan = plan_from_sources()
     summary = summarize_plan(plan)
-    print(json.dumps({"summary": summary, "actions": [dataclass_to_dict(action) for action in plan]}, indent=2))
+    print(
+        json.dumps(
+            {"summary": summary, "actions": [dataclass_to_dict(action) for action in plan]},
+            indent=2,
+        )
+    )
     return 0
 
 
 def dataclass_to_dict(value: Any) -> Any:
     if hasattr(value, "__dataclass_fields__"):
-        return {field_name: dataclass_to_dict(getattr(value, field_name)) for field_name in value.__dataclass_fields__}
+        return {
+            field_name: dataclass_to_dict(getattr(value, field_name))
+            for field_name in value.__dataclass_fields__
+        }
     if isinstance(value, Mapping):
         return {key: dataclass_to_dict(item) for key, item in value.items()}
     if isinstance(value, list):
