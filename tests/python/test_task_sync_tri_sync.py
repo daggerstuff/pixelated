@@ -8,7 +8,10 @@ from scripts.task_sync.tri_sync import (
     build_sync_plan,
     extract_sync_key,
     merge_body_with_sync_metadata,
+    normalize_asana_payload,
+    normalize_jira_payload,
     parse_sync_metadata,
+    plan_from_sources,
     select_canonical_record,
     task_body_without_sync_block,
 )
@@ -153,3 +156,119 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("asana", "update") in actions
+
+
+def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
+    beads = make_record(
+        "beads",
+        "bd-1",
+        "Tri-sync rollout",
+        "Ship the sync bridge",
+        "open",
+        1,
+        "tri-sync-rollout",
+    )
+
+    plan = build_sync_plan(
+        {
+            "beads": [beads],
+        },
+        enabled_providers=("beads", "asana", "jira"),
+    )
+
+    jira_action = next(action for action in plan if action.provider == "jira")
+    clean_body, metadata = parse_sync_metadata(jira_action.body)
+
+    assert clean_body == "Ship the sync bridge"
+    assert metadata["key"] == "tri-sync-rollout"
+    assert metadata["source-provider"] == "beads"
+    assert metadata["source-id"] == "bd-1"
+    assert metadata["beads"] == "bd-1"
+
+
+def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
+    payload = {
+        "gid": "A-1",
+        "name": "Tri-sync rollout",
+        "notes": merge_body_with_sync_metadata(
+            "Ship the sync bridge",
+            SyncMetadata(
+                key="tri-sync-rollout",
+                status="open",
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "jira": "PIX-1"},
+            ),
+        ),
+        "completed": True,
+        "modified_at": "2026-03-23T00:00:00Z",
+    }
+
+    record = normalize_asana_payload(payload)
+
+    assert record is not None
+    assert record.external_id == "A-1"
+    assert record.status == "closed"
+    assert record.sync_key == "tri-sync-rollout"
+    assert record.provider_ids["jira"] == "PIX-1"
+
+
+def test_normalize_jira_payload_reads_fields_shape() -> None:
+    payload = {
+        "key": "PIX-1",
+        "fields": {
+            "summary": "Tri-sync rollout",
+            "description": merge_body_with_sync_metadata(
+                "Ship the sync bridge",
+                SyncMetadata(
+                    key="tri-sync-rollout",
+                    status="open",
+                    source_provider="beads",
+                    source_id="bd-1",
+                    provider_ids={"beads": "bd-1", "asana": "A-1"},
+                ),
+            ),
+            "status": {"name": "In Progress"},
+            "updated": "2026-03-23T00:00:00Z",
+        },
+    }
+
+    record = normalize_jira_payload(payload)
+
+    assert record is not None
+    assert record.external_id == "PIX-1"
+    assert record.title == "Tri-sync rollout"
+    assert record.status == "in_progress"
+    assert record.sync_key == "tri-sync-rollout"
+    assert record.provider_ids["asana"] == "A-1"
+
+
+def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
+    asana_path = tmp_path / "asana.json"
+    jira_path = tmp_path / "jira.jsonl"
+
+    asana_path.write_text(
+        """[
+  {
+    "gid": "A-1",
+    "name": "Tri-sync rollout",
+    "notes": "Ship the sync bridge",
+    "modified_at": "2026-03-23T00:00:00Z"
+  }
+]
+""",
+        encoding="utf-8",
+    )
+    jira_path.write_text(
+        """{"key":"PIX-1","fields":{"summary":"Tri-sync rollout","description":"Ship the sync bridge","status":{"name":"To Do"},"updated":"2026-03-23T00:00:00Z"}}\n""",
+        encoding="utf-8",
+    )
+
+    plan = plan_from_sources(
+        enabled_providers=("asana", "jira", "beads"),
+        export_paths={"asana": asana_path, "jira": jira_path},
+    )
+
+    actions = {(action.provider, action.action) for action in plan}
+
+    assert ("beads", "create") in actions
