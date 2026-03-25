@@ -21,12 +21,20 @@ const navItems = [
 
 <header class="header bg-void border-b border-primary py-4 sticky top-0 z-sticky glass">
   <div class="header-container flex justify-between items-center">
-    <!-- Logo Section -->
-    <a href="/" class="flex items-center gap-3 group no-underline">
-      <div class="logo-container relative">
-        <img src={logo} alt={title} class="h-10 w-auto filter-bright animate-float" />
-        <div class="absolute -inset-1 bg-accent-primary opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-normal"></div>
-      </div>
+<!-- Logo Section -->
+  <a href="/" class="flex items-center gap-3 group no-underline">
+    <div class="logo-container relative">
+      <img 
+        src={logo} 
+        alt={title} 
+        class="h-10 w-auto logo-img" 
+        width="40" 
+        height="40"
+        loading="eager"
+        decoding="async"
+      />
+      <div class="absolute -inset-1 bg-accent-primary opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-normal"></div>
+    </div>
       <span class="font-display font-bold text-xl tracking-tight text-white group-hover:text-accent-primary transition-colors">
         {title.split(' ')[0]}<span class="text-accent-primary">{title.split(' ')[1]}</span>
       </span>
@@ -278,10 +286,28 @@ const navItems = [
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
   
-  .header-mobile-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
+.header-mobile-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Logo styles */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover .logo-img {
+  transform: scale(1.05);
+}
 </style>
 
 <script>

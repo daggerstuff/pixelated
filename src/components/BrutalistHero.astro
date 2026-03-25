@@ -8,14 +8,24 @@ export interface Props {
   subtitle?: string;
   primaryCTA?: { text: string; href: string };
   secondaryCTA?: { text: string; href: string };
+  ctaPrimary?: { text: string; href: string };
+  ctaSecondary?: { text: string; href: string };
+  stats?: Array<{ value: string; label: string }>;
 }
 
 const {
   title = "Where Emotional Intelligence Meets Artificial Precision",
   subtitle = "Master complex therapeutic dialogues in high-fidelity, risk-free simulations. Transform difficult conversations into clinical mastery with the Empathy Gym™.",
-  primaryCTA = { text: "Enter the Gym", href: "/training" },
-  secondaryCTA = { text: "Explore Intelligence", href: "/ai-engine" },
+  primaryCTA,
+  secondaryCTA,
+  ctaPrimary,
+  ctaSecondary,
+  stats,
 } = Astro.props;
+
+// Support both prop naming conventions
+const primaryAction = primaryCTA || ctaPrimary || { text: "Enter the Gym", href: "/training" };
+const secondaryAction = secondaryCTA || ctaSecondary || { text: "Explore Intelligence", href: "/ai-engine" };
 ---
 
 <section class="hero relative min-h-screen flex items-center pt-20 overflow-hidden" data-component="brutalist-hero">
@@ -25,8 +35,8 @@ const {
     <div class="absolute inset-0 opacity-40 mix-blend-screen grayscale hover:grayscale-0 transition-all duration-ultra brightness-50">
       <img src="/assets/hero-bg.png" alt="Empathy Gym Background" class="w-full h-full object-cover" />
     </div>
-    <!-- Grain/Noise Overlay -->
-    <div class="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] pointer-events-none"></div>
+<!-- Grain/Noise Overlay -->
+  <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);"></div>
     <!-- Radial Focal Glow -->
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"></div>
   </div>
@@ -49,18 +59,32 @@ const {
       </p>
 
       <div class="flex flex-wrap gap-6 items-center">
-        <a href={primaryCTA.href} class="btn-premium group">
-          <span class="relative z-10">{primaryCTA.text}</span>
+        <a href={primaryAction.href} class="btn-premium group">
+          <span class="relative z-10">{primaryAction.text}</span>
           <div class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"></div>
         </a>
-        
-        <a href={secondaryCTA.href} class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline">
-          <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryCTA.text}</span>
+
+        <a href={secondaryAction.href} class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline">
+          <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryAction.text}</span>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="transform group-hover:translate-x-2 transition-transform">
             <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
           </svg>
         </a>
       </div>
+
+      <!-- Stats Section -->
+      {stats && stats.length > 0 && (
+        <div class="stats-grid mt-16 pt-8" style="border-top: var(--border-primary);">
+          <div class="grid grid-cols-3 gap-8">
+            {stats.map((stat) => (
+              <div class="stat-item text-center md:text-left">
+                <span class="stat-value font-display font-black text-4xl md:text-5xl text-accent-primary block">{stat.value}</span>
+                <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   </div>
 
