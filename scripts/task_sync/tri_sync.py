@@ -576,7 +576,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         raise SystemExit("Usage: tri_sync.py [plan|dry-run]")
 
     plan = plan_from_sources()
-    summarize_plan(plan)
+    summary = summarize_plan(plan)
+    print(json.dumps(summary, indent=2))
     return 0
 
 
