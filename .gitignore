@@ -201,8 +201,8 @@ tmp/
 .kilocode
 .memory/
 .notes/
-.planning/
-.planning/codebase
+.agent/internal/
+.agent/internal/codebase
 .scrapy
 .sisyphus/run-continuation
 .trunk
@@ -276,3 +276,5 @@ CLAUDE.md
 AGENTS.md
 scripts/colab
 scripts/ovh
+
+helm
