@@ -1883,7 +1883,7 @@ werkzeug==3.1.7
     #   flask-socketio
 wget==3.2
     # via lightning-sdk
-wrapt==1.17.3
+wrapt==2.1.2
     # via
     #   deprecated
     #   opentelemetry-instrumentation
