@@ -138,11 +138,11 @@ def _first_present(payload: Mapping[str, Any], *paths: str) -> Any:
     return None
 
 
-def _parse_updated_at(payload: Mapping[str, Any], *paths: str) -> datetime:
+def _parse_updated_at(payload: Mapping[str, Any], *paths: str) -> datetime | None:
     updated_at = _first_present(payload, *paths)
-    if isinstance(updated_at, str) and updated_at.strip():
-        return parse_iso8601(updated_at)
-    return datetime.now(timezone.utc)
+    if not isinstance(updated_at, str):
+        return None
+    return parse_iso8601(updated_at.strip())
 
 
 def _parse_provider_ids(metadata: Mapping[str, str]) -> dict[str, str]:
@@ -380,7 +380,8 @@ def normalize_beads_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         title=str(payload.get("title") or payload.get("name") or ""),
         body=body,
         status=normalize_status(str(payload.get("status") or payload.get("state") or "open")),
-        updated_at=_parse_updated_at(payload, "updated_at", "updatedAt", "created_at", "createdAt"),
+        updated_at=_parse_updated_at(payload, "updated_at", "updatedAt", "created_at", "createdAt")
+        or datetime.now(timezone.utc),
         sync_key=metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         raw=payload,
@@ -414,7 +415,8 @@ def normalize_asana_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
             "updated_at",
             "completed_at",
             "created_at",
-        ),
+        )
+        or datetime.now(timezone.utc),
         sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         raw=payload,
@@ -441,7 +443,8 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
             "fields.updated",
             "created",
             "fields.created",
-        ),
+        )
+        or datetime.now(timezone.utc),
         sync_key=_string_or_empty(_first_present(payload, "sync_key", "external_ref"))
         or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
