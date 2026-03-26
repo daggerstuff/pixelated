@@ -56,6 +56,18 @@ export const AdminDashboard: FC = () => {
     defaultValue: [],
   })
 
+  // ⚡ Bolt Performance Optimization: Memoize the callback to prevent unnecessary re-renders of child tabs when dashboard state changes
+  const handleTherapistSelect = React.useCallback(
+    (therapistId: string) => {
+      setSelectedTherapists((prev) =>
+        prev.includes(therapistId)
+          ? prev.filter((id) => id !== therapistId)
+          : [...prev, therapistId],
+      )
+    },
+    [setSelectedTherapists],
+  )
+
   // Mock data - in real app would come from API
   const institutionMetrics: InstitutionMetrics = {
     totalPatients: 1247,
@@ -167,15 +179,7 @@ export const AdminDashboard: FC = () => {
             <OverviewTab
               metrics={institutionMetrics}
               therapists={therapists}
-              onTherapistSelect={(therapistId) => {
-                if (selectedTherapists.includes(therapistId)) {
-                  setSelectedTherapists((prev) =>
-                    prev.filter((id) => id !== therapistId),
-                  )
-                } else {
-                  setSelectedTherapists((prev) => [...prev, therapistId])
-                }
-              }}
+              onTherapistSelect={handleTherapistSelect}
               selectedTherapists={selectedTherapists}
               timeRange={timeRange}
             />
@@ -184,15 +188,7 @@ export const AdminDashboard: FC = () => {
           {dashboardView === 'therapists' && (
             <TherapistsTab
               therapists={therapists}
-              onTherapistSelect={(therapistId) => {
-                if (selectedTherapists.includes(therapistId)) {
-                  setSelectedTherapists((prev) =>
-                    prev.filter((id) => id !== therapistId),
-                  )
-                } else {
-                  setSelectedTherapists((prev) => [...prev, therapistId])
-                }
-              }}
+              onTherapistSelect={handleTherapistSelect}
               selectedTherapists={selectedTherapists}
             />
           )}
