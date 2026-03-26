@@ -71,7 +71,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     )
 
     await threatDetectionSystem.huntingService.initializeServices()
-  }, 30000)
+  })
 
   afterEach(async () => {
     await mongod.stop()
