@@ -23,18 +23,18 @@ configure_azure_credentials() {
       echo '##[warning]SYSTEM_ACCESSTOKEN is empty. Expose it via env: SYSTEM_ACCESSTOKEN: $(System.AccessToken)'
       return 0
     fi
-    local b64
-    b64=$(printf 'Bearer %s' "${token}" | base64 -w 0 2>/dev/null || printf 'Bearer %s' "${token}" | base64)
-    git config --global http."https://dev.azure.com/".extraHeader "Authorization: Basic ${b64}"
+    # Use url.insteadOf to embed the token for Azure DevOps git authentication
+    # This is more robust for submodules than extraHeader matching.
+    git config --global url."https://x-token-auth:${token}@dev.azure.com/".insteadOf "https://dev.azure.com/"
     _AZ_AUTH_CONFIGURED=true
-    echo 'Azure DevOps git credential header configured.'
+    echo 'Azure DevOps git credential header (URL rewrite) configured.'
   fi
 }
 
 cleanup_azure_credentials() {
   if [[ "${_AZ_AUTH_CONFIGURED}" == "true" ]]; then
-    git config --global --unset http."https://dev.azure.com/".extraHeader 2>/dev/null || true
-    echo 'Azure DevOps git credential header cleared.'
+    git config --global --unset url."https://x-token-auth:${SYSTEM_ACCESSTOKEN:-}@dev.azure.com/".insteadOf 2>/dev/null || true
+    echo 'Azure DevOps git credential header (URL rewrite) cleared.'
   fi
 }
 trap cleanup_azure_credentials EXIT
