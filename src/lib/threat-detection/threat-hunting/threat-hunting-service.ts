@@ -100,13 +100,27 @@ export interface Investigation {
   huntId?: string
   threatId?: string
   templateId?: string
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
+  title?: string
+  description?: string
+  type?: string
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled' | 'active' | 'in_progress' | 'resolved'
   priority: 'low' | 'medium' | 'high' | 'critical'
+  assignedTo?: string
   steps: InvestigationStepResult[]
   findings: InvestigationFinding[]
+  evidence?: Record<string, unknown>[]
+  tags?: string[]
   createdAt: Date
+  updatedAt?: Date
   startedAt?: Date
   completedAt?: Date
+  resolvedAt?: Date
+  resolution?: string
+  resolvedBy?: string
+  resolutionNotes?: string
+  lessonsLearned?: string
+  progress?: number
+  notes?: string
   metadata: Record<string, unknown>
 }
 
@@ -132,26 +146,51 @@ export interface InvestigationFinding {
   timestamp: Date
 }
 
+// Interfaces for loosely-typed dependency services
+interface AIService {
+  analyzePattern(events: unknown): Promise<Record<string, unknown>>
+  predictAnomaly(data: unknown): Promise<{ isAnomaly: boolean; [key: string]: unknown }>
+  generateInsights(data: unknown): Promise<unknown>
+}
+
+interface BehavioralService {
+  analyzeUserBehavior(userId: string, data: unknown): Promise<unknown>
+  getBehavioralProfile(userId: string): Promise<{ profile: { riskLevel: unknown; anomalies: unknown } }>
+  detectAnomalies(data: unknown): Promise<unknown>
+}
+
+interface PredictiveService {
+  predictThreats(data: unknown[]): Promise<Record<string, unknown>>
+  getThreatForecast(data: unknown): Promise<unknown>
+  analyzeTrends(data: unknown): Promise<unknown>
+}
+
+interface OrchestratorService {
+  executeResponse(data: unknown): Promise<unknown>
+  getInvestigationResults(id: string): Promise<unknown>
+  getStatistics(): Promise<unknown>
+}
+
 export class ThreatHuntingService extends EventEmitter {
   redis: Redis
-  mongoClient: MongoClient
+  mongoClient!: MongoClient
   public config: ThreatHuntingConfig
-  orchestrator: unknown
-  aiService: unknown
-  behavioralService: unknown
-  predictiveService: unknown
-  investigations: unknown
-  huntQueries: unknown
+  orchestrator: OrchestratorService
+  aiService: AIService
+  behavioralService: BehavioralService
+  predictiveService: PredictiveService
+  investigations: Map<string, unknown>
+  huntQueries: Map<string, unknown>
   private huntingModel: tf.Sequential | null = null
   private huntingInterval: NodeJS.Timeout | null = null
   private activeInvestigations: Map<string, Investigation> = new Map()
 
   constructor(
     redis: Redis,
-    orchestrator: unknown,
-    aiService: unknown,
-    behavioralService: unknown,
-    predictiveService: unknown,
+    orchestrator: OrchestratorService,
+    aiService: AIService,
+    behavioralService: BehavioralService,
+    predictiveService: PredictiveService,
     config?: ThreatHuntingConfig,
   ) {
     super()
@@ -177,16 +216,15 @@ export class ThreatHuntingService extends EventEmitter {
     this.huntQueries = new Map()
   }
 
-  private async initializeServices(): Promise<void> {
+  public async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379')
       this.mongoClient = new MongoClient(
         process.env.MONGODB_URI || 'mongodb://localhost:27017/threat_detection',
       )
 
       await this.mongoClient.connect()
 
-      if (this.config.mlModelConfig.enabled) {
+      if (this.config.mlModelConfig?.enabled) {
         await this.initializeMLModel()
       }
 
@@ -234,6 +272,12 @@ export class ThreatHuntingService extends EventEmitter {
       return
     }
 
+    if (!this.mongoClient) {
+      throw new Error(
+        'ThreatHuntingService is not initialized. Call initializeServices() before startHunting().',
+      )
+    }
+
     if (this.huntingInterval) {
       logger.warn('Threat hunting is already running')
       return
@@ -243,14 +287,15 @@ export class ThreatHuntingService extends EventEmitter {
       // Execute initial hunt
       await this.executeHunts()
 
-      // Schedule regular hunts
+      // Schedule regular hunts; default to 1 hour if huntingFrequency is not configured
+      const frequency = this.config.huntingFrequency ?? 3600000
       this.huntingInterval = setInterval(async () => {
         try {
           await this.executeHunts()
         } catch (error) {
           logger.error('Automated hunting error:', { error })
         }
-      }, this.config.huntingFrequency)
+      }, frequency)
 
       logger.info('Automated threat hunting started')
       this.emit('hunting_started')
@@ -277,8 +322,14 @@ export class ThreatHuntingService extends EventEmitter {
    * Execute threat hunting rules
    */
   async executeHunts(): Promise<HuntResult[]> {
+    if (!this.mongoClient) {
+      throw new Error(
+        'ThreatHuntingService is not initialized. Call initializeServices() before executeHunts().',
+      )
+    }
+
     try {
-      const enabledRules = this.config.huntingRules.filter(
+      const enabledRules = (this.config.huntingRules ?? []).filter(
         (rule) => rule.enabled,
       )
       const results: HuntResult[] = []
@@ -381,19 +432,19 @@ export class ThreatHuntingService extends EventEmitter {
    */
   public async executeHuntQuery(
     query: Record<string, unknown> | string,
-  ): Promise<
-    | HuntFinding[]
-    | {
-        errors: string[]
-        data: unknown[]
-      }
-  > {
+  ): Promise<HuntFinding[]> {
     const findings: HuntFinding[] = []
 
     try {
       // Compatibility: when a hunt query ID string is provided, pull results from Redis list
       if (typeof query === 'string') {
+        // Validate queryId to a safe alphanumeric/UUID-style pattern before
+        // using it to construct Redis keys, preventing key injection.
         const queryId = query
+        if (!/^[a-zA-Z0-9_:.-]{1,256}$/.test(queryId)) {
+          logger.warn('executeHuntQuery: rejected unsafe queryId', { queryId: '[REDACTED]' })
+          return []
+        }
         const raw = await this.redis.get(`hunt:${queryId}`)
         if (!raw) {
           return []
@@ -404,13 +455,31 @@ export class ThreatHuntingService extends EventEmitter {
           0,
           (this.config.maxResultsPerQuery ?? 1000) - 1,
         )
-        return items.map((i) => {
+        // Validate and normalise each Redis item to a proper HuntFinding shape.
+        return items.reduce<HuntFinding[]>((acc, i) => {
           try {
-            return JSON.parse(i)
+            const parsed = JSON.parse(i) as Record<string, unknown>
+            if (typeof parsed.findingId === 'string' && typeof parsed.type === 'string') {
+              acc.push(parsed as unknown as HuntFinding)
+            } else {
+              // Wrap unstructured items so consumers receive a valid contract
+              acc.push({
+                findingId: `redis_item_${Date.now()}_${acc.length}`,
+                type: 'suspicious_pattern',
+                title: 'Raw Redis Finding',
+                description: String(i).slice(0, 500),
+                evidence: [{ raw: parsed }],
+                confidence: 0.5,
+                severity: 'low',
+                recommendedActions: [],
+                relatedEntities: [],
+              })
+            }
           } catch {
-            return i as unknown as HuntFinding
+            // skip unparseable items
           }
-        }) as unknown as HuntFinding[]
+          return acc
+        }, [])
       }
 
       // Query MongoDB for threat data
@@ -430,12 +499,8 @@ export class ThreatHuntingService extends EventEmitter {
       return findings
     } catch (error) {
       logger.error('Failed to execute hunt query:', { error })
-      if (typeof query === 'string') {
-        return {
-          errors: [error instanceof Error ? error.message : String(error)],
-          data: [],
-        }
-      }
+      // Return empty findings on infrastructure failure so the hunt pipeline
+      // continues; infra errors are recorded in the log for later review.
       return []
     }
   }
@@ -618,33 +683,34 @@ export class ThreatHuntingService extends EventEmitter {
     }
 
     try {
-      const mlFindings: HuntFinding[] = []
+      // Run all ML predictions in parallel to reduce cumulative latency.
+      const results = await Promise.all(
+        findings.map(async (finding) => {
+          const features = this.extractMLFeatures(finding)
+          const prediction = await this.predictThreatLevel(features)
+          if (
+            prediction.confidence > (this.config.mlModelConfig?.confidenceThreshold ?? 0.5)
+          ) {
+            return {
+              findingId: `ml_${finding.findingId}`,
+              type: 'behavioral_deviation' as const,
+              title: `ML-Enhanced: ${finding.title}`,
+              description: `ML analysis indicates ${prediction.threatLevel} threat level with ${(prediction.confidence * 100).toFixed(1)}% confidence`,
+              evidence: [...finding.evidence, { ml_prediction: prediction }],
+              confidence: prediction.confidence,
+              severity: this.mapThreatLevelToSeverity(prediction.threatLevel),
+              recommendedActions: [
+                ...finding.recommendedActions,
+                'review_ml_findings',
+              ],
+              relatedEntities: finding.relatedEntities,
+            } as HuntFinding
+          }
+          return null
+        }),
+      )
 
-      for (const finding of findings) {
-        const features = this.extractMLFeatures(finding)
-        const prediction = await this.predictThreatLevel(features)
-
-        if (
-          prediction.confidence > this.config.mlModelConfig.confidenceThreshold
-        ) {
-          mlFindings.push({
-            findingId: `ml_${finding.findingId}`,
-            type: 'behavioral_deviation',
-            title: `ML-Enhanced: ${finding.title}`,
-            description: `ML analysis indicates ${prediction.threatLevel} threat level with ${(prediction.confidence * 100).toFixed(1)}% confidence`,
-            evidence: [...finding.evidence, { ml_prediction: prediction }],
-            confidence: prediction.confidence,
-            severity: this.mapThreatLevelToSeverity(prediction.threatLevel),
-            recommendedActions: [
-              ...finding.recommendedActions,
-              'review_ml_findings',
-            ],
-            relatedEntities: finding.relatedEntities,
-          })
-        }
-      }
-
-      return mlFindings
+      return results.filter((r): r is HuntFinding => r !== null)
     } catch (error) {
       logger.error('Failed to apply ML analysis:', { error })
       return []
@@ -684,14 +750,15 @@ export class ThreatHuntingService extends EventEmitter {
     }
 
     try {
-      const result =  tf.tidy(async () => {
-        const inputTensor = tf.tensor2d([features])
-        const prediction = ( this.huntingModel!.predict(
-          inputTensor,
-        )) as tf.Tensor
-        const data = await prediction.data()
-        return Array.from(data)
-      })
+      // Use await prediction.data() (async) rather than dataSync() to avoid
+      // blocking the Node.js event loop during ML inference.
+      const inputTensor = tf.tensor2d([features])
+      const prediction = this.huntingModel!.predict(inputTensor) as tf.Tensor
+      const data = await prediction.data()
+      // Explicit tensor disposal since we are not inside tf.tidy
+      prediction.dispose()
+      inputTensor.dispose()
+      const result = Array.from(data)
 
       const maxIndex = result.indexOf(Math.max(...result))
       const threatLevels = ['low', 'medium', 'high', 'critical']
@@ -843,7 +910,7 @@ export class ThreatHuntingService extends EventEmitter {
     templateId?: string
   }): InvestigationTemplate {
     if (params.templateId) {
-      const template = this.config.investigationTemplates.find(
+      const template = (this.config.investigationTemplates ?? []).find(
         (t) => t.templateId === params.templateId,
       )
       if (template) {
@@ -852,23 +919,22 @@ export class ThreatHuntingService extends EventEmitter {
     }
 
     // Default template selection based on context
+    const templates = this.config.investigationTemplates ?? []
     if (params.huntId) {
       return (
-        this.config.investigationTemplates.find((t) =>
-          t.name.includes('Hunt'),
-        ) || this.config.investigationTemplates[0]
+        templates.find((t) => t.name.includes('Hunt')) ||
+        templates[0]
       )
     }
 
     if (params.threatId) {
       return (
-        this.config.investigationTemplates.find((t) =>
-          t.name.includes('Threat'),
-        ) || this.config.investigationTemplates[0]
+        templates.find((t) => t.name.includes('Threat')) ||
+        templates[0]
       )
     }
 
-    return this.config.investigationTemplates[0]
+    return templates[0]
   }
 
   /**
@@ -893,7 +959,7 @@ export class ThreatHuntingService extends EventEmitter {
       })
 
       for (const step of investigation.steps) {
-        if (investigation.status === 'cancelled') {
+        if ((investigation.status as string) === 'cancelled') {
           break
         }
 
@@ -971,7 +1037,7 @@ export class ThreatHuntingService extends EventEmitter {
       })
 
       // Get the actual step configuration
-      const template = this.config.investigationTemplates.find((t) =>
+      const template = (this.config.investigationTemplates ?? []).find((t) =>
         t.steps.some((s) => s.stepId === step.stepId),
       )
 
@@ -1318,6 +1384,38 @@ export class ThreatHuntingService extends EventEmitter {
   /**
    * Get investigation by ID
    */
+  /**
+   * Normalise a raw Redis payload into a valid Investigation object.
+   * Redis may store a lighter shape created by createInvestigation.
+   */
+  private normaliseRedisInvestigation(
+    parsed: Record<string, unknown>,
+    investigationId: string,
+  ): Investigation {
+    // Explicit field-by-field mapping prevents prototype pollution from spread.
+    return {
+      investigationId: (parsed.investigationId as string) ?? (parsed.id as string) ?? investigationId,
+      huntId: parsed.huntId as string | undefined,
+      threatId: parsed.threatId as string | undefined,
+      templateId: parsed.templateId as string | undefined,
+      title: parsed.title as string | undefined,
+      description: (parsed.description as string) ?? '',
+      type: (parsed.type as string) ?? 'manual',
+      status: (parsed.status as Investigation['status']) ?? 'active',
+      priority: (parsed.priority as Investigation['priority']) ?? 'medium',
+      assignedTo: (parsed.assignedTo as string) ?? 'unassigned',
+      createdAt: parsed.createdAt ? new Date(parsed.createdAt as string) : new Date(),
+      updatedAt: parsed.updatedAt ? new Date(parsed.updatedAt as string) : new Date(),
+      startedAt: parsed.startedAt ? new Date(parsed.startedAt as string) : undefined,
+      completedAt: parsed.completedAt ? new Date(parsed.completedAt as string) : undefined,
+      steps: (parsed.steps as Investigation['steps']) ?? [],
+      findings: (parsed.findings as Investigation['findings']) ?? [],
+      evidence: (parsed.evidence as Investigation['evidence']) ?? [],
+      tags: (parsed.tags as string[]) ?? [],
+      metadata: (parsed.metadata as Record<string, unknown>) ?? {},
+    }
+  }
+
   async getInvestigation(
     investigationId: string,
   ): Promise<Investigation | null> {
@@ -1326,7 +1424,8 @@ export class ThreatHuntingService extends EventEmitter {
       const fromRedis = await this.redis.get(`investigation:${investigationId}`)
       if (fromRedis) {
         try {
-          return JSON.parse(fromRedis)
+          const parsed = JSON.parse(fromRedis) as Record<string, unknown>
+          return this.normaliseRedisInvestigation(parsed, investigationId)
         } catch {
           // fall through to DB
         }
@@ -1781,18 +1880,20 @@ export class ThreatHuntingService extends EventEmitter {
   public async analyzePatterns(
     threatData: Record<string, unknown>[],
   ): Promise<Record<string, unknown>> {
-    return this.aiService.analyzePattern(threatData)
+    const result = await this.aiService.analyzePattern(threatData)
+    return (result as Record<string, unknown>) ?? {}
   }
 
   public async correlateThreatWithBehavior(
     threatData: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
-    const behavioralData = await this.behavioralService.getBehavioralProfile(
+    const rawBehavioralData = await this.behavioralService.getBehavioralProfile(
       threatData.userId as string,
     )
+    const behavioralData = rawBehavioralData as Record<string, Record<string, unknown>>
     return {
-      behavioralRisk: behavioralData.profile.riskLevel,
-      correlatedAnomalies: behavioralData.profile.anomalies,
+      behavioralRisk: behavioralData.profile?.riskLevel,
+      correlatedAnomalies: behavioralData.profile?.anomalies,
     }
   }
 
@@ -1849,9 +1950,10 @@ export class ThreatHuntingService extends EventEmitter {
   public async detectRealTimeAnomalies(
     realTimeData: Record<string, unknown>[],
   ): Promise<Record<string, unknown>[]> {
-    const anomalies = []
+    const anomalies: Record<string, unknown>[] = []
     for (const data of realTimeData) {
-      const anomaly = await this.aiService.predictAnomaly(data)
+      const rawAnomaly = await this.aiService.predictAnomaly(data)
+      const anomaly = rawAnomaly as Record<string, unknown>
       if (anomaly.isAnomaly) {
         anomalies.push(anomaly)
       }
