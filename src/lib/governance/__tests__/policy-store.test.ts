@@ -1,22 +1,58 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { PolicyStore } from '../policy-store'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 
+vi.mock('mongodb', () => {
+  class MockCollection {
+    data = new Map()
+    async replaceOne(filter: any, doc: any, options: any) {
+      if (filter.id) {
+        this.data.set(filter.id, { ...doc })
+      }
+    }
+    async findOne(filter: any) {
+      if (filter.id) {
+        return this.data.get(filter.id) || null
+      }
+      return null
+    }
+    async insertOne(doc: any) {
+      this.data.set(doc.id, doc)
+    }
+  }
+
+  const mockDb = {
+    collections: new Map(),
+    collection(name: string) {
+      if (!this.collections.has(name)) {
+        this.collections.set(name, new MockCollection())
+      }
+      return this.collections.get(name)
+    }
+  }
+
+  return {
+    MongoClient: class {
+      db() {
+        return mockDb
+      }
+      async connect() {
+        return this
+      }
+      async close() {}
+    }
+  }
+})
 describe('PolicyStore', () => {
-  let mongod: MongoMemoryServer
   let policyStore: PolicyStore
   let mongoUri: string
 
   beforeEach(async () => {
-    // Start in-memory MongoDB server
-    mongod = await MongoMemoryServer.create()
-    mongoUri = mongod.getUri()
+    mongoUri = 'mongodb://localhost:27017/test'
   })
 
   afterEach(async () => {
     // Clean up
     await policyStore?.disconnect?.()
-    await mongod.stop()
   })
 
   describe('initialize', () => {

@@ -9,6 +9,38 @@ fi
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
 cd "${PROJECT_ROOT}"
 
+# ---------------------------------------------------------------------------
+# Azure Pipelines authentication
+# When running inside Azure Pipelines (TF_BUILD=True), inject the pipeline
+# OAuth token as a git extraheader so HTTPS submodule clones can authenticate
+# without interactive prompts. The token is cleared after use.
+# ---------------------------------------------------------------------------
+_AZ_AUTH_CONFIGURED=false
+configure_azure_credentials() {
+  if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
+    local token="${SYSTEM_ACCESSTOKEN:-}"
+    if [[ -z "${token}" ]]; then
+      echo '##[warning]SYSTEM_ACCESSTOKEN is empty. Expose it via env: SYSTEM_ACCESSTOKEN: $(System.AccessToken)'
+      return 0
+    fi
+    local b64
+    b64=$(printf 'Bearer %s' "${token}" | base64 -w 0 2>/dev/null || printf 'Bearer %s' "${token}" | base64)
+    git config --global http."https://dev.azure.com/".extraHeader "Authorization: Basic ${b64}"
+    _AZ_AUTH_CONFIGURED=true
+    echo 'Azure DevOps git credential header configured.'
+  fi
+}
+
+cleanup_azure_credentials() {
+  if [[ "${_AZ_AUTH_CONFIGURED}" == "true" ]]; then
+    git config --global --unset http."https://dev.azure.com/".extraHeader 2>/dev/null || true
+    echo 'Azure DevOps git credential header cleared.'
+  fi
+}
+trap cleanup_azure_credentials EXIT
+
+configure_azure_credentials
+
 run() {
   if [[ "${DRY_RUN}" == "true" ]]; then
     printf '[dry-run] %q' "$1"
