@@ -1,0 +1,16 @@
+<<<<<<< SEARCH
+  beforeEach(async () => {
+    // Setup in-memory MongoDB
+    mongod = await MongoMemoryServer.create()
+
+    // Setup mock Redis
+    redis = new Redis()
+=======
+  beforeEach(async () => {
+    // Setup in-memory MongoDB
+    mongod = await MongoMemoryServer.create()
+    process.env.MONGODB_URI = mongod.getUri()
+
+    // Setup mock Redis
+    redis = new Redis()
+>>>>>>> REPLACE

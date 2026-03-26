@@ -16,6 +16,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   beforeEach(async () => {
     // Setup in-memory MongoDB
     mongod = await MongoMemoryServer.create()
+    process.env.MONGODB_URI = mongod.getUri()
 
     // Setup mock Redis
     redis = new Redis()
