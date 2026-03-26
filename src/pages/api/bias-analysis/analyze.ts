@@ -116,11 +116,10 @@ export const POST: APIRoute = async ({ request }) => {
     }), { status: 200 })
 
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('Bias analysis failed:', error)
     return new Response(JSON.stringify({
       error: 'Analysis failed',
-      message
+      message: 'An internal server error occurred'
     }), { status: 500 })
   }
 }
