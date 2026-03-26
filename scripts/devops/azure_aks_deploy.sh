@@ -2,6 +2,13 @@
 set -euo pipefail
 
 APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-}}"
+
+# Strip unresolved Azure DevOps variables passed as literal $()
+for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RESOURCE_GROUP AZURE_AKS_RESOURCE_GROUP AZURE_SUBSCRIPTION_NAME; do
+  if [[ "${!var:-}" == '$('* ]]; then
+    export "$var"=""
+  fi
+done
 if [ -z "${APP_ENV_RAW}" ]; then
   BRANCH_NAME="${BUILD_SOURCEBRANCHNAME:-${BUILD_SOURCEBRANCH##*/}}"
   case "${BRANCH_NAME}" in

@@ -182,6 +182,8 @@ stages:
 
           - script: bash scripts/devops/init-submodules.sh
             displayName: Initialize CI-aware submodules
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
           - task: HelmInstaller@1
             displayName: Install Helm

@@ -348,6 +348,7 @@
     "hastscript": "^9.0.1",
     "hono": "^4.12.8",
     "html-entities": "^2.6.0",
+    "ioredis-mock": "^8.13.1",
     "js-base64": "^3.7.8",
     "jsdom": "^29.0.0",
     "launchdarkly-js-client-sdk": "^3.9.0",
