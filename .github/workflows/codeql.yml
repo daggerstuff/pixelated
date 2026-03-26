@@ -35,6 +35,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
