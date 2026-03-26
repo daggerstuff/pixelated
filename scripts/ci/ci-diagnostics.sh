@@ -94,7 +94,8 @@ fi
 echo ""
 
 echo "🔐 Git Configuration (for git dependencies):"
-git config --list | grep -E "(http|pack|lfs|credential)" || echo "  ℹ️  No relevant git config found"
+# Mask potential credentials in url rewrites
+git config --list | grep -E "(http|pack|lfs|credential)" | sed -E "s/https:\/\/x-token-auth:[^@]+@/https:\/\/x-token-auth:***@/g" || echo "  ℹ️  No relevant git config found"
 echo ""
 
 echo "💡 Recommended Actions:"
