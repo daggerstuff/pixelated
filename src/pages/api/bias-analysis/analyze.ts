@@ -144,6 +144,7 @@ export const GET: APIRoute = async ({ url }) => {
       data: summary
     }), { status: 200 })
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 })
+    console.error('Bias analysis summary failed:', error)
+    return new Response(JSON.stringify({ error: 'An internal server error occurred' }), { status: 500 })
   }
 }
