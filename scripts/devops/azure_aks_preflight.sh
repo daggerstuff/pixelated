@@ -4,6 +4,13 @@ set -euo pipefail
 AZURE_CLI_BIN="${AZURE_CLI_BIN:-/usr/bin/az}"
 AZURE_CLI_MIN_VERSION="${AZURE_CLI_MIN_VERSION:-2.30.0}"
 export AZURE_CORE_ONLY_SHOW_ERRORS="${AZURE_CORE_ONLY_SHOW_ERRORS:-true}"
+
+# Strip unresolved Azure DevOps variables passed as literal $()
+for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RESOURCE_GROUP AZURE_AKS_RESOURCE_GROUP AZURE_SUBSCRIPTION_NAME; do
+  if [[ "${!var:-}" == '$('* ]]; then
+    export "$var"=""
+  fi
+done
 if ! command -v "${AZURE_CLI_BIN}" >/dev/null 2>&1; then
   echo "##vso[task.logissue type=error]Azure CLI not found at ${AZURE_CLI_BIN}."
   exit 1
