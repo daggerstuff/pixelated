@@ -128,6 +128,13 @@ stages:
               ACR_NAME: $(ACR_NAME)
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+              APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+              AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+              AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
 
           - task: SonarCloudAnalyze@4
             displayName: 'Run Code Analysis'
@@ -169,6 +176,10 @@ stages:
         steps:
           - checkout: self
             fetchDepth: 1
+            persistCredentials: true
+
+          - script: bash scripts/devops/init-submodules.sh
+            displayName: Initialize CI-aware submodules
 
           - task: HelmInstaller@1
             displayName: Install Helm
@@ -193,6 +204,11 @@ stages:
               ACR_NAME: $(ACR_NAME)
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+              APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
               AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+              AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
               SKIP_BUILD: 'true'

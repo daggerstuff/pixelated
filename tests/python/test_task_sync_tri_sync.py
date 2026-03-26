@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone, timedelta
+from types import SimpleNamespace
 
 from scripts.task_sync.tri_sync import (
     SyncMetadata,
     TaskRecord,
+    apply_sync_plan,
     build_sync_plan,
     extract_sync_key,
     merge_body_with_sync_metadata,
@@ -104,14 +106,13 @@ def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> 
             "beads": [beads],
             "asana": [asana],
         },
-        enabled_providers=("beads", "asana", "jira", "linear"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("asana", "update") in actions
     assert ("jira", "create") in actions
-    assert ("linear", "create") in actions
     assert ("beads", "create") not in actions
 
 
@@ -184,6 +185,78 @@ def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
     assert metadata["source-provider"] == "beads"
     assert metadata["source-id"] == "bd-1"
     assert metadata["beads"] == "bd-1"
+
+
+def test_build_sync_plan_preserves_linked_provider_ids_from_metadata() -> None:
+    beads = make_record(
+        "beads",
+        "bd-1",
+        "Tri-sync rollout",
+        merge_body_with_sync_metadata(
+            "Ship the sync bridge",
+            SyncMetadata(
+                key="tri-sync-rollout",
+                status="open",
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-7", "jira": "PIX-2"},
+            ),
+        ),
+        "open",
+        1,
+        "tri-sync-rollout",
+    )
+    beads = TaskRecord(
+        provider=beads.provider,
+        external_id=beads.external_id,
+        title=beads.title,
+        body=beads.body,
+        status=beads.status,
+        updated_at=beads.updated_at,
+        sync_key=beads.sync_key,
+        provider_ids={"beads": "bd-1", "asana": "A-7", "jira": "PIX-2"},
+        clean_body="Ship the sync bridge",
+    )
+
+    plan = build_sync_plan(
+        {"beads": [beads]},
+        enabled_providers=("beads", "asana", "jira"),
+    )
+
+    asana_action = next(action for action in plan if action.provider == "asana")
+
+    assert asana_action.provider_ids["jira"] == "PIX-2"
+
+
+def test_build_sync_plan_ignores_records_without_sync_keys() -> None:
+    beads = make_record(
+        "beads",
+        "bd-1",
+        "",
+        "",
+        "open",
+        1,
+        None,
+    )
+    jira = make_record(
+        "jira",
+        "PIX-1",
+        "",
+        "",
+        "open",
+        2,
+        None,
+    )
+
+    plan = build_sync_plan(
+        {
+            "beads": [beads],
+            "jira": [jira],
+        },
+        enabled_providers=("beads", "asana", "jira"),
+    )
+
+    assert plan == []
 
 
 def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
@@ -272,3 +345,47 @@ def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("beads", "create") in actions
+
+
+def test_apply_sync_plan_runs_beads_and_external_provider_commands() -> None:
+    commands: list[tuple[list[str], str | None]] = []
+
+    def fake_runner(command, *, input_text=None):
+        command_list = list(command)
+        commands.append((command_list, input_text))
+        if command_list[:2] == ["bd", "create"]:
+            return SimpleNamespace(returncode=0, stdout="bd-42\n", stderr="")
+        return SimpleNamespace(returncode=0, stdout="ok\n", stderr="")
+
+    results = apply_sync_plan(
+        [
+            make_action("beads", "create", None),
+            make_action("asana", "update", "A-1"),
+        ],
+        provider_commands={"asana": ["cat"]},
+        run_process=fake_runner,
+    )
+
+    assert results[0].success is True
+    assert results[0].target_id == "bd-42"
+    assert results[1].success is True
+    assert commands[0][0][:2] == ["bd", "create"]
+    assert commands[1][0] == ["cat"]
+    assert "\"provider\": \"asana\"" in (commands[1][1] or "")
+
+
+def make_action(provider: str, action: str, target_id: str | None):
+    from scripts.task_sync.tri_sync import SyncAction
+
+    return SyncAction(
+        provider=provider,
+        action=action,
+        sync_key="tri-sync-rollout",
+        source_provider="beads",
+        source_id="bd-1",
+        target_id=target_id,
+        title="Tri-sync rollout",
+        body="Ship the sync bridge",
+        status="open",
+        provider_ids={"beads": "bd-1"},
+    )
