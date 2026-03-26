@@ -35,16 +35,26 @@ resolve_chart_dir() {
     [[ -n "${dir}" && -d "${dir}" && -f "${dir}/Chart.yaml" ]]
   }
 
+  # 1. Configured value as-is (works if it is an absolute path or the shell cwd matches)
   if is_chart_dir "${configured}"; then
     printf '%s' "${configured}"
     return 0
   fi
 
+  # 2. Configured value relative to PWD (covers the common case where CHART_DIR is a
+  #    repo-relative path and workingDirectory is the repo root)
+  if [[ -n "${configured}" && "${configured}" != /* ]] && is_chart_dir "${PWD}/${configured}"; then
+    printf '%s' "${PWD}/${configured}"
+    return 0
+  fi
+
+  # 3. Configured value relative to BUILD_SOURCESDIRECTORY (Azure DevOps predefined var)
   if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* ]] && is_chart_dir "${repo_root}/${configured}"; then
     printf '%s' "${repo_root}/${configured}"
     return 0
   fi
 
+  # 4. Well-known fallback paths relative to repo_root, then PWD
   local candidates=()
   if [[ -n "${repo_root}" ]]; then
     candidates+=("${repo_root}/ai/infrastructure/helm/pixelated-empathy")
@@ -146,13 +156,26 @@ verify_remote_image() {
 
 if ! CHART_DIR="$(resolve_chart_dir)"; then
   echo "##vso[task.logissue type=error]Helm chart directory not found."
-  echo "CHART_DIR was: ${CHART_DIR:-<unset>}"
-  echo "Working directory: ${PWD}"
-  echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
-  echo "Expected one of:"
-  echo " - ai/infrastructure/helm/pixelated-empathy"
-  echo " - ai/infra/cloud/helm/pixelated-empathy"
-  echo " - helm"
+  echo "CHART_DIR env var was: ${CHART_DIR:-<unset>}"
+  echo "Working directory (PWD): ${PWD}"
+  echo "BUILD_SOURCESDIRECTORY: ${BUILD_SOURCESDIRECTORY:-<unset>}"
+  echo "SYSTEM_DEFAULTWORKINGDIRECTORY: ${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}"
+  echo ""
+  echo "Searched the following paths (none contained Chart.yaml):"
+  for _d in \
+    "${CHART_DIR:-}" \
+    "${PWD}/${CHART_DIR:-}" \
+    "${BUILD_SOURCESDIRECTORY:-}/${CHART_DIR:-}" \
+    "${BUILD_SOURCESDIRECTORY:-}/ai/infrastructure/helm/pixelated-empathy" \
+    "${BUILD_SOURCESDIRECTORY:-}/ai/infra/cloud/helm/pixelated-empathy" \
+    "${BUILD_SOURCESDIRECTORY:-}/helm" \
+    "${PWD}/ai/infrastructure/helm/pixelated-empathy" \
+    "${PWD}/ai/infra/cloud/helm/pixelated-empathy" \
+    "${PWD}/helm"; do
+    [[ -n "${_d}" ]] && echo "  - ${_d} $([ -d "${_d}" ] && echo '(dir exists, no Chart.yaml)' || echo '(not found)')"
+  done
+  echo ""
+  echo "Tip: Set CHART_DIR to the absolute path or a path relative to the repo root in the pipeline variable group."
   exit 1
 fi
 

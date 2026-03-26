@@ -11,6 +11,7 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from collections.abc import Iterable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,7 +20,7 @@ from typing import Any
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER = ("beads", "asana", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
