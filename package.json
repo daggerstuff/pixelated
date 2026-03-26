@@ -151,7 +151,7 @@
     "@astrojs/netlify": "^7.0.3",
     "@astrojs/node": "^10.0.2",
     "@astrojs/react": "^5.0.1",
-    "@astrojs/vercel": "^10.0.1",
+    "@astrojs/vercel": "^10.0.2",
     "@auth0/auth0-react": "~2.11.0",
     "@aws-sdk/client-dynamodb": "^3.1010.0",
     "@aws-sdk/client-ec2": "^3.1010.0",
