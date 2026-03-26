@@ -10,6 +10,7 @@ import { Redis } from 'ioredis'
 import { MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { HuntFinding } from './types'
 
 const logger = createBuildSafeLogger('threat-hunting-service')
 
@@ -83,17 +84,7 @@ export interface HuntResult {
   metadata: Record<string, unknown>
 }
 
-export interface HuntFinding {
-  findingId: string
-  type: 'anomaly' | 'suspicious_pattern' | 'iocs' | 'behavioral_deviation'
-  title: string
-  description: string
-  evidence: Record<string, unknown>[]
-  confidence: number
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  recommendedActions: string[]
-  relatedEntities: string[]
-}
+
 
 export interface Investigation {
   investigationId: string
