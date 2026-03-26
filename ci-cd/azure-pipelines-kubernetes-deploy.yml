@@ -167,7 +167,9 @@ stages:
         )
       )
     variables:
-      IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
+      - group: pixelated-pipeline-variables
+      - name: IMAGE_TAG
+    value: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
       - job: DeployHosted
         displayName: Helm deploy (hosted)
