@@ -124,8 +124,13 @@ IMAGE_FULL="${ACR_LOGIN_SERVER}/${ACR_REPO}:${IMAGE_TAG}"
 IMAGE_LATEST="${ACR_LOGIN_SERVER}/${ACR_REPO}:latest"
 NAMESPACE="pixelated-empathy-${APP_ENV}"
 RELEASE_NAME="pixelated-empathy-${APP_ENV}"
-CLUSTER_NAME="${AKS_CLUSTER_NAME}"
-RESOURCE_GROUP="${AKS_RESOURCE_GROUP}"
+CLUSTER_NAME="${AKS_CLUSTER_NAME:-${AZURE_AKS_CLUSTER_NAME:-}}"
+RESOURCE_GROUP="${AKS_RESOURCE_GROUP:-${AZURE_AKS_RESOURCE_GROUP:-}}"
+
+# Normalize alternate variable names so subsequent logic can rely on AKS_*.
+AKS_CLUSTER_NAME="${CLUSTER_NAME}"
+AKS_RESOURCE_GROUP="${RESOURCE_GROUP}"
+export AKS_CLUSTER_NAME AKS_RESOURCE_GROUP
 PUSH_LATEST="${PUSH_LATEST:-false}"
 verify_remote_image() {
   local repository="$1"
@@ -159,8 +164,8 @@ fi
 if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
   CLUSTER_READY=true
 else
-  echo "AKS_CLUSTER_NAME and AKS_RESOURCE_GROUP are both required."
-  echo "Set them in the variable group before running this pipeline."
+  echo "AKS cluster variables are required."
+  echo "Provide either AKS_CLUSTER_NAME/AKS_RESOURCE_GROUP or AZURE_AKS_CLUSTER_NAME/AZURE_AKS_RESOURCE_GROUP in the variable group."
   exit 1
 fi
 

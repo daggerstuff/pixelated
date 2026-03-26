@@ -14,6 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Install pnpm
         uses: pnpm/action-setup@v5.0.0
 

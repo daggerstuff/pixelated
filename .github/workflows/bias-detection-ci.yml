@@ -41,6 +41,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         uses: aquasecurity/trivy-action@v0.35.0
@@ -108,6 +111,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0
         with:
@@ -173,6 +179,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0
@@ -242,6 +251,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6.2.0
@@ -339,6 +351,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0

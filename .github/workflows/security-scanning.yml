@@ -26,6 +26,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
         with:
@@ -142,6 +145,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
         uses: actions/setup-node@v6.3.0

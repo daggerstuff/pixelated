@@ -58,6 +58,9 @@ fi
 
 CURRENT_SUBSCRIPTION_ID=$("${AZURE_CLI_BIN}" account show --query "id" -o tsv)
 CURRENT_TENANT_ID=$("${AZURE_CLI_BIN}" account show --query "tenantId" -o tsv)
+
+AKS_CLUSTER_NAME_RESOLVED="${AKS_CLUSTER_NAME:-${AZURE_AKS_CLUSTER_NAME:-}}"
+AKS_RESOURCE_GROUP_RESOLVED="${AKS_RESOURCE_GROUP:-${AZURE_AKS_RESOURCE_GROUP:-}}"
 if [[ -z "${CURRENT_SUBSCRIPTION_ID}" || -z "${CURRENT_TENANT_ID}" ]]; then
   echo "##vso[task.logissue type=error]Failed to read required subscription metadata from Azure account context."
   exit 1
@@ -100,16 +103,16 @@ if [[ -n "${AZURE_SUBSCRIPTION_NAME:-}" ]]; then
   fi
 fi
 
-if [[ -z "${RESOLVED_SUBSCRIPTION_ID}" && -n "${AKS_RESOURCE_GROUP:-}" && -n "${AKS_CLUSTER_NAME:-}" ]]; then
+if [[ -z "${RESOLVED_SUBSCRIPTION_ID}" && -n "${AKS_RESOURCE_GROUP_RESOLVED:-}" && -n "${AKS_CLUSTER_NAME_RESOLVED:-}" ]]; then
   SUBSCRIPTION_IDS=$("${AZURE_CLI_BIN}" account list --all --query "[].id" -o tsv | tr '\r' '\n')
   for SUBSCRIPTION_ID in ${SUBSCRIPTION_IDS}; do
     if [[ -z "${SUBSCRIPTION_ID}" ]]; then
       continue
     fi
 
-    if "${AZURE_CLI_BIN}" aks show --subscription "${SUBSCRIPTION_ID}" --resource-group "${AKS_RESOURCE_GROUP}" --name "${AKS_CLUSTER_NAME}" >/dev/null 2>&1; then
+    if "${AZURE_CLI_BIN}" aks show --subscription "${SUBSCRIPTION_ID}" --resource-group "${AKS_RESOURCE_GROUP_RESOLVED}" --name "${AKS_CLUSTER_NAME_RESOLVED}" >/dev/null 2>&1; then
       RESOLVED_SUBSCRIPTION_ID="${SUBSCRIPTION_ID}"
-      echo "Matched AKS cluster ${AKS_CLUSTER_NAME} in resource group ${AKS_RESOURCE_GROUP} to subscription ${RESOLVED_SUBSCRIPTION_ID}"
+      echo "Matched AKS cluster ${AKS_CLUSTER_NAME_RESOLVED} in resource group ${AKS_RESOURCE_GROUP_RESOLVED} to subscription ${RESOLVED_SUBSCRIPTION_ID}"
       break
     fi
   done
@@ -143,8 +146,8 @@ fi
 echo "##vso[task.logissue type=error]Automatic subscription resolution failed."
 echo "Azure CLI can currently see:"
 "${AZURE_CLI_BIN}" account list --all --output table
-if [[ -n "${AKS_RESOURCE_GROUP:-}" && -n "${AKS_CLUSTER_NAME:-}" ]]; then
-  echo "Could not locate AKS cluster ${AKS_CLUSTER_NAME} in resource group ${AKS_RESOURCE_GROUP} under any accessible subscription."
+if [[ -n "${AKS_RESOURCE_GROUP_RESOLVED:-}" && -n "${AKS_CLUSTER_NAME_RESOLVED:-}" ]]; then
+  echo "Could not locate AKS cluster ${AKS_CLUSTER_NAME_RESOLVED} in resource group ${AKS_RESOURCE_GROUP_RESOLVED} under any accessible subscription."
 fi
 echo "Please validate service connection permissions and subscription mappings."
 exit 1
