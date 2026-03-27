@@ -1,6 +1,13 @@
 /**
  * Behavioral Analysis Service
  * Provides real-time user profiling, anomaly detection, and behavioral pattern analysis
+ *
+ * Decomposed into specialized services:
+ * - SpatialAnalysisService: Geolocation and spatial pattern analysis
+ * - TemporalAnalysisService: Time-based pattern analysis
+ * - SequentialPatternMiner: Pattern mining from event sequences
+ * - MLAnomalyDetector: ML-based anomaly detection
+ * - BehavioralGraphAnalyzer: Graph-based behavioral analysis
  */
 
 import * as crypto from 'crypto'
@@ -12,23 +19,30 @@ import { MongoClient } from 'mongodb'
 import { BehavioralGraphAnalyzer } from './analyzers/behavioral-graph-analyzer'
 import { MLAnomalyDetector } from './analyzers/ml-anomaly-detector'
 import { SequentialPatternMiner } from './miners/sequential-pattern-miner'
+import { SpatialAnalysisService } from './analyzers/spatial-analysis.service'
+import { TemporalAnalysisService } from './analyzers/temporal-analysis.service'
 
-export interface SecurityEvent {
-  eventId: string
-  userId: string
-  timestamp: Date
-  eventType: string
-  sourceIp: string
-  userAgent: string
-  requestMethod: string
-  endpoint: string
-  responseCode: number
-  responseTime: number
-  payloadSize: number
-  sessionId: string
-  riskScore?: number
-  metadata?: Record<string, unknown>
-}
+// Re-export types from centralized types file
+export type {
+  SecurityEvent,
+  BehaviorProfile,
+  BehavioralPattern,
+  Anomaly,
+  RiskScore,
+  BehavioralFeatures,
+  TemporalFeatures,
+  SpatialFeatures,
+  SequentialFeatures,
+  FrequencyFeatures,
+  ContextualFeatures,
+  BehavioralSequence,
+  BehaviorGraph,
+  Cluster,
+  RiskIndicator,
+  BaselineMetrics,
+  AnomalyThresholds,
+  PrivateBehavioralAnalysis,
+} from './types'
 
 export interface BehaviorProfile {
   userId: string
@@ -105,6 +119,8 @@ export class AdvancedBehavioralAnalysisService
   private riskCalculator!: RiskCalculator
   private privacyPreserver!: PrivacyPreserver
   private graphAnalyzer!: GraphAnalyzer
+  private spatialAnalyzer!: SpatialAnalysisService
+  private temporalAnalyzer!: TemporalAnalysisService
   private initialized = false
   private initializationPromise: Promise<void> | null = null
 
@@ -151,6 +167,8 @@ export class AdvancedBehavioralAnalysisService
       this.config.privacyConfig,
     )
     this.graphAnalyzer = new BehavioralGraphAnalyzer()
+    this.spatialAnalyzer = new SpatialAnalysisService()
+    this.temporalAnalyzer = new TemporalAnalysisService()
 
     await this.mongoClient.connect()
     this.initialized = true
@@ -469,30 +487,11 @@ export class AdvancedBehavioralAnalysisService
     profile: BehaviorProfile,
     events: SecurityEvent[],
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = []
-    const temporalFeatures = await this.extractTemporalFeatures(events)
-
-    if (
-      temporalFeatures.timeOfDayPreference >
-      profile.baselineMetrics.timeOfDayThreshold
-    ) {
-      anomalies.push({
-        anomalyId: this.generateAnomalyId(),
-        userId: profile.userId,
-        patternId: 'temporal_timing',
-        anomalyType: 'deviation',
-        severity: 'medium',
-        deviationScore: temporalFeatures.timeOfDayPreference,
-        confidence: 0.8,
-        context: {
-          feature: 'timeOfDayPreference',
-          value: temporalFeatures.timeOfDayPreference,
-        },
-        timestamp: new Date(),
-      })
-    }
-
-    return anomalies
+    // Delegate to TemporalAnalysisService
+    return this.temporalAnalyzer.detectTemporalAnomalies(
+      profile.baselineMetrics,
+      events,
+    )
   }
 
   private calculateTimeIntervals(timestamps: number[]): number[] {
@@ -625,30 +624,11 @@ export class AdvancedBehavioralAnalysisService
     profile: BehaviorProfile,
     events: SecurityEvent[],
   ): Promise<Anomaly[]> {
-    const anomalies: Anomaly[] = []
-    const spatialFeatures = await this.extractSpatialFeatures(events)
-
-    if (
-      spatialFeatures.geographicSpread >
-      profile.baselineMetrics.geographicThreshold
-    ) {
-      anomalies.push({
-        anomalyId: this.generateAnomalyId(),
-        userId: profile.userId,
-        patternId: 'spatial_location',
-        anomalyType: 'novelty',
-        severity: 'high',
-        deviationScore: spatialFeatures.geographicSpread,
-        confidence: 0.9,
-        context: {
-          feature: 'geographicSpread',
-          value: spatialFeatures.geographicSpread,
-        },
-        timestamp: new Date(),
-      })
-    }
-
-    return anomalies
+    // Delegate to SpatialAnalysisService
+    return this.spatialAnalyzer.detectSpatialAnomalies(
+      profile.baselineMetrics,
+      events,
+    )
   }
 
   private async classifyPatterns(

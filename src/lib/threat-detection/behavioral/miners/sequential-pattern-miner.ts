@@ -130,6 +130,7 @@ export class SequentialPatternMiner implements PatternMiner {
     const frequentSequences = this.enumerateFrequentSequences(
       idLists,
       minSupport,
+      sequences.length,
     )
 
     for (const seq of frequentSequences) {
@@ -211,11 +212,14 @@ export class SequentialPatternMiner implements PatternMiner {
   private enumerateFrequentSequences(
     idLists: Record<string, number[][]>,
     minSupport: number,
+    totalSequences: number,
   ): string[][] {
     const frequentSequences: string[][] = []
+    const minCount = Math.ceil(totalSequences * minSupport)
 
     for (const item of Object.keys(idLists)) {
-      if (idLists[item].length >= minSupport) {
+      const uniqueSequenceIds = new Set(idLists[item].map((entry) => entry[0]))
+      if (uniqueSequenceIds.size >= minCount) {
         frequentSequences.push([item])
       }
     }
@@ -226,7 +230,14 @@ export class SequentialPatternMiner implements PatternMiner {
       const frequentKSequences: string[][] = []
 
       for (const candidate of candidates) {
-        if (this.isFrequentSequence(candidate, idLists, minSupport)) {
+        if (
+          this.isFrequentSequence(
+            candidate,
+            idLists,
+            minSupport,
+            totalSequences,
+          )
+        ) {
           frequentKSequences.push(candidate)
         }
       }
@@ -271,15 +282,17 @@ export class SequentialPatternMiner implements PatternMiner {
     sequence: string[],
     idLists: Record<string, number[][]>,
     minSupport: number,
+    totalSequences: number,
   ): boolean {
     const lastItem = sequence[sequence.length - 1]
     const idList = idLists[lastItem]
     if (!idList) {
       return false
     }
+    const minCount = Math.ceil(totalSequences * minSupport)
     const uniqueSequenceIds = new Set(idList.map((entry) => entry[0]))
     const support = uniqueSequenceIds.size
-    return support >= minSupport
+    return support >= minCount
   }
 
   private calculateSequenceSupport(
