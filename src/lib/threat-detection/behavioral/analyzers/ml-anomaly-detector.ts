@@ -323,8 +323,8 @@ export class MLAnomalyDetector implements AnomalyDetector {
   private getReconstructionThreshold(profile: BehaviorProfile): number {
     return (
       profile.baselineMetrics.reconstructionThreshold ??
-      profile.anomalyThresholds.sequential ??
       profile.baselineMetrics.sequentialThreshold ??
+      profile.anomalyThresholds.sequential ??
       0.1
     )
   }

@@ -1,64 +1,29 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { PolicyStore } from '../policy-store'
+import { MongoMemoryServer } from 'mongodb-memory-server'
 
-vi.mock('mongodb', () => {
-  class MockCollection {
-    data = new Map()
-    async replaceOne(filter: any, doc: any, options: any) {
-      if (filter.id) {
-        this.data.set(filter.id, { ...doc })
-      }
-    }
-    async findOne(filter: any) {
-      if (filter.id) {
-        return this.data.get(filter.id) || null
-      }
-      return null
-    }
-    async insertOne(doc: any) {
-      this.data.set(doc.id, doc)
-    }
-  }
-
-  const mockDb = {
-    collections: new Map(),
-    collection(name: string) {
-      if (!this.collections.has(name)) {
-        this.collections.set(name, new MockCollection())
-      }
-      return this.collections.get(name)
-    }
-  }
-
-  return {
-    MongoClient: class {
-      db() {
-        return mockDb
-      }
-      async connect() {
-        return this
-      }
-      async close() {}
-    }
-  }
-})
 describe('PolicyStore', () => {
   let policyStore: PolicyStore
+  let mongod: MongoMemoryServer
   let mongoUri: string
 
   beforeEach(async () => {
-    mongoUri = 'mongodb://localhost:27017/test'
+    // Setup in-memory MongoDB
+    mongod = await MongoMemoryServer.create()
+    mongoUri = mongod.getUri()
+    process.env.MONGODB_URI = mongoUri
   })
 
   afterEach(async () => {
     // Clean up
     await policyStore?.disconnect?.()
+    await mongod?.stop()
   })
 
   describe('initialize', () => {
     it('connects to MongoDB using the provided URI', async () => {
       policyStore = new PolicyStore()
-      await policyStore.initialize(mongoUri)
+      await policyStore.initialize()
       // If we got here without error, connection succeeded
       expect(policyStore).toBeDefined()
     })
@@ -67,7 +32,7 @@ describe('PolicyStore', () => {
   describe('savePolicy', () => {
     beforeEach(async () => {
       policyStore = new PolicyStore()
-      await policyStore.initialize(mongoUri)
+      await policyStore.initialize()
     })
 
     it('stores a policy in MongoDB', async () => {
@@ -154,7 +119,7 @@ describe('PolicyStore', () => {
   describe('getPolicy', () => {
     beforeEach(async () => {
       policyStore = new PolicyStore()
-      await policyStore.initialize(mongoUri)
+      await policyStore.initialize()
     })
 
     it('retrieves a policy by id', async () => {

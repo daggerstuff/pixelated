@@ -211,7 +211,7 @@ stages:
             inputs:
               helmVersionToInstall: v3.15.4
 
-          - task: KubernetesInstaller@0
+          - task: KubectlInstaller@0
             displayName: Install kubectl
             inputs:
               kubectlVersion: 'latest'
