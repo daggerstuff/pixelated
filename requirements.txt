@@ -1536,7 +1536,7 @@ sentry-sdk==2.56.0
     # via
     #   pixelated (pyproject.toml)
     #   wandb
-setuptools==81.0.0
+setuptools==82.0.1
     # via
     #   ctranslate2
     #   spacy
