@@ -178,7 +178,7 @@ mypy-extensions==1.1.0 # via
 # mypy
 networkx==3.6.1 # via torch
 ninja==1.13.0 # via deepspeed
-nltk==3.9.3 # Fixes GHSA-pg7x-xvh5-64q5 (Zip Slip vulnerability)
+nltk==3.9.4 # Fixes GHSA-pg7x-xvh5-64q5 (Zip Slip vulnerability)
 # via
 # -r src/lib/ai/training/requirements.txt
 # textstat
@@ -356,7 +356,7 @@ redis==7.1.0 # via -r src/lib/ai/training/requirements.txt
 regex==2026.1.15 # via
 # nltk
 # transformers
-requests==2.32.5 # via
+requests==2.33.0 # via
 # -r src/lib/ai/training/requirements.txt
 # databricks-sdk
 # datasets
