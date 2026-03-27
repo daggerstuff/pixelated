@@ -36,20 +36,23 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
-          scan-type: fs
-          scan-ref: .
-          format: sarif
-          output: trivy-results.sarif
+          with:
+            scan-type: fs
+            scan-ref: .
+            format: sarif
+            output: trivy-results.sarif
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3.29.1
-        if: always()
+        with:
           sarif_file: trivy-results.sarif
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3.29.1
-          languages: javascript,typescript
+          with:
+            languages: javascript,typescript
       - name: Setup Node.js for CodeQL
         uses: actions/setup-node@v4.4.0
-          node-version: ${{ env.NODE_VERSION }}
+          with:
+            node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack for CodeQL
         run: corepack enable
       - name: Setup pnpm for CodeQL
@@ -61,10 +64,11 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache for CodeQL
         uses: actions/cache@v4.2.3
-          path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          with:
+            path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
       - name: Install dependencies for CodeQL
         run: pnpm install --no-frozen-lockfile
       - name: Build for CodeQL
@@ -80,7 +84,8 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-          node-version: ${{ env.NODE_VERSION }}
+          with:
+            node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
       - name: Setup pnpm
@@ -92,10 +97,11 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          with:
+            path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Run ESLint
@@ -131,7 +137,8 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-          node-version: ${{ env.NODE_VERSION }}
+          with:
+            node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
       - name: Setup pnpm
@@ -143,10 +150,11 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          with:
+            path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Setup test environment
@@ -170,9 +178,10 @@ jobs:
           NODE_ENV: test
       - name: Upload coverage reports
         uses: codecov/codecov-action@v5
-          files: ./coverage/lcov.info
-          flags: typescript
-          name: typescript-coverage
+          with:
+            files: ./coverage/lcov.info
+            flags: typescript
+            name: typescript-coverage
   python-tests:
     name: Python ML Tests
     runs-on: ubuntu-latest
@@ -182,7 +191,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
-          python-version: ${{ env.PYTHON_VERSION }}
+          with:
+            python-version: ${{ env.PYTHON_VERSION }}
       - name: Ensure `uv` shim is available
         run: |
           if ! command -v uv >/dev/null 2>&1; then
@@ -195,13 +205,15 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-          service-dir: src/lib/ai/bias-detection/python-service
+          with:
+            service-dir: src/lib/ai/bias-detection/python-service
       - name: Cache pip dependencies
         uses: actions/cache@v4.2.3
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
+          with:
+            path: ~/.cache/pip
+            key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
+            restore-keys: |
+              ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
       - name: Install Python dependencies
         run: |
           if [ ! -d "src/lib/ai/bias-detection/python-service" ]; then
@@ -239,9 +251,10 @@ jobs:
           JWT_SECRET_KEY: test-jwt-secret
       - name: Upload Python coverage
         uses: codecov/codecov-action@v5
-          files: ./src/lib/ai/bias-detection/python-service/coverage.xml
-          flags: python
-          name: python-coverage
+          with:
+            files: ./src/lib/ai/bias-detection/python-service/coverage.xml
+            flags: python
+            name: python-coverage
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -262,7 +275,8 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-          node-version: ${{ env.NODE_VERSION }}
+          with:
+            node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
       - name: Setup pnpm
@@ -274,15 +288,17 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          with:
+            path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            restore-keys: |
+              ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
       - name: Setup Python for ML service
         uses: actions/setup-python@v5
-          python-version: ${{ env.PYTHON_VERSION }}
+          with:
+            python-version: ${{ env.PYTHON_VERSION }}
       - name: Ensure `uv` shim is available
         run: |
           if ! command -v uv >/dev/null 2>&1; then
@@ -295,7 +311,8 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-          service-dir: src/lib/ai/bias-detection/python-service
+          with:
+            service-dir: src/lib/ai/bias-detection/python-service
       - name: Install Python ML dependencies
         run: |
           cd src/lib/ai/bias-detection/python-service
@@ -351,7 +368,7 @@ jobs:
           NODE_ENV: test
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4
-        if: failure()
+        with:
           name: e2e-test-results
           path: |
             test-results/
