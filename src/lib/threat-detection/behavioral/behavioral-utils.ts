@@ -1,5 +1,5 @@
 export const detectAnomalies = (profile: any, current: any) => {
-  const anomalies = []
+  const anomalies: { type: string }[] = []
 
   // Check IP Anomaly
   const ip = current.metadata?.ip || current.sourceIp
