@@ -63,7 +63,8 @@ const normalizeUrlForSchemeChecks = (raw: string): string => {
   let result = ''
   for (const ch of raw) {
     const code = ch.charCodeAt(0)
-    if (code <= 0x20 || code === 0x7f || /\s/u.test(ch)) continue
+    if (code <= 0x20 || code === 0x7f) continue
+    if (/\s/u.test(ch)) continue
     result += ch
   }
   return result.toLowerCase()
@@ -95,12 +96,12 @@ const isAllowedUrl = (raw: string): boolean => {
 }
 
 /**
-* Sanitizes untrusted HTML for safe rendering in the browser.
+* Sanitizes HTML for the research consent document only.
 *
 * On the server (when `window` is not available), this returns an empty string
 * rather than attempting to parse HTML, to avoid emitting unsanitized markup.
 */
-const sanitizeHtml = (html: string): string => {
+const sanitizeConsentDocumentHtml = (html: string): string => {
   // SSR-safe default: never emit raw, unsanitized HTML
   if (typeof window === 'undefined') return ''
 
@@ -184,7 +185,7 @@ export function ResearchConsentForm({
 
   const sanitizedDocumentText = useMemo(() => {
     if (showSummaryOnly || !expandedView || !documentText) return ''
-    return sanitizeHtml(documentText)
+    return sanitizeConsentDocumentHtml(documentText)
   }, [documentText, expandedView, showSummaryOnly])
 
   // Fetch consent status when component mounts or user changes
