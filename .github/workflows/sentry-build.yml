@@ -62,7 +62,7 @@ jobs:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_RELEASE: ${{ github.sha }}
-        PUBLIC_SENTRY_DSN: ${{ secrets.PUBLIC_SENTRY_DSN }}
+        PUBLIC_SENTRY_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
       run: |
         IMAGE_TAG=ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
         docker build \
