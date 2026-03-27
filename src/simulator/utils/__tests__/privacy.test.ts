@@ -13,6 +13,9 @@ describe('privacy utilities', () => {
         const id2 = createEphemeralSessionId()
         expect(id1).toMatch(/^sim_[a-z0-9]+_[a-z0-9]+$/)
         expect(id1).not.toBe(id2)
+        // Assert expected segments or exact IDs
+        expect(id1).toBe('sim_20200101000000_123456')
+        expect(id2).toBe('sim_20200101000000_654321')
       } finally {
         randomSpy.mockRestore()
         vi.useRealTimers()
@@ -24,12 +27,8 @@ describe('privacy utilities', () => {
     it('generates consistent hashes for the same input', () => {
       expect(createPrivacyHash('test-123')).toBe(createPrivacyHash('test-123'))
     })
-
-    it('handles empty string properly', () => {
-      const emptyHash1 = createPrivacyHash('')
-      const emptyHash2 = createPrivacyHash('')
-      expect(emptyHash1).toMatch(/^hash_/)
-      expect(emptyHash2).toBe(emptyHash1)
+    it('handles empty string deterministically', () => {
+      expect(createPrivacyHash('')).toBe('hash_0')
     })
   })
 })
