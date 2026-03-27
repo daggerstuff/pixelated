@@ -99,6 +99,8 @@ jobs:
 
       - name: 'Export selected labels'
         id: 'export_selected_labels'
+        if: |-
+          ${{ steps.get_labels.outputs.available_labels != '' }}
         run: |-
           printf 'selected_labels=%s\n' "${{ steps.gemini_analysis.outputs.summary || '' }}" >> "${GITHUB_OUTPUT}"
 
