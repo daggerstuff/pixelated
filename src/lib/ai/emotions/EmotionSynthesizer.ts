@@ -256,19 +256,23 @@ export class EmotionSynthesizer {
   }
 
   /**
-   * Merges multiple raw emotion intensity maps into a single unified `EmotionProfile` instance.
-   * This is used to create a synthesized emotional state from disparate inputs (e.g., combining
-   * text sentiment, acoustic features, and facial expressions), assigning a new unique ID, timestamp,
-   * and a default confidence score of 0.8. The resulting profile also becomes the new current active state.
+   * Wraps a raw emotion intensity map into a unified `EmotionProfile` instance.
+   *
+   * Note: despite the name, this method does not merge multiple emotion maps; callers should
+   * combine inputs before calling this.
+   *
+   * Assigns a new unique ID, timestamp, and a default confidence score of 0.8. The resulting
+   * profile also becomes the new current active state.
    *
    * @param emotions - A record of emotion keys to their raw intensity values.
-   * @returns A newly synthesized `EmotionProfile` object representing the blended state.
+   * @returns A newly synthesized `EmotionProfile` object representing the updated state.
    */
   blendEmotions(emotions: Record<string, number>): EmotionProfile {
+    const now = Date.now()
     const profile: EmotionProfile = {
-      id: `blend-${Date.now()}`,
-      emotions,
-      timestamp: Date.now(),
+      id: `blend-${now}`,
+      emotions: { ...emotions },
+      timestamp: now,
       confidence: 0.8,
     }
 
