@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r requirements.txt
     #   matplotlib
-cryptography==46.0.5
+cryptography==46.0.6
     # via
     #   -r requirements.txt
     #   great-expectations
