@@ -20,8 +20,8 @@ configure_azure_credentials() {
   if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
     local token="${SYSTEM_ACCESSTOKEN:-}"
     if [[ -z "${token}" ]]; then
-      echo '##[warning]SYSTEM_ACCESSTOKEN is empty. Expose it via env: SYSTEM_ACCESSTOKEN: $(System.AccessToken)'
-      return 0
+      echo '##vso[task.logissue type=error]SYSTEM_ACCESSTOKEN is empty. Expose it via env: SYSTEM_ACCESSTOKEN: $(System.AccessToken) and enable OAuth token access for the pipeline/job.'
+      exit 1
     fi
     # Use extraHeader for Bearer token authentication. This is more secure than
     # embedding the token in the URL and more reliable to clean up.
