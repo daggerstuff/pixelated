@@ -7,8 +7,8 @@ import type {
   BehavioralFeatures,
 } from '../behavioral-analysis-service'
 
-// Placeholder class for IsolationForest until a concrete implementation is integrated.
-class IsolationForest {
+// Mock class for IsolationForest until a concrete implementation is integrated.
+class MockIsolationForest {
   constructor(_nTrees: number, _sampleSize: number) { }
 
   predict(data: number[][]): number[] {
@@ -20,7 +20,7 @@ const FEATURE_VECTOR_DIMENSION = 10
 
 export class MLAnomalyDetector implements AnomalyDetector {
   private model: tf.Sequential | null = null
-  private isolationForest: IsolationForest | null = null
+  private isolationForest: MockIsolationForest | null = null
 
   constructor(private readonly modelPath: string) {
     void this.modelPath
@@ -91,7 +91,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
       loss: 'meanSquaredError',
     })
 
-    this.isolationForest = new IsolationForest(100, 256)
+    this.isolationForest = new MockIsolationForest(100, 256)
   }
 
   private featuresToVector(features: BehavioralFeatures): number[] {
@@ -323,8 +323,8 @@ export class MLAnomalyDetector implements AnomalyDetector {
   private getReconstructionThreshold(profile: BehaviorProfile): number {
     return (
       profile.baselineMetrics.reconstructionThreshold ??
-      profile.baselineMetrics.sequentialThreshold ??
       profile.anomalyThresholds.sequential ??
+      profile.baselineMetrics.sequentialThreshold ??
       0.1
     )
   }
