@@ -192,6 +192,7 @@ export interface BaselineMetrics {
   geographicThreshold: number
   frequencyThreshold: number
   sequentialThreshold: number
+  reconstructionThreshold?: number
   deviceDiversityThreshold: number
 }
 

@@ -9,12 +9,14 @@ import type {
 
 // Placeholder class for IsolationForest until a concrete implementation is integrated.
 class IsolationForest {
-  constructor(_nTrees: number, _sampleSize: number) {}
+  constructor(_nTrees: number, _sampleSize: number) { }
 
   predict(data: number[][]): number[] {
     return data.map(() => 0.0)
   }
 }
+
+const FEATURE_VECTOR_DIMENSION = 10
 
 export class MLAnomalyDetector implements AnomalyDetector {
   private model: tf.Sequential | null = null
@@ -67,7 +69,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
       tf.layers.dense({
         units: 32,
         activation: 'relu',
-        inputShape: [10],
+        inputShape: [FEATURE_VECTOR_DIMENSION],
       }),
     )
     this.model.add(tf.layers.dropout({ rate: 0.2 }))
@@ -93,7 +95,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
   }
 
   private featuresToVector(features: BehavioralFeatures): number[] {
-    return [
+    const vector = [
       features.temporal.avgSessionDuration / 3600,
       features.temporal.timeOfDayPreference,
       features.temporal.activityFrequency,
@@ -105,6 +107,14 @@ export class MLAnomalyDetector implements AnomalyDetector {
       features.frequency.endpointFrequency['/api/sensitive'] || 0,
       features.contextual.deviceCharacteristics.deviceType === 'mobile' ? 1 : 0,
     ]
+
+    if (vector.length !== FEATURE_VECTOR_DIMENSION) {
+      throw new Error(
+        `Feature vector dimension mismatch: expected ${FEATURE_VECTOR_DIMENSION}, got ${vector.length}`,
+      )
+    }
+
+    return vector
   }
 
   private async detectMLAnomalies(
@@ -135,8 +145,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
 
       const anomalyScore = isolationForest.predict([featureVector])[0]
 
-      const reconstructionThreshold =
-        profile.baselineMetrics.sequentialThreshold || 0.1
+      const reconstructionThreshold = this.getReconstructionThreshold(profile)
 
       if (reconstructionError > reconstructionThreshold) {
         anomalies.push({
@@ -309,5 +318,14 @@ export class MLAnomalyDetector implements AnomalyDetector {
 
   private generateAnomalyId(): string {
     return `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  private getReconstructionThreshold(profile: BehaviorProfile): number {
+    return (
+      profile.baselineMetrics.reconstructionThreshold ??
+      profile.anomalyThresholds.sequential ??
+      profile.baselineMetrics.sequentialThreshold ??
+      0.1
+    )
   }
 }

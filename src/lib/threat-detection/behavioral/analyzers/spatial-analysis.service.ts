@@ -4,6 +4,7 @@
  */
 
 import type { SecurityEvent, SpatialFeatures, NetworkCharacteristics } from './types'
+import { generateAnomalyId } from './analyzer-utils'
 
 export class SpatialAnalysisService {
   /**
@@ -107,6 +108,6 @@ export class SpatialAnalysisService {
   }
 
   private generateAnomalyId(): string {
-    return `spatial_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+    return generateAnomalyId('spatial')
   }
 }
