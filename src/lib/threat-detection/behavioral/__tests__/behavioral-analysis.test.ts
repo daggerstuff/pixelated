@@ -132,7 +132,7 @@ describe('Behavioral Analysis Service', () => {
       expect((service as any).mongoClient).toBeDefined()
     })
 
-    it('should keep a failed initialization promise rejected without retrying', async () => {
+    it('should allow initialization to retry after a cleanup on failure', async () => {
       const initializationError = new Error('initialization failed')
       const connectCallsBefore = mockMongoClientInstance.connect.mock.calls.length
       const failingService = new AdvancedBehavioralAnalysisService(defaultConfig)
@@ -143,12 +143,10 @@ describe('Behavioral Analysis Service', () => {
         'initialization failed',
       )
 
-      await expect(failingService.initializeServices()).rejects.toThrow(
-        'initialization failed',
-      )
+      await expect(failingService.initializeServices()).resolves.toBeUndefined()
 
       expect(mockMongoClientInstance.connect).toHaveBeenCalledTimes(
-        connectCallsBefore + 1,
+        connectCallsBefore + 2,
       )
     })
   })
