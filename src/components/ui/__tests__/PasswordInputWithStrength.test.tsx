@@ -105,4 +105,4 @@ describe('PasswordInputWithStrength', () => {
     const progressbar = screen.getByRole('progressbar')
     expect(progressbar.getAttribute('aria-valuetext')).toBe('empty')
   })
-}
+})
