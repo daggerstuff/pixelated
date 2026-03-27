@@ -314,15 +314,15 @@ const recipientTypes = [
 
 <script>
   // Initialize the data portability form
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  document.addEventListener('DOMContentLoaded', (_event) => {
     const form = document.getElementById('data-portability-form')
 
     if (form) {
-      form.addEventListener('submit', (e: Event) => {
+      form.addEventListener('submit', (e) => {
         e.preventDefault()
 
         // In a real implementation, we would collect form data and process it
-        const formData = new FormData(e.target as HTMLFormElement)
+        const formData = new FormData(e.target)
 
         // For demonstration purposes, just show an alert
         alert(

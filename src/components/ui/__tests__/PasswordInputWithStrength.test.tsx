@@ -1,7 +1,12 @@
+/** @vitest-environment jsdom */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PasswordInputWithStrength } from '../PasswordInputWithStrength'
 import React from 'react'
+import { cleanup } from '@testing-library/react'
+import * as matchers from '@testing-library/jest-dom/matchers'
+expect.extend(matchers)
+import { afterEach } from 'vitest'
 
 // Mock the hook to control strength
 vi.mock('../../hooks/usePasswordStrength', () => ({
@@ -15,6 +20,9 @@ vi.mock('../../hooks/usePasswordStrength', () => ({
 }))
 
 describe('PasswordInputWithStrength', () => {
+  afterEach(() => {
+    cleanup()
+  })
   it('renders label and input', () => {
     render(
       <PasswordInputWithStrength
@@ -61,7 +69,7 @@ describe('PasswordInputWithStrength', () => {
   })
 
   it('has aria-live="polite" on feedback text', () => {
-    render(
+    const { container } = render(
       <PasswordInputWithStrength
         label="Password"
         name="password"
@@ -71,8 +79,8 @@ describe('PasswordInputWithStrength', () => {
     )
 
     // Check for aria-live="polite" on the element containing the feedback
-    const feedback = screen.getByText(/Fair - could be stronger/i)
-    expect(feedback.getAttribute('aria-live')).toBe('polite')
+    const feedback = container.querySelector('.password-feedback')
+    expect(feedback?.getAttribute('aria-live')).toBe('polite')
   })
 
   it('includes error in aria-describedby when error exists', () => {
@@ -86,7 +94,7 @@ describe('PasswordInputWithStrength', () => {
     )
 
     const input = screen.getByLabelText('Password', { selector: 'input' })
-    const describedBy = input.getAttribute('aria-describedby')
+    const describedBy = input.getAttribute('aria-describedby') || ''
     expect(describedBy).toContain('password-error')
     expect(describedBy).toContain('password-helper')
   })
