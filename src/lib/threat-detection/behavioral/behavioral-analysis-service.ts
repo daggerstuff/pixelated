@@ -144,15 +144,28 @@ export class AdvancedBehavioralAnalysisService
     }
 
     this.initializationPromise = this.initializeServicesInternal()
-      .catch((error) => {
-        this.initializationPromise = null
+      .catch(async (error) => {
+        await this.cleanupInitializationFailure()
         throw error
-      })
-      .then(() => {
-        this.initializationPromise = null
       })
 
     return this.initializationPromise
+  }
+
+  private async cleanupInitializationFailure(): Promise<void> {
+    const cleanupTasks: Promise<unknown>[] = []
+
+    if (this.redis) {
+      cleanupTasks.push(Promise.resolve(this.redis.quit()).catch(() => undefined))
+    }
+
+    if (this.mongoClient) {
+      cleanupTasks.push(
+        Promise.resolve(this.mongoClient.close()).catch(() => undefined),
+      )
+    }
+
+    await Promise.allSettled(cleanupTasks)
   }
 
   private async initializeServicesInternal(): Promise<void> {
@@ -442,44 +455,14 @@ export class AdvancedBehavioralAnalysisService
     events: SecurityEvent[],
   ): Promise<BehavioralFeatures> {
     const features: BehavioralFeatures = {
-      temporal: await this.extractTemporalFeatures(events),
-      spatial: await this.extractSpatialFeatures(events),
+      temporal: await this.temporalAnalyzer.extractTemporalFeatures(events),
+      spatial: await this.spatialAnalyzer.extractSpatialFeatures(events),
       sequential: await this.extractSequentialFeatures(events),
       frequency: await this.extractFrequencyFeatures(events),
       contextual: await this.extractContextualFeatures(events),
     }
 
     return features
-  }
-
-  private async extractTemporalFeatures(
-    events: SecurityEvent[],
-  ): Promise<TemporalFeatures> {
-    const timestamps = events.map((e) => e.timestamp.getTime())
-    const intervals = this.calculateTimeIntervals(timestamps)
-
-    return {
-      avgSessionDuration: this.calculateAverageSessionDuration(events),
-      timeOfDayPreference: this.calculateTimeOfDayPreference(events),
-      dayOfWeekPattern: this.calculateDayOfWeekPattern(events),
-      activityFrequency: this.calculateActivityFrequency(events),
-      sessionRegularity: this.calculateSessionRegularity(intervals),
-      responseTimePattern: this.calculateResponseTimePattern(events),
-    }
-  }
-
-  private async extractSpatialFeatures(
-    events: SecurityEvent[],
-  ): Promise<SpatialFeatures> {
-    const ipAddresses = events.map((e) => e.sourceIp)
-    const locations = await this.geolocateIPs(ipAddresses)
-
-    return {
-      ipDiversity: this.calculateIPDiversity(ipAddresses),
-      geographicSpread: this.calculateGeographicSpread(locations),
-      mobilityPattern: this.calculateMobilityPattern(locations),
-      networkCharacteristics: this.analyzeNetworkCharacteristics(events),
-    }
   }
 
   private async detectTemporalAnomalies(
@@ -491,75 +474,6 @@ export class AdvancedBehavioralAnalysisService
       profile.baselineMetrics,
       events,
     )
-  }
-
-  private calculateTimeIntervals(timestamps: number[]): number[] {
-    if (timestamps.length < 2) return []
-    const sorted = [...timestamps].sort((a, b) => a - b)
-    const intervals: number[] = []
-    for (let i = 1; i < sorted.length; i++) {
-      intervals.push(sorted[i] - sorted[i - 1])
-    }
-    return intervals
-  }
-
-  private calculateAverageSessionDuration(events: SecurityEvent[]): number {
-    if (events.length === 0) return 0
-    // Simplified: max time - min time
-    const timestamps = events.map((e) => e.timestamp.getTime())
-    return Math.max(...timestamps) - Math.min(...timestamps)
-  }
-
-  private calculateTimeOfDayPreference(events: SecurityEvent[]): number {
-    if (events.length === 0) return 0
-    // Return avg hour (0-24) / 24
-    const hours = events.map((e) => e.timestamp.getHours())
-    const avg = hours.reduce((a, b) => a + b, 0) / hours.length
-    return avg / 24
-  }
-
-  private calculateDayOfWeekPattern(_events: SecurityEvent[]): number[] {
-    return [0, 0, 0, 0, 0, 0, 0] // Placeholder for 7 days
-  }
-
-  private calculateActivityFrequency(events: SecurityEvent[]): number {
-    return events.length
-  }
-
-  private calculateSessionRegularity(intervals: number[]): number {
-    if (intervals.length === 0) return 1
-    // Variance of intervals?
-    return 0.8 // Placeholder
-  }
-
-  private calculateResponseTimePattern(_events: SecurityEvent[]): number[] {
-    return [] // Placeholder
-  }
-
-  private async geolocateIPs(ips: string[]): Promise<unknown[]> {
-    return ips.map((_ip) => ({ lat: 0, lon: 0 }))
-  }
-
-  private calculateIPDiversity(ips: string[]): number {
-    return new Set(ips).size
-  }
-
-  private calculateGeographicSpread(_locations: unknown[]): number {
-    return 0.1
-  }
-
-  private calculateMobilityPattern(_locations: unknown[]): number {
-    return 0.1
-  }
-
-  private analyzeNetworkCharacteristics(
-    _events: SecurityEvent[],
-  ): NetworkCharacteristics {
-    return {
-      connectionType: 'unknown',
-      bandwidthEstimate: 0,
-      latency: 0,
-    }
   }
 
   private async extractSequentialFeatures(
