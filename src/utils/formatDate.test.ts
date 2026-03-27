@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDuration } from './formatDate'
+import { formatDuration, isValidDate } from './formatDate'
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
@@ -28,5 +28,36 @@ describe('formatDuration', () => {
     expect(formatDuration(2 * 86400000 + 4 * 3600000)).toBe('2d 4h')
     // exactly 1 day
     expect(formatDuration(86400000)).toBe('1d 0h')
+  })
+})
+
+describe('isValidDate', () => {
+  it('returns true for a valid date string', () => {
+    expect(isValidDate('2023-01-01')).toBe(true)
+    expect(isValidDate('2023-12-31T23:59:59Z')).toBe(true)
+  })
+
+  it('returns false for an invalid date string', () => {
+    expect(isValidDate('invalid-date')).toBe(false)
+    expect(isValidDate('')).toBe(false)
+  })
+
+  it('handles edge cases correctly', () => {
+    // Numeric strings are parsed as invalid by Date constructor when passed as strings
+    expect(isValidDate('123456789')).toBe(false)
+    // Invalid calendar dates should return false
+    expect(isValidDate('2023-02-30')).toBe(false)
+    // Leap year handling
+    expect(isValidDate('2024-02-29')).toBe(true)
+    expect(isValidDate('2023-02-29')).toBe(false)
+    // Whitespace
+    expect(isValidDate(' 2023-01-01 ')).toBe(true)
+    expect(isValidDate('\t2023-01-01\n')).toBe(true)
+    // Partial dates
+    expect(isValidDate('2023')).toBe(true)
+    expect(isValidDate('2023-01')).toBe(true)
+    // Timezone variations
+    expect(isValidDate('2023-01-01T00:00:00+05:00')).toBe(true)
+    expect(isValidDate('2023-01-01T00:00:00-08:00')).toBe(true)
   })
 })
