@@ -90,11 +90,11 @@ jobs:
         if: |-
           ${{ steps.find_issues.outputs.issues_to_triage != '[]' }}
         env:
-          HAS_GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY != '' }}'
-          HAS_GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY != '' }}'
-          HAS_GCP_WIF_PROVIDER: '${{ vars.GCP_WIF_PROVIDER != '' }}'
-          HAS_GCP_PROJECT: '${{ vars.GOOGLE_CLOUD_PROJECT != '' }}'
-          HAS_GCP_SERVICE_ACCOUNT: '${{ vars.SERVICE_ACCOUNT_EMAIL != '' }}'
+          HAS_GEMINI_API_KEY: "${{ secrets.GEMINI_API_KEY != '' }}"
+          HAS_GOOGLE_API_KEY: "${{ secrets.GOOGLE_API_KEY != '' }}"
+          HAS_GCP_WIF_PROVIDER: "${{ vars.GCP_WIF_PROVIDER != '' }}"
+          HAS_GCP_PROJECT: "${{ vars.GOOGLE_CLOUD_PROJECT != '' }}"
+          HAS_GCP_SERVICE_ACCOUNT: "${{ vars.SERVICE_ACCOUNT_EMAIL != '' }}"
         run: |-
           set -euo pipefail
 
