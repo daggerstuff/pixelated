@@ -26,7 +26,7 @@ describe('PasswordInputWithStrength', () => {
       />
     )
     // Use selector to avoid matching the button title
-    expect(screen.getByLabelText('Password', { selector: 'input' })).toBeDefined()
+    expect(screen.getByLabelText('Password', { selector: 'input' })).toBeInTheDocument()
   })
 
   it('shows error even when focused', () => {
@@ -105,4 +105,4 @@ describe('PasswordInputWithStrength', () => {
     const progressbar = screen.getByRole('progressbar')
     expect(progressbar.getAttribute('aria-valuetext')).toBe('empty')
   })
-})
+}

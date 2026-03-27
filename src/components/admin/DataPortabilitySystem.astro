@@ -21,13 +21,22 @@ const bindDataPortabilityHandlers = () => {
       )
 
       // In production, this would trigger the actual data export and transfer process
-      console.log(
-        'Form submitted with data:',
-        Object.fromEntries(formData.entries()),
-      )
+      console.log('Data portability form submitted successfully')
     })
   }
 }
 
 document.addEventListener('DOMContentLoaded', bindDataPortabilityHandlers)
 document.addEventListener('astro:page-load', bindDataPortabilityHandlers)
+
+// Restored component UI
+<div>
+  <div>
+    <div>
+      <form id="data-portability-form">
+        <!-- Add form fields here -->
+        <button id="data-portability-cancel-btn">Cancel</button>
+      </form>
+    </div>
+  </div>
+</div>
