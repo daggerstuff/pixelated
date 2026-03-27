@@ -62,7 +62,7 @@ export interface SelectProps {
         <span
           class="form-error"
           id={`${Astro.props.id || Astro.props.name}-error`}
-          role="alert"
+          aria-live="polite"
         >
           {Astro.props.error}
         </span>
