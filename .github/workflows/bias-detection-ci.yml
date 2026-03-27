@@ -1,5 +1,4 @@
 name: Bias Detection Engine CI/CD
-
 permissions:
   contents: read
   id-token: write
@@ -7,12 +6,9 @@ permissions:
   checks: read
   pull-requests: read
   security-events: write
-
 on:
   push:
-    branches:
-      - main
-      - staging
+    branches: [main, staging]
     paths:
       - src/lib/ai/bias-detection/**
       - src/components/admin/bias-detection/**
@@ -20,21 +16,17 @@ on:
       - tests/**/*bias-detection*
       - .github/workflows/bias-detection-ci.yml
   pull_request:
-    branches:
-      - main
-      - staging
+    branches: [main, staging]
     paths:
       - src/lib/ai/bias-detection/**
       - src/components/admin/bias-detection/**
       - src/pages/api/bias-detection/**
       - tests/**/*bias-detection*
       - .github/workflows/bias-detection-ci.yml
-
 env:
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.11
   PNPM_VERSION: 10.32.1
-
 jobs:
   security-scan:
     name: Security Scan
@@ -44,22 +36,19 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.30.0
-        with:
           scan-type: fs
           scan-ref: .
           format: sarif
           output: trivy-results.sarif
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3.29.1
-        with:
+        if: always()
           sarif_file: trivy-results.sarif
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3.29.1
-        with:
           languages: javascript,typescript
       - name: Setup Node.js for CodeQL
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack for CodeQL
         run: corepack enable
@@ -72,7 +61,6 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache for CodeQL
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache-codeql.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -83,7 +71,7 @@ jobs:
         run: pnpm build
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3.29.1
-
+  # Code quality and linting
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
@@ -92,7 +80,6 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
@@ -105,7 +92,6 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -118,13 +104,10 @@ jobs:
         run: pnpm typecheck
       - name: Check formatting
         run: pnpm format:check
-
   typescript-tests:
     name: TypeScript Tests
     runs-on: ubuntu-latest
-    needs:
-      - security-scan
-      - code-quality
+    needs: [security-scan, code-quality]
     if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result == 'success' }}
     services:
       postgres:
@@ -134,19 +117,13 @@ jobs:
           POSTGRES_DB: test_db
           POSTGRES_HOST_AUTH_METHOD: trust
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
       redis:
         image: redis:7
         options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 6379:6379
     steps:
@@ -154,7 +131,6 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
@@ -167,7 +143,6 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -195,22 +170,18 @@ jobs:
           NODE_ENV: test
       - name: Upload coverage reports
         uses: codecov/codecov-action@v5
-        with:
           files: ./coverage/lcov.info
           flags: typescript
           name: typescript-coverage
-
   python-tests:
     name: Python ML Tests
     runs-on: ubuntu-latest
-    needs:
-      - security-scan
+    needs: [security-scan]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Ensure `uv` shim is available
         run: |
@@ -224,11 +195,9 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-        with:
           service-dir: src/lib/ai/bias-detection/python-service
       - name: Cache pip dependencies
         uses: actions/cache@v4.2.3
-        with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
@@ -270,17 +239,13 @@ jobs:
           JWT_SECRET_KEY: test-jwt-secret
       - name: Upload Python coverage
         uses: codecov/codecov-action@v5
-        with:
           files: ./src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python
           name: python-coverage
-
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    needs:
-      - typescript-tests
-      - python-tests
+    needs: [typescript-tests, python-tests]
     services:
       postgres:
         image: postgres:15
@@ -289,10 +254,7 @@ jobs:
           POSTGRES_DB: test_db
           POSTGRES_HOST_AUTH_METHOD: trust
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
         ports:
           - 5432:5432
     steps:
@@ -300,7 +262,6 @@ jobs:
         uses: actions/checkout@v4.2.2
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Enable Corepack
         run: corepack enable
@@ -313,7 +274,6 @@ jobs:
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
@@ -322,7 +282,6 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Setup Python for ML service
         uses: actions/setup-python@v5
-        with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Ensure `uv` shim is available
         run: |
@@ -336,7 +295,6 @@ jobs:
       - name: Prepare uv venv
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
-        with:
           service-dir: src/lib/ai/bias-detection/python-service
       - name: Install Python ML dependencies
         run: |
@@ -393,7 +351,7 @@ jobs:
           NODE_ENV: test
       - name: Upload E2E test results
         uses: actions/upload-artifact@v4
-        with:
+        if: failure()
           name: e2e-test-results
           path: |
             test-results/

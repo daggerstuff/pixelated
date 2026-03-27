@@ -35,10 +35,6 @@ export interface SelectProps {
   error?: string
   id?: string
 }
-
-const baseId = Astro.props.id || Astro.props.name;
-const errorId = baseId ? `${baseId}-error` : undefined;
-
 ---
 
 <!-- Input Component -->
@@ -57,14 +53,16 @@ const errorId = baseId ? `${baseId}-error` : undefined;
       disabled={Astro.props.disabled}
       class:list={['input', Astro.props.error && 'input-error']}
       aria-invalid={Astro.props.error ? 'true' : undefined}
-      aria-describedby={Astro.props.error ? errorId : undefined}
+      aria-describedby={Astro.props.error
+        ? `${Astro.props.id || Astro.props.name}-error`
+        : undefined}
     />
     {
       Astro.props.error && (
         <span
           class="form-error"
-          id={errorId}
-          role="alert"
+          id={`${Astro.props.id || Astro.props.name}-error`}
+          aria-live="polite"
         >
           {Astro.props.error}
         </span>

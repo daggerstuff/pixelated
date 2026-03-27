@@ -48,9 +48,6 @@ jobs:
         run: corepack enable
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
-          run_install: false
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
@@ -93,13 +90,14 @@ jobs:
           echo "Triggering validation via webhook..."
           # Disable 'exit on error' just for this call to capture curl failures without aborting the step
           set +e
-          STATUS_CODE=$( curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
-            -o response.json -w "%{http_code}" \
-            -X POST "${APP_URL}/api/ai/validation/webhook" \
-            -H "Content-Type: application/json" \
-            -H "x-github-event: workflow_dispatch" \
-            -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
-            -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
+          STATUS_CODE=$(
+            curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS \
+              -o response.json -w "%{http_code}" \
+              -X POST "${APP_URL}/api/ai/validation/webhook" \
+              -H "Content-Type: application/json" \
+              -H "x-github-event: workflow_dispatch" \
+              -H "x-hub-signature-256: ${WEBHOOK_TOKEN}" \
+              -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
           CURL_EXIT=$?
           set -e
           if [[ ${CURL_EXIT} -ne 0 ]]; then
@@ -203,19 +201,21 @@ jobs:
       - name: Send notification on validation issues
         if: ${{ steps.results.outputs.needs_alert == 'true' }}
         uses: actions/github-script@v7
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const { repo, owner } = context.repo;
-          github.rest.issues.create({
-            owner,
-            repo,
-            title: `⚠️ AI Model Validation Alert: ${process.env.PASS_RATE}% success rate`,
-            body: ` # AI Model Validation Alert
-A recent validation run found potential issues with AI model accuracy.
-- **Environment:** ${process.env.ENV_NAME}
-- **Run ID:** ${process.env.RUN_ID}
-- **Success Rate:** ${process.env.PASS_RATE}%
-- **Threshold:** 85%
-Please investigate this issue by checking the [AI Validation Dashboard](${process.env.APP_URL}/admin/ai/validation-pipeline).
-This issue was automatically created by the AI validation pipeline.
-`);
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { repo, owner } = context.repo;
+            github.rest.issues.create({
+              owner,
+              repo,
+              title: `⚠️ AI Model Validation Alert: ${process.env.PASS_RATE}% success rate`,
+              body: `
+              # AI Model Validation Alert
+              A recent validation run found potential issues with AI model accuracy.
+              - **Environment:** ${process.env.ENV_NAME}
+              - **Run ID:** ${process.env.RUN_ID}
+              - **Success Rate:** ${process.env.PASS_RATE}%
+              - **Threshold:** 85%
+              Please investigate this issue by checking the [AI Validation Dashboard](${process.env.APP_URL}/admin/ai/validation-pipeline).
+              This issue was automatically created by the AI validation pipeline.
+              `
+            });
