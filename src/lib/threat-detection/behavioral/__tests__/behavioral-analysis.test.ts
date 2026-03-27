@@ -131,6 +131,26 @@ describe('Behavioral Analysis Service', () => {
       expect((service as any).redis).toBeDefined() // Should use the mock
       expect((service as any).mongoClient).toBeDefined()
     })
+
+    it('should keep a failed initialization promise rejected without retrying', async () => {
+      const initializationError = new Error('initialization failed')
+      const connectCallsBefore = mockMongoClientInstance.connect.mock.calls.length
+      const failingService = new AdvancedBehavioralAnalysisService(defaultConfig)
+
+      mockMongoClientInstance.connect.mockRejectedValueOnce(initializationError)
+
+      await expect(failingService.initializeServices()).rejects.toThrow(
+        'initialization failed',
+      )
+
+      await expect(failingService.initializeServices()).rejects.toThrow(
+        'initialization failed',
+      )
+
+      expect(mockMongoClientInstance.connect).toHaveBeenCalledTimes(
+        connectCallsBefore + 1,
+      )
+    })
   })
 
   describe('User Profile Management', () => {
@@ -160,6 +180,44 @@ describe('Behavioral Analysis Service', () => {
       expect(profile).toBeDefined()
       expect(profile.userId).toBe(userId)
       expect(mockRedisInstance.setex).toHaveBeenCalled()
+    })
+
+    it('should delegate temporal and spatial feature extraction to specialized analyzers', async () => {
+      const userId = 'user_456'
+      const events: any[] = [
+        {
+          eventId: 'evt_1',
+          userId,
+          timestamp: new Date('2026-03-27T08:00:00.000Z'),
+          eventType: 'login',
+          sourceIp: '127.0.0.1',
+          userAgent: 'test-agent',
+          requestMethod: 'POST',
+          endpoint: '/login',
+          responseCode: 200,
+          responseTime: 100,
+          payloadSize: 100,
+          sessionId: 'sess_1',
+        },
+      ]
+
+      const spatialAnalyzer = (service as any).spatialAnalyzer as {
+        extractSpatialFeatures: ReturnType<typeof vi.fn>
+      }
+      const temporalAnalyzer = (service as any).temporalAnalyzer as {
+        extractTemporalFeatures: ReturnType<typeof vi.fn>
+      }
+
+      const spatialSpy = vi.spyOn(spatialAnalyzer, 'extractSpatialFeatures')
+      const temporalSpy = vi.spyOn(temporalAnalyzer, 'extractTemporalFeatures')
+
+      mockRedisInstance.setex.mockResolvedValue('OK')
+
+      const profile = await service.createBehaviorProfile(userId, events)
+
+      expect(profile).toBeDefined()
+      expect(spatialSpy).toHaveBeenCalledTimes(1)
+      expect(temporalSpy).toHaveBeenCalledTimes(1)
     })
 
     it('should detect anomalies', async () => {
