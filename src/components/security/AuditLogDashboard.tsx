@@ -65,14 +65,16 @@ export function AuditLogDashboard() {
   ]
 
   const abortControllerRef = useRef<AbortController | null>(null)
-  const timerRef = useRef<number | null>(null)
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const currentAbortControllerRef = useRef<AbortController | null>(null)
 
   const fetchLogs = React.useCallback(async () => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
-    abortControllerRef.current = new AbortController()
+    const abortController = new AbortController()
+    currentAbortControllerRef.current = abortController
+    abortControllerRef.current = abortController
+
     try {
       setLoading(true)
       // Build query parameters
@@ -84,8 +86,8 @@ export function AuditLogDashboard() {
         params.append('userId', filters.userId)
       }
       // Optionally handle pagination/limits here if desired
-      const res = await fetch('https://your-api-url.com/api/admin/audit-logs?' + params.toString(), {
-        signal: abortControllerRef.current.signal,
+      const res = await fetch('/api/admin/audit-logs?' + params.toString(), {
+        signal: abortController.signal,
         // Specify the fetch options to use a secure connection
         mode: 'cors',
         credentials: 'same-origin',
@@ -96,6 +98,7 @@ export function AuditLogDashboard() {
       })
       const data = await res.json()
       let fetchedLogs: AuditLogEntry[] = data.logs || []
+
       // Apply date range filter if set
       if (filters.startDate || filters.endDate) {
         fetchedLogs = fetchedLogs.filter((log) => {
@@ -109,6 +112,7 @@ export function AuditLogDashboard() {
           return true
         })
       }
+
       // Apply search term filter if set
       if (filters.searchTerm) {
         const searchLower = filters.searchTerm.toLowerCase()
@@ -120,6 +124,7 @@ export function AuditLogDashboard() {
             log.userId.toLowerCase().includes(searchLower),
         )
       }
+
       setLogs(fetchedLogs)
     } catch (error: unknown) {
       if (error instanceof DOMException && error.name === 'AbortError') {
@@ -129,7 +134,10 @@ export function AuditLogDashboard() {
       }
     } finally {
       setLoading(false)
-      abortControllerRef.current = null
+      if (abortControllerRef.current === currentAbortControllerRef.current) {
+        abortControllerRef.current = null
+        currentAbortControllerRef.current = null
+      }
     }
   }, [filters])
 
@@ -137,26 +145,7 @@ export function AuditLogDashboard() {
     void fetchLogs()
   }, [])
 
-  useEffect(() => {
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current)
-    }
-    debounceTimerRef.current = window.setTimeout(() => {
-      void fetchLogs()
-    }, 300)
-    return () => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current)
-        debounceTimerRef.current = null
-      }
-    }
-  }, [fetchLogs])
-
   const handleApplyFilters = () => {
-    if (debounceTimerRef.current) {
-      window.clearTimeout(debounceTimerRef.current)
-      debounceTimerRef.current = null
-    }
     void fetchLogs()
   }
 
