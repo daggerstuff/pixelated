@@ -180,10 +180,12 @@ export function ResearchConsentForm({
   const [withdrawReason, setWithdrawReason] = useState('')
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
 
+  const documentText = consentStatus?.currentVersion?.documentText ?? ''
+
   const sanitizedDocumentText = useMemo(() => {
-    if (showSummaryOnly || !expandedView) return ''
-    return sanitizeHtml(consentStatus?.currentVersion.documentText ?? '')
-  }, [consentStatus?.currentVersion.documentText, expandedView, showSummaryOnly])
+    if (showSummaryOnly || !expandedView || !documentText) return ''
+    return sanitizeHtml(documentText)
+  }, [documentText, expandedView, showSummaryOnly])
 
   // Fetch consent status when component mounts or user changes
   useEffect(() => {
