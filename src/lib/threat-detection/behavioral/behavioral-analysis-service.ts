@@ -110,8 +110,7 @@ export interface BehavioralAnalysisService {
 
 export class AdvancedBehavioralAnalysisService
   extends EventEmitter
-  implements BehavioralAnalysisService
-{
+  implements BehavioralAnalysisService {
   private redis!: Redis
   private mongoClient!: MongoClient
   private anomalyDetector!: AnomalyDetector
@@ -882,7 +881,7 @@ export class AdvancedBehavioralAnalysisService
       std ||
       Math.sqrt(
         data.reduce((sum, val) => sum + Math.pow(val - dataMean, 2), 0) /
-          data.length,
+        data.length,
       )
 
     if (dataStd === 0) {
@@ -1067,6 +1066,7 @@ export interface BaselineMetrics {
   geographicThreshold: number
   frequencyThreshold: number
   sequentialThreshold: number
+  reconstructionThreshold?: number
   deviceDiversityThreshold: number
 }
 
@@ -1115,7 +1115,7 @@ class MultiFactorRiskCalculator implements RiskCalculator {
 }
 
 class DifferentialPrivacyPreserver implements PrivacyPreserver {
-  constructor(private config: PrivacyConfig) {}
+  constructor(private config: PrivacyConfig) { }
 
   async applyPrivacy(events: SecurityEvent[]): Promise<SecurityEvent[]> {
     return events
