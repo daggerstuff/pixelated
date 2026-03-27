@@ -11,7 +11,6 @@ describe('PolicyStore', () => {
     // Setup in-memory MongoDB
     mongod = await MongoMemoryServer.create()
     mongoUri = mongod.getUri()
-    process.env.MONGODB_URI = mongoUri
   })
 
   afterEach(async () => {
@@ -23,7 +22,7 @@ describe('PolicyStore', () => {
   describe('initialize', () => {
     it('connects to MongoDB using the provided URI', async () => {
       policyStore = new PolicyStore()
-      await policyStore.initialize()
+      await policyStore.initialize(mongoUri)
       // If we got here without error, connection succeeded
       expect(policyStore).toBeDefined()
     })
@@ -31,8 +30,15 @@ describe('PolicyStore', () => {
 
   describe('savePolicy', () => {
     beforeEach(async () => {
+      mongod = await MongoMemoryServer.create()
+      mongoUri = mongod.getUri()
       policyStore = new PolicyStore()
-      await policyStore.initialize()
+      await policyStore.initialize(mongoUri)
+    })
+
+    afterEach(async () => {
+      await policyStore?.disconnect?.()
+      await mongod?.stop()
     })
 
     it('stores a policy in MongoDB', async () => {
@@ -118,8 +124,15 @@ describe('PolicyStore', () => {
 
   describe('getPolicy', () => {
     beforeEach(async () => {
+      mongod = await MongoMemoryServer.create()
+      mongoUri = mongod.getUri()
       policyStore = new PolicyStore()
-      await policyStore.initialize()
+      await policyStore.initialize(mongoUri)
+    })
+
+    afterEach(async () => {
+      await policyStore?.disconnect?.()
+      await mongod?.stop()
     })
 
     it('retrieves a policy by id', async () => {
