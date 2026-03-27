@@ -11,6 +11,16 @@ export interface AuthenticatedRequest extends Request {
   }
 }
 
+/**
+ * Middleware to authenticate API requests via JWT.
+ * Extracts the Bearer token from the Authorization header and verifies it.
+ * If valid, attaches the decoded user payload to the request object for downstream use.
+ * This ensures that protected routes have access to verified user context without re-authenticating.
+ *
+ * @param req - The incoming request, extended to potentially hold user data
+ * @param res - The outgoing response
+ * @param next - Function to pass control to the next middleware
+ */
 export const authenticateToken = async (
   req: AuthenticatedRequest,
   res: Response,
