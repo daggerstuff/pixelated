@@ -18,21 +18,99 @@ interface ResearchConsentFormProps {
  * Provides audit-compliant consent tracking
  */
 
-// Basic HTML sanitizer to prevent XSS
+/**
+ * Basic HTML sanitizer to prevent XSS in consent text.
+ * This is intentionally conservative and removes:
+ * - All script-like/active content elements
+ * - All event handler attributes (on*)
+ * - Inline styles
+ * - Potentially dangerous URL-bearing attributes with risky schemes
+ */
 const sanitizeHtml = (html: string) => {
-  if (typeof window === 'undefined') return html;
+  // SSR-safe default: don’t emit raw HTML to prevent hydration mismatch and XSS
+  if (typeof window === 'undefined') return '';
+
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const elementsToRemove = doc.querySelectorAll('script, style, object, iframe, embed, applet, link, meta, form');
+
+  // Remove high-risk elements entirely
+  const elementsToRemove = doc.querySelectorAll(
+    'script, style, object, iframe, embed, applet, link, meta, form, base'
+  );
   elementsToRemove.forEach(el => el.remove());
+
   const allElements = doc.querySelectorAll('*');
+
+  // Attributes that can carry URLs or script-relevant data
+  const urlLikeAttributes = new Set([
+    'src',
+    'href',
+    'xlink:href',
+    'formaction',
+    'action',
+    'poster',
+    'data',
+    'srcdoc',
+    'srcset'
+  ]);
+
+  // Dangerous URI schemes / patterns
+  const dangerousSchemePrefixes = [
+    'javascript:',
+    'vbscript:',
+    'data:',
+    'file:',
+    'filesystem:'
+  ];
+
+  const isDangerousUrlValue = (rawValue: string): boolean => {
+    const normalize = (v: string) =>
+      v.trim().toLowerCase().replace(/[\u0000-\u001F\u007F\s]+/g, '');
+
+    let value = normalize(rawValue);
+
+    // Try a single decode to catch simple encoded "javascript:" etc.
+    try {
+      value = normalize(decodeURIComponent(value));
+    } catch {
+      // ignore decode errors and use original normalized value
+    }
+
+    if (dangerousSchemePrefixes.some(prefix => value.startsWith(prefix))) {
+      return true;
+    }
+
+    // Very conservative CSS-related checks
+    if (value.includes('expression(')) return true;
+
+    return false;
+  };
+
   allElements.forEach(el => {
     for (let i = el.attributes.length - 1; i >= 0; i--) {
       const attr = el.attributes[i];
-      if (attr.name.toLowerCase().startsWith('on') || attr.value.toLowerCase().includes('javascript:')) {
+      const name = attr.name.toLowerCase();
+      const value = attr.value || '';
+
+      // Strip all inline event handlers
+      if (name.startsWith('on')) {
         el.removeAttribute(attr.name);
+        continue;
+      }
+
+      // Drop inline style completely for consent text
+      if (name === 'style') {
+        el.removeAttribute(attr.name);
+        continue;
+      }
+
+      // Remove dangerous URL-bearing attributes
+      if (urlLikeAttributes.has(name) && isDangerousUrlValue(value)) {
+        el.removeAttribute(attr.name);
+        continue;
       }
     }
   });
+
   return doc.body.innerHTML;
 };
 
