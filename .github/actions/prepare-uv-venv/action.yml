@@ -17,8 +17,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.service-dir }}
       run: |
-        py_mm="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
         echo "use_system=" >> $GITHUB_OUTPUT
-        if command -v pyenv &> /dev/null && ! pyenv versions --bare | grep -Eq "^${py_mm}(\\.|$)"; then
-          echo "use_system=--system" >> $GITHUB_OUTPUT
+        py_mm="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+        if command -v pyenv &> /dev/null && ! pyenv versions --bare | grep -Eq "^${py_mm}(\.|$)"; then
+            echo "use_system=--system" >> $GITHUB_OUTPUT
         fi
