@@ -2,6 +2,13 @@
 set -euo pipefail
 
 APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-}}"
+
+# Strip unresolved Azure DevOps variables passed as literal $()
+for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RESOURCE_GROUP AZURE_AKS_RESOURCE_GROUP AZURE_SUBSCRIPTION_NAME; do
+  if [[ "${!var:-}" == '$('* ]]; then
+    export "$var"=""
+  fi
+done
 if [ -z "${APP_ENV_RAW}" ]; then
   BRANCH_NAME="${BUILD_SOURCEBRANCHNAME:-${BUILD_SOURCEBRANCH##*/}}"
   case "${BRANCH_NAME}" in
@@ -28,27 +35,35 @@ esac
 resolve_chart_dir() {
   local configured="${CHART_DIR:-}"
   local repo_root="${BUILD_SOURCESDIRECTORY:-${BUILD_SOURCES_DIR:-${BUILD_SOURCES_DIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-}}}}"
+  local candidate
 
-  if [[ -n "${configured}" && -d "${configured}" ]]; then
+  is_chart_dir() {
+    local dir="$1"
+    [[ -n "${dir}" && -d "${dir}" && -f "${dir}/Chart.yaml" ]]
+  }
+
+  if is_chart_dir "${configured}"; then
     printf '%s' "${configured}"
     return 0
   fi
 
-  if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* && -d "${repo_root}/${configured}" ]]; then
+  if [[ -n "${configured}" && -n "${repo_root}" && "${configured}" != /* ]] && is_chart_dir "${repo_root}/${configured}"; then
     printf '%s' "${repo_root}/${configured}"
     return 0
   fi
 
   local candidates=()
   if [[ -n "${repo_root}" ]]; then
+    candidates+=("${repo_root}/ai/infrastructure/helm/pixelated-empathy")
     candidates+=("${repo_root}/ai/infra/cloud/helm/pixelated-empathy")
     candidates+=("${repo_root}/helm")
   fi
+  candidates+=("${PWD}/ai/infrastructure/helm/pixelated-empathy")
   candidates+=("${PWD}/ai/infra/cloud/helm/pixelated-empathy")
   candidates+=("${PWD}/helm")
 
   for candidate in "${candidates[@]}"; do
-    if [[ -d "${candidate}" ]]; then
+    if is_chart_dir "${candidate}"; then
       printf '%s' "${candidate}"
       return 0
     fi
@@ -116,8 +131,13 @@ IMAGE_FULL="${ACR_LOGIN_SERVER}/${ACR_REPO}:${IMAGE_TAG}"
 IMAGE_LATEST="${ACR_LOGIN_SERVER}/${ACR_REPO}:latest"
 NAMESPACE="pixelated-empathy-${APP_ENV}"
 RELEASE_NAME="pixelated-empathy-${APP_ENV}"
-CLUSTER_NAME="${AKS_CLUSTER_NAME}"
-RESOURCE_GROUP="${AKS_RESOURCE_GROUP}"
+CLUSTER_NAME="${AKS_CLUSTER_NAME:-${AZURE_AKS_CLUSTER_NAME:-}}"
+RESOURCE_GROUP="${AKS_RESOURCE_GROUP:-${AZURE_AKS_RESOURCE_GROUP:-}}"
+
+# Normalize alternate variable names so subsequent logic can rely on AKS_*.
+AKS_CLUSTER_NAME="${CLUSTER_NAME}"
+AKS_RESOURCE_GROUP="${RESOURCE_GROUP}"
+export AKS_CLUSTER_NAME AKS_RESOURCE_GROUP
 PUSH_LATEST="${PUSH_LATEST:-false}"
 verify_remote_image() {
   local repository="$1"
@@ -137,6 +157,7 @@ if ! CHART_DIR="$(resolve_chart_dir)"; then
   echo "Working directory: ${PWD}"
   echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
   echo "Expected one of:"
+  echo " - ai/infrastructure/helm/pixelated-empathy"
   echo " - ai/infra/cloud/helm/pixelated-empathy"
   echo " - helm"
   exit 1
@@ -150,8 +171,8 @@ fi
 if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
   CLUSTER_READY=true
 else
-  echo "AKS_CLUSTER_NAME and AKS_RESOURCE_GROUP are both required."
-  echo "Set them in the variable group before running this pipeline."
+  echo "AKS cluster variables are required."
+  echo "Provide either AKS_CLUSTER_NAME/AKS_RESOURCE_GROUP or AZURE_AKS_CLUSTER_NAME/AZURE_AKS_RESOURCE_GROUP in the variable group."
   exit 1
 fi
 
@@ -282,4 +303,3 @@ INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ing
 if [ -n "${INGRESS_CADDY_IP}" ]; then
   echo "Namespace ${NAMESPACE} caddy ingress controller IP: ${INGRESS_CADDY_IP}"
 fi
-

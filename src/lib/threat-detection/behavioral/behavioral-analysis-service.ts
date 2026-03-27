@@ -95,13 +95,14 @@ export class AdvancedBehavioralAnalysisService
   extends EventEmitter
   implements BehavioralAnalysisService
 {
-  private redis: Redis
-  private mongoClient: MongoClient
-  private anomalyDetector: AnomalyDetector
-  private patternMiner: PatternMiner
-  private riskCalculator: RiskCalculator
-  private privacyPreserver: PrivacyPreserver
-  private graphAnalyzer: GraphAnalyzer
+  private redis!: Redis
+  private mongoClient!: MongoClient
+  private anomalyDetector!: AnomalyDetector
+  private patternMiner!: PatternMiner
+  private riskCalculator!: RiskCalculator
+  private privacyPreserver!: PrivacyPreserver
+  private graphAnalyzer!: GraphAnalyzer
+  private initialized = false
 
   constructor(
     private config: {
@@ -113,12 +114,9 @@ export class AdvancedBehavioralAnalysisService
     },
   ) {
     super()
-    this.initializeServices().catch((error) => {
-      this.emit('error', error)
-    })
   }
 
-  private async initializeServices(): Promise<void> {
+  public async initializeServices(): Promise<void> {
     this.redis = new Redis(this.config.redisUrl)
     this.mongoClient = new MongoClient(this.config.mongoUrl)
 
@@ -131,13 +129,23 @@ export class AdvancedBehavioralAnalysisService
     this.graphAnalyzer = new BehavioralGraphAnalyzer()
 
     await this.mongoClient.connect()
+    this.initialized = true
     this.emit('services_initialized')
+  }
+
+  private ensureInitialized(): void {
+    if (!this.initialized) {
+      throw new Error(
+        'AdvancedBehavioralAnalysisService must be initialized via await initializeServices() before use.',
+      )
+    }
   }
 
   async createBehaviorProfile(
     userId: string,
     events: SecurityEvent[],
   ): Promise<BehaviorProfile> {
+    this.ensureInitialized()
     try {
       if (!userId || !events || events.length === 0) {
         throw new Error('Invalid input: userId and events are required')
@@ -186,6 +194,7 @@ export class AdvancedBehavioralAnalysisService
     profile: BehaviorProfile,
     currentEvents: SecurityEvent[],
   ): Promise<Anomaly[]> {
+    this.ensureInitialized()
     try {
       const anomalies: Anomaly[] = []
 
@@ -242,6 +251,7 @@ export class AdvancedBehavioralAnalysisService
     profile: BehaviorProfile,
     events: SecurityEvent[],
   ): Promise<RiskScore> {
+    this.ensureInitialized()
     try {
       const riskFactors = await this.extractRiskFactors(profile, events)
 
@@ -294,6 +304,7 @@ export class AdvancedBehavioralAnalysisService
   async mineBehavioralPatterns(
     sequences: BehavioralSequence[],
   ): Promise<BehavioralPattern[]> {
+    this.ensureInitialized()
     try {
       const patterns = await this.patternMiner.minePatterns(sequences)
 
@@ -316,6 +327,7 @@ export class AdvancedBehavioralAnalysisService
   }
 
   async analyzeBehaviorGraph(events: SecurityEvent[]): Promise<BehaviorGraph> {
+    this.ensureInitialized()
     try {
       const graph = await this.graphAnalyzer.buildGraph(events)
 
@@ -350,6 +362,7 @@ export class AdvancedBehavioralAnalysisService
   async analyzeWithPrivacy(
     events: SecurityEvent[],
   ): Promise<PrivateBehavioralAnalysis> {
+    this.ensureInitialized()
     try {
       const privateEvents = await this.privacyPreserver.applyPrivacy(events)
 
@@ -1201,17 +1214,22 @@ class MLAnomalyDetector extends AnomalyDetector {
     const anomalies: Anomaly[] = []
 
     try {
-      // run tensor operations inside tf.tidy to ensure tensors are disposed
-      const { reconstructionError, anomalyScore } = tf.tidy(() => {
+      const {model, isolationForest} = this;
+      if (!model || !isolationForest) {
+        return []
+      }
+      // run tensor operations inside tf.tidy to ensure intermediate tensors are disposed
+      const reconstructionErrorTensor = tf.tidy(() => {
         const inputTensor = tf.tensor2d([featureVector])
-        const reconstruction = this.model.predict(inputTensor) as tf.Tensor
-        const error = tf
-          .mean(tf.abs(tf.sub(inputTensor, reconstruction)))
-          .dataSync()[0]
-
-        const score = this.isolationForest.predict([featureVector])[0]
-        return { reconstructionError: error, anomalyScore: score }
+        const reconstruction = model.predict(inputTensor) as tf.Tensor
+        return tf.mean(tf.abs(tf.sub(inputTensor, reconstruction)))
       })
+
+      const reconstructionErrorData = await reconstructionErrorTensor.data()
+      const reconstructionError = reconstructionErrorData[0]
+      reconstructionErrorTensor.dispose()
+
+      const anomalyScore = isolationForest.predict([featureVector])[0]
 
       const reconstructionThreshold =
         profile.baselineMetrics.sequentialThreshold || 0.1

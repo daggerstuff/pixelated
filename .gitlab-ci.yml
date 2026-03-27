@@ -9,8 +9,8 @@ stages:
   - security
 
 variables:
-  NODE_VERSION: '24'
-  PNPM_VERSION: '10.32.1'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.33.0"
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
   # Required for terraform jobs:
@@ -18,7 +18,7 @@ variables:
   # - TF_HTTP_PASSWORD (GitLab token for state backend, marked as secret)
   # - AZURE_SUBSCRIPTION_ID
   # - AZURE_TENANT_ID
-  TERRAFORM_VERSION: '${TERRAFORM_VERSION:-1.9.0}'
+  TERRAFORM_VERSION: "${TERRAFORM_VERSION:-1.9.0}"
 
 # Validation jobs
 validate:dependencies:
@@ -82,7 +82,7 @@ validate:typecheck:
     # Increase Node.js heap size to prevent OOM during typecheck
     # Astro check can be memory-intensive with large codebases
     # Using 8GB to match dev environment requirements
-    NODE_OPTIONS: '--max-old-space-size=8192'
+    NODE_OPTIONS: "--max-old-space-size=8192"
   cache:
     key:
       files:
@@ -216,7 +216,7 @@ terraform:plan:
   stage: terraform
   image: hashicorp/terraform:${TERRAFORM_VERSION}
   variables:
-    TF_ENVIRONMENT: '${TF_ENVIRONMENT:-staging}'
+    TF_ENVIRONMENT: "${TF_ENVIRONMENT:-staging}"
   before_script:
     - cd terraform
     - |
@@ -280,7 +280,7 @@ build:
     - job: test:unit
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: '/certs'
+    DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     # Validate Docker registry variables are set
     - |
@@ -322,7 +322,7 @@ build:acr:
     - job: validate:dependencies
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: '/certs'
+    DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     # Validate Azure Container Registry variables
     - |
@@ -373,7 +373,7 @@ security:scan:
     - job: build
   variables:
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: '/certs'
+    DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     # Install Trivy (latest version)
     - apk add --no-cache curl

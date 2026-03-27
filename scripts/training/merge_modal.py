@@ -6,7 +6,7 @@ app = modal.App("pixelated-lora-merge")
 
 # Use a standard image with necessary LoRA/Merge dependencies
 image = (
-    modal.Image.debian_slim(python_version="3.11")
+    modal.Image.debian_slim(python_version="3.13")
     .pip_install(
         "torch",
         "transformers",

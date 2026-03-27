@@ -16,7 +16,7 @@ on:
 
 env:
   NODE_VERSION: 24.13.0
-  PYTHON_VERSION: 3.11
+  PYTHON_VERSION: 3.13
   PNPM_VERSION: 10.30.1
 
 jobs:
@@ -31,9 +31,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -48,7 +51,7 @@ jobs:
 
       - name: Setup Node.js
         if: matrix.language == 'javascript'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.3.0
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -58,7 +61,7 @@ jobs:
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5.0.0
         with:
           version: ${{ env.PNPM_VERSION }}
           run_install: false
@@ -72,7 +75,7 @@ jobs:
 
       - name: Setup pnpm cache
         if: matrix.language == 'javascript'
-        uses: actions/cache@v4
+        uses: actions/cache@v5.0.4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -89,7 +92,7 @@ jobs:
 
       - name: Setup Python
         if: matrix.language == 'python'
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v6.2.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -149,7 +152,7 @@ jobs:
           output: sarif-latest
 
       - name: Upload SARIF results as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.0
         if: always()
         with:
           name: codeql-sarif-${{ matrix.language }}
@@ -157,7 +160,7 @@ jobs:
           retention-days: 30
 
       - name: Upload CodeQL database (for advanced analysis)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.0
         if: failure()
         with:
           name: codeql-database-${{ matrix.language }}

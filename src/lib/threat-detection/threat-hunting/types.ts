@@ -1,3 +1,9 @@
+import type { Redis } from 'ioredis'
+import type { MongoClient } from 'mongodb'
+
+export type IRedisClient = Redis
+export type IMongoClient = MongoClient
+
 export interface ThreatHunt { }
 export interface InvestigationResult { }
 export interface ThreatIndicator { }
@@ -37,4 +43,16 @@ export interface ThreatFinding {
 	related_threats: string[]
 	created_at: string
 	status: 'new' | 'investigating' | 'resolved' | 'dismissed'
+}
+
+export interface HuntFinding {
+  findingId: string
+  type: 'anomaly' | 'suspicious_pattern' | 'iocs' | 'behavioral_deviation'
+  title: string
+  description: string
+  evidence: Record<string, unknown>[]
+  confidence: number
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  recommendedActions: string[]
+  relatedEntities: string[]
 }

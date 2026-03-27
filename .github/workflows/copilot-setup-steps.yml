@@ -5,20 +5,23 @@ on:
   workflow_dispatch:
 jobs:
   copilot-code-review:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       pull-requests: write
     environment: copilot
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5.0.0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6.3.0
         with:
           node-version: "24.14.0"
           cache: "pnpm"
@@ -42,8 +45,8 @@ jobs:
             echo "No supported test runner found (vitest/jest)."
           fi
 
-      - name: Run TypeScript type check
-        run: pnpm run typecheck || true
+      - name: Run oxlint type-aware
+        run: pnpm exec oxlint --type-aware -c .oxlintrc.json . || true
 
       - name: Summary
         run: |

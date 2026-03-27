@@ -22,16 +22,19 @@ name: Training Artifact Verification
 
 jobs:
   verify-stage-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6.2.0
         with:
-          python-version: '3.11'
+          python-version: '3.13'
 
       - name: Verify stage manifest and split completeness
         run: |

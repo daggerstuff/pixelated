@@ -1,232 +1,104 @@
-import { z } from 'zod'
+import { z } from "zod";
+import { aiEnvSchema } from "./schemas/ai.schema";
+import { authEnvSchema } from "./schemas/auth.schema";
+import { azureEnvSchema } from "./schemas/azure.schema";
+import { clientEnvSchema } from "./schemas/client.schema";
+import { databaseEnvSchema } from "./schemas/database.schema";
+import { monitoringEnvSchema } from "./schemas/monitoring.schema";
+import { notificationEnvSchema } from "./schemas/notification.schema";
+import { securityEnvSchema } from "./schemas/security.schema";
+import { serverEnvSchema } from "./schemas/server.schema";
 
 /**
  * Environment variable schema with validation
+ * Merged from modular domain schemas
  */
-const envSchema = z.object({
-  // Node environment
-  NODE_ENV: z
-    .enum(['development', 'production', 'test'])
-    .default('development'),
-
-  // Server configuration
-  PORT: z.string().transform(Number).default(3000),
-  LOG_LEVEL: z
-    .enum(['error', 'warn', 'info', 'verbose', 'debug'])
-    .default('info'),
-  ENABLE_RATE_LIMITING: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Analytics worker configuration
-  ANALYTICS_WS_PORT: z.string().transform(Number).default(8083),
-
-  // Notification worker configuration
-  NOTIFICATION_WS_PORT: z.string().transform(Number).default(8082),
-
-  // Database - MongoDB Atlas
-  MONGODB_URI: z.string().optional(),
-  MONGODB_DB_NAME: z.string().optional(),
-  MONGODB_USERNAME: z.string().optional(),
-  MONGODB_PASSWORD: z.string().optional(),
-  MONGODB_CLUSTER: z.string().optional(),
-
-  // Legacy database (PostgreSQL) - kept for migration purposes
-  POSTGRES_URL: z.string().optional(),
-  POSTGRES_PRISMA_URL: z.string().optional(),
-  POSTGRES_URL_NON_POOLING: z.string().optional(),
-
-  // Redis configuration
-  UPSTASH_REDIS_REST_URL: z.string().optional(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
-  REDIS_URL: z.string().optional(),
-  REDIS_TOKEN: z.string().optional(),
-
-  // Authentication - JWT based
-  JWT_SECRET: z.string().optional(),
-  JWT_EXPIRES_IN: z.string().default('24h'), // Per original PR requirements
-
-  // APIs
-  OPENAI_API_KEY: z.string().optional(),
-  OPENAI_BASE_URL: z.string().url().optional(),
-  ANTHROPIC_API_KEY: z.string().optional(),
-  TOGETHER_API_KEY: z.string().optional(),
-  JIGSAWSTACK_API_KEY: z.string().optional(),
-  GOOGLE_API_KEY: z.string().optional(),
-  REPLICATE_API_TOKEN: z.string().optional(),
-
-  // Azure OpenAI
-  AZURE_OPENAI_API_KEY: z.string().optional(),
-  AZURE_OPENAI_ENDPOINT: z.string().url().optional(),
-  AZURE_OPENAI_API_VERSION: z.string().optional(),
-  AZURE_OPENAI_DEPLOYMENT_NAME: z.string().optional(),
-
-  // Azure Services
-  AZURE_STORAGE_CONNECTION_STRING: z.string().optional(),
-  AZURE_STORAGE_ACCOUNT_NAME: z.string().optional(),
-  AZURE_STORAGE_ACCOUNT_KEY: z.string().optional(),
-  AZURE_STORAGE_CONTAINER_NAME: z.string().optional(),
-
-  // Azure Authentication
-  AZURE_AD_CLIENT_ID: z.string().optional(),
-  AZURE_AD_CLIENT_SECRET: z.string().optional(),
-  AZURE_AD_TENANT_ID: z.string().optional(),
-
-  // Monitoring and analytics
-  SENTRY_DSN: z.string().url().optional(),
-  AXIOM_DATASET: z.string().optional(),
-  AXIOM_TOKEN: z.string().optional(),
-  VITE_LITLYX_PROJECT_ID: z.string().optional(),
-  VITE_LITLYX_API_KEY: z.string().optional(),
-
-  // Email
-  EMAIL_FROM: z.string().email().optional(),
-  RESEND_API_KEY: z.string().optional(),
-  SITE_URL: z.string().url().optional(),
-
-  // Security
-  SECURITY_ENABLE_BRUTE_FORCE_PROTECTION: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  SECURITY_MAX_LOGIN_ATTEMPTS: z.string().transform(Number).default(5),
-  SECURITY_ACCOUNT_LOCKOUT_DURATION: z.string().transform(Number).default(1800),
-  SECURITY_API_ABUSE_THRESHOLD: z.string().transform(Number).default(100),
-  SECURITY_ENABLE_ALERTS: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Rate limiting
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default(100),
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default(900000),
-
-  // Logging
-  LOG_CONSOLE: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  LOG_AUDIT: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-
-  // Security Implementation
-  ENABLE_AUDIT_LOGGING: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .default(true),
-  AUDIT_LOG_RETENTION_DAYS: z.string().transform(Number).default(2555),
-  ENCRYPTION_ALGORITHM: z.enum(['aes-256-gcm']).default('aes-256-gcm'),
-  ENCRYPTION_KEY: z.string().min(32).optional(),
-
-  // Client-side variables (exposed to the browser)
-  VITE_API_URL: z.string().url().optional(),
-  VITE_MONGODB_CLUSTER: z.string().optional(),
-  PUBLIC_TRAINING_WS_URL: z
-    .string()
-    .refine(
-      (val) => {
-        if (!val) return true // Optional, so empty is valid
-        try {
-          const url = new URL(val)
-          // Accept ws://, wss://, http://, and https:// schemes
-          return ['ws:', 'wss:', 'http:', 'https:'].includes(url.protocol)
-        } catch {
-          return false
-        }
-      },
-      {
-        message:
-          'PUBLIC_TRAINING_WS_URL must be a valid WebSocket URL (ws:// or wss://) or HTTP URL',
-      },
-    )
-    .optional(),
-
-  // Notification configuration
-  VAPID_PUBLIC_KEY: z.string().optional(),
-  VAPID_PRIVATE_KEY: z.string().optional(),
-  VAPID_SUBJECT: z.string().url().optional(),
-
-  // Twilio configuration
-  TWILIO_ACCOUNT_SID: z.string().optional(),
-  TWILIO_AUTH_TOKEN: z.string().optional(),
-  TWILIO_PHONE_NUMBER: z.string().optional(),
-
-  // Slack (for notifications)
-  SLACK_WEBHOOK_URL: z.string().url().optional(),
-
-  // MentalLLaMA configuration
-  MENTALLAMA_API_KEY: z.string().optional(),
-  MENTALLAMA_ENDPOINT_URL_7B: z.string().url().optional(),
-  MENTALLAMA_ENDPOINT_URL_13B: z.string().url().optional(),
-  MENTALLAMA_DEFAULT_MODEL_TIER: z.enum(['7B', '13B']).optional(),
-  MENTALLAMA_ENABLE_PYTHON_BRIDGE: z
-    .string()
-    .transform((val: string) => val === 'true')
-    .optional(),
-  MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
-})
+export const envSchema = serverEnvSchema
+  .merge(databaseEnvSchema)
+  .merge(authEnvSchema)
+  .merge(aiEnvSchema)
+  .merge(monitoringEnvSchema)
+  .merge(securityEnvSchema)
+  .merge(notificationEnvSchema)
+  .merge(clientEnvSchema)
+  .merge(azureEnvSchema);
 
 /**
  * Cache the validated environment variables
  */
 
 // Helper to mask secrets in logs
-
 function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
-  const secretKeys = [
-    'MONGODB_PASSWORD',
-    'MONGODB_URI',
-    'JWT_SECRET',
-    'OPENAI_API_KEY',
-    'TOGETHER_API_KEY',
-    'JIGSAWSTACK_API_KEY',
-    'GOOGLE_API_KEY',
-    'REPLICATE_API_TOKEN',
-    'AXIOM_TOKEN',
-    'VITE_LITLYX_API_KEY',
-    'RESEND_API_KEY',
-    'TWILIO_AUTH_TOKEN',
-    'SENTRY_DSN',
-    'SENTRY_DSN',
-    'SLACK_WEBHOOK_URL',
-    'ENCRYPTION_KEY',
-  ]
+  const secretKeyPatterns = [
+    /SECRET/,
+    /TOKEN/,
+    /KEY$/,
+    /PASSWORD/,
+    /PRIVATE/,
+    /DSN$/,
+    /^DATABASE_URL$/,
+    /^REDIS_URL$/,
+    /^MONGODB_URI$/,
+    /^SENTRY_DSN$/,
+    /^AXIOM_TOKEN$/,
+  ];
+  const safeKeyPatterns = [
+    /^PUBLIC_/,
+    /^NODE_ENV$/,
+    /^CI$/,
+    /^PORT$/,
+    /^LOG_LEVEL$/,
+    /^ENABLE_RATE_LIMITING$/,
+    /_WS_PORT$/,
+    /^JWT_EXPIRES_IN$/,
+    /^AZURE_OPENAI_API_VERSION$/,
+    /^AZURE_OPENAI_DEPLOYMENT_NAME$/,
+    /^AXIOM_DATASET$/,
+    /^SITE_URL$/,
+    /^SECURITY_(ENABLE_|MAX_|ACCOUNT_)/,
+    /^RATE_LIMIT_/,
+    /^LOG_(CONSOLE|AUDIT)$/,
+    /^ENABLE_AUDIT_LOGGING$/,
+    /^AUDIT_LOG_RETENTION_DAYS$/,
+    /^ENCRYPTION_ALGORITHM$/,
+    /^VAPID_SUBJECT$/,
+    /^MENTALLAMA_(DEFAULT_MODEL_TIER|ENABLE_PYTHON_BRIDGE|PYTHON_BRIDGE_SCRIPT_PATH)$/,
+  ];
   return Object.fromEntries(
     Object.entries(env).map(([k, v]) => [
       k,
-      secretKeys.includes(k) && v ? '[hidden]' : v,
+      v === undefined || v === null
+        ? v
+        : secretKeyPatterns.some((pattern) => pattern.test(k))
+          ? "[hidden]"
+          : safeKeyPatterns.some((pattern) => pattern.test(k))
+            ? v
+            : "[hidden]",
     ]),
-  )
+  );
 }
+
 /**
  * Get the validated environment variables
  * (Refactored: stateless, no caching, for simplicity and correctness)
  */
 export function getEnv(): z.infer<typeof envSchema> {
   // Type-safe environment source handling
-  let envSource: Record<string, unknown>
+  let envSource: Record<string, unknown>;
 
-  if (typeof process !== 'undefined') {
-    envSource = process.env as Record<string, unknown>
+  if (typeof process !== "undefined") {
+    envSource = (process.env as Record<string, unknown>) || {};
   } else {
-    // For browser/Vite environments, we'll work with an empty object
-    // since client-side env vars should be prefixed with VITE_
-    envSource = {}
+    envSource = typeof import.meta !== "undefined" ? import.meta.env : {};
   }
 
   // Log all env variables (masking secrets)
   // Only log in CI or production to avoid local noise
-  if (envSource['CI'] || envSource['NODE_ENV'] === 'production') {
-    console.log(
-      '[env.config] Environment variables at build:',
-      maskEnv(envSource),
-    )
+  if (envSource["CI"] || envSource["NODE_ENV"] === "production") {
+    console.log("[env.config] Environment variables at build:", maskEnv(envSource));
   }
 
-  return envSchema.parse(envSource)
+  return envSchema.parse(envSource);
 }
 
 /**
@@ -234,27 +106,27 @@ export function getEnv(): z.infer<typeof envSchema> {
  * Note: Lazy evaluation to avoid initialization issues during build
  */
 export const env = (() => {
-  let cachedEnvInstance: z.infer<typeof envSchema> | null = null
+  let cachedEnvInstance: z.infer<typeof envSchema> | null = null;
   return () => {
     if (!cachedEnvInstance) {
-      cachedEnvInstance = getEnv()
+      cachedEnvInstance = getEnv();
     }
-    return cachedEnvInstance
-  }
-})()
+    return cachedEnvInstance;
+  };
+})();
 
 /**
  * Type definition for environment variables
  */
-export type Env = z.infer<typeof envSchema>
+export type Env = z.infer<typeof envSchema>;
 
 /**
  * Environment configuration object
  */
 export const config = {
-  isDevelopment: (): boolean => env().NODE_ENV === 'development',
-  isProduction: (): boolean => env().NODE_ENV === 'production',
-  isTest: (): boolean => env().NODE_ENV === 'test',
+  isDevelopment: (): boolean => env().NODE_ENV === "development",
+  isProduction: (): boolean => env().NODE_ENV === "production",
+  isTest: (): boolean => env().NODE_ENV === "test",
 
   server: {
     port: (): number => env().PORT,
@@ -290,10 +162,8 @@ export const config = {
   },
 
   redis: {
-    url: (): string | undefined =>
-      env().REDIS_URL || env().UPSTASH_REDIS_REST_URL,
-    token: (): string | undefined =>
-      env().UPSTASH_REDIS_REST_TOKEN || env().REDIS_TOKEN,
+    url: (): string | undefined => env().REDIS_URL || env().UPSTASH_REDIS_REST_URL,
+    token: (): string | undefined => env().UPSTASH_REDIS_REST_TOKEN || env().REDIS_TOKEN,
   },
 
   ai: {
@@ -308,22 +178,16 @@ export const config = {
     // Azure OpenAI
     azureOpenAiKey: (): string | undefined => env().AZURE_OPENAI_API_KEY,
     azureOpenAiEndpoint: (): string | undefined => env().AZURE_OPENAI_ENDPOINT,
-    azureOpenAiApiVersion: (): string | undefined =>
-      env().AZURE_OPENAI_API_VERSION,
-    azureOpenAiDeploymentName: (): string | undefined =>
-      env().AZURE_OPENAI_DEPLOYMENT_NAME,
+    azureOpenAiApiVersion: (): string | undefined => env().AZURE_OPENAI_API_VERSION,
+    azureOpenAiDeploymentName: (): string | undefined => env().AZURE_OPENAI_DEPLOYMENT_NAME,
   },
 
   azure: {
     // Storage
-    storageConnectionString: (): string | undefined =>
-      env().AZURE_STORAGE_CONNECTION_STRING,
-    storageAccountName: (): string | undefined =>
-      env().AZURE_STORAGE_ACCOUNT_NAME,
-    storageAccountKey: (): string | undefined =>
-      env().AZURE_STORAGE_ACCOUNT_KEY,
-    storageContainerName: (): string | undefined =>
-      env().AZURE_STORAGE_CONTAINER_NAME,
+    storageConnectionString: (): string | undefined => env().AZURE_STORAGE_CONNECTION_STRING,
+    storageAccountName: (): string | undefined => env().AZURE_STORAGE_ACCOUNT_NAME,
+    storageAccountKey: (): string | undefined => env().AZURE_STORAGE_ACCOUNT_KEY,
+    storageContainerName: (): string | undefined => env().AZURE_STORAGE_CONTAINER_NAME,
 
     // Authentication
     adClientId: (): string | undefined => env().AZURE_AD_CLIENT_ID,
@@ -349,11 +213,9 @@ export const config = {
   },
 
   security: {
-    enableBruteForceProtection: (): boolean =>
-      env().SECURITY_ENABLE_BRUTE_FORCE_PROTECTION,
+    enableBruteForceProtection: (): boolean => env().SECURITY_ENABLE_BRUTE_FORCE_PROTECTION,
     maxLoginAttempts: (): number => env().SECURITY_MAX_LOGIN_ATTEMPTS,
-    accountLockoutDuration: (): number =>
-      env().SECURITY_ACCOUNT_LOCKOUT_DURATION,
+    accountLockoutDuration: (): number => env().SECURITY_ACCOUNT_LOCKOUT_DURATION,
     apiAbuseThreshold: (): number => env().SECURITY_API_ABUSE_THRESHOLD,
     enableAlerts: (): boolean => env().SECURITY_ENABLE_ALERTS,
     encryption: {
@@ -380,13 +242,15 @@ export const config = {
     apiUrl: (): string | undefined => env().VITE_API_URL,
     mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
     trainingWsUrl: (): string | undefined => env().PUBLIC_TRAINING_WS_URL,
+    rybbitScriptUrl: (): string | undefined => env().PUBLIC_RYBBIT_SCRIPT_URL,
+    rybbitSiteId: (): string | undefined => env().PUBLIC_RYBBIT_SITE_ID,
   },
 
   notifications: {
     vapidPublicKey: (): string | undefined => env().VAPID_PUBLIC_KEY,
     vapidPrivateKey: (): string | undefined => env().VAPID_PRIVATE_KEY,
     vapidSubject: (): string | undefined => env().VAPID_SUBJECT,
-    slackWebhookUrl: (): string | undefined => env().SLACK_WEBHOOK_URL, // Added for Slack
+    slackWebhookUrl: (): string | undefined => env().SLACK_WEBHOOK_URL,
   },
 
   twilio: {
@@ -399,13 +263,10 @@ export const config = {
     apiKey: (): string | undefined => env().MENTALLAMA_API_KEY,
     endpointUrl7B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_7B,
     endpointUrl13B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_13B,
-    defaultModelTier: (): '7B' | '13B' | undefined =>
-      env().MENTALLAMA_DEFAULT_MODEL_TIER,
-    enablePythonBridge: (): boolean | undefined =>
-      env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
-    pythonBridgeScriptPath: (): string | undefined =>
-      env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
+    defaultModelTier: (): "7B" | "13B" | undefined => env().MENTALLAMA_DEFAULT_MODEL_TIER,
+    enablePythonBridge: (): boolean | undefined => env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
+    pythonBridgeScriptPath: (): string | undefined => env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
   },
-}
+};
 
-export default config
+export default config;

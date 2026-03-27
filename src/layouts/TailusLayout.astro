@@ -14,12 +14,13 @@ const {
   title = 'Pixelated Empathy - AI-Powered Mental Health Support',
   description = 'Experience personalized mental health support through our advanced AI platform. Get insights, therapy assistance, and emotional wellness tools designed for your unique journey.',
 } = Astro.props
+const { cspNonce } = Astro.locals
 ---
 
 <!doctype html>
 <html lang="en" class="dark scroll-smooth">
   <head>
-    <BaseHead {title} {description} />
+    <BaseHead {title} {description} cspNonce={cspNonce} />
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0f172a" />
 
@@ -36,12 +37,10 @@ const {
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
 
-    <!-- Rybbit Analytics -->
-    <script src="https://app.rybbit.io/api/script.js" data-site-id="9ee28b13ba40" defer></script>
-
     <!-- GoatCounter Analytics -->
     <script
       is:inline
+      nonce={cspNonce}
       data-goatcounter="https://pixelated.goatcounter.com/count"
       async
       src="//gc.zgo.at/count.js"></script>
@@ -64,7 +63,7 @@ const {
     <AppFooter />
     <SpeedInsights />
     <Analytics />
-    <script is:inline>
+    <script is:inline nonce={cspNonce}>
       function speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)
         return data

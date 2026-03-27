@@ -1,0 +1,90 @@
+---
+import type { AdminNavItem } from './admin-nav'
+
+interface Props {
+  items: AdminNavItem[]
+  activeItem?: string
+  variant?: 'portal' | 'refined'
+  showIcons?: boolean
+}
+
+const {
+  items,
+  activeItem = '',
+  variant = 'portal',
+  showIcons = false,
+} = Astro.props
+
+const isPortal = variant === 'portal'
+
+const iconPaths: Record<string, string> = {
+  'dashboard':
+    'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z',
+  'users':
+    'M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z',
+  'stats':
+    'M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
+  'shield':
+    'M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
+  'shield-check':
+    'M10 1l6 3v5c0 3.866-2.239 7.39-6 9-3.761-1.61-6-5.134-6-9V4l6-3zm3.707 6.293a1 1 0 00-1.414-1.414L9 9.172 7.707 7.879a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
+  'database':
+    'M4 4c0-1.105 2.686-2 6-2s6 .895 6 2-2.686 2-6 2-6-.895-6-2zm0 4c0 1.105 2.686 2 6 2s6-.895 6-2M4 12c0 1.105 2.686 2 6 2s6-.895 6-2M4 4v12c0 1.105 2.686 2 6 2s6-.895 6-2V4',
+  'file-export':
+    'M3 3h10a2 2 0 012 2v4h-2V5H5v10h4v2H5a2 2 0 01-2-2V5a2 2 0 012-2zm10 8V8l5 4-5 4v-3H8v-2h5z',
+  'calendar':
+    'M6 2a1 1 0 012 0v1h4V2a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h1V2zm9 5H5v8h10V7z',
+  'list':
+    'M4 6h12M4 10h12M4 14h12M2 6h.01M2 10h.01M2 14h.01',
+  'settings':
+    'M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z',
+  'user':
+    'M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z',
+  'document':
+    'M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V8l-4-4H6zm6 1.5L14.5 6H12V3.5zM7 9h6v1.5H7V9zm0 3h6v1.5H7V12z',
+}
+---
+
+<ul class:list={[isPortal ? 'space-y-2 font-medium' : 'space-y-1']}>
+  {
+    items.map((item) => {
+      const isActive = activeItem === item.id
+      return (
+        <li>
+          <a
+            href={item.href}
+            class:list={
+              isPortal
+                ? [
+                    'flex items-center p-2 rounded-lg',
+                    isActive
+                      ? 'bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-500'
+                      : 'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700',
+                  ]
+                : [
+                    'nav-link-refined flex items-center px-6 py-3',
+                    { 'nav-link-refined--active': isActive },
+                  ]
+            }
+          >
+            {
+              showIcons && item.icon && iconPaths[item.icon] && (
+                <span class={isPortal ? 'mr-3' : 'mr-3'}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d={iconPaths[item.icon]}></path>
+                  </svg>
+                </span>
+              )
+            }
+            <span class={isPortal ? 'ms-3' : undefined}>{item.label}</span>
+          </a>
+        </li>
+      )
+    })
+  }
+</ul>

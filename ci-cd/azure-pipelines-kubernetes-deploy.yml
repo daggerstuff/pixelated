@@ -4,6 +4,8 @@ trigger:
   batch: true
   branches:
     include:
+      - main
+      - master
       - staging
   paths:
     include:
@@ -24,6 +26,7 @@ pr:
   autoCancel: true
   branches:
     include:
+      - main
       - master
       - staging
   paths:
@@ -77,7 +80,22 @@ stages:
           vmImage: ubuntu-24.04
         steps:
           - checkout: self
-            fetchDepth: 1
+            fetchDepth: 0
+
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '24.x'
+
+          - task: SonarCloudPrepare@4
+            displayName: 'Prepare Analysis Configuration'
+            inputs:
+              SonarCloud: 'SonarQube Cloud'
+              organization: 'slimshadyme'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'slimshadyme_pixelated'
+              cliProjectName: 'pixelated'
 
           - task: AzureCLI@2
             displayName: Build and push image to ACR
@@ -115,6 +133,21 @@ stages:
               ACR_NAME: $(ACR_NAME)
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+              APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+              AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+              AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+              AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
+
+          - task: SonarCloudAnalyze@4
+            displayName: 'Run Code Analysis'
+
+          - task: SonarCloudPublish@4
+            displayName: 'Publish Quality Gate Result'
+            inputs:
+              pollingTimeoutSec: '300'
 
   # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
   # Uses the image tag produced in the Build stage.
@@ -131,12 +164,17 @@ stages:
           ),
           and(
             eq('${{ parameters.environment }}', 'production'),
-            eq(variables['Build.SourceBranch'], 'refs/heads/master')
+            or(
+              eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+              eq(variables['Build.SourceBranch'], 'refs/heads/main')
+            )
           )
         )
       )
     variables:
-      IMAGE_TAG: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
+      - group: pixelated-pipeline-variables
+      - name: IMAGE_TAG
+        value: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
       - job: DeployHosted
         displayName: Helm deploy (hosted)
@@ -145,6 +183,12 @@ stages:
         steps:
           - checkout: self
             fetchDepth: 1
+            persistCredentials: true
+
+          - script: bash scripts/devops/init-submodules.sh
+            displayName: Initialize CI-aware submodules
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
           - task: HelmInstaller@1
             displayName: Install Helm
@@ -169,6 +213,11 @@ stages:
               ACR_NAME: $(ACR_NAME)
               ACR_REPO: $(ACR_REPO)
               ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+              APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+              APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+              AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
               AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
               AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+              AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+              AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
               SKIP_BUILD: 'true'

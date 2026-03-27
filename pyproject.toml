@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.11.13"
+requires-python = ">=3.13"
 dependencies = [
   "flask",
   "flask-cors>=6.0.2", # Updated to latest secure version
@@ -17,6 +17,7 @@ dependencies = [
   "fairlearn",
   "shap>=0.41.0",
   "lime",
+  "scikit-image>=0.26.0",
   "spacy>=3.8.11", # Updated to latest secure version
   "nltk>=3.9.3", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip)
   "evaluate",
@@ -44,7 +45,7 @@ dependencies = [
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=4.48.0", # Required for dataset_pipeline training_runner
-  "torch>=2.6.0,<3.0.0", # Fixes CVE-2025-32434 affecting versions ≤2.5.1
+  "torch==2.10.0", # Downgraded to match ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -117,6 +118,7 @@ dependencies = [
   "gradient-adk>=0.2.11",
   "honeyhive>=0.2.19",
   "virtualenv>=21.2.0",
+  "voyageai>=0.3.7",
 ]
 [project.optional-dependencies]
 test = [
@@ -141,7 +143,6 @@ dev = [
   "coverage",
   "flake8",
   "semgrep>=1.60.0",
-  "checkov",
   "pyright",
   "sourcery; sys_platform == 'darwin'",
   "types-requests",
@@ -155,7 +156,7 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["ai*"]
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.13"
 ignore_missing_imports = true
 mypy_path = "stubs"
 files = ["src", "tests", "ai"]
@@ -181,9 +182,9 @@ reportMissingTypeStubs = false
 reportMissingImports = false
 reportMissingModuleSource = false
 reportPrivateUsage = false
-pythonVersion = "3.11"
+pythonVersion = "3.13"
 [tool.ruff]
-target-version = "py311"
+target-version = "py313"
 line-length = 100
 exclude = [
   "node_modules",
@@ -231,7 +232,7 @@ known-first-party = ["ai", "src"]
 combine-as-imports = true
 force-single-line = false
 [tool.black]
-target-version = ["py311"]
+target-version = ["py313"]
 line-length = 100
 skip-string-normalization = false
 [tool.isort]
@@ -269,7 +270,6 @@ concurrent-downloads = 1 # Download one package at a time for slower connections
 [dependency-groups]
 dev = [
   "black>=25.12.0",
-  "checkov>=3.0.34",
   "coverage>=7.13.4",
   "flake8>=7.3.0",
   "isort>=6.0.1",
