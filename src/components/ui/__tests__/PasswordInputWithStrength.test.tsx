@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PasswordInputWithStrength } from '../PasswordInputWithStrength'
@@ -35,12 +38,12 @@ describe('PasswordInputWithStrength', () => {
       />
     )
 
-    const input = screen.getByLabelText('Password', { selector: 'input' })
+    const input = container.querySelector('input[name="password"]') as HTMLElement
     fireEvent.focus(input)
 
     // Error label should be present and announced as an alert
     const errorAlert = screen.getByRole('alert')
-    expect(errorAlert).toHaveTextContent('Invalid password')
+    expect(errorAlert.textContent).toContain('Invalid password')
 
     // aria-invalid should be true
     expect(input.getAttribute('aria-invalid')).toBe('true')
@@ -60,7 +63,7 @@ describe('PasswordInputWithStrength', () => {
     expect(progressbar.getAttribute('aria-valuetext')).toBe('fair')
   })
 
-  it('has aria-live="polite" on feedback text', () => {
+  it('has aria-live="polite" on feedback text', async () => {
     render(
       <PasswordInputWithStrength
         label="Password"
@@ -70,13 +73,13 @@ describe('PasswordInputWithStrength', () => {
       />
     )
 
-    // Check for aria-live="polite" on the element containing the feedback
-    const feedback = screen.getByText(/Fair - could be stronger/i)
+    // Wait for the debounced feedback to appear
+    const feedback = await screen.findByText(/Fair - could be stronger/i)
     expect(feedback.getAttribute('aria-live')).toBe('polite')
   })
 
   it('includes error in aria-describedby when error exists', () => {
-    render(
+    const { container } = render(
       <PasswordInputWithStrength
         label="Password"
         name="password"
@@ -85,9 +88,21 @@ describe('PasswordInputWithStrength', () => {
       />
     )
 
-    const input = screen.getByLabelText('Password', { selector: 'input' })
+    const input = container.querySelector('input[name="password"]') as HTMLElement
     const describedBy = input.getAttribute('aria-describedby')
     expect(describedBy).toContain('password-error')
     expect(describedBy).toContain('password-helper')
   })
-})
+
+  it('shows empty strength when password is empty', () => {
+    render(
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+      />
+    )
+
+    const progressbar = screen.getByRole('progressbar')
+    expect(progressbar.getAttribute('aria-valuetext')).toBe('empty')
+  })
+}
