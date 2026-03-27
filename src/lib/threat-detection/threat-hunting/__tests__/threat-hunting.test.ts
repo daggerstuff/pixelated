@@ -1073,7 +1073,7 @@ describe('Threat Hunting Service', () => {
       const results = await service.performRealTimeHunting(huntingData)
 
       expect(results).toBeDefined()
-      expect(results.errors).toContain('Real-time hunting timeout')
+      expect(results.errors?.[0]).toContain('Real-time hunting timeout')
       expect(results.matches).toHaveLength(0)
     })
   })
@@ -1091,7 +1091,7 @@ describe('Threat Hunting Service', () => {
       const investigation = await service.createInvestigation(investigationData)
 
       expect(investigation).toBeDefined()
-      expect(investigation.errors).toContain('Redis connection failed')
+      expect(investigation.errors?.[0]).toContain('Redis connection failed')
     })
 
     it('should handle invalid investigation data', async () => {
@@ -1106,7 +1106,7 @@ describe('Threat Hunting Service', () => {
       const investigation = await service.createInvestigation(invalidData)
 
       expect(investigation).toBeDefined()
-      expect(investigation.errors).toContain('Invalid investigation data')
+      expect(investigation.errors?.[0]).toContain('Invalid investigation data')
     })
 
     it('should handle hunt query execution errors', async () => {
@@ -1116,7 +1116,7 @@ describe('Threat Hunting Service', () => {
       const results = await service.executeHuntQuery(queryId as any)
 
       expect(results).toBeDefined()
-      expect(results.errors).toContain('Query execution failed')
+      expect(results.errors?.[0]).toContain('Query execution failed')
       expect(results.data).toHaveLength(0)
     })
 
@@ -1127,7 +1127,7 @@ describe('Threat Hunting Service', () => {
       const analysis = await service.analyzeTimeline(timelineId)
 
       expect(analysis).toBeDefined()
-      expect(analysis.errors).toContain('Timeline not found')
+      expect(analysis.errors?.[0]).toContain('Timeline not found')
       expect(analysis.patterns).toHaveLength(0)
     })
   })

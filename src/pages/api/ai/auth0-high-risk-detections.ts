@@ -94,7 +94,6 @@ export const GET = async ({ request, url }) => {
       'ai-high-risk-detections',
       {
         error: error?.message,
-        stack: error?.stack,
       },
       AuditEventStatus.FAILURE,
     )
