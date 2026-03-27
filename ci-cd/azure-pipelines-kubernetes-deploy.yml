@@ -82,10 +82,10 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - task: UseNode@1
+          - task: NodeTool@0
             displayName: 'Install Node.js (LTS)'
             inputs:
-              version: '20.x'
+              versionSpec: '20.x'
               checkLatest: true
 
           - task: SonarCloudPrepare@4
@@ -144,13 +144,20 @@ stages:
           - task: SonarCloudAnalyze@4
             displayName: 'Run Code Analysis'
 
+          - task: NodeTool@0
+            displayName: 'Reinstall Node.js before Quality Gate publish'
+            inputs:
+              versionSpec: '20.x'
+              checkLatest: true
+
           - task: Bash@3
             displayName: 'Verify Node is available for Quality Gate publish'
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                echo "Node path: $(command -v node)"
+                NODE_BIN="$(command -v node)"
+                echo "Node path: ${NODE_BIN}"
                 node --version
 
           - task: SonarCloudPublish@4
