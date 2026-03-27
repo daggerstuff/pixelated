@@ -16,6 +16,11 @@ export class SequentialPatternMiner implements PatternMiner {
   private minSupport = 0.1
   private maxPatternLength = 10
   private minPatternLength = 2
+  private maxInputSequences = 5000
+  private maxRecursionDepth = 8
+  private maxCandidatesPerIteration = 5000
+  private spadeSequenceLimit = 1000
+  private spadeAverageLengthLimit = 15
 
   async minePatterns(
     sequences: BehavioralSequence[],
@@ -50,15 +55,24 @@ export class SequentialPatternMiner implements PatternMiner {
   private async mineFrequentPatterns(
     sequences: string[][],
   ): Promise<FrequentPattern[]> {
-    const patterns: FrequentPattern[] = []
+    if (sequences.length === 0) {
+      return []
+    }
 
-    const prefixSpanPatterns = await this.prefixSpan(sequences, this.minSupport)
-    patterns.push(...prefixSpanPatterns)
+    const boundedSequences = sequences.slice(0, this.maxInputSequences)
+    const averageLength =
+      boundedSequences.reduce((sum, sequence) => sum + sequence.length, 0) /
+      boundedSequences.length
 
-    const spadePatterns = await this.spade(sequences, this.minSupport)
-    patterns.push(...spadePatterns)
+    const shouldUseSpade =
+      boundedSequences.length <= this.spadeSequenceLimit &&
+      averageLength <= this.spadeAverageLengthLimit
 
-    return patterns
+    if (shouldUseSpade) {
+      return this.spade(boundedSequences, this.minSupport)
+    }
+
+    return this.prefixSpan(boundedSequences, this.minSupport)
   }
 
   private async prefixSpan(
@@ -74,6 +88,7 @@ export class SequentialPatternMiner implements PatternMiner {
         projectedDB,
         [item],
         minSupport,
+        1,
       )
       patterns.push(...pattern)
     }
@@ -85,10 +100,14 @@ export class SequentialPatternMiner implements PatternMiner {
     projectedDB: string[][],
     prefix: string[],
     minSupport: number,
+    depth: number,
   ): Promise<FrequentPattern[]> {
     const patterns: FrequentPattern[] = []
 
-    if (prefix.length >= this.maxPatternLength) {
+    if (
+      prefix.length >= this.maxPatternLength ||
+      depth >= this.maxRecursionDepth
+    ) {
       return patterns
     }
 
@@ -112,6 +131,7 @@ export class SequentialPatternMiner implements PatternMiner {
           newProjectedDB,
           newPrefix,
           minSupport,
+          depth + 1,
         )
         patterns.push(...subPatterns)
       }
@@ -225,7 +245,7 @@ export class SequentialPatternMiner implements PatternMiner {
     }
 
     let k = 2
-    while (true) {
+    while (k <= this.maxPatternLength) {
       const candidates = this.generateCandidates(frequentSequences, k)
       const frequentKSequences: string[][] = []
 
@@ -258,6 +278,7 @@ export class SequentialPatternMiner implements PatternMiner {
     k: number,
   ): string[][] {
     const candidates: string[][] = []
+    const candidateSet = new Set<string>()
 
     for (let i = 0; i < frequentSequences.length; i++) {
       for (let j = i + 1; j < frequentSequences.length; j++) {
@@ -270,7 +291,14 @@ export class SequentialPatternMiner implements PatternMiner {
           seq1.slice(0, -1).every((item, idx) => item === seq2[idx])
         ) {
           const candidate = [...seq1, seq2[seq2.length - 1]]
-          candidates.push(candidate)
+          const key = candidate.join('\u0001')
+          if (!candidateSet.has(key)) {
+            candidateSet.add(key)
+            candidates.push(candidate)
+            if (candidates.length >= this.maxCandidatesPerIteration) {
+              return candidates
+            }
+          }
         }
       }
     }
@@ -284,15 +312,96 @@ export class SequentialPatternMiner implements PatternMiner {
     minSupport: number,
     totalSequences: number,
   ): boolean {
-    const lastItem = sequence[sequence.length - 1]
-    const idList = idLists[lastItem]
-    if (!idList) {
+    const minCount = Math.ceil(totalSequences * minSupport)
+
+    const positionMaps = new Map<string, Map<number, number[]>>()
+    for (const item of sequence) {
+      const idList = idLists[item]
+      if (!idList) {
+        return false
+      }
+      const map = this.buildSequencePositionMap(idList)
+      positionMaps.set(item, map)
+    }
+
+    const candidateSequenceIds = this.intersectSequenceIds(positionMaps)
+    if (candidateSequenceIds.length < minCount) {
       return false
     }
-    const minCount = Math.ceil(totalSequences * minSupport)
-    const uniqueSequenceIds = new Set(idList.map((entry) => entry[0]))
-    const support = uniqueSequenceIds.size
-    return support >= minCount
+
+    let supportCount = 0
+    for (const sequenceId of candidateSequenceIds) {
+      if (this.hasOrderedOccurrence(sequence, sequenceId, positionMaps)) {
+        supportCount++
+        if (supportCount >= minCount) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
+  private buildSequencePositionMap(idList: number[][]): Map<number, number[]> {
+    const map = new Map<number, number[]>()
+    for (const [sequenceId, itemIndex] of idList) {
+      const positions = map.get(sequenceId)
+      if (positions) {
+        positions.push(itemIndex)
+      } else {
+        map.set(sequenceId, [itemIndex])
+      }
+    }
+
+    for (const positions of map.values()) {
+      positions.sort((a, b) => a - b)
+    }
+
+    return map
+  }
+
+  private intersectSequenceIds(
+    positionMaps: Map<string, Map<number, number[]>>,
+  ): number[] {
+    const maps = [...positionMaps.values()]
+    if (maps.length === 0) {
+      return []
+    }
+
+    const [firstMap, ...rest] = maps
+    const sequenceIds: number[] = []
+
+    for (const sequenceId of firstMap.keys()) {
+      if (rest.every((map) => map.has(sequenceId))) {
+        sequenceIds.push(sequenceId)
+      }
+    }
+
+    return sequenceIds
+  }
+
+  private hasOrderedOccurrence(
+    sequence: string[],
+    sequenceId: number,
+    positionMaps: Map<string, Map<number, number[]>>,
+  ): boolean {
+    let previousIndex = -1
+
+    for (const item of sequence) {
+      const positions = positionMaps.get(item)?.get(sequenceId)
+      if (!positions) {
+        return false
+      }
+
+      const nextIndex = positions.find((position) => position > previousIndex)
+      if (nextIndex === undefined) {
+        return false
+      }
+
+      previousIndex = nextIndex
+    }
+
+    return true
   }
 
   private calculateSequenceSupport(

@@ -4,6 +4,7 @@
  */
 
 import type { SecurityEvent, TemporalFeatures } from './types'
+import { calculateTimeIntervals, generateAnomalyId } from './analyzer-utils'
 
 export class TemporalAnalysisService {
   /**
@@ -80,13 +81,7 @@ export class TemporalAnalysisService {
   }
 
   private calculateTimeIntervals(timestamps: number[]): number[] {
-    if (timestamps.length < 2) return []
-    const sorted = [...timestamps].sort((a, b) => a - b)
-    const intervals: number[] = []
-    for (let i = 1; i < sorted.length; i++) {
-      intervals.push(sorted[i] - sorted[i - 1])
-    }
-    return intervals
+    return calculateTimeIntervals(timestamps)
   }
 
   private calculateAverageSessionDuration(events: SecurityEvent[]): number {
@@ -120,6 +115,6 @@ export class TemporalAnalysisService {
   }
 
   private generateAnomalyId(): string {
-    return `temporal_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`
+    return generateAnomalyId('temporal')
   }
 }
