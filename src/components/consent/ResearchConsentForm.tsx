@@ -18,86 +18,91 @@ interface ResearchConsentFormProps {
  * Provides audit-compliant consent tracking
  */
 
-// Basic HTML sanitizer to prevent XSS
+const BLOCKED_ELEMENTS_SELECTOR =
+  'script,style,object,iframe,embed,applet,link,meta,form,base,svg,math'
+const ALLOWED_TAGS = new Set([
+  'a',
+  'b',
+  'blockquote',
+  'br',
+  'code',
+  'div',
+  'em',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'i',
+  'li',
+  'ol',
+  'p',
+  'pre',
+  's',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'table',
+  'tbody',
+  'td',
+  'th',
+  'thead',
+  'tr',
+  'u',
+  'ul',
+])
+
+const ALLOWED_ATTRS_BY_TAG: Record<string, Set<string>> = {
+  a: new Set(['href', 'title']),
+}
+
+const normalizeUrlForSchemeChecks = (raw: string): string => {
+  let result = ''
+  for (const ch of raw) {
+    const code = ch.charCodeAt(0)
+    if (code <= 0x20 || code === 0x7f || /\s/u.test(ch)) continue
+    result += ch
+  }
+  return result.toLowerCase()
+}
+
+const isAllowedUrl = (raw: string): boolean => {
+  const normalized = normalizeUrlForSchemeChecks(raw)
+
+  if (
+    normalized.startsWith('#') ||
+    normalized.startsWith('/') ||
+    normalized.startsWith('./') ||
+    normalized.startsWith('../') ||
+    normalized.startsWith('//')
+  ) {
+    return true
+  }
+
+  const match = normalized.match(/^([a-z0-9+.-]+):/)
+  if (!match) return true
+
+  const scheme = match[1]
+  return (
+    scheme === 'http' ||
+    scheme === 'https' ||
+    scheme === 'mailto' ||
+    scheme === 'tel'
+  )
+}
+
+/**
+* Sanitizes untrusted HTML for safe rendering in the browser.
+*
+* On the server (when `window` is not available), this returns an empty string
+* rather than attempting to parse HTML, to avoid emitting unsanitized markup.
+*/
 const sanitizeHtml = (html: string): string => {
   // SSR-safe default: never emit raw, unsanitized HTML
   if (typeof window === 'undefined') return ''
-
-  const BLOCKED_ELEMENTS_SELECTOR =
-    'script,style,object,iframe,embed,applet,link,meta,form,base,svg,math'
-  const ALLOWED_TAGS = new Set([
-    'a',
-    'b',
-    'blockquote',
-    'br',
-    'code',
-    'div',
-    'em',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'hr',
-    'i',
-    'li',
-    'ol',
-    'p',
-    'pre',
-    's',
-    'span',
-    'strong',
-    'sub',
-    'sup',
-    'table',
-    'tbody',
-    'td',
-    'th',
-    'thead',
-    'tr',
-    'u',
-    'ul',
-  ])
-
-  const ALLOWED_ATTRS_BY_TAG: Record<string, Set<string>> = {
-    a: new Set(['href', 'title']),
-  }
-
-  const normalizeUrlForSchemeChecks = (raw: string): string => {
-    let result = ''
-    for (const ch of raw) {
-      const code = ch.charCodeAt(0)
-      if (code <= 0x20 || code === 0x7f || /\s/u.test(ch)) continue
-      result += ch
-    }
-    return result.toLowerCase()
-  }
-
-  const isAllowedUrl = (raw: string): boolean => {
-    const normalized = normalizeUrlForSchemeChecks(raw)
-
-    if (
-      normalized.startsWith('#') ||
-      normalized.startsWith('/') ||
-      normalized.startsWith('./') ||
-      normalized.startsWith('../') ||
-      normalized.startsWith('//')
-    ) {
-      return true
-    }
-
-    const match = normalized.match(/^([a-z0-9+.-]+):/)
-    if (!match) return true
-
-    const scheme = match[1]
-    return (
-      scheme === 'http' ||
-      scheme === 'https' ||
-      scheme === 'mailto' ||
-      scheme === 'tel'
-    )
-  }
 
   const doc = new DOMParser().parseFromString(html, 'text/html')
 
