@@ -225,6 +225,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.20",
+    "dompurify": "^3.3.3",
     "drizzle-orm": "^0.45.1",
     "events": "^3.3.0",
     "express": "^5.2.1",

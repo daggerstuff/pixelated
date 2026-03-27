@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 
+import createDOMPurify from 'dompurify'
+
 import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
 import type { UserConsentStatus } from '@/lib/security/consent/types'
@@ -18,9 +20,7 @@ interface ResearchConsentFormProps {
  * Provides audit-compliant consent tracking
  */
 
-const BLOCKED_ELEMENTS_SELECTOR =
-  'script,style,object,iframe,embed,applet,link,meta,form,base,svg,math'
-const ALLOWED_TAGS = new Set([
+const CONSENT_ALLOWED_TAGS = [
   'a',
   'b',
   'blockquote',
@@ -53,47 +53,18 @@ const ALLOWED_TAGS = new Set([
   'tr',
   'u',
   'ul',
-])
+]
+const CONSENT_ALLOWED_ATTRS = ['href', 'title']
 
-const ALLOWED_ATTRS_BY_TAG: Record<string, Set<string>> = {
-  a: new Set(['href', 'title']),
-}
+const CONSENT_ALLOWED_URI_REGEXP = /^(?:(?:https?|mailto|tel):|[#/.])/i
+const CONSENT_DOMPURIFY_CONFIG = {
+  ALLOWED_TAGS: CONSENT_ALLOWED_TAGS,
+  ALLOWED_ATTR: CONSENT_ALLOWED_ATTRS,
+  ALLOWED_URI_REGEXP: CONSENT_ALLOWED_URI_REGEXP,
+} as const
 
-const normalizeUrlForSchemeChecks = (raw: string): string => {
-  let result = ''
-  for (const ch of raw) {
-    const code = ch.charCodeAt(0)
-    if (code <= 0x20 || code === 0x7f) continue
-    if (/\s/u.test(ch)) continue
-    result += ch
-  }
-  return result.toLowerCase()
-}
-
-const isAllowedUrl = (raw: string): boolean => {
-  const normalized = normalizeUrlForSchemeChecks(raw)
-
-  if (
-    normalized.startsWith('#') ||
-    normalized.startsWith('/') ||
-    normalized.startsWith('./') ||
-    normalized.startsWith('../') ||
-    normalized.startsWith('//')
-  ) {
-    return true
-  }
-
-  const match = normalized.match(/^([a-z0-9+.-]+):/)
-  if (!match) return true
-
-  const scheme = match[1]
-  return (
-    scheme === 'http' ||
-    scheme === 'https' ||
-    scheme === 'mailto' ||
-    scheme === 'tel'
-  )
-}
+const consentDOMPurify =
+  typeof window === 'undefined' ? null : createDOMPurify(window)
 
 /**
 * Sanitizes HTML for the research consent document only.
@@ -103,63 +74,9 @@ const isAllowedUrl = (raw: string): boolean => {
 */
 const sanitizeConsentDocumentHtml = (html: string): string => {
   // SSR-safe default: never emit raw, unsanitized HTML
-  if (typeof window === 'undefined') return ''
+  if (!consentDOMPurify) return ''
 
-  const doc = new DOMParser().parseFromString(html, 'text/html')
-
-  doc.querySelectorAll(BLOCKED_ELEMENTS_SELECTOR).forEach((el) => el.remove())
-
-  const allElements = Array.from(doc.body.querySelectorAll('*'))
-
-  for (let i = allElements.length - 1; i >= 0; i--) {
-    const el = allElements[i]
-    if (!el) continue
-
-    const tagName = el.tagName.toLowerCase()
-    if (!ALLOWED_TAGS.has(tagName)) {
-      const parent = el.parentNode
-      if (parent) {
-        while (el.firstChild) parent.insertBefore(el.firstChild, el)
-        parent.removeChild(el)
-      }
-      continue
-    }
-
-    const allowedAttrs = ALLOWED_ATTRS_BY_TAG[tagName]
-
-    for (let j = el.attributes.length - 1; j >= 0; j--) {
-      const attr = el.attributes[j]
-      if (!attr) continue
-
-      const name = attr.name.toLowerCase()
-      const value = attr.value
-
-      if (name.startsWith('on') || name === 'style') {
-        el.removeAttribute(attr.name)
-        continue
-      }
-
-      if (!allowedAttrs?.has(name)) {
-        el.removeAttribute(attr.name)
-        continue
-      }
-
-      if (name === 'href') {
-        let href = value
-        try {
-          href = decodeURIComponent(href)
-        } catch {
-          // Ignore decode errors and use the original value.
-        }
-
-        if (!isAllowedUrl(href)) {
-          el.removeAttribute(attr.name)
-        }
-      }
-    }
-  }
-
-  return doc.body.innerHTML
+  return consentDOMPurify.sanitize(html, CONSENT_DOMPURIFY_CONFIG)
 }
 
 export function ResearchConsentForm({
