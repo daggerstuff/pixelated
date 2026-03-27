@@ -15,8 +15,10 @@ runs:
     - name: Check system python
       id: check-pyenv
       shell: bash
+      working-directory: ${{ inputs.service-dir }}
       run: |
+        py_mm="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
         echo "use_system=" >> $GITHUB_OUTPUT
-        if command -v pyenv &> /dev/null && ! pyenv versions --bare | grep -q "^$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"; then
-            echo "use_system=--system" >> $GITHUB_OUTPUT
+        if command -v pyenv &> /dev/null && ! pyenv versions --bare | grep -Eq "^${py_mm}(\\.|$)"; then
+          echo "use_system=--system" >> $GITHUB_OUTPUT
         fi
