@@ -41,6 +41,7 @@ pr:
         - k8s/**
         - package.json
         - pnpm-lock.yaml
+        - .gitmodules
       exclude:
         - docs/**
         - '**/*.md'
@@ -70,8 +71,6 @@ variables:
     value: $(ACR_NAME).azurecr.io
 
 stages:
-  # Stage 1: Build the Docker image once and push to ACR.
-  # Runs on a Microsoft-hosted agent so no self-hosted runner availability is required.
   - stage: Build
     displayName: Build and push image to ACR
     jobs:
@@ -125,7 +124,6 @@ stages:
                 docker push "${IMAGE_LATEST}"
               fi
 
-              # Export the computed tag for downstream stages
               echo "##vso[task.setvariable variable=IMAGE_TAG;isOutput=true]${IMAGE_TAG}"
             name: build_step
             env:
@@ -166,8 +164,6 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-  # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
-  # Uses the image tag produced in the Build stage.
   - stage: DeployHosted
     displayName: Deploy to AKS (hosted agent)
     dependsOn: Build
