@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 import { consentService } from '@/lib/security/consent/ConsentService'
@@ -18,101 +18,143 @@ interface ResearchConsentFormProps {
  * Provides audit-compliant consent tracking
  */
 
-/**
- * Basic HTML sanitizer to prevent XSS in consent text.
- * This is intentionally conservative and removes:
- * - All script-like/active content elements
- * - All event handler attributes (on*)
- * - Inline styles
- * - Potentially dangerous URL-bearing attributes with risky schemes
- */
-const sanitizeHtml = (html: string) => {
-  // SSR-safe default: don’t emit raw HTML to prevent hydration mismatch and XSS
-  if (typeof window === 'undefined') return '';
+// Basic HTML sanitizer to prevent XSS
+const sanitizeHtml = (html: string): string => {
+  // SSR-safe default: never emit raw, unsanitized HTML
+  if (typeof window === 'undefined') return ''
 
-  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const BLOCKED_ELEMENTS_SELECTOR =
+    'script,style,object,iframe,embed,applet,link,meta,form,base,svg,math'
+  const ALLOWED_TAGS = new Set([
+    'a',
+    'b',
+    'blockquote',
+    'br',
+    'code',
+    'div',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'h4',
+    'h5',
+    'h6',
+    'hr',
+    'i',
+    'li',
+    'ol',
+    'p',
+    'pre',
+    's',
+    'span',
+    'strong',
+    'sub',
+    'sup',
+    'table',
+    'tbody',
+    'td',
+    'th',
+    'thead',
+    'tr',
+    'u',
+    'ul',
+  ])
 
-  // Remove high-risk elements entirely
-  const elementsToRemove = doc.querySelectorAll(
-    'script, style, object, iframe, embed, applet, link, meta, form, base'
-  );
-  elementsToRemove.forEach(el => el.remove());
+  const ALLOWED_ATTRS_BY_TAG: Record<string, Set<string>> = {
+    a: new Set(['href', 'title']),
+  }
 
-  const allElements = doc.querySelectorAll('*');
+  const normalizeUrlForSchemeChecks = (raw: string): string => {
+    let result = ''
+    for (const ch of raw) {
+      const code = ch.charCodeAt(0)
+      if (code <= 0x20 || code === 0x7f || /\s/u.test(ch)) continue
+      result += ch
+    }
+    return result.toLowerCase()
+  }
 
-  // Attributes that can carry URLs or script-relevant data
-  const urlLikeAttributes = new Set([
-    'src',
-    'href',
-    'xlink:href',
-    'formaction',
-    'action',
-    'poster',
-    'data',
-    'srcdoc',
-    'srcset'
-  ]);
+  const isAllowedUrl = (raw: string): boolean => {
+    const normalized = normalizeUrlForSchemeChecks(raw)
 
-  // Dangerous URI schemes / patterns
-  const dangerousSchemePrefixes = [
-    'javascript:',
-    'vbscript:',
-    'data:',
-    'file:',
-    'filesystem:'
-  ];
-
-  const isDangerousUrlValue = (rawValue: string): boolean => {
-    const normalize = (v: string) =>
-      v.trim().toLowerCase().replace(/[\u0000-\u001F\u007F\s]+/g, '');
-
-    let value = normalize(rawValue);
-
-    // Try a single decode to catch simple encoded "javascript:" etc.
-    try {
-      value = normalize(decodeURIComponent(value));
-    } catch {
-      // ignore decode errors and use original normalized value
+    if (
+      normalized.startsWith('#') ||
+      normalized.startsWith('/') ||
+      normalized.startsWith('./') ||
+      normalized.startsWith('../') ||
+      normalized.startsWith('//')
+    ) {
+      return true
     }
 
-    if (dangerousSchemePrefixes.some(prefix => value.startsWith(prefix))) {
-      return true;
+    const match = normalized.match(/^([a-z0-9+.-]+):/)
+    if (!match) return true
+
+    const scheme = match[1]
+    return (
+      scheme === 'http' ||
+      scheme === 'https' ||
+      scheme === 'mailto' ||
+      scheme === 'tel'
+    )
+  }
+
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+
+  doc.querySelectorAll(BLOCKED_ELEMENTS_SELECTOR).forEach((el) => el.remove())
+
+  const allElements = Array.from(doc.body.querySelectorAll('*'))
+
+  for (let i = allElements.length - 1; i >= 0; i--) {
+    const el = allElements[i]
+    if (!el) continue
+
+    const tagName = el.tagName.toLowerCase()
+    if (!ALLOWED_TAGS.has(tagName)) {
+      const parent = el.parentNode
+      if (parent) {
+        while (el.firstChild) parent.insertBefore(el.firstChild, el)
+        parent.removeChild(el)
+      }
+      continue
     }
 
-    // Very conservative CSS-related checks
-    if (value.includes('expression(')) return true;
+    const allowedAttrs = ALLOWED_ATTRS_BY_TAG[tagName]
 
-    return false;
-  };
+    for (let j = el.attributes.length - 1; j >= 0; j--) {
+      const attr = el.attributes[j]
+      if (!attr) continue
 
-  allElements.forEach(el => {
-    for (let i = el.attributes.length - 1; i >= 0; i--) {
-      const attr = el.attributes[i];
-      const name = attr.name.toLowerCase();
-      const value = attr.value || '';
+      const name = attr.name.toLowerCase()
+      const value = attr.value
 
-      // Strip all inline event handlers
-      if (name.startsWith('on')) {
-        el.removeAttribute(attr.name);
-        continue;
+      if (name.startsWith('on') || name === 'style') {
+        el.removeAttribute(attr.name)
+        continue
       }
 
-      // Drop inline style completely for consent text
-      if (name === 'style') {
-        el.removeAttribute(attr.name);
-        continue;
+      if (!allowedAttrs?.has(name)) {
+        el.removeAttribute(attr.name)
+        continue
       }
 
-      // Remove dangerous URL-bearing attributes
-      if (urlLikeAttributes.has(name) && isDangerousUrlValue(value)) {
-        el.removeAttribute(attr.name);
-        continue;
+      if (name === 'href') {
+        let href = value
+        try {
+          href = decodeURIComponent(href)
+        } catch {
+          // Ignore decode errors and use the original value.
+        }
+
+        if (!isAllowedUrl(href)) {
+          el.removeAttribute(attr.name)
+        }
       }
     }
-  });
+  }
 
-  return doc.body.innerHTML;
-};
+  return doc.body.innerHTML
+}
 
 export function ResearchConsentForm({
   onConsentChanged,
@@ -132,6 +174,11 @@ export function ResearchConsentForm({
   >({})
   const [withdrawReason, setWithdrawReason] = useState('')
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false)
+
+  const sanitizedDocumentText = useMemo(() => {
+    if (showSummaryOnly || !expandedView) return ''
+    return sanitizeHtml(consentStatus?.currentVersion.documentText ?? '')
+  }, [consentStatus?.currentVersion.documentText, expandedView, showSummaryOnly])
 
   // Fetch consent status when component mounts or user changes
   useEffect(() => {
@@ -376,7 +423,7 @@ export function ResearchConsentForm({
               <div className='bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm'>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: sanitizeHtml(consentStatus.currentVersion.documentText),
+                    __html: sanitizedDocumentText,
                   }}
                 ></div>
               </div>
