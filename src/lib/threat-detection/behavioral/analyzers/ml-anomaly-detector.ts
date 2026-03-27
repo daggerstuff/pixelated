@@ -7,12 +7,17 @@ import type {
   BehavioralFeatures,
 } from '../behavioral-analysis-service'
 
-// Mock class for IsolationForest until a concrete implementation is integrated.
+/**
+ * MockIsolationForest - Placeholder until real Isolation Forest implementation is integrated.
+ * Returns random scores in 0.1-0.3 range (normal behavior) to avoid false positives.
+ * TODO: Replace with actual Isolation Forest implementation
+ */
 class MockIsolationForest {
   constructor(_nTrees: number, _sampleSize: number) { }
 
   predict(data: number[][]): number[] {
-    return data.map(() => 0.0)
+    // Return random scores in low range - real implementation needed for actual detection
+    return data.map(() => Math.random() * 0.2 + 0.1) // 0.1 to 0.3 range
   }
 }
 

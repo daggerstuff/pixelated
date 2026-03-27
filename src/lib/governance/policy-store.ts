@@ -1,6 +1,7 @@
 import type { Db, MongoClient } from 'mongodb'
 import { ObjectId, MongoClient as MongoConstructor } from 'mongodb'
 import type { GovernancePolicy } from './types'
+import { mongoClient as sharedMongoClient } from '../db/mongoClient'
 
 const GOVERNANCE_DB_NAME = 'governance'
 const POLICIES_COLLECTION = 'policies'
@@ -29,9 +30,9 @@ export class PolicyStore {
    this.db = this.client.db(GOVERNANCE_DB_NAME)
   } else {
    // Use shared mongoClient singleton (production)
-   const { mongoClient } = await import('../db/mongoClient')
-   await mongoClient.connect()
-   this.db = mongoClient.db
+   await sharedMongoClient.connect()
+   this.client = sharedMongoClient
+   this.db = sharedMongoClient.db
   }
  }
 
