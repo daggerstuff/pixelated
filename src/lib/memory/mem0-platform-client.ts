@@ -2,15 +2,12 @@
  * @file mem0-platform-client.ts
  * @module lib/memory/mem0-platform-client
  * @description
- *   Production Mem0 Platform API client for frontend integration.
- *   Provides a typed interface to the Mem0 Platform API with support for:
- *   - Memory CRUD operations
- *   - Semantic search
- *   - User and session context
- *   - Category and metadata management
- *
- * Based on: https://docs.mem0.ai/platform/overview
+ *   Backward-compatible browser memory client.
+ *   Legacy imports keep working, but the implementation now routes through the
+ *   local/shared MCP memory API instead of talking to Mem0 directly.
  */
+
+import { mcpMemoryManager } from './mcp-memory-client'
 
 export interface Mem0Memory {
   id: string
@@ -36,9 +33,9 @@ export interface SearchMemoryOptions {
 }
 
 export interface Mem0ClientConfig {
-  /** Mem0 Platform API key */
-  apiKey: string
-  /** Base URL for the API (defaults to Mem0 Platform) */
+  /** Optional compatibility field; no longer used for proxy-backed requests. */
+  apiKey?: string
+  /** Base URL for the proxy API (defaults to the MCP memory server). */
   baseUrl?: string
   /** Optional custom fetch implementation */
   fetch?: typeof fetch
@@ -64,40 +61,13 @@ export interface Mem0ClientConfig {
  * ```
  */
 export class Mem0PlatformClient {
-  private readonly apiKey: string
   private readonly baseUrl: string
-  private readonly fetchFn: typeof fetch
 
   constructor(config: Mem0ClientConfig) {
-    this.apiKey = config.apiKey
-    this.baseUrl = config.baseUrl || 'https://api.mem0.ai/v1'
-    this.fetchFn = config.fetch || fetch.bind(globalThis)
-  }
-
-  /**
-   * Make an authenticated request to the Mem0 API.
-   */
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {},
-  ): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`
-
-    const headers = new Headers(options.headers)
-    headers.set('Content-Type', 'application/json')
-    headers.set('Authorization', `Token ${this.apiKey}`)
-
-    const response = await this.fetchFn(url, {
-      ...options,
-      headers,
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Mem0 API error (${response.status}): ${errorText}`)
-    }
-
-    return response.json() as Promise<T>
+    this.baseUrl =
+      config.baseUrl ||
+      process.env.NEXT_PUBLIC_MEMORY_API_URL ||
+      'http://localhost:5003'
   }
 
   /**
@@ -108,31 +78,10 @@ export class Mem0PlatformClient {
    * @returns The created memory ID
    */
   async addMemory(content: string, options: AddMemoryOptions): Promise<string> {
-    const payload: Record<string, unknown> = {
-      messages: [{ role: 'user', content }],
-      user_id: options.userId,
-    }
-
-    if (options.agentId) payload.agent_id = options.agentId
-    if (options.metadata) payload.metadata = options.metadata
-    if (options.category) {
-      const existingMetadata =
-        (payload.metadata as Record<string, unknown>) || {}
-      payload.metadata = { ...existingMetadata, category: options.category }
-    }
-
-    const response = await this.request<{ results: Array<{ id: string }> }>(
-      '/memories/',
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      },
-    )
-
-    if (response.results && response.results.length > 0) {
-      return response.results[0].id
-    }
-    return 'stored'
+    return mcpMemoryManager.addMemory(content, options.userId, {
+      sessionId: options.sessionId,
+      category: options.category,
+    })
   }
 
   /**
@@ -146,21 +95,16 @@ export class Mem0PlatformClient {
     query: string,
     options: SearchMemoryOptions,
   ): Promise<Mem0Memory[]> {
-    const payload = {
+    const memories = await mcpMemoryManager.searchMemories(
       query,
-      user_id: options.userId,
-      limit: options.limit || 10,
-    }
-
-    const response = await this.request<{ results: Mem0Memory[] }>(
-      '/memories/search/',
-      {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      },
+      options.userId,
+      options.limit || 10,
     )
-
-    return response.results || []
+    return memories.map((memory) => ({
+      id: memory.id,
+      memory: memory.content,
+      metadata: memory.metadata,
+    }))
   }
 
   /**
@@ -170,11 +114,12 @@ export class Mem0PlatformClient {
    * @returns Array of all user memories
    */
   async getAllMemories(userId: string): Promise<Mem0Memory[]> {
-    const response = await this.request<{ results: Mem0Memory[] }>(
-      `/memories/?user_id=${encodeURIComponent(userId)}`,
-    )
-
-    return response.results || []
+    const memories = await mcpMemoryManager.getAllMemories(userId)
+    return memories.map((memory) => ({
+      id: memory.id,
+      memory: memory.content,
+      metadata: memory.metadata,
+    }))
   }
 
   /**
@@ -184,11 +129,11 @@ export class Mem0PlatformClient {
    * @returns The memory object or null
    */
   async getMemory(memoryId: string): Promise<Mem0Memory | null> {
-    try {
-      return await this.request<Mem0Memory>(`/memories/${memoryId}/`)
-    } catch {
-      return null
-    }
+    const memories = await mcpMemoryManager.getAllMemories('default_user')
+    const match = memories.find((memory) => memory.id === memoryId)
+    return match
+      ? { id: match.id, memory: match.content, metadata: match.metadata }
+      : null
   }
 
   /**
@@ -198,10 +143,7 @@ export class Mem0PlatformClient {
    * @param content - New content for the memory
    */
   async updateMemory(memoryId: string, content: string): Promise<void> {
-    await this.request(`/memories/${memoryId}/`, {
-      method: 'PATCH',
-      body: JSON.stringify({ text: content }),
-    })
+    await mcpMemoryManager.updateMemory(memoryId, content)
   }
 
   /**
@@ -210,9 +152,7 @@ export class Mem0PlatformClient {
    * @param memoryId - The memory ID to delete
    */
   async deleteMemory(memoryId: string): Promise<void> {
-    await this.request(`/memories/${memoryId}/`, {
-      method: 'DELETE',
-    })
+    await mcpMemoryManager.deleteMemory(memoryId)
   }
 
   /**
@@ -221,30 +161,16 @@ export class Mem0PlatformClient {
    * @param userId - The user ID
    */
   async deleteAllMemories(userId: string): Promise<void> {
-    await this.request(`/memories/?user_id=${encodeURIComponent(userId)}`, {
-      method: 'DELETE',
-    })
+    const memories = await mcpMemoryManager.getAllMemories(userId)
+    await Promise.all(memories.map((memory) => this.deleteMemory(memory.id)))
   }
 }
 
 /**
- * Create a Mem0 client with environment-based configuration.
- *
- * Uses PUBLIC_MEM0_API_KEY or MEM0_API_KEY from environment.
+ * Create a compatibility client backed by the MCP memory server.
  */
 export function createMem0Client(): Mem0PlatformClient | null {
-  // Check for API key in various environment variable formats
-  const apiKey =
-    (typeof import.meta !== 'undefined' &&
-      import.meta.env?.PUBLIC_MEM0_API_KEY) ||
-    (typeof process !== 'undefined' && process.env?.MEM0_API_KEY)
-
-  if (!apiKey) {
-    console.warn('Mem0 API key not found in environment')
-    return null
-  }
-
-  return new Mem0PlatformClient({ apiKey })
+  return new Mem0PlatformClient({})
 }
 
 /**

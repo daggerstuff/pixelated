@@ -23,6 +23,10 @@ run() {
   "$@"
 }
 
+is_azure_environment() {
+  [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]
+}
+
 azure_repo_url() {
   local repo_name="$1"
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
@@ -42,7 +46,7 @@ select_submodule_url() {
     return 0
   fi
 
-  if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
+  if is_azure_environment; then
     azure_repo_url "${repo_name}"
     return 0
   fi
@@ -67,8 +71,32 @@ configure_submodule() {
   run git submodule set-url "${path}" "${url}"
 }
 
+git_submodule_update_command() {
+  if is_azure_environment && [[ -n "${SYSTEM_ACCESSTOKEN:-}" ]]; then
+    printf '%s\n' \
+      git \
+      -c \
+      "http.https://dev.azure.com/.extraheader=AUTHORIZATION: bearer ${SYSTEM_ACCESSTOKEN}" \
+      submodule \
+      update \
+      --init \
+      --recursive \
+      --depth \
+      1
+    return 0
+  fi
+
+  printf '%s\n' git submodule update --init --recursive --depth 1
+}
+
+run_submodule_update() {
+  local -a cmd=()
+  mapfile -t cmd < <(git_submodule_update_command)
+  run "${cmd[@]}"
+}
+
 configure_submodule ai
 configure_submodule docs
 
 run git submodule sync --recursive
-run git submodule update --init --recursive --depth 1
+run_submodule_update
