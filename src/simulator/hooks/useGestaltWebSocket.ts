@@ -81,7 +81,16 @@ export interface UseGestaltWebSocketResult {
 // Helpers
 // -------------------------------------------------------------------
 
-/** Clamp all numeric keys of a score map to [0, 1]. */
+/**
+ * Clamp all numeric keys of a score map to [0, 1].
+ * This ensures that emotion and personality scores from the Gestalt engine
+ * are strictly bounded percentages/probabilities, preventing math errors
+ * or rendering anomalies in downstream UI components that expect values
+ * between 0.0 and 1.0.
+ *
+ * @param scores - A map of raw score values
+ * @returns A new map where all valid numeric values are clamped to [0, 1]
+ */
 function sanitiseScores(
   scores: Record<string, number>,
 ): Record<string, number> {
