@@ -14,6 +14,7 @@ cd "${PROJECT_ROOT}"
 # When running inside Azure Pipelines (TF_BUILD=True), inject the pipeline
 # OAuth token as a git extraheader so HTTPS submodule clones can authenticate
 # without interactive prompts. The token is cleared after use.
+# Note: Uses --global scope so submodules inherit the credential configuration
 # ---------------------------------------------------------------------------
 _AZ_AUTH_CONFIGURED=false
 configure_azure_credentials() {
@@ -25,15 +26,19 @@ configure_azure_credentials() {
     fi
     # Use extraHeader for Bearer token authentication. This is more secure than
     # embedding the token in the URL and more reliable to clean up.
-    git config --local "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
+    # Using --global so submodule clones inherit this configuration
+    git config --global "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
+    # Also configure for the legacy visualstudio.com endpoint
+    git config --global "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
     _AZ_AUTH_CONFIGURED=true
-    echo 'Azure DevOps git credential header (extraHeader) configured.'
+    echo 'Azure DevOps git credential header (extraHeader) configured globally.'
   fi
 }
 
 cleanup_azure_credentials() {
   if [[ "${_AZ_AUTH_CONFIGURED}" == "true" ]]; then
-    git config --local --unset "http.https://dev.azure.com/.extraHeader" 2>/dev/null || true
+    git config --global --unset "http.https://dev.azure.com/.extraHeader" 2>/dev/null || true
+    git config --global --unset "http.https://handtransfer.visualstudio.com/.extraHeader" 2>/dev/null || true
     echo 'Azure DevOps git credential header (extraHeader) cleared.'
   fi
 }
