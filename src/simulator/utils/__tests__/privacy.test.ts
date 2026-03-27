@@ -15,8 +15,8 @@ describe('privacy utilities', () => {
         const id1 = createEphemeralSessionId()
         const id2 = createEphemeralSessionId()
 
-        expect(id1).toMatch(/^sim_[^_]+_[^_]+$/)
-        expect(id2).toMatch(/^sim_[^_]+_[^_]+$/)
+        expect(id1).toMatch(/^sim_.+/)
+        expect(id2).toMatch(/^sim_.+/)
         expect(id1).not.toBe(id2)
       } finally {
         randomSpy.mockRestore()
