@@ -125,6 +125,10 @@ jobs:
         name: checkov-sarif
         path: checkov-results.sarif
 
+  /**
+   * Performs a dependency check on the project's dependencies.
+   * This job is responsible for installing the project's dependencies and running a security audit.
+   */
   dependency-check:
     name: Dependency Check
     runs-on: ubuntu-latest
