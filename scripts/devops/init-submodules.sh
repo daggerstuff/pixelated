@@ -79,7 +79,7 @@ run() {
 
 azure_repo_url() {
   local repo_name="$1"
-  printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
+  printf 'https://handtransfer@dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
 github_repo_url() {
