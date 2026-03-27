@@ -39,7 +39,7 @@
     "mongoose": "^9.2.3",
     "multer": "^2.1.0",
     "multer-s3": "^3.0.1",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^8.0.4",
     "pg": "^8.19.0",
     "redis": "^4.7.1",
     "socket.io": "^4.8.3",
