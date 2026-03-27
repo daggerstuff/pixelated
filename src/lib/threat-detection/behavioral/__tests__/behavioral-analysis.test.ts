@@ -117,10 +117,11 @@ describe('Behavioral Analysis Service', () => {
     },
   }
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
 
     service = new AdvancedBehavioralAnalysisService(defaultConfig)
+    await service.initializeServices()
   })
 
   describe('Service Initialization', () => {

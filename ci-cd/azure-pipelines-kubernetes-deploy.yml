@@ -82,6 +82,11 @@ stages:
           - checkout: self
             fetchDepth: 0
 
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '24.x'
+
           - task: SonarCloudPrepare@4
             displayName: 'Prepare Analysis Configuration'
             inputs:

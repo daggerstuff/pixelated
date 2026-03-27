@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
+from typing import Any
 
 from scripts.task_sync.tri_sync import (
+    SyncAction,
     SyncMetadata,
     TaskRecord,
     apply_sync_plan,
@@ -25,9 +27,10 @@ def make_record(
     title: str,
     body: str,
     status: str,
-    minutes_ago: int,
-    sync_key: str | None = None,
+    **kwargs: Any,
 ) -> TaskRecord:
+    minutes_ago = kwargs.get("minutes_ago", 0)
+    sync_key = kwargs.get("sync_key")
     return TaskRecord(
         provider=provider,
         external_id=external_id,
@@ -74,9 +77,15 @@ def test_sync_block_round_trip_preserves_task_body() -> None:
 
 
 def test_select_canonical_record_prefers_latest_record_and_beads_on_tie() -> None:
-    earlier = make_record("asana", "A-1", "Tri-sync", "Body", "open", 30, "tri-sync")
-    later = make_record("jira", "PIX-1", "Tri-sync", "Body", "open", 5, "tri-sync")
-    tie_beads = make_record("beads", "bd-1", "Tri-sync", "Body", "open", 5, "tri-sync")
+    earlier = make_record(
+        "asana", "A-1", "Tri-sync", "Body", "open", minutes_ago=30, sync_key="tri-sync"
+    )
+    later = make_record(
+        "jira", "PIX-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync"
+    )
+    tie_beads = make_record(
+        "beads", "bd-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync"
+    )
 
     assert select_canonical_record([earlier, later, tie_beads]).provider == "beads"
 
@@ -88,8 +97,8 @@ def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     asana = make_record(
         "asana",
@@ -97,8 +106,8 @@ def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> 
         "Tri-sync rollout",
         "Ship the sync bridge but old",
         "open",
-        20,
-        "tri-sync-rollout",
+        minutes_ago=20,
+        sync_key="tri-sync-rollout",
     )
 
     plan = build_sync_plan(
@@ -123,8 +132,8 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     asana = make_record(
         "asana",
@@ -132,8 +141,8 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     asana = TaskRecord(
         provider=asana.provider,
@@ -166,8 +175,8 @@ def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
 
     plan = build_sync_plan(
@@ -203,8 +212,8 @@ def test_build_sync_plan_preserves_linked_provider_ids_from_metadata() -> None:
             ),
         ),
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     beads = TaskRecord(
         provider=beads.provider,
@@ -235,8 +244,8 @@ def test_build_sync_plan_ignores_records_without_sync_keys() -> None:
         "",
         "",
         "open",
-        1,
-        None,
+        minutes_ago=1,
+        sync_key=None,
     )
     jira = make_record(
         "jira",
@@ -244,8 +253,8 @@ def test_build_sync_plan_ignores_records_without_sync_keys() -> None:
         "",
         "",
         "open",
-        2,
-        None,
+        minutes_ago=2,
+        sync_key=None,
     )
 
     plan = build_sync_plan(
@@ -371,12 +380,10 @@ def test_apply_sync_plan_runs_beads_and_external_provider_commands() -> None:
     assert results[1].success is True
     assert commands[0][0][:2] == ["bd", "create"]
     assert commands[1][0] == ["cat"]
-    assert "\"provider\": \"asana\"" in (commands[1][1] or "")
+    assert '"provider": "asana"' in (commands[1][1] or "")
 
 
 def make_action(provider: str, action: str, target_id: str | None):
-    from scripts.task_sync.tri_sync import SyncAction
-
     return SyncAction(
         provider=provider,
         action=action,
