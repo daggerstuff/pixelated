@@ -20,6 +20,10 @@ export class PolicyStore {
  async initialize(mongoUri?: string): Promise<void> {
   // If URI provided, create dedicated connection (for testing)
   if (mongoUri) {
+   // Close existing connection if active to prevent leaks
+   if (this.client) {
+    await this.client.close()
+   }
    this.client = new MongoConstructor(mongoUri)
    await this.client.connect()
    this.db = this.client.db(GOVERNANCE_DB_NAME)
@@ -27,8 +31,7 @@ export class PolicyStore {
    // Use shared mongoClient singleton (production)
    const { mongoClient } = await import('../db/mongoClient')
    await mongoClient.connect()
-   const clientDb = mongoClient.db
-   this.db = clientDb.client.db(GOVERNANCE_DB_NAME)
+   this.db = mongoClient.db
   }
  }
 
