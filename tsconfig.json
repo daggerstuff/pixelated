@@ -79,8 +79,7 @@
       {
         "name": "@astrojs/ts-plugin"
       }
-    ],
-    "downlevelIteration": true
+    ]
   },
   "include": [
     "./src/**/*.ts",
