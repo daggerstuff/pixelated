@@ -47,8 +47,8 @@ const INITIAL_STATE: RealTimeAnalysisState = {
  * Real-time analysis streams generate high-frequency events that would
  * overwhelm React's rendering pipeline if bound directly. This hook
  * instead polls the `FeedbackService` at fixed 100ms intervals, batching
- * state changes to guarantee smooth 10fps UI transitions while
- * preventing main-thread lockups during intense analysis periods.
+ * state changes to limit UI updates to approximately 10Hz and
+ * help reduce main-thread contention during intense analysis periods.
  */
 export function useRealTimeAnalysis() {
   const [state, setState] = useState<RealTimeAnalysisState>(INITIAL_STATE)
