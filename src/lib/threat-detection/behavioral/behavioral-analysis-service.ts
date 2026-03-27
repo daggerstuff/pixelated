@@ -145,46 +145,64 @@ export class AdvancedBehavioralAnalysisService
 
     this.initializationPromise = this.initializeServicesInternal()
       .catch(async (error) => {
-        await this.cleanupInitializationFailure()
+        this.resetInitializationState()
+        this.initializationPromise = null
         throw error
       })
 
     return this.initializationPromise
   }
 
-  private async cleanupInitializationFailure(): Promise<void> {
-    const cleanupTasks: Promise<unknown>[] = []
-
-    if (this.redis) {
-      cleanupTasks.push(Promise.resolve(this.redis.quit()).catch(() => undefined))
-    }
-
-    if (this.mongoClient) {
-      cleanupTasks.push(
-        Promise.resolve(this.mongoClient.close()).catch(() => undefined),
-      )
-    }
-
-    await Promise.allSettled(cleanupTasks)
-  }
-
   private async initializeServicesInternal(): Promise<void> {
-    this.redis = new Redis(this.config.redisUrl)
-    this.mongoClient = new MongoClient(this.config.mongoUrl)
+    const redis = new Redis(this.config.redisUrl)
+    const mongoClient = new MongoClient(this.config.mongoUrl)
 
-    this.anomalyDetector = new MLAnomalyDetector(this.config.modelPath)
-    this.patternMiner = new SequentialPatternMiner()
-    this.riskCalculator = new MultiFactorRiskCalculator()
-    this.privacyPreserver = new DifferentialPrivacyPreserver(
+    const anomalyDetector = new MLAnomalyDetector(this.config.modelPath)
+    const patternMiner = new SequentialPatternMiner()
+    const riskCalculator = new MultiFactorRiskCalculator()
+    const privacyPreserver = new DifferentialPrivacyPreserver(
       this.config.privacyConfig,
     )
-    this.graphAnalyzer = new BehavioralGraphAnalyzer()
-    this.spatialAnalyzer = new SpatialAnalysisService()
-    this.temporalAnalyzer = new TemporalAnalysisService()
 
-    await this.mongoClient.connect()
-    this.initialized = true
-    this.emit('services_initialized')
+    const graphAnalyzer = new BehavioralGraphAnalyzer()
+    const spatialAnalyzer = new SpatialAnalysisService()
+    const temporalAnalyzer = new TemporalAnalysisService()
+
+    try {
+      await mongoClient.connect()
+
+      this.redis = redis
+      this.mongoClient = mongoClient
+      this.anomalyDetector = anomalyDetector
+      this.patternMiner = patternMiner
+      this.riskCalculator = riskCalculator
+      this.privacyPreserver = privacyPreserver
+      this.graphAnalyzer = graphAnalyzer
+      this.spatialAnalyzer = spatialAnalyzer
+      this.temporalAnalyzer = temporalAnalyzer
+
+      this.initialized = true
+      this.emit('services_initialized')
+    } catch (error) {
+      await Promise.allSettled([
+        Promise.resolve(redis.quit()).catch(() => undefined),
+        Promise.resolve(mongoClient.close()).catch(() => undefined),
+      ])
+      throw error
+    }
+  }
+
+  private resetInitializationState(): void {
+    this.initialized = false
+    this.redis = undefined as unknown as Redis
+    this.mongoClient = undefined as unknown as MongoClient
+    this.anomalyDetector = undefined as unknown as MLAnomalyDetector
+    this.patternMiner = undefined as unknown as SequentialPatternMiner
+    this.riskCalculator = undefined as unknown as RiskCalculator
+    this.privacyPreserver = undefined as unknown as DifferentialPrivacyPreserver
+    this.graphAnalyzer = undefined as unknown as BehavioralGraphAnalyzer
+    this.spatialAnalyzer = undefined as unknown as SpatialAnalysisService
+    this.temporalAnalyzer = undefined as unknown as TemporalAnalysisService
   }
 
   private async ensureInitialized(): Promise<void> {
