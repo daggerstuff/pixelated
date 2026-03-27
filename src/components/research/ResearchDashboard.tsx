@@ -148,6 +148,43 @@ export const ResearchDashboard: FC = () => {
     methodology: study.methodology,
   }))
 
+  const handleTabKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>,
+    currentTabId: string,
+  ) => {
+    const { key } = event;
+
+    // Only handle arrow/home/end keys for the tab pattern
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(key)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const currentIndex = dashboardTabs.findIndex((tab) => tab.id === currentTabId);
+    if (currentIndex === -1) return;
+
+    let nextIndex = currentIndex;
+
+    if (key === 'ArrowRight') {
+      nextIndex = (currentIndex + 1) % dashboardTabs.length;
+    } else if (key === 'ArrowLeft') {
+      nextIndex = (currentIndex - 1 + dashboardTabs.length) % dashboardTabs.length;
+    } else if (key === 'Home') {
+      nextIndex = 0;
+    } else if (key === 'End') {
+      nextIndex = dashboardTabs.length - 1;
+    }
+
+    const nextTab = dashboardTabs[nextIndex];
+    if (!nextTab) return;
+
+    setDashboardView(nextTab.id as any);
+    // Move focus to the newly selected tab
+    const nextTabElement = document.getElementById(`tab-${nextTab.id}`);
+    nextTabElement?.focus();
+  };
+
   return (
     <ResponsiveContainer size='full'>
       <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
