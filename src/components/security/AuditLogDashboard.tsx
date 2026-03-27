@@ -1,25 +1,61 @@
 import { format } from 'date-fns'
-import React, { useState, useEffect, useRef } from 'react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, } from 'recharts'
+import React, { useState, useEffect } from 'react'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts'
+
 import { Button } from '../ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from '../ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../ui/card'
 import { Input } from '../ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '../ui/select'
-import { Table as UITable, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '../ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select'
+import {
+  Table as UITable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../ui/table'
 
 export interface AuditLogEntry {
   id: string
   userId: string
   action: string
-  resource: { id: string; type: string | undefined }
+  resource: {
+    id: string
+    type: string | undefined
+  }
   metadata: Record<string, unknown>
   timestamp: string // Will be parsed as Date in code
 }
 
 // Simple Table wrapper that doesn't require the complex props
-const Table: React.FC<React.PropsWithChildren> = ({ children }) => {
+const Table: FC<React.PropsWithChildren> = ({ children }) => {
   return (
-    <UITable columns={[]} dataSource={{ data: [], totalCount: 0 }} tableState={{ currentPage: 1, pageSize: 10 }} onStateChange={() => {}} >
+    <UITable
+      columns={[]}
+      dataSource={{ data: [], totalCount: 0 }}
+      tableState={{ currentPage: 1, pageSize: 10 }}
+      onStateChange={() => {}}
+    >
       {children}
     </UITable>
   )
@@ -64,17 +100,7 @@ export function AuditLogDashboard() {
     'security_alert',
   ]
 
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const currentAbortControllerRef = useRef<AbortController | null>(null)
-
   const fetchLogs = React.useCallback(async () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-    const abortController = new AbortController()
-    currentAbortControllerRef.current = abortController
-    abortControllerRef.current = abortController
-
     try {
       setLoading(true)
       // Build query parameters
@@ -86,16 +112,8 @@ export function AuditLogDashboard() {
         params.append('userId', filters.userId)
       }
       // Optionally handle pagination/limits here if desired
-      const res = await fetch('/api/admin/audit-logs?' + params.toString(), {
-        signal: abortController.signal,
-        // Specify the fetch options to use a secure connection
-        mode: 'cors',
-        credentials: 'same-origin',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      })
+
+      const res = await fetch('/api/admin/audit-logs?' + params.toString())
       const data = await res.json()
       let fetchedLogs: AuditLogEntry[] = data.logs || []
 
@@ -119,35 +137,25 @@ export function AuditLogDashboard() {
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
-            (log.resource.type && log.resource.type.toLowerCase().includes(searchLower)) ||
-            (log.resource.id && log.resource.id.toLowerCase().includes(searchLower)) ||
+            (log.resource.type &&
+              log.resource.type.toLowerCase().includes(searchLower)) ||
+            (log.resource.id &&
+              log.resource.id.toLowerCase().includes(searchLower)) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }
 
       setLogs(fetchedLogs)
     } catch (error: unknown) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        // Ignore abort error
-      } else {
-        console.error('Error fetching audit logs:', error)
-      }
+      console.error('Error fetching audit logs:', error)
     } finally {
       setLoading(false)
-      if (abortControllerRef.current === currentAbortControllerRef.current) {
-        abortControllerRef.current = null
-        currentAbortControllerRef.current = null
-      }
     }
   }, [filters])
 
   useEffect(() => {
     void fetchLogs()
-  }, [])
-
-  const handleApplyFilters = () => {
-    void fetchLogs()
-  }
+  }, [fetchLogs])
 
   const getEventTypeStats = () => {
     const stats = logs.reduce(
@@ -158,7 +166,11 @@ export function AuditLogDashboard() {
       },
       {} as Record<string, number>,
     )
-    return Object.entries(stats).map(([name, value]) => ({ name, value }))
+
+    return Object.entries(stats).map(([name, value]) => ({
+      name,
+      value,
+    }))
   }
 
   const columns = [
@@ -184,7 +196,8 @@ export function AuditLogDashboard() {
     },
     {
       header: 'Details',
-      cell: (log: AuditLogEntry) => log.metadata ? JSON.stringify(log.metadata) : '-',
+      cell: (log: AuditLogEntry) =>
+        log.metadata ? JSON.stringify(log.metadata) : '-',
     },
   ]
 
@@ -194,13 +207,17 @@ export function AuditLogDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Filters</CardTitle>
-          <CardDescription>Filter audit logs by various criteria</CardDescription>
+          <CardDescription>
+            Filter audit logs by various criteria
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
             <Select
               value={filters.eventType}
-              onValueChange={(value: string) => setFilters({ ...filters, eventType: value })}
+              onValueChange={(value: string) =>
+                setFilters({ ...filters, eventType: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -214,35 +231,51 @@ export function AuditLogDashboard() {
                 ))}
               </SelectContent>
             </Select>
+
             <Input
               placeholder='User ID'
               value={filters.userId}
-              onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, userId: e.target.value })
+              }
             />
+
             <Input
               type='date'
               value={filters.startDate}
-              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, startDate: e.target.value })
+              }
             />
+
             <Input
               type='date'
               value={filters.endDate}
-              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, endDate: e.target.value })
+              }
             />
+
             <Input
               placeholder='Search...'
               value={filters.searchTerm}
-              onChange={(e) => setFilters({ ...filters, searchTerm: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, searchTerm: e.target.value })
+              }
             />
-            <Button onClick={handleApplyFilters}>Apply Filters</Button>
+
+            <Button onClick={() => fetchLogs()}>Apply Filters</Button>
           </div>
         </CardContent>
       </Card>
+
       {/* Statistics */}
       <Card>
         <CardHeader>
           <CardTitle>Event Distribution</CardTitle>
-          <CardDescription>Distribution of audit events by type</CardDescription>
+          <CardDescription>
+            Distribution of audit events by type
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='h-[300px]'>
@@ -258,6 +291,7 @@ export function AuditLogDashboard() {
           </div>
         </CardContent>
       </Card>
+
       {/* Logs Table */}
       <Card>
         <CardHeader>
@@ -280,7 +314,9 @@ export function AuditLogDashboard() {
                 {logs.map((log) => (
                   <TableRow key={log.id}>
                     {columns.map((column) => (
-                      <TableCell key={column.header}>{column.cell(log)}</TableCell>
+                      <TableCell key={column.header}>
+                        {column.cell(log)}
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))}
