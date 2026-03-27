@@ -82,10 +82,11 @@ stages:
           - checkout: self
             fetchDepth: 0
 
-          - task: NodeTool@0
-            displayName: 'Install Node.js'
+          - task: UseNode@1
+            displayName: 'Install Node.js (LTS)'
             inputs:
-              versionSpec: '24.x'
+              version: '20.x'
+              checkLatest: true
 
           - task: SonarCloudPrepare@4
             displayName: 'Prepare Analysis Configuration'
@@ -106,7 +107,6 @@ stages:
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 set -euo pipefail
-                bash scripts/devops/azure_aks_preflight.sh
 
                 IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
                 IMAGE_FULL="$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}"
@@ -143,6 +143,15 @@ stages:
 
           - task: SonarCloudAnalyze@4
             displayName: 'Run Code Analysis'
+
+          - task: Bash@3
+            displayName: 'Verify Node is available for Quality Gate publish'
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                echo "Node path: $(command -v node)"
+                node --version
 
           - task: SonarCloudPublish@4
             displayName: 'Publish Quality Gate Result'
@@ -195,6 +204,11 @@ stages:
             inputs:
               helmVersionToInstall: v3.15.4
 
+          - task: KubernetesInstaller@0
+            displayName: Install kubectl
+            inputs:
+              kubectlVersion: 'latest'
+
           - task: AzureCLI@2
             displayName: Deploy Helm chart to AKS
             inputs:
@@ -204,6 +218,7 @@ stages:
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
                 export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
                 bash scripts/devops/azure_aks_deploy.sh
             env:
