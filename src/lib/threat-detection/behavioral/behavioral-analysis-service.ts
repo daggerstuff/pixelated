@@ -1214,8 +1214,7 @@ class MLAnomalyDetector extends AnomalyDetector {
     const anomalies: Anomaly[] = []
 
     try {
-      const model = this.model
-      const isolationForest = this.isolationForest
+      const {model, isolationForest} = this;
       if (!model || !isolationForest) {
         return []
       }
