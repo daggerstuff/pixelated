@@ -1,10 +1,10 @@
 [submodule "ai"]
 	path = ai
-	url = https://dev.azure.com/handtransfer/pixelated/_git/ai
+	url = https://handtransfer@dev.azure.com/handtransfer/pixelated/_git/ai
 	branch = staging
 	ignore = all
 
 [submodule "docs"]
 	path = docs
-	url = https://dev.azure.com/handtransfer/pixelated/_git/docs
+	url = https://handtransfer@dev.azure.com/handtransfer/pixelated/_git/docs
 	ignore = all
