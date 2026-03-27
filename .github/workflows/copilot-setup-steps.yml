@@ -13,25 +13,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-
       - name: Set up Node.js
         uses: actions/setup-node@v5
-        with:
           node-version: "24.14.0"
           cache: "pnpm"
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
       - name: Lint (Oxlint)
         run: pnpm lint
-
       - name: Format check (Prettier)
         run: pnpm exec prettier --check . || true
-
       - name: Run tests
         run: |
           if pnpm exec vitest --version 2>/dev/null; then
@@ -41,10 +34,8 @@ jobs:
           else
             echo "No supported test runner found (vitest/jest)."
           fi
-
       - name: Run TypeScript type check
         run: pnpm run typecheck || true
-
       - name: Summary
         run: |
           echo "=== Code Quality Check Summary ==="

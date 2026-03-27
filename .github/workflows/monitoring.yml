@@ -1,17 +1,13 @@
 name: Monitoring
-
 permissions:
   contents: read
-
 on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
-
 env:
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.32.1
-
 jobs:
   health-check:
     name: Health Check
@@ -28,19 +24,16 @@ jobs:
             exit 1
           fi
           echo "BASE_URL=$BASE_URL" >> "$GITHUB_ENV"
-
       - name: Check site and API health
         id: health
         run: |
           set -euo pipefail
-
           check_endpoint() {
             local url="$1"
             local name="$2"
             local retries=5
             local delay=6
             local code=000
-
             for attempt in $(seq 1 $retries); do
               code=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 10 --max-time 20 "$url" || echo "000")
               echo "$name attempt $attempt/$retries -> HTTP $code"
@@ -49,58 +42,41 @@ jobs:
               fi
               sleep "$delay"
             done
-
             echo "::error::$name failed health check at $url (last HTTP $code)"
             return 1
           }
-
           check_endpoint "$BASE_URL" "Main site"
           check_endpoint "$BASE_URL/api/health" "API health"
-
       - name: Setup Node
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: ${{ env.NODE_VERSION }}
-
       - name: Enable Corepack
         run: corepack enable
-
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
-
+        uses: pnpm/action-setup@v4
       - name: Get pnpm store directory
         id: pnpm-store
         shell: bash
         run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
-
       - name: Run monitoring smoke tests
         run: pnpm exec playwright test tests/monitoring --project=chromium
         env:
           BASE_URL: ${{ env.BASE_URL }}
-
       - name: Notify on failure (optional)
         if: failure() && env.HAS_SLACK_WEBHOOK == 'true'
         uses: slackapi/slack-github-action@v1.25.0
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
           payload: |
             {
               "text": "🚨 Monitoring failed for ${{ env.BASE_URL }} in workflow run ${{ github.run_id }}"

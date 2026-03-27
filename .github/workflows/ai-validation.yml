@@ -1,5 +1,4 @@
 name: AI Model Validation Pipeline
-
 permissions:
   contents: read
   actions: read
@@ -7,7 +6,6 @@ permissions:
   pull-requests: read
   security-events: write
   issues: write
-
 on:
   schedule:
     - cron: 0 0 * * *
@@ -17,23 +15,18 @@ on:
         description: "Environment name (staging, production, etc)"
         required: false
         default: "staging"
-
 jobs:
   validate-ai-models:
     name: AI Model Validation
     runs-on: ubuntu-latest
     env:
       ENV_NAME: ${{ inputs.ENV_NAME || 'staging' }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4.4.0
-        with:
           node-version: 24.14.0
-
       - name: Generate validation token
         id: generate-token
         run: |
@@ -50,61 +43,47 @@ jobs:
           echo "token=${VALIDATION_TOKEN}" >> $GITHUB_OUTPUT
         env:
           AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
-
       - name: Enable Corepack
         run: corepack enable
-
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.1.0
-        with:
-          version: 10.32.1
-          run_install: false
-
+        uses: pnpm/action-setup@v4
       - name: Get pnpm store directory
         id: pnpm-cache
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
       - name: Setup pnpm cache
         uses: actions/cache@v4.2.3
-        with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
       - name: Install system tools (jq, bc)
         run: |
           sudo apt-get update
           # Ensure TLS root certs and openssl are present for curl/openssl diagnostics
           sudo apt-get install -y jq bc ca-certificates openssl
           sudo update-ca-certificates || true
-
       - name: Set environment variables
         run: |
           # Default environment if not provided
           if [[ -z "${ENV_NAME}" ]]; then
             echo "ENV_NAME=staging" >> $GITHUB_ENV
           fi
-
           APP_URL="${{ secrets.APP_URL }}"
           if [[ -z "${APP_URL}" ]]; then
             APP_URL="https://pixelatedempathy.com"
             echo "::notice::APP_URL not configured; defaulting to ${APP_URL}"
           fi
           echo "APP_URL=${APP_URL}" >> $GITHUB_ENV
-
       - name: Run model validation
         id: validation
         run: |
           # Generate webhook validation token
           WEBHOOK_TOKEN=$(openssl rand -base64 32)
           echo "WEBHOOK_TOKEN=${WEBHOOK_TOKEN}" >> $GITHUB_ENV
-
           # Trigger validation via webhook
           echo "Triggering validation via webhook..."
           # Disable 'exit on error' just for this call to capture curl failures without aborting the step
@@ -119,7 +98,6 @@ jobs:
               -d '{"action":"validate","environment":"'"${ENV_NAME}"'"}')
           CURL_EXIT=$?
           set -e
-
           if [[ ${CURL_EXIT} -ne 0 ]]; then
             echo "success=false" >> "$GITHUB_OUTPUT"
             echo "Validation trigger request failed (curl exit ${CURL_EXIT})."
@@ -150,20 +128,17 @@ jobs:
             cat response.json
             # Continue the workflow anyway, don't fail the build
           fi
-
       - name: Wait for validation to complete
         if: steps.validation.outputs.success == 'true'
         run: |
           echo "Waiting for validation to complete (120 seconds)..."
           sleep 120
-
       - name: Fetch validation results
         if: steps.validation.outputs.success == 'true'
         id: results
         run: |
           # Use the generated token from previous step
           VALIDATION_TOKEN="${{ steps.generate-token.outputs.token }}"
-
           # Get validation history and results
           set +e
           STATUS_CODE=$(curl --http1.1 -4 --tlsv1.2 --retry 3 --retry-all-errors --max-time 30 -sS -o validation_history.json -w "%{http_code}" \
@@ -171,7 +146,6 @@ jobs:
             -H "Authorization: Bearer ${VALIDATION_TOKEN}")
           CURL_EXIT=$?
           set -e
-
           if [[ ${CURL_EXIT} -ne 0 ]]; then
             echo "success=false" >> "$GITHUB_OUTPUT"
             echo "Failed to fetch validation results (curl exit ${CURL_EXIT})"
@@ -189,12 +163,10 @@ jobs:
             RUN_ID=$(jq -r '.history[0].runId' validation_history.json)
             RUN_SUCCESS=$(jq -r '.history[0].success' validation_history.json)
             echo "Last validation run: ${RUN_ID}, Success: ${RUN_SUCCESS}, Pass rate: ${PASS_RATE}%"
-
             # Store metrics for the summary
             echo "PASS_RATE=${PASS_RATE}" >> $GITHUB_ENV
             echo "RUN_ID=${RUN_ID}" >> $GITHUB_ENV
             echo "RUN_SUCCESS=${RUN_SUCCESS}" >> $GITHUB_ENV
-
             # Check if pass rate is below threshold for alerting
             if (( $(echo "${PASS_RATE} < 85" | bc -l) )); then
               echo "needs_alert=true" >> "$GITHUB_OUTPUT"
@@ -206,12 +178,10 @@ jobs:
             echo "needs_alert=false" >> "$GITHUB_OUTPUT"
             echo "Failed to fetch validation results (HTTP ${STATUS_CODE})"
           fi
-
       - name: Create summary
         run: |
           echo "# AI Model Validation Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
           if [[ "${{ steps.validation.outputs.success }}" == "true" && "${{ steps.results.outputs.success }}" == "true" ]]; then
             echo "✅ **Validation completed successfully**" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -226,11 +196,9 @@ jobs:
             echo "Please check the validation pipeline manually to verify model accuracy." >> $GITHUB_STEP_SUMMARY
             echo "[AI Validation Dashboard](${APP_URL}/admin/ai/validation-pipeline)" >> $GITHUB_STEP_SUMMARY
           fi
-
       - name: Send notification on validation issues
         if: ${{ steps.results.outputs.needs_alert == 'true' }}
         uses: actions/github-script@v7
-        with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { repo, owner } = context.repo;
@@ -240,16 +208,12 @@ jobs:
               title: `⚠️ AI Model Validation Alert: ${process.env.PASS_RATE}% success rate`,
               body: `
               # AI Model Validation Alert
-
               A recent validation run found potential issues with AI model accuracy.
-
               - **Environment:** ${process.env.ENV_NAME}
               - **Run ID:** ${process.env.RUN_ID}
               - **Success Rate:** ${process.env.PASS_RATE}%
               - **Threshold:** 85%
-
               Please investigate this issue by checking the [AI Validation Dashboard](${process.env.APP_URL}/admin/ai/validation-pipeline).
-
               This issue was automatically created by the AI validation pipeline.
               `
             });

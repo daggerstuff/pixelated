@@ -6,11 +6,8 @@ groups:
   - fhir
   - ehr
   - healthcare
-
 dependencies:
   codeql/javascript-all: '*'
   codeql/javascript-queries: '*'
-
 # Extend the JavaScript query pack
 extractor: javascript
-

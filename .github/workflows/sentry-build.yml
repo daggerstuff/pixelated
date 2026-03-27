@@ -1,12 +1,10 @@
 name: Build & Sentry Release
-
 permissions:
   contents: read
 on:
   push:
     branches: [ main, staging ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,21 +15,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-
     - name: Use Node.js
       uses: actions/setup-node@v4
-      with:
         node-version: '24'
         cache: 'pnpm'
-
     - name: Setup pnpm
       run: |
         corepack enable
         pnpm -v
-
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
-
     - name: Build (with Sentry envs if provided)
       env:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -41,7 +34,6 @@ jobs:
       run: |
         echo "Building with SENTRY_RELEASE=${SENTRY_RELEASE}"
         pnpm build
-
     - name: Create Sentry release and upload source maps (optional)
       if: ${{ env.SENTRY_AUTH_TOKEN != '' }}
       env:
@@ -56,7 +48,6 @@ jobs:
         sentry-cli releases new ${SENTRY_RELEASE}
         sentry-cli releases files ${SENTRY_RELEASE} upload-sourcemaps ./dist --rewrite --strip-prefix ./ --strip-common-prefix
         sentry-cli releases finalize ${SENTRY_RELEASE}
-
     - name: Build Docker image (optional)
       env:
         SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
@@ -72,7 +63,6 @@ jobs:
           --build-arg SENTRY_RELEASE="${SENTRY_RELEASE}" \
           --build-arg PUBLIC_SENTRY_DSN="${PUBLIC_SENTRY_DSN}" \
           .
-
     - name: Optionally push Docker image to GitHub Container Registry
       if: ${{ env.GITHUB_TOKEN != '' && always() }}
       run: |
