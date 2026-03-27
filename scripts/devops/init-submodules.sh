@@ -99,8 +99,11 @@ configure_submodule() {
   run git submodule set-url "${path}" "${url}"
 }
 
+# Configure URLs for all submodules
 configure_submodule ai
 configure_submodule docs
 
+# Sync and initialize
+# Note: --depth 1 is used for faster cloning in CI environments
 run git submodule sync --recursive
 run git submodule update --init --recursive --depth 1
