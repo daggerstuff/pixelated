@@ -2,6 +2,10 @@
  * Browser compatibility testing utilities
  */
 
+/**
+ * Information about the current browser environment and feature support.
+ * Used to adjust UI and functionality based on compatibility.
+ */
 export interface BrowserInfo {
   name: string
   version: string
