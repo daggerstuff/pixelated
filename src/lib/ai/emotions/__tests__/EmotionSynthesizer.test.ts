@@ -1,9 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-
-import {
-  EmotionSynthesizer,
-  type EnhancedSynthesisOptions,
-} from '../EmotionSynthesizer'
+import { EmotionSynthesizer, type EnhancedSynthesisOptions, } from '../EmotionSynthesizer'
 
 describe('EmotionSynthesizer', () => {
   let synthesizer: EmotionSynthesizer
@@ -27,16 +23,12 @@ describe('EmotionSynthesizer', () => {
       const options: EnhancedSynthesisOptions = {
         currentEmotions,
         decayFactor,
-        randomFluctuation: 0,
-      } // No noise for this test
-
+        randomFluctuation: 0, // No noise for this test
+      }
       const result = await synthesizer.synthesizeEmotion(options)
       expect(result.success).toBe(true)
       expect(result.profile.emotions['joy']).toBeCloseTo(0.8 * decayFactor, 3)
-      expect(result.profile.emotions['sadness']).toBeCloseTo(
-        0.4 * decayFactor,
-        3,
-      )
+      expect(result.profile.emotions['sadness']).toBeCloseTo(0.4 * decayFactor, 3)
     })
 
     it('should apply baseEmotion and baseIntensity', async () => {
@@ -81,7 +73,6 @@ describe('EmotionSynthesizer', () => {
       const expectedJoy = Math.min(1, 0.2 + 0.1 * contextInfluence) // 0.2 + 0.05 = 0.25
       const expectedSadness = Math.max(0, 0.5 - 0.05 * contextInfluence) // 0.5 - 0.025 = 0.475
       const expectedAnger = Math.max(0, 0.3 - 0.05 * contextInfluence) // 0.3 - 0.025 = 0.275
-
       expect(result.profile.emotions['joy']).toBeCloseTo(expectedJoy, 3)
       expect(result.profile.emotions['sadness']).toBeCloseTo(expectedSadness, 3)
       expect(result.profile.emotions['anger']).toBeCloseTo(expectedAnger, 3)
@@ -101,7 +92,6 @@ describe('EmotionSynthesizer', () => {
       const expectedSadness = Math.min(1, 0.1 + 0.2 * contextInfluence) // 0.1 + 0.1 = 0.2
       const expectedFear = Math.min(1, 0.1 + 0.15 * contextInfluence) // 0.1 + 0.075 = 0.175
       const expectedJoy = Math.max(0, 0.5 - 0.1 * contextInfluence) // 0.5 - 0.05 = 0.45
-
       expect(result.profile.emotions['sadness']).toBeCloseTo(expectedSadness, 3)
       expect(result.profile.emotions['fear']).toBeCloseTo(expectedFear, 3)
       expect(result.profile.emotions['joy']).toBeCloseTo(expectedJoy, 3)
@@ -120,9 +110,7 @@ describe('EmotionSynthesizer', () => {
       // Expected joy before final clamp: 0.9 (current) + 0.1 (context) = 1.0. Max with baseIntensity (0.5) is 1.0.
       // With fluctuation, it could go up to 1.0 + 0.3 = 1.3 or down to 1.0 - 0.3 = 0.7
       // The final value must be clamped.
-
-      for (let i = 0; i < 10; i++) {
-        // Run multiple times due to randomness
+      for (let i = 0; i < 10; i++) { // Run multiple times due to randomness
         const result = await synthesizer.synthesizeEmotion(options)
         expect(result.profile.emotions['joy']).toBeGreaterThanOrEqual(0)
         expect(result.profile.emotions['joy']).toBeLessThanOrEqual(1)
@@ -131,7 +119,7 @@ describe('EmotionSynthesizer', () => {
 
     it('should remove neutral if other significant emotions are present', async () => {
       const options: EnhancedSynthesisOptions = {
-        currentEmotions: { neutral: 0.8, joy: 0.01 }, // joy is not significant yet
+        currentEmotions: { neutral: 0.8, joy: 0.01 },
         baseEmotion: 'joy',
         baseIntensity: 0.5, // Makes joy significant
         decayFactor: 1,
@@ -172,6 +160,29 @@ describe('EmotionSynthesizer', () => {
     })
   })
 
+  describe('blendEmotions', () => {
+    it('should blend two emotions together', async () => {
+      const emotion1 = { joy: 0.5, sadness: 0.3 }
+      const emotion2 = { joy: 0.2, fear: 0.4 }
+      const result = await synthesizer.blendEmotions(emotion1, emotion2)
+      expect(result).toEqual({ joy: 0.35, sadness: 0.15, fear: 0.2 })
+    })
+
+    it('should handle empty emotions', async () => {
+      const emotion1 = {}
+      const emotion2 = { joy: 0.2, fear: 0.4 }
+      const result = await synthesizer.blendEmotions(emotion1, emotion2)
+      expect(result).toEqual({ joy: 0.1, fear: 0.2 })
+    })
+
+    it('should handle null emotions', async () => {
+      const emotion1 = null
+      const emotion2 = { joy: 0.2, fear: 0.4 }
+      const result = await synthesizer.blendEmotions(emotion1, emotion2)
+      expect(result).toEqual({ joy: 0.1, fear: 0.2 })
+    })
+  })
+
   describe('getCurrentProfile', () => {
     it('should return null if no emotion has been synthesized yet', () => {
       expect(synthesizer.getCurrentProfile()).toBeNull()
@@ -189,10 +200,7 @@ describe('EmotionSynthesizer', () => {
 
   describe('reset', () => {
     it('should reset currentProfile to null', async () => {
-      await synthesizer.synthesizeEmotion({
-        baseEmotion: 'tense',
-        baseIntensity: 0.7,
-      })
+      await synthesizer.synthesizeEmotion({ baseEmotion: 'tense', baseIntensity: 0.7, })
       expect(synthesizer.getCurrentProfile()).not.toBeNull()
       synthesizer.reset()
       expect(synthesizer.getCurrentProfile()).toBeNull()

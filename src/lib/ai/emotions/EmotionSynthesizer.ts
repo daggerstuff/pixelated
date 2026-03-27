@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { v4 as uuidv4 } from 'uuid'; // Import UUID v4 generator
 
 const logger = createBuildSafeLogger('default')
 
@@ -14,7 +15,7 @@ export type EmotionTransitionContext =
   | 'therapist_challenges'
   | 'therapist_reflects'
   | 'therapist_neutral'
-  | 'therapist_empathizes' // Added for more nuance
+  | 'therapist_empathizes'
   | 'patient_shares_positive'
   | 'patient_shares_negative'
   | 'patient_discusses_trauma'
@@ -23,8 +24,9 @@ export type EmotionTransitionContext =
   | 'setback_experienced'
   | 'session_start'
   | 'session_end'
-  | 'general_conversation' // Default context
+  | 'general_conversation'
 
+// Default context
 export interface SynthesisOptions {
   // Original options
   targetEmotion: string // Primary emotion to influence
@@ -49,8 +51,7 @@ export interface SynthesisResult {
   message: string
 }
 
-/**
- * Emotion Synthesizer - Creates and manipulates emotional profiles
+/** Emotion Synthesizer - Creates and manipulates emotional profiles
  * Implements singleton pattern for consistent state management across the application
  */
 export class EmotionSynthesizer {
@@ -61,8 +62,7 @@ export class EmotionSynthesizer {
     logger.info('EmotionSynthesizer initialized')
   }
 
-  /**
-   * Get the singleton instance of EmotionSynthesizer
+  /** Get the singleton instance of EmotionSynthesizer
    * @returns The singleton instance
    */
   public static getInstance(): EmotionSynthesizer {
@@ -72,16 +72,14 @@ export class EmotionSynthesizer {
     return EmotionSynthesizer.instance
   }
 
-  /**
-   * Create a new instance for testing purposes
+  /** Create a new instance for testing purposes
    * @returns A new instance (not the singleton)
    */
   public static createTestInstance(): EmotionSynthesizer {
     return new EmotionSynthesizer()
   }
 
-  /**
-   * Get a default emotion profile without needing an instance
+  /** Get a default emotion profile without needing an instance
    * This is a convenience method that maintains proper encapsulation
    * @returns A fresh default emotion profile
    */
@@ -102,22 +100,18 @@ export class EmotionSynthesizer {
     }
   }
 
-  /**
-   * Reset the singleton instance (useful for testing)
-   */
+  /** Reset the singleton instance (useful for testing) */
   public static resetInstance() {
     EmotionSynthesizer.instance = null
   }
 
-  /**
-   * Synthesize a new emotion profile based on current state, context, and target influences.
+  /** Synthesize a new emotion profile based on current state, context, and target influences.
    */
   async synthesizeEmotion(
     options: EnhancedSynthesisOptions,
   ): Promise<SynthesisResult> {
     try {
       logger.debug('Synthesizing emotion with enhanced options', { options })
-
       const {
         currentEmotions,
         baseEmotion,
@@ -127,7 +121,6 @@ export class EmotionSynthesizer {
         contextInfluence = 0.1, // Context has a 10% influence on shifts by default
         randomFluctuation = 0.02, // Tiny bit of noise
       } = options
-
       let newEmotions = currentEmotions
         ? { ...currentEmotions }
         : { ...this.getDefaultProfile().emotions }
@@ -158,9 +151,7 @@ export class EmotionSynthesizer {
         newEmotions[baseEmotion] = baseIntensity
       }
 
-      // 3. Placeholder for Contextual influence (heuristic-based)
-      // This part will need more detailed rules based on EmotionTransitionContext
-      // Example:
+      // 3. Contextual influence (heuristic-based)
       if (context === 'therapist_validates') {
         newEmotions['joy'] = Math.min(
           1,
@@ -187,8 +178,27 @@ export class EmotionSynthesizer {
           0,
           (newEmotions['joy'] ?? 0) - 0.1 * contextInfluence,
         )
+      } else if (context === 'therapist_reflects') {
+        // Add handling for 'therapist_reflects' context
+        newEmotions['neutral'] = Math.min(
+          1,
+          (newEmotions['neutral'] ?? 0) + 0.1 * contextInfluence,
+        )
+        newEmotions['sadness'] = Math.max(
+          0,
+          (newEmotions['sadness'] ?? 0) - 0.05 * contextInfluence,
+        )
+      } else if (context === 'therapist_challenges') {
+        // Add handling for 'therapist_challenges' context
+        newEmotions['anger'] = Math.min(
+          1,
+          (newEmotions['anger'] ?? 0) + 0.1 * contextInfluence,
+        )
+        newEmotions['fear'] = Math.max(
+          0,
+          (newEmotions['fear'] ?? 0) - 0.05 * contextInfluence,
+        )
       }
-      // ... more context rules to be added
 
       // Normalize emotions if needed (e.g., if sum > 1, or ensure one primary emotion)
       // For now, just clamp individual emotions between 0 and 1
@@ -207,14 +217,12 @@ export class EmotionSynthesizer {
       }
 
       const profile: EmotionProfile = {
-        id: `emotion-${Date.now()}`,
+        id: uuidv4(), // Generate a unique ID using UUID v4
         emotions: newEmotions,
         timestamp: Date.now(),
         confidence: 0.75 + Math.random() * 0.2, // Confidence might be more stable or context-dependent
       }
-
       this.currentProfile = profile // Update internal cache
-
       return {
         profile,
         success: true,
@@ -230,23 +238,18 @@ export class EmotionSynthesizer {
     }
   }
 
-  /**
-   * Get current emotion profile
-   */
+  /** Get current emotion profile */
   getCurrentProfile(): EmotionProfile | null {
     return this.currentProfile
   }
 
-  /**
-   * Reset to neutral emotional state
-   */
+  /** Reset to neutral emotional state */
   reset() {
     this.currentProfile = null
     logger.debug('EmotionSynthesizer reset')
   }
 
-  /**
-   * Get the default emotion profile
+  /** Get the default emotion profile
    * This provides a public way to access the default neutral emotional state
    * IMPORTANT: This is the ONLY public way to access the default profile.
    * Do NOT use bracket notation or try to access the private getDefaultProfile() method.
@@ -255,8 +258,7 @@ export class EmotionSynthesizer {
     return this.getDefaultProfile()
   }
 
-  /**
-   * Wraps a raw emotion intensity map into a unified `EmotionProfile` instance.
+  /** Wraps a raw emotion intensity map into a unified `EmotionProfile` instance.
    *
    * Note: despite the name, this method does not merge multiple emotion maps; callers should
    * combine inputs before calling this.
@@ -270,12 +272,11 @@ export class EmotionSynthesizer {
   blendEmotions(emotions: Record<string, number>): EmotionProfile {
     const now = Date.now()
     const profile: EmotionProfile = {
-      id: `blend-${now}`,
+      id: uuidv4(), // Generate a unique ID using UUID v4
       emotions: { ...emotions },
       timestamp: now,
       confidence: 0.8,
     }
-
     this.currentProfile = profile
     return profile
   }
