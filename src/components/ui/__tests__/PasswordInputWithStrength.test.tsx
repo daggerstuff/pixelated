@@ -93,4 +93,16 @@ describe('PasswordInputWithStrength', () => {
     expect(describedBy).toContain('password-error')
     expect(describedBy).toContain('password-helper')
   })
+
+  it('shows empty strength when password is empty', () => {
+    render(
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+      />
+    )
+
+    const progressbar = screen.getByRole('progressbar')
+    expect(progressbar.getAttribute('aria-valuetext')).toBe('empty')
+  })
 })
