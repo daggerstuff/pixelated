@@ -71,7 +71,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       },
     )
 
-    await threatDetectionSystem.huntingService.initializeServices()
+    process.env.MONGODB_URI = mongod.getUri();
+    await threatDetectionSystem.huntingService.initializeServices();
+    await threatDetectionSystem.monitoringService.initializeServices();
   })
 
   afterEach(async () => {
