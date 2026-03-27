@@ -85,10 +85,52 @@ jobs:
           ISSUE_COUNT="$(echo "${ISSUES}" | jq 'length')"
           echo "✅ Found ${ISSUE_COUNT} issue(s) to triage! 🎯"
 
+      - name: 'Validate Gemini configuration'
+        id: 'validate_gemini_config'
+        if: |-
+          ${{ steps.find_issues.outputs.issues_to_triage != '[]' }}
+        env:
+          HAS_GEMINI_API_KEY: '${{ secrets.GEMINI_API_KEY != '' }}'
+          HAS_GOOGLE_API_KEY: '${{ secrets.GOOGLE_API_KEY != '' }}'
+          HAS_GCP_WIF_PROVIDER: '${{ vars.GCP_WIF_PROVIDER != '' }}'
+          HAS_GCP_PROJECT: '${{ vars.GOOGLE_CLOUD_PROJECT != '' }}'
+          HAS_GCP_SERVICE_ACCOUNT: '${{ vars.SERVICE_ACCOUNT_EMAIL != '' }}'
+        run: |-
+          set -euo pipefail
+
+          auth_methods=0
+
+          if [ "${HAS_GEMINI_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${HAS_GOOGLE_API_KEY}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${HAS_GCP_WIF_PROVIDER}" = 'true' ]; then
+            auth_methods=$((auth_methods + 1))
+          fi
+
+          if [ "${auth_methods}" -eq 0 ]; then
+            echo '::error::Gemini triage requires one configured authentication method. Set one of: secrets.GEMINI_API_KEY, secrets.GOOGLE_API_KEY, or vars.GCP_WIF_PROVIDER.'
+            exit 1
+          fi
+
+          if [ "${auth_methods}" -gt 1 ]; then
+            echo '::error::Gemini triage auth is ambiguous. Configure exactly one of: secrets.GEMINI_API_KEY, secrets.GOOGLE_API_KEY, or vars.GCP_WIF_PROVIDER.'
+            exit 1
+          fi
+
+          if [ "${HAS_GCP_WIF_PROVIDER}" = 'true' ] && { [ "${HAS_GCP_PROJECT}" != 'true' ] || [ "${HAS_GCP_SERVICE_ACCOUNT}" != 'true' ]; }; then
+            echo '::error::Gemini triage WIF configuration is incomplete. vars.GCP_WIF_PROVIDER, vars.GOOGLE_CLOUD_PROJECT, and vars.SERVICE_ACCOUNT_EMAIL must all be set together.'
+            exit 1
+          fi
+
       - name: 'Run Gemini Issue Analysis'
         id: 'gemini_issue_analysis'
         if: |-
-          ${{ steps.find_issues.outputs.issues_to_triage != '[]' }}
+          ${{ steps.find_issues.outputs.issues_to_triage != '[]' && steps.validate_gemini_config.outcome == 'success' }}
         uses: 'google-github-actions/run-gemini-cli@v0' # ratchet:exclude
         env:
           GITHUB_TOKEN: '' # Do not pass any auth token here since this runs on untrusted inputs
