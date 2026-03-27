@@ -19,14 +19,14 @@ vi.mock('../../hooks/usePasswordStrength', () => ({
 
 describe('PasswordInputWithStrength', () => {
   it('renders label and input', () => {
-    const { container } = render(
+    render(
       <PasswordInputWithStrength
         label="Password"
         name="password"
       />
     )
     // Use selector to avoid matching the button title
-    expect(container.querySelector('input[name="password"]')).not.toBeNull()
+    expect(screen.getByLabelText('Password', { selector: 'input' })).toBeDefined()
   })
 
   it('shows error even when focused', () => {

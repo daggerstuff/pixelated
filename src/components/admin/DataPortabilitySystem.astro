@@ -254,6 +254,7 @@ const recipientTypes = [
           type="text"
           id="recipient-name"
           autocomplete="name"
+          aria-label="Recipient name or organization"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient name or organization"
           required
@@ -262,6 +263,7 @@ const recipientTypes = [
           type="email"
           id="recipient-email"
           autocomplete="email"
+          aria-label="Recipient email"
           class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           placeholder="Recipient email"
           required
@@ -314,18 +316,15 @@ const recipientTypes = [
 </div>
 
 <script>
-  // Initialize the data portability form
-  document.addEventListener('DOMContentLoaded', (_event: Event) => {
+  const bindDataPortabilityHandlers = () => {
     const form = document.getElementById('data-portability-form')
     const cancelBtn = document.getElementById('data-portability-cancel-btn')
 
-    if (cancelBtn && form) {
-      cancelBtn.addEventListener('click', () => {
-        ;(form as HTMLFormElement).reset()
-      })
+    if (form instanceof HTMLFormElement && cancelBtn instanceof HTMLButtonElement) {
+      cancelBtn.onclick = () => form.reset()
     }
 
-    if (form) {
+    if (form instanceof HTMLFormElement) {
       form.addEventListener('submit', (e: Event) => {
         e.preventDefault()
 
@@ -344,5 +343,8 @@ const recipientTypes = [
         )
       })
     }
-  })
+  }
+
+  document.addEventListener('DOMContentLoaded', bindDataPortabilityHandlers)
+  document.addEventListener('astro:page-load', bindDataPortabilityHandlers)
 </script>
