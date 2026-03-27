@@ -1219,17 +1219,18 @@ class MLAnomalyDetector extends AnomalyDetector {
       if (!model || !isolationForest) {
         return []
       }
-      // run tensor operations inside tf.tidy to ensure tensors are disposed
-      const { reconstructionError, anomalyScore } = tf.tidy(() => {
+      // run tensor operations inside tf.tidy to ensure intermediate tensors are disposed
+      const reconstructionErrorTensor = tf.tidy(() => {
         const inputTensor = tf.tensor2d([featureVector])
         const reconstruction = model.predict(inputTensor) as tf.Tensor
-        const error = tf
-          .mean(tf.abs(tf.sub(inputTensor, reconstruction)))
-          .dataSync()[0]
-
-        const score = isolationForest.predict([featureVector])[0]
-        return { reconstructionError: error, anomalyScore: score }
+        return tf.mean(tf.abs(tf.sub(inputTensor, reconstruction)))
       })
+
+      const reconstructionErrorData = await reconstructionErrorTensor.data()
+      const reconstructionError = reconstructionErrorData[0]
+      reconstructionErrorTensor.dispose()
+
+      const anomalyScore = isolationForest.predict([featureVector])[0]
 
       const reconstructionThreshold =
         profile.baselineMetrics.sequentialThreshold || 0.1
