@@ -14,7 +14,7 @@ describe('EmotionSynthesizer', () => {
   })
 
   describe('synthesizeEmotion (Enhanced)', () => {
-    it('should return a default neutral profile if no options are provided', async () => {
+    it('should return a default neutral profile when noise is disabled', async () => {
       // Pass randomFluctuation = 0 to make test deterministic since default adds noise
       const result = await synthesizer.synthesizeEmotion({ randomFluctuation: 0 })
       expect(result.success).toBe(true)
