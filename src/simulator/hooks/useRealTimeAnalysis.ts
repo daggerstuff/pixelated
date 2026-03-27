@@ -40,6 +40,16 @@ const INITIAL_STATE: RealTimeAnalysisState = {
   lastError: null,
 }
 
+/**
+ * Bridges the event-driven `FeedbackService` with React's render cycle.
+ *
+ * Why this exists:
+ * Real-time analysis streams generate high-frequency events that would
+ * overwhelm React's rendering pipeline if bound directly. This hook
+ * instead polls the `FeedbackService` at fixed 100ms intervals, batching
+ * state changes to limit UI updates to approximately 10Hz and
+ * help reduce main-thread contention during intense analysis periods.
+ */
 export function useRealTimeAnalysis() {
   const [state, setState] = useState<RealTimeAnalysisState>(INITIAL_STATE)
   const feedbackServiceRef = useRef<FeedbackService | null>(null)
