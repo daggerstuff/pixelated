@@ -23,28 +23,7 @@ trigger:
       - docs/**
       - '**/*.md'
 
-pr:
-  autoCancel: true
-  branches:
-    include:
-      - main
-      - master
-      - staging
-    paths:
-      include:
-        - src/**
-        - ai/**
-        - docker/**
-        - scripts/devops/**
-        - ci-cd/azure-pipelines-kubernetes-deploy.yml
-        - ai/infrastructure/helm/**
-        - k8s/**
-        - package.json
-        - pnpm-lock.yaml
-        - .gitmodules
-      exclude:
-        - docs/**
-        - '**/*.md'
+pr: none
 
 parameters:
   - name: environment
@@ -71,6 +50,8 @@ variables:
     value: $(ACR_NAME).azurecr.io
 
 stages:
+  # Stage 1: Build the Docker image once and push to ACR.
+  # Runs on a Microsoft-hosted agent so no self-hosted runner availability is required.
   - stage: Build
     displayName: Build and push image to ACR
     jobs:
@@ -102,29 +83,30 @@ stages:
             displayName: Build and push image to ACR
             inputs:
               azureSubscription: $(AZURE_SUBSCRIPTION)
-            scriptType: bash
-            scriptLocation: inlineScript
-            workingDirectory: $(Build.SourcesDirectory)
-            inlineScript: |
-              set -euo pipefail
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                set -euo pipefail
 
-              IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
-              IMAGE_FULL="$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}"
-              IMAGE_LATEST="$(ACR_LOGIN_SERVER)/$(ACR_REPO):latest"
+                IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
+                IMAGE_FULL="$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}"
+                IMAGE_LATEST="$(ACR_LOGIN_SERVER)/$(ACR_REPO):latest"
 
-              echo "🔐 Logging into ACR"
-              az acr login --name "$(ACR_NAME)"
+                echo "🔐 Logging into ACR"
+                az acr login --name "$(ACR_NAME)"
 
-              echo "📦 Building ${IMAGE_FULL}"
-              docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
-              docker push "${IMAGE_FULL}"
+                echo "📦 Building ${IMAGE_FULL}"
+                docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
+                docker push "${IMAGE_FULL}"
 
-              if [ "${{ parameters.pushLatest }}" = "True" ] || [ "${{ parameters.pushLatest }}" = "true" ]; then
-                docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
-                docker push "${IMAGE_LATEST}"
-              fi
+                if [ "${{ parameters.pushLatest }}" = "True" ] || [ "${{ parameters.pushLatest }}" = "true" ]; then
+                  docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
+                  docker push "${IMAGE_LATEST}"
+                fi
 
-              echo "##vso[task.setvariable variable=IMAGE_TAG;isOutput=true]${IMAGE_TAG}"
+                # Export the computed tag for downstream stages
+                echo "##vso[task.setvariable variable=IMAGE_TAG;isOutput=true]${IMAGE_TAG}"
             name: build_step
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
@@ -164,6 +146,8 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
+  # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
+  # Uses the image tag produced in the Build stage.
   - stage: DeployHosted
     displayName: Deploy to AKS (hosted agent)
     dependsOn: Build
@@ -198,7 +182,7 @@ stages:
             fetchDepth: 1
             persistCredentials: true
             submodules: recursive
-            credential: $(System.AccessToken)
+
 
           - task: HelmInstaller@1
             displayName: Install Helm
@@ -214,14 +198,14 @@ stages:
             displayName: Deploy Helm chart to AKS
             inputs:
               azureSubscription: $(AZURE_SUBSCRIPTION)
-            scriptType: bash
-            scriptLocation: inlineScript
-            workingDirectory: $(Build.SourcesDirectory)
-            inlineScript: |
-              set -euo pipefail
-              bash scripts/devops/azure_aks_preflight.sh
-              export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
-              bash scripts/devops/azure_aks_deploy.sh
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(Build.SourcesDirectory)
+              inlineScript: |
+                set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
+                export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
+                bash scripts/devops/azure_aks_deploy.sh
             env:
               APP_ENVIRONMENT: ${{ parameters.environment }}
               PUSH_LATEST: ${{ parameters.pushLatest }}
