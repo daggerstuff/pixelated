@@ -29,10 +29,12 @@ def audit_logger():
 @pytest.fixture
 def mock_encryption_service():
     """Mock encryption service for testing"""
-    with patch('src.lib.security.encryptionManager') as mock:
-        mock.encrypt.return_value = "encrypted_data_mock"
-        mock.decrypt.return_value = {"sensitive": "data"}
-        yield mock
+    class MockEncryptionService:
+        def encrypt(self, data):
+            return "encrypted_data_mock"
+        def decrypt(self, data):
+            return {"sensitive": "data"}
+    yield MockEncryptionService()
 
 
 @pytest.fixture

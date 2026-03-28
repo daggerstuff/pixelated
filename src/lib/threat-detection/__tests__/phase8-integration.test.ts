@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis-mock'
+import Redis from 'ioredis-mock'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
@@ -9,14 +9,14 @@ import { createCompleteThreatDetectionSystem } from '../integrations'
 describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer
   let redis: Redis
-  let mockOrchestrator: EventEmitter
+  let mockOrchestrator: any
   let mockRateLimiter: any
   let threatDetectionSystem: any
 
   beforeEach(async () => {
     // Setup in-memory MongoDB
     mongod = await MongoMemoryServer.create()
-    const mongoUri = mongod.getUri()
+    process.env.MONGODB_URI = mongod.getUri()
 
     // Setup mock Redis
     redis = new Redis()
@@ -35,8 +35,6 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       mockRateLimiter,
       {
         threatDetection: {
-          mongoUri,
-          redisUrl: 'redis://localhost:6379',
           enabled: true,
         },
         monitoring: {
@@ -72,6 +70,10 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         },
       },
     )
+
+    process.env.MONGODB_URI = mongod.getUri();
+    await threatDetectionSystem.huntingService.initializeServices();
+    await threatDetectionSystem.monitoringService.initializeServices();
   })
 
   afterEach(async () => {
@@ -281,7 +283,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       expect(global.fetch).toHaveBeenCalled()
 
       // Reset mock
-      global.fetch.mockClear()
+      vi.mocked(global.fetch).mockClear()
 
       // Second lookup - should hit cache
       const result2 = await intelligenceService.lookupIOC(ip, 'ip')

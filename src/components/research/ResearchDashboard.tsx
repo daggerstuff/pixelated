@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -135,7 +135,8 @@ export const ResearchDashboard: FC = () => {
     },
   ]
 
-  const analyticsData = studies.map((study, _index) => ({
+  // ⚡ Bolt: Memoize analytics calculation to prevent expensive O(N) array transformations on every render
+  const analyticsData = useMemo(() => studies.map((study, _index) => ({
     studyId: study.id,
     studyName: study.title,
     participants: study.participants,
@@ -146,7 +147,7 @@ export const ResearchDashboard: FC = () => {
     status: study.status,
     outcomesCount: study.outcomes.length,
     methodology: study.methodology,
-  }))
+  })), [studies])
 
   return (
     <ResponsiveContainer size='full'>
