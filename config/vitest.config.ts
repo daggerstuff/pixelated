@@ -63,6 +63,7 @@ export default defineConfig({
       'tests/security/**/*',
       'backups/**',
       'backups/**/*',
+    'worktrees/**',
       ...(process.env['CI']
         ? [
           'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
@@ -108,6 +109,7 @@ export default defineConfig({
         'vitest.config.ts',
         'backups/**',
         'backups/**/*',
+    'worktrees/**',
       ],
     },
     isolate: !process.env['CI'],
