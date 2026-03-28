@@ -30,11 +30,11 @@ setup_fake_git() {
   cat > "${TEST_DIR}/repo/.gitmodules" <<'EOF'
 [submodule "ai"]
 	path = ai
-	url = https://github.com/daggerstuff/ai.git
+	url = https://github.com/pixelatedempathy/ai.git
 
 [submodule "docs"]
 	path = docs
-	url = https://github.com/daggerstuff/docs.git
+	url = https://github.com/pixelatedempathy/docs.git
 EOF
 
   cat > "${TEST_DIR}/bin/git" <<EOF
@@ -53,8 +53,8 @@ if [[ "\$#" -ge 4 && "\$1" == "config" && "\$2" == "-f" && "\$3" == ".gitmodules
   case "\$5" in
     submodule.ai.path) printf '%s\n' 'ai' ;;
     submodule.docs.path) printf '%s\n' 'docs' ;;
-    submodule.ai.url) printf '%s\n' 'https://github.com/daggerstuff/ai.git' ;;
-    submodule.docs.url) printf '%s\n' 'https://github.com/daggerstuff/docs.git' ;;
+    submodule.ai.url) printf '%s\n' 'https://github.com/pixelatedempathy/ai.git' ;;
+    submodule.docs.url) printf '%s\n' 'https://github.com/pixelatedempathy/docs.git' ;;
     *) exit 1 ;;
   esac
   exit 0
@@ -92,7 +92,7 @@ test_azure_submodule_update_uses_global_config() {
   bash "${TARGET_SCRIPT}"
 
   # Check if git was called with the correct arguments
-  assert_contains "submodule update --init --recursive --depth 1" "${TEST_DIR}/git.log"
+  assert_contains "submodule update --recursive --force --depth 1" "${TEST_DIR}/git.log"
   
   # The actual authentication is now handled via GIT_CONFIG_GLOBAL,
   # which the mock git doesn't see in its arguments ($*).
