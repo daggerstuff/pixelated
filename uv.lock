@@ -2472,6 +2472,21 @@ wheels = [
 ]
 
 [[package]]
+name = "hindsight-litellm"
+version = "0.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "filelock" },
+    { name = "litellm" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/54/74/e78ff1f5044ad95235b09fbbc25b27943cefdfddf17289057d5bf3f91f54/hindsight_litellm-0.5.0.tar.gz", hash = "sha256:4cd9060f9be42b89b57775e5fef0df5c1f8305f0c8a6ff6b21d5d6d6489f6961", size = 190642, upload-time = "2026-03-21T08:19:10.786Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/de/37/2c229eee0a56aaaa6e1c857d72cc45a5b8290c1a98141099d47d8257d29e/hindsight_litellm-0.5.0-py3-none-any.whl", hash = "sha256:a27035887e80e9cfb27089b254dd22d4195db7ce10542cf6a55666de1482c1e2", size = 40010, upload-time = "2026-03-21T08:19:09.172Z" },
+]
+
+[[package]]
 name = "honeyhive"
 version = "0.2.19"
 source = { registry = "https://pypi.org/simple" }
@@ -5774,6 +5789,7 @@ dependencies = [
     { name = "gradient-adk" },
     { name = "h11" },
     { name = "hatch" },
+    { name = "hindsight-litellm" },
     { name = "honeyhive" },
     { name = "httpx" },
     { name = "huggingface-hub", version = "0.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14' or sys_platform == 'emscripten'" },
@@ -5940,6 +5956,7 @@ requires-dist = [
     { name = "gradient-adk", specifier = ">=0.2.11" },
     { name = "h11", specifier = ">=0.15.0" },
     { name = "hatch", specifier = ">=1.14.1" },
+    { name = "hindsight-litellm", specifier = ">=0.5.0" },
     { name = "honeyhive", specifier = ">=0.2.19" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "huggingface-hub", specifier = ">=0.24.0" },

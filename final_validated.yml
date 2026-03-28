@@ -1,0 +1,185 @@
+name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+    - master
+    - staging
+  paths:
+    include:
+    - src/**
+    - ai/**
+    - docker/**
+    - scripts/devops/**
+    - ci-cd/azure-pipelines-kubernetes-deploy.yml
+    - ai/infrastructure/helm/**
+    - k8s/**
+    - package.json
+    - pnpm-lock.yaml
+    exclude:
+    - docs/**
+    - '**/*.md'
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - main
+    - master
+    - staging
+  paths:
+    include:
+    - src/**
+    - ai/**
+    - docker/**
+    - scripts/devops/**
+    - ci-cd/azure-pipelines-kubernetes-deploy.yml
+    - ai/infrastructure/helm/**
+    - k8s/**
+    - package.json
+    - pnpm-lock.yaml
+    exclude:
+    - docs/**
+    - '**/*.md'
+parameters:
+- name: environment
+  displayName: 'Environment'
+  type: string
+  default: staging
+  values:
+  - staging
+  - production
+- name: pushLatest
+  displayName: 'Push :latest tag'
+  type: boolean
+  default: false
+variables:
+- group: pixelated-pipeline-variables
+- name: ACR_NAME
+  value: pixelatedregistry01
+- name: ACR_REPO
+  value: pixelatedempathy
+- name: CHART_DIR
+  value: ai/infrastructure/helm/pixelated-empathy
+- name: ACR_LOGIN_SERVER
+  value: $(ACR_NAME).azurecr.io
+stages:
+- stage: Build
+  displayName: Build and push image to ACR
+  jobs:
+  - job: BuildImage
+    displayName: Build image and push to ACR
+    pool:
+      vmImage: ubuntu-24.04
+    steps:
+    - task: 6d15af64-176c-496d-b583-fd2ae21d4df4@1
+      inputs:
+        repository: self
+        fetchDepth: 0
+    - task: SonarCloudPrepare@4
+      displayName: 'Prepare Analysis Configuration'
+      inputs:
+        SonarCloud: 'SonarQube Cloud'
+        organization: 'slimshadyme'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'slimshadyme_pixelated'
+        cliProjectName: 'pixelated'
+    - task: AzureCLI@2
+      displayName: Build and push image to ACR
+      inputs:
+        azureSubscription: $(AZURE_SUBSCRIPTION)
+        scriptType: bash
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: "set -euo pipefail\nbash scripts/devops/azure_aks_preflight.sh\n\nIMAGE_TAG=\"${BUILD_SOURCEVERSION:0:7}\"\nIMAGE_FULL=\"$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}\"\nIMAGE_LATEST=\"$(ACR_LOGIN_SERVER)/$(ACR_REPO):latest\"\n\necho \"\U0001F510 Logging into ACR\"\naz acr login --name \"$(ACR_NAME)\"\n\necho \"\U0001F4E6 Building ${IMAGE_FULL}\"\ndocker build -f docker/Dockerfile.production -t \"${IMAGE_FULL}\" .\ndocker push \"${IMAGE_FULL}\"\n\nif [ \"False\" = \"True\" ] || [ \"False\" = \"true\" ]; then\n  docker tag \"${IMAGE_FULL}\" \"${IMAGE_LATEST}\"\n  docker push \"${IMAGE_LATEST}\"\nfi\n\n# Export the computed tag for downstream stages\necho \"##vso[task.setvariable variable=IMAGE_TAG;isOutput=true]${IMAGE_TAG}\"\n"
+      name: build_step
+      env:
+        APP_ENVIRONMENT: staging
+        PUSH_LATEST: False
+        ACR_NAME: $(ACR_NAME)
+        ACR_REPO: $(ACR_REPO)
+        ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+        APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+        APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+        AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+        AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+        AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+        AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
+    - task: SonarCloudAnalyze@4
+      displayName: 'Run Code Analysis'
+    - task: SonarCloudPublish@4
+      displayName: 'Publish Quality Gate Result'
+      inputs:
+        pollingTimeoutSec: '300'
+- stage: DeployHosted
+  displayName: Deploy to AKS (hosted agent)
+  dependsOn:
+  - Build
+  condition: >
+    and(
+      succeeded(),
+      or(
+        and(
+          eq('staging', 'staging'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/staging')
+        ),
+        and(
+          eq('staging', 'production'),
+          or(
+            eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+            eq(variables['Build.SourceBranch'], 'refs/heads/main')
+          )
+        )
+      )
+    )
+  variables:
+  - name: IMAGE_TAG
+    value: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
+  jobs:
+  - job: DeployHosted
+    displayName: Helm deploy (hosted)
+    pool:
+      vmImage: ubuntu-24.04
+    steps:
+    - task: 6d15af64-176c-496d-b583-fd2ae21d4df4@1
+      inputs:
+        repository: self
+        fetchDepth: 1
+        persistCredentials: true
+    - task: CmdLine@2
+      displayName: Initialize CI-aware submodules
+      inputs:
+        script: bash scripts/devops/init-submodules.sh
+    - task: HelmInstaller@1
+      displayName: Install Helm
+      inputs:
+        helmVersionToInstall: v3.15.4
+    - task: AzureCLI@2
+      displayName: Deploy Helm chart to AKS
+      inputs:
+        azureSubscription: $(AZURE_SUBSCRIPTION)
+        scriptType: bash
+        scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)
+        inlineScript: |
+          set -euo pipefail
+          export BUILD_SOURCEVERSION="$(IMAGE_TAG)"
+          bash scripts/devops/azure_aks_deploy.sh
+      env:
+        APP_ENVIRONMENT: staging
+        PUSH_LATEST: False
+        CHART_DIR: $(CHART_DIR)
+        ACR_NAME: $(ACR_NAME)
+        ACR_REPO: $(ACR_REPO)
+        ACR_LOGIN_SERVER: $(ACR_LOGIN_SERVER)
+        APP_HOSTNAME_STAGING: $(APP_HOSTNAME_STAGING)
+        APP_HOSTNAME_PRODUCTION: $(APP_HOSTNAME_PRODUCTION)
+        AZURE_SUBSCRIPTION_ID: $(AZURE_SUBSCRIPTION_ID)
+        AKS_CLUSTER_NAME: $(AKS_CLUSTER_NAME)
+        AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
+        AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
+        AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
+        SKIP_BUILD: 'true'
+

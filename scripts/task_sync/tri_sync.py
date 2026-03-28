@@ -11,7 +11,6 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from collections.abc import Iterable, Mapping, Sequence
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -38,11 +37,16 @@ STATUS_ALIASES = {
     "resolved": "closed",
     "complete": "closed",
     "completed": "closed",
+    "cancelled": "closed",
+    "canceled": "closed",
     "in progress": "in_progress",
+    "under review": "in_progress",
+    "review": "in_progress",
     "doing": "in_progress",
     "active": "in_progress",
     "open": "open",
     "todo": "open",
+    "to do": "open",
     "backlog": "open",
 }
 
@@ -278,6 +282,17 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     return max(records, key=sort_key)
 
 
+def select_provider_record(records: Sequence[TaskRecord]) -> TaskRecord:
+    if not records:
+        raise ValueError("Cannot select a provider record from an empty sequence")
+
+    def sort_key(record: TaskRecord) -> tuple[int, datetime, str]:
+        status_rank = 0 if normalize_status(record.status) == "closed" else 1
+        return (status_rank, record.updated_at, record.external_id)
+
+    return max(records, key=sort_key)
+
+
 def record_clean_body(record: TaskRecord) -> str:
     if record.clean_body is not None:
         return record.clean_body
@@ -292,6 +307,10 @@ def group_records_by_key(
         for record in records:
             normalized_record = normalized_group_record(provider, record)
             if not normalized_record.sync_key:
+                print(
+                    f"Skipping {provider} record {record.external_id}: missing sync key",
+                    file=sys.stderr,
+                )
                 continue
             grouped.setdefault(normalized_record.sync_key, []).append(normalized_record)
     return grouped
@@ -366,8 +385,18 @@ def build_sync_plan(
     plan: list[SyncAction] = []
 
     for sync_key, records in sorted(grouped.items()):
-        canonical = select_canonical_record(records)
-        provider_lookup = {record.provider: record for record in records}
+        provider_lookup = {
+            provider: select_provider_record(
+                [record for record in records if record.provider == provider]
+            )
+            for provider in {record.provider for record in records}
+        }
+        canonical_candidates = [
+            record
+            for record in provider_lookup.values()
+            if normalize_status(record.status) != "closed"
+        ]
+        canonical = select_canonical_record(canonical_candidates or list(provider_lookup.values()))
         provider_ids = merged_provider_ids(records)
 
         for provider in enabled:
@@ -389,6 +418,10 @@ def build_sync_plan(
 
 def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
     provider_ids: dict[str, str] = {}
+    selected_by_provider = {
+        provider: select_provider_record([record for record in records if record.provider == provider])
+        for provider in {record.provider for record in records}
+    }
     for record in records:
         provider_ids.update(
             {
@@ -397,8 +430,78 @@ def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
                 if external_id
             }
         )
-        provider_ids[record.provider] = record.external_id
+    for provider, record in selected_by_provider.items():
+        provider_ids[provider] = record.external_id
     return provider_ids
+
+
+def find_beads_duplicate_groups(
+    records: Sequence[TaskRecord],
+) -> list[tuple[str, TaskRecord, list[TaskRecord]]]:
+    duplicates: list[tuple[str, TaskRecord, list[TaskRecord]]] = []
+    grouped: dict[str, list[TaskRecord]] = {}
+    for record in records:
+        if record.provider != "beads":
+            continue
+        normalized = normalized_group_record("beads", record)
+        if not normalized.sync_key:
+            continue
+        grouped.setdefault(normalized.sync_key, []).append(normalized)
+
+    for sync_key, sync_records in sorted(grouped.items()):
+        if len(sync_records) < 2:
+            continue
+        canonical = select_provider_record(sync_records)
+        stale_records = [
+            record for record in sync_records if record.external_id != canonical.external_id
+        ]
+        if stale_records:
+            duplicates.append((sync_key, canonical, stale_records))
+    return duplicates
+
+
+def cleanup_beads_duplicates(
+    records: Sequence[TaskRecord],
+    *,
+    run_process: Any | None = None,
+) -> list[SyncExecutionResult]:
+    run_process = run_process or _run_process
+    results: list[SyncExecutionResult] = []
+    for sync_key, canonical, stale_records in find_beads_duplicate_groups(records):
+        for stale_record in stale_records:
+            close_completed = run_process(["bd", "close", stale_record.external_id])
+            close_success = getattr(close_completed, "returncode", 1) == 0
+            stdout_parts = [(_string_or_empty(getattr(close_completed, "stdout", ""))).strip()]
+            stderr_parts = [(_string_or_empty(getattr(close_completed, "stderr", ""))).strip()]
+
+            if close_success:
+                dep_completed = run_process(
+                    [
+                        "bd",
+                        "dep",
+                        "add",
+                        stale_record.external_id,
+                        canonical.external_id,
+                        "--type",
+                        "related",
+                    ]
+                )
+                close_success = getattr(dep_completed, "returncode", 1) == 0
+                stdout_parts.append((_string_or_empty(getattr(dep_completed, "stdout", ""))).strip())
+                stderr_parts.append((_string_or_empty(getattr(dep_completed, "stderr", ""))).strip())
+
+            results.append(
+                SyncExecutionResult(
+                    provider="beads",
+                    action="dedupe",
+                    sync_key=sync_key,
+                    target_id=canonical.external_id,
+                    success=close_success,
+                    stdout="\n".join(part for part in stdout_parts if part),
+                    stderr="\n".join(part for part in stderr_parts if part),
+                )
+            )
+    return results
 
 
 def _run_command(command: Sequence[str], *, input_text: str | None = None) -> str:
@@ -508,10 +611,69 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
 
 
 def _jira_body(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> str:
-    return _string_or_empty(
-        _first_present(payload, "description", "body")
-        or _first_present(field_payload, "description")
-    )
+    body = _first_present(payload, "description", "body") or _first_present(field_payload, "description")
+    if isinstance(body, Mapping):
+        return _jira_adf_to_text(body)
+    return _string_or_empty(body)
+
+
+def _jira_adf_to_text(node: Mapping[str, Any] | Sequence[Any] | str | None) -> str:
+    if node is None:
+        return ""
+    if isinstance(node, str):
+        return node
+    if isinstance(node, Sequence) and not isinstance(node, (str, bytes, bytearray)):
+        return "".join(_jira_adf_to_text(item) for item in node)
+    if not isinstance(node, Mapping):
+        return _string_or_empty(node)
+
+    node_type = _string_or_empty(node.get("type"))
+    if node_type == "text":
+        return _string_or_empty(node.get("text"))
+    if node_type in {"paragraph", "heading"}:
+        text = "".join(_jira_adf_to_text(item) for item in node.get("content", []))
+        return f"{text}\n\n" if text else ""
+    if node_type == "hardBreak":
+        return "\n"
+    if node_type in {"bulletList", "orderedList"}:
+        rendered_items = []
+        for index, item in enumerate(node.get("content", []), start=1):
+            item_text = _jira_adf_list_item_text(item).strip()
+            prefix = f"{index}. " if node_type == "orderedList" else "- "
+            if item_text:
+                rendered_items.append(prefix + item_text)
+        return "\n".join(item for item in rendered_items if item) + ("\n\n" if rendered_items else "")
+    if node_type == "listItem":
+        return _jira_adf_list_item_text(node)
+
+    return "".join(_jira_adf_to_text(item) for item in node.get("content", []))
+
+
+def _jira_adf_list_item_text(node: Mapping[str, Any] | Sequence[Any] | str | None) -> str:
+    if node is None:
+        return ""
+    if isinstance(node, str):
+        return node
+    if isinstance(node, Sequence) and not isinstance(node, (str, bytes, bytearray)):
+        return "".join(_jira_adf_list_item_text(item) for item in node)
+    if not isinstance(node, Mapping):
+        return _string_or_empty(node)
+
+    parts = []
+    for item in node.get("content", []):
+        if isinstance(item, Mapping) and _string_or_empty(item.get("type")) in {"bulletList", "orderedList"}:
+            nested_text = _jira_adf_to_text(item).strip()
+            if nested_text:
+                parts.append(_indent_multiline_text(nested_text, "  "))
+            continue
+        rendered = _jira_adf_to_text(item).strip()
+        if rendered:
+            parts.append(rendered)
+    return "\n".join(part for part in parts if part)
+
+
+def _indent_multiline_text(text: str, prefix: str) -> str:
+    return "\n".join(f"{prefix}{line}" if line else line for line in text.splitlines())
 
 
 def _jira_status(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> Any:
@@ -551,7 +713,7 @@ def get_provider_normalizer(provider: str):
 
 
 def beads_export() -> list[TaskRecord]:
-    output = _run_command(["bd", "export", "--no-memories", "--scrub"])
+    output = _run_command(["bd", "export", "--no-memories"])
     records: list[TaskRecord] = []
     for line in output.splitlines():
         if not line.strip():
@@ -651,13 +813,86 @@ def resolve_export_path(
 
 def load_sync_state(path: Path = SYNC_STATE_PATH) -> dict[str, Any]:
     if not path.exists():
-        return {}
-    return json.loads(path.read_text())
+        return {"records": {}}
+
+    try:
+        state = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"records": {}}
+
+    if not isinstance(state, dict):
+        return {"records": {}}
+    if not isinstance(state.get("records"), dict):
+        state["records"] = {}
+    return state
 
 
 def save_sync_state(state: Mapping[str, Any], path: Path = SYNC_STATE_PATH) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n")
+    path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def update_sync_state(
+    plan: Sequence[SyncAction],
+    results: Sequence[SyncExecutionResult],
+    *,
+    state: Mapping[str, Any] | None = None,
+    applied_at: str | None = None,
+) -> dict[str, Any]:
+    next_state = dict(state or {})
+    records = next_state.get("records")
+    if not isinstance(records, dict):
+        records = {}
+        next_state["records"] = records
+
+    timestamp = applied_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    for action, result in zip(plan, results):
+        existing_record = records.get(action.sync_key)
+        record = dict(existing_record) if isinstance(existing_record, dict) else {}
+
+        provider_ids = record.get("provider_ids")
+        if not isinstance(provider_ids, dict):
+            provider_ids = {}
+        provider_ids.update(
+            {
+                provider: external_id
+                for provider, external_id in action.provider_ids.items()
+                if external_id
+            }
+        )
+        if result.success and result.target_id:
+            provider_ids[action.provider] = result.target_id
+
+        providers = record.get("providers")
+        if not isinstance(providers, dict):
+            providers = {}
+
+        providers[action.provider] = {
+            "action": action.action,
+            "success": result.success,
+            "target_id": result.target_id,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "updated_at": timestamp,
+        }
+
+        record.update(
+            {
+                "sync_key": action.sync_key,
+                "source_provider": action.source_provider,
+                "source_id": action.source_id,
+                "title": action.title,
+                "status": action.status,
+                "provider_ids": provider_ids,
+                "providers": providers,
+                "updated_at": timestamp,
+            }
+        )
+        records[action.sync_key] = record
+
+    next_state["last_applied_at"] = timestamp
+    next_state["record_count"] = len(records)
+    return next_state
 
 
 def summarize_plan(plan: Sequence[SyncAction]) -> dict[str, int]:
@@ -693,8 +928,6 @@ def _apply_beads_action(
             action.title,
             "--description",
             action.body,
-            "--status",
-            action.status,
             "--external-ref",
             action.sync_key,
             "--silent",
@@ -755,13 +988,15 @@ def _apply_bridge_action(
         )
 
     completed = run_process(command, input_text=json.dumps(dataclass_to_dict(action)))
+    stdout = (getattr(completed, "stdout", "") or "").strip()
+    target_id = _parse_bridge_target_id(action.provider, stdout) or action.target_id
     return SyncExecutionResult(
         provider=action.provider,
         action=action.action,
         sync_key=action.sync_key,
-        target_id=action.target_id,
+        target_id=target_id,
         success=getattr(completed, "returncode", 1) == 0,
-        stdout=(getattr(completed, "stdout", "") or "").strip(),
+        stdout=stdout,
         stderr=(getattr(completed, "stderr", "") or "").strip(),
     )
 
@@ -829,6 +1064,47 @@ def plan_from_sources(
     )
 
 
+def resolve_enabled_providers_from_env() -> tuple[str, ...]:
+    raw = os.getenv("PIXELATED_TASK_SYNC_PROVIDERS", "").strip()
+    if not raw:
+        return DEFAULT_PROVIDER_ORDER
+
+    providers = tuple(
+        provider.strip().lower()
+        for provider in raw.split(",")
+        if provider.strip().lower() in DEFAULT_PROVIDER_ORDER
+    )
+    return providers or DEFAULT_PROVIDER_ORDER
+
+
+def execute_apply_mode(
+    plan: Sequence[SyncAction],
+) -> tuple[dict[str, Any], int]:
+    results = apply_sync_plan(plan, provider_commands=resolve_apply_commands_from_env())
+    state = update_sync_state(plan, results, state=load_sync_state(path=SYNC_STATE_PATH))
+    save_sync_state(state, path=SYNC_STATE_PATH)
+
+    beads_cleanup_results = cleanup_beads_duplicates(beads_export())
+
+    payload: dict[str, Any] = {
+        "results": [dataclass_to_dict(result) for result in results],
+        "beads_cleanup": {
+            "summary": {
+                "dedupe": len(beads_cleanup_results),
+                "success": sum(1 for result in beads_cleanup_results if result.success),
+                "failure": sum(1 for result in beads_cleanup_results if not result.success),
+            },
+            "results": [dataclass_to_dict(result) for result in beads_cleanup_results],
+        },
+    }
+    exit_code = 0
+    if not all(result.success for result in results):
+        exit_code = 1
+    if not all(result.success for result in beads_cleanup_results):
+        exit_code = 1
+    return payload, exit_code
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(argv or sys.argv[1:])
     mode = args[0] if args else "plan"
@@ -836,7 +1112,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if mode not in {"plan", "dry-run", "apply"}:
         raise SystemExit("Usage: tri_sync.py [plan|dry-run|apply]")
 
-    plan = plan_from_sources()
+    enabled_providers = resolve_enabled_providers_from_env()
+    records_by_provider = collect_records(enabled_providers=enabled_providers)
+    plan = build_sync_plan(records_by_provider, enabled_providers=enabled_providers)
     action_payloads = [dataclass_to_dict(action) for action in plan]
     payload: dict[str, Any] = {
         "mode": mode,
@@ -844,11 +1122,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         "actions": action_payloads,
     }
     if mode == "apply":
-        results = apply_sync_plan(plan, provider_commands=resolve_apply_commands_from_env())
-        payload["results"] = [dataclass_to_dict(result) for result in results]
-        if not all(result.success for result in results):
+        apply_payload, exit_code = execute_apply_mode(plan)
+        payload.update(apply_payload)
+        if exit_code:
             print(json.dumps(payload, indent=2))
-            return 1
+            return exit_code
 
     print(json.dumps(payload, indent=2))
     return 0
@@ -865,6 +1143,35 @@ def dataclass_to_dict(value: Any) -> Any:
     if isinstance(value, list):
         return [dataclass_to_dict(item) for item in value]
     return value
+
+
+def _parse_bridge_target_id(provider: str, stdout: str) -> str | None:
+    if not stdout:
+        return None
+    payload = _parse_bridge_stdout_payload(stdout)
+    if not isinstance(payload, Mapping):
+        return None
+    if provider == "asana":
+        return (_string_or_empty(payload.get("gid") or payload.get("id")).strip() or None)
+    if provider == "jira":
+        return (_string_or_empty(payload.get("key") or payload.get("id")).strip() or None)
+    return None
+
+
+def _parse_bridge_stdout_payload(stdout: str) -> Mapping[str, Any] | None:
+    candidates = [stdout.strip()]
+    lines = [line for line in stdout.splitlines() if line.strip()]
+    if lines:
+        candidates.extend(reversed(lines))
+
+    for candidate in candidates:
+        try:
+            payload = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, Mapping):
+            return payload
+    return None
 
 
 if __name__ == "__main__":

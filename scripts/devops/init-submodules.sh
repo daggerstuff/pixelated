@@ -77,6 +77,10 @@ run() {
   "$@"
 }
 
+is_azure_environment() {
+  [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]
+}
+
 azure_repo_url() {
   local repo_name="$1"
   printf 'https://handtransfer@dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
@@ -96,7 +100,7 @@ select_submodule_url() {
     return 0
   fi
 
-  if [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]; then
+  if is_azure_environment; then
     azure_repo_url "${repo_name}"
     return 0
   fi
