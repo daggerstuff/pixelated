@@ -215,7 +215,7 @@ const Content = details ? 'collapsible-content' : 'div'
               <p class="op-60">{formatDate(date, false)}</p>
             )}
             {details && (
-              <button class="details-switch op-50 op-transition hover:op-100">
+              <button type="button" aria-expanded="false" aria-label="Toggle details" class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]">
                 <div u-i-lucide-chevron-down class="icon-down" />
                 <div u-i-lucide-chevron-up class="icon-up hidden" />
               </button>
@@ -263,11 +263,13 @@ const Content = details ? 'collapsible-content' : 'div'
           this.#detailsContainer.style.maxHeight = `${this.#detailsContainer.scrollHeight}px`
           this.#upIcon.classList.remove('hidden')
           this.#downIcon.classList.add('hidden')
+          this.#button.setAttribute('aria-expanded', 'true')
         } else {
           this.#detailsContainer.style.marginTop = '0'
           this.#detailsContainer.style.maxHeight = '0'
           this.#upIcon.classList.add('hidden')
           this.#downIcon.classList.remove('hidden')
+          this.#button.setAttribute('aria-expanded', 'false')
         }
       }
 
