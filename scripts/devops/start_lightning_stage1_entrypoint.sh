@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-STAGE1_TRAINING_SCRIPT="${STAGE1_TRAINING_SCRIPT:-ai/orchestrator/targets/lightning_production/train_therapeutic_ai.py}"
+STAGE1_TRAINING_SCRIPT="${STAGE1_TRAINING_SCRIPT:-ai/lightning/production/train_therapeutic_ai.py}"
 STAGE="${STAGE1_STAGE:-1}"
 MAX_STEPS="${STAGE1_MAX_STEPS:-100000}"
 DRY_RUN="${STAGE1_DRY_RUN:-0}"
@@ -11,13 +11,27 @@ WORKDIR_HINT="${STAGE1_WORKDIR_HINT:-${WORKDIR_HINT:-}}"
 ENTRYPOINT_MODE="${STAGE1_ENTRYPOINT_MODE:-studio}"
 WORKDIR="${WORKDIR:-$(pwd)}"
 
-BASE_COMMAND=(uv run python "${STAGE1_TRAINING_SCRIPT}" --stage "${STAGE}" --compute-backend gpu --max-steps "${MAX_STEPS}")
+BASE_COMMAND=(uv run python "${STAGE1_TRAINING_SCRIPT}" --stage "${STAGE}" --max-steps "${MAX_STEPS}")
 if [[ "${DRY_RUN}" == "1" ]]; then
-  BASE_COMMAND+=(--dry-run --data-path ai/data/compress/processed/sample_conversations.json --base-model gpt2 --skip-lora)
+  BASE_COMMAND+=(--dry-run)
 fi
 if [[ -n "${TRAIN_WORKERS}" ]]; then
   BASE_COMMAND+=(--num-workers "${TRAIN_WORKERS}")
 fi
+
+validate_repo_url() {
+  local repo_url="$1"
+  case "${repo_url}" in
+    git@github.com:pixelatedempathy/*|https://github.com/pixelatedempathy/*)
+      return 0
+      ;;
+    *)
+      echo "ERROR: LIGHTNING_REPO_URL must point to the pixelatedempathy GitHub org."
+      echo "Received: ${repo_url}"
+      return 1
+      ;;
+  esac
+}
 
 resolve_workdir() {
   for candidate in "${WORKDIR}" "/home/zeus/pixelated" "/home/vivi/pixelated" "/workspace" "/workspace/pixelated"; do
@@ -60,6 +74,9 @@ else
     if [[ -z "${REPO_URL}" ]]; then
       echo "ERROR: Could not locate Stage 1 training script and LIGHTNING_REPO_URL is not set."
       echo "Set LIGHTNING_STUDIO_PATH to your repo path, or LIGHTNING_REPO_URL for clone fallback."
+      exit 1
+    fi
+    if ! validate_repo_url "${REPO_URL}"; then
       exit 1
     fi
 
