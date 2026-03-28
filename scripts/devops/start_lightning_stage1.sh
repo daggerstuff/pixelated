@@ -66,7 +66,7 @@ STAGE="${LIGHTNING_STAGE:-1}"
 DRY_RUN_FLAG="${LIGHTNING_DRY_RUN:-0}"
 MAX_STEPS="${LIGHTNING_MAX_STEPS:-100000}"
 TRAIN_WORKERS="${LIGHTNING_TRAIN_WORKERS:-}"
-STAGE1_TRAINING_SCRIPT="ai/orchestrator/targets/lightning_production/train_therapeutic_ai.py"
+STAGE1_TRAINING_SCRIPT="${LIGHTNING_TRAINING_SCRIPT:-ai/lightning/production/train_therapeutic_ai.py}"
 LIGHTNING_REPO_URL="${LIGHTNING_REPO_URL:-}"
 LIGHTNING_ENV_ARGS=()
 for env_key in \

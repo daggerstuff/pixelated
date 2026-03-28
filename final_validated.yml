@@ -76,6 +76,15 @@ stages:
       inputs:
         repository: self
         fetchDepth: 0
+        persistCredentials: true
+        submodules: false
+    - task: CmdLine@2
+      displayName: Initialize CI-aware submodules (Azure/GitHub)
+      inputs:
+        script: bash scripts/devops/init-submodules.sh
+      env:
+        GITHUB_PAT: $(GITHUB_PAT)
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     - task: SonarCloudPrepare@4
       displayName: 'Prepare Analysis Configuration'
       inputs:
@@ -149,9 +158,12 @@ stages:
         fetchDepth: 1
         persistCredentials: true
     - task: CmdLine@2
-      displayName: Initialize CI-aware submodules
+      displayName: Initialize CI-aware submodules (Azure/GitHub)
       inputs:
         script: bash scripts/devops/init-submodules.sh
+      env:
+        GITHUB_PAT: $(GITHUB_PAT)
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     - task: HelmInstaller@1
       displayName: Install Helm
       inputs:
