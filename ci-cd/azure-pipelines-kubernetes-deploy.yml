@@ -199,6 +199,31 @@ stages:
 
                 echo "✅ GITHUB_PAT is present"
 
+                # Safe diagnostics (no secret leakage): confirm runtime context + repo visibility via GitHub API
+                echo "Branch: $(Build.SourceBranch)"
+                echo "Reason: $(Build.Reason)"
+                echo "Repo: $(Build.Repository.Name)"
+                echo "PAT length: ${#GITHUB_PAT}"
+
+                auth_header="$(printf 'x-access-token:%s' "${GITHUB_PAT}" | base64 -w0)"
+                for repo in daggerstuff/pixelated-ai daggerstuff/pixelated-docs; do
+                  http_code="$(curl -sS -o /dev/null -w "%{http_code}" \
+                    -H "Authorization: Basic ${auth_header}" \
+                    "https://api.github.com/repos/${repo}")"
+
+                  if [ "${http_code}" = "200" ]; then
+                    echo "✅ ${repo} visible (HTTP ${http_code})"
+                  elif [ "${http_code}" = "404" ]; then
+                    echo "##vso[task.logissue type=error]${repo} not visible (HTTP 404). Check repo path/access and org SSO authorization for this token."
+                    exit 1
+                  elif [ "${http_code}" = "401" ]; then
+                    echo "##vso[task.logissue type=error]GitHub auth failed for ${repo} (HTTP 401). Token value in this job context may be invalid or unavailable."
+                    exit 1
+                  else
+                    echo "##vso[task.logissue type=warning]Unexpected GitHub API response for ${repo}: HTTP ${http_code}"
+                  fi
+                done
+
           - task: Bash@3
             displayName: 'Authenticate GitHub submodules and update recursively'
             env:
@@ -208,9 +233,34 @@ stages:
               script: |
                 set -euo pipefail
 
+                # Ensure PAT auth is used for every GitHub request in this step
+                auth_header="$(printf 'x-access-token:%s' "${GITHUB_PAT}" | base64 -w0)"
+                git config --global http.https://github.com/.extraheader "AUTHORIZATION: basic ${auth_header}"
+                git config --global credential.helper ""
+
+                # Keep URL rewrite as a fallback for tools honoring insteadOf
                 git config --global url."https://x-access-token:${GITHUB_PAT}@github.com/".insteadOf "https://github.com/"
+
+                # Sync local submodule config from .gitmodules
                 git submodule sync --recursive
-                git submodule update --init --force --depth=1 --recursive
+
+                # Preflight: validate access to each submodule remote before clone/update
+                while IFS=' ' read -r key url; do
+                  [ "${key}" = "url" ] || continue
+                  clean_url="${url%.git}.git"
+                  echo "Preflight: checking access to ${clean_url}"
+                  if ! git ls-remote "${clean_url}" HEAD >/dev/null 2>&1; then
+                    echo "##vso[task.logissue type=error]Cannot access submodule repository: ${clean_url}. Ensure GITHUB_PAT has repo read access and SSO authorization for the org."
+                    exit 1
+                  fi
+                done < <(git config -f .gitmodules --get-regexp '^submodule\..*\.url$' | awk '{print "url " $2}')
+
+                # Update submodules using explicit auth header in command scope
+                git -c http.https://github.com/.extraheader="AUTHORIZATION: basic ${auth_header}" \
+                  submodule update --init --force --depth=1 --recursive
+
+                # Cleanup sensitive auth config
+                git config --global --unset-all http.https://github.com/.extraheader || true
 
           - task: HelmInstaller@1
             displayName: Install Helm
