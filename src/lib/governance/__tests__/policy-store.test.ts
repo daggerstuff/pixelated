@@ -3,12 +3,12 @@ import { PolicyStore } from '../policy-store'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 
 describe('PolicyStore', () => {
-  let mongod: MongoMemoryServer
   let policyStore: PolicyStore
+  let mongod: MongoMemoryServer
   let mongoUri: string
 
   beforeEach(async () => {
-    // Start in-memory MongoDB server
+    // Setup in-memory MongoDB
     mongod = await MongoMemoryServer.create()
     mongoUri = mongod.getUri()
   })
@@ -16,7 +16,7 @@ describe('PolicyStore', () => {
   afterEach(async () => {
     // Clean up
     await policyStore?.disconnect?.()
-    await mongod.stop()
+    await mongod?.stop()
   })
 
   describe('initialize', () => {
@@ -30,8 +30,15 @@ describe('PolicyStore', () => {
 
   describe('savePolicy', () => {
     beforeEach(async () => {
+      mongod = await MongoMemoryServer.create()
+      mongoUri = mongod.getUri()
       policyStore = new PolicyStore()
       await policyStore.initialize(mongoUri)
+    })
+
+    afterEach(async () => {
+      await policyStore?.disconnect?.()
+      await mongod?.stop()
     })
 
     it('stores a policy in MongoDB', async () => {
@@ -117,8 +124,15 @@ describe('PolicyStore', () => {
 
   describe('getPolicy', () => {
     beforeEach(async () => {
+      mongod = await MongoMemoryServer.create()
+      mongoUri = mongod.getUri()
       policyStore = new PolicyStore()
       await policyStore.initialize(mongoUri)
+    })
+
+    afterEach(async () => {
+      await policyStore?.disconnect?.()
+      await mongod?.stop()
     })
 
     it('retrieves a policy by id', async () => {
