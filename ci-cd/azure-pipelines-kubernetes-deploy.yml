@@ -181,8 +181,36 @@ stages:
           - checkout: self
             fetchDepth: 1
             persistCredentials: true
-            submodules: recursive
+            submodules: false
 
+          - task: Bash@3
+            displayName: 'Preflight: Validate GitHub submodule secret'
+            env:
+              GITHUB_PAT: $(GITHUB_PAT)
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                if [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]GITHUB_PAT is not set. Add a secret variable named GITHUB_PAT to variable group 'pixelated-pipeline-variables' with read access to required private GitHub repos."
+                  exit 1
+                fi
+
+                echo "✅ GITHUB_PAT is present"
+
+          - task: Bash@3
+            displayName: 'Authenticate GitHub submodules and update recursively'
+            env:
+              GITHUB_PAT: $(GITHUB_PAT)
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                git config --global url."https://x-access-token:${GITHUB_PAT}@github.com/".insteadOf "https://github.com/"
+                git submodule sync --recursive
+                git submodule update --init --force --depth=1 --recursive
 
           - task: HelmInstaller@1
             displayName: Install Helm
