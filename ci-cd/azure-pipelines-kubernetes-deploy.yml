@@ -219,7 +219,7 @@ stages:
                 echo "PAT length: ${#GITHUB_PAT}"
 
                 auth_header="$(printf 'x-access-token:%s' "${GITHUB_PAT}" | base64 -w0)"
-                for repo in daggerstuff/pixelated-ai daggerstuff/pixelated-docs; do
+                for repo in pixelatedempathy/ai pixelatedempathy/docs; do
                   http_code="$(curl -sS -o /dev/null -w "%{http_code}" \
                     -H "Authorization: Basic ${auth_header}" \
                     "https://api.github.com/repos/${repo}")"
