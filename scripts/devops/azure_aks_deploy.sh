@@ -266,8 +266,8 @@ clear_stale_pending_release() {
   local release_name="$1"
   local namespace="$2"
   local release_status=""
-  local release_secret
-  local orphaned_resource
+  local orphaned_resources=()
+  local release_secrets=()
 
   release_status="$(get_helm_release_status "${release_name}" "${namespace}" || true)"
   case "${release_status}" in
@@ -275,19 +275,17 @@ clear_stale_pending_release() {
       echo "⚠️  Helm release ${release_name} is stuck in status ${release_status}. Clearing stale release metadata..."
       helm uninstall "${release_name}" -n "${namespace}" --wait --timeout 5m || true
 
-      while read -r orphaned_resource; do
-        if [ -n "${orphaned_resource}" ]; then
-          echo "   Removing orphaned release resource ${orphaned_resource}..."
-          kubectl delete "${orphaned_resource}" -n "${namespace}" --ignore-not-found=true || true
-        fi
-      done < <(kubectl get all -n "${namespace}" -l "app.kubernetes.io/instance=${release_name}" -o name 2>/dev/null || true)
+      mapfile -t orphaned_resources < <(kubectl get all -n "${namespace}" -l "app.kubernetes.io/instance=${release_name}" -o name 2>/dev/null || true)
+      if [ "${#orphaned_resources[@]}" -gt 0 ]; then
+        echo "   Removing orphaned release resources..."
+        kubectl delete -n "${namespace}" --ignore-not-found=true "${orphaned_resources[@]}" || true
+      fi
 
-      while read -r release_secret; do
-        if [ -n "${release_secret}" ]; then
-          echo "   Removing stale Helm secret ${release_secret}..."
-          kubectl delete "${release_secret}" -n "${namespace}" || true
-        fi
-      done < <(kubectl get secret -n "${namespace}" -o name 2>/dev/null | grep "^secret/sh\\.helm\\.release\\.v1\\.${release_name}\\.v" || true)
+      mapfile -t release_secrets < <(kubectl get secret -n "${namespace}" -o name 2>/dev/null | grep "^secret/sh\\.helm\\.release\\.v1\\.${release_name}\\.v" || true)
+      if [ "${#release_secrets[@]}" -gt 0 ]; then
+        echo "   Removing stale Helm secrets..."
+        kubectl delete -n "${namespace}" "${release_secrets[@]}" || true
+      fi
       ;;
   esac
 }
