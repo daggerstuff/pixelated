@@ -85,8 +85,18 @@ python scripts/training/merge_lora.py \
   --output ./merged-pixelated-v2
 
 # Run evaluation
-modal run ai/deployment/modal_app.py
+uv run python scripts/training/evaluate_repetition.py \
+  --model-path LatitudeGames/Wayfarer-2-12B \
+  --adapter-path ./pixelated-v2-qlora \
+  --prompts-file ai/lab/evals/golden_questions.json \
+  --output-file ai/lab/evals/repetition_report.json
 ```
+
+Success criteria for the anti-repetition retrain:
+
+- `repetition_report.json` shows `passes_target: true`
+- `repetition_rate` is `< 0.05`
+- No obvious degenerate outputs in the generated sample responses
 
 ---
 
