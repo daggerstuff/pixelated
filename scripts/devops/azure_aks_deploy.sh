@@ -308,17 +308,16 @@ retire_legacy_staging_release() {
   clear_stale_pending_release "${legacy_release}" "${legacy_namespace}"
   helm uninstall "${legacy_release}" -n "${legacy_namespace}" --wait --timeout 10m || true
 
-  for cluster_resource in \
-    "clusterrole/caddy-ingress-controller-role" \
-    "clusterrolebinding/caddy-ingress-controller-role-binding"
-  do
-    local owner_release=""
-    owner_release="$(kubectl get "${cluster_resource}" -o jsonpath='{.metadata.annotations.meta\.helm\.sh/release-name}' 2>/dev/null || true)"
-    if [ "${owner_release}" = "${legacy_release}" ]; then
-      echo "   Removing stale legacy-owned ${cluster_resource}..."
-      kubectl delete "${cluster_resource}" --ignore-not-found=true
-    fi
-  done
+  local stale_cluster_resources=()
+  mapfile -t stale_cluster_resources < <(
+    kubectl get clusterrole,clusterrolebinding,ingressclass \
+      -o go-template='{{range .items}}{{if and (eq (index .metadata.annotations "meta.helm.sh/release-name") "'"${legacy_release}"'") (eq (index .metadata.annotations "meta.helm.sh/release-namespace") "'"${legacy_namespace}"'")}}{{lower .kind}}/{{.metadata.name}}{{"\n"}}{{end}}{{end}}' \
+      2>/dev/null
+  )
+  if [ "${#stale_cluster_resources[@]}" -gt 0 ]; then
+    echo "   Removing stale legacy-owned cluster resources..."
+    kubectl delete "${stale_cluster_resources[@]}" --ignore-not-found=true
+  fi
 }
 
 retire_legacy_staging_release
