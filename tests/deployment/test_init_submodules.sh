@@ -30,11 +30,11 @@ setup_fake_git() {
   cat > "${TEST_DIR}/repo/.gitmodules" <<'EOF'
 [submodule "ai"]
 	path = ai
-	url = git@github.com:daggerstuff/ai.git
+	url = https://github.com/daggerstuff/ai.git
 
 [submodule "docs"]
 	path = docs
-	url = git@github.com:daggerstuff/docs.git
+	url = https://github.com/daggerstuff/docs.git
 EOF
 
   cat > "${TEST_DIR}/bin/git" <<EOF
@@ -53,8 +53,8 @@ if [[ "\$#" -ge 4 && "\$1" == "config" && "\$2" == "-f" && "\$3" == ".gitmodules
   case "\$5" in
     submodule.ai.path) printf '%s\n' 'ai' ;;
     submodule.docs.path) printf '%s\n' 'docs' ;;
-    submodule.ai.url) printf '%s\n' 'git@github.com:daggerstuff/ai.git' ;;
-    submodule.docs.url) printf '%s\n' 'git@github.com:daggerstuff/docs.git' ;;
+    submodule.ai.url) printf '%s\n' 'https://github.com/daggerstuff/ai.git' ;;
+    submodule.docs.url) printf '%s\n' 'https://github.com/daggerstuff/docs.git' ;;
     *) exit 1 ;;
   esac
   exit 0
