@@ -247,7 +247,10 @@ fi
 set +e
 # Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed
 kubectl delete statefulset "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas" -n "${NAMESPACE}" --cascade=orphan 2>/dev/null || true
-# Delete existing ingress to resolve ownership conflicts if it was created outside this Helm release
+# Manual deletion of ingress is required here because Helm fails with "invalid ownership metadata" 
+# when an ingress exists without the expected Helm labels/annotations. This typically happens 
+# if the resource was partially orphaned or created out-of-band. While this creates a brief 
+# window of downtime for the ingress, it is necessary to restore Helm's ability to manage the resource.
 kubectl delete ingress "${RELEASE_NAME}" -n "${NAMESPACE}" 2>/dev/null || true
 helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --install \
