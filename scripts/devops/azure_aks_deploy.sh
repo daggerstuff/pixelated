@@ -244,7 +244,56 @@ if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
   )
 fi
 
+get_helm_release_status() {
+  local release_name="$1"
+  local namespace="$2"
+  local status_json
+
+  if ! status_json="$(helm -n "${namespace}" status "${release_name}" -o json 2>/dev/null)"; then
+    return 1
+  fi
+
+  STATUS_JSON="${status_json}" python3 - <<'PY'
+import json
+import os
+
+payload = json.loads(os.environ["STATUS_JSON"])
+print(payload.get("info", {}).get("status", ""))
+PY
+}
+
+clear_stale_pending_release() {
+  local release_name="$1"
+  local namespace="$2"
+  local release_status=""
+  local release_secret
+  local orphaned_resource
+
+  release_status="$(get_helm_release_status "${release_name}" "${namespace}" || true)"
+  case "${release_status}" in
+    pending-install|pending-upgrade|pending-rollback)
+      echo "⚠️  Helm release ${release_name} is stuck in status ${release_status}. Clearing stale release metadata..."
+      helm uninstall "${release_name}" -n "${namespace}" --wait --timeout 5m || true
+
+      while read -r orphaned_resource; do
+        if [ -n "${orphaned_resource}" ]; then
+          echo "   Removing orphaned release resource ${orphaned_resource}..."
+          kubectl delete "${orphaned_resource}" -n "${namespace}" --ignore-not-found=true || true
+        fi
+      done < <(kubectl get all -n "${namespace}" -l "app.kubernetes.io/instance=${release_name}" -o name 2>/dev/null || true)
+
+      while read -r release_secret; do
+        if [ -n "${release_secret}" ]; then
+          echo "   Removing stale Helm secret ${release_secret}..."
+          kubectl delete "${release_secret}" -n "${namespace}" || true
+        fi
+      done < <(kubectl get secret -n "${namespace}" -o name 2>/dev/null | grep "^secret/sh\\.helm\\.release\\.v1\\.${release_name}\\.v" || true)
+      ;;
+  esac
+}
+
 set +e
+clear_stale_pending_release "${RELEASE_NAME}" "${NAMESPACE}"
 # Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed (e.g. volume templates)
 # We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
 echo "🧹 Checking for existing statefulsets to avoid immutable field conflicts..."
