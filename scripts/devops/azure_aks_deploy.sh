@@ -2,6 +2,7 @@
 set -euo pipefail
 
 APP_ENV_RAW="${APP_ENV:-${APP_ENVIRONMENT:-}}"
+SOURCE_BRANCH_NAME="${BUILD_SOURCEBRANCHNAME:-${BUILD_SOURCEBRANCH##*/}}"
 
 # Strip unresolved Azure DevOps variables passed as literal $()
 for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RESOURCE_GROUP AZURE_AKS_RESOURCE_GROUP AZURE_SUBSCRIPTION_NAME; do
@@ -10,8 +11,9 @@ for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RES
   fi
 done
 if [ -z "${APP_ENV_RAW}" ]; then
-  BRANCH_NAME="${BUILD_SOURCEBRANCHNAME:-${BUILD_SOURCEBRANCH##*/}}"
-  case "${BRANCH_NAME}" in
+  # The staging branch is currently the live branch. Until a separate staging
+  # platform exists, branch-based environment inference must target production.
+  case "${SOURCE_BRANCH_NAME}" in
     master|main)
       APP_ENV_RAW="production"
       ;;
@@ -290,11 +292,29 @@ clear_stale_pending_release() {
   esac
 }
 
+retire_legacy_staging_release() {
+  if [ "${APP_ENV}" != "production" ]; then
+    return 0
+  fi
+
+  local legacy_namespace="pixelated-empathy-staging"
+  local legacy_release="pixelated-empathy-staging"
+
+  if ! helm -n "${legacy_namespace}" status "${legacy_release}" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "🧹 Retiring legacy staging release ${legacy_release} before live production deploy..."
+  clear_stale_pending_release "${legacy_release}" "${legacy_namespace}"
+  helm uninstall "${legacy_release}" -n "${legacy_namespace}" --wait --timeout 10m || true
+}
+
+retire_legacy_staging_release
 set +e
-clear_stale_pending_release "${RELEASE_NAME}" "${NAMESPACE}"
 # Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed (e.g. volume templates)
 # We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
 echo "🧹 Checking for existing statefulsets to avoid immutable field conflicts..."
+clear_stale_pending_release "${RELEASE_NAME}" "${NAMESPACE}"
 for sts in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas"; do
   if kubectl get statefulset "$sts" -n "${NAMESPACE}" >/dev/null 2>&1; then
     echo "   Removing statefulset $sts (keeping pods)..."
