@@ -16,10 +16,10 @@ if [ -z "${APP_ENV_RAW}" ]; then
       APP_ENV_RAW="production"
       ;;
     staging|stg|stage)
-      APP_ENV_RAW="staging"
+      APP_ENV_RAW="production"
       ;;
     *)
-      APP_ENV_RAW="staging"
+      APP_ENV_RAW="production"
       ;;
   esac
 fi
