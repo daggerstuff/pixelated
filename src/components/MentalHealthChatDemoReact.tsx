@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { MentalHealthHistoryChart } from '@/components/MentalHealthHistoryChart'
 import { Button } from '@/components/ui/button'
@@ -107,8 +107,9 @@ export default function MentalHealthChatDemoReact({
     }
   }, [settings.enableAnalysis, settings.useExpertGuidance])
 
+  // ⚡ Bolt: Memoizing analysisHistory to prevent expensive array mapping and filtering on every keystroke/render
   // Get all analyses from the message history
-  const getAnalysisHistory = (): EnhancedMentalHealthAnalysis[] => {
+  const analysisHistory = useMemo((): EnhancedMentalHealthAnalysis[] => {
     return messages
       .filter((m) => m.mentalHealthAnalysis)
       .map((m) => {
@@ -140,7 +141,7 @@ export default function MentalHealthChatDemoReact({
             : undefined,
         } as EnhancedMentalHealthAnalysis
       })
-  }
+  }, [messages])
 
   // Process a new user message
   const handleSendMessage = async () => {
@@ -318,7 +319,7 @@ export default function MentalHealthChatDemoReact({
                         Mental health analysis will appear here
                       </p>
                     </div>
-                    {getAnalysisHistory().length === 0 && (
+                    {analysisHistory.length === 0 && (
                       <p className='text-muted-foreground text-sm'>
                         No analysis data available yet
                       </p>
@@ -328,7 +329,7 @@ export default function MentalHealthChatDemoReact({
                         Pattern Analysis
                       </h3>
                       <MentalHealthHistoryChart
-                        analysisHistory={getAnalysisHistory().map(
+                        analysisHistory={analysisHistory.map(
                           (analysis) => ({
                             ...analysis,
                             hasMentalHealthIssue: true,
