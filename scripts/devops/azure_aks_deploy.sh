@@ -245,8 +245,15 @@ if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
 fi
 
 set +e
-# Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed
-kubectl delete statefulset "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas" -n "${NAMESPACE}" --cascade=orphan 2>/dev/null || true
+# Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed (e.g. volume templates)
+# We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
+echo "🧹 Checking for existing statefulsets to avoid immutable field conflicts..."
+for sts in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas"; do
+  if kubectl get statefulset "$sts" -n "${NAMESPACE}" >/dev/null 2>&1; then
+    echo "   Removing statefulset $sts (keeping pods)..."
+    kubectl delete statefulset "$sts" -n "${NAMESPACE}" --cascade=orphan --wait=true || true
+  fi
+done
 helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --install \
   --namespace "${NAMESPACE}" \
