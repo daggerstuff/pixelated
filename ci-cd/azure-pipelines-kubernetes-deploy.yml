@@ -29,7 +29,7 @@ parameters:
   - name: environment
     displayName: 'Environment'
     type: string
-    default: staging
+    default: production
     values:
       - staging
       - production
@@ -175,6 +175,7 @@ stages:
           and(
             eq('${{ parameters.environment }}', 'production'),
             or(
+              eq(variables['Build.SourceBranch'], 'refs/heads/staging'),
               eq(variables['Build.SourceBranch'], 'refs/heads/master'),
               eq(variables['Build.SourceBranch'], 'refs/heads/main')
             )
