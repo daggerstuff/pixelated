@@ -7,6 +7,19 @@ import { useSimulatorContext } from '../context/SimulatorContext'
 
 const logger = createBuildSafeLogger('useEmotionDetection')
 
+/**
+ * Hook for initializing and interacting with the EmotionLlamaProvider.
+ *
+ * This hook sets up a connection to the Emotion Llama API (with credentials
+ * injected from the environment) and exposes a `detectEmotions` method. When called,
+ * it runs the provider's emotional analysis on the provided text and then updates
+ * the SimulatorContext's emotion state (for example, via its `updateEmotionState`
+ * helper, which dispatches the `UPDATE_EMOTION_STATE` action) using the
+ * dimension-based PAD (Pleasure-Arousal-Dominance) values returned by the model.
+ * Note that the provider's 'arousal' dimension maps to the simulator's 'energy' state.
+ *
+ * It is primarily used to track real-time emotional shifts during a simulated session.
+ */
 export const useEmotionDetection = () => {
   const providerRef = useRef<EmotionLlamaProvider | null>(null)
   const { updateEmotionState } = useSimulatorContext()
