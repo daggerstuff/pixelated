@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { MentalHealthHistoryChart } from '@/components/MentalHealthHistoryChart'
 import { Button } from '@/components/ui/button'
@@ -107,8 +107,9 @@ export default function MentalHealthChatDemoReact({
     }
   }, [settings.enableAnalysis, settings.useExpertGuidance])
 
+  // ⚡ Bolt: Memoizing analysisHistory so the filter/map over messages only runs when the messages array changes
   // Get all analyses from the message history
-  const getAnalysisHistory = (): EnhancedMentalHealthAnalysis[] => {
+  const analysisHistory = useMemo(() => {
     return messages
       .filter((m) => m.mentalHealthAnalysis)
       .map((m) => {
@@ -121,7 +122,7 @@ export default function MentalHealthChatDemoReact({
         const hasScores = (obj: unknown): obj is AnalysisWithScores =>
           typeof obj === 'object' && obj !== null && 'scores' in obj
 
-        return {
+        const enhancedAnalysis = {
           ...analysis,
           riskLevel: analysis.category === 'high' ? 'high' : 'low',
           summary: analysis.explanation || '',
@@ -139,8 +140,28 @@ export default function MentalHealthChatDemoReact({
             ? analysis.explanation
             : undefined,
         } as EnhancedMentalHealthAnalysis
+
+        // Also apply the chart shape mapping so it's fully memoized
+        return {
+          ...enhancedAnalysis,
+          hasMentalHealthIssue: true,
+          confidence: 1,
+          supportingEvidence: [],
+          scores: {
+            depression: enhancedAnalysis.scores?.depression ?? 0,
+            anxiety: enhancedAnalysis.scores?.anxiety ?? 0,
+            stress: enhancedAnalysis.scores?.stress ?? 0,
+            anger: enhancedAnalysis.scores?.anger ?? 0,
+            socialIsolation: enhancedAnalysis.scores?.socialIsolation ?? 0,
+            bipolarDisorder: enhancedAnalysis.scores?.bipolarDisorder ?? 0,
+            ocd: enhancedAnalysis.scores?.ocd ?? 0,
+            eatingDisorder: enhancedAnalysis.scores?.eatingDisorder ?? 0,
+            socialAnxiety: enhancedAnalysis.scores?.socialAnxiety ?? 0,
+            panicDisorder: enhancedAnalysis.scores?.panicDisorder ?? 0,
+          },
+        }
       })
-  }
+  }, [messages])
 
   // Process a new user message
   const handleSendMessage = async () => {
@@ -318,7 +339,7 @@ export default function MentalHealthChatDemoReact({
                         Mental health analysis will appear here
                       </p>
                     </div>
-                    {getAnalysisHistory().length === 0 && (
+                    {analysisHistory.length === 0 && (
                       <p className='text-muted-foreground text-sm'>
                         No analysis data available yet
                       </p>
@@ -328,31 +349,7 @@ export default function MentalHealthChatDemoReact({
                         Pattern Analysis
                       </h3>
                       <MentalHealthHistoryChart
-                        analysisHistory={getAnalysisHistory().map(
-                          (analysis) => ({
-                            ...analysis,
-                            hasMentalHealthIssue: true,
-                            confidence: 1,
-                            supportingEvidence: [],
-                            scores: {
-                              depression: analysis.scores?.depression ?? 0,
-                              anxiety: analysis.scores?.anxiety ?? 0,
-                              stress: analysis.scores?.stress ?? 0,
-                              anger: analysis.scores?.anger ?? 0,
-                              socialIsolation:
-                                analysis.scores?.socialIsolation ?? 0,
-                              bipolarDisorder:
-                                analysis.scores?.bipolarDisorder ?? 0,
-                              ocd: analysis.scores?.ocd ?? 0,
-                              eatingDisorder:
-                                analysis.scores?.eatingDisorder ?? 0,
-                              socialAnxiety:
-                                analysis.scores?.socialAnxiety ?? 0,
-                              panicDisorder:
-                                analysis.scores?.panicDisorder ?? 0,
-                            },
-                          }),
-                        )}
+                        analysisHistory={analysisHistory}
                       />
                     </div>
                   </div>
