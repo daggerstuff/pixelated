@@ -941,7 +941,7 @@ opentelemetry-instrumentation-logging==0.60b1
     # via traceloop-sdk
 opentelemetry-instrumentation-marqo==0.53.3
     # via traceloop-sdk
-opentelemetry-instrumentation-mcp==0.53.3
+opentelemetry-instrumentation-mcp==0.55.0
     # via traceloop-sdk
 opentelemetry-instrumentation-milvus==0.53.3
     # via traceloop-sdk
