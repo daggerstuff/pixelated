@@ -5,16 +5,22 @@ import json
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(
-    "/home/vivi/pixelated/.agent/internal/scripts/bootstrap_dual_storage_layout.py"
+import os
+
+SCRIPT_PATH = (
+    Path(os.environ.get("PIXELATED_ROOT", str(Path(__file__).parent.parent.parent)))
+    / ".agent"
+    / "internal"
+    / "scripts"
+    / "bootstrap_dual_storage_layout.py"
 )
 
 
 def _load_module():
     spec = importlib.util.spec_from_file_location("dual_storage_bootstrap", SCRIPT_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Failed to load module from {SCRIPT_PATH}")
     module = importlib.util.module_from_spec(spec)
-    assert spec is not None
-    assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
@@ -79,16 +85,10 @@ def test_build_storage_plan_maps_manifest_entries_to_local_and_future_s3_paths(
         "pixelated-workspace/curated_sources/final_dataset"
     )
     assert (
-        plan["entries"][0]["future_s3_uri"]
-        == "s3://pixel-data-phx/curated_sources/final_dataset/"
+        plan["entries"][0]["future_s3_uri"] == "s3://pixel-data-phx/curated_sources/final_dataset/"
     )
-    assert plan["entries"][1]["local_path"].endswith(
-        "pixelated-workspace/salvage/raw_datasets"
-    )
-    assert (
-        plan["entries"][1]["future_s3_uri"]
-        == "s3://pixel-data-phx/salvage/raw_datasets/"
-    )
+    assert plan["entries"][1]["local_path"].endswith("pixelated-workspace/salvage/raw_datasets")
+    assert plan["entries"][1]["future_s3_uri"] == "s3://pixel-data-phx/salvage/raw_datasets/"
     assert plan["entries"][2]["materialize"] is False
 
 
@@ -111,16 +111,12 @@ def test_materialize_storage_plan_creates_roots_and_included_entry_paths(
         "entries": [
             {
                 "name": "final_dataset",
-                "local_path": str(
-                    tmp_path / "pixelated-workspace/curated_sources/final_dataset"
-                ),
+                "local_path": str(tmp_path / "pixelated-workspace/curated_sources/final_dataset"),
                 "materialize": True,
             },
             {
                 "name": "processed_ready",
-                "local_path": str(
-                    tmp_path / "pixelated-workspace/deferred/processed_ready"
-                ),
+                "local_path": str(tmp_path / "pixelated-workspace/deferred/processed_ready"),
                 "materialize": False,
             },
         ],

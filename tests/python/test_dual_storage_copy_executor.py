@@ -5,8 +5,15 @@ import time
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(
-    "/home/vivi/pixelated/.agent/internal/scripts/execute_dual_storage_copy_jobs.py"
+import os
+from pathlib import Path
+
+SCRIPT_PATH = (
+    Path(os.environ.get("PIXELATED_ROOT", str(Path(__file__).parent.parent.parent)))
+    / ".agent"
+    / "internal"
+    / "scripts"
+    / "execute_dual_storage_copy_jobs.py"
 )
 
 
@@ -15,9 +22,9 @@ def _load_module():
         "dual_storage_copy_executor",
         SCRIPT_PATH,
     )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Failed to load module from {SCRIPT_PATH}")
     module = importlib.util.module_from_spec(spec)
-    assert spec is not None
-    assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
@@ -97,7 +104,12 @@ def test_build_execution_queue_skips_s3_when_local_source_is_not_present() -> No
                 "local_path": "/tmp/definitely-missing-pixelated-source",
                 "local_job": None,
                 "s3_job": {
-                    "command": ["s3cmd", "sync", "/tmp/definitely-missing-pixelated-source/", "s3://pixel-data/final_dataset/"],
+                    "command": [
+                        "s3cmd",
+                        "sync",
+                        "/tmp/definitely-missing-pixelated-source/",
+                        "s3://pixel-data/final_dataset/",
+                    ],
                 },
             }
         ],
