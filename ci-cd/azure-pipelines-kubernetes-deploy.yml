@@ -4,6 +4,10 @@ trigger: none
 
 pr: none
 
+# To bypass the "no free minutes" error, the agent MUST be moved to this non-hosted pool.
+pool:
+  name: azplocal
+
 parameters:
   - name: environment
     displayName: 'Environment'
@@ -35,10 +39,6 @@ stages:
     jobs:
       - job: BuildImage
         displayName: Build image and push to ACR
-        pool:
-          name: Azure Pipelines
-          demands:
-            - Agent.Name -equals Azure Pipelines 1
         steps:
           - checkout: self
             fetchDepth: 0
@@ -153,10 +153,6 @@ stages:
     jobs:
       - job: DeployHosted
         displayName: Helm deploy (hosted)
-        pool:
-          name: Azure Pipelines
-          demands:
-            - Agent.Name -equals Azure Pipelines 1
         steps:
           - checkout: self
             fetchDepth: 1
