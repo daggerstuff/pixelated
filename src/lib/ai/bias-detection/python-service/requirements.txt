@@ -79,7 +79,7 @@ confection==0.1.5
     #   weasel
 contourpy==1.3.3
     # via matplotlib
-cryptography==46.0.5
+cryptography==46.0.6
     # via bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
 cuda-bindings==12.9.4
     # via torch
