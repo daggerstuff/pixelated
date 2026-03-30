@@ -214,6 +214,7 @@ tmp/
 /.astro
 /.output
 /.python
+/.planning/
 /bin/
 /browser-compatibility/
 /bundle-analysis.html
