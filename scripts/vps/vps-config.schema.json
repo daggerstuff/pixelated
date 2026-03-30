@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "VPS Provisioning Configuration",
+  "description": "Configuration schema for Pixelated Empathy VPS provisioning",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "_comment": { "type": "string" },
+
+    "profile": {
+      "type": "string",
+      "description": "Provisioning profile",
+      "enum": ["minimal", "web-app", "ai-workload", "full-stack"],
+      "default": "minimal"
+    },
+
+    "username": {
+      "type": "string",
+      "default": "vivi",
+      "pattern": "^[a-z_][a-z0-9_-]*$"
+    },
+
+    "ssh_public_key": {
+      "type": "string",
+      "pattern": "^(ssh-rsa|ssh-ed25519|ecdsa-sh2-nistp[0-9]+) "
+    },
+
+    "ssh_port": { "type": "string", "default": "22" },
+    "ssh_permit_root_login": { "type": "string", "default": "no", "enum": ["yes", "no", "prohibit-password"] },
+    "ssh_password_auth": { "type": "string", "default": "no", "enum": ["yes", "no"] },
+
+    "registry": {
+      "type": "string",
+      "description": "Docker registry",
+      "enum": ["", "gitlab", "acr", "nvidia", "ngc", "ghcr"]
+    },
+
+    "registry_url": { "type": "string", "default": "registry.gitlab.com" },
+    "registry_username": { "type": "string" },
+    "registry_token": { "type": "string" },
+    "nvidia_api_key": { "type": "string" },
+    "acr_name": { "type": "string" },
+
+    "enable_monitoring": { "type": "string", "default": "false", "enum": ["true", "false"] },
+    "enable_traefik": { "type": "string", "default": "false", "enum": ["true", "false"] },
+
+    "domain": { "type": "string" },
+    "acme_email": { "type": "string" },
+    "cloudflare_api_token": { "type": "string" },
+    "traefik_auth": { "type": "string" },
+
+    "timezone": { "type": "string", "default": "UTC" },
+    "swap_size": { "type": "string", "default": "2G", "pattern": "^[0-9]+[MG]$" }
+  },
+  "required": ["username"]
+}
