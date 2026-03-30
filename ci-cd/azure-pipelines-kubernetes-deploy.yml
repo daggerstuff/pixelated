@@ -25,10 +25,10 @@ trigger:
 
 pr: none
 
-# This pipeline must run on a self-hosted pool because Microsoft-hosted
-# Azure Pipelines minutes are exhausted for this organization.
+# This pipeline must run on the self-hosted Bear Dance pool because
+# Microsoft-hosted Azure Pipelines minutes are exhausted for this organization.
 pool:
-  name: Default
+  name: Bear Dance
 
 parameters:
   - name: environment
