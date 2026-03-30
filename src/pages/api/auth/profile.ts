@@ -221,8 +221,7 @@ export const PUT = async ({
       })
     }
 
-    // Log security event for profile update
-    await logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, userId, {
+    await logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
       updates: Object.keys(auth0Updates),
       clientInfo,
     })
@@ -255,8 +254,9 @@ export const PUT = async ({
   } catch (error: unknown) {
     console.error('Update profile error:', error)
 
-    await logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+    await logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
       action: 'update_profile',
+      success: false,
       error: detectAndRedactPHI(
         error instanceof Error ? error.message : String(error),
       ),
