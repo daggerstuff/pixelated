@@ -258,6 +258,8 @@ values.yaml
 volumes/
 workspace/
 worktrees/
+postgres-sts.yaml
+screenshot_context.png
 y-router/
 yt-downloader
 # Beads / Dolt files (added by bd init)
