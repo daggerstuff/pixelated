@@ -11,10 +11,13 @@ from scripts.task_sync.tri_sync import (
     SyncMetadata,
     SyncExecutionResult,
     TaskRecord,
+    apply_sync_action,
     apply_sync_plan,
     beads_export,
     build_sync_plan,
     cleanup_beads_duplicates,
+    collect_provider_records,
+    execute_apply_mode,
     extract_sync_key,
     find_beads_duplicate_groups,
     merge_body_with_sync_metadata,
@@ -707,10 +710,99 @@ def test_main_apply_persists_sync_state(tmp_path, monkeypatch, capsys) -> None:
     assert state["record_count"] == 1
 
 
+def test_execute_apply_mode_reconciles_until_plan_is_stable(monkeypatch, tmp_path) -> None:
+    state_path = tmp_path / "task-sync-state.json"
+    first_action = SyncAction(
+        provider="jira",
+        action="create",
+        sync_key="tri-sync-rollout",
+        source_provider="beads",
+        source_id="bd-1",
+        target_id=None,
+        title="Tri-sync rollout",
+        body="Ship the sync bridge",
+        status="open",
+        provider_ids={"beads": "bd-1", "asana": "A-1"},
+    )
+    first_plan = [first_action]
+    apply_calls: list[list[SyncAction]] = []
+
+    def fake_apply_sync_plan(actions, *, provider_commands=None, run_process=tri_sync._run_process, max_workers=None):
+        _ = provider_commands
+        _ = run_process
+        _ = max_workers
+        apply_calls.append(list(actions))
+        results = []
+        for action in actions:
+            target_id = action.target_id
+            if action.provider == "jira" and target_id is None:
+                target_id = "PIX-1"
+            results.append(
+                SyncExecutionResult(
+                    provider=action.provider,
+                    action=action.action,
+                    sync_key=action.sync_key,
+                    target_id=target_id,
+                    success=True,
+                )
+            )
+        return results
+
+    monkeypatch.setattr(tri_sync, "SYNC_STATE_PATH", state_path)
+    monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", lambda: {})
+    monkeypatch.setattr(tri_sync, "resolve_enabled_providers_from_env", lambda: tri_sync.DEFAULT_PROVIDER_ORDER)
+    monkeypatch.setattr(tri_sync, "apply_sync_plan", fake_apply_sync_plan)
+    monkeypatch.setattr(tri_sync, "beads_export", lambda: [])
+    monkeypatch.setattr(tri_sync, "cleanup_beads_duplicates", lambda records: [])
+
+    payload, exit_code = execute_apply_mode(first_plan)
+
+    assert exit_code == 0
+    assert [len(actions) for actions in apply_calls] == [1, 3]
+    assert payload["passes"] == [
+        {"pass": 1, "summary": {"create": 1, "update": 0}, "result_count": 1, "success": True},
+        {"pass": 2, "summary": {"create": 0, "update": 3}, "result_count": 3, "success": True},
+    ]
+
+
 def test_resolve_enabled_providers_from_env(monkeypatch) -> None:
     monkeypatch.setenv("PIXELATED_TASK_SYNC_PROVIDERS", "beads,asana")
 
     assert resolve_enabled_providers_from_env() == ("beads", "asana")
+
+
+def test_collect_provider_records_uses_direct_asana_export_when_no_path(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "export_asana_tasks",
+        lambda: [
+            {
+                "gid": "A-1",
+                "name": "Tri-sync rollout",
+                "notes": "Ship the sync bridge",
+                "completed": False,
+                "modified_at": "2026-03-23T00:00:00Z",
+            }
+        ],
+    )
+
+    records = collect_provider_records("asana", {})
+
+    assert records is not None
+    assert records[0].external_id == "A-1"
+
+
+def test_apply_sync_action_uses_direct_asana_bridge_when_command_missing(monkeypatch) -> None:
+    monkeypatch.setattr(
+        tri_sync,
+        "apply_provider_action",
+        lambda provider, payload: {"gid": "A-99"} if provider == "asana" else {},
+    )
+
+    result = apply_sync_action(make_action("asana", "create", None))
+
+    assert result.success is True
+    assert result.target_id == "A-99"
 
 
 def make_action(provider: str, action: str, target_id: str | None):

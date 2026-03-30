@@ -237,6 +237,37 @@ stages:
                 set -euo pipefail
                 bash scripts/devops/init-submodules.sh
 
+          - task: Bash@3
+            displayName: Ensure unzip is available
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                if command -v unzip >/dev/null 2>&1; then
+                  echo "unzip already installed"
+                  exit 0
+                fi
+
+                SUDO=""
+                if command -v sudo >/dev/null 2>&1; then
+                  SUDO="sudo"
+                fi
+
+                if command -v apt-get >/dev/null 2>&1; then
+                  $SUDO apt-get update
+                  $SUDO apt-get install -y unzip
+                elif command -v dnf >/dev/null 2>&1; then
+                  $SUDO dnf install -y unzip
+                elif command -v yum >/dev/null 2>&1; then
+                  $SUDO yum install -y unzip
+                elif command -v apk >/dev/null 2>&1; then
+                  $SUDO apk add --no-cache unzip
+                else
+                  echo "##vso[task.logissue type=error]Unable to install unzip automatically on this self-hosted agent."
+                  exit 1
+                fi
+
           - task: HelmInstaller@1
             displayName: Install Helm
             inputs:
