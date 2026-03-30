@@ -340,7 +340,7 @@ body {
 
 /* Layout Utilities */
 .brutalist-container {
-  max-width: 1200px;
+  max-width: 72rem;
   margin: 0 auto;
   padding: 0 var(--space-6);
 }

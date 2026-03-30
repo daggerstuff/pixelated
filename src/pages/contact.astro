@@ -39,15 +39,28 @@ const organizationSchema = {
         <!-- Left: Contact Info -->
         <div class="space-y-8">
           <div>
-            <h1 class="display-heading mb-6">Get in Touch</h1>
+            <h1 class="display-heading mb-6">Talk to the Team</h1>
             <p class="lede-text">
-              Ready to transform your therapy training program? Let's discuss
-              how we can customize our platform for your needs.
+              Reach out if you want to evaluate the platform, discuss a pilot,
+              ask security questions, or figure out whether the workflow fits
+              your training program.
             </p>
           </div>
 
           <!-- Contact Methods -->
           <div class="space-y-6">
+            <div class="card-elegant">
+              <div class="eyebrow-text mb-2">Best For</div>
+              <ul
+                class="space-y-2 text-sm"
+                style="color: var(--text-secondary);"
+              >
+                <li>Pilot programs and training rollouts</li>
+                <li>Supervisor and cohort workflows</li>
+                <li>Security, privacy, and deployment questions</li>
+              </ul>
+            </div>
+
             <div class="card-elegant">
               <div class="eyebrow-text mb-2">Email</div>
               <a
@@ -82,7 +95,7 @@ const organizationSchema = {
               <p
                 style="color: var(--text-muted); font-size: var(--text-sm); margin-top: 0.5rem;"
               >
-                Founded 2025 • Early-stage startup
+                Founded 2025 • Founder-led
               </p>
             </div>
 
@@ -96,14 +109,6 @@ const organizationSchema = {
                   rel="noopener noreferrer"
                 >
                   Twitter
-                </a>
-                <a
-                  href="https://www.linkedin.com/company/pixelated-empathy"
-                  class="nav-link-refined"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LinkedIn
                 </a>
                 <a
                   href="https://github.com/nochadisfaction/pixelated"
@@ -286,7 +291,7 @@ const organizationSchema = {
     // Form elements
     const form = document.getElementById('contact-form')!
     const submitButton = document.getElementById('submit-button')!
-    const submitText = document.getElementById('submit-text')!
+    const submitText = document.getElementById('submit-text')
     const loadingSpinner = document.getElementById('loading-spinner')!
     const successMessage = document.getElementById('success-message')!
     const errorMessage = document.getElementById('error-message')!
@@ -378,11 +383,11 @@ const organizationSchema = {
     function setLoading(loading: boolean) {
       if (loading) {
         submitButton.disabled = true
-        submitText.textContent = 'Sending...'
+        if (submitText) submitText.textContent = 'Sending...'
         loadingSpinner.classList.remove('hidden')
       } else {
         submitButton.disabled = false
-        submitText.textContent = 'Send Message'
+        if (submitText) submitText.textContent = 'Send Message'
         loadingSpinner.classList.add('hidden')
       }
     }

@@ -1,11 +1,13 @@
 ---
 import { AuthButtons } from '@/components/auth/AuthButtons'
 
+const currentPath = Astro.url.pathname
+
 const links = [
   { text: 'Home', href: '/', isAnchor: false },
   { text: 'Features', href: '/features', isAnchor: false },
   { text: 'About', href: '/about', isAnchor: false },
-  { text: 'Team', href: '/team', isAnchor: false },
+  { text: 'Trust', href: '/trust', isAnchor: false },
   { text: 'Contact', href: '/contact', isAnchor: false },
 ]
 ---
@@ -13,22 +15,29 @@ const links = [
 <header
   class="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-white/10"
 >
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="site-shell px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-20">
-      <div class="flex-shrink-0 flex items-center gap-2">
+      <div class="flex-shrink-0 flex items-center gap-3">
         <!-- Logo Icon -->
         <div
           class="w-8 h-8 rounded-lg overflow-hidden shadow-lg shadow-primary-500/20"
         >
           <img
-            src="/android-chrome-192x192.png"
+            src="/favicon.svg"
             alt="Pixelated Empathy"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-contain"
           />
         </div>
-        <span class="font-bold text-base tracking-tight text-white"
-          >Pixelated Empathy</span
-        >
+        <div class="leading-tight">
+          <span class="block font-bold text-base tracking-tight text-white"
+            >Pixelated Empathy</span
+          >
+          <span
+            class="hidden lg:block text-[11px] uppercase tracking-[0.18em] text-slate-500"
+          >
+            AI roleplay for therapist training
+          </span>
+        </div>
       </div>
 
       <nav class="hidden md:flex space-x-8" aria-label="Main navigation">
@@ -36,7 +45,13 @@ const links = [
           links.map((link) => (
             <a
               href={link.href}
-              class="text-slate-300 hover:text-white transition-colors text-sm font-medium"
+              class:list={[
+                'transition-colors text-sm font-medium',
+                currentPath === link.href
+                  ? 'text-white'
+                  : 'text-slate-300 hover:text-white',
+              ]}
+              aria-current={currentPath === link.href ? 'page' : undefined}
             >
               {link.text}
             </a>
@@ -94,7 +109,7 @@ const links = [
             Log in
           </a>
           <a
-            href="/auth/signup"
+            href="/signup"
             class="block bg-white text-slate-950 px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-200 transition-colors text-center"
           >
             Get Started

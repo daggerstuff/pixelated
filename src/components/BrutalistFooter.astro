@@ -13,116 +13,186 @@ const currentYear = new Date().getFullYear()
 
 const links = {
   product: [
-    { href: "/training", label: "Training" },
-    { href: "/features", label: "Features" },
-    { href: "/pricing", label: "Pricing" },
-    { href: "/demo", label: "Demo" },
+    { href: '/training', label: 'Training' },
+    { href: '/features', label: 'Features' },
+    { href: '/trust', label: 'Trust' },
+    { href: '/demo-hub', label: 'Demos' },
   ],
   company: [
-    { href: "/about", label: "About" },
-    { href: "/team", label: "Team" },
-    { href: "/blog", label: "Blog" },
-    { href: "/contact", label: "Contact" },
+    { href: '/about', label: 'About' },
+    { href: '/company', label: 'Company' },
+    { href: '/team', label: 'Team' },
+    { href: '/contact', label: 'Contact' },
   ],
   legal: [
-    { href: "/privacy", label: "Privacy" },
-    { href: "/terms", label: "Terms" },
-    { href: "/trust", label: "Trust" },
+    { href: '/privacy', label: 'Privacy' },
+    { href: '/terms', label: 'Terms' },
+    { href: '/cookie-policy', label: 'Cookies' },
   ],
 }
 
 const social = [
-  { href: "https://github.com/nochadisfaction/pixelated", label: "GitHub", icon: "github" },
-  { href: "https://twitter.com/tweetpixelated", label: "Twitter", icon: "twitter" },
+  {
+    href: 'https://github.com/nochadisfaction/pixelated',
+    label: 'GitHub',
+    icon: 'github',
+  },
+  {
+    href: 'https://twitter.com/pixelatedempathy',
+    label: 'Twitter',
+    icon: 'twitter',
+  },
 ]
 ---
 
 <footer class="footer" data-component="brutalist-footer">
   <!-- Top Accent Line -->
   <div class="footer-accent" aria-hidden="true"></div>
-  
+
   <div class="footer-container">
     {/* Main Grid */}
     <div class="footer-grid">
       {/* Brand Column */}
       <div class="footer-brand">
         <a href="/" class="footer-logo group no-underline">
-          <span class="footer-logo-text font-display font-bold text-xl text-white">
-            Pixelated <span class="text-accent-primary">Empathy</span>
+          <span class="footer-brand-lockup">
+            <img
+              src="/favicon.svg"
+              alt="Pixelated Empathy"
+              class="footer-logo-mark"
+              width="36"
+              height="36"
+              loading="lazy"
+              decoding="async"
+            />
+            <span
+              class="footer-logo-text font-display font-bold text-xl text-white"
+            >
+              Pixelated <span class="text-accent-primary">Empathy</span>
+            </span>
           </span>
         </a>
-        <p class="footer-tagline text-sm text-secondary mt-4 leading-relaxed italic opacity-80">
-          "Beyond the screen, lies a deeper connection."
+        <p
+          class="footer-tagline text-sm text-secondary mt-4 leading-relaxed opacity-90"
+        >
+          AI roleplay and simulation training for therapists, supervisors, and
+          care teams practicing difficult conversations before they happen with
+          real people.
         </p>
-        <p class="text-[11px] font-mono text-muted uppercase tracking-widest mt-2">
-          Forging high-fidelity human understanding.
+        <p
+          class="text-[11px] font-mono text-muted uppercase tracking-widest mt-2"
+        >
+          Founder-led in the United States // Built for clinical training teams
         </p>
-        
+
         {/* Social Links */}
         <div class="footer-social mt-6">
-          {social.map((item) => (
-            <a 
-              href={item.href} 
-              class="footer-social-link" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label={item.label}
-            >
-              {item.icon === "github" && (
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                  <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.09.682-.22.682-.48 0-.24-.009-.87-.013-1.71-2.782.6-3.369-1.34-3.369-1.34-.454-1.16-1.11-1.47-1.11-1.47-.908-.62.069-.61.069-.61 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.09 2.91.83.092-.65.35-1.09.636-1.34-2.22-.25-4.555-1.11-4.555-4.94 0-1.09.39-1.98 1.029-2.68-.103-.25-.446-1.27.098-2.64 0 0 .84-.27 2.75 1.02A9.578 9.578 0 0112 6.84c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.546 1.37.202 2.39.1 2.64.64.7 1.028 1.59 1.028 2.68 0 3.84-2.339 4.68-4.566 4.94.359.31.678.92.678 1.85 0 1.34-.012 2.42-.012 2.75 0 .27.18.58.688.48A10.019 10.019 0 0022 12c0-5.523-4.477-10-10-10z" />
-                </svg>
-              )}
-              {item.icon === "twitter" && (
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              )}
-            </a>
-          ))}
+          {
+            social.map((item) => (
+              <a
+                href={item.href}
+                class="footer-social-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={item.label}
+              >
+                {item.icon === 'github' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="18"
+                    height="18"
+                  >
+                    <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.09.682-.22.682-.48 0-.24-.009-.87-.013-1.71-2.782.6-3.369-1.34-3.369-1.34-.454-1.16-1.11-1.47-1.11-1.47-.908-.62.069-.61.069-.61 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.09 2.91.83.092-.65.35-1.09.636-1.34-2.22-.25-4.555-1.11-4.555-4.94 0-1.09.39-1.98 1.029-2.68-.103-.25-.446-1.27.098-2.64 0 0 .84-.27 2.75 1.02A9.578 9.578 0 0112 6.84c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.546 1.37.202 2.39.1 2.64.64.7 1.028 1.59 1.028 2.68 0 3.84-2.339 4.68-4.566 4.94.359.31.678.92.678 1.85 0 1.34-.012 2.42-.012 2.75 0 .27.18.58.688.48A10.019 10.019 0 0022 12c0-5.523-4.477-10-10-10z" />
+                  </svg>
+                )}
+                {item.icon === 'twitter' && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    width="18"
+                    height="18"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                )}
+              </a>
+            ))
+          }
         </div>
       </div>
-      
+
       {/* Links Columns */}
       <div class="footer-links">
-        <span class="footer-links-label">Ecosystem</span>
+        <span class="footer-links-label">Product</span>
         <ul class="footer-links-list">
-          {links.product.map((link) => (
-            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
-          ))}
+          {
+            links.product.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="footer-link hover:text-accent-primary"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
-      
+
       <div class="footer-links">
-        <span class="footer-links-label">Intelligence</span>
+        <span class="footer-links-label">Company</span>
         <ul class="footer-links-list">
-          {links.company.map((link) => (
-            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
-          ))}
+          {
+            links.company.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="footer-link hover:text-accent-primary"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
-      
+
       <div class="footer-links">
-        <span class="footer-links-label">Security</span>
+        <span class="footer-links-label">Policies</span>
         <ul class="footer-links-list">
-          {links.legal.map((link) => (
-            <li><a href={link.href} class="footer-link hover:text-accent-primary">{link.label}</a></li>
-          ))}
+          {
+            links.legal.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="footer-link hover:text-accent-primary"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
         </ul>
       </div>
-    </div>
-    
-    {/* Bottom Bar */}
-    <div class="footer-bottom border-t border-white/5 pt-8 mt-12">
-      <p class="footer-copyright font-mono text-[10px] text-muted uppercase tracking-widest">
-        &copy; {currentYear} Pixelated Empathy // Engineered with Purpose.
-      </p>
-      <p class="footer-built font-mono text-[10px] text-muted uppercase tracking-widest flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse"></span>
-        Zero-Leak Policy Active
-      </p>
     </div>
 
+    {/* Bottom Bar */}
+    <div class="footer-bottom border-t border-white/5 pt-8 mt-12">
+      <p
+        class="footer-copyright font-mono text-[10px] text-muted uppercase tracking-widest"
+      >
+        &copy; {currentYear} Pixelated Empathy // All rights reserved.
+      </p>
+      <p
+        class="footer-built font-mono text-[10px] text-muted uppercase tracking-widest flex items-center gap-2"
+      >
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse"
+        ></span>
+        Therapy simulation platform // Public site
+      </p>
+    </div>
   </div>
 </footer>
 
@@ -132,7 +202,7 @@ const social = [
     background: var(--bg-void);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
-  
+
   .footer-accent {
     height: 1px;
     background: linear-gradient(
@@ -143,13 +213,13 @@ const social = [
     );
     opacity: 0.2;
   }
-  
+
   .footer-container {
-    max-width: var(--container-xl);
+    max-width: 72rem;
     margin: 0 auto;
     padding: var(--space-16) var(--space-6);
   }
-  
+
   /* Grid Layout */
   .footer-grid {
     display: grid;
@@ -157,45 +227,58 @@ const social = [
     gap: var(--space-8);
     margin-bottom: var(--space-12);
   }
-  
+
   @media (min-width: 768px) {
     .footer-grid {
       grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: var(--space-12);
     }
   }
-  
+
   /* Brand */
   .footer-brand {
     max-width: 300px;
   }
-  
+
   .footer-logo {
     display: inline-block;
     text-decoration: none;
     margin-bottom: var(--space-4);
   }
-  
+
+  .footer-brand-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .footer-logo-mark {
+    width: 2.25rem;
+    height: 2.25rem;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
   .footer-logo-text {
     font-family: var(--font-mono);
     font-size: var(--text-lg);
     font-weight: 700;
     color: var(--text-primary);
   }
-  
+
   .footer-tagline {
     font-size: var(--text-sm);
     color: var(--text-muted);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-6);
   }
-  
+
   /* Social */
   .footer-social {
     display: flex;
     gap: var(--space-4);
   }
-  
+
   .footer-social-link {
     display: flex;
     align-items: center;
@@ -207,19 +290,19 @@ const social = [
     color: var(--text-muted);
     transition: all var(--duration-fast) var(--ease-out);
   }
-  
+
   .footer-social-link:hover {
     border-color: var(--accent-primary);
     color: var(--accent-primary);
   }
-  
+
   /* Links */
   .footer-links {
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
   }
-  
+
   .footer-links-label {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
@@ -228,7 +311,7 @@ const social = [
     text-transform: uppercase;
     color: var(--text-muted);
   }
-  
+
   .footer-links-list {
     display: flex;
     flex-direction: column;
@@ -237,18 +320,18 @@ const social = [
     margin: 0;
     padding: 0;
   }
-  
+
   .footer-link {
     font-size: var(--text-sm);
     color: var(--text-secondary);
     text-decoration: none;
     transition: color var(--duration-fast) var(--ease-out);
   }
-  
+
   .footer-link:hover {
     color: var(--text-primary);
   }
-  
+
   /* Bottom Bar */
   .footer-bottom {
     display: flex;
@@ -257,7 +340,7 @@ const social = [
     padding-top: var(--space-8);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
-  
+
   @media (min-width: 768px) {
     .footer-bottom {
       flex-direction: row;
@@ -265,7 +348,7 @@ const social = [
       align-items: center;
     }
   }
-  
+
   .footer-copyright,
   .footer-built {
     font-family: var(--font-mono);
