@@ -248,7 +248,7 @@ docstring-parser==0.17.0
     #   cyclopts
 docutils==0.22.4
     # via rich-rst
-e2b==2.18.0
+e2b==2.19.0
     # via pixelated (pyproject.toml)
 einops==0.8.2
     # via pixelated (pyproject.toml)
