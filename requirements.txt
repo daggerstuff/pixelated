@@ -975,7 +975,7 @@ opentelemetry-instrumentation-transformers==0.53.3
     # via traceloop-sdk
 opentelemetry-instrumentation-urllib3==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-vertexai==0.53.3
+opentelemetry-instrumentation-vertexai==0.55.0
     # via traceloop-sdk
 opentelemetry-instrumentation-voyageai==0.53.3
     # via traceloop-sdk
