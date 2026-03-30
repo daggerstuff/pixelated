@@ -126,7 +126,7 @@ export const GET = async ({
 
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'Failed to get profile',
+        error: 'Failed to get profile',
       }),
       {
         status: 401,
@@ -265,8 +265,7 @@ export const PUT = async ({
 
     return new Response(
       JSON.stringify({
-        error:
-          error instanceof Error ? error.message : 'Failed to update profile',
+        error: 'Failed to update profile',
       }),
       {
         status: 500,
