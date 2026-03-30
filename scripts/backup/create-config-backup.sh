@@ -71,12 +71,40 @@ create_backup_dir() {
 backup_ssh() {
     local user_home="/home/${CONFIG[username]}"
     local dest="$1/ssh"
-    
+
     info "Backing up SSH config..."
     mkdir -p "${dest}"
-    
+
     # Copy SSH directory (excluding very large files)
     if [[ -d "${user_home}/.ssh" ]]; then
+        # Check if any private keys will be backed up
+        local private_keys=()
+        while IFS= read -r -d '' key; do
+            private_keys+=("$key")
+        done < <(find "${user_home}/.ssh" -type f -name "id_*" ! -name "*.pub" -print0 2>/dev/null)
+        
+        if [[ ${#private_keys[@]} -gt 0 ]]; then
+            # Verify private keys are encrypted before backup to cloud
+            if [[ -n "${CONFIG[rclone_remote]}" ]]; then
+                info "Checking SSH key encryption for cloud upload..."
+                local unencrypted_keys=()
+                for key in "${private_keys[@]}"; do
+                    # ENCRYPTED means the key is passphrase-protected
+                    if ! grep -q "ENCRYPTED" "$key" 2>/dev/null; then
+                        unencrypted_keys+=("$(basename "$key")")
+                    fi
+                done
+                
+                if [[ ${#unencrypted_keys[@]} -gt 0 ]]; then
+                    error "SECURITY: Unencrypted SSH private keys detected: ${unencrypted_keys[*]}"
+                    error "Cloud upload blocked. Encrypt keys with: ssh-keygen -p -f <keyfile>"
+                    error "Or use --no-archive to create local backup only"
+                    die "Refusing to upload unencrypted private keys to cloud storage"
+                fi
+                success "All SSH private keys are encrypted - safe for cloud backup"
+            fi
+        fi
+        
         rsync -a \
             --exclude='*.pub' \
             --exclude='known_hosts.old' \
