@@ -53,6 +53,7 @@ const iconPaths: Record<string, string> = {
         <li>
           <a
             href={item.href}
+            aria-current={isActive ? 'page' : undefined}
             class:list={
               isPortal
                 ? [
@@ -75,6 +76,7 @@ const iconPaths: Record<string, string> = {
                     class="h-5 w-5"
                     viewBox="0 0 20 20"
                     fill="currentColor"
+                    aria-hidden="true"
                   >
                     <path d={iconPaths[item.icon]}></path>
                   </svg>
