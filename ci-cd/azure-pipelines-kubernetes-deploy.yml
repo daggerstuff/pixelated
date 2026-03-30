@@ -5,7 +5,7 @@ trigger: none
 pr: none
 
 pool:
-  name: Hosted
+  name: Azure Pipelines
 
 parameters:
   - name: environment
