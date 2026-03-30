@@ -113,6 +113,109 @@ resolve_values_file() {
 
   return 1
 }
+
+generate_secret_value() {
+  python3 - <<'PY'
+import secrets
+print(secrets.token_urlsafe(32))
+PY
+}
+
+get_secret_key_value() {
+  local namespace="$1"
+  local secret_name="$2"
+  local key_name="$3"
+
+  kubectl -n "${namespace}" get secret "${secret_name}" -o "jsonpath={.data.${key_name}}" 2>/dev/null | base64 --decode 2>/dev/null || true
+}
+
+extract_postgres_password_from_url() {
+  local database_url="$1"
+  printf '%s' "${database_url}" | sed -n 's#^postgresql://postgres:\([^@]*\)@.*#\1#p'
+}
+
+extract_redis_password_from_url() {
+  local redis_url="$1"
+  printf '%s' "${redis_url}" | sed -n 's#^redis://:\([^@]*\)@.*#\1#p'
+}
+
+resolve_or_generate_value() {
+  local current_value="$1"
+  if [ -n "${current_value}" ]; then
+    printf '%s' "${current_value}"
+    return 0
+  fi
+
+  generate_secret_value
+}
+
+resolve_runtime_credentials() {
+  local namespace="$1"
+  local release_name="$2"
+  local app_secret_name="${release_name}-secrets"
+  local postgres_secret_name="${release_name}-postgresql"
+  local redis_secret_name="${release_name}-redis"
+  local postgres_password=""
+  local redis_password=""
+  local jwt_secret=""
+  local encryption_key=""
+  local existing_database_url=""
+  local existing_redis_url=""
+
+  existing_database_url="$(get_secret_key_value "${namespace}" "${app_secret_name}" "database-url")"
+  existing_redis_url="$(get_secret_key_value "${namespace}" "${app_secret_name}" "redis-url")"
+
+  postgres_password="$(get_secret_key_value "${namespace}" "${postgres_secret_name}" "postgres-password")"
+  if [ -z "${postgres_password}" ]; then
+    postgres_password="$(extract_postgres_password_from_url "${existing_database_url}")"
+  fi
+  postgres_password="$(resolve_or_generate_value "${postgres_password}")"
+
+  redis_password="$(get_secret_key_value "${namespace}" "${redis_secret_name}" "redis-password")"
+  if [ -z "${redis_password}" ]; then
+    redis_password="$(extract_redis_password_from_url "${existing_redis_url}")"
+  fi
+  redis_password="$(resolve_or_generate_value "${redis_password}")"
+
+  jwt_secret="$(get_secret_key_value "${namespace}" "${app_secret_name}" "jwt-secret")"
+  jwt_secret="$(resolve_or_generate_value "${jwt_secret}")"
+
+  encryption_key="$(get_secret_key_value "${namespace}" "${app_secret_name}" "encryption-key")"
+  encryption_key="$(resolve_or_generate_value "${encryption_key}")"
+
+  POSTGRES_RUNTIME_PASSWORD="${postgres_password}"
+  REDIS_RUNTIME_PASSWORD="${redis_password}"
+  APP_DATABASE_URL="postgresql://postgres:${postgres_password}@${release_name}-postgresql:5432/pixelated_empathy"
+  APP_REDIS_URL="redis://:${redis_password}@${release_name}-redis-master:6379"
+  APP_JWT_SECRET="${jwt_secret}"
+  APP_ENCRYPTION_KEY="${encryption_key}"
+}
+
+create_runtime_values_file() {
+  local release_name="$1"
+
+  RUNTIME_VALUES_FILE="$(mktemp)"
+  cat > "${RUNTIME_VALUES_FILE}" <<EOF
+app:
+  secrets:
+    databaseUrl: "${APP_DATABASE_URL}"
+    redisUrl: "${APP_REDIS_URL}"
+    jwtSecret: "${APP_JWT_SECRET}"
+    encryptionKey: "${APP_ENCRYPTION_KEY}"
+postgresql:
+  auth:
+    postgresPassword: "${POSTGRES_RUNTIME_PASSWORD}"
+redis:
+  auth:
+    password: "${REDIS_RUNTIME_PASSWORD}"
+EOF
+}
+
+cleanup_runtime_values_file() {
+  if [ -n "${RUNTIME_VALUES_FILE:-}" ]; then
+    rm -f "${RUNTIME_VALUES_FILE}"
+  fi
+}
 STAGING_HOSTNAME="${APP_HOSTNAME_STAGING:-staging.pixelatedempathy.com}"
 PRODUCTION_HOSTNAME="${APP_HOSTNAME_PRODUCTION:-pixelatedempathy.com}"
 IMAGE_TAG="${BUILD_BUILDID:-}"
@@ -326,6 +429,9 @@ set +e
 # We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
 echo "🧹 Checking for existing statefulsets to avoid immutable field conflicts..."
 clear_stale_pending_release "${RELEASE_NAME}" "${NAMESPACE}"
+resolve_runtime_credentials "${NAMESPACE}" "${RELEASE_NAME}"
+create_runtime_values_file "${RELEASE_NAME}"
+trap cleanup_runtime_values_file EXIT
 for sts in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas"; do
   if kubectl get statefulset "$sts" -n "${NAMESPACE}" >/dev/null 2>&1; then
     echo "   Removing statefulset $sts (keeping pods)..."
@@ -337,13 +443,14 @@ helm upgrade "${RELEASE_NAME}" "${CHART_DIR}" \
   --namespace "${NAMESPACE}" \
   --create-namespace \
   "${HELM_VALUES_ARGS[@]}" \
+  --values "${RUNTIME_VALUES_FILE}" \
   --set image.repository="${ACR_LOGIN_SERVER}/${ACR_REPO}" \
   --set image.tag="${IMAGE_TAG}" \
   --set ingress.hosts[0].host="${APP_HOSTNAME}" \
   --set ingress.tls[0].hosts[0]="${APP_HOSTNAME}" \
   --set ingress.tls[0].secretName="pixelated-empathy-${APP_ENV}-tls" \
   --wait \
-  --timeout 30m \
+  --timeout 10m \
   --atomic \
   --force
 HELM_EXIT_CODE=$?
