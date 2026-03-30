@@ -1,0 +1,27 @@
+{
+  "$schema": "./vps-config.schema.json",
+  "_comment": "Full Stack Production Configuration - ACR + Traefik + Monitoring",
+
+  "profile": "full-stack",
+  "username": "vivi",
+  "ssh_public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-here",
+
+  "registry": "acr",
+  "acr_name": "pixelatedregistry",
+  "registry_username": "pixelatedregistry",
+  "registry_token": "xxxxx",
+
+  "domain": "pixelatedempathy.com",
+  "acme_email": "admin@pixelatedempathy.com",
+  "cloudflare_api_token": "cf_xxxxx",
+
+  "enable_monitoring": "true",
+  "enable_traefik": "true",
+
+  "ssh_port": "2222",
+  "ssh_permit_root_login": "no",
+  "ssh_password_auth": "no",
+
+  "timezone": "UTC",
+  "swap_size": "4G"
+}
