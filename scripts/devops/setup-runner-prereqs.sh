@@ -9,7 +9,7 @@ cd $HOME
 
 echo "Updating system..."
 apt-get update -y
-apt-get install -y ca-certificates curl gnupg lsb-release build-essential make g++ python3 python3-dev jq git libssl-dev libffi-dev python3-pip
+apt-get install -y ca-certificates curl gnupg lsb-release build-essential make g++ python3 python3-dev jq git libssl-dev libffi-dev python3-pip unzip
 
 echo "Installing Docker..."
 mkdir -p /etc/apt/keyrings
