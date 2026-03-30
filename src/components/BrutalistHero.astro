@@ -6,8 +6,6 @@
 export interface Props {
   title?: string
   subtitle?: string
-  primaryCTA?: { text: string; href: string }
-  secondaryCTA?: { text: string; href: string }
   ctaPrimary?: { text: string; href: string }
   ctaSecondary?: { text: string; href: string }
   stats?: Array<{ value: string; label: string }>
@@ -16,18 +14,13 @@ export interface Props {
 const {
   title = 'AI Roleplay Training for Therapists',
   subtitle = 'Practice difficult clinical conversations with realistic AI patients, structured feedback, and repeatable supervision workflows.',
-  primaryCTA,
-  secondaryCTA,
-  ctaPrimary,
-  ctaSecondary,
+  ctaPrimary = { text: 'Enter the Gym', href: '/training' },
+  ctaSecondary = { text: 'Explore Intelligence', href: '/ai-engine' },
   stats,
 } = Astro.props
 
-// Support both prop naming conventions
-const primaryAction = primaryCTA ||
-  ctaPrimary || { text: 'Enter the Gym', href: '/training' }
-const secondaryAction = secondaryCTA ||
-  ctaSecondary || { text: 'Explore Intelligence', href: '/ai-engine' }
+const primaryAction = ctaPrimary
+const secondaryAction = ctaSecondary
 ---
 
 <section
