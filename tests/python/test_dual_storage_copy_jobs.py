@@ -5,16 +5,23 @@ import json
 from pathlib import Path
 
 
-SCRIPT_PATH = Path(
-    "/home/vivi/pixelated/.agent/internal/scripts/generate_dual_storage_copy_jobs.py"
+import os
+from pathlib import Path
+
+SCRIPT_PATH = (
+    Path(os.environ.get("PIXELATED_ROOT", str(Path(__file__).parent.parent.parent)))
+    / ".agent"
+    / "internal"
+    / "scripts"
+    / "generate_dual_storage_copy_jobs.py"
 )
 
 
 def _load_module():
     spec = importlib.util.spec_from_file_location("dual_storage_copy_jobs", SCRIPT_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Failed to load module from {SCRIPT_PATH}")
     module = importlib.util.module_from_spec(spec)
-    assert spec is not None
-    assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
@@ -193,9 +200,7 @@ def test_build_copy_plan_supports_explicit_host_bucket_template_override() -> No
         s3cmd_config_path="/tmp/pixel-data.s3cfg",
     )
 
-    assert copy_plan["s3_target"]["host_bucket_template"] == (
-        "%(bucket)s.digitaloceanspaces.com"
-    )
+    assert copy_plan["s3_target"]["host_bucket_template"] == ("%(bucket)s.digitaloceanspaces.com")
     assert copy_plan["s3_target"]["config_path"] == "/tmp/pixel-data.s3cfg"
     assert copy_plan["jobs"][0]["s3_job"]["command"] == [
         "s3cmd",
