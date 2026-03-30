@@ -1,0 +1,15 @@
+{
+  "$schema": "./vps-config.schema.json",
+  "_comment": "AI Workload Configuration - NVIDIA NGC Registry",
+
+  "profile": "ai-workload",
+  "username": "vivi",
+  "ssh_public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-here",
+
+  "registry": "nvidia",
+  "nvidia_api_key": "nvapi_xxxxx",
+
+  "ssh_port": "22",
+  "timezone": "UTC",
+  "swap_size": "4G"
+}

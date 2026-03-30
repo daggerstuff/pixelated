@@ -5,6 +5,7 @@
 .serena/
 .sonarlint
 .vscode/
+.crush/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/

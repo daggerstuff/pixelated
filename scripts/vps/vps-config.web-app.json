@@ -1,0 +1,24 @@
+{
+  "$schema": "./vps-config.schema.json",
+  "_comment": "Web App Configuration - GitLab Registry + Traefik",
+
+  "profile": "web-app",
+  "username": "vivi",
+  "ssh_public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-here",
+
+  "registry": "gitlab",
+  "registry_url": "registry.gitlab.com",
+  "registry_username": "vivi",
+  "registry_token": "glpat_xxxxx",
+
+  "domain": "app.example.com",
+  "acme_email": "admin@example.com",
+  "cloudflare_api_token": "cf_xxxxx",
+
+  "enable_monitoring": "true",
+  "enable_traefik": "true",
+
+  "ssh_port": "2222",
+  "timezone": "UTC",
+  "swap_size": "2G"
+}
