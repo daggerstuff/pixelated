@@ -955,7 +955,7 @@ opentelemetry-instrumentation-openai-agents==0.53.3
     # via traceloop-sdk
 opentelemetry-instrumentation-pinecone==0.53.3
     # via traceloop-sdk
-opentelemetry-instrumentation-qdrant==0.53.3
+opentelemetry-instrumentation-qdrant==0.55.0
     # via traceloop-sdk
 opentelemetry-instrumentation-redis==0.60b1
     # via traceloop-sdk
