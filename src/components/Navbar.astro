@@ -2,16 +2,23 @@
 // Enhanced Navbar component with active state indicators and improved accessibility
 import ThemeSwitcher from './ThemeSwitcher.astro'
 
+const currentPath = Astro.url.pathname
+
 // Define navigation items
 const navItems = [
-  { href: '/training', label: 'Empathy Gym' },
+  { href: '/training', label: 'Training' },
   { href: '/features', label: 'Features' },
-  { href: '/pricing', label: 'Ecosystem' },
-  { href: '/about', label: 'Intelligence' },
-  { href: '/therapy-chat', label: 'Demo' },
+  { href: '/trust', label: 'Trust' },
+  { href: '/about', label: 'About' },
+  { href: '/demo-hub', label: 'Demos' },
 ]
 
-// ... (isActive logic) ...
+function isActive(href: string) {
+  return href === '/'
+    ? currentPath === '/'
+    : currentPath === href || currentPath.startsWith(`${href}/`)
+}
+---
 
 <header
   class="sticky top-0 z-50 bg-void/80 backdrop-blur-2xl w-full border-b border-white/5"
@@ -19,8 +26,14 @@ const navItems = [
 >
   <div class="flex items-center justify-between h-20 px-6 sm:px-8 lg:px-12">
     <div class="flex items-center">
-      <a href="/" class="flex items-center group no-underline" aria-label="Go to homepage">
-        <div class="w-10 h-10 mr-3 relative overflow-hidden rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+      <a
+        href="/"
+        class="flex items-center group no-underline"
+        aria-label="Go to homepage"
+      >
+        <div
+          class="w-10 h-10 mr-3 relative overflow-hidden rounded-lg bg-white/5 border border-white/10 flex items-center justify-center"
+        >
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -42,10 +55,17 @@ const navItems = [
               stroke-linecap="round"
               stroke-linejoin="round"></path>
           </svg>
-          <div class="absolute inset-0 bg-accent-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div
+            class="absolute inset-0 bg-accent-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          >
+          </div>
         </div>
-        <span class="text-xl font-display font-bold tracking-tight text-white group-hover:text-accent-primary transition-colors duration-300"
-          >Pixelated <span class="text-accent-primary group-hover:text-white transition-colors duration-300">Empathy</span></span
+        <span
+          class="text-xl font-display font-bold tracking-tight text-white group-hover:text-accent-primary transition-colors duration-300"
+          >Pixelated <span
+            class="text-accent-primary group-hover:text-white transition-colors duration-300"
+            >Empathy</span
+          ></span
         >
       </a>
     </div>
@@ -84,18 +104,22 @@ const navItems = [
           }
         </ul>
       </nav>
-      <div class="flex items-center space-x-6 border-l border-white/10 pl-6 ml-6">
+      <div
+        class="flex items-center space-x-6 border-l border-white/10 pl-6 ml-6"
+      >
         <ThemeSwitcher />
         <a
           href="/signup"
           class="relative group px-5 py-2 overflow-hidden rounded-md bg-white font-display font-bold text-sm text-void transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span class="relative z-10">Launch App</span>
-          <div class="absolute inset-0 bg-accent-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <span class="relative z-10">Start Practice</span>
+          <div
+            class="absolute inset-0 bg-accent-primary translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+          >
+          </div>
         </a>
       </div>
     </div>
-
 
     <div class="flex md:hidden">
       <ThemeSwitcher />

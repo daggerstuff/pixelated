@@ -8,7 +8,7 @@ const organizationSchema = {
   '@type': 'Organization',
   'name': 'Pixelated Empathy',
   'url': 'https://pixelatedempathy.com',
-  'logo': 'https://pixelatedempathy.com/android-chrome-192x192.png',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
   'description': 'AI-powered training platform for mental health professionals',
   'foundingDate': '2025',
   'address': {
@@ -29,11 +29,11 @@ const organizationSchema = {
     set:html={JSON.stringify(organizationSchema)}
   />
   <section class="brutalist-section pt-20 md:pt-24 pb-16">
-    <div class="brutalist-container">
+    <div class="site-shell site-shell--narrow">
       <PageHeader
         eyebrow="About"
         title="About Pixelated Empathy"
-        lede="We build safe AI simulation for therapists to practice the hardest sessions before they happen in real life."
+        lede="We build AI roleplay and simulation tools for therapists, supervisors, and training programs that need safer ways to practice difficult conversations."
       />
 
       <div class="divider my-12"></div>
@@ -41,24 +41,26 @@ const organizationSchema = {
       <div class="mt-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
         <Surface class="p-6">
           <h2 class="text-2xl md:text-3xl font-semibold text-white">
-            What we built
+            What the platform does
           </h2>
           <p class="mt-4 text-gray-300 leading-relaxed">
-            An enterprise‑grade training simulator that lets programs run
-            unlimited high‑stakes role‑plays with adversarial AI clients,
-            real‑time bias cues, and post‑session coaching. Practice escalations
-            safely. Build measurable competence. Reduce risk.
+            Pixelated Empathy gives teams a place to rehearse crisis
+            conversations, rupture repair, trauma disclosures, and other
+            sessions that are difficult to stage consistently in the real world.
+            After each simulation, the platform helps teams review pacing,
+            empathy, bias cues, and decision points.
           </p>
         </Surface>
         <Surface class="p-6">
           <h2 class="text-2xl md:text-3xl font-semibold text-white">
-            Why it matters
+            Why teams use it
           </h2>
           <p class="mt-4 text-gray-300 leading-relaxed">
-            Students see a handful of curated cases. Real practice isn’t
-            curated. We give universities, clinics, and practitioners a way to
-            train for the edge‑cases that actually break sessions—without
-            putting patients at risk.
+            Clinical training often depends on a small number of live cases,
+            roleplays that vary by facilitator, and supervision notes written
+            after the moment has passed. We are building a repeatable training
+            environment so programs can practice the same hard scenario, review
+            what changed, and coach against something concrete.
           </p>
         </Surface>
       </div>
@@ -69,9 +71,7 @@ const organizationSchema = {
         <div>
           <div class="brutalist-caption mb-2 text-teal-400">Founded</div>
           <p class="text-white font-medium">2025</p>
-          <p class="text-gray-400 text-sm mt-1">
-            Built deliberately, production‑ready
-          </p>
+          <p class="text-gray-400 text-sm mt-1">Founder-led build</p>
         </div>
         <div>
           <div class="brutalist-caption mb-2 text-teal-400">Location</div>
@@ -81,9 +81,11 @@ const organizationSchema = {
         <div>
           <div class="brutalist-caption mb-2 text-teal-400">Who we serve</div>
           <p class="text-white font-medium">
-            Universities, clinics, practitioners
+            Training programs, supervisors, and clinicians
           </p>
-          <p class="text-gray-400 text-sm mt-1">Competency you can measure</p>
+          <p class="text-gray-400 text-sm mt-1">
+            From solo practice to cohort review
+          </p>
         </div>
       </div>
 
@@ -109,11 +111,13 @@ const organizationSchema = {
             </div>
             <div>
               <div class="text-sm text-gray-500 mb-1">Status</div>
-              <div class="text-white font-medium">Early-stage startup</div>
+              <div class="text-white font-medium">
+                Founder-led product build
+              </div>
             </div>
           </div>
           <p class="mt-6 text-gray-400">
-            Learn more about our team and mission on our
+            Learn more about the current team structure on our
             <a href="/team" class="text-teal-400 hover:text-teal-300"
               >team page</a
             >.
