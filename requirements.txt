@@ -1279,7 +1279,7 @@ pydantic==2.12.5
     #   wandb
     #   weasel
     #   xai-sdk
-pydantic-ai==1.71.0
+pydantic-ai==1.73.0
     # via pixelated (pyproject.toml)
 pydantic-ai-slim==1.71.0
     # via
