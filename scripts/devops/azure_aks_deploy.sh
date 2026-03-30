@@ -265,98 +265,70 @@ verify_remote_image() {
   fi
 }
 
-if ! CHART_DIR="$(resolve_chart_dir)"; then
-  echo "##vso[task.logissue type=error]Helm chart directory not found."
-  echo "CHART_DIR was: ${CHART_DIR:-<unset>}"
-  echo "Working directory: ${PWD}"
-  echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
-  echo "Expected one of:"
-  echo " - ai/infrastructure/helm/pixelated-empathy"
-  echo " - ai/infra/cloud/helm/pixelated-empathy"
-  echo " - helm"
-  exit 1
-fi
+clear_legacy_caddy_resources() {
+  local namespace="$1"
+  local release_name="$2"
+  local stale_namespace_resources=()
+  local stale_cluster_resources=()
 
-if ! ENV_VALUES="$(resolve_values_file "${CHART_DIR}" "${APP_ENV}")"; then
-  echo "##vso[task.logissue type=error]Helm values file not found for environment ${APP_ENV} in chart directory ${CHART_DIR}."
-  exit 1
-fi
+  mapfile -t stale_namespace_resources < <(
+    kubectl get deployment,service,pod,serviceaccount,role,rolebinding -n "${namespace}" -o name 2>/dev/null | \
+      grep -E "^(.*/)?${release_name}-caddy-ingress-controller([-/].*)?$" || true
+  )
 
-if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
-  CLUSTER_READY=true
-else
-  echo "AKS cluster variables are required."
-  echo "Provide either AKS_CLUSTER_NAME/AKS_RESOURCE_GROUP or AZURE_AKS_CLUSTER_NAME/AZURE_AKS_RESOURCE_GROUP in the variable group."
-  exit 1
-fi
-
-case "${APP_ENV}" in
-  production)
-    APP_HOSTNAME="${PRODUCTION_HOSTNAME}"
-    ;;
-  staging)
-    APP_HOSTNAME="${STAGING_HOSTNAME}"
-    ;;
-  *)
-    APP_HOSTNAME="${APP_HOSTNAME:-${PRODUCTION_HOSTNAME}}"
-    ;;
-esac
-
-echo "🔐 Logging into Azure and ACR"
-az acr login --name "${ACR_NAME}"
-export HELM_EXPERIMENTAL_OCI=1
-ACR_TOKEN=$(az acr login --name "${ACR_NAME}" --expose-token --output tsv --query accessToken)
-echo "${ACR_TOKEN}" | helm registry login "${ACR_LOGIN_SERVER}" --username "00000000-0000-0000-0000-000000000000" --password-stdin
-
-if [[ "${SKIP_BUILD:-false}" != "true" ]]; then
-  echo "📦 Building and pushing ${IMAGE_FULL}"
-  docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
-  docker push "${IMAGE_FULL}"
-
-  if [ "${PUSH_LATEST}" = "True" ] || [ "${PUSH_LATEST}" = "true" ] || [ "${PUSH_LATEST}" = "1" ]; then
-    docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
-    docker push "${IMAGE_LATEST}"
+  if [ "${#stale_namespace_resources[@]}" -gt 0 ]; then
+    echo "🧹 Removing legacy Caddy resources from namespace ${namespace}..."
+    kubectl delete -n "${namespace}" --ignore-not-found=true "${stale_namespace_resources[@]}" || true
   fi
-else
-  echo "⏭️  SKIP_BUILD=true, skipping docker build and push."
-fi
 
-echo "🔐 Loading AKS kubeconfig"
-az aks get-credentials --resource-group "${RESOURCE_GROUP}" --name "${CLUSTER_NAME}" --overwrite-existing
-kubectl cluster-info
-
-echo "📦 Preparing Helm chart for ${NAMESPACE}"
-# Moved after context loading to ensure private registry access if needed
-helm dependency update "${CHART_DIR}"
-
-echo "📄 Using chart directory: ${CHART_DIR}"
-echo "📄 Using values file: ${ENV_VALUES}"
-echo "📄 Database image pinning: postgres=${POSTGRESQL_IMAGE_TAG}, redis=${REDIS_IMAGE_TAG}"
-
-HELM_VALUES_ARGS=(
-  --values "${ENV_VALUES}"
-)
-
-if [ "${APP_ENV}" != "training" ]; then
-  HELM_VALUES_ARGS+=(
-    --set "training.enabled=false"
-    --set "postgresql.image.repository=bitnami/postgresql"
-    --set "postgresql.image.tag=${POSTGRESQL_IMAGE_TAG}"
-    --set "postgresql.image.pullPolicy=IfNotPresent"
-    --set "redis.image.repository=bitnami/redis"
-    --set "redis.image.tag=${REDIS_IMAGE_TAG}"
-    --set "redis.image.pullPolicy=IfNotPresent"
+  mapfile -t stale_cluster_resources < <(
+    kubectl get clusterrole,clusterrolebinding,ingressclass -o name 2>/dev/null | \
+      grep 'caddy-ingress-controller' || true
   )
 
-  verify_remote_image "docker.io/bitnami/postgresql" "${POSTGRESQL_IMAGE_TAG}"
-  verify_remote_image "docker.io/bitnami/redis" "${REDIS_IMAGE_TAG}"
-fi
+  if [ "${#stale_cluster_resources[@]}" -gt 0 ]; then
+    echo "🧹 Removing legacy Caddy cluster resources..."
+    kubectl delete --ignore-not-found=true "${stale_cluster_resources[@]}" || true
+  fi
+}
 
-if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
-  HELM_VALUES_ARGS+=(
-    --values "${CHART_DIR}/values-cost-effective.yaml"
-  )
-fi
+verify_aks_nodepools_ready() {
+  local nodepool_names=()
+  local nodepool_name
+  local nodepool_state
+  local nodepool_power_state
+  local nodepool_count
+
+  mapfile -t nodepool_names < <(az aks nodepool list \
+    --resource-group "${RESOURCE_GROUP}" \
+    --cluster-name "${CLUSTER_NAME}" \
+    --query '[].name' \
+    -o tsv)
+
+  if [ "${#nodepool_names[@]}" -eq 0 ]; then
+    echo "##vso[task.logissue type=error]No AKS nodepools found for cluster ${CLUSTER_NAME}."
+    exit 1
+  fi
+
+  echo "🧱 Verifying AKS nodepools before ingress cutover..."
+  for nodepool_name in "${nodepool_names[@]}"; do
+    readarray -t nodepool_fields < <(az aks nodepool show \
+      --resource-group "${RESOURCE_GROUP}" \
+      --cluster-name "${CLUSTER_NAME}" \
+      --name "${nodepool_name}" \
+      --query '{state: provisioningState, power: powerState.code, count: count}' \
+      -o json | python3 -c 'import json, sys; payload = json.load(sys.stdin); print(payload.get("state", "")); print(payload.get("power", "")); print(payload.get("count", ""))')
+    nodepool_state="${nodepool_fields[0]:-}"
+    nodepool_power_state="${nodepool_fields[1]:-}"
+    nodepool_count="${nodepool_fields[2]:-}"
+
+    echo "   Nodepool ${nodepool_name}: state=${nodepool_state} power=${nodepool_power_state:-Running} count=${nodepool_count}"
+    if [ "${nodepool_state}" != "Succeeded" ]; then
+      echo "##vso[task.logissue type=error]AKS nodepool ${nodepool_name} is not ready (state=${nodepool_state})."
+      exit 1
+    fi
+  done
+}
 
 get_helm_release_status() {
   local release_name="$1"
@@ -432,7 +404,102 @@ retire_legacy_staging_release() {
   fi
 }
 
+if ! CHART_DIR="$(resolve_chart_dir)"; then
+  echo "##vso[task.logissue type=error]Helm chart directory not found."
+  echo "CHART_DIR was: ${CHART_DIR:-<unset>}"
+  echo "Working directory: ${PWD}"
+  echo "Repo root (BUILD_SOURCESDIRECTORY-like): ${BUILD_SOURCESDIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-<unset>}}"
+  echo "Expected one of:"
+  echo " - ai/infrastructure/helm/pixelated-empathy"
+  echo " - ai/infra/cloud/helm/pixelated-empathy"
+  echo " - helm"
+  exit 1
+fi
+
+if ! ENV_VALUES="$(resolve_values_file "${CHART_DIR}" "${APP_ENV}")"; then
+  echo "##vso[task.logissue type=error]Helm values file not found for environment ${APP_ENV} in chart directory ${CHART_DIR}."
+  exit 1
+fi
+
+if [ -n "${AKS_CLUSTER_NAME:-}" ] && [ -n "${AKS_RESOURCE_GROUP:-}" ]; then
+  CLUSTER_READY=true
+else
+  echo "AKS cluster variables are required."
+  echo "Provide either AKS_CLUSTER_NAME/AKS_RESOURCE_GROUP or AZURE_AKS_CLUSTER_NAME/AZURE_AKS_RESOURCE_GROUP in the variable group."
+  exit 1
+fi
+
+case "${APP_ENV}" in
+  production)
+    APP_HOSTNAME="${PRODUCTION_HOSTNAME}"
+    ;;
+  staging)
+    APP_HOSTNAME="${STAGING_HOSTNAME}"
+    ;;
+  *)
+    APP_HOSTNAME="${APP_HOSTNAME:-${PRODUCTION_HOSTNAME}}"
+    ;;
+esac
+
+echo "🔐 Logging into Azure and ACR"
+az acr login --name "${ACR_NAME}"
+export HELM_EXPERIMENTAL_OCI=1
+ACR_TOKEN=$(az acr login --name "${ACR_NAME}" --expose-token --output tsv --query accessToken)
+echo "${ACR_TOKEN}" | helm registry login "${ACR_LOGIN_SERVER}" --username "00000000-0000-0000-0000-000000000000" --password-stdin
+
+if [[ "${SKIP_BUILD:-false}" != "true" ]]; then
+  echo "📦 Building and pushing ${IMAGE_FULL}"
+  docker build -f docker/Dockerfile.production -t "${IMAGE_FULL}" .
+  docker push "${IMAGE_FULL}"
+
+  if [ "${PUSH_LATEST}" = "True" ] || [ "${PUSH_LATEST}" = "true" ] || [ "${PUSH_LATEST}" = "1" ]; then
+    docker tag "${IMAGE_FULL}" "${IMAGE_LATEST}"
+    docker push "${IMAGE_LATEST}"
+  fi
+else
+  echo "⏭️  SKIP_BUILD=true, skipping docker build and push."
+fi
+
+echo "🔐 Loading AKS kubeconfig"
+az aks get-credentials --resource-group "${RESOURCE_GROUP}" --name "${CLUSTER_NAME}" --overwrite-existing
+kubectl cluster-info
+verify_aks_nodepools_ready
+
+echo "📦 Preparing Helm chart for ${NAMESPACE}"
+# Moved after context loading to ensure private registry access if needed
+helm dependency update "${CHART_DIR}"
+
+echo "📄 Using chart directory: ${CHART_DIR}"
+echo "📄 Using values file: ${ENV_VALUES}"
+echo "📄 Database image pinning: postgres=${POSTGRESQL_IMAGE_TAG}, redis=${REDIS_IMAGE_TAG}"
+
+HELM_VALUES_ARGS=(
+  --values "${ENV_VALUES}"
+)
+
+if [ "${APP_ENV}" != "training" ]; then
+  HELM_VALUES_ARGS+=(
+    --set "training.enabled=false"
+    --set "postgresql.image.repository=bitnami/postgresql"
+    --set "postgresql.image.tag=${POSTGRESQL_IMAGE_TAG}"
+    --set "postgresql.image.pullPolicy=IfNotPresent"
+    --set "redis.image.repository=bitnami/redis"
+    --set "redis.image.tag=${REDIS_IMAGE_TAG}"
+    --set "redis.image.pullPolicy=IfNotPresent"
+  )
+
+  verify_remote_image "docker.io/bitnami/postgresql" "${POSTGRESQL_IMAGE_TAG}"
+  verify_remote_image "docker.io/bitnami/redis" "${REDIS_IMAGE_TAG}"
+fi
+
+if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
+  HELM_VALUES_ARGS+=(
+    --values "${CHART_DIR}/values-cost-effective.yaml"
+  )
+fi
+
 retire_legacy_staging_release
+clear_legacy_caddy_resources "${NAMESPACE}" "${RELEASE_NAME}"
 set +e
 # Delete statefulsets with cascade=orphan to allow Helm to recreate them if immutable fields changed (e.g. volume templates)
 # We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
@@ -482,7 +549,20 @@ fi
 kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME}"
 
 echo "📄 DNS target info:"
-INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ingress-controller" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+INGRESS_TRAEFIK_IP=""
+for attempt in $(seq 1 30); do
+  INGRESS_TRAEFIK_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-traefik" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+  if [ -n "${INGRESS_TRAEFIK_IP}" ]; then
+    break
+  fi
+
+  if [ "${attempt}" -eq 30 ]; then
+    break
+  fi
+
+  echo "   Waiting for Traefik load balancer IP (${attempt}/30)..."
+  sleep 10
+done
 if [ "${APP_ENV}" = "production" ]; then
   PROD_INGRESS_HOST="$(kubectl -n "${NAMESPACE}" get ingress "${RELEASE_NAME}" -o jsonpath='{.spec.rules[0].host}' 2>/dev/null || true)"
   if [ -z "${PROD_INGRESS_HOST}" ]; then
@@ -492,12 +572,12 @@ if [ "${APP_ENV}" = "production" ]; then
   fi
   echo "Production ingress host in namespace ${NAMESPACE}: ${PROD_INGRESS_HOST}"
 
-  if [ -z "${INGRESS_CADDY_IP}" ]; then
-    echo "##vso[task.logissue type=error]No public IP found on the Caddy ingress controller service ${RELEASE_NAME}-caddy-ingress-controller in namespace ${NAMESPACE}."
+  if [ -z "${INGRESS_TRAEFIK_IP}" ]; then
+    echo "##vso[task.logissue type=error]No public IP found on the Traefik ingress controller service ${RELEASE_NAME}-traefik in namespace ${NAMESPACE}."
     exit 1
   fi
-  echo "Pixelated production ingress (DNS for pixelatedempathy.com): ${INGRESS_CADDY_IP}"
+  echo "Pixelated production ingress (DNS for pixelatedempathy.com): ${INGRESS_TRAEFIK_IP}"
 fi
-if [ -n "${INGRESS_CADDY_IP}" ]; then
-  echo "Namespace ${NAMESPACE} caddy ingress controller IP: ${INGRESS_CADDY_IP}"
+if [ -n "${INGRESS_TRAEFIK_IP}" ]; then
+  echo "Namespace ${NAMESPACE} traefik ingress controller IP: ${INGRESS_TRAEFIK_IP}"
 fi
