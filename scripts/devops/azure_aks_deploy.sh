@@ -550,17 +550,20 @@ kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME
 
 echo "📄 DNS target info:"
 INGRESS_TRAEFIK_IP=""
-for attempt in $(seq 1 30); do
+# Attempt to resolve Traefik IP by specific name first, then by label
+for attempt in $(seq 1 15); do
   INGRESS_TRAEFIK_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-traefik" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+  
+  if [ -z "${INGRESS_TRAEFIK_IP}" ]; then
+    INGRESS_TRAEFIK_IP="$(kubectl -n "${NAMESPACE}" get svc -l "app.kubernetes.io/name=traefik,app.kubernetes.io/instance=${RELEASE_NAME}" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
+  fi
+
   if [ -n "${INGRESS_TRAEFIK_IP}" ]; then
+    echo "✅ Traefik LoadBalancer IP found: ${INGRESS_TRAEFIK_IP}"
     break
   fi
 
-  if [ "${attempt}" -eq 30 ]; then
-    break
-  fi
-
-  echo "   Waiting for Traefik load balancer IP (${attempt}/30)..."
+  echo "   Waiting for Traefik load balancer IP (${attempt}/15)..."
   sleep 10
 done
 if [ "${APP_ENV}" = "production" ]; then
