@@ -32,7 +32,8 @@ if ! version_ge "${AZURE_CLI_VERSION}" "${AZURE_CLI_MIN_VERSION}"; then
   echo "Found: ${AZURE_CLI_VERSION_LINE}"
   echo "Minimum required: ${AZURE_CLI_MIN_VERSION}"
   echo "Reason: AzureCLI@2 task diagnostics can fail or mis-parse CLI output on very old versions."
-  echo "Action: run this job on a modern Microsoft-hosted agent (ubuntu-24.04/ubuntu-latest) or update agent tooling."
+  echo "Action: run this job on an agent with Azure CLI ${AZURE_CLI_MIN_VERSION}+ installed."
+  echo "A modern Microsoft-hosted Ubuntu image works, or update the self-hosted agent tooling."
   exit 1
 fi
 

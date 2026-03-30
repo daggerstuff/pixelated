@@ -4,7 +4,8 @@ trigger: none
 
 pr: none
 
-# To bypass the "no free minutes" error, the agent MUST be moved to this non-hosted pool.
+# This pipeline must run on a self-hosted pool because Microsoft-hosted
+# Azure Pipelines minutes are exhausted for this organization.
 pool:
   name: Default
 
@@ -126,7 +127,7 @@ stages:
 
   # Stage 2: Deploy to AKS
   - stage: DeployHosted
-    displayName: Deploy to AKS (hosted agent)
+    displayName: Deploy to AKS (self-hosted agent)
     dependsOn: Build
     condition: |
       and(
@@ -152,7 +153,7 @@ stages:
         value: $[ stageDependencies.Build.BuildImage.outputs['build_step.IMAGE_TAG'] ]
     jobs:
       - job: DeployHosted
-        displayName: Helm deploy (hosted)
+        displayName: Helm deploy (self-hosted)
         steps:
           - checkout: self
             fetchDepth: 1
@@ -188,6 +189,11 @@ stages:
             displayName: Install Helm
             inputs:
               helmVersionToInstall: v3.15.4
+
+          - task: KubectlInstaller@0
+            displayName: Install kubectl
+            inputs:
+              kubectlVersion: 'latest'
 
           - task: AzureCLI@2
             displayName: Deploy Helm chart to AKS
