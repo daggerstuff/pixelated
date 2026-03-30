@@ -107,6 +107,20 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
         color: #f8fafc;
       }
 
+      .site-shell {
+        width: 100%;
+        max-width: 72rem;
+        margin-inline: auto;
+      }
+
+      .site-shell--wide {
+        max-width: 80rem;
+      }
+
+      .site-shell--narrow {
+        max-width: 56rem;
+      }
+
       /* Ensure dark mode is applied */
       html.dark {
         --c-bg: #0f172a;
@@ -135,7 +149,7 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     {showNavBar && <Navbar />}
 
     <!-- Main -->
-    <main id="main" class="flex-grow w-full px-7 py-10 pt-24">
+    <main id="main" class="flex-grow w-full px-6 py-10 pt-24 sm:px-7">
       <!-- Content -->
       <slot />
       <!-- Share -->
@@ -181,6 +195,5 @@ if (hasCustomCursor) style['--external-link-cursor'] = cursorType
     <!-- Vercel Speed Insights and Analytics -->
     <SpeedInsights />
     <Analytics />
-
   </body>
 </html>

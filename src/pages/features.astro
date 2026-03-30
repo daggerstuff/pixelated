@@ -4,82 +4,82 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const coreFeatures = [
   {
-    category: 'CRISIS TRAINING',
+    category: 'CRISIS PRACTICE',
     icon: '⚠',
     features: [
       {
         name: 'Suicidal Ideation Scenarios',
         description:
-          'Practice assessment and intervention with AI clients presenting various levels of suicidal risk.',
-        metric: '300% faster competency',
+          'Practice assessment, de-escalation, and intervention with AI patients presenting different levels of suicidal risk.',
+        metric: 'High-stakes rehearsal',
         status: 'ACTIVE',
       },
       {
         name: 'Psychotic Episode Management',
         description:
-          'Learn to navigate delusions, hallucinations, and disorganized thinking safely.',
-        metric: 'Zero harm incidents',
+          'Rehearse how to respond to delusions, hallucinations, and disorganized thinking without relying on a generic script.',
+        metric: 'Stabilization practice',
         status: 'ACTIVE',
       },
       {
         name: 'Acute Trauma Response',
         description:
-          'Handle fresh trauma presentations with appropriate stabilization techniques.',
-        metric: '95% confidence boost',
+          'Handle fresh trauma presentations with grounding, pacing, and stabilization techniques that can be repeated safely.',
+        metric: 'Rupture-aware coaching',
         status: 'ACTIVE',
       },
     ],
   },
   {
-    category: 'BIAS DETECTION',
+    category: 'FEEDBACK & BIAS CUES',
     icon: '⚡',
     features: [
       {
         name: 'Real-Time Cultural Analysis',
         description:
-          'Instant feedback on cultural assumptions and biases during therapy sessions.',
-        metric: '200+ patterns detected',
+          'Surface cultural assumptions and blind spots while the conversation is still fresh enough to learn from.',
+        metric: 'Immediate review',
         status: 'ACTIVE',
       },
       {
         name: 'Microaggression Identification',
         description:
-          'Catch subtle biases that could harm therapeutic relationships.',
-        metric: '78% bias reduction',
+          'Catch subtle phrasing and response patterns that could damage therapeutic trust.',
+        metric: 'Relationship protection',
         status: 'ACTIVE',
       },
       {
         name: 'Inclusive Language Coaching',
         description:
-          'Learn culturally appropriate language for diverse client populations.',
-        metric: '89% improvement',
+          'Train more inclusive language choices across diverse client populations and presentations.',
+        metric: 'Clearer communication',
         status: 'ACTIVE',
       },
     ],
   },
   {
-    category: 'DIAGNOSTIC TRAINING',
+    category: 'ASSESSMENT & DECISION-MAKING',
     icon: '🎯',
     features: [
       {
         name: 'Differential Diagnosis Practice',
         description:
-          'Complex cases requiring careful diagnostic consideration and ruling out alternatives.',
-        metric: '85% accuracy boost',
+          'Work through cases that require careful formulation, uncertainty management, and ruling out alternatives.',
+        metric: 'Structured reasoning',
         status: 'ACTIVE',
       },
       {
         name: 'Comorbidity Recognition',
         description:
-          'Identify multiple co-occurring conditions in realistic client presentations.',
-        metric: '92% detection rate',
+          'Identify multiple co-occurring conditions in realistic client presentations instead of simplified textbook cases.',
+        metric: 'Complex case review',
         status: 'ACTIVE',
       },
       {
         name: 'Assessment Tool Mastery',
         description:
-          'Practice with standardized assessments and learn proper administration.',
-        metric: 'Complete coverage',
+          'Practice how structured assessments fit into live sessions and when they meaningfully change the conversation.',
+        metric: 'Workflow alignment',
         status: 'ACTIVE',
       },
     ],
@@ -91,22 +91,22 @@ const coreFeatures = [
       {
         name: 'Zero-Knowledge Encryption',
         description:
-          'Your training sessions are encrypted before leaving your device. We cannot read them.',
-        metric: 'Military-grade AES-256',
+          'Training sessions are protected with privacy-first handling designed for sensitive mental health workflows.',
+        metric: 'Privacy-first design',
         status: 'ACTIVE',
       },
       {
         name: 'Homomorphic Computing',
         description:
-          'AI analyzes encrypted data without ever decrypting your conversations.',
-        metric: 'Invisible processing',
+          'Explore advanced privacy approaches that reduce exposure while still supporting useful analysis and review.',
+        metric: 'Protected analysis',
         status: 'ACTIVE',
       },
       {
-        name: 'HIPAA++ Compliance',
+        name: 'Operational Controls',
         description:
-          'Exceeds all healthcare privacy requirements with additional protections.',
-        metric: 'Beyond compliance',
+          'Support healthcare-oriented training environments with privacy, retention, and review controls that teams can evaluate directly.',
+        metric: 'Operational readiness',
         status: 'ACTIVE',
       },
     ],
@@ -115,25 +115,41 @@ const coreFeatures = [
 
 const platformStats = [
   {
-    value: '50,000+',
-    label: 'AI Personas',
-    description: 'Complete clinical spectrum',
+    value: 'Roleplay',
+    label: 'Scenario practice',
+    description: 'Rehearse difficult sessions safely',
   },
-  { value: '15+', label: 'Universities', description: 'Elite institutions' },
-  { value: '2,500+', label: 'Students', description: 'Successfully trained' },
-  { value: '0', label: 'Patient Harm', description: 'Perfect safety record' },
-  { value: '200+', label: 'Bias Patterns', description: 'Real-time detection' },
   {
-    value: '85%',
-    label: 'Accuracy Boost',
-    description: 'Diagnostic improvement',
+    value: 'Review',
+    label: 'Session feedback',
+    description: 'See what helped or escalated',
+  },
+  {
+    value: 'Bias',
+    label: 'Cultural cues',
+    description: 'Spot relational risk earlier',
+  },
+  {
+    value: 'Team',
+    label: 'Supervisor workflows',
+    description: 'Compare, coach, and repeat',
+  },
+  {
+    value: 'Privacy',
+    label: 'Protected training',
+    description: 'Built for sensitive practice',
+  },
+  {
+    value: 'Deploy',
+    label: 'Individual to enterprise',
+    description: 'Use solo or across a program',
   },
 ]
 ---
 
 <BaseLayout
   title="Features - AI Therapy Training Platform"
-  description="Comprehensive therapy training features including crisis intervention, bias detection, diagnostic training, and military-grade security."
+  description="Explore the simulation, feedback, supervision, and privacy features inside the Pixelated Empathy training platform."
 >
   <!-- Hero Section -->
   <section class="brutalist-section">
@@ -141,30 +157,30 @@ const platformStats = [
       <div class="text-center mb-16">
         <div class="status-indicator status-indicator--online inline-flex mb-6">
           <div class="pulse-dot pulse-dot--green"></div>
-          <span class="font-bold">FULL FEATURE ACCESS</span>
+          <span class="font-bold">PLATFORM OVERVIEW</span>
         </div>
 
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
-          COMPLETE THERAPY
+          WHAT PIXELATED EMPATHY
           <br />
-          <span class="confidence-boost">TRAINING ARSENAL</span>
+          <span class="confidence-boost">ACTUALLY INCLUDES</span>
         </h1>
 
         <p class="text-xl text-gray-300 mb-8 max-w-4xl mx-auto">
-          Every tool you need to master therapy. From crisis interventions to
-          cultural competency, we've built the most comprehensive training
-          platform ever created.
+          Pixelated Empathy gives therapy teams an AI roleplay environment for
+          crisis practice, structured feedback, supervision workflows, and
+          privacy-aware training operations.
         </p>
 
         <div class="flex flex-wrap justify-center gap-4 mb-12">
           <div class="brutalist-badge brutalist-badge--success">
-            ✓ EVIDENCE-BASED
+            ✓ AI ROLEPLAY
           </div>
           <div class="brutalist-badge brutalist-badge--info">
-            ✓ CLINICALLY VALIDATED
+            ✓ FEEDBACK LOOPS
           </div>
           <div class="brutalist-badge brutalist-badge--warning">
-            ✓ CONTINUOUSLY UPDATED
+            ✓ TEAM TRAINING
           </div>
         </div>
       </div>
@@ -176,11 +192,12 @@ const platformStats = [
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          BY THE
-          <span class="text-blue-400">NUMBERS</span>
+          HOW TEAMS
+          <span class="text-blue-400">USE IT</span>
         </h2>
         <p class="text-lg text-gray-300">
-          Measurable impact across every dimension of therapy training.
+          The platform is designed around repeatable training workflows, not a
+          one-off demo experience.
         </p>
       </div>
 
@@ -207,8 +224,9 @@ const platformStats = [
           <span class="confidence-boost">CAPABILITIES</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Four pillars of comprehensive therapy training, each with specialized
-          sub-modules.
+          The product is organized around the four things therapy teams need
+          most: realistic practice, meaningful review, safer decision-making,
+          and privacy-aware deployment.
         </p>
       </div>
 
@@ -272,11 +290,12 @@ const platformStats = [
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          TECHNICAL
-          <span class="text-blue-400">SPECIFICATIONS</span>
+          PLATFORM
+          <span class="text-blue-400">FOUNDATIONS</span>
         </h2>
         <p class="text-lg text-gray-300">
-          Built on cutting-edge technology with enterprise-grade reliability.
+          The supporting stack is built to make training credible, reviewable,
+          and deployable inside real organizations.
         </p>
       </div>
 
@@ -349,12 +368,12 @@ const platformStats = [
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          SEAMLESS
-          <span class="confidence-boost">INTEGRATION</span>
+          HOW IT FITS
+          <span class="confidence-boost">INTO TRAINING PROGRAMS</span>
         </h2>
         <p class="text-lg text-gray-300 max-w-3xl mx-auto">
-          Fits into your existing curriculum with minimal disruption and maximum
-          impact.
+          Use it alongside coursework, supervision, faculty review, or internal
+          training without rebuilding your entire program around the tool.
         </p>
       </div>
 
@@ -417,7 +436,7 @@ const platformStats = [
             <div
               class="flex items-center justify-between p-4 bg-gray-800 border border-gray-700"
             >
-              <span class="font-medium">24/7 Technical Support</span>
+              <span class="font-medium">Implementation Support</span>
               <span class="brutalist-badge brutalist-badge--success"
                 >INCLUDED</span
               >
@@ -465,11 +484,12 @@ const platformStats = [
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          WHY CHOOSE
-          <span class="confidence-boost">PIXELATED EMPATHY</span>
+          WHY TEAMS MOVE
+          <span class="confidence-boost">BEYOND AD HOC ROLEPLAY</span>
         </h2>
         <p class="text-lg text-gray-300">
-          See how we compare to traditional training methods and competitors.
+          Structured simulation creates repeatability, clearer feedback, and
+          less guesswork than one-off classroom exercises.
         </p>
       </div>
 
@@ -532,14 +552,14 @@ const platformStats = [
         <div class="text-5xl mb-6 text-green-400">🚀</div>
 
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
-          READY TO UPGRADE
+          READY TO SEE
           <br />
-          <span class="confidence-boost">YOUR PROGRAM?</span>
+          <span class="confidence-boost">THE WORKFLOW?</span>
         </h2>
 
         <p class="text-xl text-gray-300 mb-8">
-          Join the institutions setting new standards in therapy education. Your
-          students deserve the best training available.
+          Explore the demos, review the platform structure, and decide whether
+          Pixelated Empathy fits your supervision or training program.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -559,13 +579,13 @@ const platformStats = [
 
         <div class="flex flex-wrap justify-center gap-4 text-sm">
           <span class="brutalist-badge brutalist-badge--success"
-            >✓ 30-DAY TRIAL</span
+            >✓ DEMO ACCESS</span
           >
           <span class="brutalist-badge brutalist-badge--info"
-            >✓ FULL SUPPORT</span
+            >✓ CONTACT SALES</span
           >
           <span class="brutalist-badge brutalist-badge--warning"
-            >✓ MONEY-BACK GUARANTEE</span
+            >✓ TEAM DEPLOYMENT OPTIONS</span
           >
         </div>
       </div>

@@ -4,100 +4,255 @@
  * High-impact mission statement
  */
 export interface Props {
-  title?: string;
-  subtitle?: string;
-  primaryCTA?: { text: string; href: string };
-  secondaryCTA?: { text: string; href: string };
-  ctaPrimary?: { text: string; href: string };
-  ctaSecondary?: { text: string; href: string };
-  stats?: Array<{ value: string; label: string }>;
+  title?: string
+  subtitle?: string
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
+  ctaPrimary?: { text: string; href: string }
+  ctaSecondary?: { text: string; href: string }
+  stats?: Array<{ value: string; label: string }>
 }
 
 const {
-  title = "Where Emotional Intelligence Meets Artificial Precision",
-  subtitle = "Master complex therapeutic dialogues in high-fidelity, risk-free simulations. Transform difficult conversations into clinical mastery with the Empathy Gym™.",
+  title = 'AI Roleplay Training for Therapists',
+  subtitle = 'Practice difficult clinical conversations with realistic AI patients, structured feedback, and repeatable supervision workflows.',
   primaryCTA,
   secondaryCTA,
   ctaPrimary,
   ctaSecondary,
   stats,
-} = Astro.props;
+} = Astro.props
 
 // Support both prop naming conventions
-const primaryAction = primaryCTA || ctaPrimary || { text: "Enter the Gym", href: "/training" };
-const secondaryAction = secondaryCTA || ctaSecondary || { text: "Explore Intelligence", href: "/ai-engine" };
+const primaryAction = primaryCTA ||
+  ctaPrimary || { text: 'Enter the Gym', href: '/training' }
+const secondaryAction = secondaryCTA ||
+  ctaSecondary || { text: 'Explore Intelligence', href: '/ai-engine' }
 ---
 
-<section class="hero relative min-h-screen flex items-center pt-20 overflow-hidden" data-component="brutalist-hero">
+<section
+  class="hero relative min-h-screen flex items-center pt-20 overflow-hidden"
+  data-component="brutalist-hero"
+>
   <!-- Background Layer -->
   <div class="absolute inset-0 z-0">
     <div class="absolute inset-0 bg-void"></div>
-    <div class="absolute inset-0 opacity-40 mix-blend-screen grayscale hover:grayscale-0 transition-all duration-ultra brightness-50">
-      <img src="/assets/hero-bg.png" alt="Empathy Gym Background" class="w-full h-full object-cover" />
+    <div class="hero-atmosphere absolute inset-0 opacity-80">
+      <div class="hero-atmosphere__glow hero-atmosphere__glow--left"></div>
+      <div class="hero-atmosphere__glow hero-atmosphere__glow--right"></div>
+      <div class="hero-atmosphere__mesh"></div>
+      <div class="hero-atmosphere__grid"></div>
+      <div class="hero-atmosphere__scanline"></div>
     </div>
-<!-- Grain/Noise Overlay -->
-  <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);"></div>
+    <!-- Grain/Noise Overlay -->
+    <div
+      class="absolute inset-0 opacity-[0.03] pointer-events-none"
+      style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);"
+    >
+    </div>
     <!-- Radial Focal Glow -->
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"></div>
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"
+    >
+    </div>
   </div>
 
   <div class="container relative z-10">
     <div class="max-w-4xl">
       <!-- Tag/Status -->
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft"
+      >
         <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
-        <span class="text-[10px] font-mono uppercase tracking-widest text-accent-primary">Intelligence Engine Active // v2.4.0</span>
+        <span
+          class="text-[10px] font-mono uppercase tracking-widest text-accent-primary"
+          >AI Roleplay Platform // Therapist Training</span
+        >
       </div>
 
-      <h1 class="font-display font-black text-6xl md:text-8xl leading-tight mb-8 tracking-tighter text-white">
-        Architecting <span class="text-accent-primary">Empathy</span><br />
-        in the <span class="stark-outline">Code.</span>
+      <h1
+        class="font-display font-black text-6xl md:text-8xl leading-tight mb-8 tracking-tighter text-white"
+      >
+        {title}
       </h1>
 
-      <p class="text-xl md:text-2xl text-secondary max-w-2xl mb-12 leading-relaxed font-light">
+      <p
+        class="text-xl md:text-2xl text-secondary max-w-2xl mb-12 leading-relaxed font-light"
+      >
         {subtitle}
       </p>
 
       <div class="flex flex-wrap gap-6 items-center">
         <a href={primaryAction.href} class="btn-premium group">
           <span class="relative z-10">{primaryAction.text}</span>
-          <div class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"></div>
+          <div
+            class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"
+          >
+          </div>
         </a>
 
-        <a href={secondaryAction.href} class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline">
-          <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryAction.text}</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="transform group-hover:translate-x-2 transition-transform">
-            <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+        <a
+          href={secondaryAction.href}
+          class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline"
+        >
+          <span class="opacity-60 group-hover:opacity-100 transition-opacity"
+            >{secondaryAction.text}</span
+          >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            class="transform group-hover:translate-x-2 transition-transform"
+          >
+            <path
+              d="M5 12H19M19 12L13 6M19 12L13 18"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="square"></path>
           </svg>
         </a>
       </div>
 
       <!-- Stats Section -->
-      {stats && stats.length > 0 && (
-        <div class="stats-grid mt-16 pt-8" style="border-top: var(--border-primary);">
-          <div class="grid grid-cols-3 gap-8">
-            {stats.map((stat) => (
-              <div class="stat-item text-center md:text-left">
-                <span class="stat-value font-display font-black text-4xl md:text-5xl text-accent-primary block">{stat.value}</span>
-                <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">{stat.label}</span>
-              </div>
-            ))}
+      {
+        stats && stats.length > 0 && (
+          <div
+            class="stats-grid mt-16 pt-8"
+            style="border-top: var(--border-primary);"
+          >
+            <div class="grid grid-cols-3 gap-8">
+              {stats.map((stat) => (
+                <div class="stat-item text-center md:text-left">
+                  <span class="stat-value font-display font-black text-4xl md:text-5xl text-accent-primary block">
+                    {stat.value}
+                  </span>
+                  <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
     </div>
   </div>
 
   <!-- Perspective Grid Footer -->
-  <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"></div>
+  <div
+    class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"
+  >
+  </div>
 </section>
 
 <style>
+  .hero {
+    background:
+      radial-gradient(circle at top, rgba(34, 197, 94, 0.08), transparent 36%),
+      linear-gradient(
+        180deg,
+        rgba(2, 6, 23, 0.88) 0%,
+        rgba(2, 6, 23, 0.97) 100%
+      );
+  }
+
+  .hero-atmosphere {
+    overflow: hidden;
+  }
+
+  .hero-atmosphere__glow {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(90px);
+    opacity: 0.55;
+    transform: translateZ(0);
+  }
+
+  .hero-atmosphere__glow--left {
+    top: 8%;
+    left: -8%;
+    width: min(44rem, 60vw);
+    height: min(44rem, 60vw);
+    background: radial-gradient(
+      circle,
+      rgba(16, 185, 129, 0.24) 0%,
+      rgba(16, 185, 129, 0.08) 42%,
+      transparent 72%
+    );
+  }
+
+  .hero-atmosphere__glow--right {
+    right: -6%;
+    bottom: 4%;
+    width: min(40rem, 52vw);
+    height: min(40rem, 52vw);
+    background: radial-gradient(
+      circle,
+      rgba(56, 189, 248, 0.18) 0%,
+      rgba(14, 165, 233, 0.08) 45%,
+      transparent 74%
+    );
+  }
+
+  .hero-atmosphere__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        115deg,
+        rgba(15, 23, 42, 0.08) 0%,
+        rgba(15, 23, 42, 0) 42%
+      ),
+      url('/assets/hero-bg.svg') center / cover no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.95;
+    transform: scale(1.08);
+  }
+
+  .hero-atmosphere__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
+    background-position: center center;
+    background-size: 72px 72px;
+    mask-image: radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.9),
+      transparent 82%
+    );
+    opacity: 0.16;
+  }
+
+  .hero-atmosphere__scanline {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.05),
+        transparent 22%,
+        transparent 78%,
+        rgba(255, 255, 255, 0.03)
+      ),
+      repeating-linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.035) 0,
+        rgba(255, 255, 255, 0.035) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+    opacity: 0.08;
+    mix-blend-mode: soft-light;
+  }
+
   .stark-outline {
     -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
     color: transparent;
   }
-  
+
   .btn-premium {
     position: relative;
     padding: 1.25rem 2.5rem;
@@ -114,9 +269,20 @@ const secondaryAction = secondaryCTA || ctaSecondary || { text: "Explore Intelli
     display: inline-block;
     transition: color 0.3s ease;
   }
-  
+
   .btn-premium:hover {
     color: black;
   }
-</style>
 
+  @media (max-width: 768px) {
+    .hero-atmosphere__mesh {
+      transform: scale(1.18);
+      background-position: 56% center;
+    }
+
+    .hero-atmosphere__grid {
+      background-size: 44px 44px;
+      opacity: 0.11;
+    }
+  }
+</style>

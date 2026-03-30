@@ -4,37 +4,57 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 
 <BaseLayout
   title="Trust Center"
-  description="Security, privacy, and compliance overview."
+  description="Security, privacy, and operational overview for Pixelated Empathy."
 >
-  <section class="brutalist-section">
-    <div class="brutalist-container">
+  <section class="brutalist-section py-20">
+    <div class="site-shell site-shell--narrow">
       <h1 class="brutalist-heading text-4xl md:text-6xl mb-6">Trust Center</h1>
       <p class="text-gray-300 max-w-3xl mb-10">
-        Zero‑knowledge architecture, encryption at rest and in transit, optional
-        audit logs, and data‑retention controls. Contact us for security
-        documentation.
+        Pixelated Empathy is being built for sensitive training workflows. This
+        page describes the areas we focus on most when teams ask about security,
+        privacy, and operational controls.
       </p>
 
-      <div class="brutalist-grid brutalist-grid--3">
+      <div class="grid gap-6 md:grid-cols-3">
         <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-2">Zero‑knowledge</h3>
+          <h3 class="brutalist-subheading mb-3">Privacy</h3>
           <p class="text-sm text-gray-400">
-            Sessions are encrypted end‑to‑end. We cannot read your content.
+            Transcript handling, retention choices, and review workflows are
+            product decisions, not just policy footnotes.
           </p>
         </div>
         <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-2">Compliance</h3>
+          <h3 class="brutalist-subheading mb-3">Security</h3>
           <p class="text-sm text-gray-400">
-            HIPAA, FERPA practices; SOC 2 processes; BAAs on request.
+            We design around encryption, access control, auditability, and
+            deployment choices that fit more sensitive environments.
           </p>
         </div>
         <div class="brutalist-card">
-          <h3 class="brutalist-subheading mb-2">Data retention</h3>
+          <h3 class="brutalist-subheading mb-3">Operational Review</h3>
           <p class="text-sm text-gray-400">
-            No training data reuse without explicit consent. Export & delete at
-            any time.
+            Teams evaluating the platform can ask for documentation and discuss
+            the controls they need before rollout.
           </p>
         </div>
+      </div>
+
+      <div class="brutalist-card mt-8">
+        <h2 class="text-2xl font-semibold text-white mb-4">
+          Common evaluation topics
+        </h2>
+        <ul class="space-y-3 text-gray-300">
+          <li>Encryption and key management expectations</li>
+          <li>Retention, export, and deletion workflows</li>
+          <li>Access control for supervisors, trainees, and administrators</li>
+          <li>Deployment requirements for more regulated environments</li>
+        </ul>
+        <a
+          href="/contact"
+          class="inline-flex mt-6 brutalist-button brutalist-button--primary"
+        >
+          Request security information
+        </a>
       </div>
     </div>
   </section>
