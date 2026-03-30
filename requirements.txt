@@ -14,7 +14,7 @@ aiofiles==25.1.0
     # via ngcsdk
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.3
+aiohttp==3.13.4
     # via
     #   pixelated (pyproject.toml)
     #   fsspec
@@ -103,12 +103,12 @@ blinker==1.9.0
     #   flask-socketio
 blis==1.3.3
     # via thinc
-boto3==1.42.77
+boto3==1.42.78
     # via
     #   pixelated (pyproject.toml)
     #   ngcsdk
     #   pydantic-ai-slim
-botocore==1.42.77
+botocore==1.42.78
     # via
     #   boto3
     #   ngcsdk
@@ -368,7 +368,7 @@ gradient-adk==0.2.11
     # via pixelated (pyproject.toml)
 greenlet==3.3.2
     # via sqlalchemy
-griffelib==2.0.1
+griffelib==2.0.2
     # via pydantic-ai-slim
 groq==1.1.2
     # via pydantic-ai-slim
@@ -549,7 +549,7 @@ lance-namespace-urllib3-client==0.6.1
     # via lance-namespace
 lancedb==0.30.1
     # via pixelated (pyproject.toml)
-langchain-core==1.2.22
+langchain-core==1.2.23
     # via
     #   langchain-text-splitters
     #   langgraph
@@ -626,7 +626,7 @@ mdurl==0.1.2
     # via markdown-it-py
 mem0-mcp-server==0.2.1
     # via pixelated (pyproject.toml)
-mem0ai==1.0.8
+mem0ai==1.0.9
     # via
     #   pixelated (pyproject.toml)
     #   mem0-mcp-server
@@ -702,7 +702,7 @@ numba==0.64.0
     #   librosa
     #   openai-whisper
     #   shap
-numpy==2.4.3
+numpy==2.4.4
     # via
     #   pixelated (pyproject.toml)
     #   accelerate
@@ -1581,7 +1581,7 @@ soundfile==0.13.1
     # via librosa
 soxr==1.0.0
     # via librosa
-spacy==3.8.13
+spacy==3.8.14
     # via pixelated (pyproject.toml)
 spacy-legacy==3.0.12
     # via spacy
@@ -1594,7 +1594,7 @@ srsly==2.5.3
     #   spacy
     #   thinc
     #   weasel
-sse-starlette==3.3.3
+sse-starlette==3.3.4
     # via mcp
 standard-aifc==3.13.0
     # via
