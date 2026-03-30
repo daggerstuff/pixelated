@@ -466,9 +466,6 @@ importers:
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
-      vite:
-        specifier: 7.3.1
-        version: 7.3.1(@types/node@25.5.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
       vue:
         specifier: ^3.5.31
         version: 3.5.31(typescript@5.9.3)
@@ -833,6 +830,9 @@ importers:
       viewerjs:
         specifier: ^1.11.7
         version: 1.11.7
+      vite:
+        specifier: 7.3.1
+        version: 7.3.1(@types/node@25.5.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
       vite-tsconfig-paths:
         specifier: ^6.1.1
         version: 6.1.1(typescript@5.9.3)(vite@7.3.1(@types/node@25.5.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
