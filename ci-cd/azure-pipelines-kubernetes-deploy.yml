@@ -6,7 +6,7 @@ pr: none
 
 # To bypass the "no free minutes" error, the agent MUST be moved to this non-hosted pool.
 pool:
-  name: azplocal
+  name: Default
 
 parameters:
   - name: environment
