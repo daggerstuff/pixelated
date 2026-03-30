@@ -915,7 +915,7 @@ opentelemetry-instrumentation-alephalpha==0.53.3
     # via traceloop-sdk
 opentelemetry-instrumentation-anthropic==0.53.3
     # via traceloop-sdk
-opentelemetry-instrumentation-bedrock==0.53.3
+opentelemetry-instrumentation-bedrock==0.55.0
     # via traceloop-sdk
 opentelemetry-instrumentation-chromadb==0.53.3
     # via traceloop-sdk
