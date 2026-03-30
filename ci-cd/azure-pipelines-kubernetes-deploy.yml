@@ -1,6 +1,27 @@
 name: pixelated-aks-$(Date:yyyyMMdd)-$(Rev:.r)
 
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+      - master
+      - staging
+  paths:
+    include:
+      - src/**
+      - ai/**
+      - docker/**
+      - scripts/devops/**
+      - ci-cd/azure-pipelines-kubernetes-deploy.yml
+      - ai/infrastructure/helm/**
+      - k8s/**
+      - package.json
+      - pnpm-lock.yaml
+      - .gitmodules
+    exclude:
+      - docs/**
+      - '**/*.md'
 
 pr: none
 
