@@ -809,7 +809,7 @@ openai-whisper==20250625
     # via pixelated (pyproject.toml)
 openapi-pydantic==0.5.1
     # via fastmcp
-opentelemetry-api==1.39.1
+opentelemetry-api==1.40.0
     # via
     #   fastmcp
     #   mistralai
