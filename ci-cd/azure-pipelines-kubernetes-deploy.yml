@@ -4,6 +4,9 @@ trigger: none
 
 pr: none
 
+pool:
+  name: Hosted
+
 parameters:
   - name: environment
     displayName: 'Environment'
@@ -35,8 +38,6 @@ stages:
     jobs:
       - job: BuildImage
         displayName: Build image and push to ACR
-        pool:
-          name: Hosted
         steps:
           - checkout: self
             fetchDepth: 0
@@ -151,8 +152,6 @@ stages:
     jobs:
       - job: DeployHosted
         displayName: Helm deploy (hosted)
-        pool:
-          name: Hosted
         steps:
           - checkout: self
             fetchDepth: 1
