@@ -114,13 +114,6 @@ resolve_values_file() {
   return 1
 }
 
-generate_secret_value() {
-  python3 - <<'PY'
-import secrets
-print(secrets.token_urlsafe(32))
-PY
-}
-
 get_secret_key_value() {
   local namespace="$1"
   local secret_name="$2"
@@ -129,72 +122,88 @@ get_secret_key_value() {
   kubectl -n "${namespace}" get secret "${secret_name}" -o "jsonpath={.data.${key_name}}" 2>/dev/null | base64 --decode 2>/dev/null || true
 }
 
-extract_postgres_password_from_url() {
-  local database_url="$1"
-  printf '%s' "${database_url}" | sed -n 's#^postgresql://postgres:\([^@]*\)@.*#\1#p'
-}
-
-extract_redis_password_from_url() {
-  local redis_url="$1"
-  printf '%s' "${redis_url}" | sed -n 's#^redis://:\([^@]*\)@.*#\1#p'
-}
-
-resolve_or_generate_value() {
-  local current_value="$1"
-  if [ -n "${current_value}" ]; then
-    printf '%s' "${current_value}"
-    return 0
-  fi
-
-  generate_secret_value
-}
-
-resolve_runtime_credentials() {
+fetch_existing_runtime_inputs() {
   local namespace="$1"
   local release_name="$2"
   local app_secret_name="${release_name}-secrets"
   local postgres_secret_name="${release_name}-postgresql"
   local redis_secret_name="${release_name}-redis"
-  local postgres_password=""
-  local redis_password=""
-  local jwt_secret=""
-  local encryption_key=""
-  local existing_database_url=""
-  local existing_redis_url=""
 
-  existing_database_url="$(get_secret_key_value "${namespace}" "${app_secret_name}" "database-url")"
-  existing_redis_url="$(get_secret_key_value "${namespace}" "${app_secret_name}" "redis-url")"
+  EXISTING_DATABASE_URL="$(get_secret_key_value "${namespace}" "${app_secret_name}" "database-url")"
+  EXISTING_REDIS_URL="$(get_secret_key_value "${namespace}" "${app_secret_name}" "redis-url")"
+  EXISTING_JWT_SECRET="$(get_secret_key_value "${namespace}" "${app_secret_name}" "jwt-secret")"
+  EXISTING_ENCRYPTION_KEY="$(get_secret_key_value "${namespace}" "${app_secret_name}" "encryption-key")"
+  EXISTING_POSTGRES_PASSWORD="$(get_secret_key_value "${namespace}" "${postgres_secret_name}" "postgres-password")"
+  EXISTING_REDIS_PASSWORD="$(get_secret_key_value "${namespace}" "${redis_secret_name}" "redis-password")"
+}
 
-  postgres_password="$(get_secret_key_value "${namespace}" "${postgres_secret_name}" "postgres-password")"
-  if [ -z "${postgres_password}" ]; then
-    postgres_password="$(extract_postgres_password_from_url "${existing_database_url}")"
-  fi
-  postgres_password="$(resolve_or_generate_value "${postgres_password}")"
+resolve_runtime_credentials() {
+  local release_name="$1"
+  local resolved_values=()
 
-  redis_password="$(get_secret_key_value "${namespace}" "${redis_secret_name}" "redis-password")"
-  if [ -z "${redis_password}" ]; then
-    redis_password="$(extract_redis_password_from_url "${existing_redis_url}")"
-  fi
-  redis_password="$(resolve_or_generate_value "${redis_password}")"
+  mapfile -d '' -t resolved_values < <(
+    printf '%s\0%s\0%s\0%s\0%s\0%s' \
+      "${EXISTING_POSTGRES_PASSWORD}" \
+      "${EXISTING_DATABASE_URL}" \
+      "${EXISTING_REDIS_PASSWORD}" \
+      "${EXISTING_REDIS_URL}" \
+      "${EXISTING_JWT_SECRET}" \
+      "${EXISTING_ENCRYPTION_KEY}" | \
+      python3 -c '
+from urllib.parse import urlsplit
+import secrets
+import sys
 
-  jwt_secret="$(get_secret_key_value "${namespace}" "${app_secret_name}" "jwt-secret")"
-  jwt_secret="$(resolve_or_generate_value "${jwt_secret}")"
+parts = sys.stdin.buffer.read().split(b"\0")
+parts += [b""] * (6 - len(parts))
+postgres_secret, database_url, redis_secret, redis_url, jwt_secret, encryption_key = [
+    item.decode() for item in parts[:6]
+]
 
-  encryption_key="$(get_secret_key_value "${namespace}" "${app_secret_name}" "encryption-key")"
-  encryption_key="$(resolve_or_generate_value "${encryption_key}")"
+def resolve_url_password(url: str):
+    if not url:
+        return None
+    parsed = urlsplit(url)
+    if parsed.password is None:
+        return ""
+    return parsed.password
 
-  POSTGRES_RUNTIME_PASSWORD="${postgres_password}"
-  REDIS_RUNTIME_PASSWORD="${redis_password}"
-  APP_DATABASE_URL="postgresql://postgres:${postgres_password}@${release_name}-postgresql:5432/pixelated_empathy"
-  APP_REDIS_URL="redis://:${redis_password}@${release_name}-redis-master:6379"
-  APP_JWT_SECRET="${jwt_secret}"
-  APP_ENCRYPTION_KEY="${encryption_key}"
+postgres_password = postgres_secret or resolve_url_password(database_url)
+if postgres_password is None:
+    postgres_password = secrets.token_urlsafe(32)
+
+redis_password = redis_secret or resolve_url_password(redis_url)
+if redis_password is None:
+    redis_password = secrets.token_urlsafe(32)
+
+jwt_value = jwt_secret or secrets.token_urlsafe(32)
+encryption_value = encryption_key or secrets.token_urlsafe(32)
+
+sys.stdout.buffer.write(postgres_password.encode())
+sys.stdout.buffer.write(b"\0")
+sys.stdout.buffer.write(redis_password.encode())
+sys.stdout.buffer.write(b"\0")
+sys.stdout.buffer.write(jwt_value.encode())
+sys.stdout.buffer.write(b"\0")
+sys.stdout.buffer.write(encryption_value.encode())
+'
+  )
+
+  POSTGRES_RUNTIME_PASSWORD="${resolved_values[0]}"
+  REDIS_RUNTIME_PASSWORD="${resolved_values[1]}"
+  APP_JWT_SECRET="${resolved_values[2]}"
+  APP_ENCRYPTION_KEY="${resolved_values[3]}"
+
+  APP_DATABASE_URL="postgresql://postgres:${POSTGRES_RUNTIME_PASSWORD}@${release_name}-postgresql:5432/pixelated_empathy"
+  APP_REDIS_URL="redis://:${REDIS_RUNTIME_PASSWORD}@${release_name}-redis-master:6379"
 }
 
 create_runtime_values_file() {
   local release_name="$1"
 
+  umask 077
   RUNTIME_VALUES_FILE="$(mktemp)"
+  chmod 600 "${RUNTIME_VALUES_FILE}"
   cat > "${RUNTIME_VALUES_FILE}" <<EOF
 app:
   secrets:
@@ -429,9 +438,10 @@ set +e
 # We use --cascade=orphan to keep the pods running while the controller is replaced by Helm.
 echo "🧹 Checking for existing statefulsets to avoid immutable field conflicts..."
 clear_stale_pending_release "${RELEASE_NAME}" "${NAMESPACE}"
-resolve_runtime_credentials "${NAMESPACE}" "${RELEASE_NAME}"
-create_runtime_values_file "${RELEASE_NAME}"
 trap cleanup_runtime_values_file EXIT
+fetch_existing_runtime_inputs "${NAMESPACE}" "${RELEASE_NAME}"
+resolve_runtime_credentials "${RELEASE_NAME}"
+create_runtime_values_file "${RELEASE_NAME}"
 for sts in "${RELEASE_NAME}-postgresql" "${RELEASE_NAME}-redis-master" "${RELEASE_NAME}-redis-replicas"; do
   if kubectl get statefulset "$sts" -n "${NAMESPACE}" >/dev/null 2>&1; then
     echo "   Removing statefulset $sts (keeping pods)..."
