@@ -196,17 +196,6 @@ stages:
                 echo "✅ GITHUB_PAT is present"
 
           - task: Bash@3
-            displayName: 'Initialize CI-aware submodules'
-            env:
-              GITHUB_PAT: $(GITHUB_PAT)
-              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-            inputs:
-              targetType: 'inline'
-              script: |
-                set -euo pipefail
-                bash scripts/devops/init-submodules.sh
-
-          - task: Bash@3
             displayName: Ensure unzip is available
             inputs:
               targetType: 'inline'
@@ -236,6 +225,17 @@ stages:
                   echo "##vso[task.logissue type=error]Unable to install unzip automatically on this self-hosted agent."
                   exit 1
                 fi
+
+          - task: Bash@3
+            displayName: 'Initialize CI-aware submodules'
+            env:
+              GITHUB_PAT: $(GITHUB_PAT)
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+                bash scripts/devops/init-submodules.sh
 
           - task: HelmInstaller@1
             displayName: Install Helm
