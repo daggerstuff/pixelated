@@ -4,11 +4,10 @@
  * Minimal navigation with terminal-like precision
  */
 export interface Props {
-  logo?: string
   title?: string
 }
 
-const { logo = '/favicon.svg', title = 'Pixelated Empathy' } = Astro.props
+const { title = 'Pixelated Empathy' } = Astro.props
 const [titlePrimary = 'Pixelated', ...titleRest] = title.trim().split(/\s+/)
 const titleSecondary = titleRest.join(' ')
 
@@ -25,26 +24,15 @@ const navItems = [
   class="header bg-void border-b border-primary py-4 sticky top-0 z-sticky glass"
 >
   <div class="header-container flex justify-between items-center">
-    <!-- Logo Section -->
+    <!-- Brand -->
     <a href="/" class="flex items-center gap-3 group no-underline">
-      <div class="logo-container relative">
-        <img
-          src={logo}
-          alt={title}
-          class="logo-img h-10 w-10"
-          width="40"
-          height="40"
-          loading="eager"
-          decoding="async"
-        />
-        <div
-          class="absolute -inset-1 bg-accent-primary opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-normal"
-        >
-        </div>
+      <div class="brand-emblem" aria-hidden="true">
+        <span class="brand-emblem__pixel brand-emblem__pixel--a"></span>
+        <span class="brand-emblem__pixel brand-emblem__pixel--b"></span>
+        <span class="brand-emblem__pixel brand-emblem__pixel--c"></span>
+        <span class="brand-emblem__pixel brand-emblem__pixel--d"></span>
       </div>
-      <span
-        class="brand-mark font-display font-bold text-xl tracking-tight text-white transition-colors"
-      >
+      <span class="brand-mark text-white transition-colors">
         <span class="brand-mark__primary">{titlePrimary}</span>
         {
           titleSecondary && (
@@ -155,16 +143,33 @@ const navItems = [
     color: var(--text-primary);
   }
 
-  .logo-img {
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
   .brand-mark {
     display: inline-flex;
-    align-items: baseline;
-    gap: 0.4rem;
+    flex-direction: column;
+    gap: 0.1rem;
     white-space: nowrap;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  .brand-mark__primary,
+  .brand-mark__secondary {
+    display: block;
+    font-family: var(--font-display);
+    letter-spacing: -0.05em;
+  }
+
+  .brand-mark__primary {
+    font-size: clamp(1.1rem, 1rem + 0.5vw, 1.5rem);
+    font-weight: 700;
+  }
+
+  .brand-mark__secondary {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    color: rgba(255, 255, 255, 0.68);
+    margin-left: 0.08rem;
   }
 
   .group:hover .brand-mark__primary,
@@ -172,8 +177,47 @@ const navItems = [
     color: var(--accent-primary);
   }
 
-  .brand-mark__secondary {
-    color: var(--accent-primary);
+  .brand-emblem {
+    position: relative;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
+      radial-gradient(circle at 30% 30%, rgba(0, 255, 136, 0.18), transparent 70%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 0 1px rgba(0, 255, 136, 0.04);
+  }
+
+  .brand-emblem__pixel {
+    position: absolute;
+    width: 0.58rem;
+    height: 0.58rem;
+    background: var(--accent-primary);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.25);
+  }
+
+  .brand-emblem__pixel--a {
+    top: 0.45rem;
+    left: 0.45rem;
+  }
+
+  .brand-emblem__pixel--b {
+    top: 0.45rem;
+    right: 0.45rem;
+    opacity: 0.35;
+  }
+
+  .brand-emblem__pixel--c {
+    bottom: 0.45rem;
+    left: 0.9rem;
+  }
+
+  .brand-emblem__pixel--d {
+    bottom: 0.45rem;
+    right: 0.45rem;
+    opacity: 0.7;
   }
 
   /* Navigation */
@@ -335,22 +379,20 @@ const navItems = [
     justify-content: center;
   }
 
-  /* Logo styles */
-  .logo-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  @media (max-width: 767px) {
+    .brand-mark__primary {
+      font-size: 1rem;
+    }
 
-  .logo-img {
-    height: 2.5rem;
-    width: auto;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-  }
+    .brand-mark__secondary {
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+    }
 
-  .logo-container:hover .logo-img {
-    transform: scale(1.05);
+    .brand-emblem {
+      width: 2.35rem;
+      height: 2.35rem;
+    }
   }
 </style>
 
