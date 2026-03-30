@@ -51,14 +51,13 @@ variables:
 
 stages:
   # Stage 1: Build the Docker image once and push to ACR.
-  # Runs on a Microsoft-hosted agent so no self-hosted runner availability is required.
   - stage: Build
     displayName: Build and push image to ACR
     jobs:
       - job: BuildImage
         displayName: Build image and push to ACR
         pool:
-          vmImage: ubuntu-24.04
+          name: Hosted
         steps:
           - checkout: self
             fetchDepth: 0
@@ -101,6 +100,7 @@ stages:
               workingDirectory: $(Build.SourcesDirectory)
               inlineScript: |
                 set -euo pipefail
+                bash scripts/devops/azure_aks_preflight.sh
 
                 IMAGE_TAG="${BUILD_SOURCEVERSION:0:7}"
                 IMAGE_FULL="$(ACR_LOGIN_SERVER)/$(ACR_REPO):${IMAGE_TAG}"
@@ -138,29 +138,12 @@ stages:
           - task: SonarCloudAnalyze@4
             displayName: 'Run Code Analysis'
 
-          - task: NodeTool@0
-            displayName: 'Reinstall Node.js before Quality Gate publish'
-            inputs:
-              versionSpec: '20.x'
-              checkLatest: true
-
-          - task: Bash@3
-            displayName: 'Verify Node is available for Quality Gate publish'
-            inputs:
-              targetType: 'inline'
-              script: |
-                set -euo pipefail
-                NODE_BIN="$(command -v node)"
-                echo "Node path: ${NODE_BIN}"
-                node --version
-
           - task: SonarCloudPublish@4
             displayName: 'Publish Quality Gate Result'
             inputs:
               pollingTimeoutSec: '300'
 
-  # Stage 2: Deploy to AKS from a Microsoft-hosted agent (preferred).
-  # Uses the image tag produced in the Build stage.
+  # Stage 2: Deploy to AKS
   - stage: DeployHosted
     displayName: Deploy to AKS (hosted agent)
     dependsOn: Build
@@ -190,7 +173,7 @@ stages:
       - job: DeployHosted
         displayName: Helm deploy (hosted)
         pool:
-          vmImage: ubuntu-24.04
+          name: Hosted
         steps:
           - checkout: self
             fetchDepth: 1
@@ -205,41 +188,14 @@ stages:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-
                 if [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]GITHUB_PAT is not set. Add a secret variable named GITHUB_PAT to variable group 'pixelated-pipeline-variables' with read access to required private GitHub repos."
+                  echo "##vso[task.logissue type=error]GITHUB_PAT is not set."
                   exit 1
                 fi
-
                 echo "✅ GITHUB_PAT is present"
 
-                # Safe diagnostics (no secret leakage): confirm runtime context + repo visibility via GitHub API
-                echo "Branch: $(Build.SourceBranch)"
-                echo "Reason: $(Build.Reason)"
-                echo "Repo: $(Build.Repository.Name)"
-                echo "PAT length: ${#GITHUB_PAT}"
-
-                auth_header="$(printf 'x-access-token:%s' "${GITHUB_PAT}" | base64 -w0)"
-                for repo in daggerstuff/ai daggerstuff/docs; do
-                  http_code="$(curl -sS -o /dev/null -w "%{http_code}" \
-                    -H "Authorization: Basic ${auth_header}" \
-                    "https://api.github.com/repos/${repo}")"
-
-                  if [ "${http_code}" = "200" ]; then
-                    echo "✅ ${repo} visible (HTTP ${http_code})"
-                  elif [ "${http_code}" = "404" ]; then
-                    echo "##vso[task.logissue type=error]${repo} not visible (HTTP 404). Check repo path/access and org SSO authorization for this token."
-                    exit 1
-                  elif [ "${http_code}" = "401" ]; then
-                    echo "##vso[task.logissue type=error]GitHub auth failed for ${repo} (HTTP 401). Token value in this job context may be invalid or unavailable."
-                    exit 1
-                  else
-                    echo "##vso[task.logissue type=warning]Unexpected GitHub API response for ${repo}: HTTP ${http_code}"
-                  fi
-                done
-
           - task: Bash@3
-            displayName: 'Initialize CI-aware submodules (Azure/GitHub)'
+            displayName: 'Initialize CI-aware submodules'
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
@@ -253,11 +209,6 @@ stages:
             displayName: Install Helm
             inputs:
               helmVersionToInstall: v3.15.4
-
-          - task: KubectlInstaller@0
-            displayName: Install kubectl
-            inputs:
-              kubectlVersion: 'latest'
 
           - task: AzureCLI@2
             displayName: Deploy Helm chart to AKS
