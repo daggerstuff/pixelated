@@ -482,12 +482,8 @@ fi
 kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME}"
 
 echo "📄 DNS target info:"
+INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ingress-controller" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
 if [ "${APP_ENV}" = "production" ]; then
-  INGRESS_NGINX_IP="$(kubectl -n ingress-nginx get svc ingress-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
-  if [ -n "${INGRESS_NGINX_IP}" ]; then
-    echo "Pixelated production ingress (DNS for pixelatedempathy.com): ${INGRESS_NGINX_IP}"
-  fi
-
   PROD_INGRESS_HOST="$(kubectl -n "${NAMESPACE}" get ingress "${RELEASE_NAME}" -o jsonpath='{.spec.rules[0].host}' 2>/dev/null || true)"
   if [ -z "${PROD_INGRESS_HOST}" ]; then
     echo "##vso[task.logissue type=error]Production ingress object was not created or has no hostname rule."
@@ -496,12 +492,12 @@ if [ "${APP_ENV}" = "production" ]; then
   fi
   echo "Production ingress host in namespace ${NAMESPACE}: ${PROD_INGRESS_HOST}"
 
-  if [ -z "${INGRESS_NGINX_IP}" ]; then
-    echo "##vso[task.logissue type=error]No public IP found on ingress-nginx controller in ingress-nginx namespace."
+  if [ -z "${INGRESS_CADDY_IP}" ]; then
+    echo "##vso[task.logissue type=error]No public IP found on the Caddy ingress controller service ${RELEASE_NAME}-caddy-ingress-controller in namespace ${NAMESPACE}."
     exit 1
   fi
+  echo "Pixelated production ingress (DNS for pixelatedempathy.com): ${INGRESS_CADDY_IP}"
 fi
-INGRESS_CADDY_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-caddy-ingress-controller" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
 if [ -n "${INGRESS_CADDY_IP}" ]; then
   echo "Namespace ${NAMESPACE} caddy ingress controller IP: ${INGRESS_CADDY_IP}"
 fi
