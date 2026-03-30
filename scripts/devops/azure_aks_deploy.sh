@@ -550,8 +550,9 @@ kubectl -n "${NAMESPACE}" get pods -l app.kubernetes.io/instance="${RELEASE_NAME
 
 echo "📄 DNS target info:"
 INGRESS_TRAEFIK_IP=""
-# Attempt to resolve Traefik IP by specific name first, then by label
-for attempt in $(seq 1 15); do
+# Attempt to resolve Traefik IP by specific name first, then by label.
+# Azure load balancer provisioning can take several minutes on new clusters.
+for attempt in $(seq 1 30); do
   INGRESS_TRAEFIK_IP="$(kubectl -n "${NAMESPACE}" get svc "${RELEASE_NAME}-traefik" -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || true)"
   
   if [ -z "${INGRESS_TRAEFIK_IP}" ]; then
@@ -563,7 +564,7 @@ for attempt in $(seq 1 15); do
     break
   fi
 
-  echo "   Waiting for Traefik load balancer IP (${attempt}/15)..."
+  echo "   Waiting for Traefik load balancer IP (${attempt}/30)..."
   sleep 10
 done
 if [ "${APP_ENV}" = "production" ]; then
