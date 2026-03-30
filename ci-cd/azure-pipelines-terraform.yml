@@ -13,7 +13,7 @@
 #   - Creates initial namespaces (pixelated, ollama)
 #   - Note: Application deployments are handled by azure-pipelines.yml
 
-trigger:
+trigger: none # trigger:
   batch: true
   branches:
     include:
@@ -26,7 +26,7 @@ trigger:
       - terraform/*
       - ci-cd/azure-pipelines-terraform.yml
 
-pr:
+pr: none # pr:
   autoCancel: true
   branches:
     include:
