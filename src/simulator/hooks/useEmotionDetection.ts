@@ -13,8 +13,9 @@ const logger = createBuildSafeLogger('useEmotionDetection')
  * This hook sets up a connection to the Emotion Llama API (with credentials
  * injected from the environment) and exposes a `detectEmotions` method. When called,
  * it runs the provider's emotional analysis on the provided text and then updates
- * the SimulatorContext's emotion state using the `updateEmotionState` helper from the context.
- * The helper dispatches the `UPDATE_EMOTION_STATE` action with the dimension-based PAD (Pleasure-Arousal-Dominance) values returned by the model.
+ * the SimulatorContext's emotion state (for example, via its `updateEmotionState`
+ * helper, which dispatches the `UPDATE_EMOTION_STATE` action) using the
+ * dimension-based PAD (Pleasure-Arousal-Dominance) values returned by the model.
  * Note that the provider's 'arousal' dimension maps to the simulator's 'energy' state.
  *
  * It is primarily used to track real-time emotional shifts during a simulated session.
@@ -29,12 +30,14 @@ export const useEmotionDetection = () => {
       try {
         const baseUrl = process.env.EMOTION_LLAMA_API_URL
         const apiKey = process.env.EMOTION_LLAMA_API_KEY
+
         if (!baseUrl || !apiKey) {
           logger.error(
             'Missing required API credentials for EmotionLlamaProvider',
           )
           return
         }
+
         providerRef.current = new EmotionLlamaProvider(
           baseUrl,
           apiKey,
@@ -44,6 +47,7 @@ export const useEmotionDetection = () => {
         logger.error('Failed to initialize EmotionLlamaProvider:', error)
       }
     }
+
     void initProvider()
   }, [])
 
@@ -62,17 +66,20 @@ export const useEmotionDetection = () => {
           logger.error('EmotionLlamaProvider not initialized')
           return null
         }
+
         const analysis = await providerRef.current.analyzeEmotions(text)
+
         // Update the simulator context with the pre-computed PAD emotion state from dimensions
         if (analysis.dimensions) {
-          const { valence, arousal, dominance } = analysis.dimensions
+          const { valence, energy, dominance } = analysis.dimensions
           updateEmotionState({
             valence,
-            energy: arousal, // Map 'arousal' to 'energy'
+            energy,
             dominance,
             timestamp: Date.now(),
           })
         }
+
         return analysis
       } catch (error: unknown) {
         logger.error('Error detecting emotions:', error)
@@ -82,5 +89,7 @@ export const useEmotionDetection = () => {
     [updateEmotionState],
   )
 
-  return { detectEmotions }
+  return {
+    detectEmotions,
+  }
 }
