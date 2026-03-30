@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -109,7 +109,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -178,7 +178,7 @@ jobs:
           - 6379:6379
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -237,7 +237,7 @@ jobs:
           NODE_ENV: test
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v5.5.3
+        uses: codecov/codecov-action@v6.0.0
         with:
           files: ./coverage/lcov.info
           flags: typescript
@@ -250,7 +250,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
@@ -326,7 +326,7 @@ jobs:
           JWT_SECRET_KEY: test-jwt-secret
 
       - name: Upload Python coverage
-        uses: codecov/codecov-action@v5.5.3
+        uses: codecov/codecov-action@v6.0.0
         with:
           files: ./src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python
@@ -350,7 +350,7 @@ jobs:
           - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
