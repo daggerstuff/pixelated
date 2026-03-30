@@ -272,7 +272,7 @@ a:hover {
 /* === CONTAINER SYSTEM === */
 .container-refined {
   width: 100%;
-  max-width: 1280px;
+  max-width: 72rem;
   margin: 0 auto;
   padding: 0 var(--space-6);
 }
