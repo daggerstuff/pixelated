@@ -146,7 +146,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.64",
     "@ai-sdk/mcp": "^1.0.30",
-    "@ai-sdk/openai": "^3.0.48",
+    "@ai-sdk/openai": "^3.0.49",
     "@astrojs/check": "^0.9.8",
     "@astrojs/netlify": "^7.0.5",
     "@astrojs/node": "^10.0.4",
@@ -230,7 +230,7 @@
     "events": "^3.3.0",
     "express": "^5.2.1",
     "express-openid-connect": "^2.19.4",
-    "express-rate-limit": "^8.3.1",
+    "express-rate-limit": "^8.3.2",
     "flexsearch": "^0.8.212",
     "framer-motion": "^12.37.0",
     "helmet": "^8.1.0",
