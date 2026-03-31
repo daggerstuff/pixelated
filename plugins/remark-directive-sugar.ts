@@ -5,7 +5,7 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Root } from 'mdast'
-import { visit, type Visitor } from 'unist-util-visit'
+import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
 type BadgePreset = Record<string, { text: string; color: string }>
@@ -76,7 +76,7 @@ function remarkDirectiveSugar() {
    *   File.
    */
   return (tree: Root, file: VFile) => {
-    visit(tree, (node: Visitor) => {
+    visit(tree, (node) => {
       if (
         node.type === 'containerDirective' ||
         node.type === 'leafDirective' ||
