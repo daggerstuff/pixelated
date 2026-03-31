@@ -27,7 +27,7 @@ on:
       - .github/workflows/bias-detection-ci.yml
 
 env:
-  GHA_LOCAL_RUN: "false"
+  GHA_LOCAL_RUN: 'false'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PYTHON_VERSION: 3.13
@@ -319,7 +319,7 @@ jobs:
       - name: Run Python tests
         run: |
           cd src/lib/ai/bias-detection/python-service
-          uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml
+          uv python -m pytest test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
         env:
           ENV: ci
           FLASK_SECRET_KEY: test-flask-secret

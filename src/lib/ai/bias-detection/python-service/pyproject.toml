@@ -95,7 +95,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=bias_detection --cov-report=term-missing --cov-report=html"
+addopts = "-v --cov=bias_detection --cov-report=term-missing --cov-report=html --cov-fail-under=25"
 
 [tool.mypy]
 python_version = "3.11"

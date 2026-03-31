@@ -1,13 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// Mock authenticateRequest before importing authMiddleware
-const mockAuthenticateRequest = vi.fn();
+const mockAuthenticateRequest = vi.hoisted(() => vi.fn());
 
 vi.mock("../../../lib/auth/auth0-middleware", () => ({
   authenticateRequest: mockAuthenticateRequest,
 }));
 
-// Mock user-identity to prevent resolution errors
 vi.mock("../../../lib/auth/user-identity", () => ({
   resolveIdentity: vi.fn().mockResolvedValue({
     internalId: "user123",
