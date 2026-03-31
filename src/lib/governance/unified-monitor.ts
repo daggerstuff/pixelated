@@ -12,26 +12,40 @@ export interface MonitorEvent {
 export type AlertHandler = (alert: { type: string; count: number; source: string }) => void
 
 const ALERT_THRESHOLD = 5
+const MAX_EVENTS_PER_SOURCE = 1000 // Memory limit
 
 export class UnifiedMonitor {
-  private events: MonitorEvent[] = []
+  // Source-keyed storage for O(1) lookups
+  private eventsBySource: Map<string, MonitorEvent[]> = new Map()
   private alertHandlers: AlertHandler[] = []
   private failureCounts: Map<string, number> = new Map()
 
   async record(event: MonitorEvent): Promise<void> {
-    this.events.push(event)
+    // Store event in source-keyed map (O(1) insertion)
+    const sourceEvents = this.eventsBySource.get(event.source) || []
+    sourceEvents.push(event)
+    
+    // Enforce memory limit - remove oldest events if exceeded
+    if (sourceEvents.length > MAX_EVENTS_PER_SOURCE) {
+      sourceEvents.shift() // Remove oldest
+    }
+    
+    this.eventsBySource.set(event.source, sourceEvents)
+    
     logger.info(`Recorded event: ${event.source}/${event.event}`)
 
-    // Check alert thresholds for compliance failures
+    // Check alert thresholds synchronously before any await
     if (event.event === 'compliance_failure') {
       const key = `${event.source}:compliance_failure`
       const count = (this.failureCounts.get(key) || 0) + 1
       this.failureCounts.set(key, count)
 
+      // Trigger alert synchronously if threshold reached
       if (count >= ALERT_THRESHOLD) {
-        await this.triggerAlert({ type: 'compliance_failure', count, source: event.source })
-        // Reset counter after alert
+        // Reset counter immediately to prevent duplicate alerts
         this.failureCounts.set(key, 0)
+        // Log and notify handlers (async but after sync state update)
+        this.triggerAlert({ type: 'compliance_failure', count, source: event.source })
       }
     }
   }
@@ -41,19 +55,23 @@ export class UnifiedMonitor {
   }
 
   getEvents(source: string): MonitorEvent[] {
-    return this.events.filter(e => e.source === source)
+    return this.eventsBySource.get(source) || []
   }
 
   getAllEvents(): MonitorEvent[] {
-    return [...this.events]
+    const all: MonitorEvent[] = []
+    for (const events of this.eventsBySource.values()) {
+      all.push(...events)
+    }
+    return all
   }
 
   clearEvents(): void {
-    this.events = []
+    this.eventsBySource.clear()
     this.failureCounts.clear()
   }
 
-  private async triggerAlert(alert: { type: string; count: number; source: string }): Promise<void> {
+  private triggerAlert(alert: { type: string; count: number; source: string }): void {
     for (const handler of this.alertHandlers) {
       handler(alert)
     }
