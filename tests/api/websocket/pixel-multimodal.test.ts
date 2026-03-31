@@ -36,21 +36,21 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
   })
 
   describe('Connection Lifecycle', () => {
-    it('should establish WebSocket connection', () => new Promise<void>((resolve, reject) => {
+    it('should establish WebSocket connection', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
         expect(ws.readyState).toBe(WebSocket.OPEN)
         ws.close()
-        resolve()
+        done()
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should send connection status on open', () => new Promise<void>((resolve, reject) => {
+    it('should send connection status on open', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       let receivedStatus = false
 
@@ -60,16 +60,16 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
           receivedStatus = true
           ws.close()
           expect(receivedStatus).toBe(true)
-          resolve()
+          done()
         }
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should handle graceful disconnection', () => new Promise<void>((resolve, reject) => {
+    it('should handle graceful disconnection', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -78,15 +78,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       ws.on('close', (code) => {
         expect(code).toBe(1000)
-        resolve()
+        done()
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should clear buffered state on disconnect', () => new Promise<void>((resolve, reject) => {
+    it('should clear buffered state on disconnect', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -107,17 +107,17 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       ws.on('close', () => {
         expect(ws.readyState).toBe(WebSocket.CLOSED)
-        resolve()
+        done()
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 
   describe('Text Message Handling', () => {
-    it('should receive and buffer text message', () => new Promise<void>((resolve, reject) => {
+    it('should receive and buffer text message', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const testText = 'I am feeling anxious'
 
@@ -137,16 +137,16 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
         if (message.type === 'status' && message.status === 'text_received') {
           expect(message.contextType).toBe('therapeutic')
           ws.close()
-        resolve()
+          done()
         }
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should accept context type in text message', () => new Promise<void>((resolve, reject) => {
+    it('should accept context type in text message', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -171,17 +171,17 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(received).toBe(true)
-        resolve()
+        done()
       }, 100)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 
   describe('Audio Chunk Handling', () => {
-    it('should buffer audio chunks', () => new Promise<void>((resolve, reject) => {
+    it('should buffer audio chunks', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const audioChunk = Buffer.from('audio_chunk_data')
 
@@ -206,15 +206,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(statusReceived).toBe(true)
-        resolve()
+        done()
       }, 100)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should buffer multiple chunks sequentially', () => new Promise<void>((resolve, reject) => {
+    it('should buffer multiple chunks sequentially', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const chunk1 = Buffer.from('chunk1_data')
       const chunk2 = Buffer.from('chunk2_data')
@@ -247,15 +247,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(messageCount).toBeGreaterThan(0)
-        resolve()
+        done()
       }, 150)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should reject audio exceeding 25MB limit', () => new Promise<void>((resolve, reject) => {
+    it('should reject audio exceeding 25MB limit', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const largeBuffer = Buffer.alloc(26 * 1024 * 1024) // 26MB
 
@@ -280,15 +280,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(errorReceived).toBe(true)
-        resolve()
+        done()
       }, 200)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should close connection on payload overflow', () => new Promise<void>((resolve, reject) => {
+    it('should close connection on payload overflow', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -307,17 +307,17 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
 
       ws.on('close', (code) => {
         expect([1009, 1000]).toContain(code) // 1009 = payload too large
-        resolve()
+        done()
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 
   describe('Multimodal Fusion & Inference', () => {
-    it('should construct form data with text + audio on complete', () => new Promise<void>((resolve, reject) => {
+    it('should construct form data with text + audio on complete', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const mockPixelResponse = {
         response: 'Test response',
@@ -375,15 +375,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
           expect.stringContaining('/infer-multimodal'),
           expect.any(Object),
         )
-        resolve()
+        done()
       }, 300)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should handle text-only completion (no audio)', () => new Promise<void>((resolve, reject) => {
+    it('should handle text-only completion (no audio)', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const mockPixelResponse = {
         response: 'Response to text',
@@ -426,15 +426,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(resultReceived).toBe(true)
-        resolve()
+        done()
       }, 200)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should return latency metrics from Pixel service', () => new Promise<void>((resolve, reject) => {
+    it('should return latency metrics from Pixel service', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
       const mockPixelResponse = {
         response: 'Test',
@@ -461,18 +461,18 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
         if (message.type === 'result') {
           expect(message.data.latency_ms).toBeLessThan(200)
           ws.close()
-        resolve()
+          done()
         }
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 
   describe('Error Handling & Recovery', () => {
-    it('should handle malformed JSON gracefully', () => new Promise<void>((resolve, reject) => {
+    it('should handle malformed JSON gracefully', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -490,15 +490,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(errorReceived).toBe(true)
-        resolve()
+        done()
       }, 100)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should reject unknown message types', () => new Promise<void>((resolve, reject) => {
+    it('should reject unknown message types', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -521,15 +521,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(errorReceived).toBe(true)
-        resolve()
+        done()
       }, 100)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should handle Pixel API errors gracefully', () => new Promise<void>((resolve, reject) => {
+    it('should handle Pixel API errors gracefully', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       vi.mocked(global.fetch).mockRejectedValueOnce(
@@ -557,17 +557,17 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(errorReceived).toBe(true)
-        resolve()
+        done()
       }, 200)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 
   describe('Status Message Flow', () => {
-    it('should emit connected status on connection', () => new Promise<void>((resolve, reject) => {
+    it('should emit connected status on connection', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('message', (data) => {
@@ -575,16 +575,16 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
         if (message.type === 'status' && message.status === 'connected') {
           expect(message.port).toBe(8091)
           ws.close()
-        resolve()
+          done()
         }
       })
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should emit text_received status', () => new Promise<void>((resolve, reject) => {
+    it('should emit text_received status', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       ws.on('open', () => {
@@ -608,15 +608,15 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(textStatusReceived).toBe(true)
-        resolve()
+        done()
       }, 100)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
 
-    it('should emit processing status on complete', () => new Promise<void>((resolve, reject) => {
+    it('should emit processing status on complete', (done) => {
       const ws = new WebSocket(`ws://localhost:${wsPort}`)
 
       vi.mocked(global.fetch).mockResolvedValueOnce({
@@ -645,12 +645,12 @@ describe('WebSocket /api/websocket/pixel-multimodal', () => {
       setTimeout(() => {
         ws.close()
         expect(processingReceived).toBe(true)
-        resolve()
+        done()
       }, 200)
 
       ws.on('error', (err) => {
-        reject(new Error(`WebSocket error: ${err.message}`))
+        done(new Error(`WebSocket error: ${err.message}`))
       })
-    }))
+    })
   })
 })
