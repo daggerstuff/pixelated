@@ -10,30 +10,8 @@ for var in AZURE_SUBSCRIPTION_ID AKS_CLUSTER_NAME AZURE_AKS_CLUSTER_NAME AKS_RES
     export "$var"=""
   fi
 done
-if [ -z "${APP_ENV_RAW}" ]; then
-  # The staging branch is currently the live branch. Until a separate staging
-  # platform exists, branch-based environment inference must target production.
-  case "${SOURCE_BRANCH_NAME}" in
-    master|main)
-      APP_ENV_RAW="production"
-      ;;
-    staging|stg|stage)
-      APP_ENV_RAW="production"
-      ;;
-    *)
-      APP_ENV_RAW="production"
-      ;;
-  esac
-fi
-APP_ENV="$(printf '%s' "${APP_ENV_RAW}" | tr '[:upper:]' '[:lower:]')"
-case "${APP_ENV}" in
-  production|prod)
-    APP_ENV="production"
-    ;;
-  staging|stage|stg)
-    APP_ENV="staging"
-    ;;
-esac
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_ENV="$(bash "${SCRIPT_DIR}/infer-deploy-environment.sh" "${APP_ENV_RAW}" "${SOURCE_BRANCH_NAME}")"
 resolve_chart_dir() {
   local configured="${CHART_DIR:-}"
   local repo_root="${BUILD_SOURCESDIRECTORY:-${BUILD_SOURCES_DIR:-${BUILD_SOURCES_DIRECTORY:-${SYSTEM_DEFAULTWORKINGDIRECTORY:-}}}}"
@@ -467,7 +445,7 @@ verify_aks_nodepools_ready
 
 echo "📦 Preparing Helm chart for ${NAMESPACE}"
 # Moved after context loading to ensure private registry access if needed
-helm dependency update "${CHART_DIR}"
+bash "${SCRIPT_DIR}/prepare-helm-dependencies.sh" "${CHART_DIR}"
 
 echo "📄 Using chart directory: ${CHART_DIR}"
 echo "📄 Using values file: ${ENV_VALUES}"
@@ -490,6 +468,12 @@ if [ "${APP_ENV}" != "training" ]; then
 
   verify_remote_image "docker.io/bitnami/postgresql" "${POSTGRESQL_IMAGE_TAG}"
   verify_remote_image "docker.io/bitnami/redis" "${REDIS_IMAGE_TAG}"
+fi
+
+if [ "${APP_ENV}" = "staging" ] && [ -f "${CHART_DIR}/values-staging-infra.yaml" ]; then
+  HELM_VALUES_ARGS+=(
+    --values "${CHART_DIR}/values-staging-infra.yaml"
+  )
 fi
 
 if [ -f "${CHART_DIR}/values-cost-effective.yaml" ]; then
