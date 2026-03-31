@@ -87,8 +87,8 @@
   --glass-blur: 12px;
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: editorial serif, less rounded and less juvenile */
-  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
+  /* Headings: neutral UI sans, consistent with the product */
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   
   /* Body: neutral UI sans */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -107,9 +107,9 @@
   --text-xl: clamp(1.125rem, 1rem + 0.625vw, 1.375rem);
   --text-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.625rem);
   --text-3xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
-  --text-4xl: clamp(2rem, 1.6rem + 2vw, 3rem);
-  --text-5xl: clamp(2.5rem, 2rem + 2.5vw, 4rem);
-  --text-6xl: clamp(3rem, 2.2rem + 4vw, 5.5rem);
+  --text-4xl: clamp(1.9rem, 1.55rem + 1.75vw, 2.85rem);
+  --text-5xl: clamp(2.2rem, 1.85rem + 1.9vw, 3.45rem);
+  --text-6xl: clamp(2.8rem, 2.2rem + 3vw, 4.6rem);
 
   /* Line Heights - tight for headings */
   --leading-none: 1;
@@ -222,7 +222,7 @@ h6 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
+  letter-spacing: -0.035em;
   color: var(--text-primary);
   margin: 0;
 }
@@ -290,7 +290,7 @@ a:hover {
 .display-heading {
   font-family: var(--font-display);
   font-size: var(--text-6xl);
-  font-weight: 800;
+  font-weight: 700;
   line-height: var(--leading-none);
   letter-spacing: var(--tracking-tighter);
   color: var(--text-primary);
@@ -410,10 +410,10 @@ pre {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
