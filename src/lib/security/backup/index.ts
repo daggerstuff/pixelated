@@ -168,6 +168,7 @@ const logger = createBuildSafeLogger('backup-security')
 // Current version of the encryption implementation
 const ENCRYPTION_VERSION = '1.0'
 
+import mongoose from "mongoose"
 import { BackupType, BackupStatus, StorageLocation } from './backup-types'
 
 export interface BackupRetentionPolicy {
@@ -798,7 +799,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? String(error) : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${error instanceof Error ? error.message : String(error)}`,
         )
       }
     }
@@ -809,16 +810,83 @@ export class BackupSecurityManager {
   /**
    * Get data to backup based on backup type
    */
-  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    // Implementation would collect app data based on backup type
-    // For now return dummy data for demonstration
-    // [PIX-44] TODO: No more fucking cop-outs
-    const dummyData = {
-      message: `This is a ${type} backup created at ${new Date().toISOString()}`,
+  private async getLastBackupTime(requireFull: boolean = false): Promise<Date | null> {
+    let latestTimestamp = 0;
+
+    const storageEntries = Array.from(this.storageProviders.entries())
+    for (let i = 0; i < storageEntries.length; i++) {
+      const entry = storageEntries[i]
+      if (!entry || !Array.isArray(entry) || entry.length < 2) continue
+
+      const [location, provider] = entry
+      if (!provider) continue
+
+      try {
+        const files = await provider.listFiles("backups/") // Fallback to list all and filter if pattern not supported
+        const metaFiles = files.filter(f => f.endsWith(".meta.json"))
+        for (const file of metaFiles) {
+          try {
+            const metadataBuffer = await provider.getFile(file)
+            const metadata = JSON.parse(new TextDecoder().decode(metadataBuffer)) as BackupMetadata
+
+            if (metadata.status === BackupStatus.COMPLETED) {
+              if (requireFull && metadata.type !== BackupType.FULL) continue
+              if (!requireFull && metadata.type !== BackupType.FULL && metadata.type !== BackupType.DIFFERENTIAL && metadata.type !== BackupType.INCREMENTAL) continue
+
+              const timestamp = new Date(metadata.timestamp).getTime()
+              if (timestamp > latestTimestamp) {
+                latestTimestamp = timestamp
+              }
+            }
+          } catch (e) {
+            // Ignore individual file parsing errors
+          }
+        }
+      } catch (error: unknown) {
+        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? error.message : String(error)}`)
+      }
     }
 
-    // Use TextEncoder for cross-environment compatibility
-    return new TextEncoder().encode(JSON.stringify(dummyData))
+    return latestTimestamp > 0 ? new Date(latestTimestamp) : null;
+  }
+
+  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
+    const backupData: Record<string, any> = {
+      timestamp: new Date().toISOString(),
+      type,
+      data: {}
+    }
+
+    try {
+      let query = {}
+
+      if (type === BackupType.DIFFERENTIAL || type === BackupType.INCREMENTAL) {
+        const requireFull = type === BackupType.DIFFERENTIAL
+        const lastBackupTime = await this.getLastBackupTime(requireFull)
+        const baselineTime = lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000)
+        query = { updatedAt: { $gte: baselineTime } }
+      }
+
+      const models = mongoose.modelNames()
+      const dataPromises = models.map(async (modelName) => {
+        const Model = mongoose.model(modelName)
+        const docs = await Model.find(query).lean().exec()
+        return { modelName, docs }
+      })
+
+      const results = await Promise.all(dataPromises)
+
+      for (const result of results) {
+        if (result.docs.length > 0) {
+          backupData.data[result.modelName] = result.docs
+        }
+      }
+    } catch (error: unknown) {
+      logger.error(`Failed to collect data for backup: ${error instanceof Error ? error.message : String(error)}`)
+      throw new Error(`Data collection failed: ${error instanceof Error ? error.message : String(error)}`)
+    }
+
+    return new TextEncoder().encode(JSON.stringify(backupData))
   }
 
   /**
