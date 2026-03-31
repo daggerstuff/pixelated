@@ -1,13 +1,4 @@
-/**
- * Tests for ComplianceValidator
- *
- * Validates HIPAA++ compliance checks for:
- * - FHE encryption status
- * - Audit logging status
- * - Consent verification
- */
-
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { ComplianceValidator } from '../compliance-validator'
 
 describe('ComplianceValidator', () => {
@@ -17,40 +8,57 @@ describe('ComplianceValidator', () => {
     validator = new ComplianceValidator()
   })
 
-  describe('validate()', () => {
-    it('returns compliant: true when FHE is active', async () => {
-      // Mock FHE service as active
-      const mockFheService = {
-        isInitialized: () => true,
-      }
-
-      validator.setFheService(mockFheService as any)
-
-      const result = await validator.validate()
-
-      expect(result.compliant).toBe(true)
-      expect(result.reasons).toHaveLength(0)
-      expect(result.timestamp).toBeDefined()
+  it('validates FHE encryption is active', async () => {
+    const result = await validator.validate({
+      operation: 'access_phi',
+      fheActive: true,
+      auditEnabled: true,
+      consentVerified: true
     })
+    expect(result.compliant).toBe(true)
+  })
 
-    it('returns compliant: false with reason when FHE is not active', async () => {
-      // Mock FHE service as not active
-      const mockFheService = {
-        isInitialized: () => false,
-      }
-
-      validator.setFheService(mockFheService as any)
-
-      const result = await validator.validate()
-
-      expect(result.compliant).toBe(false)
-      expect(result.reasons).toContainEqual(
-        expect.objectContaining({
-          check: 'fhe_encryption',
-          compliant: false,
-        })
-      )
-      expect(result.timestamp).toBeDefined()
+  it('blocks when FHE is not active', async () => {
+    const result = await validator.validate({
+      operation: 'access_phi',
+      fheActive: false,
+      auditEnabled: true,
+      consentVerified: true
     })
+    expect(result.compliant).toBe(false)
+    expect(result.reasons).toContain('FHE encryption required')
+  })
+
+  it('blocks when audit is not enabled', async () => {
+    const result = await validator.validate({
+      operation: 'access_phi',
+      fheActive: true,
+      auditEnabled: false,
+      consentVerified: true
+    })
+    expect(result.compliant).toBe(false)
+    expect(result.reasons).toContain('Audit trail required')
+  })
+
+  it('blocks when consent is not verified', async () => {
+    const result = await validator.validate({
+      operation: 'access_phi',
+      fheActive: true,
+      auditEnabled: true,
+      consentVerified: false
+    })
+    expect(result.compliant).toBe(false)
+    expect(result.reasons).toContain('Consent verification required')
+  })
+
+  it('returns timestamp with validation result', async () => {
+    const result = await validator.validate({
+      operation: 'access_phi',
+      fheActive: true,
+      auditEnabled: true,
+      consentVerified: true
+    })
+    expect(result.timestamp).toBeDefined()
+    expect(new Date(result.timestamp).toISOString()).toBe(result.timestamp)
   })
 })
