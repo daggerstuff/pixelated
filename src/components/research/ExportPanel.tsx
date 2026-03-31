@@ -88,53 +88,62 @@ export default function ExportPanel({
   }
 
   return (
-    <div className='fixed inset-0 z-50 flex justify-end'>
+    <div className="fixed inset-0 z-50 flex justify-end">
       {/* Backdrop */}
       <div
-        className='bg-black/50 absolute inset-0 backdrop-blur-sm'
+        className="bg-black/50 absolute inset-0 backdrop-blur-sm"
         onClick={onClose}
+        role="button"
+        tabIndex={0}
+        aria-label="Close export panel backdrop"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClose()
+          }
+        }}
       ></div>
 
       {/* Panel */}
-      <div className='bg-slate-900 border-slate-700 animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l shadow-2xl'>
-        <div className='border-slate-800 flex items-center justify-between border-b p-6'>
-          <h2 className='text-white text-xl font-bold'>Export Results</h2>
+      <div className="bg-slate-900 border-slate-700 animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l shadow-2xl">
+        <div className="border-slate-800 flex items-center justify-between border-b p-6">
+          <h2 className="text-white text-xl font-bold">Export Results</h2>
           <button
             onClick={onClose}
-            className='text-slate-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-md'
-            aria-label='Close export panel'
+            className="text-slate-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-pink-500 rounded-md"
+            aria-label="Close export panel"
           >
             <svg
-              className='h-6 w-6'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
-                d='M6 18L18 6M6 6l12 12'
+                d="M6 18L18 6M6 6l12 12"
               />
             </svg>
           </button>
         </div>
 
-        <div className='flex-grow space-y-8 p-6'>
-          <div className='bg-slate-800/50 border-slate-700 rounded-lg border p-4'>
-            <p className='text-slate-300'>
+        <div className="flex-grow space-y-8 p-6">
+          <div className="bg-slate-800/50 border-slate-700 rounded-lg border p-4">
+            <p className="text-slate-300">
               Ready to export{' '}
-              <span className='text-pink-400 font-bold'>{results.length}</span>{' '}
+              <span className="text-pink-400 font-bold">{results.length}</span>{' '}
               items.
             </p>
           </div>
 
           {/* Format Selection */}
           <div>
-            <label className='text-slate-300 mb-3 block text-sm font-medium'>
+            <label className="text-slate-300 mb-3 block text-sm font-medium">
               Export Format
             </label>
-            <div className='grid grid-cols-2 gap-3'>
+            <div className="grid grid-cols-2 gap-3">
               {(['json', 'csv', 'bibtex', 'ris'] as const).map((f) => (
                 <button
                   key={f}
@@ -154,21 +163,21 @@ export default function ExportPanel({
 
           {/* Options */}
           <div>
-            <label className='text-slate-300 mb-3 block text-sm font-medium'>
+            <label className="text-slate-300 mb-3 block text-sm font-medium">
               Options
             </label>
-            <div className='space-y-3'>
-              <div className='flex items-center'>
+            <div className="space-y-3">
+              <div className="flex items-center">
                 <input
-                  type='checkbox'
-                  id='include-abstract'
-                  className='border-slate-600 bg-slate-800 text-pink-600 focus:ring-pink-500 h-4 w-4 rounded'
+                  type="checkbox"
+                  id="include-abstract"
+                  className="border-slate-600 bg-slate-800 text-pink-600 focus:ring-pink-500 h-4 w-4 rounded"
                   checked={includeAbstract}
                   onChange={(e) => setIncludeAbstract(e.target.checked)}
                 />
                 <label
-                  htmlFor='include-abstract'
-                  className='text-slate-300 ml-2 text-sm cursor-pointer'
+                  htmlFor="include-abstract"
+                  className="text-slate-300 ml-2 text-sm cursor-pointer"
                 >
                   Include Abstracts (if available)
                 </label>
@@ -178,40 +187,43 @@ export default function ExportPanel({
 
           {/* Filename */}
           <div>
-            <label htmlFor='export-filename' className='text-slate-300 mb-2 block text-sm font-medium'>
+            <label
+              htmlFor="export-filename"
+              className="text-slate-300 mb-2 block text-sm font-medium"
+            >
               Filename
             </label>
-            <div className='bg-slate-800 border-slate-700 flex overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-pink-500'>
+            <div className="bg-slate-800 border-slate-700 flex overflow-hidden rounded-lg border focus-within:ring-2 focus-within:ring-pink-500">
               <input
-                id='export-filename'
-                type='text'
+                id="export-filename"
+                type="text"
                 value={filename}
                 onChange={(e) => setFilename(e.target.value)}
-                className='bg-transparent text-white w-full border-none px-3 py-2 focus:ring-0 outline-none'
+                className="bg-transparent text-white w-full border-none px-3 py-2 focus:ring-0 outline-none"
               />
-              <span className='text-slate-500 bg-slate-900 border-slate-700 border-l px-3 py-2'>
+              <span className="text-slate-500 bg-slate-900 border-slate-700 border-l px-3 py-2">
                 .{format === 'bibtex' ? 'bib' : format}
               </span>
             </div>
           </div>
         </div>
 
-        <div className='border-slate-800 bg-slate-900 border-t p-6'>
+        <div className="border-slate-800 bg-slate-900 border-t p-6">
           <button
             onClick={handleExport}
-            className='bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900'
+            className="bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
             <svg
-              className='h-5 w-5'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
-                d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
               />
             </svg>
             Download File
