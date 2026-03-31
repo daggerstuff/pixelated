@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -91,14 +91,15 @@ export function TherapeuticGoalsTracker({
       : 0
 
   // Get interventions related to a specific goal
-  const getRelatedInterventions = (goalId: string) => {
+  // ⚡ Bolt: Memoize getRelatedInterventions to prevent unnecessary re-computations
+  const getRelatedInterventions = useCallback((goalId: string) => {
+    // ⚡ Bolt: Fix O(N^2) loop by finding the goal outside the filter loop
+    const goal = goals.find((g) => g.id === goalId)
+    if (!goal || !goal.relatedInterventions) return []
     return therapistInterventions
-      .filter((intervention) => {
-        const goal = goals.find((g) => g.id === goalId)
-        return goal?.relatedInterventions.includes(intervention.type)
-      })
+      .filter((intervention) => goal.relatedInterventions.includes(intervention.type))
       .slice(0, 3) // Show only most recent 3
-  }
+  }, [therapistInterventions, goals])
 
   // Handle category tab click
   const handleCategoryClick = (category: GoalCategory | 'all') => {
