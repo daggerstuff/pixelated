@@ -665,7 +665,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`,
       )
 
       const response = await GET({ request, url })
@@ -691,7 +691,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&includeCache=true`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist&includeCache=true`,
       )
 
       const response = await GET({ request, url })
@@ -718,7 +718,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&anonymize=true`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist&anonymize=true`,
       )
 
       const response = await GET({ request, url })
@@ -740,7 +740,7 @@ describe('Session Analysis API Endpoint', () => {
       )
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`,
       )
 
       const response = await GET({ request, url })
@@ -778,7 +778,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`,
       )
 
       const response = await GET({ request, url })
@@ -799,7 +799,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`,
       )
 
       const response = await GET({ request, url })
@@ -823,7 +823,7 @@ describe('Session Analysis API Endpoint', () => {
       })
 
       const url = new URL(
-        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}`,
+        `http://localhost:3000/api/bias-detection/analyze?sessionId=${mockSession.sessionId}&therapistId=test-therapist`,
       )
 
       const response = await GET({ request, url })
