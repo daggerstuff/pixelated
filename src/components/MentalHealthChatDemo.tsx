@@ -382,6 +382,13 @@ How are you feeling today? I'm here to listen and help.`,
       .map((m) => m.mentalHealthAnalysis!)
   }, [messages])
 
+  // ⚡ Bolt: Memoize filtered analyzed user messages to prevent O(N) re-filtering on every render
+  const analyzedUserMessages = useMemo(() => {
+    return messages.filter(
+      (m) => m.role === 'user' && m.mentalHealthAnalysis && !m.isProcessing,
+    )
+  }, [messages])
+
   // Enhanced analysis for component compatibility
   const enhancedAnalysisHistory = useMemo(() => {
     const analysisHistory = getAnalysisHistory()
@@ -1130,13 +1137,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 </p>
               </div>
 
-              {messages
-                .filter(
-                  (m) =>
-                    m.role === 'user' &&
-                    m.mentalHealthAnalysis &&
-                    !m.isProcessing,
-                )
+              {analyzedUserMessages
                 .slice(-2)
                 .map((m) => (
                   <div key={`analysis_${m.id}`}>
@@ -1153,12 +1154,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   </div>
                 ))}
 
-              {!messages.some(
-                (m) =>
-                  m.role === 'user' &&
-                  m.mentalHealthAnalysis &&
-                  !m.isProcessing,
-              ) && (
+              {analyzedUserMessages.length === 0 && (
                 <Card className='bg-slate-50 w-full shadow-sm'>
                   <CardContent className='p-6'>
                     <div className='text-center'>
