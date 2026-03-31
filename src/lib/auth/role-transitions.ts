@@ -118,7 +118,7 @@ export async function requestRoleTransition(
 ): Promise<RoleTransitionRequest> {
   try {
     // Get current user role
-    const currentRole = sessionData.role
+    const currentRole = sessionData.role as UserRole
 
     // Validate role transition
     const validation = validateRoleTransition(currentRole, requestedRole)
@@ -200,7 +200,7 @@ export async function requestRoleTransition(
       roleFrom: currentRole,
       roleTo: requestedRole,
       actorId: requestedBy,
-      actorRole: sessionData.role,
+      actorRole: sessionData.role as UserRole,
       reason,
       timestamp: now,
       ipAddress: clientInfo.ipAddress,
@@ -243,18 +243,18 @@ export async function processRoleTransitionApproval(
     userAgent: string
   },
 ): Promise<RoleTransitionRequest> {
+  // Destructure outside try for catch block access
+  const {
+    requestId,
+    approverId,
+    approverRole,
+    decision,
+    reason,
+    twoFactorToken,
+  } = approval
   try {
-    const {
-      requestId,
-      approverId,
-      approverRole,
-      decision,
-      reason,
-      twoFactorToken,
-    } = approval
-
     // Get the transition request
-    const request = await getFromCache(`role_transition:request:${requestId}`)
+    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
     if (!request) {
       throw new AuthenticationError('Role transition request not found')
     }
@@ -373,7 +373,7 @@ async function executeRoleTransition(
 ): Promise<void> {
   try {
     // Get user's current authentication data
-    const userAuth = await getFromCache(`user_auth:${request.userId}`)
+    const userAuth = (await getFromCache<{ role: UserRole; permissions: string[]; updatedAt: number }>(`user_auth:${request.userId}`))!
     if (!userAuth) {
       throw new AuthenticationError('User authentication data not found')
     }
@@ -403,7 +403,7 @@ async function executeRoleTransition(
       roleFrom: previousRole,
       roleTo: request.requestedRole,
       actorId: request.approverId!,
-      actorRole: approverSession.role,
+      actorRole: approverSession.role as UserRole,
       reason: 'Role transition approved and executed',
       timestamp: Date.now(),
       ipAddress: approverSession.ipAddress,
@@ -445,7 +445,7 @@ export async function cancelRoleTransitionRequest(
 ): Promise<void> {
   try {
     // Get the transition request
-    const request = await getFromCache(`role_transition:request:${requestId}`)
+    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
     if (!request) {
       throw new AuthenticationError('Role transition request not found')
     }
@@ -488,7 +488,7 @@ export async function cancelRoleTransitionRequest(
       roleFrom: request.currentRole,
       roleTo: request.requestedRole,
       actorId: userId,
-      actorRole: sessionData.role,
+      actorRole: sessionData.role as UserRole,
       reason,
       timestamp: Date.now(),
       ipAddress: clientInfo.ipAddress,
@@ -529,12 +529,12 @@ export async function getUserRoleTransitionRequests(
 ): Promise<RoleTransitionRequest[]> {
   try {
     const requestsKey = `user:role_requests:${userId}`
-    const requestIds = (await getFromCache(requestsKey)) || []
+    const requestIds = (await getFromCache<string[]>(requestsKey)) || []
 
     const requests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = await getFromCache(`role_transition:request:${requestId}`)
+      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
       if (request && (!status || request.status === status)) {
         requests.push(request)
       }
@@ -559,12 +559,12 @@ export async function getPendingRoleTransitionRequests(
   try {
     // Get all pending request IDs (simplified implementation)
     const pendingKey = 'role_transition:pending'
-    const requestIds = (await getFromCache(pendingKey)) || []
+    const requestIds = (await getFromCache<string[]>(pendingKey)) || []
 
     const eligibleRequests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = await getFromCache(`role_transition:request:${requestId}`)
+      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
       if (
         request &&
         request.status === 'pending' &&
@@ -627,7 +627,7 @@ async function addUserPendingRequest(
 ): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = (await getFromCache(pendingKey)) || []
+    let pendingRequests = (await getFromCache<string[]>(pendingKey)) || []
 
     pendingRequests.push(requestId)
 
@@ -646,7 +646,7 @@ async function removeUserPendingRequest(
 ): Promise<void> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    let pendingRequests = (await getFromCache(pendingKey)) || []
+    let pendingRequests = (await getFromCache<string[]>(pendingKey)) || []
 
     pendingRequests = pendingRequests.filter((id: string) => id !== requestId)
 
@@ -668,12 +668,12 @@ async function getPendingRoleRequests(
 ): Promise<RoleTransitionRequest[]> {
   try {
     const pendingKey = `user:pending_requests:${userId}`
-    const requestIds = (await getFromCache(pendingKey)) || []
+    const requestIds = (await getFromCache<string[]>(pendingKey)) || []
 
     const requests: RoleTransitionRequest[] = []
 
     for (const requestId of requestIds) {
-      const request = await getFromCache(`role_transition:request:${requestId}`)
+      const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
       if (request && request.status === 'pending') {
         requests.push(request)
       }
@@ -691,7 +691,7 @@ async function getPendingRoleRequests(
  */
 async function expireRoleTransitionRequest(requestId: string): Promise<void> {
   try {
-    const request = await getFromCache(`role_transition:request:${requestId}`)
+    const request = (await getFromCache<RoleTransitionRequest>(`role_transition:request:${requestId}`))!
     if (!request) return
 
     request.status = 'expired'
@@ -714,7 +714,7 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       roleFrom: request.currentRole,
       roleTo: request.requestedRole,
       actorId: 'system',
-      actorRole: 'system',
+      actorRole: 'admin' as UserRole,  // system actor
       reason: 'Request expired',
       timestamp: Date.now(),
       ipAddress: 'system',
@@ -742,7 +742,7 @@ async function logRoleTransitionAudit(
 
     // Add to user's audit trail
     const userAuditKey = `user:role_audit:${auditLog.userId}`
-    let userAuditTrail = (await getFromCache(userAuditKey)) || []
+    let userAuditTrail = (await getFromCache<string[]>(userAuditKey)) || []
 
     userAuditTrail.push(auditLog.id)
 
@@ -819,7 +819,7 @@ export async function getRoleTransitionAuditTrail(
 ): Promise<RoleTransitionAuditLog[]> {
   try {
     const userAuditKey = `user:role_audit:${userId}`
-    const auditIds = (await getFromCache(userAuditKey)) || []
+    const auditIds = (await getFromCache<string[]>(userAuditKey)) || []
 
     const auditLogs: RoleTransitionAuditLog[] = []
 
@@ -827,7 +827,7 @@ export async function getRoleTransitionAuditTrail(
     const recentIds = auditIds.slice(-limit)
 
     for (const auditId of recentIds) {
-      const auditLog = await getFromCache(`role_transition:audit:${auditId}`)
+      const auditLog = (await getFromCache<RoleTransitionAuditLog>(`role_transition:audit:${auditId}`))!
       if (auditLog) {
         auditLogs.push(auditLog)
       }
@@ -854,16 +854,16 @@ export async function validateRoleAssignment(
   sessionData: SessionData,
   twoFactorToken: string,
 ): Promise<RoleTransitionValidation> {
+  // Initialize outside try for catch block access
+  const validation: RoleTransitionValidation = {
+    canTransition: false,
+    requiresApproval: false,
+    requiresMFA: false,
+    requiresSecurityReview: false,
+    restrictions: [],
+    warnings: [],
+  }
   try {
-    const validation: RoleTransitionValidation = {
-      canTransition: false,
-      requiresApproval: false,
-      requiresMFA: false,
-      requiresSecurityReview: false,
-      restrictions: [],
-      warnings: [],
-    }
-
     // Check if assigner can assign the target role
     if (!canAssignRole(assignerRole, targetRole)) {
       validation.restrictions.push(
@@ -914,7 +914,7 @@ export async function validateRoleAssignment(
     }
 
     // Check for existing role conflicts
-    const targetUserAuth = await getFromCache(`user_auth:${targetUserId}`)
+    const targetUserAuth = (await getFromCache<{ role: UserRole }>(`user_auth:${targetUserId}`))!
     if (targetUserAuth) {
       const currentRole = targetUserAuth.role
       if (currentRole === targetRole) {

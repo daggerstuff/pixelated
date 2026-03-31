@@ -49,7 +49,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
     this.config = config
     this.healthMonitor = healthMonitor
     this.dataSyncManager = dataSyncManager
-    this.logger = new Logger('AutomatedFailoverOrchestrator')
+    this.logger = new Logger({ prefix: 'AutomatedFailoverOrchestrator' })
 
     // Initialize AWS clients
     this.snsClient = new SNSClient({ region: config.getPrimaryRegion() })
@@ -151,7 +151,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       } catch (error) {
         return {
           status: 'unhealthy',
-          message: `Failover readiness check failed: ${error.message}`,
+          message: `Failover readiness check failed: ${error instanceof Error ? error.message : String(error)}`,
         }
       }
     })
@@ -175,7 +175,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       } catch (error) {
         return {
           status: 'unhealthy',
-          message: `Data sync lag check failed: ${error.message}`,
+          message: `Data sync lag check failed: ${error instanceof Error ? error.message : String(error)}`,
         }
       }
     })
@@ -226,7 +226,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       this.logger.error('Failover readiness check failed', { error })
       return {
         ready: false,
-        message: `Readiness check error: ${error.message}`,
+        message: `Readiness check error: ${error instanceof Error ? error.message : String(error)}`,
       }
     }
   }
@@ -272,7 +272,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       return { healthy: true }
     } catch (error) {
       this.logger.error('Backup regions health check failed', { error })
-      return { healthy: false, reason: error.message }
+      return { healthy: false, reason: error instanceof Error ? error.message : String(error) }
     }
   }
 

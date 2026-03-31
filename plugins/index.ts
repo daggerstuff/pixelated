@@ -12,7 +12,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkDirective from 'remark-directive'
 import remarkImgattr from 'remark-imgattr'
 import remarkMath from 'remark-math'
-import { visit, type Visitor } from 'unist-util-visit'
+import { visit } from 'unist-util-visit'
 
 import { UI } from '../src/config'
 import remarkDirectiveSugar from './remark-directive-sugar'
@@ -58,7 +58,7 @@ export const rehypePlugins: RehypePlugins = [
         }
 
         let hasImage = false
-        visit(el, 'element', (childNode: Visitor) => {
+        visit(el, 'element', (childNode) => {
           if (childNode.tagName === 'img') {
             hasImage = true
             return false
@@ -80,7 +80,7 @@ export const rehypePlugins: RehypePlugins = [
         }
 
         let hasImage = false
-        visit(el, 'element', (childNode: Visitor) => {
+        visit(el, 'element', (childNode) => {
           if (childNode.tagName === 'img') {
             hasImage = true
             return false
@@ -132,7 +132,7 @@ export const rehypePlugins: RehypePlugins = [
       behavior: 'append',
       properties: (el: Parameters<CreateProperties>[0]) => {
         let content = ''
-        visit(el, 'text', (textNode: Visitor) => {
+        visit(el, 'text', (textNode) => {
           content += textNode.value
         })
         return {

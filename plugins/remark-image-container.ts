@@ -5,7 +5,7 @@
 /// <reference types="mdast-util-directive" />
 
 import type { Paragraph, PhrasingContent, Root } from 'mdast'
-import { visit, type Visitor } from 'unist-util-visit'
+import { visit } from 'unist-util-visit'
 import type { VFile } from 'vfile'
 
 const IMAGE_DIR_REGEXP = /^image-(.*)/
@@ -34,7 +34,7 @@ function remarkImageContainer() {
    *   File.
    */
   return (tree: Root, file: VFile) => {
-    visit(tree, (node: Visitor) => {
+    visit(tree, (node) => {
       if (node.type !== 'containerDirective') {
         return
       }
