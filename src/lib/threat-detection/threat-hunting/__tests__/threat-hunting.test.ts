@@ -171,10 +171,10 @@ describe('Threat Hunting Service', () => {
       const investigation = await service.createInvestigation(investigationData)
 
       expect(investigation).toBeDefined()
-      expect(investigation.id).toBe('inv_1')
-      expect(investigation.title).toBe(investigationData.title)
-      expect(investigation.status).toBe('active')
-      expect(investigation.createdAt).toBeDefined()
+      expect((investigation as any).id).toBe('inv_1')
+      expect((investigation as any).title).toBe(investigationData.title)
+      expect((investigation as any).status).toBe('active')
+      expect((investigation as any).createdAt).toBeDefined()
       expect(mockRedis.set).toHaveBeenCalledWith(
         `investigation:inv_1`,
         expect.any(String),
@@ -389,9 +389,9 @@ metadata: {},
       )
 
       expect(investigation).toBeDefined()
-      expect(investigation.title).toBe(investigationData.title)
-      expect(investigation.priority).toBe(investigationData.priority)
-      expect(investigation.status).toBe('active')
+      expect((investigation as any).title).toBe(investigationData.title)
+      expect((investigation as any).priority).toBe(investigationData.priority)
+      expect((investigation as any).status).toBe('active')
     })
 
     it('should update investigation with partial data', async () => {
@@ -852,9 +852,9 @@ expect(results[0]).toHaveProperty('severity')
       expect(results).toBeDefined()
       expect(results.data).toEqual(mockResults)
       expect(results.pagination).toBeDefined()
-      expect(results.pagination.total).toBe(2)
-      expect(results.pagination.page).toBe(1)
-      expect(results.pagination.limit).toBe(50)
+      expect((results.pagination as any).total).toBe(2)
+      expect((results.pagination as any).page).toBe(1)
+      expect((results.pagination as any).limit).toBe(50)
     })
 
     it('should search with complex query patterns', async () => {
@@ -896,7 +896,7 @@ expect(results[0]).toHaveProperty('severity')
       const results = await service.searchThreatData(searchData)
 
       expect(results.data).toHaveLength(0)
-      expect(results.pagination.total).toBe(0)
+      expect((results.pagination as any).total).toBe(0)
     })
   })
 
@@ -1262,12 +1262,12 @@ expect(results).toHaveLength(0)
         name: 'Related Attack Pattern Hunt',
         description: 'Search for related attack patterns',
         query: 'SELECT * FROM security_logs WHERE investigation_id = ?',
-        investigationId: investigation.id,
+        investigationId: (investigation as any).id,
       }
 
       const huntQuery = await service.createHuntQuery(queryData)
 
-      expect(huntQuery.investigationId).toBe(investigation.id)
+      expect(huntQuery.investigationId).toBe((investigation as any).id)
       expect(huntQuery.status).toBe('active')
     })
 
@@ -1345,7 +1345,7 @@ expect(results).toHaveLength(0)
         description: 'Search for APT-related patterns',
         query:
           'SELECT * FROM network_logs WHERE destination IN (known_apt_ips)',
-        investigationId: investigation.id,
+        investigationId: (investigation as any).id,
       }
 
       const huntQuery = await service.createHuntQuery(queryData)

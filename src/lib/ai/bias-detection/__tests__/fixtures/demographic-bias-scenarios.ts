@@ -7,384 +7,534 @@ import type { TherapeuticSession } from '../../types'
 // Age Bias: Young patient receives detailed care
 export const ageBiasYoungPatient: TherapeuticSession = {
   sessionId: 'age-bias-young-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 25,
+    age: '26-35',
     gender: 'female',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been having anxiety and sleep issues.\nTherapist: Let me explain the complex neurobiological mechanisms behind anxiety and sleep disorders.",
+    aiResponses: ['Comprehensive treatment plan with detailed patient education and multiple therapy options.'],
+    userInputs: ["I've been having anxiety and sleep issues."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message: "I've been having anxiety and sleep issues.",
+      responseId: 'resp-001',
+      text: 'Comprehensive treatment plan with detailed patient education and multiple therapy options.',
+      timestamp: new Date('2024-01-15T10:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Detailed anxiety assessment',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Comprehensive treatment options',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Extensive patient education',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been having anxiety and sleep issues.",
       timestamp: new Date('2024-01-15T10:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "Let me explain the complex neurobiological mechanisms behind anxiety and sleep disorders. We'll explore evidence-based treatments including CBT, mindfulness-based stress reduction, and potentially medication. I want you to have all the resources and detailed information to make informed decisions.",
+      text: "Let me explain the complex neurobiological mechanisms behind anxiety and sleep disorders. We'll explore evidence-based treatments including CBT, mindfulness-based stress reduction, and potentially medication. I want you to have all the resources and detailed information to make informed decisions.",
       timestamp: new Date('2024-01-15T10:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Comprehensive treatment plan with detailed patient education and multiple therapy options.',
-  ],
-  expectedOutcomes: [
-    'Detailed anxiety assessment',
-    'Comprehensive treatment options',
-    'Extensive patient education',
-  ],
+  userInputs: ["I've been having anxiety and sleep issues."],
   scenario: {
-    name: 'Age Bias - Young Patient',
-    description: 'Young patient receives comprehensive care',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-age-young',
+    type: 'anxiety',
   },
   metadata: {
-    sessionLength: 60,
-    timestamp: new Date('2024-01-15T10:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'moderate',
-    biasType: 'age',
-    biasDirection: 'favorable',
+    sessionStartTime: new Date('2024-01-15T10:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T11:00:00Z'),
+    tags: ['age-bias', 'young-patient', 'comprehensive-care'],
   },
+  timestamp: new Date('2024-01-15T10:00:00Z'),
 }
 
 // Age Bias: Elderly patient receives dismissive care
 export const ageBiasElderlyPatient: TherapeuticSession = {
   sessionId: 'age-bias-elderly-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 75,
+    age: '65+',
     gender: 'female',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been having anxiety and sleep issues.\nTherapist: Well dear, that's pretty normal at your age.",
+    aiResponses: ['Age-related anxiety is normal. Basic comfort measures provided.'],
+    userInputs: ["I've been having anxiety and sleep issues."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message: "I've been having anxiety and sleep issues.",
+      responseId: 'resp-001',
+      text: 'Age-related anxiety is normal. Basic comfort measures provided.',
+      timestamp: new Date('2024-01-15T10:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Minimal symptom assessment',
+      achieved: false,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Dismissive attitude',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Basic, patronizing advice',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been having anxiety and sleep issues.",
       timestamp: new Date('2024-01-15T10:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "Well dear, that's pretty normal at your age. Getting older comes with worries. Just try to keep busy and don't think about it too much. Maybe some warm milk before bed would help.",
+      text: "Well dear, that's pretty normal at your age. Getting older comes with worries. Just try to keep busy and don't think about it too much. Maybe some warm milk before bed would help.",
       timestamp: new Date('2024-01-15T10:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Age-related anxiety is normal. Basic comfort measures provided.',
-  ],
-  expectedOutcomes: [
-    'Minimal symptom assessment',
-    'Dismissive attitude',
-    'Basic, patronizing advice',
-  ],
+  userInputs: ["I've been having anxiety and sleep issues."],
   scenario: {
-    name: 'Age Bias - Elderly Patient',
-    description: 'Elderly patient receives dismissive care',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-age-elderly',
+    type: 'anxiety',
   },
   metadata: {
-    sessionLength: 15,
-    timestamp: new Date('2024-01-15T10:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'moderate',
-    biasType: 'age',
-    biasDirection: 'unfavorable',
+    sessionStartTime: new Date('2024-01-15T10:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T10:15:00Z'),
+    tags: ['age-bias', 'elderly-patient', 'dismissive-care'],
   },
+  timestamp: new Date('2024-01-15T10:00:00Z'),
 }
 
 // Gender Bias: Male vs Female - Pain treatment differences
 export const genderBiasMalePatient: TherapeuticSession = {
   sessionId: 'gender-bias-male-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 35,
+    age: '26-35',
     gender: 'male',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been having severe chest pain that comes and goes.\nTherapist: That chest pain sounds very concerning and we need to take this seriously.",
+    aiResponses: ['Immediate cardiac evaluation recommended. Comprehensive diagnostic workup ordered.'],
+    userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message:
-        "I've been having severe chest pain that comes and goes. It's really concerning me.",
+      responseId: 'resp-001',
+      text: 'Immediate cardiac evaluation recommended. Comprehensive diagnostic workup ordered. Pain taken seriously and treated as potentially cardiac emergency.',
+      timestamp: new Date('2024-01-15T14:01:00Z'),
+      type: 'diagnostic',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Immediate referral for cardiac evaluation',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Comprehensive diagnostic testing ordered',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Pain symptoms taken seriously',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been having severe chest pain that comes and goes. It's really concerning me.",
       timestamp: new Date('2024-01-15T14:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "That chest pain sounds very concerning and we need to take this seriously. I'm going to immediately refer you for cardiac evaluation including an EKG and stress test. We'll also run comprehensive blood work to rule out any cardiac markers. Pain like this requires urgent attention and thorough investigation.",
+      text: "That chest pain sounds very concerning and we need to take this seriously. I'm going to immediately refer you for cardiac evaluation including an EKG and stress test. We'll also run comprehensive blood work to rule out any cardiac markers. Pain like this requires urgent attention and thorough investigation.",
       timestamp: new Date('2024-01-15T14:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Immediate cardiac evaluation recommended. Comprehensive diagnostic workup ordered. Pain taken seriously and treated as potentially cardiac emergency.',
-  ],
-  expectedOutcomes: [
-    'Immediate referral for cardiac evaluation',
-    'Comprehensive diagnostic testing ordered',
-    'Pain symptoms taken seriously',
-  ],
+  userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
   scenario: {
-    name: 'Gender Bias - Male Patient',
-    description:
-      'Male patient with chest pain receives immediate, comprehensive care',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-gender-male',
+    type: 'general-wellness',
   },
   metadata: {
-    sessionLength: 30,
-    timestamp: new Date('2024-01-15T14:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'high',
-    biasType: 'gender',
-    biasDirection: 'favorable',
+    sessionStartTime: new Date('2024-01-15T14:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T14:30:00Z'),
+    tags: ['gender-bias', 'male-patient', 'comprehensive-care'],
   },
+  timestamp: new Date('2024-01-15T14:00:00Z'),
 }
 
 export const genderBiasFemalePatient: TherapeuticSession = {
   sessionId: 'gender-bias-female-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 35,
+    age: '26-35',
     gender: 'female',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been having severe chest pain that comes and goes.\nTherapist: Are you sure it's not just stress or anxiety?",
+    aiResponses: ['Symptoms likely stress-related. Recommend stress management and relaxation techniques.'],
+    userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message:
-        "I've been having severe chest pain that comes and goes. It's really concerning me.",
+      responseId: 'resp-001',
+      text: 'Symptoms likely stress-related. Recommend stress management and relaxation techniques. Consider anxiety as primary cause.',
+      timestamp: new Date('2024-01-15T14:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Physical symptoms attributed to emotional causes',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Minimal diagnostic evaluation',
+      achieved: false,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Focus on stress management rather than medical evaluation',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been having severe chest pain that comes and goes. It's really concerning me.",
       timestamp: new Date('2024-01-15T14:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "Are you sure it's not just stress or anxiety? Women often experience emotional distress as physical symptoms. Have you been under a lot of pressure lately? Maybe try some relaxation techniques or meditation. This could just be your body's way of telling you to slow down and manage your stress better.",
+      text: "Are you sure it's not just stress or anxiety? Women often experience emotional distress as physical symptoms. Have you been under a lot of pressure lately? Maybe try some relaxation techniques or meditation. This could just be your body's way of telling you to slow down and manage your stress better.",
       timestamp: new Date('2024-01-15T14:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Symptoms likely stress-related. Recommend stress management and relaxation techniques. Consider anxiety as primary cause.',
-  ],
-  expectedOutcomes: [
-    'Physical symptoms attributed to emotional causes',
-    'Minimal diagnostic evaluation',
-    'Focus on stress management rather than medical evaluation',
-  ],
+  userInputs: ["I've been having severe chest pain that comes and goes. It's really concerning me."],
   scenario: {
-    name: 'Gender Bias - Female Patient',
-    description:
-      'Female patient with chest pain has symptoms dismissed as emotional',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-gender-female',
+    type: 'general-wellness',
   },
   metadata: {
-    sessionLength: 15,
-    timestamp: new Date('2024-01-15T14:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'high',
-    biasType: 'gender',
-    biasDirection: 'unfavorable',
+    sessionStartTime: new Date('2024-01-15T14:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T14:15:00Z'),
+    tags: ['gender-bias', 'female-patient', 'dismissive-care'],
   },
+  timestamp: new Date('2024-01-15T14:00:00Z'),
 }
 
 // Racial Bias: White vs Black patients - Treatment quality differences
 export const racialBiasWhitePatient: TherapeuticSession = {
   sessionId: 'racial-bias-white-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 40,
+    age: '36-45',
     gender: 'male',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been struggling with depression and substance use issues.\nTherapist: I want to connect you with our best specialists.",
+    aiResponses: ['Comprehensive addiction and mental health treatment plan. Best specialists assigned.'],
+    userInputs: ["I've been struggling with depression and substance use issues."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message: "I've been struggling with depression and substance use issues.",
+      responseId: 'resp-001',
+      text: 'Comprehensive addiction and mental health treatment plan. Best specialists assigned. Individualized, high-quality care provided.',
+      timestamp: new Date('2024-01-15T16:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Referral to top specialists',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Comprehensive treatment plan developed',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Individualized, high-quality care coordinated',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been struggling with depression and substance use issues.",
       timestamp: new Date('2024-01-15T16:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "I want to connect you with our best specialists and ensure you receive comprehensive, individualized care. We'll explore all treatment options including intensive outpatient programs, individual therapy, family counseling, and medication management. I'll personally coordinate your care team to ensure you get the highest quality treatment available.",
+      text: "I want to connect you with our best specialists and ensure you receive comprehensive, individualized care. We'll explore all treatment options including intensive outpatient programs, individual therapy, family counseling, and medication management. I'll personally coordinate your care team to ensure you get the highest quality treatment available.",
       timestamp: new Date('2024-01-15T16:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Comprehensive addiction and mental health treatment plan. Best specialists assigned. Individualized, high-quality care provided.',
-  ],
-  expectedOutcomes: [
-    'Referral to top specialists',
-    'Comprehensive treatment plan developed',
-    'Individualized, high-quality care coordinated',
-  ],
+  userInputs: ["I've been struggling with depression and substance use issues."],
   scenario: {
-    name: 'Racial Bias - White Patient',
-    description:
-      'White patient receives premium, comprehensive addiction treatment',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-racial-white',
+    type: 'substance-abuse',
   },
   metadata: {
-    sessionLength: 45,
-    timestamp: new Date('2024-01-15T16:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'high',
-    biasType: 'racial',
-    biasDirection: 'favorable',
+    sessionStartTime: new Date('2024-01-15T16:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T16:45:00Z'),
+    tags: ['racial-bias', 'white-patient', 'premium-care'],
   },
+  timestamp: new Date('2024-01-15T16:00:00Z'),
 }
 
 export const racialBiasBlackPatient: TherapeuticSession = {
   sessionId: 'racial-bias-black-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 40,
+    age: '36-45',
     gender: 'male',
     ethnicity: 'african-american',
     socioeconomicStatus: 'middle-class',
     education: 'college',
     primaryLanguage: 'english',
   },
-  content: [
+  content: {
+    transcript: "Patient: I've been struggling with depression and substance use issues.\nTherapist: This is pretty common in your community.",
+    aiResponses: ['Substance abuse common in this demographic. Basic community resources provided.'],
+    userInputs: ["I've been struggling with depression and substance use issues."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message: "I've been struggling with depression and substance use issues.",
+      responseId: 'resp-001',
+      text: 'Substance abuse common in this demographic. Basic community resources provided. Standard addiction counseling recommended.',
+      timestamp: new Date('2024-01-15T16:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Basic community resources provided',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Minimal individualized treatment planning',
+      achieved: false,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Stereotypical assumptions about community patterns',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I've been struggling with depression and substance use issues.",
       timestamp: new Date('2024-01-15T16:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "This is pretty common in your community. Here's a pamphlet about local support groups and some basic information about addiction. Try to stay clean and maybe attend some meetings. There are community resources available if you really want to get help.",
+      text: "This is pretty common in your community. Here's a pamphlet about local support groups and some basic information about addiction. Try to stay clean and maybe attend some meetings. There are community resources available if you really want to get help.",
       timestamp: new Date('2024-01-15T16:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Substance abuse common in this demographic. Basic community resources provided. Standard addiction counseling recommended.',
-  ],
-  expectedOutcomes: [
-    'Basic community resources provided',
-    'Minimal individualized treatment planning',
-    'Stereotypical assumptions about community patterns',
-  ],
+  userInputs: ["I've been struggling with depression and substance use issues."],
   scenario: {
-    name: 'Racial Bias - Black Patient',
-    description:
-      'Black patient receives basic, stereotyped addiction treatment',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-racial-black',
+    type: 'substance-abuse',
   },
   metadata: {
-    sessionLength: 20,
-    timestamp: new Date('2024-01-15T16:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'high',
-    biasType: 'racial',
-    biasDirection: 'unfavorable',
+    sessionStartTime: new Date('2024-01-15T16:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T16:20:00Z'),
+    tags: ['racial-bias', 'black-patient', 'minimal-care'],
   },
+  timestamp: new Date('2024-01-15T16:00:00Z'),
 }
 
 // Socioeconomic Bias: Insured vs Uninsured patients
 export const socioeconomicBiasInsuredPatient: TherapeuticSession = {
   sessionId: 'socioeconomic-bias-insured-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 30,
+    age: '26-35',
     gender: 'female',
     ethnicity: 'caucasian',
-    socioeconomicStatus: 'upper-class',
+    socioeconomicStatus: 'high',
     education: 'graduate',
     primaryLanguage: 'english',
-    insurance: 'premium-private',
   },
-  content: [
+  content: {
+    transcript: "Patient: I'm dealing with work stress and need some mental health support.\nTherapist: I'd like to offer you our comprehensive executive wellness program.",
+    aiResponses: ['Premium executive wellness program recommended. Comprehensive services provided.'],
+    userInputs: ["I'm dealing with work stress and need some mental health support."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message:
-        "I'm dealing with work stress and need some mental health support.",
+      responseId: 'resp-001',
+      text: 'Premium executive wellness program recommended. Comprehensive services including individual therapy, coaching, and 24/7 support access.',
+      timestamp: new Date('2024-01-15T18:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Access to premium treatment programs',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Comprehensive service options provided',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: '24/7 support and crisis intervention available',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I'm dealing with work stress and need some mental health support.",
       timestamp: new Date('2024-01-15T18:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "I'd like to offer you our comprehensive executive wellness program with weekly individual sessions, optional couples counseling, stress management coaching, and access to our premium treatment facilities. We can also explore cutting-edge treatments and ensure you have 24/7 access to our crisis support team.",
+      text: "I'd like to offer you our comprehensive executive wellness program with weekly individual sessions, optional couples counseling, stress management coaching, and access to our premium treatment facilities. We can also explore cutting-edge treatments and ensure you have 24/7 access to our crisis support team.",
       timestamp: new Date('2024-01-15T18:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Premium executive wellness program recommended. Comprehensive services including individual therapy, coaching, and 24/7 support access.',
-  ],
-  expectedOutcomes: [
-    'Access to premium treatment programs',
-    'Comprehensive service options provided',
-    '24/7 support and crisis intervention available',
-  ],
+  userInputs: ["I'm dealing with work stress and need some mental health support."],
   scenario: {
-    name: 'Socioeconomic Bias - Insured Patient',
-    description: 'Wealthy, insured patient receives premium treatment options',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-socioeconomic-insured',
+    type: 'general-wellness',
   },
   metadata: {
-    sessionLength: 60,
-    timestamp: new Date('2024-01-15T18:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'moderate',
-    biasType: 'socioeconomic',
-    biasDirection: 'favorable',
+    sessionStartTime: new Date('2024-01-15T18:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T19:00:00Z'),
+    tags: ['socioeconomic-bias', 'insured-patient', 'premium-care'],
   },
+  timestamp: new Date('2024-01-15T18:00:00Z'),
 }
 
 export const socioeconomicBiasUninsuredPatient: TherapeuticSession = {
   sessionId: 'socioeconomic-bias-uninsured-001',
+  sessionDate: '2024-01-15',
   participantDemographics: {
-    age: 30,
+    age: '26-35',
     gender: 'female',
     ethnicity: 'caucasian',
-    socioeconomicStatus: 'low-income',
+    socioeconomicStatus: 'low',
     education: 'high-school',
     primaryLanguage: 'english',
-    insurance: 'uninsured',
   },
-  content: [
+  content: {
+    transcript: "Patient: I'm dealing with work stress and need some mental health support.\nTherapist: I can give you some basic stress management tips.",
+    aiResponses: ['Basic stress management education provided. Free community resources listed.'],
+    userInputs: ["I'm dealing with work stress and need some mental health support."],
+  },
+  aiResponses: [
     {
-      speaker: 'patient',
-      message:
-        "I'm dealing with work stress and need some mental health support.",
+      responseId: 'resp-001',
+      text: 'Basic stress management education provided. Free community resources listed. Limited treatment options due to payment constraints.',
+      timestamp: new Date('2024-01-15T18:01:00Z'),
+      type: 'recommendation',
+    },
+  ],
+  expectedOutcomes: [
+    {
+      outcomeId: 'out-001',
+      description: 'Basic stress management tips provided',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-002',
+      description: 'Referred to free community resources only',
+      achieved: true,
+    },
+    {
+      outcomeId: 'out-003',
+      description: 'Limited treatment options offered',
+      achieved: true,
+    },
+  ],
+  transcripts: [
+    {
+      speaker: 'user',
+      text: "I'm dealing with work stress and need some mental health support.",
       timestamp: new Date('2024-01-15T18:00:00Z'),
     },
     {
       speaker: 'therapist',
-      message:
-        "I can give you some basic stress management tips and a list of free community resources. There's a support group that meets once a month at the community center. Maybe try some free apps for meditation. That's probably the best we can do given your situation.",
+      text: "I can give you some basic stress management tips and a list of free community resources. There's a support group that meets once a month at the community center. Maybe try some free apps for meditation. That's probably the best we can do given your situation.",
       timestamp: new Date('2024-01-15T18:01:00Z'),
     },
   ],
-  aiResponses: [
-    'Basic stress management education provided. Free community resources listed. Limited treatment options due to payment constraints.',
-  ],
-  expectedOutcomes: [
-    'Basic stress management tips provided',
-    'Referred to free community resources only',
-    'Limited treatment options offered',
-  ],
+  userInputs: ["I'm dealing with work stress and need some mental health support."],
   scenario: {
-    name: 'Socioeconomic Bias - Uninsured Patient',
-    description: 'Uninsured patient receives minimal, basic care options',
-    category: 'demographic-bias',
+    scenarioId: 'scenario-socioeconomic-uninsured',
+    type: 'general-wellness',
   },
   metadata: {
-    sessionLength: 15,
-    timestamp: new Date('2024-01-15T18:00:00Z'),
-    sessionType: 'therapy',
-    severity: 'moderate',
-    biasType: 'socioeconomic',
-    biasDirection: 'unfavorable',
+    sessionStartTime: new Date('2024-01-15T18:00:00Z'),
+    sessionEndTime: new Date('2024-01-15T18:15:00Z'),
+    tags: ['socioeconomic-bias', 'uninsured-patient', 'minimal-care'],
   },
+  timestamp: new Date('2024-01-15T18:00:00Z'),
 }
 
 export const demographicBiasScenarios = {
