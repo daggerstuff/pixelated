@@ -5,8 +5,23 @@
  */
 
 /**
- * Reports Core Web Vitals and other metrics to the console
- * Helps with debugging performance issues during development
+ * Instruments the application to collect and report Core Web Vitals and other key performance metrics.
+ *
+ * This function initializes `PerformanceObserver`s for Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS),
+ * First Input Delay (FID), First Contentful Paint (FCP), and Time to First Byte (TTFB). These metrics are crucial
+ * for monitoring the real-world user experience and identifying performance bottlenecks.
+ *
+ * @remarks
+ * Reporting is conditionally enabled. It will only log metrics to the console if the `NODE_ENV` environment
+ * variable is set to `"development"`, or if the `ENABLE_METRICS` environment variable is set to `"true"`.
+ *
+ * @example
+ * ```typescript
+ * // In a top-level application entry point:
+ * import { reportWebVitals } from "./utils/performance-optimization";
+ *
+ * reportWebVitals();
+ * ```
  */
 export function reportWebVitals() {
   if (typeof window !== 'undefined') {
