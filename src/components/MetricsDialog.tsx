@@ -22,6 +22,7 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
         <button
           onClick={onClose}
           className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-3 top-3'
+          aria-label='Close dialog'
         >
           <svg
             className='h-5 w-5'
