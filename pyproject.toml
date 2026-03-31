@@ -255,6 +255,16 @@ source = ["src", "ai"]
 [tool.coverage.report]
 show_missing = true
 skip_covered = true
+fail_under = 70
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
 [tool.uv.workspace]
 members = ["./", "tools/gdrive-dataset-manager"]
 exclude = ["ai"]

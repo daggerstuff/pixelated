@@ -98,6 +98,12 @@ export default defineConfig({
         !process.env['CI'] || process.env['VITEST_COVERAGE_ENABLED'] === 'true',
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
       exclude: [
         'node_modules/**',
         'dist/**',
