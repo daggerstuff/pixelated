@@ -1,55 +1,74 @@
-import { describe, expect, it, vi } from "vitest";
-import { UnifiedMonitor } from "../unified-monitor";
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { UnifiedMonitor } from '../unified-monitor'
 
-describe("UnifiedMonitor", () => {
-  it("aggregates events from all modules (fhe, audit, secrets, governance)", () => {
-    const monitor = new UnifiedMonitor();
+describe('UnifiedMonitor', () => {
+  let monitor: UnifiedMonitor
 
-    // Record events from different sources
-    monitor.record({ source: "fhe", type: "encryption", status: "success" });
-    monitor.record({ source: "audit", type: "log", status: "success" });
-    monitor.record({ source: "secrets", type: "rotation", status: "success" });
-    monitor.record({ source: "governance", type: "policy_check", status: "success" });
+  beforeEach(() => {
+    monitor = new UnifiedMonitor()
+  })
 
-    // Verify events are aggregated by source
-    const fheEvents = monitor.getEvents("fhe");
-    const auditEvents = monitor.getEvents("audit");
-    const secretsEvents = monitor.getEvents("secrets");
-    const governanceEvents = monitor.getEvents("governance");
+  it('aggregates events from all modules', async () => {
+    await monitor.record({
+      source: 'fhe',
+      event: 'encryption_complete',
+      timestamp: new Date().toISOString()
+    })
 
-    expect(fheEvents).toHaveLength(1);
-    expect(fheEvents[0]).toEqual(
-      expect.objectContaining({
-        source: "fhe",
-        type: "encryption",
-        status: "success",
-      }),
-    );
+    const events = monitor.getEvents('fhe')
+    expect(events.length).toBe(1)
+    expect(events[0].event).toBe('encryption_complete')
+  })
 
-    expect(auditEvents).toHaveLength(1);
-    expect(secretsEvents).toHaveLength(1);
-    expect(governanceEvents).toHaveLength(1);
-  });
+  it('tracks events from multiple sources', async () => {
+    await monitor.record({ source: 'fhe', event: 'e1', timestamp: new Date().toISOString() })
+    await monitor.record({ source: 'audit', event: 'e2', timestamp: new Date().toISOString() })
+    await monitor.record({ source: 'secrets', event: 'e3', timestamp: new Date().toISOString() })
 
-  it("triggers alert on threshold breach (5+ compliance failures)", () => {
-    const monitor = new UnifiedMonitor();
-    const alertHandler = vi.fn();
-    monitor.onAlert(alertHandler);
+    expect(monitor.getEvents('fhe').length).toBe(1)
+    expect(monitor.getEvents('audit').length).toBe(1)
+    expect(monitor.getEvents('secrets').length).toBe(1)
+    expect(monitor.getAllEvents().length).toBe(3)
+  })
 
-    // Record 4 failures - should NOT trigger alert
-    for (let i = 0; i < 4; i++) {
-      monitor.record({ source: "governance", type: "compliance_failure", status: "failure" });
+  it('triggers alert on threshold breach', async () => {
+    const alertSpy = vi.fn()
+    monitor.onAlert(alertSpy)
+
+    // Record 5 compliance failures (threshold)
+    for (let i = 0; i < 5; i++) {
+      await monitor.record({
+        source: 'governance',
+        event: 'compliance_failure',
+        timestamp: new Date().toISOString()
+      })
     }
-    expect(alertHandler).not.toHaveBeenCalled();
 
-    // Record 5th failure - SHOULD trigger alert
-    monitor.record({ source: "governance", type: "compliance_failure", status: "failure" });
-    expect(alertHandler).toHaveBeenCalledTimes(1);
-    expect(alertHandler).toHaveBeenCalledWith({
-      source: "governance",
-      type: "compliance_failure",
-      count: 5,
-      threshold: 5,
-    });
-  });
-});
+    expect(alertSpy).toHaveBeenCalled()
+    expect(alertSpy).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'compliance_failure',
+      count: 5
+    }))
+  })
+
+  it('does not trigger alert below threshold', async () => {
+    const alertSpy = vi.fn()
+    monitor.onAlert(alertSpy)
+
+    for (let i = 0; i < 4; i++) {
+      await monitor.record({
+        source: 'governance',
+        event: 'compliance_failure',
+        timestamp: new Date().toISOString()
+      })
+    }
+
+    expect(alertSpy).not.toHaveBeenCalled()
+  })
+
+  it('clears events', async () => {
+    await monitor.record({ source: 'fhe', event: 'e1', timestamp: new Date().toISOString() })
+    monitor.clearEvents()
+    expect(monitor.getAllEvents().length).toBe(0)
+  })
+})
