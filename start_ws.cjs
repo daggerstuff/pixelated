@@ -1,3 +1,0 @@
-const http = require('http');
-// Pixel multimodal websocket test relies on an actual implementation, apparently it's meant to test against a running Next.js/Astro server...
-// But tests/api/websocket/pixel-multimodal.test.ts is an integration/API test that spins up the server inside the test or expects one?
