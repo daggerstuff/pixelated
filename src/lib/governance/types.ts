@@ -1,4 +1,5 @@
 // Governance policy schema
+
 export interface GovernancePolicy {
   id: string
   version: string
@@ -25,4 +26,9 @@ export interface PolicyEvaluationResult {
   reason: string
   policyId: string
   ruleId?: string
+}
+
+export interface PolicyEvaluationContext {
+  action: string
+  context: Record<string, unknown>
 }
