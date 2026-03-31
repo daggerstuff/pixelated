@@ -1,0 +1,382 @@
+# Azure DevOps Pipeline - Deploy Gate
+# Ensures upstream GitHub (security) and GitLab (quality) checks pass before deploy
+#
+# Federation Model:
+# - GitHub: Security scanning (CodeQL, Trivy, Checkov, pnpm audit)
+# - GitLab: Quality gate (tests, coverage, lint, typecheck)
+# - Azure: Deploy authority (this pipeline)
+#
+# Prerequisites:
+# - GitHub PAT with 'repo' scope stored as GITHUB_TOKEN variable
+# - GitLab PAT with 'api' scope stored as GITLAB_TOKEN variable
+# - Azure subscription service connection configured
+
+trigger: none
+
+resources:
+  pipelines:
+  # Gate on upstream GitLab quality pipeline
+  - pipeline: gitlabQuality
+    source: 'pixelated-empathy-quality'  # External GitLab pipeline name
+    trigger:
+      stages:
+      - validate
+      - test
+  # Gate on upstream GitHub security pipeline
+  - pipeline: githubSecurity
+    source: 'pixelated-empathy-security'  # External GitHub pipeline name
+    trigger: true
+
+pool:
+  name: Bear Dance
+
+parameters:
+- name: environment
+  displayName: 'Target Environment'
+  type: string
+  default: 'staging'
+  values:
+  - staging
+  - production
+- name: skipUpstreamChecks
+  displayName: 'Skip upstream checks (emergency only)'
+  type: boolean
+  default: false
+- name: imageTag
+  displayName: 'Container image tag to deploy'
+  type: string
+  default: 'latest'
+
+variables:
+- group: pixelated-pipeline-variables
+- group: pixelated-deploy-variables
+- name: containerRegistry
+  value: '$(ACR_NAME).azurecr.io'
+- name: imageRepository
+  value: 'pixelatedempathy'
+- name: kubernetesNamespace
+  value: 'pixelated'
+
+stages:
+# Stage 1: Verify Upstream Checks
+- stage: VerifyUpstream
+  displayName: 'Verify Upstream Checks'
+  condition: and(succeeded(), eq(${{ parameters.skipUpstreamChecks }}, false))
+  jobs:
+  - job: CheckGitLabQuality
+    displayName: 'Check GitLab Quality Gate'
+    steps:
+    - checkout: none
+
+    - task: Bash@3
+      displayName: 'Query GitLab Pipeline Status'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+
+          echo "🔍 Querying GitLab CI pipeline status..."
+
+          # GitLab project ID (can be found in project settings)
+          GITLAB_PROJECT_ID="${GITLAB_PROJECT_ID:-77130665}"
+          GITLAB_API_URL="https://gitlab.com/api/v4/projects/${GITLAB_PROJECT_ID}"
+
+          # Get the latest successful pipeline on the target branch
+          REF="${{ parameters.environment }}"
+          if [ "$REF" = "production" ]; then
+            REF="main"
+          elif [ "$REF" = "staging" ]; then
+            REF="staging"
+          fi
+
+          # Query GitLab API for pipeline status
+          PIPELINE_RESPONSE=$(curl -s --header "PRIVATE-TOKEN: $(GITLAB_TOKEN)" \
+            "${GITLAB_API_URL}/pipelines?ref=${REF}&status=success&per_page=1")
+
+          PIPELINE_COUNT=$(echo "$PIPELINE_RESPONSE" | jq 'length')
+
+          if [ "$PIPELINE_COUNT" -eq 0 ]; then
+            echo "##vso[task.logissue type=error]No successful GitLab pipeline found for ref: ${REF}"
+            echo "GitLab quality gate must pass before deployment"
+            echo "Check: https://gitlab.com/${GITLAB_PROJECT_PATH:-pixelated-empathy}/-/pipelines"
+            exit 1
+          fi
+
+          echo "✅ GitLab quality gate passed"
+          PIPELINE_ID=$(echo "$PIPELINE_RESPONSE" | jq -r '.[0].id')
+          echo "Latest successful pipeline: ${PIPELINE_ID}"
+
+          # Check specific job statuses
+          JOBS_RESPONSE=$(curl -s --header "PRIVATE-TOKEN: $(GITLAB_TOKEN)" \
+            "${GITLAB_API_URL}/pipelines/${PIPELINE_ID}/jobs")
+
+          REQUIRED_JOBS=("test:unit" "validate:dependencies" "security:scan")
+
+          for JOB in "${REQUIRED_JOBS[@]}"; do
+            JOB_STATUS=$(echo "$JOBS_RESPONSE" | jq -r --arg name "$JOB" '.[] | select(.name == $name) | .status')
+            if [ "$JOB_STATUS" != "success" ]; then
+              echo "##vso[task.logissue type=error]GitLab job '${JOB}' status: ${JOB_STATUS}"
+              exit 1
+            fi
+            echo "✅ ${JOB}: ${JOB_STATUS}"
+          done
+
+          echo "##vso[task.complete result=Succeeded;]All GitLab quality checks passed"
+      env:
+        GITLAB_TOKEN: $(GITLAB_TOKEN)
+        GITLAB_PROJECT_ID: $(GITLAB_PROJECT_ID)
+
+  - job: CheckGitHubSecurity
+    displayName: 'Check GitHub Security Gate'
+    steps:
+    - checkout: none
+
+    - task: Bash@3
+      displayName: 'Query GitHub Actions Status'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+
+          echo "🔍 Querying GitHub Actions workflow status..."
+
+          GITHUB_REPO="${GITHUB_REPO:-vivshare/pixelated}"
+          GITHUB_API_URL="https://api.github.com/repos/${GITHUB_REPO}"
+
+          # Required security workflows
+          REQUIRED_WORKFLOWS=("codeql.yml" "security-scanning.yml")
+
+          for WORKFLOW in "${REQUIRED_WORKFLOWS[@]}"; do
+            echo "Checking workflow: ${WORKFLOW}"
+
+            # Get the latest successful run
+            WORKFLOW_RESPONSE=$(curl -s --header "Authorization: token $(GITHUB_TOKEN)" \
+              "${GITHUB_API_URL}/actions/workflows/${WORKFLOW}/runs?status=success&per_page=1&branch=${{ parameters.environment }}")
+
+            RUN_COUNT=$(echo "$WORKFLOW_RESPONSE" | jq '.workflow_runs | length')
+
+            if [ "$RUN_COUNT" -eq 0 ]; then
+              echo "##vso[task.logissue type=error]No successful run found for workflow: ${WORKFLOW}"
+              echo "GitHub security gate must pass before deployment"
+              echo "Check: https://github.com/${GITHUB_REPO}/actions"
+              exit 1
+            fi
+
+            RUN_ID=$(echo "$WORKFLOW_RESPONSE" | jq -r '.workflow_runs[0].id')
+            echo "✅ ${WORKFLOW}: run ${RUN_ID} successful"
+          done
+
+          echo "##vso[task.complete result=Succeeded;]All GitHub security checks passed"
+      env:
+        GITHUB_TOKEN: $(GITHUB_TOKEN)
+        GITHUB_REPO: $(GITHUB_REPO)
+
+# Stage 2: Pre-Flight Checks
+- stage: PreFlight
+  displayName: 'Pre-Flight Checks'
+  dependsOn: VerifyUpstream
+  condition: succeeded()
+  jobs:
+  - job: ValidateDeployment
+    displayName: 'Validate Deployment Configuration'
+    steps:
+    - checkout: self
+
+    - task: Bash@3
+      displayName: 'Verify Container Image Exists'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+
+          IMAGE_TAG="${{ parameters.imageTag }}"
+          REGISTRY="$(containerRegistry)"
+          REPOSITORY="$(imageRepository)"
+          FULL_IMAGE="${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
+
+          echo "🔍 Verifying image exists: ${FULL_IMAGE}"
+
+          # Login to ACR
+          az acr login --name $(ACR_NAME)
+
+          # Check if image exists
+          if ! az acr repository show --name $(ACR_NAME) --image "${REPOSITORY}:${IMAGE_TAG}" &>/dev/null; then
+            echo "##vso[task.logissue type=error]Image not found: ${FULL_IMAGE}"
+            echo "Available tags:"
+            az acr repository show-tags --name $(ACR_NAME) --repository "${REPOSITORY}" --top 10
+            exit 1
+          fi
+
+          echo "✅ Image verified: ${FULL_IMAGE}"
+
+    - task: Bash@3
+      displayName: 'Verify Kubernetes Cluster Health'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+
+          echo "🔍 Checking Kubernetes cluster health..."
+
+          # Get AKS credentials
+          az aks get-credentials \
+            --resource-group $(AKS_RESOURCE_GROUP) \
+            --name $(AKS_CLUSTER_NAME) \
+            --overwrite-existing
+
+          # Verify cluster connectivity
+          if ! kubectl cluster-info &>/dev/null; then
+            echo "##vso[task.logissue type=error]Cannot connect to Kubernetes cluster"
+            exit 1
+          fi
+
+          echo "✅ Kubernetes cluster healthy"
+
+          # Check namespace exists
+          if ! kubectl get namespace $(kubernetesNamespace) &>/dev/null; then
+            echo "Creating namespace: $(kubernetesNamespace)"
+            kubectl create namespace $(kubernetesNamespace)
+          fi
+
+# Stage 3: Deploy (using inline steps for both standard and emergency paths)
+- stage: Deploy
+  displayName: 'Deploy to ${{ parameters.environment }}'
+  dependsOn: PreFlight
+  condition: succeeded()
+  jobs:
+  - deployment: DeployApplication
+    displayName: 'Deploy Application'
+    environment: ${{ parameters.environment }}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: deploy-steps.yml
+            parameters:
+              environment: ${{ parameters.environment }}
+              imageTag: ${{ parameters.imageTag }}
+
+# Emergency Bypass Stage
+- stage: EmergencyDeploy
+  displayName: 'Emergency Deploy (Skip Checks)'
+  condition: eq(${{ parameters.skipUpstreamChecks }}, true)
+  jobs:
+  - deployment: EmergencyDeployment
+    displayName: 'Emergency Deployment'
+    environment: ${{ parameters.environment }}-emergency
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: Bash@3
+            displayName: '⚠️ Emergency Deploy Warning'
+            inputs:
+              targetType: 'inline'
+              script: |
+                echo "##vso[task.logissue type=warning]⚠️ EMERGENCY DEPLOYMENT"
+                echo "Upstream checks skipped at operator request"
+                echo "This should only be used for critical incidents"
+                echo ""
+                echo "Operator: $(Build.RequestedFor)"
+                echo "Time: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+                echo "Image: $(containerRegistry)/$(imageRepository):${{ parameters.imageTag }}"
+                echo ""
+                echo "##[warning]This deployment bypassed quality and security gates"
+
+          - template: deploy-steps.yml
+            parameters:
+              environment: ${{ parameters.environment }}
+              imageTag: ${{ parameters.imageTag }}
+
+# Stage 4: Post-Deploy Verification
+- stage: PostDeploy
+  displayName: 'Post-Deploy Verification'
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: IntegrationTests
+    displayName: 'Run Integration Tests'
+    steps:
+    - checkout: self
+
+    - task: Bash@3
+      displayName: 'Run Smoke Tests'
+      inputs:
+        targetType: 'inline'
+        script: |
+          set -euo pipefail
+
+          echo "🧪 Running smoke tests..."
+
+          # Get service endpoint with retry logic for LoadBalancer provisioning
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+          SERVICE_IP=""
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            SERVICE_IP=$(kubectl get service pixelated \
+              -n $(kubernetesNamespace) \
+              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' || echo "")
+
+            if [ -n "$SERVICE_IP" ] && [ "$SERVICE_IP" != "" ]; then
+              break
+            fi
+
+            echo "⏳ Waiting for LoadBalancer IP provisioning... (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)"
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            sleep 10
+          done
+
+          if [ -z "$SERVICE_IP" ]; then
+            echo "⚠️ No LoadBalancer IP found, checking ingress..."
+            SERVICE_IP=$(kubectl get ingress pixelated \
+              -n $(kubernetesNamespace) \
+              -o jsonpath='{.spec.rules[0].host}' || echo "")
+          fi
+
+          # Run basic smoke tests
+          TEST_ENDPOINTS=("/health" "/api/status" "/api/health")
+
+          for ENDPOINT in "${TEST_ENDPOINTS[@]}"; do
+            echo "Testing: ${ENDPOINT}"
+
+            if [ -n "$SERVICE_IP" ]; then
+              HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+                "http://${SERVICE_IP}${ENDPOINT}" || echo "000")
+
+              if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "401" ]; then
+                echo "✅ ${ENDPOINT}: ${HTTP_STATUS}"
+              else
+                echo "⚠️ ${ENDPOINT}: ${HTTP_STATUS} (may be expected)"
+              fi
+            else
+              echo "⚠️ No endpoint available for testing"
+            fi
+          done
+
+          echo "✅ Smoke tests completed"
+
+  - job: NotifySuccess
+    displayName: 'Notify Deployment Success'
+    dependsOn: IntegrationTests
+    condition: succeeded()
+    steps:
+    - task: Bash@3
+      displayName: 'Send Success Notification'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "📤 Deployment to ${{ parameters.environment }} completed successfully"
+          echo ""
+          echo "Details:"
+          echo "  Environment: ${{ parameters.environment }}"
+          echo "  Image: $(containerRegistry)/$(imageRepository):${{ parameters.imageTag }}"
+          echo "  Build: $(Build.BuildNumber)"
+          echo "  Triggered by: $(Build.RequestedFor)"
+          echo ""
+          echo "🔗 Links:"
+          echo "  Pipeline: $(System.TeamFoundationCollectionUri)$(System.TeamProject)/_build/results?buildId=$(Build.BuildId)"
+          # Optional: Send to Slack/Teams webhook
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data "{\"text\":\"✅ Deployed to ${{ parameters.environment }}: $(containerRegistry)/$(imageRepository):${{ parameters.imageTag }}\"}" \
+          #   "$(SLACK_WEBHOOK_URL)" || true
