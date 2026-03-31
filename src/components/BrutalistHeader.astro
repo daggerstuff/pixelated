@@ -8,7 +8,7 @@ export interface Props {
   title?: string
 }
 
-const { logo = '/assets/logo.png', title = 'Pixelated Empathy' } = Astro.props
+const { logo = '/favicon.svg', title = 'Pixelated Empathy' } = Astro.props
 const [titlePrimary = 'Pixelated', ...titleRest] = title.trim().split(/\s+/)
 const titleSecondary = titleRest.join(' ')
 
@@ -155,11 +155,6 @@ const navItems = [
     color: var(--text-primary);
   }
 
-  .logo-img {
-    object-fit: contain;
-    flex-shrink: 0;
-  }
-
   .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -184,7 +179,7 @@ const navItems = [
 
   .brand-mark__secondary {
     color: var(--accent-primary);
-    font-weight: 600;
+    font-weight: 700;
   }
 
   /* Navigation */
@@ -355,7 +350,7 @@ const navItems = [
 
   .logo-img {
     height: 2.5rem;
-    width: auto;
+    width: 2.5rem;
     object-fit: contain;
     transition: transform 0.3s ease;
   }
@@ -376,6 +371,7 @@ const navItems = [
 
     .logo-img {
       height: 2.2rem;
+      width: 2.2rem;
     }
   }
 </style>

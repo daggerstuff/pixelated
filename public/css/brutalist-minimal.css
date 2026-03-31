@@ -13,81 +13,25 @@
 
 /* === FONTS === */
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-400.ttf") format("truetype");
+  font-family: "Inter";
+  src: url("/fonts/inter-regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-500.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-600.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-700.ttf") format("truetype");
+  font-family: "Inter";
+  src: url("/fonts/inter-bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-800.ttf") format("truetype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono-400.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono-500.ttf") format("truetype");
+  font-family: "DM Mono";
+  src: url("/fonts/dm-mono-medium.woff2") format("woff2");
   font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono-600.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono-700.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  src: url("/fonts/jetbrains-mono-800.ttf") format("truetype");
-  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -144,14 +88,14 @@
   --glass-blur: 12px;
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: Outfit - Premium, modern */
-  --font-display: "Outfit", sans-serif;
+  /* Headings: Inter - matches the broader product typography */
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   
-  /* Body: Outfit - consistent and clean */
-  --font-sans: "Outfit", sans-serif;
+  /* Body: Inter - matches the broader product typography */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* Technical: JetBrains Mono - terminal precision */
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, monospace;
+  /* Technical accents: restrained mono, no oversized terminal feel */
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Display: Outfit for that Premium feel */
   --font-heading: var(--font-display);
@@ -287,7 +231,7 @@ h6 {
 
 h1 {
   font-size: var(--text-5xl);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: var(--tracking-tighter);
 }
 
@@ -298,22 +242,22 @@ h2 {
 
 h3 {
   font-size: var(--text-3xl);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h4 {
   font-size: var(--text-2xl);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 h5 {
   font-size: var(--text-xl);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 h6 {
   font-size: var(--text-lg);
-  font-weight: 500;
+  font-weight: 700;
 }
 
 p {
@@ -334,7 +278,7 @@ a:hover {
   color: var(--accent-secondary);
 }
 
-/* Monospace label - Antfu style section markers */
+/* Section marker */
 .label-mono {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -460,7 +404,7 @@ pre {
 
 /* ================================================
    BRUTALIST BUTTON SYSTEM
-   Hard edges, monospace labels, terminal feel
+   Hard edges, restrained typography
    ================================================ */
 
 .btn {
@@ -468,10 +412,10 @@ pre {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: var(--tracking-mono);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
@@ -641,7 +585,7 @@ pre {
 
 /* ================================================
    NAVIGATION SYSTEM
-   Minimal, text-focused, terminal-like
+   Minimal, text-focused
    ================================================ */
 
 .nav {
@@ -651,14 +595,15 @@ pre {
 }
 
 .nav-link {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
-  font-weight: 500;
-  letter-spacing: var(--tracking-mono);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
   color: var(--text-secondary);
   text-decoration: none;
   transition: color var(--duration-fast) var(--ease-out);
   position: relative;
+  text-transform: uppercase;
 }
 
 .nav-link:hover {
@@ -694,7 +639,7 @@ pre {
 
 .input {
   width: 100%;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   padding: var(--space-3) var(--space-4);
   background: var(--bg-tertiary);
@@ -720,10 +665,10 @@ pre {
 
 .label {
   display: block;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
-  font-weight: 500;
-  letter-spacing: var(--tracking-mono);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: var(--space-2);
@@ -737,10 +682,10 @@ pre {
 .badge {
   display: inline-flex;
   align-items: center;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
   font-weight: 600;
-  letter-spacing: var(--tracking-mono);
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);

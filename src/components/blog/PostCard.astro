@@ -93,9 +93,11 @@ function getReadingTime(content: string) {
           </p>
           <div class="flex items-center gap-2 mt-auto">
             <img
-              src="/assets/avatar-default.svg"
-              alt="Author avatar"
-              class="w-7 h-7 rounded-full border border-green-400/30"
+              src="/favicon.svg"
+              alt="Pixelated Empathy"
+              class="h-7 w-7 rounded-full border border-green-400/30 object-contain p-0.5"
+              loading="lazy"
+              decoding="async"
             />
             <span class="text-xs text-slate-400">
               By {post.data.author ?? 'Pixelated Empathy'}
