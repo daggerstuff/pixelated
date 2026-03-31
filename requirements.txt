@@ -1292,7 +1292,7 @@ pydantic-core==2.41.5
     #   pydantic
 pydantic-evals==1.71.0
     # via pydantic-ai-slim
-pydantic-graph==1.71.0
+pydantic-graph==1.74.0
     # via pydantic-ai-slim
 pydantic-handlebars==0.1.0
     # via pydantic-ai-slim
