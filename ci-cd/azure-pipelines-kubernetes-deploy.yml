@@ -68,12 +68,6 @@ stages:
             submodules: false
 
           - task: Bash@3
-            displayName: 'Ensure swap is available on self-hosted runner'
-            inputs:
-              targetType: 'filePath'
-              filePath: 'scripts/devops/ensure-swap.sh'
-
-          - task: Bash@3
             displayName: 'Initialize CI-aware submodules'
             env:
               GITHUB_PAT: $(GITHUB_PAT)
@@ -211,12 +205,6 @@ stages:
             fetchDepth: 1
             persistCredentials: true
             submodules: false
-
-          - task: Bash@3
-            displayName: 'Ensure swap is available on self-hosted runner'
-            inputs:
-              targetType: 'filePath'
-              filePath: 'scripts/devops/ensure-swap.sh'
 
           - task: Bash@3
             displayName: 'Preflight: Validate GitHub submodule secret'
