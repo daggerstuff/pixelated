@@ -47,8 +47,8 @@ const enhancedFHEService = fheService as unknown as EnhancedFHEService
 // Secret key for signatures
 const SECRET_KEY =
   typeof process !== 'undefined' && process.env
-    ? process.env['SECRET_KEY'] || 'default-secret-key'
-    : 'default-secret-key'
+    ? process.env['SECRET_KEY'] || ''
+    : ''
 
 /**
  * Initialize security system
@@ -457,6 +457,7 @@ export function generateSecureToken(length = 32): string {
  * Create a signature for data integrity
  */
 export function createSignature(data: string): string {
+  if (!SECRET_KEY) throw new Error("SECRET_KEY is required for signatures");
   try {
     // Browser-safe implementation
     if (typeof window !== 'undefined') {
