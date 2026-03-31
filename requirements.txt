@@ -927,7 +927,7 @@ opentelemetry-instrumentation-google-generativeai==0.53.3
     # via traceloop-sdk
 opentelemetry-instrumentation-groq==0.53.3
     # via traceloop-sdk
-opentelemetry-instrumentation-haystack==0.53.3
+opentelemetry-instrumentation-haystack==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-httpx==0.60b1
     # via logfire
