@@ -44,8 +44,8 @@ const organizationSchema = {
   <BrutalistHero
     title="The AI Training Ground for Therapists"
     subtitle="Pixelated Empathy is an AI roleplay platform for therapists, trainees, and care teams who need realistic practice, instant feedback, and safer repetition before the real conversation starts."
-    ctaPrimary={{ text: 'Start Practice', href: '/signup' }}
-    ctaSecondary={{ text: 'Watch Demo', href: '/demo-hub' }}
+    primaryCTA={{ text: 'Start Practice', href: '/signup' }}
+    secondaryCTA={{ text: 'Watch Demo', href: '/demo-hub' }}
     stats={[
       { value: 'Scenario', label: 'Configurable practice' },
       { value: 'Feedback', label: 'Review after each session' },
@@ -229,7 +229,7 @@ const organizationSchema = {
 
   .home-card-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: var(--space-6);
   }
 
@@ -238,15 +238,30 @@ const organizationSchema = {
     background: rgba(255, 255, 255, 0.02);
   }
 
+  .home-card:nth-child(1) {
+    grid-column: span 5;
+  }
+
+  .home-card:nth-child(2) {
+    grid-column: span 7;
+    background:
+      linear-gradient(180deg, rgba(0, 255, 136, 0.05), rgba(255, 255, 255, 0.02));
+  }
+
+  .home-card:nth-child(3) {
+    grid-column: 3 / span 8;
+  }
+
   .home-card h3 {
-    font-size: var(--text-2xl);
+    font-size: clamp(1.3rem, 1.15rem + 0.45vw, 1.7rem);
     margin-bottom: var(--space-3);
+    line-height: 1.15;
   }
 
   .home-split {
     display: grid;
-    grid-template-columns: minmax(24rem, 1.08fr) minmax(22rem, 0.92fr);
-    gap: var(--space-10);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--space-8);
     align-items: start;
   }
 
@@ -279,9 +294,26 @@ const organizationSchema = {
   }
 
   @media (max-width: 1180px) {
-    .home-card-grid,
     .home-intro,
     .home-split {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 1240px) {
+    .home-card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-card:nth-child(1),
+    .home-card:nth-child(2),
+    .home-card:nth-child(3) {
+      grid-column: auto;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .home-card-grid {
       grid-template-columns: 1fr;
     }
   }
