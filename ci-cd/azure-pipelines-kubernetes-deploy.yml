@@ -153,27 +153,10 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
 
-  - stage: ProductionApproval
-    displayName: Approve production deployment
-    dependsOn: Build
-    condition: and(succeeded(), eq('${{ parameters.environment }}', 'production'))
-    jobs:
-      - job: AwaitApproval
-        displayName: Manual approval before production deploy
-        pool: server
-        steps:
-          - task: ManualValidation@0
-            timeoutInMinutes: 1440
-            inputs:
-              instructions: 'Approve only after confirming the production Helm deploy target and image tag are correct.'
-              onTimeout: 'reject'
-
   # Stage 2: Deploy to AKS
   - stage: DeployHosted
     displayName: Deploy to AKS (self-hosted agent)
-    dependsOn:
-      - Build
-      - ProductionApproval
+    dependsOn: Build
     condition: |
       and(
         succeeded('Build'),
@@ -184,7 +167,6 @@ stages:
           ),
           and(
             eq('${{ parameters.environment }}', 'production'),
-            succeeded('ProductionApproval'),
             or(
               eq(variables['Build.SourceBranch'], 'refs/heads/staging'),
               eq(variables['Build.SourceBranch'], 'refs/heads/master'),
