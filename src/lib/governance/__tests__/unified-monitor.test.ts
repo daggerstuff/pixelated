@@ -73,12 +73,17 @@ describe('UnifiedMonitor', () => {
     expect(monitor.getAllEvents().length).toBe(0)
   })
 
-  it('connects SlackAlerter for notifications', async () => {
+  it('can integrate with SlackAlerter via onAlert', async () => {
     const mockFetch = vi.fn().mockResolvedValue({ ok: true })
     global.fetch = mockFetch
 
+    // Integration happens at composition root, not inside UnifiedMonitor
     const slackAlerter = new SlackAlerter('https://hooks.slack.com/test')
-    monitor.connectSlack(slackAlerter)
+    monitor.onAlert(async (alert) => {
+      await slackAlerter.send({
+        text: `🚨 Governance Alert: ${alert.type} (count: ${alert.count}, source: ${alert.source})`,
+      })
+    })
 
     // Trigger alert by hitting threshold
     for (let i = 0; i < 5; i++) {

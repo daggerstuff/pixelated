@@ -1,5 +1,4 @@
 import { getLogger } from '../logging'
-import type { SlackAlerter } from './slack-alert'
 
 const logger = getLogger({ module: 'unified-monitor' })
 
@@ -70,18 +69,6 @@ export class UnifiedMonitor {
   clearEvents(): void {
     this.eventsBySource.clear()
     this.failureCounts.clear()
-  }
-
-  /**
-   * Register a Slack alerter to receive all governance alerts.
-   * The SlackAlerter will be called for each alert triggered by threshold breaches.
-   */
-  connectSlack(alerter: SlackAlerter): void {
-    this.onAlert(async (alert) => {
-      await alerter.send({
-        text: `🚨 Governance Alert: ${alert.type} (count: ${alert.count}, source: ${alert.source})`,
-      })
-    })
   }
 
   private triggerAlert(alert: { type: string; count: number; source: string }): void {
