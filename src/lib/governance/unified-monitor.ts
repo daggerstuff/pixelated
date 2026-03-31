@@ -1,98 +1,62 @@
-// Unified monitoring with event aggregation and alerting
+import { getLogger } from '../logging'
+
+const logger = getLogger({ module: 'unified-monitor' })
 
 export interface MonitorEvent {
   source: 'fhe' | 'audit' | 'secrets' | 'governance'
-  type: string
-  status: string
-  timestamp?: number
+  event: string
+  timestamp: string
+  details?: Record<string, unknown>
 }
 
-export interface AlertPayload {
-  source: string
-  type: string
-  count: number
-  threshold: number
-}
+export type AlertHandler = (alert: { type: string; count: number; source: string }) => void
 
-export type AlertHandler = (payload: AlertPayload) => void
+const ALERT_THRESHOLD = 5
 
 export class UnifiedMonitor {
-  private events: Map<string, MonitorEvent[]> = new Map()
-  private failureCounts: Map<string, number> = new Map()
+  private events: MonitorEvent[] = []
   private alertHandlers: AlertHandler[] = []
-  private readonly complianceFailureThreshold = 5
+  private failureCounts: Map<string, number> = new Map()
 
-  /**
-   * Record an event from a source module
-   */
-  record(event: MonitorEvent): void {
-    const timestampedEvent: MonitorEvent = {
-      ...event,
-      timestamp: event.timestamp ?? Date.now(),
-    }
+  async record(event: MonitorEvent): Promise<void> {
+    this.events.push(event)
+    logger.info(`Recorded event: ${event.source}/${event.event}`)
 
-    // Aggregate event by source
-    const sourceEvents = this.events.get(event.source) ?? []
-    sourceEvents.push(timestampedEvent)
-    this.events.set(event.source, sourceEvents)
+    // Check alert thresholds for compliance failures
+    if (event.event === 'compliance_failure') {
+      const key = `${event.source}:compliance_failure`
+      const count = (this.failureCounts.get(key) || 0) + 1
+      this.failureCounts.set(key, count)
 
-    // Track compliance failures
-    if (event.status === 'failure' && event.type === 'compliance_failure') {
-      const currentCount = this.failureCounts.get(event.source) ?? 0
-      const newCount = currentCount + 1
-      this.failureCounts.set(event.source, newCount)
-
-      // Trigger alert if threshold breached
-      if (newCount >= this.complianceFailureThreshold) {
-        this.triggerAlert({
-          source: event.source,
-          type: event.type,
-          count: newCount,
-          threshold: this.complianceFailureThreshold,
-        })
+      if (count >= ALERT_THRESHOLD) {
+        await this.triggerAlert({ type: 'compliance_failure', count, source: event.source })
+        // Reset counter after alert
+        this.failureCounts.set(key, 0)
       }
     }
   }
 
-  /**
-   * Get events filtered by source
-   */
-  getEvents(source?: string): MonitorEvent[] {
-    if (source) {
-      return this.events.get(source) ?? []
-    }
-    // Return all events if no source specified
-    return Array.from(this.events.values()).flat()
-  }
-
-  /**
-   * Register an alert handler
-   */
   onAlert(handler: AlertHandler): void {
     this.alertHandlers.push(handler)
   }
 
-  /**
-   * Get failure counts (for testing/monitoring)
-   */
-  getFailureCounts(): Map<string, number> {
-    return new Map(this.failureCounts)
+  getEvents(source: string): MonitorEvent[] {
+    return this.events.filter(e => e.source === source)
   }
 
-  /**
-   * Clear all events and counts
-   */
-  clear(): void {
-    this.events.clear()
+  getAllEvents(): MonitorEvent[] {
+    return [...this.events]
+  }
+
+  clearEvents(): void {
+    this.events = []
     this.failureCounts.clear()
   }
 
-  /**
-   * Trigger alert to all registered handlers
-   */
-  private triggerAlert(payload: AlertPayload): void {
+  private async triggerAlert(alert: { type: string; count: number; source: string }): Promise<void> {
     for (const handler of this.alertHandlers) {
-      handler(payload)
+      handler(alert)
     }
+    logger.warn(`ALERT: ${alert.type} (count: ${alert.count}, source: ${alert.source})`)
   }
 }
