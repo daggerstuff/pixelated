@@ -6,6 +6,8 @@
 export interface Props {
   title?: string
   subtitle?: string
+  primaryCTA?: { text: string; href: string }
+  secondaryCTA?: { text: string; href: string }
   ctaPrimary?: { text: string; href: string }
   ctaSecondary?: { text: string; href: string }
   stats?: Array<{ value: string; label: string }>
@@ -14,13 +16,18 @@ export interface Props {
 const {
   title = 'AI Roleplay Training for Therapists',
   subtitle = 'Practice difficult clinical conversations with realistic AI patients, structured feedback, and repeatable supervision workflows.',
-  ctaPrimary = { text: 'Enter the Gym', href: '/training' },
-  ctaSecondary = { text: 'Explore Intelligence', href: '/ai-engine' },
+  primaryCTA,
+  secondaryCTA,
+  ctaPrimary,
+  ctaSecondary,
   stats,
 } = Astro.props
 
-const primaryAction = ctaPrimary
-const secondaryAction = ctaSecondary
+// Support both prop naming conventions
+const primaryAction = primaryCTA ||
+  ctaPrimary || { text: 'Enter the Gym', href: '/training' }
+const secondaryAction = secondaryCTA ||
+  ctaSecondary || { text: 'Explore Intelligence', href: '/ai-engine' }
 ---
 
 <section
@@ -31,6 +38,9 @@ const secondaryAction = ctaSecondary
   <div class="absolute inset-0 z-0">
     <div class="absolute inset-0 bg-void"></div>
     <div class="hero-atmosphere absolute inset-0 opacity-80">
+      <div class="hero-atmosphere__plane hero-atmosphere__plane--left"></div>
+      <div class="hero-atmosphere__plane hero-atmosphere__plane--right"></div>
+      <div class="hero-atmosphere__beam"></div>
       <div class="hero-atmosphere__glow hero-atmosphere__glow--left"></div>
       <div class="hero-atmosphere__glow hero-atmosphere__glow--right"></div>
       <div class="hero-atmosphere__grid"></div>
@@ -51,21 +61,30 @@ const secondaryAction = ctaSecondary
 
   <div class="container relative z-10 hero-shell">
     <div class="hero-copy">
+      <!-- Tag/Status -->
       <div
-        class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8"
+        class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft"
       >
         <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
         <span
           class="text-[10px] font-mono uppercase tracking-widest text-accent-primary"
-          >Clinical Simulation System // Pixelated Empathy</span
+          >AI Roleplay Platform // Therapist Training</span
         >
       </div>
 
-      <h1 class="hero-title">{title}</h1>
+      <h1
+        class="font-display font-black text-6xl md:text-8xl leading-tight mb-8 tracking-tighter text-white"
+      >
+        {title}
+      </h1>
 
-      <p class="hero-subtitle">{subtitle}</p>
+      <p
+        class="text-xl md:text-2xl text-secondary max-w-2xl mb-12 leading-relaxed font-light"
+      >
+        {subtitle}
+      </p>
 
-      <div class="hero-actions">
+      <div class="flex flex-wrap gap-6 items-center">
         <a href={primaryAction.href} class="btn-premium group">
           <span class="relative z-10">{primaryAction.text}</span>
           <div
@@ -74,8 +93,13 @@ const secondaryAction = ctaSecondary
           </div>
         </a>
 
-        <a href={secondaryAction.href} class="hero-link group">
-          <span class="hero-link__label">{secondaryAction.text}</span>
+        <a
+          href={secondaryAction.href}
+          class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline"
+        >
+          <span class="opacity-60 group-hover:opacity-100 transition-opacity"
+            >{secondaryAction.text}</span
+          >
           <svg
             width="24"
             height="24"
@@ -92,59 +116,29 @@ const secondaryAction = ctaSecondary
         </a>
       </div>
 
+      <!-- Stats Section -->
       {
         stats && stats.length > 0 && (
-          <div class="stats-grid">
-            {stats.map((stat) => (
-              <div class="stat-item">
-                <span class="stat-value">{stat.value}</span>
-                <span class="stat-label">{stat.label}</span>
-              </div>
-            ))}
+          <div
+            class="stats-grid mt-16 pt-8"
+            style="border-top: var(--border-primary);"
+          >
+            <div class="grid grid-cols-3 gap-8">
+              {stats.map((stat) => (
+                <div class="stat-item text-center md:text-left">
+                  <span class="stat-value font-display font-black text-4xl md:text-5xl text-accent-primary block">
+                    {stat.value}
+                  </span>
+                  <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">
+                    {stat.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )
       }
     </div>
-
-    <aside class="hero-visual-panel" aria-label="Platform preview">
-      <div class="hero-visual-panel__frame">
-        <div class="hero-visual-panel__header">
-          <span class="hero-visual-panel__eyebrow">Live Simulation</span>
-          <span class="hero-visual-panel__status">Risk cues active</span>
-        </div>
-
-        <div class="hero-transcript">
-          <div class="hero-bubble hero-bubble--patient">
-            "I keep telling everyone I'm fine because I do not want them to make
-            this bigger than it already is."
-          </div>
-          <div class="hero-bubble hero-bubble--clinician">
-            "You do not have to minimize this with me. I want to understand how
-            unsafe it feels right now."
-          </div>
-          <div class="hero-bubble hero-bubble--system">
-            Feedback: reflected avoidance, named risk gently, kept the pace
-            contained.
-          </div>
-        </div>
-
-        <div class="hero-metrics">
-          <div class="hero-metric">
-            <span class="hero-metric__label">Empathy</span>
-            <strong>91</strong>
-          </div>
-          <div class="hero-metric">
-            <span class="hero-metric__label">Pacing</span>
-            <strong>88</strong>
-          </div>
-          <div class="hero-metric">
-            <span class="hero-metric__label">Risk detection</span>
-            <strong>94</strong>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </div>
   </div>
 
   <!-- Perspective Grid Footer -->
@@ -156,8 +150,8 @@ const secondaryAction = ctaSecondary
 
 <style>
   .hero {
-    min-height: clamp(42rem, 82svh, 54rem);
-    padding: clamp(6rem, 10vw, 8rem) 0 clamp(3.5rem, 6vw, 5rem);
+    min-height: clamp(38rem, 84vh, 50rem);
+    padding: clamp(6.5rem, 10vh, 8.5rem) 0 clamp(4rem, 7vh, 6rem);
     background:
       radial-gradient(circle at top, rgba(34, 197, 94, 0.08), transparent 36%),
       linear-gradient(
@@ -167,209 +161,53 @@ const secondaryAction = ctaSecondary
       );
   }
 
-  .hero-shell {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.9fr);
-    gap: clamp(2rem, 4vw, 4.5rem);
-    align-items: center;
-  }
-
-  .hero-copy {
-    max-width: 42rem;
-  }
-
-  .hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(3.4rem, 7vw, 6.75rem);
-    font-weight: 700;
-    line-height: 0.92;
-    letter-spacing: -0.06em;
-    margin: 0 0 1.5rem;
-    max-width: 11ch;
-    text-wrap: balance;
-  }
-
-  .hero-subtitle {
-    font-size: clamp(1.05rem, 1rem + 0.5vw, 1.45rem);
-    color: var(--text-secondary);
-    max-width: 38rem;
-    margin: 0 0 2rem;
-    line-height: 1.6;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    align-items: center;
-    margin-bottom: 2.5rem;
-  }
-
-  .hero-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.65rem;
-    color: white;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
-  .hero-link__label {
-    opacity: 0.7;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .hero-link:hover .hero-link__label {
-    opacity: 1;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    padding-top: 1.5rem;
-    border-top: var(--border-primary);
-  }
-
-  .stat-item {
-    min-width: 0;
-  }
-
-  .stat-value {
-    display: block;
-    font-family: var(--font-display);
-    font-size: clamp(1.6rem, 2vw, 2.4rem);
-    font-weight: 700;
-    color: var(--accent-primary);
-    letter-spacing: -0.05em;
-  }
-
-  .stat-label {
-    display: block;
-    margin-top: 0.35rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text-secondary);
-  }
-
-  .hero-visual-panel {
-    position: relative;
-  }
-
-  .hero-visual-panel__frame {
-    position: relative;
-    padding: 1.35rem;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
-      rgba(5, 10, 15, 0.88);
-    box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  }
-
-  .hero-visual-panel__frame::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border: 1px solid rgba(0, 255, 136, 0.16);
-    pointer-events: none;
-    transform: translate(0.65rem, 0.65rem);
-    opacity: 0.6;
-  }
-
-  .hero-visual-panel__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.85rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  .hero-visual-panel__eyebrow {
-    color: rgba(255, 255, 255, 0.62);
-    font-size: 0.72rem;
-  }
-
-  .hero-visual-panel__status {
-    color: var(--accent-primary);
-    font-size: 0.68rem;
-  }
-
-  .hero-transcript {
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .hero-bubble {
-    padding: 0.95rem 1rem;
-    font-size: 0.96rem;
-    line-height: 1.55;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .hero-bubble--patient {
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(255, 255, 255, 0.88);
-    margin-right: 2rem;
-  }
-
-  .hero-bubble--clinician {
-    background: rgba(0, 255, 136, 0.08);
-    color: white;
-    margin-left: 1.4rem;
-  }
-
-  .hero-bubble--system {
-    background: rgba(56, 189, 248, 0.08);
-    color: rgba(255, 255, 255, 0.82);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .hero-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-    margin-top: 1rem;
-  }
-
-  .hero-metric {
-    padding-top: 0.9rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .hero-metric strong {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    letter-spacing: -0.05em;
-    color: white;
-  }
-
-  .hero-metric__label {
-    display: block;
-    margin-bottom: 0.25rem;
-    font-family: var(--font-mono);
-    font-size: 0.64rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.55);
-  }
-
   .hero-atmosphere {
     overflow: hidden;
+  }
+
+  .hero-atmosphere__plane,
+  .hero-atmosphere__beam {
+    position: absolute;
+    inset: auto;
+  }
+
+  .hero-atmosphere__plane--left {
+    top: -10%;
+    left: -6%;
+    width: min(52rem, 70vw);
+    height: min(36rem, 54vw);
+    background:
+      linear-gradient(135deg, rgba(11, 15, 24, 0.9), rgba(8, 18, 24, 0.5));
+    clip-path: polygon(0 0, 84% 0, 62% 100%, 0 100%);
+    opacity: 0.86;
+  }
+
+  .hero-atmosphere__plane--right {
+    right: -7%;
+    bottom: -16%;
+    width: min(34rem, 44vw);
+    height: min(34rem, 44vw);
+    background:
+      linear-gradient(160deg, rgba(7, 24, 28, 0.92), rgba(4, 10, 22, 0.45));
+    clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 82%);
+    opacity: 0.88;
+  }
+
+  .hero-atmosphere__beam {
+    top: 14%;
+    right: 16%;
+    width: min(28rem, 34vw);
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 255, 136, 0.7) 48%,
+      rgba(255, 255, 255, 0.28) 100%
+    );
+    transform: rotate(-24deg);
+    transform-origin: right center;
+    opacity: 0.8;
+    box-shadow: 0 0 18px rgba(0, 255, 136, 0.18);
   }
 
   .hero-atmosphere__glow {
@@ -470,29 +308,39 @@ const secondaryAction = ctaSecondary
     color: black;
   }
 
-  @media (max-width: 960px) {
-    .hero-shell {
-      grid-template-columns: 1fr;
-    }
+  .hero-shell {
+    max-width: 66rem;
+  }
 
-    .hero-copy {
-      max-width: none;
-    }
-
-    .hero-title {
-      max-width: none;
-    }
-
-    .hero-visual-panel {
-      max-width: 38rem;
-    }
+  .hero-copy {
+    max-width: 52rem;
   }
 
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 6.5rem;
-      padding-bottom: 3.5rem;
+      padding-top: 6rem;
+      padding-bottom: 4rem;
+    }
+
+    .hero-atmosphere__plane--left {
+      width: 92vw;
+      height: 62vw;
+      left: -18%;
+      top: -4%;
+    }
+
+    .hero-atmosphere__plane--right {
+      width: 65vw;
+      height: 65vw;
+      right: -18%;
+      bottom: 2%;
+    }
+
+    .hero-atmosphere__beam {
+      top: 22%;
+      right: -4%;
+      width: 58vw;
     }
 
     .hero-atmosphere__grid {
@@ -500,28 +348,9 @@ const secondaryAction = ctaSecondary
       opacity: 0.11;
     }
 
-    .hero-actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .hero-link {
-      justify-content: space-between;
-    }
-
-    .stats-grid,
-    .hero-metrics {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-bubble--patient,
-    .hero-bubble--clinician {
-      margin-left: 0;
-      margin-right: 0;
-    }
-
-    .hero-visual-panel__frame::before {
-      transform: translate(0.35rem, 0.35rem);
+    .hero-shell,
+    .hero-copy {
+      max-width: 100%;
     }
   }
 </style>
