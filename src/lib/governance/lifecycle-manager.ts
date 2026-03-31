@@ -3,6 +3,10 @@
  * Manages retention policies and archival scheduling
  */
 
+import { getLogger } from '../logging'
+
+const logger = getLogger({ module: 'lifecycle-manager' })
+
 export type RetentionPeriod = "30-day" | "90-day" | "7-year" | "permanent";
 
 export interface RetentionRecord {
@@ -98,7 +102,7 @@ export class LifecycleManager {
     if (record) {
       // Delete encryption key (crypto-shred)
       this.records.delete(resourceId);
-      console.log(`Crypto-shred deleted ${resourceId}`);
+      logger.info(`Crypto-shred deleted ${resourceId}`);
       return { deleted: true, method: "crypto-shred" };
     }
     return { deleted: false, method: "none" };

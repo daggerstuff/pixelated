@@ -110,4 +110,26 @@ describe('LifecycleManager', () => {
       }).toThrow('Record not found');
     });
   });
+
+  describe('secureDelete', () => {
+    it('securely deletes a record using crypto-shred', async () => {
+      const recordId = 'phi-record-007';
+      const createdDate = new Date('2026-01-01');
+
+      lifecycleManager.applyRetention(recordId, '30-day', createdDate);
+
+      const result = await lifecycleManager.secureDelete(recordId);
+
+      expect(result.deleted).toBe(true);
+      expect(result.method).toBe('crypto-shred');
+      expect(lifecycleManager.getRetention(recordId)).toBeUndefined();
+    });
+
+    it('returns not deleted for non-existent record', async () => {
+      const result = await lifecycleManager.secureDelete('non-existent');
+
+      expect(result.deleted).toBe(false);
+      expect(result.method).toBe('none');
+    });
+  });
 });
