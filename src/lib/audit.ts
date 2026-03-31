@@ -61,6 +61,9 @@ export enum AuditEventType {
   SUSPICIOUS_ACTIVITY = 'suspicious_activity',
   AI_MODEL_ACCESS = 'ai_model_access',
   AI_GENERATION = 'ai_generation',
+  // Governance events
+  GOVERNANCE_ALLOW = 'governance_allow',
+  GOVERNANCE_DENY = 'governance_deny',
 }
 
 // Audit log status
