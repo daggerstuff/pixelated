@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { UnifiedMonitor } from '../unified-monitor'
+import { SlackAlerter } from '../slack-alert'
 
 describe('UnifiedMonitor', () => {
   let monitor: UnifiedMonitor
@@ -70,5 +71,29 @@ describe('UnifiedMonitor', () => {
     await monitor.record({ source: 'fhe', event: 'e1', timestamp: new Date().toISOString() })
     monitor.clearEvents()
     expect(monitor.getAllEvents().length).toBe(0)
+  })
+
+  it('connects SlackAlerter for notifications', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: true })
+    global.fetch = mockFetch
+
+    const slackAlerter = new SlackAlerter('https://hooks.slack.com/test')
+    monitor.connectSlack(slackAlerter)
+
+    // Trigger alert by hitting threshold
+    for (let i = 0; i < 5; i++) {
+      await monitor.record({
+        source: 'governance',
+        event: 'compliance_failure',
+        timestamp: new Date().toISOString(),
+      })
+    }
+
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    const callArgs = mockFetch.mock.calls[0]
+    const body = JSON.parse(callArgs[1].body)
+    expect(body.text).toContain('compliance_failure')
+    expect(body.text).toContain('5')
+    expect(body.text).toContain('governance')
   })
 })
