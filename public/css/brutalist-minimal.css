@@ -1,14 +1,13 @@
 /* ================================================
    PIXELATED BRUTALISM DESIGN SYSTEM
-   A unique blend of Modern + Minimalism + Brutalist
-   Inspired by Antfu's elegant terminal aesthetics
-   
+   Structured, clinical, and direct.
+
    Philosophy:
    - Expose structure, celebrate the grid
-   - Sharp display typography, restrained mono accents
+   - Serious editorial display typography
    - Sharp edges or minimal radius
    - Purposeful animations, no decoration
-   - Precision without terminal cosplay
+   - Precision without novelty styling
    ================================================ */
 
 /* === FONTS === */
@@ -32,22 +31,6 @@
   font-family: "DM Mono";
   src: url("/fonts/dm-mono-medium.woff2") format("woff2");
   font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-600.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Outfit";
-  src: url("/fonts/outfit-700.ttf") format("truetype");
-  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -104,10 +87,10 @@
   --glass-blur: 12px;
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: Outfit - cleaner, sharper, more intentional brand presence */
-  --font-display: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Headings: editorial serif, less rounded and less juvenile */
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
   
-  /* Body: Inter - matches the broader product typography */
+  /* Body: neutral UI sans */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   /* Technical accents: restrained mono, no oversized terminal feel */
@@ -427,10 +410,10 @@ pre {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: var(--tracking-wide);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
