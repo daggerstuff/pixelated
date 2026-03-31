@@ -949,7 +949,7 @@ opentelemetry-instrumentation-mistralai==0.53.3
     # via traceloop-sdk
 opentelemetry-instrumentation-ollama==0.53.3
     # via traceloop-sdk
-opentelemetry-instrumentation-openai==0.53.3
+opentelemetry-instrumentation-openai==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-openai-agents==0.53.3
     # via traceloop-sdk
