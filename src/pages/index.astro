@@ -212,9 +212,9 @@ const organizationSchema = {
   .home-panel-label,
   .home-card-kicker {
     display: inline-block;
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--accent-primary);
     margin-bottom: var(--space-4);
@@ -245,7 +245,7 @@ const organizationSchema = {
 
   .home-split {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(24rem, 1.08fr) minmax(22rem, 0.92fr);
     gap: var(--space-10);
     align-items: start;
   }
@@ -266,10 +266,10 @@ const organizationSchema = {
   }
 
   .home-step-number {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: var(--accent-primary);
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: 0.08em;
     padding-top: 0.35rem;
   }
 
@@ -278,7 +278,7 @@ const organizationSchema = {
     margin-bottom: var(--space-2);
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1180px) {
     .home-card-grid,
     .home-intro,
     .home-split {
