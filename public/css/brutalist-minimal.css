@@ -5,10 +5,10 @@
    
    Philosophy:
    - Expose structure, celebrate the grid
-   - Monospace for headings, sans for body
+   - Sharp display typography, restrained mono accents
    - Sharp edges or minimal radius
    - Purposeful animations, no decoration
-   - Terminal-like precision
+   - Precision without terminal cosplay
    ================================================ */
 
 /* === FONTS === */
@@ -32,6 +32,22 @@
   font-family: "DM Mono";
   src: url("/fonts/dm-mono-medium.woff2") format("woff2");
   font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/fonts/outfit-600.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Outfit";
+  src: url("/fonts/outfit-700.ttf") format("truetype");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -88,8 +104,8 @@
   --glass-blur: 12px;
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: Inter - matches the broader product typography */
-  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Headings: Outfit - cleaner, sharper, more intentional brand presence */
+  --font-display: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   
   /* Body: Inter - matches the broader product typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -97,7 +113,6 @@
   /* Technical accents: restrained mono, no oversized terminal feel */
   --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* Display: Outfit for that Premium feel */
   --font-heading: var(--font-display);
 
 
@@ -211,7 +226,7 @@ body {
 
 /* ================================================
    TYPOGRAPHY SYSTEM
-   Headings: Monospace, tight, uppercase available
+   Headings: Display sans, tight, assertive
    Body: Sans, readable, spacious
    ================================================ */
 

@@ -60,14 +60,15 @@ const secondaryAction = secondaryCTA ||
   </div>
 
   <div class="container relative z-10 hero-shell">
-    <div class="hero-copy">
+    <div class="hero-layout">
+      <div class="hero-copy">
       <!-- Tag/Status -->
       <div
         class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft"
       >
         <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
         <span
-          class="text-[10px] font-mono uppercase tracking-widest text-accent-primary"
+          class="text-[10px] hero-kicker uppercase tracking-widest text-accent-primary"
           >AI Roleplay Platform // Therapist Training</span
         >
       </div>
@@ -95,7 +96,7 @@ const secondaryAction = secondaryCTA ||
 
         <a
           href={secondaryAction.href}
-          class="group flex items-center gap-2 text-white font-mono text-sm uppercase tracking-widest no-underline"
+          class="group hero-secondary-link flex items-center gap-2 text-white text-sm uppercase tracking-widest no-underline"
         >
           <span class="opacity-60 group-hover:opacity-100 transition-opacity"
             >{secondaryAction.text}</span
@@ -130,6 +131,7 @@ const secondaryAction = secondaryCTA ||
                     {stat.value}
                   </span>
                   <span class="stat-label mt-2 font-mono text-xs uppercase tracking-widest text-secondary block">
+                  <span class="stat-label mt-2 text-xs uppercase tracking-widest text-secondary block">
                     {stat.label}
                   </span>
                 </div>
@@ -138,6 +140,43 @@ const secondaryAction = secondaryCTA ||
           </div>
         )
       }
+      </div>
+
+      <aside class="hero-visual" aria-label="Pixelated Empathy brand visual">
+        <div class="hero-visual__frame">
+          <div class="hero-visual__meta">
+            <span class="hero-visual__eyebrow">Pixelated Empathy</span>
+            <span class="hero-visual__status">Live supervision stack</span>
+          </div>
+
+          <div class="hero-visual__image-shell">
+            <img
+              src="/favicon.svg"
+              alt="Pixelated Empathy brand mark"
+              class="hero-visual__image"
+              width="192"
+              height="192"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+
+          <div class="hero-visual__readout">
+            <div class="hero-visual__readout-item">
+              <span class="hero-visual__label">Mode</span>
+              <strong>Roleplay</strong>
+            </div>
+            <div class="hero-visual__readout-item">
+              <span class="hero-visual__label">Feedback</span>
+              <strong>Structured</strong>
+            </div>
+            <div class="hero-visual__readout-item">
+              <span class="hero-visual__label">Replay</span>
+              <strong>Repeatable</strong>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
   </div>
 
@@ -293,11 +332,11 @@ const secondaryAction = secondaryCTA ||
     background: transparent;
     border: 1px solid var(--accent-primary);
     color: white;
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
     font-size: 0.875rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.12em;
     overflow: hidden;
     text-decoration: none;
     display: inline-block;
@@ -312,8 +351,141 @@ const secondaryAction = secondaryCTA ||
     max-width: 66rem;
   }
 
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(20rem, 24rem);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: center;
+  }
+
   .hero-copy {
     max-width: 52rem;
+  }
+
+  .hero-kicker,
+  .hero-secondary-link,
+  .stat-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-secondary-link {
+    letter-spacing: 0.12em;
+  }
+
+  .hero-visual {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .hero-visual__frame {
+    position: relative;
+    width: min(100%, 24rem);
+    padding: 1.5rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px);
+  }
+
+  .hero-visual__frame::before {
+    content: "";
+    position: absolute;
+    inset: 0.85rem;
+    border: 1px solid rgba(0, 255, 136, 0.18);
+    pointer-events: none;
+  }
+
+  .hero-visual__meta,
+  .hero-visual__readout {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-visual__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .hero-visual__eyebrow,
+  .hero-visual__status,
+  .hero-visual__label {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-visual__eyebrow {
+    color: var(--text-primary);
+  }
+
+  .hero-visual__status,
+  .hero-visual__label {
+    color: var(--text-tertiary);
+  }
+
+  .hero-visual__image-shell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at center, rgba(0, 255, 136, 0.12), transparent 58%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  }
+
+  .hero-visual__image-shell::before,
+  .hero-visual__image-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-visual__image-shell::before {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.26;
+  }
+
+  .hero-visual__image-shell::after {
+    background: linear-gradient(135deg, transparent 0%, rgba(0, 255, 136, 0.08) 100%);
+  }
+
+  .hero-visual__image {
+    position: relative;
+    z-index: 1;
+    width: min(68%, 13rem);
+    height: auto;
+    filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.35));
+  }
+
+  .hero-visual__readout {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+
+  .hero-visual__readout-item {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .hero-visual__readout-item strong {
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
   }
 
   @media (max-width: 768px) {
@@ -348,9 +520,20 @@ const secondaryAction = secondaryCTA ||
       opacity: 0.11;
     }
 
+    .hero-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
     .hero-shell,
-    .hero-copy {
+    .hero-copy,
+    .hero-visual,
+    .hero-visual__frame {
       max-width: 100%;
+    }
+
+    .hero-visual {
+      justify-content: stretch;
     }
   }
 </style>
