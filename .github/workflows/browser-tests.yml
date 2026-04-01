@@ -12,12 +12,12 @@ on:
   workflow_dispatch:
 
 env:
-  GHA_LOCAL_RUN: "false"
+  GHA_LOCAL_RUN: 'false'
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
   NODE_ENV: test
-  DISABLE_AUTH: "true"
+  DISABLE_AUTH: 'true'
 
 jobs:
   browser-tests:
@@ -73,7 +73,7 @@ jobs:
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
           export BASE_URL=http://localhost:4323
-          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --project=chromium --max-failures=10 --workers=1
+          pnpm exec playwright test tests/browser/auth.spec.ts tests/browser/cross-browser-compatibility.spec.ts --config=config/playwright.config.ts --project=chromium --max-failures=10 --workers=1
         env:
           CI: true
 
@@ -107,7 +107,7 @@ jobs:
         uses: actions/download-artifact@v8.0.1
         with:
           path: all-test-results
-          pattern: "*-test-results-*"
+          pattern: '*-test-results-*'
           merge-multiple: true
 
       - name: Generate comprehensive HTML report
