@@ -1,44 +1,47 @@
 export const heroContent = {
-  title: 'The AI Training Ground for Therapists',
+  title: 'Rehearse the hardest clinical conversations before they happen.',
   subtitle:
-    'Pixelated Empathy is an AI roleplay platform for therapists, trainees, and care teams who need realistic practice, structured review, and safer repetition before the real conversation starts.',
+    'Run one difficult case, keep the exchange intact, and review the next pass from what actually happened instead of what the room remembers.',
+  kicker: 'Clinical rehearsal for supervision teams',
   primaryCTA: { text: 'Start Practice', href: '/signup' },
   secondaryCTA: { text: 'Watch Demo', href: '/demo-hub' },
   stats: [
     {
-      value: 'Repeat the hard case',
+      value: 'Run the same case',
       label:
-        'Run the same high-risk scenario across trainees instead of coaching from one-off roleplay memories.',
+        'Give multiple clinicians the same difficult conversation instead of coaching from one-off recollection.',
     },
     {
-      value: 'Review the record',
+      value: 'Keep the record',
       label:
-        'Keep transcript, pacing markers, empathy gaps, and escalation points in one supervision-ready artifact.',
+        'Hold the transcript, pacing shifts, and decision points in one place a supervisor can actually teach from.',
     },
     {
-      value: 'Coach with specificity',
+      value: 'Coach the retry',
       label:
-        'Use the exact exchange to discuss what changed the room and what the next pass should do differently.',
+        'Use the actual exchange to decide what the next pass should do differently.',
     },
   ],
   artifact: {
-    eyebrow: 'Recorded review structure',
-    status: 'What the platform actually returns after a run',
-    chip: 'Session artifact',
-    mode: 'Supervision review',
+    eyebrow: 'Live product surface',
+    status: 'A real session capture from the product, ready for review.',
+    chip: 'Captured in product',
+    mode: 'Supervision-ready',
+    image: '/images/homepage/training-session-proof.png',
+    imageAlt: 'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
-      { label: 'Scenario', value: 'High-risk outpatient intake' },
-      { label: 'Review focus', value: 'Pacing after disclosure' },
+      { label: 'What you are seeing', value: 'The actual training surface, captured from the product instead of reconstructed for the homepage' },
+      { label: 'Why it matters', value: 'The exchange and review notes stay together, so supervision can stay concrete after the session ends' },
     ],
     outputs: [
-      { label: 'Transcript', value: 'Timestamped exchange for replay and team review' },
-      { label: 'Risk markers', value: 'Disclosure, hesitation, and escalation moments called out' },
-      { label: 'Coaching prompts', value: 'Specific openings a supervisor can discuss on the next pass' },
+      { label: 'Live exchange', value: 'Therapist turns and patient responses stay in one training surface' },
+      { label: 'Review lane', value: 'Supervisor notes stay adjacent to the session instead of being reconstructed later' },
+      { label: 'Handoff', value: 'The run moves from practice into review without changing mediums' },
     ],
     readout: [
-      { label: 'Record', value: 'Replayable transcript' },
-      { label: 'Review', value: 'Empathy + pacing tags' },
-      { label: 'Team use', value: 'Supervision-ready artifact' },
+      { label: 'Practice', value: 'Session UI' },
+      { label: 'Review', value: 'Notes lane' },
+      { label: 'Reuse', value: 'Team coaching' },
     ],
   },
 } as const

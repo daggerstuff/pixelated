@@ -1,10 +1,12 @@
 ---
+import InfoStrip from '@/components/homepage/InfoStrip.astro'
+
 export interface Props {
   content: {
     label: string
     title: string
     cards: Array<{ kicker: string; title: string; body: string }>
-    proofBand: {
+    strip: {
       label: string
       title: string
       body: string
@@ -16,14 +18,14 @@ export interface Props {
 const { content } = Astro.props
 ---
 
-<section class="section home-section home-section--scenarios">
-  <div class="container home-shell">
-    <span class="label-mono">{content.label}</span>
-    <h2 class="mt-4">{content.title}</h2>
+<section class="pe-page-section home-section home-section--scenarios">
+  <div class="pe-page-shell home-shell">
+    <span class="pe-page-label">{content.label}</span>
+    <h2 class="pe-page-heading">{content.title}</h2>
 
-    <div class="home-card-grid mt-12">
-      {content.cards.map((card) => (
-        <article class="card card-lined home-card">
+    <div class="home-card-grid home-card-grid--spaced">
+      {content.cards.map((card, index) => (
+        <article class:list={['home-card', index === 0 && 'home-card--featured', index === 2 && 'home-card--muted']}>
           <span class="home-card-kicker">{card.kicker}</span>
           <h3>{card.title}</h3>
           <p>{card.body}</p>
@@ -31,42 +33,22 @@ const { content } = Astro.props
       ))}
     </div>
 
-    <div class="home-proof-band mt-10">
-      <div class="home-proof-band__lead">
-        <span class="home-panel-label">{content.proofBand.label}</span>
-        <h3>{content.proofBand.title}</h3>
-        <p>{content.proofBand.body}</p>
-      </div>
-      <div class="home-proof-band__grid">
-        {content.proofBand.items.map((item) => (
-          <div class="home-proof-band__item">
-            <span>{item.label}</span>
-            <strong>{item.value}</strong>
-          </div>
-        ))}
-      </div>
-    </div>
+    <InfoStrip
+      className="home-use-strip home-use-strip--spaced"
+      label={content.strip.label}
+      title={content.strip.title}
+      body={content.strip.body}
+      items={content.strip.items}
+      theme="dark"
+    />
   </div>
 </section>
 
 <style>
-  .home-shell {
-    max-width: 75rem;
-  }
-
-  .home-section {
-    position: relative;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    padding-top: clamp(4.5rem, 7vw, 7rem);
-    padding-bottom: clamp(4.5rem, 7vw, 7rem);
-  }
-
   .home-section--scenarios {
-    background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.055), rgba(125, 211, 168, 0.014) 18%, transparent 72%);
+    background: linear-gradient(180deg, rgba(8, 12, 13, 0.98), rgba(8, 12, 13, 1));
   }
 
-  .home-panel-label,
   .home-card-kicker {
     display: inline-block;
     font-family: var(--font-sans);
@@ -79,61 +61,51 @@ const { content } = Astro.props
 
   .home-card-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-5);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: var(--space-6);
+  }
+
+  .home-card-grid--spaced {
+    margin-top: var(--space-12);
   }
 
   .home-card {
     min-width: 0;
     display: grid;
     gap: var(--space-4);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
-  }
-
-  .home-proof-band {
-    display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-    gap: clamp(1.5rem, 3vw, 3rem);
-    padding: clamp(1.5rem, 2vw, 2.2rem);
+    padding: clamp(1.65rem, 2.2vw, 2.35rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.025);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
   }
 
-  .home-proof-band__lead {
-    display: grid;
-    gap: var(--space-3);
+  .home-card--featured {
+    grid-row: span 2;
+    align-content: end;
+    min-height: 100%;
+    background:
+      linear-gradient(180deg, rgba(125, 211, 168, 0.13), rgba(125, 211, 168, 0.03) 38%, rgba(255, 255, 255, 0.018));
   }
 
-  .home-proof-band__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
+  .home-card--featured h3 {
+    font-size: clamp(1.8rem, 1.45rem + 0.8vw, 2.4rem);
+    max-width: 14ch;
   }
 
-  .home-proof-band__item {
-    display: grid;
-    gap: var(--space-2);
-    min-width: 0;
+  .home-card--muted {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.012));
   }
 
-  .home-proof-band__item span {
-    font-size: var(--text-sm);
-    font-weight: 600;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-  }
-
-  .home-proof-band__item strong {
-    font-size: var(--text-base);
-    line-height: 1.45;
+  .home-use-strip--spaced {
+    margin-top: var(--space-10);
   }
 
   @media (max-width: 1080px) {
-    .home-card-grid,
-    .home-proof-band,
-    .home-proof-band__grid {
+    .home-card-grid {
       grid-template-columns: 1fr;
+    }
+
+    .home-card--featured {
+      grid-row: auto;
     }
   }
 </style>
