@@ -3,23 +3,13 @@ import type {
   BiasDashboardSummary,
   BiasDashboardData,
 } from '@/lib/ai/bias-detection'
+import type { AlertItem, BiasScoreFilterLiteral } from '@/types/bias-detection'
 
 interface TrendItem {
   date?: string
   biasScore?: number
   sessionCount?: number
   alertCount?: number
-}
-
-interface AlertItem {
-  alertId: string
-  message: string
-  level: string
-  timestamp: string | Date
-  sessionId?: string
-  type?: string
-  acknowledged?: boolean
-  status?: string
 }
 
 interface BiasAnalysisItem {

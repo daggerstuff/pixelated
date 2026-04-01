@@ -3,7 +3,7 @@ import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
 import { clientScenarios } from '@/data/scenarios'
 import { useStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
-import type { Message } from '@/types/chat'
+import type { Message, MentalHealthChatAnalysis, InterventionConfig, TherapeuticInterventions } from '@/types/chat'
 import type { Scenario } from '@/types/scenarios'
 // Import this component dynamically for code splitting
 const LazyAnalyticsDashboard = lazy(() => import('./LazyAnalyticsDashboard'))
@@ -42,33 +42,6 @@ interface ExtendedMessage extends Message {
 // Add the systemMessage property to Scenario for the current code
 interface EnhancedScenario extends Scenario {
   systemMessage: string
-}
-
-// Define MentalHealthChatAnalysis interface if not already defined elsewhere
-interface MentalHealthChatAnalysis {
-  category: 'low' | 'medium' | 'high' | 'critical'
-  hasMentalHealthIssue: boolean
-  confidence: number
-  explanation: string
-  supportingEvidence: string[]
-  timestamp: number
-  expertGuided: boolean
-  emotions: string[]
-  riskFactors: string[]
-}
-
-// Define InterventionConfig interface if not already defined elsewhere
-interface InterventionConfig {
-  scores: unknown
-  type: 'immediate' | 'preventive' | 'supportive'
-  requiresExpert: boolean
-  emotions: EmotionAnalysis
-  riskFactors: string[]
-}
-
-// Define TherapeuticInterventions interface if not already defined elsewhere
-interface TherapeuticInterventions {
-  generateIntervention: (config: InterventionConfig) => Promise<string>
 }
 
 // Define useTherapeuticInterventions hook
