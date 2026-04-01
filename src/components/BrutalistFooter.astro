@@ -3,13 +3,16 @@
  * Brutalist Footer Component
  * Minimal, grid-exposed structure
  */
-export interface Props {
-  showNewsletter?: boolean
-}
-
-const { showNewsletter = true } = Astro.props
-
 const currentYear = new Date().getFullYear()
+
+export interface Props {
+  tagline?: string
+  foundation?: string
+  manifesto?: string
+  proofTitle?: string
+  reviewStandards?: string[]
+  proofCTA?: { text: string; href: string }
+}
 
 const links = {
   product: [
@@ -43,6 +46,19 @@ const social = [
     icon: 'twitter',
   },
 ]
+
+const {
+  tagline = 'AI roleplay and simulation training for therapists, supervisors, and care teams practicing difficult conversations before they happen with real people.',
+  foundation = 'Founder-led in the United States // Built for clinical training teams',
+  manifesto = 'Clinical training should leave a record worth supervising.',
+  proofTitle = 'Keep it only if supervision becomes more specific.',
+  reviewStandards = [
+    'Use it when your team needs a transcript you can actually coach against.',
+    'Use it when supervisors need a shared rehearsal record across clinicians.',
+    'Skip it if you only want a novelty demo and not a reviewable training artifact.',
+  ],
+  proofCTA = { text: 'Talk to the team behind it', href: '/contact' },
+} = Astro.props
 ---
 
 <footer class="footer" data-component="brutalist-footer">
@@ -65,9 +81,7 @@ const social = [
               loading="lazy"
               decoding="async"
             />
-            <span
-              class="footer-logo-text font-display font-bold text-xl text-white"
-            >
+            <span class="footer-logo-text font-display font-bold text-xl text-white">
               Pixelated <span class="text-accent-primary">Empathy</span>
             </span>
           </span>
@@ -75,14 +89,13 @@ const social = [
         <p
           class="footer-tagline text-sm text-secondary mt-4 leading-relaxed opacity-90"
         >
-          AI roleplay and simulation training for therapists, supervisors, and
-          care teams practicing difficult conversations before they happen with
-          real people.
+          {tagline}
         </p>
-        <p
-          class="text-[11px] font-mono text-muted uppercase tracking-widest mt-2"
-        >
-          Founder-led in the United States // Built for clinical training teams
+        <p class="footer-foundation mt-2">
+          {foundation}
+        </p>
+        <p class="footer-manifesto mt-5">
+          {manifesto}
         </p>
 
         {/* Social Links */}
@@ -176,18 +189,27 @@ const social = [
           }
         </ul>
       </div>
+
+      <aside class="footer-proof">
+        <span class="footer-links-label">Decision standard</span>
+        <h3 class="footer-proof-title">
+          {proofTitle}
+        </h3>
+        <ul class="footer-proof-list">
+          {
+            reviewStandards.map((item) => <li>{item}</li>)
+          }
+        </ul>
+        <a href={proofCTA.href} class="footer-proof-link">{proofCTA.text}</a>
+      </aside>
     </div>
 
     {/* Bottom Bar */}
     <div class="footer-bottom border-t border-white/5 pt-8 mt-12">
-      <p
-        class="footer-copyright font-mono text-[10px] text-muted uppercase tracking-widest"
-      >
+      <p class="footer-copyright">
         &copy; {currentYear} Pixelated Empathy // All rights reserved.
       </p>
-      <p
-        class="footer-built font-mono text-[10px] text-muted uppercase tracking-widest flex items-center gap-2"
-      >
+      <p class="footer-built flex items-center gap-2">
         <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse"
         ></span>
         Therapy simulation platform // Public site
@@ -230,7 +252,7 @@ const social = [
 
   @media (min-width: 768px) {
     .footer-grid {
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 0.8fr)) minmax(0, 1.2fr);
       gap: var(--space-12);
     }
   }
@@ -260,10 +282,19 @@ const social = [
   }
 
   .footer-logo-text {
-    font-family: var(--font-mono);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: 700;
     color: var(--text-primary);
+  }
+
+  .footer-foundation {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
 
   .footer-tagline {
@@ -271,6 +302,14 @@ const social = [
     color: var(--text-muted);
     line-height: var(--leading-relaxed);
     margin-bottom: var(--space-6);
+  }
+
+  .footer-manifesto {
+    max-width: 18rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1rem + 0.36vw, 1.35rem);
+    line-height: 1.18;
+    color: var(--text-primary);
   }
 
   /* Social */
@@ -303,11 +342,58 @@ const social = [
     gap: var(--space-3);
   }
 
+  .footer-proof {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding: clamp(1rem, 1.5vw, 1.35rem);
+    border: 1px solid rgba(125, 211, 168, 0.16);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(180deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.03) 55%, rgba(255, 255, 255, 0.015) 100%);
+  }
+
+  .footer-proof-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1rem + 0.45vw, 1.45rem);
+    line-height: 1.12;
+    color: var(--text-primary);
+  }
+
+  .footer-proof-list {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding-left: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .footer-proof-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(125, 211, 168, 0.32);
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    background: rgba(7, 11, 12, 0.42);
+  }
+
+  .footer-proof-link:hover {
+    color: var(--bg-void);
+    background: var(--accent-primary);
+  }
+
   .footer-links-label {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
     font-weight: 600;
-    letter-spacing: var(--tracking-wider);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
@@ -351,8 +437,16 @@ const social = [
 
   .footer-copyright,
   .footer-built {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: var(--text-xs);
     color: var(--text-dim);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 767px) {
+    .footer-brand {
+      max-width: none;
+    }
   }
 </style>

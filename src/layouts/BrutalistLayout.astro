@@ -10,11 +10,13 @@ import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
 export interface Props {
   title: string
   description?: string
+  footerProps?: Record<string, unknown>
 }
 
 const {
   title,
   description = 'AI-powered training platform for mental health professionals',
+  footerProps = {},
 } = Astro.props
 
 const { cspNonce } = Astro.locals
@@ -82,7 +84,7 @@ const { cspNonce } = Astro.locals
     </main>
 
     <!-- Footer -->
-    <BrutalistFooter />
+    <BrutalistFooter {...footerProps} />
 
     <!-- Scroll Progress -->
     <div class="scroll-progress" aria-hidden="true"></div>

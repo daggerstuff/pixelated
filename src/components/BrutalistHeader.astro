@@ -12,12 +12,18 @@ const { logo = '/favicon.svg', title = 'Pixelated Empathy' } = Astro.props
 const [titlePrimary = 'Pixelated', ...titleRest] = title.trim().split(/\s+/)
 const titleSecondary = titleRest.join(' ')
 
+const currentPath = Astro.url.pathname
+const isActivePath = (href: string) =>
+  href === '/'
+    ? currentPath === '/'
+    : currentPath === href || currentPath.startsWith(`${href}/`)
+
 const navItems = [
-  { href: '/', label: 'Home' },
   { href: '/training', label: 'Training' },
   { href: '/features', label: 'Features' },
+  { href: '/trust', label: 'Trust' },
   { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact', label: 'Talk to Us' },
 ]
 ---
 
@@ -44,12 +50,11 @@ const navItems = [
       </div>
       <span class="brand-mark text-white transition-colors">
         <span class="brand-mark__primary">{titlePrimary}</span>
-        {
-          titleSecondary && (
-            <span class="brand-mark__secondary">{titleSecondary}</span>
-          )
-        }
+        {titleSecondary ? (
+          <span class="brand-mark__secondary">{titleSecondary}</span>
+        ) : null}
       </span>
+      <span class="brand-meta">Clinical simulation for supervision teams</span>
     </a>
 
     <!-- Navigation -->
@@ -58,7 +63,11 @@ const navItems = [
         {
           navItems.map((item) => (
             <li>
-              <a href={item.href} class="nav-link">
+              <a
+                href={item.href}
+                class="nav-link"
+                aria-current={isActivePath(item.href) ? 'page' : undefined}
+              >
                 {item.label}
               </a>
             </li>
@@ -73,61 +82,56 @@ const navItems = [
       <a href="/signup" class="btn btn-primary btn-sm">Start Practice</a>
     </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button
-      class="header-menu-toggle"
-      aria-label="Toggle menu"
-      aria-expanded="false"
-    >
-      <span class="menu-icon">
-        <span></span>
-        <span></span>
-      </span>
-    </button>
-  </div>
+    <details class="header-mobile-shell">
+      <summary class="header-menu-toggle" aria-label="Toggle menu">
+        <span class="menu-icon">
+          <span></span>
+          <span></span>
+        </span>
+      </summary>
 
-  <!-- Mobile Navigation -->
-  <nav class="header-mobile-nav" aria-label="Mobile navigation">
-    <ul class="header-mobile-list">
-      {
-        navItems.map((item) => (
-          <li>
-            <a href={item.href} class="nav-link">
-              {item.label}
-            </a>
+      <nav class="header-mobile-nav" aria-label="Mobile navigation">
+        <ul class="header-mobile-list">
+          {
+            navItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="nav-link"
+                  aria-current={isActivePath(item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+          <li class="header-mobile-actions">
+            <a href="/login" class="btn btn-outline">Sign In</a>
+            <a href="/signup" class="btn btn-primary">Start Practice</a>
           </li>
-        ))
-      }
-      <li class="header-mobile-actions">
-        <a href="/login" class="btn btn-outline">Sign In</a>
-        <a href="/signup" class="btn btn-primary">Start Practice</a>
-      </li>
-    </ul>
-  </nav>
+        </ul>
+      </nav>
+    </details>
+  </div>
 </header>
 
 <style>
   .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
     z-index: var(--z-sticky);
-    background: rgba(0, 0, 0, 0.9);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--bg-void) 90%, transparent);
+    border-bottom: 1px solid var(--glass-border);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    transition: transform 0.3s var(--ease-out);
   }
 
   .header-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: var(--container-xl);
+    max-width: 78rem;
     margin: 0 auto;
     padding: var(--space-4) var(--space-6);
-    gap: var(--space-8);
+    gap: clamp(1.25rem, 2.5vw, 2.5rem);
   }
 
   /* Logo */
@@ -158,16 +162,16 @@ const navItems = [
     align-items: center;
     gap: 0.42rem;
     white-space: nowrap;
-    font-family: var(--font-sans);
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
   }
 
   .brand-mark__primary,
   .brand-mark__secondary {
     display: inline-block;
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, 0.95rem + 0.22vw, 1.24rem);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(1.18rem, 1.03rem + 0.44vw, 1.56rem);
+    font-weight: 600;
     line-height: 1;
   }
 
@@ -178,7 +182,16 @@ const navItems = [
 
   .brand-mark__secondary {
     color: var(--accent-primary);
-    font-weight: 700;
+    font-weight: 600;
+  }
+
+  .brand-meta {
+    display: none;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
   }
 
   /* Navigation */
@@ -189,6 +202,13 @@ const navItems = [
   @media (min-width: 768px) {
     .header-nav {
       display: block;
+    }
+
+    .brand-meta {
+      display: inline-flex;
+      align-items: center;
+      max-width: 13rem;
+      line-height: 1.35;
     }
   }
 
@@ -203,9 +223,9 @@ const navItems = [
 
   .nav-link {
     font-family: var(--font-sans);
-    font-size: var(--text-xs);
+    font-size: 0.82rem;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--text-secondary);
     text-decoration: none;
@@ -247,6 +267,19 @@ const navItems = [
     gap: var(--space-3);
   }
 
+  .header-actions :global(.btn-ghost) {
+    border-color: transparent;
+    color: var(--text-secondary);
+  }
+
+  .header-actions :global(.btn-primary) {
+    min-width: 9.5rem;
+  }
+
+  .header-actions :global(.btn) {
+    min-height: 2.5rem;
+  }
+
   @media (min-width: 768px) {
     .header-actions {
       display: flex;
@@ -254,6 +287,18 @@ const navItems = [
   }
 
   /* Mobile Menu Toggle */
+  .header-mobile-shell {
+    display: block;
+  }
+
+  .header-mobile-shell summary {
+    list-style: none;
+  }
+
+  .header-mobile-shell summary::-webkit-details-marker {
+    display: none;
+  }
+
   .header-menu-toggle {
     display: flex;
     align-items: center;
@@ -261,7 +306,7 @@ const navItems = [
     width: 40px;
     height: 40px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: border-color var(--duration-fast) var(--ease-out);
@@ -272,7 +317,7 @@ const navItems = [
   }
 
   @media (min-width: 768px) {
-    .header-menu-toggle {
+    .header-mobile-shell {
       display: none;
     }
   }
@@ -291,11 +336,11 @@ const navItems = [
     transition: all var(--duration-fast) var(--ease-out);
   }
 
-  .header-menu-toggle[aria-expanded='true'] .menu-icon span:first-child {
+  .header-mobile-shell[open] .menu-icon span:first-child {
     transform: rotate(45deg) translateY(5px);
   }
 
-  .header-menu-toggle[aria-expanded='true'] .menu-icon span:last-child {
+  .header-mobile-shell[open] .menu-icon span:last-child {
     transform: rotate(-45deg) translateY(-5px);
   }
 
@@ -303,11 +348,11 @@ const navItems = [
   .header-mobile-nav {
     display: none;
     background: var(--bg-primary);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--glass-border);
     padding: var(--space-4) var(--space-6);
   }
 
-  .header-mobile-nav[aria-hidden='false'] {
+  .header-mobile-shell[open] .header-mobile-nav {
     display: block;
   }
 
@@ -323,7 +368,7 @@ const navItems = [
   .header-mobile-list .nav-link {
     display: block;
     padding: var(--space-3) 0;
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
   }
 
   .header-mobile-actions {
@@ -332,7 +377,7 @@ const navItems = [
     gap: var(--space-3);
     margin-top: var(--space-4);
     padding-top: var(--space-4);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--glass-border);
   }
 
   .header-mobile-actions .btn {
@@ -374,36 +419,3 @@ const navItems = [
     }
   }
 </style>
-
-<script>
-  const toggle = document.querySelector('.header-menu-toggle')
-  const mobileNav = document.querySelector('.header-mobile-nav')
-
-  mobileNav?.setAttribute('aria-hidden', 'true')
-
-  toggle?.addEventListener('click', () => {
-    const expanded = toggle.getAttribute('aria-expanded') === 'true'
-    toggle.setAttribute('aria-expanded', String(!expanded))
-    mobileNav?.setAttribute('aria-hidden', String(expanded))
-  })
-
-  // Scroll behavior
-  let lastScroll = 0
-  const header = document.querySelector('.header')
-
-  window.addEventListener(
-    'scroll',
-    () => {
-      const currentScroll = window.scrollY
-
-      if (currentScroll > lastScroll && currentScroll > 100) {
-        header?.style.setProperty('transform', 'translateY(-100%)')
-      } else {
-        header?.style.setProperty('transform', 'translateY(0)')
-      }
-
-      lastScroll = currentScroll
-    },
-    { passive: true },
-  )
-</script>

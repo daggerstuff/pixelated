@@ -1,0 +1,139 @@
+---
+export interface Props {
+  content: {
+    label: string
+    title: string
+    cards: Array<{ kicker: string; title: string; body: string }>
+    proofBand: {
+      label: string
+      title: string
+      body: string
+      items: Array<{ label: string; value: string }>
+    }
+  }
+}
+
+const { content } = Astro.props
+---
+
+<section class="section home-section home-section--scenarios">
+  <div class="container home-shell">
+    <span class="label-mono">{content.label}</span>
+    <h2 class="mt-4">{content.title}</h2>
+
+    <div class="home-card-grid mt-12">
+      {content.cards.map((card) => (
+        <article class="card card-lined home-card">
+          <span class="home-card-kicker">{card.kicker}</span>
+          <h3>{card.title}</h3>
+          <p>{card.body}</p>
+        </article>
+      ))}
+    </div>
+
+    <div class="home-proof-band mt-10">
+      <div class="home-proof-band__lead">
+        <span class="home-panel-label">{content.proofBand.label}</span>
+        <h3>{content.proofBand.title}</h3>
+        <p>{content.proofBand.body}</p>
+      </div>
+      <div class="home-proof-band__grid">
+        {content.proofBand.items.map((item) => (
+          <div class="home-proof-band__item">
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-shell {
+    max-width: 75rem;
+  }
+
+  .home-section {
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: clamp(4.5rem, 7vw, 7rem);
+    padding-bottom: clamp(4.5rem, 7vw, 7rem);
+  }
+
+  .home-section--scenarios {
+    background:
+      linear-gradient(180deg, rgba(125, 211, 168, 0.055), rgba(125, 211, 168, 0.014) 18%, transparent 72%);
+  }
+
+  .home-panel-label,
+  .home-card-kicker {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .home-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .home-card {
+    min-width: 0;
+    display: grid;
+    gap: var(--space-4);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  }
+
+  .home-proof-band {
+    display: grid;
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    padding: clamp(1.5rem, 2vw, 2.2rem);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  .home-proof-band__lead {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .home-proof-band__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .home-proof-band__item {
+    display: grid;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .home-proof-band__item span {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .home-proof-band__item strong {
+    font-size: var(--text-base);
+    line-height: 1.45;
+  }
+
+  @media (max-width: 1080px) {
+    .home-card-grid,
+    .home-proof-band,
+    .home-proof-band__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

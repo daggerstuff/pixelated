@@ -1,0 +1,184 @@
+---
+export interface Props {
+  artifact: {
+    eyebrow: string
+    status: string
+    chip: string
+    mode: string
+    context: Array<{ label: string; value: string }>
+    outputs: Array<{ label: string; value: string }>
+    readout: Array<{ label: string; value: string }>
+  }
+}
+
+const { artifact } = Astro.props
+---
+
+<aside class="hero-artifact card card-lined" aria-label="Session review artifact">
+  <div class="hero-artifact__header">
+    <div>
+      <span class="hero-artifact__eyebrow">{artifact.eyebrow}</span>
+      <h2 class="hero-artifact__title">{artifact.status}</h2>
+    </div>
+    <div class="hero-artifact__chips">
+      <span class="hero-artifact__chip">{artifact.chip}</span>
+      <span class="hero-artifact__chip hero-artifact__chip--accent">{artifact.mode}</span>
+    </div>
+  </div>
+
+  <div class="hero-artifact__block">
+    <span class="hero-artifact__label">Session context</span>
+    <dl class="hero-artifact__facts">
+      {artifact.context.map((item) => (
+        <div class="hero-artifact__fact">
+          <dt>{item.label}</dt>
+          <dd>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+
+  <div class="hero-artifact__block">
+    <span class="hero-artifact__label">Recorded outputs</span>
+    <div class="hero-artifact__outputs">
+      {artifact.outputs.map((item) => (
+        <div class="hero-artifact__output">
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="hero-artifact__readout">
+    {artifact.readout.map((item) => (
+      <div class="hero-artifact__metric">
+        <span>{item.label}</span>
+        <strong>{item.value}</strong>
+      </div>
+    ))}
+  </div>
+</aside>
+
+<style>
+  .hero-artifact {
+    position: relative;
+    align-self: center;
+    display: grid;
+    gap: var(--space-5);
+    width: min(100%, 22rem);
+    margin-left: auto;
+    padding: clamp(1.2rem, 1.7vw, 1.7rem);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.072), rgba(255, 255, 255, 0.026)),
+      rgba(7, 11, 12, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
+  }
+
+  .hero-artifact__header {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .hero-artifact__eyebrow,
+  .hero-artifact__label,
+  .hero-artifact__output span,
+  .hero-artifact__metric span,
+  .hero-artifact__fact dt {
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .hero-artifact__title {
+    font-size: clamp(1.38rem, 1.08rem + 0.8vw, 1.9rem);
+    line-height: 1.02;
+    max-width: 14ch;
+  }
+
+  .hero-artifact__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .hero-artifact__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.38rem 0.62rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 9999px;
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .hero-artifact__chip--accent {
+    border-color: rgba(125, 211, 168, 0.28);
+    color: var(--accent-primary);
+  }
+
+  .hero-artifact__block {
+    display: grid;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-artifact__facts,
+  .hero-artifact__outputs,
+  .hero-artifact__readout {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .hero-artifact__fact,
+  .hero-artifact__output,
+  .hero-artifact__metric {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .hero-artifact__fact dd,
+  .hero-artifact__output strong,
+  .hero-artifact__metric strong {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+  }
+
+  .hero-artifact__readout {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-artifact__metric {
+    min-width: 0;
+    padding: 0.8rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  @media (max-width: 1024px) {
+    .hero-artifact {
+      width: 100%;
+      margin-left: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero-artifact__readout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

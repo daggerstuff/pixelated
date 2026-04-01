@@ -3,12 +3,25 @@
  * Brutalist Hero Component
  * High-impact mission statement
  */
+import BrutalistHeroArtifact from './BrutalistHeroArtifact.astro'
+import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+import { heroContent } from '@/lib/content/hero'
+
 export interface Props {
   title?: string
   subtitle?: string
   primaryCTA?: { text: string; href: string }
   secondaryCTA?: { text: string; href: string }
   stats?: Array<{ value: string; label: string }>
+  artifact?: {
+    eyebrow: string
+    status: string
+    chip: string
+    mode: string
+    context: Array<{ label: string; value: string }>
+    outputs: Array<{ label: string; value: string }>
+    readout: Array<{ label: string; value: string }>
+  }
 }
 
 const {
@@ -17,187 +30,95 @@ const {
   primaryCTA,
   secondaryCTA,
   stats,
+  artifact,
 } = Astro.props
 
-const primaryAction = primaryCTA || { text: 'Enter the Gym', href: '/training' }
-const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/ai-engine' }
+const primaryAction = primaryCTA || { text: 'Start Practice', href: '/signup' }
+const secondaryAction = secondaryCTA || { text: 'Watch Demo', href: '/demo-hub' }
+const reviewArtifact = artifact || heroContent.artifact
 ---
 
 <section
   class="hero relative flex items-center overflow-hidden"
   data-component="brutalist-hero"
 >
-  <!-- Background Layer -->
   <div class="absolute inset-0 z-0">
     <div class="absolute inset-0 bg-void"></div>
-    <div class="hero-atmosphere absolute inset-0 opacity-80">
-      <div class="hero-atmosphere__plane hero-atmosphere__plane--left"></div>
-      <div class="hero-atmosphere__plane hero-atmosphere__plane--right"></div>
-      <div class="hero-atmosphere__beam"></div>
-      <div class="hero-atmosphere__glow hero-atmosphere__glow--left"></div>
-      <div class="hero-atmosphere__glow hero-atmosphere__glow--right"></div>
-      <div class="hero-atmosphere__grid"></div>
-      <div class="hero-atmosphere__scanline"></div>
-    </div>
-    <!-- Grain/Noise Overlay -->
-    <div
-      class="absolute inset-0 opacity-[0.03] pointer-events-none"
-      style="background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.1) 100%);"
-    >
-    </div>
-    <!-- Radial Focal Glow -->
-    <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,255,136,0.05)_0%,transparent_70%)]"
-    >
-    </div>
+    <HeroAtmosphere />
+    <div class="hero-surface-noise"></div>
   </div>
 
   <div class="container relative z-10 hero-shell">
     <div class="hero-layout">
       <div class="hero-copy">
-      <!-- Tag/Status -->
-      <div
-        class="inline-flex items-center gap-2 px-3 py-1 bg-accent-primary-glow border border-accent-primary-dim rounded-full mb-8 animate-pulse-soft"
-      >
-        <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
-        <span
-          class="text-[10px] hero-kicker uppercase tracking-widest text-accent-primary"
-          >AI Roleplay Platform // Therapist Training</span
+        <div
+          class="hero-kicker-pill inline-flex items-center gap-2 px-3 py-1 rounded-full mb-7"
         >
-      </div>
+          <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
+          <span class="hero-kicker">Clinical rehearsal for difficult therapeutic conversations</span>
+        </div>
 
-      <h1 class="hero-title">
-        {title}
-      </h1>
+        <h1 class="hero-title">
+          {title}
+        </h1>
 
-      <p class="hero-subtitle">
-        {subtitle}
-      </p>
+        <p class="hero-subtitle">
+          {subtitle}
+        </p>
 
-      <div class="flex flex-wrap gap-6 items-center">
-        <a href={primaryAction.href} class="btn-premium group">
-          <span class="relative z-10">{primaryAction.text}</span>
-          <div
-            class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"
+        <div class="flex flex-wrap gap-6 items-center">
+          <a href={primaryAction.href} class="btn-premium group">
+            <span class="relative z-10">{primaryAction.text}</span>
+            <div
+              class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"
+            >
+            </div>
+          </a>
+
+          <a
+            href={secondaryAction.href}
+            class="group hero-secondary-link flex items-center gap-2 text-white text-sm uppercase tracking-widest no-underline"
           >
-          </div>
-        </a>
+            <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryAction.text}</span>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              class="transform group-hover:translate-x-2 transition-transform"
+            >
+              <path
+                d="M5 12H19M19 12L13 6M19 12L13 18"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="square"></path>
+            </svg>
+          </a>
+        </div>
 
-        <a
-          href={secondaryAction.href}
-          class="group hero-secondary-link flex items-center gap-2 text-white text-sm uppercase tracking-widest no-underline"
-        >
-          <span class="opacity-60 group-hover:opacity-100 transition-opacity"
-            >{secondaryAction.text}</span
-          >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            class="transform group-hover:translate-x-2 transition-transform"
-          >
-            <path
-              d="M5 12H19M19 12L13 6M19 12L13 18"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="square"></path>
-          </svg>
-        </a>
-      </div>
-
-      <!-- Stats Section -->
-      {
-        stats && stats.length > 0 && (
+        {
+          stats && stats.length > 0 && (
           <div
             class="stats-grid mt-16 pt-8"
-            style="border-top: var(--border-primary);"
+            style="border-top: 1px solid rgba(255, 255, 255, 0.12);"
           >
-            <div class="hero-stats-grid">
-              {stats.map((stat) => (
-                <div class="stat-item">
-                  <span class="stat-value">
-                    {stat.value}
-                  </span>
-                  <span class="stat-label">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
+              <div class="hero-stats-grid" aria-label="Proof points">
+                {stats.map((stat) => (
+                  <div class="stat-item">
+                    <span class="stat-value">{stat.value}</span>
+                    <span class="stat-label">{stat.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )
-      }
+          )
+        }
       </div>
 
-      <aside class="hero-visual" aria-label="Pixelated Empathy brand visual">
-        <div class="hero-visual__frame">
-          <div class="hero-visual__meta">
-            <span class="hero-visual__eyebrow">Pixelated Empathy</span>
-            <span class="hero-visual__status">Live supervision stack</span>
-          </div>
-
-          <div class="hero-visual__workspace">
-            <div class="hero-visual__workspace-header">
-              <span class="hero-visual__workspace-chip">
-                <img
-                  src="/favicon.svg"
-                  alt="Pixelated Empathy brand mark"
-                  class="hero-visual__badge"
-                  width="20"
-                  height="20"
-                  loading="eager"
-                  decoding="async"
-                />
-                Session
-              </span>
-              <span class="hero-visual__workspace-mode">Scenario 04</span>
-            </div>
-
-            <div class="hero-visual__transcript">
-              <div class="hero-visual__line hero-visual__line--patient">
-                "I almost cancelled today."
-              </div>
-              <div class="hero-visual__line hero-visual__line--clinician">
-                "What nearly kept you away?"
-              </div>
-              <div class="hero-visual__line hero-visual__line--patient">
-                "I did not want to admit how bad it got."
-              </div>
-            </div>
-
-            <div class="hero-visual__signal-grid">
-              <div>
-                <span class="hero-visual__label">Pacing</span>
-                <strong>Stable</strong>
-              </div>
-              <div>
-                <span class="hero-visual__label">Risk</span>
-                <strong>Tracked</strong>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-visual__readout">
-            <div class="hero-visual__readout-item">
-              <span class="hero-visual__label">Mode</span>
-              <strong>Roleplay</strong>
-            </div>
-            <div class="hero-visual__readout-item">
-              <span class="hero-visual__label">Feedback</span>
-              <strong>Structured</strong>
-            </div>
-            <div class="hero-visual__readout-item">
-              <span class="hero-visual__label">Replay</span>
-              <strong>Repeatable</strong>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <BrutalistHeroArtifact artifact={reviewArtifact} />
     </div>
   </div>
 
-  <!-- Perspective Grid Footer -->
   <div
     class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"
   >
@@ -206,141 +127,25 @@ const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/
 
 <style>
   .hero {
-    min-height: clamp(38rem, 84vh, 50rem);
-    padding: clamp(6.5rem, 10vh, 8.5rem) 0 clamp(4rem, 7vh, 6rem);
+    min-height: clamp(40rem, 82vh, 52rem);
+    padding: clamp(7rem, 10vh, 9rem) 0 clamp(4.5rem, 8vh, 6.5rem);
     background:
-      radial-gradient(circle at top, rgba(34, 197, 94, 0.08), transparent 36%),
+      radial-gradient(circle at top, rgba(125, 211, 168, 0.08), transparent 34%),
       linear-gradient(
         180deg,
-        rgba(2, 6, 23, 0.88) 0%,
-        rgba(2, 6, 23, 0.97) 100%
+        rgba(8, 12, 13, 0.92) 0%,
+        rgba(8, 12, 13, 0.98) 100%
       );
   }
 
-  .hero-atmosphere {
-    overflow: hidden;
-  }
-
-  .hero-atmosphere__plane,
-  .hero-atmosphere__beam {
-    position: absolute;
-    inset: auto;
-  }
-
-  .hero-atmosphere__plane--left {
-    top: -10%;
-    left: -6%;
-    width: min(52rem, 70vw);
-    height: min(36rem, 54vw);
-    background:
-      linear-gradient(135deg, rgba(11, 15, 24, 0.9), rgba(8, 18, 24, 0.5));
-    clip-path: polygon(0 0, 84% 0, 62% 100%, 0 100%);
-    opacity: 0.86;
-  }
-
-  .hero-atmosphere__plane--right {
-    right: -7%;
-    bottom: -16%;
-    width: min(34rem, 44vw);
-    height: min(34rem, 44vw);
-    background:
-      linear-gradient(160deg, rgba(7, 24, 28, 0.92), rgba(4, 10, 22, 0.45));
-    clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 82%);
-    opacity: 0.88;
-  }
-
-  .hero-atmosphere__beam {
-    top: 14%;
-    right: 16%;
-    width: min(28rem, 34vw);
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(0, 255, 136, 0.7) 48%,
-      rgba(255, 255, 255, 0.28) 100%
-    );
-    transform: rotate(-24deg);
-    transform-origin: right center;
-    opacity: 0.8;
-    box-shadow: 0 0 18px rgba(0, 255, 136, 0.18);
-  }
-
-  .hero-atmosphere__glow {
-    position: absolute;
-    border-radius: 9999px;
-    filter: blur(90px);
-    opacity: 0.55;
-    transform: translateZ(0);
-  }
-
-  .hero-atmosphere__glow--left {
-    top: 8%;
-    left: -8%;
-    width: min(44rem, 60vw);
-    height: min(44rem, 60vw);
-    background: radial-gradient(
-      circle,
-      rgba(16, 185, 129, 0.24) 0%,
-      rgba(16, 185, 129, 0.08) 42%,
-      transparent 72%
-    );
-  }
-
-  .hero-atmosphere__glow--right {
-    right: -6%;
-    bottom: 4%;
-    width: min(40rem, 52vw);
-    height: min(40rem, 52vw);
-    background: radial-gradient(
-      circle,
-      rgba(34, 197, 94, 0.16) 0%,
-      rgba(34, 197, 94, 0.06) 45%,
-      transparent 74%
-    );
-  }
-
-  .hero-atmosphere__grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
-    background-position: center center;
-    background-size: 72px 72px;
-    mask-image: radial-gradient(
-      circle at center,
-      rgba(0, 0, 0, 0.9),
-      transparent 82%
-    );
-    opacity: 0.16;
-  }
-
-  .hero-atmosphere__scanline {
+  .hero-surface-noise {
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.05),
-        transparent 22%,
-        transparent 78%,
-        rgba(255, 255, 255, 0.03)
-      ),
-      repeating-linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.035) 0,
-        rgba(255, 255, 255, 0.035) 1px,
-        transparent 1px,
-        transparent 4px
-      );
-    opacity: 0.08;
-    mix-blend-mode: soft-light;
-  }
-
-  .stark-outline {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
-    color: transparent;
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%, transparent 84%, rgba(255, 255, 255, 0.02)),
+      radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.12) 100%);
+    opacity: 0.22;
+    pointer-events: none;
   }
 
   .btn-premium {
@@ -350,7 +155,7 @@ const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/
     border: 1px solid var(--accent-primary);
     color: white;
     font-family: var(--font-sans);
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -364,38 +169,43 @@ const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/
     color: black;
   }
 
+  .hero-kicker-pill {
+    border: 1px solid rgba(125, 211, 168, 0.24);
+    background: rgba(125, 211, 168, 0.08);
+  }
+
   .hero-shell {
-    max-width: 66rem;
+    max-width: 74rem;
   }
 
   .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.18fr) minmax(18rem, 21rem);
-    gap: clamp(1.75rem, 3.2vw, 3.25rem);
-    align-items: center;
+    grid-template-columns: minmax(0, 1.34fr) minmax(19rem, 23.5rem);
+    gap: clamp(2rem, 4vw, 4.5rem);
+    align-items: start;
   }
 
   .hero-copy {
-    max-width: 34rem;
+    max-width: 39rem;
+    padding-top: 0.5rem;
   }
 
   .hero-title {
-    max-width: 9.5ch;
-    margin: 0 0 1.5rem;
-    font-family: var(--font-sans);
-    font-size: clamp(2.7rem, 2rem + 2.35vw, 4.4rem);
-    font-weight: 700;
-    line-height: 0.96;
-    letter-spacing: -0.055em;
-    text-wrap: balance;
+    max-width: 9.8ch;
+    margin: 0 0 1.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 2.1rem + 1.8vw, 4.1rem);
+    font-weight: 600;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
     color: var(--text-primary);
   }
 
   .hero-subtitle {
-    max-width: 30rem;
-    margin: 0 0 2.2rem;
-    font-size: clamp(1rem, 0.93rem + 0.32vw, 1.18rem);
-    line-height: 1.6;
+    max-width: 38rem;
+    margin: 0 0 2.25rem;
+    font-size: clamp(1.03rem, 0.96rem + 0.28vw, 1.18rem);
+    line-height: 1.62;
     color: var(--text-secondary);
   }
 
@@ -404,226 +214,46 @@ const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/
   .stat-label {
     font-family: var(--font-sans);
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
+  }
+
+  .hero-kicker {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--accent-primary);
   }
 
   .hero-secondary-link {
-    letter-spacing: 0.12em;
-  }
-
-  .stats-grid {
-    margin-top: 2.4rem;
-    padding-top: 1.25rem;
-    border-top: var(--border-primary);
+    font-size: 0.78rem;
   }
 
   .hero-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
+    gap: var(--space-5);
   }
 
   .stat-item {
     min-width: 0;
+    display: grid;
+    gap: 0.55rem;
   }
 
   .stat-value {
-    display: block;
-    font-family: var(--font-sans);
-    font-size: clamp(1.45rem, 1.2rem + 0.8vw, 2rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.04em;
+    font-family: var(--font-display);
+    font-size: clamp(1.18rem, 1.06rem + 0.32vw, 1.42rem);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
     color: var(--text-primary);
   }
 
   .stat-label {
     display: block;
-    margin-top: 0.55rem;
-    font-size: 0.7rem;
-    color: var(--text-tertiary);
-  }
-
-  .hero-visual {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .hero-visual__frame {
-    position: relative;
-    width: min(100%, 20.5rem);
-    padding: 1.1rem;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow:
-      0 24px 60px rgba(0, 0, 0, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(18px);
-  }
-
-  .hero-visual__frame::before {
-    content: "";
-    position: absolute;
-    inset: 0.85rem;
-    border: 1px solid rgba(0, 255, 136, 0.18);
-    pointer-events: none;
-  }
-
-  .hero-visual__meta,
-  .hero-visual__readout {
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-visual__meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 0.9rem;
-    text-transform: uppercase;
-  }
-
-  .hero-visual__eyebrow,
-  .hero-visual__status,
-  .hero-visual__label {
-    font-family: var(--font-sans);
     font-size: 0.72rem;
-    letter-spacing: 0.12em;
-  }
-
-  .hero-visual__eyebrow {
-    color: var(--text-primary);
-  }
-
-  .hero-visual__status,
-  .hero-visual__label {
-    color: var(--text-tertiary);
-  }
-
-  .hero-visual__workspace {
-    position: relative;
-    display: grid;
-    gap: 0.9rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at center, rgba(0, 255, 136, 0.12), transparent 58%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
-  }
-
-  .hero-visual__workspace::before,
-  .hero-visual__workspace::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .hero-visual__workspace::before {
-    background-image:
-      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: 0.26;
-  }
-
-  .hero-visual__workspace::after {
-    background: linear-gradient(135deg, transparent 0%, rgba(0, 255, 136, 0.08) 100%);
-  }
-
-  .hero-visual__workspace-header,
-  .hero-visual__transcript,
-  .hero-visual__signal-grid {
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-visual__workspace-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.75rem;
-    align-items: center;
-  }
-
-  .hero-visual__workspace-chip,
-  .hero-visual__workspace-mode {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-family: var(--font-sans);
-    font-size: 0.66rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
+    line-height: 1.55;
     text-transform: uppercase;
-  }
-
-  .hero-visual__workspace-chip {
-    color: var(--text-primary);
-  }
-
-  .hero-visual__workspace-mode {
     color: var(--text-tertiary);
-  }
-
-  .hero-visual__badge {
-    width: 1rem;
-    height: 1rem;
-    flex: none;
-  }
-
-  .hero-visual__transcript {
-    display: grid;
-    gap: 0.65rem;
-  }
-
-  .hero-visual__line {
-    max-width: 90%;
-    padding: 0.72rem 0.8rem;
-    font-family: var(--font-sans);
-    font-size: 0.88rem;
-    line-height: 1.45;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text-secondary);
-  }
-
-  .hero-visual__line--clinician {
-    margin-left: auto;
-    border-color: rgba(0, 255, 136, 0.28);
-    background: rgba(0, 255, 136, 0.08);
-    color: var(--text-primary);
-  }
-
-  .hero-visual__signal-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem;
-  }
-
-  .hero-visual__signal-grid > div {
-    display: grid;
-    gap: 0.22rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .hero-visual__readout {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
-  }
-
-  .hero-visual__readout-item {
-    display: grid;
-    gap: 0.3rem;
-  }
-
-  .hero-visual__readout-item strong {
-    font-family: var(--font-sans);
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: var(--text-primary);
   }
 
   @media (max-width: 768px) {
@@ -633,55 +263,23 @@ const secondaryAction = secondaryCTA || { text: 'Explore Intelligence', href: '/
       padding-bottom: 4rem;
     }
 
-    .hero-atmosphere__plane--left {
-      width: 92vw;
-      height: 62vw;
-      left: -18%;
-      top: -4%;
-    }
-
-    .hero-atmosphere__plane--right {
-      width: 65vw;
-      height: 65vw;
-      right: -18%;
-      bottom: 2%;
-    }
-
-    .hero-atmosphere__beam {
-      top: 22%;
-      right: -4%;
-      width: 58vw;
-    }
-
-    .hero-atmosphere__grid {
-      background-size: 44px 44px;
-      opacity: 0.11;
-    }
-
     .hero-layout {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 2.5rem;
       align-items: start;
     }
 
     .hero-shell,
-    .hero-copy,
-    .hero-visual,
-    .hero-visual__frame {
+    .hero-copy {
       max-width: 100%;
     }
 
-    .hero-visual {
-      justify-content: flex-start;
-    }
-
     .hero-title {
-      max-width: 9ch;
-      font-size: clamp(2.5rem, 1.9rem + 3vw, 3.5rem);
+      max-width: 11ch;
+      font-size: clamp(2.2rem, 1.9rem + 1.6vw, 2.9rem);
     }
 
-    .hero-stats-grid,
-    .hero-visual__readout {
+    .hero-stats-grid {
       grid-template-columns: 1fr;
     }
   }
