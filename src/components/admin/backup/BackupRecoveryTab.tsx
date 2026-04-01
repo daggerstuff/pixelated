@@ -50,6 +50,9 @@ interface RecoveryTest {
     testCase: string
     passed: boolean
     details: Record<string, unknown>
+    id?: string
+    status?: 'critical' | 'high' | 'medium' | 'low'
+    description?: string
   }>
   issues?: Array<{
     type: string

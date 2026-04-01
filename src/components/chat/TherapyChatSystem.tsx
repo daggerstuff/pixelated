@@ -361,8 +361,13 @@ function ProfessionalTherapistWorkspace() {
 
     try {
       // Convert messages to the format expected by generatePatientResponse
-      const conversationMessages = messages.map((msg) => ({
-        role: msg.role === 'assistant' ? 'patient' : 'therapist',
+      const conversationMessages: Array<{
+			role: 'therapist' | 'patient'
+			content: string
+		}> = messages.map((msg) => ({
+        role: (msg.role === 'assistant' ? 'patient' : 'therapist') as
+			| 'therapist'
+			| 'patient',
         content: msg.content,
       }))
 

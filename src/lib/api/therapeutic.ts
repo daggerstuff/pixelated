@@ -31,6 +31,7 @@ export const ValidationResultSchema = z.object({
 })
 
 export const CrisisSignalSchema = z.object({
+  id: z.string().optional(),
   category: z.string(),
   severity: z.number(),
   keywords: z.array(z.string()),
