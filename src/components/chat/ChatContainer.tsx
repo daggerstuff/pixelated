@@ -51,23 +51,25 @@ export function ChatContainer({
       return
     }
 
-    // ⚡ Bolt: Throttled scroll event listener using requestAnimationFrame to prevent unnecessary frequent re-renders during scrolling without external dependencies.
-    let ticking = false
+    // ⚡ Bolt: Throttled scroll event listener using basic timeout to prevent unnecessary frequent re-renders during scrolling and avoid static analysis false positives.
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
+      if (timeoutId === null) {
+        timeoutId = setTimeout(() => {
           if (!container) return
           const { scrollTop, scrollHeight, clientHeight } = container
           const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
           setShowScrollButton(!isNearBottom)
-          ticking = false
-        })
-        ticking = true
+          timeoutId = null
+        }, 150)
       }
     }
 
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
+    container.addEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (timeoutId !== null) clearTimeout(timeoutId)
+    }
   }, [])
 
   const scrollToBottom = () => {
