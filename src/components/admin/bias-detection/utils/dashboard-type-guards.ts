@@ -16,6 +16,10 @@ interface AlertItem {
   message: string
   level: string
   timestamp: string | Date
+  sessionId?: string
+  type?: string
+  acknowledged?: boolean
+  status?: string
 }
 
 interface BiasAnalysisItem {

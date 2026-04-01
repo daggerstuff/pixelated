@@ -516,7 +516,7 @@ describe('BiasDashboard', () => {
     )
     fireEvent.change(timeRangeSelect, { target: { value: '7d' } })
 
-    expect(timeRangeSelect.value).toBe('7d')
+    expect((timeRangeSelect as HTMLSelectElement).value).toBe('7d')
   })
 
   it('shows custom date inputs when custom time range is selected', async () => {
@@ -545,7 +545,7 @@ describe('BiasDashboard', () => {
     )
     fireEvent.change(biasScoreSelect, { target: { value: 'high' } })
 
-    expect(biasScoreSelect.value).toBe('high')
+    expect((biasScoreSelect as HTMLSelectElement).value).toBe('high')
   })
 
   it('handles alert level filter changes', async () => {
@@ -560,7 +560,7 @@ describe('BiasDashboard', () => {
     )
     fireEvent.change(alertLevelSelect, { target: { value: 'critical' } })
 
-    expect(alertLevelSelect.value).toBe('critical')
+    expect((alertLevelSelect as HTMLSelectElement).value).toBe('critical')
   })
 
   it('clears all filters when clear button is clicked', async () => {
