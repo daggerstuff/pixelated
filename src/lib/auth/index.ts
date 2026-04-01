@@ -6,6 +6,7 @@
 import type { AstroCookies } from "astro";
 
 import { authConfig } from "../../config/auth.config";
+import { getUserById as getAuth0UserById } from "../../services/auth0.service";
 import { validateToken } from "./auth0-jwt-service";
 import { extractTokenFromRequest } from "./auth0-middleware";
 import { getSession } from "./session";
@@ -155,7 +156,22 @@ export async function getUserById(
       name: `User ${userId}`,
     };
   }
-  return null;
+
+  try {
+    const user = await getAuth0UserById(userId);
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.fullName,
+    };
+  } catch (error) {
+    console.error("Failed to look up Auth0 user:", error);
+    return null;
+  }
 }
 
 export const auth = {

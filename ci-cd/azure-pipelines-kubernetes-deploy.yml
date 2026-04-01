@@ -68,6 +68,33 @@ stages:
             submodules: false
 
           - task: Bash@3
+            displayName: 'Preflight: Validate submodule credentials'
+            env:
+              GITHUB_PAT: $(GITHUB_PAT)
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+            inputs:
+              targetType: 'inline'
+              script: |
+                set -euo pipefail
+
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
+                  exit 1
+                fi
+
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
+                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
+                fi
+
+                if [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##[warning]GITHUB_PAT is not set. GitHub submodule fallback will not be available."
+                else
+                  echo "✅ GITHUB_PAT is present for fallback access"
+                fi
+
+                echo "✅ Submodule credential preflight complete"
+
+          - task: Bash@3
             displayName: 'Initialize CI-aware submodules'
             env:
               GITHUB_PAT: $(GITHUB_PAT)
@@ -189,18 +216,31 @@ stages:
             submodules: false
 
           - task: Bash@3
-            displayName: 'Preflight: Validate GitHub submodule secret'
+            displayName: 'Preflight: Validate submodule credentials'
             env:
               GITHUB_PAT: $(GITHUB_PAT)
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                if [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]GITHUB_PAT is not set."
+
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
                   exit 1
                 fi
-                echo "✅ GITHUB_PAT is present"
+
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
+                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
+                fi
+
+                if [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##[warning]GITHUB_PAT is not set. GitHub submodule fallback will not be available."
+                else
+                  echo "✅ GITHUB_PAT is present for fallback access"
+                fi
+
+                echo "✅ Submodule credential preflight complete"
 
           - task: Bash@3
             displayName: Ensure unzip is available

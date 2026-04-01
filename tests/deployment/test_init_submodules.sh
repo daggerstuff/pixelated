@@ -44,13 +44,20 @@ set -euo pipefail
 log_file="${TEST_DIR}/git.log"
 printf '%s\n' "\$*" >> "\${log_file}"
 
-if [[ "\$#" -ge 2 && "\$1" == "rev-parse" && "\$2" == "--show-toplevel" ]]; then
+args=("\$@")
+idx=0
+while [[ \$idx -lt \$# && "\${args[\$idx]}" == "-c" ]]; do
+  idx=\$((idx + 2))
+done
+cmd="\${args[\$idx]:-}"
+
+if [[ "\$#" -ge \$((idx + 2)) && "\$cmd" == "rev-parse" && "\${args[\$((idx + 1))]}" == "--show-toplevel" ]]; then
   printf '%s\n' "${TEST_DIR}/repo"
   exit 0
 fi
 
-if [[ "\$#" -ge 4 && "\$1" == "config" && "\$2" == "-f" && "\$3" == ".gitmodules" && "\$4" == "--get" ]]; then
-  case "\$5" in
+if [[ "\$#" -ge \$((idx + 4)) && "\$cmd" == "config" && "\${args[\$((idx + 1))]}" == "-f" && "\${args[\$((idx + 2))]}" == ".gitmodules" && "\${args[\$((idx + 3))]}" == "--get" ]]; then
+  case "\${args[\$((idx + 4))]}" in
     submodule.ai.path) printf '%s\n' 'ai' ;;
     submodule.docs.path) printf '%s\n' 'docs' ;;
     submodule.ai.url) printf '%s\n' 'https://github.com/daggerstuff/ai.git' ;;
@@ -60,7 +67,26 @@ if [[ "\$#" -ge 4 && "\$1" == "config" && "\$2" == "-f" && "\$3" == ".gitmodules
   exit 0
 fi
 
-if [[ "\$1" == "submodule" ]]; then
+if [[ "\$cmd" == "submodule" ]]; then
+  if [[ "\${args[\$((idx + 1))]:-}" == "update" && "\$*" == *"--depth 1"* && "${MOCK_GIT_FAIL_SHALLOW_UPDATE:-0}" == "1" ]]; then
+    exit 1
+  fi
+  exit 0
+fi
+
+if [[ "\$cmd" == "ls-remote" ]]; then
+  remote=""
+  for ((i = idx + 1; i < \$#; i++)); do
+    arg="\${args[\$i]}"
+    if [[ "\$arg" == http* || "\$arg" == git@* ]]; then
+      remote="\$arg"
+      break
+    fi
+  done
+  if [[ "\${MOCK_GIT_FAIL_REMOTE_PATTERN:-}" != "" && "\$remote" == *"\${MOCK_GIT_FAIL_REMOTE_PATTERN}"* ]]; then
+    exit 1
+  fi
+  printf '%s\n' 'deadbeef	HEAD'
   exit 0
 fi
 
@@ -80,8 +106,8 @@ assert_contains() {
   fi
 }
 
-test_azure_submodule_update_uses_global_config() {
-  print_header "Azure submodule update uses GIT_CONFIG_GLOBAL"
+test_azure_submodule_update_uses_per_command_headers() {
+  print_header "Azure submodule update prefers Azure mirrors"
   TESTS_RUN=$((TESTS_RUN + 1))
   setup_fake_git
 
@@ -91,14 +117,44 @@ test_azure_submodule_update_uses_global_config() {
   SYSTEM_ACCESSTOKEN="test-token" \
   bash "${TARGET_SCRIPT}"
 
-  # Check if git was called with the correct arguments
+  assert_contains "-c http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer test-token" "${TEST_DIR}/git.log"
   assert_contains "submodule update --recursive --force --depth 1" "${TEST_DIR}/git.log"
-  
-  # The actual authentication is now handled via GIT_CONFIG_GLOBAL,
-  # which the mock git doesn't see in its arguments ($*).
-  # But we can verify that the script output says it was configured.
-  # (Since we are running it and capturing output might be hard here,
-  # we'll just trust that if it didn't fail and it logged 'configured', it's good).
+  assert_contains "config submodule.ai.url https://dev.azure.com/handtransfer/pixelated/_git/ai" "${TEST_DIR}/git.log"
+}
+
+test_azure_falls_back_to_github_when_mirror_is_unavailable() {
+  print_header "Azure submodule update falls back to GitHub when Azure mirror is unavailable"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  rm -rf "${TEST_DIR}"
+  TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
+  setup_fake_git
+
+  PATH="${TEST_DIR}/bin:${PATH}" \
+  PROJECT_ROOT="${TEST_DIR}/repo" \
+  TF_BUILD="True" \
+  SYSTEM_ACCESSTOKEN="test-token" \
+  GITHUB_PAT="github-token" \
+  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
+  bash "${TARGET_SCRIPT}"
+
+  assert_contains "config submodule.ai.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_contains "-c http.https://github.com/.extraHeader=AUTHORIZATION: basic" "${TEST_DIR}/git.log"
+}
+
+test_submodule_update_retries_without_depth_when_shallow_fetch_fails() {
+  print_header "Submodule update retries without depth when shallow fetch fails"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  rm -rf "${TEST_DIR}"
+  TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
+  setup_fake_git
+
+  PATH="${TEST_DIR}/bin:${PATH}" \
+  PROJECT_ROOT="${TEST_DIR}/repo" \
+  MOCK_GIT_FAIL_SHALLOW_UPDATE="1" \
+  bash "${TARGET_SCRIPT}"
+
+  assert_contains "submodule update --recursive --force --depth 1" "${TEST_DIR}/git.log"
+  assert_contains "submodule update --recursive --force" "${TEST_DIR}/git.log"
 }
 
 test_non_azure_submodule_update_has_no_extraheader() {
@@ -120,7 +176,9 @@ test_non_azure_submodule_update_has_no_extraheader() {
 }
 
 main() {
-  test_azure_submodule_update_uses_global_config
+  test_azure_submodule_update_uses_per_command_headers
+  test_azure_falls_back_to_github_when_mirror_is_unavailable
+  test_submodule_update_retries_without_depth_when_shallow_fetch_fails
   test_non_azure_submodule_update_has_no_extraheader
 
   echo "Tests run: ${TESTS_RUN}"

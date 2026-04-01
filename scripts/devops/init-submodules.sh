@@ -26,11 +26,44 @@ is_azure_environment() {
   [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]
 }
 
+has_github_credentials() {
+  [[ -n "${GITHUB_PAT:-${GITHUB_TOKEN:-}}" ]]
+}
+
+remote_is_accessible() {
+  local remote_url="$1"
+  git_with_auth ls-remote --exit-code "${remote_url}" HEAD >/dev/null 2>&1
+}
+
+is_allowed_override_url() {
+  local name="$1"
+  local url="$2"
+
+  case "${name}" in
+    ai|docs) ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  case "${url}" in
+    "https://github.com/daggerstuff/${name}.git"|\
+    "https://dev.azure.com/handtransfer/pixelated/_git/${name}"|\
+    "git@ssh.dev.azure.com:v3/handtransfer/pixelated/${name}"|\
+    "https://bitbucket.org/slimshadyme/${name}.git"|\
+    "git@bitbucket.org:slimshadyme/${name}.git")
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
 # ---------------------------------------------------------------------------
 # Authentication Configuration
 # ---------------------------------------------------------------------------
-_AUTH_CONFIGURED=false
-_TEMP_GITCONFIG=""
+AUTH_GIT_ARGS=()
 
 configure_credentials() {
   # 1. Azure DevOps Credentials
@@ -39,15 +72,11 @@ configure_credentials() {
     if [[ -z "${token}" ]]; then
       echo "⚠️  Warning: SYSTEM_ACCESSTOKEN is not set. Azure DevOps internal repo access may fail."
     else
-      local temp_gitconfig
-      temp_gitconfig=$(mktemp "${TMPDIR:-/tmp}/git-azure-creds.XXXXXX")
-      git config -f "${temp_gitconfig}" "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
-      git config -f "${temp_gitconfig}" "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
-      
-      export GIT_CONFIG_GLOBAL="${temp_gitconfig}"
-      _TEMP_GITCONFIG="${temp_gitconfig}"
-      _AUTH_CONFIGURED=true
-      echo "✅ Azure DevOps credentials configured via GIT_CONFIG_GLOBAL"
+      AUTH_GIT_ARGS+=(
+        -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${token}"
+        -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${token}"
+      )
+      echo "✅ Azure DevOps credentials configured via per-command headers"
     fi
   fi
 
@@ -58,25 +87,19 @@ configure_credentials() {
     local auth_header
     auth_header="$(printf 'x-access-token:%s' "${github_token}" | base64 -w0)"
     
-    # We use --global for the runner context
-    run git config --global "http.https://github.com/.extraheader" "AUTHORIZATION: basic ${auth_header}"
-    run git config --global credential.helper ""
-    run git config --global url."https://x-access-token:${github_token}@github.com/".insteadOf "https://github.com/"
+    AUTH_GIT_ARGS+=(
+      -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
+      -c "credential.helper="
+      -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=https://github.com/"
+    )
     echo "✅ GitHub credentials configured"
   fi
 }
 
 cleanup_credentials() {
-  if [[ "${_AUTH_CONFIGURED}" == "true" ]]; then
-    [[ -f "${_TEMP_GITCONFIG}" ]] && rm -f "${_TEMP_GITCONFIG}"
-    unset GIT_CONFIG_GLOBAL
-    echo "🧹 Azure DevOps credentials cleared"
-  fi
-  
-  if [[ -n "${GITHUB_PAT:-${GITHUB_TOKEN:-}}" ]]; then
-    git config --global --unset-all "http.https://github.com/.extraheader" || true
-    git config --global --unset-all url."https://x-access-token:${GITHUB_PAT:-${GITHUB_TOKEN:-}}@github.com/".insteadOf || true
-    echo "🧹 GitHub credentials cleared"
+  if (( ${#AUTH_GIT_ARGS[@]} > 0 )); then
+    AUTH_GIT_ARGS=()
+    echo "🧹 Temporary Git credential headers cleared"
   fi
 }
 
@@ -96,7 +119,14 @@ select_submodule_url() {
 
   # 1. Priority: Environment Override
   if [[ -n "${!env_override_key:-}" ]]; then
-    printf '%s' "${!env_override_key}"
+    local override_url="${!env_override_key}"
+
+    if ! is_allowed_override_url "${name}" "${override_url}"; then
+      echo "##[error]Rejected unsafe override URL for submodule '${name}': ${override_url}" >&2
+      exit 1
+    fi
+
+    printf '%s' "${override_url}"
     return 0
   fi
 
@@ -106,20 +136,31 @@ select_submodule_url() {
 
   # 3. Azure Environment Logic
   if is_azure_environment; then
-    # If it's a relative path (doesn't start with http or git@), force to Azure HTTPS mirror
-    if [[ "${original_url}" != "http"* && "${original_url}" != "git@"* ]]; then
-      azure_repo_url "${name}"
+    local azure_url
+    azure_url="$(azure_repo_url "${name}")"
+
+    # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
+    # submodule source of truth aligned.
+    if remote_is_accessible "${azure_url}"; then
+      printf '%s' "${azure_url}"
       return 0
     fi
-    
-    # If it's a GitHub URL, keep it as GitHub (we have GITHUB_PAT)
-    if [[ "${original_url}" == *"github.com"* ]]; then
+
+    echo "##[warning]Azure mirror for submodule '${name}' is not accessible. Falling back." >&2
+
+    if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials && remote_is_accessible "${original_url}"; then
       printf '%s' "${original_url}"
       return 0
     fi
 
-    # Fallback for Azure: use HTTPS mirror
-    azure_repo_url "${name}"
+    if remote_is_accessible "${original_url}"; then
+      printf '%s' "${original_url}"
+      return 0
+    fi
+
+    # Return the Azure mirror as the final value so the caller fails with the
+    # correct remote if neither candidate is reachable.
+    printf '%s' "${azure_url}"
     return 0
   fi
 
@@ -138,6 +179,15 @@ run() {
   "$@"
 }
 
+git_with_auth() {
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    run git "${AUTH_GIT_ARGS[@]}" "$@"
+    return 0
+  fi
+
+  git "${AUTH_GIT_ARGS[@]}" "$@"
+}
+
 # ---------------------------------------------------------------------------
 # Main Execution
 # ---------------------------------------------------------------------------
@@ -145,7 +195,7 @@ configure_credentials
 
 # 1. Pre-initialize submodules to register them in .git/config
 echo "📦 Initializing submodules..."
-run git submodule init
+git_with_auth submodule init
 
 # 2. Configure URLs for target submodules
 for name in ai docs; do
@@ -161,6 +211,9 @@ done
 
 # 3. Update (fetch and checkout)
 echo "📥 Updating submodules (depth=1)..."
-run git submodule update --recursive --force --depth 1
+if ! git_with_auth submodule update --recursive --force --depth 1; then
+  echo "##[warning]Shallow submodule update failed. Retrying with full history for pinned commit checkout..."
+  git_with_auth submodule update --recursive --force
+fi
 
 echo "✅ Submodule initialization complete!"
