@@ -8,7 +8,7 @@ export type AlertLevel = 'low' | 'medium' | 'high' | 'critical'
 // Alert status for tracking
 export type AlertStatus = 'active' | 'acknowledged' | 'resolved' | 'dismissed'
 
-// Alert item from WebSocket or API
+// Base alert interface
 export interface BiasAlert {
   alertId: string
   message: string
@@ -20,15 +20,9 @@ export interface BiasAlert {
   status?: AlertStatus
 }
 
-// Alert item for dashboard (extended from BiasAlert)
-export interface AlertItem {
-  alertId: string
-  message: string
+// Dashboard variant with looser types for display
+export type AlertItem = Omit<BiasAlert, 'level' | 'status'> & {
   level: string
-  timestamp: string | Date
-  sessionId?: string
-  type?: string
-  acknowledged?: boolean
   status?: string
 }
 
