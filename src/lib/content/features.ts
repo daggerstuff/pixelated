@@ -1,43 +1,43 @@
 export const featuresContent = {
-  label: 'Practice workflow',
-  title: 'Built to make supervision sharper, not just louder.',
+  label: 'What the platform adds',
+  title: 'One surface for practice, another for the supervisor who has to judge it.',
   copy:
-    'The goal is not more AI novelty. It is cleaner clinical rehearsal, clearer supervision, and a record of what actually happened in the room.',
-  proofLabel: 'What supervisors can point to',
+    'The product has two distinct jobs: keep the clinician inside a believable conversation, then give the supervisor a review surface specific enough to teach from.',
+  proofLabel: 'What the team gets back',
   proofItems: [
-    'Where the clinician pushed too quickly after disclosure',
-    'Which question opened the patient up instead of closing them down',
-    'How the same scenario changed across multiple trainees',
+    'A training surface that behaves more like a room than a script',
+    'A review path that preserves pacing, disclosure, and intervention turns',
+    'A shared case teams can use to compare judgment across clinicians',
   ],
   cards: [
     {
-      title: 'Run the hard conversation, not a script tree',
+      title: 'Let the clinician stay in the room',
       description:
-        'Sessions respond to tone, pacing, and judgment so trainees can feel what happens when a patient withdraws, escalates, deflects, or tests the room.',
+        'The practice surface should feel like a conversation to navigate, not a branching script to memorize.',
       icon: 'chat',
     },
     {
-      title: 'Review what changed the exchange',
+      title: 'Let the supervisor see what changed it',
       description:
-        'Feedback calls out missed openings, pacing mistakes, escalation points, and the interventions that either stabilized or destabilized the moment.',
+        'The review needs to preserve the moment that changed the room, not just the clinician’s memory of it.',
       icon: 'chart',
     },
     {
-      title: 'Coach against the same case across a team',
+      title: 'Let the team compare one case across people',
       description:
-        'Supervisors can replay the same scenario with different clinicians and compare decisions against one shared transcript trail.',
+        'Shared cases turn vague supervision into side-by-side coaching because everyone is working against the same difficult moment.',
       icon: 'shield',
     },
   ],
   comparison: {
-    label: 'What changes in supervision',
-    title: 'Move from retrospective opinion to something your team can point at.',
+    label: 'What the supervisor’s job becomes',
+    title: 'Move from retrospective opinion to visible intervention decisions.',
     body:
-      'The value is not that the rehearsal feels interesting. The value is that supervisors can show what changed the exchange, what failed, and what should be different on the next run.',
+      'The point is not novelty. The point is that a supervisor can point to a turn in the exchange and explain what should change next time.',
     items: [
       {
         label: 'Without a reviewable artifact',
-        value: '“I think the clinician got rushed here.”',
+        value: '“I think they got rushed here.”',
       },
       {
         label: 'With Pixelated Empathy',
@@ -46,7 +46,7 @@ export const featuresContent = {
       },
       {
         label: 'Without a shared case',
-        value: 'Each trainee gets different difficulty, so coaching stays fuzzy.',
+        value: 'Each trainee gets a different difficulty curve, so coaching stays fuzzy.',
       },
       {
         label: 'With a replayable case',

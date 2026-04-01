@@ -3,12 +3,14 @@
  * Brutalist Header Component
  * Minimal navigation with terminal-like precision
  */
+import { headerContent } from '@/lib/content/header'
+
 export interface Props {
   logo?: string
   title?: string
 }
 
-const { logo = '/favicon.svg', title = 'Pixelated Empathy' } = Astro.props
+const { logo = '/favicon.svg', title = headerContent.title } = Astro.props
 const [titlePrimary = 'Pixelated', ...titleRest] = title.trim().split(/\s+/)
 const titleSecondary = titleRest.join(' ')
 
@@ -18,43 +20,36 @@ const isActivePath = (href: string) =>
     ? currentPath === '/'
     : currentPath === href || currentPath.startsWith(`${href}/`)
 
-const navItems = [
-  { href: '/training', label: 'Training' },
-  { href: '/features', label: 'Features' },
-  { href: '/trust', label: 'Trust' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/contact', label: 'Talk to Us' },
-]
+const navItems = headerContent.navItems
+const primaryAction = headerContent.actions.primary
+const secondaryAction = headerContent.actions.secondary
 ---
 
-<header
-  class="header bg-void border-b border-primary py-4 sticky top-0 z-sticky glass"
->
-  <div class="header-container flex justify-between items-center">
+<header class="header">
+  <div class="header-container">
     <!-- Logo Section -->
-    <a href="/" class="flex items-center gap-3 group no-underline">
-      <div class="logo-container relative">
+    <a href="/" class="header-brand-link">
+      <div class="logo-container">
         <img
           src={logo}
           alt={title}
-          class="logo-img h-10 w-10"
+          class="logo-img"
           width="40"
           height="40"
           loading="eager"
           decoding="async"
         />
-        <div
-          class="absolute -inset-1 bg-accent-primary opacity-0 group-hover:opacity-20 blur-lg transition-opacity duration-normal"
-        >
-        </div>
+        <div class="logo-glow"></div>
       </div>
-      <span class="brand-mark text-white transition-colors">
-        <span class="brand-mark__primary">{titlePrimary}</span>
-        {titleSecondary ? (
-          <span class="brand-mark__secondary">{titleSecondary}</span>
-        ) : null}
+      <span class="brand-lockup">
+        <span class="brand-mark">
+          <span class="brand-mark__primary">{titlePrimary}</span>
+          {titleSecondary ? (
+            <span class="brand-mark__secondary">{titleSecondary}</span>
+          ) : null}
+        </span>
+        <span class="brand-meta">{headerContent.brandMeta}</span>
       </span>
-      <span class="brand-meta">Clinical simulation for supervision teams</span>
     </a>
 
     <!-- Navigation -->
@@ -65,7 +60,7 @@ const navItems = [
             <li>
               <a
                 href={item.href}
-                class="nav-link"
+                class="header-nav-link"
                 aria-current={isActivePath(item.href) ? 'page' : undefined}
               >
                 {item.label}
@@ -78,8 +73,8 @@ const navItems = [
 
     <!-- Actions -->
     <div class="header-actions">
-      <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
-      <a href="/signup" class="btn btn-primary btn-sm">Start Practice</a>
+      <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
+      <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
     </div>
 
     <details class="header-mobile-shell">
@@ -97,7 +92,7 @@ const navItems = [
               <li>
                 <a
                   href={item.href}
-                  class="nav-link"
+                  class="header-nav-link"
                   aria-current={isActivePath(item.href) ? 'page' : undefined}
                 >
                   {item.label}
@@ -106,8 +101,8 @@ const navItems = [
             ))
           }
           <li class="header-mobile-actions">
-            <a href="/login" class="btn btn-outline">Sign In</a>
-            <a href="/signup" class="btn btn-primary">Start Practice</a>
+            <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
+            <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
           </li>
         </ul>
       </nav>
@@ -117,8 +112,10 @@ const navItems = [
 
 <style>
   .header {
+    position: sticky;
+    top: 0;
     z-index: var(--z-sticky);
-    background: color-mix(in srgb, var(--bg-void) 90%, transparent);
+    background: rgba(10, 13, 13, 0.92);
     border-bottom: 1px solid var(--glass-border);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -128,10 +125,17 @@ const navItems = [
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 78rem;
+    max-width: 80rem;
     margin: 0 auto;
     padding: var(--space-4) var(--space-6);
-    gap: clamp(1.25rem, 2.5vw, 2.5rem);
+    gap: clamp(1.5rem, 2.8vw, 3rem);
+  }
+
+  .header-brand-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
   }
 
   /* Logo */
@@ -166,17 +170,22 @@ const navItems = [
     letter-spacing: -0.03em;
   }
 
+  .brand-lockup {
+    display: grid;
+    gap: 0.18rem;
+  }
+
   .brand-mark__primary,
   .brand-mark__secondary {
     display: inline-block;
     font-family: var(--font-display);
-    font-size: clamp(1.18rem, 1.03rem + 0.44vw, 1.56rem);
+    font-size: clamp(1.28rem, 1.08rem + 0.56vw, 1.78rem);
     font-weight: 600;
     line-height: 1;
   }
 
-  .group:hover .brand-mark__primary,
-  .group:hover .brand-mark__secondary {
+  .header-brand-link:hover .brand-mark__primary,
+  .header-brand-link:hover .brand-mark__secondary {
     color: var(--accent-primary);
   }
 
@@ -186,12 +195,54 @@ const navItems = [
   }
 
   .brand-meta {
-    display: none;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    text-transform: none;
     color: var(--text-tertiary);
+  }
+
+  .header-action-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.45rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-family: var(--font-sans);
+    font-size: 0.79rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .header-action-link--secondary {
+    color: var(--text-secondary);
+    border-color: rgba(255, 255, 255, 0.12);
+    background: transparent;
+  }
+
+  .header-action-link--secondary:hover {
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .header-action-link--primary {
+    color: #09100e;
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+  }
+
+  .header-action-link--primary:hover {
+    color: var(--accent-primary);
+    background: transparent;
   }
 
   /* Navigation */
@@ -205,9 +256,8 @@ const navItems = [
     }
 
     .brand-meta {
-      display: inline-flex;
       align-items: center;
-      max-width: 13rem;
+      max-width: 15rem;
       line-height: 1.35;
     }
   }
@@ -215,18 +265,18 @@ const navItems = [
   .header-nav-list {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
+    gap: clamp(1.25rem, 2vw, 2rem);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
-  .nav-link {
+  .header-nav-link {
     font-family: var(--font-sans);
-    font-size: 0.82rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-size: 0.96rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-secondary);
     text-decoration: none;
     padding: var(--space-2) 0;
@@ -234,15 +284,15 @@ const navItems = [
     transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .nav-link:hover {
+  .header-nav-link:hover {
     color: var(--text-primary);
   }
 
-  .nav-link[aria-current='page'] {
+  .header-nav-link[aria-current='page'] {
     color: var(--accent-primary);
   }
 
-  .nav-link::after {
+  .header-nav-link::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -255,8 +305,8 @@ const navItems = [
     transition: transform var(--duration-fast) var(--ease-out);
   }
 
-  .nav-link:hover::after,
-  .nav-link[aria-current='page']::after {
+  .header-nav-link:hover::after,
+  .header-nav-link[aria-current='page']::after {
     transform: scaleX(1);
   }
 
@@ -265,19 +315,6 @@ const navItems = [
     display: none;
     align-items: center;
     gap: var(--space-3);
-  }
-
-  .header-actions :global(.btn-ghost) {
-    border-color: transparent;
-    color: var(--text-secondary);
-  }
-
-  .header-actions :global(.btn-primary) {
-    min-width: 9.5rem;
-  }
-
-  .header-actions :global(.btn) {
-    min-height: 2.5rem;
   }
 
   @media (min-width: 768px) {
@@ -365,7 +402,7 @@ const navItems = [
     padding: 0;
   }
 
-  .header-mobile-list .nav-link {
+  .header-mobile-list .header-nav-link {
     display: block;
     padding: var(--space-3) 0;
     font-size: var(--text-base);
@@ -380,13 +417,14 @@ const navItems = [
     border-top: 1px solid var(--glass-border);
   }
 
-  .header-mobile-actions .btn {
+  .header-mobile-actions .header-action-link {
     width: 100%;
     justify-content: center;
   }
 
   /* Logo styles */
   .logo-container {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -397,9 +435,24 @@ const navItems = [
     width: 2.5rem;
     object-fit: contain;
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
   }
 
-  .logo-container:hover .logo-img {
+  .logo-glow {
+    position: absolute;
+    inset: -0.25rem;
+    background: var(--accent-primary);
+    opacity: 0;
+    filter: blur(0.875rem);
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .header-brand-link:hover .logo-glow {
+    opacity: 0.2;
+  }
+
+  .header-brand-link:hover .logo-img {
     transform: scale(1.05);
   }
 

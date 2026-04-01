@@ -1,32 +1,32 @@
 export const scenariosContent = {
   label: 'What you can practice',
-  title: 'Train for the moments clinicians do not get to rehearse in public.',
+  title: 'Use it on the conversations clinicians least want to improvise in the room.',
   cards: [
     {
       kicker: 'Escalation',
       title: 'Crisis and risk conversations',
-      body: 'Practice suicidality screening, de-escalation, safety planning, and how to stay clinically grounded when the room changes fast.',
+      body: 'Practice suicidality screening, de-escalation, safety planning, and what to say when the room changes faster than the clinician expected.',
     },
     {
       kicker: 'Complex Dynamics',
       title: 'Trauma, shutdown, anger, and rupture',
-      body: 'Work through avoidance, dysregulation, mistrust, emotional withdrawal, and the conversational repairs that determine whether a client stays engaged.',
+      body: 'Work through avoidance, dysregulation, mistrust, emotional withdrawal, and the repairs that determine whether a client stays in the conversation.',
     },
     {
-      kicker: 'Supervision',
-      title: 'Repeatable training for teams',
-      body: 'Give trainees the same hard scenario, compare decisions, and coach against real transcripts instead of vague recollections after the fact.',
+      kicker: 'Rupture Repair',
+      title: 'Alliance strain, mistrust, and therapeutic misattunement',
+      body: 'Practice the moments where a client withdraws, flares, tests the therapist, or stops trusting the room, then work the repair without improvising blind.',
     },
   ],
-  proofBand: {
-    label: 'Why teams keep it in the loop',
-    title: 'It gives supervision something concrete to point at.',
+  strip: {
+    label: 'Who it is built for',
+    title: 'Use it in the teams that have to rehearse difficult judgment under pressure.',
     body:
-      'Instead of debating vague impressions after a difficult roleplay, teams can replay the exchange, mark the turning points, and compare how different clinicians handled the same moment.',
+      'The strongest fit is any training environment where one hard case needs to be run more than once and reviewed by more than one person.',
     items: [
-      { label: 'Replay the same scenario', value: 'Across trainees, not just once' },
-      { label: 'Review the exact exchange', value: 'Not just memory after supervision' },
-      { label: 'Coach to visible decisions', value: 'Instead of generic feedback language' },
+      { label: 'Graduate programs', value: 'For repeatable trainee rehearsal' },
+      { label: 'Supervision teams', value: 'For concrete review and coaching' },
+      { label: 'Care organizations', value: 'For high-stakes communication practice' },
     ],
   },
 } as const

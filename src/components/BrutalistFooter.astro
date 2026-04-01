@@ -3,6 +3,8 @@
  * Brutalist Footer Component
  * Minimal, grid-exposed structure
  */
+import { footerContent } from '@/lib/content/footer'
+
 const currentYear = new Date().getFullYear()
 
 export interface Props {
@@ -48,16 +50,12 @@ const social = [
 ]
 
 const {
-  tagline = 'AI roleplay and simulation training for therapists, supervisors, and care teams practicing difficult conversations before they happen with real people.',
-  foundation = 'Founder-led in the United States // Built for clinical training teams',
-  manifesto = 'Clinical training should leave a record worth supervising.',
-  proofTitle = 'Keep it only if supervision becomes more specific.',
-  reviewStandards = [
-    'Use it when your team needs a transcript you can actually coach against.',
-    'Use it when supervisors need a shared rehearsal record across clinicians.',
-    'Skip it if you only want a novelty demo and not a reviewable training artifact.',
-  ],
-  proofCTA = { text: 'Talk to the team behind it', href: '/contact' },
+  tagline = footerContent.tagline,
+  foundation = footerContent.foundation,
+  manifesto = footerContent.manifesto,
+  proofTitle = footerContent.proofTitle,
+  reviewStandards = footerContent.reviewStandards,
+  proofCTA = footerContent.proofCTA,
 } = Astro.props
 ---
 
@@ -70,7 +68,7 @@ const {
     <div class="footer-grid">
       {/* Brand Column */}
       <div class="footer-brand">
-        <a href="/" class="footer-logo group no-underline">
+        <a href="/" class="footer-logo">
           <span class="footer-brand-lockup">
             <img
               src="/favicon.svg"
@@ -81,20 +79,18 @@ const {
               loading="lazy"
               decoding="async"
             />
-            <span class="footer-logo-text font-display font-bold text-xl text-white">
-              Pixelated <span class="text-accent-primary">Empathy</span>
+            <span class="footer-logo-text">
+              Pixelated <span class="footer-logo-text-accent">Empathy</span>
             </span>
           </span>
         </a>
-        <p
-          class="footer-tagline text-sm text-secondary mt-4 leading-relaxed opacity-90"
-        >
+        <p class="footer-tagline">
           {tagline}
         </p>
-        <p class="footer-foundation mt-2">
+        <p class="footer-foundation">
           {foundation}
         </p>
-        <p class="footer-manifesto mt-5">
+        <p class="footer-manifesto">
           {manifesto}
         </p>
 
@@ -135,59 +131,60 @@ const {
         </div>
       </div>
 
-      {/* Links Columns */}
-      <div class="footer-links">
-        <span class="footer-links-label">Product</span>
-        <ul class="footer-links-list">
-          {
-            links.product.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  class="footer-link hover:text-accent-primary"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+      <div class="footer-link-groups">
+        <div class="footer-links">
+          <span class="footer-links-label">Product</span>
+          <ul class="footer-links-list">
+            {
+              links.product.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="footer-link"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
 
-      <div class="footer-links">
-        <span class="footer-links-label">Company</span>
-        <ul class="footer-links-list">
-          {
-            links.company.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  class="footer-link hover:text-accent-primary"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+        <div class="footer-links">
+          <span class="footer-links-label">Company</span>
+          <ul class="footer-links-list">
+            {
+              links.company.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="footer-link"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
 
-      <div class="footer-links">
-        <span class="footer-links-label">Policies</span>
-        <ul class="footer-links-list">
-          {
-            links.legal.map((link) => (
-              <li>
-                <a
-                  href={link.href}
-                  class="footer-link hover:text-accent-primary"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
+        <div class="footer-links">
+          <span class="footer-links-label">Policies</span>
+          <ul class="footer-links-list">
+            {
+              links.legal.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="footer-link"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
 
       <aside class="footer-proof">
@@ -205,13 +202,12 @@ const {
     </div>
 
     {/* Bottom Bar */}
-    <div class="footer-bottom border-t border-white/5 pt-8 mt-12">
+    <div class="footer-bottom">
       <p class="footer-copyright">
         &copy; {currentYear} Pixelated Empathy // All rights reserved.
       </p>
-      <p class="footer-built flex items-center gap-2">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary animate-pulse"
-        ></span>
+      <p class="footer-built">
+        <span class="footer-built-dot"></span>
         Therapy simulation platform // Public site
       </p>
     </div>
@@ -239,7 +235,7 @@ const {
   .footer-container {
     max-width: 72rem;
     margin: 0 auto;
-    padding: var(--space-16) var(--space-6);
+    padding: calc(var(--space-16) + var(--space-2)) var(--space-6);
   }
 
   /* Grid Layout */
@@ -252,8 +248,19 @@ const {
 
   @media (min-width: 768px) {
     .footer-grid {
-      grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 0.8fr)) minmax(0, 1.2fr);
-      gap: var(--space-12);
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: calc(var(--space-12) + var(--space-2));
+    }
+  }
+
+  .footer-link-groups {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .footer-link-groups {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
@@ -268,6 +275,14 @@ const {
     margin-bottom: var(--space-4);
   }
 
+  .footer-logo:hover .footer-logo-mark {
+    transform: translateY(-1px);
+  }
+
+  .footer-logo:hover .footer-logo-text-accent {
+    color: #b5dec7;
+  }
+
   .footer-brand-lockup {
     display: inline-flex;
     align-items: center;
@@ -279,6 +294,7 @@ const {
     height: 2.25rem;
     object-fit: contain;
     flex-shrink: 0;
+    transition: transform 0.2s ease;
   }
 
   .footer-logo-text {
@@ -288,7 +304,13 @@ const {
     color: var(--text-primary);
   }
 
+  .footer-logo-text-accent {
+    color: var(--accent-primary);
+    transition: color 0.2s ease;
+  }
+
   .footer-foundation {
+    margin-top: var(--space-2);
     font-family: var(--font-sans);
     font-size: 0.7rem;
     font-weight: 600;
@@ -298,6 +320,7 @@ const {
   }
 
   .footer-tagline {
+    margin-top: var(--space-4);
     font-size: var(--text-sm);
     color: var(--text-muted);
     line-height: var(--leading-relaxed);
@@ -305,6 +328,7 @@ const {
   }
 
   .footer-manifesto {
+    margin-top: var(--space-5);
     max-width: 18rem;
     font-family: var(--font-display);
     font-size: clamp(1.1rem, 1rem + 0.36vw, 1.35rem);
@@ -423,6 +447,7 @@ const {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
+    margin-top: var(--space-12);
     padding-top: var(--space-8);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
@@ -442,6 +467,34 @@ const {
     color: var(--text-dim);
     letter-spacing: 0.04em;
     text-transform: uppercase;
+  }
+
+  .footer-built {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .footer-built-dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+    box-shadow: 0 0 0 0 rgba(136, 201, 165, 0.12);
+    animation: footer-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes footer-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(136, 201, 165, 0.08);
+      opacity: 0.82;
+    }
+
+    50% {
+      box-shadow: 0 0 0 0.3rem rgba(136, 201, 165, 0.02);
+      opacity: 1;
+    }
   }
 
   @media (max-width: 767px) {

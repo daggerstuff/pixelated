@@ -38,24 +38,41 @@
 :root {
   /* ... existing colors ... */
   /* === CLINICAL NIGHT PALETTE === */
-  --bg-void: #060707;
-  --bg-primary: #0d1011;
-  --bg-secondary: #151a1b;
-  --bg-tertiary: #1d2324;
-  --bg-elevated: #242b2c;
-  --bg-surface: #2c3435;
+  --bg-void: #0a0d0d;
+  --bg-primary: #121716;
+  --bg-secondary: #1a211f;
+  --bg-tertiary: #222927;
+  --bg-elevated: #2a312f;
+  --bg-surface: #323937;
+  --surface-paper: #ece9df;
+  --surface-paper-alt: #e4e5da;
+  --surface-paper-strong: rgba(255, 255, 255, 0.72);
+  --ink-primary: #111716;
+  --ink-secondary: rgba(17, 23, 22, 0.78);
+  --ink-muted: rgba(17, 23, 22, 0.58);
+  --ink-border: rgba(17, 23, 22, 0.1);
+  --surface-paper-top: #f3f0e7;
+  --surface-paper-top-soft: #f5f2ea;
+  --surface-paper-top-bright: #f7f4ed;
+  --surface-paper-top-alt: #efede4;
+  --surface-paper-gradient: linear-gradient(180deg, var(--surface-paper) 0%, var(--surface-paper-alt) 52%, var(--surface-paper-top) 100%);
+  --surface-paper-gradient-soft: linear-gradient(180deg, var(--surface-paper-top-soft), var(--surface-paper-top-alt));
+  --surface-paper-gradient-bright: linear-gradient(180deg, var(--surface-paper-top-bright), var(--surface-paper-top-soft));
+  --surface-paper-panel: rgba(255, 255, 255, 0.6);
+  --surface-paper-panel-muted: rgba(255, 255, 255, 0.52);
+  --surface-paper-panel-soft: rgba(255, 255, 255, 0.48);
 
   /* === STARK CONTRAST TEXT === */
   --text-primary: #ffffff;
-  --text-secondary: #d6dbdb;
-  --text-tertiary: #a3adad;
-  --text-muted: #7c8585;
-  --text-dim: #5e6767;
+  --text-secondary: #d7ddd9;
+  --text-tertiary: #a9b4ae;
+  --text-muted: #808982;
+  --text-dim: #616a64;
 
   /* === ACCENTS === */
-  --accent-primary: #7dd3a8;
-  --accent-primary-dim: #57a985;
-  --accent-primary-glow: rgba(125, 211, 168, 0.16);
+  --accent-primary: #88c9a5;
+  --accent-primary-dim: #5f9877;
+  --accent-primary-glow: rgba(136, 201, 165, 0.15);
 
   /* Secondary: Pure white for stark contrast */
   --accent-secondary: #ffffff;
@@ -76,8 +93,8 @@
   --border-glow: 1px solid var(--accent-primary-glow);
 
   /* Grid exposure - our signature brutalist element */
-  --grid-line: 1px solid rgba(255, 255, 255, 0.04);
-  --grid-line-accent: 1px solid rgba(125, 211, 168, 0.12);
+  --grid-line-color: rgba(255, 255, 255, 0.04);
+  --grid-line-accent-color: rgba(125, 211, 168, 0.12);
 
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.035);
@@ -86,7 +103,7 @@
 
   /* === TYPOGRAPHY SYSTEM === */
   /* Headings: sharper editorial serif for a less toy-like, more clinical voice */
-  --font-display: "Baskerville", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-display: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Baskerville", Georgia, serif;
   
   /* Body: neutral UI sans */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -99,9 +116,9 @@
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.72rem, 0.69rem + 0.12vw, 0.8rem);
-  --text-sm: clamp(0.84rem, 0.79rem + 0.18vw, 0.94rem);
-  --text-base: clamp(0.875rem, 0.85rem + 0.125vw, 1rem);
-  --text-lg: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-sm: clamp(0.88rem, 0.82rem + 0.18vw, 0.98rem);
+  --text-base: clamp(0.97rem, 0.92rem + 0.14vw, 1.04rem);
+  --text-lg: clamp(1.08rem, 1.01rem + 0.26vw, 1.22rem);
   --text-xl: clamp(1.125rem, 1rem + 0.625vw, 1.375rem);
   --text-2xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.625rem);
   --text-3xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
@@ -190,7 +207,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-size: 17px;
+  font-size: 18px;
   background-color: var(--bg-void);
   color-scheme: dark;
 }
@@ -217,7 +234,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading);
   font-weight: 600;
   line-height: 0.98;
   letter-spacing: -0.04em;
@@ -276,10 +293,20 @@ a:hover {
 
 /* Section marker */
 .label-mono {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  opacity: 0.9;
+}
+
+.br-home-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--accent-primary);
   opacity: 0.9;
@@ -357,11 +384,72 @@ pre {
   top: 0;
   bottom: 0;
   background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line-color) 1px, transparent 1px);
   background-size: 80px 80px;
   pointer-events: none;
   opacity: 0.5;
+}
+
+.pe-home-shell {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.br-home-shell {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.pe-home-section {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: clamp(4.5rem, 7vw, 7rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7rem);
+}
+
+.pe-home-panel-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-4);
+}
+
+.br-home-panel-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .pe-home-shell {
+    padding: 0 var(--space-8);
+  }
+
+  .br-home-shell {
+    padding: 0 var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pe-home-shell {
+    padding: 0 var(--space-10);
+  }
+
+  .br-home-shell {
+    padding: 0 var(--space-10);
+  }
 }
 
 /* Section spacing */
@@ -412,7 +500,7 @@ pre {
   font-family: var(--font-sans);
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);

@@ -1,26 +1,26 @@
 export const workflowContent = {
   label: 'How it works',
-  title: 'You run the conversation. The platform scores what happened.',
+  title: 'Use one hard case to find out whether the review is worth keeping.',
   steps: [
     {
       number: '01',
-      title: 'Choose a scenario',
-      body: 'Select the kind of client presentation, level of intensity, and difficulty you want to rehearse.',
+      title: 'Choose the case worth rehearsing',
+      body: 'Start with the conversation your team already struggles to coach under pressure.',
     },
     {
       number: '02',
-      title: 'Handle the session in real time',
-      body: 'The AI patient responds to your tone, questions, pacing, and judgment as the conversation unfolds.',
+      title: 'Run the conversation in real time',
+      body: 'The clinician has to respond to tone, pacing, rupture, disclosure, and resistance as the room changes.',
     },
     {
       number: '03',
-      title: 'Review the transcript and feedback',
-      body: 'See where the interaction shifted, which opportunities were missed, and what should change on the next pass.',
+      title: 'Review the record and direct the retry',
+      body: 'Use the transcript and notes to point at the intervention, miss, or repair that should change on the next attempt.',
     },
   ],
-  editorial: [
-    'Would the transcript change what a supervisor says after the session?',
-    'Does the review identify a clinically useful next move?',
-    'Would you use this artifact with a real trainee next week?',
+  outputs: [
+    { label: 'Session record', value: 'A persistent transcript and notes lane the team can return to.' },
+    { label: 'Supervision pass', value: 'A concrete review of where the room shifted and what changed it.' },
+    { label: 'Next attempt', value: 'A sharper retry based on a visible decision, not a vague impression.' },
   ],
 } as const

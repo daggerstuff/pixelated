@@ -11,6 +11,7 @@ import WorkflowSection from '@/components/homepage/WorkflowSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
 import { homepageContent } from '@/lib/content'
+import '@/styles/homepage.css'
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -18,7 +19,7 @@ const organizationSchema = {
   name: 'Pixelated Empathy',
   url: 'https://pixelatedempathy.com',
   logo: 'https://pixelatedempathy.com/favicon.svg',
-  description: 'AI-powered training platform for mental health professionals',
+  description: 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
   foundingDate: '2025',
   address: {
     '@type': 'PostalAddress',
@@ -37,8 +38,8 @@ const organizationSchema = {
 ---
 
 <BrutalistLayout
-  title="Pixelated Empathy | The AI Training Ground for Therapists"
-  description="Practice difficult conversations in a safe space. No pressure, just progress."
+  title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
+  description="Rehearse difficult sessions, keep the transcript, and review the next pass with supervision-ready evidence."
   footerProps={homepageContent.footer}
 >
   <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />

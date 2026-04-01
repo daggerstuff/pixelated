@@ -30,13 +30,13 @@ const {
 } = Astro.props
 ---
 
-<section class="section core-features-section">
+<section class="pe-page-section core-features-section">
   <SectionAtmosphere variant="section" />
-  <div class="container core-features-shell">
+  <div class="pe-page-shell core-features-shell">
     <div class="core-features-intro">
       <div>
-        <span class="label-mono">{label}</span>
-        <h2 class="mt-4">{title}</h2>
+        <span class="pe-page-label">{label}</span>
+        <h2 class="pe-page-heading">{title}</h2>
       </div>
       <p class="core-features-copy">
         {copy}
@@ -44,8 +44,8 @@ const {
     </div>
 
     <div class="core-features-grid">
-      <aside class="core-features-proof card card-lined">
-        <span class="home-panel-label">{proofLabel}</span>
+      <aside class="core-features-proof">
+        <span class="pe-page-panel-label">{proofLabel}</span>
         <ul class="core-features-proof-list">
           {proofItems.map((item) => <li>{item}</li>)}
         </ul>
@@ -56,12 +56,12 @@ const {
         cards.map((feature, index) => (
           <div
             class:list={[
-              'card card-lined core-feature-card',
+              'core-feature-card',
               index === 0 && 'core-feature-card--lead',
             ]}
             data-index={index}
           >
-            <div class="flex items-start gap-4">
+            <div class="core-feature-card__row">
               <div class="feature-icon">
                 {feature.icon === 'chat' && (
                   <svg
@@ -115,9 +115,9 @@ const {
                   </svg>
                 )}
               </div>
-              <div>
-                <h3 class="mb-2">{feature.title}</h3>
-                <p class="text-muted">{feature.description}</p>
+              <div class="core-feature-card__copy">
+                <h3 class="core-feature-card__title">{feature.title}</h3>
+                <p class="core-feature-card__description">{feature.description}</p>
               </div>
             </div>
           </div>
@@ -128,7 +128,7 @@ const {
 
     <div class="core-features-comparison">
       <div class="core-features-comparison__lead">
-        <span class="home-panel-label">{comparison?.label}</span>
+        <span class="pe-page-panel-label">{comparison?.label}</span>
         <h3>{comparison?.title}</h3>
         <p>{comparison?.body}</p>
       </div>
@@ -159,9 +159,12 @@ const {
 
   .core-features-section {
     position: relative;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
-      linear-gradient(90deg, rgba(125, 211, 168, 0.03), transparent 30%, transparent 70%, rgba(125, 211, 168, 0.025));
+    background: var(--surface-paper-gradient-bright);
+    color: var(--ink-primary);
+  }
+
+  .core-features-section :is(h2, h3, p, strong) {
+    color: inherit;
   }
 
   .core-features-intro {
@@ -174,12 +177,13 @@ const {
 
   .core-features-copy {
     font-size: var(--text-lg);
+    color: var(--ink-secondary);
   }
 
   .core-features-grid {
     display: grid;
     grid-template-columns: minmax(19rem, 0.9fr) minmax(0, 1.1fr);
-    gap: var(--space-6);
+    gap: var(--space-8);
     margin-bottom: var(--space-12);
   }
 
@@ -187,15 +191,35 @@ const {
     display: grid;
     align-content: start;
     gap: var(--space-5);
-    padding: clamp(1.4rem, 2vw, 1.9rem);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022));
+    padding: clamp(1.55rem, 2.15vw, 2.1rem);
+    border: 1px solid var(--ink-border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(236, 233, 223, 0.95));
+    box-shadow: 0 18px 40px rgba(17, 23, 22, 0.06);
   }
 
   .core-features-proof-list {
     display: grid;
     gap: var(--space-4);
     padding-left: 1rem;
-    color: var(--text-secondary);
+    color: var(--ink-secondary);
+  }
+
+  .core-feature-card__row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .core-feature-card__copy {
+    min-width: 0;
+  }
+
+  .core-feature-card__title {
+    margin-bottom: var(--space-2);
+  }
+
+  .core-feature-card__description {
+    color: var(--ink-secondary);
   }
 
   .core-features-comparison {
@@ -204,7 +228,7 @@ const {
     gap: clamp(1.5rem, 3vw, 3rem);
     align-items: start;
     padding-top: var(--space-10);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--ink-border);
   }
 
   .core-features-comparison__lead {
@@ -228,14 +252,14 @@ const {
     gap: var(--space-3);
     min-width: 0;
     padding: 1.15rem 1.2rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.028);
+    border: 1px solid var(--ink-border);
+    background: var(--surface-paper-panel-muted);
   }
 
   .core-features-comparison__item--accent {
     background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.03) 55%, rgba(255, 255, 255, 0.018));
-    border-color: rgba(125, 211, 168, 0.22);
+      linear-gradient(180deg, rgba(125, 211, 168, 0.18), rgba(125, 211, 168, 0.05) 55%, rgba(255, 255, 255, 0.42));
+    border-color: rgba(99, 154, 122, 0.22);
   }
 
   .core-features-comparison__item span {
@@ -243,32 +267,34 @@ const {
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: var(--text-tertiary);
+    color: rgba(17, 23, 22, 0.56);
   }
 
   .core-features-comparison__item strong {
     font-size: clamp(1.02rem, 0.98rem + 0.18vw, 1.14rem);
     line-height: 1.5;
-    color: var(--text-primary);
+    color: #111716;
   }
 
   .core-features-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5);
+    gap: var(--space-6);
   }
 
   .core-feature-card {
     min-width: 0;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    padding: clamp(1.45rem, 2vw, 1.95rem);
+    border: 1px solid rgba(17, 23, 22, 0.08);
+    background: rgba(255, 255, 255, 0.46);
   }
 
   .core-feature-card--lead {
     grid-column: 1 / -1;
     padding: clamp(1.5rem, 2vw, 2.1rem);
     background:
-      linear-gradient(135deg, rgba(125, 211, 168, 0.16), rgba(125, 211, 168, 0.04) 38%, rgba(255, 255, 255, 0.025) 100%),
-      rgba(255, 255, 255, 0.04);
+      linear-gradient(135deg, rgba(125, 211, 168, 0.2), rgba(125, 211, 168, 0.05) 38%, rgba(255, 255, 255, 0.62) 100%),
+      rgba(255, 255, 255, 0.74);
   }
 
   .core-feature-card--lead h3 {
@@ -281,13 +307,13 @@ const {
     justify-content: center;
     width: 48px;
     height: 48px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(17, 23, 22, 0.12);
     border-radius: var(--radius-sm);
     color: var(--accent-primary);
     flex-shrink: 0;
   }
 
-  .card:hover .feature-icon {
+  .core-feature-card:hover .feature-icon {
     border-color: var(--accent-primary);
   }
 

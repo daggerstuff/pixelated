@@ -18,6 +18,8 @@ export interface Props {
     status: string
     chip: string
     mode: string
+    image?: string
+    imageAlt?: string
     context: Array<{ label: string; value: string }>
     outputs: Array<{ label: string; value: string }>
     readout: Array<{ label: string; value: string }>
@@ -35,27 +37,23 @@ const {
 
 const primaryAction = primaryCTA || { text: 'Start Practice', href: '/signup' }
 const secondaryAction = secondaryCTA || { text: 'Watch Demo', href: '/demo-hub' }
-const reviewArtifact = artifact || heroContent.artifact
+const artifactData = artifact ?? heroContent.artifact
+const kicker = heroContent.kicker
 ---
 
-<section
-  class="hero relative flex items-center overflow-hidden"
-  data-component="brutalist-hero"
->
-  <div class="absolute inset-0 z-0">
-    <div class="absolute inset-0 bg-void"></div>
+<section class="hero hero-section" data-component="brutalist-hero">
+  <div class="hero-background">
+    <div class="hero-backdrop"></div>
     <HeroAtmosphere />
     <div class="hero-surface-noise"></div>
   </div>
 
-  <div class="container relative z-10 hero-shell">
+  <div class="pe-page-shell hero-shell">
     <div class="hero-layout">
       <div class="hero-copy">
-        <div
-          class="hero-kicker-pill inline-flex items-center gap-2 px-3 py-1 rounded-full mb-7"
-        >
-          <span class="w-2 h-2 rounded-full bg-accent-primary"></span>
-          <span class="hero-kicker">Clinical rehearsal for difficult therapeutic conversations</span>
+        <div class="hero-kicker-pill">
+          <span class="hero-kicker-dot"></span>
+          <span class="hero-kicker">{kicker}</span>
         </div>
 
         <h1 class="hero-title">
@@ -66,26 +64,23 @@ const reviewArtifact = artifact || heroContent.artifact
           {subtitle}
         </p>
 
-        <div class="flex flex-wrap gap-6 items-center">
-          <a href={primaryAction.href} class="btn-premium group">
-            <span class="relative z-10">{primaryAction.text}</span>
-            <div
-              class="absolute inset-0 bg-accent-primary transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-normal"
-            >
-            </div>
+        <div class="hero-actions">
+          <a href={primaryAction.href} class="btn-premium">
+            <span class="btn-premium__text">{primaryAction.text}</span>
+            <div class="btn-premium__fill"></div>
           </a>
 
           <a
             href={secondaryAction.href}
-            class="group hero-secondary-link flex items-center gap-2 text-white text-sm uppercase tracking-widest no-underline"
+            class="hero-secondary-link"
           >
-            <span class="opacity-60 group-hover:opacity-100 transition-opacity">{secondaryAction.text}</span>
+            <span class="hero-secondary-link__text">{secondaryAction.text}</span>
             <svg
               width="24"
               height="24"
               viewBox="0 0 24 24"
               fill="none"
-              class="transform group-hover:translate-x-2 transition-transform"
+              class="hero-secondary-link__icon"
             >
               <path
                 d="M5 12H19M19 12L13 6M19 12L13 18"
@@ -98,10 +93,7 @@ const reviewArtifact = artifact || heroContent.artifact
 
         {
           stats && stats.length > 0 && (
-          <div
-            class="stats-grid mt-16 pt-8"
-            style="border-top: 1px solid rgba(255, 255, 255, 0.12);"
-          >
+          <div class="hero-stats">
               <div class="hero-stats-grid" aria-label="Proof points">
                 {stats.map((stat) => (
                   <div class="stat-item">
@@ -115,18 +107,19 @@ const reviewArtifact = artifact || heroContent.artifact
         }
       </div>
 
-      <BrutalistHeroArtifact artifact={reviewArtifact} />
+      <BrutalistHeroArtifact artifact={artifactData} />
     </div>
   </div>
 
-  <div
-    class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-void to-transparent"
-  >
-  </div>
+  <div class="hero-fadeout"></div>
 </section>
 
 <style>
   .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
     min-height: clamp(40rem, 82vh, 52rem);
     padding: clamp(7rem, 10vh, 9rem) 0 clamp(4.5rem, 8vh, 6.5rem);
     background:
@@ -138,6 +131,16 @@ const reviewArtifact = artifact || heroContent.artifact
       );
   }
 
+  .hero-section {
+    border-top: 0;
+  }
+
+  .hero-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
   .hero-surface-noise {
     position: absolute;
     inset: 0;
@@ -146,6 +149,12 @@ const reviewArtifact = artifact || heroContent.artifact
       radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.12) 100%);
     opacity: 0.22;
     pointer-events: none;
+  }
+
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--bg-void);
   }
 
   .btn-premium {
@@ -169,43 +178,81 @@ const reviewArtifact = artifact || heroContent.artifact
     color: black;
   }
 
+  .btn-premium__text {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn-premium__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--accent-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-normal) var(--ease-out);
+  }
+
+  .btn-premium:hover .btn-premium__fill {
+    transform: scaleX(1);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
   .hero-kicker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: 1.75rem;
     border: 1px solid rgba(125, 211, 168, 0.24);
     background: rgba(125, 211, 168, 0.08);
   }
 
+  .hero-kicker-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+  }
+
   .hero-shell {
-    max-width: 74rem;
+    max-width: 80rem;
   }
 
   .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.34fr) minmax(19rem, 23.5rem);
-    gap: clamp(2rem, 4vw, 4.5rem);
+    grid-template-columns: minmax(0, 1.38fr) minmax(23rem, 27.5rem);
+    gap: clamp(2rem, 4.2vw, 5rem);
     align-items: start;
   }
 
   .hero-copy {
-    max-width: 39rem;
+    max-width: 50rem;
     padding-top: 0.5rem;
   }
 
   .hero-title {
-    max-width: 9.8ch;
+    max-width: 14.5ch;
     margin: 0 0 1.25rem;
     font-family: var(--font-display);
-    font-size: clamp(2.75rem, 2.1rem + 1.8vw, 4.1rem);
+    font-size: clamp(2.8rem, 2.2rem + 1.8vw, 4.45rem);
     font-weight: 600;
-    line-height: 0.94;
-    letter-spacing: -0.045em;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
     color: var(--text-primary);
   }
 
   .hero-subtitle {
-    max-width: 38rem;
+    max-width: 42rem;
     margin: 0 0 2.25rem;
-    font-size: clamp(1.03rem, 0.96rem + 0.28vw, 1.18rem);
-    line-height: 1.62;
+    font-size: clamp(1.06rem, 0.98rem + 0.3vw, 1.2rem);
+    line-height: 1.68;
     color: var(--text-secondary);
   }
 
@@ -214,7 +261,7 @@ const reviewArtifact = artifact || heroContent.artifact
   .stat-label {
     font-family: var(--font-sans);
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
   }
 
   .hero-kicker {
@@ -224,13 +271,52 @@ const reviewArtifact = artifact || heroContent.artifact
   }
 
   .hero-secondary-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    text-decoration: none;
     font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
+  .hero-secondary-link__text {
+    opacity: 0.6;
+    transition: opacity var(--duration-fast) var(--ease-out);
+  }
+
+  .hero-secondary-link__icon {
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  .hero-secondary-link:hover .hero-secondary-link__text {
+    opacity: 1;
+  }
+
+  .hero-secondary-link:hover .hero-secondary-link__icon {
+    transform: translateX(0.5rem);
+  }
+
+  .hero-stats {
+    margin-top: var(--space-16);
+    padding-top: var(--space-8);
+  }
+
+  .hero-fadeout {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 8rem;
+    background: linear-gradient(to top, var(--bg-void), transparent);
+  }
   .hero-stats-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-5);
+    gap: var(--space-6);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: var(--space-8);
   }
 
   .stat-item {
@@ -250,10 +336,11 @@ const reviewArtifact = artifact || heroContent.artifact
 
   .stat-label {
     display: block;
-    font-size: 0.72rem;
-    line-height: 1.55;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    color: var(--text-secondary);
   }
 
   @media (max-width: 768px) {

@@ -1,22 +1,24 @@
 ---
+import InfoStrip from '@/components/homepage/InfoStrip.astro'
+
 export interface Props {
   content: {
     label: string
     title: string
     steps: Array<{ number: string; title: string; body: string }>
-    editorial: string[]
+    outputs: Array<{ label: string; value: string }>
   }
 }
 
 const { content } = Astro.props
 ---
 
-<section class="section home-section home-section--how">
-  <div class="container home-shell">
+<section class="pe-page-section home-section home-section--how">
+  <div class="pe-page-shell home-shell">
     <div class="home-split">
       <div>
-        <span class="label-mono">{content.label}</span>
-        <h2 class="mt-4">{content.title}</h2>
+        <span class="pe-page-label">{content.label}</span>
+        <h2 class="pe-page-heading">{content.title}</h2>
       </div>
 
       <div class="home-steps">
@@ -32,57 +34,34 @@ const { content } = Astro.props
       </div>
     </div>
 
-    <div class="home-editorial mt-12">
-      <article class="home-editorial__statement">
-        <span class="home-panel-label">What gets judged</span>
-        <h3>Whether the review makes supervision more specific.</h3>
-        <p>
-          The platform earns its place only if your team can point to a better
-          intervention, a clearer risk assessment, or a stronger repair on the
-          next pass. Anything less is theater.
-        </p>
-      </article>
-      <div class="home-editorial__checks">
-        {content.editorial.map((item, index) => (
-          <div class="home-editorial__check">
-            <span>{`Check ${index + 1}`}</span>
-            <strong>{item}</strong>
-          </div>
-        ))}
-      </div>
-    </div>
+    <InfoStrip
+      className="home-outputs home-outputs--spaced"
+      label="What comes out of one run"
+      title="A session record, a review surface, and a cleaner next attempt."
+      body="The workflow matters because the practice run does not disappear at the end of the conversation. It stays intact long enough for a supervisor to coach from it."
+      items={content.outputs}
+      theme="paper"
+    />
   </div>
 </section>
 
 <style>
-  .home-shell {
-    max-width: 75rem;
-  }
-
-  .home-section {
-    position: relative;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    padding-top: clamp(4.5rem, 7vw, 7rem);
-    padding-bottom: clamp(4.5rem, 7vw, 7rem);
-  }
-
   .home-section--how {
-    background:
-      linear-gradient(180deg, rgba(238, 237, 230, 0.98), rgba(224, 227, 217, 0.95));
-    color: #111716;
+    background: var(--surface-paper-gradient-soft);
+    color: var(--ink-primary);
   }
 
   .home-section--how :is(h2, h3, strong) {
-    color: #111716;
+    color: var(--ink-primary);
   }
 
   .home-section--how p {
-    color: rgba(17, 23, 22, 0.76);
+    color: var(--ink-secondary);
   }
 
   .home-split {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
     gap: clamp(1.8rem, 3vw, 3.2rem);
     align-items: start;
   }
@@ -97,14 +76,12 @@ const { content } = Astro.props
     grid-template-columns: auto 1fr;
     gap: var(--space-4);
     align-items: start;
-    padding: 1.2rem 1.2rem 1.1rem;
-    border: 1px solid rgba(17, 23, 22, 0.12);
-    background: rgba(255, 255, 255, 0.48);
+    padding: 1.35rem 1.35rem 1.2rem;
+    border: 1px solid var(--ink-border);
+    background: var(--surface-paper-panel-muted);
   }
 
-  .home-step-number,
-  .home-panel-label,
-  .home-editorial__check span {
+  .home-step-number {
     font-size: var(--text-sm);
     font-weight: 600;
     letter-spacing: 0.03em;
@@ -115,48 +92,17 @@ const { content } = Astro.props
     color: rgba(17, 23, 22, 0.52);
   }
 
-  .home-panel-label,
-  .home-editorial__check span {
-    color: rgba(17, 23, 22, 0.58);
+  .home-outputs {
+    border-color: var(--ink-border);
+    background: var(--surface-paper-panel);
   }
 
-  .home-editorial {
-    display: grid;
-    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
-    gap: clamp(1.5rem, 3vw, 3rem);
-  }
-
-  .home-editorial__statement,
-  .home-editorial__checks {
-    min-width: 0;
-  }
-
-  .home-editorial__statement {
-    display: grid;
-    gap: var(--space-4);
-    padding: clamp(1.4rem, 2vw, 2rem);
-    border: 1px solid rgba(17, 23, 22, 0.12);
-    background: rgba(255, 255, 255, 0.62);
-  }
-
-  .home-editorial__checks {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
-  }
-
-  .home-editorial__check {
-    display: grid;
-    gap: var(--space-3);
-    padding: 1rem 1rem 1.1rem;
-    border: 1px solid rgba(17, 23, 22, 0.12);
-    background: rgba(255, 255, 255, 0.44);
+  .home-outputs--spaced {
+    margin-top: var(--space-12);
   }
 
   @media (max-width: 1080px) {
-    .home-split,
-    .home-editorial,
-    .home-editorial__checks {
+    .home-split {
       grid-template-columns: 1fr;
     }
   }
