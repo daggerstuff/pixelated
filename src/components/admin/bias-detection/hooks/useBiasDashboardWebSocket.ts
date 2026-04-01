@@ -4,7 +4,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 
 type WsConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting" | "error";
 type BiasLevel = "all" | "low" | "medium" | "high" | "critical";
-type BiasScoreFilter = { min: number; max: number };
+type BiasScoreFilter = "all" | "low" | "medium" | "high" | { min: number; max: number };
 type LogFn = (message: string, details?: Record<string, unknown>) => void;
 type SetState<T> = Dispatch<SetStateAction<T>>;
 
