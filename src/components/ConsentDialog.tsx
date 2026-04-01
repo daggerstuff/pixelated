@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { generateConsentForm } from '@/simulator/utils/privacy'
-import { FocusTrap } from '@/components/FocusTrap'
+import { FocusTrap } from '@/components/accessibility/FocusTrap'
 
 interface ConsentDialogProps {
   isOpen: boolean
@@ -21,22 +21,12 @@ export function ConsentDialog({
   const dialogRef = useRef<HTMLDivElement>(null)
   const { consentText, privacyPoints } = generateConsentForm()
 
-  // Handle Escape key to close the dialog
+  // Focus the dialog when it opens for accessibility
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
-      }
-    }
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown)
-      // Focus the dialog when it opens for accessibility
       dialogRef.current?.focus()
     }
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [isOpen, onClose])
+  }, [isOpen])
 
   const handleConsentClick = () => {
     onConsent(true)
@@ -48,6 +38,13 @@ export function ConsentDialog({
     onClose()
   }
 
+  const handleDialogKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.stopPropagation()
+      onClose()
+    }
+  }
+
   // If dialog is not open, don't render anything
   if (!isOpen) {
     return null
@@ -55,10 +52,11 @@ export function ConsentDialog({
 
   return (
     <div className='bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 p-4'>
-      <FocusTrap>
+      <FocusTrap active={isOpen}>
         <div
           ref={dialogRef}
           tabIndex={-1}
+          onKeyDown={handleDialogKeyDown}
           className='bg-white flex w-full max-w-2xl flex-col rounded-lg shadow-xl'
           role='dialog'
           aria-modal='true'
