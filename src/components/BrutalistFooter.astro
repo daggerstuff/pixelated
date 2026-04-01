@@ -43,9 +43,9 @@ const social = [
     icon: 'github',
   },
   {
-    href: 'https://twitter.com/pixelatedempathy',
-    label: 'Twitter',
-    icon: 'twitter',
+    href: 'https://x.com/pixelatedempathy',
+    label: 'X',
+    icon: 'x',
   },
 ]
 
@@ -64,9 +64,9 @@ const {
   <div class="footer-accent" aria-hidden="true"></div>
 
   <div class="footer-container">
-    {/* Main Grid */}
+    <!-- Main Grid -->
     <div class="footer-grid">
-      {/* Brand Column */}
+      <!-- Brand Column -->
       <div class="footer-brand">
         <a href="/" class="footer-logo">
           <span class="footer-brand-lockup">
@@ -94,8 +94,8 @@ const {
           {manifesto}
         </p>
 
-        {/* Social Links */}
-        <div class="footer-social mt-6">
+        <!-- Social Links -->
+        <div class="footer-social">
           {
             social.map((item) => (
               <a
@@ -115,7 +115,7 @@ const {
                     <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.09.682-.22.682-.48 0-.24-.009-.87-.013-1.71-2.782.6-3.369-1.34-3.369-1.34-.454-1.16-1.11-1.47-1.11-1.47-.908-.62.069-.61.069-.61 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.09 2.91.83.092-.65.35-1.09.636-1.34-2.22-.25-4.555-1.11-4.555-4.94 0-1.09.39-1.98 1.029-2.68-.103-.25-.446-1.27.098-2.64 0 0 .84-.27 2.75 1.02A9.578 9.578 0 0112 6.84c.85 0 1.7.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.546 1.37.202 2.39.1 2.64.64.7 1.028 1.59 1.028 2.68 0 3.84-2.339 4.68-4.566 4.94.359.31.678.92.678 1.85 0 1.34-.012 2.42-.012 2.75 0 .27.18.58.688.48A10.019 10.019 0 0022 12c0-5.523-4.477-10-10-10z" />
                   </svg>
                 )}
-                {item.icon === 'twitter' && (
+                {item.icon === 'x' && (
                   <svg
                     viewBox="0 0 24 24"
                     fill="currentColor"
@@ -194,14 +194,14 @@ const {
         </h3>
         <ul class="footer-proof-list">
           {
-            reviewStandards.map((item) => <li>{item}</li>)
+            reviewStandards.map((item) => <li class="footer-proof-item">{item}</li>)
           }
         </ul>
         <a href={proofCTA.href} class="footer-proof-link">{proofCTA.text}</a>
       </aside>
     </div>
 
-    {/* Bottom Bar */}
+    <!-- Bottom Bar -->
     <div class="footer-bottom">
       <p class="footer-copyright">
         &copy; {currentYear} Pixelated Empathy // All rights reserved.
@@ -340,6 +340,7 @@ const {
   .footer-social {
     display: flex;
     gap: var(--space-4);
+    margin-top: var(--space-6);
   }
 
   .footer-social-link {
@@ -391,6 +392,11 @@ const {
     padding-left: 1rem;
     color: var(--text-secondary);
     line-height: 1.55;
+    list-style: disc;
+  }
+
+  .footer-proof-item {
+    list-style: disc;
   }
 
   .footer-proof-link {
@@ -494,6 +500,12 @@ const {
     50% {
       box-shadow: 0 0 0 0.3rem rgba(136, 201, 165, 0.02);
       opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-built-dot {
+      animation: none;
     }
   }
 
