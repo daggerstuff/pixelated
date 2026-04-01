@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDuration, isValidDate } from './formatDate'
+import { formatDuration, isValidDate, getStartOf } from './formatDate'
 
 describe('formatDuration', () => {
   it('formats seconds correctly', () => {
@@ -66,5 +66,15 @@ describe('isValidDate', () => {
     // Timezone variations
     expect(isValidDate('2023-01-01T00:00:00+05:00')).toBe(true)
     expect(isValidDate('2023-01-01T00:00:00-08:00')).toBe(true)
+  })
+})
+describe('getStartOf', () => {
+  it('returns the start of the day', () => {
+    const date = new Date('2023-05-15T12:30:45Z');
+    const start = getStartOf(date, 'day');
+    expect(start.getHours()).toBe(0);
+    expect(start.getMinutes()).toBe(0);
+    expect(start.getSeconds()).toBe(0);
+    expect(start.getMilliseconds()).toBe(0);
   })
 })
