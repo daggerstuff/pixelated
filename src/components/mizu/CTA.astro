@@ -31,19 +31,19 @@ const {
 } = Astro.props
 ---
 
-<section class="section cta-section">
+<section class="pe-page-section cta-section">
   <SectionAtmosphere variant="cta" />
-  <div class="container cta-shell">
+  <div class="pe-page-shell cta-shell">
     <div class="cta-panel">
       <div class="cta-copy">
-        <span class="label-mono block mb-4">{label}</span>
-        <h2 class="mb-6">
+        <span class="pe-page-label cta-label">{label}</span>
+        <h2 class="cta-title">
           {title}
         </h2>
-        <p class="mb-6">
+        <p class="cta-intro">
           {intro}
         </p>
-        <p class="cta-verdict-copy mb-6">
+        <p class="cta-verdict-copy">
           {verdictCopy}
         </p>
         <div class="cta-proof-list">
@@ -70,10 +70,10 @@ const {
         </div>
 
         <div class="cta-action-cluster">
-          <a href={primaryCTA.href} class="btn btn-primary btn-terminal">
+          <a href={primaryCTA.href} class="cta-button cta-button--primary">
             {primaryCTA.text}
           </a>
-          <a href={secondaryCTA.href} class="btn btn-outline">{secondaryCTA.text}</a>
+          <a href={secondaryCTA.href} class="cta-button cta-button--secondary">{secondaryCTA.text}</a>
         </div>
 
         <p class="cta-meta">
@@ -87,7 +87,7 @@ const {
 <style>
   .cta-section {
     position: relative;
-    background: var(--bg-void);
+    background: linear-gradient(180deg, #111716 0%, #161c1b 100%);
   }
 
   .cta-shell {
@@ -99,18 +99,28 @@ const {
   .cta-panel {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
-    gap: var(--space-8);
+    gap: var(--space-10);
     align-items: center;
-    border: var(--border-primary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     background:
-      linear-gradient(135deg, rgba(125, 211, 168, 0.18), rgba(125, 211, 168, 0.04) 34%, rgba(255, 255, 255, 0.025) 100%),
-      rgba(255, 255, 255, 0.035);
-    padding: clamp(1.5rem, 3vw, 3rem);
+      linear-gradient(135deg, rgba(125, 211, 168, 0.14), rgba(125, 211, 168, 0.03) 34%, rgba(255, 255, 255, 0.018) 100%),
+      rgba(255, 255, 255, 0.028);
+    padding: clamp(1.9rem, 3.2vw, 3.25rem);
     border-radius: var(--radius-md);
   }
 
   .cta-copy {
     max-width: 42rem;
+  }
+
+  .cta-label {
+    margin-bottom: var(--space-4);
+  }
+
+  .cta-title,
+  .cta-intro,
+  .cta-verdict-copy {
+    margin-bottom: var(--space-6);
   }
 
   .cta-subcopy {
@@ -154,29 +164,35 @@ const {
   .cta-actions {
     display: grid;
     gap: var(--space-4);
-    padding: clamp(1.2rem, 1.8vw, 1.7rem);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: clamp(1.45rem, 2vw, 1.95rem);
+    border: 1px solid rgba(17, 23, 22, 0.08);
     background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.03) 28%, rgba(7, 11, 12, 0.88) 100%);
+      linear-gradient(180deg, rgba(248, 247, 241, 0.98), rgba(236, 235, 227, 0.96) 100%);
+    color: #111716;
   }
 
   .cta-decision {
     display: grid;
     gap: var(--space-3);
     padding-bottom: var(--space-4);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(17, 23, 22, 0.08);
   }
 
   .cta-decision h3 {
     font-size: clamp(1.45rem, 1.18rem + 0.7vw, 1.95rem);
     line-height: 1.05;
+    color: #111716;
+  }
+
+  .cta-actions :is(h3, strong) {
+    color: #111716;
   }
 
   .cta-verdict {
     display: grid;
     gap: var(--space-3);
     padding-bottom: var(--space-4);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(17, 23, 22, 0.08);
   }
 
   .cta-verdict__label {
@@ -184,7 +200,7 @@ const {
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: var(--accent-primary);
+    color: #2f6b4d;
   }
 
   .cta-verdict__list {
@@ -192,22 +208,63 @@ const {
     gap: var(--space-3);
     margin: 0;
     padding-left: 1rem;
-    color: var(--text-secondary);
+    color: rgba(17, 23, 22, 0.76);
     line-height: 1.55;
   }
 
   .cta-action-cluster {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--space-3);
+  }
+
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.8rem;
+    padding: 0.85rem 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      background-color var(--duration-fast) var(--ease-out),
+      border-color var(--duration-fast) var(--ease-out);
+  }
+
+  .cta-button--primary {
+    color: #09100e;
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+  }
+
+  .cta-button--primary:hover {
+    color: var(--accent-primary);
+    background: transparent;
+  }
+
+  .cta-button--secondary {
+    color: #111716;
+    border-color: rgba(17, 23, 22, 0.18);
+    background: transparent;
+  }
+
+  .cta-button--secondary:hover {
+    border-color: #111716;
   }
 
   .cta-meta {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     letter-spacing: 0.01em;
-    color: var(--text-muted);
+    color: rgba(17, 23, 22, 0.6);
   }
 
   @media (max-width: 1024px) {
@@ -221,7 +278,7 @@ const {
       width: 100%;
     }
 
-    .cta-action-cluster .btn {
+    .cta-action-cluster .cta-button {
       width: 100%;
     }
   }

@@ -1,40 +1,40 @@
 export const introContent = {
-  label: 'Why trust this in training',
-  title: 'A reviewable training record, not a black-box demo.',
+  label: 'The problem with current training',
+  title: 'Most clinical training is expensive to run and almost impossible to reuse.',
   paragraphs: [
-    'Pixelated Empathy helps therapists, supervisors, and training programs rehearse complex sessions with AI patients that push back, spiral, dissociate, avoid, or disclose hard truths unexpectedly.',
-    'The useful part is what remains after the session: transcript, missed openings, pacing issues, risk markers, and the exact places a supervisor can coach with specificity.',
+    'Once a live roleplay ends, the useful parts usually dissolve into memory, scattered notes, and disagreement about what actually changed the room.',
+    'Pixelated Empathy is built to preserve the exchange long enough for a supervisor to review a specific turn, compare clinicians against a shared case, and direct the next attempt with more precision.',
   ],
-  panelLabel: 'What the product actually leaves behind',
+  panelLabel: 'Where most training breaks down',
   panelItems: [
     {
-      label: 'Transcript record',
-      body: 'A timestamped exchange you can replay, annotate, and compare across multiple clinicians.',
+      label: 'The case gets burned in one room',
+      body: 'A difficult conversation runs once, then disappears into opinion, side notes, and whatever the team remembers afterward.',
     },
     {
-      label: 'Feedback structure',
-      body: 'Empathy, pacing, rupture-repair, and escalation cues are broken out after the session instead of buried in generic notes.',
+      label: 'Supervision becomes impressionistic',
+      body: 'Teams can feel the conversation shift, but they cannot reliably point to where it happened, why it changed, or what should be coached next.',
     },
     {
-      label: 'Team use',
-      body: 'Training teams can rerun the same difficult case, review the same artifact, and coach against the same turning points.',
+      label: 'Comparison gets fuzzy fast',
+      body: 'When every trainee gets a different case and a different recap afterward, coaching loses precision almost immediately.',
     },
   ],
   evidenceCards: [
     {
-      title: 'What improves after one review',
+      title: 'What the platform should give back',
       items: [
-        'Supervision shifts from impressions to timestamps and wording.',
-        'Trainees can rerun the same hard case with cleaner intent.',
-        'Teams can compare how different clinicians handled the same rupture.',
+        'A case the team can rerun without reinventing the setup every time.',
+        'A review surface a supervisor can use to coach a specific intervention or miss.',
+        'A shared record that lets the team compare clinicians against the same difficult moment.',
       ],
     },
     {
-      title: 'What this is not',
+      title: 'What it should never turn into',
       items: [
-        'Not generic chatbot roleplay with motivational copy pasted over it.',
-        'Not a static script tree that rewards memorization.',
-        'Not a novelty AI layer with no supervision value after the session ends.',
+        'Not a novelty chatbot with therapy language pasted over it.',
+        'Not a script tree that rewards memorization instead of judgment.',
+        'Not a flashy session that leaves nothing usable for supervision.',
       ],
     },
   ],
