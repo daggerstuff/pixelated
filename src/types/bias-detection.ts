@@ -20,23 +20,6 @@ export interface BiasAlert {
   status?: AlertStatus
 }
 
-// Verification result for backup/recovery tests
-export interface VerificationResult {
-  testCase: string
-  passed: boolean
-  details: Record<string, unknown>
-  id?: string
-  status?: AlertLevel
-  description?: string
-}
-
-// Bias score filter types
-export type BiasScoreFilterLiteral = 'all' | 'low' | 'medium' | 'high'
-export type BiasScoreFilter = BiasScoreFilterLiteral | { min: number; max: number }
-
-// Time range filter
-export type TimeRange = '24h' | '7d' | '30d' | '90d' | 'custom'
-
 // Alert item for dashboard (extended from BiasAlert)
 export interface AlertItem {
   alertId: string
@@ -48,3 +31,10 @@ export interface AlertItem {
   acknowledged?: boolean
   status?: string
 }
+
+// Bias score filter types
+export type BiasScoreFilterLiteral = 'all' | 'low' | 'medium' | 'high'
+export type BiasScoreFilter = BiasScoreFilterLiteral | { min: number; max: number }
+
+// Time range filter
+export type TimeRange = '24h' | '7d' | '30d' | '90d' | 'custom'
