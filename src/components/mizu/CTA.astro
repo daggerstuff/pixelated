@@ -18,16 +18,16 @@ export interface Props {
 }
 
 const {
-  label = 'Run the evaluation',
-  title = 'Judge it like a supervision tool, not an AI demo.',
-  intro = 'Take one difficult case, give it to a clinician or trainee, then ask whether the transcript and feedback changed the quality of your next supervisory conversation.',
-  verdictCopy = 'If the platform does not give your team a clearer intervention, a sharper risk read, or a better repair on the second pass, it has not earned a place in training.',
+  label,
+  title,
+  intro,
+  verdictCopy,
   proofItems = [],
-  decisionTitle = 'If you would not use the transcript in real supervision next week, walk away.',
+  decisionTitle,
   rubric = [],
   primaryCTA = { text: 'Start Practice', href: '/signup' },
   secondaryCTA = { text: 'Talk to Us', href: '/contact' },
-  meta = 'No credit card required for trial. Use one real training case and decide from the review, not the pitch.',
+  meta,
 } = Astro.props
 ---
 
@@ -117,21 +117,18 @@ const {
     margin-bottom: var(--space-4);
   }
 
+  .cta-proof-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
   .cta-title,
   .cta-intro,
   .cta-verdict-copy {
     margin-bottom: var(--space-6);
   }
 
-  .cta-subcopy {
-    color: var(--text-tertiary);
-  }
-
-  .cta-proof-list {
-    display: grid;
-    gap: var(--space-4);
-  }
-
+  .cta-intro,
   .cta-verdict-copy {
     max-width: 38rem;
     font-family: var(--font-display);

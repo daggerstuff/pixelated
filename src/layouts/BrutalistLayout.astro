@@ -19,7 +19,7 @@ const {
   footerProps = {},
 } = Astro.props
 
-const { cspNonce } = Astro.locals
+const cspNonce = Astro.locals?.cspNonce ?? ''
 ---
 
 <!doctype html>
@@ -106,7 +106,7 @@ const { cspNonce } = Astro.locals
     height: 1px;
     background: var(--accent-primary);
     width: 0%;
-    z-index: var(--z-modal);
+    z-index: var(--z-sticky);
     transition: width 0.1s linear;
   }
 </style>

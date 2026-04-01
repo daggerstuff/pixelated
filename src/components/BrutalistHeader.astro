@@ -138,29 +138,7 @@ const secondaryAction = headerContent.actions.secondary
     text-decoration: none;
   }
 
-  /* Logo */
-  .header-logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    text-decoration: none;
-    color: var(--text-primary);
-  }
-
-  .header-logo-img {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-  }
-
-  .header-logo-text {
-    font-family: var(--font-sans);
-    font-size: var(--text-sm);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-  }
-
+  /* Navigation */
   .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -371,6 +349,28 @@ const secondaryAction = headerContent.actions.secondary
     height: 1px;
     background: var(--text-primary);
     transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .menu-icon span {
+      transition: none;
+    }
+
+    .header-nav-link::after {
+      transition: none;
+    }
+
+    .header-action-link {
+      transition: none;
+    }
+
+    .logo-img {
+      transition: none;
+    }
+
+    .logo-glow {
+      transition: none;
+    }
   }
 
   .header-mobile-shell[open] .menu-icon span:first-child {
