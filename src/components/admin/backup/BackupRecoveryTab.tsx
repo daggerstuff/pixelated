@@ -20,6 +20,7 @@ import { toast } from '@/components/ui/toast'
 
 import type { BackupType, BackupStatus } from '../../../lib/security/backup'
 import { RecoveryTestStatus } from '../../../lib/security/backup/backup-types'
+import type { VerificationResult } from '@/types/backup'
 
 // Define the enum locally to avoid server-side imports
 enum TestEnvironmentType {
@@ -46,14 +47,7 @@ interface RecoveryTest {
   status: RecoveryTestStatus
   timeTaken: number
   environment: string
-  verificationResults?: Array<{
-    testCase: string
-    passed: boolean
-    details: Record<string, unknown>
-    id?: string
-    status?: 'critical' | 'high' | 'medium' | 'low'
-    description?: string
-  }>
+  verificationResults?: VerificationResult[]
   issues?: Array<{
     type: string
     description: string
