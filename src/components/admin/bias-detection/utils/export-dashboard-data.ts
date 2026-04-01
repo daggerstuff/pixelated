@@ -51,11 +51,8 @@ type ExportOptions = {
   exportDateRange: DateRangeFilter;
   exportDataTypes: ExportDataTypes;
   exportFilters: ExportDateFilter;
-  selectedTimeRange: TimeRange;
-  biasScoreFilter: {
-    min: number;
-    max: number;
-  };
+  selectedTimeRange: TimeRange | string;
+  biasScoreFilter: { min: number; max: number } | 'all' | 'low' | 'medium' | 'high';
   alertLevelFilter: BiasLevel;
   selectedDemographicFilter: string;
   customDateRange?: DateRangeFilter;

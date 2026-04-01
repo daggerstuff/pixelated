@@ -10,7 +10,12 @@ import { ChatContainer } from '../ChatContainer'
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
 // Helpers
-const messages = [
+const messages: Array<{
+		role: 'user' | 'assistant' | 'system'
+		content: string
+		name: string
+		type?: string
+	}> = [
   { role: 'user', content: 'User message', name: 'You' },
   { role: 'assistant', content: 'Bot response', name: 'Assistant' },
   { role: 'system', content: 'System note', name: 'System' },
@@ -42,7 +47,11 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
   })
 
   it('maps therapy/patient/therapist roles to bot/user/system correctly', () => {
-    const therapyMessages = [
+    const therapyMessages: Array<{
+			role: 'therapist' | 'patient' | 'system'
+			content: string
+			name: string
+		}> = [
       {
         role: 'therapist',
         content: 'Therapist acting as user',
@@ -52,14 +61,18 @@ describe('Contract propagation in ChatContainer and ChatMessage', () => {
       { role: 'system', content: 'System message', name: 'System' },
     ]
     // Simulate TherapyChatSystem's mapping (see production mapping)
-    const mapped = therapyMessages.map((msg) => ({
+    const mapped: Array<{
+		role: 'user' | 'assistant' | 'system'
+		content: string
+		name: string
+	}> = therapyMessages.map((msg) => ({
       ...msg,
       role:
         msg.role === 'therapist'
-          ? 'user'
+        ? 'user' as const
           : msg.role === 'patient'
-            ? 'assistant'
-            : msg.role,
+        ? 'assistant' as const
+        : 'system' as const,
     }))
     render(
       <ThemeProvider>

@@ -82,6 +82,7 @@ import type {
   BiasAnalysisResult,
   DashboardRecommendation,
   BiasDashboardSummary,
+  BiasAlert,
 } from '@/lib/ai/bias-detection'
 import { exportBiasDashboardData } from '@/components/admin/bias-detection/utils/export-dashboard-data'
 import {
@@ -143,7 +144,7 @@ interface AlertItem extends BaseFilterableItem {
   type?: string
   message: string
   level: string
-  sessionId: string
+  sessionId?: string
   timestamp: string | Date
   acknowledged?: boolean
   status?: string
@@ -818,7 +819,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             )
             return {
               ...prev,
-              alerts: [newAlert, ...(prev.alerts || [])],
+              alerts: [newAlert as BiasAlert, ...(prev.alerts || [])],
               summary: {
                 ...prev.summary,
                 alertsLast24h: prev.summary.alertsLast24h + 1,
@@ -1161,8 +1162,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const reconnectWebSocket = useCallback(() => {
     if (wsRef.current) {
       // Close existing connection
-      if (wsRef.current.heartbeatInterval) {
-        clearInterval(wsRef.current.heartbeatInterval)
+      const ws = wsRef.current as WebSocket & { heartbeatInterval?: ReturnType<typeof setInterval> }; if (ws.heartbeatInterval) {
+        clearInterval(ws.heartbeatInterval)
       }
       wsRef.current.close(1000, 'Manual reconnection')
       wsRef.current = null

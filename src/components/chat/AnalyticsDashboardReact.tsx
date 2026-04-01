@@ -178,10 +178,7 @@ export default function AnalyticsDashboard({
 
       // Get analytics data
       const results = await fheAnalytics.createAnalyticsDashboard(
-        messages.map((msg) => ({
-          id: generateId(),
-          ...msg,
-        })),
+        messages.map((msg) => ({ id: generateId(), role: msg.role, content: msg.content, timestamp: msg.timestamp ? new Date(msg.timestamp).getTime() : Date.now(), })),
         config,
       )
 

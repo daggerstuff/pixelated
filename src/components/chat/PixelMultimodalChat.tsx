@@ -9,14 +9,14 @@ import {
 
 interface PixelMultimodalChatProps {
   sessionId: string
-  contextType?: string
+  defaultContextType?: string
   title?: string
   onResult?: (result: MultimodalInferenceResponse | null) => void
 }
 
 export function PixelMultimodalChat({
   sessionId,
-  contextType = 'therapeutic',
+  defaultContextType = 'therapeutic',
   title = 'Pixel Multimodal Chat',
   onResult,
 }: PixelMultimodalChatProps) {
@@ -45,7 +45,7 @@ export function PixelMultimodalChat({
     streaming,
     streamStatus,
     streamError,
-  } = useMultimodalPixel({ contextType })
+  } = useMultimodalPixel({})
 
   const handleChunk = useMemo(
     () => (chunk: Blob) => {
@@ -84,7 +84,7 @@ export function PixelMultimodalChat({
 
   const handleStartRecording = async () => {
     if (streamingMode) {
-      connectStream({ sessionId, contextType })
+      connectStream({ sessionId })
       if (message) {
         sendTextToStream(message)
       }
@@ -95,7 +95,7 @@ export function PixelMultimodalChat({
   const handleStopRecording = async () => {
     const blob = await stopRecording()
     if (streamingMode) {
-      finalizeStream({ text: message, sessionId, contextType })
+      finalizeStream({ text: message, sessionId })
     } else if (!audioBlob && blob) {
       // update local audio blob when not streaming and no existing blob
     }
@@ -105,7 +105,7 @@ export function PixelMultimodalChat({
     if (!message && !audioBlob) return
 
     if (streamingMode) {
-      finalizeStream({ text: message, sessionId, contextType })
+      finalizeStream({ text: message, sessionId })
       return
     }
 
@@ -113,7 +113,7 @@ export function PixelMultimodalChat({
       text: message,
       audioBlob,
       sessionId,
-      contextType,
+      contextType: defaultContextType,
     })
 
     if (result && onResult) {
@@ -162,7 +162,7 @@ export function PixelMultimodalChat({
           />
           <div className='text-slate-500 flex flex-wrap items-center gap-3 text-xs'>
             <span>Session: {sessionId}</span>
-            <span className='hidden md:inline'>Context: {contextType}</span>
+            <span className='hidden md:inline'>Context: {defaultContextType}</span>
           </div>
         </div>
 
@@ -388,7 +388,7 @@ function Stat({ label, value }: { label: string; value?: number }) {
 
 function formatFusedSummary(fused: FusedEmotion): string {
   const { valence, arousal, overall_eq, conflict_score } = fused
-  const parts = []
+  const parts: string[] = []
   if (overall_eq !== undefined)
     parts.push(`EQ ${(overall_eq * 100).toFixed(0)}%`)
   if (valence !== undefined) parts.push(`Val ${(valence * 100).toFixed(0)}%`)
