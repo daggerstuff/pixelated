@@ -2,45 +2,65 @@
 /**
  * CoreFeatures Component - Brutalist Style
  */
-const features = [
-  {
-    title: 'Realistic patient simulation',
-    description:
-      'Sessions respond to your tone, pacing, and judgment so you can practice hard conversations instead of clicking through scripted branches.',
-    icon: 'chat',
-  },
-  {
-    title: 'Session-by-session clinical feedback',
-    description:
-      'Review empathy, missed openings, escalation points, and whether your intervention choices helped or destabilized the exchange.',
-    icon: 'chart',
-  },
-  {
-    title: 'Safe repetition before the real encounter',
-    description:
-      'Test new phrasing, supervision guidance, and difficult responses in a contained environment before using them with actual clients.',
-    icon: 'shield',
-  },
-]
+import SectionAtmosphere from '@/components/homepage/SectionAtmosphere.astro'
+
+export interface Props {
+  label?: string
+  title?: string
+  copy?: string
+  proofLabel?: string
+  proofItems?: string[]
+  cards?: Array<{ title: string; description: string; icon: string }>
+  comparison?: {
+    label: string
+    title: string
+    body: string
+    items: Array<{ label: string; value: string; accent?: boolean }>
+  }
+}
+
+const {
+  label = 'Practice workflow',
+  title = 'Built to make supervision sharper, not just louder.',
+  copy = 'The goal is not more AI novelty. It is cleaner clinical rehearsal, clearer supervision, and a record of what actually happened in the room.',
+  proofLabel = 'What supervisors can point to',
+  proofItems = [],
+  cards = [],
+  comparison,
+} = Astro.props
 ---
 
-<section class="section" style="background: var(--bg-secondary);">
+<section class="section core-features-section">
+  <SectionAtmosphere variant="section" />
   <div class="container core-features-shell">
     <div class="core-features-intro">
       <div>
-        <span class="label-mono">// Core Features</span>
-        <h2 class="mt-4">What the platform actually gives you</h2>
+        <span class="label-mono">{label}</span>
+        <h2 class="mt-4">{title}</h2>
       </div>
       <p class="core-features-copy">
-        Every training session is built to make clinicians more prepared, more
-        consistent, and easier to coach across a team.
+        {copy}
       </p>
     </div>
 
     <div class="core-features-grid">
+      <aside class="core-features-proof card card-lined">
+        <span class="home-panel-label">{proofLabel}</span>
+        <ul class="core-features-proof-list">
+          {proofItems.map((item) => <li>{item}</li>)}
+        </ul>
+      </aside>
+
+      <div class="core-features-list">
       {
-        features.map((feature, index) => (
-          <div class="card card-lined core-feature-card" data-index={index}>
+        cards.map((feature, index) => (
+          <div
+            class:list={[
+              'card card-lined core-feature-card',
+              index === 0 && 'core-feature-card--lead',
+            ]}
+            data-index={index}
+          >
             <div class="flex items-start gap-4">
               <div class="feature-icon">
                 {feature.icon === 'chat' && (
@@ -103,13 +123,45 @@ const features = [
           </div>
         ))
       }
+      </div>
+    </div>
+
+    <div class="core-features-comparison">
+      <div class="core-features-comparison__lead">
+        <span class="home-panel-label">{comparison?.label}</span>
+        <h3>{comparison?.title}</h3>
+        <p>{comparison?.body}</p>
+      </div>
+
+      <div class="core-features-comparison__grid">
+        {comparison?.items.map((item) => (
+          <div
+            class:list={[
+              'core-features-comparison__item',
+              item.accent && 'core-features-comparison__item--accent',
+            ]}
+          >
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 </section>
 
 <style>
   .core-features-shell {
+    position: relative;
+    z-index: 1;
     max-width: 72rem;
+  }
+
+  .core-features-section {
+    position: relative;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006)),
+      linear-gradient(90deg, rgba(125, 211, 168, 0.03), transparent 30%, transparent 70%, rgba(125, 211, 168, 0.025));
   }
 
   .core-features-intro {
@@ -126,13 +178,101 @@ const features = [
 
   .core-features-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: minmax(19rem, 0.9fr) minmax(0, 1.1fr);
     gap: var(--space-6);
+    margin-bottom: var(--space-12);
+  }
+
+  .core-features-proof {
+    display: grid;
+    align-content: start;
+    gap: var(--space-5);
+    padding: clamp(1.4rem, 2vw, 1.9rem);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.022));
+  }
+
+  .core-features-proof-list {
+    display: grid;
+    gap: var(--space-4);
+    padding-left: 1rem;
+    color: var(--text-secondary);
+  }
+
+  .core-features-comparison {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+    align-items: start;
+    padding-top: var(--space-10);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .core-features-comparison__lead {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .core-features-comparison__lead h3 {
+    font-size: clamp(1.6rem, 1.28rem + 0.75vw, 2.2rem);
+    line-height: 1.04;
+  }
+
+  .core-features-comparison__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .core-features-comparison__item {
+    display: grid;
+    gap: var(--space-3);
+    min-width: 0;
+    padding: 1.15rem 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.028);
+  }
+
+  .core-features-comparison__item--accent {
+    background:
+      linear-gradient(180deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.03) 55%, rgba(255, 255, 255, 0.018));
+    border-color: rgba(125, 211, 168, 0.22);
+  }
+
+  .core-features-comparison__item span {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .core-features-comparison__item strong {
+    font-size: clamp(1.02rem, 0.98rem + 0.18vw, 1.14rem);
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .core-features-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
   }
 
   .core-feature-card {
     min-width: 0;
-    background: rgba(255, 255, 255, 0.02);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  }
+
+  .core-feature-card--lead {
+    grid-column: 1 / -1;
+    padding: clamp(1.5rem, 2vw, 2.1rem);
+    background:
+      linear-gradient(135deg, rgba(125, 211, 168, 0.16), rgba(125, 211, 168, 0.04) 38%, rgba(255, 255, 255, 0.025) 100%),
+      rgba(255, 255, 255, 0.04);
+  }
+
+  .core-feature-card--lead h3 {
+    font-size: clamp(1.55rem, 1.25rem + 0.85vw, 2.05rem);
   }
 
   .feature-icon {
@@ -141,7 +281,7 @@ const features = [
     justify-content: center;
     width: 48px;
     height: 48px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius-sm);
     color: var(--accent-primary);
     flex-shrink: 0;
@@ -151,9 +291,22 @@ const features = [
     border-color: var(--accent-primary);
   }
 
+  .core-feature-card h3 {
+    font-size: clamp(1.35rem, 1.15rem + 0.4vw, 1.72rem);
+    line-height: 1.06;
+  }
+
   @media (max-width: 1024px) {
     .core-features-intro,
-    .core-features-grid {
+    .core-features-grid,
+    .core-features-comparison {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .core-features-list,
+    .core-features-comparison__grid {
       grid-template-columns: 1fr;
     }
   }
