@@ -1,0 +1,51 @@
+.pe-page-shell {
+  width: 100%;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.pe-page-section {
+  position: relative;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: clamp(4.5rem, 7vw, 7rem);
+  padding-bottom: clamp(4.5rem, 7vw, 7rem);
+}
+
+.pe-page-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  opacity: 0.9;
+}
+
+.pe-page-panel-label {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+  margin-bottom: var(--space-4);
+}
+
+.pe-page-heading {
+  margin-top: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .pe-page-shell {
+    padding: 0 var(--space-8);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pe-page-shell {
+    padding: 0 var(--space-10);
+  }
+}
