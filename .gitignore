@@ -6,6 +6,7 @@
 .sonarlint
 .vscode/
 .crush/
+.letta/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -283,3 +284,7 @@ scripts/ovh
 .github/instructions/openmemory.instructions.md
 
 gha-creds-*.json
+
+# Playwright
+/blob-report/
+/playwright/.auth/
