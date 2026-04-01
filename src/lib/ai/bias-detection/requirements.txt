@@ -754,7 +754,7 @@ regex==2026.1.15
     #   -r requirements.txt
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r requirements.txt
     #   dash

@@ -391,7 +391,7 @@ regex==2026.1.15
     # via
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   datasets
     #   evaluate

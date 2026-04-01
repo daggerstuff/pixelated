@@ -356,7 +356,7 @@ redis==7.1.0 # via -r src/lib/ai/training/requirements.txt
 regex==2026.1.15 # via
 # nltk
 # transformers
-requests==2.33.0 # via
+requests==2.33.1 # via
 # -r src/lib/ai/training/requirements.txt
 # databricks-sdk
 # datasets
