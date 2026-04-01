@@ -168,7 +168,6 @@ const logger = createBuildSafeLogger('backup-security')
 // Current version of the encryption implementation
 const ENCRYPTION_VERSION = '1.0'
 
-import mongoose from "mongoose"
 import { BackupType, BackupStatus, StorageLocation } from './backup-types'
 
 export interface BackupRetentionPolicy {
@@ -810,40 +809,37 @@ export class BackupSecurityManager {
   /**
    * Get data to backup based on backup type
    */
-  private async getLastBackupTime(requireFull: boolean = false): Promise<Date | null> {
+  private async getLastBackupTime(requireFull = false): Promise<Date | null> {
     let latestTimestamp = 0;
 
-    const storageEntries = Array.from(this.storageProviders.entries())
+    const storageEntries = Array.from(this.storageProviders.entries());
     for (let i = 0; i < storageEntries.length; i++) {
-      const entry = storageEntries[i]
-      if (!entry || !Array.isArray(entry) || entry.length < 2) continue
-
-      const [location, provider] = entry
-      if (!provider) continue
+      const [, provider] = storageEntries[i];
+      if (!provider) continue;
 
       try {
-        const files = await provider.listFiles("backups/") // Fallback to list all and filter if pattern not supported
-        const metaFiles = files.filter(f => f.endsWith(".meta.json"))
-        for (const file of metaFiles) {
+        const files = await provider.listFiles("backups/");
+        const metaFiles = files.filter((f) => f.endsWith(".meta.json"));
+        for (const metaFile of metaFiles) {
           try {
-            const metadataBuffer = await provider.getFile(file)
-            const metadata = JSON.parse(new TextDecoder().decode(metadataBuffer)) as BackupMetadata
+            const metadataBuffer = await provider.getFile(metaFile);
+            const metadata = JSON.parse(new TextDecoder().decode(metadataBuffer)) as BackupMetadata;
 
             if (metadata.status === BackupStatus.COMPLETED) {
-              if (requireFull && metadata.type !== BackupType.FULL) continue
-              if (!requireFull && metadata.type !== BackupType.FULL && metadata.type !== BackupType.DIFFERENTIAL && metadata.type !== BackupType.INCREMENTAL) continue
+              if (requireFull && metadata.type !== BackupType.FULL) continue;
+              if (!requireFull && metadata.type !== BackupType.FULL && metadata.type !== BackupType.DIFFERENTIAL && metadata.type !== BackupType.INCREMENTAL) continue;
 
-              const timestamp = new Date(metadata.timestamp).getTime()
+              const timestamp = new Date(metadata.timestamp).getTime();
               if (timestamp > latestTimestamp) {
-                latestTimestamp = timestamp
+                latestTimestamp = timestamp;
               }
             }
-          } catch (e) {
+          } catch {
             // Ignore individual file parsing errors
           }
         }
       } catch (error: unknown) {
-        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? error.message : String(error)}`)
+        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -851,42 +847,57 @@ export class BackupSecurityManager {
   }
 
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    const backupData: Record<string, any> = {
-      timestamp: new Date().toISOString(),
-      type,
-      data: {}
-    }
+    let appDataJson = '{"timestamp":"' + new Date().toISOString() + '","type":"' + type + '","data":{';
 
     try {
-      let query = {}
+      const mongooseModule = "mongoose";
+      const mongoose = (await import(/* @vite-ignore */ mongooseModule)).default || await import(/* @vite-ignore */ mongooseModule);
+      const models = mongoose.modelNames();
 
+      let isFirstModel = true;
+
+      let baselineTime: Date | null = null;
       if (type === BackupType.DIFFERENTIAL || type === BackupType.INCREMENTAL) {
-        const requireFull = type === BackupType.DIFFERENTIAL
-        const lastBackupTime = await this.getLastBackupTime(requireFull)
-        const baselineTime = lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000)
-        query = { updatedAt: { $gte: baselineTime } }
+        const requireFull = type === BackupType.DIFFERENTIAL;
+        const lastBackupTime = await this.getLastBackupTime(requireFull);
+        baselineTime = lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000);
       }
 
-      const models = mongoose.modelNames()
-      const dataPromises = models.map(async (modelName) => {
-        const Model = mongoose.model(modelName)
-        const docs = await Model.find(query).lean().exec()
-        return { modelName, docs }
-      })
+      for (const modelName of models) {
+        const Model = mongoose.model(modelName);
+        const query: Record<string, unknown> = {};
 
-      const results = await Promise.all(dataPromises)
-
-      for (const result of results) {
-        if (result.docs.length > 0) {
-          backupData.data[result.modelName] = result.docs
+        if (baselineTime && Model.schema.paths.updatedAt) {
+          query.updatedAt = { $gte: baselineTime };
         }
+
+        if (!isFirstModel) {
+          appDataJson += ',';
+        }
+        appDataJson += '"' + modelName + '":[';
+        isFirstModel = false;
+
+        const cursor = Model.find(query).lean().cursor();
+        let isFirstDoc = true;
+
+        for await (const doc of cursor) {
+          if (!isFirstDoc) {
+            appDataJson += ',';
+          }
+          appDataJson += JSON.stringify(doc);
+          isFirstDoc = false;
+        }
+
+        appDataJson += ']';
       }
+
+      appDataJson += '}}';
     } catch (error: unknown) {
-      logger.error(`Failed to collect data for backup: ${error instanceof Error ? error.message : String(error)}`)
-      throw new Error(`Data collection failed: ${error instanceof Error ? error.message : String(error)}`)
+      logger.error(`Failed to collect data for backup: ${error instanceof Error ? error.message : String(error)}`);
+      throw error; // Fail loudly to prevent silent data corruption
     }
 
-    return new TextEncoder().encode(JSON.stringify(backupData))
+    return new TextEncoder().encode(appDataJson);
   }
 
   /**
