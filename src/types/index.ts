@@ -222,6 +222,8 @@ export * from './chat'
 export * from './user'
 export * from './analytics'
 export * from './treatment'
+export * from './bias-detection'
+export * from './backup'
 
 // ============================================================================
 // TYPE GUARDS

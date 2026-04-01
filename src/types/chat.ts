@@ -105,3 +105,21 @@ export interface InterventionConfig {
   emotions: string[]
   riskFactors: string[]
 }
+
+// Extended mental health analysis for therapeutic contexts
+export interface MentalHealthChatAnalysis {
+  category: 'low' | 'medium' | 'high' | 'critical'
+  hasMentalHealthIssue: boolean
+  confidence: number
+  explanation: string
+  supportingEvidence: string[]
+  timestamp: number
+  expertGuided: boolean
+  emotions: string[]
+  riskFactors: string[]
+}
+
+// Therapeutic interventions interface
+export interface TherapeuticInterventions {
+  generateIntervention: (config: InterventionConfig) => Promise<string>
+}
