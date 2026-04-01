@@ -614,7 +614,7 @@ pexpect==4.9.0
     # via
     #   -r requirements.txt
     #   ipython
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   -r requirements.txt
     #   imageio
@@ -754,7 +754,7 @@ regex==2026.1.15
     #   -r requirements.txt
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   -r requirements.txt
     #   dash
