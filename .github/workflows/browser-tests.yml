@@ -53,16 +53,6 @@ jobs:
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         run: pnpm exec playwright install --with-deps
 
-      - name: Build project
-        run: pnpm run build
-
-      - name: Start preview server in background
-        run: pnpm run preview -- --port 4323 &
-        shell: bash
-
-      - name: Wait for server
-        run: sleep 15
-
       - name: Run browser tests
         run: |
           export NODE_ENV=test
