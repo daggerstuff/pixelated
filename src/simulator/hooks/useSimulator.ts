@@ -210,11 +210,15 @@ function generateFeedbackType(
     recommendedTechniques.includes(t),
   )
 
-  // Randomly select feedback type with weighted probability
+  // Randomly select feedback type with weighted probability.
+  // We use magic numbers here to simulate the non-deterministic,
+  // subjective nature of human responses in therapeutic settings.
+  // Even if a recommended technique is used perfectly, a client might not
+  // always respond positively. This avoids creating a binary training environment.
   const rand = Math.random()
 
   if (usedRecommendedTechnique) {
-    // Higher chance of positive feedback when using recommended techniques
+    // 70% chance of POSITIVE, 15% DEVELOPMENTAL, 15% TECHNIQUE_SUGGESTION
     if (rand < 0.7) {
       return FeedbackType.POSITIVE
     } else if (rand < 0.85) {
@@ -223,6 +227,7 @@ function generateFeedbackType(
       return FeedbackType.TECHNIQUE_SUGGESTION
     }
   } else if (rand < 0.3) {
+    // 30% chance of POSITIVE, 30% DEVELOPMENTAL, 20% TECHNIQUE_SUGGESTION, 20% ALTERNATIVE_APPROACH
     return FeedbackType.POSITIVE
   } else if (rand < 0.6) {
     return FeedbackType.DEVELOPMENTAL
