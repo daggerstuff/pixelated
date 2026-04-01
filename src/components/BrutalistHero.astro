@@ -3,7 +3,7 @@
  * Brutalist Hero Component
  * High-impact mission statement
  */
-import BrutalistHeroArtifact from './BrutalistHeroArtifact.astro'
+import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
 import { heroContent } from '@/lib/content/hero'
 
@@ -27,8 +27,8 @@ export interface Props {
 }
 
 const {
-  title = 'AI Roleplay Training for Therapists',
-  subtitle = 'Practice difficult clinical conversations with realistic AI patients, structured feedback, and repeatable supervision workflows.',
+  title = heroContent.title,
+  subtitle = heroContent.subtitle,
   primaryCTA,
   secondaryCTA,
   stats,
@@ -94,14 +94,14 @@ const kicker = heroContent.kicker
         {
           stats && stats.length > 0 && (
           <div class="hero-stats">
-              <div class="hero-stats-grid" aria-label="Proof points">
+              <ul class="hero-stats-grid" aria-label="Proof points" role="list">
                 {stats.map((stat) => (
-                  <div class="stat-item">
+                  <li class="stat-item">
                     <span class="stat-value">{stat.value}</span>
                     <span class="stat-label">{stat.label}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           )
         }

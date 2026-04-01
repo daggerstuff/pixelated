@@ -20,7 +20,7 @@ const { content } = Astro.props
         <span class="pe-page-label">{content.label}</span>
         <h2 class="pe-page-heading">{content.title}</h2>
         {content.paragraphs.map((paragraph, index) => (
-          <p class:list={['home-copy', index === 0 ? 'mt-6' : 'mt-4']}>{paragraph}</p>
+          <p class:list={['home-copy', index === 0 ? 'home-copy--first' : 'home-copy--subsequent']}>{paragraph}</p>
         ))}
       </div>
 
@@ -37,7 +37,7 @@ const { content } = Astro.props
       </div>
     </div>
 
-    <div class="home-evidence-grid mt-10">
+    <div class="home-evidence-grid home-evidence-grid--spaced">
       {content.evidenceCards.map((card, index) => (
         <article class:list={['home-evidence-card', index === 0 && 'home-evidence-card--light']}>
           <span class="pe-page-panel-label">{card.title}</span>
@@ -59,6 +59,14 @@ const { content } = Astro.props
   .home-copy {
     max-width: 42rem;
     font-size: var(--text-lg);
+  }
+
+  .home-copy--first {
+    margin-top: var(--space-6);
+  }
+
+  .home-copy--subsequent {
+    margin-top: var(--space-4);
   }
 
   .home-section--intro :is(h2, h3, p, li) {
@@ -125,6 +133,10 @@ const { content } = Astro.props
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
     align-items: stretch;
     gap: var(--space-6);
+  }
+
+  .home-evidence-grid--spaced {
+    margin-top: var(--space-10);
   }
 
   .home-evidence-card {
