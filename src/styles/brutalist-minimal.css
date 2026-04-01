@@ -60,17 +60,15 @@
   --grid-line-accent: 1px solid rgba(0, 255, 136, 0.1);
 
   /* === TYPOGRAPHY SYSTEM === */
-  /* Headings: Space Grotesk - sharper, less generic than system sans */
+  /* Headings: JetBrains Mono - terminal precision */
   --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", ui-monospace, monospace;
 
   /* Body: Geist Sans - clean, readable */
   --font-sans:
     "Geist Sans", "Inter Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* Display: strong geometric grotesk for brand presence */
-  --font-display:
-    "Space Grotesk", "Geist Sans", "Inter Variable", -apple-system,
-    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Display: Monospace for that Antfu feel */
+  --font-display: var(--font-mono);
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.625rem, 0.6rem + 0.125vw, 0.75rem);

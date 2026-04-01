@@ -5,27 +5,31 @@
  */
 import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
 import BrutalistHero from '@/components/BrutalistHero.astro'
+import IntroSection from '@/components/homepage/IntroSection.astro'
+import ScenariosSection from '@/components/homepage/ScenariosSection.astro'
+import WorkflowSection from '@/components/homepage/WorkflowSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
 import CTA from '@/components/mizu/CTA.astro'
+import { homepageContent } from '@/lib/content'
 
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  'name': 'Pixelated Empathy',
-  'url': 'https://pixelatedempathy.com',
-  'logo': 'https://pixelatedempathy.com/favicon.svg',
-  'description': 'AI-powered training platform for mental health professionals',
-  'foundingDate': '2025',
-  'address': {
+  name: 'Pixelated Empathy',
+  url: 'https://pixelatedempathy.com',
+  logo: 'https://pixelatedempathy.com/favicon.svg',
+  description: 'AI-powered training platform for mental health professionals',
+  foundingDate: '2025',
+  address: {
     '@type': 'PostalAddress',
-    'addressCountry': 'US',
+    addressCountry: 'US',
   },
-  'contactPoint': {
+  contactPoint: {
     '@type': 'ContactPoint',
-    'email': 'info@pixelatedempathy.com',
-    'contactType': 'Customer Service',
+    email: 'info@pixelatedempathy.com',
+    contactType: 'Customer Service',
   },
-  'sameAs': [
+  sameAs: [
     'https://twitter.com/pixelatedempathy',
     'https://github.com/nochadisfaction/pixelated',
   ],
@@ -35,305 +39,43 @@ const organizationSchema = {
 <BrutalistLayout
   title="Pixelated Empathy | The AI Training Ground for Therapists"
   description="Practice difficult conversations in a safe space. No pressure, just progress."
+  footerProps={homepageContent.footer}
 >
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)}
-  />
+  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 
   <BrutalistHero
-    title="The AI Training Ground for Therapists"
-    subtitle="Pixelated Empathy is an AI roleplay platform for therapists, trainees, and care teams who need realistic practice, instant feedback, and safer repetition before the real conversation starts."
-    primaryCTA={{ text: 'Start Practice', href: '/signup' }}
-    secondaryCTA={{ text: 'Watch Demo', href: '/demo-hub' }}
-    stats={[
-      { value: 'Scenario', label: 'Configurable practice' },
-      { value: 'Feedback', label: 'Review after each session' },
-      { value: 'Team', label: 'Supervisor workflows' },
-    ]}
+    title={homepageContent.hero.title}
+    subtitle={homepageContent.hero.subtitle}
+    primaryCTA={homepageContent.hero.primaryCTA}
+    secondaryCTA={homepageContent.hero.secondaryCTA}
+    stats={homepageContent.hero.stats}
+    artifact={homepageContent.hero.artifact}
   />
 
-  <section class="section home-section home-section--intro">
-    <div class="container home-shell">
-      <div class="home-intro">
-        <div class="home-intro__lead">
-          <span class="label-mono">// What This Is</span>
-          <h2 class="mt-4">
-            A practice lab for high-stakes mental health conversations.
-          </h2>
-          <p class="home-copy mt-6">
-            Pixelated Empathy helps therapists, supervisors, and training
-            programs rehearse complex sessions with AI patients that push back,
-            spiral, dissociate, avoid, or disclose hard truths unexpectedly.
-          </p>
-          <p class="home-copy mt-4">
-            It is not a generic chatbot. It is structured clinical roleplay with
-            feedback on empathy, pacing, risk recognition, and how your choices
-            shape the conversation.
-          </p>
-        </div>
+  <IntroSection content={homepageContent.intro} />
+  <ScenariosSection content={homepageContent.scenarios} />
+  <WorkflowSection content={homepageContent.how} />
 
-        <div class="home-intro__panel card card-lined">
-          <span class="home-panel-label">Who It Serves</span>
-          <ul class="home-list">
-            <li>
-              Therapists who want to sharpen crisis, trauma, and resistance
-              handling.
-            </li>
-            <li>
-              Graduate programs and supervisors who need repeatable
-              simulation-based training.
-            </li>
-            <li>
-              Care teams that want safer rehearsal before difficult real-world
-              conversations.
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CoreFeatures
+    label={homepageContent.features.label}
+    title={homepageContent.features.title}
+    copy={homepageContent.features.copy}
+    proofLabel={homepageContent.features.proofLabel}
+    proofItems={homepageContent.features.proofItems}
+    cards={homepageContent.features.cards}
+    comparison={homepageContent.features.comparison}
+  />
 
-  <section class="section home-section home-section--scenarios">
-    <div class="container home-shell">
-      <span class="label-mono">// What You Can Practice</span>
-      <h2 class="mt-4">
-        Train for the moments clinicians do not get to rehearse in public.
-      </h2>
-
-      <div class="home-card-grid mt-12">
-        <article class="card card-lined home-card">
-          <span class="home-card-kicker">Escalation</span>
-          <h3>Crisis and risk conversations</h3>
-          <p>
-            Practice suicidality screening, de-escalation, safety planning, and
-            how to stay clinically grounded when the room changes fast.
-          </p>
-        </article>
-
-        <article class="card card-lined home-card">
-          <span class="home-card-kicker">Complex Dynamics</span>
-          <h3>Trauma, shutdown, anger, and rupture</h3>
-          <p>
-            Work through avoidance, dysregulation, mistrust, emotional
-            withdrawal, and the conversational repairs that determine whether a
-            client stays engaged.
-          </p>
-        </article>
-
-        <article class="card card-lined home-card">
-          <span class="home-card-kicker">Supervision</span>
-          <h3>Repeatable training for teams</h3>
-          <p>
-            Give trainees the same hard scenario, compare decisions, and coach
-            against real transcripts instead of vague recollections after the
-            fact.
-          </p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="section home-section home-section--how">
-    <div class="container home-shell">
-      <div class="home-split">
-        <div>
-          <span class="label-mono">// How It Works</span>
-          <h2 class="mt-4">
-            You run the conversation. The platform scores what happened.
-          </h2>
-        </div>
-
-        <div class="home-steps">
-          <div class="home-step">
-            <span class="home-step-number">01</span>
-            <div>
-              <h3>Choose a scenario</h3>
-              <p>
-                Select the kind of client presentation, level of intensity, and
-                difficulty you want to rehearse.
-              </p>
-            </div>
-          </div>
-          <div class="home-step">
-            <span class="home-step-number">02</span>
-            <div>
-              <h3>Handle the session in real time</h3>
-              <p>
-                The AI patient responds to your tone, questions, pacing, and
-                missteps instead of following a canned script.
-              </p>
-            </div>
-          </div>
-          <div class="home-step">
-            <span class="home-step-number">03</span>
-            <div>
-              <h3>Review feedback and repeat</h3>
-              <p>
-                See what improved, what escalated risk, and where you missed
-                openings so the next attempt is sharper.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <CoreFeatures />
-  <CTA />
+  <CTA
+    label={homepageContent.cta.label}
+    title={homepageContent.cta.title}
+    intro={homepageContent.cta.intro}
+    verdictCopy={homepageContent.cta.verdictCopy}
+    proofItems={homepageContent.cta.proofItems}
+    decisionTitle={homepageContent.cta.decisionTitle}
+    rubric={homepageContent.cta.rubric}
+    primaryCTA={homepageContent.cta.primaryCTA}
+    secondaryCTA={homepageContent.cta.secondaryCTA}
+    meta={homepageContent.cta.meta}
+  />
 </BrutalistLayout>
-
-<style>
-  .home-shell {
-    max-width: 72rem;
-  }
-
-  .home-section {
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-  }
-
-  .home-copy {
-    max-width: 42rem;
-    font-size: var(--text-lg);
-  }
-
-  .home-intro {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.9fr);
-    gap: var(--space-8);
-    align-items: start;
-  }
-
-  .home-intro__panel {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .home-panel-label,
-  .home-card-kicker {
-    display: inline-block;
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-primary);
-    margin-bottom: var(--space-4);
-  }
-
-  .home-list {
-    display: grid;
-    gap: var(--space-4);
-    padding-left: 1.1rem;
-    color: var(--text-secondary);
-  }
-
-  .home-card-grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--space-6);
-  }
-
-  .home-card {
-    min-width: 0;
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .home-card:nth-child(1) {
-    grid-column: span 5;
-  }
-
-  .home-card:nth-child(2) {
-    grid-column: span 7;
-    background:
-      linear-gradient(180deg, rgba(0, 255, 136, 0.05), rgba(255, 255, 255, 0.02));
-  }
-
-  .home-card:nth-child(3) {
-    grid-column: 3 / span 8;
-  }
-
-  .home-card h3 {
-    font-size: clamp(1.3rem, 1.15rem + 0.45vw, 1.7rem);
-    margin-bottom: var(--space-3);
-    line-height: 1.15;
-  }
-
-  .home-split {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-    gap: var(--space-8);
-    align-items: start;
-  }
-
-  .home-steps {
-    display: grid;
-    gap: var(--space-6);
-  }
-
-  .home-step {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--space-4);
-    padding: var(--space-5);
-    border: var(--border-primary);
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: var(--radius-md);
-  }
-
-  .home-step-number {
-    font-family: var(--font-sans);
-    font-size: var(--text-xs);
-    color: var(--accent-primary);
-    letter-spacing: 0.08em;
-    padding-top: 0.35rem;
-  }
-
-  .home-step h3 {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-2);
-  }
-
-  @media (max-width: 1180px) {
-    .home-intro,
-    .home-split {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 1240px) {
-    .home-card-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .home-card:nth-child(1),
-    .home-card:nth-child(2),
-    .home-card:nth-child(3) {
-      grid-column: auto;
-    }
-  }
-
-  @media (max-width: 860px) {
-    .home-card-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .home-shell {
-      max-width: 100%;
-    }
-
-    .home-copy {
-      font-size: var(--text-base);
-    }
-
-    .home-card-grid {
-      gap: var(--space-4);
-    }
-
-    .home-step {
-      grid-template-columns: 1fr;
-      gap: var(--space-3);
-    }
-  }
-</style>

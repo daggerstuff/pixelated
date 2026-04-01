@@ -1,0 +1,163 @@
+---
+export interface Props {
+  content: {
+    label: string
+    title: string
+    steps: Array<{ number: string; title: string; body: string }>
+    editorial: string[]
+  }
+}
+
+const { content } = Astro.props
+---
+
+<section class="section home-section home-section--how">
+  <div class="container home-shell">
+    <div class="home-split">
+      <div>
+        <span class="label-mono">{content.label}</span>
+        <h2 class="mt-4">{content.title}</h2>
+      </div>
+
+      <div class="home-steps">
+        {content.steps.map((step) => (
+          <div class="home-step">
+            <span class="home-step-number">{step.number}</span>
+            <div>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="home-editorial mt-12">
+      <article class="home-editorial__statement">
+        <span class="home-panel-label">What gets judged</span>
+        <h3>Whether the review makes supervision more specific.</h3>
+        <p>
+          The platform earns its place only if your team can point to a better
+          intervention, a clearer risk assessment, or a stronger repair on the
+          next pass. Anything less is theater.
+        </p>
+      </article>
+      <div class="home-editorial__checks">
+        {content.editorial.map((item, index) => (
+          <div class="home-editorial__check">
+            <span>{`Check ${index + 1}`}</span>
+            <strong>{item}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-shell {
+    max-width: 75rem;
+  }
+
+  .home-section {
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: clamp(4.5rem, 7vw, 7rem);
+    padding-bottom: clamp(4.5rem, 7vw, 7rem);
+  }
+
+  .home-section--how {
+    background:
+      linear-gradient(180deg, rgba(238, 237, 230, 0.98), rgba(224, 227, 217, 0.95));
+    color: #111716;
+  }
+
+  .home-section--how :is(h2, h3, strong) {
+    color: #111716;
+  }
+
+  .home-section--how p {
+    color: rgba(17, 23, 22, 0.76);
+  }
+
+  .home-split {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(1.8rem, 3vw, 3.2rem);
+    align-items: start;
+  }
+
+  .home-steps {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .home-step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    align-items: start;
+    padding: 1.2rem 1.2rem 1.1rem;
+    border: 1px solid rgba(17, 23, 22, 0.12);
+    background: rgba(255, 255, 255, 0.48);
+  }
+
+  .home-step-number,
+  .home-panel-label,
+  .home-editorial__check span {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .home-step-number {
+    color: rgba(17, 23, 22, 0.52);
+  }
+
+  .home-panel-label,
+  .home-editorial__check span {
+    color: rgba(17, 23, 22, 0.58);
+  }
+
+  .home-editorial {
+    display: grid;
+    grid-template-columns: minmax(0, 0.84fr) minmax(0, 1.16fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .home-editorial__statement,
+  .home-editorial__checks {
+    min-width: 0;
+  }
+
+  .home-editorial__statement {
+    display: grid;
+    gap: var(--space-4);
+    padding: clamp(1.4rem, 2vw, 2rem);
+    border: 1px solid rgba(17, 23, 22, 0.12);
+    background: rgba(255, 255, 255, 0.62);
+  }
+
+  .home-editorial__checks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .home-editorial__check {
+    display: grid;
+    gap: var(--space-3);
+    padding: 1rem 1rem 1.1rem;
+    border: 1px solid rgba(17, 23, 22, 0.12);
+    background: rgba(255, 255, 255, 0.44);
+  }
+
+  @media (max-width: 1080px) {
+    .home-split,
+    .home-editorial,
+    .home-editorial__checks {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

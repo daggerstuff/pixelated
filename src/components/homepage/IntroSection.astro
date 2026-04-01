@@ -1,0 +1,143 @@
+---
+export interface Props {
+  content: {
+    label: string
+    title: string
+    paragraphs: string[]
+    panelLabel: string
+    panelItems: Array<{ label: string; body: string }>
+    evidenceCards: Array<{ title: string; items: string[] }>
+  }
+}
+
+const { content } = Astro.props
+---
+
+<section class="section home-section home-section--intro">
+  <div class="container home-shell">
+    <div class="home-intro">
+      <div class="home-intro__lead">
+        <span class="label-mono">{content.label}</span>
+        <h2 class="mt-4">{content.title}</h2>
+        {content.paragraphs.map((paragraph, index) => (
+          <p class:list={['home-copy', index === 0 ? 'mt-6' : 'mt-4']}>{paragraph}</p>
+        ))}
+      </div>
+
+      <div class="home-intro__panel card card-lined">
+        <span class="home-panel-label">{content.panelLabel}</span>
+        <div class="home-proof-stack">
+          {content.panelItems.map((item) => (
+            <div class="home-proof-item">
+              <span class="home-proof-item__label">{item.label}</span>
+              <p>{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <div class="home-evidence-grid mt-10">
+      {content.evidenceCards.map((card) => (
+        <article class="home-evidence-card card card-lined">
+          <span class="home-panel-label">{card.title}</span>
+          <ul class="home-evidence-list">
+            {card.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-shell {
+    max-width: 75rem;
+  }
+
+  .home-section {
+    position: relative;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: clamp(4.5rem, 7vw, 7rem);
+    padding-bottom: clamp(4.5rem, 7vw, 7rem);
+  }
+
+  .home-section--intro {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006) 45%, transparent 85%);
+  }
+
+  .home-copy {
+    max-width: 42rem;
+    font-size: var(--text-lg);
+  }
+
+  .home-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.32fr) minmax(20rem, 0.88fr);
+    gap: clamp(2rem, 3vw, 3.5rem);
+    align-items: start;
+  }
+
+  .home-intro__panel {
+    padding: clamp(1.55rem, 2vw, 2.2rem);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.018));
+  }
+
+  .home-panel-label {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    margin-bottom: var(--space-4);
+  }
+
+  .home-proof-stack,
+  .home-evidence-grid,
+  .home-evidence-list {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .home-proof-item {
+    display: grid;
+    gap: var(--space-2);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .home-proof-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .home-proof-item__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .home-evidence-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-evidence-card {
+    min-width: 0;
+  }
+
+  .home-evidence-list {
+    padding-left: 1rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 960px) {
+    .home-intro,
+    .home-evidence-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
