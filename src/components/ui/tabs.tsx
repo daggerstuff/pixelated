@@ -124,7 +124,7 @@ export function TabsList({ children, className = '' }: TabsListProps) {
     const tabs = Array.from(
       list.querySelectorAll('[role="tab"]:not([disabled])'),
     )
-    const index = tabs.indexOf(document.activeElement as HTMLElement)
+    const index = tabs.indexOf(document.activeElement as any as HTMLElement)
 
     if (index < 0) return
 

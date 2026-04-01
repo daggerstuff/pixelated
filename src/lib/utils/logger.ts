@@ -36,7 +36,7 @@ class Logger {
       return obj
     }
 
-    const newObj = { ...(obj as Record<string, unknown>) }
+    const newObj = { ...(obj as any as Record<string, unknown>) }
     for (const key of keys) {
       if (key in newObj) {
         newObj[key] = '[REDACTED]'

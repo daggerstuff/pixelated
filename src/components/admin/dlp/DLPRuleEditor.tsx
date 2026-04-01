@@ -49,7 +49,7 @@ export default function DLPRuleEditor() {
       if (!(event instanceof CustomEvent)) {
         return
       }
-      const detail = event.detail as EditorRule
+      const detail = event.detail as any as EditorRule
       setCurrentRule({ ...defaultRule, ...detail, matchPattern: detail.matchPattern ?? '' })
       setIsEditing(true)
     }

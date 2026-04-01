@@ -19,31 +19,31 @@ export type Logger = {
 
 // Factory functions for named loggers - delegate to canonical getLogger so tests can mock
 export function getBiasDetectionLogger(scope: string): Logger {
-  return getLogger(`bias-detection:${scope}`) as unknown as Logger
+  return getLogger(`bias-detection:${scope}`) as any as Logger
 }
 
 export function getClinicalAnalysisLogger(scope: string): Logger {
-  return getLogger(`clinical-analysis:${scope}`) as unknown as Logger
+  return getLogger(`clinical-analysis:${scope}`) as any as Logger
 }
 
 export function getAiServiceLogger(scope: string): Logger {
-  return getLogger(`ai-service:${scope}`) as unknown as Logger
+  return getLogger(`ai-service:${scope}`) as any as Logger
 }
 
 export function getApiEndpointLogger(scope: string): Logger {
-  return getLogger(`api-endpoint:${scope}`) as unknown as Logger
+  return getLogger(`api-endpoint:${scope}`) as any as Logger
 }
 
 export function getComponentLogger(scope: string): Logger {
-  return getLogger(`component:${scope}`) as unknown as Logger
+  return getLogger(`component:${scope}`) as any as Logger
 }
 
 export function getServiceLogger(scope: string): Logger {
-  return getLogger(`service:${scope}`) as unknown as Logger
+  return getLogger(`service:${scope}`) as any as Logger
 }
 
 export function getSecurityLogger(scope: string): Logger {
-  return getLogger(`security:${scope}`) as unknown as Logger
+  return getLogger(`security:${scope}`) as any as Logger
 }
 
 export function getAdvancedPHILogger(
@@ -51,11 +51,11 @@ export function getAdvancedPHILogger(
 ): Logger {
   return getLogger(
     `advanced-phi${config.enableLogCollection ? ':collect' : ''}`,
-  ) as unknown as Logger
+  ) as any as Logger
 }
 
 export function getHipaaCompliantLogger(scope: string): Logger {
-  return getLogger(`hipaa:${scope}`) as unknown as Logger
+  return getLogger(`hipaa:${scope}`) as any as Logger
 }
 
 // Default/general loggers - provide thin runtime proxies to getLogger
