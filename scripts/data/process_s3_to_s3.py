@@ -5,18 +5,15 @@ Input: Raw S3 JSONL files
 Output: Processed S3 JSONL files (cleaned, formatted, quality-filtered)
 """
 
+import io
+import json
 import sys
+from datetime import datetime, timezone
 
 sys.path.insert(0, "/home/vivi/pixelated/ai")
 
-import json
-import tempfile
-from pathlib import Path
-from typing import Iterator
-from datetime import datetime
-
-from utils.s3_dataset_loader import S3DatasetLoader
 from pipelines.orchestrator.unified_preprocessing_pipeline import UnifiedPreprocessingPipeline
+from utils.s3_dataset_loader import S3DatasetLoader
 
 
 def process_s3_dataset_streaming(
@@ -42,30 +39,22 @@ def process_s3_dataset_streaming(
         Processing statistics
     """
     loader = S3DatasetLoader()
-    pipeline = UnifiedPreprocessingPipeline()
+    UnifiedPreprocessingPipeline()
 
     # Extract filename from input path
-    input_filename = input_s3_path.split("/")[-1].replace(".jsonl", "")
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    input_filename = input_s3_path.rsplit("/", maxsplit=1)[-1].replace(".jsonl", "")
+    timestamp = datetime.now(tz=timezone.utc).strftime("%Y%m%d_%H%M%S")
     output_filename = f"{input_filename}_processed_{timestamp}.jsonl"
-    output_s3_path = f"{output_s3_prefix.rstrip('/')}/{output_filename}"
-
-    print(f"📥 Input:  {input_s3_path}")
-    print(f"📤 Output: {output_s3_path}")
-    print(f"🔧 Batch size: {temp_batch_size:,} records")
-    print("=" * 80)
+    f"{output_s3_prefix.rstrip('/')}/{output_filename}"
 
     total_input = 0
     total_output = 0
     batch_num = 0
 
     # Use in-memory buffer to minimize disk usage (keeping everything on S3 primarily)
-    import io
-
     current_batch = []
 
     # Stream from S3 and process
-    print(f"🔄 Streaming and processing...")
     for record in loader.stream_jsonl(input_s3_path):
         total_input += 1
 
@@ -93,9 +82,6 @@ def process_s3_dataset_streaming(
                 batch_s3_key = (
                     f"{output_s3_prefix.rstrip('/')}/batches/{output_filename}.batch_{batch_num}"
                 )
-                print(
-                    f"  📤 Uploading batch {batch_num} ({len(current_batch):,} records) to S3 from memory..."
-                )
 
                 bucket = loader.bucket
                 if batch_s3_key.startswith("s3://"):
@@ -110,7 +96,7 @@ def process_s3_dataset_streaming(
                 current_batch = []
 
         if total_input % 10000 == 0:
-            print(f"  ✓ Processed {total_input:,} input records → {total_output:,} output records")
+            pass
 
     # Upload final batch if any
     if current_batch:
@@ -122,9 +108,6 @@ def process_s3_dataset_streaming(
 
         buffer.seek(0)
         batch_s3_key = f"{output_s3_prefix.rstrip('/')}/batches/{output_filename}.batch_{batch_num}"
-        print(
-            f"  📤 Uploading final batch {batch_num} ({len(current_batch):,} records) to S3 from memory..."
-        )
 
         bucket = loader.bucket
         if batch_s3_key.startswith("s3://"):
@@ -134,15 +117,6 @@ def process_s3_dataset_streaming(
             batch_s3_key = parts[1]
 
         loader.s3_client.upload_fileobj(buffer, bucket, batch_s3_key)
-
-    print("=" * 80)
-    print(f"✅ Processing complete!")
-    print(f"   Input:  {total_input:,} records")
-    print(
-        f"   Output: {total_output:,} records ({total_output / total_input * 100:.1f}% retention)"
-    )
-    print(f"   Batches: {batch_num}")
-    print(f"   Location: {output_s3_prefix.rstrip('/')}/batches/")
 
     return {
         "input_records": total_input,
@@ -160,17 +134,11 @@ def main():
     input_path = "s3://pixel-data/processed/pixelated_tier1_priority_curated_dark_humor.jsonl"
     output_prefix = "s3://pixel-data/processed_ready/"
 
-    print("🚀 S3-to-S3 Processing Pipeline")
-    print("=" * 80)
-
-    stats = process_s3_dataset_streaming(
+    process_s3_dataset_streaming(
         input_s3_path=input_path,
         output_s3_prefix=output_prefix,
         temp_batch_size=10000,  # 10k records per batch (manageable temp file size)
     )
-
-    print("\n📊 Final Statistics:")
-    print(json.dumps(stats, indent=2))
 
 
 if __name__ == "__main__":

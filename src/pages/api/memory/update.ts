@@ -1,92 +1,31 @@
-import { getCurrentUser } from '@/lib/auth'
+import {
+  getGateway,
+  jsonError,
+  jsonResponse,
+  toMemoryScope,
+  withAuthenticatedMemoryRoute,
+} from './_shared'
 
-// import type { APIRoute } from 'astro'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { MemoryService } from '../../../lib/memory'
-
-const logger = createBuildSafeLogger('memory-api')
-const memoryService = new MemoryService()
-
-export const PUT = async ({ request, cookies }) => {
-  try {
-    // Authenticate request
-    const user = await getCurrentUser(cookies)
-    if (!user) {
-      return new Response(
-        JSON.stringify({
-          error: 'Unauthorized',
-          message: 'You must be authenticated to access this endpoint',
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-    }
-
-    // Parse request body
+const handleUpdate = withAuthenticatedMemoryRoute('updating memory', async ({ request }, user) => {
     const body = await request.json()
     const { memoryId, content, metadata } = body
 
     if (!memoryId || !content) {
-      return new Response(
-        JSON.stringify({
-          error: 'Bad Request',
-          message: 'memoryId and content parameters are required',
-        }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
+      return jsonError(400, 'Bad Request', 'memoryId and content parameters are required')
     }
 
-    // Update memory
-    const result = await memoryService.updateMemory(memoryId, user.id, {
+    const result = await getGateway().updateMemory({
+      ...toMemoryScope(user.id),
+      memoryId,
       content,
-      ...metadata,
+      metadata,
     })
 
-    if (result === null) {
-      return new Response(
-        JSON.stringify({
-          error: 'Not Found',
-          message:
-            'Memory not found or you do not have permission to update it',
-        }),
-        {
-          status: 404,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-    }
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    return jsonResponse({
+      success: true,
+      memory: result,
     })
-  } catch (error: unknown) {
-    logger.error('Error updating memory:', error)
+})
 
-    return new Response(
-      JSON.stringify({
-        error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    )
-  }
-}
+export const PUT = handleUpdate
+export const PATCH = handleUpdate

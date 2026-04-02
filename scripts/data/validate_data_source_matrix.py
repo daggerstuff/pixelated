@@ -50,10 +50,9 @@ def parse_bool(val: str) -> bool | None:
     return None
 
 
-def main() -> int:
+def main() -> int:  # noqa: PLR0912
     errors: list[str] = []
     if not MATRIX_PATH.exists():
-        print(f"ERROR: Matrix not found at {MATRIX_PATH}")
         return 2
     with MATRIX_PATH.open(newline="") as f:
         reader = csv.DictReader(f)
@@ -102,9 +101,8 @@ def main() -> int:
             if license_val == "unclear" and status_val == "approved":
                 errors.append(f"{ctx}: license=unclear cannot be approval_status=approved")
             # approved requires reviewer and review_date
-            if status_val == "approved":
-                if not (row.get("reviewer") and row.get("review_date")):
-                    errors.append(f"{ctx}: approved requires reviewer and review_date")
+            if status_val == "approved" and not (row.get("reviewer") and row.get("review_date")):
+                errors.append(f"{ctx}: approved requires reviewer and review_date")
             # high risk extra check
             if (row.get("risk_level") or "").strip().lower() == "high" and status_val == "approved":
                 ac = (row.get("acceptance_criteria") or "").lower()
@@ -113,9 +111,7 @@ def main() -> int:
                         f"{ctx}: high risk approved must include mitigation/contract in acceptance_criteria"
                     )
         if errors:
-            print("VALIDATION FAILED:\n" + "\n".join(f"- {e}" for e in errors))
             return 1
-        print("Validation passed: data_source_matrix.csv is consistent.")
         return 0
 
 

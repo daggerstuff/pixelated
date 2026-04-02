@@ -16,13 +16,10 @@ from ai.pipelines.design.taxonomy_classifier import TaxonomyClassifier, Therapeu
 
 def test_classifier():
     """Test classifier on sample conversations."""
-    
-    print("="*80)
-    print("🧪 TESTING TAXONOMY CLASSIFIER")
-    print("="*80)
-    
+
+
     classifier = TaxonomyClassifier()
-    
+
     # Test cases representing different categories
     test_cases = [
         {
@@ -74,46 +71,29 @@ def test_classifier():
             "expected": TherapeuticCategory.THERAPEUTIC_CONVERSATION
         }
     ]
-    
-    print("\n")
+
     correct = 0
     total = len(test_cases)
-    
-    for i, test_case in enumerate(test_cases, 1):
-        print(f"\n{'─'*80}")
-        print(f"Test {i}/{total}: {test_case['name']}")
-        print(f"{'─'*80}")
-        
+
+    for _i, test_case in enumerate(test_cases, 1):
+
         record = {"messages": test_case["messages"]}
         classification = classifier.classify_record(record)
-        
+
         is_correct = classification.category == test_case["expected"]
-        status = "✅ CORRECT" if is_correct else "❌ INCORRECT"
-        
-        print(f"\nExpected:  {test_case['expected'].value}")
-        print(f"Predicted: {classification.category.value}")
-        print(f"Confidence: {classification.confidence:.2%}")
-        print(f"Reasoning: {classification.reasoning}")
-        print(f"Keywords: {', '.join(classification.keywords_detected[:3])}")
-        print(f"\nResult: {status}")
-        
+
+
         if is_correct:
             correct += 1
-    
+
     # Summary
     accuracy = correct / total
-    print("\n" + "="*80)
-    print("📊 TEST SUMMARY")
-    print("="*80)
-    print(f"Tests passed: {correct}/{total} ({accuracy:.1%})")
-    print(f"Target: >95% accuracy")
-    
+
     if accuracy >= 0.95:
-        print("\n✅ Classifier meets accuracy threshold!")
+        pass
     else:
-        print(f"\n⚠️  Classifier below threshold ({accuracy:.1%} < 95%)")
-        print("   Consider improving classification logic before full validation")
-    
+        pass
+
     return accuracy >= 0.95
 
 

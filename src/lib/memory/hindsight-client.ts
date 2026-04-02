@@ -2,7 +2,8 @@
  * @file hindsight-client.ts
  * @module lib/memory/hindsight-client
  * @description
- *   Native Hindsight memory client for browser/frontend use.
+ *   Product-facing memory client. This must target app/backend routes only,
+ *   never the internal shared memory service directly.
  *   Implements the core Learning Loop: Retain, Recall, and Reflect.
  */
 
@@ -31,14 +32,14 @@ export interface HindsightReflectOptions {
 }
 
 export interface HindsightClientConfig {
-  /** Base URL for the Hindsight API or proxy. */
+  /** Base URL for the app/backend proxy. */
   baseUrl?: string
   /** Default Bank ID to use if not specified in calls. */
   defaultBankId?: string
 }
 
 /**
- * Hindsight client for browser/frontend use.
+ * Hindsight client for browser/frontend use through app-owned routes.
  * 
  * Implements the agentic memory pattern:
  * 1. Retain: Store facts and experiences.
@@ -50,8 +51,8 @@ export class HindsightClient {
   private readonly defaultBankId: string
 
   constructor(config: HindsightClientConfig = {}) {
-    this.baseUrl = config.baseUrl || process.env.NEXT_PUBLIC_MEMORY_API_URL || 'https://localhost:5003'
-    this.defaultBankId = config.defaultBankId || 'pixeldated'
+    this.baseUrl = config.baseUrl || process.env.NEXT_PUBLIC_APP_ORIGIN || ''
+    this.defaultBankId = config.defaultBankId || 'pixelated'
   }
 
   private async request<T>(endpoint: string, options: RequestInit): Promise<T> {
