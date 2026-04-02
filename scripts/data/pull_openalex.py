@@ -15,12 +15,14 @@ Usage:
 import argparse
 import json
 import logging
+import sys
 import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import urlopen
 
+sys.path.insert(0, str(Path(__file__).parent))
 from pix30_utils import build_record, write_record
 
 logging.basicConfig(
@@ -31,12 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger("openalex")
 
 OPENALEX_API = "https://api.openalex.org/works"
-SEARCH_FILTER = (
-    "topics.display_name:Psychology|"
-    "topics.display_name:Psychiatry|"
-    "topics.display_name:Mental%20health|"
-    "topics.display_name:Clinical%20psychology"
-)
+SEARCH_FILTER = "default.search:psychology%2Bpsychiatry%2Bmental%2Bhealth"
 
 
 def _fetch(url: str) -> dict:
@@ -65,7 +62,7 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
             f"&per_page=200"
             f"&cursor={quote(cursor)}"
             f"&select=id,title,abstract_inverted_index,authorships,primary_location,"
-            f"publication_date,primary_topic,keywords_concepts,type"
+            f"publication_date"
         )
         data = _fetch(url)
         results = data.get("results", [])
@@ -89,7 +86,6 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
                 a.get("author", {}).get("display_name", "") for a in work.get("authorships", [])
             ]
 
-            primary_topic = work.get("primary_topic", {})
             keywords = [kw.get("display_name", "") for kw in work.get("keywords_concepts", [])[:10]]
 
             record = build_record(
@@ -105,21 +101,21 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
                     if work.get("doi")
                     else "",
                     "publication_date": work.get("publication_date", ""),
-                    "journal": work.get("primary_location", {})
-                    .get("source", {})
-                    .get("display_name", "")
-                    if work.get("primary_location")
-                    else "",
+                    "journal": (
+                        work.get("primary_location", {}).get("source", {}).get("display_name", "")
+                        if work.get("primary_location") and work["primary_location"].get("source")
+                        else ""
+                    ),
                     "mesh_terms": keywords,
                     "topic_tags": ["psychology", "psychiatry", "metadata"],
                     "therapeutic_modality": "N/A",
                     "quality_score": 0.7,
                     "openalex_id": work_id,
-                    "primary_topic": primary_topic.get("display_name", ""),
+                    "primary_topic": "",
                     "keywords": keywords,
                     "work_type": work.get("type", ""),
                 },
-                license_str="unknown",
+                license="unknown",
                 license_verified=False,
             )
 

@@ -16,11 +16,13 @@ import argparse
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
+sys.path.insert(0, str(Path(__file__).parent))
 from pix30_utils import build_record, write_record
 
 logging.basicConfig(
