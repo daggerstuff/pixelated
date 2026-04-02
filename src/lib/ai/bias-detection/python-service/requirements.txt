@@ -6,7 +6,7 @@ aif360==0.6.1
     # via bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.3
+aiohttp==3.13.4
     # via
     #   bias-detection-service (src/lib/ai/bias-detection/python-service/pyproject.toml)
     #   datasets
@@ -327,7 +327,7 @@ pandas==3.0.0
     #   evaluate
     #   fairlearn
     #   shap
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   imageio
     #   matplotlib
@@ -391,7 +391,7 @@ regex==2026.1.15
     # via
     #   nltk
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   datasets
     #   evaluate
