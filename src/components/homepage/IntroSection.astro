@@ -67,15 +67,6 @@ const { content } = Astro.props
     margin-top: var(--space-6);
   }
 
-  .home-copy--first::first-letter {
-    float: left;
-    margin: 0.08em 0.14em 0 0;
-    font-family: var(--font-display);
-    font-size: 4.4rem;
-    line-height: 0.8;
-    color: var(--ink-primary);
-  }
-
   .home-copy--subsequent {
     margin-top: var(--space-4);
   }
@@ -106,8 +97,7 @@ const { content } = Astro.props
     width: min(24rem, 42vw);
     height: min(24rem, 42vw);
     border: 1px solid rgba(17, 23, 22, 0.08);
-    border-radius: 999px;
-    opacity: 0.45;
+    opacity: 0.2;
   }
 
   .home-intro__lead {
@@ -118,10 +108,9 @@ const { content } = Astro.props
   .home-intro__panel {
     position: relative;
     padding: clamp(1.35rem, 2vw, 1.9rem);
-    border: 1px solid rgba(17, 23, 22, 0.1);
-    background: linear-gradient(180deg, rgba(17, 23, 22, 0.98), rgba(17, 23, 22, 0.95));
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
-    transform: translate(1rem, 1.25rem);
+    border: 1px solid rgba(17, 23, 22, 0.08);
+    background: linear-gradient(180deg, rgba(23, 29, 27, 0.96), rgba(23, 29, 27, 0.93));
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.06);
   }
 
   .home-intro__panel::before {
@@ -176,8 +165,8 @@ const { content } = Astro.props
   }
 
   .home-evidence-grid--spaced {
-    margin-top: var(--space-10);
-    padding-top: var(--space-6);
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
   }
 
   .home-evidence-grid--spaced::before {
@@ -192,13 +181,13 @@ const { content } = Astro.props
     min-width: 0;
     padding: clamp(1.3rem, 2vw, 1.8rem);
     border: 0;
-    background: rgba(243, 240, 231, 0.58);
+    background: rgba(243, 240, 231, 0.76);
   }
 
   .home-evidence-card--light {
     position: relative;
     background: rgba(248, 245, 237, 0.92);
-    box-shadow: 0 24px 60px rgba(17, 23, 22, 0.08);
+    box-shadow: 0 14px 32px rgba(17, 23, 22, 0.05);
   }
 
   .home-evidence-card--light::before {
@@ -210,10 +199,9 @@ const { content } = Astro.props
   }
 
   .home-evidence-card:last-child {
-    transform: translateY(2.5rem);
-    background: rgba(17, 23, 22, 0.92);
-    color: rgba(255, 255, 255, 0.92);
-    box-shadow: 0 20px 44px rgba(17, 23, 22, 0.12);
+    background: rgba(232, 228, 219, 0.94);
+    color: var(--ink-primary);
+    box-shadow: 0 14px 32px rgba(17, 23, 22, 0.04);
   }
 
   .home-evidence-card--light .home-evidence-list {
@@ -232,11 +220,6 @@ const { content } = Astro.props
     line-height: 1.65;
   }
 
-  .home-evidence-card:last-child .pe-page-panel-label,
-  .home-evidence-card:last-child .home-evidence-list {
-    color: rgba(255, 255, 255, 0.8);
-  }
-
   @media (max-width: 960px) {
     .home-intro,
     .home-evidence-grid {
@@ -247,9 +230,5 @@ const { content } = Astro.props
       display: none;
     }
 
-    .home-intro__panel,
-    .home-evidence-card:last-child {
-      transform: none;
-    }
   }
 </style>
