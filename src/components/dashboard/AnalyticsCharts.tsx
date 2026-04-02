@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import type { FC } from 'react'
 
 import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
@@ -54,7 +54,8 @@ interface TimeRangeSelectorProps {
   onChange: (range: TimeRange) => void
 }
 
-const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
+// ⚡ Bolt: Prevents unnecessary re-renders of the time range buttons when analytics data refreshes or other states change
+const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(({ value, onChange }) => {
   const options: { value: TimeRange; label: string }[] = [
     { value: '7d', label: 'Last 7 days' },
     { value: '30d', label: 'Last 30 days' },
@@ -79,7 +80,8 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
       ))}
     </div>
   )
-}
+})
+TimeRangeSelector.displayName = 'TimeRangeSelector'
 
 // Session activity chart component
 interface SessionChartProps {
