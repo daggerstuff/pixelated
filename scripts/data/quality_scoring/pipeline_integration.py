@@ -95,8 +95,8 @@ def score_jsonl_file(
         open(input_path, encoding="utf-8") as fin,
         open(output_path, "w", encoding="utf-8") as fout,
     ):
-        for line in fin:
-            line = line.strip()
+        for raw_line in fin:
+            line = raw_line.strip()
             if not line:
                 continue
 
@@ -163,8 +163,8 @@ def filter_by_decision(
         open(input_path, encoding="utf-8") as fin,
         open(output_path, "w", encoding="utf-8") as fout,
     ):
-        for line in fin:
-            line = line.strip()
+        for raw_line in fin:
+            line = raw_line.strip()
             if not line:
                 continue
 

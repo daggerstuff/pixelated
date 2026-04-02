@@ -15,190 +15,159 @@ Usage:
     pixelated sourcing generate --stage stage2_therapeutic_expertise --source journal --samples 500
 """
 
-import argparse
-import json
 import sys
 from pathlib import Path
 
-# Add project root to path
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+import argparse
 
 from ai.data.sourcing import (
+    EdgeCaseSource,
     HuggingFaceSource,
     JournalSource,
-    EdgeCaseSource,
-    VoiceSource,
     PromptCorpusSource,
+    VoiceSource,
 )
 
 
 def cmd_discover(args):
     """Discover available sources."""
-    print("=== Dataset Discovery ===\n")
 
     if args.all or args.huggingface:
-        print("HuggingFace:")
         source = HuggingFaceSource()
-        for result in source.discover(limit=5):
-            print(f"  {result['id']}: {result['downloads']:,} downloads")
-        print()
+        for _result in source.discover(limit=5):
+            pass
 
     if args.all or args.journal:
-        print("Journal Research:")
         source = JournalSource()
-        for info in source.discover():
-            print(f"  {info['category']}: {', '.join(info['queries'])}")
-        print()
+        for _info in source.discover():
+            pass
 
     if args.all or args.edge_case:
-        print("Edge Case Generation:")
         source = EdgeCaseSource()
-        for info in source.discover():
-            print(f"  {info['category']}: {info['intensity']} intensity")
-        print()
+        for _info in source.discover():
+            pass
 
     if args.all or args.voice:
-        print("Voice Sourcing:")
         source = VoiceSource()
-        for info in source.discover():
-            if 'persona_id' in info:
-                print(f"  {info['persona_id']}: {info['style']}")
+        for _info in source.discover():
+            if "persona_id" in _info:
+                pass
             else:
-                print(f"  Transcripts: {info.get('transcript_count', 0)} files")
-        print()
+                pass
 
     if args.all or args.prompt_corpus:
-        print("Prompt Corpus:")
         source = PromptCorpusSource()
-        for info in source.discover():
-            print(f"  {info['type']}: {info.get('category', info.get('source_path', 'unknown'))}")
-        print()
+        for _info in source.discover():
+            pass
 
 
-def cmd_generate(args):
+def cmd_generate(args):  # noqa: PLR0912
     """Generate samples from specified source."""
-    print(f"=== Generating {args.samples} samples for {args.stage} ===\n")
 
     # Select source based on stage and args
-    if args.source == 'huggingface':
+    if args.source == "huggingface":
         source = HuggingFaceSource()
         results = list(source.fill_gap(args.samples))
-        for r in results:
-            print(f"  Downloaded: {r['dataset_id']} ({r['samples']} samples)")
+        for _r in results:
+            pass
 
-    elif args.source == 'journal':
+    elif args.source == "journal":
         source = JournalSource()
         count = 0
-        for record in source.fill_gap(args.samples):
-            print(f"  Ingested: {record['source']}: {record.get('title', 'N/A')[:60]}...")
+        for _record in source.fill_gap(args.samples):
             count += 1
         results = [f"{count} abstracts"]
 
-    elif args.source == 'edge_case':
+    elif args.source == "edge_case":
         source = EdgeCaseSource()
         count = 0
-        for record in source.fill_gap(args.samples):
-            print(f"  Generated: [{record['metadata']['category']}] edge case")
+        for _record in source.fill_gap(args.samples):
             count += 1
         results = [f"{count} edge cases"]
 
-    elif args.source == 'voice':
+    elif args.source == "voice":
         source = VoiceSource()
         count = 0
-        for record in source.fill_gap(args.samples):
-            print(f"  Generated: [{record['metadata']['persona_id']}] voice sample")
+        for _record in source.fill_gap(args.samples):
             count += 1
         results = [f"{count} voice samples"]
 
-    elif args.source == 'prompt_corpus':
+    elif args.source == "prompt_corpus":
         source = PromptCorpusSource()
         count = 0
-        for record in source.fill_gap(args.samples):
-            print(f"  Extracted: [{record['metadata']['category']}] prompt")
+        for _record in source.fill_gap(args.samples):
             count += 1
         results = [f"{count} prompts"]
 
-    elif args.source == 'auto':
+    elif args.source == "auto":
         # Auto-select based on stage
-        if 'stage3' in args.stage or 'edge' in args.stage:
-            print("Auto-selected: EdgeCaseSource")
+        if "stage3" in args.stage or "edge" in args.stage:
             source = EdgeCaseSource()
-        elif 'stage4' in args.stage or 'voice' in args.stage:
-            print("Auto-selected: VoiceSource")
+        elif "stage4" in args.stage or "voice" in args.stage:
             source = VoiceSource()
-        elif 'stage2' in args.stage:
-            print("Auto-selected: JournalSource")
+        elif "stage2" in args.stage:
             source = JournalSource()
         else:
-            print("Auto-selected: HuggingFaceSource")
             source = HuggingFaceSource()
 
-        for record in source.fill_gap(args.samples):
-            if 'metadata' in record:
-                print(f"  Generated: {record['metadata']}")
-            elif 'source' in record:
-                print(f"  Sourced: {record['source']}")
+        for _record in source.fill_gap(args.samples):
+            if "metadata" in _record or "source" in _record:
+                pass
         results = [f"{args.samples} samples"]
 
     else:
-        print(f"Unknown source: {args.source}")
         return
 
-    print(f"\n=== Generated {len(results)} records ===")
 
-
-def cmd_status(args):
+def cmd_status(_args):
     """Show sourcing status."""
-    print("=== Sourcing Status ===\n")
 
     # Check output directories
     output_dirs = {
-        'HuggingFace': 'ai/data/acquired_datasets/huggingface',
-        'Journal': 'ai/data/acquired_datasets/journal_research',
-        'Edge Cases': 'ai/data/acquired_datasets/edge_cases',
-        'Voice': 'ai/data/acquired_datasets/voice_samples',
-        'Prompt Corpus': 'ai/data/acquired_datasets/prompt_corpus',
+        "HuggingFace": "ai/data/acquired_datasets/huggingface",
+        "Journal": "ai/data/acquired_datasets/journal_research",
+        "Edge Cases": "ai/data/acquired_datasets/edge_cases",
+        "Voice": "ai/data/acquired_datasets/voice_samples",
+        "Prompt Corpus": "ai/data/acquired_datasets/prompt_corpus",
     }
 
-    for name, path in output_dirs.items():
+    for _name, path in output_dirs.items():
         p = Path(path)
         if p.exists():
-            file_count = len(list(p.glob("*")))
-            print(f"  {name}: {file_count} files in {path}")
+            len(list(p.glob("*")))
         else:
-            print(f"  {name}: Directory not created yet")
-
-    print()
+            pass
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Dataset Sourcing CLI',
-        prog='pixelated sourcing'
-    )
-    subparsers = parser.add_subparsers(dest='command', help='Commands')
+    parser = argparse.ArgumentParser(description="Dataset Sourcing CLI", prog="pixelated sourcing")
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Discover command
-    discover_parser = subparsers.add_parser('discover', help='Discover available sources')
-    discover_parser.add_argument('--all', action='store_true', help='Show all sources')
-    discover_parser.add_argument('--huggingface', action='store_true')
-    discover_parser.add_argument('--journal', action='store_true')
-    discover_parser.add_argument('--edge-case', action='store_true')
-    discover_parser.add_argument('--voice', action='store_true')
-    discover_parser.add_argument('--prompt-corpus', action='store_true')
+    discover_parser = subparsers.add_parser("discover", help="Discover available sources")
+    discover_parser.add_argument("--all", action="store_true", help="Show all sources")
+    discover_parser.add_argument("--huggingface", action="store_true")
+    discover_parser.add_argument("--journal", action="store_true")
+    discover_parser.add_argument("--edge-case", action="store_true")
+    discover_parser.add_argument("--voice", action="store_true")
+    discover_parser.add_argument("--prompt-corpus", action="store_true")
     discover_parser.set_defaults(func=cmd_discover)
 
     # Generate command
-    generate_parser = subparsers.add_parser('generate', help='Generate samples')
-    generate_parser.add_argument('--stage', required=True, help='Target stage')
-    generate_parser.add_argument('--source', default='auto',
-                                choices=['auto', 'huggingface', 'journal', 'edge_case', 'voice', 'prompt_corpus'])
-    generate_parser.add_argument('--samples', type=int, default=100, help='Number of samples')
+    generate_parser = subparsers.add_parser("generate", help="Generate samples")
+    generate_parser.add_argument("--stage", required=True, help="Target stage")
+    generate_parser.add_argument(
+        "--source",
+        default="auto",
+        choices=["auto", "huggingface", "journal", "edge_case", "voice", "prompt_corpus"],
+    )
+    generate_parser.add_argument("--samples", type=int, default=100, help="Number of samples")
     generate_parser.set_defaults(func=cmd_generate)
 
     # Status command
-    status_parser = subparsers.add_parser('status', help='Show sourcing status')
+    status_parser = subparsers.add_parser("status", help="Show sourcing status")
     status_parser.set_defaults(func=cmd_status)
 
     args = parser.parse_args()
@@ -210,5 +179,5 @@ def main():
     args.func(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

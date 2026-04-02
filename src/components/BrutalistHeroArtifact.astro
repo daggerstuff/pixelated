@@ -204,8 +204,37 @@ const { artifact } = Astro.props
   }
 
   @media (max-width: 640px) {
+    .hero-artifact {
+      padding: clamp(1rem, 4vw, 1.4rem);
+      gap: var(--space-4);
+    }
+
+    .hero-artifact__title {
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+    }
+
     .hero-artifact__readout {
       grid-template-columns: 1fr;
+      gap: var(--space-2);
+    }
+
+    .hero-artifact__metric {
+      padding: 0.6rem 0.7rem;
+    }
+
+    .hero-artifact__figure {
+      border-radius: 0.25rem;
+    }
+
+    .hero-artifact__facts,
+    .hero-artifact__outputs {
+      gap: var(--space-2);
+    }
+
+    .hero-artifact__fact dd,
+    .hero-artifact__output strong,
+    .hero-artifact__metric strong {
+      font-size: var(--text-xs);
     }
   }
 </style>

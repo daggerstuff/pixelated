@@ -1,104 +1,97 @@
-import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
+import {
+  assertRequestedUser,
+  getGateway,
+  jsonError,
+  jsonResponse,
+  parsePagination,
+  toMemoryScope,
+  withAuthenticatedMemoryRoute,
+} from './_shared'
 
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { MemoryService } from '../../../lib/memory'
-
-const logger = createBuildSafeLogger('memory-api')
-const memoryService = new MemoryService()
-
-export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
-  try {
-    // Authentication is handled by middleware, so we can safely access user data
-    // The user object is attached to the request by the middleware
-    const user = request.user
-
-    if (!user) {
-      return new Response(
-        JSON.stringify({
-          error: 'Unauthorized',
-          message: 'You must be authenticated to access this endpoint',
-        }),
-        {
-          status: 401,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-    }
-
-    // Parse query parameters
+export const GET = withAuthenticatedMemoryRoute('searching memories', async ({ request }, user) => {
     const url = new URL(request.url)
     const query = url.searchParams.get('q')
-    let limit = parseInt(url.searchParams.get('limit') || '50', 10)
-    let offset = parseInt(url.searchParams.get('offset') || '0', 10)
+    const { limit, offset } = parsePagination(url)
+    const requestedUserId = url.searchParams.get('userId')
+
+    const userError = assertRequestedUser(user.id, requestedUserId)
+    if (userError) {
+      return userError
+    }
 
     if (!query) {
-      return new Response(
-        JSON.stringify({
-          error: 'Bad Request',
-          message: 'Search query parameter (q) is required',
-        }),
-        {
-          status: 400,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+      return jsonError(
+        400,
+        'Bad Request',
+        'Search query parameter (q) is required',
       )
-    }
-
-    // Validate limit and offset
-    if (isNaN(limit) || limit < 1 || limit > 100) {
-      limit = 50
-    }
-    if (isNaN(offset) || offset < 0) {
-      offset = 0
     }
 
     // Search memories
-    const result = await memoryService.searchMemories(user.id, query, {
+    const result = await getGateway().searchMemories({
+      ...toMemoryScope(user.id),
+      query,
       limit,
       offset,
     })
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        memories: result,
-        query,
-        pagination: {
-          limit,
-          offset,
-          total: result.length,
-        },
-        user: {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    return jsonResponse({
+      success: true,
+      memories: result.memories,
+      query,
+      pagination: {
+        limit,
+        offset,
+        total: result.total,
       },
-    )
-  } catch (error: unknown) {
-    logger.error('Error searching memories:', error)
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+    })
+})
 
-    return new Response(
-      JSON.stringify({
-        error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
-      }),
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+export const POST = withAuthenticatedMemoryRoute('searching memories', async ({ request }, user) => {
+    const body = await request.json()
+    const query = typeof body.query === 'string' ? body.query : body.q
+    const requestedUserId = body.user_id ?? body.userId
+    const limit =
+      Number.isFinite(body.limit) && body.limit > 0
+        ? Math.min(body.limit, 100)
+        : 10
+
+    const userError = assertRequestedUser(user.id, requestedUserId)
+    if (userError) {
+      return userError
+    }
+
+    if (!query) {
+      return jsonError(
+        400,
+        'Bad Request',
+        'Search query parameter (query) is required',
+      )
+    }
+
+    const result = await getGateway().searchMemories({
+      ...toMemoryScope(user.id),
+      query,
+      limit,
+      offset: 0,
+    })
+
+    return jsonResponse({
+      success: true,
+      memories: result.memories,
+      query,
+      pagination: {
+        limit,
+        offset: 0,
+        total: result.total,
       },
-    )
-  }
-}
+      user: {
+        id: user.id,
+        role: user.role,
+      },
+    })
+})

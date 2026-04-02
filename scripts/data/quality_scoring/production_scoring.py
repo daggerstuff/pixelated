@@ -28,7 +28,6 @@ try:
         QualityAssessmentFramework,
     )
     from ai.dataset_pipeline.quality.safety_ethics_validator import (
-        HarmfulContentType,
         SafetyEthicsValidator,
     )
 
@@ -234,7 +233,7 @@ class ProductionSignalComputer:
             harm=self._clamp01(harm),
         )
 
-    def _compute_empathy(self, text: str, text_lower: str) -> float:
+    def _compute_empathy(self, _text: str, text_lower: str) -> float:
         """Compute empathy score."""
         # Try production validator first
         if self.empathy_validator:
@@ -341,15 +340,12 @@ class ProductionSignalComputer:
         """Compute domain relevance (therapeutic/mental health relevance)."""
         # Count keyword matches across categories
         total_matches = 0
-        for category, keywords in self.therapeutic_keywords.items():
+        for _category, keywords in self.therapeutic_keywords.items():
             matches = sum(1 for keyword in keywords if keyword in text_lower)
             total_matches += matches
 
         # Normalize (expect 2-5 matches for relevant content)
-        if total_matches > 0:
-            domain_score = min(1.0, total_matches / 5.0)
-        else:
-            domain_score = 0.0
+        domain_score = min(1.0, total_matches / 5.0) if total_matches > 0 else 0.0
 
         # Boost if multiple categories present
         categories_present = sum(
@@ -363,7 +359,7 @@ class ProductionSignalComputer:
 
         return domain_score
 
-    def _compute_harmfulness(self, text: str, text_lower: str) -> float:
+    def _compute_harmfulness(self, _text: str, text_lower: str) -> float:
         """Compute harmfulness score (higher = more harmful)."""
         # Try production safety validator first
         if self.safety_validator:
@@ -437,7 +433,7 @@ def compute_signals(text: str) -> Signals:
     Returns:
         Signals object with empathy, fidelity, domain, harm scores
     """
-    global _computer
+    global _computer  # noqa: PLW0603
     if _computer is None:
         _computer = ProductionSignalComputer()
     return _computer.compute_signals(text)

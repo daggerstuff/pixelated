@@ -288,3 +288,8 @@ gha-creds-*.json
 # Playwright
 /blob-report/
 /playwright/.auth/
+
+.playwright-mcp
+.reports
+.uv-cache
+.local-memory
