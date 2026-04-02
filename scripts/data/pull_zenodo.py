@@ -32,10 +32,9 @@ ACCEPTED_LICENSES = {"cc-by-4.0", "cc-by-3.0", "cc-by-sa-4.0", "cc0-1.0", "mit"}
 
 SEARCH_QUERY = (
     "q=mental+health+OR+psychotherapy+OR+clinical+psychology+OR+therapy"
-    "&access_right=open"
-    "&file_type=csv&file_type=json&file_type=xlsx"
+    "&access_status=open"
     "&sort=mostviewed"
-    "&size=100"
+    "&size=25"
 )
 
 

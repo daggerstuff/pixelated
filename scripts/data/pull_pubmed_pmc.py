@@ -54,10 +54,10 @@ FULLTEXT_QUERY = (
 )
 
 
-def _esearch(query: str, retmax: int = 10000, retstart: int = 0) -> list[str]:
+def _esearch(query: str, retmax: int = 10000, retstart: int = 0, db: str = "pubmed") -> list[str]:
     """Search NCBI and return list of PMIDs."""
     params = {
-        "db": "pubmed",
+        "db": db,
         "term": query,
         "retmode": "json",
         "retmax": retmax,
@@ -77,10 +77,10 @@ def _esearch(query: str, retmax: int = 10000, retstart: int = 0) -> list[str]:
         return []
 
 
-def _efetch_pmids(pmids: list[str], retmode: str = "text") -> str:
+def _efetch_pmids(pmids: list[str], retmode: str = "text", db: str = "pubmed") -> str:
     """Fetch abstracts for a list of PMIDs."""
     params = {
-        "db": "pubmed",
+        "db": db,
         "id": ",".join(pmids),
         "retmode": retmode,
         "rettype": "abstract",
@@ -285,9 +285,16 @@ def pull_abstracts(output_dir: Path, target: int) -> int:
             if not xml_text:
                 continue
 
+            # Strip XML declaration before wrapping
+            xml_clean = xml_text
+            if xml_clean.startswith("<?xml"):
+                xml_clean = xml_clean.split("?>", 1)[1].strip()
+            if xml_clean.startswith("<!DOCTYPE"):
+                xml_clean = xml_clean.split(">", 1)[1].strip()
+
             # Parse XML (may contain multiple PubmedArticle elements)
             try:
-                root = ET.fromstring(f"<root>{xml_text}</root>")
+                root = ET.fromstring(f"<root>{xml_clean}</root>")
             except ET.ParseError:
                 continue
 
@@ -322,7 +329,7 @@ def pull_fulltexts(output_dir: Path, target: int) -> int:
 
     for retstart in range(0, target, batch_size):
         retmax = min(batch_size, target - retstart)
-        pmids = _esearch(FULLTEXT_QUERY, retmax=retmax, retstart=retstart)
+        pmids = _esearch(FULLTEXT_QUERY, retmax=retmax, retstart=retstart, db="pmc")
         if not pmids:
             break
 
@@ -334,7 +341,7 @@ def pull_fulltexts(output_dir: Path, target: int) -> int:
 
         with output_file.open("a", encoding="utf-8") as f:
             for pmid in new_pmids:
-                xml_text = _efetch_pmids([pmid], retmode="xml")
+                xml_text = _efetch_pmids([pmid], retmode="xml", db="pmc")
                 if not xml_text:
                     continue
 
