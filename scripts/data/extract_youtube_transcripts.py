@@ -377,7 +377,7 @@ class YouTubeTranscriptExtractor:
                     transcript = api.fetch(video_id, languages=[language])
 
                     # Combine all text segments using .text property
-                    full_text = " ".join([snippet["text"] for snippet in transcript])
+                    full_text = " ".join([snippet.text for snippet in transcript])
 
                     # Clean up text
                     full_text = self._clean_transcript_text(full_text)
