@@ -91,6 +91,9 @@ class YouTubeExtractionConfig:
     # Proxy configuration for cloud environments (YouTube blocks cloud IPs)
     proxy_url: str | None = None  # e.g., "http://proxy:8080" or "socks5://proxy:1080"
 
+    # Proxy configuration for cloud environments (YouTube blocks cloud IPs)
+    proxy_url: str | None = None  # e.g., "http://proxy:8080" or "socks5://proxy:1080"
+
 
 @dataclass
 class VideoMetadata:
@@ -619,6 +622,11 @@ def main():
         default="youtube_transcripts/",
         help="S3 prefix for uploaded files (default: youtube_transcripts/)",
     )
+    parser.add_argument(
+        "--proxy",
+        help="Proxy URL for YouTube requests (e.g., 'http://proxy:8080' or 'socks5://proxy:1080'). "
+             "Required in cloud environments where YouTube blocks IP addresses.",
+    )
 
     args = parser.parse_args()
 
@@ -633,6 +641,7 @@ def main():
         youtube_api_key=api_key,
         apply_safety_filter=not args.skip_safety,
         apply_classification=not args.skip_classification,
+        proxy_url=args.proxy,
     )
 
     # Initialize extractor
