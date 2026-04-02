@@ -51,17 +51,27 @@ def _search(api_key: str, offset: int = 0) -> dict:
         return {}
 
 
-def _get_fulltext(api_key: str, work_id: str) -> str:
-    """Get full text for a CORE work."""
+def _get_fulltext(api_key: str, work_id: str, max_retries: int = 3) -> str:
+    """Get full text for a CORE work with exponential backoff retry."""
     url = f"{CORE_API}/works/{work_id}/fullText"
     req = Request(url, headers={"Authorization": f"Bearer {api_key}"})
-    try:
-        with urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode())
-            return data.get("fullText", "")
-    except (HTTPError, Exception) as e:
-        logger.warning("CORE fulltext error for %s: %s", work_id, e)
-        return ""
+    for attempt in range(max_retries):
+        try:
+            with urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read().decode())
+                return data.get("fullText", "")
+        except (HTTPError, Exception) as e:
+            if attempt < max_retries - 1:
+                delay = 2**attempt
+                logger.warning(
+                    "CORE fulltext retry %d/%d for %s: %s", attempt + 1, max_retries, work_id, e
+                )
+                time.sleep(delay)
+            else:
+                logger.warning(
+                    "CORE fulltext failed for %s after %d retries: %s", work_id, max_retries, e
+                )
+    return ""
 
 
 def pull_papers(output_dir: Path, api_key: str, limit: int) -> int:
