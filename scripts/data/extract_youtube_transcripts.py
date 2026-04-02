@@ -377,7 +377,7 @@ class YouTubeTranscriptExtractor:
                     transcript = api.fetch(video_id, languages=[language])
 
                     # Combine all text segments using .text property
-                    full_text = " ".join([snippet.text for snippet in transcript])
+                    full_text = " ".join([snippet["text"] for snippet in transcript])
 
                     # Clean up text
                     full_text = self._clean_transcript_text(full_text)
@@ -520,6 +520,49 @@ class YouTubeTranscriptExtractor:
 
         logger.info(f"✅ Saved {len(records)} records to {output_path}")
 
+    def upload_to_s3(self, file_path: Path, s3_key: str) -> bool:
+        """Upload file to S3 bucket.
+
+        Requires OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY environment variables.
+        """
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+
+            # Get S3 credentials from environment
+            endpoint_url = os.getenv("OVH_S3_ENDPOINT", "https://s3.us-east-va.io.cloud.ovh.us")
+            access_key = os.getenv("OVH_S3_ACCESS_KEY") or os.getenv("AWS_ACCESS_KEY_ID")
+            secret_key = os.getenv("OVH_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+            region = os.getenv("OVH_S3_REGION", "us-east-va")
+            bucket = os.getenv("OVH_S3_BUCKET", "pixel-data")
+
+            if not access_key or not secret_key:
+                logger.error(
+                    "❌ S3 credentials not found. Set OVH_S3_ACCESS_KEY and OVH_S3_SECRET_KEY"
+                )
+                return False
+
+            # Create S3 client
+            s3_client = boto3.client(
+                "s3",
+                endpoint_url=endpoint_url,
+                aws_access_key_id=access_key,
+                aws_secret_access_key=secret_key,
+                region_name=region,
+            )
+
+            # Upload file
+            s3_client.upload_file(str(file_path), bucket, s3_key)
+            logger.info(f"✅ Uploaded to S3: s3://{bucket}/{s3_key}")
+            return True
+
+        except ClientError as e:
+            logger.error(f"❌ S3 upload failed: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"❌ S3 upload error: {e}")
+            return False
+
 
 def main():
     """Main entry point for YouTube transcript extraction."""
@@ -552,6 +595,16 @@ def main():
         "--skip-classification",
         action="store_true",
         help="Skip therapeutic category classification",
+    )
+    parser.add_argument(
+        "--upload-s3",
+        action="store_true",
+        help="Upload output to S3 bucket (requires OVH_S3 credentials)",
+    )
+    parser.add_argument(
+        "--s3-prefix",
+        default="youtube_transcripts/",
+        help="S3 prefix for uploaded files (default: youtube_transcripts/)",
     )
 
     args = parser.parse_args()
@@ -612,7 +665,25 @@ def main():
     if processed_records:
         extractor.save_to_jsonl(processed_records, args.output)
 
+        # Upload to S3 if requested
+        if args.upload_s3:
+            from datetime import datetime
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            s3_key = f"{args.s3_prefix}youtube_transcripts_{timestamp}.jsonl"
+            extractor.upload_to_s3(args.output, s3_key)
+
         # Print summary
+        print("\n" + "=" * 80)
+        print("📊 PIX-4 EXTRACTION SUMMARY")
+        print("=" * 80)
+        print(f"Total videos found: {len(all_videos)}")
+        print(f"Successfully processed: {len(processed_records)}")
+        print(f"Crisis-flagged videos: {sum(1 for r in processed_records if r.crisis_flag)}")
+        print(f"Output file: {args.output}")
+        if args.upload_s3:
+            print(f"S3 upload: {args.s3_prefix}")
+        print("=" * 80)
 
         # Print category breakdown
         categories = {}
@@ -620,8 +691,9 @@ def main():
             cat = record.therapeutic_category or "uncategorized"
             categories[cat] = categories.get(cat, 0) + 1
 
-        for _cat, _count in sorted(categories.items(), key=lambda x: x[1], reverse=True):
-            pass
+        print("\nTherapeutic Categories:")
+        for cat, count in sorted(categories.items(), key=lambda x: x[1], reverse=True):
+            print(f" - {cat}: {count}")
     else:
         logger.warning("⚠️ No transcripts extracted")
 
