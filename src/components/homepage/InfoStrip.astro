@@ -3,7 +3,7 @@ export interface Props {
   label: string
   title: string
   body: string
-  items: Array<{ label: string; value: string }>
+  items: readonly { label: string; value: string }[]
   theme?: 'paper' | 'dark'
   className?: string
 }
@@ -40,6 +40,16 @@ const {
     grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
     gap: clamp(1.5rem, 3vw, 3rem);
     padding: clamp(1.65rem, 2.2vw, 2.5rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-strip::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--accent-primary), rgba(136, 201, 165, 0.08));
   }
 
   .info-strip__lead {
@@ -57,7 +67,7 @@ const {
     display: grid;
     gap: var(--space-2);
     min-width: 0;
-    padding-left: var(--space-4);
+    padding: 0.4rem 0 0.4rem var(--space-4);
   }
 
   .info-strip__item span {
@@ -76,6 +86,7 @@ const {
     border: 1px solid var(--ink-border);
     background: var(--surface-paper-panel);
     color: var(--ink-primary);
+    box-shadow: 0 18px 40px rgba(17, 23, 22, 0.05);
   }
 
   .info-strip--paper .info-strip__lead :is(h3, p) {
@@ -100,6 +111,7 @@ const {
       linear-gradient(180deg, rgba(238, 235, 225, 0.96), rgba(232, 229, 220, 0.92)),
       linear-gradient(135deg, rgba(136, 201, 165, 0.06), transparent 70%);
     color: var(--ink-primary);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.12);
   }
 
   .info-strip--dark .info-strip__lead :is(h3, p) {

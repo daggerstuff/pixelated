@@ -61,7 +61,7 @@ const { content } = Astro.props
 
   .home-card-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-6);
   }
 
@@ -79,15 +79,12 @@ const { content } = Astro.props
   }
 
   .home-card--featured {
-    grid-row: span 2;
-    align-content: end;
-    min-height: 100%;
     background:
       linear-gradient(180deg, rgba(125, 211, 168, 0.13), rgba(125, 211, 168, 0.03) 38%, rgba(255, 255, 255, 0.018));
   }
 
   .home-card--featured h3 {
-    font-size: clamp(1.8rem, 1.45rem + 0.8vw, 2.4rem);
+    font-size: clamp(1.4rem, 1.2rem + 0.45vw, 1.85rem);
     max-width: 14ch;
   }
 

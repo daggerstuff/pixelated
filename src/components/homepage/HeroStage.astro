@@ -1,0 +1,52 @@
+<div class="hero-stage">
+  <div class="hero-stage__frame hero-stage__frame--left"></div>
+  <div class="hero-stage__frame hero-stage__frame--right"></div>
+  <slot />
+</div>
+
+<style>
+  .hero-stage {
+    position: relative;
+    display: grid;
+    gap: 1.35rem;
+    padding: clamp(1.1rem, 1.8vw, 1.45rem);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01)),
+      rgba(8, 12, 13, 0.48);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 30px 80px rgba(0, 0, 0, 0.2);
+    overflow: clip;
+  }
+
+  .hero-stage__frame {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 1px;
+    background: linear-gradient(180deg, rgba(125, 211, 168, 0.65), rgba(125, 211, 168, 0));
+    pointer-events: none;
+  }
+
+  .hero-stage__frame--left {
+    left: clamp(0.7rem, 1.5vw, 1rem);
+  }
+
+  .hero-stage__frame--right {
+    left: auto;
+    right: clamp(0.7rem, 1.5vw, 1rem);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0));
+  }
+
+  @media (max-width: 1080px) {
+    .hero-stage {
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-stage {
+      padding: 0.85rem;
+    }
+  }
+</style>

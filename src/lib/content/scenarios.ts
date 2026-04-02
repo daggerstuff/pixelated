@@ -1,6 +1,6 @@
 export const scenariosContent = {
-  label: 'What you can practice',
-  title: 'Use it on the conversations clinicians least want to improvise in the room.',
+  label: 'Where teams start',
+  title: 'Start with the conversations clinicians should not have to improvise under pressure.',
   cards: [
     {
       kicker: 'Escalation',
@@ -8,25 +8,25 @@ export const scenariosContent = {
       body: 'Practice suicidality screening, de-escalation, safety planning, and what to say when the room changes faster than the clinician expected.',
     },
     {
-      kicker: 'Complex Dynamics',
-      title: 'Trauma, shutdown, anger, and rupture',
-      body: 'Work through avoidance, dysregulation, mistrust, emotional withdrawal, and the repairs that determine whether a client stays in the conversation.',
+      kicker: 'Rupture',
+      title: 'Shutdown, mistrust, anger, and repair',
+      body: 'Work through avoidance, dysregulation, emotional withdrawal, and the repairs that determine whether a client stays in the conversation.',
     },
     {
-      kicker: 'Rupture Repair',
-      title: 'Alliance strain, mistrust, and therapeutic misattunement',
-      body: 'Practice the moments where a client withdraws, flares, tests the therapist, or stops trusting the room, then work the repair without improvising blind.',
+      kicker: 'Disclosure',
+      title: 'The moment the room changes',
+      body: 'Practice the turn where a client discloses something high-stakes and the therapist has to decide what to do next without flattening the room.',
     },
   ],
   strip: {
     label: 'Who it is built for',
-    title: 'Use it in the teams that have to rehearse difficult judgment under pressure.',
+    title: 'Use it anywhere one hard case needs to be run, reviewed, and compared.',
     body:
-      'The strongest fit is any training environment where one hard case needs to be run more than once and reviewed by more than one person.',
+      'The strongest fit is any training environment where one difficult conversation needs to be run more than once and reviewed by more than one person.',
     items: [
-      { label: 'Graduate programs', value: 'For repeatable trainee rehearsal' },
-      { label: 'Supervision teams', value: 'For concrete review and coaching' },
-      { label: 'Care organizations', value: 'For high-stakes communication practice' },
+      { label: 'Graduate programs', value: 'Repeatable trainee rehearsal' },
+      { label: 'Supervision teams', value: 'Concrete review and coaching' },
+      { label: 'Care organizations', value: 'High-stakes communication practice' },
     ],
   },
 } as const

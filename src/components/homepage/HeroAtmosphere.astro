@@ -1,4 +1,5 @@
 <div class="hero-atmosphere" aria-hidden="true">
+  <div class="hero-atmosphere__spine"></div>
   <div class="hero-atmosphere__plane hero-atmosphere__plane--left"></div>
   <div class="hero-atmosphere__plane hero-atmosphere__plane--right"></div>
   <div class="hero-atmosphere__beam"></div>
@@ -16,10 +17,20 @@
   }
 
   .hero-atmosphere__plane,
+  .hero-atmosphere__spine,
   .hero-atmosphere__beam,
   .hero-atmosphere__glow,
   .hero-atmosphere__grid {
     position: absolute;
+  }
+
+  .hero-atmosphere__spine {
+    top: 0;
+    bottom: 0;
+    left: clamp(1.2rem, 4vw, 4rem);
+    width: 1px;
+    background: linear-gradient(180deg, transparent 0%, rgba(125, 211, 168, 0.34) 18%, rgba(255, 255, 255, 0.08) 52%, rgba(125, 211, 168, 0.16) 82%, transparent 100%);
+    opacity: 0.9;
   }
 
   .hero-atmosphere__plane--left {
@@ -80,15 +91,19 @@
   .hero-atmosphere__grid {
     inset: 0;
     background-image:
-      linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+      linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
     background-position: center center;
-    background-size: 72px 72px;
+    background-size: 88px 88px;
     mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), transparent 82%);
-    opacity: 0.08;
+    opacity: 0.1;
   }
 
   @media (max-width: 768px) {
+    .hero-atmosphere__spine {
+      left: 1rem;
+    }
+
     .hero-atmosphere__plane--left {
       width: 92vw;
       height: 62vw;
