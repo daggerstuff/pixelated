@@ -1,0 +1,17 @@
+[Unit]
+Description=Pixelated shared memory service
+After=network.target
+
+[Service]
+Type=simple
+User=__USER__
+Group=__GROUP__
+WorkingDirectory=__WORKDIR__
+EnvironmentFile=__ENV_FILE__
+StateDirectory=pixelated-memory
+ExecStart=__START_SCRIPT__
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
