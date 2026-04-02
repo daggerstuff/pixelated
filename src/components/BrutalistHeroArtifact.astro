@@ -7,9 +7,9 @@ export interface Props {
     mode: string
     image?: string
     imageAlt?: string
-    context: Array<{ label: string; value: string }>
-    outputs: Array<{ label: string; value: string }>
-    readout: Array<{ label: string; value: string }>
+    context: readonly { label: string; value: string }[]
+    outputs: readonly { label: string; value: string }[]
+    readout: readonly { label: string; value: string }[]
   }
 }
 
@@ -17,6 +17,15 @@ const { artifact } = Astro.props
 ---
 
 <aside class="hero-artifact" aria-label="Session review artifact">
+  <div class="hero-artifact__readout">
+    {artifact.readout.map((item) => (
+      <div class="hero-artifact__metric">
+        <span>{item.label}</span>
+        <strong>{item.value}</strong>
+      </div>
+    ))}
+  </div>
+
   <div class="hero-artifact__header">
     <div>
       <span class="hero-artifact__eyebrow">{artifact.eyebrow}</span>
@@ -29,16 +38,21 @@ const { artifact } = Astro.props
   </div>
 
   <div class="hero-artifact__block">
-    <span class="hero-artifact__label">In-product capture</span>
+    <span class="hero-artifact__label">Live product capture</span>
     {artifact.image ? (
       <figure class="hero-artifact__figure">
+        <div class="hero-artifact__stamp">Session evidence</div>
         <img src={artifact.image} alt={artifact.imageAlt || artifact.status} class="hero-artifact__image" loading="eager" decoding="async" width="1440" height="1200" srcset="/images/homepage/training-session-proof-640.png 640w, /images/homepage/training-session-proof-960.png 960w, /images/homepage/training-session-proof.png 1440w" sizes="(max-width: 768px) 92vw, (max-width: 1200px) 36vw, 400px" />
+        <figcaption class="hero-artifact__note">
+          <span class="hero-artifact__note-label">Supervisor note</span>
+          <strong>One run. One visible decision. One clearer retry.</strong>
+        </figcaption>
       </figure>
     ) : null}
   </div>
 
   <div class="hero-artifact__block">
-    <span class="hero-artifact__label">What makes it useful</span>
+    <span class="hero-artifact__label">Why it earns review time</span>
     <dl class="hero-artifact__facts">
       {artifact.context.map((item) => (
         <div class="hero-artifact__fact">
@@ -49,8 +63,8 @@ const { artifact } = Astro.props
     </dl>
   </div>
 
-  <div class="hero-artifact__block">
-    <span class="hero-artifact__label">Recorded outputs</span>
+  <div class="hero-artifact__block hero-artifact__block--dense">
+    <span class="hero-artifact__label">What stays attached to the run</span>
     <div class="hero-artifact__outputs">
       {artifact.outputs.map((item) => (
         <div class="hero-artifact__output">
@@ -61,14 +75,6 @@ const { artifact } = Astro.props
     </div>
   </div>
 
-  <div class="hero-artifact__readout">
-    {artifact.readout.map((item) => (
-      <div class="hero-artifact__metric">
-        <span>{item.label}</span>
-        <strong>{item.value}</strong>
-      </div>
-    ))}
-  </div>
 </aside>
 
 <style>
@@ -76,19 +82,43 @@ const { artifact } = Astro.props
     position: relative;
     align-self: center;
     display: grid;
-    gap: var(--space-5);
-    width: min(100%, 26.5rem);
+    gap: var(--space-4);
+    width: min(100%, 30rem);
     margin-left: auto;
-    padding: clamp(1.3rem, 1.8vw, 1.85rem);
+    padding: clamp(1rem, 1.5vw, 1.35rem);
     background: var(--surface-paper-gradient-soft);
     color: var(--ink-primary);
     border: 1px solid var(--ink-border);
-    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.28);
+    isolation: isolate;
+    transform: rotate(1.2deg);
+    transform-origin: center top;
+    animation: artifact-settle 900ms var(--ease-out) both;
+  }
+
+  .hero-artifact::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, rgba(47, 107, 77, 0.9), rgba(47, 107, 77, 0.08));
+  }
+
+  .hero-artifact::after {
+    content: '';
+    position: absolute;
+    inset: 1rem -0.9rem -1rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(8, 12, 13, 0.22);
+    z-index: -1;
   }
 
   .hero-artifact__header {
-    display: grid;
-    gap: var(--space-4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
   }
 
   .hero-artifact__eyebrow,
@@ -105,8 +135,8 @@ const { artifact } = Astro.props
   }
 
   .hero-artifact__title {
-    font-size: clamp(1.38rem, 1.08rem + 0.8vw, 1.9rem);
-    line-height: 1.02;
+    font-size: clamp(1.35rem, 1.08rem + 0.7vw, 1.85rem);
+    line-height: 1.04;
     max-width: 15ch;
     color: #121715;
   }
@@ -115,6 +145,7 @@ const { artifact } = Astro.props
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
+    justify-content: flex-end;
   }
 
   .hero-artifact__chip {
@@ -122,10 +153,10 @@ const { artifact } = Astro.props
     align-items: center;
     padding: 0.38rem 0.62rem;
     border: 1px solid rgba(18, 23, 21, 0.12);
-    border-radius: 9999px;
+    border-radius: 0;
     font-size: var(--text-xs);
     font-weight: 600;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: rgba(18, 23, 21, 0.7);
     background: rgba(18, 23, 21, 0.03);
@@ -140,30 +171,83 @@ const { artifact } = Astro.props
   .hero-artifact__block {
     display: grid;
     gap: var(--space-3);
-    padding-top: var(--space-4);
+    padding-top: var(--space-3);
     border-top: 1px solid rgba(18, 23, 21, 0.08);
+  }
+
+  .hero-artifact__block--dense {
+    gap: var(--space-2);
   }
 
   .hero-artifact__figure {
     margin: 0;
-    overflow: hidden;
+    position: relative;
+    overflow: visible;
     border: 1px solid rgba(18, 23, 21, 0.08);
-    border-radius: 0.35rem;
+    border-radius: 0;
     background: rgba(18, 23, 21, 0.04);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+    padding: 0.7rem;
   }
 
   .hero-artifact__image {
     display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 14 / 11;
+    object-fit: cover;
+    object-position: top;
+    border: 1px solid rgba(18, 23, 21, 0.08);
+  }
+
+  .hero-artifact__stamp {
+    position: absolute;
+    top: -0.8rem;
+    right: 0.9rem;
+    padding: 0.42rem 0.62rem;
+    border: 1px solid rgba(47, 107, 77, 0.3);
+    background: rgba(243, 240, 231, 0.96);
+    color: #2f6b4d;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+  }
+
+  .hero-artifact__note {
+    position: absolute;
+    left: -0.75rem;
+    bottom: 1rem;
+    display: grid;
+    gap: 0.2rem;
+    width: min(12rem, 58%);
+    padding: 0.7rem 0.75rem;
+    border: 1px solid rgba(18, 23, 21, 0.14);
+    background: rgba(243, 240, 231, 0.96);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+    transform: rotate(-3deg);
+  }
+
+  .hero-artifact__note-label {
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(18, 23, 21, 0.48);
+  }
+
+  .hero-artifact__note strong {
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: #121715;
   }
 
   .hero-artifact__facts,
   .hero-artifact__outputs,
   .hero-artifact__readout {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
   .hero-artifact__fact,
@@ -179,27 +263,51 @@ const { artifact } = Astro.props
     margin: 0;
     color: #121715;
     font-size: var(--text-sm);
-    line-height: 1.45;
+    line-height: 1.4;
   }
 
   .hero-artifact__readout {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-3);
-    padding-top: var(--space-4);
-    border-top: 1px solid rgba(18, 23, 21, 0.08);
+    gap: var(--space-2);
+    padding-right: 0.2rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid rgba(18, 23, 21, 0.08);
   }
 
   .hero-artifact__metric {
     min-width: 0;
-    padding: 0.8rem 0.85rem;
+    padding: 0.72rem 0.78rem;
     border: 1px solid rgba(18, 23, 21, 0.08);
     background: rgba(18, 23, 21, 0.03);
+  }
+
+  .hero-artifact__metric strong {
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @keyframes artifact-settle {
+    from {
+      opacity: 0;
+      transform: translateY(1.2rem) rotate(2.2deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: rotate(1.2deg);
+    }
   }
 
   @media (max-width: 1024px) {
     .hero-artifact {
       width: 100%;
       margin-left: 0;
+      transform: none;
+    }
+
+    .hero-artifact::after {
+      inset: 0.8rem -0.5rem -0.8rem 0.8rem;
     }
   }
 
@@ -207,6 +315,19 @@ const { artifact } = Astro.props
     .hero-artifact {
       padding: clamp(1rem, 4vw, 1.4rem);
       gap: var(--space-4);
+    }
+
+    .hero-artifact::after {
+      display: none;
+    }
+
+    .hero-artifact__header {
+      display: grid;
+      justify-content: stretch;
+    }
+
+    .hero-artifact__chips {
+      justify-content: flex-start;
     }
 
     .hero-artifact__title {
@@ -223,7 +344,20 @@ const { artifact } = Astro.props
     }
 
     .hero-artifact__figure {
-      border-radius: 0.25rem;
+      padding: 0.5rem;
+    }
+
+    .hero-artifact__stamp {
+      top: -0.7rem;
+      right: 0.5rem;
+      font-size: 0.6rem;
+    }
+
+    .hero-artifact__note {
+      position: static;
+      width: 100%;
+      margin-top: 0.6rem;
+      transform: none;
     }
 
     .hero-artifact__facts,
@@ -235,6 +369,17 @@ const { artifact } = Astro.props
     .hero-artifact__output strong,
     .hero-artifact__metric strong {
       font-size: var(--text-xs);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-artifact {
+      animation: none;
+    }
+
+    .hero-artifact__stamp,
+    .hero-artifact__note {
+      transform: none;
     }
   }
 </style>

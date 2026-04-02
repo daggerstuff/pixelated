@@ -1,47 +1,52 @@
 export const heroContent = {
-  title: 'Rehearse the hardest clinical conversations before they happen.',
+  title: 'Bring one hard case into rehearsal. Leave with coaching evidence.',
   subtitle:
-    'Run one difficult case, keep the exchange intact, and review the next pass from what actually happened instead of what the room remembers.',
+    'Pixelated Empathy lets supervision teams run a difficult session, preserve the exchange, and direct the next attempt from something more credible than memory.',
   kicker: 'Clinical rehearsal for supervision teams',
-  primaryCTA: { text: 'Start Practice', href: '/signup' },
-  secondaryCTA: { text: 'Watch Demo', href: '/demo-hub' },
+  proofPoints: [
+    'Persistent transcript',
+    'Shared case across clinicians',
+    'Supervisor notes tied to the session',
+  ],
+  primaryCTA: { text: 'Bring a Case to Pilot', href: '/signup' },
+  secondaryCTA: { text: 'See the Product Demo', href: '/demo-hub' },
   stats: [
     {
-      value: 'Run the same case',
+      value: 'One case',
       label:
-        'Give multiple clinicians the same difficult conversation instead of coaching from one-off recollection.',
+        'Keep the difficulty constant so the team compares judgment instead of different scenarios.',
     },
     {
-      value: 'Keep the record',
+      value: 'One record',
       label:
-        'Hold the transcript, pacing shifts, and decision points in one place a supervisor can actually teach from.',
+        'Hold the transcript and review notes in one surface the supervisor can teach from.',
     },
     {
-      value: 'Coach the retry',
+      value: 'One retry',
       label:
-        'Use the actual exchange to decide what the next pass should do differently.',
+        'Direct the next pass from a visible miss, opening, or repair instead of vague recall.',
     },
   ],
   artifact: {
-    eyebrow: 'Live product surface',
-    status: 'A real session capture from the product, ready for review.',
+    eyebrow: 'In-product proof',
+    status: 'The actual session surface teams can review together.',
     chip: 'Captured in product',
-    mode: 'Supervision-ready',
+    mode: 'Ready to coach',
     image: '/images/homepage/training-session-proof.png',
     imageAlt: 'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
-      { label: 'What you are seeing', value: 'The actual training surface, captured from the product instead of reconstructed for the homepage' },
-      { label: 'Why it matters', value: 'The exchange and review notes stay together, so supervision can stay concrete after the session ends' },
+      { label: 'What you are seeing', value: 'The real training surface, shown as a product capture instead of a staged mockup.' },
+      { label: 'Why teams care', value: 'The exchange and coaching notes stay together, so the supervisor can point at the exact turn that needs work.' },
     ],
     outputs: [
-      { label: 'Live exchange', value: 'Therapist turns and patient responses stay in one training surface' },
-      { label: 'Review lane', value: 'Supervisor notes stay adjacent to the session instead of being reconstructed later' },
-      { label: 'Handoff', value: 'The run moves from practice into review without changing mediums' },
+      { label: 'Live exchange', value: 'Therapist turns and patient responses stay in one session view.' },
+      { label: 'Review lane', value: 'Supervisor notes stay adjacent instead of being rebuilt later.' },
+      { label: 'Handoff', value: 'The run moves into review without changing mediums.' },
     ],
     readout: [
-      { label: 'Practice', value: 'Session UI' },
-      { label: 'Review', value: 'Notes lane' },
-      { label: 'Reuse', value: 'Team coaching' },
+      { label: 'Practice', value: 'Shared case' },
+      { label: 'Review', value: 'Evidence lane' },
+      { label: 'Outcome', value: 'Clearer retry' },
     ],
   },
 } as const

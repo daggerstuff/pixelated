@@ -20,6 +20,7 @@ import sys
 import time
 from pathlib import Path
 from urllib.error import HTTPError
+from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -34,7 +35,7 @@ logger = logging.getLogger("core")
 
 CORE_API = "https://api.core.ac.uk/v3"
 SEARCH_QUERY = (
-    'q=subject:"psychology" OR subject:"psychiatry" OR subject:"mental health"'
+    'q=subject:"psychology"+OR+subject:"psychiatry"+OR+subject:"mental+health"'
     "&hasFullText=true"
     "&limit=100"
     "&orderBy=relevance"
