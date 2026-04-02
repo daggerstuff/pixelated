@@ -29,10 +29,9 @@ Usage:
 import re
 import sys
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -52,7 +51,6 @@ except ImportError:
 # EPUB processing
 try:
     from ebooklib import epub
-    from ebooklib.utils import debug as ebooklib_debug
 
     EPUB_AVAILABLE = True
 except ImportError:
@@ -165,6 +163,7 @@ CHAPTER_PATTERNS = [
     r"^chapter\s+[ivxlc]+",
     r"^\d+\.\s+[A-Z]",
     r"^part\s+\d+",
+    r"^part\s+[ivxlc]+",  # Added: matches "Part I", "Part II", etc.
     r"^section\s+\d+",
     r"^unit\s+\d+",
 ]
@@ -222,7 +221,6 @@ class BooksExtractor:
 
             # Process pages
             full_text_by_chapter: dict[str, list[tuple[int, str]]] = {}
-            current_text = []
             current_chapter_pages: list[tuple[int, str]] = []
 
             for page_num in range(total_pages):
