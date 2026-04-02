@@ -16,9 +16,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+import argparse
+import logging
 
 from ai.core.pipelines.processing.normalization_pipeline import (
     DedupStrategy,
@@ -27,7 +28,6 @@ from ai.core.pipelines.processing.normalization_pipeline import (
 
 
 def main(args: list[str] | None = None) -> int:
-    import argparse
 
     parser = argparse.ArgumentParser(
         description="Normalize ingested JSONL data (PIX-32 pipeline).",
@@ -68,8 +68,6 @@ def main(args: list[str] | None = None) -> int:
     ns = parser.parse_args(args or [])
 
     if ns.verbose:
-        import logging
-
         logging.basicConfig(level=logging.DEBUG)
 
     pipeline = NormalizationPipeline(
@@ -81,8 +79,6 @@ def main(args: list[str] | None = None) -> int:
         output_path=ns.output,
         reject_path=ns.reject_path,
     )
-
-    print(result.summary())
 
     if result.final_records == 0 and result.total_records > 0:
         return 2

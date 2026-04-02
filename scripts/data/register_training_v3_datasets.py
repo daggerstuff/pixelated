@@ -6,13 +6,14 @@ So the unified preprocessing pipeline can discover and process them
 import json
 from pathlib import Path
 
+
 def main():
     registry_path = Path("ai/data/dataset_registry.json")
-    
+
     # Load existing registry
     with open(registry_path) as f:
         registry = json.load(f)
-    
+
     # S3 datasets to add
     training_v3_datasets = {
         "stage1_foundation_mental_health_counseling": {
@@ -72,23 +73,20 @@ def main():
             "priority": "low"
         },
     }
-    
+
     # Add to registry under appropriate category
     if "datasets" not in registry:
         registry["datasets"] = {}
     if "training_v3" not in registry["datasets"]:
         registry["datasets"]["training_v3"] = {}
-    
+
     # Merge new datasets
     registry["datasets"]["training_v3"].update(training_v3_datasets)
-    
+
     # Save updated registry
-    with open(registry_path, 'w') as f:
+    with open(registry_path, "w") as f:
         json.dump(registry, f, indent=2)
-    
-    print(f"✅ Registered {len(training_v3_datasets)} training_v3 datasets")
-    print(f"📄 Registry updated: {registry_path}")
-    print(f"\nTotal datasets in registry: {sum(len(v) if isinstance(v, dict) else 0 for v in registry.get('datasets', {}).values())}")
+
 
 if __name__ == "__main__":
     main()

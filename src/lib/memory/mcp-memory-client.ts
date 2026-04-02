@@ -6,41 +6,46 @@ import type {
 } from './memory-client'
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_MEMORY_API_URL || 'http://localhost:5003'
+  process.env.NEXT_PUBLIC_APP_ORIGIN || ''
 
 export const mcpMemoryManager = {
   async addMemory(
     input: AddMemoryInput,
-    userId = 'default_user',
+    userId?: string,
   ): Promise<string> {
+    const resolvedUserId = requireUserId(userId)
     const response = await fetch(`${BASE_URL}/api/memory/add`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         content: input.content,
-        user_id: userId,
+        user_id: resolvedUserId,
         metadata: input.metadata,
         category: input.metadata?.category,
       }),
     })
-
     if (!response.ok) {
       throw new Error(`Failed to add memory: ${response.statusText}`)
     }
 
     const data = await response.json()
-    return data.memory_id
+    const memoryId = data.memory_id
+    if (!memoryId) {
+      throw new Error('Memory add response did not include memory_id')
+    }
+    return memoryId
   },
 
   async updateMemory(
     memoryId: string,
     content: string,
-    _userId = 'default_user',
+    userId?: string,
   ): Promise<void> {
-    const response = await fetch(`${BASE_URL}/api/memory/${memoryId}`, {
+    const resolvedUserId = requireUserId(userId)
+    const response = await fetch(`${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: content }),
+      body: JSON.stringify({ content, user_id: resolvedUserId }),
     })
 
     if (!response.ok) {
@@ -50,9 +55,12 @@ export const mcpMemoryManager = {
 
   async deleteMemory(
     memoryId: string,
-    _userId = 'default_user',
+    userId?: string,
   ): Promise<void> {
-    const response = await fetch(`${BASE_URL}/api/memory/${memoryId}`, {
+    const resolvedUserId = requireUserId(userId)
+    const params = new URLSearchParams()
+    params.set('userId', resolvedUserId)
+    const response = await fetch(`${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}?${params.toString()}`, {
       method: 'DELETE',
     })
 
@@ -61,39 +69,20 @@ export const mcpMemoryManager = {
     }
   },
 
-  async getAllMemories(userId = 'default_user'): Promise<MemoryEntry[]> {
-    const response = await fetch(
-      `${BASE_URL}/api/memory/all/${userId}?limit=100`,
-    )
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch memories: ${response.statusText}`)
-    }
-
-    const data = await response.json()
-    // Map backend format to frontend format if needed
-    // Backend returns dicts. Frontend expects MemoryEntry.
-    // Backend: { id, memory, ... } or { id, content, ... } ?
-    // Let's check Mem0 response format or my server implementation.
-    // Server returns whatever manager returns.
-    // Manager uses Mem0.search which users "memory" or "content".
-
-    return (data.memories || []).map((m: any) => ({
-      id: m.id || 'unknown',
-      content: m.memory || m.content || '',
-      metadata: m.metadata || {},
-    }))
+  async getAllMemories(userId?: string): Promise<MemoryEntry[]> {
+    const resolvedUserId = requireUserId(userId)
+    return fetchMappedMemories(buildMemoryListQuery({ userId: resolvedUserId }))
   },
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
-    const { userId = 'default_user', query, limit = 10 } = options
-
+    const { userId, query, limit = 10 } = options
+    const resolvedUserId = requireUserId(userId)
     const response = await fetch(`${BASE_URL}/api/memory/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query,
-        user_id: userId,
+        user_id: resolvedUserId,
         limit,
       }),
     })
@@ -103,57 +92,56 @@ export const mcpMemoryManager = {
     }
 
     const data = await response.json()
-    return (data.memories || []).map((m: any) => ({
-      id: m.id || 'unknown',
-      content: m.memory || m.content || '',
-      metadata: m.metadata || {},
-    }))
+    return mapMemoryEntries(data.memories)
   },
 
-  async getMemoryStats(userId = 'default_user'): Promise<MemoryStats> {
-    // Since backend has no stats endpoint, fetch all and calculate
-    const memories = await this.getAllMemories(userId)
+  async getMemoryStats(userId?: string): Promise<MemoryStats> {
+    const resolvedUserId = requireUserId(userId)
+    const response = await fetch(
+      `${BASE_URL}/api/memory/stats/${encodeURIComponent(resolvedUserId)}`,
+    )
 
-    const categoryCounts: Record<string, number> = {}
-    for (const m of memories) {
-      const cat = (m.metadata?.category as string) || 'general'
-      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1
+    if (!response.ok) {
+      throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
     }
 
+    const data = await response.json()
+
     return {
-      totalMemories: memories.length,
-      categoryCounts,
-      recentActivity: [], // Backend doesn't track operation history in a way we can easily query yet
+      totalMemories: data.totalMemories || 0,
+      categoryCounts: data.categoryCounts || {},
+      recentActivity: [],
     }
   },
 
   async searchByCategory(
     category: string,
-    userId = 'default_user',
+    userId?: string,
   ): Promise<MemoryEntry[]> {
-    // Client-side filtering until backend supports it
-    const memories = await this.getAllMemories(userId)
-    return memories.filter((m) => m.metadata?.category === category)
+    const resolvedUserId = requireUserId(userId)
+    return fetchMappedMemories(
+      buildMemoryListQuery({ userId: resolvedUserId, category }),
+    )
   },
 
   async searchByTags(
     tags: string[],
-    userId = 'default_user',
+    userId?: string,
   ): Promise<MemoryEntry[]> {
-    // Client-side filtering until backend supports it
-    const memories = await this.getAllMemories(userId)
-    return memories.filter((m) =>
-      tags.every((t) => (m.metadata?.tags as string[])?.includes(t)),
+    const resolvedUserId = requireUserId(userId)
+    return fetchMappedMemories(
+      buildMemoryListQuery({ userId: resolvedUserId, tags }),
     )
   },
 
-  async getMemoryHistory(_userId = 'default_user'): Promise<any[]> {
+  async getMemoryHistory(userId?: string): Promise<any[]> {
+    requireUserId(userId)
     return []
   },
 
   // Legacy support methods (if needed by UI)
   async addUserPreference(
-    userId = 'default_user',
+    userId: string | undefined,
     key: string,
     value: unknown,
   ): Promise<void> {
@@ -167,7 +155,7 @@ export const mcpMemoryManager = {
   },
 
   async addConversationContext(
-    userId = 'default_user',
+    userId: string | undefined,
     context: string,
     sessionId?: string,
   ): Promise<void> {
@@ -185,7 +173,7 @@ export const mcpMemoryManager = {
   },
 
   async addProjectInfo(
-    userId = 'default_user',
+    userId: string | undefined,
     projectInfo: string,
     projectId?: string,
   ): Promise<void> {
@@ -197,4 +185,55 @@ export const mcpMemoryManager = {
       userId,
     )
   },
+}
+
+function requireUserId(userId?: string): string {
+  if (!userId) {
+    throw new Error('Memory operations require an authenticated user id')
+  }
+  return userId
+}
+
+function buildMemoryListQuery({
+  userId,
+  category,
+  tags,
+  limit = 100,
+}: {
+  userId: string
+  category?: string
+  tags?: string[]
+  limit?: number
+}): URLSearchParams {
+  const params = new URLSearchParams()
+  params.set('limit', String(limit))
+  params.set('userId', userId)
+  if (category) {
+    params.set('category', category)
+  }
+  for (const tag of tags ?? []) {
+    params.append('tag', tag)
+  }
+  return params
+}
+
+async function fetchMappedMemories(params: URLSearchParams): Promise<MemoryEntry[]> {
+  const response = await fetch(`${BASE_URL}/api/memory/list?${params.toString()}`)
+  if (!response.ok) {
+    throw new Error(`Failed to fetch memories: ${response.statusText}`)
+  }
+  const data = await response.json()
+  return mapMemoryEntries(data.memories)
+}
+
+function mapMemoryEntries(memories: unknown): MemoryEntry[] {
+  if (!Array.isArray(memories)) {
+    return []
+  }
+
+  return memories.map((memory: any) => ({
+    id: memory.id || 'unknown',
+    content: memory.memory || memory.content || '',
+    metadata: memory.metadata || {},
+  }))
 }

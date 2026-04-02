@@ -62,11 +62,10 @@ class ProcessingStats:
 
 def get_rss_bytes() -> int:
     """Get current RSS in bytes from /proc/self/status."""
-    with contextlib.suppress(OSError, ValueError):
-        with open("/proc/self/status") as f:
-            for line in f:
-                if line.startswith("VmRSS:"):
-                    return int(line.split()[1]) * 1024  # kB → bytes
+    with contextlib.suppress(OSError, ValueError), open("/proc/self/status") as f:
+        for line in f:
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) * 1024  # kB → bytes
     return 0
 
 

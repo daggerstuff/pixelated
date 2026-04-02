@@ -18,7 +18,7 @@ Usage:
 
 from __future__ import annotations
 
-import json
+import argparse
 import logging
 import os
 import sys
@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from ai.core.pipelines.processing.normalization_pipeline import (
+from ai.core.pipelines.processing.normalization_pipeline import (  # noqa: E402
     DedupStrategy,
     NormalizationPipeline,
 )
@@ -49,8 +49,6 @@ def _progress_callback(current: int, total: int) -> None:
 
 
 def main(args: list[str] | None = None) -> int:
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="PIX-32: Normalize and deduplicate ingested JSONL data.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -152,10 +150,8 @@ def main(args: list[str] | None = None) -> int:
         logger.error("Pipeline failed: %s", exc, exc_info=True)
         return 1
 
-    # Print summary
-    print()
-    print(result.summary())
-    print()
+    # Print summary to stdout for CLI visibility
+    sys.stdout.write(f"\n{result.summary()}\n\n")
 
     # Exit with error if no valid records produced
     if result.final_records == 0 and result.total_records > 0:

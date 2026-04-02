@@ -346,13 +346,13 @@ const kicker = heroContent.kicker
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 6rem;
-      padding-bottom: 4rem;
+      padding-top: 5rem;
+      padding-bottom: 3rem;
     }
 
     .hero-layout {
       grid-template-columns: 1fr;
-      gap: 2.5rem;
+      gap: 2rem;
       align-items: start;
     }
 
@@ -363,11 +363,69 @@ const kicker = heroContent.kicker
 
     .hero-title {
       max-width: 11ch;
-      font-size: clamp(2.2rem, 1.9rem + 1.6vw, 2.9rem);
+      font-size: clamp(1.8rem, 6vw, 2.4rem);
+      line-height: 1.05;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.95rem, 3vw, 1.05rem);
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-actions {
+      gap: 1rem;
+    }
+
+    .btn-premium {
+      padding: 0.75rem 1.5rem;
+      font-size: 0.8rem;
+    }
+
+    .hero-stats {
+      margin-top: var(--space-10);
+      padding-top: var(--space-6);
     }
 
     .hero-stats-grid {
       grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .hero-artifact {
+      width: 100%;
+      margin-left: 0;
+      max-width: 100%;
+    }
+
+    .hero-kicker-pill {
+      margin-bottom: 1rem;
+    }
+
+    .hero-secondary-link {
+      font-size: 0.72rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding-top: 4.5rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .hero-title {
+      font-size: clamp(1.6rem, 7vw, 2rem);
+      max-width: 10ch;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .btn-premium {
+      width: 100%;
+      text-align: center;
     }
   }
 </style>
