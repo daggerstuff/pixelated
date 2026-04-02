@@ -78,6 +78,7 @@ dependencies = [
   # NVIDIA NeMo Data Designer for synthetic dataset generation
   "nemo-microservices[data-designer]>=1.0.0",
   "kaggle>=1.8.2",
+  "youtube-transcript-api>=0.6.0",
   "boto3>=1.40.75", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
   "google-api-python-client>=2.150.0",
