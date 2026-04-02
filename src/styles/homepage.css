@@ -8,8 +8,8 @@
 .pe-page-section {
   position: relative;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding-top: clamp(4.5rem, 7vw, 7rem);
-  padding-bottom: clamp(4.5rem, 7vw, 7rem);
+  padding-top: clamp(3.2rem, 5vw, 5rem);
+  padding-bottom: clamp(3.2rem, 5vw, 5rem);
 }
 
 .pe-page-section::before {
@@ -28,9 +28,9 @@
   align-items: center;
   gap: 0.7rem;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent-primary);
   opacity: 0.9;
@@ -47,9 +47,9 @@
 .pe-page-panel-label {
   display: inline-block;
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent-primary);
   margin-bottom: var(--space-4);
@@ -58,9 +58,9 @@
 .pe-page-heading {
   margin-top: var(--space-4);
   max-width: 14ch;
-  font-size: clamp(2rem, 1.65rem + 1.5vw, 3.35rem);
-  line-height: 0.98;
-  letter-spacing: -0.05em;
+  font-size: clamp(1.85rem, 1.5rem + 1.2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 @media (min-width: 768px) {
