@@ -83,7 +83,9 @@ log INFO "Compressing backup ${raw_backup}"
 gzip -f "${raw_backup}"
 
 log INFO "Pruning backups older than ${RETENTION_DAYS} days from ${BACKUP_DIR}"
-find "${BACKUP_DIR}" -type f -name "${source_base}.*.sqlite3.gz" -mtime +"${RETENTION_DAYS}" -print -delete >&2 || true
+if ! find "${BACKUP_DIR}" -type f -name "${source_base}.*.sqlite3.gz" -mtime +"${RETENTION_DAYS}" -print -delete >&2; then
+    log WARN "Backup pruning encountered errors and was not fully completed."
+fi
 
 if [[ ! -f "${gz_backup}" ]]; then
     log ERROR "Expected backup artifact missing: ${gz_backup}"
