@@ -41,7 +41,6 @@ const secondaryAction = headerContent.actions.secondary
         <div class="logo-glow"></div>
       </div>
       <span class="brand-lockup">
-        <span class="brand-index">Site 01</span>
         <span class="brand-mark">
           <span class="brand-mark__primary">{titlePrimary}</span>
           {titleSecondary ? (
@@ -136,7 +135,7 @@ const secondaryAction = headerContent.actions.secondary
     align-items: center;
     max-width: 80rem;
     margin: 0 auto;
-    padding: 0.9rem var(--space-6);
+    padding: 1rem var(--space-6);
     gap: clamp(1rem, 2vw, 2rem);
   }
 
@@ -146,8 +145,7 @@ const secondaryAction = headerContent.actions.secondary
     gap: var(--space-3);
     text-decoration: none;
     min-width: 0;
-    padding-right: clamp(0.8rem, 1.8vw, 1.5rem);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding-right: clamp(0.8rem, 1.8vw, 1.25rem);
   }
 
   .brand-mark {
@@ -164,18 +162,11 @@ const secondaryAction = headerContent.actions.secondary
     gap: 0.18rem;
   }
 
-  .brand-index {
-    font-size: 0.68rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.4);
-  }
-
   .brand-mark__primary,
   .brand-mark__secondary {
     display: inline-block;
     font-family: var(--font-display);
-    font-size: clamp(1.28rem, 1.08rem + 0.56vw, 1.78rem);
+    font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.55rem);
     font-weight: 600;
     line-height: 1;
   }
@@ -192,7 +183,7 @@ const secondaryAction = headerContent.actions.secondary
 
   .brand-meta {
     display: inline-flex;
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     font-weight: 500;
     letter-spacing: 0.01em;
     text-transform: none;
@@ -207,12 +198,12 @@ const secondaryAction = headerContent.actions.secondary
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.3rem;
-    padding: 0.55rem 0.9rem;
-    border-radius: 999px;
+    min-height: 2.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: 0.35rem;
     border: 1px solid transparent;
     font-family: var(--font-sans);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -259,7 +250,7 @@ const secondaryAction = headerContent.actions.secondary
       align-items: center;
       gap: var(--space-4);
       min-width: 0;
-      padding: 0.45rem 0.55rem 0.45rem 1rem;
+      padding: 0.65rem 0.65rem 0.65rem 1rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background:
         linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
@@ -285,7 +276,7 @@ const secondaryAction = headerContent.actions.secondary
   .header-nav-list {
     display: flex;
     align-items: center;
-    gap: clamp(0.9rem, 1.4vw, 1.35rem);
+    gap: clamp(1rem, 1.5vw, 1.5rem);
     list-style: none;
     margin: 0;
     padding: 0;
@@ -296,9 +287,9 @@ const secondaryAction = headerContent.actions.secondary
     align-items: center;
     gap: 0.45rem;
     font-family: var(--font-sans);
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
     color: var(--text-secondary);
     text-decoration: none;
@@ -308,7 +299,7 @@ const secondaryAction = headerContent.actions.secondary
   }
 
   .header-nav-link__index {
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     letter-spacing: 0.14em;
     color: rgba(255, 255, 255, 0.35);
   }
@@ -362,8 +353,8 @@ const secondaryAction = headerContent.actions.secondary
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     background: transparent;
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
@@ -428,7 +419,7 @@ const secondaryAction = headerContent.actions.secondary
   /* Mobile Navigation */
   .header-mobile-nav {
     display: none;
-    background: var(--bg-primary);
+    background: rgba(10, 13, 13, 0.98);
     border-top: 1px solid var(--glass-border);
     padding: var(--space-4) var(--space-6);
     position: absolute;
@@ -530,7 +521,6 @@ const secondaryAction = headerContent.actions.secondary
       border-right: 0;
     }
 
-    .brand-index,
     .brand-meta {
       display: none;
     }
