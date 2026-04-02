@@ -15,11 +15,13 @@ Usage:
 import argparse
 import json
 import logging
+import sys
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+sys.path.insert(0, str(Path(__file__).parent))
 from pix30_utils import build_record, write_record
 
 logging.basicConfig(
