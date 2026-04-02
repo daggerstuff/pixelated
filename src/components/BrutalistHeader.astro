@@ -27,7 +27,6 @@ const secondaryAction = headerContent.actions.secondary
 
 <header class="header">
   <div class="header-container">
-    <!-- Logo Section -->
     <a href="/" class="header-brand-link">
       <div class="logo-container">
         <img
@@ -42,6 +41,7 @@ const secondaryAction = headerContent.actions.secondary
         <div class="logo-glow"></div>
       </div>
       <span class="brand-lockup">
+        <span class="brand-index">Site 01</span>
         <span class="brand-mark">
           <span class="brand-mark__primary">{titlePrimary}</span>
           {titleSecondary ? (
@@ -52,29 +52,30 @@ const secondaryAction = headerContent.actions.secondary
       </span>
     </a>
 
-    <!-- Navigation -->
-    <nav class="header-nav" aria-label="Main navigation">
-      <ul class="header-nav-list">
-        {
-          navItems.map((item) => (
-            <li>
-              <a
-                href={item.href}
-                class="header-nav-link"
-                aria-current={isActivePath(item.href) ? 'page' : undefined}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    <div class="header-frame">
+      <nav class="header-nav" aria-label="Main navigation">
+        <ul class="header-nav-list">
+          {
+            navItems.map((item, index) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="header-nav-link"
+                  aria-current={isActivePath(item.href) ? 'page' : undefined}
+                >
+                  <span class="header-nav-link__index">{String(index + 1).padStart(2, '0')}</span>
+                  <span>{item.label}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
 
-    <!-- Actions -->
-    <div class="header-actions">
-      <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
-      <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
+      <div class="header-actions">
+        <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
+        <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
+      </div>
     </div>
 
     <details class="header-mobile-shell">
@@ -115,20 +116,28 @@ const secondaryAction = headerContent.actions.secondary
     position: sticky;
     top: 0;
     z-index: var(--z-sticky);
-    background: rgba(10, 13, 13, 0.92);
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(10, 13, 13, 0.86);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(125, 211, 168, 0.55), transparent);
   }
 
   .header-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
     max-width: 80rem;
     margin: 0 auto;
-    padding: var(--space-4) var(--space-6);
-    gap: clamp(1.5rem, 2.8vw, 3rem);
+    padding: 0.9rem var(--space-6);
+    gap: clamp(1rem, 2vw, 2rem);
   }
 
   .header-brand-link {
@@ -136,9 +145,11 @@ const secondaryAction = headerContent.actions.secondary
     align-items: center;
     gap: var(--space-3);
     text-decoration: none;
+    min-width: 0;
+    padding-right: clamp(0.8rem, 1.8vw, 1.5rem);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  /* Navigation */
   .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -151,6 +162,13 @@ const secondaryAction = headerContent.actions.secondary
   .brand-lockup {
     display: grid;
     gap: 0.18rem;
+  }
+
+  .brand-index {
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
   }
 
   .brand-mark__primary,
@@ -181,18 +199,22 @@ const secondaryAction = headerContent.actions.secondary
     color: var(--text-tertiary);
   }
 
+  .header-frame {
+    display: none;
+  }
+
   .header-action-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.45rem;
-    padding: 0.6rem 1rem;
-    border-radius: var(--radius-sm);
+    min-height: 2.3rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
     border: 1px solid transparent;
     font-family: var(--font-sans);
-    font-size: 0.79rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
     transition:
@@ -204,7 +226,7 @@ const secondaryAction = headerContent.actions.secondary
   .header-action-link--secondary {
     color: var(--text-secondary);
     border-color: rgba(255, 255, 255, 0.12);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .header-action-link--secondary:hover {
@@ -224,42 +246,71 @@ const secondaryAction = headerContent.actions.secondary
   }
 
   /* Navigation */
-  .header-nav {
-    display: none;
-  }
-
   @media (min-width: 768px) {
-    .header-nav {
-      display: block;
-    }
-
     .brand-meta {
       align-items: center;
       max-width: 15rem;
       line-height: 1.35;
+    }
+
+    .header-frame {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-4);
+      min-width: 0;
+      padding: 0.45rem 0.55rem 0.45rem 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+        rgba(8, 12, 13, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      position: relative;
+    }
+
+    .header-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: linear-gradient(180deg, rgba(125, 211, 168, 0.85), rgba(125, 211, 168, 0.12));
+    }
+
+    .header-nav {
+      display: block;
+      min-width: 0;
     }
   }
 
   .header-nav-list {
     display: flex;
     align-items: center;
-    gap: clamp(1.25rem, 2vw, 2rem);
+    gap: clamp(0.9rem, 1.4vw, 1.35rem);
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .header-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
     font-family: var(--font-sans);
-    font-size: 0.96rem;
-    font-weight: 500;
-    letter-spacing: 0;
-    text-transform: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--text-secondary);
     text-decoration: none;
-    padding: var(--space-2) 0;
+    padding: 0.35rem 0;
     position: relative;
     transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  .header-nav-link__index {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: rgba(255, 255, 255, 0.35);
   }
 
   .header-nav-link:hover {
@@ -288,22 +339,15 @@ const secondaryAction = headerContent.actions.secondary
     transform: scaleX(1);
   }
 
-  /* Actions */
   .header-actions {
-    display: none;
     align-items: center;
-    gap: var(--space-3);
-  }
-
-  @media (min-width: 768px) {
-    .header-actions {
-      display: flex;
-    }
+    gap: 0.55rem;
   }
 
   /* Mobile Menu Toggle */
   .header-mobile-shell {
     display: block;
+    justify-self: end;
   }
 
   .header-mobile-shell summary {
@@ -387,6 +431,11 @@ const secondaryAction = headerContent.actions.secondary
     background: var(--bg-primary);
     border-top: 1px solid var(--glass-border);
     padding: var(--space-4) var(--space-6);
+    position: absolute;
+    right: var(--space-4);
+    top: calc(100% + 0.55rem);
+    width: min(20rem, calc(100vw - 2rem));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
   }
 
   .header-mobile-shell[open] .header-mobile-nav {
@@ -405,7 +454,7 @@ const secondaryAction = headerContent.actions.secondary
   .header-mobile-list .header-nav-link {
     display: block;
     padding: var(--space-3) 0;
-    font-size: var(--text-base);
+    font-size: 0.92rem;
   }
 
   .header-mobile-actions {
@@ -457,6 +506,11 @@ const secondaryAction = headerContent.actions.secondary
   }
 
   @media (max-width: 767px) {
+    .header-container {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding: 0.85rem var(--space-4);
+    }
+
     .brand-mark {
       gap: 0.34rem;
     }
@@ -469,6 +523,16 @@ const secondaryAction = headerContent.actions.secondary
     .logo-img {
       height: 2.2rem;
       width: 2.2rem;
+    }
+
+    .header-brand-link {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .brand-index,
+    .brand-meta {
+      display: none;
     }
   }
 </style>

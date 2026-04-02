@@ -3,10 +3,10 @@ export interface Props {
   content: {
     label: string
     title: string
-    paragraphs: string[]
+    paragraphs: readonly string[]
     panelLabel: string
-    panelItems: Array<{ label: string; body: string }>
-    evidenceCards: Array<{ title: string; items: string[] }>
+    panelItems: readonly { label: string; body: string }[]
+    evidenceCards: readonly { title: string; items: readonly string[] }[]
   }
 }
 
@@ -54,15 +54,26 @@ const { content } = Astro.props
   .home-section--intro {
     background: var(--surface-paper-gradient);
     color: var(--ink-primary);
+    overflow: hidden;
   }
 
   .home-copy {
     max-width: 42rem;
-    font-size: var(--text-lg);
+    font-size: clamp(1rem, 0.96rem + 0.2vw, 1.1rem);
+    line-height: 1.7;
   }
 
   .home-copy--first {
     margin-top: var(--space-6);
+  }
+
+  .home-copy--first::first-letter {
+    float: left;
+    margin: 0.08em 0.14em 0 0;
+    font-family: var(--font-display);
+    font-size: 4.4rem;
+    line-height: 0.8;
+    color: var(--ink-primary);
   }
 
   .home-copy--subsequent {
@@ -81,16 +92,44 @@ const { content } = Astro.props
 
   .home-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.32fr) minmax(20rem, 0.88fr);
-    gap: clamp(2rem, 3vw, 3.5rem);
+    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
+    gap: clamp(1.5rem, 3vw, 3rem);
     align-items: start;
+    position: relative;
+  }
+
+  .home-intro::after {
+    content: '';
+    position: absolute;
+    right: clamp(-4rem, -6vw, -2rem);
+    bottom: -2.4rem;
+    width: min(24rem, 42vw);
+    height: min(24rem, 42vw);
+    border: 1px solid rgba(17, 23, 22, 0.08);
+    border-radius: 999px;
+    opacity: 0.45;
+  }
+
+  .home-intro__lead {
+    position: relative;
+    z-index: 1;
   }
 
   .home-intro__panel {
-    padding: clamp(1.75rem, 2.3vw, 2.4rem);
-    border: 1px solid var(--ink-border);
-    background: linear-gradient(180deg, rgba(17, 23, 22, 0.98), rgba(17, 23, 22, 0.92));
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+    position: relative;
+    padding: clamp(1.35rem, 2vw, 1.9rem);
+    border: 1px solid rgba(17, 23, 22, 0.1);
+    background: linear-gradient(180deg, rgba(17, 23, 22, 0.98), rgba(17, 23, 22, 0.95));
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
+    transform: translate(1rem, 1.25rem);
+  }
+
+  .home-intro__panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: rgba(136, 201, 165, 0.8);
   }
 
   .home-intro__panel .home-proof-item__label,
@@ -112,7 +151,7 @@ const { content } = Astro.props
   .home-proof-item {
     display: grid;
     gap: var(--space-2);
-    padding-top: var(--space-4);
+    padding-top: var(--space-3);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -126,29 +165,55 @@ const { content } = Astro.props
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    color: var(--text-tertiary);
+    color: var(--accent-primary);
   }
 
   .home-evidence-grid {
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
     align-items: stretch;
     gap: var(--space-6);
+    position: relative;
   }
 
   .home-evidence-grid--spaced {
     margin-top: var(--space-10);
+    padding-top: var(--space-6);
+  }
+
+  .home-evidence-grid--spaced::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(17, 23, 22, 0.2), transparent 78%);
   }
 
   .home-evidence-card {
     min-width: 0;
-    padding: clamp(1.55rem, 2.2vw, 2.2rem);
-    border: 1px solid var(--ink-border);
-    background: var(--surface-paper-panel);
+    padding: clamp(1.3rem, 2vw, 1.8rem);
+    border: 0;
+    background: rgba(243, 240, 231, 0.58);
   }
 
   .home-evidence-card--light {
-    background: var(--surface-paper-strong);
-    box-shadow: 0 18px 40px rgba(17, 23, 22, 0.06);
+    position: relative;
+    background: rgba(248, 245, 237, 0.92);
+    box-shadow: 0 24px 60px rgba(17, 23, 22, 0.08);
+  }
+
+  .home-evidence-card--light::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: rgba(17, 23, 22, 0.82);
+  }
+
+  .home-evidence-card:last-child {
+    transform: translateY(2.5rem);
+    background: rgba(17, 23, 22, 0.92);
+    color: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 20px 44px rgba(17, 23, 22, 0.12);
   }
 
   .home-evidence-card--light .home-evidence-list {
@@ -164,12 +229,27 @@ const { content } = Astro.props
   .home-evidence-list {
     padding-left: 1rem;
     color: var(--ink-secondary);
+    line-height: 1.65;
+  }
+
+  .home-evidence-card:last-child .pe-page-panel-label,
+  .home-evidence-card:last-child .home-evidence-list {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   @media (max-width: 960px) {
     .home-intro,
     .home-evidence-grid {
       grid-template-columns: 1fr;
+    }
+
+    .home-intro::after {
+      display: none;
+    }
+
+    .home-intro__panel,
+    .home-evidence-card:last-child {
+      transform: none;
     }
   }
 </style>

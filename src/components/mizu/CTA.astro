@@ -9,9 +9,9 @@ export interface Props {
   title?: string
   intro?: string
   verdictCopy?: string
-  proofItems?: Array<{ label: string; value: string }>
+  proofItems?: readonly { label: string; value: string }[]
   decisionTitle?: string
-  rubric?: string[]
+  rubric?: readonly string[]
   primaryCTA?: { text: string; href: string }
   secondaryCTA?: { text: string; href: string }
   meta?: string
@@ -99,18 +99,29 @@ const {
   .cta-panel {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.85fr);
-    gap: var(--space-10);
+    gap: var(--space-8);
     align-items: center;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background:
       linear-gradient(135deg, rgba(125, 211, 168, 0.14), rgba(125, 211, 168, 0.03) 34%, rgba(255, 255, 255, 0.018) 100%),
       rgba(255, 255, 255, 0.028);
-    padding: clamp(1.9rem, 3.2vw, 3.25rem);
+    padding: clamp(1.6rem, 3vw, 2.75rem);
     border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: linear-gradient(180deg, var(--accent-primary), rgba(136, 201, 165, 0.1));
   }
 
   .cta-copy {
     max-width: 42rem;
+    padding-left: 0.5rem;
   }
 
   .cta-label {
@@ -119,22 +130,22 @@ const {
 
   .cta-proof-list {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-3);
   }
 
   .cta-title,
   .cta-intro,
   .cta-verdict-copy {
-    margin-bottom: var(--space-6);
+    margin-bottom: var(--space-5);
   }
 
   .cta-intro,
   .cta-verdict-copy {
     max-width: 38rem;
-    font-family: var(--font-display);
-    font-size: clamp(1.15rem, 1.02rem + 0.4vw, 1.42rem);
-    line-height: 1.24;
-    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: clamp(1.02rem, 0.98rem + 0.2vw, 1.14rem);
+    line-height: 1.7;
+    color: var(--text-secondary);
   }
 
   .cta-proof-item {
@@ -161,11 +172,12 @@ const {
   .cta-actions {
     display: grid;
     gap: var(--space-4);
-    padding: clamp(1.45rem, 2vw, 1.95rem);
+    padding: clamp(1.2rem, 2vw, 1.65rem);
     border: 1px solid rgba(17, 23, 22, 0.08);
     background:
       linear-gradient(180deg, rgba(248, 247, 241, 0.98), rgba(236, 235, 227, 0.96) 100%);
     color: #111716;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
   }
 
   .cta-decision {
@@ -176,8 +188,8 @@ const {
   }
 
   .cta-decision h3 {
-    font-size: clamp(1.45rem, 1.18rem + 0.7vw, 1.95rem);
-    line-height: 1.05;
+    font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.75rem);
+    line-height: 1.16;
     color: #111716;
   }
 
@@ -261,7 +273,8 @@ const {
     font-family: var(--font-sans);
     font-size: var(--text-sm);
     letter-spacing: 0.01em;
-    color: rgba(17, 23, 22, 0.6);
+    color: rgba(17, 23, 22, 0.7);
+    line-height: 1.55;
   }
 
   @media (max-width: 1024px) {
