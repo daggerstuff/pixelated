@@ -10,6 +10,11 @@ export interface AuditEvent extends AuditEventData {
   timestamp: string
 }
 
+/**
+ * Service responsible for creating and storing secure audit trails.
+ * Essential for maintaining compliance and tracking security-sensitive actions
+ * across the application.
+ */
 export class AuditService {
   async createAuditEvent(eventData: AuditEventData): Promise<AuditEvent> {
     const newEvent: AuditEvent = {
