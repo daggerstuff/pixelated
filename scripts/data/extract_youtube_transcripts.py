@@ -88,6 +88,8 @@ class YouTubeExtractionConfig:
     apply_safety_filter: bool = True
     apply_classification: bool = True
     rate_limit_delay: float = 1.0  # Seconds between API calls
+    # Proxy configuration for cloud environments (YouTube blocks cloud IPs)
+    proxy_url: str | None = None  # e.g., "http://proxy:8080" or "socks5://proxy:1080"
 
 
 @dataclass
@@ -368,16 +370,26 @@ class YouTubeTranscriptExtractor:
         languages = languages or self.config.languages
 
         try:
-            # Use the instance-based API
-            api = YouTubeTranscriptApi()
+            # Configure proxy if provided (for cloud environments)
+            if self.config.proxy_url:
+                from youtube_transcript_api._proxies import GenericProxyConfig
+
+                proxy_config = GenericProxyConfig(
+                    http=self.config.proxy_url,
+                    https=self.config.proxy_url,
+                )
+                api = YouTubeTranscriptApi(proxy_config=proxy_config)
+                logger.debug(f"Using proxy: {self.config.proxy_url}")
+            else:
+                api = YouTubeTranscriptApi()
 
             # Try to fetch transcript in preferred languages
             for language in languages:
                 try:
                     transcript = api.fetch(video_id, languages=[language])
 
-                    # Combine all text segments using .text property
-                    full_text = " ".join([snippet.text for snippet in transcript])
+                    # Combine all text segments
+                    full_text = " ".join([snippet["text"] for snippet in transcript])
 
                     # Clean up text
                     full_text = self._clean_transcript_text(full_text)
@@ -387,11 +399,11 @@ class YouTubeTranscriptExtractor:
 
                 except (NoTranscriptFound, TranscriptsDisabled):
                     continue
+                except Exception as e:
+                    logger.error(f"Error extracting transcript for {video_id}: {e}")
 
-        except TranscriptsDisabled:
-            logger.info(f"Transcripts disabled for video {video_id}")
         except Exception as e:
-            logger.error(f"Error extracting transcript for {video_id}: {e}")
+            logger.error(f"Transcript extraction failed for {video_id}: {e}")
 
         return None
 
@@ -404,14 +416,15 @@ class YouTubeTranscriptExtractor:
         text = re.sub(r"\[.*?\]", "", text)  # Remove [Music], [Applause], etc.
         text = re.sub(r"\(.*?\)", "", text)  # Remove (laughing), (crying), etc.
 
-        # Remove duplicate phrases (common in auto-generated)
+        artifact_words = {"um", "uh", "you", "know", "like", "right", "so", "okay"}
         words = text.split()
         cleaned_words = []
         prev_word = None
         for word in words:
-            if word.lower() != prev_word:
-                cleaned_words.append(word)
-                prev_word = word.lower()
+            if word.lower() in artifact_words and word.lower() == prev_word:
+                continue
+            cleaned_words.append(word)
+            prev_word = word.lower()
 
         return " ".join(cleaned_words).strip()
 

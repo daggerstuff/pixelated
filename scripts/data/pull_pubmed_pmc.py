@@ -18,6 +18,7 @@ Usage:
 import argparse
 import json
 import logging
+import os
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -35,6 +36,9 @@ logger = logging.getLogger("pubmed_pmc")
 NCBI_BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
 TOOL_NAME = "pixelated_empathy_pix30"
 EMAIL = "team@pixelatedempathy.com"
+NCBI_API_KEY = os.environ.get("NCBI_API_KEY", "")
+
+RATE_LIMIT_DELAY = 0.1 if NCBI_API_KEY else 0.34
 
 ABSTRACT_QUERY = (
     '("psychotherapy"[MeSH] OR "mental health"[Title/Abstract] '
@@ -61,6 +65,8 @@ def _esearch(query: str, retmax: int = 10000, retstart: int = 0) -> list[str]:
         "tool": TOOL_NAME,
         "email": EMAIL,
     }
+    if NCBI_API_KEY:
+        params["api_key"] = NCBI_API_KEY
     url = f"{NCBI_BASE}esearch.fcgi?{urlencode(params)}"
     try:
         with urlopen(url, timeout=30) as resp:
@@ -81,6 +87,8 @@ def _efetch_pmids(pmids: list[str], retmode: str = "text") -> str:
         "tool": TOOL_NAME,
         "email": EMAIL,
     }
+    if NCBI_API_KEY:
+        params["api_key"] = NCBI_API_KEY
     url = f"{NCBI_BASE}efetch.fcgi?{urlencode(params)}"
     try:
         with urlopen(url, timeout=60) as resp:
@@ -88,6 +96,53 @@ def _efetch_pmids(pmids: list[str], retmode: str = "text") -> str:
     except (HTTPError, Exception) as e:
         logger.warning("efetch failed: %s", e)
         return ""
+
+
+def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> dict:
+    """Extract shared metadata fields from NCBI XML."""
+    if article is None:
+        return {
+            "title": "",
+            "abstract": "",
+            "journal": "",
+            "pub_year": "",
+            "mesh_terms": [],
+            "dois": [],
+        }
+
+    title_el = (
+        article.find(".//ArticleTitle")
+        or article.find(".//article-title")
+        or article.find(".//title")
+    )
+    title = title_el.text.strip() if title_el is not None and title_el.text else ""
+
+    journal_el = article.find(".//Journal/Title") or article.find(".//journal-title")
+    journal = journal_el.text.strip() if journal_el is not None and journal_el.text else ""
+
+    pub_date_el = article.find(".//PubDate/Year") or article.find(".//pub-date//year")
+    pub_year = pub_date_el.text if pub_date_el is not None and pub_date_el.text else ""
+
+    mesh_terms = []
+    for mesh in root.findall(".//MeshHeading/DescriptorName") or article.findall(
+        ".//kwd-group//kwd"
+    ):
+        if mesh.text:
+            mesh_terms.append(mesh.text.strip())
+
+    dois = []
+    for art_id in root.findall(".//ArticleId") or article.findall(".//article-id"):
+        id_type = art_id.get("IdType") or art_id.get("pub-id-type")
+        if id_type == "doi" and art_id.text:
+            dois.append(art_id.text.strip())
+
+    return {
+        "title": title,
+        "journal": journal,
+        "pub_year": pub_year,
+        "mesh_terms": mesh_terms,
+        "dois": dois,
+    }
 
 
 def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict | None:
@@ -113,21 +168,12 @@ def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict | None:
 
     full_text = "\n\n".join(body_paragraphs)
 
-    journal_el = article.find(".//journal-title")
-    journal = journal_el.text.strip() if journal_el is not None and journal_el.text else ""
-
-    pub_date_el = article.find(".//pub-date//year")
-    pub_year = pub_date_el.text if pub_date_el is not None and pub_date_el.text else ""
-
-    mesh_terms = []
-    for mesh in article.findall(".//kwd-group//kwd"):
-        if mesh.text:
-            mesh_terms.append(mesh.text.strip())
-
-    dois = []
-    for art_id in article.findall(".//article-id"):
-        if art_id.get("pub-id-type") == "doi" and art_id.text:
-            dois.append(art_id.text.strip())
+    meta = _extract_common_metadata(root, article)
+    title = meta["title"]
+    journal = meta["journal"]
+    pub_year = meta["pub_year"]
+    mesh_terms = meta["mesh_terms"]
+    dois = meta["dois"]
 
     if not title and not full_text:
         return None
@@ -170,27 +216,15 @@ def _parse_abstract_xml(xml_text: str, pmid: str) -> dict | None:
     if article is None:
         return None
 
-    title_el = article.find(".//ArticleTitle")
-    title = title_el.text.strip() if title_el is not None and title_el.text else ""
-
     abstract_els = article.findall(".//AbstractText")
     abstract = " ".join(el.text or "" for el in abstract_els if el.text)
 
-    journal_el = article.find(".//Journal/Title")
-    journal = journal_el.text.strip() if journal_el is not None and journal_el.text else ""
-
-    pub_date_el = article.find(".//PubDate/Year")
-    pub_year = pub_date_el.text if pub_date_el is not None and pub_date_el.text else ""
-
-    mesh_terms = []
-    for mesh in root.findall(".//MeshHeading/DescriptorName"):
-        if mesh.text:
-            mesh_terms.append(mesh.text.strip())
-
-    dois = []
-    for art_id in root.findall(".//ArticleId"):
-        if art_id.get("IdType") == "doi" and art_id.text:
-            dois.append(art_id.text.strip())
+    meta = _extract_common_metadata(root, article)
+    title = meta["title"]
+    journal = meta["journal"]
+    pub_year = meta["pub_year"]
+    mesh_terms = meta["mesh_terms"]
+    dois = meta["dois"]
 
     if not title and not abstract:
         return None
@@ -266,7 +300,7 @@ def pull_abstracts(output_dir: Path, target: int) -> int:
                         f.write(json.dumps(record, ensure_ascii=False) + "\n")
                         count += 1
 
-            time.sleep(0.34)  # NCBI rate limit: 3 requests per second
+            time.sleep(RATE_LIMIT_DELAY)
 
         logger.info("Pulled %d abstracts so far...", count)
         if count >= target:
@@ -309,7 +343,7 @@ def pull_fulltexts(output_dir: Path, target: int) -> int:
                     f.write(json.dumps(record, ensure_ascii=False) + "\n")
                     count += 1
 
-                time.sleep(0.34)
+                time.sleep(RATE_LIMIT_DELAY)
 
         logger.info("Pulled %d full-texts so far...", count)
         if count >= target:
