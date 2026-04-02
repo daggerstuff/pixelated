@@ -12,6 +12,27 @@ TARGET_GROUP="${TARGET_GROUP:-${TARGET_USER}}"
 ENV_FILE="${ENV_FILE:-/etc/pixelated/pixelated-memory.env}"
 INSTALL_PATH="${INSTALL_PATH:-/etc/systemd/system/${SERVICE_NAME}}"
 
+read_env_value() {
+    local env_file="$1"
+    local key="$2"
+    awk -F= -v target_key="${key}" '
+        /^[[:space:]]*#/ { next }
+        $1 == target_key {
+            value = substr($0, index($0, "=") + 1)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+            if (value ~ /^".*"$/ || value ~ /^'\''.*'\''$/) {
+                value = substr(value, 2, length(value) - 2)
+            }
+            resolved = value
+        }
+        END {
+            if (resolved != "") {
+                print resolved
+            }
+        }
+    ' "${env_file}"
+}
+
 if [[ ! -f "${TEMPLATE_PATH}" ]]; then
     echo "Missing systemd unit template: ${TEMPLATE_PATH}" >&2
     exit 1
@@ -25,7 +46,7 @@ sudo mkdir -p "${DEFAULT_STATE_DIR}"
 sudo chown "${TARGET_USER}:${TARGET_GROUP}" "${DEFAULT_STATE_DIR}"
 
 if [[ -f "${ENV_FILE}" ]]; then
-    DB_PATH="$(grep -E '^HINDSIGHT_LOCAL_DB_PATH=' "${ENV_FILE}" | tail -n1 | cut -d= -f2- || true)"
+    DB_PATH="$(read_env_value "${ENV_FILE}" "HINDSIGHT_LOCAL_DB_PATH")"
     DB_DIR=""
     if [[ -n "${DB_PATH}" ]]; then
         DB_DIR="$(dirname "${DB_PATH}")"
