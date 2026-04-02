@@ -68,7 +68,7 @@ const { content } = Astro.props
 
   .home-steps {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
     position: relative;
     padding-left: 1.1rem;
   }
@@ -88,18 +88,19 @@ const { content } = Astro.props
     grid-template-columns: auto 1fr;
     gap: var(--space-4);
     align-items: start;
-    padding: 1.1rem 1.15rem 1rem;
-    border: 1px solid var(--ink-border);
-    background: var(--surface-paper-panel-muted);
+    padding: 1rem 1.05rem 0.95rem;
+    border: 1px solid rgba(17, 23, 22, 0.08);
+    background: rgba(245, 242, 235, 0.8);
+    box-shadow: 0 10px 24px rgba(17, 23, 22, 0.04);
   }
 
   .home-step-number {
-    font-size: var(--text-xs);
+    font-size: 0.8rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     position: relative;
-    min-width: 3rem;
+    min-width: 3.4rem;
   }
 
   .home-step-number {
@@ -124,7 +125,7 @@ const { content } = Astro.props
   }
 
   .home-outputs--spaced {
-    margin-top: var(--space-10);
+    margin-top: var(--space-8);
   }
 
   @media (max-width: 1080px) {
