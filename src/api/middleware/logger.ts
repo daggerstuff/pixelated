@@ -136,9 +136,19 @@ function getResourceType(req: Request): string {
 function getResourceId(req: Request): string | undefined {
   const parts = req.path.split("/").filter(Boolean);
 
-  // Only return a resource ID if path has more than one segment
-  // e.g., /api/users/123 → "123", but /api/users → undefined
-  if (parts.length > 1) {
+  if (parts.length === 0) return undefined;
+
+  // Only return a resource ID if path follows resource/id pattern
+  // /api/users/123 → '123', but /api/users → undefined (need 3+ segments with api prefix)
+  if (parts[0] === "api") {
+    if (parts.length >= 3) {
+      const lastPart = parts[parts.length - 1];
+      if (lastPart && !lastPart.includes("?")) {
+        return lastPart;
+      }
+    }
+  } else if (parts.length >= 2) {
+    // /users/456 → '456', but /users → undefined
     const lastPart = parts[parts.length - 1];
     if (lastPart && !lastPart.includes("?")) {
       return lastPart;
