@@ -14,6 +14,15 @@ import { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
 // NODE_ENV checks are available inline where needed; avoid unused bindings to satisfy linter.
 
+import * as crypto from 'crypto'
+
+const generateFallbackSecret = (name: string, length: number = 32): string => {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(`CRITICAL: Mandatory secret ${name} is not set in production.`);
+  }
+  return crypto.randomBytes(length).toString('hex');
+};
+
 const baseConfig = {
   mongodb: {
     url: process.env.MONGODB_URI || 'mongodb://localhost:27017/pixelated',
@@ -31,9 +40,9 @@ const baseConfig = {
     edge_locations: (process.env.EDGE_LOCATIONS || '50').split(',').map(Number),
   },
   security: {
-    jwt_secret: process.env.JWT_SECRET || 'your-jwt-secret-key',
+    jwt_secret: process.env.JWT_SECRET || generateFallbackSecret('JWT_SECRET'),
     encryption_key:
-      process.env.ENCRYPTION_KEY || 'your-encryption-key-32-chars-long',
+      process.env.ENCRYPTION_KEY || generateFallbackSecret('ENCRYPTION_KEY'),
     rate_limiting: {
       window_ms: parseInt(process.env.RATE_LIMIT_WINDOW || '900000'), // 15 minutes
       max_requests: parseInt(process.env.RATE_LIMIT_MAX || '100'),
