@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import React from 'react'
+import { Sparkles } from 'lucide-react'
 
 import { type DatasetMetadata } from '@/lib/api/research'
 
@@ -23,7 +24,7 @@ const DatasetHeader = ({ dataset }: { dataset: DatasetMetadata }) => {
               animate={{ scale: [0.9, 1.1, 1] }}
               className='bg-emerald-900/40 text-emerald-400 border-emerald-800 flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs'
             >
-              ✨ High Quality
+              <Sparkles className="w-4 h-4" /> High Quality
             </motion.span>
           )}
         </div>
