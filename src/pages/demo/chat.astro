@@ -5,6 +5,7 @@ import BrutalistButton from '@/components/ui/BrutalistButton.astro'
 import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 import { ChatDemo } from '../../components/demo'
 
+import { ChartBar, Rocket } from 'lucide-react'
 export const prerender = false
 ---
 
@@ -299,7 +300,7 @@ export const prerender = false
 
         <BrutalistCard hover={true}>
           <div class="text-center">
-            <div class="text-4xl mb-4">📊</div>
+            <div class="text-4xl mb-4"><ChartBar className="w-10 h-10" /></div>
             <h3 class="brutalist-subheading text-lg mb-3">
               SENTIMENT ANALYSIS
             </h3>
@@ -390,7 +391,7 @@ export const prerender = false
   <section class="brutalist-section bg-gray-900/50">
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-5xl mb-6">🚀</div>
+        <div class="text-5xl mb-6"><Rocket className="w-20 h-20" /></div>
 
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
           READY TO INTEGRATE

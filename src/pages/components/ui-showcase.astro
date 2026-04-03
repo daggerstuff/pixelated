@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import { Target, TrendingUp } from 'lucide-react'
 import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
 ---
 
@@ -78,7 +79,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
               description:
                 'Collaborative goal setting and strategy development',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🎯</div><h3 class="text-xl font-bold mb-2">Planning</h3><p class="text-center text-sm opacity-90">Creating personalized treatment strategies</p></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4"><Target className="w-20 h-20" /></div><h3 class="text-xl font-bold mb-2">Planning</h3><p class="text-center text-sm opacity-90">Creating personalized treatment strategies</p></div>',
             },
             {
               id: 'journey-3',
@@ -92,7 +93,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
               title: 'Progress Monitoring',
               description: 'Tracking improvements and adjusting approach',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-yellow-500 to-orange-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">📈</div><h3 class="text-xl font-bold mb-2">Progress</h3><p class="text-center text-sm opacity-90">Measuring growth and celebrating victories</p></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-yellow-500 to-orange-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4"><TrendingUp className="w-20 h-20" /></div><h3 class="text-xl font-bold mb-2">Progress</h3><p class="text-center text-sm opacity-90">Measuring growth and celebrating victories</p></div>',
             },
             {
               id: 'journey-5',
@@ -138,7 +139,7 @@ import SwiperCarousel from '@/components/ui/SwiperCarousel.tsx'
             {
               id: 'testimonial-3',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950 dark:to-pink-950 p-8 rounded-lg"><div class="text-4xl mb-4">🎯</div><blockquote class="text-lg italic text-center mb-4">"Having clear treatment goals and being able to see my progress helped me stay engaged in therapy."</blockquote><p class="font-semibold">- Jessica L.</p><p class="text-sm text-gray-600 dark:text-gray-400">Behavioral Change Program</p></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-950 dark:to-pink-950 p-8 rounded-lg"><div class="text-4xl mb-4"><Target className="w-16 h-16" /></div><blockquote class="text-lg italic text-center mb-4">"Having clear treatment goals and being able to see my progress helped me stay engaged in therapy."</blockquote><p class="font-semibold">- Jessica L.</p><p class="text-sm text-gray-600 dark:text-gray-400">Behavioral Change Program</p></div>',
             },
           ]}
         />
