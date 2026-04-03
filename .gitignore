@@ -7,6 +7,7 @@
 .vscode/
 .crush/
 .letta/
+.continue-here.md
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -215,7 +216,6 @@ tmp/
 /.astro
 /.output
 /.python
-/.planning/
 /bin/
 /browser-compatibility/
 /bundle-analysis.html
@@ -265,6 +265,20 @@ postgres-sts.yaml
 screenshot_context.png
 y-router/
 yt-downloader
+
+# === INTERNAL & PRIVATE ===
+business-strategy/
+metrics/
+security/
+scripts/data/run_pix30_academic_pulls.py
+scripts/data/extract_youtube_transcripts.py
+scripts/generate_dual_persona_data.py
+scripts/run-simple-dataset-integration.py
+scripts/run-simple-integrated-pipeline.py
+scripts/run-standalone-integrated-pipeline.py
+scripts/memory/run-shared-memory-service.sh
+scripts/*.ipynb
+tests/scripts/
 # Beads / Dolt files (added by bd init)
 .beads-credential-key
 .beads/
@@ -293,3 +307,6 @@ gha-creds-*.json
 .reports
 .uv-cache
 .local-memory
+NOTES.md
+memory.db-shm
+memory.db-wal
