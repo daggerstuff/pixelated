@@ -1,3 +1,6 @@
+/* Import Plus Jakarta Sans for SaaS-optimized typography */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
 .pe-page-shell {
   width: 100%;
   max-width: 78rem;
@@ -8,8 +11,8 @@
 .pe-page-section {
   position: relative;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding-top: clamp(3.2rem, 5vw, 5rem);
-  padding-bottom: clamp(3.2rem, 5vw, 5rem);
+  padding-top: clamp(4rem, 8vw, 6rem);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
 }
 
 .pe-page-section::before {
