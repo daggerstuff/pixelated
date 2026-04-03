@@ -1,16 +1,16 @@
 export const workflowContent = {
   label: 'What one run leaves behind',
-  title: 'The session should move cleanly from rehearsal into supervision.',
+  title: 'The session should move cleanly from rehearsal to review.',
   steps: [
     {
       number: '01',
-      title: 'Choose the difficult case',
+      title: 'Pick the difficult case',
       body: 'Start with the conversation your team already struggles to coach under pressure.',
     },
     {
       number: '02',
-      title: 'Run it in real time',
-      body: 'The clinician responds to tone, pacing, rupture, disclosure, and resistance as the room changes.',
+      title: 'Run it live',
+      body: 'The clinician responds as the room shifts instead of rehearsing a memorized script.',
     },
     {
       number: '03',
@@ -19,8 +19,17 @@ export const workflowContent = {
     },
   ],
   outputs: [
-    { label: 'Session record', value: 'A persistent transcript and notes lane the team can return to.' },
-    { label: 'Supervision pass', value: 'A concrete read on where the room shifted and what changed it.' },
-    { label: 'Next attempt', value: 'A sharper retry based on a visible decision, not a vague impression.' },
+    {
+      label: 'Session record',
+      value: 'A saved transcript and notes lane the team can return to.',
+    },
+    {
+      label: 'Review signal',
+      value: 'A concrete read on where the room shifted and what changed it.',
+    },
+    {
+      label: 'Next attempt',
+      value: 'A sharper retry based on a visible decision.',
+    },
   ],
 } as const

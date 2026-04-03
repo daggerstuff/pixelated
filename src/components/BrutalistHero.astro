@@ -6,7 +6,6 @@
 import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
 import HeroStage from '@/components/homepage/HeroStage.astro'
-import HeroStatsBand from '@/components/homepage/HeroStatsBand.astro'
 import { heroContent } from '@/lib/content/hero'
 
 export interface Props {
@@ -15,7 +14,6 @@ export interface Props {
   proofPoints?: readonly string[]
   primaryCTA?: { text: string; href: string }
   secondaryCTA?: { text: string; href: string }
-  stats?: readonly { value: string; label: string }[]
   artifact?: {
     eyebrow: string
     status: string
@@ -35,7 +33,6 @@ const {
   proofPoints = heroContent.proofPoints,
   primaryCTA = heroContent.primaryCTA,
   secondaryCTA = heroContent.secondaryCTA,
-  stats = heroContent.stats,
   artifact,
 } = Astro.props
 
@@ -59,7 +56,6 @@ const kicker = heroContent.kicker
               <span class="hero-kicker-dot"></span>
               <span class="hero-kicker">{kicker}</span>
             </div>
-            <span class="hero-case-index">Casefile 01</span>
           </div>
 
           <h1 class="hero-title">{title}</h1>
@@ -67,16 +63,20 @@ const kicker = heroContent.kicker
           <p class="hero-subtitle">{subtitle}</p>
 
           <ul class="hero-proof-grid" aria-label="Core proof" role="list">
-            {proofPoints.map((item, index) => (
-              <li class="hero-proof-card">
-                <span class="hero-proof-card__index">{String(index + 1).padStart(2, '0')}</span>
-                <p class="hero-proof-card__copy">{item}</p>
-              </li>
-            ))}
+            {
+              proofPoints.map((item, index) => (
+                <li class="hero-proof-card" tabindex="0">
+                  <span class="hero-proof-card__index">
+                    {index === 0 ? 'For' : 'Outcome'}
+                  </span>
+                  <p class="hero-proof-card__copy">{item}</p>
+                </li>
+              ))
+            }
           </ul>
 
           <div class="hero-actions">
-            <a href={primaryCTA.href} class="btn-premium">
+            <a href={primaryCTA.href} class="btn-premium" role="button">
               <span class="btn-premium__text">{primaryCTA.text}</span>
               <div class="btn-premium__fill"></div>
             </a>
@@ -95,18 +95,9 @@ const kicker = heroContent.kicker
                   d="M5 12H19M19 12L13 6M19 12L13 18"
                   stroke="currentColor"
                   stroke-width="2"
-                  stroke-linecap="square"
-                />
+                  stroke-linecap="square"></path>
               </svg>
             </a>
-          </div>
-
-          <div class="hero-operator-note">
-            <span class="hero-operator-note__label">Operating model</span>
-            <p class="hero-operator-note__copy">
-              Practice the difficult conversation, keep the transcript and notes in one evidence
-              trail, then coach the retry from the exact turn that mattered.
-            </p>
           </div>
         </div>
 
@@ -114,12 +105,6 @@ const kicker = heroContent.kicker
           <BrutalistHeroArtifact artifact={artifactData} />
         </div>
       </div>
-
-      {
-        stats && stats.length > 0 && (
-          <HeroStatsBand stats={stats} />
-        )
-      }
     </HeroStage>
   </div>
 
@@ -132,8 +117,8 @@ const kicker = heroContent.kicker
     display: flex;
     align-items: flex-start;
     overflow: hidden;
-    min-height: clamp(24rem, 54vh, 34rem);
-    padding: clamp(3.3rem, 5vh, 4.8rem) 0 clamp(2.2rem, 4vh, 3.4rem);
+    min-height: clamp(25rem, 58vh, 37rem);
+    padding: clamp(3.8rem, 6.4vh, 5.4rem) 0 clamp(2rem, 4vh, 2.8rem);
     background: var(--bg-void);
   }
 
@@ -158,7 +143,11 @@ const kicker = heroContent.kicker
         transparent 84%,
         rgba(255, 255, 255, 0.02)
       ),
-      radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.12) 100%);
+      radial-gradient(
+        circle at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.12) 100%
+      );
     opacity: 0.22;
     pointer-events: none;
   }
@@ -177,28 +166,27 @@ const kicker = heroContent.kicker
 
   .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 0.94fr) minmax(22rem, 1.06fr);
-    gap: clamp(1.25rem, 2.5vw, 2.4rem);
-    align-items: stretch;
+    grid-template-columns: minmax(0, 0.9fr) minmax(24rem, 1.1fr);
+    gap: clamp(2rem, 4vw, 4.6rem);
+    align-items: start;
     position: relative;
     z-index: 1;
   }
 
   .hero-copy {
-    max-width: 42rem;
+    max-width: 34rem;
     position: relative;
     z-index: 1;
     display: grid;
     align-content: start;
-    gap: 0.95rem;
-    padding: clamp(0.8rem, 1.1vw, 1.1rem) 0;
+    gap: 1.25rem;
+    padding: clamp(1rem, 1.8vw, 1.5rem) 0;
   }
 
   .hero-prelude {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
   }
 
@@ -234,38 +222,29 @@ const kicker = heroContent.kicker
     color: var(--accent-primary);
   }
 
-  .hero-case-index {
-    font-family: var(--font-sans);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
-  }
-
   .hero-title {
-    max-width: 12ch;
+    max-width: 18ch;
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(2.35rem, 2rem + 1.2vw, 3.75rem);
+    font-size: clamp(2.7rem, 2.1rem + 2vw, 4.5rem);
     font-weight: 600;
-    line-height: 0.98;
-    letter-spacing: -0.045em;
+    line-height: 0.94;
+    letter-spacing: -0.05em;
     color: var(--text-primary);
   }
 
   .hero-subtitle {
-    max-width: 34rem;
+    max-width: 26rem;
     margin: 0;
-    font-size: clamp(1rem, 0.96rem + 0.22vw, 1.12rem);
-    line-height: 1.62;
-    color: #E2E8F0;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.16rem);
+    line-height: 1.72;
+    color: #e2e8f0;
   }
 
   .hero-proof-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem;
+    gap: 0.75rem;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -273,17 +252,38 @@ const kicker = heroContent.kicker
 
   .hero-proof-card {
     display: grid;
-    gap: 0.45rem;
+    gap: 0.5rem;
     min-width: 0;
-    padding: 0.82rem 0.85rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.9rem 0.95rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.08), rgba(125, 211, 168, 0)),
-      rgba(255, 255, 255, 0.035);
+      linear-gradient(
+        180deg,
+        rgba(125, 211, 168, 0.12),
+        rgba(125, 211, 168, 0.02)
+      ),
+      rgba(255, 255, 255, 0.025);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      background var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
   }
 
-  .hero-proof-card:last-child {
-    grid-column: 1 / -1;
+  .hero-proof-card:hover {
+    border-color: rgba(125, 211, 168, 0.25);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(125, 211, 168, 0.18),
+        rgba(125, 211, 168, 0.04)
+      ),
+      rgba(255, 255, 255, 0.04);
+    transform: translateY(-2px);
+  }
+
+  .hero-proof-card:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
   }
 
   .hero-proof-card__index,
@@ -300,17 +300,17 @@ const kicker = heroContent.kicker
 
   .hero-proof-card__copy {
     margin: 0;
-    font-size: 0.86rem;
-    line-height: 1.4;
-    color: #F1F5F9;
+    font-size: 0.88rem;
+    line-height: 1.44;
+    color: #f1f5f9;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.85rem;
+    gap: 0.9rem;
     align-items: center;
-    margin-top: 0.2rem;
+    margin-top: 0.35rem;
   }
 
   .btn-premium {
@@ -328,6 +328,11 @@ const kicker = heroContent.kicker
     text-decoration: none;
     display: inline-block;
     transition: color 0.3s ease;
+  }
+
+  .btn-premium:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
   }
 
   .btn-premium:hover {
@@ -363,8 +368,20 @@ const kicker = heroContent.kicker
     letter-spacing: 0.08em;
   }
 
+  .hero-secondary-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(125, 211, 168, 0.4);
+  }
+
+  .hero-secondary-link:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
   .hero-secondary-link__text {
-    opacity: 0.6;
+    opacity: 0.85;
     transition: opacity var(--duration-fast) var(--ease-out);
   }
 
@@ -380,30 +397,13 @@ const kicker = heroContent.kicker
     transform: translateX(0.5rem);
   }
 
-  .hero-operator-note {
-    display: grid;
-    gap: 0.45rem;
-    max-width: 34rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .hero-operator-note__label {
-    color: rgba(255, 255, 255, 0.52);
-  }
-
-  .hero-operator-note__copy {
-    margin: 0;
-    font-size: 0.88rem;
-    line-height: 1.5;
-    color: #CBD5E1;
-  }
-
   .hero-artifact-shell {
     position: relative;
     z-index: 2;
     display: flex;
     align-items: stretch;
+    min-width: 0;
+    isolation: isolate;
   }
 
   .hero-fadeout {
@@ -411,14 +411,14 @@ const kicker = heroContent.kicker
     right: 0;
     bottom: 0;
     left: 0;
-    height: 8rem;
+    height: 5rem;
     background: linear-gradient(to top, var(--bg-void), transparent);
   }
 
-  @media (max-width: 1080px) {
+  @media (max-width: 1180px) {
     .hero-layout {
       grid-template-columns: 1fr;
-      gap: 1.1rem;
+      gap: 1.35rem;
     }
 
     .hero-copy,
@@ -428,19 +428,15 @@ const kicker = heroContent.kicker
     }
 
     .hero-proof-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .hero-proof-card:last-child {
-      grid-column: auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 768px) {
     .hero {
       min-height: auto;
-      padding-top: 4.5rem;
-      padding-bottom: 3rem;
+      padding-top: 4.4rem;
+      padding-bottom: 2.6rem;
     }
 
     .hero-shell,
@@ -450,24 +446,36 @@ const kicker = heroContent.kicker
 
     .hero-copy {
       gap: 1rem;
-      padding: 0.6rem 0 0.7rem;
+      padding: 0.2rem 0 0.55rem;
     }
 
     .hero-title {
-      font-size: clamp(2.45rem, 8vw, 3.2rem);
+      font-size: clamp(2.5rem, 8vw, 3.3rem);
     }
 
     .hero-subtitle {
-      font-size: clamp(0.94rem, 3vw, 1rem);
+      font-size: clamp(1rem, 3vw, 1.04rem);
     }
 
     .hero-proof-grid {
       grid-template-columns: 1fr;
-      gap: 0.65rem;
+      gap: 0.75rem;
     }
 
-    .hero-proof-card:last-child {
-      grid-column: auto;
+    .hero-artifact-shell {
+      margin-top: 0.2rem;
+      max-height: 60vh;
+      overflow: hidden;
+    }
+
+    .hero-artifact {
+      max-height: 60vh;
+      overflow: auto;
+    }
+
+    .hero-artifact__image {
+      max-height: 20rem;
+      object-fit: contain;
     }
 
     .btn-premium {
@@ -479,8 +487,8 @@ const kicker = heroContent.kicker
       font-size: 0.72rem;
     }
 
-    .hero-operator-note {
-      padding-top: 0.8rem;
+    .hero-background {
+      opacity: 0.78;
     }
   }
 
@@ -501,6 +509,11 @@ const kicker = heroContent.kicker
 
     .hero-prelude {
       align-items: flex-start;
+      justify-content: flex-start;
+    }
+
+    .hero-title {
+      max-width: 18ch;
     }
 
     .btn-premium {

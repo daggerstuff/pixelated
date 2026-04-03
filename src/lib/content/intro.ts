@@ -1,40 +1,41 @@
 export const introContent = {
   label: 'Why teams stop relying on standard roleplay',
-  title: 'Most supervision breaks right after the room finally gets difficult.',
+  title:
+    'The useful part of supervision usually disappears right after the room gets difficult.',
   paragraphs: [
-    'Once a live roleplay ends, the useful part usually dissolves into recollection, side notes, and disagreement about what actually changed the room.',
-    'Pixelated Empathy keeps the exchange intact long enough for a supervisor to point at one turn, compare clinicians against a shared case, and coach the retry with less guesswork.',
+    'Once the roleplay ends, the exchange usually collapses into recollection, side notes, and disagreement about what actually shifted the room.',
+    'This product keeps the case, the transcript, and the review in one surface long enough for a supervisor to coach a specific retry.',
   ],
-  panelLabel: 'What breaks in the old workflow',
+  panelLabel: 'Where standard roleplay breaks',
   panelItems: [
     {
-      label: 'The evidence disappears',
-      body: 'A difficult conversation runs once, then collapses into opinion and whatever the team remembers afterward.',
+      label: 'No durable record',
+      body: 'A difficult conversation runs once, then turns into opinion and partial recall.',
     },
     {
-      label: 'The coaching stays vague',
-      body: 'The team can feel the conversation shift, but cannot reliably point to where it happened or what should change next.',
+      label: 'Vague coaching',
+      body: 'The team can feel the shift, but cannot point to the exact intervention that should change next.',
     },
     {
-      label: 'The comparison is unfair',
-      body: 'When every trainee gets a different case and a different recap, coaching loses precision almost immediately.',
+      label: 'Uneven comparison',
+      body: 'When each trainee gets a different case, supervision stops comparing judgment against the same moment.',
     },
   ],
   evidenceCards: [
     {
-      title: 'What a usable rehearsal system gives back',
+      title: 'What breaks without a reviewable record',
       items: [
-        'A repeatable case the team can run without rebuilding the setup every time.',
-        'A review surface a supervisor can use to coach a specific intervention or miss.',
-        'A shared record that lets the team compare clinicians against the same difficult moment.',
+        'The useful part of the conversation disappears after the roleplay ends.',
+        'Supervisors coach from recollection instead of a visible intervention.',
+        'Teams cannot compare clinicians against the same difficult moment.',
       ],
     },
     {
-      title: 'What this product is not trying to be',
+      title: 'What changes when the record stays attached',
       items: [
-        'Not a novelty chatbot with therapy language pasted over it.',
-        'Not a script tree that rewards memorization instead of judgment.',
-        'Not a flashy session that leaves nothing usable for supervision.',
+        'The transcript, notes, and retry logic stay tied to one run.',
+        'Supervisors can point at the exact turn that needs work.',
+        'The team can coach multiple clinicians against the same case.',
       ],
     },
   ],

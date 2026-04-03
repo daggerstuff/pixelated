@@ -11,8 +11,8 @@
 .pe-page-section {
   position: relative;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding-top: clamp(4rem, 8vw, 6rem);
-  padding-bottom: clamp(4rem, 8vw, 6rem);
+  padding-top: clamp(3.25rem, 6vw, 4.8rem);
+  padding-bottom: clamp(3.25rem, 6vw, 4.8rem);
 }
 
 .pe-page-section::before {
@@ -23,7 +23,14 @@
   width: min(100% - 3rem, 78rem);
   height: 1px;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, transparent 0%, rgba(136, 201, 165, 0.18) 18%, rgba(255, 255, 255, 0.05) 50%, rgba(136, 201, 165, 0.18) 82%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(136, 201, 165, 0.18) 18%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(136, 201, 165, 0.18) 82%,
+    transparent 100%
+  );
 }
 
 .pe-page-label {

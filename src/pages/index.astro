@@ -16,21 +16,22 @@ import '@/styles/homepage.css'
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'Pixelated Empathy',
-  url: 'https://pixelatedempathy.com',
-  logo: 'https://pixelatedempathy.com/favicon.svg',
-  description: 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
-  foundingDate: '2025',
-  address: {
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
+  'description':
+    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
+  'foundingDate': '2025',
+  'address': {
     '@type': 'PostalAddress',
-    addressCountry: 'US',
+    'addressCountry': 'US',
   },
-  contactPoint: {
+  'contactPoint': {
     '@type': 'ContactPoint',
-    email: 'info@pixelatedempathy.com',
-    contactType: 'Customer Service',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
   },
-  sameAs: [
+  'sameAs': [
     'https://x.com/pixelatedempathy',
     'https://github.com/nochadisfaction/pixelated',
   ],
@@ -42,14 +43,16 @@ const organizationSchema = {
   description="Bring one difficult case into clinical rehearsal, keep the transcript, and coach the retry from a record a supervisor can actually use."
   footerProps={homepageContent.footer}
 >
-  <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)}
+  />
 
   <BrutalistHero
     title={homepageContent.hero.title}
     subtitle={homepageContent.hero.subtitle}
     primaryCTA={homepageContent.hero.primaryCTA}
     secondaryCTA={homepageContent.hero.secondaryCTA}
-    stats={homepageContent.hero.stats}
     artifact={homepageContent.hero.artifact}
   />
 
@@ -57,13 +60,20 @@ const organizationSchema = {
     <div class="pe-page-shell trust-band-shell">
       <InfoStrip
         className="trust-band"
-        label="Why teams take the pilot seriously"
-        title="A clinical training product should look reviewable before anyone asks for a call."
-        body="The homepage should communicate the same standard as the product: high-contrast, specific, and built for supervision teams that need evidence more than excitement."
+        label="Trust markers"
         items={[
-          { label: 'Positioning', value: 'Clinical simulation for real supervision workflows' },
-          { label: 'Review standard', value: 'Transcript, notes, and retry logic stay connected' },
-          { label: 'Pilot motion', value: 'Start with one case and judge the evidence together' },
+          {
+            label: 'Who it is for',
+            value: 'Therapist training and supervision teams',
+          },
+          {
+            label: 'What stays attached',
+            value: 'Transcript, notes, and retry logic',
+          },
+          {
+            label: 'How to judge it',
+            value: 'Start with one real case and review the record together',
+          },
         ]}
         theme="dark"
       />
@@ -100,9 +110,13 @@ const organizationSchema = {
 <style>
   .trust-band-section {
     position: relative;
-    margin-top: -0.75rem;
-    padding-bottom: clamp(1rem, 2vw, 1.5rem);
-    background: linear-gradient(180deg, rgba(8, 12, 13, 1), rgba(8, 12, 13, 0.94));
+    margin-top: -0.25rem;
+    padding-bottom: clamp(1rem, 2vw, 1.25rem);
+    background: linear-gradient(
+      180deg,
+      rgba(8, 12, 13, 1),
+      rgba(8, 12, 13, 0.94)
+    );
   }
 
   .trust-band-shell {

@@ -1,8 +1,7 @@
 export const featuresContent = {
   label: 'What the platform adds',
-  title: 'A rehearsal surface for the clinician and a decision surface for the supervisor.',
-  copy:
-    'The product has two jobs: keep the clinician inside a believable conversation, then give the supervisor a review surface specific enough to coach from.',
+  title: 'A room to practice in and a record to coach from.',
+  copy: 'The product has two jobs: hold the clinician inside a believable conversation, then give the supervisor a concrete record specific enough to coach from.',
   proofLabel: 'What the team gets back',
   proofItems: [
     'A training surface that behaves more like a room than a script.',
@@ -32,8 +31,7 @@ export const featuresContent = {
   comparison: {
     label: 'What the supervisor’s job becomes',
     title: 'Move from retrospective opinion to visible intervention decisions.',
-    body:
-      'The point is not novelty. The point is that a supervisor can point to a turn in the exchange and explain what should change next time.',
+    body: 'The point is not novelty. The point is that a supervisor can point to a turn in the exchange and explain what should change next time.',
     items: [
       {
         label: 'Without a reviewable artifact',
@@ -41,16 +39,19 @@ export const featuresContent = {
       },
       {
         label: 'With Pixelated Empathy',
-        value: '“At the disclosure, they moved to reassurance before checking immediacy.”',
+        value:
+          '“At the disclosure, they moved to reassurance before checking immediacy.”',
         accent: true,
       },
       {
         label: 'Without a shared case',
-        value: 'Each trainee gets a different difficulty curve, so coaching stays fuzzy.',
+        value:
+          'Each trainee gets a different difficulty curve, so coaching stays fuzzy.',
       },
       {
         label: 'With a replayable case',
-        value: 'The team compares how multiple clinicians handled the same rupture.',
+        value:
+          'The team compares how multiple clinicians handled the same rupture.',
         accent: true,
       },
     ],

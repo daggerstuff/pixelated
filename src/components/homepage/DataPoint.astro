@@ -1,0 +1,42 @@
+---
+export interface Props {
+  label: string
+  value: string
+  compact?: boolean
+}
+
+const { label, value, compact = false } = Astro.props
+---
+
+<div class:list={['data-point', compact && 'data-point--compact']}>
+  <span class="data-point__label">{label}</span>
+  <strong class="data-point__value">{value}</strong>
+</div>
+
+<style>
+  .data-point {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .data-point__label {
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.46);
+  }
+
+  .data-point__value {
+    font-size: 0.96rem;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .data-point--compact .data-point__value {
+    font-size: 0.84rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+</style>
