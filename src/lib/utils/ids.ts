@@ -11,8 +11,8 @@
  * @returns A unique ID string
  */
 export function generateId(length: number = 16): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let id = ''
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  let id = ""
 
   for (let i = 0; i < length; i++) {
     id += chars.charAt(Math.floor(Math.random() * chars.length))
@@ -24,12 +24,28 @@ export function generateId(length: number = 16): string {
 /**
  * Generate a UUID v4 compliant ID
  *
- * Uses the built-in crypto.randomUUID() for secure UUID generation.
+ * Uses crypto.randomUUID() when available, but falls back to a secure
+ * implementation using crypto.getRandomValues() when it is not.
  *
  * @returns A UUID v4 string
  */
 export function generateUUID(): string {
-  return crypto.randomUUID()
+  try {
+    // Try to use the standard crypto.randomUUID() function
+    return crypto.randomUUID()
+  } catch {
+    // Fallback implementation for environments where randomUUID is not available
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+      /[xy]/g,
+      function (c) {
+        const array = new Uint8Array(1)
+        globalThis.crypto.getRandomValues(array)
+        const r = array[0] % 16
+        const v = c === "x" ? r : (r & 0x3) | 0x8
+        return v.toString(16)
+      },
+    )
+  }
 }
 
 /**
