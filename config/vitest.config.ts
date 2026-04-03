@@ -1,11 +1,12 @@
 import path from "node:path";
 
 import react from "@vitejs/plugin-react";
+import tsconfigPaths from "vite-tsconfig-paths";
 /// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tsconfigPaths({ root: path.resolve(__dirname, "..") })],
   define: {
     global: "globalThis",
   },
@@ -17,21 +18,40 @@ export default defineConfig({
     noExternal: ["msw"],
   },
   resolve: {
-    tsconfigPaths: true,
-    alias: {
-      "@": path.resolve(__dirname, "../src"),
-      "react-dom/test-utils": path.resolve(__dirname, "../__mocks__/react-dom/test-utils.js"),
-      "react/jsx-dev-runtime": path.resolve(__dirname, "../node_modules/react/jsx-dev-runtime.js"),
-      "react/jsx-runtime": path.resolve(__dirname, "../node_modules/react/jsx-runtime.js"),
-      react: path.resolve(__dirname, "../node_modules/react/index.js"),
-      "react-dom": path.resolve(__dirname, "../node_modules/react-dom/index.js"),
-    },
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname, "../src") },
+      {
+        find: "react-dom/test-utils",
+        replacement: path.resolve(__dirname, "../__mocks__/react-dom/test-utils.js"),
+      },
+      {
+        find: "react/jsx-dev-runtime",
+        replacement: path.resolve(__dirname, "../node_modules/react/jsx-dev-runtime.js"),
+      },
+      {
+        find: "react/jsx-runtime",
+        replacement: path.resolve(__dirname, "../node_modules/react/jsx-runtime.js"),
+      },
+      {
+        find: "react",
+        replacement: path.resolve(__dirname, "../node_modules/react/index.js"),
+      },
+      {
+        find: "react-dom",
+        replacement: path.resolve(__dirname, "../node_modules/react-dom/index.js"),
+      },
+    ],
     conditions: ["node", "import", "module", "default"],
   },
   test: {
     globals: true,
     environment: "jsdom",
-    setupFiles: ["./src/test/setup.ts", "./vitest.setup.ts"],
+    setupFiles: ["./src/test/setup.ts", "./src/test/setup-react19.ts", "./vitest.setup.ts"],
+    environmentMatchGlobs: [
+      // Tests that depend on Node.js built-in modules must run in node environment
+      ["src/tests/health-monitor.test.ts", "node"],
+      ["src/lib/logging/__tests__/audit-logger.test.ts", "node"],
+    ],
     css: {
       modules: {
         classNameStrategy: "non-scoped",
