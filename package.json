@@ -167,6 +167,7 @@
     "@composio/vercel": "^0.6.8",
     "@google-cloud/compute": "^6.9.0",
     "@google-cloud/storage": "^7.19.0",
+    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@iconify-json/lucide": "^1.2.101",
     "@microsoft/clarity": "^1.0.2",
