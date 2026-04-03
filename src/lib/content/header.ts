@@ -6,7 +6,7 @@ export const headerContent = {
     { href: '/features', label: 'Features' },
     { href: '/trust', label: 'Trust' },
     { href: '/blog', label: 'Blog' },
-    { href: '/contact', label: 'Talk to Us' },
+    { href: '/contact', label: 'Contact' },
   ],
   actions: {
     primary: { href: '/signup', text: 'Start Practice' },
