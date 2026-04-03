@@ -1,7 +1,7 @@
 ---
 /**
  * Brutalist Hero Component
- * High-impact mission statement
+ * Balanced product-first homepage entry for the supervision workflow.
  */
 import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
@@ -39,8 +39,6 @@ const {
   artifact,
 } = Astro.props
 
-const primaryAction = primaryCTA
-const secondaryAction = secondaryCTA
 const artifactData = artifact ?? heroContent.artifact
 const kicker = heroContent.kicker
 ---
@@ -64,45 +62,51 @@ const kicker = heroContent.kicker
             <span class="hero-case-index">Casefile 01</span>
           </div>
 
-          <h1 class="hero-title">
-            {title}
-          </h1>
+          <h1 class="hero-title">{title}</h1>
 
-          <p class="hero-subtitle">
-            {subtitle}
-          </p>
+          <p class="hero-subtitle">{subtitle}</p>
 
-          <div class="hero-evidence-strip" aria-label="Core proof">
-            {proofPoints.map((item) => (
-              <span class="hero-evidence-pill">{item}</span>
+          <ul class="hero-proof-grid" aria-label="Core proof" role="list">
+            {proofPoints.map((item, index) => (
+              <li class="hero-proof-card">
+                <span class="hero-proof-card__index">{String(index + 1).padStart(2, '0')}</span>
+                <p class="hero-proof-card__copy">{item}</p>
+              </li>
             ))}
-          </div>
+          </ul>
 
           <div class="hero-actions">
-            <a href={primaryAction.href} class="btn-premium">
-              <span class="btn-premium__text">{primaryAction.text}</span>
+            <a href={primaryCTA.href} class="btn-premium">
+              <span class="btn-premium__text">{primaryCTA.text}</span>
               <div class="btn-premium__fill"></div>
             </a>
 
-            <a
-              href={secondaryAction.href}
-              class="hero-secondary-link"
-            >
-              <span class="hero-secondary-link__text">{secondaryAction.text}</span>
+            <a href={secondaryCTA.href} class="hero-secondary-link">
+              <span class="hero-secondary-link__text">{secondaryCTA.text}</span>
               <svg
                 width="24"
                 height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 class="hero-secondary-link__icon"
+                aria-hidden="true"
               >
                 <path
                   d="M5 12H19M19 12L13 6M19 12L13 18"
                   stroke="currentColor"
                   stroke-width="2"
-                  stroke-linecap="square"></path>
+                  stroke-linecap="square"
+                />
               </svg>
             </a>
+          </div>
+
+          <div class="hero-operator-note">
+            <span class="hero-operator-note__label">Operating model</span>
+            <p class="hero-operator-note__copy">
+              Practice the difficult conversation, keep the transcript and notes in one evidence
+              trail, then coach the retry from the exact turn that mattered.
+            </p>
           </div>
         </div>
 
@@ -132,11 +136,7 @@ const kicker = heroContent.kicker
     padding: clamp(3.3rem, 5vh, 4.8rem) 0 clamp(2.2rem, 4vh, 3.4rem);
     background:
       radial-gradient(circle at top, rgba(125, 211, 168, 0.08), transparent 34%),
-      linear-gradient(
-        180deg,
-        rgba(8, 12, 13, 0.92) 0%,
-        rgba(8, 12, 13, 0.98) 100%
-      );
+      linear-gradient(180deg, rgba(8, 12, 13, 0.92) 0%, rgba(8, 12, 13, 0.98) 100%);
   }
 
   .hero-section {
@@ -153,7 +153,13 @@ const kicker = heroContent.kicker
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 18%, transparent 84%, rgba(255, 255, 255, 0.02)),
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.02),
+        transparent 18%,
+        transparent 84%,
+        rgba(255, 255, 255, 0.02)
+      ),
       radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.12) 100%);
     opacity: 0.22;
     pointer-events: none;
@@ -163,6 +169,150 @@ const kicker = heroContent.kicker
     position: absolute;
     inset: 0;
     background: var(--bg-void);
+  }
+
+  .hero-shell {
+    max-width: 80rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.94fr) minmax(22rem, 1.06fr);
+    gap: clamp(1.25rem, 2.5vw, 2.4rem);
+    align-items: stretch;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-copy {
+    max-width: 42rem;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    align-content: start;
+    gap: 0.95rem;
+    padding: clamp(0.8rem, 1.1vw, 1.1rem) 0;
+  }
+
+  .hero-prelude {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .hero-kicker-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(125, 211, 168, 0.24);
+    background: rgba(125, 211, 168, 0.08);
+  }
+
+  .hero-kicker-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--accent-primary);
+  }
+
+  .hero-kicker,
+  .hero-secondary-link,
+  .hero-proof-card__index,
+  .hero-operator-note__label {
+    font-family: var(--font-sans);
+    font-weight: 600;
+  }
+
+  .hero-kicker {
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+  }
+
+  .hero-case-index {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.42);
+  }
+
+  .hero-title {
+    max-width: 12ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.35rem, 2rem + 1.2vw, 3.75rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    color: var(--text-primary);
+  }
+
+  .hero-subtitle {
+    max-width: 34rem;
+    margin: 0;
+    font-size: clamp(1rem, 0.96rem + 0.22vw, 1.12rem);
+    line-height: 1.62;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .hero-proof-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hero-proof-card {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+    padding: 0.82rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(180deg, rgba(125, 211, 168, 0.08), rgba(125, 211, 168, 0)),
+      rgba(255, 255, 255, 0.035);
+  }
+
+  .hero-proof-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .hero-proof-card__index,
+  .hero-operator-note__label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .hero-proof-card__index {
+    color: var(--accent-primary);
+  }
+
+  .hero-proof-card__copy {
+    margin: 0;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.84);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    align-items: center;
+    margin-top: 0.2rem;
   }
 
   .btn-premium {
@@ -204,126 +354,6 @@ const kicker = heroContent.kicker
     transform: scaleX(1);
   }
 
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.85rem;
-    align-items: center;
-    margin-top: 0.1rem;
-  }
-
-  .hero-kicker-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
-    margin-bottom: 1rem;
-    border: 1px solid rgba(125, 211, 168, 0.24);
-    background: rgba(125, 211, 168, 0.08);
-  }
-
-  .hero-kicker-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 999px;
-    background: var(--accent-primary);
-  }
-
-  .hero-shell {
-    max-width: 80rem;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 24rem);
-    gap: clamp(1rem, 2.2vw, 2rem);
-    align-items: start;
-    position: relative;
-    z-index: 1;
-  }
-
-  .hero-copy {
-    max-width: 39rem;
-    position: relative;
-    z-index: 1;
-    padding:
-      clamp(1rem, 1.4vw, 1.25rem)
-      0
-      clamp(1rem, 1.6vw, 1.25rem);
-  }
-
-  .hero-prelude {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-  }
-
-  .hero-case-index {
-    font-family: var(--font-sans);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.42);
-  }
-
-  .hero-title {
-    max-width: 9ch;
-    margin: 0 0 1rem;
-    font-family: var(--font-display);
-    font-size: clamp(3rem, 2.1rem + 2.2vw, 4.9rem);
-    font-weight: 600;
-    line-height: 0.94;
-    letter-spacing: -0.06em;
-    color: var(--text-primary);
-  }
-
-  .hero-subtitle {
-    max-width: 28rem;
-    margin: 0;
-    font-size: clamp(0.98rem, 0.93rem + 0.18vw, 1.08rem);
-    line-height: 1.55;
-    color: rgba(255, 255, 255, 0.8);
-  }
-
-  .hero-evidence-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-    margin: 1rem 0 1rem;
-  }
-
-  .hero-evidence-pill {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2rem;
-    padding: 0.45rem 0.68rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.04);
-    color: rgba(255, 255, 255, 0.84);
-    font-size: 0.74rem;
-    line-height: 1.2;
-  }
-
-  .hero-kicker,
-  .hero-secondary-link {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    letter-spacing: 0.05em;
-  }
-
-  .hero-kicker {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: var(--accent-primary);
-  }
-
   .hero-secondary-link {
     display: inline-flex;
     align-items: center;
@@ -352,6 +382,32 @@ const kicker = heroContent.kicker
     transform: translateX(0.5rem);
   }
 
+  .hero-operator-note {
+    display: grid;
+    gap: 0.45rem;
+    max-width: 34rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-operator-note__label {
+    color: rgba(255, 255, 255, 0.52);
+  }
+
+  .hero-operator-note__copy {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .hero-artifact-shell {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: stretch;
+  }
+
   .hero-fadeout {
     position: absolute;
     right: 0;
@@ -359,12 +415,6 @@ const kicker = heroContent.kicker
     left: 0;
     height: 8rem;
     background: linear-gradient(to top, var(--bg-void), transparent);
-  }
-  .hero-artifact-shell {
-    position: relative;
-    z-index: 2;
-    margin-right: 0;
-    margin-bottom: 0;
   }
 
   @media (max-width: 1080px) {
@@ -379,9 +429,12 @@ const kicker = heroContent.kicker
       max-width: none;
     }
 
-    .hero-artifact-shell {
-      margin-right: 0;
-      margin-bottom: 0;
+    .hero-proof-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hero-proof-card:last-child {
+      grid-column: auto;
     }
   }
 
@@ -398,26 +451,25 @@ const kicker = heroContent.kicker
     }
 
     .hero-copy {
+      gap: 1rem;
       padding: 0.6rem 0 0.7rem;
     }
 
     .hero-title {
-      font-size: clamp(2.6rem, 9vw, 3.25rem);
+      font-size: clamp(2.45rem, 8vw, 3.2rem);
     }
 
     .hero-subtitle {
       font-size: clamp(0.94rem, 3vw, 1rem);
     }
 
-    .hero-evidence-strip {
-      gap: 0.55rem;
-      margin: 1.2rem 0 1.1rem;
+    .hero-proof-grid {
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
     }
 
-    .hero-evidence-pill {
-      min-height: 2rem;
-      padding: 0.45rem 0.7rem;
-      font-size: 0.74rem;
+    .hero-proof-card:last-child {
+      grid-column: auto;
     }
 
     .btn-premium {
@@ -425,12 +477,12 @@ const kicker = heroContent.kicker
       font-size: 0.8rem;
     }
 
-    .hero-kicker-pill {
-      margin-bottom: 1rem;
-    }
-
     .hero-secondary-link {
       font-size: 0.72rem;
+    }
+
+    .hero-operator-note {
+      padding-top: 0.8rem;
     }
   }
 

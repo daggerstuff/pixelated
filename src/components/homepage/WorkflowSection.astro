@@ -47,7 +47,8 @@ const { content } = Astro.props
 
 <style>
   .home-section--how {
-    background: var(--surface-paper-gradient-soft);
+    background:
+      linear-gradient(180deg, rgba(239, 235, 226, 0.96), rgba(229, 224, 214, 0.96));
     color: var(--ink-primary);
   }
 
@@ -89,15 +90,17 @@ const { content } = Astro.props
     gap: var(--space-4);
     align-items: start;
     padding: 1rem 1.05rem 0.95rem;
-    border: 1px solid rgba(17, 23, 22, 0.08);
-    background: rgba(245, 242, 235, 0.8);
-    box-shadow: 0 10px 24px rgba(17, 23, 22, 0.04);
+    border: 1px solid rgba(17, 23, 22, 0.1);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)),
+      rgba(248, 245, 239, 0.82);
+    box-shadow: 0 14px 30px rgba(17, 23, 22, 0.05);
   }
 
   .home-step-number {
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     position: relative;
     min-width: 3.4rem;
