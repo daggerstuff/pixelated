@@ -11,6 +11,7 @@ import Particle from '@/components/three/Particle.tsx'
 const { user } = Astro.props as { user: any }
 
 const clientId = user?.id || 'demo-patient'
+import { Users } from 'lucide-react'
 const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 ---
 
@@ -108,7 +109,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
               title: 'Relationship Building',
               description: 'Strengthening connections with others',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🤝</div><h3 class="text-xl font-bold mb-2">Connections</h3><p class="text-center text-sm opacity-90">Building healthy relationships and support</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3.99-4H18a4 4 0 0 0-4 4v2"></path><path d="M15 3a4 4 0 0 1 4 4"></path><path d="M6 9a4 4 0 0 0-4 4"></path></svg></div><h3 class="text-xl font-bold mb-2">Connections</h3><p class="text-center text-sm opacity-90">Building healthy relationships and support</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div></div>',
             },
             {
               id: 'journey-5',

@@ -4,6 +4,8 @@ export interface Props {
   class?: string
 }
 
+import { Target } from 'lucide-react'
+
 const { class: className } = Astro.props
 ---
 
@@ -30,7 +32,7 @@ const { class: className } = Astro.props
         </p>
       </div>
       <div class="feature">
-        <h3>🎯 Targeted</h3>
+        <h3 class="flex items-center gap-2"><Target className="w-5 h-5" /> Targeted</h3>
         <p>
           Include specific snippets where needed without cluttering your main
           content.

@@ -327,7 +327,7 @@ const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
           </div>
           <div className='bg-white rounded p-4'>
             <h4 className='text-blue-700 mb-2 font-semibold'>
-              💡 Recommendations
+              <LightBulbIcon className="w-5 h-5" /> Recommendations
             </h4>
             <ul className='text-gray-600 space-y-1'>
               <li>• Continue current coping strategies</li>

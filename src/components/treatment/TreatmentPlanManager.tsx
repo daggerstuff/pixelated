@@ -173,7 +173,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   const getCategoryIcon = (category: TreatmentGoal['category']) => {
     switch (category) {
       case 'behavioral':
-        return '🎯'
+        return <Target className="w-4 h-4" />
       case 'cognitive':
         return '🧠'
       case 'emotional':
@@ -181,7 +181,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       case 'social':
         return '👥'
       case 'physical':
-        return '💪'
+        return <Dumbbell className="w-4 h-4" />
       default:
         return '📋'
     }

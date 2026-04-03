@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
 
+import { ChartBar, Rocket, Search, Target, TrendingUp } from 'lucide-react'
 export const prerender = false
 ---
 
@@ -263,7 +264,7 @@ export const prerender = false
                   id="analyze-btn"
                   class="brutalist-button brutalist-button--primary flex-1"
                 >
-                  🔍 ANALYZE FOR BIAS
+                  <Button variant="accent">🔍 Analyze For Bias</Button>
                 </button>
                 <button
                   id="export-btn"
@@ -286,7 +287,7 @@ export const prerender = false
             <div class="space-y-6">
               <div class="border-b border-gray-700 pb-4">
                 <h3 class="brutalist-subheading text-xl mb-2">
-                  📊 ANALYSIS RESULTS
+                  <h2>📊 Analysis Results</h2>
                 </h3>
                 <p class="text-gray-400 text-sm">
                   Real-time bias detection across multiple layers
@@ -310,7 +311,7 @@ export const prerender = false
               <!-- Results Display -->
               <div id="results-display" aria-live="polite" aria-busy="false">
                 <div class="text-center py-8 text-gray-400">
-                  <div class="text-4xl mb-4">🎯</div>
+                  <div class="text-4xl mb-4"><Target className="w-10 h-10" /></div>
                   <p class="font-bold">RUN ANALYSIS TO SEE RESULTS</p>
                 </div>
               </div>
@@ -367,7 +368,7 @@ export const prerender = false
         <div class="brutalist-grid brutalist-grid--3">
           <BrutalistCard hover={true}>
             <div class="text-center">
-              <div class="text-4xl mb-4">🔍</div>
+              <div class="text-4xl mb-4"><Search className="w-10 h-10" /></div>
               <h3 class="brutalist-subheading text-lg mb-3">
                 MULTI-LAYER ANALYSIS
               </h3>
@@ -450,7 +451,7 @@ export const prerender = false
     <section class="brutalist-section">
       <div class="brutalist-container">
         <div class="mental-health-safe max-w-4xl mx-auto text-center">
-          <div class="text-5xl mb-6">🚀</div>
+          <div class="text-5xl mb-6"><Rocket className="w-20 h-20" /></div>
 
           <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
             ELIMINATE BIAS
@@ -638,7 +639,7 @@ export const prerender = false
           loadingState?.classList.add('hidden')
           resultsDisplay?.classList.remove('hidden')
           if (analyzeBtn) {
-            analyzeBtn.textContent = '🔍 Analyze for Bias'
+            analyzeBtn.textContent = 'Analyze for Bias'
             analyzeBtn.disabled = false
           }
           resultsDisplay?.setAttribute('aria-busy', 'false')
@@ -725,7 +726,7 @@ export const prerender = false
 
           <!-- Historical Comparison -->
           <div class="bg-cyan-500/10 border border-cyan-400/30 rounded-lg p-4">
-            <h4 class="text-lg font-semibold text-cyan-200 mb-3">📈 Historical Comparison</h4>
+            <h4 class="text-lg font-semibold text-cyan-200 mb-3 flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Historical Comparison</h4>
             <div class="grid grid-cols-3 gap-4 text-center">
               <div>
                 <div class="text-lg font-bold text-cyan-300">${this.getHistoricalAverage()}%</div>
@@ -842,7 +843,7 @@ export const prerender = false
         if (resultsEl) {
           resultsEl.innerHTML = `
             <div class="text-center py-8 text-gray-400">
-              <div class="text-4xl mb-4">🎯</div>
+              <div class="text-4xl mb-4"><Target className="w-10 h-10" /></div>
               <p>Run an analysis to see bias detection results</p>
             </div>
           `

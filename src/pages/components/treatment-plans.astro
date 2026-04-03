@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import { ChartBar, Dumbbell, Target } from 'lucide-react'
 import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.tsx'
 ---
 
@@ -28,7 +29,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
       <!-- Features Overview -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div class="text-3xl mb-4 text-center">🎯</div>
+          <div class="text-3xl mb-4 text-center"><Target className="w-12 h-12" /></div>
           <h3 class="text-xl font-semibold mb-3 text-center">
             Goal Management
           </h3>
@@ -56,7 +57,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
         </div>
 
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-          <div class="text-3xl mb-4 text-center">📊</div>
+          <div class="text-3xl mb-4 text-center"><ChartBar className="w-12 h-12" /></div>
           <h3 class="text-xl font-semibold mb-3 text-center">
             Progress Analytics
           </h3>
@@ -79,7 +80,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
-            <div class="text-3xl mb-2">🎯</div>
+            <div class="text-3xl mb-2"><Target className="w-8 h-8" /></div>
             <h4 class="font-semibold">Behavioral</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Behavior modification and habit formation goals
@@ -107,7 +108,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
             </p>
           </div>
           <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
-            <div class="text-3xl mb-2">💪</div>
+            <div class="text-3xl mb-2"><Dumbbell className="w-8 h-8" /></div>
             <h4 class="font-semibold">Physical</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Physical wellness and health-related objectives
@@ -179,7 +180,7 @@ import TreatmentPlanManager from '@/components/treatment/TreatmentPlanManager.ts
             </p>
           </div>
           <div class="text-center">
-            <div class="text-2xl mb-2">📊</div>
+            <div class="text-2xl mb-2"><ChartBar className="w-6 h-6" /></div>
             <h4 class="font-semibold">Analytics Ready</h4>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Integrated reporting and insights

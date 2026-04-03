@@ -7,6 +7,7 @@ import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
 import Badge from '@/components/ui/Badge.astro'
 import Button from '@/components/ui/Button.astro'
+import { Target } from 'lucide-react'
 
 export const prerender = false // Enable SSR for A/B testing
 
@@ -456,7 +457,7 @@ const universityResults = [
             class="border border-cyan-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
           >
             <CardContent class="p-8 lg:p-12">
-              <div class="text-6xl text-cyan-400 mb-6">🎯</div>
+              <div class="text-6xl text-cyan-400 mb-6"><Target className="w-24 h-24" /></div>
 
               <div class="mb-6">
                 <Badge

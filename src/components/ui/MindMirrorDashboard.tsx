@@ -49,7 +49,7 @@ const ARCHETYPES = {
   },
   shadow_strategist: {
     name: 'Shadow Strategist',
-    icon: '🎯',
+    icon: 'target',
     color: '#4ECDC4',
     description: 'Strategic thinker with deep analytical skills',
     gradient: 'from-teal-400 to-cyan-500',
