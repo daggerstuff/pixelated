@@ -14,7 +14,7 @@ export default function PipelineOverview() {
       title: 'Entity Extraction',
       description:
         'Identify mental health conditions, treatments, and risk factors',
-      icon: '🔍',
+      icon: 'search',
       details: 'NLP-powered recognition of clinical entities and concepts',
     },
     {
