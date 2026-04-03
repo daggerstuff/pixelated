@@ -73,6 +73,7 @@ interface ChatMessage {
   id: string
   role: 'user' | 'assistant'
   content: string
+  displayContent?: React.ReactNode
   timestamp: string
   mentalHealthAnalysis?: MentalHealthAnalysisResult
   isProcessing?: boolean
@@ -231,10 +232,49 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
 
 🧠 **Clinical-Grade Analysis**: Advanced AI analyzes your messages for mental health indicators
 🔒 **Privacy-First**: All analysis uses encrypted processing - your data stays secure
-<ChartBar className="w-4 h-4 inline" /> **Real-Time Insights**: Get immediate feedback on emotional patterns and trends
+📊 **Real-Time Insights**: Get immediate feedback on emotional patterns and trends
 🚨 **Crisis Detection**: Automatic identification of urgent situations with immediate resources
 
 How are you feeling today? I'm here to listen and help.`,
+      displayContent: (
+        <div className='space-y-3'>
+          <p>
+            Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here
+            to provide thoughtful, evidence-based support.
+          </p>
+          <div className='space-y-2 py-1'>
+            <div className='flex items-center gap-2'>
+              <Brain className='text-purple-600 h-4 w-4 shrink-0' />
+              <p className='text-sm'>
+                <strong>Clinical-Grade Analysis</strong>: Advanced AI analyzes
+                your messages for mental health indicators
+              </p>
+            </div>
+            <div className='flex items-center gap-2'>
+              <Shield className='text-blue-600 h-4 w-4 shrink-0' />
+              <p className='text-sm'>
+                <strong>Privacy-First</strong>: All analysis uses encrypted
+                processing - your data stays secure
+              </p>
+            </div>
+            <div className='flex items-center gap-2'>
+              <ChartBar className='text-indigo-600 h-4 w-4 shrink-0' />
+              <p className='text-sm'>
+                <strong>Real-Time Insights</strong>: Get immediate feedback on
+                emotional patterns and trends
+              </p>
+            </div>
+            <div className='flex items-center gap-2'>
+              <AlertTriangle className='text-red-600 h-4 w-4 shrink-0' />
+              <p className='text-sm'>
+                <strong>Crisis Detection</strong>: Automatic identification of
+                urgent situations with immediate resources
+              </p>
+            </div>
+          </div>
+          <p>How are you feeling today? I'm here to listen and help.</p>
+        </div>
+      ),
       timestamp: new Date().toISOString(),
     },
   ])
@@ -853,9 +893,9 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                           : 'bg-gray-100 text-gray-900 border'
                       }`}
                     >
-                      <p className='whitespace-pre-wrap text-sm leading-relaxed'>
-                        {message.content}
-                      </p>
+                      <div className='whitespace-pre-wrap text-sm leading-relaxed'>
+                        {message.displayContent || message.content}
+                      </div>
                       {message.isProcessing && (
                         <div className='mt-2 flex items-center text-xs opacity-70'>
                           <div className='border-current border-t-transparent mr-2 h-3 w-3 animate-spin rounded-full border'></div>
