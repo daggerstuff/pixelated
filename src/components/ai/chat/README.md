@@ -77,7 +77,7 @@ All hooks share these advanced capabilities:
 - Cancellation support
 - Chunk-by-chunk handling
 
-### 📊 Analytics & Insights
+### Analytics & Insights
 
 - Performance metrics
 - Usage statistics

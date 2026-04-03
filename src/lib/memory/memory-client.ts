@@ -22,7 +22,9 @@ export type MemoryMetadata = {
 export interface MemoryEntry {
   id: string
   content: string
-  metadata?: MemoryMetadata
+  metadata: MemoryMetadata
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface SearchOptions {
@@ -36,7 +38,7 @@ export interface SearchOptions {
 export interface MemoryStats {
   totalMemories: number
   categoryCounts: Record<string, number>
-  recentActivity: Array<{ id: string; timestamp: string; operation: string }>
+  recentActivity?: Array<{ id: string; timestamp: string; operation: string; memoryId?: string }>
 }
 
 export interface AddMemoryInput {
@@ -79,15 +81,18 @@ export const memoryManager = {
   async addMemory(input: AddMemoryInput, userId = 'default'): Promise<string> {
     ensureUser(userId)
     const id = cryptoRandomId()
+    const now = nowISO()
     const entry: MemoryEntry = {
       id,
       content: input.content,
       metadata: {
-        timestamp: nowISO(),
+        timestamp: now,
         userId,
         category: 'general',
         ...input.metadata,
       },
+      createdAt: now,
+      updatedAt: now,
     }
     store.get(userId)!.unshift(entry)
     addHistory(userId, 'add', id)
@@ -104,10 +109,12 @@ export const memoryManager = {
     const idx = list.findIndex((m) => m.id === memoryId)
     if (idx >= 0 && list[idx]) {
       const existingMemory = list[idx]
+      const now = nowISO()
       list[idx] = {
-        id: existingMemory.id,
+        ...existingMemory,
         content,
-        metadata: { ...existingMemory.metadata, timestamp: nowISO() },
+        metadata: { ...existingMemory.metadata, timestamp: now },
+        updatedAt: now,
       }
       addHistory(userId, 'update', memoryId)
     }
