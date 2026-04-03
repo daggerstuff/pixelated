@@ -1,55 +1,45 @@
-export interface MentalHealthAnalysis {
-  id: string
+/**
+ * Shared types for mental health analysis and chat functionality
+ */
+
+export interface EnhancedMentalHealthAnalysis {
   timestamp: number
+  category: 'low' | 'medium' | 'high' | 'critical'
+  explanation: string
+  expertGuided: boolean
+  scores: Record<string, unknown>
+  summary: string
+  hasMentalHealthIssue: boolean
   confidence: number
+  supportingEvidence: string[]
   riskLevel: 'low' | 'medium' | 'high' | 'critical'
-  categories: MentalHealthCategory[]
-  sentiment: SentimentScore
-  indicators: HealthIndicator[]
-  recommendations: string[]
-  requiresIntervention: boolean
+  emotions?: string[]
+  riskFactors?: string[]
 }
 
-export interface MentalHealthCategory {
-  name: string
-  score: number
+// Archetype definitions inspired by Mind-Mirror
+export interface ArchetypeResult {
+  main_archetype: string
   confidence: number
-  keywords: string[]
-}
-
-export interface SentimentScore {
-  overall: number
-  positive: number
-  negative: number
-  neutral: number
-}
-
-export interface HealthIndicator {
-  type: 'depression' | 'anxiety' | 'stress' | 'anger' | 'isolation' | 'crisis'
-  severity: number
-  evidence: string[]
+  secondary_archetype?: string
+  color: string
   description: string
 }
 
-export interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
+export interface MoodVector {
+  emotional_intensity: number
+  cognitive_clarity: number
+  energy_level: number
+  social_connection: number
+  coherence_index: number
+  urgency_score: number
+}
+
+export interface MindMirrorAnalysis {
+  archetype: ArchetypeResult
+  mood_vector: MoodVector
   timestamp: number
-  analysis?: MentalHealthAnalysis
-}
-
-export interface TherapeuticResponse {
-  content: string
-  approach: 'supportive' | 'cognitive' | 'behavioral' | 'crisis'
-  techniques: string[]
-  followUp: string[]
-}
-
-export interface AnalysisConfig {
-  enableAnalysis: boolean
-  confidenceThreshold: number
-  interventionThreshold: number
-  analysisMinLength: number
-  enableCrisisDetection: boolean
+  session_id: string
+  insights: string[]
+  recommendations: string[]
 }

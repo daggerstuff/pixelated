@@ -10,24 +10,18 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
-import {
-  MentalHealthInsights,
-  type EnhancedMentalHealthAnalysis,
-} from '@/components/MentalHealthInsights'
+import { MentalHealthInsights } from '@/components/MentalHealthInsights'
 import { Badge } from '@/components/ui/badge'
 import BrainVisualization from '@/components/ui/BrainVisualization'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import MindMirrorDashboard, {
-  type MindMirrorAnalysis,
-} from '@/components/ui/MindMirrorDashboard'
-// import {
-//   MentalHealthInsights,
-//   MentalHealthHistoryChart,
-//   type EnhancedMentalHealthAnalysis as ComponentEnhancedMentalHealthAnalysis,
-// } from '@/components/MentalHealthInsights'
+import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  type EnhancedMentalHealthAnalysis,
+  type MindMirrorAnalysis,
+} from '@/lib/mental-health/types'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {

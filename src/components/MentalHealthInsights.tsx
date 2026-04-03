@@ -2,40 +2,28 @@ import { AlertTriangle, Heart, Brain, Shield, Zap } from 'lucide-react'
 import { FC } from 'react'
 
 import { Badge } from '@/components/ui/badge'
-
-// Types for the component
-export interface EnhancedMentalHealthAnalysis {
-  timestamp: number
-  category: 'low' | 'medium' | 'high' | 'critical'
-  explanation: string
-  expertGuided: boolean
-  scores: Record<string, unknown>
-  summary: string
-  hasMentalHealthIssue: boolean
-  confidence: number
-  supportingEvidence: string[]
-  riskLevel: 'low' | 'medium' | 'high'
-  emotions?: string[]
-  riskFactors?: string[]
-}
+import { type EnhancedMentalHealthAnalysis } from '@/lib/mental-health/types'
 
 interface MentalHealthInsightsProps {
   analysis: EnhancedMentalHealthAnalysis
 }
 
 const RISK_BADGE_VARIANT_MAP: Record<
-  'low' | 'medium' | 'high',
+  'low' | 'medium' | 'high' | 'critical',
   'destructive' | 'outline' | 'secondary'
 > = {
+  critical: 'destructive',
   high: 'destructive',
   medium: 'outline',
   low: 'secondary',
 } as const
 
 const getRiskIconComponent = (
-  riskLevel: 'low' | 'medium' | 'high',
+  riskLevel: 'low' | 'medium' | 'high' | 'critical',
 ): React.ReactElement => {
   switch (riskLevel) {
+    case 'critical':
+      return <Zap className='text-red-600 h-4 w-4 animate-pulse' />
     case 'high':
       return <AlertTriangle className='text-red-500 h-4 w-4' />
     case 'medium':

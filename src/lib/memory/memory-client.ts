@@ -128,8 +128,13 @@ export const memoryManager = {
       
       addHistory(userId, 'update', memoryId)
       
-      // Return a deep copy to prevent external mutation
-      return { ...updatedMemory, metadata: updatedMemory.metadata ? { ...updatedMemory.metadata } : undefined }
+      // Return a deep copy to prevent external mutation (addresses Issue #2)
+      // We manually spread because these are simple objects, ensuring compatibility
+      const deepCopiedResult: MemoryEntry = {
+        ...updatedMemory,
+        metadata: updatedMemory.metadata ? { ...updatedMemory.metadata } : undefined
+      }
+      return deepCopiedResult
     }
     return undefined
   },

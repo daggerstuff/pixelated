@@ -1,7 +1,9 @@
 import { Brain, Shield, ChartBar, AlertTriangle, Lightbulb } from 'lucide-react'
 import React from 'react'
-import { type EnhancedMentalHealthAnalysis } from '@/components/MentalHealthInsights'
-import { type MindMirrorAnalysis } from '@/components/ui/MindMirrorDashboard'
+import {
+  type EnhancedMentalHealthAnalysis,
+  type MindMirrorAnalysis,
+} from '@/lib/mental-health/types'
 import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 
 export interface ChatMessage {
@@ -30,7 +32,7 @@ export interface ChatMessage {
 export const convertToMindMirrorAnalysis = (
   analysis: EnhancedMentalHealthAnalysis,
 ): MindMirrorAnalysis => {
-  // Map severity levels to archetypes
+  // Map severity levels to archetypes (must match keys in MindMirrorDashboard.tsx)
   const severityToArchetype: Record<string, string> = {
     low: 'wise_elder',
     medium: 'caregiver',
@@ -38,10 +40,24 @@ export const convertToMindMirrorAnalysis = (
     critical: 'wounded_healer',
   }
 
-  const archetype = severityToArchetype[analysis.category] || 'visionary'
+  let archetype = severityToArchetype[analysis.category] || 'visionary'
 
   // Determine energy and social connection based on explanation content
   const explanationLower = (analysis.explanation || '').toLowerCase()
+  
+  // Refine archetype based on specific indicators
+  if (analysis.category === 'low') {
+    if (explanationLower.includes('curiosity') || explanationLower.includes('wonder')) {
+      archetype = 'inner_child'
+    }
+  } else if (analysis.category === 'medium') {
+    if (explanationLower.includes('angry') || explanationLower.includes('frustrated')) {
+      archetype = 'rebel_spirit'
+    } else if (explanationLower.includes('analytical') || explanationLower.includes('planning')) {
+      archetype = 'shadow_strategist'
+    }
+  }
+
   const isStressRelated =
     explanationLower.includes('stress') ||
     explanationLower.includes('overwhelm')
