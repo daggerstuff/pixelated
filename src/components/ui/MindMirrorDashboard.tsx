@@ -5,33 +5,11 @@ import React, { useState, useMemo } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-// Archetype definitions inspired by Mind-Mirror
-export interface ArchetypeResult {
-  main_archetype: string
-  confidence: number
-  secondary_archetype?: string
-  color: string
-  description: string
-}
-
-export interface MoodVector {
-  emotional_intensity: number
-  cognitive_clarity: number
-  energy_level: number
-  social_connection: number
-  coherence_index: number
-  urgency_score: number
-}
-
-export interface MindMirrorAnalysis {
-  archetype: ArchetypeResult
-  mood_vector: MoodVector
-  timestamp: number
-  session_id: string
-  insights: string[]
-  recommendations: string[]
-}
+import {
+  type MindMirrorAnalysis,
+  type ArchetypeResult,
+  type MoodVector,
+} from '@/lib/mental-health/types'
 
 interface MindMirrorDashboardProps {
   analysis?: MindMirrorAnalysis
