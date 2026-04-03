@@ -6,6 +6,8 @@ import pytest
 from unittest.mock import Mock, patch
 from datetime import datetime, timezone
 from pathlib import Path
+import tempfile
+import os
 
 from ai.pipelines.orchestrator.orchestration.asana_progress_service import (
     AsanaProgressSyncService,
@@ -20,9 +22,22 @@ class MockConfig:
         self.asana_project_gid = "1234567890"
         self.asana_section_gid = None
         self.asana_parent_task_gid = None
-        self.asana_task_gid_output_path = "/tmp/task_gid.txt"
-        self.asana_task_key_mapping_output_path = "/tmp/task_key_mapping.json"
-        self.asana_task_transition_output_path = "/tmp/task_transitions.json"
+        
+        # Use unique temporary files for test outputs
+        self.test_dir = tempfile.mkdtemp()
+        self.asana_task_gid_output_path = os.path.join(self.test_dir, "task_gid.txt")
+        self.asana_task_key_mapping_output_path = os.path.join(self.test_dir, "task_key_mapping.json")
+        self.asana_task_transition_output_path = os.path.join(self.test_dir, "task_transitions.json")
+
+    def __del__(self):
+        # Cleanup temporary files if they exist
+        try:
+            if hasattr(self, 'test_dir') and os.path.exists(self.test_dir):
+                for f in os.listdir(self.test_dir):
+                    os.remove(os.path.join(self.test_dir, f))
+                os.rmdir(self.test_dir)
+        except Exception:
+            pass
 
 
 class MockStats:

@@ -103,21 +103,28 @@ export const memoryManager = {
     memoryId: string,
     content: string,
     userId = 'default',
-  ): Promise<void> {
+  ): Promise<MemoryEntry | undefined> {
     ensureUser(userId)
     const list = store.get(userId)!
     const idx = list.findIndex((m) => m.id === memoryId)
     if (idx >= 0 && list[idx]) {
       const existingMemory = list[idx]
       const now = nowISO()
-      list[idx] = {
+      const updatedMemory: MemoryEntry = {
         ...existingMemory,
         content,
         metadata: { ...existingMemory.metadata, timestamp: now },
         updatedAt: now,
       }
+      
+      const newList = [...list]
+      newList[idx] = updatedMemory
+      store.set(userId, newList)
+      
       addHistory(userId, 'update', memoryId)
+      return updatedMemory
     }
+    return undefined
   },
 
   async deleteMemory(memoryId: string, userId = 'default'): Promise<void> {
@@ -125,7 +132,8 @@ export const memoryManager = {
     const list = store.get(userId)!
     const idx = list.findIndex((m) => m.id === memoryId)
     if (idx >= 0) {
-      list.splice(idx, 1)
+      const newList = list.filter((m) => m.id !== memoryId)
+      store.set(userId, newList)
       addHistory(userId, 'delete', memoryId)
     }
   },
