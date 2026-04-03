@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
 
+import { ChartBar, Search, Target, TrendingUp } from 'lucide-react'
 export const prerender = false
 ---
 
@@ -72,7 +73,7 @@ export const prerender = false
       <!-- Key Insights Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <BrutalistCard variant="elevated" class="text-center">
-          <div class="text-3xl mb-3">📊</div>
+          <div class="text-3xl mb-3"><ChartBar className="w-8 h-8" /></div>
           <div class="metric-value" id="total-analyses">0</div>
           <div class="metric-label">Total Analyses</div>
           <div class="text-sm text-gray-400 mt-2" id="analysis-trend">
@@ -81,7 +82,7 @@ export const prerender = false
         </BrutalistCard>
 
         <BrutalistCard variant="elevated" class="text-center">
-          <div class="text-3xl mb-3">🎯</div>
+          <div class="text-3xl mb-3"><Target className="w-8 h-8" /></div>
           <div class="metric-value" id="avg-bias-score">0%</div>
           <div class="metric-label">Average Bias Score</div>
           <div class="text-sm text-gray-400 mt-2" id="bias-trend">
@@ -126,7 +127,7 @@ export const prerender = false
             class="min-h-[400px] flex items-center justify-center"
           >
             <div class="text-center text-gray-400">
-              <div class="text-4xl mb-2">📈</div>
+              <div class="text-4xl mb-2"><TrendingUp className="w-10 h-10" /></div>
               <p>Loading analytics data...</p>
             </div>
           </div>
@@ -149,7 +150,7 @@ export const prerender = false
 
             <div id="bias-distribution" class="space-y-4">
               <div class="text-center py-8 text-gray-400">
-                <div class="text-3xl mb-2">📊</div>
+                <div class="text-3xl mb-2"><ChartBar className="w-8 h-8" /></div>
                 <p>Loading distribution data...</p>
               </div>
             </div>
@@ -233,7 +234,7 @@ export const prerender = false
 
         <BrutalistCard hover={true}>
           <div class="text-center">
-            <div class="text-4xl mb-4">📊</div>
+            <div class="text-4xl mb-4"><ChartBar className="w-10 h-10" /></div>
             <h3 class="brutalist-subheading text-lg mb-3">EXCEL EXPORT</h3>
             <p class="text-gray-400 text-sm mb-4">
               Export raw data and analytics to Excel format for further
