@@ -266,9 +266,11 @@ class SetDeduplication implements DeduplicationStrategy {
 class BloomFilterDeduplication implements DeduplicationStrategy {
   private bloomFilter: BloomFilter;
   private itemCount: number = 0;
+  private capacity: number;
 
   constructor(expectedItems: number) {
     this.bloomFilter = new BloomFilter(expectedItems);
+    this.capacity = expectedItems;
   }
 
   has(id: string): boolean {
@@ -287,6 +289,14 @@ class BloomFilterDeduplication implements DeduplicationStrategy {
   getMemoryUsage(): string {
     return `${(this.bloomFilter.getByteSize() / 1024 / 1024).toFixed(2)} MB Bloom filter`;
   }
+
+  getCapacity(): number {
+    return this.capacity;
+  }
+
+  isNearCapacity(threshold: number = 0.8): boolean {
+    return this.itemCount / this.capacity > threshold;
+  }
 }
 
 class HybridDeduplication implements DeduplicationStrategy {
@@ -295,6 +305,7 @@ class HybridDeduplication implements DeduplicationStrategy {
   private switchedToBloom = false;
   private threshold: number;
   private uniqueCount: number = 0;
+  private estimatedCapacity: number = 0;
 
   constructor(threshold: number = BLOOM_FILTER_THRESHOLD) {
     this.setDedup = new SetDeduplication();
@@ -310,10 +321,18 @@ class HybridDeduplication implements DeduplicationStrategy {
 
   add(id: string): void {
     if (this.switchedToBloom && this.bloomDedup) {
-      if (!this.bloomDedup.has(id)) {
-        this.uniqueCount++;
-      }
+      // Bloom filter is probabilistic - we increment on every add
+      // because has() may return false positives (claiming item exists when it doesn't)
+      // This means uniqueCount is an upper bound estimate after Bloom switch
       this.bloomDedup.add(id);
+      this.uniqueCount++;
+
+      if (this.bloomDedup.isNearCapacity(0.8)) {
+        logger.warn(
+          `Bloom filter approaching capacity (${this.uniqueCount.toLocaleString()}/${this.estimatedCapacity.toLocaleString()}). ` +
+            `False positive rate may increase. Consider increasing estimatedCapacity parameter.`,
+        );
+      }
       return;
     }
 
@@ -326,15 +345,18 @@ class HybridDeduplication implements DeduplicationStrategy {
 
     if (!this.switchedToBloom && this.setDedup && this.setDedup.size() >= this.threshold) {
       this.switchedToBloom = true;
-      const estimatedTotal = this.threshold * 10;
-      this.bloomDedup = new BloomFilterDeduplication(estimatedTotal);
+      // Dynamic capacity estimation: start with 10x, but allow for growth
+      // The Bloom filter will resize its bit array based on expectedItems
+      this.estimatedCapacity = this.threshold * 10;
+      this.bloomDedup = new BloomFilterDeduplication(this.estimatedCapacity);
 
       for (const existingId of this.setDedup.getSeenIds()) {
         this.bloomDedup.add(existingId);
       }
 
       logger.info(
-        `Switching to Bloom filter at ${this.threshold.toLocaleString()} entries. Estimated capacity: ${estimatedTotal.toLocaleString()}`,
+        `Switching to Bloom filter at ${this.threshold.toLocaleString()} entries. Estimated capacity: ${this.estimatedCapacity.toLocaleString()}. ` +
+          `Note: uniqueCount becomes an upper-bound estimate after this point.`,
       );
       this.setDedup = null;
     }
@@ -346,9 +368,17 @@ class HybridDeduplication implements DeduplicationStrategy {
 
   getMemoryUsage(): string {
     if (this.switchedToBloom && this.bloomDedup) {
-      return this.bloomDedup.getMemoryUsage();
+      return `${this.bloomDedup.getMemoryUsage()} (estimating ~${Math.round(this.uniqueCount * 0.99).toLocaleString()} unique items at 1% FPR)`;
     }
     return this.setDedup?.getMemoryUsage() ?? "0 entries";
+  }
+
+  isExact(): boolean {
+    return !this.switchedToBloom;
+  }
+
+  getEstimatedCapacity(): number {
+    return this.estimatedCapacity;
   }
 }
 
