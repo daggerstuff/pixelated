@@ -45,6 +45,72 @@ async function* findNormalizedFiles(baseDir: string): AsyncGenerator<string> {
   }
 }
 
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current);
+  return result;
+}
+
+function flattenRecordForCSV(record: ConversationRecord): Record<string, string> {
+  const flat: Record<string, string> = {
+    conversation_id: record.conversation_id,
+    source: record.source,
+    quality_score: String(record.metadata?.quality_score ?? 0.5),
+  };
+
+  const maxMessages = 10;
+  for (let i = 0; i < maxMessages; i++) {
+    const msg = record.messages[i];
+    if (msg) {
+      flat[`message_${i}_role`] = msg.role;
+      flat[`message_${i}_content`] = msg.content.replace(/"/g, '""').replace(/\n/g, "\\n");
+    } else {
+      flat[`message_${i}_role`] = "";
+      flat[`message_${i}_content`] = "";
+    }
+  }
+
+  return flat;
+}
+
+function generateCSVHeaders(): string[] {
+  const headers = ["conversation_id", "source", "quality_score"];
+  for (let i = 0; i < 10; i++) {
+    headers.push(`message_${i}_role`, `message_${i}_content`);
+  }
+  return headers;
+}
+
+function recordToCSVRow(record: ConversationRecord, headers: string[]): string {
+  const flat = flattenRecordForCSV(record);
+  const values = headers.map((h) => {
+    const val = flat[h] ?? "";
+    return `"${val}"`;
+  });
+  return values.join(",");
+}
+
 export async function mergeAllDatasets(
   options: MergeDatasetOptions = {
     outputFormat: "jsonl",
@@ -72,7 +138,19 @@ export async function mergeAllDatasets(
   let qualitySum = 0;
   let qualityCount = 0;
 
-  for await (const filePath of findNormalizedFiles(normalizedDir)) {
+  const csvHeaders = generateCSVHeaders();
+
+  if (options.outputFormat === "csv") {
+    writeStream.write(csvHeaders.map((h) => `"${h}"`).join(",") + "\n");
+  }
+
+  if (options.outputFormat === "json") {
+    writeStream.write("[\n");
+  }
+
+  let reachedMaxSamples = false;
+
+  outerLoop: for await (const filePath of findNormalizedFiles(normalizedDir)) {
     datasetCount++;
     logger.info(`Merging ${filePath}`);
 
@@ -97,7 +175,8 @@ export async function mergeAllDatasets(
         }
 
         if (options.maxSamples && mergedSamples >= options.maxSamples) {
-          break;
+          reachedMaxSamples = true;
+          break outerLoop;
         }
 
         seenIds.add(record.conversation_id);
@@ -106,8 +185,19 @@ export async function mergeAllDatasets(
         qualitySum += qualityScore;
         qualityCount++;
 
-        if (options.outputFormat === "jsonl") {
-          writeStream.write(JSON.stringify(record) + "\n");
+        switch (options.outputFormat) {
+          case "jsonl":
+            writeStream.write(JSON.stringify(record) + "\n");
+            break;
+          case "json":
+            if (mergedSamples > 0) {
+              writeStream.write(",\n");
+            }
+            writeStream.write("  " + JSON.stringify(record));
+            break;
+          case "csv":
+            writeStream.write(recordToCSVRow(record, csvHeaders) + "\n");
+            break;
         }
 
         mergedSamples++;
@@ -115,6 +205,14 @@ export async function mergeAllDatasets(
         logger.debug(`Skipping malformed line: ${parseError}`);
       }
     }
+  }
+
+  if (reachedMaxSamples) {
+    logger.info(`Reached maxSamples limit: ${options.maxSamples}`);
+  }
+
+  if (options.outputFormat === "json") {
+    writeStream.write("\n]");
   }
 
   writeStream.end();
@@ -169,6 +267,134 @@ export function getMergedDatasetPath(format: "jsonl" | "json" | "csv" = "jsonl")
   return validatedPath;
 }
 
+async function validateJSONDataset(filePath: string, errors: string[]): Promise<number> {
+  const readStream = createReadStream(filePath, "utf-8");
+  const rl = createInterface({ input: readStream, crlfDelay: Infinity });
+
+  let lineNumber = 0;
+  let sampleCount = 0;
+  let currentRecord = "";
+  let braceDepth = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for await (const line of rl) {
+    lineNumber++;
+
+    const trimmed = line.trim();
+
+    if (lineNumber === 1 && trimmed === "[") continue;
+    if (trimmed === "]") break;
+    if (trimmed === "," || trimmed === "") continue;
+
+    const recordLine = trimmed.startsWith(",") ? trimmed.slice(1).trim() : trimmed;
+
+    for (let i = 0; i < recordLine.length; i++) {
+      const char = recordLine[i];
+
+      if (escapeNext) {
+        currentRecord += char;
+        escapeNext = false;
+        continue;
+      }
+
+      if (char === "\\") {
+        currentRecord += char;
+        escapeNext = true;
+        continue;
+      }
+
+      if (char === '"' && !escapeNext) {
+        inString = !inString;
+        currentRecord += char;
+        continue;
+      }
+
+      currentRecord += char;
+
+      if (!inString) {
+        if (char === "{") braceDepth++;
+        if (char === "}") braceDepth--;
+      }
+    }
+
+    if (braceDepth === 0 && currentRecord.trim()) {
+      try {
+        const record = JSON.parse(currentRecord.trim());
+        if (!record.conversation_id || !Array.isArray(record.messages)) {
+          errors.push(`Record near line ${lineNumber}: Missing required fields`);
+        }
+        sampleCount++;
+      } catch {
+        errors.push(`Record near line ${lineNumber}: Invalid JSON`);
+      }
+      currentRecord = "";
+      inString = false;
+      escapeNext = false;
+    }
+  }
+
+  return sampleCount;
+}
+
+async function validateCSVDataset(filePath: string, errors: string[]): Promise<number> {
+  const readStream = createReadStream(filePath, "utf-8");
+  const rl = createInterface({ input: readStream, crlfDelay: Infinity });
+
+  let lineNumber = 0;
+  let headers: string[] = [];
+  let sampleCount = 0;
+
+  for await (const line of rl) {
+    lineNumber++;
+
+    if (lineNumber === 1) {
+      headers = parseCSVLine(line).map((h) => h.trim());
+      if (!headers.includes("conversation_id")) {
+        errors.push("CSV missing required column: conversation_id");
+      }
+      continue;
+    }
+
+    if (!line.trim()) continue;
+
+    const values = parseCSVLine(line);
+    if (values.length !== headers.length) {
+      errors.push(
+        `Line ${lineNumber}: Column count mismatch (expected ${headers.length}, got ${values.length})`,
+      );
+    }
+    sampleCount++;
+  }
+
+  return sampleCount;
+}
+
+async function validateJSONLDataset(filePath: string, errors: string[]): Promise<number> {
+  const readStream = createReadStream(filePath, "utf-8");
+  const rl = createInterface({ input: readStream, crlfDelay: Infinity });
+
+  let lineNumber = 0;
+  let sampleCount = 0;
+
+  for await (const line of rl) {
+    lineNumber++;
+    if (!line.trim()) continue;
+
+    try {
+      const record = JSON.parse(line);
+      if (!record.conversation_id || !Array.isArray(record.messages)) {
+        errors.push(`Line ${lineNumber}: Missing required fields`);
+      }
+      sampleCount++;
+    } catch {
+      errors.push(`Line ${lineNumber}: Invalid JSON`);
+    }
+  }
+
+  return sampleCount;
+}
+
 export async function validateMergedDataset(filePath: string): Promise<{
   isValid: boolean;
   errors: string[];
@@ -182,31 +408,26 @@ export async function validateMergedDataset(filePath: string): Promise<{
   });
 
   const errors: string[] = [];
-  let sampleCount = 0;
 
   if (!existsSync(validatedPath)) {
     errors.push("Dataset file does not exist");
     return { isValid: false, errors, sampleCount: 0 };
   }
 
+  const extension = validatedPath.split(".").pop()?.toLowerCase();
+
+  let sampleCount = 0;
+
   try {
-    const readStream = createReadStream(validatedPath, "utf-8");
-    const rl = createInterface({ input: readStream, crlfDelay: Infinity });
-
-    let lineNumber = 0;
-    for await (const line of rl) {
-      lineNumber++;
-      if (!line.trim()) continue;
-
-      try {
-        const record = JSON.parse(line);
-        if (!record.conversation_id || !Array.isArray(record.messages)) {
-          errors.push(`Line ${lineNumber}: Missing required fields`);
-        }
-        sampleCount++;
-      } catch (parseError) {
-        errors.push(`Line ${lineNumber}: Invalid JSON`);
-      }
+    switch (extension) {
+      case "json":
+        sampleCount = await validateJSONDataset(validatedPath, errors);
+        break;
+      case "csv":
+        sampleCount = await validateCSVDataset(validatedPath, errors);
+        break;
+      default:
+        sampleCount = await validateJSONLDataset(validatedPath, errors);
     }
   } catch (error) {
     errors.push(`Read error: ${error}`);
