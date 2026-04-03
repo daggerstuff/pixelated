@@ -24,29 +24,12 @@ export function generateId(length: number = 16): string {
 /**
  * Generate a UUID v4 compliant ID
  *
- * Uses crypto.randomUUID() when available, but falls back to a less secure
- * but compatible implementation when it's not.
+ * Uses the built-in crypto.randomUUID() for secure UUID generation.
  *
  * @returns A UUID v4 string
  */
 export function generateUUID(): string {
-  try {
-    // Try to use the standard crypto.randomUUID() function
-    return crypto.randomUUID()
-  } catch {
-    // Fallback implementation for environments where randomUUID is not available
-
-    // This is a simple implementation that is not cryptographically secure,
-    // but is suitable for most use cases in a controlled test environment
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
-      /[xy]/g,
-      function (c) {
-        const r = (Math.random() * 16) | 0,
-          v = c === 'x' ? r : (r & 0x3) | 0x8
-        return v.toString(16)
-      },
-    )
-  }
+  return crypto.randomUUID()
 }
 
 /**
