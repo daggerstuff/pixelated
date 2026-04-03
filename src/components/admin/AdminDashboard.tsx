@@ -1,6 +1,6 @@
 import type { FC } from 'react'
 import React from 'react'
-import { ChartBar, TrendingUp, Star } from 'lucide-react'
+import { ChartBar, TrendingUp, Star, Users, Building, Settings, Clipboard, Stethoscope } from 'lucide-react'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -166,7 +166,7 @@ export const AdminDashboard: FC = () => {
                       : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
                 >
-                  <span>{tab.icon}</span>
+                  {tab.icon === "chart" ? <ChartBar className="w-5 h-5" /> : tab.icon === "therapist" ? <Stethoscope className="w-5 h-5" /> : tab.icon === "institution" ? <Building className="w-5 h-5" /> : tab.icon === "system" ? <Settings className="w-5 h-5" /> : tab.icon === "compliance" ? <Clipboard className="w-5 h-5" /> : null}
                   {tab.label}
                 </button>
               ))}
