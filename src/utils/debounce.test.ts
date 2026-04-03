@@ -11,7 +11,7 @@ describe('debounce', () => {
   })
 
   it('should debounce a function', () => {
-    const func = vi.fn()
+    const func = vi.fn<any>()
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc()
@@ -26,7 +26,7 @@ describe('debounce', () => {
   })
 
   it('should call immediately if immediate is true', () => {
-    const func = vi.fn()
+    const func = vi.fn<any>()
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc()
@@ -41,7 +41,7 @@ describe('debounce', () => {
   })
 
   it('should call again after timeout if immediate is true', () => {
-    const func = vi.fn()
+    const func = vi.fn<any>()
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc()
@@ -54,7 +54,7 @@ describe('debounce', () => {
   })
 
   it('should pass arguments to the debounced function', () => {
-    const func = vi.fn()
+    const func = vi.fn<any>()
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc('test', 123)
