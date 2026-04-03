@@ -52,4 +52,15 @@ describe('debounce', () => {
     debouncedFunc()
     expect(func).toHaveBeenCalledTimes(2)
   })
+
+  it('should pass arguments to the debounced function', () => {
+    const func = vi.fn()
+    const debouncedFunc = debounce(func, 100)
+
+    debouncedFunc('test', 123)
+    vi.advanceTimersByTime(100)
+
+    expect(func).toHaveBeenCalledWith('test', 123)
+  })
+
 })
