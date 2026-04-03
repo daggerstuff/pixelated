@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { ChartBar } from 'lucide-react'
 
 import { researchAPI, type DatasetMetadata } from '@/lib/api/research'
 
@@ -175,7 +176,7 @@ export default function DatasetSearch() {
 
           {!loading && !hasSearched && (
             <div className='py-20 text-center'>
-              <div className='mb-6 text-6xl opacity-20'>📊</div>
+              <ChartBar className="w-24 h-24 opacity-20" />
               <h3 className='text-slate-200 mb-2 text-2xl font-bold'>
                 Explore Therapy Datasets
               </h3>

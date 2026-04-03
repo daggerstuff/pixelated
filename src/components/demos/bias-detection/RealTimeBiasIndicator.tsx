@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 // Real-time bias indicator component for live feedback
 import React, { useMemo } from 'react'
+import { Lightbulb } from 'lucide-react'
 
 interface BiasIndicator {
   type: 'demographic' | 'cultural' | 'linguistic' | 'gender' | 'age'
@@ -295,7 +296,7 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
                       {indicator.description}
                     </div>
                     <div className='text-gray-600 mt-1 text-xs'>
-                      💡 {indicator.suggestion}
+                      <Lightbulb className="w-5 h-5" /> {indicator.suggestion}
                     </div>
                   </div>
                   <div className='text-gray-500 ml-2 text-xs'>
