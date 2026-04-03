@@ -5,6 +5,7 @@
  */
 import BrutalistLayout from '@/layouts/BrutalistLayout.astro'
 import BrutalistHero from '@/components/BrutalistHero.astro'
+import InfoStrip from '@/components/homepage/InfoStrip.astro'
 import IntroSection from '@/components/homepage/IntroSection.astro'
 import WorkflowSection from '@/components/homepage/WorkflowSection.astro'
 import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
@@ -52,6 +53,23 @@ const organizationSchema = {
     artifact={homepageContent.hero.artifact}
   />
 
+  <section class="trust-band-section">
+    <div class="pe-page-shell trust-band-shell">
+      <InfoStrip
+        className="trust-band"
+        label="Why teams take the pilot seriously"
+        title="A clinical training product should look reviewable before anyone asks for a call."
+        body="The homepage should communicate the same standard as the product: high-contrast, specific, and built for supervision teams that need evidence more than excitement."
+        items={[
+          { label: 'Positioning', value: 'Clinical simulation for real supervision workflows' },
+          { label: 'Review standard', value: 'Transcript, notes, and retry logic stay connected' },
+          { label: 'Pilot motion', value: 'Start with one case and judge the evidence together' },
+        ]}
+        theme="dark"
+      />
+    </div>
+  </section>
+
   <IntroSection content={homepageContent.intro} />
   <WorkflowSection content={homepageContent.how} />
 
@@ -78,3 +96,17 @@ const organizationSchema = {
     meta={homepageContent.cta.meta}
   />
 </BrutalistLayout>
+
+<style>
+  .trust-band-section {
+    position: relative;
+    margin-top: -0.75rem;
+    padding-bottom: clamp(1rem, 2vw, 1.5rem);
+    background: linear-gradient(180deg, rgba(8, 12, 13, 1), rgba(8, 12, 13, 0.94));
+  }
+
+  .trust-band-shell {
+    position: relative;
+    z-index: 1;
+  }
+</style>
