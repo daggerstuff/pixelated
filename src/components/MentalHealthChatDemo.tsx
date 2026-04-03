@@ -36,23 +36,6 @@ import type {
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-// Extended analysis result that might include additional fields
-interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
-  expertGuidance?: unknown
-  categoryScores?: {
-    depression?: number
-    anxiety?: number
-    stress?: number
-    anger?: number
-    socialIsolation?: number
-    bipolarDisorder?: number
-    ocd?: number
-    eatingDisorder?: number
-    socialAnxiety?: number
-    panicDisorder?: number
-  }
-}
-
 interface MentalHealthAdapter {
   analyzeMentalHealth(
     content: string,
@@ -67,25 +50,29 @@ interface MentalHealthService {
   isInitialized: boolean
 }
 
+import {
+  convertToMindMirrorAnalysis,
+  getInitialMessages,
+  createInterventionMessage,
+  type ChatMessage,
+} from '@/lib/mental-health/chat-utils'
+
 const logger = createBuildSafeLogger('chat-demo')
 
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  displayContent?: React.ReactNode
-  timestamp: string
-  mentalHealthAnalysis?: MentalHealthAnalysisResult
-  isProcessing?: boolean
-  riskLevel?: 'low' | 'medium' | 'high' | 'critical'
-  needsIntervention?: boolean
-  apiResponse?: unknown // Add type if available
-  metadata?: {
-    responseType?: string
-    confidence?: number
-    copingStrategies?: unknown
-    resources?: unknown
-    processingTime?: number
+// Extended analysis result that might include additional fields
+interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {
+  expertGuidance?: unknown
+  categoryScores?: {
+    depression?: number
+    anxiety?: number
+    stress?: number
+    anger?: number
+    socialIsolation?: number
+    bipolarDisorder?: number
+    ocd?: number
+    eatingDisorder?: number
+    socialAnxiety?: number
+    panicDisorder?: number
   }
 }
 
@@ -224,60 +211,7 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
   showSettingsPanel = true,
   initialTab = 'analysis',
 }: MentalHealthChatDemoProps = {}) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome_msg',
-      role: 'assistant',
-      content: `Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to provide thoughtful, evidence-based support.
-
-🧠 **Clinical-Grade Analysis**: Advanced AI analyzes your messages for mental health indicators
-🔒 **Privacy-First**: All analysis uses encrypted processing - your data stays secure
-📊 **Real-Time Insights**: Get immediate feedback on emotional patterns and trends
-🚨 **Crisis Detection**: Automatic identification of urgent situations with immediate resources
-
-How are you feeling today? I'm here to listen and help.`,
-      displayContent: (
-        <div className='space-y-3'>
-          <p>
-            Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here
-            to provide thoughtful, evidence-based support.
-          </p>
-          <div className='space-y-2 py-1'>
-            <div className='flex items-center gap-2'>
-              <Brain className='text-purple-600 h-4 w-4 shrink-0' />
-              <p className='text-sm'>
-                <strong>Clinical-Grade Analysis</strong>: Advanced AI analyzes
-                your messages for mental health indicators
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <Shield className='text-blue-600 h-4 w-4 shrink-0' />
-              <p className='text-sm'>
-                <strong>Privacy-First</strong>: All analysis uses encrypted
-                processing - your data stays secure
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <ChartBar className='text-indigo-600 h-4 w-4 shrink-0' />
-              <p className='text-sm'>
-                <strong>Real-Time Insights</strong>: Get immediate feedback on
-                emotional patterns and trends
-              </p>
-            </div>
-            <div className='flex items-center gap-2'>
-              <AlertTriangle className='text-red-600 h-4 w-4 shrink-0' />
-              <p className='text-sm'>
-                <strong>Crisis Detection</strong>: Automatic identification of
-                urgent situations with immediate resources
-              </p>
-            </div>
-          </div>
-          <p>How are you feeling today? I'm here to listen and help.</p>
-        </div>
-      ),
-      timestamp: new Date().toISOString(),
-    },
-  ])
+  const [messages, setMessages] = useState<ChatMessage[]>(getInitialMessages())
 
   const [input, setInput] = useState('')
   const [processing, setProcessing] = useState(false)
@@ -298,62 +232,9 @@ How are you feeling today? I'm here to listen and help.`,
     useState<MindMirrorAnalysis | null>(null)
 
   // Convert existing analysis to Mind-Mirror format
-  const convertToMindMirrorAnalysis = useCallback(
+  const convertToMindMirrorAnalysisCallback = useCallback(
     (analysis: EnhancedMentalHealthAnalysis): MindMirrorAnalysis => {
-      // Map severity levels to archetypes
-      const severityToArchetype = {
-        low: 'wise_elder',
-        medium: 'caregiver',
-        high: 'wounded_healer',
-        critical: 'wounded_healer',
-      }
-
-      const archetype = severityToArchetype[analysis.category] || 'visionary'
-
-      // Determine energy and social connection based on explanation content
-      const explanationLower = (analysis.explanation || '').toLowerCase()
-      const isStressRelated =
-        explanationLower.includes('stress') ||
-        explanationLower.includes('overwhelm')
-      const isSocialIsolationRelated =
-        explanationLower.includes('isolation') ||
-        explanationLower.includes('lonely') ||
-        explanationLower.includes('social')
-
-      return {
-        archetype: {
-          main_archetype: archetype,
-          confidence: analysis.confidence || 0,
-          color: '#45B7D1',
-          description: analysis.explanation || 'Analysis completed',
-        },
-        mood_vector: {
-          emotional_intensity:
-            analysis.riskLevel === 'high'
-              ? 0.8
-              : analysis.riskLevel === 'medium'
-                ? 0.6
-                : 0.4,
-          cognitive_clarity: analysis.confidence || 0,
-          energy_level: isStressRelated ? 0.3 : 0.6,
-          social_connection: isSocialIsolationRelated ? 0.2 : 0.7,
-          coherence_index: analysis.confidence || 0,
-          urgency_score:
-            analysis.riskLevel === 'high'
-              ? 0.9
-              : analysis.riskLevel === 'medium'
-                ? 0.6
-                : 0.3,
-        },
-        timestamp: analysis.timestamp || Date.now(),
-        session_id: 'chat_session',
-        insights: analysis.supportingEvidence || [],
-        recommendations: [
-          'Continue monitoring your mental health patterns',
-          'Consider professional support if symptoms persist',
-          'Practice self-care and stress management techniques',
-        ],
-      }
+      return convertToMindMirrorAnalysis(analysis)
     },
     [],
   )
@@ -507,16 +388,21 @@ How are you feeling today? I'm here to listen and help.`,
 
           const chatResult = await response.json()
 
+          // Validate API response structure (addresses Issue #1)
+          if (!chatResult || !chatResult.analysis || !chatResult.response) {
+            throw new Error('Invalid API response format: missing analysis or response data')
+          }
+
           // Convert API response to our analysis format
           const analysisResult: MentalHealthAnalysisResult = {
-            mentalHealthCategory: chatResult.analysis.emotionalState,
-            confidence: chatResult.analysis.concernSeverity / 10, // Convert 1-10 to 0-1
-            supportingEvidence: chatResult.analysis.keyTopics,
+            mentalHealthCategory: chatResult.analysis.emotionalState || 'unknown',
+            confidence: (chatResult.analysis.concernSeverity || 0) / 10, // Convert 1-10 to 0-1
+            supportingEvidence: chatResult.analysis.keyTopics || [],
             isCrisis:
               chatResult.riskAssessment?.crisisLevel === 'imminent' ||
               chatResult.riskAssessment?.crisisLevel === 'high',
             hasMentalHealthIssue: chatResult.analysis.stressLevel !== 'low',
-            explanation: `Stress level: ${chatResult.analysis.stressLevel}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
+            explanation: `Stress level: ${chatResult.analysis.stressLevel || 'unknown'}, Sentiment: ${chatResult.analysis.sentimentScore > 0 ? 'positive' : chatResult.analysis.sentimentScore < 0 ? 'negative' : 'neutral'}`,
             timestamp: new Date().toISOString(),
           }
 
@@ -606,15 +492,15 @@ How are you feeling today? I'm here to listen and help.`,
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
               role: 'assistant',
-              content: chatResult.response.message,
+              content: chatResult.response?.message || "I'm processing your request.",
               timestamp: new Date().toISOString(),
               // Include API metadata for enhanced display
               metadata: {
-                responseType: chatResult.response.type,
-                confidence: chatResult.response.confidence,
+                responseType: chatResult.response?.type,
+                confidence: chatResult.response?.confidence,
                 copingStrategies: chatResult.copingStrategies,
                 resources: chatResult.resources,
-                processingTime: chatResult.metadata.processingTime,
+                processingTime: chatResult.metadata?.processingTime,
               },
             }
             setMessages((prev) => [...prev, assistantMessage])
@@ -807,12 +693,10 @@ It sounds like you're dealing with some challenges. What's been the most difficu
         messageWithAnalysis.mentalHealthAnalysis,
       )
 
-      const assistantMessage: ChatMessage = {
-        id: `intervention_${Date.now()}_${generateSecureRandomString(9)}`,
-        role: 'assistant',
-        content: `<Lightbulb className="w-4 h-4 inline" /> **Therapeutic Intervention**\n\n${intervention}`,
-        timestamp: new Date().toISOString(),
-      }
+      const assistantMessage: ChatMessage = createInterventionMessage(
+        `intervention_${Date.now()}_${generateSecureRandomString(9)}`,
+        intervention,
+      )
 
       setMessages((prev) => [...prev, assistantMessage])
 

@@ -110,19 +110,26 @@ export const memoryManager = {
     if (idx >= 0 && list[idx]) {
       const existingMemory = list[idx]
       const now = nowISO()
+      
+      // Create a deep copy of the updated memory
       const updatedMemory: MemoryEntry = {
         ...existingMemory,
         content,
-        metadata: { ...existingMemory.metadata, timestamp: now },
+        metadata: existingMemory.metadata 
+          ? { ...existingMemory.metadata, timestamp: now } 
+          : { timestamp: now },
         updatedAt: now,
       }
       
+      // Atomic update of the store by replacing the entire list reference
       const newList = [...list]
       newList[idx] = updatedMemory
       store.set(userId, newList)
       
       addHistory(userId, 'update', memoryId)
-      return updatedMemory
+      
+      // Return a deep copy to prevent external mutation
+      return { ...updatedMemory, metadata: updatedMemory.metadata ? { ...updatedMemory.metadata } : undefined }
     }
     return undefined
   },
