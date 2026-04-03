@@ -5,6 +5,8 @@ import {
   Shield,
   Zap,
   Sparkles,
+  ChartBar,
+  Lightbulb,
 } from 'lucide-react'
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
@@ -229,7 +231,7 @@ export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
 
 🧠 **Clinical-Grade Analysis**: Advanced AI analyzes your messages for mental health indicators
 🔒 **Privacy-First**: All analysis uses encrypted processing - your data stays secure
-📊 **Real-Time Insights**: Get immediate feedback on emotional patterns and trends
+<ChartBar className="w-4 h-4 inline" /> **Real-Time Insights**: Get immediate feedback on emotional patterns and trends
 🚨 **Crisis Detection**: Automatic identification of urgent situations with immediate resources
 
 How are you feeling today? I'm here to listen and help.`,
@@ -768,7 +770,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
       const assistantMessage: ChatMessage = {
         id: `intervention_${Date.now()}_${generateSecureRandomString(9)}`,
         role: 'assistant',
-        content: `💡 **Therapeutic Intervention**\n\n${intervention}`,
+        content: `<Lightbulb className="w-4 h-4 inline" /> **Therapeutic Intervention**\n\n${intervention}`,
         timestamp: new Date().toISOString(),
       }
 
