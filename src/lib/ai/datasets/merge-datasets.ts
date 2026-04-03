@@ -7,6 +7,55 @@ import { securePathJoin } from "../../utils/server";
 const logger = createBuildSafeLogger("default");
 
 const MEMORY_WARNING_THRESHOLD = 1000000;
+const BLOOM_FILTER_THRESHOLD = 500000;
+const BLOOM_FILTER_FALSE_POSITIVE_RATE = 0.01;
+
+class BloomFilter {
+  private size: number;
+  private hashCount: number;
+  private bitArray: Uint8Array;
+
+  constructor(expectedItems: number, falsePositiveRate: number = BLOOM_FILTER_FALSE_POSITIVE_RATE) {
+    this.size = Math.ceil(
+      (-expectedItems * Math.log(falsePositiveRate)) / Math.pow(Math.log(2), 2),
+    );
+    this.hashCount = Math.ceil((this.size / expectedItems) * Math.log(2));
+    this.bitArray = new Uint8Array(Math.ceil(this.size / 8));
+  }
+
+  private hash(item: string, seed: number): number {
+    let hash = seed;
+    for (let i = 0; i < item.length; i++) {
+      hash = (hash * 31 + item.charCodeAt(i)) >>> 0;
+    }
+    return hash % this.size;
+  }
+
+  add(item: string): void {
+    for (let i = 0; i < this.hashCount; i++) {
+      const index = this.hash(item, i);
+      const byteIndex = Math.floor(index / 8);
+      const bitIndex = index % 8;
+      this.bitArray[byteIndex] |= 1 << bitIndex;
+    }
+  }
+
+  mightContain(item: string): boolean {
+    for (let i = 0; i < this.hashCount; i++) {
+      const index = this.hash(item, i);
+      const byteIndex = Math.floor(index / 8);
+      const bitIndex = index % 8;
+      if ((this.bitArray[byteIndex] & (1 << bitIndex)) === 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  getByteSize(): number {
+    return this.bitArray.length;
+  }
+}
 
 export interface DatasetMergeStats {
   totalDatasets: number;
@@ -183,6 +232,126 @@ function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
   });
 }
 
+interface DeduplicationStrategy {
+  has(id: string): boolean;
+  add(id: string): void;
+  size(): number;
+  getMemoryUsage(): string;
+}
+
+class SetDeduplication implements DeduplicationStrategy {
+  private _seenIds = new Set<string>();
+
+  has(id: string): boolean {
+    return this._seenIds.has(id);
+  }
+
+  add(id: string): void {
+    this._seenIds.add(id);
+  }
+
+  size(): number {
+    return this._seenIds.size;
+  }
+
+  getMemoryUsage(): string {
+    return `${this._seenIds.size.toLocaleString()} entries in Set`;
+  }
+
+  getSeenIds(): Set<string> {
+    return this._seenIds;
+  }
+}
+
+class BloomFilterDeduplication implements DeduplicationStrategy {
+  private bloomFilter: BloomFilter;
+  private itemCount: number = 0;
+
+  constructor(expectedItems: number) {
+    this.bloomFilter = new BloomFilter(expectedItems);
+  }
+
+  has(id: string): boolean {
+    return this.bloomFilter.mightContain(id);
+  }
+
+  add(id: string): void {
+    this.bloomFilter.add(id);
+    this.itemCount++;
+  }
+
+  size(): number {
+    return this.itemCount;
+  }
+
+  getMemoryUsage(): string {
+    return `${(this.bloomFilter.getByteSize() / 1024 / 1024).toFixed(2)} MB Bloom filter`;
+  }
+}
+
+class HybridDeduplication implements DeduplicationStrategy {
+  private setDedup: SetDeduplication | null = null;
+  private bloomDedup: BloomFilterDeduplication | null = null;
+  private switchedToBloom = false;
+  private threshold: number;
+  private uniqueCount: number = 0;
+
+  constructor(threshold: number = BLOOM_FILTER_THRESHOLD) {
+    this.setDedup = new SetDeduplication();
+    this.threshold = threshold;
+  }
+
+  has(id: string): boolean {
+    if (this.switchedToBloom && this.bloomDedup) {
+      return this.bloomDedup.has(id);
+    }
+    return this.setDedup?.has(id) ?? false;
+  }
+
+  add(id: string): void {
+    if (this.switchedToBloom && this.bloomDedup) {
+      if (!this.bloomDedup.has(id)) {
+        this.uniqueCount++;
+      }
+      this.bloomDedup.add(id);
+      return;
+    }
+
+    if (this.setDedup) {
+      if (!this.setDedup.has(id)) {
+        this.uniqueCount++;
+      }
+      this.setDedup.add(id);
+    }
+
+    if (!this.switchedToBloom && this.setDedup && this.setDedup.size() >= this.threshold) {
+      this.switchedToBloom = true;
+      const estimatedTotal = this.threshold * 10;
+      this.bloomDedup = new BloomFilterDeduplication(estimatedTotal);
+
+      for (const existingId of this.setDedup.getSeenIds()) {
+        this.bloomDedup.add(existingId);
+      }
+
+      logger.info(
+        `Switching to Bloom filter at ${this.threshold.toLocaleString()} entries. Estimated capacity: ${estimatedTotal.toLocaleString()}`,
+      );
+      this.setDedup = null;
+    }
+  }
+
+  size(): number {
+    return this.uniqueCount;
+  }
+
+  getMemoryUsage(): string {
+    if (this.switchedToBloom && this.bloomDedup) {
+      return this.bloomDedup.getMemoryUsage();
+    }
+    return this.setDedup?.getMemoryUsage() ?? "0 entries";
+  }
+}
+
 export async function mergeAllDatasets(
   options: MergeDatasetOptions = {
     outputFormat: "jsonl",
@@ -202,7 +371,7 @@ export async function mergeAllDatasets(
   const writeStream = createWriteStream(outputPath, "utf-8");
   const writer = createWriter(options.outputFormat, writeStream);
 
-  const seenIds = new Set<string>();
+  const dedup = options.removeDuplicates ? new HybridDeduplication() : null;
   const categories = new Set<string>();
   let totalSamples = 0;
   let mergedSamples = 0;
@@ -228,7 +397,7 @@ export async function mergeAllDatasets(
         const record: ConversationRecord = JSON.parse(line);
         totalSamples++;
 
-        if (options.removeDuplicates && seenIds.has(record.conversation_id)) {
+        if (dedup && dedup.has(record.conversation_id)) {
           duplicatesRemoved++;
           continue;
         }
@@ -243,12 +412,14 @@ export async function mergeAllDatasets(
           break outerLoop;
         }
 
-        seenIds.add(record.conversation_id);
+        if (dedup) {
+          dedup.add(record.conversation_id);
+        }
         categories.add(record.source);
 
-        if (!memoryWarned && seenIds.size > MEMORY_WARNING_THRESHOLD) {
+        if (!memoryWarned && dedup && dedup.size() > MEMORY_WARNING_THRESHOLD) {
           logger.warn(
-            `Deduplication set has grown to ${seenIds.size.toLocaleString()} entries. Consider using Bloom filter for large datasets.`,
+            `Deduplication using ${dedup.getMemoryUsage()}. For strict deduplication on extremely large datasets, consider persistent KV store.`,
           );
           memoryWarned = true;
         }
