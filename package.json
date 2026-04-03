@@ -311,7 +311,7 @@
     "@types/node": "^25.5.0",
     "@types/nprogress": "^0.2.3",
     "@types/p5": "^1.7.7",
-    "@types/pg": "8.18.0",
+    "@types/pg": "8.20.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@types/slug": "^5.0.9",
@@ -333,7 +333,7 @@
     "cross-env": "^10.1.0",
     "del-cli": "^7.0.0",
     "dotenv": "^17.4.0",
-    "esbuild": "^0.25.12",
+    "esbuild": "^0.28.0",
     "eslint": "^9.39.4",
     "eslint-plugin-astro": "^1.6.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -356,7 +356,7 @@
     "launchdarkly-js-client-sdk": "^3.9.0",
     "lint-staged": "^16.4.0",
     "markdownlint": "^0.40.0",
-    "markdownlint-cli": "^0.47.0",
+    "markdownlint-cli": "^0.48.0",
     "mcp-remote": "^0.1.38",
     "mdast-util-directive": "^3.1.0",
     "mdast-util-to-string": "^4.0.0",
@@ -364,11 +364,11 @@
     "mongodb-memory-server": "^11.0.1",
     "msw": "^2.12.14",
     "nprogress": "^0.2.0",
-    "oxc-parser": "^0.107.0",
+    "oxc-parser": "^0.123.0",
     "oxc-resolver": "^11.19.1",
-    "oxfmt": "^0.35.0",
+    "oxfmt": "^0.43.0",
     "oxlint": "^1.58.0",
-    "path-to-regexp": "8.3.0",
+    "path-to-regexp": "8.4.2",
     "postcss": "^8.5.8",
     "postcss-import": "^16.1.1",
     "postinstall-postinstall": "^2.1.0",
@@ -385,7 +385,7 @@
     "remark-math": "^6.0.0",
     "remark-toc": "^9.0.0",
     "rollup-plugin-visualizer": "^7.0.1",
-    "satori": "^0.18.4",
+    "satori": "^0.26.0",
     "satori-html": "^0.3.2",
     "scheduler": "^0.27.0",
     "sharp": "^0.34.5",
@@ -411,7 +411,7 @@
     "hono": "^4.12.7"
   },
   "resolutions": {
-    "path-to-regexp": "8.3.0"
+    "path-to-regexp": "8.4.2"
   },
   "engines": {
     "node": ">=24"
