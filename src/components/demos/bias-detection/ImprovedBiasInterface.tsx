@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 // Enhanced Bias Detection Interface with improved UX
 import React, { useState, useCallback } from 'react'
+import { Target } from 'lucide-react'
 
 import type {
   SessionData,
@@ -249,7 +250,7 @@ export const ImprovedBiasInterface: React.FC<ImprovedBiasInterfaceProps> = ({
               {/* Additional insights section */}
               <div className='bg-blue-50 border-blue-200 rounded-lg border p-6'>
                 <h3 className='text-blue-900 mb-2 text-lg font-medium'>
-                  🎯 Key Insights
+                  <Target className="w-5 h-5" /> Key Insights
                 </h3>
                 <div className='text-blue-800 space-y-2 text-sm'>
                   <p>

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import React, { useState, useCallback, useEffect } from 'react'
+import { ChartBar, Search, TrendingUp, Save } from 'lucide-react'
 
 import type {
   SessionData,
@@ -699,19 +700,19 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 <div className='border-gray-200 mt-6 border-b'>
                   <div className='flex space-x-8'>
                     {[
-                      { id: 'analysis', label: 'Main Analysis', icon: '📊' },
+                      { id: 'analysis', label: 'Main Analysis', icon: 'chart' },
                       {
                         id: 'counterfactual',
                         label: 'What-If Scenarios',
-                        icon: '🔍',
+                        icon: 'search',
                         badge: counterfactualScenarios.length,
                       },
                       {
                         id: 'historical',
                         label: 'Historical Trends',
-                        icon: '📈',
+                        icon: 'trending',
                       },
-                      { id: 'export', label: 'Export & Share', icon: '💾' },
+                      { id: 'export', label: 'Export & Share', icon: 'save' },
                     ].map((tab) => (
                       <button
                         key={tab.id}
@@ -722,7 +723,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
-                        <span>{tab.icon}</span>
+                        {tab.icon === 'chart' ? <ChartBar className="w-5 h-5" /> : tab.icon === 'search' ? <Search className="w-5 h-5" /> : tab.icon === 'trending' ? <TrendingUp className="w-5 h-5" /> : tab.icon === 'save' ? <Save className="w-5 h-5" /> : null}
                         <span>{tab.label}</span>
                         {tab.badge && (
                           <span className='bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs'>
