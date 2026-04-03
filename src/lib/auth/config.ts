@@ -5,10 +5,11 @@
 
 // JWT Configuration
 export const JWT_CONFIG = {
-  secret:
-    process.env.JWT_SECRET ||
-    import.meta.env.JWT_SECRET ||
-    'fallback-secret-change-in-production',
+  secret: (() => {
+    const s = process.env.JWT_SECRET || import.meta.env.JWT_SECRET;
+    if (!s) throw new Error("JWT_SECRET environment variable is strictly required.");
+    return s;
+  })(),
   audience:
     process.env.JWT_AUDIENCE ||
     import.meta.env.JWT_AUDIENCE ||
