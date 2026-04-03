@@ -1,5 +1,6 @@
 import type { FC } from 'react'
 import React, { useMemo } from 'react'
+import { ChartBarIcon, ArrowTrendingUpIcon, LightBulbIcon } from '@heroicons/react/24/outline'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -54,10 +55,10 @@ export const ResearchDashboard: FC = () => {
     [],
   )
   const dashboardTabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'overview', label: 'Overview', icon: 'chart' },
     { id: 'studies', label: 'Studies', icon: '🔬' },
     { id: 'datasets', label: 'Datasets', icon: '💾' },
-    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'analytics', label: 'Analytics', icon: 'trending' },
     { id: 'publications', label: 'Publications', icon: '📚' },
   ] as const
 
@@ -347,7 +348,7 @@ const OverviewTab: FC<{
                 </p>
               </div>
               <div className='bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg'>
-                <span className='text-yellow-600 dark:text-yellow-400'>📈</span>
+                <span className='text-yellow-600 dark:text-yellow-400'><ArrowTrendingUpIcon className="w-5 h-5" /></span>
               </div>
             </div>
             <p className='text-gray-500 mt-2 text-sm'>
@@ -408,7 +409,7 @@ const OverviewTab: FC<{
         <SlideUp>
           <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6'>
             <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
-              <span>💡</span>
+              <span><LightBulbIcon className="w-5 h-5" /></span>
               Research Insights
             </h3>
             <div className='space-y-3'>

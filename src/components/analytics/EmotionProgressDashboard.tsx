@@ -1,4 +1,5 @@
 import type { FC } from 'react'
+import { LightBulbIcon } from '@heroicons/react/24/outline'
 
 interface EmotionProgressData {
   date: string
