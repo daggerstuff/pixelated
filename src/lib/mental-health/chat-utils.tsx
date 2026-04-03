@@ -2,6 +2,7 @@ import { Brain, Shield, ChartBar, AlertTriangle, Lightbulb } from 'lucide-react'
 import React from 'react'
 import { type EnhancedMentalHealthAnalysis } from '@/components/MentalHealthInsights'
 import { type MindMirrorAnalysis } from '@/components/ui/MindMirrorDashboard'
+import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
 
 export interface ChatMessage {
   id: string
@@ -9,12 +10,18 @@ export interface ChatMessage {
   content: string
   displayContent?: React.ReactNode
   timestamp: string
-  mentalHealthAnalysis?: any // Use proper type if possible
+  mentalHealthAnalysis?: MentalHealthAnalysisResult
   isProcessing?: boolean
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   needsIntervention?: boolean
-  apiResponse?: any
-  metadata?: any
+  apiResponse?: unknown
+  metadata?: {
+    responseType?: string
+    confidence?: number
+    copingStrategies?: unknown
+    resources?: unknown
+    processingTime?: number
+  }
 }
 
 /**
