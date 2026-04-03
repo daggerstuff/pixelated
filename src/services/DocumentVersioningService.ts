@@ -1,4 +1,6 @@
 import { Pool } from 'pg'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { sql } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 
 import { FileStorageService, FileMetadata } from './FileStorageService.js'
@@ -42,44 +44,28 @@ export class DocumentVersioningService {
     const client = await this.db.connect()
 
     try {
-      await client.query('BEGIN')
+      await drizzle(client).execute(sql`BEGIN`)
 
       let fileId: string
       let newVersion: number
 
       if (originalFileId) {
         // This is a new version of an existing file
-        const currentVersionResult = await client.query(
-          'SELECT MAX(version) as max_version FROM file_versions WHERE file_id = $1',
-          [originalFileId],
-        )
+        const currentVersionResult = await drizzle(client).execute(sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${originalFileId}`)
         newVersion = (currentVersionResult.rows[0]?.max_version || 0) + 1
         fileId = originalFileId
 
         // Update the original file record
-        await client.query(
-          'UPDATE files SET updated_at = NOW() WHERE id = $1',
-          [fileId],
-        )
+        await drizzle(client).execute(sql`UPDATE files SET updated_at = NOW() WHERE id = ${fileId}`)
       } else {
         // This is a new file
         fileId = uuidv4()
         newVersion = 1
 
         // Create file record
-        await client.query(
-          `INSERT INTO files (id, original_name, file_name, mime_type, size, url, uploaded_by, s3_key, version)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [
-            fileId,
-            file.originalname,
-            file.originalname,
-            file.mimetype,
-            file.size,
-            '',
-            userId,
-            '',
-          ],
+        await drizzle(client).execute(
+          sql`INSERT INTO files (id, original_name, file_name, mime_type, size, url, uploaded_by, s3_key, version)
+           VALUES (${fileId}, ${file.originalname}, ${file.originalname}, ${file.mimetype}, ${file.size}, ${''}, ${userId}, ${''}, ${undefined})`
         )
       }
 
@@ -88,24 +74,12 @@ export class DocumentVersioningService {
 
       // Create version record
       const versionId = uuidv4()
-      await client.query(
-        `INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE)`,
-        [
-          versionId,
-          fileId,
-          newVersion,
-          file.originalname,
-          file.size,
-          fileMetadata.url,
-          fileMetadata.fileName,
-          userId,
-          changes || `Version ${newVersion}`,
-          await this.generateChecksum(file.buffer),
-        ],
+      await drizzle(client).execute(
+        sql`INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
+         VALUES (${versionId}, ${fileId}, ${newVersion}, ${file.originalname}, ${file.size}, ${fileMetadata.url}, ${fileMetadata.fileName}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(file.buffer)}, TRUE)`
       )
 
-      await client.query('COMMIT')
+      await drizzle(client).execute(sql`COMMIT`)
 
       const versionRecord = await this.getFileVersion(fileId, newVersion)
       if (!versionRecord) {
@@ -122,7 +96,7 @@ export class DocumentVersioningService {
         version: versionRecord,
       }
     } catch (error) {
-      await client.query('ROLLBACK')
+      await drizzle(client).execute(sql`ROLLBACK`)
       throw error
     } finally {
       client.release()
@@ -133,10 +107,7 @@ export class DocumentVersioningService {
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
-    const result = await this.db.query(
-      'SELECT * FROM file_versions WHERE file_id = $1 AND version = $2',
-      [fileId, version],
-    )
+    const result = await drizzle(this.db).execute(sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version}`)
 
     if (result.rows.length === 0) {
       return null
@@ -160,10 +131,7 @@ export class DocumentVersioningService {
   }
 
   async getCurrentVersion(fileId: string): Promise<DocumentVersion | null> {
-    const result = await this.db.query(
-      'SELECT * FROM file_versions WHERE file_id = $1 AND is_current = TRUE',
-      [fileId],
-    )
+    const result = await drizzle(this.db).execute(sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND is_current = TRUE`)
 
     if (result.rows.length === 0) {
       return null
@@ -187,10 +155,7 @@ export class DocumentVersioningService {
   }
 
   async getVersionHistory(fileId: string): Promise<VersionHistory> {
-    const fileResult = await this.db.query(
-      'SELECT * FROM files WHERE id = $1',
-      [fileId],
-    )
+    const fileResult = await drizzle(this.db).execute(sql`SELECT * FROM files WHERE id = ${fileId}`)
 
     if (fileResult.rows.length === 0) {
       throw new Error('File not found')
@@ -214,10 +179,7 @@ export class DocumentVersioningService {
       metadata: fileRow.metadata || {},
     }
 
-    const versionsResult = await this.db.query(
-      'SELECT * FROM file_versions WHERE file_id = $1 ORDER BY version DESC',
-      [fileId],
-    )
+    const versionsResult = await drizzle(this.db).execute(sql`SELECT * FROM file_versions WHERE file_id = ${fileId} ORDER BY version DESC`)
 
     const versions: DocumentVersion[] = versionsResult.rows.map((row) => ({
       id: row.id,
@@ -251,13 +213,10 @@ export class DocumentVersioningService {
     const client = await this.db.connect()
 
     try {
-      await client.query('BEGIN')
+      await drizzle(client).execute(sql`BEGIN`)
 
       // Get the target version
-      const targetVersionResult = await client.query(
-        'SELECT * FROM file_versions WHERE file_id = $1 AND version = $2',
-        [fileId, targetVersion],
-      )
+      const targetVersionResult = await drizzle(client).execute(sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${targetVersion}`)
 
       if (targetVersionResult.rows.length === 0) {
         throw new Error('Target version not found')
@@ -273,10 +232,10 @@ export class DocumentVersioningService {
         `Rolled back to version ${targetVersion}`,
       )
 
-      await client.query('COMMIT')
+      await drizzle(client).execute(sql`COMMIT`)
       return newVersion
     } catch (error) {
-      await client.query('ROLLBACK')
+      await drizzle(client).execute(sql`ROLLBACK`)
       throw error
     } finally {
       client.release()
@@ -287,13 +246,10 @@ export class DocumentVersioningService {
     const client = await this.db.connect()
 
     try {
-      await client.query('BEGIN')
+      await drizzle(client).execute(sql`BEGIN`)
 
       // Get the version to delete
-      const versionResult = await client.query(
-        'SELECT s3_key FROM file_versions WHERE file_id = $1 AND version = $2',
-        [fileId, version],
-      )
+      const versionResult = await drizzle(client).execute(sql`SELECT s3_key FROM file_versions WHERE file_id = ${fileId} AND version = ${version}`)
 
       if (versionResult.rows.length === 0) {
         throw new Error('Version not found')
@@ -305,14 +261,11 @@ export class DocumentVersioningService {
       await this.fileStorage.deleteFile(s3Key)
 
       // Delete from database
-      await client.query(
-        'DELETE FROM file_versions WHERE file_id = $1 AND version = $2',
-        [fileId, version],
-      )
+      await drizzle(client).execute(sql`DELETE FROM file_versions WHERE file_id = ${fileId} AND version = ${version}`)
 
-      await client.query('COMMIT')
+      await drizzle(client).execute(sql`COMMIT`)
     } catch (error) {
-      await client.query('ROLLBACK')
+      await drizzle(client).execute(sql`ROLLBACK`)
       throw error
     } finally {
       client.release()
@@ -326,10 +279,7 @@ export class DocumentVersioningService {
   ): Promise<string> {
     const folderId = uuidv4()
 
-    await this.db.query(
-      'INSERT INTO folders (id, name, parent_id, owner_id) VALUES ($1, $2, $3, $4)',
-      [folderId, name, parentId || null, userId],
-    )
+    await drizzle(this.db).execute(sql`INSERT INTO folders (id, name, parent_id, owner_id) VALUES (${folderId}, ${name}, ${parentId || null}, ${userId})`)
 
     return folderId
   }
@@ -342,13 +292,12 @@ export class DocumentVersioningService {
     folders: Array<{ id: string; name: string; fileCount: number }>
   }> {
     // Get files in folder
-    const filesResult = await this.db.query(
-      `SELECT f.*, fp.permission_type 
+    const filesResult = await drizzle(this.db).execute(
+      sql`SELECT f.*, fp.permission_type
        FROM files f
-       LEFT JOIN file_permissions fp ON f.id = fp.file_id AND fp.user_id = $2
-       WHERE f.folder_id = $1 AND (f.is_public = TRUE OR f.uploaded_by = $2 OR fp.permission_type IS NOT NULL)
-       ORDER BY f.uploaded_at DESC`,
-      [folderId, userId],
+       LEFT JOIN file_permissions fp ON f.id = fp.file_id AND fp.user_id = ${userId}
+       WHERE f.folder_id = ${folderId} AND (f.is_public = TRUE OR f.uploaded_by = ${userId} OR fp.permission_type IS NOT NULL)
+       ORDER BY f.uploaded_at DESC`
     )
 
     const files: FileMetadata[] = filesResult.rows.map((row) => ({
@@ -369,14 +318,13 @@ export class DocumentVersioningService {
     }))
 
     // Get subfolders
-    const foldersResult = await this.db.query(
-      `SELECT f.id, f.name, COUNT(files.id) as file_count
+    const foldersResult = await drizzle(this.db).execute(
+      sql`SELECT f.id, f.name, COUNT(files.id) as file_count
        FROM folders f
        LEFT JOIN files ON files.folder_id = f.id
-       WHERE f.parent_id = $1 AND f.owner_id = $2
+       WHERE f.parent_id = ${folderId} AND f.owner_id = ${userId}
        GROUP BY f.id, f.name
-       ORDER BY f.name`,
-      [folderId, userId],
+       ORDER BY f.name`
     )
 
     const folders = foldersResult.rows.map((row) => ({
@@ -402,28 +350,13 @@ export class DocumentVersioningService {
   ): Promise<DocumentVersion> {
     // This would download the file from S3 and re-upload it as a new version
     // For now, create a new version record
-    const versionResult = await this.db.query(
-      'SELECT MAX(version) as max_version FROM file_versions WHERE file_id = $1',
-      [fileId],
-    )
+    const versionResult = await drizzle(this.db).execute(sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`)
     const newVersion = (versionResult.rows[0]?.max_version || 0) + 1
 
     const versionId = uuidv4()
-    await this.db.query(
-      `INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, TRUE)`,
-      [
-        versionId,
-        fileId,
-        newVersion,
-        `version-${newVersion}`,
-        0, // Size would be calculated from S3
-        '', // URL would be generated
-        s3Key,
-        userId,
-        changes || `Version ${newVersion}`,
-        await this.generateChecksum(Buffer.from('')),
-      ],
+    await drizzle(this.db).execute(
+      sql`INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
+       VALUES (${versionId}, ${fileId}, ${newVersion}, ${`version-${newVersion}`}, 0, '', ${s3Key}, ${userId}, ${changes || `Version ${newVersion}`}, ${await this.generateChecksum(Buffer.from(''))}, TRUE)`
     )
 
     const newVersionRecord = await this.getFileVersion(fileId, newVersion)
