@@ -1,6 +1,11 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import type { Swiper as SwiperType } from 'swiper'
 import {
+  ArrowTrendingUpIcon,
+  UserGroupIcon,
+  CursorArrowRaysIcon,
+} from '@heroicons/react/24/outline'
+import {
   Navigation,
   Pagination,
   Autoplay,
@@ -97,7 +102,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         description: 'Monitor your emotional growth over time',
         content: (
           <div className='from-green-500 to-teal-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
-            <div className='mb-4 text-6xl'>📈</div>
+            <div className='mb-4'><ArrowTrendingUpIcon className="w-16 h-16" /></div>
             <h3 className='mb-2 text-2xl font-bold'>Analytics</h3>
             <p className='text-center opacity-90'>
               Track your progress with detailed insights
@@ -111,7 +116,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         description: 'Connect with others on similar journeys',
         content: (
           <div className='from-pink-500 to-rose-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
-            <div className='mb-4 text-6xl'>🤝</div>
+            <div className='mb-4'><UserGroupIcon className="w-16 h-16" /></div>
             <h3 className='mb-2 text-2xl font-bold'>Community</h3>
             <p className='text-center opacity-90'>
               Find support in our caring community
@@ -125,7 +130,7 @@ const SwiperCarousel: React.FC<SwiperCarouselProps> = ({
         description: 'AI-powered tools tailored to your needs',
         content: (
           <div className='from-orange-500 to-red-600 text-white flex h-full flex-col items-center justify-center rounded-lg bg-gradient-to-br p-8'>
-            <div className='mb-4 text-6xl'>🎯</div>
+            <div className='mb-4'><CursorArrowRaysIcon className="w-16 h-16" /></div>
             <h3 className='mb-2 text-2xl font-bold'>AI Tools</h3>
             <p className='text-center opacity-90'>
               Personalized interventions powered by AI
