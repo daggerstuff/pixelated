@@ -6,6 +6,8 @@ import { securePathJoin } from "../../utils/server";
 
 const logger = createBuildSafeLogger("default");
 
+const MEMORY_WARNING_THRESHOLD = 1000000;
+
 export interface DatasetMergeStats {
   totalDatasets: number;
   totalSamples: number;
@@ -33,6 +35,69 @@ interface ConversationRecord {
     topic_tags?: string[];
     [key: string]: unknown;
   };
+}
+
+interface DatasetWriter {
+  init(): void;
+  writeRecord(record: ConversationRecord, index: number): void;
+  close(): void;
+}
+
+class JSONLWriter implements DatasetWriter {
+  constructor(private writeStream: NodeJS.WritableStream) {}
+  init() {}
+  writeRecord(record: ConversationRecord): void {
+    this.writeStream.write(JSON.stringify(record) + "\n");
+  }
+  close() {}
+}
+
+class JSONWriter implements DatasetWriter {
+  constructor(private writeStream: NodeJS.WritableStream) {}
+  init(): void {
+    this.writeStream.write("[\n");
+  }
+  writeRecord(record: ConversationRecord, index: number): void {
+    if (index > 0) {
+      this.writeStream.write(",\n");
+    }
+    this.writeStream.write("  " + JSON.stringify(record));
+  }
+  close(): void {
+    this.writeStream.write("\n]");
+  }
+}
+
+class CSVWriter implements DatasetWriter {
+  private headers: string[];
+
+  constructor(private writeStream: NodeJS.WritableStream) {
+    this.headers = generateCSVHeaders();
+  }
+
+  init(): void {
+    this.writeStream.write(this.headers.map((h) => `"${h}"`).join(",") + "\n");
+  }
+
+  writeRecord(record: ConversationRecord): void {
+    this.writeStream.write(recordToCSVRow(record, this.headers) + "\n");
+  }
+
+  close() {}
+}
+
+function createWriter(
+  format: "jsonl" | "json" | "csv",
+  writeStream: NodeJS.WritableStream,
+): DatasetWriter {
+  switch (format) {
+    case "json":
+      return new JSONWriter(writeStream);
+    case "csv":
+      return new CSVWriter(writeStream);
+    default:
+      return new JSONLWriter(writeStream);
+  }
 }
 
 async function* findNormalizedFiles(baseDir: string): AsyncGenerator<string> {
@@ -111,6 +176,13 @@ function recordToCSVRow(record: ConversationRecord, headers: string[]): string {
   return values.join(",");
 }
 
+function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
+  return new Promise((resolve, reject) => {
+    stream.once("finish", resolve);
+    stream.once("error", reject);
+  });
+}
+
 export async function mergeAllDatasets(
   options: MergeDatasetOptions = {
     outputFormat: "jsonl",
@@ -128,6 +200,7 @@ export async function mergeAllDatasets(
 
   const outputPath = getMergedDatasetPath(options.outputFormat);
   const writeStream = createWriteStream(outputPath, "utf-8");
+  const writer = createWriter(options.outputFormat, writeStream);
 
   const seenIds = new Set<string>();
   const categories = new Set<string>();
@@ -137,18 +210,9 @@ export async function mergeAllDatasets(
   let datasetCount = 0;
   let qualitySum = 0;
   let qualityCount = 0;
+  let memoryWarned = false;
 
-  const csvHeaders = generateCSVHeaders();
-
-  if (options.outputFormat === "csv") {
-    writeStream.write(csvHeaders.map((h) => `"${h}"`).join(",") + "\n");
-  }
-
-  if (options.outputFormat === "json") {
-    writeStream.write("[\n");
-  }
-
-  let reachedMaxSamples = false;
+  writer.init();
 
   outerLoop: for await (const filePath of findNormalizedFiles(normalizedDir)) {
     datasetCount++;
@@ -175,31 +239,24 @@ export async function mergeAllDatasets(
         }
 
         if (options.maxSamples && mergedSamples >= options.maxSamples) {
-          reachedMaxSamples = true;
+          logger.info(`Reached maxSamples limit: ${options.maxSamples}`);
           break outerLoop;
         }
 
         seenIds.add(record.conversation_id);
         categories.add(record.source);
 
+        if (!memoryWarned && seenIds.size > MEMORY_WARNING_THRESHOLD) {
+          logger.warn(
+            `Deduplication set has grown to ${seenIds.size.toLocaleString()} entries. Consider using Bloom filter for large datasets.`,
+          );
+          memoryWarned = true;
+        }
+
         qualitySum += qualityScore;
         qualityCount++;
 
-        switch (options.outputFormat) {
-          case "jsonl":
-            writeStream.write(JSON.stringify(record) + "\n");
-            break;
-          case "json":
-            if (mergedSamples > 0) {
-              writeStream.write(",\n");
-            }
-            writeStream.write("  " + JSON.stringify(record));
-            break;
-          case "csv":
-            writeStream.write(recordToCSVRow(record, csvHeaders) + "\n");
-            break;
-        }
-
+        writer.writeRecord(record, mergedSamples);
         mergedSamples++;
       } catch (parseError) {
         logger.debug(`Skipping malformed line: ${parseError}`);
@@ -207,15 +264,10 @@ export async function mergeAllDatasets(
     }
   }
 
-  if (reachedMaxSamples) {
-    logger.info(`Reached maxSamples limit: ${options.maxSamples}`);
-  }
-
-  if (options.outputFormat === "json") {
-    writeStream.write("\n]");
-  }
-
+  writer.close();
   writeStream.end();
+
+  await awaitStreamFinish(writeStream);
 
   const stats: DatasetMergeStats = {
     totalDatasets: datasetCount,
