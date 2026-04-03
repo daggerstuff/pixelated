@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { ChartBarIcon } from '@heroicons/react/24/outline'
 
 interface BiasAnalyticsChartProps {
   data: Array<{
@@ -186,7 +187,7 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
         {data.length === 0 && (
           <div className='text-gray-400 absolute inset-0 flex items-center justify-center'>
             <div className='text-center'>
-              <div className='mb-2 text-4xl'>📊</div>
+              <ChartBarIcon className="mx-auto mb-2 w-8 h-8" />
               <p>No data available</p>
             </div>
           </div>
