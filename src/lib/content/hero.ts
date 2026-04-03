@@ -1,52 +1,53 @@
 export const heroContent = {
-  title: 'Bring one hard case into rehearsal. Leave with coaching evidence.',
+  title: 'Clinical simulation for therapist training and supervision.',
   subtitle:
-    'Pixelated Empathy lets supervision teams run a difficult session, preserve the exchange, and direct the next attempt from something more credible than memory.',
+    'Run a difficult conversation, keep the transcript and notes, and review the exact turn a supervisor wants to coach.',
   kicker: 'Clinical rehearsal for supervision teams',
   proofPoints: [
-    'Persistent transcript',
-    'Shared case across clinicians',
-    'Supervisor notes tied to the session',
+    'For therapist training teams, supervisors, and clinical leads',
+    'A shared case, a saved record, and a clearer retry',
   ],
   primaryCTA: { text: 'Bring a Case to Pilot', href: '/signup' },
   secondaryCTA: { text: 'See the Product Demo', href: '/demo-hub' },
-  stats: [
-    {
-      value: 'One case',
-      label:
-        'Keep the difficulty constant so the team compares judgment instead of different scenarios.',
-    },
-    {
-      value: 'One record',
-      label:
-        'Hold the transcript and review notes in one surface the supervisor can teach from.',
-    },
-    {
-      value: 'One retry',
-      label:
-        'Direct the next pass from a visible miss, opening, or repair instead of vague recall.',
-    },
-  ],
   artifact: {
-    eyebrow: 'In-product proof',
-    status: 'The actual session surface teams can review together.',
-    chip: 'Captured in product',
-    mode: 'Ready to coach',
+    eyebrow: 'Product proof',
+    status: 'One session record the team can review together.',
+    chip: 'Shown from the actual product',
+    mode: 'Review-ready',
     image: '/images/homepage/training-session-proof.png',
-    imageAlt: 'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
+    imageAlt:
+      'Pixelated Empathy training session interface showing therapist response area and coaching notes panel',
     context: [
-      { label: 'What you are seeing', value: 'The real training surface, shown as a product capture instead of a staged mockup.' },
-      { label: 'Why teams care', value: 'The exchange and coaching notes stay together, so the supervisor can point at the exact turn that needs work.' },
+      {
+        label: 'What this shows',
+        value:
+          'The live training surface, the saved transcript, and the adjacent review lane in one place.',
+      },
+      {
+        label: 'Why it matters',
+        value:
+          'A supervisor can point at the exact turn that needs work instead of rebuilding the session from memory.',
+      },
     ],
     outputs: [
-      { label: 'Live exchange', value: 'Therapist turns and patient responses stay in one session view.' },
-      { label: 'Review lane', value: 'Supervisor notes stay adjacent instead of being rebuilt later.' },
-      { label: 'Handoff', value: 'The run moves into review without changing mediums.' },
+      {
+        label: 'Shared case',
+        value: 'Clinicians can be coached against the same difficult moment.',
+      },
+      {
+        label: 'Saved record',
+        value: 'Transcript and notes stay attached to the run.',
+      },
+      {
+        label: 'Cleaner retry',
+        value:
+          'The next pass starts from a visible intervention, miss, or repair.',
+      },
     ],
     readout: [
-      { label: 'Practice', value: 'Shared case' },
-      { label: 'Review', value: 'Evidence lane' },
-      { label: 'Outcome', value: 'Clearer retry' },
+      { label: 'Who it is for', value: 'Supervision teams' },
+      { label: 'What stays', value: 'Transcript + notes' },
+      { label: 'What changes', value: 'Sharper retry' },
     ],
   },
 } as const

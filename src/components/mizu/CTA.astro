@@ -2,6 +2,7 @@
 /**
  * CTA Component - Brutalist Style
  */
+import DataPoint from '@/components/homepage/DataPoint.astro'
 import SectionAtmosphere from '@/components/homepage/SectionAtmosphere.astro'
 
 export interface Props {
@@ -47,12 +48,13 @@ const {
           {verdictCopy}
         </p>
         <div class="cta-proof-list">
-          {proofItems.map((item) => (
-            <div class="cta-proof-item">
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-            </div>
-          ))}
+          {
+            proofItems.map((item) => (
+              <div class="cta-proof-item">
+                <DataPoint label={item.label} value={item.value} />
+              </div>
+            ))
+          }
         </div>
       </div>
 
@@ -70,10 +72,12 @@ const {
         </div>
 
         <div class="cta-action-cluster">
-          <a href={primaryCTA.href} class="cta-button cta-button--primary">
+          <a href={primaryCTA.href} class="cta-button cta-button--primary" role="button">
             {primaryCTA.text}
           </a>
-          <a href={secondaryCTA.href} class="cta-button cta-button--secondary">{secondaryCTA.text}</a>
+          <a href={secondaryCTA.href} class="cta-button cta-button--secondary" role="button"
+            >{secondaryCTA.text}</a
+          >
         </div>
 
         <p class="cta-meta">
@@ -88,7 +92,11 @@ const {
   .cta-section {
     position: relative;
     background:
-      radial-gradient(circle at top right, rgba(125, 211, 168, 0.08), transparent 28%),
+      radial-gradient(
+        circle at top right,
+        rgba(125, 211, 168, 0.08),
+        transparent 28%
+      ),
       linear-gradient(180deg, #0f1414 0%, #151b1a 100%);
   }
 
@@ -101,13 +109,18 @@ const {
   .cta-panel {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.96fr);
-    gap: clamp(1.25rem, 2vw, 2rem);
+    gap: clamp(1.1rem, 2vw, 1.8rem);
     align-items: start;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background:
-      linear-gradient(135deg, rgba(125, 211, 168, 0.14), rgba(125, 211, 168, 0.03) 34%, rgba(255, 255, 255, 0.018) 100%),
+      linear-gradient(
+        135deg,
+        rgba(125, 211, 168, 0.14),
+        rgba(125, 211, 168, 0.03) 34%,
+        rgba(255, 255, 255, 0.018) 100%
+      ),
       rgba(255, 255, 255, 0.028);
-    padding: clamp(1.25rem, 2vw, 1.9rem);
+    padding: clamp(1.2rem, 2vw, 1.65rem);
     position: relative;
     overflow: hidden;
   }
@@ -116,8 +129,13 @@ const {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: 5px;
-    background: linear-gradient(180deg, var(--accent-primary), rgba(136, 201, 165, 0.1));
+    width: 6px;
+    background: linear-gradient(
+      180deg,
+      var(--accent-primary),
+      rgba(136, 201, 165, 0.15) 60%,
+      transparent
+    );
   }
 
   .cta-copy {
@@ -130,13 +148,13 @@ const {
 
   .cta-proof-list {
     display: grid;
-    gap: var(--space-3);
+    gap: 0.75rem;
   }
 
   .cta-title,
   .cta-intro,
   .cta-verdict-copy {
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
   }
 
   .cta-intro,
@@ -149,33 +167,20 @@ const {
   }
 
   .cta-proof-item {
-    display: grid;
-    gap: 0.45rem;
-    padding-top: 0.8rem;
+    padding-top: 0.7rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .cta-proof-item span {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-tertiary);
-  }
-
-  .cta-proof-item strong {
-    font-size: var(--text-base);
-    line-height: 1.45;
-    color: var(--text-primary);
   }
 
   .cta-actions {
     display: grid;
-    gap: 1rem;
-    padding: 1rem 1rem 1.1rem;
+    gap: 0.9rem;
+    padding: 0.95rem 1rem 1rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02) 100%);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.02) 100%
+    );
     color: var(--text-primary);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
@@ -248,25 +253,36 @@ const {
       border-color var(--duration-fast) var(--ease-out);
   }
 
+  .cta-button:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 3px;
+  }
+
   .cta-button--primary {
     color: #09100e;
     background: var(--accent-primary);
     border-color: var(--accent-primary);
+    min-width: 12.5rem;
+    box-shadow: 0 12px 26px rgba(125, 211, 168, 0.22);
   }
 
   .cta-button--primary:hover {
-    color: var(--accent-primary);
-    background: transparent;
+    color: #09100e;
+    background: color-mix(in srgb, var(--accent-primary) 85%, white);
+    box-shadow: 0 14px 30px rgba(125, 211, 168, 0.3);
   }
 
   .cta-button--secondary {
-    color: var(--text-primary);
-    border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(255, 255, 255, 0.02);
+    color: rgba(255, 255, 255, 0.88);
+    border-color: transparent;
+    background: transparent;
+    padding-inline: 0;
+    min-width: 0;
   }
 
   .cta-button--secondary:hover {
     border-color: var(--accent-primary);
+    color: var(--text-primary);
   }
 
   .cta-meta {
@@ -275,6 +291,8 @@ const {
     letter-spacing: 0.01em;
     color: rgba(255, 255, 255, 0.58);
     line-height: 1.55;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   @media (max-width: 1024px) {
@@ -292,8 +310,18 @@ const {
       width: 100%;
     }
 
-    .cta-action-cluster .cta-button {
+    .cta-action-cluster {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .cta-action-cluster .cta-button--primary {
       width: 100%;
+    }
+
+    .cta-action-cluster .cta-button--secondary {
+      width: auto;
+      justify-content: flex-start;
     }
   }
 </style>

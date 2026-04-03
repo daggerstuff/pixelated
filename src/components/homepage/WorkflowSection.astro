@@ -16,21 +16,23 @@ const { content } = Astro.props
 <section class="pe-page-section home-section home-section--how">
   <div class="pe-page-shell home-shell">
     <div class="home-split">
-      <div>
+      <div class="home-split__intro">
         <span class="pe-page-label">{content.label}</span>
         <h2 class="pe-page-heading">{content.title}</h2>
       </div>
 
       <div class="home-steps">
-        {content.steps.map((step) => (
-          <div class="home-step">
-            <span class="home-step-number">{step.number}</span>
-            <div>
-              <h3>{step.title}</h3>
-              <p>{step.body}</p>
+        {
+          content.steps.map((step) => (
+            <div class="home-step">
+              <span class="home-step-number">{step.number}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.body}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
 
@@ -40,7 +42,7 @@ const { content } = Astro.props
       title="A session record, a review surface, and a cleaner next attempt."
       body="The workflow matters because the practice run does not disappear at the end of the conversation. It stays intact long enough for a supervisor to coach from it."
       items={content.outputs}
-      theme="paper"
+      theme="dark"
     />
   </div>
 </section>
@@ -48,30 +50,40 @@ const { content } = Astro.props
 <style>
   .home-section--how {
     background:
-      linear-gradient(180deg, rgba(239, 235, 226, 0.96), rgba(229, 224, 214, 0.96));
-    color: var(--ink-primary);
+      radial-gradient(
+        circle at top left,
+        rgba(125, 211, 168, 0.09),
+        transparent 28%
+      ),
+      linear-gradient(180deg, rgba(11, 16, 17, 0.98), rgba(8, 12, 13, 1));
+    color: var(--text-primary);
   }
 
   .home-section--how :is(h2, h3, strong) {
-    color: var(--ink-primary);
+    color: var(--text-primary);
   }
 
   .home-section--how p {
-    color: var(--ink-secondary);
+    color: #d2ddd8;
   }
 
   .home-split {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: clamp(1.8rem, 3vw, 3.2rem);
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    gap: clamp(2rem, 3.2vw, 3.6rem);
     align-items: start;
+  }
+
+  .home-split__intro {
+    display: grid;
+    gap: 0.85rem;
   }
 
   .home-steps {
     display: grid;
-    gap: var(--space-4);
+    gap: 1.1rem;
     position: relative;
-    padding-left: 1.1rem;
+    padding-left: 1.15rem;
   }
 
   .home-steps::before {
@@ -81,7 +93,11 @@ const { content } = Astro.props
     bottom: 0.4rem;
     left: 0;
     width: 1px;
-    background: linear-gradient(180deg, rgba(136, 201, 165, 0.62), rgba(17, 23, 22, 0.14));
+    background: linear-gradient(
+      180deg,
+      rgba(136, 201, 165, 0.62),
+      rgba(136, 201, 165, 0.08)
+    );
   }
 
   .home-step {
@@ -89,16 +105,53 @@ const { content } = Astro.props
     grid-template-columns: auto 1fr;
     gap: var(--space-4);
     align-items: start;
-    padding: 1rem 1.05rem 0.95rem;
-    border: 1px solid rgba(17, 23, 22, 0.1);
+    padding: 1.2rem 1.2rem 1.15rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)),
-      rgba(248, 245, 239, 0.82);
-    box-shadow: 0 14px 30px rgba(17, 23, 22, 0.05);
+      linear-gradient(
+        180deg,
+        rgba(125, 211, 168, 0.08),
+        rgba(125, 211, 168, 0)
+      ),
+      rgba(255, 255, 255, 0.03);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+    transition:
+      border-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .home-step:hover {
+    border-color: rgba(125, 211, 168, 0.2);
+    transform: translateX(4px);
+  }
+
+  .home-step:first-child {
+    position: relative;
+    border-color: rgba(125, 211, 168, 0.2);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(125, 211, 168, 0.14),
+        rgba(125, 211, 168, 0.02)
+      ),
+      rgba(255, 255, 255, 0.05);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+  }
+
+  .home-step:first-child::after {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: linear-gradient(
+      180deg,
+      rgba(125, 211, 168, 1),
+      rgba(125, 211, 168, 0.18)
+    );
   }
 
   .home-step-number {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -107,7 +160,17 @@ const { content } = Astro.props
   }
 
   .home-step-number {
-    color: rgba(17, 23, 22, 0.52);
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .home-step h3 {
+    font-size: clamp(1.05rem, 1rem + 0.2vw, 1.16rem);
+    line-height: 1.2;
+    margin-bottom: 0.45rem;
+  }
+
+  .home-step p {
+    line-height: 1.55;
   }
 
   .home-step-number::before {
@@ -119,21 +182,58 @@ const { content } = Astro.props
     height: 0.55rem;
     border-radius: 999px;
     background: var(--accent-primary);
-    box-shadow: 0 0 0 4px rgba(136, 201, 165, 0.12);
+    box-shadow: 0 0 8px 2px rgba(136, 201, 165, 0.25);
   }
 
   .home-outputs {
-    border-color: var(--ink-border);
-    background: var(--surface-paper-panel);
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.045);
+    position: relative;
   }
 
   .home-outputs--spaced {
-    margin-top: var(--space-8);
+    margin-top: clamp(2rem, 4vw, 3rem);
+    position: relative;
+  }
+
+  .home-outputs--spaced::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(125, 211, 168, 0.35),
+      transparent 78%
+    );
+    z-index: 1;
+  }
+
+  .home-outputs--spaced::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      rgba(125, 211, 168, 0.2),
+      transparent 60%
+    );
   }
 
   @media (max-width: 1080px) {
     .home-split {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .home-step {
+      padding: 1rem;
+    }
+
+    .home-outputs :global(.info-strip__item:last-child) {
+      display: none;
     }
   }
 </style>

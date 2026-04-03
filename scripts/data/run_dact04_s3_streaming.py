@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+"""
+DACT-04: S3 Streaming Normalization & Dedup
+
+Uses the StreamingS3Processor to normalize and dedup datasets in-place on S3
+without downloading the full 10GB+ corpus locally.
+"""
+
+import json
+import logging
+import os
+import sys
+from pathlib import Path
+from datetime import datetime, timezone
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("dact04-s3")
+
+
+def load_registry() -> dict:
+    """Load dataset registry."""
+    with open("ai/data/dataset_registry.json") as f:
+        return json.load(f)
+
+
+def get_datasets_by_status(registry: dict, status: str) -> list:
+    """Get list of datasets with given status."""
+    result = []
+    for category, datasets in registry.get("datasets", {}).items():
+        if isinstance(datasets, dict):
+            for name, config in datasets.items():
+                if config.get("status") == status:
+                    result.append({
+                        "category": category,
+                        "name": name,
+                        "config": config
+                    })
+    return result
+
+
+def extract_s3_parts(s3_path: str) -> tuple[str, str]:
+    """Extract bucket and key from s3:// URL."""
+    if not s3_path.startswith("s3://"):
+        raise ValueError(f"Invalid S3 path: {s3_path}")
+
+    remainder = s3_path[5:]
+    parts = remainder.split("/", 1)
+    if len(parts) != 2:
+        raise ValueError(f"Invalid S3 path format: {s3_path}")
+
+    return parts[0], parts[1]
+
+
+def main():
+    registry = load_registry()
+
+    pending_sync = get_datasets_by_status(registry, "pending_sync")
+    active = get_datasets_by_status(registry, "active")
+
+    logger.info("DACT-04 S3 Streaming Processor")
+    logger.info(f"Pending sync: {len(pending_sync)} datasets")
+    logger.info(f"Active (already processed): {len(active)} datasets")
+
+    s3_configured = os.environ.get("AWS_ACCESS_KEY_ID") is not None
+    if not s3_configured:
+        logger.warning("S3 credentials not configured. Checking for local fallback...")
+        return process_local_datasets()
+
+    logger.info("S3 credentials found - proceeding with streaming processing")
+
+    processed = 0
+    failed = 0
+
+    for ds in pending_sync[:10]:
+        try:
+            logger.info(f"Processing {ds['category']}/{ds['name']}...")
+            config = ds["config"]
+            s3_path = config.get("path", "")
+
+            if not s3_path.startswith("s3://"):
+                logger.warning(f"Invalid S3 path: {s3_path}")
+                failed += 1
+                continue
+
+            bucket, key = extract_s3_parts(s3_path)
+
+            from ai.training.scripts.streaming_s3_processor import StreamingS3Processor
+
+            processor = StreamingS3Processor(source_bucket=bucket)
+            result = processor.process_and_upload(key)
+
+            if result.get("success"):
+                logger.info(f" ✓ {ds['name']}: {result.get('records_processed', 0)} records processed")
+                processed += 1
+            else:
+                logger.error(f" ✗ {ds['name']}: {result.get('error', 'Unknown error')}")
+                failed += 1
+
+        except Exception as e:
+            logger.error(f" ✗ {ds['name']}: {e}")
+            failed += 1
+
+    report = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "processed": processed,
+        "failed": failed,
+        "total_pending": len(pending_sync),
+    }
+
+    report_path = Path("ai/data/normalized/dact04_s3_report.json")
+    report_path.parent.mkdir(exist_ok=True)
+    with open(report_path, "w") as f:
+        json.dump(report, f, indent=2)
+
+    logger.info(f"\nDACT-04 S3 Summary:")
+    logger.info(f" Processed: {processed}")
+    logger.info(f" Failed: {failed}")
+    logger.info(f" Report: {report_path}")
+
+    return 0
+
+
+def process_local_datasets():
+    """Fallback: process local datasets only."""
+    logger.info("Using local fallback mode")
+    local_datasets = [
+        "ai/data/acquired_datasets/cot_reasoning.json",
+        "ai/data/acquired_datasets/mental_health_counseling.json",
+    ]
+
+    for ds_path in local_datasets:
+        if Path(ds_path).exists():
+            logger.info(f"Found local dataset: {ds_path}")
+        else:
+            logger.warning(f"Missing local dataset: {ds_path}")
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
