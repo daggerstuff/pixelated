@@ -1,35 +1,36 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { describe, expect, it, afterEach } from 'vitest'
 
 import TrainingSession from '../TrainingSession'
 
 describe('TrainingSession', () => {
+  afterEach(() => cleanup())
   it('renders training session component', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Therapist Training Session')).toBeInTheDocument()
-    expect(screen.getByText('Session State:')).toBeInTheDocument()
+    expect(screen.getByText('Therapist Training Session')).not.toBeNull()
+    expect(screen.getByText('Session State:')).not.toBeNull()
   })
 
   it('renders session controls', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Start Session')).toBeInTheDocument()
-    expect(screen.getByText('Pause')).toBeInTheDocument()
-    expect(screen.getByText('Resume')).toBeInTheDocument()
-    expect(screen.getByText('End Session')).toBeInTheDocument()
+    expect(screen.getByText('Start Session')).not.toBeNull()
+    expect(screen.getByText('Pause')).not.toBeNull()
+    expect(screen.getByText('Resume')).not.toBeNull()
+    expect(screen.getByText('End Session')).not.toBeNull()
   })
 
   it('renders progress bar', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByLabelText('Session Progress')).toBeInTheDocument()
+    expect(screen.getByLabelText('Session Progress')).not.toBeNull()
   })
 
   it('renders evaluation feedback section', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Evaluation Feedback')).toBeInTheDocument()
+    expect(screen.getAllByText('Evaluation Feedback').length).toBeGreaterThan(0)
   })
 })

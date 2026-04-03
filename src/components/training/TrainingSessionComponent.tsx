@@ -683,6 +683,7 @@ export function TrainingSessionComponent() {
             value={therapistResponse}
             onChange={(e) => setTherapistResponse(e.target.value)}
             rows={3}
+            aria-label={role === 'observer' ? 'Coaching note input' : 'Therapeutic response input'}
             className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${role === 'observer' ? 'focus:ring-purple-500' : 'focus:ring-blue-500'}`}
             placeholder={
               role === 'observer'
