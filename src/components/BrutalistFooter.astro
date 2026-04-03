@@ -138,10 +138,7 @@ const {
             {
               links.product.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="footer-link"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.label}
                   </a>
                 </li>
@@ -156,10 +153,7 @@ const {
             {
               links.company.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="footer-link"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.label}
                   </a>
                 </li>
@@ -174,10 +168,7 @@ const {
             {
               links.legal.map((link) => (
                 <li>
-                  <a
-                    href={link.href}
-                    class="footer-link"
-                  >
+                  <a href={link.href} class="footer-link">
                     {link.label}
                   </a>
                 </li>
@@ -194,7 +185,9 @@ const {
         </h3>
         <ul class="footer-proof-list">
           {
-            reviewStandards.map((item) => <li class="footer-proof-item">{item}</li>)
+            reviewStandards.map((item) => (
+              <li class="footer-proof-item">{item}</li>
+            ))
           }
         </ul>
         <a href={proofCTA.href} class="footer-proof-link">{proofCTA.text}</a>
@@ -235,38 +228,46 @@ const {
   .footer-container {
     max-width: 72rem;
     margin: 0 auto;
-    padding: calc(var(--space-16) + var(--space-2)) var(--space-6);
+    padding: var(--space-12) var(--space-6);
   }
 
   /* Grid Layout */
   .footer-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-8);
-    margin-bottom: var(--space-12);
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .footer-grid {
-      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.1fr);
-      gap: calc(var(--space-12) + var(--space-2));
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+      gap: var(--space-8);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .footer-grid {
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--space-10);
     }
   }
 
   .footer-link-groups {
     display: grid;
-    gap: var(--space-8);
+    gap: var(--space-6);
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .footer-link-groups {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
     }
   }
 
   /* Brand */
   .footer-brand {
-    max-width: 300px;
+    max-width: 22rem;
   }
 
   .footer-logo {
@@ -323,16 +324,16 @@ const {
     margin-top: var(--space-4);
     font-size: var(--text-sm);
     color: var(--text-muted);
-    line-height: var(--leading-relaxed);
-    margin-bottom: var(--space-6);
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
   }
 
   .footer-manifesto {
-    margin-top: var(--space-5);
-    max-width: 18rem;
+    margin-top: var(--space-4);
+    max-width: 15rem;
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 1rem + 0.36vw, 1.35rem);
-    line-height: 1.18;
+    font-size: clamp(0.94rem, 0.9rem + 0.2vw, 1.08rem);
+    line-height: 1.16;
     color: var(--text-primary);
   }
 
@@ -340,7 +341,7 @@ const {
   .footer-social {
     display: flex;
     gap: var(--space-4);
-    margin-top: var(--space-6);
+    margin-top: var(--space-4);
   }
 
   .footer-social-link {
@@ -370,28 +371,27 @@ const {
   .footer-proof {
     display: grid;
     align-content: start;
-    gap: var(--space-4);
-    padding: clamp(1rem, 1.5vw, 1.35rem);
-    border: 1px solid rgba(125, 211, 168, 0.16);
+    gap: var(--space-3);
+    padding: 0;
+    border: 0;
     border-radius: var(--radius-md);
-    background:
-      linear-gradient(180deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.03) 55%, rgba(255, 255, 255, 0.015) 100%);
+    background: transparent;
   }
 
   .footer-proof-title {
     font-family: var(--font-display);
-    font-size: clamp(1.1rem, 1rem + 0.45vw, 1.45rem);
+    font-size: clamp(1rem, 0.94rem + 0.28vw, 1.22rem);
     line-height: 1.12;
     color: var(--text-primary);
   }
 
   .footer-proof-list {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-2);
     margin: 0;
     padding-left: 1rem;
     color: var(--text-secondary);
-    line-height: 1.55;
+    line-height: 1.48;
     list-style: disc;
   }
 
@@ -402,21 +402,20 @@ const {
   .footer-proof-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 2.75rem;
-    padding: 0.8rem 1rem;
-    border: 1px solid rgba(125, 211, 168, 0.32);
-    color: var(--text-primary);
+    justify-content: flex-start;
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    color: var(--accent-primary);
     font-size: var(--text-sm);
     font-weight: 600;
     letter-spacing: 0.03em;
     text-transform: uppercase;
-    background: rgba(7, 11, 12, 0.42);
+    background: transparent;
   }
 
   .footer-proof-link:hover {
-    color: var(--bg-void);
-    background: var(--accent-primary);
+    color: var(--text-primary);
   }
 
   .footer-links-label {
@@ -453,8 +452,8 @@ const {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
-    margin-top: var(--space-12);
-    padding-top: var(--space-8);
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
   }
 
@@ -512,6 +511,10 @@ const {
   @media (max-width: 767px) {
     .footer-brand {
       max-width: none;
+    }
+
+    .footer-proof-item:last-child {
+      display: none;
     }
   }
 </style>

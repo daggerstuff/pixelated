@@ -1,8 +1,8 @@
 ---
 export interface Props {
   label: string
-  title: string
-  body: string
+  title?: string
+  body?: string
   items: readonly { label: string; value: string }[]
   theme?: 'paper' | 'dark'
   className?: string
@@ -10,8 +10,8 @@ export interface Props {
 
 const {
   label,
-  title,
-  body,
+  title = '',
+  body = '',
   items,
   theme = 'paper',
   className = '',
@@ -21,25 +21,27 @@ const {
 <div class:list={['info-strip', `info-strip--${theme}`, className]}>
   <div class="info-strip__lead">
     <span class="pe-page-panel-label">{label}</span>
-    <h3>{title}</h3>
-    <p>{body}</p>
+    {title ? <h3>{title}</h3> : null}
+    {body ? <p>{body}</p> : null}
   </div>
   <div class="info-strip__grid">
-    {items.map((item) => (
-      <div class="info-strip__item">
-        <span>{item.label}</span>
-        <strong>{item.value}</strong>
-      </div>
-    ))}
+    {
+      items.map((item) => (
+        <div class="info-strip__item">
+          <span>{item.label}</span>
+          <strong>{item.value}</strong>
+        </div>
+      ))
+    }
   </div>
 </div>
 
 <style>
   .info-strip {
     display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
-    gap: clamp(1.2rem, 2.4vw, 2.2rem);
-    padding: clamp(1.35rem, 1.8vw, 1.9rem);
+    grid-template-columns: minmax(0, 0.64fr) minmax(0, 1.36fr);
+    gap: clamp(1rem, 2vw, 1.9rem);
+    padding: clamp(1rem, 1.6vw, 1.35rem);
     position: relative;
     overflow: hidden;
   }
@@ -48,39 +50,58 @@ const {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: 4px;
-    background: linear-gradient(180deg, var(--accent-primary), rgba(136, 201, 165, 0.08));
+    width: 5px;
+    background: linear-gradient(
+      180deg,
+      var(--accent-primary),
+      rgba(136, 201, 165, 0.08)
+    );
   }
 
   .info-strip__lead {
     display: grid;
-    gap: var(--space-3);
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  .info-strip__lead :is(h3, p) {
+    max-width: 28rem;
   }
 
   .info-strip__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-4);
+    gap: 0.75rem;
   }
 
   .info-strip__item {
     display: grid;
-    gap: 0.5rem;
+    align-content: start;
+    gap: 0.35rem;
     min-width: 0;
-    padding: 0.95rem 1rem;
-    border: 1px solid rgba(17, 23, 22, 0.1);
-    background: rgba(255, 255, 255, 0.68);
+    min-height: 100%;
+    padding: 0.85rem 0.9rem;
+    border: 1px solid rgba(17, 23, 22, 0.08);
+    background: rgba(255, 255, 255, 0.62);
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .info-strip__item,
+  .info-strip__item strong {
+    text-wrap: balance;
+    hyphens: auto;
   }
 
   .info-strip__item span {
-    font-size: 0.76rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
   .info-strip__item strong {
-    font-size: 1rem;
+    font-size: 0.94rem;
     line-height: 1.35;
   }
 
@@ -106,10 +127,15 @@ const {
   .info-strip--dark {
     border: 1px solid rgba(255, 255, 255, 0.1);
     background:
-      linear-gradient(135deg, rgba(125, 211, 168, 0.12), rgba(125, 211, 168, 0.02) 34%, rgba(255, 255, 255, 0.03) 100%),
+      linear-gradient(
+        135deg,
+        rgba(125, 211, 168, 0.12),
+        rgba(125, 211, 168, 0.02) 34%,
+        rgba(255, 255, 255, 0.03) 100%
+      ),
       rgba(10, 14, 15, 0.98);
     color: var(--text-primary);
-    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
   }
 
   .info-strip--dark .info-strip__lead :is(h3, p) {
@@ -125,19 +151,30 @@ const {
   }
 
   .info-strip--dark .info-strip__item {
-    border-color: rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   @media (max-width: 1080px) {
-    .info-strip,
-    .info-strip__grid {
+    .info-strip {
       grid-template-columns: 1fr;
     }
 
-    .info-strip__item {
-      padding-left: 0;
-      padding-top: var(--space-3);
+    .info-strip__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 860px) {
+    .info-strip__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .info-strip,
+    .info-strip__grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
