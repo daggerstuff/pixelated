@@ -8,6 +8,7 @@ import {
   FileText,
   Brain,
   Zap,
+  TrendingUp,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { FC } from 'react'
@@ -583,7 +584,7 @@ const ClientFacingDemo: FC = () => {
             <CardContent>
               <div className='grid gap-6 md:grid-cols-3'>
                 <div className='bg-slate-700 rounded-lg p-6 text-center'>
-                  <div className='mb-4 text-4xl'>📊</div>
+                  <div className='mb-4 text-4xl'><BarChart3 className="w-10 h-10" /></div>
                   <h4 className='text-purple-400 mb-2 text-lg font-semibold'>
                     Training Dataset
                   </h4>
@@ -600,7 +601,7 @@ const ClientFacingDemo: FC = () => {
                 </div>
 
                 <div className='bg-slate-700 rounded-lg p-6 text-center'>
-                  <div className='mb-4 text-4xl'>📈</div>
+                  <div className='mb-4 text-4xl'><TrendingUp className="w-10 h-10" /></div>
                   <h4 className='text-blue-400 mb-2 text-lg font-semibold'>
                     Quality Report
                   </h4>
