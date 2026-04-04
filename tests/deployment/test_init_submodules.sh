@@ -106,6 +106,17 @@ assert_contains() {
   fi
 }
 
+assert_not_contains() {
+  local needle="$1"
+  local file="$2"
+
+  if grep -Fq -- "${needle}" "${file}"; then
+    print_fail "Unexpected fragment present: ${needle}"
+  else
+    print_pass "Fragment correctly absent: ${needle}"
+  fi
+}
+
 test_azure_submodule_update_uses_per_command_headers() {
   print_header "Azure submodule update prefers Azure mirrors"
   TESTS_RUN=$((TESTS_RUN + 1))
@@ -139,6 +150,25 @@ test_azure_falls_back_to_github_when_mirror_is_unavailable() {
 
   assert_contains "config submodule.ai.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
   assert_contains "-c http.https://github.com/.extraHeader=AUTHORIZATION: basic" "${TEST_DIR}/git.log"
+}
+
+test_azure_falls_back_to_github_without_github_probe() {
+  print_header "Azure submodule fallback does not require GitHub ls-remote success"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  rm -rf "${TEST_DIR}"
+  TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
+  setup_fake_git
+
+  PATH="${TEST_DIR}/bin:${PATH}" \
+  PROJECT_ROOT="${TEST_DIR}/repo" \
+  TF_BUILD="True" \
+  SYSTEM_ACCESSTOKEN="test-token" \
+  GITHUB_PAT="github-token" \
+  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
+  bash "${TARGET_SCRIPT}"
+
+  assert_contains "config submodule.ai.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_not_contains "ls-remote --exit-code https://github.com/daggerstuff/ai.git HEAD" "${TEST_DIR}/git.log"
 }
 
 test_submodule_update_retries_without_depth_when_shallow_fetch_fails() {
@@ -178,6 +208,7 @@ test_non_azure_submodule_update_has_no_extraheader() {
 main() {
   test_azure_submodule_update_uses_per_command_headers
   test_azure_falls_back_to_github_when_mirror_is_unavailable
+  test_azure_falls_back_to_github_without_github_probe
   test_submodule_update_retries_without_depth_when_shallow_fetch_fails
   test_non_azure_submodule_update_has_no_extraheader
 
