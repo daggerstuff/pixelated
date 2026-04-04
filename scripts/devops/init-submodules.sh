@@ -207,6 +207,23 @@ for name in ai docs; do
   
   # Set the URL directly in .git/config to override .gitmodules
   run git config "submodule.${name}.url" "${url}"
+
+  if [[ -d "${path}/.git" ]]; then
+    run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+  elif [[ -f "${path}/.git" ]]; then
+    gitdir="$(sed 's/gitdir: //' "${path}/.git")"
+    if [[ "${gitdir}" != /* ]]; then
+      gitdir="$(cd "${path}" && cd "${gitdir}" && pwd)"
+    fi
+    if [[ -d "${gitdir}" ]]; then
+      run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+    fi
+  fi
+
+  modules_config="${PROJECT_ROOT}/.git/modules/${name}/config"
+  if [[ -f "${modules_config}" ]]; then
+    run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
+  fi
 done
 
 # 3. Update (fetch and checkout)
