@@ -270,7 +270,10 @@ for name in ai docs; do
   fi
 done
 
-git_with_auth submodule sync --recursive
+# IMPORTANT: do not run another `submodule sync` here.
+# We just wrote explicit per-submodule URLs into .git/config (and nested
+# module config when present). Running sync again would copy relative URLs
+# from .gitmodules back into .git/config and override the CI-safe remotes.
 
 # 3. Update (fetch and checkout)
 echo "📥 Updating submodules (depth=1)..."
