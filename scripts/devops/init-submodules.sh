@@ -64,6 +64,19 @@ is_allowed_override_url() {
 # Authentication Configuration
 # ---------------------------------------------------------------------------
 AUTH_GIT_ARGS=()
+AUTH_GIT_CONFIG=""
+
+set_auth_config() {
+  local key="$1"
+  local value="$2"
+
+  if [[ -z "${AUTH_GIT_CONFIG}" ]]; then
+    AUTH_GIT_CONFIG="$(mktemp)"
+    AUTH_GIT_ARGS=(-c "include.path=${AUTH_GIT_CONFIG}")
+  fi
+
+  git config --file "${AUTH_GIT_CONFIG}" "${key}" "${value}"
+}
 
 configure_credentials() {
   # 1. Azure DevOps Credentials
@@ -72,10 +85,10 @@ configure_credentials() {
     if [[ -z "${token}" ]]; then
       echo "⚠️  Warning: SYSTEM_ACCESSTOKEN is not set. Azure DevOps internal repo access may fail."
     else
-      AUTH_GIT_ARGS+=(
-        -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${token}"
-        -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${token}"
-      )
+      set_auth_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
+      set_auth_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${token}"
+      set_auth_config "url.https://x-access-token:${token}@dev.azure.com/.insteadOf" "https://dev.azure.com/"
+      set_auth_config "url.https://x-access-token:${token}@handtransfer.visualstudio.com/.insteadOf" "https://handtransfer.visualstudio.com/"
       echo "✅ Azure DevOps credentials configured via per-command headers"
     fi
   fi
@@ -86,17 +99,20 @@ configure_credentials() {
     echo "🔑 Configuring GitHub credentials..."
     local auth_header
     auth_header="$(printf 'x-access-token:%s' "${github_token}" | base64 -w0)"
-    
-    AUTH_GIT_ARGS+=(
-      -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
-      -c "credential.helper="
-      -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=https://github.com/"
-    )
+
+    set_auth_config "http.https://github.com/.extraHeader" "AUTHORIZATION: basic ${auth_header}"
+    set_auth_config "credential.helper" ""
+    set_auth_config "url.https://x-access-token:${github_token}@github.com/.insteadOf" "https://github.com/"
     echo "✅ GitHub credentials configured"
   fi
 }
 
 cleanup_credentials() {
+  if [[ -n "${AUTH_GIT_CONFIG}" && -f "${AUTH_GIT_CONFIG}" ]]; then
+    rm -f "${AUTH_GIT_CONFIG}"
+    AUTH_GIT_CONFIG=""
+  fi
+
   if (( ${#AUTH_GIT_ARGS[@]} > 0 )); then
     AUTH_GIT_ARGS=()
     echo "🧹 Temporary Git credential headers cleared"
@@ -207,6 +223,20 @@ for name in ai docs; do
 
   # Set the URL directly in .git/config to override .gitmodules
   run git config "submodule.${name}.url" "${url}"
+
+  if [[ -d "${path}/.git" ]]; then
+    run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+  elif [[ -f "${path}/.git" ]]; then
+    gitdir="$(sed 's/gitdir: //' "${path}/.git")"
+    if [[ -d "${gitdir}" ]]; then
+      run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+    fi
+  fi
+
+  modules_config="${PROJECT_ROOT}/.git/modules/${name}/config"
+  if [[ -f "${modules_config}" ]]; then
+    run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
+  fi
 done
 
 # 3. Update (fetch and checkout)
