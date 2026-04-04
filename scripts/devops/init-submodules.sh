@@ -29,6 +29,11 @@ is_azure_environment() {
 sanitize_token() {
   local token="${1:-}"
 
+  # Trim accidental whitespace/newline characters from CI secret values.
+  token="$(printf '%s' "${token}" | tr -d '\r\n')"
+  token="${token#${token%%[![:space:]]*}}"
+  token="${token%${token##*[![:space:]]}}"
+
   case "${token}" in
     ""|'$('*) printf '' ;;
     *) printf '%s' "${token}" ;;
@@ -39,6 +44,44 @@ has_github_credentials() {
   local github_token
   github_token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
   [[ -n "${github_token}" ]]
+}
+
+azdo_username() {
+  local username
+  username="${AZDO_USERNAME:-${SYSTEM_ACCESSTOKEN_USER:-handtransfer}}"
+  printf '%s' "${username}"
+}
+
+has_azure_pat_credentials() {
+  local token
+  token="$(sanitize_token "${AZDO_PAT:-${AZURE_DEVOPS_EXT_PAT:-}}")"
+  [[ -n "${token}" ]]
+}
+
+github_username() {
+  local token username
+  token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
+
+  if [[ -n "${GITHUB_USERNAME:-}" ]]; then
+    username="${GITHUB_USERNAME}"
+  elif [[ -n "${GITHUB_USER:-}" ]]; then
+    username="${GITHUB_USER}"
+  elif [[ -n "${GITHUB_ACTOR:-}" ]]; then
+    username="${GITHUB_ACTOR}"
+  elif [[ "${token}" == ghs_* || "${token}" == ghu_* ]]; then
+    username="x-access-token"
+  else
+    username="git"
+  fi
+
+  printf '%s' "${username}"
+}
+
+github_repo_is_accessible() {
+  local repo_name="$1"
+  local url
+  url="$(canonical_public_submodule_url "${repo_name}")"
+  remote_is_accessible "${url}"
 }
 
 remote_is_accessible() {
@@ -75,21 +118,65 @@ is_allowed_override_url() {
 # Authentication Configuration
 # ---------------------------------------------------------------------------
 AUTH_GIT_ARGS=()
+AUTH_CONFIG_KEYS=()
+
+append_auth_config_key() {
+  local key="$1"
+  local existing
+
+  for existing in "${AUTH_CONFIG_KEYS[@]:-}"; do
+    if [[ "${existing}" == "${key}" ]]; then
+      return 0
+    fi
+  done
+
+  AUTH_CONFIG_KEYS+=("${key}")
+}
+
+set_temp_git_config() {
+  local key="$1"
+  local value="$2"
+
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    run git config --local --replace-all "${key}" "${value}"
+  else
+    git config --local --replace-all "${key}" "${value}"
+  fi
+
+  append_auth_config_key "${key}"
+}
 
 configure_credentials() {
   # 1. Azure DevOps Credentials
-  if is_azure_environment; then
-    local token
-    token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
-    if [[ -z "${token}" ]]; then
-      echo "⚠️  Warning: SYSTEM_ACCESSTOKEN is not set. Azure DevOps internal repo access may fail."
-    else
-      AUTH_GIT_ARGS+=(
-        -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${token}"
-        -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${token}"
-      )
-      echo "✅ Azure DevOps credentials configured via per-command headers"
-    fi
+  local system_token azdo_pat azdo_user azdo_auth_header
+  system_token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
+  azdo_pat="$(sanitize_token "${AZDO_PAT:-${AZURE_DEVOPS_EXT_PAT:-}}")"
+
+  if [[ -n "${system_token}" ]]; then
+    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}"
+    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}"
+
+    AUTH_GIT_ARGS+=(
+      -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${system_token}"
+      -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${system_token}"
+    )
+    echo "✅ Azure DevOps credentials configured via System.AccessToken"
+  elif [[ -n "${azdo_pat}" ]]; then
+    azdo_user="$(azdo_username)"
+    azdo_auth_header="$(printf '%s:%s' "${azdo_user}" "${azdo_pat}" | base64 -w0)"
+
+    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}"
+    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}"
+    set_temp_git_config "credential.helper" ""
+
+    AUTH_GIT_ARGS+=(
+      -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: basic ${azdo_auth_header}"
+      -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: basic ${azdo_auth_header}"
+      -c "credential.helper="
+    )
+    echo "✅ Azure DevOps credentials configured via AZDO_PAT (user: ${azdo_user})"
+  elif is_azure_environment; then
+    echo "⚠️  Warning: SYSTEM_ACCESSTOKEN and AZDO_PAT are not set. Azure DevOps internal repo access may fail."
   fi
 
   # 2. GitHub Credentials (via GITHUB_PAT or GITHUB_TOKEN)
@@ -97,23 +184,38 @@ configure_credentials() {
   github_token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
   if [[ -n "${github_token}" ]]; then
     echo "🔑 Configuring GitHub credentials..."
+    local github_user
+    github_user="$(github_username)"
     local auth_header
-    auth_header="$(printf 'x-access-token:%s' "${github_token}" | base64 -w0)"
+    auth_header="$(printf '%s:%s' "${github_user}" "${github_token}" | base64 -w0)"
+
+    set_temp_git_config "http.https://github.com/.extraHeader" "AUTHORIZATION: basic ${auth_header}"
+    set_temp_git_config "credential.helper" ""
     
     AUTH_GIT_ARGS+=(
       -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
       -c "credential.helper="
-      -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=https://github.com/"
     )
-    echo "✅ GitHub credentials configured"
+    echo "✅ GitHub credentials configured (user: ${github_user})"
   fi
 }
 
 cleanup_credentials() {
-  if (( ${#AUTH_GIT_ARGS[@]} > 0 )); then
-    AUTH_GIT_ARGS=()
-    echo "🧹 Temporary Git credential headers cleared"
+  local key
+
+  if (( ${#AUTH_CONFIG_KEYS[@]} > 0 )); then
+    for key in "${AUTH_CONFIG_KEYS[@]}"; do
+      if [[ "${DRY_RUN}" == "true" ]]; then
+        run git config --local --unset-all "${key}" || true
+      else
+        git config --local --unset-all "${key}" || true
+      fi
+    done
+    AUTH_CONFIG_KEYS=()
   fi
+
+  AUTH_GIT_ARGS=()
+  echo "🧹 Temporary Git credential headers cleared"
 }
 
 trap cleanup_credentials EXIT
@@ -180,9 +282,13 @@ select_submodule_url() {
     # remotes in CI and can accidentally point to non-existent sibling repos.
     # Use canonical GitHub fallback instead of preserving relative URLs.
     if is_relative_submodule_url "${original_url}"; then
-      if has_github_credentials || remote_is_accessible "${github_url}"; then
+      if github_repo_is_accessible "${name}"; then
         printf '%s' "${github_url}"
         return 0
+      fi
+
+      if has_github_credentials; then
+        echo "##[warning]GitHub credentials are present but cannot access '${github_url}'. Check token scopes/organization access." >&2
       fi
     fi
 
@@ -196,7 +302,7 @@ select_submodule_url() {
       return 0
     fi
 
-    if has_github_credentials || remote_is_accessible "${github_url}"; then
+    if github_repo_is_accessible "${name}"; then
       printf '%s' "${github_url}"
       return 0
     fi
@@ -245,7 +351,7 @@ git_with_auth submodule sync --recursive
 for name in ai docs; do
   path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
   url="$(select_submodule_url "${name}")"
-  
+
   echo "🔧 Configuring submodule '${name}' at '${path}'"
   echo "   URL: ${url}"
   
