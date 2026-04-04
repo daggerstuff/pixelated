@@ -75,6 +75,11 @@ configure_credentials() {
       AUTH_GIT_ARGS+=(
         -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${token}"
         -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${token}"
+        # URL rewrite embeds the token directly — works for ls-remote, fetch,
+        # submodule update, etc. This is the mechanism that actually makes
+        # authentication work; extraHeader alone does not cover ls-remote.
+        -c "url.https://x-access-token:${token}@dev.azure.com/.insteadOf=https://dev.azure.com/"
+        -c "url.https://x-access-token:${token}@handtransfer.visualstudio.com/.insteadOf=https://handtransfer.visualstudio.com/"
       )
       echo "✅ Azure DevOps credentials configured via per-command headers"
     fi
@@ -138,6 +143,14 @@ select_submodule_url() {
   if is_azure_environment; then
     local azure_url
     azure_url="$(azure_repo_url "${name}")"
+
+    # When .gitmodules already points to Azure DevOps (our CI-native source),
+    # use it directly without a wasteful ls-remote probe. The per-command
+    # extraHeader auth is applied by git_with_auth and is sufficient.
+    if [[ "${original_url}" == *"dev.azure.com"* || "${original_url}" == *"visualstudio.com"* ]]; then
+      printf '%s' "${original_url}"
+      return 0
+    fi
 
     # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
     # submodule source of truth aligned.
