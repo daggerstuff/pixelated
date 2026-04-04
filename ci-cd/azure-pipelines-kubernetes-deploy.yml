@@ -21,7 +21,7 @@ trigger:
       - .gitmodules
     exclude:
       - docs/**
-      - '**/*.md'
+      - "**/*.md"
 
 pr: none
 
@@ -32,14 +32,14 @@ pool:
 
 parameters:
   - name: environment
-    displayName: 'Environment'
+    displayName: "Environment"
     type: string
     default: production
     values:
       - staging
       - production
   - name: pushLatest
-    displayName: 'Push :latest tag'
+    displayName: "Push :latest tag"
     type: boolean
     default: false
 
@@ -68,12 +68,14 @@ stages:
             submodules: false
 
           - task: Bash@3
-            displayName: 'Preflight: Validate submodule credentials'
+            displayName: "Preflight: Validate submodule credentials"
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              AZDO_PAT: $(AZDO_PAT)
+              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
-              targetType: 'inline'
+              targetType: "inline"
               script: |
                 set -euo pipefail
 
@@ -88,14 +90,17 @@ stages:
 
                 SYSTEM_ACCESSTOKEN="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
                 GITHUB_PAT="$(sanitize_token "${GITHUB_PAT:-}")"
+                AZDO_PAT="$(sanitize_token "${AZDO_PAT:-}")"
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]None of System.AccessToken, AZDO_PAT, or GITHUB_PAT is set for submodule initialization."
                   exit 1
                 fi
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
-                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ]; then
+                  echo "##[warning]Neither System.AccessToken nor AZDO_PAT is set. Azure submodule mirrors may not be available."
+                elif [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -n "${AZDO_PAT:-}" ]; then
+                  echo "✅ AZDO_PAT is present for Azure mirror fallback access"
                 fi
 
                 if [ -z "${GITHUB_PAT:-}" ]; then
@@ -107,37 +112,39 @@ stages:
                 echo "✅ Submodule credential preflight complete"
 
           - task: Bash@3
-            displayName: 'Initialize CI-aware submodules'
+            displayName: "Initialize CI-aware submodules"
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              AZDO_PAT: $(AZDO_PAT)
+              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
-              targetType: 'inline'
+              targetType: "inline"
               script: |
                 set -euo pipefail
                 bash scripts/devops/init-submodules.sh
 
           - task: NodeTool@0
-            displayName: 'Install Node.js (LTS)'
+            displayName: "Install Node.js (LTS)"
             inputs:
-              versionSpec: '20.x'
+              versionSpec: "20.x"
               checkLatest: true
 
           - task: Bash@3
-            displayName: 'Clean Docker leftovers on self-hosted runner'
+            displayName: "Clean Docker leftovers on self-hosted runner"
             inputs:
-              targetType: 'filePath'
-              filePath: 'scripts/devops/cleanup-docker-artifacts.sh'
+              targetType: "filePath"
+              filePath: "scripts/devops/cleanup-docker-artifacts.sh"
 
           - task: SonarCloudPrepare@4
-            displayName: 'Prepare Analysis Configuration'
+            displayName: "Prepare Analysis Configuration"
             inputs:
-              SonarCloud: 'SonarQube Cloud'
-              organization: 'slimshadyme'
-              scannerMode: 'CLI'
-              configMode: 'manual'
-              cliProjectKey: 'slimshadyme_pixelated'
-              cliProjectName: 'pixelated'
+              SonarCloud: "SonarQube Cloud"
+              organization: "slimshadyme"
+              scannerMode: "CLI"
+              configMode: "manual"
+              cliProjectKey: "slimshadyme_pixelated"
+              cliProjectName: "pixelated"
 
           - task: AzureCLI@2
             displayName: Build and push image to ACR
@@ -185,12 +192,12 @@ stages:
               AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
 
           - task: SonarCloudAnalyze@4
-            displayName: 'Run Code Analysis'
+            displayName: "Run Code Analysis"
 
           - task: SonarCloudPublish@4
-            displayName: 'Publish Quality Gate Result'
+            displayName: "Publish Quality Gate Result"
             inputs:
-              pollingTimeoutSec: '300'
+              pollingTimeoutSec: "300"
 
   # Stage 2: Deploy to AKS
   - stage: DeployHosted
@@ -228,22 +235,39 @@ stages:
             submodules: false
 
           - task: Bash@3
-            displayName: 'Preflight: Validate submodule credentials'
+            displayName: "Preflight: Validate submodule credentials"
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              AZDO_PAT: $(AZDO_PAT)
+              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
-              targetType: 'inline'
+              targetType: "inline"
               script: |
                 set -euo pipefail
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
+                sanitize_token() {
+                  local token="${1:-}"
+
+                  case "${token}" in
+                    ""|'$('*) printf '' ;;
+                    *) printf '%s' "${token}" ;;
+                  esac
+                }
+
+                SYSTEM_ACCESSTOKEN="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
+                GITHUB_PAT="$(sanitize_token "${GITHUB_PAT:-}")"
+                AZDO_PAT="$(sanitize_token "${AZDO_PAT:-}")"
+
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]None of System.AccessToken, AZDO_PAT, or GITHUB_PAT is set for submodule initialization."
                   exit 1
                 fi
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
-                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ]; then
+                  echo "##[warning]Neither System.AccessToken nor AZDO_PAT is set. Azure submodule mirrors may not be available."
+                elif [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -n "${AZDO_PAT:-}" ]; then
+                  echo "✅ AZDO_PAT is present for Azure mirror fallback access"
                 fi
 
                 if [ -z "${GITHUB_PAT:-}" ]; then
@@ -257,7 +281,7 @@ stages:
           - task: Bash@3
             displayName: Ensure unzip is available
             inputs:
-              targetType: 'inline'
+              targetType: "inline"
               script: |
                 set -euo pipefail
 
@@ -286,12 +310,14 @@ stages:
                 fi
 
           - task: Bash@3
-            displayName: 'Initialize CI-aware submodules'
+            displayName: "Initialize CI-aware submodules"
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              AZDO_PAT: $(AZDO_PAT)
+              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
-              targetType: 'inline'
+              targetType: "inline"
               script: |
                 set -euo pipefail
                 bash scripts/devops/init-submodules.sh
@@ -304,7 +330,7 @@ stages:
           - task: KubectlInstaller@0
             displayName: Install kubectl
             inputs:
-              kubectlVersion: 'latest'
+              kubectlVersion: "latest"
 
           - task: AzureCLI@2
             displayName: Deploy Helm chart to AKS
@@ -332,4 +358,4 @@ stages:
               AKS_RESOURCE_GROUP: $(AKS_RESOURCE_GROUP)
               AZURE_AKS_CLUSTER_NAME: $(AZURE_AKS_CLUSTER_NAME)
               AZURE_AKS_RESOURCE_GROUP: $(AZURE_AKS_RESOURCE_GROUP)
-              SKIP_BUILD: 'true'
+              SKIP_BUILD: "true"
