@@ -210,16 +210,37 @@ configure_credentials
 echo "📦 Initializing submodules..."
 git_with_auth submodule init
 
-# 2. Configure URLs for target submodules
+# 2. Configure URLs for target submodules BEFORE fetching
+# This MUST happen before submodule update to ensure Git fetches from the right remote.
 for name in ai docs; do
   path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
   url="$(select_submodule_url "${name}")"
-  
+
   echo "🔧 Configuring submodule '${name}' at '${path}'"
   echo "   URL: ${url}"
-  
-  # Set the URL directly in .git/config to override .gitmodules
+
+  # Set the URL in .git/config to override .gitmodules
   run git config "submodule.${name}.url" "${url}"
+
+  # Update the submodule's internal remote URL if it exists.
+  # This handles both embedded .git dirs and .git file pointers.
+  if [[ -d "${path}/.git" ]]; then
+    run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+  elif [[ -f "${path}/.git" ]]; then
+    # When .git is a file, it points to the actual gitdir in .git/modules/
+    gitdir="$(sed 's/gitdir: //' "${path}/.git")"
+    if [[ -d "${gitdir}" ]]; then
+      run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
+    fi
+  fi
+
+  # CRITICAL: Also update the URL in .git/modules/${name}/config if it exists.
+  # Git's submodule update reads from this file, not just .git/config.
+  # If this still has the old GitHub URL, the fetch will fail.
+  modules_config="${PROJECT_ROOT}/.git/modules/${name}/config"
+  if [[ -f "${modules_config}" ]]; then
+    run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
+  fi
 done
 
 # 3. Update (fetch and checkout)
