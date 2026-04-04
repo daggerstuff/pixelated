@@ -51,7 +51,7 @@ export function preparedDatasetsExist(): PreparedDatasetStatus {
   };
 }
 
-function mapRoleToOpenAI(role: string): "user" | "assistant" {
+export function mapRoleToOpenAI(role: string): "user" | "assistant" {
   const roleMap: Record<string, "user" | "assistant"> = {
     client: "user",
     user: "user",
@@ -61,7 +61,7 @@ function mapRoleToOpenAI(role: string): "user" | "assistant" {
   return roleMap[role.toLowerCase()] || "user";
 }
 
-function mapRoleToHuggingFace(role: string): string {
+export function mapRoleToHuggingFace(role: string): string {
   const roleMap: Record<string, string> = {
     client: "human",
     user: "human",

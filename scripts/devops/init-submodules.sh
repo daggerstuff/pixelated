@@ -75,11 +75,6 @@ configure_credentials() {
       AUTH_GIT_ARGS+=(
         -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${token}"
         -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${token}"
-        # URL rewrite embeds the token directly — works for ls-remote, fetch,
-        # submodule update, etc. This is the mechanism that actually makes
-        # authentication work; extraHeader alone does not cover ls-remote.
-        -c "url.https://x-access-token:${token}@dev.azure.com/.insteadOf=https://dev.azure.com/"
-        -c "url.https://x-access-token:${token}@handtransfer.visualstudio.com/.insteadOf=https://handtransfer.visualstudio.com/"
       )
       echo "✅ Azure DevOps credentials configured via per-command headers"
     fi
@@ -118,11 +113,6 @@ azure_repo_url() {
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
-github_repo_url() {
-  local repo_name="$1"
-  printf 'https://github.com/daggerstuff/%s.git' "${repo_name}"
-}
-
 select_submodule_url() {
   local name="$1"
   local env_override_key="$(printf '%s_SUBMODULE_URL' "$(printf '%s' "${name}" | tr '[:lower:]' '[:upper:]')")"
@@ -147,24 +137,16 @@ select_submodule_url() {
   # 3. Azure Environment Logic
   if is_azure_environment; then
     local azure_url
-    local github_url
     azure_url="$(azure_repo_url "${name}")"
-    github_url="$(github_repo_url "${name}")"
 
-    # Prefer the Azure mirror, but only when it is actually reachable by the
-    # current CI identity. This keeps Azure-hosted repos authoritative while
-    # still preserving GitHub fallback when a mirror is missing or inaccessible.
+    # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
+    # submodule source of truth aligned.
     if remote_is_accessible "${azure_url}"; then
       printf '%s' "${azure_url}"
       return 0
     fi
 
     echo "##[warning]Azure mirror for submodule '${name}' is not accessible. Falling back." >&2
-
-    if has_github_credentials && remote_is_accessible "${github_url}"; then
-      printf '%s' "${github_url}"
-      return 0
-    fi
 
     if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials && remote_is_accessible "${original_url}"; then
       printf '%s' "${original_url}"
@@ -215,8 +197,7 @@ configure_credentials
 echo "📦 Initializing submodules..."
 git_with_auth submodule init
 
-# 2. Configure URLs for target submodules BEFORE fetching
-# This MUST happen before submodule update to ensure Git fetches from the right remote.
+# 2. Configure URLs for target submodules
 for name in ai docs; do
   path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
   url="$(select_submodule_url "${name}")"
@@ -224,28 +205,8 @@ for name in ai docs; do
   echo "🔧 Configuring submodule '${name}' at '${path}'"
   echo "   URL: ${url}"
 
-  # Set the URL in .git/config to override .gitmodules
+  # Set the URL directly in .git/config to override .gitmodules
   run git config "submodule.${name}.url" "${url}"
-
-  # Update the submodule's internal remote URL if it exists.
-  # This handles both embedded .git dirs and .git file pointers.
-  if [[ -d "${path}/.git" ]]; then
-    run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
-  elif [[ -f "${path}/.git" ]]; then
-    # When .git is a file, it points to the actual gitdir in .git/modules/
-    gitdir="$(sed 's/gitdir: //' "${path}/.git")"
-    if [[ -d "${gitdir}" ]]; then
-      run git -C "${path}" remote set-url origin "${url}" 2>/dev/null || true
-    fi
-  fi
-
-  # CRITICAL: Also update the URL in .git/modules/${name}/config if it exists.
-  # Git's submodule update reads from this file, not just .git/config.
-  # If this still has the old GitHub URL, the fetch will fail.
-  modules_config="${PROJECT_ROOT}/.git/modules/${name}/config"
-  if [[ -f "${modules_config}" ]]; then
-    run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
-  fi
 done
 
 # 3. Update (fetch and checkout)
