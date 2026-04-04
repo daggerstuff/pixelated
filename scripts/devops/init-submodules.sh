@@ -26,8 +26,19 @@ is_azure_environment() {
   [[ "${TF_BUILD:-}" == "True" || -n "${SYSTEM_COLLECTIONURI:-}" ]]
 }
 
+sanitize_token() {
+  local token="${1:-}"
+
+  case "${token}" in
+    ""|'$('*) printf '' ;;
+    *) printf '%s' "${token}" ;;
+  esac
+}
+
 has_github_credentials() {
-  [[ -n "${GITHUB_PAT:-${GITHUB_TOKEN:-}}" ]]
+  local github_token
+  github_token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
+  [[ -n "${github_token}" ]]
 }
 
 remote_is_accessible() {
@@ -68,7 +79,8 @@ AUTH_GIT_ARGS=()
 configure_credentials() {
   # 1. Azure DevOps Credentials
   if is_azure_environment; then
-    local token="${SYSTEM_ACCESSTOKEN:-}"
+    local token
+    token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
     if [[ -z "${token}" ]]; then
       echo "⚠️  Warning: SYSTEM_ACCESSTOKEN is not set. Azure DevOps internal repo access may fail."
     else
@@ -81,7 +93,8 @@ configure_credentials() {
   fi
 
   # 2. GitHub Credentials (via GITHUB_PAT or GITHUB_TOKEN)
-  local github_token="${GITHUB_PAT:-${GITHUB_TOKEN:-}}"
+  local github_token
+  github_token="$(sanitize_token "${GITHUB_PAT:-${GITHUB_TOKEN:-}}")"
   if [[ -n "${github_token}" ]]; then
     echo "🔑 Configuring GitHub credentials..."
     local auth_header
@@ -113,6 +126,13 @@ azure_repo_url() {
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
+is_relative_submodule_url() {
+  case "${1:-}" in
+    ../*|./*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 select_submodule_url() {
   local name="$1"
   local env_override_key="$(printf '%s_SUBMODULE_URL' "$(printf '%s' "${name}" | tr '[:lower:]' '[:upper:]')")"
@@ -136,6 +156,11 @@ select_submodule_url() {
 
   # 3. Azure Environment Logic
   if is_azure_environment; then
+    if is_relative_submodule_url "${original_url}"; then
+      printf '%s' "${original_url}"
+      return 0
+    fi
+
     local azure_url
     azure_url="$(azure_repo_url "${name}")"
 
@@ -196,6 +221,7 @@ configure_credentials
 # 1. Pre-initialize submodules to register them in .git/config
 echo "📦 Initializing submodules..."
 git_with_auth submodule init
+git_with_auth submodule sync --recursive
 
 # 2. Configure URLs for target submodules
 for name in ai docs; do
@@ -225,6 +251,8 @@ for name in ai docs; do
     run git -C ".git/modules/${name}" config remote.origin.url "${url}" 2>/dev/null || true
   fi
 done
+
+git_with_auth submodule sync --recursive
 
 # 3. Update (fetch and checkout)
 echo "📥 Updating submodules (depth=1)..."
