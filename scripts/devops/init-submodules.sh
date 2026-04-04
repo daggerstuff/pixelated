@@ -126,6 +126,11 @@ azure_repo_url() {
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
+canonical_public_submodule_url() {
+  local repo_name="$1"
+  printf 'https://github.com/daggerstuff/%s.git' "${repo_name}"
+}
+
 is_relative_submodule_url() {
   case "${1:-}" in
     ../*|./*) return 0 ;;
@@ -154,16 +159,14 @@ select_submodule_url() {
   local original_url
   original_url="$(git config -f .gitmodules --get "submodule.${name}.url")"
 
+  local azure_url
+  azure_url="$(azure_repo_url "${name}")"
+
+  local github_url
+  github_url="$(canonical_public_submodule_url "${name}")"
+
   # 3. Azure Environment Logic
   if is_azure_environment; then
-    if is_relative_submodule_url "${original_url}"; then
-      printf '%s' "${original_url}"
-      return 0
-    fi
-
-    local azure_url
-    azure_url="$(azure_repo_url "${name}")"
-
     # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
     # submodule source of truth aligned.
     if remote_is_accessible "${azure_url}"; then
@@ -173,6 +176,16 @@ select_submodule_url() {
 
     echo "##[warning]Azure mirror for submodule '${name}' is not accessible. Falling back." >&2
 
+    # Relative URLs (../ai, ../docs) resolve against Azure DevOps checkout
+    # remotes in CI and can accidentally point to non-existent sibling repos.
+    # Use canonical GitHub fallback instead of preserving relative URLs.
+    if is_relative_submodule_url "${original_url}"; then
+      if has_github_credentials || remote_is_accessible "${github_url}"; then
+        printf '%s' "${github_url}"
+        return 0
+      fi
+    fi
+
     if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials; then
       printf '%s' "${original_url}"
       return 0
@@ -180,6 +193,11 @@ select_submodule_url() {
 
     if remote_is_accessible "${original_url}"; then
       printf '%s' "${original_url}"
+      return 0
+    fi
+
+    if has_github_credentials || remote_is_accessible "${github_url}"; then
+      printf '%s' "${github_url}"
       return 0
     fi
 
