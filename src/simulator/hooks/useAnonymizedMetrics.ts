@@ -22,8 +22,15 @@ export interface SimpleMetrics {
 }
 
 /**
- * Simplified hook for anonymized metrics that provides data for the MetricsDialog
- * This implementation is focused on the UI needs rather than the full data model
+ * Simplified hook for anonymized metrics that provides data for the MetricsDialog.
+ *
+ * Why this exists:
+ * This implementation is focused on the immediate UI needs (displaying simple metrics
+ * like session count and average score) rather than maintaining the full complex
+ * data model of all user interactions. It caches data in localStorage to persist
+ * between sessions for demo purposes.
+ *
+ * @returns {SimpleMetrics} An object containing the simplified metrics and an update function.
  */
 export function useAnonymizedMetrics(): SimpleMetrics {
   const [metrics, setMetrics] = useState<Omit<SimpleMetrics, 'updateMetrics'>>({
