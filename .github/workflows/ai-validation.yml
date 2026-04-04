@@ -17,9 +17,9 @@ on:
   workflow_dispatch:
     inputs:
       ENV_NAME:
-        description: "Environment name (staging, production, etc)"
+        description: 'Environment name (staging, production, etc)'
         required: false
-        default: "staging"
+        default: 'staging'
 
 jobs:
   validate-ai-models:
@@ -160,8 +160,22 @@ jobs:
       - name: Wait for validation to complete
         if: steps.validation.outputs.success == 'true'
         run: |
-          echo "Waiting for validation to complete (120 seconds)..."
-          sleep 120
+          echo "Waiting for validation to complete..."
+          MAX_RETRIES=120
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            STATUS=$(curl -sSf -o /dev/null -w "%{http_code}" "${APP_URL}/api/ai/validation/status" 2>/dev/null || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "Validation completed!"
+              exit 0
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Attempt $RETRY_COUNT/$MAX_RETRIES - validation status: $STATUS"
+            sleep 1
+          done
+          echo "Validation did not complete within ${MAX_RETRIES} seconds"
+          # Don't fail - continue to fetch results anyway
+          exit 0
 
       - name: Fetch validation results
         if: steps.validation.outputs.success == 'true'
