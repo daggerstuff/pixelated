@@ -148,7 +148,7 @@ select_submodule_url() {
 
     echo "##[warning]Azure mirror for submodule '${name}' is not accessible. Falling back." >&2
 
-    if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials && remote_is_accessible "${original_url}"; then
+    if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials; then
       printf '%s' "${original_url}"
       return 0
     fi
