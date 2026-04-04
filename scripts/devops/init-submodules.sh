@@ -117,25 +117,15 @@ is_allowed_override_url() {
 # ---------------------------------------------------------------------------
 # Authentication Configuration
 # ---------------------------------------------------------------------------
+# Use http.extraHeader for authentication (secure, no token in URL)
+# Tokens are passed via Authorization header, not embedded in URLs
 AUTH_GIT_ARGS=()
 AUTH_CONFIG_KEYS=()
-
-append_auth_config_key() {
-  local key="$1"
-  local existing
-
-  for existing in "${AUTH_CONFIG_KEYS[@]:-}"; do
-    if [[ "${existing}" == "${key}" ]]; then
-      return 0
-    fi
-  done
-
-  AUTH_CONFIG_KEYS+=("${key}")
-}
 
 set_temp_git_config() {
   local key="$1"
   local value="$2"
+  local token="${3:-}"
 
   if [[ "${DRY_RUN}" == "true" ]]; then
     run git config --local --replace-all "${key}" "${value}"
@@ -143,7 +133,8 @@ set_temp_git_config() {
     git config --local --replace-all "${key}" "${value}"
   fi
 
-  append_auth_config_key "${key}"
+  # Track config keys for cleanup (tokens stored via extraHeader, not in URLs)
+  AUTH_CONFIG_KEYS+=("${key}")
 }
 
 configure_credentials() {
@@ -153,8 +144,8 @@ configure_credentials() {
   azdo_pat="$(sanitize_token "${AZDO_PAT:-${AZURE_DEVOPS_EXT_PAT:-}}")"
 
   if [[ -n "${system_token}" ]]; then
-    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}"
-    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}"
+    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}" "${system_token}"
+    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}" "${system_token}"
 
     AUTH_GIT_ARGS+=(
       -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${system_token}"
@@ -165,8 +156,8 @@ configure_credentials() {
     azdo_user="$(azdo_username)"
     azdo_auth_header="$(printf '%s:%s' "${azdo_user}" "${azdo_pat}" | base64 -w0)"
 
-    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}"
-    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}"
+    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}" "${azdo_pat}"
+    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}" "${azdo_pat}"
     set_temp_git_config "credential.helper" ""
 
     AUTH_GIT_ARGS+=(
