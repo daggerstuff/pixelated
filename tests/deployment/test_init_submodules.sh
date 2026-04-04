@@ -26,7 +26,7 @@ cleanup() {
 trap cleanup EXIT
 
 setup_fake_git() {
-  mkdir -p "${TEST_DIR}/bin" "${TEST_DIR}/repo"
+  mkdir -p "${TEST_DIR}/bin" "${TEST_DIR}/repo/.git/modules/ai" "${TEST_DIR}/repo/.git/modules/docs"
   cat > "${TEST_DIR}/repo/.gitmodules" <<'EOF'
 [submodule "ai"]
 	path = ai
@@ -187,6 +187,31 @@ test_submodule_update_retries_without_depth_when_shallow_fetch_fails() {
   assert_contains "submodule update --recursive --force" "${TEST_DIR}/git.log"
 }
 
+test_existing_submodule_metadata_is_synchronized() {
+  print_header "Existing submodule metadata is updated to the selected remote"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  rm -rf "${TEST_DIR}"
+  TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
+  setup_fake_git
+
+  mkdir -p "${TEST_DIR}/repo/ai" "${TEST_DIR}/repo/docs"
+  printf 'gitdir: ../.git/modules/ai\n' > "${TEST_DIR}/repo/ai/.git"
+  printf 'gitdir: ../.git/modules/docs\n' > "${TEST_DIR}/repo/docs/.git"
+  : > "${TEST_DIR}/repo/.git/modules/ai/config"
+  : > "${TEST_DIR}/repo/.git/modules/docs/config"
+
+  PATH="${TEST_DIR}/bin:${PATH}" \
+  PROJECT_ROOT="${TEST_DIR}/repo" \
+  TF_BUILD="True" \
+  SYSTEM_ACCESSTOKEN="test-token" \
+  GITHUB_PAT="github-token" \
+  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
+  bash "${TARGET_SCRIPT}"
+
+  assert_contains "-C ai remote set-url origin https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_contains "-C .git/modules/ai config remote.origin.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+}
+
 test_non_azure_submodule_update_has_no_extraheader() {
   print_header "Non-Azure submodule update does not inject Azure auth"
   TESTS_RUN=$((TESTS_RUN + 1))
@@ -210,6 +235,7 @@ main() {
   test_azure_falls_back_to_github_when_mirror_is_unavailable
   test_azure_falls_back_to_github_without_github_probe
   test_submodule_update_retries_without_depth_when_shallow_fetch_fails
+  test_existing_submodule_metadata_is_synchronized
   test_non_azure_submodule_update_has_no_extraheader
 
   echo "Tests run: ${TESTS_RUN}"
