@@ -44,7 +44,7 @@
     "type-check": "pnpm run typecheck",
     "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
     "check:all": "pnpm run check && pnpm run typecheck",
-    "test": "node ./scripts/local-test-runner.cjs",
+    "test": "node ./scripts/testing/local-test-runner.cjs",
     "test:unit": "NODE_ENV=test vitest run -c config/vitest.config.ts --coverage",
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "NODE_ENV=test vitest run -c config/vitest.config.ts --coverage",
