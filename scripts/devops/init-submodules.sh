@@ -118,6 +118,11 @@ azure_repo_url() {
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
+github_repo_url() {
+  local repo_name="$1"
+  printf 'https://github.com/daggerstuff/%s.git' "${repo_name}"
+}
+
 select_submodule_url() {
   local name="$1"
   local env_override_key="$(printf '%s_SUBMODULE_URL' "$(printf '%s' "${name}" | tr '[:lower:]' '[:upper:]')")"
@@ -142,24 +147,24 @@ select_submodule_url() {
   # 3. Azure Environment Logic
   if is_azure_environment; then
     local azure_url
+    local github_url
     azure_url="$(azure_repo_url "${name}")"
+    github_url="$(github_repo_url "${name}")"
 
-    # When .gitmodules already points to Azure DevOps (our CI-native source),
-    # use it directly without a wasteful ls-remote probe. The per-command
-    # extraHeader auth is applied by git_with_auth and is sufficient.
-    if [[ "${original_url}" == *"dev.azure.com"* || "${original_url}" == *"visualstudio.com"* ]]; then
-      printf '%s' "${original_url}"
-      return 0
-    fi
-
-    # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
-    # submodule source of truth aligned.
+    # Prefer the Azure mirror, but only when it is actually reachable by the
+    # current CI identity. This keeps Azure-hosted repos authoritative while
+    # still preserving GitHub fallback when a mirror is missing or inaccessible.
     if remote_is_accessible "${azure_url}"; then
       printf '%s' "${azure_url}"
       return 0
     fi
 
     echo "##[warning]Azure mirror for submodule '${name}' is not accessible. Falling back." >&2
+
+    if has_github_credentials && remote_is_accessible "${github_url}"; then
+      printf '%s' "${github_url}"
+      return 0
+    fi
 
     if [[ "${original_url}" == *"github.com"* ]] && has_github_credentials && remote_is_accessible "${original_url}"; then
       printf '%s' "${original_url}"
