@@ -78,9 +78,11 @@ stages:
                 set -euo pipefail
 
                 sanitize_token() {
-                  case "${1:-}" in
+                  local token="${1:-}"
+
+                  case "${token}" in
                     ""|'$('*) printf '' ;;
-                    *) printf '%s' "${1}" ;;
+                    *) printf '%s' "${token}" ;;
                   esac
                 }
 
