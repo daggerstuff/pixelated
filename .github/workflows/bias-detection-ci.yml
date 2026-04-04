@@ -442,14 +442,25 @@ jobs:
           uv python bias_detection_service.py &
           PYTHON_PID=$!
           echo "Started Python service with PID: $PYTHON_PID"
-          sleep 10
+          echo "Waiting for Python service to be ready..."
+          MAX_RETRIES=20
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -sSf http://localhost:5000/health > /dev/null 2>&1; then
+              echo "Python service is ready!"
+              exit 0
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Attempt $RETRY_COUNT/$MAX_RETRIES - service not ready yet..."
+            sleep 1
+          done
           # Check if the service is still running
           if kill -0 $PYTHON_PID 2>/dev/null; then
-            echo "Python service is running successfully"
+            echo "Python service is running but health check failed"
           else
             echo "Python service failed to start"
-            exit 1
           fi
+          exit 1
         env:
           FLASK_ENV: testing
           ENV: ci
@@ -462,7 +473,20 @@ jobs:
       - name: Start application
         run: |
           pnpm start &
-          sleep 30
+          echo "Waiting for application to be ready..."
+          MAX_RETRIES=60
+          RETRY_COUNT=0
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if curl -sSf http://localhost:4321/health > /dev/null 2>&1; then
+              echo "Application is ready!"
+              exit 0
+            fi
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Attempt $RETRY_COUNT/$MAX_RETRIES - application not ready yet..."
+            sleep 1
+          done
+          echo "Application failed to become ready after ${MAX_RETRIES} seconds"
+          exit 1
         env:
           NODE_ENV: test
 
