@@ -30,11 +30,11 @@ setup_fake_git() {
   cat > "${TEST_DIR}/repo/.gitmodules" <<'EOF'
 [submodule "ai"]
 	path = ai
-	url = https://dev.azure.com/handtransfer/pixelated/_git/ai
+	url = https://github.com/daggerstuff/ai.git
 
 [submodule "docs"]
 	path = docs
-	url = https://dev.azure.com/handtransfer/pixelated/_git/docs
+	url = https://github.com/daggerstuff/docs.git
 EOF
 
   cat > "${TEST_DIR}/bin/git" <<EOF
@@ -60,8 +60,8 @@ if [[ "\$#" -ge \$((idx + 4)) && "\$cmd" == "config" && "\${args[\$((idx + 1))]}
   case "\${args[\$((idx + 4))]}" in
     submodule.ai.path) printf '%s\n' 'ai' ;;
     submodule.docs.path) printf '%s\n' 'docs' ;;
-    submodule.ai.url) printf '%s\n' 'https://dev.azure.com/handtransfer/pixelated/_git/ai' ;;
-    submodule.docs.url) printf '%s\n' 'https://dev.azure.com/handtransfer/pixelated/_git/docs' ;;
+    submodule.ai.url) printf '%s\n' 'https://github.com/daggerstuff/ai.git' ;;
+    submodule.docs.url) printf '%s\n' 'https://github.com/daggerstuff/docs.git' ;;
     *) exit 1 ;;
   esac
   exit 0
