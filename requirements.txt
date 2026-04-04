@@ -1625,7 +1625,7 @@ sympy==1.14.0
     #   torch
 synchronicity==0.11.1
     # via modal
-temporalio==1.20.0
+temporalio==1.24.0
     # via pydantic-ai-slim
 tenacity==9.1.4
     # via
