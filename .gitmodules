@@ -1,10 +1,10 @@
 [submodule "ai"]
 	path = ai
-	url = https://github.com/daggerstuff/ai.git
+	url = ../ai
 	branch = staging
 	ignore = all
 
 [submodule "docs"]
 	path = docs
-	url = https://github.com/daggerstuff/docs.git
+	url = ../docs
 	ignore = all

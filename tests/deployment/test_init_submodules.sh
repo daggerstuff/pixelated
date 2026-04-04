@@ -30,11 +30,11 @@ setup_fake_git() {
   cat > "${TEST_DIR}/repo/.gitmodules" <<'EOF'
 [submodule "ai"]
 	path = ai
-	url = https://github.com/daggerstuff/ai.git
+	url = ../ai
 
 [submodule "docs"]
 	path = docs
-	url = https://github.com/daggerstuff/docs.git
+	url = ../docs
 EOF
 
   cat > "${TEST_DIR}/bin/git" <<EOF
@@ -60,8 +60,8 @@ if [[ "\$#" -ge \$((idx + 4)) && "\$cmd" == "config" && "\${args[\$((idx + 1))]}
   case "\${args[\$((idx + 4))]}" in
     submodule.ai.path) printf '%s\n' 'ai' ;;
     submodule.docs.path) printf '%s\n' 'docs' ;;
-    submodule.ai.url) printf '%s\n' 'https://github.com/daggerstuff/ai.git' ;;
-    submodule.docs.url) printf '%s\n' 'https://github.com/daggerstuff/docs.git' ;;
+    submodule.ai.url) printf '%s\n' '../ai' ;;
+    submodule.docs.url) printf '%s\n' '../docs' ;;
     *) exit 1 ;;
   esac
   exit 0
@@ -117,8 +117,8 @@ assert_not_contains() {
   fi
 }
 
-test_azure_submodule_update_uses_per_command_headers() {
-  print_header "Azure submodule update prefers Azure mirrors"
+test_relative_submodule_urls_are_used_in_azure() {
+  print_header "Relative submodule URLs are used in Azure"
   TESTS_RUN=$((TESTS_RUN + 1))
   setup_fake_git
 
@@ -129,12 +129,13 @@ test_azure_submodule_update_uses_per_command_headers() {
   bash "${TARGET_SCRIPT}"
 
   assert_contains "-c http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer test-token" "${TEST_DIR}/git.log"
+  assert_contains "submodule sync --recursive" "${TEST_DIR}/git.log"
   assert_contains "submodule update --recursive --force --depth 1" "${TEST_DIR}/git.log"
-  assert_contains "config submodule.ai.url https://dev.azure.com/handtransfer/pixelated/_git/ai" "${TEST_DIR}/git.log"
+  assert_contains "config submodule.ai.url ../ai" "${TEST_DIR}/git.log"
 }
 
 test_azure_falls_back_to_github_when_mirror_is_unavailable() {
-  print_header "Azure submodule update falls back to GitHub when Azure mirror is unavailable"
+  print_header "Relative submodule URLs avoid Azure/GitHub remote probing"
   TESTS_RUN=$((TESTS_RUN + 1))
   rm -rf "${TEST_DIR}"
   TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
@@ -145,15 +146,15 @@ test_azure_falls_back_to_github_when_mirror_is_unavailable() {
   TF_BUILD="True" \
   SYSTEM_ACCESSTOKEN="test-token" \
   GITHUB_PAT="github-token" \
-  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
   bash "${TARGET_SCRIPT}"
 
-  assert_contains "config submodule.ai.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_contains "config submodule.ai.url ../ai" "${TEST_DIR}/git.log"
+  assert_not_contains "ls-remote --exit-code https://dev.azure.com/handtransfer/pixelated/_git/ai HEAD" "${TEST_DIR}/git.log"
   assert_contains "-c http.https://github.com/.extraHeader=AUTHORIZATION: basic" "${TEST_DIR}/git.log"
 }
 
 test_azure_falls_back_to_github_without_github_probe() {
-  print_header "Azure submodule fallback does not require GitHub ls-remote success"
+  print_header "Relative submodule URLs do not require GitHub ls-remote success"
   TESTS_RUN=$((TESTS_RUN + 1))
   rm -rf "${TEST_DIR}"
   TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
@@ -164,11 +165,27 @@ test_azure_falls_back_to_github_without_github_probe() {
   TF_BUILD="True" \
   SYSTEM_ACCESSTOKEN="test-token" \
   GITHUB_PAT="github-token" \
-  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
   bash "${TARGET_SCRIPT}"
 
-  assert_contains "config submodule.ai.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_contains "config submodule.ai.url ../ai" "${TEST_DIR}/git.log"
   assert_not_contains "ls-remote --exit-code https://github.com/daggerstuff/ai.git HEAD" "${TEST_DIR}/git.log"
+}
+
+test_unresolved_github_token_placeholder_is_not_treated_as_credentials() {
+  print_header "Unresolved GitHub token placeholder does not enable fallback auth"
+  TESTS_RUN=$((TESTS_RUN + 1))
+  rm -rf "${TEST_DIR}"
+  TEST_DIR="$(mktemp -d /tmp/init-submodules-test-XXXXXX)"
+  setup_fake_git
+
+  PATH="${TEST_DIR}/bin:${PATH}" \
+  PROJECT_ROOT="${TEST_DIR}/repo" \
+  TF_BUILD="True" \
+  SYSTEM_ACCESSTOKEN="test-token" \
+  GITHUB_PAT='$(GITHUB_PAT)' \
+  bash "${TARGET_SCRIPT}"
+
+  assert_not_contains "-c http.https://github.com/.extraHeader=AUTHORIZATION: basic" "${TEST_DIR}/git.log"
 }
 
 test_submodule_update_retries_without_depth_when_shallow_fetch_fails() {
@@ -205,11 +222,10 @@ test_existing_submodule_metadata_is_synchronized() {
   TF_BUILD="True" \
   SYSTEM_ACCESSTOKEN="test-token" \
   GITHUB_PAT="github-token" \
-  MOCK_GIT_FAIL_REMOTE_PATTERN="dev.azure.com/handtransfer/pixelated/_git/" \
   bash "${TARGET_SCRIPT}"
 
-  assert_contains "-C ai remote set-url origin https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
-  assert_contains "-C .git/modules/ai config remote.origin.url https://github.com/daggerstuff/ai.git" "${TEST_DIR}/git.log"
+  assert_contains "-C ai remote set-url origin ../ai" "${TEST_DIR}/git.log"
+  assert_contains "-C .git/modules/ai config remote.origin.url ../ai" "${TEST_DIR}/git.log"
 }
 
 test_non_azure_submodule_update_has_no_extraheader() {
@@ -231,9 +247,10 @@ test_non_azure_submodule_update_has_no_extraheader() {
 }
 
 main() {
-  test_azure_submodule_update_uses_per_command_headers
+  test_relative_submodule_urls_are_used_in_azure
   test_azure_falls_back_to_github_when_mirror_is_unavailable
   test_azure_falls_back_to_github_without_github_probe
+  test_unresolved_github_token_placeholder_is_not_treated_as_credentials
   test_submodule_update_retries_without_depth_when_shallow_fetch_fails
   test_existing_submodule_metadata_is_synchronized
   test_non_azure_submodule_update_has_no_extraheader
