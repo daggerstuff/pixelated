@@ -77,6 +77,16 @@ stages:
               script: |
                 set -euo pipefail
 
+                sanitize_token() {
+                  case "${1:-}" in
+                    ""|'$('*) printf '' ;;
+                    *) printf '%s' "${1}" ;;
+                  esac
+                }
+
+                SYSTEM_ACCESSTOKEN="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
+                GITHUB_PAT="$(sanitize_token "${GITHUB_PAT:-}")"
+
                 if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
                   echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
                   exit 1
