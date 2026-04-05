@@ -87,9 +87,10 @@
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (e) => {
-        // Only react to system changes if user hasn't set a preference
-        if (!localStorage.getItem('theme')) {
-          applyTheme(e.matches ? 'dark' : 'light')
+        // Only apply system theme if user hasn't set a preference
+        if (localStorage.getItem('theme') === null) {
+          const newTheme = e.matches ? 'dark' : 'light'
+          applyTheme(newTheme)
         }
       })
   })
