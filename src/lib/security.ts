@@ -52,7 +52,7 @@ function requireSecretKey(): string {
       : undefined
 
   if (!key) throw new Error("SECRET_KEY is required for signatures")
-  return key
+  return key.trim()
 }
 
 /**
@@ -538,25 +538,37 @@ export function verifySecureToken(
     const [encodedData, signature] = token.split('.')
 
     if (!encodedData || !signature) {
+      logger.error('Invalid token format')
+      return null
+    }
+
+    // Check if secret key is available before verifying
+    try {
+      requireSecretKey()
+    } catch (e) {
+      logger.error('Cannot verify token: SECRET_KEY is missing')
       return null
     }
 
     // Verify signature
     if (!verifySignature(encodedData, signature)) {
+      logger.error('Invalid token signature')
       return null
     }
 
     // Decode payload using atob instead of Buffer
     const dataString = atob(encodedData)
-    const payload = JSON.parse(dataString) as unknown
+    const payload = JSON.parse(dataString) as any
 
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      logger.warn('Token expired')
       return null // Token expired
     }
 
     return payload
-  } catch {
+  } catch (error) {
+    logger.error('Token verification failed:', { error })
     return null
   }
 }
