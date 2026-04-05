@@ -779,7 +779,7 @@ nvidia-nvtx-cu12==12.8.90
     # via torch
 oauthlib==3.3.1
     # via requests-oauthlib
-onnx==1.20.1
+onnx==1.21.0
     # via
     #   pixelated (pyproject.toml)
     #   onnx-ir
