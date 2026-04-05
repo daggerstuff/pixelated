@@ -8,6 +8,8 @@
 // Use isomorphic approach for process
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
+import HmacSHA256 from 'crypto-js/hmac-sha256'
+import Base64 from 'crypto-js/enc-base64'
 
 import { fheService } from './fhe'
 import type { FHEOperation, HomomorphicOperationResult } from './fhe/types'
@@ -239,17 +241,18 @@ export async function createVerificationToken(
  */
 export function generateSecureSessionKey(): string {
   // Use a proper CSPRNG that works in both Node.js and browser environments
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
     // Browser environment
-    const array = new Uint8Array(32)
+    const array = new Uint8Array(16) // 16 bytes for 32 hex chars
     window.crypto.getRandomValues(array)
     return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
       '',
     )
   } else {
     // Node.js environment
-    // Use a simple fallback for server-side rendering
-    return Date.now().toString(36) + Math.random().toString(36).substring(2, 15)
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const crypto = require('crypto')
+    return crypto.randomBytes(16).toString('hex')
   }
 }
 
@@ -435,19 +438,17 @@ export function secureClear(obj: Record<string, unknown>): void {
 export function generateSecureToken(length = 32): string {
   try {
     // Browser-safe implementation
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
       const array = new Uint8Array(length)
       window.crypto.getRandomValues(array)
       return Array.from(array, (byte) =>
         byte.toString(16).padStart(2, '0'),
       ).join('')
     } else {
-      // Node.js implementation - use a safe fallback for SSR
-      return (
-        Date.now().toString(36) +
-        Math.random().toString(36).substring(2) +
-        Math.random().toString(36).substring(2, 15)
-      )
+      // Node.js implementation
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const crypto = require('crypto')
+      return crypto.randomBytes(length).toString('hex')
     }
   } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
@@ -464,23 +465,8 @@ export function generateSecureToken(length = 32): string {
 export function createSignature(data: string): string {
   const secret = requireSecretKey();
   try {
-    // Browser-safe implementation
-    if (typeof window !== 'undefined') {
-      // Simple browser-compatible hash function for development
-      // In production, use a proper Web Crypto API implementation
-      return btoa(
-        String.fromCharCode.apply(
-          null,
-          Array.from(new TextEncoder().encode(data + secret)),
-        ),
-      )
-    } else {
-      // Server-side implementation without Node.js Buffer
-      const encoder = new TextEncoder()
-      const dataWithKey = encoder.encode(data + secret)
-      // Convert Uint8Array to base64 string without using Buffer
-      return btoa(String.fromCharCode.apply(null, Array.from(dataWithKey)))
-    }
+    const hash = HmacSHA256(data, secret);
+    return Base64.stringify(hash);
   } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
       message: error instanceof Error ? String(error) : String(error),
@@ -498,7 +484,29 @@ export function createSignature(data: string): string {
  */
 export function verifySignature(data: string, signature: string): boolean {
   const expectedSignature = createSignature(data)
-  return expectedSignature === signature
+  
+  if (typeof window === 'undefined') {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const crypto = require('crypto')
+      const a = Buffer.from(expectedSignature)
+      const b = Buffer.from(signature)
+      if (a.length !== b.length) return false
+      return crypto.timingSafeEqual(a, b)
+    } catch {
+      // Fallback
+    }
+  }
+
+  // Constant-time comparison fallback
+  if (expectedSignature.length !== signature.length) {
+    return false
+  }
+  let result = 0
+  for (let i = 0; i < expectedSignature.length; i++) {
+    result |= expectedSignature.charCodeAt(i) ^ signature.charCodeAt(i)
+  }
+  return result === 0
 }
 
 /**
@@ -558,15 +566,20 @@ export function verifySecureToken(
 
     // Decode payload using atob instead of Buffer
     const dataString = atob(encodedData)
-    const payload = JSON.parse(dataString) as any
+    const payload = JSON.parse(dataString)
+
+    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+      logger.error('Invalid token payload format')
+      return null
+    }
 
     // Check expiration
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+    if ('exp' in payload && typeof payload.exp === 'number' && payload.exp < Math.floor(Date.now() / 1000)) {
       logger.warn('Token expired')
       return null // Token expired
     }
 
-    return payload
+    return payload as Record<string, unknown>
   } catch (error) {
     logger.error('Token verification failed:', { error })
     return null
