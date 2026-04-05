@@ -1,8 +1,9 @@
 export const featuresContent = {
   label: 'What the platform adds',
-  title: 'A live practice surface with a record supervisors can coach from.',
-  copy: 'The product has two jobs: hold the clinician inside a believable conversation, then give the supervisor a concrete record specific enough to coach from.',
-  proofLabel: 'What the team gets back',
+  title:
+    'Keep the room believable, then hand supervisors a record worth coaching.',
+  copy: 'The product has two jobs: hold the clinician inside a believable conversation, then preserve the specific turn a supervisor needs to coach next.',
+  proofLabel: 'What the team gets',
   proofItems: [
     'A training surface that behaves more like a room than a script.',
     'A review path that preserves pacing, disclosure, and intervention turns.',
@@ -29,8 +30,8 @@ export const featuresContent = {
     },
   ],
   comparison: {
-    label: 'What the supervisor’s job becomes',
-    title: 'Move from retrospective opinion to visible intervention decisions.',
+    label: 'What supervision becomes',
+    title: 'Move from vague impressions to visible intervention decisions.',
     body: 'The point is not novelty. The point is that a supervisor can point to a turn in the exchange and explain what should change next time.',
     items: [
       {

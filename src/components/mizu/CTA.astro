@@ -72,11 +72,17 @@ const {
         </div>
 
         <div class="cta-action-cluster">
-          <a href={primaryCTA.href} class="cta-button cta-button--primary" role="button">
+          <a
+            href={primaryCTA.href}
+            class="cta-button cta-button--primary"
+            role="button"
+          >
             {primaryCTA.text}
           </a>
-          <a href={secondaryCTA.href} class="cta-button cta-button--secondary" role="button"
-            >{secondaryCTA.text}</a
+          <a
+            href={secondaryCTA.href}
+            class="cta-button cta-button--secondary"
+            role="button">{secondaryCTA.text}</a
           >
         </div>
 
@@ -103,16 +109,16 @@ const {
   .cta-shell {
     position: relative;
     z-index: 1;
-    max-width: 76rem;
+    max-width: 80rem;
   }
 
   .cta-panel {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(20rem, 0.98fr);
-    gap: clamp(1.8rem, 3vw, 2.8rem);
+    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+    gap: clamp(2rem, 3vw, 3.2rem);
     align-items: start;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.5rem;
+    border-radius: 1.15rem;
     background:
       linear-gradient(
         135deg,
@@ -121,7 +127,7 @@ const {
         rgba(255, 255, 255, 0.018) 100%
       ),
       rgba(255, 255, 255, 0.028);
-    padding: clamp(1.5rem, 2.25vw, 2rem);
+    padding: clamp(1.7rem, 2.4vw, 2.3rem);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-floating);
@@ -147,10 +153,10 @@ const {
   }
 
   .cta-title {
-    max-width: 12ch;
-    font-size: clamp(2.15rem, 1.6rem + 1.55vw, 3.3rem);
-    line-height: 0.94;
-    letter-spacing: -0.055em;
+    max-width: 13ch;
+    font-size: clamp(2.25rem, 1.95rem + 1vw, 3.1rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
     text-wrap: balance;
   }
 
@@ -161,7 +167,8 @@ const {
   .cta-proof-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.9rem;
+    gap: 0.8rem;
+    margin-top: 1.1rem;
   }
 
   .cta-title,
@@ -174,29 +181,29 @@ const {
   .cta-verdict-copy {
     max-width: 38rem;
     font-family: var(--font-sans);
-    font-size: clamp(0.98rem, 0.95rem + 0.14vw, 1.08rem);
-    line-height: 1.72;
+    font-size: clamp(1rem, 0.96rem + 0.12vw, 1.06rem);
+    line-height: 1.75;
     color: var(--text-secondary);
     text-wrap: pretty;
   }
 
   .cta-proof-item {
-    padding: 0.95rem 1rem;
+    padding: 0.85rem 0.95rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.02);
   }
 
   .cta-actions {
     display: grid;
-    gap: 1.1rem;
-    padding: 1.2rem 1.2rem 1.25rem;
+    gap: 1.2rem;
+    padding: 1.35rem 1.35rem 1.4rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.2rem;
+    border-radius: 1rem;
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.05),
-      rgba(255, 255, 255, 0.02) 100%
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018) 100%
     );
     color: var(--text-primary);
     box-shadow:
@@ -212,8 +219,8 @@ const {
   }
 
   .cta-decision h3 {
-    font-size: clamp(1.12rem, 1rem + 0.36vw, 1.4rem);
-    line-height: 1.16;
+    font-size: clamp(1.08rem, 1rem + 0.25vw, 1.28rem);
+    line-height: 1.22;
     color: var(--text-primary);
   }
 
@@ -239,11 +246,11 @@ const {
 
   .cta-verdict__list {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.6rem;
     margin: 0;
     padding-left: 1rem;
     color: rgba(255, 255, 255, 0.74);
-    line-height: 1.62;
+    line-height: 1.66;
   }
 
   .cta-action-cluster {
@@ -259,10 +266,10 @@ const {
     justify-content: center;
     min-height: 2.8rem;
     padding: 0.9rem 1.05rem;
-    border-radius: 1rem;
+    border-radius: 0.85rem;
     border: 1px solid transparent;
     font-family: var(--font-sans);
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0.01em;
     text-transform: none;
