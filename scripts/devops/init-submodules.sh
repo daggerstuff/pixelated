@@ -252,8 +252,6 @@ for name in ai docs; do
   fi
 done
 
-git_with_auth submodule sync --recursive
-
 # 3. Update (fetch and checkout)
 echo "📥 Updating submodules (depth=1)..."
 if ! git_with_auth submodule update --recursive --force --depth 1; then
