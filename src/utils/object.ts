@@ -23,37 +23,61 @@ type IdentityStrategy = (item: any) => string
  * carry an `id` property to stay in the O(1) fast path and avoid hashing cost
  * entirely.
  */
+const COMMON_IDENTITY_FIELDS = ['id', '_id', 'uuid', 'key', 'uri', 'path', 'urn', 'email', 'username', 'slug'];
+
+/**
+ * Generate a stable identity key for an item so array merge can deduplicate by
+ * value identity rather than reference.
+ *
+ * Priority (fastest → slowest):
+ *  1. Common ID fields — O(1), most reliable for domain objects.
+ *  2. Shallow hash of own properties — O(K) where K = own key count.
+ *     Primitive values are included verbatim; non-primitive values contribute
+ *     a type marker to keep hashing cheap.
+ *  3. JSON.stringify with circular-reference protection — only reached for
+ *     objects that are completely empty (zero own keys). Deterministic fallback.
+ *  4. 'fallback_unique' — only when serialisation throws (e.g. BigInt values).
+ *
+ * Performance note: callers should ensure frequently-updated domain objects
+ * carry an `id` or other common identity field to stay in the O(1) fast path.
+ */
 const getIdentityKey: IdentityStrategy = (item) => {
   if (isPrimitive(item)) {
     return `prim:${String(item)}`
   }
-  if ('id' in item) {
-    return `id:${item.id}`
+
+  // Phase 1: O(1) fast-path for common identity markers.
+  for (const field of COMMON_IDENTITY_FIELDS) {
+    if (field in item) {
+      const val = item[field]
+      if (isPrimitive(val) && val !== null) {
+        return `id:${val}`
+      }
+    }
   }
 
-  // Shallow hash — O(K) where K = own key count.
-  // Primitive values are embedded directly; non-primitive values contribute
-  // their key + typeof so an object full of nested arrays still gets a hash
-  // without touching JSON.stringify.
-  let hash = ''
-  for (const key in item) {
-    if (Object.prototype.hasOwnProperty.call(item, key)) {
+  // Phase 2: Shallow hash — O(K) where K = own key count.
+  // We limit the number of keys processed to 20 to prevent O(N*K) degradation
+  // for extremely large object schemas while maintaining enough entropy for
+  // most deduplication cases.
+  const keys = Object.keys(item)
+  if (keys.length > 0) {
+    let hash = ''
+    const maxKeys = Math.min(keys.length, 20)
+    for (let i = 0; i < maxKeys; i++) {
+      const key = keys[i]
       const val = item[key]
       if (isPrimitive(val)) {
         hash += `${key}:${String(val)}|`
       } else {
-        // Non-primitive: include key name and type tag as a structural signal.
-        hash += `${key}:[${typeof val}]|`
+        // Just use type marker for nested values to keep hashing O(1) per key.
+        hash += `${key}:${Array.isArray(val) ? 'arr' : 'obj'}|`
       }
     }
-  }
-  if (hash) {
     return `hash:${hash}`
   }
 
-  // Only reached for completely empty objects (no own keys).
-  // Guard against circular references so the serialiser does not throw and we
-  // do not silently misidentify items.
+  // Only reached for objects with zero own keys (completely empty `{}`).
   try {
     const seen = new Set<object>()
     const safeReplacer = (_: string, val: unknown) => {
@@ -65,8 +89,6 @@ const getIdentityKey: IdentityStrategy = (item) => {
     }
     return `json:${JSON.stringify(item, safeReplacer)}`
   } catch {
-    // Serialisation still failed (e.g. BigInt). Fall back to a static marker.
-    // Callers treat 'fallback_unique' as non-deduplicate-able.
     return 'fallback_unique'
   }
 }
@@ -78,6 +100,10 @@ const getIdentityKey: IdentityStrategy = (item) => {
  *    local slot (Phase 2, using the pre-snapshot index from `localSnapshot`).
  *  - Remote items with new keys are appended.
  *  - Items whose key is 'fallback_unique' are never deduplicated.
+ *
+ * Performance: identity keying costs O(K) per item where K = own key count.
+ * For large arrays, callers should ensure items carry an explicit `id` property
+ * to hit the O(1) fast path in `getIdentityKey` and avoid the hash loop.
  */
 function mergeArrayElements<T>(local: any[], remote: any[], depth: number, visited: WeakSet<object>): T {
   // Phase 1: build result from local items only — indices become stable here.

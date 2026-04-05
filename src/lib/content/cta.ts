@@ -28,5 +28,5 @@ export const ctaContent = {
   ],
   primaryCTA: { text: 'Bring a Case to Pilot', href: '/signup' },
   secondaryCTA: { text: 'Talk to Us', href: '/contact' },
-  meta: 'Use one real case, judge the review, and decide from evidence instead of a sales deck.',
+  meta: 'Pilot one difficult case, judge the review, and decide from evidence instead of a sales deck.',
 } as const
