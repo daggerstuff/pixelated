@@ -268,8 +268,7 @@ select_submodule_url() {
     # Use canonical GitHub fallback instead of preserving relative URLs.
     if is_relative_submodule_url "${original_url}"; then
       if github_repo_is_accessible "${name}"; then
-    printf '%s' "${github_url}"
-    return 0
+        printf '%s' "${github_url}"
         return 0
       fi
 
@@ -324,17 +323,28 @@ git_with_auth() {
 # ---------------------------------------------------------------------------
 # Main Execution
 # ---------------------------------------------------------------------------
+echo "DEBUG: Starting configure_credentials..."
 configure_credentials
+echo "DEBUG: configure_credentials complete"
 
 # 1. Pre-initialize submodules to register them in .git/config
 echo "📦 Initializing submodules..."
+echo "DEBUG: Running git submodule init..."
 git_with_auth submodule init
+echo "DEBUG: Running git submodule sync..."
 git_with_auth submodule sync --recursive
+echo "DEBUG: Submodule init/sync complete"
 
 # 2. Configure URLs for target submodules
+echo "DEBUG: Starting submodule URL configuration for: ai docs"
 for name in ai docs; do
+  echo "DEBUG: Processing submodule '${name}'..."
   path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
+  echo "DEBUG: Got path for '${name}': ${path}"
+  
+  echo "DEBUG: Calling select_submodule_url for '${name}'..."
   url="$(select_submodule_url "${name}")"
+  echo "DEBUG: Got URL for '${name}': ${url}"
 
   echo "🔧 Configuring submodule '${name}' at '${path}'"
   echo "   URL: ${url}"
