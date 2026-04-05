@@ -7,6 +7,8 @@ describe('formatDuration', () => {
     expect(formatDuration(45000)).toBe('45s')
     // 0 seconds
     expect(formatDuration(0)).toBe('0s')
+    // negative seconds
+    expect(formatDuration(-1000)).toBe('0s')
   })
 
   it('formats minutes and seconds correctly', () => {
