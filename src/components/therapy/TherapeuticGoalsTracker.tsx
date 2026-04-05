@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -91,14 +91,42 @@ export function TherapeuticGoalsTracker({
       : 0
 
   // Get interventions related to a specific goal
-  const getRelatedInterventions = (goalId: string) => {
-    return therapistInterventions
-      .filter((intervention) => {
-        const goal = goals.find((g) => g.id === goalId)
-        return goal?.relatedInterventions.includes(intervention.type)
-      })
-      .slice(0, 3) // Show only most recent 3
-  }
+  // ⚡ Bolt: Precompute goal → relatedInterventions map to avoid repeated linear scans
+  const goalInterventionsMap = useMemo(() => {
+    const map = new Map<string, string[]>()
+
+    goals.forEach((goal) => {
+      if (goal.relatedInterventions && goal.relatedInterventions.length > 0) {
+        map.set(goal.id, goal.relatedInterventions)
+      }
+    })
+
+    return map
+  }, [goals])
+
+  // ⚡ Bolt: Precompute the top related therapist interventions for each goal once per render
+  const relatedInterventionsByGoalId = useMemo(() => {
+    const map = new Map<string, typeof therapistInterventions>()
+
+    goalInterventionsMap.forEach((relatedInterventionTypes, goalId) => {
+      const matches = []
+      for (const intervention of therapistInterventions) {
+        if (relatedInterventionTypes.includes(intervention.type)) {
+          matches.push(intervention)
+          if (matches.length === 3) break
+        }
+      }
+      map.set(goalId, matches)
+    })
+
+    return map
+  }, [therapistInterventions, goalInterventionsMap])
+
+  // ⚡ Bolt: Keep the helper stable while avoiding repeated filtering work
+  const getRelatedInterventions = useCallback(
+    (goalId: string) => relatedInterventionsByGoalId.get(goalId) ?? [],
+    [relatedInterventionsByGoalId],
+  )
 
   // Handle category tab click
   const handleCategoryClick = (category: GoalCategory | 'all') => {
