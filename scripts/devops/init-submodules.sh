@@ -21,6 +21,7 @@ fi
 PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>&1)}"
 echo "DEBUG: PROJECT_ROOT result: ${PROJECT_ROOT}"
 cd "${PROJECT_ROOT}" || { echo "ERROR: Failed to cd to ${PROJECT_ROOT}"; exit 1; }
+echo "DEBUG: Successfully cd'd to $(pwd)"
 
 # ---------------------------------------------------------------------------
 # Environment Detection
