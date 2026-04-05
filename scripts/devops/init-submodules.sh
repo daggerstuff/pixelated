@@ -138,33 +138,39 @@ set_temp_git_config() {
 }
 
 configure_credentials() {
+  local config_count=0
+  
   # 1. Azure DevOps Credentials
   local system_token azdo_pat azdo_user azdo_auth_header
   system_token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
   azdo_pat="$(sanitize_token "${AZDO_PAT:-${AZURE_DEVOPS_EXT_PAT:-}}")"
 
   if [[ -n "${system_token}" ]]; then
-    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}" "${system_token}"
-    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: bearer ${system_token}" "${system_token}"
-
-    AUTH_GIT_ARGS+=(
-      -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: bearer ${system_token}"
-      -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: bearer ${system_token}"
-    )
+    export GIT_CONFIG_KEY_${config_count}="http.https://dev.azure.com/.extraheader"
+    export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: bearer ${system_token}"
+    ((config_count++))
+    export GIT_CONFIG_KEY_${config_count}="http.https://handtransfer.visualstudio.com/.extraheader"
+    export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: bearer ${system_token}"
+    ((config_count++))
+    export GIT_CONFIG_KEY_${config_count}="credential.helper"
+    export GIT_CONFIG_VALUE_${config_count}=""
+    ((config_count++))
+    
     echo "✅ Azure DevOps credentials configured via System.AccessToken"
   elif [[ -n "${azdo_pat}" ]]; then
     azdo_user="$(azdo_username)"
     azdo_auth_header="$(printf '%s:%s' "${azdo_user}" "${azdo_pat}" | base64 -w0)"
 
-    set_temp_git_config "http.https://dev.azure.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}" "${azdo_pat}"
-    set_temp_git_config "http.https://handtransfer.visualstudio.com/.extraHeader" "AUTHORIZATION: basic ${azdo_auth_header}" "${azdo_pat}"
-    set_temp_git_config "credential.helper" ""
-
-    AUTH_GIT_ARGS+=(
-      -c "http.https://dev.azure.com/.extraHeader=AUTHORIZATION: basic ${azdo_auth_header}"
-      -c "http.https://handtransfer.visualstudio.com/.extraHeader=AUTHORIZATION: basic ${azdo_auth_header}"
-      -c "credential.helper="
-    )
+    export GIT_CONFIG_KEY_${config_count}="http.https://dev.azure.com/.extraheader"
+    export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: basic ${azdo_auth_header}"
+    ((config_count++))
+    export GIT_CONFIG_KEY_${config_count}="http.https://handtransfer.visualstudio.com/.extraheader"
+    export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: basic ${azdo_auth_header}"
+    ((config_count++))
+    export GIT_CONFIG_KEY_${config_count}="credential.helper"
+    export GIT_CONFIG_VALUE_${config_count}=""
+    ((config_count++))
+    
     echo "✅ Azure DevOps credentials configured via AZDO_PAT (user: ${azdo_user})"
   elif is_azure_environment; then
     echo "⚠️  Warning: SYSTEM_ACCESSTOKEN and AZDO_PAT are not set. Azure DevOps internal repo access may fail."
@@ -180,14 +186,17 @@ configure_credentials() {
     local auth_header
     auth_header="$(printf '%s:%s' "${github_user}" "${github_token}" | base64 -w0)"
 
-    export GIT_CONFIG_COUNT=2
-    export GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
-    export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic ${auth_header}"
-    export GIT_CONFIG_KEY_1="credential.helper"
-    export GIT_CONFIG_VALUE_1=""
+    export GIT_CONFIG_KEY_${config_count}="http.https://github.com/.extraheader"
+    export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: basic ${auth_header}"
+    ((config_count++))
+    export GIT_CONFIG_KEY_${config_count}="credential.helper"
+    export GIT_CONFIG_VALUE_${config_count}=""
+    ((config_count++))
     
     echo "✅ GitHub credentials configured (user: ${github_user})"
   fi
+  
+  export GIT_CONFIG_COUNT=${config_count}
 }
 
 cleanup_credentials() {
