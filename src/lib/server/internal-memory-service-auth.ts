@@ -11,7 +11,7 @@ export function resolveInternalMemoryServiceConfig(): InternalMemoryServiceClien
   const baseUrl =
     process.env.MEMORY_SERVICE_BASE_URL ||
     process.env.SUBCONSCIOUS_MEMORY_BASE_URL ||
-    'http://127.0.0.1:5003'
+    'http://127.0.0.1:54321'
   const actorId =
     process.env.MEMORY_SERVICE_ACTOR_ID ||
     process.env.SUBCONSCIOUS_MEMORY_ACTOR_ID
@@ -111,4 +111,3 @@ function canonicalRequest({
     nonce,
   ].join('\n')
 }
-
