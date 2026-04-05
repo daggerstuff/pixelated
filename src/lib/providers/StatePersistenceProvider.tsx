@@ -3,7 +3,6 @@
  *
  * Provides comprehensive state persistence management including:
  * - Jotai enhanced storage initialization
- * - Offline synchronization setup
  * - Cross-tab state synchronization
  * - State backup and recovery
  * - Performance monitoring
@@ -21,6 +20,7 @@ import React, {
 
 import { logger } from '@/lib/logger'
 import { persistenceManager } from '@/lib/state/jotai-persistence'
+import { SyncProvider } from './SyncContext'
 import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 // ============================================================================
@@ -310,9 +310,11 @@ export function StatePersistenceProvider({
   }
 
   return (
-    <StatePersistenceContext.Provider value={contextValue}>
-      <JotaiProvider>{children}</JotaiProvider>
-    </StatePersistenceContext.Provider>
+    <SyncProvider>
+      <StatePersistenceContext.Provider value={contextValue}>
+        <JotaiProvider>{children}</JotaiProvider>
+      </StatePersistenceContext.Provider>
+    </SyncProvider>
   )
 }
 
