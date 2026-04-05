@@ -172,7 +172,7 @@ class TestHindsightMemoryProvider:
         mock_manager = Mock()
         provider = HindsightMemoryProvider(mock_manager)
         assert provider.hindsight == mock_manager
-        assert provider.bank_id == "pixeldated"
+        assert provider.bank_id == "pixelated"
 
     def test_init_with_config(self):
         """Test provider initialization with config."""
