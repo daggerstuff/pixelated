@@ -13,7 +13,7 @@ aiohappyeyeballs==2.6.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   aiohttp
-aiohttp==3.13.3
+aiohttp==3.13.4
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   fsspec
