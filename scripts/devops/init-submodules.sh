@@ -41,6 +41,12 @@ has_github_credentials() {
   [[ -n "${github_token}" ]]
 }
 
+has_azure_credentials() {
+  local azure_token
+  azure_token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
+  [[ -n "${azure_token}" ]]
+}
+
 remote_is_accessible() {
   local remote_url="$1"
   git_with_auth ls-remote --exit-code "${remote_url}" HEAD >/dev/null 2>&1
@@ -161,16 +167,20 @@ select_submodule_url() {
 
   # 3. Azure Environment Logic
   if is_azure_environment; then
+    local azure_url
+    azure_url="$(azure_repo_url "${name}")"
+
     if is_relative_submodule_url "${original_url}"; then
-      # Convert relative URL to absolute GitHub URL
+      if has_azure_credentials; then
+        printf '%s' "${azure_url}"
+        return 0
+      fi
+
       local github_url
       github_url="$(canonical_public_submodule_url "${name}")"
       printf '%s' "${github_url}"
       return 0
     fi
-
-    local azure_url
-    azure_url="$(azure_repo_url "${name}")"
 
     # Azure CI should prefer Azure-hosted mirrors to keep the superproject and
     # submodule source of truth aligned.
