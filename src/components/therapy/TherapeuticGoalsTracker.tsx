@@ -104,17 +104,28 @@ export function TherapeuticGoalsTracker({
     return map
   }, [goals])
 
-  // ⚡ Bolt: Memoize getRelatedInterventions to prevent unnecessary re-computations
-  const getRelatedInterventions = useCallback(
-    (goalId: string) => {
-      const relatedInterventions = goalInterventionsMap.get(goalId)
-      if (!relatedInterventions) return []
+  // ⚡ Bolt: Precompute the top related therapist interventions for each goal once per render
+  const relatedInterventionsByGoalId = useMemo(() => {
+    const map = new Map<string, typeof therapistInterventions>()
 
-      return therapistInterventions
-        .filter((intervention) => relatedInterventions.includes(intervention.type))
-        .slice(0, 3) // Show only most recent 3
-    },
-    [therapistInterventions, goalInterventionsMap]
+    goalInterventionsMap.forEach((relatedInterventionTypes, goalId) => {
+      const matches = []
+      for (const intervention of therapistInterventions) {
+        if (relatedInterventionTypes.includes(intervention.type)) {
+          matches.push(intervention)
+          if (matches.length === 3) break
+        }
+      }
+      map.set(goalId, matches)
+    })
+
+    return map
+  }, [therapistInterventions, goalInterventionsMap])
+
+  // ⚡ Bolt: Keep the helper stable while avoiding repeated filtering work
+  const getRelatedInterventions = useCallback(
+    (goalId: string) => relatedInterventionsByGoalId.get(goalId) ?? [],
+    [relatedInterventionsByGoalId],
   )
 
   // Handle category tab click
