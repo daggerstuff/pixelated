@@ -7,6 +7,7 @@
   type="button"
   class="inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
   aria-label="Toggle dark mode"
+  aria-pressed="false"
 >
   <!-- Sun icon for dark mode (shows when in dark mode to switch to light) -->
   <svg
@@ -46,32 +47,39 @@
   document.addEventListener('astro:page-load', (_event) => {
     const themeToggle = document.getElementById('theme-toggle')
 
-    // Function to set theme and update storage
+    // Function to apply theme without persisting to storage
+    const applyTheme = (theme: 'light' | 'dark') => {
+      document.documentElement.classList.toggle('dark', theme === 'dark')
+      if (themeToggle) {
+        themeToggle.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false')
+      }
+    }
+
+    // Function to set theme and persist to storage
     const setTheme = (theme: 'light' | 'dark') => {
       localStorage.setItem('theme', theme)
-      document.documentElement.classList.toggle('dark', theme === 'dark')
+      applyTheme(theme)
     }
 
     // Check for saved theme preference or set based on system preference
     const storedTheme = localStorage.getItem('theme')
-    const savedTheme: 'light' | 'dark' =
-      storedTheme === 'dark' || storedTheme === 'light'
-        ? storedTheme
-        : window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'dark'
-          : 'light'
-
-    // Apply the theme
-    setTheme(savedTheme)
+    
+    // Initial application (does NOT persist if it was based on system preference)
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      applyTheme(storedTheme)
+    } else {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light'
+      applyTheme(systemTheme)
+    }
 
     // Toggle theme on button click
     themeToggle?.addEventListener('click', (_event) => {
-      const currentStored = localStorage.getItem('theme')
-      const currentTheme: 'light' | 'dark' =
-        currentStored === 'dark' || currentStored === 'light'
-          ? currentStored
-          : 'light'
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+      // Determine current applied theme
+      const currentApplied = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+      
+      const newTheme = currentApplied === 'dark' ? 'light' : 'dark'
       setTheme(newTheme)
     })
 
@@ -79,8 +87,9 @@
     window
       .matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (e) => {
+        // Only react to system changes if user hasn't set a preference
         if (!localStorage.getItem('theme')) {
-          setTheme(e.matches ? 'dark' : 'light')
+          applyTheme(e.matches ? 'dark' : 'light')
         }
       })
   })

@@ -183,6 +183,7 @@ export function getStartOf(date: Date, unit: "day" | "week" | "month" | "year"):
  * @returns The formatted duration string
  */
 export function formatDuration(ms: number): string {
+  if (ms < 0) return '0s';
   const seconds = Math.floor(ms / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
