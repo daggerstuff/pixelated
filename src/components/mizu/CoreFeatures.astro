@@ -117,7 +117,7 @@ const getCardClasses = (index: number) => ({
     background:
       radial-gradient(
         circle at top left,
-        rgba(136, 201, 165, 0.1),
+        rgba(143, 184, 162, 0.1),
         transparent 28%
       ),
       linear-gradient(180deg, #101514 0%, #121817 100%);
@@ -156,7 +156,7 @@ const getCardClasses = (index: number) => ({
 
   .core-features-grid {
     display: grid;
-    grid-template-columns: minmax(18rem, 0.82fr) minmax(0, 1.18fr);
+    grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1.22fr);
     gap: clamp(1.2rem, 2.2vw, 2rem);
     margin-bottom: var(--space-6);
   }
@@ -165,17 +165,20 @@ const getCardClasses = (index: number) => ({
     display: grid;
     align-content: start;
     gap: var(--space-4);
-    padding: clamp(1.15rem, 1.7vw, 1.45rem);
+    padding: clamp(1.25rem, 1.8vw, 1.6rem);
     border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 1.25rem;
     background:
       linear-gradient(
         180deg,
-        rgba(125, 211, 168, 0.05),
-        rgba(125, 211, 168, 0)
+        rgba(143, 184, 162, 0.05),
+        rgba(143, 184, 162, 0)
       ),
       rgba(10, 14, 15, 0.92);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-panel);
     position: relative;
+    top: 6.5rem;
+    position: sticky;
   }
 
   .core-features-proof::before {
@@ -185,8 +188,8 @@ const getCardClasses = (index: number) => ({
     width: 4px;
     background: linear-gradient(
       180deg,
-      rgba(125, 211, 168, 1),
-      rgba(125, 211, 168, 0.18)
+      rgba(143, 184, 162, 1),
+      rgba(143, 184, 162, 0.18)
     );
   }
 
@@ -249,29 +252,24 @@ const getCardClasses = (index: number) => ({
 
   .core-features-comparison__grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 0;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    background: rgba(255, 255, 255, 0.015);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
   .core-features-comparison__item {
     display: grid;
-    grid-template-columns: minmax(8rem, 0.38fr) minmax(0, 1fr);
+    grid-template-columns: 1fr;
     align-items: start;
-    gap: 1rem;
+    gap: 0.55rem;
     min-width: 0;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.026);
-  }
-
-  .core-features-comparison__item:last-child {
-    border-bottom: 0;
+    padding: 1rem 1.05rem;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .core-features-comparison__item--accent {
-    background: rgba(125, 211, 168, 0.1);
+    background: rgba(143, 184, 162, 0.1);
   }
 
   @media (max-width: 640px) {
@@ -300,17 +298,20 @@ const getCardClasses = (index: number) => ({
 
   .core-features-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: var(--space-4);
   }
 
   .core-feature-card {
+    grid-column: span 3;
     min-width: 0;
-    padding: clamp(1.05rem, 1.55vw, 1.35rem);
+    padding: clamp(1.1rem, 1.55vw, 1.45rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.1rem;
     background: rgba(255, 255, 255, 0.04);
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-panel);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       background var(--duration-fast) var(--ease-out),
@@ -318,9 +319,9 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card:hover {
-    border-color: rgba(125, 211, 168, 0.25);
+    border-color: rgba(143, 184, 162, 0.25);
     background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 
   .core-feature-card::after {
@@ -343,18 +344,18 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card--lead {
-    grid-column: 1 / -1;
+    grid-column: span 4;
     padding: clamp(1.35rem, 1.8vw, 1.7rem);
-    border-color: rgba(125, 211, 168, 0.15);
+    border-color: rgba(143, 184, 162, 0.16);
     background:
       linear-gradient(
         135deg,
-        rgba(125, 211, 168, 0.18),
-        rgba(125, 211, 168, 0.05) 36%,
+        rgba(143, 184, 162, 0.18),
+        rgba(143, 184, 162, 0.05) 36%,
         rgba(255, 255, 255, 0.04) 100%
       ),
       rgba(255, 255, 255, 0.06);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-floating);
   }
 
   .core-feature-card:not(.core-feature-card--lead) {
@@ -362,7 +363,16 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card:not(.core-feature-card--lead):hover {
-    border-color: rgba(125, 211, 168, 0.2);
+    border-color: rgba(143, 184, 162, 0.2);
+  }
+
+  .core-feature-card:nth-child(2) {
+    grid-column: span 2;
+  }
+
+  .core-feature-card:nth-child(3) {
+    grid-column: span 2;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   .core-feature-card--lead h3 {
@@ -376,10 +386,10 @@ const getCardClasses = (index: number) => ({
     width: 44px;
     height: 44px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0;
+    border-radius: 0.85rem;
     color: var(--accent-primary);
     flex-shrink: 0;
-    background: rgba(0, 0, 0, 0.14);
+    background: rgba(10, 17, 17, 0.38);
   }
 
   .core-feature-card:hover .feature-icon {
@@ -397,12 +407,25 @@ const getCardClasses = (index: number) => ({
     .core-features-comparison {
       grid-template-columns: 1fr;
     }
+
+    .core-features-proof {
+      position: static;
+      top: auto;
+    }
   }
 
   @media (max-width: 768px) {
     .core-features-list,
     .core-features-comparison__grid {
       grid-template-columns: 1fr;
+    }
+
+    .core-feature-card,
+    .core-feature-card--lead,
+    .core-feature-card:nth-child(2),
+    .core-feature-card:nth-child(3) {
+      grid-column: auto;
+      margin-top: 0;
     }
   }
 

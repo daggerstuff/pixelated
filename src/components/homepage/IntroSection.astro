@@ -75,7 +75,7 @@ const { content } = Astro.props
     background:
       radial-gradient(
         circle at top right,
-        rgba(125, 211, 168, 0.08),
+        rgba(143, 184, 162, 0.08),
         transparent 28%
       ),
       linear-gradient(180deg, rgba(10, 14, 15, 0.98), rgba(8, 11, 12, 1));
@@ -121,8 +121,8 @@ const { content } = Astro.props
 
   .home-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
-    gap: clamp(1.8rem, 3.5vw, 3.6rem);
+    grid-template-columns: minmax(0, 1.12fr) minmax(20rem, 0.88fr);
+    gap: clamp(2rem, 3.8vw, 4.6rem);
     align-items: start;
     position: relative;
   }
@@ -130,12 +130,18 @@ const { content } = Astro.props
   .home-intro::after {
     content: '';
     position: absolute;
-    right: clamp(-4rem, -6vw, -2rem);
-    bottom: -2.4rem;
-    width: min(24rem, 42vw);
-    height: min(24rem, 42vw);
-    border: 1px solid rgba(17, 23, 22, 0.08);
-    opacity: 0.2;
+    right: clamp(-5rem, -6vw, -2.5rem);
+    bottom: -3rem;
+    width: min(26rem, 44vw);
+    height: min(26rem, 44vw);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(143, 184, 162, 0.12),
+      transparent 68%
+    );
+    filter: blur(12px);
+    opacity: 0.7;
   }
 
   .home-intro__lead {
@@ -145,12 +151,16 @@ const { content } = Astro.props
 
   .home-intro__panel {
     position: relative;
-    padding: clamp(1.25rem, 2vw, 1.7rem);
+    margin-top: clamp(1.2rem, 4vw, 3rem);
+    padding: clamp(1.35rem, 2vw, 1.8rem);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1.25rem;
     background:
-      linear-gradient(180deg, rgba(20, 28, 28, 0.98), rgba(14, 19, 20, 0.94)),
+      linear-gradient(180deg, rgba(20, 28, 28, 0.96), rgba(14, 19, 20, 0.92)),
       rgba(12, 16, 17, 0.94);
-    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+    box-shadow: var(--shadow-floating);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
 
   .home-intro__panel::before {
@@ -202,7 +212,7 @@ const { content } = Astro.props
   }
 
   .home-evidence-grid {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: stretch;
     gap: clamp(0.9rem, 1.8vw, 1.2rem);
     position: relative;
@@ -226,9 +236,11 @@ const { content } = Astro.props
   }
 
   .home-evidence-card {
+    grid-column: span 6;
     min-width: 0;
-    padding: clamp(1.15rem, 1.8vw, 1.45rem);
+    padding: clamp(1.2rem, 1.9vw, 1.6rem);
     border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1.15rem;
     background:
       linear-gradient(
         180deg,
@@ -236,15 +248,24 @@ const { content } = Astro.props
         rgba(255, 255, 255, 0)
       ),
       rgba(11, 15, 16, 0.92);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.14);
+    box-shadow: var(--shadow-panel);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       transform var(--duration-fast) var(--ease-out);
   }
 
+  .home-evidence-card:first-child {
+    grid-column: 1 / span 7;
+  }
+
+  .home-evidence-card:last-child {
+    grid-column: 8 / -1;
+    margin-top: clamp(1.5rem, 3vw, 2.8rem);
+  }
+
   .home-evidence-card:hover {
-    border-color: rgba(125, 211, 168, 0.2);
-    transform: translateY(-2px);
+    border-color: rgba(143, 184, 162, 0.24);
+    transform: translateY(-4px);
   }
 
   .home-evidence-card--light {
@@ -252,11 +273,29 @@ const { content } = Astro.props
     background:
       linear-gradient(
         180deg,
-        rgba(125, 211, 168, 0.08),
-        rgba(125, 211, 168, 0)
+        rgba(143, 184, 162, 0.08),
+        rgba(143, 184, 162, 0)
       ),
       rgba(13, 19, 20, 0.98);
-    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.16);
+    box-shadow: var(--shadow-floating);
+  }
+
+  .home-evidence-list {
+    padding-left: 1rem;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 1080px) {
+    .home-evidence-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .home-evidence-card:first-child,
+    .home-evidence-card:last-child,
+    .home-evidence-card {
+      grid-column: auto;
+      margin-top: 0;
+    }
   }
 
   .home-evidence-card--light::before {
