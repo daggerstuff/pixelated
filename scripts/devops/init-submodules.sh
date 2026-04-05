@@ -274,7 +274,8 @@ select_submodule_url() {
     # Use canonical GitHub fallback instead of preserving relative URLs.
     if is_relative_submodule_url "${original_url}"; then
       if github_repo_is_accessible "${name}"; then
-        printf '%s' "${github_url}"
+    printf '%s' "${github_url}"
+    return 0
         return 0
       fi
 
