@@ -25,8 +25,10 @@ trigger:
 
 pr: none
 
+# This pipeline must run on the self-hosted Bear Dance pool because
+# Microsoft-hosted Azure Pipelines minutes are exhausted for this organization.
 pool:
-  vmImage: 'ubuntu-latest'
+  name: Bear Dance
 
 parameters:
   - name: environment
@@ -70,35 +72,28 @@ stages:
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-              AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
 
                 sanitize_token() {
-                  local token="${1:-}"
-
-                  case "${token}" in
+                  case "${1:-}" in
                     ""|'$('*) printf '' ;;
-                    *) printf '%s' "${token}" ;;
+                    *) printf '%s' "${1}" ;;
                   esac
                 }
 
                 SYSTEM_ACCESSTOKEN="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
                 GITHUB_PAT="$(sanitize_token "${GITHUB_PAT:-}")"
-                AZDO_PAT="$(sanitize_token "${AZDO_PAT:-}")"
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]None of System.AccessToken, AZDO_PAT, or GITHUB_PAT is set for submodule initialization."
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
                   exit 1
                 fi
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ]; then
-                  echo "##[warning]Neither System.AccessToken nor AZDO_PAT is set. Azure submodule mirrors may not be available."
-                elif [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -n "${AZDO_PAT:-}" ]; then
-                  echo "✅ AZDO_PAT is present for Azure mirror fallback access"
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
+                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
                 fi
 
                 if [ -z "${GITHUB_PAT:-}" ]; then
@@ -114,26 +109,23 @@ stages:
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-              AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: git
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                echo "=== Debug: Environment Variables ==="
-                echo "AZDO_USERNAME is set to: ${AZDO_USERNAME:-'NOT SET'}"
-                echo "SYSTEM_ACCESSTOKEN exists: $(if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then echo 'YES (length:' ${#SYSTEM_ACCESSTOKEN} ')'; else echo 'NO'; fi)"
-                echo "AZDO_PAT exists: $(if [ -n "${AZDO_PAT:-}" ]; then echo 'YES (length:' ${#AZDO_PAT} ')'; else echo 'NO'; fi)"
-                echo "GITHUB_PAT exists: $(if [ -n "${GITHUB_PAT:-}" ]; then echo 'YES (length:' ${#GITHUB_PAT} ')'; else echo 'NO'; fi)"
-                echo "Current directory: $(pwd)"
-                echo "==================================="
                 bash scripts/devops/init-submodules.sh
 
           - task: NodeTool@0
             displayName: 'Install Node.js (LTS)'
             inputs:
-              versionSpec: '24.x'
+              versionSpec: '20.x'
               checkLatest: true
+
+          - task: Bash@3
+            displayName: 'Clean Docker leftovers on self-hosted runner'
+            inputs:
+              targetType: 'filePath'
+              filePath: 'scripts/devops/cleanup-docker-artifacts.sh'
 
           - task: SonarCloudPrepare@4
             displayName: 'Prepare Analysis Configuration'
@@ -238,35 +230,18 @@ stages:
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-              AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: $(AZDO_USERNAME)
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
 
-                sanitize_token() {
-                  local token="${1:-}"
-
-                  case "${token}" in
-                    ""|'$('*) printf '' ;;
-                    *) printf '%s' "${token}" ;;
-                  esac
-                }
-
-                SYSTEM_ACCESSTOKEN="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
-                GITHUB_PAT="$(sanitize_token "${GITHUB_PAT:-}")"
-                AZDO_PAT="$(sanitize_token "${AZDO_PAT:-}")"
-
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
-                  echo "##vso[task.logissue type=error]None of System.AccessToken, AZDO_PAT, or GITHUB_PAT is set for submodule initialization."
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${GITHUB_PAT:-}" ]; then
+                  echo "##vso[task.logissue type=error]Neither System.AccessToken nor GITHUB_PAT is set for submodule initialization."
                   exit 1
                 fi
 
-                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -z "${AZDO_PAT:-}" ]; then
-                  echo "##[warning]Neither System.AccessToken nor AZDO_PAT is set. Azure submodule mirrors may not be available."
-                elif [ -z "${SYSTEM_ACCESSTOKEN:-}" ] && [ -n "${AZDO_PAT:-}" ]; then
-                  echo "✅ AZDO_PAT is present for Azure mirror fallback access"
+                if [ -z "${SYSTEM_ACCESSTOKEN:-}" ]; then
+                  echo "##[warning]System.AccessToken is not set. Azure submodule mirrors will not be available."
                 fi
 
                 if [ -z "${GITHUB_PAT:-}" ]; then
@@ -313,21 +288,10 @@ stages:
             env:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-              AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: git
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
-                echo "=== Debug: Environment Variables ==="
-                echo "AZDO_USERNAME is set to: ${AZDO_USERNAME:-'NOT SET'}"
-                echo "SYSTEM_ACCESSTOKEN exists: $(if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then echo 'YES (length:' ${#SYSTEM_ACCESSTOKEN} ')'; else echo 'NO'; fi)"
-                echo "AZDO_PAT exists: $(if [ -n "${AZDO_PAT:-}" ]; then echo 'YES (length:' ${#AZDO_PAT} ')'; else echo 'NO'; fi)"
-                echo "GITHUB_PAT exists: $(if [ -n "${GITHUB_PAT:-}" ]; then echo 'YES (length:' ${#GITHUB_PAT} ')'; else echo 'NO'; fi)"
-                echo "Current directory: $(pwd)"
-                echo "Git remote -v:"
-                git remote -v || true
-                echo "==================================="
                 bash scripts/devops/init-submodules.sh
 
           - task: HelmInstaller@1
