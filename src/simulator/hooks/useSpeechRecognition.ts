@@ -1,7 +1,11 @@
 /**
- * Custom hook for speech recognition with therapeutic enhancements
- * Provides functionality for speech recognition with specialized
- * processing for therapeutic practice
+ * Hook for managing the Web Speech API lifecycle with therapeutic domain enhancements.
+ *
+ * Why this exists: Standard speech recognition lacks the vocabulary needed for
+ * clinical practice. This hook orchestrates the connection between the browser's
+ * speech engine and our therapeutic grammar lists, while maintaining local state
+ * for transcripts and detected techniques to prevent unnecessary re-renders during
+ * high-frequency interim results.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react'
