@@ -132,7 +132,7 @@ class SyncLifecycleManager<T> {
       data.tabId,
       {
         strategy: this.conflictStrategy,
-        onConflict: this.onConflict || ((_k: string, _l: T, r: T) => r),
+        onConflict: this.onConflict,
       }
     );
 
