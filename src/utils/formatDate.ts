@@ -126,22 +126,25 @@ function formatCustomDate(date: Date, formatString: string): string {
  */
 export function isValidDate(dateString: string): boolean {
   try {
-    // Check ISO 8601 date format (YYYY-MM-DD) for strict calendar validation
-    const isoMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (typeof dateString !== 'string' || !dateString.trim()) return false;
+    
+    // Check if the overall format is parsable by native Date
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return false;
+    
+    // strictly validate calendar dates to prevent JavaScript Date rollover
+    const isoMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/);
     if (isoMatch) {
-      const [, yearStr, monthStr, dayStr] = isoMatch;
-      const year = parseInt(yearStr, 10);
-      const month = parseInt(monthStr, 10);
-      const day = parseInt(dayStr, 10);
-      // Validate month range
+      const year = parseInt(isoMatch[1], 10);
+      const month = parseInt(isoMatch[2], 10);
+      const day = parseInt(isoMatch[3], 10);
+      
       if (month < 1 || month > 12) return false;
-      // Validate day range for the given month/year
       const daysInMonth = new Date(year, month, 0).getDate();
       if (day < 1 || day > daysInMonth) return false;
-      return true;
     }
-    const date = new Date(dateString);
-    return !isNaN(date.getTime());
+    
+    return true;
   } catch {
     return false;
   }
