@@ -183,6 +183,9 @@ configure_credentials() {
     set_temp_git_config "http.https://github.com/.extraHeader" "AUTHORIZATION: basic ${auth_header}"
     set_temp_git_config "credential.helper" ""
     
+    git config --global http.https://github.com/.extraHeader "AUTHORIZATION: basic ${auth_header}" 2>/dev/null || true
+    git config --global credential.helper "" 2>/dev/null || true
+    
     AUTH_GIT_ARGS+=(
       -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
       -c "credential.helper="
