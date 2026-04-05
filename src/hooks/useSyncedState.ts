@@ -184,6 +184,7 @@ class SyncLifecycleManager<T> {
       this.debounceRef = null;
     }
     this.isInitialized = false;
+    this.lastSyncValue = this.defaultValue;
   }
 }
 
