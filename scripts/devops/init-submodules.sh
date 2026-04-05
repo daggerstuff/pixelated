@@ -126,6 +126,11 @@ azure_repo_url() {
   printf 'https://dev.azure.com/handtransfer/pixelated/_git/%s' "${repo_name}"
 }
 
+canonical_public_submodule_url() {
+  local repo_name="$1"
+  printf 'https://github.com/daggerstuff/%s.git' "${repo_name}"
+}
+
 is_relative_submodule_url() {
   case "${1:-}" in
     ../*|./*) return 0 ;;
@@ -157,7 +162,10 @@ select_submodule_url() {
   # 3. Azure Environment Logic
   if is_azure_environment; then
     if is_relative_submodule_url "${original_url}"; then
-      printf '%s' "${original_url}"
+      # Convert relative URL to absolute GitHub URL
+      local github_url
+      github_url="$(canonical_public_submodule_url "${name}")"
+      printf '%s' "${github_url}"
       return 0
     fi
 
