@@ -1,6 +1,6 @@
 export const featuresContent = {
   label: 'What the platform adds',
-  title: 'A room to practice in and a record to coach from.',
+  title: 'A live practice surface with a record supervisors can coach from.',
   copy: 'The product has two jobs: hold the clinician inside a believable conversation, then give the supervisor a concrete record specific enough to coach from.',
   proofLabel: 'What the team gets back',
   proofItems: [

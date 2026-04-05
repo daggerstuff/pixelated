@@ -1,8 +1,8 @@
 export const heroContent = {
-  title: 'Clinical simulation for therapist training and supervision.',
+  title: 'Clinical rehearsal for therapist supervision teams.',
   subtitle:
-    'Run a difficult conversation, keep the transcript and notes, and review the exact turn a supervisor wants to coach.',
-  kicker: 'Clinical rehearsal for supervision teams',
+    'Run a difficult conversation, keep the transcript and notes attached, and review the exact turn a supervisor wants to coach.',
+  kicker: 'Transcript-backed rehearsal for supervision teams',
   proofPoints: [
     'For therapist training teams, supervisors, and clinical leads',
     'A shared case, a saved record, and a clearer retry',

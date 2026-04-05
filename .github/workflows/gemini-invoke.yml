@@ -8,7 +8,7 @@ on:
         required: false
 concurrency:
   group: '${{ github.workflow }}-invoke-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number }}'
-cancel-in-progress: false
+  cancel-in-progress: false
 defaults:
   run:
     shell: 'bash'
@@ -23,7 +23,7 @@ jobs:
     steps:
       - name: 'Mint identity token'
         id: 'mint_identity_token'
-        if: |- 
+        if: |-
           ${{ vars.APP_ID }}
         uses: 'actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859'
         # ratchet:actions/create-github-app-token@v3
@@ -63,53 +63,3 @@ jobs:
           use_vertex_ai: '${{ vars.GOOGLE_GENAI_USE_VERTEXAI }}'
           upload_artifacts: '${{ vars.UPLOAD_ARTIFACTS }}'
           workflow_name: 'gemini-invoke'
-        settings: |- 
-          {
-            "model": {
-              "maxSessionTurns": 25
-            },
-            "telemetry": {
-              "enabled": true,
-              "target": "local",
-              "outfile": ".gemini/telemetry.log"
-            },
-            "mcpServers": {
-              "github": {
-                "command": "docker",
-                "args": [
-                  "run",
-                  "-i",
-                  "--rm",
-                  "-e",
-                  "GITHUB_PERSONAL_ACCESS_TOKEN",
-                  "ghcr.io/github/github-mcp-server:v0.27.0"
-                ],
-                "includeTools": [
-                  "add_issue_comment",
-                  "issue_read",
-                  "list_issues",
-                  "search_issues",
-                  "pull_request_read",
-                  "list_pull_requests",
-                  "search_pull_requests",
-                  "get_commit",
-                  "get_file_contents",
-                  "list_commits",
-                  "search_code"
-                ],
-                "env": {
-                  "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-                }
-              }
-            },
-            "tools": {
-              "core": [
-                "run_shell_command(cat)",
-                "run_shell_command(echo)",
-                "run_shell_command(grep)",
-                "run_shell_command(head)",
-                "run_shell_command(tail)"
-              ]
-            }
-          }
-        prompt: '/gemini-invoke'

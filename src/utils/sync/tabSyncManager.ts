@@ -4,6 +4,7 @@
  */
 
 import storageManager from '@/utils/storage/storageManager'
+import { mergeValues } from '@/utils/object'
 
 export interface SyncMessage {
   type:
@@ -19,6 +20,7 @@ export interface SyncMessage {
   tabId: string
   version?: number
   checksum?: string
+  sourceId?: string
 }
 
 export interface SyncState {
@@ -85,14 +87,14 @@ class TabSyncManager {
     }
 
     this.tabId = this.generateTabId()
-    this.initialize()
   }
 
   private generateTabId(): string {
     return `tab_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
   }
 
-  private initialize(): void {
+  public init(): void {
+    if (this.isInitialized) return
     if (
       !this.config.enabled ||
       typeof window === 'undefined' ||
@@ -244,7 +246,7 @@ class TabSyncManager {
     }
 
     // Notify listeners
-    this.emit('stateReceived', { key, value: finalValue, tabId })
+    this.emit('stateReceived', { key, value: finalValue, tabId, sourceId: message.sourceId })
     this.config.onStateReceived(key, finalValue, tabId)
   }
 
@@ -266,39 +268,7 @@ class TabSyncManager {
   }
 
   private mergeStates(local: any, remote: any): any {
-    // Simple merge strategy - for more complex merging, this could be enhanced
-    if (typeof local !== 'object' || typeof remote !== 'object') {
-      return remote // For primitives, use remote value
-    }
-
-    if (Array.isArray(local) && Array.isArray(remote)) {
-      // For arrays, concatenate and deduplicate by reference
-      return [...new Set([...local, ...remote])]
-    }
-
-    if (
-      local &&
-      remote &&
-      typeof local === 'object' &&
-      typeof remote === 'object'
-    ) {
-      // For objects, do a deep merge
-      const merged = { ...local }
-      for (const [key, value] of Object.entries(remote)) {
-        if (
-          merged[key] &&
-          typeof merged[key] === 'object' &&
-          typeof value === 'object'
-        ) {
-          merged[key] = this.mergeStates(merged[key], value)
-        } else {
-          merged[key] = value
-        }
-      }
-      return merged
-    }
-
-    return remote
+    return mergeValues(local, remote)
   }
 
   private emit(event: string, data: any): void {
@@ -330,7 +300,7 @@ class TabSyncManager {
   /**
    * Sync a state value across tabs
    */
-  syncState(key: string, value: any): boolean {
+  syncState(key: string, value: any, sourceId?: string): boolean {
     const currentVersion = this.stateVersions.get(key) || 0
     const newVersion = currentVersion + 1
 
@@ -344,6 +314,7 @@ class TabSyncManager {
       tabId: this.tabId,
       version: newVersion,
       checksum: generateChecksum(value),
+      sourceId,
     })
   }
 

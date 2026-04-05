@@ -1,6 +1,6 @@
 export const ctaContent = {
   label: 'Pilot it on one real case',
-  title: 'Use one difficult case and judge the review on its own merits.',
+  title: 'Pilot one difficult case and judge the review on its own merits.',
   intro:
     'Pick one difficult conversation your team already finds hard to coach. Run it once, review it together, and decide from the record instead of the pitch.',
   verdictCopy:

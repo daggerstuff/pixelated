@@ -6,6 +6,7 @@
 import BrutalistHeader from '@/components/BrutalistHeader.astro'
 import BrutalistFooter from '@/components/BrutalistFooter.astro'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import '@/styles/brutalist-minimal.css'
 
 export interface Props {
   title: string
@@ -73,9 +74,6 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
       type="font/ttf"
       crossorigin
     />
-
-    <!-- Design System -->
-    <link rel="stylesheet" href="/css/brutalist-minimal.css" />
 
     <RybbitAnalytics nonce={cspNonce} />
   </head>
