@@ -8,7 +8,14 @@ export interface UseSyncedStateOptions<T> {
   defaultValue: T;
   debounceMs?: number;
   enableSync?: boolean;
-  conflictStrategy?: "local" | "remote" | "local-wins" | "remote-wins" | "merge" | "manual";
+  /**
+   * Conflict resolution strategy.
+   * - 'local-wins' / 'local': Always use local value
+   * - 'remote-wins' / 'remote': Always use remote value (default)
+   * - 'merge': Deep merge objects
+   * - 'manual': Use onConflict callback
+   */
+  conflictStrategy?: "local-wins" | "remote-wins" | "merge" | "manual";
   onSync?: (value: T, sourceTabId: string) => void;
   /**
    * Conflict resolution handler.
