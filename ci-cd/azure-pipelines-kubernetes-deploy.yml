@@ -128,12 +128,6 @@ stages:
               versionSpec: '20.x'
               checkLatest: true
 
-          - task: Bash@3
-            displayName: 'Clean Docker leftovers on self-hosted runner'
-            inputs:
-              targetType: 'filePath'
-              filePath: 'scripts/devops/cleanup-docker-artifacts.sh'
-
           - task: SonarCloudPrepare@4
             displayName: 'Prepare Analysis Configuration'
             inputs:
