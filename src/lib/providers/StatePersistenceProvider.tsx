@@ -21,6 +21,7 @@ import React, {
 
 import { logger } from '@/lib/logger'
 import { persistenceManager } from '@/lib/state/jotai-persistence'
+import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 // ============================================================================
 // Types
@@ -77,6 +78,86 @@ export function StatePersistenceProvider({
     isHealthy: true,
   })
 
+  // Refresh storage statistics
+  const refreshStats = useCallback(() => {
+    try {
+      const storageStats = persistenceManager.getStorageStats()
+
+      setStats((prev) => ({
+        ...prev,
+        totalKeys: storageStats.totalKeys,
+        totalSize: storageStats.totalSize,
+        isHealthy: true,
+      }))
+
+      if (debug) {
+        logger.debug('Storage stats updated:', storageStats)
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to refresh storage stats:', error)
+      setStats((prev) => ({ ...prev, isHealthy: false }))
+    }
+  }, [debug])
+
+  // Export all persisted state
+  const exportState = useCallback(() => {
+    try {
+      const exported = persistenceManager.exportPersistedState()
+
+      if (debug) {
+        logger.info('State exported:', Object.keys(exported))
+      }
+
+      return exported
+    } catch (error: unknown) {
+      logger.error('Failed to export state:', error)
+      throw error
+    }
+  }, [debug])
+
+  // Create a backup of current state
+  const createBackup = useCallback(async () => {
+    try {
+      const state = exportState()
+      const timestamp = Date.now()
+      const backupKey = `state_backup_${timestamp}`
+
+      // Store backup in a separate storage area
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(
+            backupKey,
+            JSON.stringify({
+              timestamp,
+              state,
+              version: '1.0',
+            }),
+          )
+
+          // Clean up old backups (keep only last 5)
+          const backupKeys = Object.keys(localStorage)
+            .filter((key) => key.startsWith('state_backup_'))
+            .sort()
+
+          if (backupKeys.length > 5) {
+            const keysToRemove = backupKeys.slice(0, backupKeys.length - 5)
+            keysToRemove.forEach((key) => localStorage.removeItem(key))
+          }
+
+          setStats((prev) => ({ ...prev, lastBackup: timestamp }))
+
+          if (debug) {
+            logger.info(`State backup created: ${backupKey}`)
+          }
+        } catch (storageError) {
+          logger.warn('Failed to store backup to localStorage:', storageError)
+        }
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to create state backup:', error)
+    }
+  }, [exportState, debug])
+
   // Initialize persistence system
   useEffect(() => {
     let backupTimer: NodeJS.Timeout | null = null
@@ -88,6 +169,12 @@ export function StatePersistenceProvider({
         }
 
         // Offline sync initialization removed: initializeOfflineSync does not exist
+
+        // Initialize cross-tab sync BroadcastChannel once at the provider level.
+        // tabSyncManager.init() is idempotent — safe to call even if already running.
+        if (typeof window !== 'undefined') {
+          tabSyncManager.init()
+        }
 
         // Set up automatic backups if enabled
         if (enableBackups && typeof window !== 'undefined') {
@@ -117,10 +204,15 @@ export function StatePersistenceProvider({
 
     void initializePersistence()
 
-    // Cleanup function
+    // Cleanup function — tear down the cross-tab sync manager so its
+    // BroadcastChannel and window 'beforeunload' listener are released on
+    // unmount (or on HMR remount), preventing listener accumulation.
     return () => {
       if (backupTimer) {
         clearInterval(backupTimer)
+      }
+      if (typeof window !== 'undefined') {
+        tabSyncManager.destroy()
       }
     }
   }, [
@@ -173,27 +265,6 @@ export function StatePersistenceProvider({
     }
   }, [isInitialized])
 
-  // Refresh storage statistics
-  const refreshStats = useCallback(() => {
-    try {
-      const storageStats = persistenceManager.getStorageStats()
-
-      setStats((prev) => ({
-        ...prev,
-        totalKeys: storageStats.totalKeys,
-        totalSize: storageStats.totalSize,
-        isHealthy: true,
-      }))
-
-      if (debug) {
-        logger.debug('Storage stats updated:', storageStats)
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to refresh storage stats:', error)
-      setStats((prev) => ({ ...prev, isHealthy: false }))
-    }
-  }, [debug])
-
   // Clear all persisted state
   const clearAllState = useCallback(async () => {
     try {
@@ -208,22 +279,6 @@ export function StatePersistenceProvider({
       throw error
     }
   }, [refreshStats, debug])
-
-  // Export all persisted state
-  const exportState = useCallback(() => {
-    try {
-      const exported = persistenceManager.exportPersistedState()
-
-      if (debug) {
-        logger.info('State exported:', Object.keys(exported))
-      }
-
-      return exported
-    } catch (error: unknown) {
-      logger.error('Failed to export state:', error)
-      throw error
-    }
-  }, [debug])
 
   // Import persisted state
   const importState = useCallback(
@@ -242,49 +297,6 @@ export function StatePersistenceProvider({
     },
     [refreshStats, debug],
   )
-
-  // Create a backup of current state
-  const createBackup = useCallback(async () => {
-    try {
-      const state = exportState()
-      const timestamp = Date.now()
-      const backupKey = `state_backup_${timestamp}`
-
-      // Store backup in a separate storage area
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem(
-            backupKey,
-            JSON.stringify({
-              timestamp,
-              state,
-              version: '1.0',
-            }),
-          )
-
-          // Clean up old backups (keep only last 5)
-          const backupKeys = Object.keys(localStorage)
-            .filter((key) => key.startsWith('state_backup_'))
-            .sort()
-
-          if (backupKeys.length > 5) {
-            const keysToRemove = backupKeys.slice(0, backupKeys.length - 5)
-            keysToRemove.forEach((key) => localStorage.removeItem(key))
-          }
-
-          setStats((prev) => ({ ...prev, lastBackup: timestamp }))
-
-          if (debug) {
-            logger.info(`State backup created: ${backupKey}`)
-          }
-        } catch (storageError) {
-          logger.warn('Failed to store backup to localStorage:', storageError)
-        }
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to create state backup:', error)
-    }
-  }, [exportState, debug])
 
   // Context value
   const contextValue: StatePersistenceContextType = {
@@ -359,7 +371,7 @@ export function StatePersistenceDebugger() {
     const reader = new FileReader()
     reader.onload = async (e) => {
       try {
-        const state = JSON.parse(e.target?.result as string) as unknown
+        const state = JSON.parse(e.target?.result as string) as Record<string, unknown>
         await importState(state)
         alert('State imported successfully!')
       } catch (error: unknown) {
