@@ -1,14 +1,15 @@
 export const heroContent = {
-  title: 'Clinical rehearsal for therapist supervision teams.',
+  title:
+    'Bring one hard case into rehearsal. Keep the record. Coach the retry.',
   subtitle:
-    'Run a difficult conversation, keep the transcript and notes attached, and review the exact turn a supervisor wants to coach.',
-  kicker: 'Transcript-backed rehearsal for supervision teams',
+    'Run the conversation live, keep the transcript and notes attached, and review the exact turn a supervisor wants to coach.',
+  kicker: 'A calmer way to run training and review the same case',
   proofPoints: [
-    'For therapist training teams, supervisors, and clinical leads',
-    'A shared case, a saved record, and a clearer retry',
+    'Built for supervision teams, clinical educators, and training leads',
+    'One shared case, one saved record, one sharper next attempt',
   ],
-  primaryCTA: { text: 'Bring a Case to Pilot', href: '/signup' },
-  secondaryCTA: { text: 'See the Product Demo', href: '/demo-hub' },
+  primaryCTA: { text: 'Start a pilot', href: '/signup' },
+  secondaryCTA: { text: 'View the product demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Product proof',
     status: 'One session record the team can review together.',

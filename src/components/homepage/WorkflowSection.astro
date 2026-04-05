@@ -49,13 +49,7 @@ const { content } = Astro.props
 
 <style>
   .home-section--how {
-    background:
-      radial-gradient(
-        circle at top left,
-        rgba(143, 184, 162, 0.09),
-        transparent 28%
-      ),
-      linear-gradient(180deg, rgba(11, 16, 17, 0.98), rgba(8, 12, 13, 1));
+    background: rgba(11, 16, 17, 0.98);
     color: var(--text-primary);
   }
 
@@ -69,21 +63,20 @@ const { content } = Astro.props
 
   .home-split {
     display: grid;
-    grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
-    gap: clamp(2.8rem, 4vw, 5rem);
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(3rem, 4vw, 5.25rem);
     align-items: start;
   }
 
   .home-split__intro {
     display: grid;
-    gap: 1rem;
-    position: sticky;
-    top: 7rem;
+    gap: 1.2rem;
+    position: static;
   }
 
   .home-steps {
     display: grid;
-    gap: 1.3rem;
+    gap: 1rem;
     position: relative;
     padding-left: 1.35rem;
   }
@@ -107,9 +100,9 @@ const { content } = Astro.props
     grid-template-columns: auto 1fr;
     gap: var(--space-4);
     align-items: start;
-    padding: 1.45rem 1.45rem 1.35rem;
+    padding: 1.35rem 1.35rem 1.4rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.25rem;
+    border-radius: 1rem;
     background:
       linear-gradient(
         180deg,
@@ -117,32 +110,25 @@ const { content } = Astro.props
         rgba(143, 184, 162, 0)
       ),
       rgba(255, 255, 255, 0.03);
-    box-shadow: var(--shadow-panel);
+    box-shadow: 0 22px 54px rgba(2, 8, 9, 0.22);
     transition:
       border-color var(--duration-fast) var(--ease-out),
-      transform var(--duration-fast) var(--ease-out);
+      background var(--duration-fast) var(--ease-out);
   }
 
   .home-step:nth-child(even) {
-    margin-left: clamp(1.4rem, 2.8vw, 2.8rem);
+    margin-left: clamp(0.8rem, 1.6vw, 1.4rem);
   }
 
   .home-step:hover {
-    border-color: rgba(143, 184, 162, 0.22);
-    transform: translateX(6px);
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .home-step:first-child {
     position: relative;
-    border-color: rgba(143, 184, 162, 0.22);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(143, 184, 162, 0.14),
-        rgba(143, 184, 162, 0.02)
-      ),
-      rgba(255, 255, 255, 0.05);
-    box-shadow: var(--shadow-floating);
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .home-step:first-child::after {
@@ -172,13 +158,13 @@ const { content } = Astro.props
   }
 
   .home-step h3 {
-    font-size: clamp(1.08rem, 1rem + 0.28vw, 1.22rem);
+    font-size: clamp(1.06rem, 1rem + 0.22vw, 1.18rem);
     line-height: 1.22;
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.5rem;
   }
 
   .home-step p {
-    line-height: 1.66;
+    line-height: 1.68;
     text-wrap: pretty;
   }
 
@@ -201,7 +187,7 @@ const { content } = Astro.props
   }
 
   .home-outputs--spaced {
-    margin-top: clamp(3rem, 5vw, 4.5rem);
+    margin-top: clamp(3.75rem, 5vw, 5.25rem);
     position: relative;
   }
 
@@ -210,33 +196,17 @@ const { content } = Astro.props
     position: absolute;
     inset: 0 0 auto;
     height: 1px;
-    background: linear-gradient(
-      90deg,
-      rgba(143, 184, 162, 0.35),
-      transparent 78%
-    );
+    background: rgba(255, 255, 255, 0.12);
     z-index: 1;
   }
 
   .home-outputs--spaced::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      rgba(143, 184, 162, 0.2),
-      transparent 60%
-    );
+    display: none;
   }
 
   @media (max-width: 1080px) {
     .home-split {
       grid-template-columns: 1fr;
-    }
-
-    .home-split__intro {
-      position: static;
     }
   }
 
