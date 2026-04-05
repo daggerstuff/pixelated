@@ -9,6 +9,8 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 
 echo "🚀 Starting Pixelated Submodule Initialization"
+echo "DEBUG: Current directory: $(pwd)"
+echo "DEBUG: Is git repo: $(git rev-parse --git-dir 2>/dev/null || echo 'NO')"
 
 DRY_RUN=false
 if [[ "${1:-}" == "--dry-run" ]]; then
