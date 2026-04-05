@@ -45,10 +45,15 @@ interface EnhancedFHEService {
 const enhancedFHEService = fheService as unknown as EnhancedFHEService
 
 // Secret key for signatures
-const SECRET_KEY =
-  typeof process !== 'undefined' && process.env
-    ? process.env['SECRET_KEY'] || 'default-secret-key'
-    : 'default-secret-key'
+function requireSecretKey(): string {
+  const key =
+    typeof process !== "undefined" && process.env
+      ? process.env["SECRET_KEY"]
+      : undefined
+
+  if (!key) throw new Error("SECRET_KEY is required for signatures")
+  return key.trim()
+}
 
 /**
  * Initialize security system
@@ -457,6 +462,7 @@ export function generateSecureToken(length = 32): string {
  * Create a signature for data integrity
  */
 export function createSignature(data: string): string {
+  const secret = requireSecretKey();
   try {
     // Browser-safe implementation
     if (typeof window !== 'undefined') {
@@ -465,13 +471,13 @@ export function createSignature(data: string): string {
       return btoa(
         String.fromCharCode.apply(
           null,
-          Array.from(new TextEncoder().encode(data + SECRET_KEY)),
+          Array.from(new TextEncoder().encode(data + secret)),
         ),
       )
     } else {
       // Server-side implementation without Node.js Buffer
       const encoder = new TextEncoder()
-      const dataWithKey = encoder.encode(data + SECRET_KEY)
+      const dataWithKey = encoder.encode(data + secret)
       // Convert Uint8Array to base64 string without using Buffer
       return btoa(String.fromCharCode.apply(null, Array.from(dataWithKey)))
     }
@@ -532,25 +538,37 @@ export function verifySecureToken(
     const [encodedData, signature] = token.split('.')
 
     if (!encodedData || !signature) {
+      logger.error('Invalid token format')
+      return null
+    }
+
+    // Check if secret key is available before verifying
+    try {
+      requireSecretKey()
+    } catch (e) {
+      logger.error('Cannot verify token: SECRET_KEY is missing')
       return null
     }
 
     // Verify signature
     if (!verifySignature(encodedData, signature)) {
+      logger.error('Invalid token signature')
       return null
     }
 
     // Decode payload using atob instead of Buffer
     const dataString = atob(encodedData)
-    const payload = JSON.parse(dataString) as unknown
+    const payload = JSON.parse(dataString) as any
 
     // Check expiration
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      logger.warn('Token expired')
       return null // Token expired
     }
 
     return payload
-  } catch {
+  } catch (error) {
+    logger.error('Token verification failed:', { error })
     return null
   }
 }
