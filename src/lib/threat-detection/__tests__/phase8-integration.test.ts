@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createCompleteThreatDetectionSystem } from "../integrations";
 
-describe("Phase 8: Advanced AI Threat Detection & Response System", () => {
+describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   let mongod: MongoMemoryServer;
   let redis: Redis;
   let mockOrchestrator: any;
