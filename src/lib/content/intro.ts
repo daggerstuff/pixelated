@@ -1,12 +1,12 @@
 export const introContent = {
-  label: 'Why teams stop relying on standard roleplay',
+  label: 'Why standard roleplay stops helping',
   title:
-    'The part supervision actually needs usually disappears once the room gets difficult.',
+    'Roleplay falls apart when nobody can point to the turn that changed the room.',
   paragraphs: [
     'Once the roleplay ends, the exchange usually collapses into recollection, side notes, and disagreement about what actually shifted the room.',
     'This product keeps the case, the transcript, and the review in one surface long enough for a supervisor to coach a specific retry.',
   ],
-  panelLabel: 'Where standard roleplay breaks',
+  panelLabel: 'Where the old process breaks',
   panelItems: [
     {
       label: 'No durable record',
@@ -23,7 +23,7 @@ export const introContent = {
   ],
   evidenceCards: [
     {
-      title: 'What breaks without a reviewable record',
+      title: 'Without a reviewable record',
       items: [
         'The useful part of the conversation disappears after the roleplay ends.',
         'Supervisors coach from recollection instead of a visible intervention.',
@@ -31,7 +31,7 @@ export const introContent = {
       ],
     },
     {
-      title: 'What changes when the record stays attached',
+      title: 'When the record stays attached',
       items: [
         'The transcript, notes, and retry logic stay tied to one run.',
         'Supervisors can point at the exact turn that needs work.',

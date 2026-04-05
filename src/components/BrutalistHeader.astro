@@ -38,14 +38,15 @@ const secondaryAction = headerContent.actions.secondary
           loading="eager"
           decoding="async"
         />
-        <div class="logo-glow"></div>
       </div>
       <span class="brand-lockup">
         <span class="brand-mark">
           <span class="brand-mark__primary">{titlePrimary}</span>
-          {titleSecondary ? (
-            <span class="brand-mark__secondary">{titleSecondary}</span>
-          ) : null}
+          {
+            titleSecondary ? (
+              <span class="brand-mark__secondary">{titleSecondary}</span>
+            ) : null
+          }
         </span>
         <span class="brand-meta">{headerContent.brandMeta}</span>
       </span>
@@ -62,7 +63,9 @@ const secondaryAction = headerContent.actions.secondary
                   class="header-nav-link"
                   aria-current={isActivePath(item.href) ? 'page' : undefined}
                 >
-                  <span class="header-nav-link__index">{String(index + 1).padStart(2, '0')}</span>
+                  <span class="header-nav-link__index">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
                   <span>{item.label}</span>
                 </a>
               </li>
@@ -72,8 +75,16 @@ const secondaryAction = headerContent.actions.secondary
       </nav>
 
       <div class="header-actions">
-        <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
-        <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
+        <a
+          href={secondaryAction.href}
+          class="header-action-link header-action-link--secondary"
+          >{secondaryAction.text}</a
+        >
+        <a
+          href={primaryAction.href}
+          class="header-action-link header-action-link--primary"
+          >{primaryAction.text}</a
+        >
       </div>
     </div>
 
@@ -101,8 +112,16 @@ const secondaryAction = headerContent.actions.secondary
             ))
           }
           <li class="header-mobile-actions">
-            <a href={secondaryAction.href} class="header-action-link header-action-link--secondary">{secondaryAction.text}</a>
-            <a href={primaryAction.href} class="header-action-link header-action-link--primary">{primaryAction.text}</a>
+            <a
+              href={secondaryAction.href}
+              class="header-action-link header-action-link--secondary"
+              >{secondaryAction.text}</a
+            >
+            <a
+              href={primaryAction.href}
+              class="header-action-link header-action-link--primary"
+              >{primaryAction.text}</a
+            >
           </li>
         </ul>
       </nav>
@@ -117,25 +136,17 @@ const secondaryAction = headerContent.actions.secondary
     z-index: var(--z-sticky);
     background: rgba(10, 13, 13, 0.86);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  .header::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(125, 211, 168, 0.55), transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .header-container {
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: center;
-    max-width: 80rem;
+    max-width: 84rem;
     margin: 0 auto;
-    padding: 0.8rem var(--space-6);
+    padding: 0.95rem var(--space-6);
     gap: clamp(0.8rem, 1.6vw, 1.4rem);
   }
 
@@ -166,7 +177,7 @@ const secondaryAction = headerContent.actions.secondary
   .brand-mark__secondary {
     display: inline-block;
     font-family: var(--font-display);
-    font-size: clamp(1.2rem, 1.05rem + 0.45vw, 1.55rem);
+    font-size: clamp(1.1rem, 0.98rem + 0.35vw, 1.4rem);
     font-weight: 600;
     line-height: 1;
   }
@@ -203,10 +214,10 @@ const secondaryAction = headerContent.actions.secondary
     border-radius: 0.35rem;
     border: 1px solid transparent;
     font-family: var(--font-sans);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-transform: none;
     text-decoration: none;
     white-space: nowrap;
     transition:
@@ -254,7 +265,11 @@ const secondaryAction = headerContent.actions.secondary
       padding: 0.45rem 0.55rem 0.45rem 0.9rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       background:
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+        linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.015)
+        ),
         rgba(8, 12, 13, 0.45);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
       position: relative;
@@ -265,7 +280,11 @@ const secondaryAction = headerContent.actions.secondary
       position: absolute;
       inset: 0 auto 0 0;
       width: 3px;
-      background: linear-gradient(180deg, rgba(125, 211, 168, 0.85), rgba(125, 211, 168, 0.12));
+      background: linear-gradient(
+        180deg,
+        rgba(125, 211, 168, 0.85),
+        rgba(125, 211, 168, 0.12)
+      );
     }
 
     .header-nav {
@@ -288,10 +307,10 @@ const secondaryAction = headerContent.actions.secondary
     align-items: center;
     gap: 0.35rem;
     font-family: var(--font-sans);
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-transform: none;
     color: var(--text-secondary);
     text-decoration: none;
     padding: 0.45rem 0;
@@ -494,19 +513,6 @@ const secondaryAction = headerContent.actions.secondary
     transition: transform 0.3s ease;
     position: relative;
     z-index: 1;
-  }
-
-  .logo-glow {
-    position: absolute;
-    inset: -0.25rem;
-    background: var(--accent-primary);
-    opacity: 0;
-    filter: blur(0.875rem);
-    transition: opacity var(--duration-normal) var(--ease-out);
-  }
-
-  .header-brand-link:hover .logo-glow {
-    opacity: 0.2;
   }
 
   .header-brand-link:hover .logo-img {

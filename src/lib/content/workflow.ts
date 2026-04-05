@@ -1,6 +1,6 @@
 export const workflowContent = {
-  label: 'What one run leaves behind',
-  title: 'Rehearsal should move into review without losing the room.',
+  label: 'What a single session leaves behind',
+  title: 'One run should leave behind something the whole team can review.',
   steps: [
     {
       number: '01',

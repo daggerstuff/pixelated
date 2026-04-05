@@ -79,17 +79,17 @@ const getCardClasses = (index: number) => ({
       </div>
     </div>
 
-    {comparison && (
-      <div class="core-features-comparison">
-        <div class="core-features-comparison__lead">
-          <span class="pe-page-panel-label">{comparison.label}</span>
-          <h3>{comparison.title}</h3>
-          <p>{comparison.body}</p>
-        </div>
+    {
+      comparison && (
+        <div class="core-features-comparison">
+          <div class="core-features-comparison__lead">
+            <span class="pe-page-panel-label">{comparison.label}</span>
+            <h3>{comparison.title}</h3>
+            <p>{comparison.body}</p>
+          </div>
 
-        <div class="core-features-comparison__grid">
-          {
-            comparison.items.map((item) => (
+          <div class="core-features-comparison__grid">
+            {comparison.items.map((item) => (
               <div
                 class:list={[
                   'core-features-comparison__item',
@@ -99,11 +99,11 @@ const getCardClasses = (index: number) => ({
                 <span>{item.label}</span>
                 <strong>{item.value}</strong>
               </div>
-            ))
-          }
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )
+    }
   </div>
 </section>
 
@@ -111,7 +111,7 @@ const getCardClasses = (index: number) => ({
   .core-features-shell {
     position: relative;
     z-index: 1;
-    max-width: 76rem;
+    max-width: 80rem;
   }
 
   .core-features-section {
@@ -132,10 +132,10 @@ const getCardClasses = (index: number) => ({
 
   .core-features-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 30rem);
-    gap: clamp(1.8rem, 3vw, 3rem);
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
+    gap: clamp(2rem, 3vw, 3.5rem);
     align-items: end;
-    margin-bottom: clamp(1.8rem, 3vw, 2.8rem);
+    margin-bottom: clamp(2.2rem, 3vw, 3.4rem);
     position: relative;
   }
 
@@ -150,27 +150,27 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-features-copy {
-    font-size: clamp(1rem, 0.96rem + 0.16vw, 1.08rem);
-    line-height: 1.8;
+    font-size: clamp(1rem, 0.96rem + 0.12vw, 1.06rem);
+    line-height: 1.78;
     color: #cbd5e1;
-    max-width: 27rem;
+    max-width: 24rem;
     text-wrap: pretty;
   }
 
   .core-features-grid {
     display: grid;
-    grid-template-columns: minmax(19rem, 0.68fr) minmax(0, 1.32fr);
-    gap: clamp(1.4rem, 2.5vw, 2.4rem);
-    margin-bottom: clamp(2rem, 3.2vw, 3rem);
+    grid-template-columns: minmax(17rem, 0.62fr) minmax(0, 1.38fr);
+    gap: clamp(1.75rem, 2.8vw, 3rem);
+    margin-bottom: clamp(2.6rem, 3.8vw, 3.8rem);
   }
 
   .core-features-proof {
     display: grid;
     align-content: start;
     gap: var(--space-4);
-    padding: clamp(1.35rem, 1.9vw, 1.8rem);
+    padding: clamp(1.4rem, 2vw, 1.9rem);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1.35rem;
+    border-radius: 1rem;
     background:
       linear-gradient(
         180deg,
@@ -178,10 +178,8 @@ const getCardClasses = (index: number) => ({
         rgba(143, 184, 162, 0)
       ),
       rgba(10, 14, 15, 0.92);
-    box-shadow: var(--shadow-panel);
+    box-shadow: 0 20px 48px rgba(2, 8, 9, 0.22);
     position: relative;
-    top: 7rem;
-    position: sticky;
   }
 
   .core-features-proof::before {
@@ -198,10 +196,10 @@ const getCardClasses = (index: number) => ({
 
   .core-features-proof-list {
     display: grid;
-    gap: 0.95rem;
+    gap: 1rem;
     padding-left: 1rem;
     color: #cbd5e1;
-    line-height: 1.68;
+    line-height: 1.7;
   }
 
   .core-feature-card__row {
@@ -237,10 +235,10 @@ const getCardClasses = (index: number) => ({
 
   .core-features-comparison {
     display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-    gap: clamp(1.5rem, 3vw, 3rem);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(2rem, 3vw, 3.5rem);
     align-items: start;
-    padding-top: var(--space-6);
+    padding-top: clamp(2rem, 3vw, 2.8rem);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
@@ -256,19 +254,19 @@ const getCardClasses = (index: number) => ({
 
   .core-features-comparison__grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
   }
 
   .core-features-comparison__item {
     display: grid;
     grid-template-columns: 1fr;
     align-items: start;
-    gap: 0.55rem;
+    gap: 0.5rem;
     min-width: 0;
-    padding: 1rem 1.05rem;
+    padding: 1rem 1.1rem;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 1rem;
+    border-radius: 0.95rem;
     background: rgba(255, 255, 255, 0.03);
   }
 
@@ -302,30 +300,28 @@ const getCardClasses = (index: number) => ({
 
   .core-features-list {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--space-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
   }
 
   .core-feature-card {
-    grid-column: span 3;
+    grid-column: span 1;
     min-width: 0;
-    padding: clamp(1.25rem, 1.7vw, 1.55rem);
+    padding: clamp(1.3rem, 1.8vw, 1.75rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.2rem;
+    border-radius: 1rem;
     background: rgba(255, 255, 255, 0.04);
     position: relative;
     overflow: hidden;
-    box-shadow: var(--shadow-panel);
+    box-shadow: 0 22px 54px rgba(2, 8, 9, 0.2);
     transition:
       border-color var(--duration-fast) var(--ease-out),
-      background var(--duration-fast) var(--ease-out),
-      transform var(--duration-fast) var(--ease-out);
+      background var(--duration-fast) var(--ease-out);
   }
 
   .core-feature-card:hover {
     border-color: rgba(143, 184, 162, 0.25);
     background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-4px);
   }
 
   .core-feature-card::after {
@@ -348,8 +344,8 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card--lead {
-    grid-column: span 4;
-    padding: clamp(1.45rem, 2vw, 1.9rem);
+    grid-column: 1 / -1;
+    padding: clamp(1.6rem, 2.2vw, 2rem);
     border-color: rgba(143, 184, 162, 0.16);
     background:
       linear-gradient(
@@ -371,12 +367,12 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card:nth-child(2) {
-    grid-column: span 2;
+    grid-column: span 1;
   }
 
   .core-feature-card:nth-child(3) {
-    grid-column: span 2;
-    margin-top: clamp(1.9rem, 3.5vw, 3rem);
+    grid-column: span 1;
+    margin-top: 0;
   }
 
   .core-feature-card--lead h3 {
@@ -401,8 +397,8 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card h3 {
-    font-size: clamp(1.35rem, 1.15rem + 0.4vw, 1.72rem);
-    line-height: 1.06;
+    font-size: clamp(1.25rem, 1.12rem + 0.34vw, 1.55rem);
+    line-height: 1.12;
   }
 
   @media (max-width: 1024px) {
