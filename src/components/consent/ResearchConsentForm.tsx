@@ -279,7 +279,7 @@ export function ResearchConsentForm({
               <div className='bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm'>
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: consentStatus.currentVersion.documentText,
+                    __html: sanitizeHtml(consentStatus.currentVersion.documentText),
                   }}
                 ></div>
               </div>
@@ -368,6 +368,47 @@ export function ResearchConsentForm({
             <div className='p-4'>
               <p className='text-gray-600 mb-4'>
                 Youre about to withdraw your consent for research participation.
+                This means your data will no longer be used for research
+                purposes.
+              </p>
+
+              <label
+                htmlFor='withdraw-reason'
+                className='text-gray-700 mb-1 block text-sm font-medium'
+              >
+                Reason for withdrawal (optional)
+              </label>
+              <textarea
+                id='withdraw-reason'
+                value={withdrawReason}
+                onChange={(e) => setWithdrawReason(e.target.value)}
+                className='border-gray-300 focus:ring-green-500 focus:border-transparent h-24 w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2'
+                placeholder="Please let us know why you're withdrawing consent (optional)"
+              ></textarea>
+            </div>
+
+            <div className='bg-gray-50 flex justify-end space-x-3 border-t p-4'>
+              <button
+                onClick={() => setWithdrawDialogOpen(false)}
+                className='bg-white border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg border px-4 py-2 font-medium'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleWithdrawConsent}
+                disabled={loading}
+                className='bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 font-medium'
+              >
+                Withdraw Consent
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+nt for research participation.
                 This means your data will no longer be used for research
                 purposes.
               </p>
