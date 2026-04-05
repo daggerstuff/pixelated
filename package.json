@@ -313,7 +313,6 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
-    "@types/dompurify": "^3.2.0",
     "@types/express": "^5.0.6",
     "@types/mdast": "^4.0.4",
     "@types/morgan": "^1.9.10",

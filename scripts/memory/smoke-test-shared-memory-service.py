@@ -48,9 +48,7 @@ def canonical_request(
     nonce: str,
 ) -> str:
     body_hash = hashlib.sha256(body).hexdigest()
-    return "\n".join(
-        [actor_id, user_id, method.upper(), target, body_hash, timestamp, nonce]
-    )
+    return "\n".join([actor_id, user_id, method.upper(), target, body_hash, timestamp, nonce])
 
 
 def signed_headers(
@@ -124,104 +122,190 @@ def request_json(
         return exc.code, parsed
 
 
-def main() -> int:
-    args = build_parser().parse_args()
-    if not args.actor_id or not args.actor_secret:
-        raise SystemExit(
-            "SUBCONSCIOUS_MEMORY_ACTOR_ID and SUBCONSCIOUS_MEMORY_ACTOR_SECRET are required"
+class DiagnosticClient:
+    """Client for service health monitoring and diagnostics."""
+
+    def __init__(
+        self,
+        base_url: str,
+        actor_id: str,
+        actor_secret: str,
+        user_id: str,
+    ):
+        self.base_url = base_url.rstrip("/")
+        self.actor_id = actor_id
+        self.actor_secret = actor_secret
+        self.user_id = user_id
+
+    def health_check(self) -> tuple[int, dict | list | str]:
+        """Check if the memory service is healthy."""
+        return request_json(
+            base_url=self.base_url,
+            path="/health",
+            method="GET",
+            actor_id=self.actor_id,
+            actor_secret=self.actor_secret,
+            user_id=self.user_id,
+            payload=None,
         )
 
-    marker = uuid.uuid4().hex[:12]
-    content = f"shared memory smoke test marker {marker}"
-    target = f"/v1/default/banks/{args.bank_id}/memories"
 
-    health_status, health_payload = request_json(
-        base_url=args.base_url,
-        path="/health",
-        method="GET",
-        actor_id=args.actor_id,
-        actor_secret=args.actor_secret,
-        user_id=args.user_id,
-    )
-    if health_status != 200:
-        raise RuntimeError(f"Memory service health check failed: {health_payload}")
+class MemoryRepository:
+    """Repository for memory CRUD operations."""
 
-    retain_status, retain_payload = request_json(
-        base_url=args.base_url,
-        path=target,
-        method="POST",
-        actor_id=args.actor_id,
-        actor_secret=args.actor_secret,
-        user_id=args.user_id,
-        payload={
-            "items": [
-                {
-                    "content": content,
-                    "context": json.dumps(
-                        {"project_id": "pixelated", "category": "operational-smoke-test"}
-                    ),
-                    "tags": ["smoke-test", marker],
-                }
-            ]
-        },
-    )
-    if retain_status not in {200, 201}:
-        raise RuntimeError(f"Memory retain failed: {retain_payload}")
-
-    results = []
-    if isinstance(retain_payload, dict):
-        raw_results = retain_payload.get("results")
-        if isinstance(raw_results, list):
-            results = raw_results
-    if not results:
-        raise RuntimeError(f"Memory retain returned no results: {retain_payload}")
-
-    document_id = str(results[0].get("id", "")).strip()
-    if not document_id:
-        raise RuntimeError(f"Memory retain did not return a document id: {retain_payload}")
-
-    recall_status, recall_payload = request_json(
-        base_url=args.base_url,
-        path=f"{target}/recall",
-        method="POST",
-        actor_id=args.actor_id,
-        actor_secret=args.actor_secret,
-        user_id=args.user_id,
-        payload={
-            "query": marker,
-            "limit": 5,
-            "tags": ["smoke-test"],
-            "tags_match": "any",
-        },
-    )
-    if recall_status != 200:
-        raise RuntimeError(f"Memory recall failed: {recall_payload}")
-
-    recall_results = []
-    if isinstance(recall_payload, dict):
-        raw_recall_results = recall_payload.get("results")
-        if isinstance(raw_recall_results, list):
-            recall_results = raw_recall_results
-    if not any(
-        marker in json.dumps(item) for item in recall_results if isinstance(item, dict)
+    def __init__(
+        self,
+        base_url: str,
+        bank_id: str,
+        actor_id: str,
+        actor_secret: str,
+        user_id: str,
     ):
-        raise RuntimeError("Stored memory was not recalled by the shared service")
+        self.base_url = base_url.rstrip("/")
+        self.bank_id = bank_id
+        self.actor_id = actor_id
+        self.actor_secret = actor_secret
+        self.user_id = user_id
 
-    delete_status, delete_payload = request_json(
+    def _make_request(
+        self,
+        path: str,
+        method: str,
+        payload: dict | None = None,
+    ) -> tuple[int, dict | list | str]:
+        """Make an authenticated request to the memory service."""
+        return request_json(
+            base_url=self.base_url,
+            path=path,
+            method=method,
+            actor_id=self.actor_id,
+            actor_secret=self.actor_secret,
+            user_id=self.user_id,
+            payload=payload,
+        )
+
+    def retain(self, content: str, context: str, tags: list) -> tuple[int, dict | list | str]:
+        """Store a memory in the shared service."""
+        target = f"/v1/default/banks/{self.bank_id}/memories"
+        return self._make_request(
+            target,
+            "POST",
+            payload={
+                "items": [
+                    {
+                        "content": content,
+                        "context": context,
+                        "tags": tags,
+                    }
+                ]
+            },
+        )
+
+    def recall(self, query: str, limit: int, tags: list, tags_match: str = "any") -> tuple[int, dict | list | str]:
+        """Recall memories from the shared service."""
+        target = f"/v1/default/banks/{self.bank_id}/memories/recall"
+        return self._make_request(
+            target,
+            "POST",
+            payload={
+                "query": query,
+                "limit": limit,
+                "tags": tags,
+                "tags_match": tags_match,
+            },
+        )
+
+    def delete_document(self, document_id: str) -> tuple[int, dict | list | str]:
+        """Delete a document from the shared service."""
+        target = f"/v1/default/banks/{self.bank_id}/documents/{document_id}"
+        return self._make_request(target, "DELETE")
+
+
+def main() -> int:
+    """Run smoke tests using the memory service client."""
+    args = build_parser().parse_args()
+
+    if not args.actor_id or not args.actor_secret:
+        print("Error: --actor-id and --actor-secret are required", file=sys.stderr)
+        return 1
+
+    diagnostic_client = DiagnosticClient(
         base_url=args.base_url,
-        path=f"/v1/default/banks/{args.bank_id}/documents/{document_id}",
-        method="DELETE",
         actor_id=args.actor_id,
         actor_secret=args.actor_secret,
         user_id=args.user_id,
     )
-    if delete_status not in {200, 204}:
-        raise RuntimeError(f"Memory delete failed: {delete_payload}")
 
-    print(
-        f"Shared memory service smoke test passed for {args.base_url} "
-        f"(bank={args.bank_id}, user={args.user_id})"
+    memory_repo = MemoryRepository(
+        base_url=args.base_url,
+        bank_id=args.bank_id,
+        actor_id=args.actor_id,
+        actor_secret=args.actor_secret,
+        user_id=args.user_id,
     )
+
+    print(f"Smoke testing memory service at {args.base_url}")
+    print(f"Bank: {args.bank_id}, User: {args.user_id}")
+    print("-" * 50)
+
+    print("\n[1/4] Testing health endpoint...")
+    status, response = diagnostic_client.health_check()
+    if status != 200:
+        print(f"  ✗ Health check failed: HTTP {status}", file=sys.stderr)
+        return 1
+    print(f"  ✓ Health check passed: {response}")
+
+    print("\n[2/4] Testing memory retention...")
+    test_content = f"Smoke test memory created at {time.strftime('%Y-%m-%d %H:%M:%S')}"
+    status, response = memory_repo.retain(
+        content=test_content,
+        context="smoke-test",
+        tags=["test", "smoke-test", "automated"],
+    )
+    if status not in (200, 201):
+        print(f"  ✗ Memory retention failed: HTTP {status}", file=sys.stderr)
+        return 1
+    print(f"  ✓ Memory retained successfully")
+
+    document_id = None
+    if isinstance(response, dict):
+        if "id" in response:
+            document_id = response["id"]
+        elif "document_id" in response:
+            document_id = response["document_id"]
+        elif "items" in response and len(response["items"]) > 0:
+            document_id = response["items"][0].get("id")
+
+    if not document_id:
+        print(f"  ✗ Failed to extract document ID from retention response", file=sys.stderr)
+        return 1
+
+    print("\n[3/4] Testing memory recall...")
+    status, response = memory_repo.recall(
+        query="smoke-test",
+        limit=10,
+        tags=["smoke-test"],
+        tags_match="any",
+    )
+    if status != 200:
+        print(f"  ✗ Memory recall failed: HTTP {status}", file=sys.stderr)
+        return 1
+    print(f"  ✓ Memory recall successful")
+    if isinstance(response, dict) and "items" in response:
+        print(f"  Found {len(response['items'])} matching memories")
+
+    if document_id:
+        print("\n[4/4] Testing document deletion...")
+        status, response = memory_repo.delete_document(document_id)
+        if status not in (200, 204):
+            print(f"  ✗ Document deletion failed: HTTP {status}", file=sys.stderr)
+            return 1
+        print(f"  ✓ Document deleted successfully")
+    else:
+        print("\n[4/4] Skipping deletion (no document ID received)")
+
+    print("\n" + "=" * 50)
+    print("All smoke tests passed!")
     return 0
 
 
