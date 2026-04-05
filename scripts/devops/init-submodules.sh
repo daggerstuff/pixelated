@@ -124,22 +124,6 @@ is_allowed_override_url() {
 # Use http.extraHeader for authentication (secure, no token in URL)
 # Tokens are passed via Authorization header, not embedded in URLs
 AUTH_GIT_ARGS=()
-AUTH_CONFIG_KEYS=()
-
-set_temp_git_config() {
-  local key="$1"
-  local value="$2"
-  local token="${3:-}"
-
-  if [[ "${DRY_RUN}" == "true" ]]; then
-    run git config --local --replace-all "${key}" "${value}"
-  else
-    git config --local --replace-all "${key}" "${value}"
-  fi
-
-  # Track config keys for cleanup (tokens stored via extraHeader, not in URLs)
-  AUTH_CONFIG_KEYS+=("${key}")
-}
 
 configure_credentials() {
   local config_count=0
@@ -204,20 +188,18 @@ configure_credentials() {
 }
 
 cleanup_credentials() {
-  local key
-
-  if (( ${#AUTH_CONFIG_KEYS[@]} > 0 )); then
-    for key in "${AUTH_CONFIG_KEYS[@]}"; do
-      if [[ "${DRY_RUN}" == "true" ]]; then
-        run git config --local --unset-all "${key}" || true
-      else
-        git config --local --unset-all "${key}" || true
-      fi
-    done
-    AUTH_CONFIG_KEYS=()
-  fi
-
+  local i
+  local count="${GIT_CONFIG_COUNT:-0}"
+  
+  # Unset all exported GIT_CONFIG environment variables
+  for ((i=0; i<count; i++)); do
+    unset "GIT_CONFIG_KEY_${i}"
+    unset "GIT_CONFIG_VALUE_${i}"
+  done
+  
+  unset GIT_CONFIG_COUNT
   AUTH_GIT_ARGS=()
+  
   echo "🧹 Temporary Git credential headers cleared"
 }
 
