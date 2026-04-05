@@ -18,8 +18,9 @@ if [[ "${1:-}" == "--dry-run" ]]; then
   echo "[dry-run mode enabled]"
 fi
 
-PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel)}"
-cd "${PROJECT_ROOT}"
+PROJECT_ROOT="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>&1)}"
+echo "DEBUG: PROJECT_ROOT result: ${PROJECT_ROOT}"
+cd "${PROJECT_ROOT}" || { echo "ERROR: Failed to cd to ${PROJECT_ROOT}"; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Environment Detection
