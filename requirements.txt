@@ -277,7 +277,7 @@ fastavro==1.12.1
     # via cohere
 faster-whisper==1.2.1
     # via pixelated (pyproject.toml)
-fastmcp==3.1.1
+fastmcp==3.2.0
     # via
     #   pixelated (pyproject.toml)
     #   pydantic-ai-slim
