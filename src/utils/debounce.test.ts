@@ -58,9 +58,58 @@ describe('debounce', () => {
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc('test', 123)
+    
+    // Validate it hasn't been called yet (Patience Protocol/Review suggestion)
+    expect(func).not.toHaveBeenCalled()
+    
     vi.advanceTimersByTime(100)
 
-    expect(func).toHaveBeenCalledWith('test', 123)
+    // Use toHaveBeenLastCalledWith to ensure exactly these args (Review suggestion)
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenLastCalledWith('test', 123)
+  })
+
+  it('should forward arguments from the most recent call', () => {
+    const func = vi.fn<any>()
+    const debouncedFunc = debounce(func, 100)
+
+    debouncedFunc('first', 1)
+    debouncedFunc('second', 2)
+    debouncedFunc('third', 3)
+
+    vi.advanceTimersByTime(100)
+
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenLastCalledWith('third', 3)
+  })
+
+  it('should pass arguments when immediate is true', () => {
+    const func = vi.fn<any>()
+    const debouncedFunc = debounce(func, 100, true)
+
+    debouncedFunc('immediate', { ok: true })
+    
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenLastCalledWith('immediate', { ok: true })
+
+    vi.advanceTimersByTime(100)
+    expect(func).toHaveBeenCalledTimes(1)
+  })
+
+  it('should handle complex argument types correctly', () => {
+    const func = vi.fn<any>()
+    const debouncedFunc = debounce(func, 100)
+    
+    const obj = { nested: { value: 1 } }
+    const arr = [1, 2, 3]
+    const callback = () => 'result'
+
+    debouncedFunc(obj, arr, callback)
+    
+    vi.advanceTimersByTime(100)
+
+    expect(func).toHaveBeenCalledTimes(1)
+    expect(func).toHaveBeenLastCalledWith(obj, arr, callback)
   })
 
 })
