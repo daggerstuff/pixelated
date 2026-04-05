@@ -129,7 +129,11 @@ stages:
                 echo "Git remote -v:"
                 git remote -v || true
                 echo "==================================="
-                bash scripts/devops/init-submodules.sh
+                echo "Running init-submodules.sh with debug tracing..."
+                bash -x scripts/devops/init-submodules.sh 2>&1 || {
+                  echo "ERROR: init-submodules.sh failed with exit code $?"
+                  exit 1
+                }
 
           - task: NodeTool@0
             displayName: 'Install Node.js (LTS)'
@@ -330,7 +334,11 @@ stages:
                 echo "Git remote -v:"
                 git remote -v || true
                 echo "==================================="
-                bash scripts/devops/init-submodules.sh
+                echo "Running init-submodules.sh with debug tracing..."
+                bash -x scripts/devops/init-submodules.sh 2>&1 || {
+                  echo "ERROR: init-submodules.sh failed with exit code $?"
+                  exit 1
+                }
 
           - task: HelmInstaller@1
             displayName: Install Helm
