@@ -44,20 +44,18 @@ describe('isValidDate', () => {
     expect(isValidDate('')).toBe(false)
   })
 
-  it('characterizes JS Date rollover for out-of-range calendar dates', () => {
+  it('rejects out-of-range calendar dates without rolling over', () => {
     // Numeric strings are parsed as invalid by Date constructor when passed as strings
     expect(isValidDate('123456789')).toBe(false)
     
-    // Invalid calendar dates should return true (JavaScript Date rolls them over)
-    expect(isValidDate('2023-02-30')).toBe(true)
-    expect(new Date('2023-02-30').toISOString().startsWith('2023-03-02')).toBe(true)
+    // Invalid calendar dates should return false (unlike native JavaScript Date rollover)
+    expect(isValidDate('2023-02-30')).toBe(false)
     
     // Leap year handling
     expect(isValidDate('2024-02-29')).toBe(true)
     
-    // JavaScript rolls this over to Mar 1, making it a valid date object
-    expect(isValidDate('2023-02-29')).toBe(true)
-    expect(new Date('2023-02-29').toISOString().startsWith('2023-03-01')).toBe(true)
+    // Not a leap year
+    expect(isValidDate('2023-02-29')).toBe(false)
     
     // Whitespace
     expect(isValidDate(' 2023-01-01 ')).toBe(true)

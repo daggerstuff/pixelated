@@ -18,13 +18,13 @@ Usage:
   monitor-shared-memory-service.sh [--health-url URL] [--db-path PATH] [--warn-disk-percent N]
 
 Environment variables:
-  MEMORY_HEALTH_URL           Health endpoint (default: http://127.0.0.1:5003/health)
+  MEMORY_HEALTH_URL           Health endpoint (default: http://127.0.0.1:54321/health)
   HINDSIGHT_LOCAL_DB_PATH     SQLite DB path used for disk checks
   MEMORY_DISK_WARN_PERCENT    Disk usage warning threshold (default: 85)
 USAGE
 }
 
-HEALTH_URL="${MEMORY_HEALTH_URL:-http://127.0.0.1:5003/health}"
+HEALTH_URL="${MEMORY_HEALTH_URL:-http://127.0.0.1:54321/health}"
 DB_PATH="${HINDSIGHT_LOCAL_DB_PATH:-}"
 WARN_DISK_PERCENT="${MEMORY_DISK_WARN_PERCENT:-85}"
 
