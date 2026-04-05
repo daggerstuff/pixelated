@@ -126,13 +126,18 @@ is_allowed_override_url() {
 AUTH_GIT_ARGS=()
 
 configure_credentials() {
+  echo "DEBUG: Entered configure_credentials"
   local config_count=0
   
+  echo "DEBUG: Sanitizing tokens..."
   # 1. Azure DevOps Credentials
   local system_token azdo_pat azdo_user azdo_auth_header
   system_token="$(sanitize_token "${SYSTEM_ACCESSTOKEN:-}")"
+  echo "DEBUG: system_token length: ${#system_token}"
   azdo_pat="$(sanitize_token "${AZDO_PAT:-${AZURE_DEVOPS_EXT_PAT:-}}")"
+  echo "DEBUG: azdo_pat length: ${#azdo_pat}"
 
+  echo "DEBUG: Checking system_token..."
   if [[ -n "${system_token}" ]]; then
     export GIT_CONFIG_KEY_${config_count}="http.https://dev.azure.com/.extraheader"
     export GIT_CONFIG_VALUE_${config_count}="AUTHORIZATION: bearer ${system_token}"
