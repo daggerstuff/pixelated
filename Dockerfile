@@ -78,6 +78,9 @@ RUN ( \
 # Copy source and run the build
 COPY . .
 
+# Ensure templates directory exists so it can be safely copied in the runtime phase
+RUN mkdir -p /app/templates
+
 # Copy required server and instrumentation files into builder context
 COPY scripts/utils/start-server.mjs /app/start-server.mjs
 COPY scripts/utils/start-server-config.mjs /app/start-server-config.mjs
@@ -184,6 +187,7 @@ RUN ( \
 # Copy built output and public assets from builder
 COPY --from=builder --chown=astro:astro /app/dist ./dist
 COPY --from=builder --chown=astro:astro /app/public ./public
+COPY --from=builder --chown=astro:astro /app/templates ./templates
 COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
 COPY --from=builder --chown=astro:astro /app/start-server-config.mjs ./start-server-config.mjs
 COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
