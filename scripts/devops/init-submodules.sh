@@ -300,6 +300,7 @@ select_submodule_url() {
     fi
 
     printf '%s' "${github_url}"
+    return 0
   fi
 
   # 4. Default: Use original
