@@ -14,21 +14,21 @@ describe('start-server port fallback policy', () => {
   it('keeps port fallback enabled when no explicit production guard is present', () => {
     const policy = getPortFallbackPolicy({})
 
-    expect(policy.disabled).toBe(false)
+    expect(policy.isFallbackDisabled).toBe(false)
     expect(policy.reasons).toEqual([])
   })
 
   it('disables port fallback when PORT is explicitly configured', () => {
     const policy = getPortFallbackPolicy({ PORT: '4321' })
 
-    expect(policy.disabled).toBe(true)
+    expect(policy.isFallbackDisabled).toBe(true)
     expect(policy.reasons).toContain('PORT is explicitly configured')
   })
 
   it('disables port fallback in production mode', () => {
     const policy = getPortFallbackPolicy({ NODE_ENV: 'production' })
 
-    expect(policy.disabled).toBe(true)
+    expect(policy.isFallbackDisabled).toBe(true)
     expect(policy.reasons).toContain('NODE_ENV=production')
   })
 
@@ -38,7 +38,7 @@ describe('start-server port fallback policy', () => {
       FORCE_EXIT_ON_EADDRINUSE: '1',
     })
 
-    expect(policy.disabled).toBe(true)
+    expect(policy.isFallbackDisabled).toBe(true)
     expect(policy.reasons).toContain('NO_PORT_FALLBACK is set')
     expect(policy.reasons).toContain('FORCE_EXIT_ON_EADDRINUSE is set')
   })

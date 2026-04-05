@@ -33,7 +33,7 @@ export function useSyncedState<T>({
   const [syncStatus, setSyncStatus] = useState<
     'synced' | 'syncing' | 'conflict' | 'offline'
   >('synced')
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const lastSyncValueRef = useRef<T>(defaultValue)
   const ignoreNextRemoteUpdate = useRef(false)
 

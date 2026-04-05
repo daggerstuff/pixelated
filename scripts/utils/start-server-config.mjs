@@ -29,7 +29,7 @@ export function getPortFallbackPolicy(env = process.env) {
   }
 
   return {
-    disabled: reasons.length > 0,
+    isFallbackDisabled: reasons.length > 0,
     reasons,
   }
 }
