@@ -180,16 +180,12 @@ configure_credentials() {
     local auth_header
     auth_header="$(printf '%s:%s' "${github_user}" "${github_token}" | base64 -w0)"
 
-    set_temp_git_config "http.https://github.com/.extraHeader" "AUTHORIZATION: basic ${auth_header}"
-    set_temp_git_config "credential.helper" ""
+    export GIT_CONFIG_COUNT=2
+    export GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+    export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic ${auth_header}"
+    export GIT_CONFIG_KEY_1="credential.helper"
+    export GIT_CONFIG_VALUE_1=""
     
-    git config --global http.https://github.com/.extraHeader "AUTHORIZATION: basic ${auth_header}" 2>/dev/null || true
-    git config --global credential.helper "" 2>/dev/null || true
-    
-    AUTH_GIT_ARGS+=(
-      -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
-      -c "credential.helper="
-    )
     echo "✅ GitHub credentials configured (user: ${github_user})"
   fi
 }
