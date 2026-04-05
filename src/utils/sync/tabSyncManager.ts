@@ -370,6 +370,8 @@ class TabSyncManager {
   destroy(): void {
     this.cleanup()
     this.stateVersions.clear()
+    // Reset so init() can re-initialize if the provider remounts (e.g. HMR).
+    this.isInitialized = false
   }
 }
 

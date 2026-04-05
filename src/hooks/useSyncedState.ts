@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react
 import { mergeValues } from '@/utils/object'
 import storageManager from '@/utils/storage/storageManager'
 import type { StorageConfig } from '@/utils/storage/storageManager'
-import tabSyncManager from '@/utils/sync/tabSyncManager'
+import { useSyncManager } from '@/lib/providers/SyncContext'
 
 export interface UseSyncedStateOptions<T> extends Partial<StorageConfig> {
   key: string
@@ -29,6 +29,7 @@ export function useSyncedState<T>({
   onConflict,
   ...storageOptions
 }: UseSyncedStateOptions<T>) {
+  const syncManager = useSyncManager()
   const [state, setState] = useState<T>(defaultValue)
   const [isLoaded, setIsLoaded] = useState(false)
   const [syncStatus, setSyncStatus] = useState<
@@ -38,6 +39,14 @@ export function useSyncedState<T>({
   const lastSyncValueRef = useRef<T>(defaultValue)
   const stateRef = useRef<T>(defaultValue)
   const instanceId = useRef(Math.random().toString(36).substring(2, 11))
+  // pendingSyncRef carries a resolved sync event to the post-commit onSync
+  // delivery effect without going through the useState updater.
+  const pendingSyncRef = useRef<{ value: T; tabId: string } | null>(null)
+  // Stable ref for the onSync callback so it never appears in useEffect deps.
+  const onSyncRef = useRef(onSync)
+  useLayoutEffect(() => {
+    onSyncRef.current = onSync
+  })
 
   // Load initial value from storage
   useEffect(() => {
@@ -52,16 +61,29 @@ export function useSyncedState<T>({
     setIsLoaded(true)
   }, [key, defaultValue, storageOptions])
 
-  // Keep ref up to date with state synchronously after commit
+  // Keep refs up to date with state synchronously after commit
   useLayoutEffect(() => {
     stateRef.current = state
+
+    // Process pending incoming remote syncs here, to ensure refs remain in sync with the actual state
+    // and avoid executing side-effects within the rendering phase.
+    const pending = pendingSyncRef.current
+    if (pending) {
+      pendingSyncRef.current = null
+      if (pending.value === state) {
+        lastSyncValueRef.current = pending.value
+        if (onSyncRef.current) {
+          onSyncRef.current(pending.value, pending.tabId)
+        }
+      }
+    }
   }, [state])
 
   // Set up tab synchronization listeners
   useEffect(() => {
-    if (!enableSync || !tabSyncManager.isAvailable()) return
+    if (!enableSync || !syncManager.isAvailable()) return
 
-    const unsubscribeStateReceived = tabSyncManager.on(
+    const unsubscribeStateReceived = syncManager.on(
       'stateReceived',
       (data: any) => {
         if (data.key !== key) return
@@ -71,54 +93,45 @@ export function useSyncedState<T>({
           return
         }
 
-        // Bridge: capture the resolved value so we can pass it to onSync after
-        // the functional updater runs (updaters must be pure — no side effects).
-        let resolvedValue: T = data.value
+        // Compute finalValue outside setState using stateRef.current
+        // (guaranteed current by useLayoutEffect after every commit).
+        // This keeps the setState updater below fully pure.
+        const currentState = stateRef.current
+        let finalValue: T = data.value
 
-        // Use a functional setState so the conflict resolution always runs
-        // against the provably-latest local state supplied by React, rather
-        // than a potentially-stale ref value captured before the first
-        // useLayoutEffect fires or during a rapid render burst.
-        setState((currentState) => {
-          let finalValue: T = data.value
-
-          if (currentState !== defaultValue && data.value !== currentState) {
-            switch (conflictStrategy) {
-              case 'local':
-                finalValue = currentState
-                break
-              case 'merge':
-                try {
-                  finalValue = mergeValues(currentState, data.value)
-                } catch {
-                  finalValue = data.value
-                }
-                break
-              case 'manual':
-                finalValue = onConflict
-                  ? onConflict(currentState, data.value)
-                  : data.value
-                break
-              case 'remote':
-              default:
+        if (currentState !== defaultValue && data.value !== currentState) {
+          switch (conflictStrategy) {
+            case 'local':
+              finalValue = currentState
+              break
+            case 'merge':
+              try {
+                finalValue = mergeValues(currentState, data.value)
+              } catch {
                 finalValue = data.value
-                break
-            }
+              }
+              break
+            case 'manual':
+              finalValue = onConflict
+                ? onConflict(currentState, data.value)
+                : data.value
+              break
+            case 'remote':
+            default:
+              finalValue = data.value
+              break
           }
+        }
 
-          // Keep refs consistent with the resolved value.
-          stateRef.current = finalValue
-          lastSyncValueRef.current = finalValue
-          // Capture for use in the post-update onSync call below.
-          resolvedValue = finalValue
+        // Record the resolved event before calling setState so the post-commit
+        // useLayoutEffect below can synchronize refs and deliver onSync.
+        pendingSyncRef.current = { value: finalValue, tabId: data.tabId }
 
-          return finalValue
-        })
+        // Pure setState — updater receives latest React state but finalValue
+        // is already fully determined above; we just return it.
+        setState(() => finalValue)
 
         setSyncStatus('synced')
-        // Call onSync with the authoritative resolved value (may differ from
-        // data.value when conflictStrategy is 'local', 'merge', or 'manual').
-        onSync?.(resolvedValue, data.tabId)
       },
     )
 
@@ -128,8 +141,8 @@ export function useSyncedState<T>({
     enableSync,
     defaultValue,
     conflictStrategy,
-    onSync,
     onConflict,
+    syncManager,
   ])
 
   // Debounced save to storage and sync across tabs
@@ -146,9 +159,13 @@ export function useSyncedState<T>({
           lastSyncValueRef.current = value
 
           // Sync across tabs if enabled
-          if (enableSync && tabSyncManager.isAvailable()) {
+          if (enableSync && syncManager.isAvailable()) {
             setSyncStatus('syncing')
-            const synced = tabSyncManager.syncState(key, value, instanceId.current)
+            const synced = syncManager.syncState(
+              key,
+              value,
+              instanceId.current,
+            )
             if (synced) {
               setSyncStatus('synced')
             } else {
@@ -158,26 +175,24 @@ export function useSyncedState<T>({
         }
       }, debounceMs)
     },
-    [key, debounceMs, enableSync, storageOptions],
+    [key, debounceMs, enableSync, storageOptions, syncManager],
   )
 
-  // Enhanced setState that also persists and syncs
+  // Enhanced setState that updates local state without side-effects in updaters
   const setSyncedState = useCallback(
     (value: T | ((prev: T) => T)) => {
-      setState((prev) => {
-        const newValue =
-          typeof value === 'function' ? (value as (prev: T) => T)(prev) : value
-
-        // Only save and sync if value actually changed
-        if (newValue !== lastSyncValueRef.current) {
-          saveToStorageAndSync(newValue)
-        }
-
-        return newValue
-      })
+      setState(value)
     },
-    [saveToStorageAndSync],
+    [],
   )
+
+  // Trigger sync for local state changes
+  useEffect(() => {
+    // If state differs from lastSyncValueRef, this is a local update
+    if (isLoaded && state !== lastSyncValueRef.current) {
+      saveToStorageAndSync(state)
+    }
+  }, [state, isLoaded, saveToStorageAndSync])
 
   // Cleanup debounce timeout on unmount
   useEffect(() => {
