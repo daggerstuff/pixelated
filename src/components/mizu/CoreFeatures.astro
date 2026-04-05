@@ -79,29 +79,31 @@ const getCardClasses = (index: number) => ({
       </div>
     </div>
 
-    <div class="core-features-comparison">
-      <div class="core-features-comparison__lead">
-        <span class="pe-page-panel-label">{comparison?.label}</span>
-        <h3>{comparison?.title}</h3>
-        <p>{comparison?.body}</p>
-      </div>
+    {comparison && (
+      <div class="core-features-comparison">
+        <div class="core-features-comparison__lead">
+          <span class="pe-page-panel-label">{comparison.label}</span>
+          <h3>{comparison.title}</h3>
+          <p>{comparison.body}</p>
+        </div>
 
-      <div class="core-features-comparison__grid">
-        {
-          comparison?.items.map((item) => (
-            <div
-              class:list={[
-                'core-features-comparison__item',
-                item.accent && 'core-features-comparison__item--accent',
-              ]}
-            >
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-            </div>
-          ))
-        }
+        <div class="core-features-comparison__grid">
+          {
+            comparison.items.map((item) => (
+              <div
+                class:list={[
+                  'core-features-comparison__item',
+                  item.accent && 'core-features-comparison__item--accent',
+                ]}
+              >
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))
+          }
+        </div>
       </div>
-    </div>
+    )}
   </div>
 </section>
 

@@ -34,7 +34,7 @@ class SyncLifecycleManager<T> {
   private storageOptions: Record<string, any>;
   private onSync?: (value: T, sourceTabId: string) => void;
   private onConflict?: (key: string, localValue: T, remoteValue: T) => T;
-  
+
   private onStateChange: (value: T) => void;
   private onStatusChange: (status: "synced" | "offline") => void;
 
@@ -44,8 +44,8 @@ class SyncLifecycleManager<T> {
   private isInitialized = false;
 
   constructor(
-    syncManager: SyncManager, 
-    instanceId: string, 
+    syncManager: SyncManager,
+    instanceId: string,
     options: UseSyncedStateOptions<T>,
     storageOptions: Record<string, any>,
     onStateChange: (value: T) => void,
@@ -59,7 +59,7 @@ class SyncLifecycleManager<T> {
     this.defaultValue = options.defaultValue;
     this.debounceMs = options.debounceMs ?? 300;
     this.storageOptions = storageOptions;
-    
+
     this.onSync = options.onSync;
     this.onConflict = options.onConflict;
     this.onStateChange = onStateChange;
@@ -80,7 +80,7 @@ class SyncLifecycleManager<T> {
     this.defaultValue = options.defaultValue;
     this.debounceMs = options.debounceMs ?? 300;
     this.storageOptions = storageOptions;
-    
+
     this.onSync = onSync;
     this.onConflict = onConflict;
   }
@@ -88,7 +88,7 @@ class SyncLifecycleManager<T> {
   init() {
     if (this.isInitialized) return;
     this.isInitialized = true;
-    
+
     // Load initial state
     const storedValue = this.syncManager.getState<T>(
       this.key,
@@ -101,7 +101,7 @@ class SyncLifecycleManager<T> {
 
     if (this.enableSync && this.syncManager.isAvailable()) {
       this.syncManager.requestState(this.key);
-      
+
       const unsubReceived = this.syncManager.on("stateReceived", (data: any) => {
         if (data.key !== this.key || data.sourceId === this.instanceId) return;
         this.processIncomingState(data);
@@ -112,7 +112,7 @@ class SyncLifecycleManager<T> {
           this.syncManager.respondToRequest(this.key, this.lastSyncValue);
         }
       });
-      
+
       this.unsubscribers.push(unsubReceived, unsubRequest);
     }
   }
@@ -132,13 +132,13 @@ class SyncLifecycleManager<T> {
     if (result.shouldUpdate) {
       this.lastSyncValue = result.value;
       this.onStateChange(result.value);
+
+      if (this.onSync) {
+        this.onSync(result.value, data.tabId);
+      }
     }
-    
+
     this.onStatusChange("synced");
-    
-    if (this.onSync) {
-      this.onSync(result.value, data.tabId);
-    }
   }
 
   saveAndSync(value: T) {
@@ -162,19 +162,19 @@ class SyncLifecycleManager<T> {
       }
     }, this.debounceMs);
   }
-  
+
   handleUserUpdate(value: T) {
-     if (value !== this.lastSyncValue) {
-         this.saveAndSync(value);
-     }
+    if (value !== this.lastSyncValue) {
+      this.saveAndSync(value);
+    }
   }
 
   cleanup() {
     this.unsubscribers.forEach(unsub => unsub());
     this.unsubscribers = [];
     if (this.debounceRef) {
-       clearTimeout(this.debounceRef);
-       this.debounceRef = null;
+      clearTimeout(this.debounceRef);
+      this.debounceRef = null;
     }
     this.isInitialized = false;
   }
@@ -237,8 +237,8 @@ export function useSyncedState<T>({
     manager.init();
     setIsLoaded(true);
     return () => manager.cleanup();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [manager, key, enableSync, syncManager]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manager, key, enableSync, syncManager]);
 
   const setSyncedState = useCallback((value: T | ((prev: T) => T)) => {
     setState(value);
