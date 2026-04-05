@@ -115,17 +115,26 @@ stages:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: $(AZDO_USERNAME)
+              AZDO_USERNAME: git
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
+                echo "=== Debug: Environment Variables ==="
+                echo "AZDO_USERNAME is set to: ${AZDO_USERNAME:-'NOT SET'}"
+                echo "SYSTEM_ACCESSTOKEN exists: $(if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then echo 'YES (length:' ${#SYSTEM_ACCESSTOKEN} ')'; else echo 'NO'; fi)"
+                echo "AZDO_PAT exists: $(if [ -n "${AZDO_PAT:-}" ]; then echo 'YES (length:' ${#AZDO_PAT} ')'; else echo 'NO'; fi)"
+                echo "GITHUB_PAT exists: $(if [ -n "${GITHUB_PAT:-}" ]; then echo 'YES (length:' ${#GITHUB_PAT} ')'; else echo 'NO'; fi)"
+                echo "Current directory: $(pwd)"
+                echo "Git remote -v:"
+                git remote -v || true
+                echo "==================================="
                 bash scripts/devops/init-submodules.sh
 
           - task: NodeTool@0
             displayName: 'Install Node.js (LTS)'
             inputs:
-              versionSpec: '20.x'
+              versionSpec: '24.x'
               checkLatest: true
 
           - task: SonarCloudPrepare@4
@@ -307,11 +316,20 @@ stages:
               GITHUB_PAT: $(GITHUB_PAT)
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               AZDO_PAT: $(AZDO_PAT)
-              AZDO_USERNAME: $(AZDO_USERNAME)
+              AZDO_USERNAME: git
             inputs:
               targetType: 'inline'
               script: |
                 set -euo pipefail
+                echo "=== Debug: Environment Variables ==="
+                echo "AZDO_USERNAME is set to: ${AZDO_USERNAME:-'NOT SET'}"
+                echo "SYSTEM_ACCESSTOKEN exists: $(if [ -n "${SYSTEM_ACCESSTOKEN:-}" ]; then echo 'YES (length:' ${#SYSTEM_ACCESSTOKEN} ')'; else echo 'NO'; fi)"
+                echo "AZDO_PAT exists: $(if [ -n "${AZDO_PAT:-}" ]; then echo 'YES (length:' ${#AZDO_PAT} ')'; else echo 'NO'; fi)"
+                echo "GITHUB_PAT exists: $(if [ -n "${GITHUB_PAT:-}" ]; then echo 'YES (length:' ${#GITHUB_PAT} ')'; else echo 'NO'; fi)"
+                echo "Current directory: $(pwd)"
+                echo "Git remote -v:"
+                git remote -v || true
+                echo "==================================="
                 bash scripts/devops/init-submodules.sh
 
           - task: HelmInstaller@1
