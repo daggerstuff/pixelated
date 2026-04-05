@@ -298,10 +298,7 @@ select_submodule_url() {
       return 0
     fi
 
-    # Return the Azure mirror as the final value so the caller fails with the
-    # correct remote if neither candidate is reachable.
-    printf '%s' "${azure_url}"
-    return 0
+    printf '%s' "${github_url}"
   fi
 
   # 4. Default: Use original
