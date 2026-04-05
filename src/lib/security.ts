@@ -4,11 +4,9 @@
  * Provides encryption, Fully Homomorphic Encryption (FHE) integration, and other
  * security features required for HIPAA compliance and beyond.
  */
-
 // Use isomorphic approach for process
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
-
 import { fheService } from './fhe'
 import type { FHEOperation, HomomorphicOperationResult } from './fhe/types'
 import { EncryptionMode } from './fhe/types'
@@ -44,11 +42,23 @@ interface EnhancedFHEService {
 // Cast to our enhanced interface to avoid TypeScript errors
 const enhancedFHEService = fheService as unknown as EnhancedFHEService
 
-// Secret key for signatures
-const SECRET_KEY =
-  typeof process !== 'undefined' && process.env
-    ? process.env['SECRET_KEY'] || ''
-    : ''
+/**
+ * Look up SECRET_KEY at call time rather than module load time.
+ * This ensures:
+ * - Tests or runtimes that set process.env.SECRET_KEY after importing this module work correctly
+ * - Browser environment properly throws if no secret is available
+ * @throws Error if SECRET_KEY is not set
+ */
+function requireSecretKey(): string {
+  const key =
+    typeof process !== 'undefined' && process.env
+      ? process.env['SECRET_KEY']
+      : undefined
+  if (!key) {
+    throw new Error('SECRET_KEY is required for signatures')
+  }
+  return key
+}
 
 /**
  * Initialize security system
@@ -63,7 +73,6 @@ export async function initializeSecurity(): Promise<void> {
 
     // Initialize encryption with the configured level
     const encryptionSuccess = await initializeEncryption(securityLevel)
-
     if (!encryptionSuccess) {
       logger.warn(
         'Encryption initialization failed, continuing with reduced security',
@@ -113,7 +122,6 @@ export async function initializeEncryption(level = 'medium'): Promise<boolean> {
         rotationPeriodDays: 7,
         persistKeys: true,
       })
-
       logger.info(`FHE initialized with key ID: ${keyId}`)
     }
 
@@ -153,14 +161,12 @@ export async function decryptMessage(
 ): Promise<string> {
   try {
     let decrypted: string
-
     if (enhancedFHEService.decrypt) {
       decrypted = await enhancedFHEService.decrypt(encryptedMessage)
     } else {
       // Fallback implementation if decrypt is not available
       throw new Error('Decryption not implemented')
     }
-
     return decrypted
   } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
@@ -251,7 +257,6 @@ export function generateSecureSessionKey(): string {
 /**
  * HIPAA Security Helper Functions
  */
-
 // Security event types for logging (runtime + type-safe)
 export const SecurityEventType = {
   ACCESS: 'access',
@@ -402,7 +407,10 @@ export function validateHIPAACompliance(): {
     compliant = false
   }
 
-  return { compliant, issues }
+  return {
+    compliant,
+    issues,
+  }
 }
 
 /**
@@ -433,9 +441,9 @@ export function generateSecureToken(length = 32): string {
     if (typeof window !== 'undefined') {
       const array = new Uint8Array(length)
       window.crypto.getRandomValues(array)
-      return Array.from(array, (byte) =>
-        byte.toString(16).padStart(2, '0'),
-      ).join('')
+      return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join(
+        '',
+      )
     } else {
       // Node.js implementation - use a safe fallback for SSR
       return (
@@ -455,9 +463,12 @@ export function generateSecureToken(length = 32): string {
 
 /**
  * Create a signature for data integrity
+ * @param data Data to sign
+ * @returns Base64-encoded signature
+ * @throws Error if SECRET_KEY is not set in environment
  */
 export function createSignature(data: string): string {
-  if (!SECRET_KEY) throw new Error("SECRET_KEY is required for signatures");
+  const secret = requireSecretKey()
   try {
     // Browser-safe implementation
     if (typeof window !== 'undefined') {
@@ -466,13 +477,13 @@ export function createSignature(data: string): string {
       return btoa(
         String.fromCharCode.apply(
           null,
-          Array.from(new TextEncoder().encode(data + SECRET_KEY)),
+          Array.from(new TextEncoder().encode(data + secret)),
         ),
       )
     } else {
       // Server-side implementation without Node.js Buffer
       const encoder = new TextEncoder()
-      const dataWithKey = encoder.encode(data + SECRET_KEY)
+      const dataWithKey = encoder.encode(data + secret)
       // Convert Uint8Array to base64 string without using Buffer
       return btoa(String.fromCharCode.apply(null, Array.from(dataWithKey)))
     }
@@ -512,12 +523,10 @@ export function createSecureToken(
     iat: Math.floor(Date.now() / 1000),
     jti: generateSecureToken(8),
   }
-
   const dataString = JSON.stringify(tokenData)
   // Use btoa instead of Buffer
   const encodedData = btoa(dataString)
   const signature = createSignature(encodedData)
-
   return `${encodedData}.${signature}`
 }
 
@@ -531,7 +540,6 @@ export function verifySecureToken(
 ): Record<string, unknown> | null {
   try {
     const [encodedData, signature] = token.split('.')
-
     if (!encodedData || !signature) {
       return null
     }
