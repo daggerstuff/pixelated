@@ -29,6 +29,11 @@ describe('formatDuration', () => {
     // exactly 1 day
     expect(formatDuration(86400000)).toBe('1d 0h')
   })
+
+  it('handles negative durations', () => {
+    // -45 seconds
+    expect(formatDuration(-45000)).toBe('-45s')
+  })
 })
 
 describe('isValidDate', () => {
