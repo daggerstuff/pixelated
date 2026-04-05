@@ -25,6 +25,15 @@ trigger:
 
 pr: none
 
+resources:
+  repositories:
+    - repository: aiRepo
+      type: git
+      name: ai
+    - repository: docsRepo
+      type: git
+      name: docs
+
 # This pipeline must run on the self-hosted Bear Dance pool because
 # Microsoft-hosted Azure Pipelines minutes are exhausted for this organization.
 pool:
@@ -61,6 +70,10 @@ stages:
     jobs:
       - job: BuildImage
         displayName: Build image and push to ACR
+        uses:
+          repositories:
+            - aiRepo
+            - docsRepo
         steps:
           - checkout: self
             fetchDepth: 0
@@ -219,6 +232,10 @@ stages:
     jobs:
       - job: DeployHosted
         displayName: Helm deploy (self-hosted)
+        uses:
+          repositories:
+            - aiRepo
+            - docsRepo
         steps:
           - checkout: self
             fetchDepth: 1
