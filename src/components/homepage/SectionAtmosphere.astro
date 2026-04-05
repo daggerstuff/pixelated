@@ -95,26 +95,45 @@ const { variant = 'section' } = Astro.props
   .section-atmosphere--section .section-atmosphere__plane--right,
   .section-atmosphere--section-soft .section-atmosphere__plane--right,
   .section-atmosphere--cta .section-atmosphere__plane--right {
-    background: linear-gradient(160deg, rgba(125, 211, 168, 0.08), rgba(255, 255, 255, 0.01));
+    background: linear-gradient(
+      160deg,
+      rgba(143, 184, 162, 0.08),
+      rgba(255, 255, 255, 0.01)
+    );
     opacity: 0.74;
   }
 
   .section-atmosphere--section .section-atmosphere__beam,
   .section-atmosphere--section-soft .section-atmosphere__beam,
   .section-atmosphere--cta .section-atmosphere__beam {
-    background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 168, 0.28) 48%, rgba(255, 255, 255, 0.12) 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(143, 184, 162, 0.28) 48%,
+      rgba(255, 255, 255, 0.12) 100%
+    );
     opacity: 0.55;
   }
 
   .section-atmosphere--section .section-atmosphere__glow--left,
   .section-atmosphere--cta .section-atmosphere__glow--left {
-    background: radial-gradient(circle, rgba(125, 211, 168, 0.1) 0%, rgba(125, 211, 168, 0.02) 45%, transparent 72%);
+    background: radial-gradient(
+      circle,
+      rgba(143, 184, 162, 0.1) 0%,
+      rgba(143, 184, 162, 0.02) 45%,
+      transparent 72%
+    );
     opacity: 0.24;
   }
 
   .section-atmosphere--section .section-atmosphere__glow--right,
   .section-atmosphere--cta .section-atmosphere__glow--right {
-    background: radial-gradient(circle, rgba(125, 211, 168, 0.08) 0%, rgba(125, 211, 168, 0.018) 45%, transparent 74%);
+    background: radial-gradient(
+      circle,
+      rgba(143, 184, 162, 0.08) 0%,
+      rgba(143, 184, 162, 0.018) 45%,
+      transparent 74%
+    );
     opacity: 0.22;
   }
 
@@ -137,11 +156,19 @@ const { variant = 'section' } = Astro.props
   }
 
   .section-atmosphere--cta .section-atmosphere__plane--left {
-    background: linear-gradient(135deg, rgba(125, 211, 168, 0.14), rgba(125, 211, 168, 0.03));
+    background: linear-gradient(
+      135deg,
+      rgba(143, 184, 162, 0.14),
+      rgba(143, 184, 162, 0.03)
+    );
   }
 
   .section-atmosphere--cta .section-atmosphere__plane--right {
-    background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(125, 211, 168, 0.015));
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(143, 184, 162, 0.015)
+    );
   }
 
   @media (max-width: 768px) {

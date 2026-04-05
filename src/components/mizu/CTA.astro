@@ -94,7 +94,7 @@ const {
     background:
       radial-gradient(
         circle at top right,
-        rgba(125, 211, 168, 0.08),
+        rgba(143, 184, 162, 0.08),
         transparent 28%
       ),
       linear-gradient(180deg, #0f1414 0%, #151b1a 100%);
@@ -108,21 +108,25 @@ const {
 
   .cta-panel {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.96fr);
-    gap: clamp(1.1rem, 2vw, 1.8rem);
+    grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.92fr);
+    gap: clamp(1.4rem, 2.6vw, 2.2rem);
     align-items: start;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.4rem;
     background:
       linear-gradient(
         135deg,
-        rgba(125, 211, 168, 0.14),
-        rgba(125, 211, 168, 0.03) 34%,
+        rgba(143, 184, 162, 0.14),
+        rgba(143, 184, 162, 0.03) 34%,
         rgba(255, 255, 255, 0.018) 100%
       ),
       rgba(255, 255, 255, 0.028);
-    padding: clamp(1.2rem, 2vw, 1.65rem);
+    padding: clamp(1.35rem, 2vw, 1.85rem);
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-floating);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .cta-panel::before {
@@ -133,7 +137,7 @@ const {
     background: linear-gradient(
       180deg,
       var(--accent-primary),
-      rgba(136, 201, 165, 0.15) 60%,
+      rgba(143, 184, 162, 0.15) 60%,
       transparent
     );
   }
@@ -142,12 +146,21 @@ const {
     max-width: 42rem;
   }
 
+  .cta-title {
+    max-width: 11ch;
+    font-size: clamp(2.1rem, 1.45rem + 1.8vw, 3.4rem);
+    line-height: 0.9;
+    letter-spacing: -0.065em;
+    text-wrap: balance;
+  }
+
   .cta-label {
     margin-bottom: var(--space-4);
   }
 
   .cta-proof-list {
     display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.75rem;
   }
 
@@ -167,22 +180,27 @@ const {
   }
 
   .cta-proof-item {
-    padding-top: 0.7rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 0.8rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.95rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .cta-actions {
     display: grid;
-    gap: 0.9rem;
-    padding: 0.95rem 1rem 1rem;
+    gap: 1rem;
+    padding: 1.05rem 1.05rem 1.1rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.15rem;
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.05),
       rgba(255, 255, 255, 0.02) 100%
     );
     color: var(--text-primary);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      var(--shadow-panel);
   }
 
   .cta-decision {
@@ -210,10 +228,11 @@ const {
   }
 
   .cta-verdict__label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: none;
     color: var(--accent-primary);
   }
 
@@ -238,19 +257,21 @@ const {
     align-items: center;
     justify-content: center;
     min-height: 2.65rem;
-    padding: 0.78rem 1rem;
-    border-radius: var(--radius-sm);
+    padding: 0.84rem 1rem;
+    border-radius: 0.95rem;
     border: 1px solid transparent;
     font-family: var(--font-sans);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    text-transform: none;
     text-decoration: none;
     transition:
       color var(--duration-fast) var(--ease-out),
       background-color var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out);
+      border-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-fast) var(--ease-out);
   }
 
   .cta-button:focus-visible {
@@ -263,13 +284,18 @@ const {
     background: var(--accent-primary);
     border-color: var(--accent-primary);
     min-width: 12.5rem;
-    box-shadow: 0 12px 26px rgba(125, 211, 168, 0.22);
+    box-shadow: 0 12px 26px rgba(143, 184, 162, 0.22);
   }
 
   .cta-button--primary:hover {
     color: #09100e;
     background: color-mix(in srgb, var(--accent-primary) 85%, white);
-    box-shadow: 0 14px 30px rgba(125, 211, 168, 0.3);
+    box-shadow: 0 14px 30px rgba(143, 184, 162, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .cta-button--primary:active {
+    transform: translateY(1px) scale(0.99);
   }
 
   .cta-button--secondary {
@@ -278,6 +304,7 @@ const {
     background: transparent;
     padding-inline: 0;
     min-width: 0;
+    justify-content: flex-start;
   }
 
   .cta-button--secondary:hover {
@@ -297,6 +324,10 @@ const {
 
   @media (max-width: 1024px) {
     .cta-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-proof-list {
       grid-template-columns: 1fr;
     }
 

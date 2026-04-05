@@ -80,6 +80,7 @@ COPY . .
 
 # Copy required server and instrumentation files into builder context
 COPY scripts/utils/start-server.mjs /app/start-server.mjs
+COPY scripts/utils/start-server-config.mjs /app/start-server-config.mjs
 COPY config/instrument.mjs /app/instrument.mjs
 
 # Limit Node.js memory usage to prevent OOM on small VPS
@@ -185,6 +186,7 @@ COPY --from=builder --chown=astro:astro /app/dist ./dist
 COPY --from=builder --chown=astro:astro /app/public ./public
 COPY --from=builder --chown=astro:astro /app/templates ./templates
 COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
+COPY --from=builder --chown=astro:astro /app/start-server-config.mjs ./start-server-config.mjs
 COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
 USER astro
 

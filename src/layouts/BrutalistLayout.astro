@@ -29,7 +29,7 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#081112" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -41,28 +41,36 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://pixelatedempathy.com/images/homepage/training-session-proof.png"
+    />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:image"
+      content="https://pixelatedempathy.com/images/homepage/training-session-proof.png"
+    />
 
     <!-- Fonts -->
     <link
       rel="preload"
-      href="/fonts/inter-regular.woff2"
+      href="/fonts/outfit-400.ttf"
       as="font"
-      type="font/woff2"
+      type="font/ttf"
       crossorigin
     />
     <link
       rel="preload"
-      href="/fonts/inter-bold.woff2"
+      href="/fonts/outfit-700.ttf"
       as="font"
-      type="font/woff2"
+      type="font/ttf"
       crossorigin
     />
     <link
       rel="preload"
-      href="/fonts/dm-mono-medium.woff2"
+      href="/fonts/jetbrains-mono-500.ttf"
       as="font"
-      type="font/woff2"
+      type="font/ttf"
       crossorigin
     />
 
@@ -94,7 +102,7 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
 <style is:global>
   /* Base body styles handled by design system */
   .main {
-    min-height: 100vh;
+    min-height: 100dvh;
     padding-top: 0;
   }
 
@@ -103,11 +111,16 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
     position: fixed;
     top: 0;
     left: 0;
-    height: 1px;
-    background: var(--accent-primary);
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--accent-primary-dim),
+      var(--accent-primary)
+    );
     width: 0%;
     z-index: var(--z-sticky);
     transition: width 0.1s linear;
+    box-shadow: 0 0 18px var(--accent-primary-glow);
   }
 </style>
 

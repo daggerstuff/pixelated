@@ -2,9 +2,13 @@
 
 import { createServer } from 'node:http'
 
-import { handler as ssrHandler } from '/app/dist/server/entry.mjs'
-
 import { Sentry, closeSentry } from './instrument.mjs'
+import {
+  getPortFallbackPolicy,
+  resolveSsrEntryModuleUrl,
+} from './start-server-config.mjs'
+
+const { handler: ssrHandler } = await import(resolveSsrEntryModuleUrl())
 
 const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT
 const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN
@@ -20,10 +24,8 @@ if (Number.isNaN(initialPort) || initialPort < 0 || initialPort > 65535) {
 }
 const host = process.env.HOST || '0.0.0.0'
 
-const isPortFallbackDisabled =
-  !!process.env.WEBSITES_PORT ||
-  !!process.env.NO_PORT_FALLBACK ||
-  !!process.env.FORCE_EXIT_ON_EADDRINUSE
+const portFallbackPolicy = getPortFallbackPolicy(process.env)
+const isPortFallbackDisabled = portFallbackPolicy.disabled
 
 // Note: We create the server inside tryListen() to avoid port conflicts
 // The unused 'server' object was removed to prevent double-binding issues
@@ -159,7 +161,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
 
       if (isPortFallbackDisabled) {
         console.error(
-          'Port fallback disabled by environment (WEBSITES_PORT or NO_PORT_FALLBACK or FORCE_EXIT_ON_EADDRINUSE). Exiting.',
+          `Port fallback disabled by environment (${portFallbackPolicy.reasons.join(', ')}). Exiting.`,
         )
         // Only report to Sentry when port fallback is disabled (fatal error)
         try {
