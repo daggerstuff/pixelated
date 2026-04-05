@@ -2,7 +2,7 @@
 
 import { createServer } from 'node:http'
 
-import { Sentry, closeSentry } from './instrument.mjs'
+import { Sentry, closeSentry } from '../../config/instrument.mjs'
 import {
   getPortFallbackPolicy,
   resolveSsrEntryModuleUrl,
@@ -25,7 +25,7 @@ if (Number.isNaN(initialPort) || initialPort < 0 || initialPort > 65535) {
 const host = process.env.HOST || '0.0.0.0'
 
 const portFallbackPolicy = getPortFallbackPolicy(process.env)
-const isPortFallbackDisabled = portFallbackPolicy.disabled
+const isPortFallbackDisabled = portFallbackPolicy.isFallbackDisabled
 
 // Note: We create the server inside tryListen() to avoid port conflicts
 // The unused 'server' object was removed to prevent double-binding issues

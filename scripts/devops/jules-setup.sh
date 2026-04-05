@@ -41,8 +41,19 @@ echo "🟢 Configuring Python environment with uv..."
 # Check for root pyproject.toml
 if [ -f "pyproject.toml" ]; then
     echo "🐍 Installing Root Python dependencies..."
-    # uv sycn is the standard way with uv for project management
+    # uv sync is the standard way with uv for project management
     uv sync
+    
+    # 4.1 Update .autoswitch_venv for zsh-autoswitch-venv plugin
+    # This ensures the prompt shows the project name instead of .venv
+    echo "🟢 Ensuring .autoswitch_venv matches pyproject.toml name..."
+    if command -v grep &> /dev/null; then
+        PROJECT_NAME=$(grep -m 1 "^name =" pyproject.toml | cut -d '"' -f 2)
+        if [ -n "$PROJECT_NAME" ]; then
+            echo "$PROJECT_NAME" > .autoswitch_venv
+            echo "✅ .autoswitch_venv set to '$PROJECT_NAME'"
+        fi
+    fi
 fi
 
 # AI Engine (Submodule/Sub-directory) setup
@@ -50,14 +61,18 @@ if [ -d "ai" ] && [ -f "ai/pyproject.toml" ]; then
     echo "🧠 Setting up AI engine dependencies (ai/)..."
     cd ai
     uv sync
+    
+    # Update AI subdirectory's .autoswitch_venv
+    if command -v grep &> /dev/null; then
+        AI_PROJECT_NAME=$(grep -m 1 "^name =" pyproject.toml | cut -d '"' -f 2)
+        if [ -n "$AI_PROJECT_NAME" ]; then
+            echo "$AI_PROJECT_NAME" > .autoswitch_venv
+        fi
+    fi
     cd ..
 fi
 
-# 5. Global Tool Discovery (Byterover)
-echo "🟢 Discovering local agent tools..."
-command -v brv &> /dev/null && echo "✅ Byterover (brv) detected." || echo "⚠️ Byterover (brv) not in PATH."
-
-# 6. Final Verification and Sanity Check
+# 5. Final Verification and Sanity Check
 echo "🟢 Running basic diagnostics..."
 # Using the project's own check script if possible, or just pnpm check:all
 # pnpm check:all || echo "⚠️ Post-setup check reported warnings/errors. Proceeding for task execution."
