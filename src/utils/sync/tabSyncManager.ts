@@ -791,7 +791,8 @@ class TabSyncManager {
       strategy,
       effectiveOnConflict,
     );
-    const shouldUpdate = resolvedValue !== localValue;
+    // Use deep equality to check if update is needed (handles objects/arrays correctly)
+    const shouldUpdate = !this.conflictResolver.areEqual(resolvedValue, localValue);
 
     // Emit conflict event
     this.emit("conflict", {
