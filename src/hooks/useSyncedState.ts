@@ -93,43 +93,43 @@ export function useSyncedState<T>({
           return
         }
 
-        // Compute finalValue outside setState using stateRef.current
-        // (guaranteed current by useLayoutEffect after every commit).
-        // This keeps the setState updater below fully pure.
-        const currentState = stateRef.current
-        let finalValue: T = data.value
+        // Use a functional updater to ensure we are resolving conflicts against 
+        // the ABSOLUTE latest state, including any pending local updates.
+        setState((currentState) => {
+          let resolvedValue: T = data.value
 
-        if (currentState !== defaultValue && data.value !== currentState) {
-          switch (conflictStrategy) {
-            case 'local':
-              finalValue = currentState
-              break
-            case 'merge':
-              try {
-                finalValue = mergeValues(currentState, data.value)
-              } catch {
-                finalValue = data.value
-              }
-              break
-            case 'manual':
-              finalValue = onConflict
-                ? onConflict(currentState, data.value)
-                : data.value
-              break
-            case 'remote':
-            default:
-              finalValue = data.value
-              break
+          if (currentState !== defaultValue && data.value !== currentState) {
+            switch (conflictStrategy) {
+              case 'local':
+                resolvedValue = currentState
+                break
+              case 'merge':
+                try {
+                  resolvedValue = mergeValues(currentState, data.value)
+                } catch {
+                  resolvedValue = data.value
+                }
+                break
+              case 'manual':
+                resolvedValue = onConflict
+                  ? onConflict(currentState, data.value)
+                  : data.value
+                break
+              case 'remote':
+              default:
+                resolvedValue = data.value
+                break
+            }
           }
-        }
 
-        // Record the resolved event before calling setState so the post-commit
-        // useLayoutEffect below can synchronize refs and deliver onSync.
-        pendingSyncRef.current = { value: finalValue, tabId: data.tabId }
+          // Record the resolved event before the state update commits so that the
+          // post-commit useLayoutEffect can synchronize refs and deliver onSync.
+          // Note: we update the ref inside the updater to capture the resolved value
+          // relative to the currentState used for this specific update.
+          pendingSyncRef.current = { value: resolvedValue, tabId: data.tabId }
 
-        // Pure setState — updater receives latest React state but finalValue
-        // is already fully determined above; we just return it.
-        setState(() => finalValue)
+          return resolvedValue
+        })
 
         setSyncStatus('synced')
       },
