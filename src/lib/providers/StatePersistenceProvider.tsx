@@ -21,7 +21,6 @@ import React, {
 import { logger } from '@/lib/logger'
 import { persistenceManager } from '@/lib/state/jotai-persistence'
 import { SyncProvider } from './SyncContext'
-import tabSyncManager from '@/utils/sync/tabSyncManager'
 
 // ============================================================================
 // Types
@@ -170,11 +169,8 @@ export function StatePersistenceProvider({
 
         // Offline sync initialization removed: initializeOfflineSync does not exist
 
-        // Initialize cross-tab sync BroadcastChannel once at the provider level.
-        // tabSyncManager.init() is idempotent — safe to call even if already running.
-        if (typeof window !== 'undefined') {
-          tabSyncManager.init()
-        }
+        // Note: tabSyncManager lifecycle is now managed solely by SyncProvider
+        // to ensure a single source of truth for the sync layer's runtime state.
 
         // Set up automatic backups if enabled
         if (enableBackups && typeof window !== 'undefined') {
@@ -204,15 +200,10 @@ export function StatePersistenceProvider({
 
     void initializePersistence()
 
-    // Cleanup function — tear down the cross-tab sync manager so its
-    // BroadcastChannel and window 'beforeunload' listener are released on
-    // unmount (or on HMR remount), preventing listener accumulation.
+    // Cleanup function — only manage backup timer, sync layer is handled by SyncProvider
     return () => {
       if (backupTimer) {
         clearInterval(backupTimer)
-      }
-      if (typeof window !== 'undefined') {
-        tabSyncManager.destroy()
       }
     }
   }, [
