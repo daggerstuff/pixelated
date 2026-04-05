@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { ChartBarIcon, ArrowTrendingUpIcon, LightBulbIcon } from '@heroicons/react/24/outline'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
@@ -150,6 +150,15 @@ export const ResearchDashboard: FC = () => {
     methodology: study.methodology,
   })), [studies])
 
+  // ⚡ Bolt: Memoize study selection handler to prevent unnecessary re-renders of list components
+  const handleStudySelect = useCallback((studyId: string) => {
+    setSelectedStudies((prev) =>
+      prev.includes(studyId)
+        ? prev.filter((id) => id !== studyId)
+        : [...prev, studyId]
+    )
+  }, [setSelectedStudies])
+
   return (
     <ResponsiveContainer size='full'>
       <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
@@ -222,15 +231,7 @@ export const ResearchDashboard: FC = () => {
             <OverviewTab
               metrics={researchMetrics}
               studies={studies}
-              onStudySelect={(studyId) => {
-                if (selectedStudies.includes(studyId)) {
-                  setSelectedStudies((prev) =>
-                    prev.filter((id) => id !== studyId),
-                  )
-                } else {
-                  setSelectedStudies((prev) => [...prev, studyId])
-                }
-              }}
+              onStudySelect={handleStudySelect}
               selectedStudies={selectedStudies}
             />
           )}
@@ -238,15 +239,7 @@ export const ResearchDashboard: FC = () => {
           {dashboardView === 'studies' && (
             <StudiesTab
               studies={studies}
-              onStudySelect={(studyId) => {
-                if (selectedStudies.includes(studyId)) {
-                  setSelectedStudies((prev) =>
-                    prev.filter((id) => id !== studyId),
-                  )
-                } else {
-                  setSelectedStudies((prev) => [...prev, studyId])
-                }
-              }}
+              onStudySelect={handleStudySelect}
               selectedStudies={selectedStudies}
             />
           )}
