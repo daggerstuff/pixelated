@@ -239,8 +239,9 @@ export function mergeValues<T>(local: T, remote: T, depth = 0, visited = new Wea
 /**
  * Deep equality check for objects and arrays
  * Handles nested objects, arrays, and primitive values
+ * Includes circular reference detection via WeakSet
  */
-export function deepEqual<T>(a: T, b: T): boolean {
+export function deepEqual<T>(a: T, b: T, _visited?: WeakSet<object>): boolean {
   // Strict equality for primitives and same reference
   if (a === b) return true;
 
@@ -250,17 +251,29 @@ export function deepEqual<T>(a: T, b: T): boolean {
   // Must be same type
   if (typeof a !== typeof b) return false;
 
-  // Handle arrays
-  if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-      if (!deepEqual(a[i], b[i])) return false;
-    }
-    return true;
-  }
-
-  // Handle objects
+  // For objects, track visited references to detect cycles
   if (typeof a === "object" && typeof b === "object") {
+    const visited = _visited || new WeakSet<object>();
+
+    // Circular reference check - if we've seen this object before, compare by reference
+    if (visited.has(a as object) || visited.has(b as object)) {
+      return a === b;
+    }
+
+    // Mark both objects as visited
+    visited.add(a as object);
+    visited.add(b as object);
+
+    // Handle arrays
+    if (Array.isArray(a) && Array.isArray(b)) {
+      if (a.length !== b.length) return false;
+      for (let i = 0; i < a.length; i++) {
+        if (!deepEqual(a[i], b[i], visited)) return false;
+      }
+      return true;
+    }
+
+    // Handle objects
     const keysA = Object.keys(a as object);
     const keysB = Object.keys(b as object);
 
@@ -269,7 +282,7 @@ export function deepEqual<T>(a: T, b: T): boolean {
     // Handle objects - use hasOwnProperty for O(1) key lookups without Set allocation overhead
     for (const key of keysA) {
       if (!Object.prototype.hasOwnProperty.call(b as object, key)) return false;
-      if (!deepEqual((a as any)[key], (b as any)[key])) return false;
+      if (!deepEqual((a as any)[key], (b as any)[key], visited)) return false;
     }
     return true;
   }
