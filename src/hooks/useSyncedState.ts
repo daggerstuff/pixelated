@@ -202,7 +202,11 @@ export function useSyncedState<T>({
   const [state, setState] = useState<T>(defaultValue);
   const [isLoaded, setIsLoaded] = useState(false);
   const [syncStatus, setSyncStatus] = useState<"synced" | "offline">("synced");
-  const instanceId = useRef(Math.random().toString(36).substring(2, 11)).current;
+  const instanceId = useRef<string>();
+if (instanceId.current === undefined) {
+  // Use crypto.randomUUID() for unique, collision-resistant instance IDs
+  instanceId.current = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
+}
 
   const handleStateChange = useCallback((value: T) => {
     setState(value);
@@ -214,7 +218,7 @@ export function useSyncedState<T>({
 
   const [manager] = useState(() => new SyncLifecycleManager<T>(
     syncManager,
-    instanceId,
+    instanceId.current!,
     {
       key,
       defaultValue,
