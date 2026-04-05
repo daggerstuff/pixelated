@@ -127,12 +127,7 @@ stages:
                 echo "GITHUB_PAT exists: $(if [ -n "${GITHUB_PAT:-}" ]; then echo 'YES (length:' ${#GITHUB_PAT} ')'; else echo 'NO'; fi)"
                 echo "Current directory: $(pwd)"
                 echo "==================================="
-                echo "Running init-submodules.sh with error tracing..."
-                # Run with tracing but filter out sensitive tokens
-                bash -x scripts/devops/init-submodules.sh 2>&1 | sed -E 's/[a-zA-Z0-9_-]{40,}/***REDACTED***/g' || {
-                  echo "ERROR: init-submodules.sh failed with exit code $?"
-                  exit 1
-                }
+                bash scripts/devops/init-submodules.sh
 
           - task: NodeTool@0
             displayName: 'Install Node.js (LTS)'
@@ -333,12 +328,7 @@ stages:
                 echo "Git remote -v:"
                 git remote -v || true
                 echo "==================================="
-                echo "Running init-submodules.sh with error tracing..."
-                # Run with tracing but filter out sensitive tokens
-                bash -x scripts/devops/init-submodules.sh 2>&1 | sed -E 's/[a-zA-Z0-9_-]{40,}/***REDACTED***/g' || {
-                  echo "ERROR: init-submodules.sh failed with exit code $?"
-                  exit 1
-                }
+                bash scripts/devops/init-submodules.sh
 
           - task: HelmInstaller@1
             displayName: Install Helm
