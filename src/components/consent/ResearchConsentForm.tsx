@@ -1,9 +1,5 @@
-import { useState, useEffect } from "react";
-import DOMPurify from "dompurify";
-
-import { authClient } from "@/lib/auth-client";
-import { consentService } from "@/lib/security/consent/ConsentService";
-import type { UserConsentStatus } from "@/lib/security/consent/types";
+import { useState } from "react";
+import { useResearchConsent } from "./useResearchConsent";
 
 interface ResearchConsentFormProps {
   onConsentChanged?: (hasConsent: boolean) => void;
@@ -23,163 +19,21 @@ export function ResearchConsentForm({
   showSummaryOnly = false,
   className = "",
 }: ResearchConsentFormProps) {
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [consentStatus, setConsentStatus] = useState<UserConsentStatus | null>(null);
+  const {
+    loading,
+    error,
+    consentStatus,
+    selectedOptions,
+    handleGrantConsent,
+    handleWithdrawConsent,
+    handleOptionChange,
+    allRequiredOptionsSelected,
+    sanitizedDocumentText,
+  } = useResearchConsent();
+
   const [expandedView, setExpandedView] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, boolean>>({});
   const [withdrawReason, setWithdrawReason] = useState("");
   const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
-
-  // Fetch consent status when component mounts or user changes
-  useEffect(() => {
-    const fetchConsentStatus = async () => {
-      if (!user) {
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-        const statuses = await consentService.getUserConsentStatus({
-          userId: user.id,
-          consentTypeName: "Research Participation",
-        });
-
-        if (statuses.length > 0) {
-          setConsentStatus(statuses[0] || null);
-
-          // Initialize selected options from user's existing consent if available
-          if (statuses[0] && statuses[0].userConsent && statuses[0].userConsent.granularOptions) {
-            setSelectedOptions(statuses[0].userConsent.granularOptions);
-          } else if (statuses[0]) {
-            // Otherwise initialize with default values
-            const initialOptions: Record<string, boolean> = {};
-            statuses[0].consentOptions?.forEach((option) => {
-              initialOptions[option.optionName] = option.defaultValue;
-            });
-            setSelectedOptions(initialOptions);
-          }
-        }
-      } catch (err: unknown) {
-        console.error("Error fetching consent status:", err);
-        setError("Failed to load consent information. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void fetchConsentStatus();
-  }, [user]);
-
-  // Handle granting consent
-  const handleGrantConsent = async () => {
-    if (!user || !consentStatus) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Get user agent for audit trail
-      const { userAgent } = window.navigator;
-
-      await consentService.grantConsent({
-        userId: user.id,
-        consentVersionId: consentStatus.currentVersion.id,
-        userAgent,
-        granularOptions: selectedOptions,
-      });
-
-      // Refresh consent status
-      const statuses = await consentService.getUserConsentStatus({
-        userId: user.id,
-        consentTypeName: "Research Participation",
-      });
-
-      if (statuses.length > 0) {
-        setConsentStatus(statuses[0] || null);
-      }
-
-      // Notify parent if callback is provided
-      if (onConsentChanged) {
-        onConsentChanged(true);
-      }
-    } catch (err: unknown) {
-      console.error("Error granting consent:", err);
-      setError("Failed to record your consent. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle withdrawing consent
-  const handleWithdrawConsent = async () => {
-    if (!user || !consentStatus?.userConsent) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Get user agent for audit trail
-      const { userAgent } = window.navigator;
-
-      await consentService.withdrawConsent({
-        userId: user.id,
-        consentId: consentStatus.userConsent.id,
-        reason: withdrawReason,
-        userAgent,
-      });
-
-      // Refresh consent status
-      const statuses = await consentService.getUserConsentStatus({
-        userId: user.id,
-        consentTypeName: "Research Participation",
-      });
-
-      if (statuses.length > 0) {
-        setConsentStatus(statuses[0] || null);
-      }
-
-      // Reset withdrawal dialog
-      setWithdrawReason("");
-      setWithdrawDialogOpen(false);
-
-      // Notify parent if callback is provided
-      if (onConsentChanged) {
-        onConsentChanged(false);
-      }
-    } catch (err: unknown) {
-      console.error("Error withdrawing consent:", err);
-      setError("Failed to withdraw your consent. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle option change
-  const handleOptionChange = (optionName: string, checked: boolean) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
-      [optionName]: checked,
-    }));
-  };
-
-  // Check if all required options are selected
-  const allRequiredOptionsSelected = () => {
-    if (!consentStatus?.consentOptions) {
-      return true;
-    }
-
-    return consentStatus.consentOptions
-      .filter((option) => option.isRequired)
-      .every((option) => selectedOptions[option.optionName]);
-  };
 
   // Render loading state
   if (loading) {
@@ -217,6 +71,24 @@ export function ResearchConsentForm({
       </div>
     );
   }
+
+  const onGrant = async () => {
+    const success = await handleGrantConsent();
+    if (success && onConsentChanged) {
+      onConsentChanged(true);
+    }
+  };
+
+  const onWithdraw = async () => {
+    const success = await handleWithdrawConsent(withdrawReason);
+    if (success) {
+      setWithdrawReason("");
+      setWithdrawDialogOpen(false);
+      if (onConsentChanged) {
+        onConsentChanged(false);
+      }
+    }
+  };
 
   // Render consent form
   return (
@@ -264,7 +136,7 @@ export function ResearchConsentForm({
               <div className="bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm">
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(consentStatus.currentVersion.documentText),
+                    __html: sanitizedDocumentText,
                   }}
                 ></div>
               </div>
@@ -308,7 +180,7 @@ export function ResearchConsentForm({
           <div className="mt-6 flex flex-wrap gap-4">
             {!consentStatus.hasActiveConsent ? (
               <button
-                onClick={handleGrantConsent}
+                onClick={onGrant}
                 disabled={loading || !allRequiredOptionsSelected()}
                 className={`rounded-lg px-4 py-2 font-medium ${
                   allRequiredOptionsSelected()
@@ -368,7 +240,7 @@ export function ResearchConsentForm({
                 Cancel
               </button>
               <button
-                onClick={handleWithdrawConsent}
+                onClick={onWithdraw}
                 disabled={loading}
                 className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 font-medium"
               >
