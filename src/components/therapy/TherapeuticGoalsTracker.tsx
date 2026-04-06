@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
@@ -348,6 +348,7 @@ export function TherapeuticGoalsTracker({
             if (!open) closeModal()
           }}
         >
+          <DialogContent>
           <form onSubmit={handleFormSubmit} className='space-y-4'>
             <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
             <Input
@@ -416,6 +417,7 @@ export function TherapeuticGoalsTracker({
               {editGoal ? 'Update Goal' : 'Create Goal'}
             </Button>
           </form>
+          </DialogContent>
         </Dialog>
       )}
 
