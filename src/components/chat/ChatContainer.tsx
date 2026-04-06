@@ -1,5 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
@@ -8,7 +8,6 @@ import type { Message } from '@/types/chat'
 import { ChatInput } from './ChatInput'
 import { ChatMessage } from './ChatMessage'
 import { IconBrain, IconChevronDown } from './icons'
-// If error persists, verify ThemeProvider file actually exports ThemeContext as a named export: "export const ThemeContext = ..."
 
 export interface ChatContainerProps {
   messages: Message[]
@@ -31,11 +30,11 @@ export function ChatContainer({
   disabled = false,
 }: ChatContainerProps) {
   const { resolvedTheme } = useTheme()
-  // Use resolvedTheme === 'dark' for dark mode checks
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
   const [input, setInput] = useState('')
+  const frameId = useRef<number>(0)
 
   // Auto scroll to bottom on new messages
   useEffect(() => {
@@ -51,14 +50,28 @@ export function ChatContainer({
       return
     }
 
+    let ticking = false
     const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
-      setShowScrollButton(!isNearBottom)
+      if (ticking) return
+      
+      ticking = true
+      frameId.current = window.requestAnimationFrame(() => {
+        if (containerRef.current) {
+          const { scrollTop, scrollHeight, clientHeight } = containerRef.current
+          const isNearBottom = scrollHeight - scrollTop - clientHeight < 100
+          setShowScrollButton(!isNearBottom)
+        }
+        ticking = false
+      })
     }
 
     container.addEventListener('scroll', handleScroll)
-    return () => container.removeEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (frameId.current) {
+        window.cancelAnimationFrame(frameId.current)
+      }
+    }
   }, [])
 
   const scrollToBottom = () => {
