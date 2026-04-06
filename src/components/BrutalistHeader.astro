@@ -42,7 +42,9 @@ const navItems = [
         >
         </div>
       </div>
-      <span class="brand-mark text-white transition-colors">
+      <span
+        class="brand-mark font-display font-bold text-xl tracking-tight text-white transition-colors"
+      >
         <span class="brand-mark__primary">{titlePrimary}</span>
         {
           titleSecondary && (
@@ -70,7 +72,7 @@ const navItems = [
     <!-- Actions -->
     <div class="header-actions">
       <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
-      <a href="/signup" class="btn btn-primary btn-sm">Start Practice</a>
+      <a href="/signup" class="btn btn-primary btn-sm">Start</a>
     </div>
 
     <!-- Mobile Menu Toggle -->
@@ -100,7 +102,7 @@ const navItems = [
       }
       <li class="header-mobile-actions">
         <a href="/login" class="btn btn-outline">Sign In</a>
-        <a href="/signup" class="btn btn-primary">Start Practice</a>
+        <a href="/signup" class="btn btn-primary">Start Training</a>
       </li>
     </ul>
   </nav>
@@ -146,10 +148,10 @@ const navItems = [
   }
 
   .header-logo-text {
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     font-size: var(--text-sm);
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight);
     color: var(--text-primary);
   }
 
@@ -158,16 +160,15 @@ const navItems = [
     align-items: center;
     gap: 0.42rem;
     white-space: nowrap;
-    font-family: var(--font-sans);
     letter-spacing: -0.02em;
   }
 
   .brand-mark__primary,
   .brand-mark__secondary {
     display: inline-block;
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, 0.95rem + 0.22vw, 1.24rem);
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(1.12rem, 1.02rem + 0.34vw, 1.48rem);
+    font-weight: 600;
     line-height: 1;
   }
 
@@ -178,7 +179,7 @@ const navItems = [
 
   .brand-mark__secondary {
     color: var(--accent-primary);
-    font-weight: 700;
+    font-weight: 600;
   }
 
   /* Navigation */
@@ -202,10 +203,10 @@ const navItems = [
   }
 
   .nav-link {
-    font-family: var(--font-sans);
+    font-family: var(--font-display);
     font-size: var(--text-xs);
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-secondary);
     text-decoration: none;
