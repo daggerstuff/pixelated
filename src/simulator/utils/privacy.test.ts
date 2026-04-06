@@ -33,18 +33,18 @@ describe('privacy utilities', () => {
       vi.unstubAllGlobals()
     })
 
-    it('should return true when stored value is "true"' , () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue('true') })
+    it('should return true when stored value is true', () => {
+      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue('true') })
       expect(getUserConsentPreference()).toBe(true)
     })
 
-    it('should return false when stored value is not "true"' , () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue('false') })
+    it('should return false when stored value is not true', () => {
+      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue('false') })
       expect(getUserConsentPreference()).toBe(false)
     })
 
     it('should return false when stored value is null', () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue(null) })
+      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue(null) })
       expect(getUserConsentPreference()).toBe(false)
     })
   })
