@@ -6,7 +6,7 @@ accelerate==1.13.0
     # via
     #   pixelated (pyproject.toml)
     #   peft
-ag-ui-protocol==0.1.14
+ag-ui-protocol==0.1.15
     # via pydantic-ai-slim
 aiofile==3.9.0
     # via py-key-value-aio
@@ -14,7 +14,7 @@ aiofiles==25.1.0
     # via ngcsdk
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.4
+aiohttp==3.13.5
     # via
     #   pixelated (pyproject.toml)
     #   fsspec
@@ -38,10 +38,8 @@ annotated-doc==0.0.4
     #   typer
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.86.0
-    # via
-    #   opentelemetry-instrumentation-bedrock
-    #   pydantic-ai-slim
+anthropic==0.89.0
+    # via pydantic-ai-slim
 anyio==4.13.0
     # via
     #   anthropic
@@ -102,12 +100,12 @@ blinker==1.9.0
     #   flask-socketio
 blis==1.3.3
     # via thinc
-boto3==1.42.78
+boto3==1.42.83
     # via
     #   pixelated (pyproject.toml)
     #   ngcsdk
     #   pydantic-ai-slim
-botocore==1.42.78
+botocore==1.42.83
     # via
     #   boto3
     #   ngcsdk
@@ -139,11 +137,11 @@ cffi==2.0.0
     #   argon2-cffi-bindings
     #   cryptography
     #   soundfile
-chardet==7.3.0
+chardet==7.4.0.post2
     # via pixelated (pyproject.toml)
-charset-normalizer==3.4.6
+charset-normalizer==3.4.7
     # via requests
-click==8.3.1
+click==8.3.2
     # via
     #   pixelated (pyproject.toml)
     #   flask
@@ -165,7 +163,7 @@ cloudpathlib==0.23.0
     # via weasel
 cloudpickle==3.1.2
     # via shap
-cohere==5.20.7
+cohere==5.21.1
     # via pydantic-ai-slim
 colorama==0.4.6
     # via traceloop-sdk
@@ -190,7 +188,7 @@ ctranslate2==4.7.1
     # via faster-whisper
 cuda-bindings==12.9.4
     # via torch
-cuda-pathfinder==1.5.0
+cuda-pathfinder==1.5.1
     # via cuda-bindings
 cuid==0.4
     # via traceloop-sdk
@@ -248,7 +246,7 @@ docstring-parser==0.17.0
     #   cyclopts
 docutils==0.22.4
     # via rich-rst
-e2b==2.19.0
+e2b==2.20.0
     # via pixelated (pyproject.toml)
 einops==0.8.2
     # via pixelated (pyproject.toml)
@@ -268,7 +266,7 @@ fairlearn==0.13.0
     # via pixelated (pyproject.toml)
 faiss-cpu==1.13.2
     # via pixelated (pyproject.toml)
-fastapi==0.135.2
+fastapi==0.135.3
     # via
     #   pixelated (pyproject.toml)
     #   gradient-adk
@@ -277,7 +275,7 @@ fastavro==1.12.1
     # via cohere
 faster-whisper==1.2.1
     # via pixelated (pyproject.toml)
-fastmcp==3.1.1
+fastmcp==3.2.0
     # via
     #   pixelated (pyproject.toml)
     #   pydantic-ai-slim
@@ -335,7 +333,7 @@ gitpython==3.1.46
     # via
     #   pixelated (pyproject.toml)
     #   wandb
-google-api-core==2.30.0
+google-api-core==2.30.2
     # via google-api-python-client
 google-api-python-client==2.193.0
     # via pixelated (pyproject.toml)
@@ -347,17 +345,17 @@ google-auth==2.49.1
     #   google-auth-oauthlib
     #   google-genai
     #   pydantic-ai-slim
-google-auth-httplib2==0.3.0
+google-auth-httplib2==0.3.1
     # via
     #   pixelated (pyproject.toml)
     #   google-api-python-client
-google-auth-oauthlib==1.3.0
+google-auth-oauthlib==1.3.1
     # via pixelated (pyproject.toml)
-google-genai==1.68.0
+google-genai==1.70.0
     # via
     #   pixelated (pyproject.toml)
     #   pydantic-ai-slim
-googleapis-common-protos==1.73.1
+googleapis-common-protos==1.74.0
     # via
     #   google-api-core
     #   opentelemetry-exporter-otlp-proto-grpc
@@ -371,7 +369,7 @@ griffelib==2.0.2
     # via pydantic-ai-slim
 groq==1.1.2
     # via pydantic-ai-slim
-grpcio==1.78.0
+grpcio==1.80.0
     # via
     #   opentelemetry-exporter-otlp-proto-grpc
     #   xai-sdk
@@ -391,7 +389,7 @@ hatch==1.16.5
     # via pixelated (pyproject.toml)
 hatchling==1.29.0
     # via hatch
-hf-xet==1.4.2
+hf-xet==1.4.3
     # via huggingface-hub
 hindsight-litellm==0.5.0
     # via pixelated (pyproject.toml)
@@ -436,7 +434,7 @@ httpx==0.28.1
     #   weasel
 httpx-sse==0.4.3
     # via mcp
-huggingface-hub==1.8.0
+huggingface-hub==1.9.0
     # via
     #   pixelated (pyproject.toml)
     #   accelerate
@@ -530,7 +528,7 @@ kaggle==2.0.0
     # via pixelated (pyproject.toml)
 kagglesdk==0.1.16
     # via kaggle
-keras==3.13.2
+keras==3.14.0
     # via pixelated (pyproject.toml)
 kernels==0.12.3
     # via pixelated (pyproject.toml)
@@ -544,9 +542,9 @@ lance-namespace==0.6.1
     # via lancedb
 lance-namespace-urllib3-client==0.6.1
     # via lance-namespace
-lancedb==0.30.1
+lancedb==0.30.2
     # via pixelated (pyproject.toml)
-langchain-core==1.2.23
+langchain-core==1.2.26
     # via
     #   langchain-text-splitters
     #   langgraph
@@ -554,17 +552,17 @@ langchain-core==1.2.23
     #   langgraph-prebuilt
 langchain-text-splitters==1.1.1
     # via voyageai
-langgraph==1.1.3
+langgraph==1.1.6
     # via gradient-adk
 langgraph-checkpoint==4.0.1
     # via
     #   langgraph
     #   langgraph-prebuilt
-langgraph-prebuilt==1.0.8
+langgraph-prebuilt==1.0.9
     # via langgraph
 langgraph-sdk==0.3.12
     # via langgraph
-langsmith==0.7.22
+langsmith==0.7.25
     # via
     #   langchain-core
     #   langsmith-fetch
@@ -587,17 +585,17 @@ lightning-utilities==0.15.3
     #   torchmetrics
 lime==0.2.0.1
     # via pixelated (pyproject.toml)
-litellm==1.82.6
+litellm==1.83.0
     # via
     #   hindsight-litellm
     #   realign
-llvmlite==0.46.0
+llvmlite==0.47.0
     # via
     #   numba
     #   shap
-logfire==4.30.0
+logfire==4.31.0
     # via pydantic-ai-slim
-logfire-api==4.30.0
+logfire-api==4.31.0
     # via
     #   pydantic-evals
     #   pydantic-graph
@@ -615,7 +613,7 @@ matplotlib==3.10.8
     #   pixelated (pyproject.toml)
     #   lime
     #   seaborn
-mcp==1.26.0
+mcp==1.27.0
     # via
     #   pixelated (pyproject.toml)
     #   fastmcp
@@ -624,7 +622,7 @@ mdurl==0.1.2
     # via markdown-it-py
 minio==7.2.20
     # via pixelated (pyproject.toml)
-mistralai==2.1.3
+mistralai==2.3.0
     # via pydantic-ai-slim
 ml-dtypes==0.5.4
     # via
@@ -632,9 +630,9 @@ ml-dtypes==0.5.4
     #   onnx
     #   onnx-ir
     #   onnxscript
-modal==1.3.5
+modal==1.4.1
     # via pixelated (pyproject.toml)
-more-itertools==10.8.0
+more-itertools==11.0.1
     # via
     #   jaraco-classes
     #   jaraco-functools
@@ -681,14 +679,14 @@ networkx==3.6.1
     #   torch
 nexus-rpc==1.4.0
     # via temporalio
-ngcsdk==4.15.0
+ngcsdk==4.16.0
     # via pixelated (pyproject.toml)
 nltk==3.9.4
     # via
     #   pixelated (pyproject.toml)
     #   textblob
     #   textstat
-numba==0.64.0
+numba==0.65.0
     # via
     #   pixelated (pyproject.toml)
     #   librosa
@@ -779,7 +777,7 @@ nvidia-nvtx-cu12==12.8.90
     # via torch
 oauthlib==3.3.1
     # via requests-oauthlib
-onnx==1.20.1
+onnx==1.21.0
     # via
     #   pixelated (pyproject.toml)
     #   onnx-ir
@@ -790,7 +788,7 @@ onnxruntime==1.24.4
     # via faster-whisper
 onnxscript==0.6.2
     # via pixelated (pyproject.toml)
-openai==2.29.0
+openai==2.30.0
     # via
     #   pixelated (pyproject.toml)
     #   litellm
@@ -899,81 +897,81 @@ opentelemetry-instrumentation==0.60b1
     #   opentelemetry-instrumentation-watsonx
     #   opentelemetry-instrumentation-weaviate
     #   opentelemetry-instrumentation-writer
-opentelemetry-instrumentation-agno==0.53.3
+opentelemetry-instrumentation-agno==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-alephalpha==0.53.3
+opentelemetry-instrumentation-alephalpha==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-anthropic==0.53.3
+opentelemetry-instrumentation-anthropic==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-bedrock==0.53.3
+opentelemetry-instrumentation-bedrock==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-chromadb==0.53.3
+opentelemetry-instrumentation-chromadb==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-cohere==0.53.3
+opentelemetry-instrumentation-cohere==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-crewai==0.53.3
+opentelemetry-instrumentation-crewai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-google-generativeai==0.53.3
+opentelemetry-instrumentation-google-generativeai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-groq==0.53.3
+opentelemetry-instrumentation-groq==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-haystack==0.53.3
+opentelemetry-instrumentation-haystack==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-httpx==0.60b1
     # via logfire
-opentelemetry-instrumentation-lancedb==0.53.3
+opentelemetry-instrumentation-lancedb==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-langchain==0.53.3
+opentelemetry-instrumentation-langchain==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-llamaindex==0.53.3
+opentelemetry-instrumentation-llamaindex==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-logging==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-marqo==0.53.3
+opentelemetry-instrumentation-marqo==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-mcp==0.53.3
+opentelemetry-instrumentation-mcp==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-milvus==0.53.3
+opentelemetry-instrumentation-milvus==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-mistralai==0.53.3
+opentelemetry-instrumentation-mistralai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-ollama==0.53.3
+opentelemetry-instrumentation-ollama==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-openai==0.53.3
+opentelemetry-instrumentation-openai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-openai-agents==0.53.3
+opentelemetry-instrumentation-openai-agents==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-pinecone==0.53.3
+opentelemetry-instrumentation-pinecone==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-qdrant==0.53.3
+opentelemetry-instrumentation-qdrant==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-redis==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-replicate==0.53.3
+opentelemetry-instrumentation-replicate==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-requests==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-sagemaker==0.53.3
+opentelemetry-instrumentation-sagemaker==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-sqlalchemy==0.60b1
     # via traceloop-sdk
 opentelemetry-instrumentation-threading==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-together==0.53.3
+opentelemetry-instrumentation-together==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-transformers==0.53.3
+opentelemetry-instrumentation-transformers==0.57.0
     # via traceloop-sdk
 opentelemetry-instrumentation-urllib3==0.60b1
     # via traceloop-sdk
-opentelemetry-instrumentation-vertexai==0.53.3
+opentelemetry-instrumentation-vertexai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-voyageai==0.53.3
+opentelemetry-instrumentation-voyageai==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-watsonx==0.53.3
+opentelemetry-instrumentation-watsonx==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-weaviate==0.53.3
+opentelemetry-instrumentation-weaviate==0.57.0
     # via traceloop-sdk
-opentelemetry-instrumentation-writer==0.53.3
+opentelemetry-instrumentation-writer==0.57.0
     # via traceloop-sdk
 opentelemetry-proto==1.39.1
     # via
@@ -1030,7 +1028,7 @@ opentelemetry-semantic-conventions==0.60b1
     #   opentelemetry-instrumentation-writer
     #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions-ai
-opentelemetry-semantic-conventions-ai==0.4.16
+opentelemetry-semantic-conventions-ai==0.5.1
     # via
     #   opentelemetry-instrumentation-agno
     #   opentelemetry-instrumentation-alephalpha
@@ -1071,7 +1069,7 @@ opentelemetry-util-http==0.60b1
     #   opentelemetry-instrumentation-urllib3
 optree==0.19.0
     # via keras
-orjson==3.11.7
+orjson==3.11.8
     # via
     #   langgraph-sdk
     #   langsmith
@@ -1122,7 +1120,7 @@ packaging==25.0
     #   wandb
     #   weasel
     #   xai-sdk
-pandas==3.0.1
+pandas==3.0.2
     # via
     #   pixelated (pyproject.toml)
     #   datasets
@@ -1142,7 +1140,7 @@ peft==0.18.1
     # via pixelated (pyproject.toml)
 pexpect==4.9.0
     # via hatch
-pillow==12.1.1
+pillow==12.2.0
     # via
     #   pixelated (pyproject.toml)
     #   imageio
@@ -1260,9 +1258,9 @@ pydantic==2.12.5
     #   wandb
     #   weasel
     #   xai-sdk
-pydantic-ai==1.73.0
+pydantic-ai==1.77.0
     # via pixelated (pyproject.toml)
-pydantic-ai-slim==1.73.0
+pydantic-ai-slim==1.77.0
     # via
     #   pydantic-ai
     #   pydantic-evals
@@ -1270,9 +1268,9 @@ pydantic-core==2.41.5
     # via
     #   cohere
     #   pydantic
-pydantic-evals==1.73.0
+pydantic-evals==1.77.0
     # via pydantic-ai-slim
-pydantic-graph==1.73.0
+pydantic-graph==1.77.0
     # via pydantic-ai-slim
 pydantic-handlebars==0.1.0
     # via pydantic-ai-slim
@@ -1347,7 +1345,7 @@ python-json-logger==2.0.7
     # via nemo-microservices
 python-magic==0.4.27
     # via s3cmd
-python-multipart==0.0.22
+python-multipart==0.0.24
     # via mcp
 python-slugify==8.0.4
     # via kaggle
@@ -1398,12 +1396,12 @@ referencing==0.37.0
     #   jsonschema
     #   jsonschema-path
     #   jsonschema-specifications
-regex==2026.2.28
+regex==2026.4.4
     # via
     #   nltk
     #   tiktoken
     #   transformers
-requests==2.33.0
+requests==2.33.1
     # via
     #   pixelated (pyproject.toml)
     #   cohere
@@ -1506,7 +1504,7 @@ sentence-transformers==5.3.0
     # via pixelated (pyproject.toml)
 sentencepiece==0.2.1
     # via pixelated (pyproject.toml)
-sentry-sdk==2.56.0
+sentry-sdk==2.57.0
     # via
     #   pixelated (pyproject.toml)
     #   wandb
@@ -1591,7 +1589,7 @@ sympy==1.14.0
     #   onnx-ir
     #   onnxruntime
     #   torch
-synchronicity==0.11.1
+synchronicity==0.12.1
     # via modal
 temporalio==1.24.0
     # via pydantic-ai-slim
@@ -1604,7 +1602,7 @@ tenacity==9.1.4
     #   voyageai
 text-unidecode==1.3
     # via python-slugify
-textblob==0.19.0
+textblob==0.20.0
     # via pixelated (pyproject.toml)
 textstat==0.7.13
     # via pixelated (pyproject.toml)
@@ -1624,7 +1622,6 @@ tokenizers==0.22.2
     #   cohere
     #   faster-whisper
     #   litellm
-    #   opentelemetry-instrumentation-bedrock
     #   transformers
     #   voyageai
 toml==0.10.2
@@ -1670,9 +1667,9 @@ tqdm==4.67.3
     #   shap
     #   spacy
     #   transformers
-traceloop-sdk==0.53.3
+traceloop-sdk==0.57.0
     # via honeyhive
-transformers==5.3.0
+transformers==5.5.0
     # via
     #   pixelated (pyproject.toml)
     #   peft
@@ -1694,9 +1691,9 @@ typer==0.24.1
     #   weasel
 types-certifi==2021.10.8.3
     # via modal
-types-protobuf==6.32.1.20260221
+types-protobuf==7.34.1.20260403
     # via temporalio
-types-requests==2.32.4.20260324
+types-requests==2.33.0.20260402
     # via cohere
 types-toml==0.10.8.20240310
     # via modal
@@ -1788,9 +1785,9 @@ uuid-utils==0.14.1
     # via
     #   langchain-core
     #   langsmith
-uv==0.11.2
+uv==0.11.3
     # via hatch
-uvicorn==0.42.0
+uvicorn==0.43.0
     # via
     #   pixelated (pyproject.toml)
     #   fastmcp
@@ -1838,7 +1835,7 @@ websockets==16.0
     #   fastmcp
     #   google-genai
     #   uvicorn
-werkzeug==3.1.7
+werkzeug==3.1.8
     # via
     #   pixelated (pyproject.toml)
     #   flask
@@ -1858,7 +1855,7 @@ wrapt==1.17.3
     #   smart-open
 wsproto==1.3.2
     # via simple-websocket
-xai-sdk==1.10.0
+xai-sdk==1.11.0
     # via pydantic-ai-slim
 xxhash==3.6.0
     # via
