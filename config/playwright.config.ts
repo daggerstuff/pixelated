@@ -183,7 +183,7 @@ export default defineConfig({
   // globalTeardown: './tests/e2e/global-teardown.ts',
 
   /* Test output directories */
-  outputDir: 'test-results/',
+  outputDir: '../test-results/',
 
   /* Expect options */
   expect: {
