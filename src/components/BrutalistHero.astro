@@ -5,6 +5,7 @@
  */
 import BrutalistHeroArtifact from '@/components/BrutalistHeroArtifact.astro'
 import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+import HeroContent from '@/components/homepage/HeroContent.astro'
 import HeroStage from '@/components/homepage/HeroStage.astro'
 export interface Props {
   kicker?: string
@@ -47,64 +48,14 @@ const {
   <div class="pe-page-shell hero-shell">
     <HeroStage>
       <div class="hero-layout">
-        <div class="hero-copy-wrap">
-          <div class="hero-copy">
-            {kicker && (
-              <div class="hero-prelude">
-                <div class="hero-kicker-pill">
-                  <span class="hero-kicker-dot"></span>
-                  <span class="hero-kicker">{kicker}</span>
-                </div>
-              </div>
-            )}
-
-            <h1 class="hero-title">{title}</h1>
-
-            <p class="hero-subtitle">{subtitle}</p>
-
-            <ul class="hero-proof-grid" aria-label="Core proof" role="list">
-              {
-                proofPoints.map((item) => (
-                  <li class="hero-proof-card" tabindex="0">
-                    <span class="hero-proof-card__index">{item.label}</span>
-                    <p class="hero-proof-card__copy">{item.text}</p>
-                  </li>
-                ))
-              }
-            </ul>
-
-            <div class="hero-actions">
-              {primaryCTA && (
-                <a href={primaryCTA.href} class="btn-premium" role="button">
-                  <span class="btn-premium__text">{primaryCTA.text}</span>
-                  <div class="btn-premium__fill"></div>
-                </a>
-              )}
-
-              {secondaryCTA && (
-                <a href={secondaryCTA.href} class="hero-secondary-link">
-                  <span class="hero-secondary-link__text"
-                    >{secondaryCTA.text}</span
-                  >
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    class="hero-secondary-link__icon"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M5 12H19M19 12L13 6M19 12L13 18"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="square"></path>
-                  </svg>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
+        <HeroContent
+          kicker={kicker}
+          title={title}
+          subtitle={subtitle}
+          proofPoints={proofPoints}
+          primaryCTA={primaryCTA}
+          secondaryCTA={secondaryCTA}
+        />
 
         {artifact && (
           <div class="hero-artifact-shell">
@@ -185,259 +136,7 @@ const {
     z-index: 1;
   }
 
-  .hero-copy-wrap {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
 
-  .hero-copy {
-    max-width: 44rem;
-    position: relative;
-    z-index: 1;
-    display: grid;
-    align-content: start;
-    justify-items: center;
-    gap: 1.3rem;
-    padding: clamp(0.25rem, 1vw, 0.65rem) 0 0;
-    text-align: center;
-  }
-
-  .hero-prelude {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-  }
-
-  .hero-kicker-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.44rem 0.8rem;
-    border-radius: 0.62rem;
-    border: 1px solid rgba(143, 184, 162, 0.18);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(143, 184, 162, 0.12),
-        rgba(143, 184, 162, 0.04)
-      ),
-      rgba(255, 255, 255, 0.025);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  }
-
-  .hero-kicker-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 999px;
-    background: var(--accent-primary);
-  }
-
-  .hero-kicker,
-  .hero-secondary-link,
-  .hero-proof-card__index,
-  .hero-operator-note__label {
-    font-family: var(--font-sans);
-    font-weight: 600;
-  }
-
-  .hero-kicker {
-    font-family: var(--font-mono);
-    font-size: 0.66rem;
-    letter-spacing: 0.1em;
-    text-transform: none;
-    color: var(--accent-primary);
-    opacity: 0.8;
-  }
-
-  .hero-title {
-    max-width: 11ch;
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2.55rem, 2.15rem + 1.9vw, 4rem);
-    font-weight: 700;
-    line-height: 0.96;
-    letter-spacing: -0.05em;
-    color: var(--text-primary);
-    text-wrap: balance;
-  }
-
-  .hero-subtitle {
-    max-width: 37rem;
-    margin: 0;
-    font-size: clamp(0.98rem, 0.94rem + 0.16vw, 1.06rem);
-    line-height: 1.76;
-    color: var(--text-secondary);
-    text-wrap: pretty;
-  }
-
-  .hero-proof-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.95rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    max-width: 43rem;
-  }
-
-  .hero-proof-card {
-    display: grid;
-    gap: 0.45rem;
-    min-width: 0;
-    padding: 0.96rem 1rem 1.02rem;
-    border-radius: 0.8rem;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.045),
-        rgba(255, 255, 255, 0.02)
-      ),
-      rgba(255, 255, 255, 0.018);
-    transition:
-      border-color var(--duration-fast) var(--ease-out),
-      background var(--duration-fast) var(--ease-out);
-  }
-
-  .hero-proof-card:hover {
-    border-color: rgba(143, 184, 162, 0.2);
-    background: rgba(255, 255, 255, 0.035);
-  }
-
-  .hero-proof-card:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-  }
-
-  .hero-proof-card__index,
-  .hero-operator-note__label {
-    font-family: var(--font-mono);
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: none;
-  }
-
-  .hero-proof-card__index {
-    color: var(--accent-primary);
-    opacity: 0.82;
-  }
-
-  .hero-proof-card__copy {
-    margin: 0;
-    font-size: 0.92rem;
-    line-height: 1.62;
-    color: #e8e2d7;
-    text-wrap: pretty;
-  }
-
-  .hero-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem 1.2rem;
-    align-items: center;
-    justify-content: center;
-    margin-top: 0.35rem;
-  }
-
-  .btn-premium {
-    position: relative;
-    padding: 0.86rem 1.5rem;
-    background: var(--accent-primary);
-    border: 1px solid var(--accent-primary);
-    border-radius: 0.72rem;
-    color: #09100e;
-    font-family: var(--font-sans);
-    font-size: 0.88rem;
-    font-weight: 600;
-    text-transform: none;
-    letter-spacing: 0.02em;
-    overflow: hidden;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 14px 34px rgba(143, 184, 162, 0.2);
-    transition:
-      transform var(--duration-fast) var(--ease-out),
-      box-shadow var(--duration-fast) var(--ease-out),
-      border-color var(--duration-fast) var(--ease-out);
-  }
-
-  .btn-premium:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 3px;
-  }
-
-  .btn-premium:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--accent-primary) 88%, white);
-    background: color-mix(in srgb, var(--accent-primary) 88%, white);
-    box-shadow: 0 18px 40px rgba(143, 184, 162, 0.28);
-  }
-
-  .btn-premium:active {
-    transform: translateY(1px) scale(0.98);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .btn-premium__text {
-    position: relative;
-    z-index: 1;
-  }
-
-  .btn-premium__fill {
-    display: none;
-  }
-
-  .hero-secondary-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-family: var(--font-sans);
-    font-size: 0.84rem;
-    font-weight: 500;
-    text-transform: none;
-    letter-spacing: 0;
-    padding: 0.76rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.72rem;
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .hero-secondary-link:hover {
-    text-decoration: none;
-    border-color: rgba(143, 184, 162, 0.28);
-    color: var(--text-primary);
-  }
-
-  .hero-secondary-link:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 3px;
-    border-radius: 2px;
-  }
-
-  .hero-secondary-link__text {
-    opacity: 0.85;
-    transition: opacity var(--duration-fast) var(--ease-out);
-  }
-
-  .hero-secondary-link__icon {
-    width: 1rem;
-    height: 1rem;
-    transition: transform var(--duration-fast) var(--ease-out);
-  }
-
-  .hero-secondary-link:hover .hero-secondary-link__text {
-    opacity: 1;
-  }
-
-  .hero-secondary-link:hover .hero-secondary-link__icon {
-    transform: translateX(0.5rem);
-  }
 
   .hero-artifact-shell {
     position: relative;
@@ -468,16 +167,6 @@ const {
       gap: 1.75rem;
     }
 
-    .hero-copy,
-    .hero-title,
-    .hero-subtitle {
-      max-width: none;
-    }
-
-    .hero-proof-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
     .hero-artifact-shell {
       margin-top: 0;
       transform: none;
@@ -491,27 +180,8 @@ const {
       padding-bottom: 4rem;
     }
 
-    .hero-shell,
-    .hero-copy {
+    .hero-shell {
       max-width: 100%;
-    }
-
-    .hero-copy {
-      gap: 1.15rem;
-      padding: 0.35rem 0 0.7rem;
-    }
-
-    .hero-title {
-      font-size: clamp(2.2rem, 7.4vw, 2.95rem);
-    }
-
-    .hero-subtitle {
-      font-size: clamp(1rem, 3vw, 1.08rem);
-    }
-
-    .hero-proof-grid {
-      grid-template-columns: 1fr;
-      gap: 0.75rem;
     }
 
     .hero-artifact-shell {
@@ -530,15 +200,6 @@ const {
       object-fit: contain;
     }
 
-    .btn-premium {
-      padding: 0.82rem 1.2rem;
-      font-size: 0.8rem;
-    }
-
-    .hero-secondary-link {
-      font-size: 0.78rem;
-    }
-
     .hero-background {
       opacity: 0.78;
     }
@@ -548,44 +209,6 @@ const {
     .hero {
       padding-top: 4.2rem;
       padding-bottom: 2.8rem;
-    }
-
-    .hero-title {
-      font-size: clamp(2.15rem, 11vw, 2.7rem);
-    }
-
-    .hero-actions {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .hero-prelude {
-      align-items: flex-start;
-      justify-content: flex-start;
-    }
-
-    .hero-title {
-      max-width: 18ch;
-    }
-
-    .btn-premium {
-      width: 100%;
-      text-align: center;
-    }
-
-    .hero-actions > a {
-      width: 100%;
-      justify-content: flex-start;
-      text-align: left;
-    }
-
-    .btn-premium {
-      text-align: center;
-    }
-
-    .hero-secondary-link {
-      justify-content: center;
-      text-align: center;
     }
   }
 </style>
