@@ -18,8 +18,6 @@ available for the Pixelated project.
 - [Introduction](./introduction.mdx) - Project overview and key features
 - [Architecture](./architecture.mdx) - System architecture and component
   relationships
-- [Project Status](./project-status.md) - Current progress, completed features,
-  and future plans
 - [Component Library](./component-library.md) - UI component documentation
 - [Quickstart](./quickstart.mdx) - Getting started with the project
 
@@ -85,8 +83,8 @@ available for the Pixelated project.
 2. **Developers**: Reference the [Component Library](./component-library.md) and
    [API Reference](./api.md) regularly
 3. **DevOps**: Focus on the Infrastructure & Deployment section
-4. **Project Managers**: Monitor the [Project Status](./project-status.md)
-   document
+4. **Project Managers**: Use the [Status Tracking](./.notes/status.mdx) and
+   [Task Management](./.notes/tasks.mdx) docs for current status
 5. **Security Team**: Review all documentation in the Security section
 
 ## Documentation Standards
