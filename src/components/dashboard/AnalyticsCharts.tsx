@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, memo } from 'react'
 import type { FC } from 'react'
 
 import { useAnalyticsDashboard } from '@/hooks/useAnalyticsDashboard'
@@ -48,25 +48,30 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   </div>
 )
 
+// Time range selector options
+const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 90 days' },
+  { value: '1y', label: 'Last year' },
+]
+
 // Time range selector component
 interface TimeRangeSelectorProps {
   value: TimeRange
   onChange: (range: TimeRange) => void
 }
 
-const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
-  const options: { value: TimeRange; label: string }[] = [
-    { value: '7d', label: 'Last 7 days' },
-    { value: '30d', label: 'Last 30 days' },
-    { value: '90d', label: 'Last 90 days' },
-    { value: '1y', label: 'Last year' },
-  ]
-
+/**
+ * Memoized time range selector to prevent unnecessary re-renders. (Review suggestion)
+ */
+const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(({ value, onChange }) => {
   return (
     <div className='flex space-x-2'>
-      {options.map((option) => (
+      {TIME_RANGE_OPTIONS.map((option) => (
         <button
           key={option.value}
+          type='button'
           onClick={() => onChange(option.value)}
           className={`rounded px-3 py-1 text-sm transition-colors ${
             value === option.value
@@ -79,7 +84,8 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
       ))}
     </div>
   )
-}
+})
+TimeRangeSelector.displayName = 'TimeRangeSelector'
 
 // Session activity chart component
 interface SessionChartProps {

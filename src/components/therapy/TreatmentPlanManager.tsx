@@ -1,5 +1,5 @@
 import { PlusCircle, Trash2 } from 'lucide-react'
-import React, { useState, useEffect, useCallback, useId } from 'react'
+import React, { useState, useEffect, useCallback, useId, FC } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -103,14 +103,18 @@ interface FormUpdatePlanData extends Omit<
   goals?: EditableGoal[]
 }
 
-const initialNewPlanData: FormNewPlanData = {
+/**
+ * Factory to create a fresh new plan data object.
+ * Fixes stale startDate issue by computing it at call time. (Review suggestion)
+ */
+const createEmptyNewPlanData = (): FormNewPlanData => ({
   title: '',
   clientId: '',
   userId: '',
   status: 'Draft',
   startDate: new Date().toISOString().split('T')[0],
   goals: [],
-}
+})
 
 const TreatmentPlanManager: FC = () => {
   const [plans, setPlans] = useState<TreatmentPlan[]>([])
@@ -118,9 +122,7 @@ const TreatmentPlanManager: FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
-    JSON.parse(JSON.stringify(initialNewPlanData) as unknown),
-  )
+  const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(createEmptyNewPlanData())
 
   const [planToDelete, setPlanToDelete] = useState<TreatmentPlan | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -166,22 +168,22 @@ const TreatmentPlanManager: FC = () => {
       | HTMLTextAreaElement
       | HTMLSelectElement
     const { name, value } = target
-    if (isEdit && editingPlanData) {
-      setEditingPlanData((prev: FormUpdatePlanData | null) =>
+    if (isEdit) {
+      setEditingPlanData((prev) =>
         prev ? { ...prev, [name]: value } : null,
       )
     } else {
-      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }))
+      setNewPlanData((prev) => ({ ...prev, [name]: value }))
     }
   }
 
   const handleSelectChange = (name: string, value: string, isEdit = false) => {
-    if (isEdit && editingPlanData) {
-      setEditingPlanData((prev: FormUpdatePlanData | null) =>
+    if (isEdit) {
+      setEditingPlanData((prev) =>
         prev ? { ...prev, [name]: value } : null,
       )
     } else {
-      setNewPlanData((prev: FormNewPlanData) => ({ ...prev, [name]: value }))
+      setNewPlanData((prev) => ({ ...prev, [name]: value }))
     }
   }
 
@@ -193,16 +195,13 @@ const TreatmentPlanManager: FC = () => {
       objectives: [],
       tempId: `goal-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     }
-    if (isEdit && editingPlanData) {
-      setEditingPlanData((prev: FormUpdatePlanData | null) => {
-        if (!prev) {
-          return null
-        }
-        const currentGoals = prev.goals || []
-        return { ...prev, goals: [...currentGoals, newGoal] }
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev) return null
+        return { ...prev, goals: [...(prev.goals || []), newGoal] }
       })
     } else {
-      setNewPlanData((prev: FormNewPlanData) => ({
+      setNewPlanData((prev) => ({
         ...prev,
         goals: [...prev.goals, newGoal],
       }))
@@ -215,43 +214,42 @@ const TreatmentPlanManager: FC = () => {
     value: string,
     isEdit = false,
   ) => {
-    if (isEdit && editingPlanData) {
-      const updatedGoals = [...(editingPlanData.goals || [])]
-      if (updatedGoals[index]) {
-        ;(updatedGoals[index])[field as keyof EditableGoal] =
-          value as never // Type-safe cast for EditableGoal union
-        setEditingPlanData((prev: FormUpdatePlanData | null) =>
-          prev ? { ...prev, goals: updatedGoals } : null,
-        )
-      }
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev || !prev.goals) return prev
+        const updatedGoals = [...prev.goals]
+        if (updatedGoals[index]) {
+          updatedGoals[index] = { ...updatedGoals[index], [field]: value }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     } else {
-      const updatedGoals = [...newPlanData.goals]
-      if (updatedGoals[index]) {
-        ;(updatedGoals[index])[
-          field
-        ] = value as never // ClientSideNewGoal is more straightforward
-        setNewPlanData((prev: FormNewPlanData) => ({
-          ...prev,
-          goals: updatedGoals,
-        }))
-      }
+      setNewPlanData((prev) => {
+        const updatedGoals = [...prev.goals]
+        if (updatedGoals[index]) {
+          updatedGoals[index] = { ...updatedGoals[index], [field]: value }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     }
   }
 
   const removeGoal = (index: number, isEdit = false) => {
-    if (isEdit && editingPlanData) {
-      const updatedGoals = [...(editingPlanData.goals || [])]
-      updatedGoals.splice(index, 1)
-      setEditingPlanData((prev: FormUpdatePlanData | null) =>
-        prev ? { ...prev, goals: updatedGoals } : null,
-      )
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev || !prev.goals) return prev
+        const updatedGoals = [...prev.goals]
+        updatedGoals.splice(index, 1)
+        return { ...prev, goals: updatedGoals }
+      })
     } else {
-      const updatedGoals = [...newPlanData.goals]
-      updatedGoals.splice(index, 1)
-      setNewPlanData((prev: FormNewPlanData) => ({
-        ...prev,
-        goals: updatedGoals,
-      }))
+      setNewPlanData((prev) => {
+        const updatedGoals = [...prev.goals]
+        updatedGoals.splice(index, 1)
+        return { ...prev, goals: updatedGoals }
+      })
     }
   }
   // --- End Goal Management ---
@@ -264,33 +262,37 @@ const TreatmentPlanManager: FC = () => {
       tempId: `obj-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
     }
 
-    if (isEdit && editingPlanData) {
-      const updatedGoals = JSON.parse(
-        JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
-      if (updatedGoals[goalIndex]) {
-        updatedGoals[goalIndex].objectives = [
-          ...(updatedGoals[goalIndex].objectives || []),
-          newObjective,
-        ]
-        setEditingPlanData((prev: FormUpdatePlanData | null) =>
-          prev ? { ...prev, goals: updatedGoals } : null,
-        )
-      }
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev || !prev.goals) return prev
+        const updatedGoals = [...prev.goals]
+        if (updatedGoals[goalIndex]) {
+          updatedGoals[goalIndex] = {
+            ...updatedGoals[goalIndex],
+            objectives: [
+              ...(updatedGoals[goalIndex].objectives || []),
+              newObjective,
+            ],
+          }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     } else {
-      const updatedGoals = JSON.parse(
-        JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
-      if (updatedGoals[goalIndex]) {
-        updatedGoals[goalIndex].objectives = [
-          ...updatedGoals[goalIndex].objectives,
-          newObjective,
-        ]
-        setNewPlanData((prev: FormNewPlanData) => ({
-          ...prev,
-          goals: updatedGoals,
-        }))
-      }
+      setNewPlanData((prev) => {
+        const updatedGoals = [...prev.goals]
+        if (updatedGoals[goalIndex]) {
+          updatedGoals[goalIndex] = {
+            ...updatedGoals[goalIndex],
+            objectives: [
+              ...updatedGoals[goalIndex].objectives,
+              newObjective,
+            ],
+          }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     }
   }
 
@@ -301,39 +303,37 @@ const TreatmentPlanManager: FC = () => {
     value: string,
     isEdit = false,
   ) => {
-    if (isEdit && editingPlanData) {
-      const updatedGoals = JSON.parse(
-        JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
-      if (
-        updatedGoals[goalIndex] &&
-        updatedGoals[goalIndex].objectives[objIndex]
-      ) {
-        ;(updatedGoals[goalIndex].objectives[objIndex])[
-          field as keyof EditableObjective
-        ] = value as never
-        setEditingPlanData((prev: FormUpdatePlanData | null) =>
-          prev ? { ...prev, goals: updatedGoals } : null,
-        )
-      }
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev || !prev.goals) return prev
+        const updatedGoals = [...prev.goals]
+        const goal = updatedGoals[goalIndex]
+        if (goal && goal.objectives && goal.objectives[objIndex]) {
+          const updatedObjectives = [...goal.objectives]
+          updatedObjectives[objIndex] = {
+            ...updatedObjectives[objIndex],
+            [field]: value,
+          }
+          updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     } else {
-      const updatedNewGoals = JSON.parse(
-        JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
-      if (
-        updatedNewGoals[goalIndex] &&
-        updatedNewGoals[goalIndex].objectives[objIndex]
-      ) {
-        ;(
-          updatedNewGoals[goalIndex].objectives[
-            objIndex
-          ]
-        )[field] = value as never
-        setNewPlanData((prev: FormNewPlanData) => ({
-          ...prev,
-          goals: updatedNewGoals,
-        }))
-      }
+      setNewPlanData((prev) => {
+        const updatedGoals = [...prev.goals]
+        const goal = updatedGoals[goalIndex]
+        if (goal && goal.objectives && goal.objectives[objIndex]) {
+          const updatedObjectives = [...goal.objectives]
+          updatedObjectives[objIndex] = {
+            ...updatedObjectives[objIndex],
+            [field]: value,
+          }
+          updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     }
   }
 
@@ -342,34 +342,37 @@ const TreatmentPlanManager: FC = () => {
     objIndex: number,
     isEdit = false,
   ) => {
-    if (isEdit && editingPlanData) {
-      const updatedGoals = JSON.parse(
-        JSON.stringify(editingPlanData.goals || []),
-      ) as EditableGoal[]
-      if (updatedGoals[goalIndex] && updatedGoals[goalIndex].objectives) {
-        updatedGoals[goalIndex].objectives.splice(objIndex, 1)
-        setEditingPlanData((prev: FormUpdatePlanData | null) =>
-          prev ? { ...prev, goals: updatedGoals } : null,
-        )
-      }
+    if (isEdit) {
+      setEditingPlanData((prev) => {
+        if (!prev || !prev.goals) return prev
+        const updatedGoals = [...prev.goals]
+        const goal = updatedGoals[goalIndex]
+        if (goal && goal.objectives) {
+          const updatedObjectives = [...goal.objectives]
+          updatedObjectives.splice(objIndex, 1)
+          updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     } else {
-      const updatedNewGoals = JSON.parse(
-        JSON.stringify(newPlanData.goals),
-      ) as ClientSideNewGoal[]
-      if (updatedNewGoals[goalIndex] && updatedNewGoals[goalIndex].objectives) {
-        updatedNewGoals[goalIndex].objectives.splice(objIndex, 1)
-        setNewPlanData((prev: FormNewPlanData) => ({
-          ...prev,
-          goals: updatedNewGoals,
-        }))
-      }
+      setNewPlanData((prev) => {
+        const updatedGoals = [...prev.goals]
+        const goal = updatedGoals[goalIndex]
+        if (goal && goal.objectives) {
+          const updatedObjectives = [...goal.objectives]
+          updatedObjectives.splice(objIndex, 1)
+          updatedGoals[goalIndex] = { ...goal, objectives: updatedObjectives }
+          return { ...prev, goals: updatedGoals }
+        }
+        return prev
+      })
     }
   }
   // --- End Objective Management ---
 
   const stripTempIds = (goals: (ClientSideNewGoal | EditableGoal)[]) => {
     return goals.map((g) => {
-      // tempId might exist on g if it's ClientSideNewGoal or a newly added EditableGoal
       const { objectives, ...goalDetails } = g as (
         | ClientSideNewGoal
         | EditableGoal
@@ -378,7 +381,6 @@ const TreatmentPlanManager: FC = () => {
         ...goalDetails,
         objectives: (objectives || []).map(
           (obj: ClientSideNewObjective | EditableObjective) => {
-            // tempId might exist on obj if it's ClientSideNewObjective or a newly added EditableObjective
             const { ...objDetails } = obj as (
               | ClientSideNewObjective
               | EditableObjective
@@ -395,7 +397,7 @@ const TreatmentPlanManager: FC = () => {
     setIsLoading(true)
     const payload = {
       ...newPlanData,
-      goals: stripTempIds(newPlanData.goals || []), // Ensure goals is an array
+      goals: stripTempIds(newPlanData.goals || []),
     }
     try {
       const response = await fetch('/api/treatment-plans', {
@@ -409,7 +411,7 @@ const TreatmentPlanManager: FC = () => {
       }
       await fetchPlans()
       setIsCreateModalOpen(false)
-      setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown))
+      setNewPlanData(createEmptyNewPlanData())
       toast.success('Treatment plan created successfully!')
     } catch (err: unknown) {
       const errorMessage =
@@ -435,8 +437,8 @@ const TreatmentPlanManager: FC = () => {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to delete treatment plan')
       }
-      await fetchPlans() // Refresh list
-      setPlanToDelete(null) // Close dialog
+      await fetchPlans()
+      setPlanToDelete(null)
       toast.success('Treatment plan deleted successfully!')
     } catch (err: unknown) {
       const errorMessage =
@@ -458,7 +460,7 @@ const TreatmentPlanManager: FC = () => {
 
     const payload = {
       ...editingPlanData,
-      goals: stripTempIds(editingPlanData.goals || []), // Ensure goals is an array
+      goals: stripTempIds(editingPlanData.goals || []),
     }
 
     try {
@@ -496,23 +498,23 @@ const TreatmentPlanManager: FC = () => {
   const openEditModal = (plan: TreatmentPlan) => {
     setEditingPlanData({
       ...plan,
-      id: plan.id, // ensure id is explicitly passed
+      id: plan.id,
       startDate: plan.startDate
         ? new Date(plan.startDate).toISOString().split('T')[0]
         : '',
       goals: plan.goals
-        ? JSON.parse(
-            JSON.stringify(
-              plan.goals.map((g) => ({ ...g, objectives: g.objectives || [] })),
-            ),
-          )
-        : [], // Deep copy goals, ensure objectives is array
-    } as FormUpdatePlanData) // Cast to ensure type compatibility
+        ? plan.goals.map((g) => ({
+            ...g,
+            // Deep copy objectives to avoid reference leaks (Review suggestion)
+            objectives: g.objectives ? g.objectives.map(o => ({ ...o })) : [],
+          }))
+        : [],
+    } as FormUpdatePlanData)
     setIsEditModalOpen(true)
   }
 
   const openCreateModal = () => {
-    setNewPlanData(JSON.parse(JSON.stringify(initialNewPlanData) as unknown)) // Reset with deep copy
+    setNewPlanData(createEmptyNewPlanData())
     setIsCreateModalOpen(true)
   }
 
