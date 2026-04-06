@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { createEphemeralSessionId, createPrivacyHash, generateConsentForm, getUserConsentPreference } from './privacy'
 
 describe('privacy utilities', () => {
@@ -29,22 +29,23 @@ describe('privacy utilities', () => {
   })
 
   describe('getUserConsentPreference', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals()
+    })
+
     it('should return true when stored value is "true" ', () => {
       vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue('true') })
       expect(getUserConsentPreference()).toBe(true)
-      vi.unstubAllGlobals()
     })
 
     it('should return false when stored value is not "true" ', () => {
       vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue('false') })
       expect(getUserConsentPreference()).toBe(false)
-      vi.unstubAllGlobals()
     })
 
     it('should return false when stored value is null', () => {
       vi.stubGlobal('localStorage', { getItem: vi.fn<() => string | null>().mockReturnValue(null) })
       expect(getUserConsentPreference()).toBe(false)
-      vi.unstubAllGlobals()
     })
   })
 })
