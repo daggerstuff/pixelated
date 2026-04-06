@@ -6,14 +6,22 @@
 
 /**
  * Instruments the application to collect and report Core Web Vitals and other key performance metrics.
+ * 
+ * This function sets up side-effectful instrumentation. It initializes `PerformanceObserver`s for 
+ * Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS), First Input Delay (FID - Legacy), 
+ * and First Contentful Paint (FCP). It also captures Time to First Byte (TTFB) from navigation entries.
  *
- * This function initializes `PerformanceObserver`s for Largest Contentful Paint (LCP), Cumulative Layout Shift (CLS),
- * First Input Delay (FID), First Contentful Paint (FCP), and Time to First Byte (TTFB). These metrics are crucial
- * for monitoring the real-world user experience and identifying performance bottlenecks.
+ * These metrics are crucial for monitoring the real-world user experience and identifying performance bottlenecks.
  *
  * @remarks
- * Reporting is conditionally enabled. It will only log metrics to the console if the `NODE_ENV` environment
- * variable is set to `"development"`, or if the `ENABLE_METRICS` environment variable is set to `"true"`.
+ * While instrumentation (observers) may be initialized, console logging is conditionally enabled. 
+ * It will only log metrics if the `NODE_ENV` environment variable is set to `"development"`, 
+ * or if the `ENABLE_METRICS` environment variable is set to `"true"`.
+ * 
+ * Note: FID is considered a legacy metric; Interaction to Next Paint (INP) is the current primary 
+ * interaction metric for Core Web Vitals.
+ *
+ * @returns {void} This function performs side-effectful instrumentation and does not return a value.
  *
  * @example
  * ```typescript
@@ -23,7 +31,7 @@
  * reportWebVitals();
  * ```
  */
-export function reportWebVitals() {
+export function reportWebVitals(): void {
   if (typeof window !== 'undefined') {
     try {
       // Only report in development or when explicitly enabled
@@ -31,19 +39,19 @@ export function reportWebVitals() {
         process.env['NODE_ENV'] === 'development' ||
         process.env['ENABLE_METRICS'] === 'true'
       ) {
-        // Report Largest Contentful Paint
+        // Report Largest Contentful Paint (via PerformanceObserver)
         reportLCP()
 
-        // Report Cumulative Layout Shift
+        // Report Cumulative Layout Shift (via PerformanceObserver)
         reportCLS()
 
-        // Report First Input Delay
+        // Report First Input Delay (Legacy - via PerformanceObserver)
         reportFID()
 
-        // Report First Contentful Paint
+        // Report First Contentful Paint (via PerformanceObserver)
         reportFCP()
 
-        // Report Time to First Byte
+        // Report Time to First Byte (via navigation timing entries)
         reportTTFB()
       }
     } catch {
@@ -71,6 +79,7 @@ interface FirstInputEntry extends PerformanceEntry {
 
 /**
  * Reports Largest Contentful Paint (LCP)
+ * Uses PerformanceObserver to track the largest image or text block rendered in the viewport.
  */
 function reportLCP() {
   try {
@@ -104,6 +113,7 @@ function reportLCP() {
 
 /**
  * Reports Cumulative Layout Shift (CLS)
+ * Uses PerformanceObserver to track unexpected layout shifts during the lifespan of the page.
  */
 function reportCLS() {
   try {
@@ -136,6 +146,8 @@ function reportCLS() {
 
 /**
  * Reports First Input Delay (FID)
+ * Legacy metric. Measures the time from when a user first interacts with a page to the 
+ * time when the browser is actually able to begin processing event handlers in response to that interaction.
  */
 function reportFID() {
   try {
@@ -146,7 +158,7 @@ function reportFID() {
       if (firstEntry) {
         const fid = firstEntry.processingStart - firstEntry.startTime
 
-        console.log('FID:', {
+        console.log('FID (Legacy):', {
           value: Math.round(fid),
           rating: fidRating(fid),
           type: firstEntry.name,
@@ -162,6 +174,8 @@ function reportFID() {
 
 /**
  * Reports First Contentful Paint (FCP)
+ * Uses PerformanceObserver to measure the time from when the page starts loading to when any part 
+ * of the page's content is rendered on the screen.
  */
 function reportFCP() {
   try {
@@ -187,6 +201,8 @@ function reportFCP() {
 
 /**
  * Reports Time to First Byte (TTFB)
+ * Gathered directly from performance.getEntriesByType('navigation') timing entries.
+ * Measures the time between the request for a resource and when the first byte of a response begins to arrive.
  */
 function reportTTFB() {
   try {
