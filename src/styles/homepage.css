@@ -1,6 +1,6 @@
 .pe-page-shell {
   width: 100%;
-  max-width: 84rem;
+  max-width: 88rem;
   margin: 0 auto;
   padding: 0 var(--space-6);
 }
@@ -8,8 +8,8 @@
 .pe-page-section {
   position: relative;
   border-top: 1px solid rgba(255, 255, 255, 0.04);
-  padding-top: clamp(6rem, 8vw, 8.4rem);
-  padding-bottom: clamp(6.5rem, 9vw, 9.4rem);
+  padding-top: clamp(6.4rem, 8.5vw, 9rem);
+  padding-bottom: clamp(6.8rem, 9.5vw, 9.8rem);
   overflow: hidden;
 }
 
@@ -29,9 +29,9 @@
   align-items: center;
   gap: 0.85rem;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: none;
   color: var(--accent-primary);
   opacity: 0.78;
@@ -48,9 +48,9 @@
 .pe-page-panel-label {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: none;
   color: var(--accent-primary);
   margin-bottom: var(--space-3);
@@ -58,14 +58,16 @@
 }
 
 .pe-page-heading {
-  margin-top: var(--space-5);
+  margin-top: var(--space-4);
   max-width: 15ch;
   font-family: var(--font-display);
-  font-size: clamp(2.35rem, 1.95rem + 1.2vw, 3.6rem);
+  font-size: clamp(2rem, 1.78rem + 0.9vw, 2.9rem);
   font-weight: 700;
   line-height: 0.98;
   letter-spacing: -0.045em;
   text-wrap: balance;
+  margin-inline: auto;
+  text-align: center;
 }
 
 @media (min-width: 768px) {
