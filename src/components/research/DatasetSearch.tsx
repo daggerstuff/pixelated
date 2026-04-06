@@ -61,6 +61,11 @@ export default function DatasetSearch() {
     }
   }
 
+  // ⚡ Bolt: Memoize mapped results to prevent expensive re-renders while typing in the search input
+  const memoizedResults = React.useMemo(() => results.map((dataset) => (
+    <DatasetCard key={dataset.url} dataset={dataset} />
+  )), [results])
+
   return (
     <div className='mx-auto w-full max-w-6xl p-4' role='main'>
       <div className='flex flex-col gap-8'>
@@ -204,9 +209,7 @@ export default function DatasetSearch() {
 
           {!loading && results.length > 0 && (
             <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {results.map((dataset) => (
-                <DatasetCard key={dataset.url} dataset={dataset} />
-              ))}
+              {memoizedResults}
             </div>
           )}
         </div>
