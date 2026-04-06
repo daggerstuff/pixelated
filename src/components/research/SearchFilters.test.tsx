@@ -1,12 +1,22 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-// @vitest-environment jsdom
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, vi } from 'vitest'
 
 import SearchFilters, { type SearchFiltersState } from './SearchFilters'
 
 // Setup Mock for onChange
 const mockOnChange = vi.fn()
+
+import { afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
+
+afterEach(() => {
+  cleanup()
+  vi.clearAllMocks()
+})
 
 const defaultFilters: SearchFiltersState = {
   topics: [],
@@ -26,11 +36,11 @@ describe('SearchFilters', () => {
   it('renders all filter sections', () => {
     render(<SearchFilters filters={defaultFilters} onChange={mockOnChange} />)
 
-    expect(screen.getByText('Advanced Filters')).toBeInTheDocument()
-    expect(screen.getByLabelText('Year From')).toBeInTheDocument()
-    expect(screen.getByLabelText('Year To')).toBeInTheDocument()
-    expect(screen.getByText('Therapeutic Topics')).toBeInTheDocument()
-    expect(screen.getByText('Min Relevance Score')).toBeInTheDocument()
+    expect(screen.getByText('Advanced Filters')).not.toBeNull()
+    expect(screen.getByLabelText('Year From')).not.toBeNull()
+    expect(screen.getByLabelText('Year To')).not.toBeNull()
+    expect(screen.getByText('Therapeutic Topics')).not.toBeNull()
+    expect(screen.getByText('Min Relevance Score')).not.toBeNull()
   })
 
   it('toggles topics correctly', () => {
@@ -43,7 +53,7 @@ describe('SearchFilters', () => {
     // AND handleApply calls onChange. But wait, toggleTopic updates local state.
     // We verify the button indicates it is pressed or selected visually (class check or aria-pressed).
     // After clicking, it should be pressed (true)
-    expect(topicButton).toHaveAttribute('aria-pressed', 'true')
+    expect(topicButton.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('calls onChange with new filters when Apply is clicked', () => {
