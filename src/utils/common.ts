@@ -135,9 +135,10 @@ export function unescapeHTML(node: VNode): VNode {
       ),
     }
   } else if (typeof children === 'object') {
-    // For object children that aren't VNodes, we can't process them
-    // so return the node unchanged
-    return node
+    return {
+      ...node,
+      children: unescapeHTML(children),
+    }
   }
 
   return node
