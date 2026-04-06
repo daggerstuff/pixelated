@@ -5,7 +5,7 @@ import {
   RefreshCwIcon,
   DownloadIcon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -240,6 +240,27 @@ export default function SyntheticTherapyDemo() {
   }
 
   const selectedConversation = conversations[selectedConversationIndex] || null
+
+  // ⚡ Bolt: Memoize expensive O(n*m) nested array filtering operations for symptom accuracy to prevent recalculating on every render
+  const { correctlyIdentified, missedSymptoms, incorrectlyIdentified } = useMemo(() => {
+    if (!selectedConversation) return { correctlyIdentified: [], missedSymptoms: [], incorrectlyIdentified: [] }
+    const correctlyIdentified = selectedConversation.encodedSymptoms.filter((encoded) =>
+      selectedConversation.decodedSymptoms.some(
+        (decoded) => decoded.includes(encoded.name) || encoded.name.includes(decoded)
+      )
+    )
+    const missedSymptoms = selectedConversation.encodedSymptoms.filter((encoded) =>
+      !selectedConversation.decodedSymptoms.some(
+        (decoded) => decoded.includes(encoded.name) || encoded.name.includes(decoded)
+      )
+    )
+    const incorrectlyIdentified = selectedConversation.decodedSymptoms.filter((decoded) =>
+      !selectedConversation.encodedSymptoms.some(
+        (encoded) => encoded.name.includes(decoded) || decoded.includes(encoded.name)
+      )
+    )
+    return { correctlyIdentified, missedSymptoms, incorrectlyIdentified }
+  }, [selectedConversation])
 
   return (
     <div className='mx-auto flex w-full max-w-6xl flex-col gap-6'>
@@ -552,15 +573,7 @@ export default function SyntheticTherapyDemo() {
                             Correctly Identified
                           </div>
                           <div className='mt-2 flex flex-wrap gap-2'>
-                            {selectedConversation.encodedSymptoms
-                              .filter((encoded) =>
-                                selectedConversation.decodedSymptoms.some(
-                                  (decoded) =>
-                                    decoded.includes(encoded.name) ||
-                                    encoded.name.includes(decoded),
-                                ),
-                              )
-                              .map((symptom) => (
+                            {correctlyIdentified.map((symptom) => (
                                 <Badge
                                   key={`correctly-identified-${symptom.name}`}
                                   variant='default'
@@ -574,16 +587,7 @@ export default function SyntheticTherapyDemo() {
                         <div className='space-y-2 rounded-lg border p-4'>
                           <div className='font-medium'>Missed by Therapist</div>
                           <div className='mt-2 flex flex-wrap gap-2'>
-                            {selectedConversation.encodedSymptoms
-                              .filter(
-                                (encoded) =>
-                                  !selectedConversation.decodedSymptoms.some(
-                                    (decoded) =>
-                                      decoded.includes(encoded.name) ||
-                                      encoded.name.includes(decoded),
-                                  ),
-                              )
-                              .map((symptom) => (
+                            {missedSymptoms.map((symptom) => (
                                 <Badge
                                   key={`missed-${symptom.name}`}
                                   variant='outline'
@@ -599,16 +603,7 @@ export default function SyntheticTherapyDemo() {
                             Incorrectly Identified
                           </div>
                           <div className='mt-2 flex flex-wrap gap-2'>
-                            {selectedConversation.decodedSymptoms
-                              .filter(
-                                (decoded) =>
-                                  !selectedConversation.encodedSymptoms.some(
-                                    (encoded) =>
-                                      encoded.name.includes(decoded) ||
-                                      decoded.includes(encoded.name),
-                                  ),
-                              )
-                              .map((symptom) => (
+                            {incorrectlyIdentified.map((symptom) => (
                                 <Badge
                                   key={`incorrect-${symptom}`}
                                   variant='secondary'
