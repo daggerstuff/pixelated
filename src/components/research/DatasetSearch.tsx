@@ -3,7 +3,7 @@ import { ChartBar } from 'lucide-react'
 
 import { researchAPI, type DatasetMetadata } from '@/lib/api/research'
 
-import DatasetCard from './DatasetCard'
+import DatasetResultsList from './DatasetResultsList'
 
 export default function DatasetSearch() {
   const [query, setQuery] = useState('')
@@ -11,6 +11,7 @@ export default function DatasetSearch() {
   const [results, setResults] = useState<DatasetMetadata[]>([])
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  
   // Filters
   const [minTurns, setMinTurns] = useState(1)
   const [minQuality, setMinQuality] = useState(0.0)
@@ -60,11 +61,6 @@ export default function DatasetSearch() {
       setLoading(false)
     }
   }
-
-  // ⚡ Bolt: Memoize mapped results to prevent expensive re-renders while typing in the search input
-  const memoizedResults = React.useMemo(() => results.map((dataset) => (
-    <DatasetCard key={dataset.url} dataset={dataset} />
-  )), [results])
 
   return (
     <div className='mx-auto w-full max-w-6xl p-4' role='main'>
@@ -166,7 +162,7 @@ export default function DatasetSearch() {
         {/* Results Area */}
         <div>
           {loading && (
-            <div className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+            <div className='grid animate-pulse grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3' aria-busy='true'>
               {[...Array(6)].map((_, i) => (
                 <div key={i} className='bg-slate-800 h-64 rounded-xl'></div>
               ))}
@@ -174,7 +170,7 @@ export default function DatasetSearch() {
           )}
 
           {error && (
-            <div className='bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center'>
+            <div className='bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center' role='alert'>
               {error}
             </div>
           )}
@@ -208,9 +204,7 @@ export default function DatasetSearch() {
           )}
 
           {!loading && results.length > 0 && (
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
-              {memoizedResults}
-            </div>
+            <DatasetResultsList results={results} />
           )}
         </div>
       </div>
