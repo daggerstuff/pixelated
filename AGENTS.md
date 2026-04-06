@@ -1,85 +1,59 @@
-# Agent Protocol: PR Churn Management
+# Pixelated Agent Operating Manual
 
-## Project Overview
-This project is dedicated to the systematic processing, fixing, and merging of the pull request backlog for the `daggerstuff/pixelated` repository. Our goal is 100% clearance of stale or pending contributions while maintaining strict repository hygiene and environment isolation.
+## 🎯 Scope
+- Root agent guide for Pixelated Empathy repo.
+- **Main Source of Truth**: Repository-wide rules, canonical commands, and defaults.
+- **Nested AGENTS.md**: For directory-specific constraints (e.g., `ai/AGENTS.md`).
+- **Policy Inheritance**: Root rules apply globally unless a nested guide overrides them for its subtree.
+- **Adapter Files**: `CLAUDE.md` and `GEMINI.md` are agent-specific adapters; they MUST align with this root guide.
 
-## Core Mandates
-1. **Isolation**: EVERY PR must be processed in a fresh, isolated `RUBE_REMOTE_WORKBENCH` sandbox.
-2. **Carry-Along Toolset**: Use the provided runtime script to instantly bootstrap new sandboxes.
-3. **Hygiene**: Ensure `uv.lock` (Python) and `pnpm-lock.yaml` (Node.js) are always synchronized before merging.
-4. **Safety**: Close redundant or dangerous PRs immediately with a clear explanation.
+## 🌐 Project Overview
+- Full-stack mental health AI platform.
+- Astro/React frontend; TS services/workers; Python AI pipelines.
+- **Privacy, safety, and security are mandatory requirements.**
 
-## First Steps for Agents
-1. **Queue Identification**: Run `gh pr list --repo daggerstuff/pixelated --limit 10 --json number,headRefName --jq 'sort_by(.createdAt)'` to find the oldest pending work.
-2. **Sandbox Initialization**: 
-   - Spawn a new `RUBE_REMOTE_WORKBENCH`.
-   - `write_file` the `sandbox-runtime.sh` script (see below) into the sandbox.
-   - Run `source sandbox-runtime.sh <PR_NUMBER> <HEAD_REF>`.
-3. **Verification**: Run `sync_deps` to ensure the environment is stable.
-4. **Execution**: Apply fixes, run tests, and merge via `GITHUB_MERGE_A_PULL_REQUEST`.
+## 🚀 Unified Agent Workflow (2026 Standard)
+Follow this loop for every task to ensure durability and reliability:
 
-## Carry-Along Toolset (`scripts/sandbox-runtime.sh`)
-```bash
-#!/bin/bash
-set -e
+1.  **Recall**: Start with Hindsight MCP tools (`recall` or `reflect`).
+2.  **Search (Proactive Capability Mapping)**:
+    -   Identify specialized **Skills** (`.agent/skills/`) or **MCP tools**.
+    -   Use name-based filtering and the initial `<skills>` block.
+    -   Only deep-scan `SKILL.md` documents for high-probability matches.
+    -   **Prioritize efficiency** over exhaustive scanning.
+    -   Minimize context window bloat and reduce session latency.
+3.  **Plan**: Draft in `.agent/internal/plans/` (`YYYY-MM-DD-task-name.md`).
+4.  **Act**: Small, atomic chunks. Fix root causes, not symptoms.
+5.  **Verify**: Run `kluster-verify` after *every* edit. Validate with focused tests.
+6.  **Retain**: Log actions/learnings in Hindsight (`retain`) at task end.
 
-# Pixelated Sandbox Carry-Along Toolset
-# Use: source ./sandbox-runtime.sh <pr_number> <head_ref>
+## 🏗️ Project Structure
+- `src/`: Astro app, React UI, API routes, shared TypeScript libraries, hooks, and workers.
+- `ai/`: Python inference, training, monitoring, safety, and pipeline code.
+- `tests/`: Integration, browser, performance, security, and API coverage.
+- `scripts/`, `docker/`, `config/`, `.github/workflows/`: Operational and deployment code.
+- `public/`: Static assets.
+- `docs/`: **PUBLIC** documentation only.
+- `.agent/internal/`: **PRIVATE** internal plans, research, and notes (git-ignored).
 
-PR_NUMBER=$1
-HEAD_REF=$2
-REPO_URL="https://github.com/daggerstuff/pixelated.git"
+## 🛠️ Canonical Commands
+- `pnpm dev`: Run main app locally on port `5173`.
+- `pnpm build` & `pnpm preview`: Validate production-ready output.
+- `pnpm lint` & `pnpm format`: Primary quality gates for frontend and TS.
+- `pnpm test`, `pnpm test:unit`, `pnpm e2e`: Main JS and browser tests.
+- `uv run pytest`: Primary Python test entry point.
+- `pnpm security:check` or `pnpm security:scan`: Audit for sensitive changes.
 
-echo "⚡ [Runtime] Initializing sandbox for PR #$PR_NUMBER..."
+## ⚖️ Working Rules
+- **Environment**: Use `pnpm` for Node/TS and `uv run` for Python. PROHIBITED: raw `npm`, `pip`, `conda`, `poetry`.
+- **Quality**: No stubs, placeholders, or suppressed lint/TS errors. Enterprise-grade code only.
+- **Data**: Synthetic test data ONLY. No secrets or local credentials.
+- **Boundary**: Treat `ai/` as a submodule with its own commit discipline.
+- **Safety**: DO NOT guess. Verify commands and structure if unsure.
+- **Context**: Use `context7` for provider docs and `exa` for web search.
 
-# 1. Path & Env Setup
-export PNPM_HOME="$HOME/.local/share/pnpm"
-export PATH="$HOME/.local/bin:$PNPM_HOME:$PATH"
-
-# 2. Idempotent Tool Installation
-install_tools() {
-    if ! command -v uv &> /dev/null; then
-        echo "📦 [Runtime] Installing uv..."
-        curl -LsSf https://astral.sh/uv/install.sh | sh > /dev/null 2>&1
-    fi
-
-    if ! command -v pnpm &> /dev/null; then
-        echo "📦 [Runtime] Installing pnpm..."
-        curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=10.33.0 sh - > /dev/null 2>&1
-    fi
-}
-
-# 3. Git Identity
-setup_git() {
-    git config --global user.email "bot@composio.dev"
-    git config --global user.name "Composio Bot"
-    git config --global credential.helper store
-}
-
-# 4. Repo Lifecycle
-sync_repo() {
-    if [ ! -d "repo" ]; then
-        echo "🚀 [Runtime] Cloning repository..."
-        git clone "$REPO_URL" repo > /dev/null 2>&1
-    fi
-    cd repo
-    echo "git [Runtime] Checking out $HEAD_REF..."
-    git fetch origin "$HEAD_REF" > /dev/null 2>&1
-    git checkout "$HEAD_REF" > /dev/null 2>&1
-}
-
-# 5. Dependency Management
-sync_deps() {
-    echo "🔗 [Runtime] Syncing all dependencies..."
-    uv pip compile pyproject.toml -o requirements.txt > /dev/null 2>&1
-    uv lock > /dev/null 2>&1
-    pnpm install --no-frozen-lockfile > /dev/null 2>&1
-}
-
-# Execute Setup
-install_tools
-setup_git
-sync_repo
-
-echo "✅ [Runtime] Sandbox Ready. Use 'sync_deps' to align lockfiles."
-```
+## 🔒 Verification & Memory
+- **Kluster AI**: Mandatory verification after *every* file change. Review todos and fix until resolved.
+- **Hindsight**: Always recall context at start and retain learnings at task end.
+- **Hindsight Identity**: In this project, NEVER use Hindsight with `user_id: "default"`. Use `user_id: "vivi"` unless the user explicitly provides a different identity.
+- **Validation**: Smallest relevant test surface; do not skip behavior checks.

@@ -10,11 +10,8 @@ export default defineConfig({
     setupFiles: ['./vitest.setup.ts'],
     globalSetup: './vitest.global.setup.ts',
     testTimeout: 30000,
-    poolOptions: {
-      threads: {
-        singleThread: true,
-      },
-    },
+    maxWorkers: 1,
+    isolate: false,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
