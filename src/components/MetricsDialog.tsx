@@ -6,6 +6,24 @@ interface MetricsDialogProps {
 }
 
 /**
+ * Text configuration for MetricsDialog. 
+ * Facilitates future i18n implementation and centralizes user-facing strings.
+ */
+const TEXT = {
+  title: 'Practice Progress',
+  closeAriaLabel: 'Close dialog',
+  closeButton: 'Close',
+  overview: 'Overview',
+  totalSessions: 'Total Sessions',
+  averageScore: 'Average Score',
+  skillsBreakdown: 'Skills Breakdown',
+  skillsImproving: 'Skills Improving',
+  skillsNeedingFocus: 'Skills Needing Focus',
+  noProgressYet: 'Complete more practice sessions to see progress',
+  keepPracticing: 'Keep practicing to identify areas for improvement',
+}
+
+/**
  * Dialog component to display anonymized metrics from practice sessions
  * Only shows data that has been anonymized and collected with user consent
  */
@@ -20,8 +38,10 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
     <div className='bg-black fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-opacity-50 p-4'>
       <div className='bg-white dark:bg-gray-800 relative w-full max-w-md rounded-lg p-6'>
         <button
+          type='button'
           onClick={onClose}
           className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-3 top-3'
+          aria-label={TEXT.closeAriaLabel}
         >
           <svg
             className='h-5 w-5'
@@ -38,21 +58,21 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
           </svg>
         </button>
 
-        <h3 className='mb-6 text-xl font-semibold'>Practice Progress</h3>
+        <h3 className='mb-6 text-xl font-semibold'>{TEXT.title}</h3>
 
         <div className='space-y-6'>
           <div>
-            <h4 className='text-md mb-2 font-medium'>Overview</h4>
+            <h4 className='text-md mb-2 font-medium'>{TEXT.overview}</h4>
             <div className='grid grid-cols-2 gap-4'>
               <div className='bg-gray-100 dark:bg-gray-700 rounded-lg p-3'>
                 <p className='text-gray-500 dark:text-gray-400 text-xs'>
-                  Total Sessions
+                  {TEXT.totalSessions}
                 </p>
                 <p className='text-2xl font-bold'>{metrics.sessionCount}</p>
               </div>
               <div className='bg-gray-100 dark:bg-gray-700 rounded-lg p-3'>
                 <p className='text-gray-500 dark:text-gray-400 text-xs'>
-                  Average Score
+                  {TEXT.averageScore}
                 </p>
                 <p className='text-2xl font-bold'>{metrics.averageScore}%</p>
               </div>
@@ -60,10 +80,10 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
           </div>
 
           <div>
-            <h4 className='text-md mb-2 font-medium'>Skills Breakdown</h4>
+            <h4 className='text-md mb-2 font-medium'>{TEXT.skillsBreakdown}</h4>
             <div className='space-y-2'>
               <div>
-                <p className='mb-1 text-sm font-medium'>Skills Improving</p>
+                <p className='mb-1 text-sm font-medium'>{TEXT.skillsImproving}</p>
                 {metrics.skillsImproving.length > 0 ? (
                   <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
                     {metrics.skillsImproving.map((skill) => (
@@ -72,12 +92,12 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
                   </ul>
                 ) : (
                   <p className='text-gray-500 dark:text-gray-400 text-sm italic'>
-                    Complete more practice sessions to see progress
+                    {TEXT.noProgressYet}
                   </p>
                 )}
               </div>
               <div>
-                <p className='mb-1 text-sm font-medium'>Skills Needing Focus</p>
+                <p className='mb-1 text-sm font-medium'>{TEXT.skillsNeedingFocus}</p>
                 {metrics.skillsNeeding.length > 0 ? (
                   <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
                     {metrics.skillsNeeding.map((skill) => (
@@ -86,7 +106,7 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
                   </ul>
                 ) : (
                   <p className='text-gray-500 dark:text-gray-400 text-sm italic'>
-                    Keep practicing to identify areas for improvement
+                    {TEXT.keepPracticing}
                   </p>
                 )}
               </div>
@@ -96,10 +116,11 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
 
         <div className='mt-8 flex justify-center'>
           <button
+            type='button'
             onClick={onClose}
             className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2'
           >
-            Close
+            {TEXT.closeButton}
           </button>
         </div>
       </div>
