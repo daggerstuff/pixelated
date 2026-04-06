@@ -40,7 +40,10 @@ class AnalysisOrchestrator:
 
         # Security managers
         self.security_manager = SecurityManager(
-            jwt_secret_key=getattr(config, "jwt_secret_key", None)
+            jwt_secret_key=getattr(config, "jwt_secret_key", None),
+encryption_password=getattr(config, "encryption_password", None),
+encryption_salt=getattr(config, "encryption_salt", None),
+pbkdf2_iterations=getattr(config, "pbkdf2_iterations", 100000),
         )
         self.audit_logger = AuditLogger(self.security_manager)
 
