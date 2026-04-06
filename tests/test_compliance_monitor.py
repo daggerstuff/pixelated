@@ -1,56 +1,85 @@
-import os
-import sys
 import importlib.util
+import sys
+from pathlib import Path
+from unittest.mock import patch
+import pytest
 
-# Load the module dynamically since it has a hyphen in the filename
-spec = importlib.util.spec_from_file_location(
-    "compliance_monitor",
-    os.path.join(os.path.dirname(__file__), "..", "security", "compliance-monitor.py")
-)
-compliance_monitor = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(compliance_monitor)
+@pytest.fixture(scope="session")
+def compliance_module(request):
+    """
+    Session-scoped fixture to dynamically import compliance-monitor.py.
+    """
+    file_path = Path(request.config.rootpath) / "security" / "compliance-monitor.py"
+    module_name = "_compliance_monitor_under_test_hipaa"
+    
+    if module_name in sys.modules:
+        del sys.modules[module_name]
+        
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    if spec is None or spec.loader is None:
+        pytest.fail(f"Could not load compliance-monitor.py from {file_path}")
+    
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception as e:
+        pytest.fail(f"Execution of compliance-monitor.py failed: {e}")
+        
+    return module
 
-ComplianceMonitor = compliance_monitor.ComplianceMonitor
+@pytest.fixture
+def monitor(compliance_module):
+    """Provides a fresh instance of ComplianceMonitor for each test."""
+    return compliance_module.ComplianceMonitor()
 
 class TestComplianceMonitorHIPAA:
-    def test_hipaa_compliance_all_pass(self):
-        monitor = ComplianceMonitor()
-        result = monitor.monitor_hipaa_compliance()
+    
+    @pytest.mark.parametrize("overrides, expected_score, expected_status", [
+        # All pass
+        ({
+            "check_administrative_safeguards": True,
+            "check_physical_safeguards": True,
+            "check_technical_safeguards": True,
+            "check_breach_notification": True,
+            "check_baa": True
+        }, 100.0, "compliant"),
+        # Some fail (2/5)
+        ({
+            "check_administrative_safeguards": False,
+            "check_physical_safeguards": True,
+            "check_technical_safeguards": False,
+            "check_breach_notification": True,
+            "check_baa": True
+        }, 60.0, "non_compliant"),
+        # All fail (5/5)
+        ({
+            "check_administrative_safeguards": False,
+            "check_physical_safeguards": False,
+            "check_technical_safeguards": False,
+            "check_breach_notification": False,
+            "check_baa": False
+        }, 0.0, "non_compliant")
+    ])
+    def test_hipaa_compliance_scenarios(self, monitor, overrides, expected_score, expected_status):
+        """Test HIPAA compliance aggregation with various safeguard results."""
+        
+        # Patch the check methods on the monitor instance
+        # We wrap the boolean values in lambdas because patch.multiple 
+        # expects callables or DEFAULT when patching attributes
+        with patch.multiple(monitor, 
+                           **{k: (lambda x=v: x) for k, v in overrides.items()}):
+            
+            result = monitor.monitor_hipaa_compliance()
 
-        assert result["framework"] == "HIPAA"
-        assert result["compliance_score"] == 100.0
-        assert result["status"] == "compliant"
-        assert all(result["checks"].values())
-
-    def test_hipaa_compliance_some_fail(self):
-        monitor = ComplianceMonitor()
-
-        # Override a few methods to simulate failure
-        monitor.check_administrative_safeguards = lambda: False
-        monitor.check_technical_safeguards = lambda: False
-
-        result = monitor.monitor_hipaa_compliance()
-
-        assert result["framework"] == "HIPAA"
-        assert result["compliance_score"] == 60.0
-        assert result["status"] == "non_compliant"
-        assert result["checks"]["administrative_safeguards"] is False
-        assert result["checks"]["technical_safeguards"] is False
-        assert result["checks"]["physical_safeguards"] is True
-
-    def test_hipaa_compliance_all_fail(self):
-        monitor = ComplianceMonitor()
-
-        # Override all methods to simulate failure
-        monitor.check_administrative_safeguards = lambda: False
-        monitor.check_physical_safeguards = lambda: False
-        monitor.check_technical_safeguards = lambda: False
-        monitor.check_breach_notification = lambda: False
-        monitor.check_baa = lambda: False
-
-        result = monitor.monitor_hipaa_compliance()
-
-        assert result["framework"] == "HIPAA"
-        assert result["compliance_score"] == 0.0
-        assert result["status"] == "non_compliant"
-        assert not any(result["checks"].values())
+            assert result["framework"] == "HIPAA"
+            assert result["compliance_score"] == expected_score
+            assert result["status"] == expected_status
+            
+            # Verify individual check mappings
+            for method, expected_val in overrides.items():
+                # Map method name to result key
+                key = method.replace("check_", "")
+                if key == "baa":
+                    key = "business_associate_agreements"
+                assert result["checks"][key] == expected_val
