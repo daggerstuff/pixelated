@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ request }) => {
       const token = authHeader.substring(7)
 
       try {
-        const tokenPayload = verifySecureToken(token)
+        const tokenPayload = await verifySecureToken(token)
         if (
           tokenPayload &&
           tokenPayload.purpose === 'ai-validation' &&

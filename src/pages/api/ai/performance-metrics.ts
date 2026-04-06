@@ -2,25 +2,12 @@ import type { APIContext } from 'astro'
 
 import mongodb from '../../../config/mongodb.config'
 import { getSession } from '../../../lib/auth/session'
-
-// Local Session interface - getSession returns null in this codebase
-interface Session {
-  user?: {
-    id: string
-    email?: string
-    role?: string
-    name?: string
-  }
-  session?: {
-    sessionId?: string
-  }
-  expires?: string
-}
+import type { Session } from '../../../lib/auth/session'
 
 export const GET = async ({ request }: APIContext) => {
   try {
     // Require authentication and admin role
-    const session: Session | null = await getSession()
+    const session: Session | null = await getSession(request)
     if (session?.user?.role !== 'admin') {
       return new Response(
         JSON.stringify({ error: 'Unauthorized - Admin access required' }),
@@ -87,109 +74,83 @@ export const GET = async ({ request }: APIContext) => {
       ;(query['model_type'] as string | undefined) = modelType
     }
 
-    const results = (await metricsCollection
-      .find(query)
-      .toArray()) as unknown as RawMetric[]
-
-    // Process and format the results
-    const metrics =
-      results?.map((row: RawMetric) => ({
-        date: row.timestamp,
-        model: row.model_type,
-        requestCount: Number(row.request_count),
-        latency: {
-          avg: Number(row.avg_latency),
-          max: Number(row.max_latency),
-          min: Number(row.min_latency),
+    // Optimize fetching and processing using aggregation to avoid in-memory reductions on large datasets.
+    const [aggregateResult] = await metricsCollection.aggregate([
+      { $match: query },
+      {
+        $facet: {
+          metrics: [
+            {
+              $project: {
+                _id: 0,
+                date: "$timestamp",
+                model: "$model_type",
+                requestCount: "$request_count",
+                latency: {
+                  avg: "$avg_latency",
+                  max: "$max_latency",
+                  min: "$min_latency",
+                },
+                tokens: {
+                  input: "$total_input_tokens",
+                  output: "$total_output_tokens",
+                  total: "$total_tokens",
+                },
+                successRate: { $cond: [ { $gt: ["$request_count", 0] }, { $divide: ["$success_count", "$request_count"] }, 0 ] },
+                cacheHitRate: { $cond: [ { $gt: ["$request_count", 0] }, { $divide: ["$cached_count", "$request_count"] }, 0 ] },
+                optimizationRate: { $cond: [ { $gt: ["$request_count", 0] }, { $divide: ["$optimized_count", "$request_count"] }, 0 ] },
+              },
+            },
+          ],
+          modelBreakdown: [
+            {
+              $group: {
+                _id: "$model_type",
+                requestCount: { $sum: "$request_count" },
+                totalTokens: { $sum: "$total_tokens" },
+                successCount: { $sum: "$success_count" },
+                cachedCount: { $sum: "$cached_count" },
+                optimizedCount: { $sum: "$optimized_count" },
+              },
+            },
+          ],
+          errorBreakdown: [
+            {
+              $group: {
+                _id: { $ifNull: ["$error_code", "unknown"] },
+                count: { $sum: 1 },
+              },
+            },
+          ],
         },
-        tokens: {
-          input: Number(row.total_input_tokens),
-          output: Number(row.total_output_tokens),
-          total: Number(row.total_tokens),
-        },
-        successRate: Number(row.success_count) / Number(row.request_count),
-        cacheHitRate: Number(row.cached_count) / Number(row.request_count),
-        optimizationRate:
-          Number(row.optimized_count) / Number(row.request_count),
-      })) ?? []
+      },
+    ]).toArray() as unknown as [{
+       metrics: any[],
+       modelBreakdown: { _id: string, requestCount: number, totalTokens: number, successCount: number, cachedCount: number, optimizedCount: number }[],
+       errorBreakdown: { _id: string, count: number }[]
+    }]
 
-    // Get model breakdown
-    type ModelAgg = {
-      model: string
-      requestCount: number
-      totalTokens: number
-      successCount: number
-      cachedCount: number
-      optimizedCount: number
-    }
-    const modelBreakdown = results.reduce<ModelAgg[]>((acc, row: RawMetric) => {
-      const {
-        model_type,
-        request_count,
-        success_count,
-        cached_count,
-        optimized_count,
-        total_tokens,
-      } = row
-
-      const existingModel = acc.find((item) => item.model === model_type)
-
-      if (existingModel) {
-        existingModel.requestCount += request_count
-        existingModel.totalTokens += total_tokens
-        existingModel.successCount += success_count
-        existingModel.cachedCount += cached_count
-        existingModel.optimizedCount += optimized_count
-      } else {
-        acc.push({
-          model: model_type,
-          requestCount: request_count,
-          totalTokens: total_tokens,
-          successCount: success_count,
-          cachedCount: cached_count,
-          optimizedCount: optimized_count,
-        })
-      }
-
-      return acc
-    }, [])
-
-    // Get error breakdown
-    type ErrorAgg = { errorCode: string; count: number }
-    const errorBreakdown = results.reduce<ErrorAgg[]>((acc, row: RawMetric) => {
-      const error_code = row.error_code ?? 'unknown'
-
-      const existingError = acc.find((item) => item.errorCode === error_code)
-
-      if (existingError) {
-        existingError.count += 1
-      } else {
-        acc.push({
-          errorCode: error_code,
-          count: 1,
-        })
-      }
-
-      return acc
-    }, [])
+    const { metrics = [], modelBreakdown = [], errorBreakdown = [] } = aggregateResult || {}
 
     // Return the metrics
     return new Response(
       JSON.stringify({
         metrics,
         modelBreakdown:
-          modelBreakdown?.map((row: ModelAgg) => ({
-            model: row.model,
-            requestCount: Number(row.requestCount),
-            totalTokens: Number(row.totalTokens),
-            successRate: Number(row.successCount) / Number(row.requestCount),
-            cacheHitRate: Number(row.cachedCount) / Number(row.requestCount),
-            optimizationRate:
-              Number(row.optimizedCount) / Number(row.requestCount),
-          })) ?? [],
+          modelBreakdown?.map((row) => {
+            const requestCount = Number(row.requestCount);
+            return {
+              model: row._id,
+              requestCount: requestCount,
+              totalTokens: Number(row.totalTokens),
+              successRate: requestCount > 0 ? Number(row.successCount) / requestCount : 0,
+              cacheHitRate: requestCount > 0 ? Number(row.cachedCount) / requestCount : 0,
+              optimizationRate: requestCount > 0 ? Number(row.optimizedCount) / requestCount : 0,
+            };
+          }) ?? [],
         errorBreakdown:
-          errorBreakdown?.map((row: { errorCode: string; count: number }) => ({
-            errorCode: row.errorCode,
+          errorBreakdown?.map((row) => ({
+            errorCode: row._id,
             count: Number(row.count),
           })) ?? [],
       }),

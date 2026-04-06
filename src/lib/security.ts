@@ -11,6 +11,21 @@ import { atomWithStorage } from "jotai/utils";
 import HmacSHA256 from "crypto-js/hmac-sha256";
 import Base64 from "crypto-js/enc-base64";
 
+// Re-export all event constants so existing consumers can keep importing from this module
+export {
+  AuthEvents,
+  UserEvents,
+  BulkOperationEvents,
+  SessionEvents,
+  AuditEvents,
+  SystemEvents,
+  RoleTransitionEvents,
+  UserRetentionEvents,
+  SecurityEventType,
+} from "./security-events";
+import type { SecurityEventTypeValue } from "./security-events";
+export type { SecurityEventTypeValue };
+
 import { fheService } from "./fhe";
 import type { FHEOperation, HomomorphicOperationResult } from "./fhe/types";
 import { EncryptionMode } from "./fhe/types";
@@ -46,21 +61,58 @@ interface EnhancedFHEService {
 // Cast to our enhanced interface to avoid TypeScript errors
 const enhancedFHEService = fheService as unknown as EnhancedFHEService;
 
+// Client-side key storage for browser environments
+let _clientSecretKey: string | null = null;
+
+/**
+ * Set the secret key for cryptographic operations (required in browser/edge environments)
+ */
+export function setSecretKey(key: string): void {
+  _clientSecretKey = key;
+}
+
 // Secret key for signatures
 function requireSecretKey(): string {
-  const key = typeof process !== "undefined" && process.env ? process.env["SECRET_KEY"] : undefined;
+  // Check override first, then process.env
+  const key = _clientSecretKey || (typeof process !== "undefined" && process.env ? process.env["SECRET_KEY"] : undefined);
 
   if (!key) {
     throw new Error(
-      "SECURITY_ERROR: SECRET_KEY environment variable is required for cryptographic signatures. " +
-        "This key is used to sign and verify secure tokens and messages. " +
-        "To resolve this issue: 1) Set the SECRET_KEY environment variable in your .env file or hosting environment, " +
-        "2) Ensure the key is a strong, randomly generated string of at least 32 characters, " +
-        "3) Never commit this key to version control. " +
-        "Example: SECRET_KEY=your-strong-randomly-generated-secret-key-here",
+      "SECURITY_CONFIG_ERROR: SECRET_KEY is required for cryptographic operations. " +
+        "In Node.js, set the SECRET_KEY environment variable. In browser/edge environments, " +
+        "call setSecretKey() before performing cryptographic operations."
     );
   }
   return key.trim();
+}
+
+/**
+ * RFC 4648 compatible Base64URL encoding with UTF-8 support
+ */
+function base64urlEncode(str: string): string {
+  const bytes = new TextEncoder().encode(str);
+  let binStr = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binStr += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binStr)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+/**
+ * RFC 4648 compatible Base64URL decoding with UTF-8 support
+ */
+function base64urlDecode(str: string): string {
+  let binStr = str.replace(/-/g, "+").replace(/_/g, "/");
+  while (binStr.length % 4) binStr += "=";
+  const decodedBin = atob(binStr);
+  const bytes = new Uint8Array(decodedBin.length);
+  for (let i = 0; i < decodedBin.length; i++) {
+    bytes[i] = decodedBin.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
 }
 
 /**
@@ -249,132 +301,7 @@ export function generateSecureSessionKey(): string {
   }
 }
 
-/**
- * HIPAA Security Helper Functions
- */
 
-export const AuthEvents = {
-  AUTHENTICATION_SUCCESS: "auth_success",
-  AUTHENTICATION_FAILED: "authentication_failed",
-  AUTHORIZATION_FAILED: "authorization_failed",
-  MFA_REQUIRED: "mfa_required",
-  MFA_ENROLLMENT_STARTED: "mfa_enrollment_started",
-  MFA_ENROLLMENT_COMPLETED: "mfa_enrollment_completed",
-  MFA_FACTOR_DELETED: "mfa_factor_deleted",
-  MFA_PREFERRED_FACTOR_SET: "mfa_preferred_factor_set",
-  MFA_VERIFICATION_COMPLETED: "mfa_verification_completed",
-  MFA_VERIFICATION_FAILED: "mfa_verification_failed",
-  MFA_CHALLENGE_SENT: "mfa_challenge_sent",
-  WEBAUTHN_REGISTRATION_STARTED: "webauthn_registration_started",
-  WEBAUTHN_REGISTRATION_COMPLETED: "webauthn_registration_completed",
-  WEBAUTHN_REGISTRATION_FAILED: "webauthn_registration_failed",
-  WEBAUTHN_AUTHENTICATION_STARTED: "webauthn_authentication_started",
-  WEBAUTHN_AUTHENTICATION_COMPLETED: "webauthn_authentication_completed",
-  WEBAUTHN_AUTHENTICATION_FAILED: "webauthn_authentication_failed",
-  WEBAUTHN_CREDENTIAL_RENAMED: "webauthn_credential_renamed",
-  WEBAUTHN_CREDENTIAL_DELETED: "webauthn_credential_deleted",
-  WEBAUTHN_RESPONSE_VALIDATED: "webauthn_response_validated",
-  WEBAUTHN_RESPONSE_VALIDATION_FAILED: "webauthn_response_validation_failed",
-} as const;
-
-export const UserEvents = {
-  USER_CREATED: "user_created",
-  USER_SOFT_DELETED: "user_soft_deleted",
-  USER_PURGED: "user_purged",
-  USER_RESTORED: "user_restored",
-  ROLE_ASSIGNED: "role_assigned",
-  ROLE_REMOVED: "role_removed",
-  IMPERSONATION_STARTED: "impersonation_started",
-  IMPERSONATION_ENDED: "impersonation_ended",
-  IMPERSONATION_DENIED: "impersonation_denied",
-  IMPERSONATION_EXTENDED: "impersonation_extended",
-  IMPERSONATION_ERROR: "impersonation_error",
-  ACCOUNT_LINKED: "account_linked",
-  ACCOUNT_UNLINKED: "account_unlinked",
-} as const;
-
-export const BulkOperationEvents = {
-  BULK_IMPORT_COMPLETED: "bulk_import_completed",
-  BULK_IMPORT_ERROR: "bulk_import_error",
-  BULK_EXPORT_COMPLETED: "bulk_export_completed",
-  BULK_EXPORT_ERROR: "bulk_export_error",
-  USER_BULK_IMPORT_SUCCESS: "user_bulk_import_success",
-  USER_BULK_IMPORT_ERROR: "user_bulk_import_error",
-  BULK_IMPORT_JOB_STATUS_CHECK: "bulk_import_job_status_check",
-  BULK_IMPORT_JOB_STATUS_ERROR: "bulk_import_job_status_error",
-  RECURRING_EXPORT_SCHEDULED: "recurring_export_scheduled",
-  RECURRING_EXPORT_SCHEDULE_ERROR: "recurring_export_schedule_error",
-} as const;
-
-export const SessionEvents = {
-  LOGIN: "login",
-  LOGOUT: "logout",
-  TOKEN_CREATED: "token_created",
-  TOKEN_REFRESHED: "token_refreshed",
-  TOKEN_REVOKED: "token_revoked",
-  TOKEN_VALIDATED: "token_validated",
-  TOKEN_VALIDATION_FAILED: "token_validation_failed",
-  TOKEN_CLEANED_UP: "token_cleaned_up",
-  SESSION_TERMINATED: "session_terminated",
-  SESSION_TERMINATION_ERROR: "session_termination_error",
-} as const;
-
-export const AuditEvents = {
-  ACCESS: "access",
-  ACCESS_ATTEMPT: "access_attempt",
-  API_ACCESS: "api_access",
-  DATA_ACCESS: "data_access",
-  COMPLIANCE_CHECK: "compliance_check",
-  RISK_ASSESSMENT: "risk_assessment",
-  SENSITIVE_ACTION: "sensitive_action",
-  PERMISSION_DENIED: "permission_denied",
-  RATE_LIMIT_EXCEEDED: "rate_limit_exceeded",
-  SECURITY_HEADER_VIOLATION: "security_header_violation",
-  CSRF_VIOLATION: "csrf_violation",
-  THERAPY_CHAT_REQUEST: "therapy_chat_request",
-  THERAPY_CHAT_RESPONSE: "therapy_chat_response",
-  THERAPY_CHAT_ERROR: "therapy_chat_error",
-} as const;
-
-export const SystemEvents = {
-  CONFIG_CHANGE: "config_change",
-  CONFIGURATION_CHANGED: "configuration_changed",
-  DATA_RETENTION_POLICY_UPDATED: "data_retention_policy_updated",
-  KEY_ROTATION: "key_rotation",
-  ENCRYPTED_OPERATION: "encrypted_operation",
-  ERROR: "error",
-  MESSAGE: "message",
-} as const;
-
-export const RoleTransitionEvents = {
-  ROLE_TRANSITION_AUDIT: "role_transition_audit",
-  ROLE_TRANSITION_REQUEST_FAILED: "role_transition_request_failed",
-  ROLE_TRANSITION_EXECUTION_FAILED: "role_transition_execution_failed",
-  ROLE_TRANSITION_CANCELLATION_FAILED: "role_transition_cancellation_failed",
-  ROLE_TRANSITION_APPROVAL_FAILED: "role_transition_approval_failed",
-} as const;
-
-export const UserRetentionEvents = {
-  USER_RETENTION_EXTENDED: "user_retention_extended",
-  USER_RETENTION_EXTENSION_ERROR: "user_retention_extension_error",
-  USER_PURGE_NOTIFICATION_SENT: "user_purge_notification_sent",
-  USER_PURGE_ERROR: "user_purge_error",
-  USER_SOFT_DELETE_ERROR: "user_soft_delete_error",
-  USER_RESTORE_ERROR: "user_restore_error",
-} as const;
-
-export const SecurityEventType = {
-  ...AuthEvents,
-  ...UserEvents,
-  ...BulkOperationEvents,
-  ...SessionEvents,
-  ...AuditEvents,
-  ...SystemEvents,
-  ...RoleTransitionEvents,
-  ...UserRetentionEvents,
-} as const;
-
-export type SecurityEventTypeValue = (typeof SecurityEventType)[keyof typeof SecurityEventType];
 
 /**
  * Generate audit log entry for HIPAA compliance
@@ -479,13 +406,17 @@ export function createSignature(data: string): string {
   const secret = requireSecretKey();
   try {
     const hash = HmacSHA256(data, secret);
-    return Base64.stringify(hash);
+    const b64 = Base64.stringify(hash);
+    // Convert to URL-safe Base64 by replacing + and / and stripping padding =
+    return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   } catch (error: unknown) {
     const errorDetails: Record<string, unknown> = {
       message: error instanceof Error ? String(error) : String(error),
     };
     logger.error("Signature creation error:", errorDetails);
-    return "";
+    throw new Error(
+      `CRITICAL_SECURITY_ERROR: Failed to create signature. ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 }
 
@@ -495,28 +426,87 @@ export function createSignature(data: string): string {
  * @param signature Signature to verify
  * @returns Whether signature is valid
  */
-export function verifySignature(data: string, signature: string): boolean {
-  const expectedSignature = createSignature(data);
-
-  if (expectedSignature.length !== signature.length) {
-    return false;
-  }
-
+export async function verifySignature(data: string, signature: string): Promise<boolean> {
+  // Node.js: use native constant-time comparison.
   if (typeof window === "undefined") {
+    const expectedSignature = createSignature(data);
+
+    if (expectedSignature.length !== signature.length) {
+      return false;
+    }
+
     try {
       const crypto = require("crypto");
       const a = Buffer.from(expectedSignature);
       const b = Buffer.from(signature);
       return crypto.timingSafeEqual(a, b);
-    } catch {}
+    } catch {
+      throw new Error(
+        "SECURITY_ERROR: crypto.timingSafeEqual unavailable; cannot perform constant-time comparison",
+      );
+    }
   }
 
-  let result = 0;
-  for (let i = 0; i < expectedSignature.length; i++) {
-    result |= expectedSignature.charCodeAt(i) ^ signature.charCodeAt(i);
+  // Browser: require Web Crypto subtle for constant-time HMAC verification.
+  // Note: Client-side HMAC verification with a shared secret is discouraged.
+  // For production, use server-side verification or public-key infrastructure (RS256).
+  if (typeof window !== "undefined" && window.crypto && window.crypto.subtle) {
+    let secret: string;
+    try {
+      secret = requireSecretKey();
+    } catch (err) {
+      // If we're on the client and the key is missing, return false gracefully
+      // to avoid crashing the UI, as client-side verification is often optional
+      // or handled by the server.
+      console.warn(
+        "SECURITY_CONFIG_WARNING: Secret key unavailable — signature verification failed locally. " +
+        "On the client, ensure setSecretKey() is initialized if local verification is required."
+      );
+      return false;
+    }
+
+    const encoder = new TextEncoder();
+    const key = await window.crypto.subtle.importKey(
+      "raw",
+      encoder.encode(secret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["verify"],
+    );
+
+    // Decode signature into bytes for subtle.verify.
+    let signatureBytes: Uint8Array;
+    try {
+      const b64 = signature.replace(/-/g, "+").replace(/_/g, "/");
+      const binStr = atob(b64);
+      signatureBytes = new Uint8Array(binStr.length);
+      for (let i = 0; i < binStr.length; i++) {
+        signatureBytes[i] = binStr.charCodeAt(i);
+      }
+    } catch {
+      return false;
+    }
+
+    const dataBytes = encoder.encode(data);
+    return await window.crypto.subtle.verify(
+      { name: "HMAC", hash: "SHA-256" },
+      key,
+      signatureBytes as BufferSource,
+      dataBytes as BufferSource
+    );
   }
-  return result === 0;
+
+  // Neither Node.js crypto nor browser Web Crypto (subtle) is available.
+  throw new Error(
+    "SECURITY_CONFIG_ERROR: Neither Node.js crypto nor the Web Crypto API is available " +
+    "for constant-time verification."
+  );
 }
+
+/**
+ * Current secure token version. Increment when modifying token structure.
+ */
+const TOKEN_VERSION = "v1";
 
 /**
  * Create a secure token with encrypted payload
@@ -533,11 +523,10 @@ export function createSecureToken(payload: Record<string, unknown>, expiresIn = 
   };
 
   const dataString = JSON.stringify(tokenData);
-  // Use btoa instead of Buffer
-  const encodedData = btoa(dataString);
+  const encodedData = base64urlEncode(dataString);
   const signature = createSignature(encodedData);
 
-  return `${encodedData}.${signature}`;
+  return `${TOKEN_VERSION}.${encodedData}.${signature}`;
 }
 
 /**
@@ -545,11 +534,25 @@ export function createSecureToken(payload: Record<string, unknown>, expiresIn = 
  * @param token Token to verify
  * @returns Decoded payload or null if invalid
  */
-export function verifySecureToken(token: string): Record<string, unknown> | null {
+export async function verifySecureToken(token: string): Promise<Record<string, unknown> | null> {
   try {
-    const [encodedData, signature] = token.split(".");
+    const parts = token.split(".");
+    let encodedData: string;
+    let signature: string;
 
-    if (!encodedData || !signature) {
+    if (parts.length === 3) {
+      // v1.{payload}.{signature}
+      const [version, data, sig] = parts;
+      if (version !== "v1") {
+        logger.error(`Unsupported token version: ${version}`);
+        return null;
+      }
+      encodedData = data;
+      signature = sig;
+    } else if (parts.length === 2) {
+      // Legacy format: {payload}.{signature}
+      [encodedData, signature] = parts;
+    } else {
       logger.error("Invalid token format");
       return null;
     }
@@ -563,13 +566,13 @@ export function verifySecureToken(token: string): Record<string, unknown> | null
     }
 
     // Verify signature
-    if (!verifySignature(encodedData, signature)) {
+    if (!(await verifySignature(encodedData, signature))) {
       logger.error("Invalid token signature");
       return null;
     }
 
-    // Decode payload using atob instead of Buffer
-    const dataString = atob(encodedData);
+    // Decode payload
+    const dataString = base64urlDecode(encodedData);
     const payload = JSON.parse(dataString);
 
     if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {

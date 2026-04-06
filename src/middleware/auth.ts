@@ -1,51 +1,65 @@
-import { NextResponse } from 'next/server'
+/**
+ * Authentication middleware for protecting routes.
+ * Uses Auth0 JWT validation via the shared auth0-jwt-service.
+ */
 
-import { getSessionFromToken, isSessionValid } from '@/lib/auth/session'
+import { getSession, isSessionValid } from '@/lib/auth/session'
+import type { Session } from '@/lib/auth/session'
 
 /**
- * Middleware to protect routes requiring authentication
- * Use on API routes or pages that require login
+ * Extended handler type that receives the validated Session alongside the
+ * Request so inner handlers do not need a redundant token round-trip.
  */
-export async function withAuth(
-  handler: (request: Request) => Promise<NextResponse>,
+export type AuthenticatedHandler = (
+  request: Request,
+  session: Session,
+) => Promise<Response>
+
+/**
+ * Wrap an Astro / fetch-API handler with authentication enforcement.
+ *
+ * The resolved Session is passed as a second argument to the inner handler
+ * so callers never need to call getSession() again.
+ *
+ * Usage in Astro API routes:
+ *   export const GET = withAuth(async (request, session) => { ... })
+ *
+ * @param handler  The inner handler to call when auth passes
+ * @param options  Optional configuration
+ * @returns        A standard (Request) => Promise<Response> handler
+ */
+export function withAuth(
+  handler: AuthenticatedHandler,
   options?: {
-    allowAnonymous?: boolean[] // Optional list of routes that don't require auth
+    /** Pathname prefixes that bypass auth (e.g. '/api/health') */
+    allowPaths?: string[]
   },
-) {
-  // Check if this route should allow anonymous access
-  if (options?.allowAnonymous?.includes(request.nextUrl.pathname)) {
-    return await handler(request)
+): (request: Request) => Promise<Response> {
+  return async (request: Request): Promise<Response> => {
+    // Allow unauthenticated access to explicitly whitelisted paths
+    if (options?.allowPaths?.length) {
+      const url = new URL(request.url)
+      if (options.allowPaths.some((p) => url.pathname.startsWith(p))) {
+        // Unauthenticated passthrough — create a minimal guest session
+        const guestSession: Session = {
+          user: { id: 'guest', role: 'guest' },
+          // Future expiration ensures validity throughout the request lifecycle
+          expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        }
+        return handler(request, guestSession)
+      }
+    }
+
+    const session = await getSession(request)
+
+    if (!session || !isSessionValid(session)) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+
+    // Pass validated session to the handler — no second token round-trip needed
+    return handler(request, session)
   }
-
-  // Get authentication token from cookies or headers
-  const authHeader = request.headers.get('Authorization') || ''
-  const token = authHeader.replace(/^Bearer\s+/i, '')
-
-  // Try to get session from token
-  const session = await getSessionFromToken({
-    accessToken: token,
-    sub: '', // Not used here
-    iat: 0,
-    exp: 0,
-    role: '', // Not used here
-  })
-
-  // Check if session is valid
-  if (!session || !isSessionValid(session)) {
-    return new NextResponse(
-      JSON.stringify({ error: 'Authentication required' }),
-      { status: 401, headers: { 'Content-Type': 'application/json' } },
-    )
-  }
-
-  // Session is valid, proceed with request
-  return await handler(request)
 }
-
-// Example usage:
-// export default withAuth(myApiHandler, { allowAnonymous: ['/api/public'] })
-// export const GET = withAuth(myHandler)
-// export const POST = withAuth(myHandler)
-
-// Optional: Add direct export for common use cases
-export { withAuth }

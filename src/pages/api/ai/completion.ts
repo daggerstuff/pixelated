@@ -4,28 +4,13 @@ import { handleApiError } from '@/lib/ai/error-handling'
 import { createTogetherAIService } from '@/lib/ai/services/together'
 import { applyRateLimit } from '@/lib/api/rate-limit'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
-// import type { AIMessage } from '@/lib/ai/models/types'
-import { getSession } from '@/lib/auth/session'
+import type { AIMessage } from '@/lib/ai/models/ai-types'
+import { getSession, isSessionValid } from '@/lib/auth/session'
+import type { Session } from '@/lib/auth/session'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { validateRequestBody } from '@/lib/validation/index'
 import { CompletionRequestSchema } from '@/lib/validation/schemas'
 
-// Define AIMessage interface locally
-interface AIMessage {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-}
-
-// Define Session interface locally (not exported from session module)
-interface Session {
-  user?: {
-    id: string
-    email?: string
-    role?: string
-    name?: string
-  }
-  expires?: string
-}
 
 // Initialize logger
 const logger = createBuildSafeLogger('ai-completion')
@@ -40,9 +25,9 @@ const logger = createBuildSafeLogger('ai-completion')
 // GET handler - returns information about the completion endpoint
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
-    // Verify session for security
-    const session = await getSession()
-    if (!session?.user) {
+    // Verify session is authenticated and not expiring imminently
+    const session = await getSession(request)
+    if (!session?.user || !isSessionValid(session)) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: {
@@ -100,7 +85,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     logger.info('Processing AI completion request')
     // Verify session
-    session = await getSession()
+    session = await getSession(request)
     if (!session?.user) {
       logger.warn('Unauthorized access attempt to AI completion endpoint')
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
