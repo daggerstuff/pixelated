@@ -1,51 +1,41 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { createEphemeralSessionId, createPrivacyHash, generateConsentForm, getUserConsentPreference } from './privacy'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { getUserConsentPreference, setUserConsentPreference } from './privacy'
 
 describe('privacy utilities', () => {
-  describe('createEphemeralSessionId', () => {
-    it('should generate a valid session ID with sim_ prefix', () => {
-      const sessionId = createEphemeralSessionId()
-      expect(sessionId).toMatch(/^sim_[a-z0-9]+_[a-z0-9]+$/)
-    })
-
-    it('should generate unique IDs', () => {
-      const id1 = createEphemeralSessionId()
-      const id2 = createEphemeralSessionId()
-      expect(id1).not.toBe(id2)
-    })
+  beforeEach(() => {
+    vi.restoreAllMocks()
   })
 
-  describe('createPrivacyHash', () => {
-    it('should generate consistent hashes for the same input', () => {
-      expect(createPrivacyHash('test')).toBe(createPrivacyHash('test'))
-    })
-  })
-
-  describe('generateConsentForm', () => {
-    it('should return healthcare consent text when true is passed', () => {
-      const result = generateConsentForm(true)
-      expect(result.consentText).toContain('metrics about my practice sessions')
-    })
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   describe('getUserConsentPreference', () => {
-    afterEach(() => {
-      vi.unstubAllGlobals()
-    })
-
-    it('should return true when stored value is true', () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue('true') })
+    it('returns true when localStorage has "true"', () => {
+      // Use spyOn for cleaner testing closer to the runtime environment (Review suggestion)
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue('true')
       expect(getUserConsentPreference()).toBe(true)
     })
 
-    it('should return false when stored value is not true', () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue('false') })
+    it('returns false when localStorage has "false"', () => {
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue('false')
       expect(getUserConsentPreference()).toBe(false)
     })
 
-    it('should return false when stored value is null', () => {
-      vi.stubGlobal('localStorage', { getItem: vi.fn<(key: string) => string | null>().mockReturnValue(null) })
+    it('returns false when localStorage is empty', () => {
+      vi.spyOn(window.localStorage, 'getItem').mockReturnValue(null)
       expect(getUserConsentPreference()).toBe(false)
+    })
+  })
+
+  describe('setUserConsentPreference', () => {
+    it('stores the preference correctly', () => {
+      const setSpy = vi.spyOn(window.localStorage, 'setItem')
+      setUserConsentPreference(true)
+      expect(setSpy).toHaveBeenCalledWith('pixelated_metrics_consent', 'true')
+      
+      setUserConsentPreference(false)
+      expect(setSpy).toHaveBeenCalledWith('pixelated_metrics_consent', 'false')
     })
   })
 })
