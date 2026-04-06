@@ -1,26 +1,29 @@
 """
 Model service for TensorFlow and PyTorch integration
 """
+from __future__ import annotations
 
 import hashlib
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import structlog
 import torch
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, BertModel, TFBertForSequenceClassification
+
+if TYPE_CHECKING:
+    import tensorflow as tf
 
 # Optional TensorFlow import
 try:
-    import tensorflow as tf
-
+    import tensorflow as tf  # type: ignore[assignment]
     TENSORFLOW_AVAILABLE = True
 except ImportError:
     TENSORFLOW_AVAILABLE = False
-    tf = None
+    tf = None  # type: ignore[assignment]
 
 from bias_detection.config import settings
 from bias_detection.models import BiasType, ConfidenceLevel
@@ -84,7 +87,8 @@ class TensorFlowModelService(ModelService):
                 logger.warning(f"Model path {self.model_path} does not exist")
                 await self._download_pretrained_model()
 
-            # Load model
+            # Load model — tf is guaranteed non-None here (constructor raises if TF unavailable)
+            assert tf is not None, "TensorFlow must be available"
             self.model = tf.keras.models.load_model(str(self.model_path))
 
             # Load tokenizer
@@ -134,11 +138,8 @@ class TensorFlowModelService(ModelService):
 
         logger.info("Pretrained model downloaded and saved")
 
-    def _create_basic_model(self) -> tf.keras.Model:
+    def _create_basic_model(self) -> Any:
         """Create a basic bias detection model"""
-        # Simple BERT-based model for bias detection
-        from transformers import TFBertForSequenceClassification
-
         return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
         )
@@ -197,7 +198,7 @@ class TensorFlowModelService(ModelService):
             if isinstance(encoded, dict) and "input_ids" in encoded:
                 # BERT-style input
                 predictions = self.model(encoded)
-                probabilities = tf.nn.softmax(predictions.logits, axis=-1)
+                probabilities = tf.nn.softmax(predictions.logits, axis=-1)  # type: ignore[union-attr]
             else:
                 # Custom model input
                 input_ids = np.array([encoded["input_ids"]])
@@ -230,7 +231,7 @@ class TensorFlowModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: tf.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
@@ -299,7 +300,7 @@ class TensorFlowModelService(ModelService):
         return {
             "name": self.model_name,
             "framework": "tensorflow",
-            "version": tf.__version__,
+            "version": tf.__version__ if tf is not None else "unavailable",
             "loaded": self.is_loaded,
             "load_time_ms": int(self.load_time * 1000),
             "model_path": str(self.model_path),
@@ -386,8 +387,7 @@ class PyTorchModelService(ModelService):
 
     def _create_basic_model(self) -> torch.nn.Module:
         """Create a basic bias detection model"""
-        # Simple BERT-based model for bias detection
-        from transformers import BertModel
+        # Simple BERT-based model for bias detection using top-level BertModel
 
         class BiasDetectionModel(torch.nn.Module):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
@@ -557,7 +557,7 @@ class ModelEnsembleService:
 
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
-            from .nvidia_api_service import NvidiaAPIService
+            from .nvidia_api_service import NvidiaAPIService  # noqa: PLC0415
             self.nvidia_service = NvidiaAPIService()
             # Note: We don't add this to services list automatically as it's a different type of service
         except Exception as e:
@@ -620,7 +620,7 @@ class ModelEnsembleService:
             # Use highest confidence level
             confidence_levels = [r["confidence_level"] for r in results_list]
             highest_confidence = max(
-                confidence_levels, key=lambda x: self._confidence_level_value(x)
+                confidence_levels, key=self._confidence_level_value
             )
 
             # Combine evidence

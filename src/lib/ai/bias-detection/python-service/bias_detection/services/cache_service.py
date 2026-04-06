@@ -2,19 +2,20 @@
 Cache service for Redis configuration and management
 """
 
+import asyncio
 import json
 import time
 from typing import Any
 
 import redis.asyncio as redis
 import structlog
-from redis.asyncio.exceptions import (
+from redis.asyncio import (
     ConnectionError as RedisConnectionError,
     RedisError,
     TimeoutError as RedisTimeoutError,
 )
 
-from ..config import settings
+from bias_detection.config import settings
 
 logger = structlog.get_logger(__name__)
 
@@ -46,8 +47,12 @@ class CacheService:
                 max_connections=50,
             )
 
-            # Test connection
-            await self.redis_client.ping()
+            # Test connection.
+            # redis.asyncio.ping() is a coroutine at runtime; stubs mark it as
+            # bool in some redis-py versions, causing a static analysis false-positive.
+            ping_coro = self.redis_client.ping()
+            if asyncio.iscoroutine(ping_coro):
+                await ping_coro
             self.is_connected = True
 
             logger.info("Redis connection established successfully")
