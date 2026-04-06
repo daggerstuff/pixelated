@@ -6,8 +6,7 @@ import {
   Zap,
   Sparkles,
 } from 'lucide-react'
-import { useState, useEffect, useMemo, useCallback, useRef, memo, FC } from 'react'
-import { toast } from 'sonner'
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
 import {
   MentalHealthInsights,
@@ -21,6 +20,11 @@ import { Input } from '@/components/ui/input'
 import MindMirrorDashboard, {
   type MindMirrorAnalysis,
 } from '@/components/ui/MindMirrorDashboard'
+// import {
+//   MentalHealthInsights,
+//   MentalHealthHistoryChart,
+//   type EnhancedMentalHealthAnalysis as ComponentEnhancedMentalHealthAnalysis,
+// } from '@/components/MentalHealthInsights'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
@@ -72,7 +76,7 @@ interface ChatMessage {
   isProcessing?: boolean
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   needsIntervention?: boolean
-  apiResponse?: unknown
+  apiResponse?: unknown // Add type if available
   metadata?: {
     responseType?: string
     confidence?: number
@@ -92,6 +96,7 @@ const mapCategoryToSeverity = (
 
   const lowerCategory = category.toLowerCase()
 
+  // Map specific mental health categories to severity levels
   switch (lowerCategory) {
     case 'depression':
     case 'severe_depression':
@@ -123,8 +128,10 @@ const enhanceAnalysis = (
     return undefined
   }
 
+  // Type assertion to extended interface for additional properties
   const extendedAnalysis = analysis as ExtendedMentalHealthAnalysisResult
 
+  // Convert the MentalLLaMA result to the enhanced analysis format
   return {
     timestamp: Date.now(),
     category: mapCategoryToSeverity(analysis.mentalHealthCategory),
@@ -174,6 +181,7 @@ const enhanceAnalysis = (
     },
 
     summary: analysis.explanation || 'Mental health analysis completed',
+    // expertGuidance doesn't exist on MentalHealthAnalysisResult, so we omit expertExplanation
     hasMentalHealthIssue: analysis.hasMentalHealthIssue || false,
     confidence: analysis.confidence || 0,
     supportingEvidence: analysis.supportingEvidence || [],
@@ -192,6 +200,10 @@ const enhanceAnalysisArray = (
   return analyses.map((analysis) => enhanceAnalysis(analysis)!).filter(Boolean)
 }
 
+/**
+ * Production-grade Mental Health Chat Demo Component
+ * Showcases real MentalLLaMA integration with clinical-grade analysis
+ */
 function generateSecureRandomString(length: number): string {
   const array = new Uint8Array(length)
   crypto.getRandomValues(array)
@@ -204,11 +216,11 @@ interface MentalHealthChatDemoProps {
   initialTab?: string
 }
 
-export const MentalHealthChatDemo: FC<MentalHealthChatDemoProps> = memo(function MentalHealthChatDemo({
+export const MentalHealthChatDemo = memo(function MentalHealthChatDemo({
   showAnalysisPanel = true,
   showSettingsPanel = true,
   initialTab = 'analysis',
-}) {
+}: MentalHealthChatDemoProps = {}) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome_msg',
@@ -246,15 +258,17 @@ How are you feeling today? I'm here to listen and help.`,
   // Convert existing analysis to Mind-Mirror format
   const convertToMindMirrorAnalysis = useCallback(
     (analysis: EnhancedMentalHealthAnalysis): MindMirrorAnalysis => {
+      // Map severity levels to archetypes
       const severityToArchetype = {
         low: 'wise_elder',
         medium: 'caregiver',
         high: 'wounded_healer',
         critical: 'wounded_healer',
-      } as const
+      }
 
       const archetype = severityToArchetype[analysis.category] || 'visionary'
 
+      // Determine energy and social connection based on explanation content
       const explanationLower = (analysis.explanation || '').toLowerCase()
       const isStressRelated =
         explanationLower.includes('stress') ||
@@ -335,6 +349,7 @@ How are you feeling today? I'm here to listen and help.`,
       try {
         logger.info('Initializing production MentalLLaMA service...')
 
+        // Initialize the production-grade MentalLLaMA components
         const { adapter } = await createMentalLLaMAFromEnvSafe()
         const clinicalKnowledge = new ClinicalKnowledgeBase()
 
@@ -348,6 +363,7 @@ How are you feeling today? I'm here to listen and help.`,
       } catch (error: unknown) {
         logger.error('Failed to initialize MentalLLaMA service', { error })
 
+        // Fallback to demonstration mode with limited functionality
         setMentalHealthService({
           adapter: null,
           clinicalKnowledge: new ClinicalKnowledgeBase(),
@@ -359,18 +375,19 @@ How are you feeling today? I'm here to listen and help.`,
     void initializeService()
   }, [])
 
+  // Get analysis history for visualization
+  const getAnalysisHistory = useCallback((): MentalHealthAnalysisResult[] => {
+    return messages
+      .filter((m) => m.mentalHealthAnalysis)
+      .map((m) => m.mentalHealthAnalysis!)
+  }, [messages])
+
   // ⚡ Bolt: Memoize filtered analyzed user messages to prevent O(N) re-filtering on every render
   const analyzedUserMessages = useMemo(() => {
     return messages.filter(
       (m) => m.role === 'user' && m.mentalHealthAnalysis && !m.isProcessing,
     )
   }, [messages])
-
-  // Get analysis history for visualization
-  // ⚡ Bolt: derived from memoized analyzedUserMessages to avoid redundant work (Review suggestion)
-  const getAnalysisHistory = useCallback((): MentalHealthAnalysisResult[] => {
-    return analyzedUserMessages.map((m) => m.mentalHealthAnalysis!)
-  }, [analyzedUserMessages])
 
   // Enhanced analysis for component compatibility
   const enhancedAnalysisHistory = useMemo(() => {
@@ -409,12 +426,14 @@ How are you feeling today? I'm here to listen and help.`,
       setMessages((prev) => [...prev, userMessage])
       setInput('')
 
+      // Perform production-grade analysis using our new backend API
       if (settings.enableAnalysis) {
         logger.info(
           'Performing production-grade mental health analysis via API...',
         )
 
         try {
+          // Call our new mental health chat API
           const response = await fetch('/api/mental-health/chat', {
             method: 'POST',
             headers: {
@@ -453,9 +472,10 @@ How are you feeling today? I'm here to listen and help.`,
 
           const chatResult = await response.json()
 
+          // Convert API response to our analysis format
           const analysisResult: MentalHealthAnalysisResult = {
             mentalHealthCategory: chatResult.analysis.emotionalState,
-            confidence: chatResult.analysis.concernSeverity / 10,
+            confidence: chatResult.analysis.concernSeverity / 10, // Convert 1-10 to 0-1
             supportingEvidence: chatResult.analysis.keyTopics,
             isCrisis:
               chatResult.riskAssessment?.crisisLevel === 'imminent' ||
@@ -465,6 +485,7 @@ How are you feeling today? I'm here to listen and help.`,
             timestamp: new Date().toISOString(),
           }
 
+          // Update message with analysis results
           setMessages((prev) =>
             prev.map((m) =>
               m.id === userMessage.id
@@ -483,12 +504,13 @@ How are you feeling today? I'm here to listen and help.`,
                             : 'low',
                     needsIntervention:
                       chatResult.riskAssessment?.immediateAction || false,
-                    apiResponse: chatResult,
+                    apiResponse: chatResult, // Store full API response for detailed analysis
                   }
                 : m,
             ),
           )
 
+          // Convert to Mind-Mirror format if enabled
           if (settings.enableMindMirrorUI) {
             const enhancedAnalysis: EnhancedMentalHealthAnalysis = {
               timestamp: Date.now(),
@@ -522,6 +544,7 @@ How are you feeling today? I'm here to listen and help.`,
             setCurrentMindMirrorAnalysis(mindMirrorAnalysis)
           }
 
+          // Update session statistics
           setSessionStats((prev) => ({
             ...prev,
             totalMessages: prev.totalMessages + 1,
@@ -543,12 +566,14 @@ How are you feeling today? I'm here to listen and help.`,
               : prev.interventionsTriggered,
           }))
 
+          // Add assistant response using the API response
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
               role: 'assistant',
               content: chatResult.response.message,
               timestamp: new Date().toISOString(),
+              // Include API metadata for enhanced display
               metadata: {
                 responseType: chatResult.response.type,
                 confidence: chatResult.response.confidence,
@@ -563,12 +588,14 @@ How are you feeling today? I'm here to listen and help.`,
         } catch (error: unknown) {
           logger.error('Failed to call mental health chat API', { error })
 
+          // Fallback to demo mode on API failure
           setMessages((prev) =>
             prev.map((m) =>
               m.id === userMessage.id ? { ...m, isProcessing: false } : m,
             ),
           )
 
+          // Generate a basic response for demo purposes
           const timeoutId = window.setTimeout(() => {
             const assistantMessage: ChatMessage = {
               id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
@@ -582,12 +609,14 @@ How are you feeling today? I'm here to listen and help.`,
           timeoutRefs.current.push(timeoutId)
         }
       } else {
+        // Analysis disabled - simple response
         setMessages((prev) =>
           prev.map((m) =>
             m.id === userMessage.id ? { ...m, isProcessing: false } : m,
           ),
         )
 
+        // Generate a basic response
         const timeoutId = window.setTimeout(() => {
           const assistantMessage: ChatMessage = {
             id: `assistant_${Date.now()}_${generateSecureRandomString(9)}`,
@@ -602,6 +631,7 @@ How are you feeling today? I'm here to listen and help.`,
     } catch (error: unknown) {
       logger.error('Error processing message', { error })
 
+      // Remove processing state on error
       if (userMessageId) {
         setMessages((prev) =>
           prev.map((m) =>
@@ -614,6 +644,7 @@ How are you feeling today? I'm here to listen and help.`,
     }
   }
 
+  // Generate therapeutic response based on analysis
   const generateTherapeuticResponse = async (
     analysis: MentalHealthAnalysisResult,
   ): Promise<string> => {
@@ -622,12 +653,14 @@ How are you feeling today? I'm here to listen and help.`,
     }
 
     try {
+      // Get intervention suggestions
       const interventions =
         mentalHealthService.clinicalKnowledge.getInterventionSuggestions(
           analysis.mentalHealthCategory,
           analysis,
         )
 
+      // Handle crisis situations with immediate priority
       if (analysis.isCrisis) {
         return `I'm concerned about what you've shared. Your safety is the most important thing right now.
 
@@ -641,6 +674,7 @@ ${analysis.explanation}
 I'm here to support you through this. Would you like to talk about what's been making you feel this way?`
       }
 
+      // Generate contextual response based on analysis
       const urgentInterventions = interventions.filter(
         (i) => i.urgency === 'urgent' || i.urgency === 'immediate',
       )
@@ -655,6 +689,7 @@ ${urgentInterventions[0].rationale}
 How does this resonate with you? What feels most challenging right now?`
       }
 
+      // Standard supportive response
       return `I hear you, and I appreciate you sharing this with me. ${analysis.explanation}
 
 It sounds like you're dealing with some challenges. What's been the most difficult part of this experience for you?`
@@ -664,6 +699,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
     }
   }
 
+  // Demo response generator for fallback
   const getDemoResponse = (userMessage: string): string => {
     const lowerMessage = userMessage.toLowerCase()
 
@@ -694,10 +730,12 @@ It sounds like you're dealing with some challenges. What's been the most difficu
     return "Thank you for sharing that with me. I'm here to listen and support you. Can you tell me more about what's been on your mind?"
   }
 
+  // Toggle settings with production-grade configuration
   const handleToggleSetting = (setting: keyof typeof settings) => {
     setSettings((prev) => {
       const newSettings = { ...prev, [setting]: !prev[setting] }
 
+      // Log configuration changes for audit trail
       logger.info('Mental health chat settings updated', {
         setting,
         newValue: newSettings[setting],
@@ -709,6 +747,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
     })
   }
 
+  // Request therapeutic intervention
   const handleRequestIntervention = async (
     messageWithAnalysis: ChatMessage,
   ) => {
@@ -742,6 +781,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
       setMessages((prev) => [...prev, assistantMessage])
 
+      // Update intervention statistics
       setSessionStats((prev) => ({
         ...prev,
         interventionsTriggered: prev.interventionsTriggered + 1,
@@ -755,6 +795,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
   return (
     <div className='mx-auto flex w-full max-w-7xl flex-col gap-4 md:flex-row'>
+      {/* Main Chat Interface */}
       <div
         className={`flex-1 ${settings.showAnalysisPanel ? 'md:max-w-[65%]' : 'w-full'}`}
       >
@@ -801,6 +842,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
           </div>
 
           <CardContent className='flex flex-1 flex-col p-0'>
+            {/* Messages Area */}
             <div className='flex-1 space-y-4 overflow-y-auto p-4'>
               {messages.map((message) => (
                 <div
@@ -808,6 +850,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className='max-w-[85%] space-y-2'>
+                    {/* Message Bubble */}
                     <div
                       className={`rounded-2xl px-4 py-3 ${
                         message.role === 'user'
@@ -826,6 +869,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                       )}
                     </div>
 
+                    {/* Analysis Results */}
                     {message.mentalHealthAnalysis && !message.isProcessing && (
                       <div className='bg-blue-50 border-blue-200 rounded-lg border p-3 text-sm'>
                         <div className='mb-2 flex items-center justify-between'>
@@ -914,6 +958,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Input Area */}
             <div className='bg-gray-50 border-t p-4'>
               <div className='flex gap-3'>
                 <Input
@@ -946,6 +991,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 </Button>
               </div>
 
+              {/* Privacy Notice */}
               <div className='text-gray-500 mt-2 flex items-center gap-1 text-xs'>
                 <Shield className='h-3 w-3' />
                 {mentalHealthService?.isInitialized ? (
@@ -965,8 +1011,10 @@ It sounds like you're dealing with some challenges. What's been the most difficu
         </Card>
       </div>
 
+      {/* Enhanced Analysis Panel */}
       {settings.showAnalysisPanel && (
         <div className='space-y-4 md:w-[35%]'>
+          {/* Mind-Mirror Brain Visualization */}
           {settings.enableMindMirrorUI && settings.showBrainVisualization && (
             <BrainVisualization
               moodVector={currentMindMirrorAnalysis?.mood_vector}
@@ -974,6 +1022,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             />
           )}
 
+          {/* Mind-Mirror Dashboard */}
           {settings.enableMindMirrorUI && (
             <MindMirrorDashboard
               analysis={currentMindMirrorAnalysis || undefined}
@@ -1010,6 +1059,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
               )}
             </TabsList>
 
+            {/* Mind-Mirror Tab Content */}
             {settings.enableMindMirrorUI && (
               <TabsContent value='mindmirror' className='mt-4 space-y-4'>
                 <div className='from-purple-50 to-blue-50 rounded-lg border-0 bg-gradient-to-r p-4 shadow-md'>
@@ -1075,6 +1125,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             )}
 
             <TabsContent value='insights' className='mt-4 space-y-4'>
+              {/* Real-time Insights */}
               <div className='from-blue-50 to-purple-50 rounded-lg border bg-gradient-to-r p-4'>
                 <h3 className='mb-2 flex items-center gap-2 text-sm font-semibold'>
                   <Brain className='text-blue-600 h-4 w-4' />
@@ -1122,6 +1173,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             </TabsContent>
 
             <TabsContent value='history' className='mt-4'>
+              {/* Analysis History */}
               <div className='mb-4'>
                 <h3 className='mb-2 text-sm font-semibold'>Analysis Trends</h3>
                 <div className='mb-4 grid grid-cols-2 gap-2'>
@@ -1140,6 +1192,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
                 </div>
               </div>
 
+              {/* If available, use the imported MentalHealthInsights with array feature for history; otherwise leave as future improvement */}
               <div className='mt-4'>
                 {enhancedAnalysisHistory.map((insight, idx) => (
                   <MentalHealthInsights
@@ -1167,6 +1220,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
             </TabsContent>
 
             <TabsContent value='stats' className='mt-4'>
+              {/* Session Statistics */}
               <Card>
                 <CardContent className='p-4'>
                   <h3 className='mb-4 flex items-center gap-2 text-sm font-semibold'>
@@ -1255,6 +1309,7 @@ It sounds like you're dealing with some challenges. What's been the most difficu
 
             {showSettingsPanel && (
               <TabsContent value='settings' className='mt-4'>
+                {/* Production Settings */}
                 <Card>
                   <CardContent className='space-y-4 p-4'>
                     <h3 className='mb-4 text-sm font-semibold'>

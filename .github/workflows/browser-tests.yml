@@ -12,12 +12,12 @@ on:
   workflow_dispatch:
 
 env:
-  GHA_LOCAL_RUN: 'false'
+  GHA_LOCAL_RUN: "false"
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.0
   PNPM_VERSION: 10.33.0
   NODE_ENV: test
-  DISABLE_AUTH: 'true'
+  DISABLE_AUTH: "true"
 
 jobs:
   browser-tests:
@@ -64,21 +64,7 @@ jobs:
         shell: bash
 
       - name: Wait for server
-        run: |
-          echo "Waiting for preview server to be ready..."
-          MAX_RETRIES=30
-          RETRY_COUNT=0
-          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            if curl -sSf http://localhost:4323 > /dev/null 2>&1; then
-              echo "Server is ready!"
-              exit 0
-            fi
-            RETRY_COUNT=$((RETRY_COUNT + 1))
-            echo "Attempt $RETRY_COUNT/$MAX_RETRIES - server not ready yet..."
-            sleep 1
-          done
-          echo "Server failed to become ready after ${MAX_RETRIES} seconds"
-          exit 1
+        run: sleep 15
 
       - name: Run browser tests
         run: |
@@ -121,7 +107,7 @@ jobs:
         uses: actions/download-artifact@v8.0.1
         with:
           path: all-test-results
-          pattern: '*-test-results-*'
+          pattern: "*-test-results-*"
           merge-multiple: true
 
       - name: Generate comprehensive HTML report
