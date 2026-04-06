@@ -10,7 +10,10 @@ const { style, class: className } = Astro.props
 <div
   {style}
   class={`flex items-center justify-center gap-3 h-full w-full ${className}`}
+  role="status"
+  aria-label="Loading"
 >
+  <span class="sr-only">Loading...</span>
   <div
     class="w-4 h-4 rounded-full bg-[#88888850] animate-[dot-pulse_1.5s_ease-in-out_both_infinite]"
   >
