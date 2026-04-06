@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Dialog, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Textarea } from '@/components/ui/textarea'
@@ -10,6 +10,7 @@ import type { TherapySession } from '@/lib/ai/interfaces/therapy'
 import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'
 import type { TherapeuticGoal } from '@/lib/ai/types/TherapeuticGoals'
+
 interface TherapeuticGoalsTrackerProps {
   patientModel: CognitiveModel
   currentSession: TherapySession
@@ -254,7 +255,7 @@ export function TherapeuticGoalsTracker({
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (editGoal) {
-      await updateGoal({ ...editGoal, ...form })
+      await updateGoal({ ...editGoal, ...form } as TherapeuticGoal)
     } else {
       await createGoal(
         form as Omit<TherapeuticGoal, 'id' | 'createdAt' | 'updatedAt'>,
@@ -376,74 +377,80 @@ export function TherapeuticGoalsTracker({
             if (!open) closeModal()
           }}
         >
-          <form onSubmit={handleFormSubmit} className='space-y-4'>
-            <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
-            <Input
-              name='title'
-              value={form.title || ''}
-              onChange={handleFormChange}
-              placeholder='Goal Title'
-              required
-              maxLength={128}
-            />
+          <DialogContent>
+            {/* Review suggestion: Move DialogTitle outside the form for better semantics */}
+            <DialogHeader>
+              <DialogTitle>{editGoal ? 'Edit Goal' : 'Add Goal'}</DialogTitle>
+            </DialogHeader>
+            
+            <form onSubmit={handleFormSubmit} className='space-y-4'>
+              <Input
+                name='title'
+                value={form.title || ''}
+                onChange={handleFormChange}
+                placeholder='Goal Title'
+                required
+                maxLength={128}
+              />
 
-            <Textarea
-              name='description'
-              value={form.description || ''}
-              onChange={handleFormChange}
-              placeholder='Description'
-              maxLength={1024}
-            />
+              <Textarea
+                name='description'
+                value={form.description || ''}
+                onChange={handleFormChange}
+                placeholder='Description'
+                maxLength={1024}
+              />
 
-            <select
-              name='category'
-              value={form.category || GoalCategory.EMOTIONAL_REGULATION}
-              onChange={handleFormChange}
-              className='w-full rounded border p-2'
-            >
-              {Object.values(GoalCategory).map((cat) => (
-                <option key={cat} value={cat}>
-                  {(() => {
-                    switch (cat) {
-                      case GoalCategory.EMOTIONAL_REGULATION:
-                        return 'Emotional Regulation'
-                      case GoalCategory.COGNITIVE_RESTRUCTURING:
-                        return 'Cognitive Restructuring'
-                      case GoalCategory.BEHAVIORAL_CHANGE:
-                        return 'Behavioral Change'
-                      case GoalCategory.SYMPTOM_REDUCTION:
-                        return 'Symptom Reduction'
-                      case GoalCategory.RELATIONSHIP_IMPROVEMENT:
-                        return 'Relationship Improvement'
-                      case GoalCategory.COPING_SKILLS:
-                        return 'Coping Skills'
-                      case GoalCategory.TRAUMA_RECOVERY:
-                        return 'Trauma Recovery'
-                      case GoalCategory.LIFESTYLE_CHANGES:
-                        return 'Lifestyle Changes'
-                      default:
-                        return cat
-                    }
-                  })()}
-                </option>
-              ))}
-            </select>
-            <select
-              name='status'
-              value={form.status || GoalStatus.NOT_STARTED}
-              onChange={handleFormChange}
-              className='w-full rounded border p-2'
-            >
-              {Object.values(GoalStatus).map((stat) => (
-                <option key={stat} value={stat}>
-                  {stat.replace('_', ' ')}
-                </option>
-              ))}
-            </select>
-            <Button type='submit' disabled={actionLoading} className='w-full'>
-              {editGoal ? 'Update Goal' : 'Create Goal'}
-            </Button>
-          </form>
+              <select
+                name='category'
+                value={form.category || GoalCategory.EMOTIONAL_REGULATION}
+                onChange={handleFormChange}
+                className='w-full rounded border p-2'
+              >
+                {Object.values(GoalCategory).map((cat) => (
+                  <option key={cat} value={cat}>
+                    {(() => {
+                      switch (cat) {
+                        case GoalCategory.EMOTIONAL_REGULATION:
+                          return 'Emotional Regulation'
+                        case GoalCategory.COGNITIVE_RESTRUCTURING:
+                          return 'Cognitive Restructuring'
+                        case GoalCategory.BEHAVIORAL_CHANGE:
+                          return 'Behavioral Change'
+                        case GoalCategory.SYMPTOM_REDUCTION:
+                          return 'Symptom Reduction'
+                        case GoalCategory.RELATIONSHIP_IMPROVEMENT:
+                          return 'Relationship Improvement'
+                        case GoalCategory.COPING_SKILLS:
+                          return 'Coping Skills'
+                        case GoalCategory.TRAUMA_RECOVERY:
+                          return 'Trauma Recovery'
+                        case GoalCategory.LIFESTYLE_CHANGES:
+                          return 'Lifestyle Changes'
+                        default:
+                          return cat
+                      }
+                    })()}
+                  </option>
+                ))}
+              </select>
+              <select
+                name='status'
+                value={form.status || GoalStatus.NOT_STARTED}
+                onChange={handleFormChange}
+                className='w-full rounded border p-2'
+              >
+                {Object.values(GoalStatus).map((stat) => (
+                  <option key={stat} value={stat}>
+                    {stat.replace('_', ' ')}
+                  </option>
+                ))}
+              </select>
+              <Button type='submit' disabled={actionLoading} className='w-full'>
+                {editGoal ? 'Update Goal' : 'Create Goal'}
+              </Button>
+            </form>
+          </DialogContent>
         </Dialog>
       )}
 
@@ -664,7 +671,6 @@ export function TherapeuticGoalsTracker({
 }
 
 // Helper function to generate goals from patient model
-// In a real application, these would be stored in the database
 function generateGoalsFromPatientModel(
   patientModel: CognitiveModel,
 ): TherapeuticGoal[] {
