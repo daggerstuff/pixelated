@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 
@@ -54,6 +54,25 @@ function createNoteKey(authorId: string, content: string): string {
   return `${authorId}:coaching_note:${content}`
 }
 
+/**
+ * Text configuration for different roles in the training session.
+ * In a full implementation, these would be moved to an i18n localization system.
+ */
+const ROLE_TEXT_CONFIG = {
+  observer: {
+    ariaLabel: 'Coaching note input',
+    placeholder: 'Add a coaching note...',
+    submitButton: 'Send Note',
+    activeColor: 'purple',
+  },
+  trainee: {
+    ariaLabel: 'Therapeutic response input',
+    placeholder: 'Type your therapeutic response...',
+    submitButton: 'Send Response',
+    activeColor: 'blue',
+  },
+} as const;
+
 export function TrainingSessionComponent() {
   const { data: session } = authClient.useSession()
   // Use authenticated user ID, fallback to demo user for development/testing
@@ -68,6 +87,11 @@ export function TrainingSessionComponent() {
 
   // Fishbowl Mode State
   const [role, setRole] = useState<'trainee' | 'observer'>('trainee')
+  
+  // Computed helpers (Review suggestion: extract isObserver and config)
+  const isObserver = role === 'observer'
+  const textConfig = isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee
+
   const ws = useRef<WebSocket | null>(null)
   // Use refs to avoid stale closures in WebSocket handlers
   const roleRef = useRef<'trainee' | 'observer'>(role)
@@ -75,7 +99,6 @@ export function TrainingSessionComponent() {
   // Track authentication state
   const isAuthenticatedRef = useRef<boolean>(false)
   // Track messages we've added locally to prevent duplicates from WebSocket echoes
-  // Key format: `${userId}:${role}:${content}` - tracks locally added messages
   const locallyAddedMessages = useRef<Set<string>>(new Set())
 
   // Keep refs in sync with state
@@ -264,7 +287,6 @@ export function TrainingSessionComponent() {
       }
 
       // Construct a proper CoachingNote object with all required fields
-      // Ensure timestamp exists (server should provide it, but handle missing case)
       const coachingNote: CoachingNote = {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
@@ -346,24 +368,17 @@ export function TrainingSessionComponent() {
     })
   }, [memory])
 
-  // WebSocket Connection - only reconnect when sessionId or userId changes, not when role changes
+  // WebSocket Connection
   useEffect(() => {
-    // Clear deduplication set when reconnecting (new session or user)
     locallyAddedMessages.current.clear()
-    // Reset authentication state on reconnect
     isAuthenticatedRef.current = false
 
-    // Get WebSocket URL from environment variable, fallback to localhost for development
     const wsUrl =
       import.meta.env.PUBLIC_TRAINING_WS_URL || 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 
     websocket.onopen = async () => {
-      console.log('Connected to Training Server')
-
-      // First, authenticate with the server
-      // Get actual auth token from auth context
       const authToken = (await getJournalResearchAuthToken()) || ''
       websocket.send(
         JSON.stringify({
@@ -396,7 +411,6 @@ export function TrainingSessionComponent() {
     }
 
     return () => {
-      // Cleanup: close the WebSocket connection when effect re-runs or component unmounts
       if (
         websocket.readyState === WebSocket.OPEN ||
         websocket.readyState === WebSocket.CONNECTING
@@ -405,7 +419,7 @@ export function TrainingSessionComponent() {
       }
       ws.current = null
     }
-  }, [sessionId, userId, handleWebSocketMessage]) // Removed 'role' from dependencies to prevent reconnection loops
+  }, [sessionId, userId, handleWebSocketMessage])
 
   // Helper function to send join session message
   const sendJoinSession = useCallback(
@@ -438,7 +452,7 @@ export function TrainingSessionComponent() {
     )
   }, [])
 
-  // Handle role changes by sending a new join_session message without reconnecting
+  // Handle role changes
   useEffect(() => {
     locallyAddedMessages.current.clear()
     setConversation([
@@ -454,7 +468,6 @@ export function TrainingSessionComponent() {
       return
     }
 
-    // If WebSocket is not open yet, wait for it to open before sending
     if (ws.current.readyState === WebSocket.CONNECTING) {
       const handleOpen = async () => {
         if (isAuthenticatedRef.current) {
@@ -470,7 +483,6 @@ export function TrainingSessionComponent() {
       }
     }
 
-    // If WebSocket is closed, don't attempt to send (connection will be re-established)
     if (
       ws.current.readyState === WebSocket.CLOSED ||
       ws.current.readyState === WebSocket.CLOSING
@@ -478,12 +490,10 @@ export function TrainingSessionComponent() {
       return
     }
 
-    // WebSocket is OPEN, send immediately
     if (ws.current.readyState === WebSocket.OPEN) {
       if (isAuthenticatedRef.current) {
         sendJoinSession(ws.current, sessionId)
       } else {
-        // Fire and forget - authentication will complete asynchronously
         sendAuthentication(ws.current).catch((error) => {
           console.error('Failed to send authentication:', error)
         })
@@ -551,7 +561,6 @@ export function TrainingSessionComponent() {
         message: response,
       }
 
-      // Create updated conversation that includes the therapist message
       const updatedConversation = [...conversation, therapistMessage]
 
       setConversation((prev) => [...prev, therapistMessage])
@@ -567,8 +576,6 @@ export function TrainingSessionComponent() {
         }),
       )
 
-      // Analyze bias and generate AI response in parallel
-      // Pass updated conversation that includes the therapist message
       const [biasResult, nextClientMsg] = await Promise.all([
         analyzeBias(sessionId, updatedConversation, response, userId),
         generateAIResponse(updatedConversation, response),
@@ -647,13 +654,13 @@ export function TrainingSessionComponent() {
           <div className='flex space-x-2'>
             <button
               onClick={() => setRole('trainee')}
-              className={`rounded px-3 py-1 text-sm ${role === 'trainee' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              className={`rounded px-3 py-1 text-sm ${!isObserver ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
             >
               Trainee
             </button>
             <button
               onClick={() => setRole('observer')}
-              className={`rounded px-3 py-1 text-sm ${role === 'observer' ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              className={`rounded px-3 py-1 text-sm ${isObserver ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'}`}
             >
               Observer
             </button>
@@ -683,25 +690,21 @@ export function TrainingSessionComponent() {
             value={therapistResponse}
             onChange={(e) => setTherapistResponse(e.target.value)}
             rows={3}
-            aria-label={role === 'observer' ? 'Coaching note input' : 'Therapeutic response input'}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${role === 'observer' ? 'focus:ring-purple-500' : 'focus:ring-blue-500'}`}
-            placeholder={
-              role === 'observer'
-                ? 'Add a coaching note...'
-                : 'Type your therapeutic response...'
-            }
+            aria-label={textConfig.ariaLabel}
+            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${isObserver ? 'focus:ring-purple-500' : 'focus:ring-blue-500'}`}
+            placeholder={textConfig.placeholder}
           />
 
           <button
             onClick={handleResponse}
             disabled={!therapistResponse.trim()}
             className={`text-white w-full rounded-lg px-6 py-3 font-medium transition-colors ${
-              role === 'observer'
+              isObserver
                 ? 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600'
                 : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600'
             }`}
           >
-            {role === 'observer' ? 'Send Note' : 'Send Response'}
+            {textConfig.submitButton}
           </button>
         </div>
 

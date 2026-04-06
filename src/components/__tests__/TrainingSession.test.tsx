@@ -1,36 +1,39 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react'
 import { describe, expect, it, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import TrainingSession from '../TrainingSession'
 
 describe('TrainingSession', () => {
   afterEach(() => cleanup())
+  
   it('renders training session component', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Therapist Training Session')).not.toBeNull()
-    expect(screen.getByText('Session State:')).not.toBeNull()
+    expect(screen.getByText('Therapist Training Session')).toBeInTheDocument()
+    expect(screen.getByText(/Session State:/i)).toBeInTheDocument()
   })
 
   it('renders session controls', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Start Session')).not.toBeNull()
-    expect(screen.getByText('Pause')).not.toBeNull()
-    expect(screen.getByText('Resume')).not.toBeNull()
-    expect(screen.getByText('End Session')).not.toBeNull()
+    expect(screen.getByText('Start Session')).toBeInTheDocument()
+    expect(screen.getByText('Pause')).toBeInTheDocument()
+    expect(screen.getByText('Resume')).toBeInTheDocument()
+    expect(screen.getByText('End Session')).toBeInTheDocument()
   })
 
   it('renders progress bar', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByLabelText('Session Progress')).not.toBeNull()
+    expect(screen.getByLabelText('Session Progress')).toBeInTheDocument()
   })
 
   it('renders evaluation feedback section', () => {
     render(<TrainingSession />)
 
-    expect(screen.getAllByText('Evaluation Feedback').length).toBeGreaterThan(0)
+    // Using queryAllByLabelText since multiple elements (section and label) share the same name
+    expect(screen.queryAllByLabelText('Evaluation Feedback').length).toBeGreaterThan(0)
   })
 })
