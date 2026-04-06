@@ -123,7 +123,7 @@ importers:
         version: 0.6.8(ws@8.20.0)(zod@4.3.6)
       '@composio/vercel':
         specifier: ^0.6.8
-        version: 0.6.8(@composio/core@0.6.8(ws@8.20.0)(zod@4.3.6))(ai@6.0.145(zod@4.3.6))
+        version: 0.6.8(@composio/core@0.6.8(ws@8.20.0)(zod@4.3.6))(ai@6.0.146(zod@4.3.6))
       '@google-cloud/compute':
         specifier: ^6.9.0
         version: 6.9.0
@@ -195,7 +195,7 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@react-three/drei':
         specifier: ^10.7.7
-        version: 10.7.7(@react-three/fiber@9.5.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2))(@types/react@19.2.14)(@types/three@0.182.0)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2)
+        version: 10.7.7(@react-three/fiber@9.5.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2))(@types/react@19.2.14)(@types/three@0.183.1)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2)
       '@react-three/fiber':
         specifier: ^9.5.0
         version: 9.5.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2)
@@ -239,8 +239,8 @@ importers:
         specifier: ^7.0.11
         version: 7.0.11
       '@types/three':
-        specifier: ^0.182.0
-        version: 0.182.0
+        specifier: ^0.183.1
+        version: 0.183.1
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -257,8 +257,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(react@19.2.4)(vue@3.5.32(typescript@5.9.3))
       ai:
-        specifier: ^6.0.145
-        version: 6.0.145(zod@4.3.6)
+        specifier: ^6.0.146
+        version: 6.0.146(zod@4.3.6)
       archiver:
         specifier: ^7.0.1
         version: 7.0.1
@@ -276,7 +276,7 @@ importers:
         version: 3.0.3
       better-auth:
         specifier: ^1.5.6
-        version: 1.5.6(f3f47e8e5688a3b8550368f9c31c9bf3)
+        version: 1.5.6(c461c979137a6ad6d6d4c8a1ca954a91)
       better-sqlite3:
         specifier: ^12.8.0
         version: 12.8.0
@@ -324,7 +324,7 @@ importers:
         version: 3.3.3
       drizzle-orm:
         specifier: ^0.45.1
-        version: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
+        version: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
       es-module-lexer:
         specifier: ^2.0.0
         version: 2.0.0
@@ -404,8 +404,8 @@ importers:
         specifier: ^0.1.3
         version: 0.1.3
       postgres:
-        specifier: ^3.4.8
-        version: 3.4.8
+        specifier: ^3.4.9
+        version: 3.4.9
       prop-types:
         specifier: ^15.8.1
         version: 15.8.1
@@ -540,8 +540,8 @@ importers:
         specifier: ^0.1.14
         version: 0.1.14(ink@6.3.0(@types/react@19.2.14)(react@19.2.4))
       '@mintlify/cli':
-        specifier: ^4.0.1090
-        version: 4.0.1090(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/node@25.5.2)(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+        specifier: ^4.0.1091
+        version: 4.0.1091(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/node@25.5.2)(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
@@ -645,8 +645,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       dotenv:
-        specifier: ^17.4.0
-        version: 17.4.0
+        specifier: ^17.4.1
+        version: 17.4.1
       esbuild:
         specifier: ^0.25.9
         version: 0.25.12
@@ -884,14 +884,14 @@ packages:
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/gateway@2.0.70':
-    resolution: {integrity: sha512-BSEG1PqEgSCirFZFRglElXlix3ltMHotn/7jIY/P2ztQV75N4xuVcikl9EjWO1cDMWNvB74JtS5EW94J9K45ZQ==}
+  '@ai-sdk/gateway@2.0.71':
+    resolution: {integrity: sha512-mLbO7WClcoT/fvp8Vsv59e8IExG/wHFZ0OnP2Yh1Otkw/23AVD/GGlWsBIagvrWVwOk0aPVrLItOmzHk9iUGuQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/gateway@3.0.87':
-    resolution: {integrity: sha512-knLx/VY0u5KAZGgrTorWCTbEnwK3oCCdm8yjxVQm3s14erqVo60SP08dsFWm+xNULPTusftQGVD/l0/hx5QOHg==}
+  '@ai-sdk/gateway@3.0.88':
+    resolution: {integrity: sha512-AFoj7xdWAtCQcy0jJ235ENSakYM8D28qBX+rB+/rX4r8qe/LXgl0e5UivOqxAlIM5E9jnQdYxIPuj3XFtGk/yg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -2588,19 +2588,19 @@ packages:
   '@microsoft/clarity@1.0.2':
     resolution: {integrity: sha512-9EZYROFpJxEGmQpHvUFqvD3ZJ7QQSqnibYSWmS+1xusoZfG1QQ1/Al9yVBBc11DWMbJrs1pe1hLT273it/skJg==}
 
-  '@mintlify/cli@4.0.1090':
-    resolution: {integrity: sha512-SDA+KrZcMBoatfXujr+JeDEJkJ4kMpFKeeWPnC/vFJ4ojrGXfD0hWdSIdJ5MjLKfs2QtLqbvQErp7yBrj5r/QA==}
+  '@mintlify/cli@4.0.1091':
+    resolution: {integrity: sha512-c41T+qXrw/+YiOTIGwvZqQQ5/ChCCBaof+sR8RZpFBmimWfKAjCt13KZEw70v0VWZrjlPpdDtdDVk2npZ6mhDw==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
   '@mintlify/common@1.0.661':
     resolution: {integrity: sha512-/Hdiblzaomp+AWStQ4smhVMgesQhffzQjC9aYBnmLReNdh2Js+ccQFUaWL3TNIxwiS2esaZvsHSV/D+zyRS3hg==}
 
-  '@mintlify/common@1.0.835':
-    resolution: {integrity: sha512-JP73YjY85KmFyvh2xEkAzjoFVYXo6QdoXF1RtdDEZdOGph3hw06MxukiuvRDaXJbfpXVyLBWCkUuaUWVbcyqkA==}
+  '@mintlify/common@1.0.836':
+    resolution: {integrity: sha512-ysfF0EHu5Hd9bp5nsKwPMU0hcfTuQJnCzbb1+LSavTVvpHSO9PMPEzArzgrFuD0Z5k7HWXcH5N6MnDrjzFtyCA==}
 
-  '@mintlify/link-rot@3.0.1010':
-    resolution: {integrity: sha512-XtIuDv/KTmRrMUNxlxke77+k163FLgm0I+e/U8PO1mlrBpnp2yiOi/mMvH4cfQpxFjjSJ6Apl5urH2nsircHKA==}
+  '@mintlify/link-rot@3.0.1011':
+    resolution: {integrity: sha512-MlI6Ntms0Dkskq03TBbMfhg6T3VEc6xXL0625elLIcvdFWDOkn63UsC3h38wHa8cUZEk7oGQknzGGDMQ3TbRAQ==}
     engines: {node: '>=18.0.0'}
 
   '@mintlify/mdx@3.0.4':
@@ -2622,11 +2622,11 @@ packages:
     resolution: {integrity: sha512-9MBRq9lS4l4HITYCrqCL7T61MOb20q9IdU7HWhqYMNMM1jGO1nHjXasFy61yZ8V6gMZyyKQARGVoZ0ZrYN48Og==}
     engines: {node: '>=18'}
 
-  '@mintlify/prebuild@1.0.977':
-    resolution: {integrity: sha512-/lKXOZHIPe9/Nrm5ZSUiEk8tK0RecJUf6WoY6haSxnNWrCvgVGBP2N9/Q3q3akT3ZK0ISZNVfM1z9K5L3dffKg==}
+  '@mintlify/prebuild@1.0.978':
+    resolution: {integrity: sha512-pFcz0UO0N3JiwtRiB33OpaKbh2HBbWJ3BnZykpi6X+8rbj2djao+Zy2qsF5PpIANxex99mXvZ5vvM7fSzbYJVQ==}
 
-  '@mintlify/previewing@4.0.1038':
-    resolution: {integrity: sha512-TzxrVZN96dpCSYeJ9JDklawL+schE0/Rdef3WmNSoMpRkutvnjhbR2biUpEyn9/X2wV7IWN0V9BGMemP9Tvhxg==}
+  '@mintlify/previewing@4.0.1039':
+    resolution: {integrity: sha512-RvsmaJquK8PNlx56WchLRl5+oo46z60lpG5Tpc/OGJ/76avDsF9AwSEqoH4yP4z/uK4Dz3+edPJRyswDTmFXYA==}
     engines: {node: '>=18.0.0'}
 
   '@mintlify/scraping@4.0.522':
@@ -2634,16 +2634,16 @@ packages:
     engines: {node: '>=18.0.0'}
     hasBin: true
 
-  '@mintlify/scraping@4.0.699':
-    resolution: {integrity: sha512-vcn+W57lvMK82jEZ2s6v1uGXLZC2VBlpmbZ0cyJbZFbCTytgWFTJiB7a+9B+wMFto5zk2IRiwHeWxWagqiFVfQ==}
+  '@mintlify/scraping@4.0.700':
+    resolution: {integrity: sha512-am8RCQqmQvH7uq6G5sTxh5dS68/6rEDbb10Ka0DM3noh/gQpHan20zJhVgjNl3QZgbKmfn5aagXqH6+XTAjJCg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
   '@mintlify/validation@0.1.555':
     resolution: {integrity: sha512-11QVUReL4N5u8wSCgZt4RN7PA0jYQoMEBZ5IrUp5pgb5ZJBOoGV/vPsQrxPPa1cxsUDAuToNhtGxRQtOav/w8w==}
 
-  '@mintlify/validation@0.1.653':
-    resolution: {integrity: sha512-TK9dntGkxRQlnaFmsUSt7znd1QjGlS0nvEZymZfJICYxCaQbEkENEtKeex0gU8ot3XVJtImQhORelvzyjtEfEQ==}
+  '@mintlify/validation@0.1.654':
+    resolution: {integrity: sha512-x3ysaaBGImyJnXnOuxbmuRIXD7n/cwCL9WOmzcGt+8yEVkgcLfakRdKKHi8U4J/i1rGb4anzSNHrr1ep8L6LpQ==}
 
   '@modelcontextprotocol/sdk@1.29.0':
     resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
@@ -6003,8 +6003,8 @@ packages:
   '@types/tedious@4.0.14':
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
 
-  '@types/three@0.182.0':
-    resolution: {integrity: sha512-WByN9V3Sbwbe2OkWuSGyoqQO8Du6yhYaXtXLoA5FkKTUJorZ+yOHBZ35zUUPQXlAKABZmbYp5oAqpA4RBjtJ/Q==}
+  '@types/three@0.183.1':
+    resolution: {integrity: sha512-f2Pu5Hrepfgavttdye3PsH5RWyY/AvdZQwIVhrc4uNtvF7nOWJacQKcoVJn0S4f0yYbmAE6AR+ve7xDcuYtMGw==}
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -6562,14 +6562,14 @@ packages:
     resolution: {integrity: sha512-0poP0T7el6Vq3rstR8Mn4V/IQrpBLO6POkUSrN7RhyY+GF/InCFShQzsQ39T25gkHhLgSLByyAz+Kjb+c2L98w==}
     engines: {node: '>=12'}
 
-  ai@5.0.166:
-    resolution: {integrity: sha512-Iuczd2aS3ubVeby7oTemf/xx0+0MY5DLBEkNVcJc0rc6JD7NFnt7uvhFyXhDKAx7ObeEl6y+8B4Gr8LiyvwVLQ==}
+  ai@5.0.167:
+    resolution: {integrity: sha512-u/nwVPlKuGH1AQyENjduaU+I1n9LA4pWhMh9O4D8rBE+GeuxpHB3PfJ3PCo22wRuIwFayLMOO7CUQ+yehREx3A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
 
-  ai@6.0.145:
-    resolution: {integrity: sha512-RbMiFsPZxE4uf5Hhs8rscp5bIwvjQOrqS5dQGWNVRHGM947QZgkKX7Ih5hto8MK/7xkbtneoOZruZ8oSLO828A==}
+  ai@6.0.146:
+    resolution: {integrity: sha512-70DE8k1rR0N3mXxyyfjYAx/FxRln/kQ5ym18lt1ys1eUklcPuoIXGbUBwdfCbmkt6YF3jCDZ5+OgkWieP/NGDw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -7946,8 +7946,8 @@ packages:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
-  dotenv@17.4.0:
-    resolution: {integrity: sha512-kCKF62fwtzwYm0IGBNjRUjtJgMfGapII+FslMHIjMR5KTnwEmBmWLDRSnc3XSNP8bNy34tekgQyDT0hr7pERRQ==}
+  dotenv@17.4.1:
+    resolution: {integrity: sha512-k8DaKGP6r1G30Lx8V4+pCsLzKr8vLmV2paqEj1Y55GdAgJuIqpRp5FfajGF8KtwMxCz9qJc6wUIJnm053d/WCw==}
     engines: {node: '>=12'}
 
   dpop@2.1.1:
@@ -10273,8 +10273,8 @@ packages:
     peerDependencies:
       three: '>=0.137'
 
-  meshoptimizer@0.22.0:
-    resolution: {integrity: sha512-IebiK79sqIy+E4EgOr+CAw+Ke8hAspXKzBd0JdgEmPHiAwmvEj2S4h1rfvo+o/BnfEYd/jAOg5IeeIjzlzSnDg==}
+  meshoptimizer@1.0.1:
+    resolution: {integrity: sha512-Vix+QlA1YYT3FwmBBZ+49cE5y/b+pRrcXKqGpS5ouh33d3lSp2PoTpCw19E0cKDFWalembrHnIaZetf27a+W2g==}
 
   methods@1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
@@ -11410,8 +11410,8 @@ packages:
     resolution: {integrity: sha512-Jtc2612XINuBjIl/QTWsV5UvE8UHuNblcO3vVADSrKsrc6RqGX6lOW1cEo3CM2v0XG4Nat8nI+YM7/f26VxXLw==}
     engines: {node: '>=12'}
 
-  postgres@3.4.8:
-    resolution: {integrity: sha512-d+JFcLM17njZaOLkv6SCev7uoLaBtfK86vMUXhW1Z4glPWh4jozno9APvW/XKFJ3CCxVoC7OL38BqRydtu5nGg==}
+  postgres@3.4.9:
+    resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
     engines: {node: '>=12'}
 
   posthog-node@5.17.2:
@@ -13914,14 +13914,14 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.22(zod@4.3.6)
       zod: 4.3.6
 
-  '@ai-sdk/gateway@2.0.70(zod@4.3.6)':
+  '@ai-sdk/gateway@2.0.71(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 2.0.1
       '@ai-sdk/provider-utils': 3.0.23(zod@4.3.6)
       '@vercel/oidc': 3.1.0
       zod: 4.3.6
 
-  '@ai-sdk/gateway@3.0.87(zod@4.3.6)':
+  '@ai-sdk/gateway@3.0.88(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@ai-sdk/provider-utils': 4.0.22(zod@4.3.6)
@@ -15382,12 +15382,12 @@ snapshots:
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260405.1
 
-  '@better-auth/drizzle-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7))':
+  '@better-auth/drizzle-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7))':
     dependencies:
       '@better-auth/core': 1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0)
       '@better-auth/utils': 0.3.1
     optionalDependencies:
-      drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
+      drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
 
   '@better-auth/kysely-adapter@1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(kysely@0.28.15)':
     dependencies:
@@ -15494,10 +15494,10 @@ snapshots:
     dependencies:
       zod: 4.3.6
 
-  '@composio/vercel@0.6.8(@composio/core@0.6.8(ws@8.20.0)(zod@4.3.6))(ai@6.0.145(zod@4.3.6))':
+  '@composio/vercel@0.6.8(@composio/core@0.6.8(ws@8.20.0)(zod@4.3.6))(ai@6.0.146(zod@4.3.6))':
     dependencies:
       '@composio/core': 0.6.8(ws@8.20.0)(zod@4.3.6)
-      ai: 6.0.145(zod@4.3.6)
+      ai: 6.0.146(zod@4.3.6)
 
   '@csstools/color-helpers@6.0.2': {}
 
@@ -16400,14 +16400,14 @@ snapshots:
 
   '@microsoft/clarity@1.0.2': {}
 
-  '@mintlify/cli@4.0.1090(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/node@25.5.2)(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/cli@4.0.1091(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/node@25.5.2)(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
       '@inquirer/prompts': 7.9.0(@types/node@25.5.2)
-      '@mintlify/common': 1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/link-rot': 3.0.1010(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/prebuild': 1.0.977(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/previewing': 4.0.1038(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/validation': 0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@mintlify/common': 1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/link-rot': 3.0.1011(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/prebuild': 1.0.978(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/previewing': 4.0.1039(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/validation': 0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       adm-zip: 0.5.16
       chalk: 5.2.0
       color: 4.2.3
@@ -16507,14 +16507,14 @@ snapshots:
       - ts-node
       - typescript
 
-  '@mintlify/common@1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/common@1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
       '@asyncapi/parser': 3.4.0(encoding@0.1.13)
       '@asyncapi/specs': 6.8.1
       '@mintlify/mdx': 3.0.4(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@mintlify/models': 0.0.287
       '@mintlify/openapi-parser': 0.0.8
-      '@mintlify/validation': 0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@mintlify/validation': 0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@sindresorhus/slugify': 2.2.0
       '@types/mdast': 4.0.4
       acorn: 8.11.2
@@ -16571,13 +16571,13 @@ snapshots:
       - typescript
       - yaml
 
-  '@mintlify/link-rot@3.0.1010(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/link-rot@3.0.1011(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
-      '@mintlify/common': 1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/prebuild': 1.0.977(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/previewing': 4.0.1038(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/common': 1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/prebuild': 1.0.978(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/previewing': 4.0.1039(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
       '@mintlify/scraping': 4.0.522(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
-      '@mintlify/validation': 0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@mintlify/validation': 0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       fs-extra: 11.1.0
       unist-util-visit: 4.1.2
     transitivePeerDependencies:
@@ -16648,12 +16648,12 @@ snapshots:
       leven: 4.1.0
       yaml: 2.8.3
 
-  '@mintlify/prebuild@1.0.977(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/prebuild@1.0.978(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
-      '@mintlify/common': 1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/common': 1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
       '@mintlify/openapi-parser': 0.0.8
-      '@mintlify/scraping': 4.0.699(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/validation': 0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@mintlify/scraping': 4.0.700(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/validation': 0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       chalk: 5.3.0
       favicons: 7.2.0
       front-matter: 4.0.2
@@ -16681,11 +16681,11 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@mintlify/previewing@4.0.1038(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/previewing@4.0.1039(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
-      '@mintlify/common': 1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/prebuild': 1.0.977(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
-      '@mintlify/validation': 0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
+      '@mintlify/common': 1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/prebuild': 1.0.978(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/validation': 0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       adm-zip: 0.5.16
       better-opn: 3.0.2
       chalk: 5.2.0
@@ -16756,9 +16756,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@mintlify/scraping@4.0.699(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
+  '@mintlify/scraping@4.0.700(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)':
     dependencies:
-      '@mintlify/common': 1.0.835(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
+      '@mintlify/common': 1.0.836(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.3)
       '@mintlify/openapi-parser': 0.0.8
       fs-extra: 11.1.1
       hast-util-to-mdast: 10.1.0
@@ -16814,7 +16814,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@mintlify/validation@0.1.653(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
+  '@mintlify/validation@0.1.654(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)':
     dependencies:
       '@mintlify/mdx': 3.0.4(@radix-ui/react-popover@1.1.15(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       '@mintlify/models': 0.0.287
@@ -19118,7 +19118,7 @@ snapshots:
 
   '@radix-ui/rect@1.1.1': {}
 
-  '@react-three/drei@10.7.7(@react-three/fiber@9.5.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2))(@types/react@19.2.14)(@types/three@0.182.0)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2)':
+  '@react-three/drei@10.7.7(@react-three/fiber@9.5.0(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2))(@types/react@19.2.14)(@types/three@0.183.1)(immer@11.1.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(three@0.183.2)':
     dependencies:
       '@babel/runtime': 7.29.2
       '@mediapipe/tasks-vision': 0.10.17
@@ -19130,10 +19130,10 @@ snapshots:
       detect-gpu: 5.0.70
       glsl-noise: 0.0.0
       hls.js: 1.6.15
-      maath: 0.10.8(@types/three@0.182.0)(three@0.183.2)
+      maath: 0.10.8(@types/three@0.183.1)(three@0.183.2)
       meshline: 3.3.1(three@0.183.2)
       react: 19.2.4
-      stats-gl: 2.4.2(@types/three@0.182.0)(three@0.183.2)
+      stats-gl: 2.4.2(@types/three@0.183.1)(three@0.183.2)
       stats.js: 0.17.0
       suspend-react: 0.1.3(react@19.2.4)
       three: 0.183.2
@@ -20238,7 +20238,7 @@ snapshots:
       '@ai-sdk/anthropic': 2.0.74(zod@4.3.6)
       '@ai-sdk/openai': 2.0.102(zod@4.3.6)
       '@ai-sdk/provider': 3.0.8
-      ai: 5.0.166(zod@4.3.6)
+      ai: 5.0.167(zod@4.3.6)
       openai: 4.104.0(encoding@0.1.13)(ws@8.20.0)(zod@4.3.6)
       supermemory: 3.14.0
       zod: 4.3.6
@@ -20681,7 +20681,7 @@ snapshots:
     dependencies:
       '@types/node': 25.5.2
 
-  '@types/three@0.182.0':
+  '@types/three@0.183.1':
     dependencies:
       '@dimforge/rapier3d-compat': 0.12.0
       '@tweenjs/tween.js': 23.1.3
@@ -20689,7 +20689,7 @@ snapshots:
       '@types/webxr': 0.5.24
       '@webgpu/types': 0.1.69
       fflate: 0.8.2
-      meshoptimizer: 0.22.0
+      meshoptimizer: 1.0.1
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -21389,17 +21389,17 @@ snapshots:
       clean-stack: 4.2.0
       indent-string: 5.0.0
 
-  ai@5.0.166(zod@4.3.6):
+  ai@5.0.167(zod@4.3.6):
     dependencies:
-      '@ai-sdk/gateway': 2.0.70(zod@4.3.6)
+      '@ai-sdk/gateway': 2.0.71(zod@4.3.6)
       '@ai-sdk/provider': 2.0.1
       '@ai-sdk/provider-utils': 3.0.23(zod@4.3.6)
       '@opentelemetry/api': 1.9.1
       zod: 4.3.6
 
-  ai@6.0.145(zod@4.3.6):
+  ai@6.0.146(zod@4.3.6):
     dependencies:
-      '@ai-sdk/gateway': 3.0.87(zod@4.3.6)
+      '@ai-sdk/gateway': 3.0.88(zod@4.3.6)
       '@ai-sdk/provider': 3.0.8
       '@ai-sdk/provider-utils': 4.0.22(zod@4.3.6)
       '@opentelemetry/api': 1.9.1
@@ -21862,10 +21862,10 @@ snapshots:
       jsonpointer: 5.0.1
       leven: 3.1.0
 
-  better-auth@1.5.6(f3f47e8e5688a3b8550368f9c31c9bf3):
+  better-auth@1.5.6(c461c979137a6ad6d6d4c8a1ca954a91):
     dependencies:
       '@better-auth/core': 1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0)
-      '@better-auth/drizzle-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7))
+      '@better-auth/drizzle-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7))
       '@better-auth/kysely-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(kysely@0.28.15)
       '@better-auth/memory-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)
       '@better-auth/mongo-adapter': 1.5.6(@better-auth/core@1.5.6(@better-auth/utils@0.3.1)(@better-fetch/fetch@1.1.21)(@cloudflare/workers-types@4.20260405.1)(@opentelemetry/api@1.9.1)(better-call@1.3.2(zod@4.3.6))(jose@6.2.2)(kysely@0.28.15)(nanostores@1.2.0))(@better-auth/utils@0.3.1)(mongodb@7.1.1(@aws-sdk/credential-providers@3.1000.0)(gcp-metadata@7.0.1)(kerberos@7.0.0)(mongodb-client-encryption@7.0.0)(socks@2.8.7))
@@ -21884,7 +21884,7 @@ snapshots:
     optionalDependencies:
       '@prisma/client': 5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))
       better-sqlite3: 12.8.0
-      drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
+      drizzle-orm: 0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7)
       mongodb: 7.1.1(@aws-sdk/credential-providers@3.1000.0)(gcp-metadata@7.0.1)(kerberos@7.0.0)(mongodb-client-encryption@7.0.0)(socks@2.8.7)
       mysql2: 3.15.3
       pg: 8.20.0
@@ -22852,13 +22852,13 @@ snapshots:
 
   dotenv@16.6.1: {}
 
-  dotenv@17.4.0: {}
+  dotenv@17.4.1: {}
 
   dpop@2.1.1: {}
 
   draco3d@1.5.7: {}
 
-  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.8)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7):
+  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260405.1)(@electric-sql/pglite@0.3.16)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)))(@types/pg@8.20.0)(@upstash/redis@1.37.0)(better-sqlite3@12.8.0)(kysely@0.28.15)(mysql2@3.15.3)(pg@8.20.0)(postgres@3.4.9)(prisma@7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(sql.js@1.14.0)(sqlite3@5.1.7):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260405.1
       '@electric-sql/pglite': 0.3.16
@@ -22870,7 +22870,7 @@ snapshots:
       kysely: 0.28.15
       mysql2: 3.15.3
       pg: 8.20.0
-      postgres: 3.4.8
+      postgres: 3.4.9
       prisma: 7.4.2(@types/react@19.2.14)(better-sqlite3@12.8.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3)
       sql.js: 1.14.0
       sqlite3: 5.1.7
@@ -25410,9 +25410,9 @@ snapshots:
 
   lz-string@1.5.0: {}
 
-  maath@0.10.8(@types/three@0.182.0)(three@0.183.2):
+  maath@0.10.8(@types/three@0.183.1)(three@0.183.2):
     dependencies:
-      '@types/three': 0.182.0
+      '@types/three': 0.183.1
       three: 0.183.2
 
   magic-regexp@0.10.0:
@@ -25814,7 +25814,7 @@ snapshots:
     dependencies:
       three: 0.183.2
 
-  meshoptimizer@0.22.0: {}
+  meshoptimizer@1.0.1: {}
 
   methods@1.1.2: {}
 
@@ -27258,7 +27258,7 @@ snapshots:
   postgres@3.4.7:
     optional: true
 
-  postgres@3.4.8: {}
+  postgres@3.4.9: {}
 
   posthog-node@5.17.2:
     dependencies:
@@ -28702,9 +28702,9 @@ snapshots:
       '@stablelib/base64': 1.0.1
       fast-sha256: 1.3.0
 
-  stats-gl@2.4.2(@types/three@0.182.0)(three@0.183.2):
+  stats-gl@2.4.2(@types/three@0.183.1)(three@0.183.2):
     dependencies:
-      '@types/three': 0.182.0
+      '@types/three': 0.183.1
       three: 0.183.2
 
   stats.js@0.17.0: {}

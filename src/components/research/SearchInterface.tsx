@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { researchAPI, type BookMetadata } from '@/lib/api/research'
 
@@ -30,62 +30,74 @@ export default function SearchInterface() {
   // Export State
   const [showExport, setShowExport] = useState(false)
 
-  const executeSearch = async (
-    currentQuery: string,
-    currentSources: string[],
-    currentFilters: SearchFiltersState,
-  ) => {
-    if (!currentQuery.trim()) return
+  /**
+   * Memoized search execution logic to maintain stable identity for potential child consumers.
+   * Note: We pass current state as arguments to ensure it can be reused without frequent re-creations
+   * if query/sources change frequently (e.g. typing).
+   */
+  const executeSearch = useCallback(
+    async (
+      currentQuery: string,
+      currentSources: string[],
+      currentFilters: SearchFiltersState,
+    ) => {
+      if (!currentQuery.trim()) return
 
-    setLoading(true)
-    setHasSearched(true)
-    setError(null)
-    setResults([])
+      setLoading(true)
+      setHasSearched(true)
+      setError(null)
+      setResults([])
 
-    try {
-      // Track search event
-      void researchAPI.trackEvent('search_literature', {
-        query: currentQuery,
-        sources: currentSources,
-        filter_count:
-          (currentFilters.topics.length || 0) +
-          (currentFilters.yearFrom ? 1 : 0) +
-          (currentFilters.yearTo ? 1 : 0),
-      })
+      try {
+        // Track search event
+        void researchAPI.trackEvent('search_literature', {
+          query: currentQuery,
+          sources: currentSources,
+          filter_count:
+            (currentFilters.topics.length || 0) +
+            (currentFilters.yearFrom ? 1 : 0) +
+            (currentFilters.yearTo ? 1 : 0),
+        })
 
-      const data = await researchAPI.searchLiterature({
-        q: currentQuery,
-        limit: 12,
-        sources: currentSources.includes('all') ? undefined : currentSources,
-        year_from: currentFilters.yearFrom,
-        year_to: currentFilters.yearTo,
-        min_relevance: currentFilters.minRelevance,
-        topics: currentFilters.topics,
-        sort_by: currentFilters.sortBy,
-      })
+        const data = await researchAPI.searchLiterature({
+          q: currentQuery,
+          limit: 12,
+          sources: currentSources.includes('all') ? undefined : currentSources,
+          year_from: currentFilters.yearFrom,
+          year_to: currentFilters.yearTo,
+          min_relevance: currentFilters.minRelevance,
+          topics: currentFilters.topics,
+          sort_by: currentFilters.sortBy,
+        })
 
-      setResults(data.results)
-    } catch (err: any) {
-      console.error('Search error:', err)
-      setError(err.message || 'Failed to fetch results.')
-    } finally {
-      setLoading(false)
-    }
-  }
+        setResults(data.results)
+      } catch (err: unknown) {
+        console.error('Search error:', err)
+        setError(err instanceof Error ? err.message : 'Failed to fetch results.')
+      } finally {
+        setLoading(false)
+      }
+    },
+    [researchAPI], // Explicitly added researchAPI dependency (Review suggestion)
+  )
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    // No need for useCallback here as it's passed to a raw <form> (Review suggestion)
     void executeSearch(query, selectedSources, filters)
   }
 
-  const handleFilterChange = (newFilters: SearchFiltersState) => {
-    setFilters(newFilters)
-    setShowFilters(false)
-    // Auto-refresh search if we already have a query
-    if (query.trim()) {
-      void executeSearch(query, selectedSources, newFilters)
-    }
-  }
+  const handleFilterChange = useCallback(
+    (newFilters: SearchFiltersState) => {
+      setFilters(newFilters)
+      setShowFilters(false)
+      // Auto-refresh search if we already have a query
+      if (query.trim()) {
+        void executeSearch(query, selectedSources, newFilters)
+      }
+    },
+    [executeSearch, query, selectedSources],
+  )
 
   return (
     <motion.div className='mx-auto w-full max-w-6xl p-4'>
