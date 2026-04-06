@@ -132,34 +132,38 @@ const getCardClasses = (index: number) => ({
 
   .core-features-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 26rem);
-    gap: clamp(2rem, 3vw, 3.5rem);
-    align-items: end;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: start;
     margin-bottom: clamp(2.2rem, 3vw, 3.4rem);
     position: relative;
+    justify-items: center;
+    text-align: center;
   }
 
   .core-features-intro::after {
     content: '';
     position: absolute;
-    right: 0;
+    left: 50%;
     bottom: -2rem;
-    width: min(18rem, 32vw);
+    width: min(18rem, 28vw);
     height: 1px;
     background: linear-gradient(90deg, rgba(125, 211, 168, 0.55), transparent);
+    transform: translateX(-50%);
   }
 
   .core-features-copy {
-    font-size: clamp(1rem, 0.96rem + 0.12vw, 1.06rem);
+    font-size: clamp(0.98rem, 0.94rem + 0.12vw, 1.04rem);
     line-height: 1.78;
     color: #cbd5e1;
-    max-width: 24rem;
+    max-width: 40rem;
     text-wrap: pretty;
+    margin: 0 auto;
   }
 
   .core-features-grid {
     display: grid;
-    grid-template-columns: minmax(17rem, 0.62fr) minmax(0, 1.38fr);
+    grid-template-columns: 1fr;
     gap: clamp(1.75rem, 2.8vw, 3rem);
     margin-bottom: clamp(2.6rem, 3.8vw, 3.8rem);
   }
@@ -167,10 +171,10 @@ const getCardClasses = (index: number) => ({
   .core-features-proof {
     display: grid;
     align-content: start;
-    gap: var(--space-4);
+    gap: 0.9rem;
     padding: clamp(1.4rem, 2vw, 1.9rem);
     border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1rem;
+    border-radius: 0.96rem;
     background:
       linear-gradient(
         180deg,
@@ -183,23 +187,26 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-features-proof::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
-    background: linear-gradient(
-      180deg,
-      rgba(143, 184, 162, 1),
-      rgba(143, 184, 162, 0.18)
-    );
+    display: none;
   }
 
   .core-features-proof-list {
     display: grid;
-    gap: 1rem;
-    padding-left: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.9rem;
+    padding-left: 0;
     color: #cbd5e1;
     line-height: 1.7;
+    list-style: none;
+    margin: 0;
+  }
+
+  .core-features-proof-list li {
+    min-width: 0;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .core-feature-card__row {
@@ -220,9 +227,9 @@ const getCardClasses = (index: number) => ({
     display: inline-flex;
     margin-bottom: 0.7rem;
     font-family: var(--font-mono);
-    font-size: 0.64rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: none;
     color: rgba(255, 255, 255, 0.48);
   }
@@ -248,13 +255,13 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-features-comparison__lead h3 {
-    font-size: clamp(1.6rem, 1.28rem + 0.75vw, 2.2rem);
-    line-height: 1.04;
+    font-size: clamp(1.35rem, 1.18rem + 0.55vw, 1.9rem);
+    line-height: 1.06;
   }
 
   .core-features-comparison__grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.9rem;
   }
 
@@ -266,7 +273,7 @@ const getCardClasses = (index: number) => ({
     min-width: 0;
     padding: 1rem 1.1rem;
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.95rem;
+    border-radius: 0.68rem;
     background: rgba(255, 255, 255, 0.03);
   }
 
@@ -287,7 +294,7 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-features-comparison__item span {
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.56);
   }
@@ -300,16 +307,16 @@ const getCardClasses = (index: number) => ({
 
   .core-features-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
     gap: 1rem;
   }
 
   .core-feature-card {
-    grid-column: span 1;
+    grid-column: span 4;
     min-width: 0;
     padding: clamp(1.3rem, 1.8vw, 1.75rem);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1rem;
+    border-radius: 0.96rem;
     background: rgba(255, 255, 255, 0.04);
     position: relative;
     overflow: hidden;
@@ -344,7 +351,7 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card--lead {
-    grid-column: 1 / -1;
+    grid-column: span 8;
     padding: clamp(1.6rem, 2.2vw, 2rem);
     border-color: rgba(143, 184, 162, 0.16);
     background:
@@ -376,7 +383,7 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card--lead h3 {
-    font-size: clamp(1.55rem, 1.25rem + 0.85vw, 2.05rem);
+    font-size: clamp(1.35rem, 1.15rem + 0.65vw, 1.8rem);
   }
 
   .feature-icon {
@@ -386,7 +393,7 @@ const getCardClasses = (index: number) => ({
     width: 44px;
     height: 44px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.85rem;
+    border-radius: 0.72rem;
     color: var(--accent-primary);
     flex-shrink: 0;
     background: rgba(10, 17, 17, 0.38);
@@ -397,7 +404,7 @@ const getCardClasses = (index: number) => ({
   }
 
   .core-feature-card h3 {
-    font-size: clamp(1.25rem, 1.12rem + 0.34vw, 1.55rem);
+    font-size: clamp(1.1rem, 1.02rem + 0.26vw, 1.35rem);
     line-height: 1.12;
   }
 
@@ -412,11 +419,15 @@ const getCardClasses = (index: number) => ({
       position: static;
       top: auto;
     }
+
+    .core-features-proof-list,
+    .core-features-comparison__grid {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 768px) {
-    .core-features-list,
-    .core-features-comparison__grid {
+    .core-features-list {
       grid-template-columns: 1fr;
     }
 

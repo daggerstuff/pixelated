@@ -72,7 +72,13 @@ const { content } = Astro.props
 
 <style>
   .home-section--intro {
-    background: rgba(10, 14, 15, 0.98);
+    background:
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(143, 184, 162, 0.06),
+        transparent 42%
+      ),
+      rgba(10, 14, 15, 0.98);
     color: var(--text-primary);
     overflow: hidden;
   }
@@ -108,17 +114,17 @@ const { content } = Astro.props
   }
 
   .home-section--intro .pe-page-heading {
-    max-width: 13ch;
-    font-size: clamp(2.8rem, 2.5rem + 1.2vw, 4rem);
-    line-height: 0.94;
+    max-width: 15ch;
+    font-size: clamp(2.15rem, 1.95rem + 0.9vw, 3rem);
+    line-height: 0.98;
     letter-spacing: -0.04em;
     color: var(--text-primary);
   }
 
   .home-intro {
     display: grid;
-    grid-template-columns: minmax(0, 1.06fr) minmax(20rem, 0.94fr);
-    gap: clamp(3rem, 5vw, 6.5rem);
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 3vw, 3rem);
     align-items: start;
     position: relative;
   }
@@ -130,30 +136,35 @@ const { content } = Astro.props
   .home-intro__lead {
     position: relative;
     z-index: 1;
-    padding-top: clamp(0.4rem, 1vw, 0.85rem);
+    max-width: 46rem;
+    margin: 0 auto;
+    padding-top: 0;
+    text-align: center;
   }
 
   .home-intro__panel {
     position: relative;
-    margin-top: clamp(0.8rem, 1.6vw, 1.4rem);
-    padding: clamp(1.6rem, 2.2vw, 2.2rem);
+    max-width: 72rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: clamp(1.3rem, 2vw, 1.7rem);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 1.1rem;
+    border-radius: 0.96rem;
     background:
-      linear-gradient(180deg, rgba(20, 28, 28, 0.96), rgba(14, 19, 20, 0.92)),
-      rgba(12, 16, 17, 0.94);
-    box-shadow: 0 24px 58px rgba(2, 8, 9, 0.28);
+      linear-gradient(180deg, rgba(20, 28, 28, 0.92), rgba(14, 19, 20, 0.88)),
+      rgba(12, 16, 17, 0.9);
+    box-shadow: 0 22px 54px rgba(2, 8, 9, 0.22);
   }
 
   .home-intro__panel::before {
     content: '';
     position: absolute;
-    inset: 0 auto 0 0;
-    width: 3px;
+    inset: 0.85rem 1rem auto 1rem;
+    height: 1px;
     background: linear-gradient(
-      180deg,
-      rgba(125, 211, 168, 0.9),
-      rgba(125, 211, 168, 0.14)
+      90deg,
+      rgba(125, 211, 168, 0.55),
+      rgba(125, 211, 168, 0.08)
     );
   }
 
@@ -173,16 +184,24 @@ const { content } = Astro.props
     gap: 1rem;
   }
 
+  .home-proof-stack {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.95rem;
+  }
+
   .home-proof-item {
     display: grid;
     gap: 0.5rem;
-    padding-top: 0.9rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0.8rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .home-proof-item:first-child {
-    padding-top: 0;
-    border-top: 0;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .home-proof-item__label {
@@ -194,9 +213,9 @@ const { content } = Astro.props
   }
 
   .home-evidence-grid {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: stretch;
-    gap: clamp(0.9rem, 1.8vw, 1.2rem);
+    gap: clamp(0.95rem, 1.8vw, 1.2rem);
     position: relative;
   }
 
@@ -218,36 +237,26 @@ const { content } = Astro.props
   }
 
   .home-evidence-card {
-    grid-column: span 6;
     min-width: 0;
-    padding: clamp(1.45rem, 2vw, 2rem);
+    padding: clamp(1.35rem, 1.9vw, 1.85rem);
     border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 1rem;
+    border-radius: 0.96rem;
     background:
       linear-gradient(
         180deg,
-        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.045),
         rgba(255, 255, 255, 0)
       ),
       rgba(11, 15, 16, 0.92);
-    box-shadow: 0 22px 54px rgba(2, 8, 9, 0.24);
+    box-shadow: 0 18px 42px rgba(2, 8, 9, 0.18);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       transform var(--duration-fast) var(--ease-out);
   }
 
-  .home-evidence-card:first-child {
-    grid-column: 1 / span 6;
-  }
-
-  .home-evidence-card:last-child {
-    grid-column: 7 / -1;
-    margin-top: clamp(1.25rem, 2.4vw, 2rem);
-  }
-
   .home-evidence-card:hover {
     border-color: rgba(143, 184, 162, 0.24);
-    transform: translateY(-4px);
+    transform: translateY(-3px);
   }
 
   .home-evidence-card--light {
@@ -283,10 +292,10 @@ const { content } = Astro.props
   .home-evidence-card--light::before {
     content: '';
     position: absolute;
-    inset: 0 auto 0 0;
-    width: 4px;
+    inset: 0.95rem 1rem auto 1rem;
+    height: 1px;
     background: linear-gradient(
-      180deg,
+      90deg,
       rgba(125, 211, 168, 1),
       rgba(125, 211, 168, 0.18)
     );
@@ -345,9 +354,9 @@ const { content } = Astro.props
     position: absolute;
     left: 0;
     top: 0.55rem;
-    width: 0.35rem;
-    height: 0.35rem;
-    border-radius: 50%;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 0.16rem;
     background: rgba(125, 211, 168, 0.5);
   }
 
@@ -359,6 +368,10 @@ const { content } = Astro.props
 
     .home-intro::after {
       display: none;
+    }
+
+    .home-proof-stack {
+      grid-template-columns: 1fr;
     }
   }
 </style>
