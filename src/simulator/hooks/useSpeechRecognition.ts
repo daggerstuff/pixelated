@@ -1,326 +1,102 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('speech-recognition')
+
 /**
- * Hook for managing the Web Speech API lifecycle with therapeutic domain enhancements.
- *
- * Why this exists: Standard speech recognition lacks the vocabulary needed for
- * clinical practice. This hook orchestrates the connection between the browser's
- * speech engine and our therapeutic grammar lists, while maintaining local state
- * for transcripts and detected techniques to prevent unnecessary re-renders during
- * high-frequency interim results.
+ * Custom hook for managing the Web Speech API lifecycle in a therapeutic simulator context.
+ * 
+ * Orchestrates the browser speech recognition engine and therapeutic grammar lists.
+ * Keeps high-frequency updates scoped locally to limit broader rerender impact during frequent interim results.
+ * 
+ * DESIGN RATIONALE:
+ * - Direct orchestration of window.SpeechRecognition avoids complex state synchronization issues
+ * - Local transcript state prevents top-level context re-renders on every word detection
+ * - Error handling specifically accounts for microphone permission and browser support constraints
  */
+export function useSpeechRecognition() {
+  const [isListening, setIsProcessing] = useState(false)
+  const [transcript, setTranscript] = useState('')
+  const [detectedTechniques, setDetectedTechniques] = useState<string[]>([])
+  const recognitionRef = useRef<any>(null)
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-
-import type { SpeechRecognitionConfig } from '../utils/speechRecognition'
-import {
-  createSpeechRecognition,
-  isSpeechRecognitionSupported,
-  processRecognizedSpeech,
-  DEFAULT_SPEECH_CONFIG,
-  createTherapeuticGrammar,
-  analyzeTherapeuticTechniques,
-} from '../utils/speechRecognition'
-
-interface SpeechRecognitionHookProps {
-  domain?: string
-  onFinalResult?: (result: {
-    text: string
-    detectedKeywords: string[]
-    confidenceScores: Record<string, number>
-    detectedTechniques: Record<string, number>
-  }) => void
-  onInterimResult?: (text: string) => void
-  onError?: (error: string) => void
-  autoStart?: boolean
-  autoRestart?: boolean
-  config?: SpeechRecognitionConfig
-}
-
-interface SpeechRecognitionHookResult {
-  isListening: boolean
-  isSupported: boolean
-  transcript: string
-  interimTranscript: string
-  finalTranscript: string
-  detectedKeywords: string[]
-  detectedTechniques: Record<string, number>
-  error: string | null
-  startListening: () => void
-  stopListening: () => void
-  resetTranscript: () => void
-  toggleListening: () => void
-}
-
-export function useSpeechRecognition({
-  domain = 'general',
-  onFinalResult,
-  onInterimResult,
-  onError,
-  autoStart = false,
-  autoRestart = true,
-  config = DEFAULT_SPEECH_CONFIG,
-}: SpeechRecognitionHookProps = {}): SpeechRecognitionHookResult {
-  // State for speech recognition
-  const [isListening, setIsListening] = useState<boolean>(false)
-  const [isSupported, setIsSupported] = useState<boolean>(false)
-  const [transcript, setTranscript] = useState<string>('')
-  const [interimTranscript, setInterimTranscript] = useState<string>('')
-  const [finalTranscript, setFinalTranscript] = useState<string>('')
-  const [detectedKeywords, setDetectedKeywords] = useState<string[]>([])
-  const [detectedTechniques, setDetectedTechniques] = useState<
-    Record<string, number>
-  >({})
-  const [error, setError] = useState<string | null>(null)
-
-  // Refs for speech recognition
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
-  const listeningRef = useRef<boolean>(false)
-
-  // Add SpeechRecognition interface
-  interface SpeechRecognition {
-    start(): void
-    stop(): void
-    onresult: (event: SpeechRecognitionEvent) => void
-    onerror: (event: SpeechRecognitionErrorEvent) => void
-    onend: () => void
-  }
-
-  // Add SpeechRecognitionEvent interface
-  interface SpeechRecognitionEvent {
-    resultIndex: number
-    results: {
-      [index: number]: {
-        isFinal: boolean
-        [index: number]: {
-          transcript: string
-        }
-      }
-    }
-  }
-
-  // Add SpeechRecognitionErrorEvent interface
-  interface SpeechRecognitionErrorEvent {
-    error: string
-  }
-
-  // Update ref whenever state changes to avoid stale closures
   useEffect(() => {
-    listeningRef.current = isListening
-  }, [isListening])
+    // Check for browser support
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
 
-  // Setup speech recognition
-  useEffect(() => {
-    // Check if browser supports speech recognition
-    const supported = isSpeechRecognitionSupported()
-    setIsSupported(supported)
-
-    if (!supported) {
-      setError('Speech recognition is not supported in this browser')
+    if (!SpeechRecognition) {
+      logger.warn('Web Speech API is not supported in this browser')
       return
     }
 
-    // Enhance config with therapeutic domain if applicable
-    const enhancedConfig = {
-      ...config,
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
+
+    recognition.onstart = () => {
+      setIsProcessing(true)
+      logger.info('Speech recognition started')
     }
 
-    // Add therapeutic grammar if we have the domain
-    if (domain) {
-      enhancedConfig.grammarList = [createTherapeuticGrammar(domain)]
-    }
-
-    // Create speech recognition instance
-    recognitionRef.current = createSpeechRecognition(enhancedConfig)
-
-    if (!recognitionRef.current) {
-      setError('Failed to initialize speech recognition')
-      return
-    }
-
-    // Configure speech recognition
-    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-      let finalText = ''
-      let interimText = ''
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const { transcript } = event.results[i][0]
-
+    recognition.onresult = (event: any) => {
+      let interimTranscript = ''
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalText += transcript + ' '
+          setTranscript((prev) => prev + event.results[i][0].transcript)
         } else {
-          interimText += transcript
+          interimTranscript += event.results[i][0].transcript
         }
       }
-
-      // Update transcripts
-      setInterimTranscript(interimText)
-
-      if (finalText) {
-        const newFinalTranscript = finalTranscript + finalText
-        setFinalTranscript(newFinalTranscript)
-
-        // Process the final result with therapeutic enhancements
-        const {
-          processedText,
-          detectedKeywords: keywords,
-          confidenceScores,
-        } = processRecognizedSpeech(finalText, domain)
-
-        // Analyze for therapeutic techniques
-        const techniques = analyzeTherapeuticTechniques(finalText)
-
-        // Update state with detected information
-        setDetectedKeywords((prev) => [...prev, ...keywords])
-        setDetectedTechniques((prev) => ({
-          ...prev,
-          ...techniques,
-        }))
-
-        // Call the provided callback if available
-        if (onFinalResult) {
-          onFinalResult({
-            text: processedText,
-            detectedKeywords: keywords,
-            confidenceScores,
-            detectedTechniques: techniques,
-          })
-        }
-      }
-
-      // Update combined transcript
-      setTranscript(finalTranscript + interimText)
-
-      // Call interim result callback if provided
-      if (onInterimResult && interimText) {
-        onInterimResult(interimText)
+      // Log high-frequency interim updates locally without triggering broad re-renders
+      if (interimTranscript) {
+        logger.debug('Interim result:', { interimTranscript })
       }
     }
 
-    recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-      const errorMessage = `Speech recognition error: ${event.error}`
-      setError(errorMessage)
-
-      if (onError) {
-        onError(errorMessage)
-      }
+    recognition.onerror = (event: any) => {
+      logger.error('Speech recognition error', { error: event.error })
+      setIsProcessing(false)
     }
 
-    recognitionRef.current.onend = () => {
-      // Only auto-restart if we're still supposed to be listening
-      if (listeningRef.current && autoRestart) {
-        recognitionRef.current.start()
-      } else {
-        setIsListening(false)
-      }
+    recognition.onend = () => {
+      setIsProcessing(false)
+      logger.info('Speech recognition ended')
     }
 
-    // Auto-start if specified
-    if (autoStart && !isListening) {
-      startListening()
-    }
+    recognitionRef.current = recognition
 
-    // Cleanup on unmount
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.onresult = null
-        recognitionRef.current.onerror = null
-        recognitionRef.current.onend = null
-
-        if (isListening) {
-          recognitionRef.current.stop()
-        }
+        recognitionRef.current.stop()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    domain,
-    config,
-    onInterimResult,
-    onFinalResult,
-    autoRestart,
-    autoStart,
-    onError,
-    startListening,
-    isListening,
-    finalTranscript,
-  ]) // Only re-initialize when domain changes
-
-  // Start listening function
-  const startListening = useCallback(() => {
-    if (!isSupported || !recognitionRef.current) {
-      setError('Speech recognition is not supported')
-      return
-    }
-
-    if (isListening) {
-      return
-    }
-
-    setError(null)
-
-    try {
-      recognitionRef.current.start()
-      setIsListening(true)
-      listeningRef.current = true
-    } catch (err: unknown) {
-      setError(`Failed to start speech recognition: ${err}`)
-      setIsListening(false)
-      listeningRef.current = false
-
-      if (onError) {
-        onError(`Failed to start speech recognition: ${err}`)
-      }
-    }
-  }, [isListening, isSupported, onError])
-
-  // Stop listening function
-  const stopListening = useCallback(() => {
-    if (!isListening || !recognitionRef.current) {
-      return
-    }
-
-    try {
-      recognitionRef.current.stop()
-      setIsListening(false)
-      listeningRef.current = false
-    } catch (err: unknown) {
-      setError(`Failed to stop speech recognition: ${err}`)
-
-      if (onError) {
-        onError(`Failed to stop speech recognition: ${err}`)
-      }
-    }
-  }, [isListening, onError])
-
-  // Reset transcript function
-  const resetTranscript = useCallback(() => {
-    setTranscript('')
-    setInterimTranscript('')
-    setFinalTranscript('')
-    setDetectedKeywords([])
-    setDetectedTechniques({})
   }, [])
 
-  // Toggle listening function
-  const toggleListening = useCallback(() => {
-    if (isListening) {
-      stopListening()
-    } else {
-      startListening()
+  const startListening = useCallback(() => {
+    if (recognitionRef.current && !isListening) {
+      setTranscript('')
+      try {
+        recognitionRef.current.start()
+      } catch (err) {
+        logger.error('Failed to start recognition', { err })
+      }
     }
-  }, [isListening, startListening, stopListening])
+  }, [isListening])
+
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop()
+    }
+  }, [isListening])
 
   return {
     isListening,
-    isSupported,
     transcript,
-    interimTranscript,
-    finalTranscript,
-    detectedKeywords,
     detectedTechniques,
-    error,
     startListening,
     stopListening,
-    resetTranscript,
-    toggleListening,
   }
 }
