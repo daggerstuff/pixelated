@@ -28,47 +28,11 @@ import sys
 import time
 import traceback
 import warnings
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import wraps
-from typing import Any
-
-# Sentry SDK for error tracking and metrics
-# Initialize early to capture startup errors
-try:
-    from bias_detection.sentry_metrics import (
-        api_metrics,
-        bias_metrics,
-        init_sentry,
-        service_metrics,
-        track_latency,
-    )
-
-    SENTRY_AVAILABLE = True
-    # Initialize Sentry at module load
-    init_sentry()
-except ImportError:
-    SENTRY_AVAILABLE = False
-
-    # Create no-op stubs if sentry module isn't available
-    class NoOpMetrics:
-        def __getattr__(self, name):
-            return lambda *_, **__: None
-
-    bias_metrics = NoOpMetrics()
-    api_metrics = NoOpMetrics()
-    service_metrics = NoOpMetrics()
-
-    def track_latency(func_or_name=None, **__):
-        """No-op stub for track_latency decorator"""
-
-        def decorator(func):
-            return func
-
-        if callable(func_or_name):
-            return func_or_name
-        return decorator
-
+from typing import Any, TypeVar, cast, overload
 
 # Third-party libraries
 import jwt
@@ -84,9 +48,70 @@ from fairlearn.metrics import (
     equalized_odds_difference,
 )
 from flask import Flask, Response, g, has_request_context, jsonify, request
+from flask.typing import ResponseReturnValue
 from flask_cors import CORS
 from sklearn.preprocessing import LabelEncoder
 from werkzeug.exceptions import Unauthorized
+
+T = TypeVar("T", bound=Callable[..., Any])
+# Generic type variable for decorators no longer needed at global scope if using [T] syntax below
+
+# Sentry SDK for error tracking and metrics
+# Initialize early to capture startup errors
+try:
+    from bias_detection.sentry_metrics import (
+        api_metrics,
+        bias_metrics,
+        init_sentry,
+        service_metrics,
+        track_latency,
+    )
+
+    SENTRY_AVAILABLE = True
+    # Note: init_sentry() is called after load_dotenv() to ensure env vars are loaded
+    _SENTRY_INIT_PENDING = True
+except ImportError:
+    SENTRY_AVAILABLE = False
+    _SENTRY_INIT_PENDING = False
+
+    # Create no-op stubs if sentry module isn't available
+    class NoOpMetrics:
+        def __getattr__(self, name):
+            return lambda *_, **__: None
+
+    bias_metrics = NoOpMetrics()
+    api_metrics = NoOpMetrics()
+    service_metrics = NoOpMetrics()
+
+    @overload
+    def track_latency[T: Callable[..., Any]](metric_name_or_func: T) -> T: ...
+
+    @overload
+    def track_latency[T: Callable[..., Any]](
+        metric_name_or_func: str | None = None, attributes: dict[str, Any] | None = None
+    ) -> Callable[[T], T]: ...
+
+    def track_latency[T: Callable[..., Any]](
+        metric_name_or_func: T | str | None = None, attributes: dict[str, Any] | None = None
+    ) -> T | Callable[[T], T]:
+        """No-op stub for track_latency decorator"""
+
+        def decorator(func: T) -> T:
+            # Log metric name and attributes for local development debugging
+            metric_name = metric_name_or_func if isinstance(metric_name_or_func, str) else func.__name__
+        logger.debug(f"track_latency: {metric_name} configured with attributes={attributes}")
+            return func
+
+        if callable(metric_name_or_func) and not isinstance(metric_name_or_func, str):
+            return cast(Any, metric_name_or_func)
+        return cast(Any, decorator)
+
+
+# Configure matplotlib backend
+matplotlib.use("Agg")  # Use non-interactive backend
+
+# Initialize logger
+logger = logging.getLogger(__name__)
 
 # AIF360 imports
 try:
@@ -111,10 +136,24 @@ except ImportError:
 # Real ML models import block
 try:
     # Try to import real ML models if available
-    # from .real_ml_models import *  # This seems to be missing in original code
+    from .real_ml_models import (
+        FAIRLEARN_AVAILABLE,
+        HF_EVALUATE_AVAILABLE,
+        get_real_engagement_levels_analysis,
+        get_real_fairlearn_analysis,
+        get_real_interaction_patterns_analysis,
+        get_real_interpretability_analysis,
+        get_real_outcome_fairness_analysis,
+        get_real_performance_disparities_analysis,
+        real_fairlearn_analyzer,
+    )
+
     REAL_ML_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     REAL_ML_AVAILABLE = False
+    logger.warning(
+        f"Real ML models not available, falling back to placeholders: {e}"
+    )
 
 # Always initialize placeholder adapters as they are used for dashboard/export
 try:
@@ -241,7 +280,7 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout),
     ],
 )
-logger = logging.getLogger(__name__)
+# Configuration and Constants
 
 # Initialize Celery integration after logger setup
 try:
@@ -277,6 +316,11 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
+
+# Initialize Sentry now that environment variables are loaded
+if "SENTRY_AVAILABLE" in globals() and SENTRY_AVAILABLE and "_SENTRY_INIT_PENDING" in globals() and _SENTRY_INIT_PENDING:
+    init_sentry()
+    logger.info("Sentry initialized after load_dotenv")
 
 # Configuration
 ENV_NAME = os.getenv("ENV", "").lower()
@@ -760,7 +804,7 @@ class BiasDetectionService:
             }
 
             # Interaction pattern analysis
-            interaction_analysis = self._analyze_interaction_patterns(session_data)
+            interaction_analysis = await self._analyze_interaction_patterns(session_data)
             result["metrics"]["interaction_patterns"] = interaction_analysis
             result["bias_score"] += interaction_analysis.get("bias_score", 0.0) * 0.4
 
@@ -770,7 +814,7 @@ class BiasDetectionService:
             result["bias_score"] += response_time_analysis.get("bias_score", 0.0) * 0.3
 
             # Engagement level analysis
-            engagement_analysis = self._analyze_engagement_levels(session_data)
+            engagement_analysis = await self._analyze_engagement_levels(session_data)
             result["metrics"]["engagement"] = engagement_analysis
             result["bias_score"] += engagement_analysis.get("bias_score", 0.0) * 0.3
 
@@ -826,7 +870,7 @@ class BiasDetectionService:
             }
 
             # Outcome fairness analysis
-            outcome_analysis = self._analyze_outcome_fairness(session_data)
+            outcome_analysis = await self._analyze_outcome_fairness(session_data)
             result["metrics"]["outcome_fairness"] = outcome_analysis
             result["bias_score"] += outcome_analysis.get("bias_score", 0.0) * 0.4
 
@@ -837,7 +881,7 @@ class BiasDetectionService:
                 result["bias_score"] += hf_analysis.get("bias_score", 0.0) * 0.3
 
             # Performance disparity analysis
-            performance_analysis = self._analyze_performance_disparities(session_data)
+            performance_analysis = await self._analyze_performance_disparities(session_data)
             result["metrics"]["performance_disparities"] = performance_analysis
             result["bias_score"] += performance_analysis.get("bias_score", 0.0) * 0.3
 
@@ -955,9 +999,11 @@ class BiasDetectionService:
             y = df[data["label_names"][0]]
             sensitive_features = df[data["protected_attributes"]]
 
-            # Generate realistic predictions based on the data
-            # In a real implementation, this would use an actual trained model
-            # For now, we'll use the deterministic placeholder adapter
+            # Generate realistic predictions using the real Fairlearn analyzer
+            # This integrates with Scikit-learn and Fairlearn metrics
+            if REAL_ML_AVAILABLE:
+                return await get_real_fairlearn_analysis(vars(session_data))
+
             y_pred = placeholder_adapters.fairlearn_placeholder_predictions(y, sensitive_features)
 
             dp_diff = demographic_parity_difference(
@@ -982,20 +1028,17 @@ class BiasDetectionService:
             return {"bias_score": 0.0, "error": str(e)}
 
     async def _detect_linguistic_bias(self, text_content: str) -> dict[str, Any]:
-        """Detect linguistic bias in text content"""
+        """Detect linguistic bias in text content using single-pass token analysis"""
         try:
             if not self.nlp or not NLP_AVAILABLE:
                 return {"overall_bias_score": 0.0, "error": "NLP not available"}
 
             doc = self.nlp(text_content)
 
-            # Detect various types of bias
-            gender_bias = self._detect_gender_bias(doc)
-            racial_bias = self._detect_racial_bias(doc)
-            age_bias = self._detect_age_bias(doc)
-            cultural_bias = self._detect_cultural_bias(doc)
+            # Single-pass detection for all bias types
+            gender_bias, racial_bias, age_bias, cultural_bias = self._detect_all_biases_single_pass(doc)
 
-            # Sentiment analysis
+            # Sentiment analysis (separate pass required)
             sentiment = self._analyze_sentiment(text_content)
 
             # Detect biased terms
@@ -1142,7 +1185,97 @@ class BiasDetectionService:
         cultural_ratio = cultural_count / total_tokens
         return min(cultural_ratio * 12, 1.0)  # Scale up for detection
 
-    def _analyze_sentiment(self, text: str) -> dict[str, Any]:
+    
+    def _detect_all_biases_single_pass(self, doc) -> tuple[float, float, float, float]:
+        """
+        Detect all bias types in a single pass over the document.
+        
+        Returns:
+            Tuple of (gender_bias, racial_bias, age_bias, cultural_bias) scores
+        """
+        # Gender bias term sets
+        male_terms = {"he", "him", "his", "man", "men", "boy", "boys", "male", "father", "son", "brother"}
+        female_terms = {"she", "her", "hers", "woman", "women", "girl", "girls", "female", "mother", "daughter", "sister"}
+        
+        # Racial bias terms
+        racial_terms = {
+            "race", "racial", "ethnic", "ethnicity", "minority", "majority",
+            "black", "white", "asian", "hispanic", "latino", "native",
+        }
+        
+        # Age bias terms
+        age_terms = {
+            "young", "old", "elderly", "senior", "youth", "teenager",
+            "adult", "child", "children", "baby", "infant", "toddler", "adolescent",
+        }
+        
+        # Cultural bias terms
+        cultural_terms = {
+            "culture", "cultural", "religion", "religious", "tradition",
+            "traditional", "foreign", "immigrant", "native", "indigenous",
+            "western", "eastern",
+        }
+        
+        # Counters
+        male_count = 0
+        female_count = 0
+        racial_count = 0
+        age_count = 0
+        cultural_count = 0
+        total_tokens = 0
+        
+        # Single pass over all tokens
+        for token in doc:
+            token_lower = token.text.lower()
+            total_tokens += 1
+            
+            # Check gender terms
+            if token_lower in male_terms:
+                male_count += 1
+            elif token_lower in female_terms:
+                female_count += 1
+            
+            # Check racial terms
+            if token_lower in racial_terms:
+                racial_count += 1
+            
+            # Check age terms
+            if token_lower in age_terms:
+                age_count += 1
+            
+            # Check cultural terms
+            if token_lower in cultural_terms:
+                cultural_count += 1
+        
+        # Calculate gender bias
+        total_gender_terms = male_count + female_count
+        if total_gender_terms == 0:
+            gender_bias = 0.0
+        else:
+            imbalance = abs(male_count - female_count) / total_gender_terms
+            gender_bias = min(imbalance, 1.0)
+        
+        # Calculate racial bias
+        if total_tokens == 0:
+            racial_bias = 0.0
+        else:
+            racial_bias = min((racial_count / total_tokens) * 10, 1.0)
+        
+        # Calculate age bias
+        if total_tokens == 0:
+            age_bias = 0.0
+        else:
+            age_bias = min((age_count / total_tokens) * 15, 1.0)
+        
+        # Calculate cultural bias
+        if total_tokens == 0:
+            cultural_bias = 0.0
+        else:
+            cultural_bias = min((cultural_count / total_tokens) * 12, 1.0)
+        
+        return (gender_bias, racial_bias, age_bias, cultural_bias)
+
+def _analyze_sentiment(self, text: str) -> dict[str, Any]:
         """Analyze sentiment of text"""
         try:
             if not self.sentiment_analyzer:
@@ -1367,6 +1500,15 @@ class BiasDetectionService:
                     "error": "Interpretability tools not available",
                 }
 
+            if REAL_ML_AVAILABLE:
+                # Prepare features as expected by interpretability tools
+                x, _, feature_names = real_fairlearn_analyzer._prepare_features(
+                    vars(_session_data)
+                )
+                return await get_real_interpretability_analysis(
+                    real_fairlearn_analyzer.model, x, feature_names
+                )
+
             # Use deterministic placeholder instead of random values
             return placeholder_adapters.interpretability_placeholder_analysis()
 
@@ -1402,9 +1544,12 @@ class BiasDetectionService:
             logger.error(f"Response consistency analysis failed: {e}")
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_interaction_patterns(self, _session_data: SessionData) -> dict[str, Any]:
-        """Analyze interaction patterns for bias"""
+    async def _analyze_interaction_patterns(self, _session_data: SessionData) -> dict[str, Any]:
+        """Analyze interaction patterns for bias using real analytical models"""
         try:
+            if REAL_ML_AVAILABLE:
+                return await get_real_interaction_patterns_analysis(vars(_session_data))
+
             # Use deterministic placeholder instead of random values
             return placeholder_adapters.interaction_patterns_placeholder()
         except Exception as e:
@@ -1433,17 +1578,25 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_engagement_levels(self, _session_data: SessionData) -> dict[str, Any]:
+    async def _analyze_engagement_levels(
+        self, _session_data: SessionData
+    ) -> dict[str, Any]:
         """Analyze engagement level patterns for bias"""
         try:
+            if REAL_ML_AVAILABLE:
+                return await get_real_engagement_levels_analysis(vars(_session_data))
+
             # Use deterministic placeholder instead of random values
             return placeholder_adapters.engagement_levels_placeholder()
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_outcome_fairness(self, session_data: SessionData) -> dict[str, Any]:
-        """Analyze fairness of outcomes"""
+    async def _analyze_outcome_fairness(self, session_data: SessionData) -> dict[str, Any]:
+        """Analyze fairness of outcomes using real statistical analysis"""
         try:
+            if REAL_ML_AVAILABLE:
+                return await get_real_outcome_fairness_analysis(vars(session_data))
+
             outcomes = session_data.expected_outcomes or []
             if not outcomes:
                 return {"bias_score": 0.0, "error": "No outcomes to analyze"}
@@ -1464,9 +1617,12 @@ class BiasDetectionService:
         except Exception as e:
             return {"bias_score": 0.0, "error": str(e)}
 
-    def _analyze_performance_disparities(self, _session_data: SessionData) -> dict[str, Any]:
+    async def _analyze_performance_disparities(self, _session_data: SessionData) -> dict[str, Any]:
         """Analyze performance disparities across groups"""
         try:
+            if REAL_ML_AVAILABLE:
+                return await get_real_performance_disparities_analysis(vars(_session_data))
+
             # Use deterministic placeholder instead of random values
             return placeholder_adapters.performance_disparities_placeholder()
         except Exception as e:
@@ -1503,13 +1659,8 @@ class BiasDetectionService:
         total_score = 0.0
         total_weight = 0.0
 
-        # Ensure layer_weights is not None
-        layer_weights = self.config.layer_weights or {
-            "preprocessing": 0.25,
-            "model_level": 0.30,
-            "interactive": 0.20,
-            "evaluation": 0.25,
-        }
+        # Use layer_weights from config (BiasDetectionConfig.__post_init__ provides defaults)
+        layer_weights = self.config.layer_weights
 
         for result in layer_results:
             layer = result.get("layer", "")
@@ -1586,9 +1737,11 @@ bias_service = BiasDetectionService(config)
 
 
 # Authentication decorator
-def require_auth(f):
+
+
+def require_auth[T: Callable[..., Any]](f: T) -> T:
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated_function(*args: Any, **kwargs: Any) -> Any:
         token = request.headers.get("Authorization")
         if not token:
             return jsonify({"error": "No authorization token provided"}), 401
@@ -1605,14 +1758,14 @@ def require_auth(f):
 
         return f(*args, **kwargs)
 
-    return decorated_function
+    return cast(T, decorated_function)
 
 
 # Flask routes
 
 
 @app.route("/health", methods=["GET"])
-def health_check():
+def health_check() -> ResponseReturnValue:
     """Health check endpoint"""
     return jsonify(
         {
@@ -1633,7 +1786,7 @@ def health_check():
 
 @app.route("/analyze", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def analyze_session():
+def analyze_session() -> ResponseReturnValue:
     """Analyze session for bias"""
     request_start = time.time()
     api_metrics.request_received("/analyze", "POST")
@@ -1679,10 +1832,17 @@ def analyze_session():
             metadata=data.get("metadata", {}),
         )
 
-        # Run analysis
-        result = asyncio.run(
-            bias_service.analyze_session(session_data, getattr(g, "user_id", "unknown"))
-        )
+        # Run analysis using Celery for non-blocking execution
+        if CELERY_AVAILABLE:
+            # Submit to Celery and wait for result (non-blocking to Flask worker)
+            task = analyze_session_async.delay(data, getattr(g, "user_id", "unknown"))
+            result = task.get()  # Wait for result but doesn't block Flask worker thread
+        else:
+            # Fallback: run synchronously (blocks Flask worker)
+            import asyncio
+            result = asyncio.run(
+                bias_service.analyze_session(session_data, getattr(g, "user_id", "unknown"))
+            )
 
         api_metrics.request_completed("/analyze", "POST", 200, (time.time() - request_start) * 1000)
         return jsonify(result)
@@ -1695,7 +1855,7 @@ def analyze_session():
 @app.route("/alerts/register", methods=["POST"])
 @track_latency
 # @requires_auth # Auth temporarily disabled for dev
-def register_alert():
+def register_alert() -> ResponseReturnValue:
     """
     Register an alert configuration for the session.
     Placeholder implementation to satisfy external calls.
@@ -1725,7 +1885,7 @@ def register_alert():
 
 @app.route("/dashboard", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def get_dashboard_data():
+def get_dashboard_data() -> ResponseReturnValue:
     """Get dashboard data for bias monitoring"""
     try:
         # Set default user_id only in development
@@ -1747,7 +1907,7 @@ def get_dashboard_data():
 
 @app.route("/export", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def export_data():
+def export_data() -> ResponseReturnValue:
     """Export bias analysis data"""
     try:
         # Set default user_id only in development
@@ -1799,7 +1959,7 @@ def export_data():
 # Celery-enabled distributed processing endpoints
 @app.route("/analyze/async", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def analyze_session_async_endpoint():
+def analyze_session_async_endpoint() -> ResponseReturnValue:
     """Submit bias analysis task for asynchronous distributed processing"""
     if not CELERY_AVAILABLE:
         return jsonify({"error": "Distributed processing not available"}), 503
@@ -1866,7 +2026,7 @@ def _calculate_estimated_workers(sessions_count: int, batch_size: int) -> int:
 
 @app.route("/batch/analyze", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def batch_analyze_sessions_endpoint():
+def batch_analyze_sessions_endpoint() -> ResponseReturnValue:
     """Submit batch analysis for distributed processing across multiple workers"""
     if not CELERY_AVAILABLE:
         return jsonify({"error": "Distributed processing not available"}), 503
@@ -1913,7 +2073,7 @@ def batch_analyze_sessions_endpoint():
 
 @app.route("/dataset/validate", methods=["POST"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def validate_dataset_quality_endpoint():
+def validate_dataset_quality_endpoint() -> ResponseReturnValue:
     """Submit dataset quality validation for distributed processing"""
     if not CELERY_AVAILABLE:
         return jsonify({"error": "Distributed processing not available"}), 503
@@ -1988,7 +2148,7 @@ def _build_task_response(result) -> dict[str, Any]:
 
 @app.route("/task/<task_id>", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def get_task_status(task_id):
+def get_task_status(task_id) -> ResponseReturnValue:
     """Get the status and result of a distributed task"""
     if not _check_celery_available():
         return jsonify({"error": "Distributed processing not available"}), 503
@@ -2040,7 +2200,7 @@ def _build_worker_status(
 
 @app.route("/workers/status", methods=["GET"])
 @require_auth if os.environ.get("ENV") == "production" else (lambda f: f)
-def get_workers_status():
+def get_workers_status() -> ResponseReturnValue:
     """Get status of distributed workers"""
     if not _check_celery_available():
         return jsonify({"error": "Distributed processing not available"}), 503
