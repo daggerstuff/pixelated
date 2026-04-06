@@ -4,5 +4,9 @@
   ],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json"
+  ],
+  "*.py": [
+    "ruff check --fix --exit-zero",
+    "ruff format"
   ]
 }
