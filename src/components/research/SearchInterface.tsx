@@ -30,7 +30,11 @@ export default function SearchInterface() {
   // Export State
   const [showExport, setShowExport] = useState(false)
 
-  // ⚡ Bolt: wrap executeSearch and related event handlers in useCallback to prevent unnecessary re-creations and re-renders of child components
+  /**
+   * Memoized search execution logic to maintain stable identity for potential child consumers.
+   * Note: We pass current state as arguments to ensure it can be reused without frequent re-creations
+   * if query/sources change frequently (e.g. typing).
+   */
   const executeSearch = useCallback(
     async (
       currentQuery: string,
@@ -67,23 +71,21 @@ export default function SearchInterface() {
         })
 
         setResults(data.results)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Search error:', err)
-        setError(err.message || 'Failed to fetch results.')
+        setError(err instanceof Error ? err.message : 'Failed to fetch results.')
       } finally {
         setLoading(false)
       }
     },
-    [],
+    [researchAPI], // Explicitly added researchAPI dependency (Review suggestion)
   )
 
-  const handleSearch = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      void executeSearch(query, selectedSources, filters)
-    },
-    [executeSearch, query, selectedSources, filters],
-  )
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    // No need for useCallback here as it's passed to a raw <form> (Review suggestion)
+    void executeSearch(query, selectedSources, filters)
+  }
 
   const handleFilterChange = useCallback(
     (newFilters: SearchFiltersState) => {
