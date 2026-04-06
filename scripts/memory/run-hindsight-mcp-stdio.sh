@@ -67,10 +67,7 @@ if [[ -z "${PYTHON_BIN}" || ! -x "${PYTHON_BIN}" ]]; then
     exit 1
 fi
 
-if [[ "${MEMORY_PROVIDER}" != "local_hindsight" ]]; then
-    echo "MEMORY_PROVIDER must be local_hindsight, got: ${MEMORY_PROVIDER}" >&2
-    exit 1
-fi
+
 
 export PYTHONPATH="${REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
 
