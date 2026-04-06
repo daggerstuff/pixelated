@@ -12,7 +12,31 @@ import { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
 import { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
 import { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
-// NODE_ENV checks are available inline where needed; avoid unused bindings to satisfy linter.
+import * as crypto from 'crypto'
+
+/**
+ * Generates a dynamic fallback secret for non-production environments.
+ * Explicitly whitelists 'development' and 'test' environments.
+ * Returns a hex string derived from random bytes of specified length.
+ * 
+ * @param name Secret name for error reporting
+ * @param byteLength Number of random bytes to generate (entropy)
+ */
+const generateFallbackSecret = (name: string, byteLength: number = 32): string => {
+  const env = process.env.NODE_ENV || 'development';
+  const isSafeEnv = env === 'development' || env === 'test';
+
+  if (!isSafeEnv) {
+    throw new Error(`CRITICAL: Mandatory secret ${name} is not set in production environment (${env}).`);
+  }
+
+  const secret = crypto.randomBytes(byteLength).toString('hex');
+  
+  // Set the environment variable so other services reading process.env directly stay in sync (Review suggestion)
+  process.env[name] = secret;
+  
+  return secret;
+};
 
 const baseConfig = {
   mongodb: {
@@ -31,9 +55,9 @@ const baseConfig = {
     edge_locations: (process.env.EDGE_LOCATIONS || '50').split(',').map(Number),
   },
   security: {
-    jwt_secret: process.env.JWT_SECRET || 'your-jwt-secret-key',
+    jwt_secret: process.env.JWT_SECRET || generateFallbackSecret('JWT_SECRET'),
     encryption_key:
-      process.env.ENCRYPTION_KEY || 'your-encryption-key-32-chars-long',
+      process.env.ENCRYPTION_KEY || generateFallbackSecret('ENCRYPTION_KEY'),
     rate_limiting: {
       window_ms: parseInt(process.env.RATE_LIMIT_WINDOW || '900000'), // 15 minutes
       max_requests: parseInt(process.env.RATE_LIMIT_MAX || '100'),

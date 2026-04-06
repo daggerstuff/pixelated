@@ -39,14 +39,20 @@ class StorageManager {
   private calculateStorageQuota(): number {
     try {
       if ('storage' in navigator && 'estimate' in navigator.storage) {
-        void navigator.storage.estimate().then((estimate) => {
-          // Use 80% of available quota or default, whichever is smaller
-          const availableQuota = estimate.quota || this.options.maxStorageSize
-          this.storageQuota = Math.min(
-            availableQuota * 0.8,
-            this.options.maxStorageSize,
-          )
-        })
+        void navigator.storage
+          .estimate()
+          .then((estimate) => {
+            // Use 80% of available quota or default, whichever is smaller
+            const availableQuota = estimate.quota || this.options.maxStorageSize
+            this.storageQuota = Math.min(
+              availableQuota * 0.8,
+              this.options.maxStorageSize,
+            )
+          })
+          .catch(() => {
+            // Fallback to default quota on rejection
+            this.storageQuota = this.options.maxStorageSize
+          })
       }
     } catch {
       // Fallback to default quota
