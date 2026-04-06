@@ -6,7 +6,7 @@ aif360==0.6.1
     # via bias-detection-service (pyproject.toml)
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.13.3
+aiohttp==3.13.4
     # via
     #   bias-detection-service (pyproject.toml)
     #   datasets
