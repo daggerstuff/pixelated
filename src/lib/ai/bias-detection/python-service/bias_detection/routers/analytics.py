@@ -3,8 +3,9 @@ Analytics API endpoints.
 """
 
 import structlog
-from bias_detection.deps import get_database_service
 from fastapi import APIRouter, Depends, Response
+
+from bias_detection.deps import get_database_service
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 logger = structlog.get_logger(__name__)

@@ -3,8 +3,9 @@ Model information endpoints.
 """
 
 import structlog
-from bias_detection.deps import get_bias_service
 from fastapi import APIRouter, Depends, HTTPException, status
+
+from bias_detection.deps import get_bias_service
 
 router = APIRouter(prefix="/api/models", tags=["models"])
 logger = structlog.get_logger(__name__)

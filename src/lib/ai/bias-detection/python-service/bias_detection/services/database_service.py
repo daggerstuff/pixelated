@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ..config import settings
-from ..models import BiasAnalysisResponse
+from bias_detection.config import settings
+from bias_detection.models import BiasAnalysisResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -79,6 +79,7 @@ class DatabaseService:
             )
 
             # Test connection
+            assert self.pg_pool is not None
             async with self.pg_pool.acquire() as conn:
                 await conn.execute("SELECT 1")
 
@@ -104,6 +105,10 @@ class DatabaseService:
 
     async def _initialize_schema(self) -> None:
         """Initialize database schema"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not initialized")
+            return
+
         try:
             logger.info("Initializing database schema")
 
@@ -132,13 +137,14 @@ class DatabaseService:
                 word_count INTEGER,
                 status VARCHAR(50) NOT NULL,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                completed_at TIMESTAMP WITH TIME ZONE,
-                INDEX idx_request_id (request_id),
-                INDEX idx_content_hash (content_hash),
-                INDEX idx_user_id (user_id),
-                INDEX idx_created_at (created_at),
-                INDEX idx_status (status)
+                completed_at TIMESTAMP WITH TIME ZONE
             );
+
+            CREATE INDEX IF NOT EXISTS idx_request_id ON bias_analyses (request_id);
+            CREATE INDEX IF NOT EXISTS idx_content_hash ON bias_analyses (content_hash);
+            CREATE INDEX IF NOT EXISTS idx_user_id ON bias_analyses (user_id);
+            CREATE INDEX IF NOT EXISTS idx_created_at ON bias_analyses (created_at);
+            CREATE INDEX IF NOT EXISTS idx_status ON bias_analyses (status);
 
             -- Bias scores table (for detailed analysis)
             CREATE TABLE IF NOT EXISTS bias_scores (
@@ -150,11 +156,12 @@ class DatabaseService:
                 confidence_level VARCHAR(20),
                 evidence JSONB,
                 explanation TEXT,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                INDEX idx_analysis_id (analysis_id),
-                INDEX idx_bias_type (bias_type),
-                INDEX idx_score (score)
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
+
+            CREATE INDEX IF NOT EXISTS idx_analysis_id ON bias_scores (analysis_id);
+            CREATE INDEX IF NOT EXISTS idx_bias_type ON bias_scores (bias_type);
+            CREATE INDEX IF NOT EXISTS idx_score ON bias_scores (score);
 
             -- User sessions table
             CREATE TABLE IF NOT EXISTS user_sessions (
@@ -164,11 +171,12 @@ class DatabaseService:
                 ip_address INET,
                 user_agent TEXT,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                INDEX idx_user_id (user_id),
-                INDEX idx_session_id (session_id),
-                INDEX idx_last_activity (last_activity)
+                last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
+
+            CREATE INDEX IF NOT EXISTS idx_user_id_sessions ON user_sessions (user_id);
+            CREATE INDEX IF NOT EXISTS idx_session_id ON user_sessions (session_id);
+            CREATE INDEX IF NOT EXISTS idx_last_activity ON user_sessions (last_activity);
 
             -- API usage tracking
             CREATE TABLE IF NOT EXISTS api_usage (
@@ -181,12 +189,13 @@ class DatabaseService:
                 response_time_ms INTEGER,
                 request_size_bytes INTEGER,
                 response_size_bytes INTEGER,
-                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                INDEX idx_user_id (user_id),
-                INDEX idx_endpoint (endpoint),
-                INDEX idx_created_at (created_at),
-                INDEX idx_status_code (status_code)
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
+
+            CREATE INDEX IF NOT EXISTS idx_user_id_usage ON api_usage (user_id);
+            CREATE INDEX IF NOT EXISTS idx_endpoint ON api_usage (endpoint);
+            CREATE INDEX IF NOT EXISTS idx_created_at_usage ON api_usage (created_at);
+            CREATE INDEX IF NOT EXISTS idx_status_code ON api_usage (status_code);
 
             -- Model performance metrics
             CREATE TABLE IF NOT EXISTS model_metrics (
@@ -197,10 +206,11 @@ class DatabaseService:
                 avg_processing_time_ms FLOAT,
                 accuracy_score FLOAT,
                 error_count BIGINT DEFAULT 0,
-                last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                INDEX idx_model_name (model_name),
-                INDEX idx_last_updated (last_updated)
+                last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
+
+            CREATE INDEX IF NOT EXISTS idx_model_name ON model_metrics (model_name);
+            CREATE INDEX IF NOT EXISTS idx_last_updated ON model_metrics (last_updated);
 
             -- System configuration
             CREATE TABLE IF NOT EXISTS system_config (
@@ -231,13 +241,19 @@ class DatabaseService:
             logger.error(
                 f"Failed to initialize database schema: {e!s}", error=str(e)
             )
+            # Re-raise to ensure initialization failure is known
             raise
+
 
     @retry(
         stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
     )
     async def store_analysis(self, analysis: BiasAnalysisResponse) -> bool:
         """Store bias analysis result"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available for store_analysis")
+            return False
+
         try:
             logger.info(
                 "Storing analysis result",
@@ -270,7 +286,7 @@ class DatabaseService:
                     analysis.request_id,  # User ID placeholder
                     analysis.request_id,  # Session ID placeholder
                     analysis.overall_bias_score,
-                    json.dumps([bt.value for bt in analysis.bias_scores]),
+                    json.dumps([bt.bias_type.value for bt in analysis.bias_scores]),
                     json.dumps(analysis.sentiment_analysis or {}),
                     json.dumps(analysis.keyword_analysis or {}),
                     json.dumps(analysis.contextual_analysis or {}),
@@ -317,8 +333,18 @@ class DatabaseService:
             )
             return False
 
+    async def store_analysis_result(self, session_id: str, _result: dict[str, Any]) -> bool:
+        """Store an orchestrated analysis result (placeholder for high-level storage)."""
+        logger.info("Orchestrated analysis result received", session_id=session_id)
+        # In a real scenario, this might store to a different table or MongoDB
+        return True
+
     async def get_analysis_by_id(self, analysis_id: str) -> dict[str, Any] | None:
         """Get analysis by ID"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return None
+
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
@@ -342,6 +368,10 @@ class DatabaseService:
         self, request_id: str
     ) -> dict[str, Any] | None:
         """Get analysis by request ID"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return None
+
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
@@ -365,6 +395,10 @@ class DatabaseService:
         self, user_id: str, limit: int = 100, offset: int = 0
     ) -> list[dict[str, Any]]:
         """Get analyses for a user"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return []
+
         try:
             async with self.pg_pool.acquire() as conn:
                 rows = await conn.fetch(
@@ -389,13 +423,17 @@ class DatabaseService:
 
     async def get_analytics_summary(self, days: int = 30) -> dict[str, Any]:
         """Get analytics summary for the last N days"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return {}
+
         try:
             async with self.pg_pool.acquire() as conn:
-                # Total analyses
+                # Total analyses - use make_interval for proper parameter binding
                 total_analyses = await conn.fetchval(
                     """
                     SELECT COUNT(*) FROM bias_analyses
-                    WHERE created_at >= NOW() - INTERVAL '%s days'
+                    WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
                     days,
                 )
@@ -404,7 +442,7 @@ class DatabaseService:
                 avg_bias_score = await conn.fetchval(
                     """
                     SELECT AVG(overall_bias_score) FROM bias_analyses
-                    WHERE created_at >= NOW() - INTERVAL '%s days'
+                    WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
                     days,
                 )
@@ -415,7 +453,7 @@ class DatabaseService:
                     SELECT bias_type, COUNT(*) as count
                     FROM bias_scores bs
                     JOIN bias_analyses ba ON bs.analysis_id = ba.id
-                    WHERE ba.created_at >= NOW() - INTERVAL '%s days'
+                    WHERE ba.created_at >= NOW() - make_interval(days => $1::int)
                     GROUP BY bias_type
                     ORDER BY count DESC
                     """,
@@ -430,9 +468,9 @@ class DatabaseService:
                         MIN(processing_time_ms) as min_time,
                         MAX(processing_time_ms) as max_time
                     FROM bias_analyses
-                    WHERE created_at >= NOW() - INTERVAL '%s days'
+                    WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
-                    days,
+                    str(days),
                 )
 
                 return {
@@ -456,17 +494,25 @@ class DatabaseService:
 
     async def track_api_usage(
         self,
-        user_id: str | None,
-        session_id: str | None,
-        endpoint: str,
-        method: str,
-        status_code: int,
-        response_time_ms: int,
-        request_size_bytes: int = 0,
-        response_size_bytes: int = 0,
+        request_details: dict[str, Any],
+        metrics: dict[str, Any],
     ) -> bool:
         """Track API usage"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return False
+
         try:
+            user_id = request_details.get("user_id")
+            session_id = request_details.get("session_id")
+            endpoint = request_details.get("endpoint", "")
+            method = request_details.get("method", "POST")
+
+            status_code = metrics.get("status_code", 200)
+            response_time_ms = metrics.get("response_time_ms", 0)
+            request_size_bytes = metrics.get("request_size_bytes", 0)
+            response_size_bytes = metrics.get("response_size_bytes", 0)
+
             async with self.pg_pool.acquire() as conn:
                 await conn.execute(
                     """
@@ -489,21 +535,29 @@ class DatabaseService:
 
         except Exception as e:
             logger.error(
-                f"Failed to track API usage: {e!s}", endpoint=endpoint, error=str(e)
+                f"Failed to track API usage: {e!s}", endpoint=request_details.get("endpoint"), error=str(e)
             )
             return False
 
     async def update_model_metrics(
         self,
-        model_name: str,
-        model_version: str,
-        prediction_count: int = 1,
-        processing_time_ms: int | None = None,
-        accuracy_score: float | None = None,
-        error_count: int = 0,
+        model_info: dict[str, Any],
+        perf_metrics: dict[str, Any],
     ) -> bool:
         """Update model performance metrics"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return False
+
         try:
+            model_name = model_info.get("model_name", "")
+            model_version = model_info.get("model_version", "1.0.0")
+
+            prediction_count = perf_metrics.get("prediction_count", 1)
+            processing_time_ms = perf_metrics.get("processing_time_ms")
+            accuracy_score = perf_metrics.get("accuracy_score")
+            error_count = perf_metrics.get("error_count", 0)
+
             async with self.pg_pool.acquire() as conn:
                 # Get current metrics
                 current_metrics = await conn.fetchrow(
@@ -534,7 +588,7 @@ class DatabaseService:
                     # Update accuracy if provided
                     new_accuracy = (
                         accuracy_score
-                        if accuracy_score
+                        if accuracy_score is not None
                         else current_metrics["accuracy_score"]
                     )
 
@@ -578,13 +632,17 @@ class DatabaseService:
         except Exception as e:
             logger.error(
                 f"Failed to update model metrics: {e!s}",
-                model_name=model_name,
+                model_name=model_info.get("model_name"),
                 error=str(e),
             )
             return False
 
     async def get_model_metrics(self, model_name: str) -> dict[str, Any] | None:
         """Get model performance metrics"""
+        if not self.pg_pool:
+            logger.error("PostgreSQL pool not available")
+            return None
+
         try:
             async with self.pg_pool.acquire() as conn:
                 row = await conn.fetchrow(
@@ -606,7 +664,7 @@ class DatabaseService:
 
     async def get_health_status(self) -> dict[str, Any]:
         """Get database service health status"""
-        if not self.is_connected:
+        if not self.is_connected or not self.pg_pool:
             return {
                 "status": "unhealthy",
                 "connected": False,

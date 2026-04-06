@@ -72,7 +72,7 @@ class NvidiaAPIService:
             stream: bool = False,
             thinking: bool = True,
             timeout: float | None = None
-    ) -> dict[str, Any] | AsyncGenerator[str, None]:
+    ) -> dict[str, Any] | AsyncGenerator[str]:
         """
         Send chat completion request to Kimi-k2.5 model via NVIDIA API
 
@@ -164,7 +164,7 @@ class NvidiaAPIService:
             )
             raise
 
-    async def _stream_response(self, response: httpx.Response) -> AsyncGenerator[str, None]:
+    async def _stream_response(self, response: httpx.Response) -> AsyncGenerator[str]:
         """
         Process streaming response from NVIDIA API
 
@@ -245,7 +245,7 @@ async def kimi_chat_completion(
         top_p: float = 1.0,
         stream: bool = False,
         thinking: bool = True
-) -> dict[str, Any] | AsyncGenerator[str, None]:
+) -> dict[str, Any] | AsyncGenerator[str]:
     """
     Convenience function for Kimi-k2.5 chat completion
 
