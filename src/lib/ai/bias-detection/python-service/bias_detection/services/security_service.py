@@ -25,36 +25,61 @@ logger = logging.getLogger(__name__)
 class SecurityManager:
     """Handles encryption, authentication, and HIPAA compliance."""
 
-    def __init__(self, jwt_secret_key: str | None = None):
-        self.encryption_key = self._generate_encryption_key()
+    def __init__(
+        self,
+        jwt_secret_key: str | None = None,
+        encryption_password: str | None = None,
+        encryption_salt: str | None = None,
+        pbkdf2_iterations: int = 100000,
+    ):
+        """
+        Initialize SecurityManager with required encryption parameters.
+
+        Args:
+            jwt_secret_key: Secret key for JWT token verification
+            encryption_password: Password for Fernet key derivation (required)
+            encryption_salt: Salt for Fernet key derivation (required)
+            pbkdf2_iterations: PBKDF2 iterations (default: 100000, recommend 600000+)
+        """
+        self.pbkdf2_iterations = pbkdf2_iterations
+        self.encryption_key = self._generate_encryption_key(
+            encryption_password, encryption_salt
+        )
         self.fernet = Fernet(self.encryption_key)
         self.jwt_secret_key = jwt_secret_key
 
-    def _generate_encryption_key(self) -> bytes:
-        """Generate encryption key from environment variables.
-
-        Requires ENCRYPTION_PASSWORD and ENCRYPTION_SALT environment variables.
-        Fails securely if not configured - no hardcoded defaults.
+    def _generate_encryption_key(
+        self, password: str | None, salt: str | None
+    ) -> bytes:
         """
-        password = os.environ.get("ENCRYPTION_PASSWORD")
-        salt = os.environ.get("ENCRYPTION_SALT")
+        Generate encryption key using PBKDF2.
 
+        Args:
+            password: Encryption password (required)
+            salt: Encryption salt (required)
+
+        Returns:
+            Fernet-compatible encryption key
+
+        Raises:
+            RuntimeError: If password or salt is not provided
+        """
         if not password:
             raise RuntimeError(
-                "ENCRYPTION_PASSWORD environment variable is required. "
-                "Generate a secure random password for encryption."
+                "Encryption password is required. Pass as argument or set "
+                "ENCRYPTION_PASSWORD environment variable."
             )
         if not salt:
             raise RuntimeError(
-                "ENCRYPTION_SALT environment variable is required. "
-                "Generate a secure random salt for encryption."
+                "Encryption salt is required. Pass as argument or set "
+                "ENCRYPTION_SALT environment variable."
             )
 
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
             salt=salt.encode(),
-            iterations=100000,
+            iterations=self.pbkdf2_iterations,
         )
         return base64.urlsafe_b64encode(kdf.derive(password.encode()))
 
