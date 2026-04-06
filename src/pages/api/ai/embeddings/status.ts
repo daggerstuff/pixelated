@@ -126,14 +126,6 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       })
     }
 
-    // Check for admin role (optional - depends on your auth setup)
-    // if (session.user.role !== 'admin') {
-    //   return new Response(JSON.stringify({ error: 'Forbidden' }), {
-    //     status: 403,
-    //     headers: { 'Content-Type': 'application/json' },
-    //   })
-    // }
-
     let body: { action?: string } = {}
     try {
       body = await request.json()

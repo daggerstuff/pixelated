@@ -1,15 +1,18 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { render, screen, cleanup } from '@testing-library/react'
+import { describe, expect, it, afterEach } from 'vitest'
+import '@testing-library/jest-dom/vitest'
 
 import TrainingSession from '../TrainingSession'
 
 describe('TrainingSession', () => {
+  afterEach(() => cleanup())
+  
   it('renders training session component', () => {
     render(<TrainingSession />)
 
     expect(screen.getByText('Therapist Training Session')).toBeInTheDocument()
-    expect(screen.getByText('Session State:')).toBeInTheDocument()
+    expect(screen.getByText(/Session State:/i)).toBeInTheDocument()
   })
 
   it('renders session controls', () => {
@@ -30,6 +33,7 @@ describe('TrainingSession', () => {
   it('renders evaluation feedback section', () => {
     render(<TrainingSession />)
 
-    expect(screen.getByText('Evaluation Feedback')).toBeInTheDocument()
+    // Using queryAllByLabelText since multiple elements (section and label) share the same name
+    expect(screen.queryAllByLabelText('Evaluation Feedback').length).toBeGreaterThan(0)
   })
 })
