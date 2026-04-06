@@ -70,7 +70,7 @@ try {
  * @see https://playwright.dev/docs/test-configuration
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: '../tests',
   testIgnore: ['tests/accessibility/**'],
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -183,7 +183,7 @@ export default defineConfig({
   // globalTeardown: './tests/e2e/global-teardown.ts',
 
   /* Test output directories */
-  outputDir: 'test-results/',
+  outputDir: '../test-results/',
 
   /* Expect options */
   expect: {
