@@ -3,9 +3,9 @@ Shared service instances and FastAPI dependency getters.
 Set in create_app() before including routers.
 """
 
-from typing import cast
+from typing import Annotated, cast
 
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 
 from .config import settings
 from .models import BiasAnalysisRequest
@@ -33,19 +33,38 @@ def get_analysis_orchestrator() -> AnalysisOrchestrator:
     return analysis_orchestrator
 
 
-async def require_rate_limit(request: BiasAnalysisRequest) -> None:
+async def get_current_user() -> dict:
     """
-    FastAPI dependency: enforce per-user rate limit for analyze endpoint.
-    Uses atomic increment-then-check so concurrent requests cannot bypass the limit.
-    FastAPI injects the same parsed BiasAnalysisRequest for this dependency and the
-    route handler, so the body is not read twice.
+    Extract current user from request context.
+    Returns user dict if authenticated, None otherwise.
+    For use with Depends() in route handlers.
     """
-    if not request.user_id:
-        return
-    key = f"user:{request.user_id}"
-    count = await cache_service.increment_rate_limit_counter(key)
-    if count > settings.rate_limit_per_minute:
+    # Placeholder - in production this would extract from JWT/session
+    # For now, returns None to indicate no authenticated user
+    return None
+
+
+async def require_authenticated_user(user: dict = Depends(get_current_user)) -> dict:
+    """
+    FastAPI dependency: require authentication.
+    Raises 401 if user is not authenticated.
+    Returns user dict if authenticated.
+    """
+    if not user:
         raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required"
         )
+
+    user_id = user.get("user_id")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid user credentials"
+        )
+
+    return user
+
+
+# Type alias for authenticated user dependency
+AuthenticatedUser = Annotated[dict, Depends(require_authenticated_user)]
