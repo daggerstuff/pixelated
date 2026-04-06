@@ -34,31 +34,42 @@ MEMORY_ENV_KEYS=(
     LOCAL_MEMORY_ACTOR_POLICIES_JSON
 )
 
+export_allowed_env() {
+    local key="$1"
+    local value="$2"
+    for allowed_key in "${MEMORY_ENV_KEYS[@]}"; do
+        if [[ "$key" == "$allowed_key" ]]; then
+            export "$key=$value"
+            break
+        fi
+    done
+}
+
+parse_env_line() {
+    local line="$1"
+    if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
+        return 0
+    fi
+    if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+        local key="${BASH_REMATCH[1]}"
+        local value="${BASH_REMATCH[2]}"
+        
+        # Strip outer quotes if present
+        value="${value#\"}"
+        value="${value%\"}"
+        value="${value#\'}"
+        value="${value%\'}"
+
+        export_allowed_env "$key" "$value"
+    fi
+}
+
 load_environment() {
     local env_path="$1"
     [[ -f "${env_path}" ]] || return 0
 
     while IFS= read -r line || [[ -n "$line" ]]; do
-        if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
-            continue
-        fi
-        if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
-            local key="${BASH_REMATCH[1]}"
-            local value="${BASH_REMATCH[2]}"
-            
-            # Strip outer quotes if present
-            value="${value#\"}"
-            value="${value%\"}"
-            value="${value#\'}"
-            value="${value%\'}"
-
-            for allowed_key in "${MEMORY_ENV_KEYS[@]}"; do
-                if [[ "$key" == "$allowed_key" ]]; then
-                    export "$key=$value"
-                    break
-                fi
-            done
-        fi
+        parse_env_line "$line"
     done < "${env_path}"
 }
 
