@@ -4,9 +4,16 @@ import { cn } from '../../lib/utils'
 
 export type Props = HTMLAttributes<'input'> & {
   error?: boolean
+  errorId?: string
 }
 
-const { type, error, class: className, ...props } = Astro.props
+const { type, error, errorId, class: className, ...props } = Astro.props
+
+// Accessibility logic (Review suggestion: consolidate attributes)
+const ariaAttributes = {
+  'aria-invalid': error ? "true" : undefined,
+  'aria-describedby': error && errorId ? errorId : props['aria-describedby']
+};
 ---
 
 <input
@@ -16,5 +23,6 @@ const { type, error, class: className, ...props } = Astro.props
     error && 'border-destructive focus-visible:ring-destructive',
     className,
   )}
+  {...ariaAttributes}
   {...props}
 />
