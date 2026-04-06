@@ -5,9 +5,14 @@ Bias analysis API endpoints.
 import time
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Response, status
 
-from bias_detection.deps import get_analysis_orchestrator, get_database_service, get_current_user, require_rate_limit
+from bias_detection.deps import (
+    AuthenticatedUser,
+    get_analysis_orchestrator,
+    get_database_service,
+    require_rate_limit,
+)
 from bias_detection.models import BiasAnalysisRequest, BiasAnalysisResponse
 
 router = APIRouter(prefix="/api/bias-analysis", tags=["bias-analysis"])
@@ -16,7 +21,6 @@ router = APIRouter(prefix="/api/bias-analysis", tags=["bias-analysis"])
 _DEP_ORCHESTRATOR = Depends(get_analysis_orchestrator)
 _DEP_DATABASE = Depends(get_database_service)
 _DEP_RATE_LIMIT = Depends(require_rate_limit)
-_DEP_CURRENT_USER = Depends(get_current_user)
 logger = structlog.get_logger(__name__)
 
 
@@ -26,7 +30,6 @@ async def analyze_bias(
     response: Response,
     _rate_limit: None = _DEP_RATE_LIMIT,
     orchestrator=_DEP_ORCHESTRATOR,
-    _current_user: dict = _DEP_CURRENT_USER,
 ):
     """Analyze text for bias. Rate limit enforced by Depends(require_rate_limit); orchestrator runs analysis and records metrics/usage."""
     request_id = response.headers.get("X-Request-ID", str(time.time()))
@@ -34,8 +37,6 @@ async def analyze_bias(
 
     try:
         return await orchestrator.run_analysis(request, request_id)
-    except HTTPException:
-        raise
     except Exception as e:
         await orchestrator.record_analysis_error(
             request,
@@ -51,38 +52,30 @@ async def get_analysis(
     analysis_id: str,
     response: Response,
     db=_DEP_DATABASE,
-    current_user: dict = _DEP_CURRENT_USER,
+    current_user: AuthenticatedUser = Depends(AuthenticatedUser),
 ):
-    """Get analysis by ID with authorization check."""
-    request_id = response.headers.get("X-Request-ID")
-    try:
-        analysis = await db.get_analysis_by_id(analysis_id)
-        if not analysis:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
-            )
+    """Get analysis by ID. Authentication required."""
+    from fastapi import HTTPException
 
-        # Authorization check: user must own the analysis
-        analysis_user_id = analysis.get("user_id")
-        current_user_id = current_user.get("user_id") if current_user else None
+    # current_user is guaranteed by AuthenticatedUser dependency
+    current_user_id = current_user.get("user_id")
 
-        if analysis_user_id and current_user_id and analysis_user_id != current_user_id:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not authorized to access this analysis"
-            )
-
-        return BiasAnalysisResponse(**analysis)
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(
-            "Failed to get analysis",
-            analysis_id=analysis_id,
-            request_id=request_id,
-            error=str(e),
+    analysis = await db.get_analysis_by_id(analysis_id)
+    if not analysis:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Analysis not found"
         )
-        raise
+
+    # Authorization check: user must own the analysis
+    analysis_user_id = analysis.get("user_id")
+    if analysis_user_id and analysis_user_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to access this analysis"
+        )
+
+    return BiasAnalysisResponse(**analysis)
 
 
 @router.get("/user/{user_id}")
@@ -92,34 +85,28 @@ async def get_user_analyses(
     limit: int = 100,
     offset: int = 0,
     db=_DEP_DATABASE,
-    current_user: dict = _DEP_CURRENT_USER,
+    current_user: AuthenticatedUser = Depends(AuthenticatedUser),
 ):
-    """Get analyses for a user with authorization check."""
-    request_id = response.headers.get("X-Request-ID")
-    limit = min(limit, 1000)
-    offset = max(offset, 0)
+    """Get analyses for a user. Authentication required; users can only access their own analyses."""
+    from fastapi import HTTPException
+
+    # current_user is guaranteed by AuthenticatedUser dependency
+    current_user_id = current_user.get("user_id")
 
     # Authorization check: user can only access their own analyses
-    current_user_id = current_user.get("user_id") if current_user else None
-    if current_user_id and current_user_id != user_id:
+    if current_user_id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not authorized to access this user's analyses"
         )
 
-    try:
-        analyses = await db.get_user_analyses(user_id=user_id, limit=limit, offset=offset)
-        return {
-            "analyses": analyses,
-            "total": len(analyses),
-            "limit": limit,
-            "offset": offset,
-        }
-    except Exception as e:
-        logger.error(
-            "Failed to get user analyses",
-            user_id=user_id,
-            request_id=request_id,
-            error=str(e),
-        )
-        raise
+    limit = min(limit, 1000)
+    offset = max(offset, 0)
+
+    analyses = await db.get_user_analyses(user_id=user_id, limit=limit, offset=offset)
+    return {
+        "analyses": analyses,
+        "total": len(analyses),
+        "limit": limit,
+        "offset": offset,
+    }
