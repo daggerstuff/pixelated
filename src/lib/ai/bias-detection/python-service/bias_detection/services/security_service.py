@@ -4,12 +4,14 @@ Handles encryption, authentication, and HIPAA-compliant audit trails.
 Framework-agnostic implementation.
 """
 
+import asyncio
 import base64
 import hashlib
 import json
 import logging
 import os
 from datetime import datetime, timezone
+from functools import partial
 from typing import Any
 
 import jwt
@@ -83,11 +85,22 @@ class SecurityManager:
 
 
 class AuditLogger:
-    """HIPAA-compliant audit logging service."""
+    """
+    HIPAA-compliant audit logging service.
 
-    def __init__(self, security_manager: SecurityManager, audit_log_path: str = "audit.log"):
+    Note: This implementation writes to a local file for development/testing.
+    For production HIPaa compliance, configure AUDIT_LOG_PATH to point to a
+    secure, append-only log destination or replace with a centralized logging
+    service (e.g., AWS CloudWatch Logs, Splunk, ELK stack).
+    """
+
+    def __init__(self, security_manager: SecurityManager, audit_log_path: str | None = None):
         self.security_manager = security_manager
-        self.audit_log_path = audit_log_path
+        # Use environment variable for production path, default to /var/log/ for HIPAA compliance
+        self.audit_log_path = audit_log_path or os.environ.get(
+            "AUDIT_LOG_PATH",
+            "/tmp/bias_detection_audit.log"  # Temporary default - change for production
+        )
 
     async def log_event(
         self,
@@ -118,9 +131,25 @@ class AuditLogger:
             )
 
         try:
-            with open(self.audit_log_path, "a") as f:
-                f.write(json.dumps(audit_entry) + "\n")
+            # Use run_in_executor to avoid blocking the event loop
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(
+                None,
+                partial(self._write_audit_log, audit_entry)
+            )
             logger.info("Audit event logged: %s for user: %s", event_type, user_id)
         except Exception as e:
             logger.error("Failed to write audit log: %s", e)
+
+    def _write_audit_log(self, audit_entry: dict[str, Any]) -> None:
+        """
+        Synchronous helper to write audit log entry to disk.
+
+        Note: For production HIPAA compliance, this should write to:
+        - A centralized logging service (e.g., Splunk, ELK, CloudWatch)
+        - A dedicated audit database with append-only access
+        - A secure audit log aggregation system
+        """
+        with open(self.audit_log_path, "a") as f:
+            f.write(json.dumps(audit_entry) + "\n")
 

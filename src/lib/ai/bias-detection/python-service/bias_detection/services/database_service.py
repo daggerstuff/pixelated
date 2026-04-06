@@ -470,7 +470,7 @@ class DatabaseService:
                     FROM bias_analyses
                     WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
-                    str(days),
+                    days,
                 )
 
                 return {
