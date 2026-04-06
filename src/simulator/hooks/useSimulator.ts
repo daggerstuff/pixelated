@@ -9,6 +9,19 @@ import {
 } from '../utils/privacy'
 import { useAnonymizedMetrics } from './useAnonymizedMetrics'
 
+// Probability weights for feedback generation
+const FEEDBACK_WEIGHTS = {
+  RECOMMENDED: {
+    POSITIVE: 0.7,
+    DEVELOPMENTAL: 0.85, // Cumulative: 70% POSITIVE, 15% DEVELOPMENTAL, 15% TECHNIQUE_SUGGESTION
+  },
+  DEFAULT: {
+    POSITIVE: 0.3,
+    DEVELOPMENTAL: 0.6,
+    TECHNIQUE: 0.8, // Cumulative: 30% POSITIVE, 30% DEVELOPMENTAL, 20% TECHNIQUE_SUGGESTION, 20% ALTERNATIVE_APPROACH
+  },
+} as const
+
 /**
  * Custom hook for simulator functionality including real-time processing
  * and HIPAA-compliant feedback
@@ -39,7 +52,7 @@ export function useSimulator() {
   const startSimulation = useCallback(
     async (scenarioId: string) => {
       try {
-        const scenario =  getScenarioById(scenarioId)
+        const scenario = getScenarioById(scenarioId)
         if (!scenario) {
           throw new Error(`Scenario with ID ${scenarioId} not found`)
         }
@@ -210,31 +223,29 @@ function generateFeedbackType(
     recommendedTechniques.includes(t),
   )
 
-  // Randomly select feedback type with weighted probability.
-  // We use magic numbers here to simulate the non-deterministic,
-  // subjective nature of human responses in therapeutic settings.
-  // Even if a recommended technique is used perfectly, a client might not
-  // always respond positively. This avoids creating a binary training environment.
+  // Randomly select feedback type with weighted probability
   const rand = Math.random()
 
   if (usedRecommendedTechnique) {
-    // 70% chance of POSITIVE, 15% DEVELOPMENTAL, 15% TECHNIQUE_SUGGESTION
-    if (rand < 0.7) {
+    // Distribution: 70% POSITIVE, 15% DEVELOPMENTAL, 15% TECHNIQUE_SUGGESTION
+    if (rand < FEEDBACK_WEIGHTS.RECOMMENDED.POSITIVE) {
       return FeedbackType.POSITIVE
-    } else if (rand < 0.85) {
+    } else if (rand < FEEDBACK_WEIGHTS.RECOMMENDED.DEVELOPMENTAL) {
       return FeedbackType.DEVELOPMENTAL
     } else {
       return FeedbackType.TECHNIQUE_SUGGESTION
     }
-  } else if (rand < 0.3) {
-    // 30% chance of POSITIVE, 30% DEVELOPMENTAL, 20% TECHNIQUE_SUGGESTION, 20% ALTERNATIVE_APPROACH
-    return FeedbackType.POSITIVE
-  } else if (rand < 0.6) {
-    return FeedbackType.DEVELOPMENTAL
-  } else if (rand < 0.8) {
-    return FeedbackType.TECHNIQUE_SUGGESTION
   } else {
-    return FeedbackType.ALTERNATIVE_APPROACH
+    // Distribution: 30% POSITIVE, 30% DEVELOPMENTAL, 20% TECHNIQUE_SUGGESTION, 20% ALTERNATIVE_APPROACH
+    if (rand < FEEDBACK_WEIGHTS.DEFAULT.POSITIVE) {
+      return FeedbackType.POSITIVE
+    } else if (rand < FEEDBACK_WEIGHTS.DEFAULT.DEVELOPMENTAL) {
+      return FeedbackType.DEVELOPMENTAL
+    } else if (rand < FEEDBACK_WEIGHTS.DEFAULT.TECHNIQUE) {
+      return FeedbackType.TECHNIQUE_SUGGESTION
+    } else {
+      return FeedbackType.ALTERNATIVE_APPROACH
+    }
   }
 }
 
@@ -352,11 +363,3 @@ function generateAlternativeResponses(
       ]
   }
 }
-
-// Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });
