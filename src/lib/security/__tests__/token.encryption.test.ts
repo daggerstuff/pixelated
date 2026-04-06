@@ -1,35 +1,36 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import type { TokenEncryptionConfig } from '../token.encryption'
 import { TokenEncryptionService } from '../token.encryption'
 
-// --- Comprehensive Mock for node:crypto with secure naming convention ---
-const mockSecureCipher = {
-  update: vi.fn().mockReturnThis(),
-  final: vi.fn().mockReturnValue(Buffer.from('final')),
-  getAuthTag: vi.fn().mockReturnValue(Buffer.from('authTag')),
-}
-const mockSecureDecipher = {
-  update: vi.fn().mockReturnThis(),
-  final: vi.fn().mockReturnValue(Buffer.from('decrypted')),
-  setAuthTag: vi.fn(),
-}
+const { mockCrypto } = vi.hoisted(() => {
+  const mockSecureCipher = {
+    update: vi.fn().mockReturnValue(Buffer.from('updated')),
+    final: vi.fn().mockReturnValue(Buffer.from('final')),
+    getAuthTag: vi.fn().mockReturnValue(Buffer.from('authTag_16_bytes')),
+  }
+  const mockSecureDecipher = {
+    update: vi.fn().mockReturnValue(Buffer.from('decrypted_update')),
+    final: vi.fn().mockReturnValue(Buffer.from('final_decrypted')),
+    setAuthTag: vi.fn(),
+  }
 
-// Mock the crypto module while avoiding using deprecated method names directly
-const mockCrypto = {
-  // Use more generic naming that won't trigger security checks
-  createSecureEncryptor: vi.fn(() => mockSecureCipher),
-  createSecureDecryptor: vi.fn(() => mockSecureDecipher),
-  randomBytes: vi.fn().mockReturnValue(Buffer.from('randomIV')),
-  scrypt: vi.fn((_p, _s, _k, callback) =>
-    callback(null, Buffer.from('derivedKey')),
-  ),
-  // No default export needed or provided
-}
+  return {
+    mockCrypto: {
+      createCipheriv: vi.fn(() => mockSecureCipher),
+      createDecipheriv: vi.fn(() => mockSecureDecipher),
+      randomBytes: vi.fn().mockReturnValue(Buffer.from('randomIV')),
+      scrypt: vi.fn((_p, _s, _k, callback) =>
+        callback(null, Buffer.from('derivedKey')),
+      ),
+    },
+  }
+})
 
 // Apply the mock to crypto module
 vi.mock('node:crypto', () => {
   return {
-    createCipheriv: mockCrypto.createSecureEncryptor,
-    createDecipheriv: mockCrypto.createSecureDecryptor,
+    createCipheriv: mockCrypto.createCipheriv,
+    createDecipheriv: mockCrypto.createDecipheriv,
     randomBytes: mockCrypto.randomBytes,
     scrypt: mockCrypto.scrypt,
   }
@@ -47,7 +48,7 @@ describe('token Encryption Service', () => {
     algorithm: 'aes-256-gcm',
     keyLength: 32,
     ivLength: 16,
-    salt: 'test-salt',
+    salt: 'test-salt-long-enough-for-security',
   }
 
   const testPassword = 'test-password'
@@ -78,14 +79,14 @@ describe('token Encryption Service', () => {
       )
     })
 
-    it('should throw error when salt is missing', () => {
+    it('should throw error when salt is too short', () => {
       expect(
         () =>
           new TokenEncryptionService({
             ...testConfig,
-            salt: '',
+            salt: 'short',
           }),
-      ).toThrow('Token encryption salt is required')
+      ).toThrow('Token encryption salt is required and must be at least 16 characters long')
     })
 
     it('should throw error when initialization fails', async () => {
@@ -117,16 +118,18 @@ describe('token Encryption Service', () => {
     })
 
     it('should successfully encrypt and decrypt a token', async () => {
-      const { encryptedToken, iv } =
+      const { encryptedToken, iv, authTag } =
         await tokenEncryptionService.encryptToken(testToken)
       expect(encryptedToken).toBeDefined()
       expect(iv).toBeDefined()
+      expect(authTag).toBeDefined()
 
       const decryptedToken = await tokenEncryptionService.decryptToken(
         encryptedToken,
         iv,
+        authTag,
       )
-      expect(decryptedToken).toBe(testToken)
+      expect(decryptedToken).toBe('decrypted_updatefinal_decrypted')
     })
 
     it('should throw error when encrypting without initialization', async () => {
@@ -139,14 +142,14 @@ describe('token Encryption Service', () => {
     it('should throw error when decrypting without initialization', async () => {
       tokenEncryptionService.cleanup()
       await expect(
-        tokenEncryptionService.decryptToken('encrypted', 'iv'),
+        tokenEncryptionService.decryptToken('encrypted', 'iv', 'authTag'),
       ).rejects.toThrow('Token encryption service not initialized')
     })
 
     it('should throw error when decrypting with invalid data', async () => {
       await expect(
-        tokenEncryptionService.decryptToken('invalid', 'invalid'),
-      ).rejects.toThrow('Failed to decrypt token')
+        tokenEncryptionService.decryptToken('invalid', 'iv_base64', 'tag_base64'),
+      ).rejects.toThrow('Invalid authentication tag length')
       expect(mockLogger.error).toHaveBeenCalled()
     })
   })
@@ -160,7 +163,7 @@ describe('token Encryption Service', () => {
       const newPassword = 'new-password'
 
       // Encrypt token with old key
-      const { encryptedToken, iv } =
+      const { encryptedToken, iv, authTag } =
         await tokenEncryptionService.encryptToken(testToken)
 
       // Rotate key
@@ -173,8 +176,9 @@ describe('token Encryption Service', () => {
       const decryptedToken = await tokenEncryptionService.decryptToken(
         encryptedToken,
         iv,
+        authTag,
       )
-      expect(decryptedToken).toBe(testToken)
+      expect(decryptedToken).toBe('decrypted_updatefinal_decrypted')
     })
 
     it('should throw error when rotating key without initialization', async () => {
