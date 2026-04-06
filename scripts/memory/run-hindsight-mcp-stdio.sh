@@ -22,14 +22,44 @@ resolve_roots() {
     fi
 }
 
+MEMORY_ENV_KEYS=(
+    MEMORY_PROVIDER
+    HINDSIGHT_LOCAL_DB_PATH
+    HINDSIGHT_BANK_ID
+    HINDSIGHT_COMPAT_ENABLE_BEARER
+    HINDSIGHT_COMPAT_BEARER_ACTOR_ID
+    HINDSIGHT_COMPAT_DEFAULT_USER_ID
+    HINDSIGHT_MCP_STDIO_TRUST
+    LOCAL_MEMORY_ACTOR_TOKENS_JSON
+    LOCAL_MEMORY_ACTOR_POLICIES_JSON
+)
+
 load_environment() {
     local env_path="$1"
     [[ -f "${env_path}" ]] || return 0
 
-    set -a
-    # shellcheck disable=SC1090
-    source "${env_path}"
-    set +a
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]]; then
+            continue
+        fi
+        if [[ "$line" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+            local key="${BASH_REMATCH[1]}"
+            local value="${BASH_REMATCH[2]}"
+            
+            # Strip outer quotes if present
+            value="${value#\"}"
+            value="${value%\"}"
+            value="${value#\'}"
+            value="${value%\'}"
+
+            for allowed_key in "${MEMORY_ENV_KEYS[@]}"; do
+                if [[ "$key" == "$allowed_key" ]]; then
+                    export "$key=$value"
+                    break
+                fi
+            done
+        fi
+    done < "${env_path}"
 }
 
 check_env() {
