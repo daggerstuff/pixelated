@@ -5,21 +5,34 @@ interface Props {
 }
 
 const { style, class: className } = Astro.props
+
+/**
+ * Text configuration for Loader.
+ * Centralizes strings for easier future i18n implementation.
+ */
+const TEXT = {
+  loading: "Loading...",
+}
 ---
 
 <div
   {style}
   class={`flex items-center justify-center gap-3 h-full w-full ${className}`}
+  role="status"
 >
+  <span class="sr-only">{TEXT.loading}</span>
   <div
+    aria-hidden="true"
     class="w-4 h-4 rounded-full bg-[#88888850] animate-[dot-pulse_1.5s_ease-in-out_both_infinite]"
   >
   </div>
   <div
+    aria-hidden="true"
     class="w-4 h-4 rounded-full bg-[#88888850] animate-[dot-pulse_1.5s_ease-in-out_both_infinite_0.16s]"
   >
   </div>
   <div
+    aria-hidden="true"
     class="w-4 h-4 rounded-full bg-[#88888850] animate-[dot-pulse_1.5s_ease-in-out_both_infinite_0.32s]"
   >
   </div>
