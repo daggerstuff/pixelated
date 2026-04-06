@@ -573,7 +573,7 @@ export function verifySecureToken(token: string): Record<string, unknown> | null
     const payload = JSON.parse(dataString);
 
     if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
-      logger.error("Invalid token payload format");
+      logger.error("Token payload must be a plain object (not array or primitive)");
       return null;
     }
 
