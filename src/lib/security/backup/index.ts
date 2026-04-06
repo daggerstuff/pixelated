@@ -798,7 +798,7 @@ export class BackupSecurityManager {
         }
       } catch (error: unknown) {
         logger.error(
-          `Error searching for backup metadata in ${location}: ${error instanceof Error ? String(error) : String(error)}`,
+          `Error searching for backup metadata in ${location}: ${error instanceof Error ? error.message : String(error)}`,
         )
       }
     }
@@ -809,16 +809,95 @@ export class BackupSecurityManager {
   /**
    * Get data to backup based on backup type
    */
-  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    // Implementation would collect app data based on backup type
-    // For now return dummy data for demonstration
-    // [PIX-44] TODO: No more fucking cop-outs
-    const dummyData = {
-      message: `This is a ${type} backup created at ${new Date().toISOString()}`,
+  private async getLastBackupTime(requireFull = false): Promise<Date | null> {
+    let latestTimestamp = 0;
+
+    const storageEntries = Array.from(this.storageProviders.entries());
+    for (let i = 0; i < storageEntries.length; i++) {
+      const [, provider] = storageEntries[i];
+      if (!provider) continue;
+
+      try {
+        const files = await provider.listFiles("backups/");
+        const metaFiles = files.filter((f) => f.endsWith(".meta.json"));
+        for (const metaFile of metaFiles) {
+          try {
+            const metadataBuffer = await provider.getFile(metaFile);
+            const metadata = JSON.parse(new TextDecoder().decode(metadataBuffer)) as BackupMetadata;
+
+            if (metadata.status === BackupStatus.COMPLETED) {
+              if (requireFull && metadata.type !== BackupType.FULL) continue;
+              if (!requireFull && metadata.type !== BackupType.FULL && metadata.type !== BackupType.DIFFERENTIAL && metadata.type !== BackupType.INCREMENTAL) continue;
+
+              const timestamp = new Date(metadata.timestamp).getTime();
+              if (timestamp > latestTimestamp) {
+                latestTimestamp = timestamp;
+              }
+            }
+          } catch {
+            // Ignore individual file parsing errors
+          }
+        }
+      } catch (error: unknown) {
+        logger.error(`Error searching for latest backup metadata: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
 
-    // Use TextEncoder for cross-environment compatibility
-    return new TextEncoder().encode(JSON.stringify(dummyData))
+    return latestTimestamp > 0 ? new Date(latestTimestamp) : null;
+  }
+
+  private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
+    let appDataJson = '{"timestamp":"' + new Date().toISOString() + '","type":"' + type + '","data":{';
+
+    try {
+      const mongooseModule = "mongoose";
+      const mongoose = (await import(/* @vite-ignore */ mongooseModule)).default || await import(/* @vite-ignore */ mongooseModule);
+      const models = mongoose.modelNames();
+
+      let isFirstModel = true;
+
+      let baselineTime: Date | null = null;
+      if (type === BackupType.DIFFERENTIAL || type === BackupType.INCREMENTAL) {
+        const requireFull = type === BackupType.DIFFERENTIAL;
+        const lastBackupTime = await this.getLastBackupTime(requireFull);
+        baselineTime = lastBackupTime || new Date(Date.now() - 24 * 60 * 60 * 1000);
+      }
+
+      for (const modelName of models) {
+        const Model = mongoose.model(modelName);
+        const query: Record<string, unknown> = {};
+
+        if (baselineTime && Model.schema.paths.updatedAt) {
+          query.updatedAt = { $gte: baselineTime };
+        }
+
+        if (!isFirstModel) {
+          appDataJson += ',';
+        }
+        appDataJson += '"' + modelName + '":[';
+        isFirstModel = false;
+
+        const cursor = Model.find(query).lean().cursor();
+        let isFirstDoc = true;
+
+        for await (const doc of cursor) {
+          if (!isFirstDoc) {
+            appDataJson += ',';
+          }
+          appDataJson += JSON.stringify(doc);
+          isFirstDoc = false;
+        }
+
+        appDataJson += ']';
+      }
+
+      appDataJson += '}}';
+    } catch (error: unknown) {
+      logger.error(`Failed to collect data for backup: ${error instanceof Error ? error.message : String(error)}`);
+      throw error; // Fail loudly to prevent silent data corruption
+    }
+
+    return new TextEncoder().encode(appDataJson);
   }
 
   /**
@@ -1047,7 +1126,7 @@ async function getStorageProvider(
   try {
     // Import the storage provider dynamically
     const { getStorageProvider: importedGetStorageProvider } =
-      await import('./storage-providers-wrapper.ts')
+      await import('./storage-providers-wrapper')
     // Convert to unknown first, then ensure it has the required type property
     const providerConfig = {
       type: provider,
