@@ -3,12 +3,34 @@
  * Centralized configuration for JWT and Better-Auth settings
  */
 
+/**
+ * Resolves the JWT secret from environment variables with strict validation.
+ * Throws an error if the secret is missing, whitespace-only, or matches the legacy fallback.
+ */
+function ensureJwtSecret(): string {
+  const secret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET;
+  const legacyFallback = 'fallback-secret-change-in-production';
+  
+  if (!secret || secret.trim().length === 0) {
+    throw new Error(
+      "JWT_SECRET environment variable is strictly required. " +
+      "Please set it in process.env.JWT_SECRET or import.meta.env.JWT_SECRET."
+    );
+  }
+
+  if (secret === legacyFallback) {
+    throw new Error(
+      "JWT_SECRET matches the insecure legacy fallback value. " +
+      "Please provide a unique, cryptographically secure secret."
+    );
+  }
+
+  return secret;
+}
+
 // JWT Configuration
 export const JWT_CONFIG = {
-  secret:
-    process.env.JWT_SECRET ||
-    import.meta.env.JWT_SECRET ||
-    'fallback-secret-change-in-production',
+  secret: ensureJwtSecret(),
   audience:
     process.env.JWT_AUDIENCE ||
     import.meta.env.JWT_AUDIENCE ||
@@ -214,10 +236,11 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
 
   const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD
 
-  // Validate JWT secret
-  const jwtSecret = process.env.JWT_SECRET || import.meta.env.JWT_SECRET
-  if (!jwtSecret && isProd) {
-    errors.push('JWT_SECRET is required in production')
+  // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
+  try {
+    ensureJwtSecret();
+  } catch (e: any) {
+    errors.push(e.message);
   }
 
   // Validate Auth0 configuration in production
