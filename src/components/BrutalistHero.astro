@@ -50,54 +50,58 @@ const kicker = heroContent.kicker
   <div class="pe-page-shell hero-shell">
     <HeroStage>
       <div class="hero-layout">
-        <div class="hero-copy">
-          <div class="hero-prelude">
-            <div class="hero-kicker-pill">
-              <span class="hero-kicker-dot"></span>
-              <span class="hero-kicker">{kicker}</span>
+        <div class="hero-copy-wrap">
+          <div class="hero-copy">
+            <div class="hero-prelude">
+              <div class="hero-kicker-pill">
+                <span class="hero-kicker-dot"></span>
+                <span class="hero-kicker">{kicker}</span>
+              </div>
             </div>
-          </div>
 
-          <h1 class="hero-title">{title}</h1>
+            <h1 class="hero-title">{title}</h1>
 
-          <p class="hero-subtitle">{subtitle}</p>
+            <p class="hero-subtitle">{subtitle}</p>
 
-          <ul class="hero-proof-grid" aria-label="Core proof" role="list">
-            {
-              proofPoints.map((item, index) => (
-                <li class="hero-proof-card" tabindex="0">
-                  <span class="hero-proof-card__index">
-                    {index === 0 ? 'Who it serves' : 'What changes'}
-                  </span>
-                  <p class="hero-proof-card__copy">{item}</p>
-                </li>
-              ))
-            }
-          </ul>
+            <ul class="hero-proof-grid" aria-label="Core proof" role="list">
+              {
+                proofPoints.map((item, index) => (
+                  <li class="hero-proof-card" tabindex="0">
+                    <span class="hero-proof-card__index">
+                      {index === 0 ? 'Who it serves' : 'What changes'}
+                    </span>
+                    <p class="hero-proof-card__copy">{item}</p>
+                  </li>
+                ))
+              }
+            </ul>
 
-          <div class="hero-actions">
-            <a href={primaryCTA.href} class="btn-premium" role="button">
-              <span class="btn-premium__text">{primaryCTA.text}</span>
-              <div class="btn-premium__fill"></div>
-            </a>
+            <div class="hero-actions">
+              <a href={primaryCTA.href} class="btn-premium" role="button">
+                <span class="btn-premium__text">{primaryCTA.text}</span>
+                <div class="btn-premium__fill"></div>
+              </a>
 
-            <a href={secondaryCTA.href} class="hero-secondary-link">
-              <span class="hero-secondary-link__text">{secondaryCTA.text}</span>
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                class="hero-secondary-link__icon"
-                aria-hidden="true"
-              >
-                <path
-                  d="M5 12H19M19 12L13 6M19 12L13 18"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="square"></path>
-              </svg>
-            </a>
+              <a href={secondaryCTA.href} class="hero-secondary-link">
+                <span class="hero-secondary-link__text"
+                  >{secondaryCTA.text}</span
+                >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  class="hero-secondary-link__icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M5 12H19M19 12L13 6M19 12L13 18"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="square"></path>
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -118,12 +122,17 @@ const kicker = heroContent.kicker
     align-items: flex-start;
     overflow: hidden;
     min-height: 100dvh;
-    padding: clamp(6.5rem, 10vh, 9rem) 0 clamp(5rem, 8vh, 6.75rem);
+    padding: clamp(6.2rem, 9vh, 8.6rem) 0 clamp(4.75rem, 7vh, 6.25rem);
     background:
       radial-gradient(
-        circle at 20% 0%,
-        rgba(143, 184, 162, 0.08),
-        transparent 40%
+        circle at 50% 0%,
+        rgba(143, 184, 162, 0.1),
+        transparent 42%
+      ),
+      radial-gradient(
+        circle at 50% 18%,
+        rgba(255, 255, 255, 0.04),
+        transparent 36%
       ),
       linear-gradient(
         180deg,
@@ -158,34 +167,44 @@ const kicker = heroContent.kicker
   }
 
   .hero-shell {
-    max-width: 84rem;
+    max-width: 88rem;
     position: relative;
     z-index: 1;
   }
 
   .hero-layout {
     display: grid;
-    grid-template-columns: minmax(0, 0.92fr) minmax(24rem, 1.08fr);
-    gap: clamp(2.5rem, 4vw, 4.75rem);
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: clamp(1.9rem, 3vw, 3rem);
+    align-items: start;
+    justify-items: center;
     position: relative;
     z-index: 1;
   }
 
+  .hero-copy-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
   .hero-copy {
-    max-width: 36rem;
+    max-width: 44rem;
     position: relative;
     z-index: 1;
     display: grid;
     align-content: start;
-    gap: 1.45rem;
-    padding: clamp(0.6rem, 1.8vw, 1.4rem) 0 0;
+    justify-items: center;
+    gap: 1.3rem;
+    padding: clamp(0.25rem, 1vw, 0.65rem) 0 0;
+    text-align: center;
   }
 
   .hero-prelude {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: center;
     gap: 0.75rem;
   }
 
@@ -193,16 +212,16 @@ const kicker = heroContent.kicker
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 0.85rem;
-    border-radius: 0.9rem;
-    border: 1px solid rgba(143, 184, 162, 0.16);
+    padding: 0.44rem 0.8rem;
+    border-radius: 0.62rem;
+    border: 1px solid rgba(143, 184, 162, 0.18);
     background:
       linear-gradient(
         180deg,
-        rgba(143, 184, 162, 0.1),
-        rgba(143, 184, 162, 0.03)
+        rgba(143, 184, 162, 0.12),
+        rgba(143, 184, 162, 0.04)
       ),
-      rgba(255, 255, 255, 0.015);
+      rgba(255, 255, 255, 0.025);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
@@ -223,30 +242,30 @@ const kicker = heroContent.kicker
 
   .hero-kicker {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
     text-transform: none;
     color: var(--accent-primary);
     opacity: 0.8;
   }
 
   .hero-title {
-    max-width: 14ch;
+    max-width: 11ch;
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(3.25rem, 2.85rem + 2.5vw, 5rem);
+    font-size: clamp(2.55rem, 2.15rem + 1.9vw, 4rem);
     font-weight: 700;
-    line-height: 0.94;
-    letter-spacing: -0.06em;
+    line-height: 0.96;
+    letter-spacing: -0.05em;
     color: var(--text-primary);
     text-wrap: balance;
   }
 
   .hero-subtitle {
-    max-width: 31rem;
+    max-width: 37rem;
     margin: 0;
-    font-size: clamp(1rem, 0.95rem + 0.18vw, 1.12rem);
-    line-height: 1.72;
+    font-size: clamp(0.98rem, 0.94rem + 0.16vw, 1.06rem);
+    line-height: 1.76;
     color: var(--text-secondary);
     text-wrap: pretty;
   }
@@ -254,21 +273,27 @@ const kicker = heroContent.kicker
   .hero-proof-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
+    gap: 0.95rem;
     margin: 0;
     padding: 0;
     list-style: none;
-    max-width: 37rem;
+    max-width: 43rem;
   }
 
   .hero-proof-card {
     display: grid;
     gap: 0.45rem;
     min-width: 0;
-    padding: 0.95rem 1rem 1rem;
-    border-radius: 0.95rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.025);
+    padding: 0.96rem 1rem 1.02rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.045),
+        rgba(255, 255, 255, 0.02)
+      ),
+      rgba(255, 255, 255, 0.018);
     transition:
       border-color var(--duration-fast) var(--ease-out),
       background var(--duration-fast) var(--ease-out);
@@ -287,9 +312,9 @@ const kicker = heroContent.kicker
   .hero-proof-card__index,
   .hero-operator-note__label {
     font-family: var(--font-mono);
-    font-size: 0.64rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: none;
   }
 
@@ -301,7 +326,7 @@ const kicker = heroContent.kicker
   .hero-proof-card__copy {
     margin: 0;
     font-size: 0.92rem;
-    line-height: 1.58;
+    line-height: 1.62;
     color: #e8e2d7;
     text-wrap: pretty;
   }
@@ -311,25 +336,26 @@ const kicker = heroContent.kicker
     flex-wrap: wrap;
     gap: 1rem 1.2rem;
     align-items: center;
+    justify-content: center;
     margin-top: 0.35rem;
   }
 
   .btn-premium {
     position: relative;
-    padding: 0.85rem 1.6rem;
-    background: var(--bg-void);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.6rem;
-    color: var(--text-primary);
+    padding: 0.86rem 1.5rem;
+    background: var(--accent-primary);
+    border: 1px solid var(--accent-primary);
+    border-radius: 0.72rem;
+    color: #09100e;
     font-family: var(--font-sans);
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 600;
     text-transform: none;
     letter-spacing: 0.02em;
     overflow: hidden;
     text-decoration: none;
     display: inline-block;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 34px rgba(143, 184, 162, 0.2);
     transition:
       transform var(--duration-fast) var(--ease-out),
       box-shadow var(--duration-fast) var(--ease-out),
@@ -343,8 +369,9 @@ const kicker = heroContent.kicker
 
   .btn-premium:hover {
     transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    border-color: color-mix(in srgb, var(--accent-primary) 88%, white);
+    background: color-mix(in srgb, var(--accent-primary) 88%, white);
+    box-shadow: 0 18px 40px rgba(143, 184, 162, 0.28);
   }
 
   .btn-premium:active {
@@ -368,17 +395,19 @@ const kicker = heroContent.kicker
     color: var(--text-secondary);
     text-decoration: none;
     font-family: var(--font-sans);
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     font-weight: 500;
     text-transform: none;
     letter-spacing: 0;
-    padding-bottom: 0.15rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 0.76rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.72rem;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .hero-secondary-link:hover {
     text-decoration: none;
-    border-bottom-color: rgba(143, 184, 162, 0.4);
+    border-color: rgba(143, 184, 162, 0.28);
     color: var(--text-primary);
   }
 
@@ -412,10 +441,13 @@ const kicker = heroContent.kicker
     z-index: 2;
     display: flex;
     align-items: stretch;
+    justify-content: center;
     min-width: 0;
     isolation: isolate;
     margin-top: 0;
     transform: none;
+    width: 100%;
+    max-width: 64rem;
   }
 
   .hero-fadeout {
@@ -467,7 +499,7 @@ const kicker = heroContent.kicker
     }
 
     .hero-title {
-      font-size: clamp(2.7rem, 8vw, 3.4rem);
+      font-size: clamp(2.2rem, 7.4vw, 2.95rem);
     }
 
     .hero-subtitle {
@@ -496,12 +528,12 @@ const kicker = heroContent.kicker
     }
 
     .btn-premium {
-      padding: 0.9rem 1.35rem;
-      font-size: 0.84rem;
+      padding: 0.82rem 1.2rem;
+      font-size: 0.8rem;
     }
 
     .hero-secondary-link {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
     }
 
     .hero-background {
@@ -516,7 +548,7 @@ const kicker = heroContent.kicker
     }
 
     .hero-title {
-      font-size: clamp(2.35rem, 12vw, 2.95rem);
+      font-size: clamp(2.15rem, 11vw, 2.7rem);
     }
 
     .hero-actions {
