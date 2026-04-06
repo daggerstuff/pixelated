@@ -68,13 +68,47 @@ describe('isValidDate', () => {
     expect(isValidDate('2023-01-01T00:00:00-08:00')).toBe(true)
   })
 })
+
 describe('getStartOf', () => {
   it('returns the start of the day', () => {
-    const date = new Date('2023-05-15T12:30:45Z');
-    const start = getStartOf(date, 'day');
-    expect(start.getHours()).toBe(0);
-    expect(start.getMinutes()).toBe(0);
-    expect(start.getSeconds()).toBe(0);
-    expect(start.getMilliseconds()).toBe(0);
+    // Use a midday UTC date to avoid any potential timezone rollover during test
+    const date = new Date('2023-05-15T12:30:45.123')
+    const start = getStartOf(date, 'day')
+    
+    // We expect the same date but with time at 00:00:00.000
+    expect(start.getFullYear()).toBe(2023)
+    expect(start.getMonth()).toBe(4) // May is index 4
+    expect(start.getDate()).toBe(15)
+    expect(start.getHours()).toBe(0)
+    expect(start.getMinutes()).toBe(0)
+    expect(start.getSeconds()).toBe(0)
+    expect(start.getMilliseconds()).toBe(0)
+  })
+
+  it('returns the start of the week (Sunday)', () => {
+    // 2023-05-17 is a Wednesday. Sunday would be 2023-05-14
+    const date = new Date('2023-05-17T10:00:00')
+    const start = getStartOf(date, 'week')
+    
+    expect(start.getDate()).toBe(14)
+    expect(start.getDay()).toBe(0) // Sunday
+    expect(start.getHours()).toBe(0)
+  })
+
+  it('returns the start of the month', () => {
+    const date = new Date('2023-05-15T10:00:00')
+    const start = getStartOf(date, 'month')
+    
+    expect(start.getDate()).toBe(1)
+    expect(start.getHours()).toBe(0)
+  })
+
+  it('returns the start of the year', () => {
+    const date = new Date('2023-05-15T10:00:00')
+    const start = getStartOf(date, 'year')
+    
+    expect(start.getMonth()).toBe(0)
+    expect(start.getDate()).toBe(1)
+    expect(start.getHours()).toBe(0)
   })
 })
