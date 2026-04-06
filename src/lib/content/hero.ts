@@ -5,8 +5,8 @@ export const heroContent = {
     'Run the conversation live, keep the transcript and notes attached, and review the exact turn a supervisor wants to coach.',
   kicker: 'A calmer way to run training and review the same case',
   proofPoints: [
-    'Built for supervision teams, clinical educators, and training leads',
-    'One shared case, one saved record, one sharper next attempt',
+    { label: 'Who it serves', text: 'Built for supervision teams, clinical educators, and training leads' },
+    { label: 'What changes', text: 'One shared case, one saved record, one sharper next attempt' },
   ],
   primaryCTA: { text: 'Start a pilot', href: '/signup' },
   secondaryCTA: { text: 'View the product demo', href: '/demo-hub' },
