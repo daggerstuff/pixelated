@@ -86,16 +86,7 @@ export default defineConfig({
     ],
     testTimeout: process.env["CI"] ? 15_000 : 30_000,
     hookTimeout: process.env["CI"] ? 10_000 : 30_000,
-    ...(process.env["CI"]
-      ? {
-          poolOptions: {
-            threads: {
-              minThreads: 1,
-              maxThreads: 2,
-            },
-          },
-        }
-      : {}),
+    ...(process.env["CI"] ? { maxWorkers: 2 } : {}),
     environmentOptions: {
       jsdom: {
         resources: "usable",

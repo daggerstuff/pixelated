@@ -30,7 +30,7 @@ import { ObjectiveSwitcher } from '../prioritization/objective-switcher'
 // Mock AI Service
 const createMockAIService = (): AIService => {
   return {
-    getModelInfo: vi.fn().mockReturnValue({
+    getModelInfo: vi.fn<() => { id: string; name: string; provider: string; capabilities: string[]; contextWindow: number; maxTokens: number }>>().mockReturnValue({
       id: 'test-model',
       name: 'Test Model',
       provider: 'test',
@@ -38,7 +38,7 @@ const createMockAIService = (): AIService => {
       contextWindow: 4096,
       maxTokens: 2048,
     }),
-    createChatCompletion: vi.fn().mockImplementation(async (messages) => {
+    createChatCompletion: vi.fn<(messages: Array<{ role: string; content: string }>) => Promise<AICompletion>>().mockImplementation(async (messages) => {
       // Simple mock responses based on user input
       const userMessage =
         messages.find((m: any) => m.role === 'user')?.content || ''
@@ -134,8 +134,8 @@ const createMockAIService = (): AIService => {
         provider: 'test',
       }
     }),
-    createStreamingChatCompletion: vi.fn(),
-    dispose: vi.fn(),
+    createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
+    dispose: vi.fn<() => void>(),
   } as unknown as AIService
 }
 
@@ -380,7 +380,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
   describe('Observer Pattern Integration', () => {
     it('should notify observers across the pipeline', async () => {
-      const switchObserver = vi.fn()
+      const switchObserver = vi.fn<(event: ContextEvent) => void>()
       objectiveSwitcher.addObserver(switchObserver)
 
       // Simulate context change

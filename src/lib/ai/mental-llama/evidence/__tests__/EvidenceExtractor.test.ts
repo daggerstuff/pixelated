@@ -1,13 +1,14 @@
 import type { IModelProvider } from '../../types/mentalLLaMATypes'
+import type { Mock } from 'vitest'
 import { EvidenceExtractor } from '../EvidenceExtractor'
 
 // Mock logger
 vi.mock('@/lib/utils/logger', () => ({
-  getLogger: () => ({
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
-  }),
+  getLogger: vi.fn<() => { info: Mock; warn: Mock; error: Mock }>(() => ({
+    info: vi.fn<() => void>(),
+    warn: vi.fn<() => void>(),
+    error: vi.fn<() => void>(),
+  })),
 }))
 
 describe('EvidenceExtractor Semantic Analysis', () => {
@@ -16,7 +17,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
 
   beforeEach(() => {
     mockModelProvider = {
-      invoke: vi.fn(),
+      invoke: vi.fn<() => Promise<{ content: string; usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number } }>>(),
     } as unknown as IModelProvider
 
     extractor = new EvidenceExtractor(

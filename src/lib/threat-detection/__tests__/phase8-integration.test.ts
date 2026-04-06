@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createCompleteThreatDetectionSystem } from "../integrations";
 
-describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
+describe("Phase 8: Advanced AI Threat Detection & Response System", () => {
   let mongod: MongoMemoryServer;
   let redis: Redis;
   let mockOrchestrator: any;
@@ -24,9 +24,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     // Setup mock orchestrator and rate limiter
     mockOrchestrator = new EventEmitter();
     mockRateLimiter = {
-      checkLimit: vi.fn().mockResolvedValue({ allowed: true }),
-      consume: vi.fn().mockResolvedValue({ allowed: true }),
-      reset: vi.fn().mockResolvedValue(true),
+      checkLimit: vi.fn<() => Promise<{ allowed: boolean }>>().mockResolvedValue({ allowed: true }),
+      consume: vi.fn<() => Promise<{ allowed: boolean }>>().mockResolvedValue({ allowed: true }),
+      reset: vi.fn<() => Promise<boolean>>().mockResolvedValue(true),
     };
 
     // Create complete threat detection system
@@ -127,7 +127,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
     it("should trigger alerts when thresholds are exceeded", async () => {
       const { monitoringService } = threatDetectionSystem;
-      const alertSpy = vi.fn();
+      const alertSpy = vi.fn<(alert: { severity: string; metric: string }) => void>();
 
       monitoringService.on("alert", alertSpy);
 
@@ -154,7 +154,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   describe("Threat Hunting Service", () => {
     it("should execute hunting rules automatically", { timeout: 10000 }, async () => {
       const { huntingService } = threatDetectionSystem;
-      const investigationSpy = vi.fn();
+      const investigationSpy = vi.fn<(investigation: { id: string; title: string }) => void>();
 
       huntingService.on("investigation:started", investigationSpy);
 
@@ -210,12 +210,21 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       process.env.ALIENVAULT_API_KEY = "test_valid_api_key";
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          results: [{ ip: "192.168.1.1", reputation: "bad" }],
-        }),
-      });
+      global.fetch = vi
+        .fn<
+          () => Promise<{
+            ok: boolean;
+            json: () => Promise<{
+              results: Array<{ ip: string; reputation: string }>;
+            }>;
+          }>
+        >()
+        .mockResolvedValue({
+          ok: true,
+          json: async () => ({
+            results: [{ ip: "192.168.1.1", reputation: "bad" }],
+          }),
+        });
 
       await intelligenceService.updateFeeds();
 
@@ -229,12 +238,21 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     it("should perform IOC lookups", async () => {
       const { intelligenceService } = threatDetectionSystem;
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          data: [{ indicator: "test.com", type: "domain" }],
-        }),
-      });
+      global.fetch = vi
+        .fn<
+          () => Promise<{
+            ok: boolean;
+            json: () => Promise<{
+              data: Array<{ indicator: string; type: string }>;
+            }>;
+          }>
+        >()
+        .mockResolvedValue({
+          ok: true,
+          json: async () => ({
+            data: [{ indicator: "test.com", type: "domain" }],
+          }),
+        });
 
       const result = await intelligenceService.lookupIOC("test.com", "domain");
       expect(result).toBeDefined();
@@ -315,7 +333,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate service failure
       const originalGetMetrics = monitoringService.getMetrics;
-      monitoringService.getMetrics = vi.fn().mockRejectedValue(new Error("Service failure"));
+      monitoringService.getMetrics = vi
+        .fn<() => Promise<never>>()
+        .mockRejectedValue(new Error("Service failure"));
 
       // Verify hunting service continues despite monitoring failure
       const investigation = await huntingService.startInvestigation({
@@ -374,10 +394,17 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       process.env.ALIENVAULT_API_KEY = "test_valid_api_key";
 
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({ data: [] }),
-      });
+      global.fetch = vi
+        .fn<
+          () => Promise<{
+            ok: boolean;
+            json: () => Promise<{ data: unknown[] }>;
+          }>
+        >()
+        .mockResolvedValue({
+          ok: true,
+          json: async () => ({ data: [] }),
+        });
 
       const start = Date.now();
       await intelligenceService.lookupIOC("test.com", "domain");
@@ -477,7 +504,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Simulate ML model failure
       const originalAnalyze = huntingService.analyzeWithML;
-      huntingService.analyzeWithML = vi.fn().mockRejectedValue(new Error("ML model not available"));
+      huntingService.analyzeWithML = vi
+        .fn<() => Promise<never>>()
+        .mockRejectedValue(new Error("ML model not available"));
 
       // Should fall back to rule-based analysis
       const result = await huntingService.analyzePatterns({
@@ -496,7 +525,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     it("should maintain audit trails for all operations", async () => {
       const { monitoringService, huntingService } = threatDetectionSystem;
 
-      const auditSpy = vi.fn();
+      const auditSpy = vi.fn<(log: { action: string; timestamp: Date }) => void>();
       mockOrchestrator.on("audit:log", auditSpy);
 
       // Perform various operations
