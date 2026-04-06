@@ -8,10 +8,14 @@ Reference: https://docs.sentry.io/platforms/python/metrics/
 Requires sentry-sdk >= 2.44.0
 """
 
+import asyncio
 import logging
 import os
 import time
+from collections.abc import Callable
+from dataclasses import dataclass
 from functools import wraps
+from typing import Any, cast, overload
 
 import sentry_sdk
 from sentry_sdk.types import Hint, Metric
@@ -33,7 +37,16 @@ SENTRY_ENABLE_METRICS = (
 )
 
 
-def before_send_metric(metric: Metric, hint: Hint) -> Metric | None:
+@dataclass
+class SentrySamplingConfig:
+    """Configuration for Sentry sampling rates."""
+
+    sample_rate: float = 1.0
+    traces_sample_rate: float = 0.2
+    profiles_sample_rate: float = 0.05
+
+
+def before_send_metric(metric: Metric, _hint: Hint) -> Metric | None:
     """
     Filter or modify metrics before they are sent to Sentry.
 
@@ -55,12 +68,11 @@ def before_send_metric(metric: Metric, hint: Hint) -> Metric | None:
 
 
 def init_sentry(
+    *,
     dsn: str | None = None,
     environment: str | None = None,
     release: str | None = None,
-    sample_rate: float = 1.0,
-    traces_sample_rate: float = 0.2,
-    profiles_sample_rate: float = 0.05,
+    sampling: SentrySamplingConfig | None = None,
 ) -> None:
     """
     Initialize Sentry SDK with metrics support.
@@ -71,10 +83,11 @@ def init_sentry(
         dsn: Sentry DSN (defaults to environment variable)
         environment: Environment name (production, staging, development)
         release: Release/version string
-        sample_rate: Error sampling rate (0.0 - 1.0)
-        traces_sample_rate: Transaction/trace sampling rate
-        profiles_sample_rate: Profiling sampling rate
+        sampling: SentrySamplingConfig for sampling rates
     """
+    # Use default values if sampling is not provided
+    s_config = sampling or SentrySamplingConfig()
+
     effective_dsn = dsn or SENTRY_DSN
     effective_environment = environment or SENTRY_ENVIRONMENT
     effective_release = release or SENTRY_RELEASE
@@ -88,10 +101,10 @@ def init_sentry(
         environment=effective_environment,
         release=effective_release,
         # Error tracking
-        sample_rate=sample_rate,
+        sample_rate=s_config.sample_rate,
         # Performance monitoring
-        traces_sample_rate=traces_sample_rate,
-        profiles_sample_rate=profiles_sample_rate,
+        traces_sample_rate=s_config.traces_sample_rate,
+        profiles_sample_rate=s_config.profiles_sample_rate,
         # Metrics support (enabled by default in SDK 2.44.0+)
         before_send_metric=before_send_metric,
         # Additional options
@@ -174,7 +187,7 @@ def gauge_metric(
         return
 
     try:
-        kwargs = {"attributes": attributes}
+        kwargs: dict[str, Any] = {"attributes": attributes}
         if unit:
             kwargs["unit"] = unit
         sentry_sdk.metrics.gauge(name, value, **kwargs)
@@ -210,7 +223,7 @@ def distribution_metric(
         return
 
     try:
-        kwargs = {"attributes": attributes}
+        kwargs: dict[str, Any] = {"attributes": attributes}
         if unit:
             kwargs["unit"] = unit
         sentry_sdk.metrics.distribution(name, value, **kwargs)
@@ -226,7 +239,7 @@ class BiasMetrics:
     """Metrics for bias detection analysis."""
 
     @staticmethod
-    def analysis_started(session_id: str, layer: str) -> None:
+    def analysis_started(_session_id: str, layer: str) -> None:
         """Track when a bias analysis starts."""
         count_metric(
             "bias.analysis_started",
@@ -238,7 +251,7 @@ class BiasMetrics:
 
     @staticmethod
     def analysis_completed(
-        session_id: str,
+        _session_id: str,
         layer: str,
         duration_ms: float,
         success: bool = True,
@@ -277,7 +290,7 @@ class BiasMetrics:
     def alert_triggered(
         level: str,
         layer: str,
-        score: float,
+        _score: float,
     ) -> None:
         """Track when a bias alert is triggered."""
         count_metric(
@@ -325,6 +338,13 @@ class APIMetrics:
                 "method": method,
             },
         )
+
+    @staticmethod
+    def request_started(endpoint: str, method: str) -> None:
+        """
+        Alias for request_received to support both event-based and lifecycle naming.
+        """
+        APIMetrics.request_received(endpoint, method)
 
     @staticmethod
     def request_completed(
@@ -426,12 +446,26 @@ class ServiceMetrics:
 # ============================================
 
 
-def track_latency(
-    metric_name: str,
-    attributes: dict | None = None,
-):
+@overload
+def track_latency[T: Callable[..., Any]](metric_name_or_func: T) -> T: ...
+
+
+@overload
+def track_latency[T: Callable[..., Any]](
+    metric_name_or_func: str | None = None, attributes: dict[str, Any] | None = None
+) -> Callable[[T], T]: ...
+
+
+def track_latency[T: Callable[..., Any]](
+    metric_name_or_func: T | str | None = None,
+    attributes: dict[str, Any] | None = None,
+) -> T | Callable[[T], T]:
     """
     Decorator to track function execution latency.
+
+    Supports usage as a factory or as a direct decorator:
+    1. @track_latency("metric.name", attributes={"a": "b"})
+    2. @track_latency
 
     Example:
         @track_latency("bias.preprocessing_analysis")
@@ -439,7 +473,15 @@ def track_latency(
             ...
     """
 
-    def decorator(func):
+    def _get_metric_name(func, metric_name=None):
+        return metric_name or f"{func.__module__}.{func.__name__}"
+
+    def decorator(func: T) -> T:
+        metric_name = _get_metric_name(
+            func,
+            metric_name_or_func if isinstance(metric_name_or_func, str) else None,
+        )
+
         @wraps(func)
         async def async_wrapper(*args, **kwargs):
             start_time = time.perf_counter()
@@ -486,13 +528,18 @@ def track_latency(
                 )
                 raise
 
-        import asyncio
-
         if asyncio.iscoroutinefunction(func):
-            return async_wrapper
-        return sync_wrapper
+            return cast(Any, async_wrapper)
+        return cast(Any, sync_wrapper)
 
-    return decorator
+    # Support usage as @track_latency or @track_latency("name")
+    if callable(metric_name_or_func) and not isinstance(metric_name_or_func, str):
+        # We were passed the function directly (e.g. @track_latency)
+        # Type narrowing is challenging here, use cast safely
+        return decorator(cast(Any, metric_name_or_func))
+
+    # We were called as a factory (e.g. @track_latency("name"))
+    return cast(Any, decorator)
 
 
 # ============================================
@@ -505,19 +552,15 @@ api_metrics = APIMetrics()
 service_metrics = ServiceMetrics()
 
 __all__ = [
-    # Initialization
-    "init_sentry",
-    # Core metric functions
-    "count_metric",
-    "gauge_metric",
-    "distribution_metric",
-    # Domain-specific helpers
-    "BiasMetrics",
     "APIMetrics",
+    "BiasMetrics",
     "ServiceMetrics",
-    "bias_metrics",
     "api_metrics",
+    "bias_metrics",
+    "count_metric",
+    "distribution_metric",
+    "gauge_metric",
+    "init_sentry",
     "service_metrics",
-    # Decorators
     "track_latency",
 ]

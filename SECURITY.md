@@ -107,6 +107,17 @@ bask in eternal glory.
 
 ---
 
+## Known Security Risks & Mitigations
+
+We transparently track certain risks that cannot be addressed by simple upgrades.
+
+- **DiskCache (CVE-2025-69872):**
+  - **Issue:** Uses `pickle` for serialization, which is unsafe for untrusted data.
+  - **Status:** No official patch is available as of February 2026.
+  - **Mitigation:** We ensure the cache directories used by `diskcache` (primarily in training pipelines) are strictly isolated with OS-level permissions. We do not allow any untrusted user input to reach the DiskCache storage paths.
+
+---
+
 ## Final Note
 
 If you’re here to test our security, bring your A-game. We eat vulnerabilities
