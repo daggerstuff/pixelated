@@ -15,9 +15,8 @@ export async function authMiddleware(
   next: NextFunction,
 ): Promise<void> {
   try {
-    // Create a Web API Request-compatible object from Express Request
-    // The authenticateRequest function is designed for Web API Request,
-    // but we can adapt the Express Request to work with it
+    // Adapt the Express Request into a standard Web API Request object to support 
+    // the shared `authenticateRequest` function used by both Express and Astro middleware.
     const webApiRequest = new globalThis.Request(
       `${req.protocol}://${req.get('host')}${req.originalUrl || req.url}`,
       {
