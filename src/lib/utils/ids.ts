@@ -2,7 +2,7 @@
  * Utility functions for generating unique IDs
  *
  * This provides a consistent way to generate unique IDs across the application,
- * with fallbacks for environments where crypto.randomUUID() is not available.
+ * utilizing cryptographically secure random number generation.
  */
 
 /**
@@ -12,10 +12,12 @@
  */
 export function generateId(length: number = 16): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const bytes = new Uint8Array(length)
+  crypto.getRandomValues(bytes)
+  
   let id = ''
-
   for (let i = 0; i < length; i++) {
-    id += chars.charAt(Math.floor(Math.random() * chars.length))
+    id += chars.charAt(bytes[i] % chars.length)
   }
 
   return id
@@ -29,7 +31,15 @@ export function generateId(length: number = 16): string {
  * @returns A UUID v4 string
  */
 export function generateUUID(): string {
-  return crypto.randomUUID()
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  
+  // Fallback for environments where randomUUID is not available (e.g. non-secure contexts)
+  // Simple UUID v4 implementation using getRandomValues
+  return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c: any) =>
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
+  )
 }
 
 /**
@@ -49,7 +59,7 @@ export function generatePrefixedId(prefix: string): string {
  */
 export function generateTimestampId(): string {
   const timestamp = Date.now().toString(36)
-  const randomStr = Math.random().toString(36).substring(2, 15)
+  const randomStr = generateId(8)
   return `${timestamp}-${randomStr}`
 }
 
