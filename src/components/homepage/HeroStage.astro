@@ -8,67 +8,55 @@
   .hero-stage {
     position: relative;
     display: grid;
-    gap: 1.55rem;
-    padding: clamp(1.2rem, 2vw, 1.7rem);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.5rem;
-    background:
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.05),
-        rgba(255, 255, 255, 0.012)
-      ),
-      rgba(9, 15, 16, 0.68);
-    box-shadow: var(--shadow-floating);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    overflow: clip;
+    gap: var(--spacing-6);
+    padding: var(--spacing-6);
+    border: 1px solid var(--border-glass);
+    border-radius: 4px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
   }
 
   .hero-stage::after {
     content: '';
     position: absolute;
-    inset: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 1rem;
+    inset: -1px;
+    border: 1px solid rgba(var(--accent-primary-rgb), 0.1);
+    border-radius: 4px;
     pointer-events: none;
   }
 
   .hero-stage__frame {
     position: absolute;
-    inset: 0 auto 0 0;
-    width: 2px;
+    top: var(--spacing-6);
+    bottom: var(--spacing-6);
+    width: 1px;
     background: linear-gradient(
       180deg,
-      rgba(143, 184, 162, 0.7),
-      rgba(143, 184, 162, 0)
+      var(--accent-primary),
+      transparent
     );
+    opacity: 0.4;
     pointer-events: none;
   }
 
   .hero-stage__frame--left {
-    left: clamp(0.7rem, 1.5vw, 1rem);
+    left: var(--spacing-4);
   }
 
   .hero-stage__frame--right {
-    left: auto;
-    right: clamp(0.7rem, 1.5vw, 1rem);
+    right: var(--spacing-4);
     background: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0)
+      rgba(255, 255, 255, 0.2),
+      transparent
     );
   }
 
-  @media (max-width: 1080px) {
+  @media (max-width: 880px) {
     .hero-stage {
-      gap: 1rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .hero-stage {
-      padding: 0.85rem;
+      padding: var(--spacing-4);
     }
   }
 </style>
